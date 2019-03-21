@@ -1,0 +1,30 @@
+language : python
+cache: pip
+
+sudo: true
+
+addons:
+    chrome: stable
+
+services:
+  - docker
+
+python:
+  - "2.7"
+  - "3.6"
+
+matrix:
+  fast_finish: true
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install node
+
+install:
+  - npm install
+  - pip install -r requirements.txt
+  - pip install -r tests/requirements.txt
+
+script:
+  - npm run build:all
+  - pytest
