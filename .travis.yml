@@ -24,6 +24,9 @@ install:
   - pip install -r requirements.txt
   - pip install -r tests/requirements.txt
   - npm install
+  - wget https://chromedriver.storage.googleapis.com/2.42/chromedriver_linux64.zip
+  - unzip chromedriver_linux64.zip
+  - export PATH=$PATH:$PWD
 
 script:
   - npm run build:all
