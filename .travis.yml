@@ -21,9 +21,9 @@ before_install:
   - sudo apt-get install node
 
 install:
-  - npm install
   - pip install -r requirements.txt
   - pip install -r tests/requirements.txt
+  - npm install
 
 script:
   - npm run build:all
