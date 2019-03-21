@@ -5,6 +5,8 @@ sudo: true
 
 addons:
     chrome: stable
+    packages:
+      - google-chrome-stable
 
 services:
   - docker
@@ -24,9 +26,6 @@ install:
   - pip install -r requirements.txt
   - pip install -r tests/requirements.txt
   - npm install
-  - wget https://chromedriver.storage.googleapis.com/73.0.3683.68/chromedriver_linux64.zip
-  - unzip chromedriver_linux64.zip
-  - export PATH=$PATH:$PWD
 
 script:
   - npm run build:all
