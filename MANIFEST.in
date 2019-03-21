@@ -1,0 +1,5 @@
+include webviz_subsurface_components/webviz_subsurface_components.min.js
+include webviz_subsurface_components/webviz_subsurface_components.dev.js
+include webviz_subsurface_components/metadata.json
+include webviz_subsurface_components/package.json
+include README.md
