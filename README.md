@@ -4,7 +4,7 @@ webviz_subsurface_components is a Dash component library for use in webviz.
 
 Get started with:
 1. Install Dash and its dependencies: https://dash.plot.ly/installation
-2. Run `python usage.py`
+2. Run `python examples/example_hm.py`
 3. Visit http://localhost:8050 in your web browser
 
 ## Contributing
