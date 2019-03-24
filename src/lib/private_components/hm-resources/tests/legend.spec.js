@@ -1,9 +1,9 @@
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import sinon from 'sinon'
-import jsdom from 'jsdom-global'
+// import jsdom from 'jsdom-global'
 import * as d3 from 'd3'
-import Legend from './legend'
+import Legend from '../legend'
 
 chai.use(sinonChai)
 
@@ -11,13 +11,13 @@ const { expect } = chai
 
 
 describe('Legend component', () => {
-    beforeEach(() => {
-        jsdom(
-            `<body>
-            </body>
-        `,
-        )
-    })
+    // beforeEach(() => {
+    //     jsdom(
+    //         `<body>
+    //         </body>
+    //     `,
+    //     )
+    // })
 
     const createValidLegend = () => {
         const svg = d3.select('body').append('svg')

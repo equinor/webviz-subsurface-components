@@ -2,7 +2,7 @@
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import sinon from 'sinon'
-import Component from './component'
+import Component from '../component'
 
 const { expect } = chai
 chai.use(sinonChai)

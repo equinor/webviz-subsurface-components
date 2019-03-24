@@ -30,5 +30,7 @@ install:
   - export PATH=$PATH:$PWD
 
 script:
+  - npm run test
   - npm run build:all
+  - pip install .
   - pytest
