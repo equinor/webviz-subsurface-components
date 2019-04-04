@@ -1,6 +1,6 @@
 # webviz_subsurface_components
 
-`webviz_subsurface_components` is a Dash component library for use in webviz.
+`webviz_subsurface_components` is a Dash component library for use in `webviz`.
 
 You can quickly get started with:
 
