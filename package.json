@@ -1,6 +1,5 @@
 {
   "name": "webviz_subsurface_components",
-  "version": "0.0.1",
   "description": "Custom Dash components for use in Webviz",
   "main": "build/index.js",
   "scripts": {
@@ -15,7 +14,7 @@
     "build:all-activated": "(. venv/bin/activate || venv\\scripts\\activate && npm run build:all)",
     "test": "jest"
   },
-  "author": "R&T Equinor hakal@statoil.com",
+  "author": "R&T Equinor",
   "license": "LGPL",
   "dependencies": {
     "d3": "^5.9.2",
