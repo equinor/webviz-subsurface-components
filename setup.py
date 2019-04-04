@@ -11,9 +11,12 @@ with open(os.path.join('webviz_subsurface_components', 'package.json')) as f:
 
 package_name = package['name'].replace(' ', '_').replace('-', '_')
 
+install_require = [
+  'dash>=0.38.0',
+]
+
 tests_require = [
   'chromedriver-binary',
-  'dash>=0.38.0',
   'ipdb',
   'percy',
   'selenium',
@@ -34,7 +37,10 @@ setup(
     url='https://github.com/equinor/webviz-subsurface-components',
     install_requires=['dash>=0.38.0'],
     tests_require=tests_require,
-    extras_require={'tests': tests_require},
+    extras_require={
+     'tests': tests_require,
+     'dependencies': install_require
+    },
     setup_requires=['setuptools_scm>=3.2.0'],
     use_scm_version=True,
     classifiers=[

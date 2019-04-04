@@ -18,6 +18,8 @@ before_install:
 
 install:
   - npm install
+  - pip install .[tests]
+  - pip install .[dependencies]
   - wget https://chromedriver.storage.googleapis.com/73.0.3683.68/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip
   - export PATH=$PATH:$PWD
@@ -26,7 +28,6 @@ script:
   - npm run test
   - npm run build:all
   - pip install .
-  - pip install .[tests]
   - pytest
 
 deploy:
