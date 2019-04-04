@@ -72,7 +72,7 @@ If you have selected install_dependencies during the prompt, you can skip this p
     ```
     npm run build:all
     ```
-2. Create a Python tarball
+2. Install the Python package:
     ```
     python setup.py install
     ```
