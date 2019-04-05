@@ -55,6 +55,7 @@ If you have selected install_dependencies during the prompt, you can skip this p
         `usage.py` and you can then automate interactions with selenium.
 
     -   Run the tests with `pytest tests`.
+
     -   The Dash team uses these types of integration tests extensively.
         Browse the Dash component code on GitHub for more examples of testing
         (e.g. [dash-core-components](https://github.com/plotly/dash-core-components)).
