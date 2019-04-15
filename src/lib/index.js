@@ -2,9 +2,11 @@
 import HistoryMatch from './components/HistoryMatch'
 import Map from './components/Map';
 import Morris from './components/Morris'
+import View3D from './components/View3D'
 
 export {
     HistoryMatch,
     Morris,
-    Map
+    Map,
+    View3D
 };

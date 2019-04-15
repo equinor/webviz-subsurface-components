@@ -18,7 +18,12 @@
   "license": "LGPL",
   "dependencies": {
     "d3": "^5.9.2",
-    "ramda": "^0.25.0"
+    "dat.gui": "^0.7.6",
+    "ramda": "^0.25.0",
+    "three": "^0.103.0",
+    "three-orbit-controls": "^82.1.0",
+    "three.interaction": "^0.2.2",
+    "webpack-dev-middleware": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
