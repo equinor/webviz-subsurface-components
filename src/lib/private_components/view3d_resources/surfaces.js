@@ -33,7 +33,7 @@ class SurfaceMesh {
     const segments = Math.sqrt(data.length) - 1;
     const geometry = new THREE.PlaneBufferGeometry(size.x, size.y, segments, segments);
     geometry.rotateX(-Math.PI / 2);
-    // geometry.rotateY(Math.PI);
+    geometry.rotateY(Math.PI);
 
     const colors = [];
     const vertices = geometry.attributes.position.array;
