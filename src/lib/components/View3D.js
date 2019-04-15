@@ -25,7 +25,6 @@ class View3D extends Component {
     constructor(props) {
         super(props);
         this.scene3D = null
-        this.floatText = this.floatText.bind(this)
     }
 
     componentDidMount() {
@@ -36,8 +35,7 @@ class View3D extends Component {
             canvasId,
             selectedId,
             this.props.center_x,
-            this.props.center_y,
-            this.floatText
+            this.props.center_y
         );
         this.scene3D.render();
         let dashProps = getDashProps(this.props);
@@ -48,13 +46,12 @@ class View3D extends Component {
             this.scene3D.loadSurfaces(parseData(dashProps.surface));
         }
     }
+
     componentWillUnmount() {
         console.log('unmounting component')
         this.scene3D.unMount()
     }
-    floatText() {
-        console.log('okokok')
-    }
+
     componentWillReceiveProps(nextProps) {
         let nProps = getDashProps(nextProps)
         let oProps = getDashProps(this.props)
