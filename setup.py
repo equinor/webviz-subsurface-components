@@ -12,7 +12,7 @@ with open(os.path.join('webviz_subsurface_components', 'package.json')) as f:
 package_name = package['name'].replace(' ', '_').replace('-', '_')
 
 install_requires = [
-    'dash==0.41.0'  # Same dependency as of webviz-config (to be relaxed)
+    'dash==0.41'  # Same dependency as of webviz-config (to be relaxed)
 ]
 
 tests_require = [
