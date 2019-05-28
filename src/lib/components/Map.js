@@ -53,67 +53,80 @@ const addNegativeFlow = ({layers, indexies}) =>
     );
 
 export function makeFlowLayers(data) {
-    const {i, j, k, x0, y0, x1, y1, x2, y2, x3, y3, value} = data;
-    const FLOWIplus = data['FLOWI+'];
-    const FLOWJplus = data['FLOWJ+'];
-    const keys = Object.keys(data.i);
+    const i_index = data['columns'].indexOf('i')
+    const j_index = data['columns'].indexOf('j')
+    const k_index = data['columns'].indexOf('k')
+    const x0_index = data['columns'].indexOf('x0')
+    const x1_index = data['columns'].indexOf('x1')
+    const x2_index = data['columns'].indexOf('x2')
+    const x3_index = data['columns'].indexOf('x3')
+    const y0_index = data['columns'].indexOf('y0')
+    const y1_index = data['columns'].indexOf('y1')
+    const y2_index = data['columns'].indexOf('y2')
+    const y3_index = data['columns'].indexOf('y3')
+    const value_index = data['columns'].indexOf('value')
+    const FLOWIplus_index = data['columns'].indexOf('FLOWI+')
+    const FLOWJplus_index = data['columns'].indexOf('FLOWJ+')
+
     const layers = [];
 
-    keys.forEach(key => {
-        const kValue = k[key];
+    data['values'].forEach(values => {
+        const kValue = values[k_index];
         if (!layers[kValue]) {
             layers[kValue] = [];
         }
         layers[kValue].push({
-            i: i[key],
-            j: j[key],
-            k: k[key],
+            i: values[i_index],
+            j: values[j_index],
+            k: values[k_index],
             points: [
-                [x0[key], y0[key]],
-                [x1[key], y1[key]],
-                [x2[key], y2[key]],
-                [x3[key], y3[key]],
+                [values[x0_index], values[y0_index]],
+                [values[x1_index], values[y1_index]],
+                [values[x2_index], values[y2_index]],
+                [values[x3_index], values[y3_index]]
             ],
-            value: value[key],
-            'FLOWI+': FLOWIplus[key],
-            'FLOWJ+': FLOWJplus[key],
+            value: values[value_index],
+            'FLOWI+': values[FLOWIplus_index],
+            'FLOWJ+': values[FLOWJplus_index]
         });
     });
+
     const indexies = getIndexies(layers);
     return addNegativeFlow({layers, indexies});
 }
 
-export const make2DLayers = ({
-    i,
-    j,
-    k,
-    x0,
-    y0,
-    x1,
-    y1,
-    x2,
-    y2,
-    x3,
-    y3,
-    value,
-}) => {
+export const make2DLayers = (data) => {
+    const i_index = data['columns'].indexOf('i')
+    const j_index = data['columns'].indexOf('j')
+    const k_index = data['columns'].indexOf('k')
+    const x0_index = data['columns'].indexOf('x0')
+    const x1_index = data['columns'].indexOf('x1')
+    const x2_index = data['columns'].indexOf('x2')
+    const x3_index = data['columns'].indexOf('x3')
+    const y0_index = data['columns'].indexOf('y0')
+    const y1_index = data['columns'].indexOf('y1')
+    const y2_index = data['columns'].indexOf('y2')
+    const y3_index = data['columns'].indexOf('y3')
+    const value_index = data['columns'].indexOf('value')
+
     const layers = [];
-    Object.keys(i).forEach(key => {
-        const kValue = k[key];
+
+    data['values'].forEach(values => {
+        const kValue = values[k_index];
         if (!layers[kValue]) {
             layers[kValue] = [];
         }
         layers[kValue].push({
-            i: i[key],
-            j: j[key],
-            k: k[key],
+            i: values[i_index],
+            j: values[j_index],
+            k: values[k_index],
             points: [
-                [x0[key], y0[key]],
-                [x1[key], y1[key]],
-                [x2[key], y2[key]],
-                [x3[key], y3[key]],
+                [values[x0_index], values[y0_index]],
+                [values[x1_index], values[y1_index]],
+                [values[x2_index], values[y2_index]],
+                [values[x3_index], values[y3_index]]
             ],
-            value: value[key],
+            value: values[value_index],
         });
     });
     return layers;
@@ -150,7 +163,7 @@ const init2DMap = ({elementSelector, data, height, layerNames}) => {
 
 const parseData = data => (typeof data === 'string' ? JSON.parse(data) : data);
 
-const shouldRenderFlowMap = data => Boolean(data['FLOWI+']);
+const shouldRenderFlowMap = data => data['columns'].includes('FLOWI+');
 
 class Map extends Component {
     constructor(props) {
