@@ -16,7 +16,7 @@ install_requires = [
 ]
 
 tests_require = [
-    'chromedriver-binary',
+    'chromedriver-binary>=74.0.3729.6.0',
     'ipdb',
     'percy',
     'selenium',
