@@ -12,11 +12,11 @@ with open(os.path.join('webviz_subsurface_components', 'package.json')) as f:
 package_name = package['name'].replace(' ', '_').replace('-', '_')
 
 install_requires = [
-    'dash>=0.38.0',
+    'dash==0.41'  # Same dependency as of webviz-config (to be relaxed)
 ]
 
 tests_require = [
-    'chromedriver-binary',
+    'chromedriver-binary>=74.0.3729.6.0',
     'ipdb',
     'percy',
     'selenium',
