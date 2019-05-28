@@ -1,4 +1,9 @@
-# webviz_subsurface_components
+[![PyPI version](https://badge.fury.io/py/webviz-subsurface-components.svg)](https://badge.fury.io/py/webviz-subsurface-components)
+[![Build Status](https://travis-ci.org/equinor/webviz-subsurface-components.svg?branch=master)](https://travis-ci.org/equinor/webviz-subsurface-components)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d89b3da9cd14462c9ee6b05f23ec75ee)](https://www.codacy.com/app/anders-kiaer/webviz-subsurface-components?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=equinor/webviz-subsurface-components&amp;utm_campaign=Badge_Grade)
+[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/)
+
+# Webviz subsurface components
 
 `webviz_subsurface_components` is a Dash component library for use in `webviz`.
 
