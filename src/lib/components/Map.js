@@ -53,41 +53,36 @@ const addNegativeFlow = ({layers, indexies}) =>
     );
 
 export function makeFlowLayers(data) {
-    const i_index = data['columns'].indexOf('i')
-    const j_index = data['columns'].indexOf('j')
-    const k_index = data['columns'].indexOf('k')
-    const x0_index = data['columns'].indexOf('x0')
-    const x1_index = data['columns'].indexOf('x1')
-    const x2_index = data['columns'].indexOf('x2')
-    const x3_index = data['columns'].indexOf('x3')
-    const y0_index = data['columns'].indexOf('y0')
-    const y1_index = data['columns'].indexOf('y1')
-    const y2_index = data['columns'].indexOf('y2')
-    const y3_index = data['columns'].indexOf('y3')
-    const value_index = data['columns'].indexOf('value')
-    const FLOWIplus_index = data['columns'].indexOf('FLOWI+')
-    const FLOWJplus_index = data['columns'].indexOf('FLOWJ+')
-
     const layers = [];
 
+    const coord_scale = data['linearscales']['coord'][0]
+    const xmin = data['linearscales']['coord'][1]
+    const ymin = data['linearscales']['coord'][2]
+
+    const val_scale = data['linearscales']['value'][0]
+    const val_min = data['linearscales']['value'][1]
+
+    const flow_scale = data['linearscales']['flow'][0]
+    const flow_min = data['linearscales']['flow'][1]
+
     data['values'].forEach(values => {
-        const kValue = values[k_index];
+        const kValue = values[2];
         if (!layers[kValue]) {
             layers[kValue] = [];
         }
         layers[kValue].push({
-            i: values[i_index],
-            j: values[j_index],
-            k: values[k_index],
+            i: values[0],
+            j: values[1],
+            k: values[2],
             points: [
-                [values[x0_index], values[y0_index]],
-                [values[x1_index], values[y1_index]],
-                [values[x2_index], values[y2_index]],
-                [values[x3_index], values[y3_index]]
+                [values[3]/coord_scale + xmin, values[7]/coord_scale + ymin],
+                [values[4]/coord_scale + xmin, values[8]/coord_scale + ymin],
+                [values[5]/coord_scale + xmin, values[9]/coord_scale + ymin],
+                [values[6]/coord_scale + xmin, values[10]/coord_scale + ymin]
             ],
-            value: values[value_index],
-            'FLOWI+': values[FLOWIplus_index],
-            'FLOWJ+': values[FLOWJplus_index]
+            value: values[11]*val_scale + val_min,
+            'FLOWI+': values[12]/flow_scale + flow_min,
+            'FLOWJ+': values[13]/flow_scale + flow_min
         });
     });
 
@@ -96,37 +91,24 @@ export function makeFlowLayers(data) {
 }
 
 export const make2DLayers = (data) => {
-    const i_index = data['columns'].indexOf('i')
-    const j_index = data['columns'].indexOf('j')
-    const k_index = data['columns'].indexOf('k')
-    const x0_index = data['columns'].indexOf('x0')
-    const x1_index = data['columns'].indexOf('x1')
-    const x2_index = data['columns'].indexOf('x2')
-    const x3_index = data['columns'].indexOf('x3')
-    const y0_index = data['columns'].indexOf('y0')
-    const y1_index = data['columns'].indexOf('y1')
-    const y2_index = data['columns'].indexOf('y2')
-    const y3_index = data['columns'].indexOf('y3')
-    const value_index = data['columns'].indexOf('value')
-
     const layers = [];
 
     data['values'].forEach(values => {
-        const kValue = values[k_index];
+        const kValue = values[2];
         if (!layers[kValue]) {
             layers[kValue] = [];
         }
         layers[kValue].push({
-            i: values[i_index],
-            j: values[j_index],
-            k: values[k_index],
+            i: values[0],
+            j: values[1],
+            k: values[2],
             points: [
-                [values[x0_index], values[y0_index]],
-                [values[x1_index], values[y1_index]],
-                [values[x2_index], values[y2_index]],
-                [values[x3_index], values[y3_index]]
+                [values[3], values[7]],
+                [values[4], values[8]],
+                [values[5], values[9]],
+                [values[6], values[10]]
             ],
-            value: values[value_index],
+            value: values[11],
         });
     });
     return layers;
@@ -163,7 +145,7 @@ const init2DMap = ({elementSelector, data, height, layerNames}) => {
 
 const parseData = data => (typeof data === 'string' ? JSON.parse(data) : data);
 
-const shouldRenderFlowMap = data => data['columns'].includes('FLOWI+');
+const shouldRenderFlowMap = data => 'flow' in data['linearscales'];
 
 class Map extends Component {
     constructor(props) {
