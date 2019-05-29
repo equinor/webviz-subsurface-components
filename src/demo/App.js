@@ -2,13 +2,14 @@
 import React, {Component} from 'react';
 import HistoryMatchDemo  from './HistoryMatchDemo';
 import MorrisDemo  from './MorrisDemo';
+import SubsurfaceMapDemo  from './SubsurfaceMapDemo';
 
 
 class App extends Component {
 
     constructor(props) {
         super(props)
-        this.state = {value:'HistoryMatch'}
+        this.state = {value:'SubsurfaceMap'}
     }
 
     onChange(e) {
@@ -23,6 +24,9 @@ class App extends Component {
             case "Morris": { 
                 return <MorrisDemo/>
             }
+            case "SubsurfaceMap": { 
+                return <SubsurfaceMapDemo/>
+            }
             default: { 
                 return null           
             } 
@@ -35,6 +39,7 @@ class App extends Component {
                 <select value={this.state.value} onChange={this.onChange.bind(this)} >
                     <option value = "HistoryMatch">HistoryMatch</option>
                     <option value = "Morris">Morris</option>
+                    <option value = "SubsurfaceMap">SubsurfaceMap</option>
                     
                 </select>
                 {this.renderDemo()}
