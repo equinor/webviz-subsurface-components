@@ -100,7 +100,7 @@ export const make2DLayers = (data) => {
     const val_scale = data.linearscales.value[0]
     const val_min = data.linearscales.value[1]
 
-    data['values'].forEach(values => {
+    data.values.forEach(values => {
         const kValue = values[2];
         if (!layers[kValue]) {
             layers[kValue] = [];
@@ -152,7 +152,7 @@ const init2DMap = ({elementSelector, data, height, layerNames}) => {
 
 const parseData = data => (typeof data === 'string' ? JSON.parse(data) : data);
 
-const shouldRenderFlowMap = data => 'flow' in data['linearscales'];
+const shouldRenderFlowMap = data => 'flow' in data.linearscales;
 
 class Map extends Component {
     constructor(props) {
