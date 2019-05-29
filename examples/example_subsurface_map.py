@@ -58,9 +58,9 @@ def compress2json(df):
 
 df = pd.read_csv('./reek.csv')
 
-# f = open('../src/demo/data.json', 'w')
-# f.write(compress2json(df))
-# f.close()
+f = open('../src/demo/data.json', 'w')
+f.write(compress2json(df))
+f.close()
 
 app = dash.Dash(__name__)
 

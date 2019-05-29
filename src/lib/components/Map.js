@@ -221,10 +221,9 @@ Map.propTypes = {
      */
     id: PropTypes.string.isRequired,
     /**
-     * The data the Map component should render.
-     * It should be JSON stringified before hand
+     * The data the Map component should render (JSON format).
      */
-    data: PropTypes.string.isRequired,
+    data: PropTypes.object.isRequired,
     /**
      * The height of the Map component
      */

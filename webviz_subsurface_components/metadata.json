@@ -41,10 +41,10 @@
       },
       "data": {
         "type": {
-          "name": "string"
+          "name": "object"
         },
         "required": true,
-        "description": "The data the Map component should render.\nIt should be JSON stringified before hand"
+        "description": "The data the Map component should render (JSON format)."
       },
       "height": {
         "type": {
