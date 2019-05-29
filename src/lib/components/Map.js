@@ -80,7 +80,7 @@ export function makeFlowLayers(data) {
                 [values[5]/coord_scale + xmin, values[9]/coord_scale + ymin],
                 [values[6]/coord_scale + xmin, values[10]/coord_scale + ymin]
             ],
-            value: values[11]*val_scale + val_min,
+            value: values[11]/val_scale + val_min,
             'FLOWI+': values[12]/flow_scale + flow_min,
             'FLOWJ+': values[13]/flow_scale + flow_min
         });
@@ -115,7 +115,7 @@ export const make2DLayers = (data) => {
                 [values[5]/coord_scale + xmin, values[9]/coord_scale + ymin],
                 [values[6]/coord_scale + xmin, values[10]/coord_scale + ymin]
             ],
-            value: values[11]*val_scale + val_min,
+            value: values[11]/val_scale + val_min,
         });
     });
     return layers;
