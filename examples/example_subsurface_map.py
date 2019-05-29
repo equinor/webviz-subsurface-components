@@ -1,5 +1,4 @@
 import json
-import pandas as pd
 import dash
 import dash_html_components as html
 import webviz_subsurface_components
