@@ -55,15 +55,15 @@ const addNegativeFlow = ({layers, indexies}) =>
 export function makeFlowLayers(data) {
     const layers = [];
 
-    const coord_scale = data['linearscales']['coord'][0]
-    const xmin = data['linearscales']['coord'][1]
-    const ymin = data['linearscales']['coord'][2]
+    const coord_scale = data.linearscales.coord[0]
+    const xmin = data.linearscales.coord[1]
+    const ymin = data.linearscales.coord[2]
 
-    const val_scale = data['linearscales']['value'][0]
-    const val_min = data['linearscales']['value'][1]
+    const val_scale = data.linearscales.value[0]
+    const val_min = data.linearscales.value[1]
 
-    const flow_scale = data['linearscales']['flow'][0]
-    const flow_min = data['linearscales']['flow'][1]
+    const flow_scale = data.linearscales.flow[0]
+    const flow_min = data.linearscales.flow[1]
 
     data['values'].forEach(values => {
         const kValue = values[2];
@@ -93,6 +93,13 @@ export function makeFlowLayers(data) {
 export const make2DLayers = (data) => {
     const layers = [];
 
+    const coord_scale = data.linearscales.coord[0]
+    const xmin = data.linearscales.coord[1]
+    const ymin = data.linearscales.coord[2]
+
+    const val_scale = data.linearscales.value[0]
+    const val_min = data.linearscales.value[1]
+
     data['values'].forEach(values => {
         const kValue = values[2];
         if (!layers[kValue]) {
@@ -103,12 +110,12 @@ export const make2DLayers = (data) => {
             j: values[1],
             k: values[2],
             points: [
-                [values[3], values[7]],
-                [values[4], values[8]],
-                [values[5], values[9]],
-                [values[6], values[10]]
+                [values[3]/coord_scale + xmin, values[7]/coord_scale + ymin],
+                [values[4]/coord_scale + xmin, values[8]/coord_scale + ymin],
+                [values[5]/coord_scale + xmin, values[9]/coord_scale + ymin],
+                [values[6]/coord_scale + xmin, values[10]/coord_scale + ymin]
             ],
-            value: values[11],
+            value: values[11]*val_scale + val_min,
         });
     });
     return layers;
