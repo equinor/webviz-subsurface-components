@@ -65,7 +65,7 @@ export function makeFlowLayers(data) {
     const flow_scale = data.linearscales.flow[0]
     const flow_min = data.linearscales.flow[1]
 
-    data['values'].forEach(values => {
+    data.values.forEach(values => {
         const kValue = values[2];
         if (!layers[kValue]) {
             layers[kValue] = [];
