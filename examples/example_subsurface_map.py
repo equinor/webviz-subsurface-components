@@ -1,13 +1,9 @@
-import numpy as np
+import json
 import pandas as pd
-import webviz_subsurface_components
 import dash
 import dash_html_components as html
-import json
+import webviz_subsurface_components
 
-app = dash.Dash(__name__)
-
-df = pd.read_csv('./reek.csv')
 
 def compress2json(df):
 
@@ -49,7 +45,7 @@ def compress2json(df):
     df[INDICES_COL] = df[INDICES_COL].astype(int)
 
     data = {
-            'values': df.values.tolist(), 
+            'values': df.values.tolist(),
             'linearscales': {
                 'coord': [coord_scale, xmin, ymin],
                 'value': [val_scale, valmin],
@@ -58,10 +54,15 @@ def compress2json(df):
             }
 
     return json.dumps(data, separators=(',', ':'))
-    
-#f = open('../src/demo/data.json', 'w')
-#f.write(compress2json(df))
-#f.close()
+
+
+df = pd.read_csv('./reek.csv')
+
+# f = open('../src/demo/data.json', 'w')
+# f.write(compress2json(df))
+# f.close()
+
+app = dash.Dash(__name__)
 
 app.layout = html.Div(children=[
     webviz_subsurface_components.Map(id='reek-map', data=compress2json(df))
