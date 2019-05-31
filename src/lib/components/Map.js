@@ -53,67 +53,69 @@ const addNegativeFlow = ({layers, indexies}) =>
     );
 
 export function makeFlowLayers(data) {
-    const {i, j, k, x0, y0, x1, y1, x2, y2, x3, y3, value} = data;
-    const FLOWIplus = data['FLOWI+'];
-    const FLOWJplus = data['FLOWJ+'];
-    const keys = Object.keys(data.i);
     const layers = [];
 
-    keys.forEach(key => {
-        const kValue = k[key];
+    const coord_scale = data.linearscales.coord[0]
+    const xmin = data.linearscales.coord[1]
+    const ymin = data.linearscales.coord[2]
+
+    const val_scale = data.linearscales.value[0]
+    const val_min = data.linearscales.value[1]
+
+    const flow_scale = data.linearscales.flow[0]
+    const flow_min = data.linearscales.flow[1]
+
+    data.values.forEach(values => {
+        const kValue = values[2];
         if (!layers[kValue]) {
             layers[kValue] = [];
         }
         layers[kValue].push({
-            i: i[key],
-            j: j[key],
-            k: k[key],
+            i: values[0],
+            j: values[1],
+            k: values[2],
             points: [
-                [x0[key], y0[key]],
-                [x1[key], y1[key]],
-                [x2[key], y2[key]],
-                [x3[key], y3[key]],
+                [values[3]/coord_scale + xmin, values[7]/coord_scale + ymin],
+                [values[4]/coord_scale + xmin, values[8]/coord_scale + ymin],
+                [values[5]/coord_scale + xmin, values[9]/coord_scale + ymin],
+                [values[6]/coord_scale + xmin, values[10]/coord_scale + ymin]
             ],
-            value: value[key],
-            'FLOWI+': FLOWIplus[key],
-            'FLOWJ+': FLOWJplus[key],
+            value: values[11]/val_scale + val_min,
+            'FLOWI+': values[12]/flow_scale + flow_min,
+            'FLOWJ+': values[13]/flow_scale + flow_min
         });
     });
+
     const indexies = getIndexies(layers);
     return addNegativeFlow({layers, indexies});
 }
 
-export const make2DLayers = ({
-    i,
-    j,
-    k,
-    x0,
-    y0,
-    x1,
-    y1,
-    x2,
-    y2,
-    x3,
-    y3,
-    value,
-}) => {
+export const make2DLayers = (data) => {
     const layers = [];
-    Object.keys(i).forEach(key => {
-        const kValue = k[key];
+
+    const coord_scale = data.linearscales.coord[0]
+    const xmin = data.linearscales.coord[1]
+    const ymin = data.linearscales.coord[2]
+
+    const val_scale = data.linearscales.value[0]
+    const val_min = data.linearscales.value[1]
+
+    data.values.forEach(values => {
+        const kValue = values[2];
         if (!layers[kValue]) {
             layers[kValue] = [];
         }
         layers[kValue].push({
-            i: i[key],
-            j: j[key],
-            k: k[key],
+            i: values[0],
+            j: values[1],
+            k: values[2],
             points: [
-                [x0[key], y0[key]],
-                [x1[key], y1[key]],
-                [x2[key], y2[key]],
-                [x3[key], y3[key]],
+                [values[3]/coord_scale + xmin, values[7]/coord_scale + ymin],
+                [values[4]/coord_scale + xmin, values[8]/coord_scale + ymin],
+                [values[5]/coord_scale + xmin, values[9]/coord_scale + ymin],
+                [values[6]/coord_scale + xmin, values[10]/coord_scale + ymin]
             ],
-            value: value[key],
+            value: values[11]/val_scale + val_min,
         });
     });
     return layers;
@@ -150,7 +152,7 @@ const init2DMap = ({elementSelector, data, height, layerNames}) => {
 
 const parseData = data => (typeof data === 'string' ? JSON.parse(data) : data);
 
-const shouldRenderFlowMap = data => Boolean(data['FLOWI+']);
+const shouldRenderFlowMap = data => 'flow' in data.linearscales;
 
 class Map extends Component {
     constructor(props) {
@@ -226,10 +228,9 @@ Map.propTypes = {
      */
     id: PropTypes.string.isRequired,
     /**
-     * The data the Map component should render.
-     * It should be JSON stringified before hand
+     * The data the Map component should render (JSON format).
      */
-    data: PropTypes.string.isRequired,
+    data: PropTypes.object.isRequired,
     /**
      * The height of the Map component
      */

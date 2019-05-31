@@ -11,8 +11,7 @@ Keyword arguments:
 - id (string; required): The ID of this component, used to identify dash components
 in callbacks. The ID needs to be unique across all of the
 components in an app.
-- data (string; required): The data the Map component should render.
-It should be JSON stringified before hand
+- data (dict; required): The data the Map component should render (JSON format).
 - height (number; optional): The height of the Map component
 - layerNames (list; optional): The name of individual layers"""
     @_explicitize_args
