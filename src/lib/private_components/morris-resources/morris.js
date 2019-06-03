@@ -7,7 +7,7 @@ import * as d3 from 'd3'
 export default function sensitivitySliderPlot(target, output, parameters, parameterName) {
     const MAIN = 'main'
     const INTERACTION = 'interaction'
-    
+
     const GRAPH_FOCUS_X = 9
     const INVERTED_GRAPH_FOCUS_X = -80
     const MINIMUM_LABEL_X = 50
@@ -37,7 +37,8 @@ export default function sensitivitySliderPlot(target, output, parameters, parame
         },
 
         initContainers() {
-            
+            d3.select('#sensitivity-slider-plot__graph-container').remove();
+            d3.select('#sensitivity-slider-plot__slider-container').remove();
             this._graphContainer = d3.select(this._target).append('div')
                 .attr('id', 'sensitivity-slider-plot__graph-container')
                 .classed('sensitivity-slider-plot__graph-container Pos(st) T(0) Ovx(h)', true)
@@ -46,7 +47,7 @@ export default function sensitivitySliderPlot(target, output, parameters, parame
                 .attr('id', 'sensitivity-slider-plot__slider-container')
                 .classed('sensitivity-slider-plot__slider-container', true)
 
-           
+
 
             return this
         },
@@ -92,9 +93,9 @@ export default function sensitivitySliderPlot(target, output, parameters, parame
                     key: j > 0 ? `${capFirst(d)} effect` : null,
                     clazz: `sensitivity-slider-plot__slider-col-header sensitivity-slider-plot__slider-col-header-${d}`,
                 }))
-                
+
             this._nParameters = this._parameters.length
-            
+
             for (let i = 0; i < this._nParameters; i++) {
                 for (let j = 0; j < 3; j++) {
                     const d = {
