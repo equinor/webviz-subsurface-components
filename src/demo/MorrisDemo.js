@@ -12,9 +12,9 @@ class MorrisDemo extends Component {
     render() {
         return (
             <div>
-                <Morris 
+                <Morris
                 id={'morris'}
-                output={output} 
+                output={output}
                 parameters={parameters}
                 parameter={response}
                 />
