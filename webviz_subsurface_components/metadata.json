@@ -41,10 +41,17 @@
       },
       "data": {
         "type": {
+<<<<<<< HEAD
           "name": "string"
         },
         "required": true,
         "description": "The data the Map component should render.\nIt should be JSON stringified before hand"
+=======
+          "name": "object"
+        },
+        "required": true,
+        "description": "The data the Map component should render (JSON format)."
+>>>>>>> upstream/master
       },
       "height": {
         "type": {
@@ -124,6 +131,7 @@
         }
       }
     }
+<<<<<<< HEAD
   },
   "src/lib/components/View3D.js": {
     "description": "",
@@ -181,5 +189,7 @@
         "required": false
       }
     }
+=======
+>>>>>>> upstream/master
   }
 }
