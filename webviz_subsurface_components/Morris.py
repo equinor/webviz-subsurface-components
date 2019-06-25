@@ -10,8 +10,8 @@ class Morris(Component):
 Keyword arguments:
 - id (string; required)
 - parameter (string; optional)
-- output (list; optional)
-- parameters (list; optional)
+- output (list of dicts; optional)
+- parameters (list of dicts; optional)
 - height (number; optional)"""
     @_explicitize_args
     def __init__(self, id=Component.REQUIRED, parameter=Component.UNDEFINED, output=Component.UNDEFINED, parameters=Component.UNDEFINED, height=Component.UNDEFINED, **kwargs):
