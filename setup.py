@@ -12,7 +12,7 @@ with open(os.path.join('webviz_subsurface_components', 'package.json')) as f:
 package_name = package['name'].replace(' ', '_').replace('-', '_')
 
 install_requires = [
-    'dash==0.41'  # Same dependency as of webviz-config (to be relaxed)
+    'dash~=1.0.0'
 ]
 
 tests_require = [
@@ -21,8 +21,7 @@ tests_require = [
     'percy',
     'selenium',
     'flake8',
-    'pylint',
-    'pytest-dash>=2.1.1'
+    'pylint'
 ]
 
 setup(
