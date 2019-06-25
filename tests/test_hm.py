@@ -2,15 +2,9 @@ import dash
 from dash.dependencies import Input, Output
 import webviz_subsurface_components
 import dash_html_components as html
-from pytest_dash.wait_for import (
-    wait_for_text_to_equal,
-    wait_for_element_by_css_selector
-)
-from pytest_dash.application_runners import import_app
 
 # Basic test for the component rendering.
-def test_render_hm(dash_threaded):
-    # dash_threaded is a fixture by pytest-dash
+def test_render_hm(dash_duo):
 
     with open('tests/data/hm_data.json', 'r') as f:
         hm_data = f.read()
@@ -23,10 +17,9 @@ def test_render_hm(dash_threaded):
         data=hm_data),
     ])
 
-    driver = dash_threaded.driver
-    dash_threaded(app)
+    dash_duo.start_server(app)
 
     # Get text of first data series
-    my_component = wait_for_element_by_css_selector(driver, '#g_history_matching_plot > text')
+    my_component = dash_duo.wait_for_element_by_css_selector('#g_history_matching_plot > text', timeout=4)
 
     assert 'Misfit overview for Iteration 0' == my_component.text

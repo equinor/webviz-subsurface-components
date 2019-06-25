@@ -21,8 +21,7 @@ tests_require = [
     'percy',
     'selenium',
     'flake8',
-    'pylint',
-    'pytest-dash>=2.1.1'
+    'pylint'
 ]
 
 setup(
