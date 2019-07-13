@@ -22,7 +22,7 @@ tests_require = [
     'selenium',
     'flake8',
     'pylint',
-    'dash[testing]'
+    '"dash[testing]"'
 ]
 
 setup(
