@@ -30,7 +30,7 @@ script:
   - npm run test
   - npm run build:all
   - pip install .
-  - pytest
+  - python -m pytest
 
 deploy:
   - provider: pypi
