@@ -24,7 +24,7 @@ tests_require = [
     'pylint'
 ]
 
-# 'dash[testing]' to be added in tests_require when 
+# 'dash[testing]' to be added in tests_require when
 # https://github.com/pypa/pip/issues/4957 is closed.
 
 setup(
