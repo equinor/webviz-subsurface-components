@@ -12,7 +12,7 @@ with open(os.path.join('webviz_subsurface_components', 'package.json')) as f:
 package_name = package['name'].replace(' ', '_').replace('-', '_')
 
 install_requires = [
-    'dash~=1.0.0'
+    'dash~=1.0.1'
 ]
 
 tests_require = [
@@ -23,6 +23,9 @@ tests_require = [
     'flake8',
     'pylint'
 ]
+
+# 'dash[testing]' to be added in tests_require when
+# https://github.com/pypa/pip/issues/4957 is closed.
 
 setup(
     name=package_name,

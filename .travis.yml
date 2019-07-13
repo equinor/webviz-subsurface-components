@@ -19,8 +19,9 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - pip install .[tests]
   - pip install .[dependencies]
+  - pip install .[tests]
+  - pip install dash[testing]
   - npm install
   - wget https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip

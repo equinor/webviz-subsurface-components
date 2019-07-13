@@ -41,7 +41,10 @@ If you have selected install_dependencies during the prompt, you can skip this p
 4. Install the python packages for testing (optional)
     ```
     pip install .[tests]
+    pip install dash[testing]
     ```
+    The second of these commands appears to be necessary as long as
+    [this `pip` issue is open](https://github.com/pypa/pip/issues/4957).
 
 ### Write component code in `src/lib/components/<component_name>.react.js`
 
