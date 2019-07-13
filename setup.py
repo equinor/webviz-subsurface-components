@@ -21,9 +21,11 @@ tests_require = [
     'percy',
     'selenium',
     'flake8',
-    'pylint',
-    '"dash[testing]"'
+    'pylint'
 ]
+
+# 'dash[testing]' to be added in tests_require when 
+# https://github.com/pypa/pip/issues/4957 is closed.
 
 setup(
     name=package_name,
