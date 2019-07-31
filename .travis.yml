@@ -1,8 +1,11 @@
 language: python
-cache: pip
+dist: bionic
 
 addons:
-    chrome: stable
+  chrome: stable
+
+services:
+  - xvfb
 
 python:
   - "3.6"
@@ -12,9 +15,6 @@ matrix:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install node
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
   - pip freeze | grep -vw "pip" | xargs pip uninstall -y
   - pip install --upgrade pip
 
@@ -23,7 +23,7 @@ install:
   - pip install .[tests]
   - pip install dash[testing]
   - npm install
-  - wget https://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_linux64.zip
+  - wget https://chromedriver.storage.googleapis.com/76.0.3809.12/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip
   - export PATH=$PATH:$PWD
 
