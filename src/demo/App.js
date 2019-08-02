@@ -3,13 +3,14 @@ import React, {Component} from 'react';
 import HistoryMatchDemo  from './HistoryMatchDemo';
 import MorrisDemo  from './MorrisDemo';
 import SubsurfaceMapDemo  from './SubsurfaceMapDemo';
+import LeafletDemo  from './LeafletDemo';
 
 
 class App extends Component {
 
     constructor(props) {
         super(props)
-        this.state = {value:'SubsurfaceMap'}
+        this.state = {value:'Leaflet'}
     }
 
     onChange(e) {
@@ -27,6 +28,9 @@ class App extends Component {
             case "SubsurfaceMap": { 
                 return <SubsurfaceMapDemo/>
             }
+            case "Leaflet": { 
+                return <LeafletDemo/>
+            }
             default: { 
                 return null           
             } 
@@ -40,7 +44,7 @@ class App extends Component {
                     <option value = "HistoryMatch">HistoryMatch</option>
                     <option value = "Morris">Morris</option>
                     <option value = "SubsurfaceMap">SubsurfaceMap</option>
-                    
+                    <option value = "Leaflet">Leaflet</option>
                 </select>
                 {this.renderDemo()}
             </div>

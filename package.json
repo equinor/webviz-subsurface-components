@@ -18,7 +18,10 @@
   "license": "LGPL",
   "dependencies": {
     "d3": "^5.9.2",
-    "ramda": "^0.25.0"
+    "file-loader": "^4.1.0",
+    "leaflet": "^1.5.1",
+    "ramda": "^0.25.0",
+    "react-leaflet": "^2.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
