@@ -1,9 +1,9 @@
 /* eslint no-magic-numbers: 0 */
 import React, {Component} from 'react';
-import HistoryMatchDemo  from './HistoryMatchDemo';
-import MorrisDemo  from './MorrisDemo';
-import SubsurfaceMapDemo  from './SubsurfaceMapDemo';
-import LeafletDemo  from './LeafletDemo';
+import HistoryMatchDemo from './HistoryMatchDemo';
+import MorrisDemo from './MorrisDemo';
+import SubsurfaceMapDemo from './SubsurfaceMapDemo';
+import LeafletDemo from './LeafletDemo';
 
 
 class App extends Component {

@@ -17,7 +17,10 @@ import {
 
 const { BaseLayer, Overlay } = LayersControl
 
+import ImageOverlayWebGL from '../private_components/leaflet-resources/ImageOverlayWebGL'
+
 class Leaflet extends Component {
+
 
     constructor(props) {
         super(props);
@@ -58,7 +61,11 @@ class Leaflet extends Component {
     }
 
     render_image(image, key) {
-        return <ImageOverlay url={image.url} bounds={image.bounds} key={key} />
+        if ('colormap' in image){
+            return <ImageOverlayWebGL url={image.url} colormap={image.colormap} bounds={image.bounds} key={key} />
+        } else {
+            return <ImageOverlayWebGL url={image.url} bounds={image.bounds} key={key} />    
+        }
     }
 
     render_layer_items(layer){
