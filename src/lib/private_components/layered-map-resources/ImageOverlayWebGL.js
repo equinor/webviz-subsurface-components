@@ -1,4 +1,5 @@
-import React, {Component} from 'react';
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import { ImageOverlay } from 'react-leaflet'
 import alter_image from './alter_image'
 
@@ -17,6 +18,12 @@ class ImageOverlayWebGL extends Component {
   render() {
     return <ImageOverlay url={this.state.data} bounds={this.props.bounds} />
   }
+}
+
+ImageOverlayWebGL.propTypes = {
+  url: PropTypes.string,
+  colormap: PropTypes.string,
+  bounds: PropTypes.array
 }
 
 export default ImageOverlayWebGL;

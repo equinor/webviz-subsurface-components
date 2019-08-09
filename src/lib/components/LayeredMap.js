@@ -1,3 +1,4 @@
+/*eslint no-inline-comments: 0 */
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 

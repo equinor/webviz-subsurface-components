@@ -146,7 +146,7 @@
       },
       "height": {
         "defaultValue": {
-          "value": "500",
+          "value": "800",
           "computed": false
         },
         "required": false
