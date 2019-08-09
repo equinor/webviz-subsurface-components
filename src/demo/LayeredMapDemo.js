@@ -1,4 +1,3 @@
-/* eslint no-magic-numbers: 0 */
 import React, {Component} from 'react';
 import LayeredMap  from '../lib/components/LayeredMap';
 
