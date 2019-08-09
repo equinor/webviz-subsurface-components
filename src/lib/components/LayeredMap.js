@@ -1,4 +1,4 @@
-/*eslint no-inline-comments: 0 */
+/* eslint no-inline-comments: 0 */
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
@@ -75,7 +75,7 @@ class LayeredMap extends Component {
                 return this.render_circle(item, index)    
             }// else if (item.type === 'image'){
             return this.render_image(item, index)    
-            //}
+            // }
         })
     }
 
