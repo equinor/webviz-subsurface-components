@@ -71,7 +71,7 @@ def array_to_png(Z, shift=True, colormap=False):
         raise ValueError('Incorrect number of dimensions in array')
 
     byte_io = io.BytesIO()
-    image.save(byte_io, format='PNG')
+    image.save(byte_io, format='png')
     byte_io.seek(0)
 
     base64_data = base64.b64encode(byte_io.read()).decode('ascii')
@@ -111,9 +111,9 @@ if __name__ == '__main__':
                     },
                     {
                      'type': 'polyline',
-                     'positions': [[433204, 6475077.5],
-                                   [436204, 6480077.5],
-                                   [437204, 6475077.5]],
+                     'positions': [[433204, 6475077],
+                                   [436204, 6480077],
+                                   [437204, 6475077]],
                      'color': 'green',
                      'tooltip': 'This is a green fault line'
                     }
@@ -142,9 +142,9 @@ if __name__ == '__main__':
                 [
                     {
                         'type': 'polygon',
-                        'positions': [[436204, 6475077.5],
-                                      [438204, 6480077.5],
-                                      [432204, 6475077.5]],
+                        'positions': [[436204, 6475077],
+                                      [438204, 6480077],
+                                      [432204, 6475077]],
                         'color': 'blue',
                         'tooltip': 'This is a blue polygon'
                     },

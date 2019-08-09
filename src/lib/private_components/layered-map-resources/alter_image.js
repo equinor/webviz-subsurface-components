@@ -17,12 +17,12 @@ function alter_image(map_base64, colormap_base64){
     return Promise.all([load_texture(map_base64), load_texture(colormap_base64)])
         .then(function(textures) {
 
-            const map_image = textures[0]['texture']
+            const map_image = textures[0].texture
             canvas.width = textures[0].width;
             canvas.height = textures[0].height;
 
-            const colormap = textures[1]['texture']
-            const colormap_length = textures[1]['width']
+            const colormap = textures[1].texture
+            const colormap_length = textures[1].width
 
             const greyscale2colormap = reglObj({
                 vert: `
@@ -54,7 +54,6 @@ function alter_image(map_base64, colormap_base64){
                     }
                 `,
                 attributes: {
-                    //position: [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1]
                     position: [-1, -1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1]
                 },
                 count: 6,

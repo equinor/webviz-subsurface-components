@@ -6,7 +6,6 @@ import {CRS} from 'leaflet';
 
 import {
   Circle,
-  ImageOverlay,
   LayersControl,
   LayerGroup,
   Map,
@@ -44,9 +43,8 @@ class LayeredMap extends Component {
             return (<Polyline color={polyline.color} positions={polyline.positions.map(xy => this.yx(xy))} key={key}>
                         <Tooltip>{polyline.tooltip}</Tooltip>
                     </Polyline>)
-        } else {
-            return <Polyline color={polyline.color} positions={polyline.positions.map(xy => this.yx(xy))} key={key} />
         }
+        return <Polyline color={polyline.color} positions={polyline.positions.map(xy => this.yx(xy))} key={key} />
     }
 
     render_polygon(polygon, key) {
@@ -54,9 +52,8 @@ class LayeredMap extends Component {
             return (<Polygon color={polygon.color} positions={polygon.positions.map(xy => this.yx(xy))} key={key}>
                         <Tooltip>{polygon.tooltip}</Tooltip>
                     </Polygon>)
-        } else {
-            return <Polygon color={polygon.color} positions={polygon.positions.map(xy => this.yx(xy))} key={key} />
         }
+        return <Polygon color={polygon.color} positions={polygon.positions.map(xy => this.yx(xy))} key={key} />
     }
 
     render_circle(circle, key) {
@@ -64,9 +61,8 @@ class LayeredMap extends Component {
             return (<Circle color={circle.color} center={this.yx(circle.center)} radius={circle.radius} key={key}>
                        <Tooltip>{circle.tooltip}</Tooltip>
                     </Circle>)
-        } else {
-            return <Circle color={circle.color} center={this.yx(circle.center)} radius={circle.radius} key={key} />
         }
+        return <Circle color={circle.color} center={this.yx(circle.center)} radius={circle.radius} key={key} />
     }
 
     render_image(image, key) {
@@ -75,15 +71,15 @@ class LayeredMap extends Component {
 
     render_layer_items(layer){
         return layer.data.map((item, index) => {
-            if (item.type == 'polyline'){
+            if (item.type === 'polyline'){
                 return this.render_polyline(item, index)
-            } else if (item.type == 'polygon'){
+            } else if (item.type === 'polygon'){
                 return this.render_polygon(item, index)    
-            } else if (item.type == 'circle'){
+            } else if (item.type === 'circle'){
                 return this.render_circle(item, index)    
-            } else if (item.type == 'image'){
-                return this.render_image(item, index)    
-            }
+            }// else if (item.type === 'image'){
+            return this.render_image(item, index)    
+            //}
         })
     }
 

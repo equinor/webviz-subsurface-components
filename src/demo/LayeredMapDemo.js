@@ -6,7 +6,12 @@ const data = require('./example-data/layered-map.json');
 
 class LayeredMapDemo extends Component {
   render() {
-    return <LayeredMap id={'layered-map-demo'} map_bounds={data['map_bounds']} center={data['center']} base_layers={data['base_layers']} overlay_layers={data['overlay_layers']} />
+    return <LayeredMap id={'layered-map-demo'} 
+                       map_bounds={data.map_bounds}
+                       center={data.center}
+                       base_layers={data.base_layers}
+                       overlay_layers={data.overlay_layers}
+           />
   }
 }
 
