@@ -41,8 +41,11 @@ function alter_image(map_base64, colormap_base64){
                     uniform float colormap_length;
 
                     void main() {
-                        // Get the map data (it is greyscale so we can take any of the rgb values):
-                        float map_array = texture2D(map_image, gl_FragCoord.xy/resolution).r;
+                        // Find the pixel coordinate (range [0, 1]).
+                        vec2 coord = gl_FragCoord.xy/resolution;
+                        // Get the map data (it is greyscale so we can take any of the rgb values).
+                        // At the same time, flip Y axis (such that original input image direction is kept).
+                        float map_array = texture2D(map_image, vec2(coord[0], 1.0-coord[1])).r;
 
                         // Scale the map_array to corresponding colormap index, and add a
                         // 0.5 pixel offset such that we sample at the "center" of each
@@ -51,7 +54,8 @@ function alter_image(map_base64, colormap_base64){
                     }
                 `,
                 attributes: {
-                    position: [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1]
+                    //position: [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1]
+                    position: [-1, -1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1]
                 },
                 count: 6,
                 uniforms: {

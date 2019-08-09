@@ -2,11 +2,11 @@
 import HistoryMatch from './components/HistoryMatch'
 import Map from './components/Map'
 import Morris from './components/Morris'
-import Leaflet from './components/Leaflet'
+import LayeredMap from './components/LayeredMap'
 
 export {
     HistoryMatch,
     Morris,
     Map,
-    Leaflet
+    LayeredMap
 };

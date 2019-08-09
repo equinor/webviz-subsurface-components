@@ -12,7 +12,7 @@ Keyword arguments:
 - parameter (string; optional)
 - output (list of dicts; optional)
 - parameters (list of dicts; optional)
-- height (number; optional)"""
+- height (number; default 800)"""
     @_explicitize_args
     def __init__(self, id=Component.REQUIRED, parameter=Component.UNDEFINED, output=Component.UNDEFINED, parameters=Component.UNDEFINED, height=Component.UNDEFINED, **kwargs):
         self._prop_names = ['id', 'parameter', 'output', 'parameters', 'height']

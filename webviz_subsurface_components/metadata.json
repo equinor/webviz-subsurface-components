@@ -27,6 +27,132 @@
       }
     }
   },
+  "src/lib/components/LayeredMap.js": {
+    "description": "",
+    "displayName": "LayeredMap",
+    "methods": [
+      {
+        "name": "render_polyline",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "polyline",
+            "type": null
+          },
+          {
+            "name": "key",
+            "type": null
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "render_polygon",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "polygon",
+            "type": null
+          },
+          {
+            "name": "key",
+            "type": null
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "render_circle",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "circle",
+            "type": null
+          },
+          {
+            "name": "key",
+            "type": null
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "render_image",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "image",
+            "type": null
+          },
+          {
+            "name": "key",
+            "type": null
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "render_layer_items",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "layer",
+            "type": null
+          }
+        ],
+        "returns": null
+      }
+    ],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": true,
+        "description": "The ID of this component, used to identify dash components\nin callbacks. The ID needs to be unique across all of the\ncomponents in an app."
+      },
+      "center": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "Center [x, y] of map when initially loaded (in physical coordinates)."
+      },
+      "map_bounds": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "The map bounds of the input data, given as [[xmin, ymin], [xmax, ymax]] (in physical coordinates)."
+      },
+      "base_layers": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "An array of different base layers. Each base layer is a dictionary with the following structure:\n   {\n           'name': 'Name of my layer',  // Name of the layer (appears in the map layer control)\n           'checked': False, // If it should be checked initially (only one base layer can have this as True)\n           'data': [ ... ] // A list of the different map components this layer consists of (see below for the allowed components)\n          }"
+      },
+      "overlay_layers": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "An array of different overlay layers. The syntax of an overlay layer follows exactly that of base layers,\nwith the only exception that 'checked' can be True for an arbitrary number of overlay layers simultaneously."
+      },
+      "height": {
+        "defaultValue": {
+          "value": "500",
+          "computed": false
+        },
+        "required": false
+      }
+    }
+  },
   "src/lib/components/Map.js": {
     "description": "",
     "displayName": "Map",

@@ -12,7 +12,7 @@ Keyword arguments:
 in callbacks. The ID needs to be unique across all of the
 components in an app.
 - data (dict; required): The data the Map component should render (JSON format).
-- height (number; optional): The height of the Map component
+- height (number; default 800): The height of the Map component
 - layerNames (list of strings; optional): The name of individual layers"""
     @_explicitize_args
     def __init__(self, id=Component.REQUIRED, data=Component.REQUIRED, height=Component.UNDEFINED, layerNames=Component.UNDEFINED, **kwargs):

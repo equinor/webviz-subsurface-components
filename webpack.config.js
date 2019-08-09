@@ -59,7 +59,7 @@ module.exports = (env, argv) => {
                     exclude: /node_modules/,
                     use: {
                         loader: 'babel-loader',
-                    },
+                    }
                 },
                 {
                     test: /\.css$/,
@@ -69,16 +69,16 @@ module.exports = (env, argv) => {
                         },
                         {
                             loader: 'css-loader',
-                        },
-                    ],
+                        }
+                    ]
                 },
                 {
-                    test: /\.(png|jpe?g|gif)$/,
+                    test: /\.(png|jpg|gif)$/i,
                     use: [
                         {
-                            loader: 'file-loader',
-                        },
-                    ],
+                            loader: 'url-loader'
+                        }
+                    ]
                 }
             ],
         },
