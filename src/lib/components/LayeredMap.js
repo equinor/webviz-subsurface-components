@@ -11,12 +11,15 @@ import {
   Map,
   Polygon,
   Polyline,
+  ScaleControl,
   Tooltip
 } from 'react-leaflet'
 
 const { BaseLayer, Overlay } = LayersControl
 
 import ImageOverlayWebGL from '../private_components/layered-map-resources/ImageOverlayWebGL'
+
+const yx = ([x,y]) => {return [y, x]}
 
 class LayeredMap extends Component {
 
@@ -28,45 +31,37 @@ class LayeredMap extends Component {
 
         this.base_layers = props.base_layers;
         this.overlay_layers = props.overlay_layers;
-
-        this.yx = (xy) => {
-            const [x, y] = xy
-            const yscaled = (y - this.ymin)*this.physical2pixels
-            const xscaled = (x - this.xmin)*this.physical2pixels
-            return [yscaled, xscaled]
-        }
-
     }
 
     render_polyline(polyline, key) {
         if ('tooltip' in polyline){
-            return (<Polyline color={polyline.color} positions={polyline.positions.map(xy => this.yx(xy))} key={key}>
+            return (<Polyline color={polyline.color} positions={polyline.positions.map(xy => yx(xy))} key={key}>
                         <Tooltip>{polyline.tooltip}</Tooltip>
                     </Polyline>)
         }
-        return <Polyline color={polyline.color} positions={polyline.positions.map(xy => this.yx(xy))} key={key} />
+        return <Polyline color={polyline.color} positions={polyline.positions.map(xy => yx(xy))} key={key} />
     }
 
     render_polygon(polygon, key) {
         if ('tooltip' in polygon){
-            return (<Polygon color={polygon.color} positions={polygon.positions.map(xy => this.yx(xy))} key={key}>
+            return (<Polygon color={polygon.color} positions={polygon.positions.map(xy => yx(xy))} key={key}>
                         <Tooltip>{polygon.tooltip}</Tooltip>
                     </Polygon>)
         }
-        return <Polygon color={polygon.color} positions={polygon.positions.map(xy => this.yx(xy))} key={key} />
+        return <Polygon color={polygon.color} positions={polygon.positions.map(xy => yx(xy))} key={key} />
     }
 
     render_circle(circle, key) {
         if ('tooltip' in circle){
-            return (<Circle color={circle.color} center={this.yx(circle.center)} radius={circle.radius} key={key}>
+            return (<Circle color={circle.color} center={yx(circle.center)} radius={circle.radius} key={key}>
                        <Tooltip>{circle.tooltip}</Tooltip>
                     </Circle>)
         }
-        return <Circle color={circle.color} center={this.yx(circle.center)} radius={circle.radius} key={key} />
+        return <Circle color={circle.color} center={yx(circle.center)} radius={circle.radius} key={key} />
     }
 
     render_image(image, key) {
-        return <ImageOverlayWebGL url={image.url} colormap={image.colormap} bounds={image.bounds.map(xy => this.yx(xy))} key={key} />
+        return <ImageOverlayWebGL url={image.url} colormap={image.colormap} bounds={image.bounds.map(xy => yx(xy))} key={key} />
     }
 
     render_layer_items(layer){
@@ -87,10 +82,12 @@ class LayeredMap extends Component {
         return (
             <div id={this.elementId} >
                 <Map style={{height: LayeredMap.defaultProps.height}}
-                     center={this.yx(this.props.center)} 
-                     zoom={1}
+                     center={yx(this.props.center)}
+                     zoom={-3} // TODO: A good initial zoom level has too be calculated
+                     minZoom={-30} // TODO: Same for a minZoom
                      attributionControl={false}
                      crs={CRS.Simple}>
+                    <ScaleControl position="bottomright" imperial={false} metric={true} />
                     <LayersControl position="topright">
                         {this.base_layers.map((layer, index) => (
                             <BaseLayer checked={layer.checked} name={layer.name} key={index}>
@@ -114,7 +111,7 @@ class LayeredMap extends Component {
 }
 
 LayeredMap.defaultProps = {
-    height: 500,
+    height: 800,
 };
 
 LayeredMap.propTypes = {
