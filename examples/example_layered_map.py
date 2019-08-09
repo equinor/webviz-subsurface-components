@@ -59,11 +59,10 @@ def array_to_png(Z, shift=True, colormap=False):
     if Z.ndim == 2:
         image = Image.fromarray(np.uint8(Z), 'L')
     elif Z.ndim == 3:
-        if Z.shape[2] == 4:
-
-            image = Image.fromarray(np.uint8(Z), 'RGBA')
-        elif Z.shape[2] == 3:
+        if Z.shape[2] == 3:
             image = Image.fromarray(np.uint8(Z), 'RGB')
+        elif Z.shape[2] == 4:
+            image = Image.fromarray(np.uint8(Z), 'RGBA')
         else:
             raise ValueError('Third dimension of array must '
                              'have length 3 (RGB) or 4 (RGBA)')
