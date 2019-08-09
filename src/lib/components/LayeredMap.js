@@ -17,9 +17,9 @@ import {
 
 const { BaseLayer, Overlay } = LayersControl
 
-import ImageOverlayWebGL from '../private_components/leaflet-resources/ImageOverlayWebGL'
+import ImageOverlayWebGL from '../private_components/layered-map-resources/ImageOverlayWebGL'
 
-class Leaflet extends Component {
+class LayeredMap extends Component {
 
 
     constructor(props) {
@@ -86,7 +86,7 @@ class Leaflet extends Component {
     render() {
         return (
             <div id={this.elementId} >
-                <Map style={{height: Leaflet.defaultProps.height}}
+                <Map style={{height: LayeredMap.defaultProps.height}}
                      bounds={this.map_bounds}
                      attributionControl={false}
                      crs={CRS.Simple}>
@@ -112,15 +112,15 @@ class Leaflet extends Component {
     }
 }
 
-Leaflet.defaultProps = {
+LayeredMap.defaultProps = {
     height: 500,
 };
 
-Leaflet.propTypes = {
+LayeredMap.propTypes = {
     id: PropTypes.string.isRequired,
     map_bounds: PropTypes.array,
     base_layers: PropTypes.array,
     overlay_layers: PropTypes.array
 };
 
-export default Leaflet;
+export default LayeredMap;
