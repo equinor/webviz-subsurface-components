@@ -37,7 +37,7 @@ class LayeredMap extends Component {
     render_polyline(polyline, key) {
         if ('tooltip' in polyline){
             return (<Polyline color={polyline.color} positions={polyline.positions.map(xy => yx(xy))} key={key}>
-                        <Tooltip>{polyline.tooltip}</Tooltip>
+                        <Tooltip sticky={true}>{polyline.tooltip}</Tooltip>
                     </Polyline>)
         }
         return <Polyline color={polyline.color} positions={polyline.positions.map(xy => yx(xy))} key={key} />
@@ -46,7 +46,7 @@ class LayeredMap extends Component {
     render_polygon(polygon, key) {
         if ('tooltip' in polygon){
             return (<Polygon color={polygon.color} positions={polygon.positions.map(xy => yx(xy))} key={key}>
-                        <Tooltip>{polygon.tooltip}</Tooltip>
+                        <Tooltip sticky={true}>{polygon.tooltip}</Tooltip>
                     </Polygon>)
         }
         return <Polygon color={polygon.color} positions={polygon.positions.map(xy => yx(xy))} key={key} />
@@ -55,7 +55,7 @@ class LayeredMap extends Component {
     render_circle(circle, key) {
         if ('tooltip' in circle){
             return (<Circle color={circle.color} center={yx(circle.center)} radius={circle.radius} key={key}>
-                       <Tooltip>{circle.tooltip}</Tooltip>
+                       <Tooltip sticky={true}>{circle.tooltip}</Tooltip>
                     </Circle>)
         }
         return <Circle color={circle.color} center={yx(circle.center)} radius={circle.radius} key={key} />
