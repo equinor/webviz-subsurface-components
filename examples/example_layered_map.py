@@ -6,6 +6,7 @@ import numpy as np
 from matplotlib import cm
 
 import dash
+import dash_core_components as dcc
 import dash_html_components as html
 import webviz_subsurface_components
 
@@ -99,7 +100,7 @@ if __name__ == '__main__':
         {
             'name': 'A seismic horizon with colormap',
             'base_layer': True,
-            'checked': True,
+            'checked': False,
             'data':
                 [
                     {
@@ -122,7 +123,7 @@ if __name__ == '__main__':
         {
             'name': 'The same map without colormap',
             'base_layer': True,
-            'checked': False,
+            'checked': True,
             'data':
                 [
                     {
@@ -169,6 +170,7 @@ if __name__ == '__main__':
     app = dash.Dash(__name__)
 
     app.layout = html.Div(children=[
+        html.Button('Remove first layer', id='button'),
         webviz_subsurface_components.LayeredMap(
             id='volve-map',
             map_bounds=map_bounds,
@@ -176,5 +178,14 @@ if __name__ == '__main__':
             layers=layers
         )
     ])
+
+    @app.callback(
+        dash.dependencies.Output('volve-map', 'layers'),
+        [dash.dependencies.Input('button', 'n_clicks')])
+    def update_output(n_clicks):
+        if n_clicks:
+            return layers[1:]
+        else:
+            return layers
 
     app.run_server(debug=True)

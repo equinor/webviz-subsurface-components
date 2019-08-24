@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
-import LayeredMap  from '../lib/components/LayeredMap';
+import React, {Component} from 'react'
+import LayeredMap  from '../lib/components/LayeredMap'
 
-const data = require('./example-data/layered-map.json');
+const data = require('./example-data/layered-map.json')
 
 class LayeredMapDemo extends Component {
   render() {
@@ -9,9 +9,8 @@ class LayeredMapDemo extends Component {
                        map_bounds={data.map_bounds}
                        center={data.center}
                        layers={data.layers}
-                       overlay_layers={data.overlay_layers}
            />
   }
 }
 
-export default LayeredMapDemo;
+export default LayeredMapDemo
