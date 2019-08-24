@@ -130,19 +130,12 @@
         "required": false,
         "description": "The map bounds of the input data, given as [[xmin, ymin], [xmax, ymax]] (in physical coordinates)."
       },
-      "base_layers": {
+      "layers": {
         "type": {
           "name": "array"
         },
         "required": false,
-        "description": "An array of different base layers. Each base layer is a dictionary with the following structure:\n   {\n           'name': 'Name of my layer',  // Name of the layer (appears in the map layer control)\n           'checked': False, // If it should be checked initially (only one base layer can have this as True)\n           'data': [ ... ] // A list of the different map components this layer consists of (see below for the allowed components)\n          }"
-      },
-      "overlay_layers": {
-        "type": {
-          "name": "array"
-        },
-        "required": false,
-        "description": "An array of different overlay layers. The syntax of an overlay layer follows exactly that of base layers,\nwith the only exception that 'checked' can be True for an arbitrary number of overlay layers simultaneously."
+        "description": "An array of different layers. Each layer is a dictionary with the following structure:\n          {\n           'name': 'Name of my layer',  // Name of the layer (appears in the map layer control)\n           'base_layer': true,\n           'checked': false, // If it should be checked initially (only one base layer can have this as True)\n           'data': [ ... ] // A list of the different map components this layer consists of (see below for the allowed components)\n          }\n\nFor overlay layers ('base_layer' == false), 'checked' can be tru for an arbitrary number of overlay layers.\nFor base layers maximum one layer should be checked."
       },
       "height": {
         "defaultValue": {

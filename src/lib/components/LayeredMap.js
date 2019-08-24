@@ -1,112 +1,52 @@
 /* eslint no-inline-comments: 0 */
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-
 import 'leaflet/dist/leaflet.css';
 import {CRS} from 'leaflet';
-
-import {
-  Circle,
-  LayersControl,
-  LayerGroup,
-  Map,
-  Polygon,
-  Polyline,
-  ScaleControl,
-  Tooltip
-} from 'react-leaflet'
+import { LayersControl, Map, ScaleControl } from 'react-leaflet'
+import Colormap from '../private_components/layered-map-resources/Colormap.react'
+import CompositeMapLayer from '../private_components/layered-map-resources/CompositeMapLayer.react'
 
 const { BaseLayer, Overlay } = LayersControl
-
-import ImageOverlayWebGL from '../private_components/layered-map-resources/ImageOverlayWebGL'
-
 const yx = ([x,y]) => {return [y, x]}
 
 class LayeredMap extends Component {
 
     constructor(props) {
-        super(props);
-        this.elementId = `container-${props.id}`;
-        [[this.xmin, this.ymin], [this.xmax, this.ymax]] = props.map_bounds
-        this.physical2pixels = 0.5*LayeredMap.defaultProps.height/(this.ymax - this.ymin)
-
-        this.base_layers = props.base_layers;
-        this.overlay_layers = props.overlay_layers;
+        super(props)
+        this.mapRef = React.createRef()
     }
 
-    render_polyline(polyline, key) {
-        if ('tooltip' in polyline){
-            return (<Polyline color={polyline.color} positions={polyline.positions.map(xy => yx(xy))} key={key}>
-                        <Tooltip sticky={true}>{polyline.tooltip}</Tooltip>
-                    </Polyline>)
-        }
-        return <Polyline color={polyline.color} positions={polyline.positions.map(xy => yx(xy))} key={key} />
-    }
-
-    render_polygon(polygon, key) {
-        if ('tooltip' in polygon){
-            return (<Polygon color={polygon.color} positions={polygon.positions.map(xy => yx(xy))} key={key}>
-                        <Tooltip sticky={true}>{polygon.tooltip}</Tooltip>
-                    </Polygon>)
-        }
-        return <Polygon color={polygon.color} positions={polygon.positions.map(xy => yx(xy))} key={key} />
-    }
-
-    render_circle(circle, key) {
-        if ('tooltip' in circle){
-            return (<Circle color={circle.color} center={yx(circle.center)} radius={circle.radius} key={key}>
-                       <Tooltip sticky={true}>{circle.tooltip}</Tooltip>
-                    </Circle>)
-        }
-        return <Circle color={circle.color} center={yx(circle.center)} radius={circle.radius} key={key} />
-    }
-
-    render_image(image, key) {
-        return <ImageOverlayWebGL url={image.url} colormap={image.colormap} bounds={image.bounds.map(xy => yx(xy))} key={key} />
-    }
-
-    render_layer_items(layer){
-        return layer.data.map((item, index) => {
-            if (item.type === 'polyline'){
-                return this.render_polyline(item, index)
-            } else if (item.type === 'polygon'){
-                return this.render_polygon(item, index)    
-            } else if (item.type === 'circle'){
-                return this.render_circle(item, index)    
-            }// else if (item.type === 'image'){
-            return this.render_image(item, index)    
-            // }
-        })
+    componentDidMount() {
+        this.mapRef.current.leafletElement.addEventListener('overlayremove', (e) => {console.log(e)});
+        this.mapRef.current.leafletElement.addEventListener('overlayadd', (e) => {console.log(e)});
+        this.mapRef.current.leafletElement.addEventListener('baselayerchange', (e) => {console.log(e)});
     }
 
     render() {
         return (
-            <div id={this.elementId} >
-                <Map style={{height: LayeredMap.defaultProps.height}}
+                <Map id={this.props.id} style={{height: LayeredMap.defaultProps.height}}
+                     ref={this.mapRef}
                      center={yx(this.props.center)}
-                     zoom={-3} // TODO: A good initial zoom level has too be calculated
-                     minZoom={-30} // TODO: Same for a minZoom
+                     zoom={-3}
+                     minZoom={-5}
                      attributionControl={false}
                      crs={CRS.Simple}>
-                    <ScaleControl position="bottomright" imperial={false} metric={true} />
-                    <LayersControl position="topright">
-                        {this.base_layers.map((layer, index) => (
+                    <ScaleControl position='bottomright' imperial={false} metric={true} />
+                    <LayersControl position='topright'>
+                        {this.props.layers.filter(layer => layer.base_layer).map((layer, index) => (
                             <BaseLayer checked={layer.checked} name={layer.name} key={index}>
-                                <LayerGroup>
-                                    {this.render_layer_items(layer)}
-                                </LayerGroup>
+                                <CompositeMapLayer layer={layer} />
                             </BaseLayer>
                         ))}
-                        {this.overlay_layers.map((layer, index) => (
+                        {this.props.layers.filter(layer => !layer.base_layer).map((layer, index) => (
                             <Overlay checked={layer.checked} name={layer.name} key={index}>
-                                <LayerGroup>
-                                    {this.render_layer_items(layer)}
-                                </LayerGroup>
+                                <CompositeMapLayer layer={layer} />
                             </Overlay>
                         ))}
                     </LayersControl>
+                    <Colormap />
                 </Map>
-            </div>
         );
     }
 }
@@ -134,20 +74,19 @@ LayeredMap.propTypes = {
     map_bounds: PropTypes.array,
 
     /**
-     * An array of different base layers. Each base layer is a dictionary with the following structure:
-     *    {
+     * An array of different layers. Each layer is a dictionary with the following structure:
+          {
            'name': 'Name of my layer',  // Name of the layer (appears in the map layer control)
-           'checked': False, // If it should be checked initially (only one base layer can have this as True)
+           'base_layer': true,
+           'checked': false, // If it should be checked initially (only one base layer can have this as True)
            'data': [ ... ] // A list of the different map components this layer consists of (see below for the allowed components)
           }
-     */
-    base_layers: PropTypes.array,
 
-    /**
-     * An array of different overlay layers. The syntax of an overlay layer follows exactly that of base layers,
-     * with the only exception that 'checked' can be True for an arbitrary number of overlay layers simultaneously.
+     * For overlay layers ('base_layer' == false), 'checked' can be tru for an arbitrary number of overlay layers.
+     * For base layers maximum one layer should be checked.
      */
-    overlay_layers: PropTypes.array
+    layers: PropTypes.array,
+
 };
 
 export default LayeredMap;

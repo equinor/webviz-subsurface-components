@@ -8,7 +8,7 @@ class LayeredMapDemo extends Component {
     return <LayeredMap id={'layered-map-demo'} 
                        map_bounds={data.map_bounds}
                        center={data.center}
-                       base_layers={data.base_layers}
+                       layers={data.layers}
                        overlay_layers={data.overlay_layers}
            />
   }

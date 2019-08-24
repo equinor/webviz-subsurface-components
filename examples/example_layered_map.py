@@ -95,9 +95,10 @@ if __name__ == '__main__':
     colormap = array_to_png(cm.get_cmap('viridis', 256)
                             ([np.linspace(0, 1, 256)]), colormap=True)
 
-    base_layers = [
+    layers = [
         {
             'name': 'A seismic horizon with colormap',
+            'base_layer': True,
             'checked': True,
             'data':
                 [
@@ -120,6 +121,7 @@ if __name__ == '__main__':
         },
         {
             'name': 'The same map without colormap',
+            'base_layer': True,
             'checked': False,
             'data':
                 [
@@ -130,12 +132,10 @@ if __name__ == '__main__':
                                 [437720, 6481113]]
                     }
                 ]
-        }
-    ]
-
-    overlay_layers = [
+        },
         {
             'name': 'Some overlay layer',
+            'base_layer': False,
             'checked': True,
             'data':
                 [
@@ -162,8 +162,7 @@ if __name__ == '__main__':
         json.dump({
                     'map_bounds': map_bounds,
                     'center': center,
-                    'base_layers': base_layers,
-                    'overlay_layers': overlay_layers
+                    'layers': layers
                    }, fh)
 
 
@@ -174,8 +173,7 @@ if __name__ == '__main__':
             id='volve-map',
             map_bounds=map_bounds,
             center=center,
-            base_layers=base_layers,
-            overlay_layers=overlay_layers
+            layers=layers
         )
     ])
 
