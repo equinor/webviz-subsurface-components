@@ -35,12 +35,12 @@ class LayeredMap extends Component {
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
                     <LayersControl position='topright'>
                         {this.props.layers.filter(layer => layer.base_layer).map((layer, index) => (
-                            <BaseLayer checked={layer.checked} name={layer.name} key={index}>
+                            <BaseLayer checked={layer.checked} name={layer.name} key={layer.name}>
                                 <CompositeMapLayer layer={layer} hillshading={this.props.hillshading} />
                             </BaseLayer>
                         ))}
                         {this.props.layers.filter(layer => !layer.base_layer).map((layer, index) => (
-                            <Overlay checked={layer.checked} name={layer.name} key={index}>
+                            <Overlay checked={layer.checked} name={layer.name} key={layer.name}>
                                 <CompositeMapLayer layer={layer} hillshading={this.props.hillshading} />
                             </Overlay>
                         ))}
