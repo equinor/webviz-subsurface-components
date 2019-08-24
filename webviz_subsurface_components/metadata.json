@@ -60,6 +60,24 @@
         "required": false,
         "description": "An array of different layers. Each layer is a dictionary with the following structure:\n          {\n           'name': 'Name of my layer',  // Name of the layer (appears in the map layer control)\n           'base_layer': true,\n           'checked': false, // If it should be checked initially (only one base layer can have this as True)\n           'data': [ ... ] // A list of the different map components this layer consists of (see below for the allowed components)\n          }\n\nFor overlay layers ('base_layer' == false), 'checked' can be tru for an arbitrary number of overlay layers.\nFor base layers maximum one layer should be checked."
       },
+      "hillshading": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "true",
+          "computed": false
+        }
+      },
+      "setProps": {
+        "type": {
+          "name": "func"
+        },
+        "required": false,
+        "description": "Dash-assigned callback that should be called whenever any of the\nproperties change"
+      },
       "height": {
         "defaultValue": {
           "value": "800",

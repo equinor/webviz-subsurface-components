@@ -36,12 +36,12 @@ class LayeredMap extends Component {
                     <LayersControl position='topright'>
                         {this.props.layers.filter(layer => layer.base_layer).map((layer, index) => (
                             <BaseLayer checked={layer.checked} name={layer.name} key={index}>
-                                <CompositeMapLayer layer={layer} />
+                                <CompositeMapLayer layer={layer} hillshading={this.props.hillshading} />
                             </BaseLayer>
                         ))}
                         {this.props.layers.filter(layer => !layer.base_layer).map((layer, index) => (
                             <Overlay checked={layer.checked} name={layer.name} key={index}>
-                                <CompositeMapLayer layer={layer} />
+                                <CompositeMapLayer layer={layer} hillshading={this.props.hillshading} />
                             </Overlay>
                         ))}
                     </LayersControl>
@@ -53,6 +53,7 @@ class LayeredMap extends Component {
 
 LayeredMap.defaultProps = {
     height: 800,
+    hillshading: true
 };
 
 LayeredMap.propTypes = {
@@ -86,6 +87,14 @@ LayeredMap.propTypes = {
      * For base layers maximum one layer should be checked.
      */
     layers: PropTypes.array,
+
+    hillshading: PropTypes.bool,
+
+    /**
+     * Dash-assigned callback that should be called whenever any of the
+     * properties change
+     */
+    setProps: PropTypes.func
 
 };
 

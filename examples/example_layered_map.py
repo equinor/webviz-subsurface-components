@@ -171,6 +171,14 @@ if __name__ == '__main__':
 
     app.layout = html.Div(children=[
         html.Button('Remove first layer', id='button'),
+        dcc.Checklist(
+            id='hillshading-checkbox',
+            options=[
+                {'label': 'Hillshading', 'value': 'HS'}
+            ],
+            value=['HS'],
+            labelStyle={'display': 'inline-block'}
+        ),  
         webviz_subsurface_components.LayeredMap(
             id='volve-map',
             map_bounds=map_bounds,
@@ -178,6 +186,12 @@ if __name__ == '__main__':
             layers=layers
         )
     ])
+
+    @app.callback(
+        dash.dependencies.Output('volve-map', 'hillshading'),
+        [dash.dependencies.Input('hillshading-checkbox', 'value')])
+    def update_output(value):
+        return True if value else False
 
     @app.callback(
         dash.dependencies.Output('volve-map', 'layers'),

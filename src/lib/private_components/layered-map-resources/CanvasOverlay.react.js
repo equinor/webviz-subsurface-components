@@ -38,7 +38,6 @@ class CanvasOverlay extends MapLayer {
 		this.el.style.height = size.y + 'px';
 	}
 
-
     componentDidMount() {
         const mapSize = this.props.leaflet.map.getSize();
 
@@ -64,11 +63,17 @@ class CanvasOverlay extends MapLayer {
         super.componentDidMount()
         this.props.drawMethod(this.el)
         this._reset()
-  }
+    }
 
-  componentWillUnmount() {
-	L.DomUtil.remove(this.el)
-  }
+    componentDidUpdate(prevProps) {
+        if (this.props.drawMethod !== prevProps.drawMethod) {
+            this.props.drawMethod(this.el)
+        }
+    }
+
+    componentWillUnmount() {
+        L.DomUtil.remove(this.el)
+    }
 
 }
 

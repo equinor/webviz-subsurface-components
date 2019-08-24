@@ -22,14 +22,15 @@ components in an app.
           }
 
 For overlay layers ('base_layer' == false), 'checked' can be tru for an arbitrary number of overlay layers.
-For base layers maximum one layer should be checked."""
+For base layers maximum one layer should be checked.
+- hillshading (boolean; default True)"""
     @_explicitize_args
-    def __init__(self, id=Component.REQUIRED, center=Component.UNDEFINED, map_bounds=Component.UNDEFINED, layers=Component.UNDEFINED, height=Component.UNDEFINED, **kwargs):
-        self._prop_names = ['id', 'center', 'map_bounds', 'layers']
+    def __init__(self, id=Component.REQUIRED, center=Component.UNDEFINED, map_bounds=Component.UNDEFINED, layers=Component.UNDEFINED, hillshading=Component.UNDEFINED, height=Component.UNDEFINED, **kwargs):
+        self._prop_names = ['id', 'center', 'map_bounds', 'layers', 'hillshading']
         self._type = 'LayeredMap'
         self._namespace = 'webviz_subsurface_components'
         self._valid_wildcard_attributes =            []
-        self.available_properties = ['id', 'center', 'map_bounds', 'layers']
+        self.available_properties = ['id', 'center', 'map_bounds', 'layers', 'hillshading']
         self.available_wildcard_properties =            []
 
         _explicit_args = kwargs.pop('_explicit_args')
