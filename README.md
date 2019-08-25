@@ -77,8 +77,6 @@ If you have selected install_dependencies during the prompt, you can skip this p
         `webviz_subsurface_components/__init__.py` so dash will serve them
         automatically when the component suite is requested.
 
--   [Review your code](./review_checklist.md)
-
 ### Build code and install
 
 1.  Build your code:
@@ -87,5 +85,5 @@ If you have selected install_dependencies during the prompt, you can skip this p
     ```
 2.  Install the Python package:
     ```
-    python setup.py install
+    pip install -e .
     ```

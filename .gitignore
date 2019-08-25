@@ -1,3 +1,8 @@
+# Dash build code
+
+webviz_subsurface_components/**/*
+!webviz_subsurface_components/__init__.py
+
 # Created by .ignore support plugin (hsz.mobi)
 ### VisualStudioCode template
 .vscode/*
