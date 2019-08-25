@@ -1,4 +1,4 @@
-# Dash build code
+# Dash built code
 
 webviz_subsurface_components/**/*
 !webviz_subsurface_components/__init__.py
