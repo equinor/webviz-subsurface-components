@@ -1,15 +1,16 @@
 /* eslint no-magic-numbers: 0 */
 import React, {Component} from 'react';
-import HistoryMatchDemo  from './HistoryMatchDemo';
-import MorrisDemo  from './MorrisDemo';
-import SubsurfaceMapDemo  from './SubsurfaceMapDemo';
+import HistoryMatchDemo from './HistoryMatchDemo';
+import MorrisDemo from './MorrisDemo';
+import SubsurfaceMapDemo from './SubsurfaceMapDemo';
+import LayeredMapDemo from './LayeredMapDemo';
 
 
 class App extends Component {
 
     constructor(props) {
         super(props)
-        this.state = {value:'SubsurfaceMap'}
+        this.state = {value:'LayeredMap'}
     }
 
     onChange(e) {
@@ -27,6 +28,9 @@ class App extends Component {
             case "SubsurfaceMap": { 
                 return <SubsurfaceMapDemo/>
             }
+            case "LayeredMap": { 
+                return <LayeredMapDemo/>
+            }
             default: { 
                 return null           
             } 
@@ -37,10 +41,10 @@ class App extends Component {
         return (
             <div>
                 <select value={this.state.value} onChange={this.onChange.bind(this)} >
-                    <option value = "HistoryMatch">HistoryMatch</option>
-                    <option value = "Morris">Morris</option>
-                    <option value = "SubsurfaceMap">SubsurfaceMap</option>
-                    
+                    <option value="HistoryMatch">HistoryMatch</option>
+                    <option value="Morris">Morris</option>
+                    <option value="SubsurfaceMap">SubsurfaceMap</option>
+                    <option value="LayeredMap">LayeredMap</option>
                 </select>
                 {this.renderDemo()}
             </div>

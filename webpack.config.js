@@ -59,7 +59,7 @@ module.exports = (env, argv) => {
                     exclude: /node_modules/,
                     use: {
                         loader: 'babel-loader',
-                    },
+                    }
                 },
                 {
                     test: /\.css$/,
@@ -69,9 +69,17 @@ module.exports = (env, argv) => {
                         },
                         {
                             loader: 'css-loader',
-                        },
-                    ],
+                        }
+                    ]
                 },
+                {
+                    test: /\.(png|jpg|gif)$/i,
+                    use: [
+                        {
+                            loader: 'url-loader'
+                        }
+                    ]
+                }
             ],
         },
         devtool
