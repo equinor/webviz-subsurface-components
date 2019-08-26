@@ -2,7 +2,7 @@ import regl from 'regl';
 import greyscale2colormap from './greyscale2colormap';
 import direct_light from './direct_light';
 
-function alter_image(map_base64, colormap_base64, canvas){
+function alter_image(map_base64, colormap_base64, hillshading, canvas){
 
     const reglObj = regl({
                           gl: canvas.getContext('webgl', { premultipliedAlpha: false }),
@@ -28,10 +28,8 @@ function alter_image(map_base64, colormap_base64, canvas){
 
             const colormap = textures[1].texture
 
-            const hill_shading = true; // TODO: Pass this through the dash component
-
-            const color_buffer = greyscale2colormap(reglObj, canvas, map_image, colormap, hill_shading);
-            if (hill_shading){
+            const color_buffer = greyscale2colormap(reglObj, canvas, map_image, colormap, hillshading);
+            if (hillshading){
                 direct_light(reglObj, canvas, map_image, color_buffer, false);
             }
 

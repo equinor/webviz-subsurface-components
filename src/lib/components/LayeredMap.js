@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import {CRS} from 'leaflet';
 import { LayersControl, Map, ScaleControl } from 'react-leaflet'
 import Colormap from '../private_components/layered-map-resources/Colormap.react'
+import HillshadeSwitch from '../private_components/layered-map-resources/HillshadeSwitch.react'
 import CompositeMapLayer from '../private_components/layered-map-resources/CompositeMapLayer.react'
 
 const { BaseLayer, Overlay } = LayersControl
@@ -15,12 +16,17 @@ class LayeredMap extends Component {
     constructor(props) {
         super(props)
         this.mapRef = React.createRef()
+        this.state = {hillShading: this.props.hillShading}
     }
 
     componentDidMount() {
         this.mapRef.current.leafletElement.addEventListener('overlayremove', (e) => {console.log(e)});
         this.mapRef.current.leafletElement.addEventListener('overlayadd', (e) => {console.log(e)});
         this.mapRef.current.leafletElement.addEventListener('baselayerchange', (e) => {console.log(e)});
+    }
+
+    handleHillshadingChange(value){
+        this.setState({hillShading: !this.state.hillShading})
     }
 
     render() {
@@ -33,19 +39,20 @@ class LayeredMap extends Component {
                      attributionControl={false}
                      crs={CRS.Simple}>
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
+                    <HillshadeSwitch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
                     <LayersControl position='topright'>
-                        {this.props.layers.filter(layer => layer.base_layer).map((layer, index) => (
-                            <BaseLayer checked={layer.checked} name={layer.name} key={index}>
-                                <CompositeMapLayer layer={layer} />
+                        {this.props.layers.filter(layer => layer.base_layer).map((layer) => (
+                            <BaseLayer checked={layer.checked} name={layer.name} key={layer.name}>
+                                <CompositeMapLayer layer={layer} hillShading={this.state.hillShading} />
                             </BaseLayer>
                         ))}
-                        {this.props.layers.filter(layer => !layer.base_layer).map((layer, index) => (
-                            <Overlay checked={layer.checked} name={layer.name} key={index}>
-                                <CompositeMapLayer layer={layer} />
+                        {this.props.layers.filter(layer => !layer.base_layer).map((layer) => (
+                            <Overlay checked={layer.checked} name={layer.name} key={layer.name}>
+                                <CompositeMapLayer layer={layer} hillShading={this.state.hillShading} />
                             </Overlay>
                         ))}
                     </LayersControl>
-                    <Colormap />
+                    <Colormap position='bottomleft' />
                 </Map>
         );
     }
@@ -53,6 +60,7 @@ class LayeredMap extends Component {
 
 LayeredMap.defaultProps = {
     height: 800,
+    hillShading: true
 };
 
 LayeredMap.propTypes = {
@@ -86,6 +94,8 @@ LayeredMap.propTypes = {
      * For base layers maximum one layer should be checked.
      */
     layers: PropTypes.array,
+
+    hillShading: PropTypes.bool
 
 };
 

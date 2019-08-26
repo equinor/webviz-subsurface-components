@@ -18,26 +18,25 @@ class CanvasOverlay extends MapLayer {
         return null;
     }
 
-	_animateZoom(e) {
-		L.DomUtil.setTransform(
+    _animateZoom(e) {
+        L.DomUtil.setTransform(
             this.el,
             this._map._latLngBoundsToNewLayerBounds(this._bounds, e.zoom, e.center).min,
             this._map.getZoomScale(e.zoom)
         )
-	}
+    }
 
-	_reset() {
-        var bounds = new Bounds(
-                this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
-                this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
-        var size = bounds.getSize();
+    _reset() {
+        const bounds = new Bounds(
+            this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
+            this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
+        const size = bounds.getSize();
 
-		L.DomUtil.setPosition(this.el, bounds.min);
+        L.DomUtil.setPosition(this.el, bounds.min);
 
-		this.el.style.width  = size.x + 'px';
-		this.el.style.height = size.y + 'px';
-	}
-
+        this.el.style.width  = size.x + 'px';
+        this.el.style.height = size.y + 'px';
+    }
 
     componentDidMount() {
         const mapSize = this.props.leaflet.map.getSize();
@@ -64,11 +63,17 @@ class CanvasOverlay extends MapLayer {
         super.componentDidMount()
         this.props.drawMethod(this.el)
         this._reset()
-  }
+    }
 
-  componentWillUnmount() {
-	L.DomUtil.remove(this.el)
-  }
+    componentDidUpdate(prevProps) {
+        if (this.props.drawMethod !== prevProps.drawMethod) {
+            this.props.drawMethod(this.el)
+        }
+    }
+
+    componentWillUnmount() {
+        L.DomUtil.remove(this.el)
+    }
 
 }
 

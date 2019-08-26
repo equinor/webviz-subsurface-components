@@ -16,6 +16,7 @@
   "author": "R&T Equinor",
   "license": "LGPL",
   "dependencies": {
+    "@material-ui/core": "^4.3.3",
     "d3": "^5.11.0",
     "gl-matrix": "^3.0.0",
     "leaflet": "^1.5.1",

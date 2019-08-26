@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 
 class Colormap extends MapControl {
 
-  createLeafletElement(opts) {
+  createLeafletElement(props) {
     const MapInfo = L.Control.extend({
       onAdd: map => {
         this.panelDiv = L.DomUtil.create('div', 'info');
@@ -14,7 +14,7 @@ class Colormap extends MapControl {
         return this.panelDiv;
       }
     });
-    return new MapInfo({ position: 'bottomleft' });
+    return new MapInfo({ position: props.position });
   }
 
   componentDidMount() {
