@@ -19,8 +19,10 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - pip install dash[testing]
   - npm install
+  - pip install .[dependencies]
+  - pip install .[tests]
+  - pip install dash[testing]
   - wget https://chromedriver.storage.googleapis.com/76.0.3809.12/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip
   - export PATH=$PATH:$PWD
@@ -29,8 +31,6 @@ script:
   - npm run test
   - npm run build:all
   - pip install .
-  - pip install .[dependencies]
-  - pip install .[tests]
   - pytest
 
 deploy:
