@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import React, {Component} from 'react'
 import { withLeaflet, MapControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
-import Switch from '@material-ui/core/Switch';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import MaterialSwitch from '@material-ui/core/Switch'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 
 
 class HillshadeSwitch extends MapControl {
@@ -43,7 +43,7 @@ class HillshadeSwitch extends MapControl {
     render() {
         return ReactDOM.createPortal(
             <FormControlLabel
-                control={<Switch checked={this.state.checked} onChange={this.handleChange.bind(this)} />}
+                control={<MaterialSwitch checked={this.state.checked} onChange={this.handleChange.bind(this)} />}
                 label={this.props.label}
             />, 
             this.panelDiv

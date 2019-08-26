@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import {CRS} from 'leaflet';
 import { LayersControl, Map, ScaleControl } from 'react-leaflet'
 import Colormap from '../private_components/layered-map-resources/Colormap.react'
-import HillshadeSwitch from '../private_components/layered-map-resources/HillshadeSwitch.react'
+import Switch from '../private_components/layered-map-resources/Switch.react'
 import CompositeMapLayer from '../private_components/layered-map-resources/CompositeMapLayer.react'
 
 const { BaseLayer, Overlay } = LayersControl
@@ -39,7 +39,7 @@ class LayeredMap extends Component {
                      attributionControl={false}
                      crs={CRS.Simple}>
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
-                    <HillshadeSwitch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
+                    <Switch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
                     <LayersControl position='topright'>
                         {this.props.layers.filter(layer => layer.base_layer).map((layer) => (
                             <BaseLayer checked={layer.checked} name={layer.name} key={layer.name}>
