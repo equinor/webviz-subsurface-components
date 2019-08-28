@@ -12,7 +12,7 @@ with open(os.path.join('webviz_subsurface_components', 'package.json')) as f:
 package_name = package['name'].replace(' ', '_').replace('-', '_')
 
 install_requires = [
-    'dash~=1.0.1'
+    'dash~=1.1'
 ]
 
 tests_require = [
@@ -43,7 +43,7 @@ setup(
         'tests': tests_require,
         'dependencies': install_requires
     },
-    setup_requires=['setuptools_scm>=3.2.0'],
+    setup_requires=['setuptools_scm~=3.2'],
     use_scm_version=True,
     classifiers=[
         'Programming Language :: Python :: 3',

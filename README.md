@@ -37,6 +37,7 @@ If you have selected install_dependencies during the prompt, you can skip this p
 3. Install python packages required to build components.
     ```
     pip install .[dependencies]
+    pip install dash[dev]
     ```
 4. Install the python packages for testing (optional)
     ```
