@@ -20,9 +20,6 @@ before_install:
 
 install:
   - export GIT_TAG=$(git describe --tags)
-  - echo $GIT_TAG
-  - git tag --delete $(git tag --list)
-  - git tag $GIT_TAG
   - npm install
   - pip install .[dependencies]
   - pip install .[tests]
@@ -37,6 +34,11 @@ script:
   - pip install .
   - pytest
 
+before_deploy:
+  # Set the version tag back to what was sent from the git release
+  # This changed locally due to local building of the code
+  - git tag --delete $(git tag --list)
+  - git tag $GIT_TAG
 deploy:
   - provider: pypi
     user: webviz
