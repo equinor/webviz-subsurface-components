@@ -19,7 +19,6 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - export GIT_TAG=$(git describe --tags)
   - npm install
   - pip install .[dependencies]
   - pip install dash[dev]
@@ -39,7 +38,7 @@ before_deploy:
   # Set the version tag back to what was sent from the git release
   # This changed locally due to local building of the code
   - git tag --delete $(git tag --list)
-  - git tag $GIT_TAG
+  - git tag $TRAVIS_TAG
 deploy:
   - provider: pypi
     skip_cleanup: true
