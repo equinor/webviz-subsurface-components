@@ -19,9 +19,12 @@ before_install:
   - pip install --upgrade pip
 
 install:
+  - export GIT_TAG=$(git describe --tags)
+  - echo $GIT_TAG
+  - git tag --delete $(git tag --list)
+  - git tag $GIT_TAG
   - npm install
   - pip install .[dependencies]
-  - pip install dash[dev]
   - pip install .[tests]
   - pip install dash[testing]
   - wget https://chromedriver.storage.googleapis.com/76.0.3809.12/chromedriver_linux64.zip
@@ -36,7 +39,6 @@ script:
 
 deploy:
   - provider: pypi
-    skip_cleanup: true
     user: webviz
     password:
       secure: XhoUT3skRNVZLuSxK8TOPwTUNF6p7xdZ5xU+lPGcLNRoWFUUZHyKiwI3CAuRPP01bMl4ifM0V+4Y3ov4XDNnotr6fL/xhIaK83wBfUW0w9u6FCmsfXBHh8qj5ELgqdJPdecJNXR3UVHSpnX5zuGzlOeTKpRL1iKNO5vOF9vRmJxG0J3sdqkrp8ZraEtBU8pgq5+reMduX309aXYBrhvnedI1L0d7IeYBCAhilEcmA+yngifyssaxIZIa9jMPyGIPcEihlZ2eho5yiko1Pg/jrZQRrK9s4IkUgJnyNuxYrRz0OjDCeWPThzXhdPo0PnXkChDPjcy00cVE7R8qFYAo/npCELsmaSiQHc0JY1RsmCM7T2ptKy4iQgh9q2wUVZN8csflHHgzY4FPR+w3fjtJ5O3RSjObutyM/ByAU+Qq/59D5tUPMDA+6lHQPTZaDbiKcH/a9QUszsEYf0m7e3ViMJcZfauSshGu8517yNKbRuwWTRILONjryKov0eqeTM47lNTVOXeUkhHyQpHpSl4rSm28yaTMnmFohbWITbr3Oy4nOCuV/RSAom0b6n60UP4KFtoNq7Y8u+IftTc1E9JueVXyaqSCEBbxOMhpzDh7f92xQliOw0/vTmy8OaLjaX8K/A0YrhvtKgVhOahFStaMjcr67LqR3hr++bBXMAw9mP4=
