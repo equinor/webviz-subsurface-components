@@ -35,10 +35,9 @@ script:
   - pytest
 
 before_deploy:
-  # Set the version tag back to what was sent from the git release
-  # This changed locally due to local building of the code
-  - git tag --delete $(git tag --list)
-  - git tag $TRAVIS_TAG
+  # Set the version back to what was sent from the git release.
+  # This changed locally due to local building of the code.
+  - export SETUPTOOLS_SCM_PRETEND_VERSION=$TRAVIS_TAG
 deploy:
   - provider: pypi
     skip_cleanup: true
