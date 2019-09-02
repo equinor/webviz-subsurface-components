@@ -86,7 +86,7 @@ class CompositeMapLayer extends Component {
 CompositeMapLayer.propTypes = {
     /* Data for one single layer. See parent component LayeredMap for documentation.
      */
-    layers: PropTypes.object,
+    layer: PropTypes.object,
     hillShading: PropTypes.bool
 };
 

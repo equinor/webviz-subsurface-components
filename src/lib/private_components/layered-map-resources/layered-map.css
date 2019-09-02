@@ -9,9 +9,7 @@
   width: 200px;
   padding: 5px;
   display: grid;
-  /* csslint ignore:start */
-  grid-template-columns: 1fr 1fr;
-  /* csslint ignore:end */
+  grid-template-columns: 1fr 1fr; /* https://github.com/CSSLint/csslint/issues/734 */
 }
 
 .leaflet-colorbar-image {
