@@ -6,8 +6,10 @@ import numpy as np
 from matplotlib import cm
 
 import dash
+from dash.dependencies import Input, Output
 import dash_html_components as html
 import webviz_subsurface_components
+
 
 def array_to_png(Z, shift=True, colormap=False):
     '''The layered map dash component takes in pictures as base64 data
@@ -106,23 +108,15 @@ if __name__ == '__main__':
             'data':
                 [
                     {
-                     'type': 'image',
-                     'url': map_data,
-                     'colormap': colormap,
-                     'unit': 'm',
-                     'minvalue': min_value,
-                     'maxvalue': max_value,
-                     'bounds': [[432205, 6475078],
-                                [437720, 6481113]]
+                        'type': 'image',
+                        'url': map_data,
+                        'colormap': colormap,
+                        'unit': 'm',
+                        'minvalue': min_value,
+                        'maxvalue': max_value,
+                        'bounds': [[432205, 6475078],
+                                   [437720, 6481113]]
                     },
-                    {
-                     'type': 'polyline',
-                     'positions': [[433204, 6475077],
-                                   [436204, 6480077],
-                                   [437204, 6475077]],
-                     'color': 'green',
-                     'tooltip': 'This is a green fault line'
-                    }
                 ]
         },
         {
@@ -132,17 +126,17 @@ if __name__ == '__main__':
             'data':
                 [
                     {
-                     'type': 'image',
-                     'url': map_data,
-                     'bounds': [[432205, 6475078],
-                                [437720, 6481113]]
+                        'type': 'image',
+                        'url': map_data,
+                        'bounds': [[432205, 6475078],
+                                   [437720, 6481113]]
                     }
                 ]
         },
         {
             'name': 'Some overlay layer',
             'base_layer': False,
-            'checked': True,
+            'checked': False,
             'data':
                 [
                     {
@@ -166,11 +160,10 @@ if __name__ == '__main__':
 
     with open('../src/demo/example-data/layered-map.json', 'w') as fh:
         json.dump({
-                    'map_bounds': map_bounds,
-                    'center': center,
-                    'layers': layers
-                   }, fh)
-
+            'map_bounds': map_bounds,
+            'center': center,
+            'layers': layers
+        }, fh)
 
     app = dash.Dash(__name__)
 
@@ -180,7 +173,19 @@ if __name__ == '__main__':
             map_bounds=map_bounds,
             center=center,
             layers=layers
-        )
+        ),
+        html.Pre(id='polyline'),
+        html.Pre(id='marker'),
     ])
+
+    @app.callback(Output('polyline', 'children'),
+                  [Input('volve-map', 'line_points')])
+    def get_edited_line(coords):
+        return f'Edited polyline: {json.dumps(coords)}'
+
+    @app.callback(Output('marker', 'children'),
+                  [Input('volve-map', 'marker_point')])
+    def get_edited_line(coords):
+        return f'Edited marker: {json.dumps(coords)}'
 
     app.run_server(debug=True)
