@@ -326,5 +326,5 @@
 .leaflet-draw-toolbar a {
   background-image: url('./spritesheet.png');
   background-repeat: no-repeat;
-  color: transparent !important;
+  color: transparent !important; /* csslint allow: known-properties, important */
 }

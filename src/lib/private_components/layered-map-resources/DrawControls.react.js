@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { MapControl, withLeaflet } from 'react-leaflet';
+import PropTypes from 'prop-types';
+import { withLeaflet } from 'react-leaflet';
 import  {EditControl}  from 'react-leaflet-draw';
 import "./assets/leaflet.draw.css";
 import L from 'leaflet';
@@ -18,7 +19,7 @@ L.Icon.Default.mergeOptions({
 *    Helper function to find marker type.
 *    https://stackoverflow.com/questions/18014907/leaflet-draw-retrieve-layer-type-on-drawedited-event
 **/
-var getShapeType = function(layer) {
+var getShapeType = (layer) => {
 
     if (layer instanceof L.Circle) {
         return 'circle';
@@ -39,6 +40,7 @@ var getShapeType = function(layer) {
     if (layer instanceof L.Rectangle) {
         return 'rectangle';
     }
+    return null
 
 }
 
@@ -46,7 +48,7 @@ class DrawControls extends Component {
 
     _onEdited(e) {
         e.layers.eachLayer( (layer) => {
-            let layertype = getShapeType(layer)
+            const layertype = getShapeType(layer)
             if (layertype === 'polyline') {
                 const coords = layer._latlngs.map(p => {
                   return [p.lat, p.lng]
@@ -74,8 +76,8 @@ class DrawControls extends Component {
     }
   
     _onCreated(e) {
-        let type = e.layerType
-        let layer = e.layer
+        const type = e.layerType
+        const layer = e.layer
         if (type === 'marker') {
             this.props.markerCoords([e.layer._latlng.lat, e.layer._latlng.lng])
             this.removeLayers('marker')
@@ -105,5 +107,14 @@ class DrawControls extends Component {
         )
     }
 }
+
+DrawControls.propTypes = {
+    /* Coordinates for selected marker*/
+    markerCoords: PropTypes.func,
+
+    /* Coordinates for selected polyline*/
+    lineCoords: PropTypes.func
+};
+
 
 export default withLeaflet(DrawControls)
