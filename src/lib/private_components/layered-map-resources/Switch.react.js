@@ -7,7 +7,7 @@ import MaterialSwitch from '@material-ui/core/Switch'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 
 
-class HillshadeSwitch extends MapControl {
+class Switch extends MapControl {
 
     constructor(props){
         super(props)
@@ -22,7 +22,7 @@ class HillshadeSwitch extends MapControl {
     createLeafletElement(props) {
         const MapInfo = L.Control.extend({
             onAdd: map => {
-                this.panelDiv = L.DomUtil.create('div')
+                this.panelDiv = L.DomUtil.create('div', 'leaflet-custom-control')
                 return this.panelDiv
             }
         })
@@ -45,10 +45,11 @@ class HillshadeSwitch extends MapControl {
             <FormControlLabel
                 control={<MaterialSwitch checked={this.state.checked} onChange={this.handleChange.bind(this)} />}
                 label={this.props.label}
+                style={{paddingLeft: '10px'}}
             />, 
             this.panelDiv
         )
     }
 }
 
-export default withLeaflet(HillshadeSwitch);
+export default withLeaflet(Switch);

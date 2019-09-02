@@ -91,6 +91,9 @@ if __name__ == '__main__':
 
     center = [435200, 6478000]
 
+    min_value = int(np.nanmin(map_data))
+    max_value = int(np.nanmax(map_data))
+
     map_data = array_to_png(map_data)
     colormap = array_to_png(cm.get_cmap('viridis', 256)
                             ([np.linspace(0, 1, 256)]), colormap=True)
@@ -106,6 +109,9 @@ if __name__ == '__main__':
                      'type': 'image',
                      'url': map_data,
                      'colormap': colormap,
+                     'unit': 'm',
+                     'minvalue': min_value,
+                     'maxvalue': max_value,
                      'bounds': [[432205, 6475078],
                                 [437720, 6481113]]
                     },

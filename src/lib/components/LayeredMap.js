@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import 'leaflet/dist/leaflet.css';
 import {CRS} from 'leaflet';
 import { LayersControl, Map, ScaleControl } from 'react-leaflet'
-import Colormap from '../private_components/layered-map-resources/Colormap.react'
 import Switch from '../private_components/layered-map-resources/Switch.react'
 import CompositeMapLayer from '../private_components/layered-map-resources/CompositeMapLayer.react'
+import '../private_components/layered-map-resources/layered-map.css'
 
 const { BaseLayer, Overlay } = LayersControl
 const yx = ([x,y]) => {return [y, x]}
@@ -17,12 +17,6 @@ class LayeredMap extends Component {
         super(props)
         this.mapRef = React.createRef()
         this.state = {hillShading: this.props.hillShading}
-    }
-
-    componentDidMount() {
-        this.mapRef.current.leafletElement.addEventListener('overlayremove', (e) => {console.log(e)});
-        this.mapRef.current.leafletElement.addEventListener('overlayadd', (e) => {console.log(e)});
-        this.mapRef.current.leafletElement.addEventListener('baselayerchange', (e) => {console.log(e)});
     }
 
     handleHillshadingChange(value){
@@ -52,7 +46,6 @@ class LayeredMap extends Component {
                             </Overlay>
                         ))}
                     </LayersControl>
-                    <Colormap position='bottomleft' />
                 </Map>
         );
     }

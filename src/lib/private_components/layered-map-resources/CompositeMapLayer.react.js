@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import ImageOverlayWebGL from './ImageOverlayWebGL.react'
+import Colormap from './Colormap.react'
 
 import {
   Circle,
@@ -61,13 +62,16 @@ class CompositeMapLayer extends Component {
                                 )
                             case 'image':
                                 return (
-                                    <ImageOverlayWebGL
-                                      url={item.url}
-                                      colormap={item.colormap}
-                                      bounds={item.bounds.map(xy => yx(xy))}
-                                      hillShading={this.props.hillShading}
-                                      key={index}
-                                    />
+                                    <>
+                                        <ImageOverlayWebGL
+                                          url={item.url}
+                                          colormap={item.colormap}
+                                          bounds={item.bounds.map(xy => yx(xy))}
+                                          hillShading={this.props.hillShading}
+                                          key={index}
+                                        />
+                                        { 'colormap' in item && <Colormap colormap={item.colormap} unit={item.unit} minvalue={item.minvalue} maxvalue={item.maxvalue} position='bottomleft' key={'colormap' + index} /> }
+                                    </>
                                 )
                             default:
                                 return null
