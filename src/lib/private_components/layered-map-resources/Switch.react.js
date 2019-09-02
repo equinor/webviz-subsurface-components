@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import React, {Component} from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom';
 import { withLeaflet, MapControl } from 'react-leaflet'
 import PropTypes from 'prop-types'

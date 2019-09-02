@@ -18,9 +18,8 @@ class CompositeMapLayer extends Component {
     render_tooltip(item){
         if ('tooltip' in item){
             return <Tooltip sticky={true}>{item.tooltip}</Tooltip>
-        } else {
-            return null
         }
+        return null
     }
 
     render() {
@@ -83,5 +82,13 @@ class CompositeMapLayer extends Component {
     }
 
 }
+
+CompositeMapLayer.propTypes = {
+    /* Data for one single layer. See parent component LayeredMap for documentation.
+     */
+    layers: PropTypes.object,
+    hillShading: PropTypes.bool
+};
+
 
 export default CompositeMapLayer;

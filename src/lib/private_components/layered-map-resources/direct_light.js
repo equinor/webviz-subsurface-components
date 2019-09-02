@@ -57,7 +57,7 @@ function direct_light(reglObj, canvas, elevation_frame, color_frame, buffer_outp
         uniforms: {
             elevation_frame: elevation_frame,
             color_frame: color_frame,
-            elevation_scale: 0.03, // TODO: Calculate elevation_scale
+            elevation_scale: 0.03,
             resolution: [canvas.width, canvas.height],
             light_direction: vec3.normalize([], [1, 1, 1])
         },
