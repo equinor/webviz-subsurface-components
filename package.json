@@ -16,8 +16,13 @@
   "author": "R&T Equinor",
   "license": "LGPL",
   "dependencies": {
+    "@material-ui/core": "^4.3.3",
     "d3": "^5.11.0",
-    "ramda": "^0.25.0"
+    "gl-matrix": "^3.0.0",
+    "leaflet": "^1.5.1",
+    "ramda": "^0.25.0",
+    "react-leaflet": "^2.4.0",
+    "regl": "^1.3.11"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
@@ -41,6 +46,7 @@
     "sinon": "^7.4.1",
     "sinon-chai": "^3.3.0",
     "style-loader": "^0.21.0",
+    "url-loader": "^2.1.0",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.7",
     "webpack-serve": "^1.0.2"

@@ -1,0 +1,22 @@
+.leaflet-custom-control {
+  opacity: 0.9;
+  background-color: rgba(256, 256, 256, 1);
+  border-radius: 5px;
+  border: 2px solid #aaaaaa;
+}
+
+.leaflet-colorbar {
+  width: 200px;
+  padding: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* https://github.com/CSSLint/csslint/issues/734 */
+}
+
+.leaflet-colorbar-image {
+  grid-column-start: 1; 
+  grid-column-end: 3; 
+}
+
+.leaflet-colorbar-right-label {
+  text-align: right;
+}
