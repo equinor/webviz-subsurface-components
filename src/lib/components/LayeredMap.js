@@ -19,7 +19,7 @@ class LayeredMap extends Component {
         this.state = {hillShading: this.props.hillShading}
     }
 
-    handleHillshadingChange(value){
+    handleHillshadingChange(){
         this.setState({hillShading: !this.state.hillShading})
     }
 

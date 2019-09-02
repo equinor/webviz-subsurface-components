@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import L from 'leaflet';
 import { MapLayer, withLeaflet } from 'react-leaflet';
@@ -39,8 +38,6 @@ class CanvasOverlay extends MapLayer {
     }
 
     componentDidMount() {
-        const mapSize = this.props.leaflet.map.getSize();
-
         this.el = L.DomUtil.create('canvas', 'leaflet-zoom-animated')
 
         const LeafletCanvasLayer = L.Layer.extend({
@@ -76,5 +73,15 @@ class CanvasOverlay extends MapLayer {
     }
 
 }
+
+CanvasOverlay.propTypes = {
+    /**
+     * The bounds of the image data, given as [[xmin, ymin], [xmax, ymax]] (in physical coordinates).
+     */
+    bounds: PropTypes.array,
+
+    /* Function which should be used for drawing the generated canvas */
+    drawMethod: PropTypes.func
+};
 
 export default withLeaflet(CanvasOverlay)

@@ -12,7 +12,7 @@ class ImageOverlayWebGL extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.hillShading !== nextProps.hillshading || this.props.url !== nextProps.url || this.props.colormap !== nextProps.colormap) {
+        if (this.props.hillShading !== nextProps.hillShading || this.props.url !== nextProps.url || this.props.colormap !== nextProps.colormap) {
             this.setState({drawMethod: (canvas) => alter_image(nextProps.url, nextProps.colormap, nextProps.hillShading, canvas)})
         }
     }
@@ -20,16 +20,16 @@ class ImageOverlayWebGL extends Component {
     render() {
         if (typeof this.props.colormap === 'undefined'){
             return <ImageOverlay url={this.props.url} bounds={this.props.bounds} />
-        } else {
-            return <CanvasOverlay drawMethod={this.state.drawMethod} bounds={this.props.bounds} />
         }
+        return <CanvasOverlay drawMethod={this.state.drawMethod} bounds={this.props.bounds} />
     }
 }
 
 ImageOverlayWebGL.propTypes = {
   url: PropTypes.string,
   colormap: PropTypes.string,
-  bounds: PropTypes.array
+  bounds: PropTypes.array,
+  hillShading: PropTypes.bool
 }
 
 export default ImageOverlayWebGL;

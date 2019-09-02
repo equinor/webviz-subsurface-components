@@ -1,5 +1,4 @@
 import L from 'leaflet'
-import React, {Component} from 'react'
 import { withLeaflet, MapControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -31,7 +30,7 @@ class Colormap extends MapControl {
 
   createLeafletElement(props) {
     const MapInfo = L.Control.extend({
-      onAdd: map => {
+      onAdd: () => {
         this.panelDiv = L.DomUtil.create('div', 'leaflet-custom-control')
         this.createColorBar(this.panelDiv)
         return this.panelDiv;
@@ -45,5 +44,20 @@ class Colormap extends MapControl {
     this.leafletElement.addTo(map);
   }
 }
+
+Colormap.propTypes = {
+    /* Colormap, given as base64 picture data string */
+    colormap: PropTypes.string,
+
+    /* Minimum value of color map */
+    minvalue: PropTypes.number,
+
+    /* Maximum value of color map */
+    maxvalue: PropTypes.number,
+
+    /* Unit to show in color map */
+    unit: PropTypes.string
+};
+
 
 export default withLeaflet(Colormap);

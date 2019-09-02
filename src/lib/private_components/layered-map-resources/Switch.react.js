@@ -1,6 +1,6 @@
 import L from 'leaflet'
-import ReactDOM from 'react-dom';
 import React, {Component} from 'react'
+import ReactDOM from 'react-dom';
 import { withLeaflet, MapControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 import MaterialSwitch from '@material-ui/core/Switch'
@@ -21,7 +21,7 @@ class Switch extends MapControl {
 
     createLeafletElement(props) {
         const MapInfo = L.Control.extend({
-            onAdd: map => {
+            onAdd: () => {
                 this.panelDiv = L.DomUtil.create('div', 'leaflet-custom-control')
                 return this.panelDiv
             }
@@ -51,5 +51,16 @@ class Switch extends MapControl {
         )
     }
 }
+
+Switch.propTypes = {
+    /* Label to be shown to the right of the switch */
+    label: PropTypes.string,
+
+    /* Callback function to call when switch changes */
+    handleChange: PropTypes.func,
+
+    /* Initial value of the swith */
+    checked: PropTypes.bool
+};
 
 export default withLeaflet(Switch);

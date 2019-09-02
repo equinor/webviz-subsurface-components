@@ -2,8 +2,10 @@ import { vec3 } from 'gl-matrix';
 
 function direct_light(reglObj, canvas, elevation_frame, color_frame, buffer_output=true){
 
+    let direct_light_buffer
+
     if (buffer_output){
-        var direct_light_buffer = reglObj.framebuffer({
+        direct_light_buffer = reglObj.framebuffer({
             width: canvas.width,
             height: canvas.height,
             colorType: 'float'

@@ -1,7 +1,9 @@
 function greyscale2colormap(reglObj, canvas, map_frame, colormap_frame, buffer_output=true){
 
+    let map_elevation_buffer
+
     if (buffer_output){
-        var map_elevation_buffer = reglObj.framebuffer({
+        map_elevation_buffer = reglObj.framebuffer({
             width: canvas.width,
             height: canvas.height,
             colorType: 'float'
