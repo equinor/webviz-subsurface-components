@@ -10,6 +10,7 @@ class LayeredMapDemo extends Component {
                        center={data.center}
                        layers={data.layers}
                        overlay_layers={data.overlay_layers}
+                       setProps={(e) => console.log(e)}
            />
   }
 }

@@ -64,6 +64,8 @@ class CanvasOverlay extends MapLayer {
 
     componentDidUpdate(prevProps) {
         if (this.props.drawMethod !== prevProps.drawMethod) {
+            this._bounds = toLatLngBounds(this.props.bounds)
+            this._reset()
             this.props.drawMethod(this.el)
         }
     }
