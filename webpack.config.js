@@ -79,7 +79,12 @@ module.exports = (env, argv) => {
                             loader: 'url-loader'
                         }
                     ]
+                },
+                {
+                    test: /\.svg$/,
+                    loader: 'svg-inline-loader'
                 }
+
             ],
         },
         devtool
