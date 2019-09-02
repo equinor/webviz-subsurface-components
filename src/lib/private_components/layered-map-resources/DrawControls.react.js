@@ -79,11 +79,11 @@ class DrawControls extends Component {
         const type = e.layerType
         const layer = e.layer
         if (type === 'marker') {
-            this.props.markerCoords([e.layer._latlng.lat, e.layer._latlng.lng])
+            this.props.markerCoords([layer._latlng.lat, layer._latlng.lng])
             this.removeLayers('marker')
         }
         if (type === 'polyline') {
-                const coords = e.layer._latlngs.map(p => {
+                const coords = layer._latlngs.map(p => {
                 return [p.lat, p.lng]
             })
             this.props.lineCoords(coords)
