@@ -50,9 +50,15 @@ class DrawControls extends Component {
             const layertype = getShapeType(layer)
             if (layertype === 'polyline') {
                 const coords = layer._latlngs.map(p => {
-                  return [p.lat, p.lng]
+                    return [p.lat, p.lng]
                 })
                 this.props.lineCoords(coords)
+            }
+            if (layertype === 'polygon') {
+                const coords = layer._latlngs[0].map(p => {
+                    return [p.lat, p.lng]
+                })
+                this.props.polygonCoords(coords)
             }
             if (layertype === 'marker') {
                 this.props.markerCoords([layer._latlng.lat, layer._latlng.lng])  
