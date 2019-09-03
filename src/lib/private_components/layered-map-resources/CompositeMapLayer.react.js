@@ -23,54 +23,52 @@ class CompositeMapLayer extends Component {
     }
 
     renderItem(item, index) {
-        switch(item.type) {
-            case 'polyline':
-                return (
-                    <Polyline
-                      color={item.color}
-                      positions={item.positions.map(xy => yx(xy))}
-                      key={index}
-                    >
-                        {this.renderTooltip(item)}
-                    </Polyline>
-                )
-            case 'polygon':
-                return (
-                    <Polygon
-                      color={item.color}
-                      positions={item.positions.map(xy => yx(xy))}
-                      key={index}
-                    >
-                        {this.renderTooltip(item)}
-                    </Polygon>
-                )
-            case 'circle':
-                return (
-                    <Circle
-                      color={item.color}
-                      center={yx(item.center)}
-                      radius={item.radius}
-                      key={index}
-                    >
-                        {this.renderTooltip(item)}
-                    </Circle>
-                )
-            case 'image':
-                return (
-                    <>
-                        <ImageOverlayWebGL
+        console.log(item.type)
+        if (item.type === 'polyline') {
+            return (
+                <Polyline
+                    color={item.color}
+                    positions={item.positions.map(xy => yx(xy))}
+                    key={index}>
+                    {this.renderTooltip(item)}
+                </Polyline>
+            )
+        }
+        if (item.type === 'polygon') {
+            return (
+                <Polygon
+                    color={item.color}
+                    positions={item.positions.map(xy => yx(xy))}
+                    key={index}>
+                    {this.renderTooltip(item)}
+                </Polygon>
+            )
+        }
+        if (item.type === 'circle') {
+            return (
+                <Circle
+                    color={item.color}
+                    center={yx(item.center)}
+                    radius={item.radius}
+                    key={index}>
+                    {this.renderTooltip(item)}
+                </Circle>
+            )
+        }
+        if (item.type === 'image') {
+            return (
+                <>
+                    <ImageOverlayWebGL
                           url={item.url}
                           colormap={item.colormap}
                           bounds={item.bounds.map(xy => yx(xy))}
                           hillShading={this.props.hillShading}
-                          key={index}
-                        />
-                        { 'colormap' in item && <Colormap colormap={item.colormap} unit={item.unit} minvalue={item.minvalue} maxvalue={item.maxvalue} position='bottomleft' key={'colormap' + index} /> }
-                    </>
-                )
-            default:
-                return null
+                          key={index}/>
+                    { 'colormap' in item && <Colormap colormap={item.colormap} unit={item.unit} minvalue={item.minvalue} maxvalue={item.maxvalue} position='bottomleft' key={'colormap' + index} /> }
+                </>
+            )
         }
+        return null
     }
 
     render() {
