@@ -58,11 +58,11 @@ class DrawControls extends Component {
                 this.props.polygonCoords(coords)
             }
             if (layertype === 'marker') {
-                this.props.markerCoords([layer._latlng.lat, layer._latlng.lng])  
+                this.props.markerCoords([layer._latlng.lat, layer._latlng.lng])
             }
         })
     }
-  
+
     removeLayers(layertype) {
         const {edit} = this.refs
         const layerContainer = edit.leafletElement.options.edit.featureGroup
@@ -75,17 +75,15 @@ class DrawControls extends Component {
             }
         }
     }
-  
+
     _onCreated(e) {
         const type = e.layerType
         const layer = e.layer
         if (type === 'marker') {
-            console.log(type)
             this.props.markerCoords([layer._latlng.lat, layer._latlng.lng])
             this.removeLayers('marker')
         }
         if (type === 'polyline') {
-            console.log(type)
                 const coords = layer._latlngs.map(p => {
                 return [p.lat, p.lng]
             })
@@ -93,10 +91,8 @@ class DrawControls extends Component {
             this.removeLayers('polyline')
         }
         if (type === 'polygon') {
-            console.log(type)
                 const coords = layer._latlngs[0].map(p => {
                 return [p.lat, p.lng]
-         
             })
             this.props.polygonCoords(coords)
             this.removeLayers('polygon')
