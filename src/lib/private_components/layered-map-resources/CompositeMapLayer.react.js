@@ -23,7 +23,6 @@ class CompositeMapLayer extends Component {
     }
 
     renderItem(item, index) {
-        console.log(item.type)
         if (item.type === 'polyline') {
             return (
                 <Polyline
