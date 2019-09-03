@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withLeaflet } from 'react-leaflet';
 import  {EditControl}  from 'react-leaflet-draw';
-import "./assets/leaflet.draw.css";
+import "leaflet-draw/dist/leaflet.draw.css";
 import L from 'leaflet';
 
 
@@ -21,27 +21,26 @@ L.Icon.Default.mergeOptions({
 **/
 var getShapeType = (layer) => {
 
-    if (layer instanceof L.Circle) {
-        return 'circle';
+    switch(true) {
+        case (layer instanceof L.Rectangle): {
+            return 'rectangle'
+        }
+        case (layer instanceof L.Circle): {
+            return 'circle'
+        }
+        case (layer instanceof L.Marker): {
+            return 'marker'
+        }
+        case (layer instanceof L.Polygon): {
+            return 'polygon'
+        }
+        case (layer instanceof L.Polyline): {
+            return 'polyline'
+        }
+        default: {
+            return null
+        }
     }
-
-    if (layer instanceof L.Marker) {
-        return 'marker';
-    }
-
-    if ((layer instanceof L.Polyline) && ! (layer instanceof L.Polygon)) {
-        return 'polyline';
-    }
-
-    if ((layer instanceof L.Polygon) && ! (layer instanceof L.Rectangle)) {
-        return 'polygon';
-    }
-
-    if (layer instanceof L.Rectangle) {
-        return 'rectangle';
-    }
-    return null
-
 }
 
 class DrawControls extends Component {
