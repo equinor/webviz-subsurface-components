@@ -49,8 +49,8 @@ class LayeredMap extends Component {
                     </LayersControl>
                     <FeatureGroup>
                         <DrawControls
-                            lineCoords={(coords) => this.props.setProps({'line_points':coords})}
-                            markerCoords={(coords) => this.props.setProps({'marker_point':coords})} />
+                            lineCoords={(coords) => this.props.setProps({'line_points': coords})}
+                            markerCoords={(coords) => this.props.setProps({'marker_point': coords})} />
                     </FeatureGroup>
                 </Map>
         );
@@ -95,7 +95,7 @@ LayeredMap.propTypes = {
     * properties change
     */
     setProps: PropTypes.func,
-    
+
     /**
      * An array of different layers. Each layer is a dictionary with the following structure:
           {
