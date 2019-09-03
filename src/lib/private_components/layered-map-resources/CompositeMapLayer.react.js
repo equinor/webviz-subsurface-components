@@ -22,7 +22,7 @@ class CompositeMapLayer extends Component {
         return null
     }
 
-    renderItems(item, index) {
+    renderItem(item, index) {
         switch(item.type) {
             case 'polyline':
                 return (
@@ -79,7 +79,7 @@ class CompositeMapLayer extends Component {
                 {this.props.layer.data.map((item, index) => {
                     return (
                         <Fragment key={item.type}>
-                            {this.renderItems(item, index)}
+                            {this.renderItem(item, index)}
                         </Fragment>
                     )
                 })}
