@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withLeaflet } from 'react-leaflet';
 import  {EditControl}  from 'react-leaflet-draw';
-import "leaflet-draw/dist/leaflet.draw.css";
+import 'leaflet-draw/dist/leaflet.draw.css';
 import L from 'leaflet';
 
 
@@ -19,7 +19,7 @@ L.Icon.Default.mergeOptions({
 *    Helper function to find marker type.
 *    https://stackoverflow.com/questions/18014907/leaflet-draw-retrieve-layer-type-on-drawedited-event
 **/
-var getShapeType = (layer) => {
+const getShapeType = (layer) => {
 
     switch(true) {
         case (layer instanceof L.Rectangle): {
@@ -61,13 +61,12 @@ class DrawControls extends Component {
     }
   
     removeLayers(layertype) {
-        var {edit} = this.refs
-        var layerContainer = edit.leafletElement.options.edit.featureGroup
-        var layers = layerContainer._layers
-        var layer_ids = Object.keys(layers)
-        let layer
+        const {edit} = this.refs
+        const layerContainer = edit.leafletElement.options.edit.featureGroup
+        const layers = layerContainer._layers
+        const layer_ids = Object.keys(layers)
         for (var i = 0; i < layer_ids.length-1; i++) {
-            layer = layers[layer_ids[i]]
+            const layer = layers[layer_ids[i]]
             if (getShapeType(layer) === layertype) {
                 layerContainer.removeLayer(layer._leaflet_id)
             }
@@ -101,7 +100,7 @@ class DrawControls extends Component {
     render() {
         return (
             <EditControl
-              ref={"edit"}
+              ref={'edit'}
               position='topright'
               onEdited={this._onEdited.bind(this)}
               onCreated={this._onCreated.bind(this)}
