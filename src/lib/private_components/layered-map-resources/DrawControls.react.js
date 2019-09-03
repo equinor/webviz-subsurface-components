@@ -19,27 +19,24 @@ L.Icon.Default.mergeOptions({
 *    Helper function to find marker type.
 *    https://stackoverflow.com/questions/18014907/leaflet-draw-retrieve-layer-type-on-drawedited-event
 **/
+
+
 const getShapeType = (layer) => {
 
-    switch(true) {
-        case (layer instanceof L.Rectangle): {
+    if (layer instanceof L.Rectangle) {
             return 'rectangle'
-        }
-        case (layer instanceof L.Circle): {
+    }
+    if (layer instanceof L.Circle) {
             return 'circle'
-        }
-        case (layer instanceof L.Marker): {
+    }
+    if (layer instanceof L.Marker) {
             return 'marker'
-        }
-        case (layer instanceof L.Polygon): {
+    }
+    if (layer instanceof L.Polygon) {
             return 'polygon'
-        }
-        case (layer instanceof L.Polyline): {
+    }
+    if (layer instanceof L.Polyline) {
             return 'polyline'
-        }
-        default: {
-            return null
-        }
     }
 }
 
@@ -71,7 +68,7 @@ class DrawControls extends Component {
         const layerContainer = edit.leafletElement.options.edit.featureGroup
         const layers = layerContainer._layers
         const layer_ids = Object.keys(layers)
-        for (var i = 0; i < layer_ids.length-1; i++) {
+        for ( let i = 0; i < layer_ids.length-1; i++) {
             const layer = layers[layer_ids[i]]
             if (getShapeType(layer) === layertype) {
                 layerContainer.removeLayer(layer._leaflet_id)
@@ -83,10 +80,12 @@ class DrawControls extends Component {
         const type = e.layerType
         const layer = e.layer
         if (type === 'marker') {
+            console.log(type)
             this.props.markerCoords([layer._latlng.lat, layer._latlng.lng])
             this.removeLayers('marker')
         }
         if (type === 'polyline') {
+            console.log(type)
                 const coords = layer._latlngs.map(p => {
                 return [p.lat, p.lng]
             })
@@ -94,6 +93,7 @@ class DrawControls extends Component {
             this.removeLayers('polyline')
         }
         if (type === 'polygon') {
+            console.log(type)
                 const coords = layer._latlngs[0].map(p => {
                 return [p.lat, p.lng]
          
