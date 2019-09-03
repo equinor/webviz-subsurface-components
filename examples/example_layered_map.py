@@ -176,6 +176,7 @@ if __name__ == '__main__':
         ),
         html.Pre(id='polyline'),
         html.Pre(id='marker'),
+        html.Pre(id='polygon'),
     ])
 
     @app.callback(Output('polyline', 'children'),
@@ -187,5 +188,10 @@ if __name__ == '__main__':
                   [Input('volve-map', 'marker_point')])
     def get_edited_line(coords):
         return f'Edited marker: {json.dumps(coords)}'
+
+    @app.callback(Output('polygon', 'children'),
+                  [Input('volve-map', 'polygon_points')])
+    def get_edited_line(coords):
+        return f'Edited closed polygon: {json.dumps(coords)}'
 
     app.run_server(debug=True)

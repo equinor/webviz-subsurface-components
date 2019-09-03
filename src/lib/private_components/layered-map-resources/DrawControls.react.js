@@ -88,6 +88,14 @@ class DrawControls extends Component {
             this.props.lineCoords(coords)
             this.removeLayers('polyline')
         }
+        if (type === 'polygon') {
+                const coords = layer._latlngs[0].map(p => {
+                return [p.lat, p.lng]
+         
+            })
+            this.props.polygonCoords(coords)
+            this.removeLayers('polygon')
+        }
     }
 
     render() {
@@ -100,7 +108,6 @@ class DrawControls extends Component {
               draw={{
                   rectangle: false,
                   circle: false,
-                  polygon:false,
                   circlemarker: false
               }}/>
         )

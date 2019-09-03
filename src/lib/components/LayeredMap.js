@@ -50,7 +50,8 @@ class LayeredMap extends Component {
                     <FeatureGroup>
                         <DrawControls
                             lineCoords={(coords) => this.props.setProps({'line_points': coords})}
-                            markerCoords={(coords) => this.props.setProps({'marker_point': coords})} />
+                            markerCoords={(coords) => this.props.setProps({'marker_point': coords})}
+                            polygonCoords={(coords) => this.props.setProps({'polygon_points': coords})} />
                     </FeatureGroup>
                 </Map>
         );
@@ -84,6 +85,11 @@ LayeredMap.propTypes = {
      * The coordinates of the last edited polyline
      */
     line_points: PropTypes.array,
+
+    /**
+     * The coordinates of the last edited closed polygon
+     */
+    polygon_points: PropTypes.array,
 
     /**
      * The coordinates of the last edited marker
