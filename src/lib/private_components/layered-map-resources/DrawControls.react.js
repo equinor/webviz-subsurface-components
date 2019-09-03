@@ -124,7 +124,10 @@ DrawControls.propTypes = {
     markerCoords: PropTypes.func,
 
     /* Coordinates for selected polyline*/
-    lineCoords: PropTypes.func
+    lineCoords: PropTypes.func,
+
+    /* Coordinates for selected polygon*/
+    polygonCoords: PropTypes.func
 };
 
 
