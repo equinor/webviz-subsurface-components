@@ -78,7 +78,7 @@ class CompositeMapLayer extends Component {
             <LayerGroup>
                 {this.props.layer.data.map((item, index) => {
                     return (
-                        <Fragment key={item.type}>
+                        <Fragment key={index}>
                             {this.renderItem(item, index)}
                         </Fragment>
                     )
