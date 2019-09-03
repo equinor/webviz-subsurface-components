@@ -3,9 +3,10 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import 'leaflet/dist/leaflet.css';
 import {CRS} from 'leaflet';
-import { LayersControl, Map, ScaleControl } from 'react-leaflet'
+import { LayersControl, Map, ScaleControl, FeatureGroup } from 'react-leaflet'
 import Switch from '../private_components/layered-map-resources/Switch.react'
 import CompositeMapLayer from '../private_components/layered-map-resources/CompositeMapLayer.react'
+import DrawControls from '../private_components/layered-map-resources/DrawControls.react'
 import '../private_components/layered-map-resources/layered-map.css'
 
 const { BaseLayer, Overlay } = LayersControl
@@ -46,6 +47,12 @@ class LayeredMap extends Component {
                             </Overlay>
                         ))}
                     </LayersControl>
+                    <FeatureGroup>
+                        <DrawControls
+                            lineCoords={(coords) => this.props.setProps({'line_points': coords})}
+                            markerCoords={(coords) => this.props.setProps({'marker_point': coords})}
+                            polygonCoords={(coords) => this.props.setProps({'polygon_points': coords})} />
+                    </FeatureGroup>
                 </Map>
         );
     }
@@ -73,6 +80,27 @@ LayeredMap.propTypes = {
      * The map bounds of the input data, given as [[xmin, ymin], [xmax, ymax]] (in physical coordinates).
      */
     map_bounds: PropTypes.array,
+
+    /**
+     * The coordinates of the last edited polyline
+     */
+    line_points: PropTypes.array,
+
+    /**
+     * The coordinates of the last edited closed polygon
+     */
+    polygon_points: PropTypes.array,
+
+    /**
+     * The coordinates of the last edited marker
+     */
+    marker_point: PropTypes.array,
+
+    /**
+    * Dash-assigned callback that should be called whenever any of the
+    * properties change
+    */
+    setProps: PropTypes.func,
 
     /**
      * An array of different layers. Each layer is a dictionary with the following structure:
