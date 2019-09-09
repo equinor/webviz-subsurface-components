@@ -25,6 +25,8 @@ class LayeredMap extends Component {
     }
 
     render() {
+        const {draw_toolbar_marker, draw_toolbar_polygon, draw_toolbar_polyline, setProps} = this.props
+        const showDrawControls = (draw_toolbar_marker || draw_toolbar_polygon || draw_toolbar_polyline) ? true : false
         return (
                 <Map id={this.props.id} style={{height: this.props.height}}
                      ref={this.mapRef}
@@ -47,12 +49,18 @@ class LayeredMap extends Component {
                             </Overlay>
                         ))}
                     </LayersControl>
-                    <FeatureGroup>
-                        <DrawControls
-                            lineCoords={(coords) => this.props.setProps({'line_points': coords})}
-                            markerCoords={(coords) => this.props.setProps({'marker_point': coords})}
-                            polygonCoords={(coords) => this.props.setProps({'polygon_points': coords})} />
-                    </FeatureGroup>
+                    { showDrawControls  && (
+                        <FeatureGroup>
+                            <DrawControls
+                                drawMarker={draw_toolbar_marker}
+                                drawPolygon={draw_toolbar_polygon}
+                                drawPolyline={draw_toolbar_polyline}
+                                lineCoords={(coords) => setProps({'polyline_points': coords})}
+                                markerCoords={(coords) => setProps({'marker_point': coords})}
+                                polygonCoords={(coords) => setProps({'polygon_points': coords})}
+                            />
+                        </FeatureGroup>
+                    )}
                 </Map>
         );
     }
@@ -60,7 +68,10 @@ class LayeredMap extends Component {
 
 LayeredMap.defaultProps = {
     height: 800,
-    hillShading: true
+    hillShading: true,
+    draw_toolbar_marker: false,
+    draw_toolbar_polygon: false,
+    draw_toolbar_polyline: false
 };
 
 LayeredMap.propTypes = {
@@ -90,17 +101,32 @@ LayeredMap.propTypes = {
     ]),
 
     /**
-     * The coordinates of the last edited polyline
+     * Add button to draw a polyline
      */
-    line_points: PropTypes.array,
+    draw_toolbar_polyline: PropTypes.bool,
 
     /**
-     * The coordinates of the last edited closed polygon
+     * Add button to draw a polygon
+     */
+    draw_toolbar_polygon: PropTypes.bool,
+
+    /**
+     * Add button to draw a marker
+     */
+    draw_toolbar_marker: PropTypes.bool,
+
+    /**
+     * The coordinates of the edited polyline
+     */
+    polyline_points: PropTypes.array,
+
+    /**
+     * The coordinates of the edited closed polygon
      */
     polygon_points: PropTypes.array,
 
     /**
-     * The coordinates of the last edited marker
+     * The coordinates of the edited marker
      */
     marker_point: PropTypes.array,
 
