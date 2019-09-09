@@ -100,6 +100,7 @@ class DrawControls extends Component {
     }
 
     render() {
+        const {showPolygon, showMarker, showPolyline} = this.props
         return (
             <EditControl
               ref={'edit'}
@@ -109,7 +110,10 @@ class DrawControls extends Component {
               draw={{
                   rectangle: false,
                   circle: false,
-                  circlemarker: false
+                  circlemarker: false,
+                  polygon: showPolygon,
+                  marker: showMarker,
+                  polyline: showPolyline
               }}/>
         )
     }
