@@ -26,7 +26,7 @@ class LayeredMap extends Component {
 
     render() {
         return (
-                <Map id={this.props.id} style={{height: LayeredMap.defaultProps.height}}
+                <Map id={this.props.id} style={{height: this.props.height}}
                      ref={this.mapRef}
                      center={yx(this.props.center)}
                      zoom={-3}
@@ -80,6 +80,14 @@ LayeredMap.propTypes = {
      * The map bounds of the input data, given as [[xmin, ymin], [xmax, ymax]] (in physical coordinates).
      */
     map_bounds: PropTypes.array,
+
+    /**
+     * Height of the component
+     */
+    height: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]),
 
     /**
      * The coordinates of the last edited polyline
