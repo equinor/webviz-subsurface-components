@@ -25,8 +25,8 @@ class LayeredMap extends Component {
     }
 
     render() {
-        const {draw_marker, draw_polygon, draw_polyline, setProps} = this.props
-        const showDrawControls = (draw_marker || draw_polygon || draw_polyline) ? true : false
+        const {draw_toolbar_marker, draw_toolbar_polygon, draw_toolbar_polyline, setProps} = this.props
+        const showDrawControls = (draw_toolbar_marker || draw_toolbar_polygon || draw_toolbar_polyline) ? true : false
         return (
                 <Map id={this.props.id} style={{height: this.props.height}}
                      ref={this.mapRef}
@@ -52,9 +52,9 @@ class LayeredMap extends Component {
                     { showDrawControls  && (
                         <FeatureGroup>
                             <DrawControls
-                                drawMarker={draw_marker}
-                                drawPolygon={draw_polygon}
-                                drawPolyline={draw_polyline}
+                                drawMarker={draw_toolbar_marker}
+                                drawPolygon={draw_toolbar_polygon}
+                                drawPolyline={draw_toolbar_polyline}
                                 lineCoords={(coords) => setProps({'polyline_points': coords})}
                                 markerCoords={(coords) => setProps({'marker_point': coords})}
                                 polygonCoords={(coords) => setProps({'polygon_points': coords})}
@@ -69,9 +69,9 @@ class LayeredMap extends Component {
 LayeredMap.defaultProps = {
     height: 800,
     hillShading: true,
-    draw_marker: false,
-    draw_polygon: false,
-    draw_polyline: false
+    draw_toolbar_marker: false,
+    draw_toolbar_polygon: false,
+    draw_toolbar_polyline: false
 };
 
 LayeredMap.propTypes = {
@@ -103,17 +103,17 @@ LayeredMap.propTypes = {
     /**
      * Add button to draw a polyline
      */
-    draw_polyline: PropTypes.bool,
+    draw_toolbar_polyline: PropTypes.bool,
 
     /**
      * Add button to draw a polygon
      */
-    draw_polygon: PropTypes.bool,
+    draw_toolbar_polygon: PropTypes.bool,
 
     /**
      * Add button to draw a marker
      */
-    draw_marker: PropTypes.bool,
+    draw_toolbar_marker: PropTypes.bool,
 
     /**
      * The coordinates of the edited polyline
