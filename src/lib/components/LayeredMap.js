@@ -55,7 +55,7 @@ class LayeredMap extends Component {
                                 drawMarker={draw_marker}
                                 drawPolygon={draw_polygon}
                                 drawPolyline={draw_polyline}
-                                lineCoords={(coords) => setProps({'line_points': coords})}
+                                lineCoords={(coords) => setProps({'polyline_points': coords})}
                                 markerCoords={(coords) => setProps({'marker_point': coords})}
                                 polygonCoords={(coords) => setProps({'polygon_points': coords})}
                             />
@@ -118,7 +118,7 @@ LayeredMap.propTypes = {
     /**
      * The coordinates of the edited polyline
      */
-    line_points: PropTypes.array,
+    polyline_points: PropTypes.array,
 
     /**
      * The coordinates of the edited closed polygon
