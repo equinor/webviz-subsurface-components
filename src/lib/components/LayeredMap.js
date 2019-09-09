@@ -25,8 +25,8 @@ class LayeredMap extends Component {
     }
 
     render() {
-        const {show_marker, show_polygon, show_polyline, setProps} = this.props
-        const showDrawControls = (show_marker || show_polygon || show_polyline) ? true: false
+        const {draw_marker, draw_polygon, draw_polyline, setProps} = this.props
+        const showDrawControls = (draw_marker || draw_polygon || draw_polyline) ? true : false
         return (
                 <Map id={this.props.id} style={{height: this.props.height}}
                      ref={this.mapRef}
@@ -52,13 +52,14 @@ class LayeredMap extends Component {
                     { showDrawControls  && (
                         <FeatureGroup>
                             <DrawControls
-                                showMarker={show_marker}
-                                showPolygon={show_polygon}
-                                showPolyline={show_polyline}
+                                drawMarker={draw_marker}
+                                drawPolygon={draw_polygon}
+                                drawPolyline={draw_polyline}
                                 lineCoords={(coords) => setProps({'line_points': coords})}
                                 markerCoords={(coords) => setProps({'marker_point': coords})}
-                                polygonCoords={(coords) => setProps({'polygon_points': coords})} />
-                                </FeatureGroup>
+                                polygonCoords={(coords) => setProps({'polygon_points': coords})}
+                            />
+                        </FeatureGroup>
                     )}
                 </Map>
         );
@@ -68,9 +69,9 @@ class LayeredMap extends Component {
 LayeredMap.defaultProps = {
     height: 800,
     hillShading: true,
-    show_marker: false,
-    show_polygon: false,
-    show_polyline: false
+    draw_marker: false,
+    draw_polygon: false,
+    draw_polyline: false
 };
 
 LayeredMap.propTypes = {
@@ -102,17 +103,17 @@ LayeredMap.propTypes = {
     /**
      * Add button to draw a polyline
      */
-    show_polyline: PropTypes.bool,
+    draw_polyline: PropTypes.bool,
 
     /**
      * Add button to draw a polygon
      */
-    show_polygon: PropTypes.bool,
+    draw_polygon: PropTypes.bool,
 
     /**
      * Add button to draw a marker
      */
-    show_marker: PropTypes.bool,
+    draw_marker: PropTypes.bool,
 
     /**
      * The coordinates of the edited polyline

@@ -100,7 +100,7 @@ class DrawControls extends Component {
     }
 
     render() {
-        const {showPolygon, showMarker, showPolyline} = this.props
+        const {drawPolygon, drawMarker, drawPolyline} = this.props
         return (
             <EditControl
               ref={'edit'}
@@ -111,15 +111,29 @@ class DrawControls extends Component {
                   rectangle: false,
                   circle: false,
                   circlemarker: false,
-                  polygon: showPolygon,
-                  marker: showMarker,
-                  polyline: showPolyline
+                  polygon: drawPolygon,
+                  marker: drawMarker,
+                  polyline: drawPolyline
               }}/>
         )
     }
 }
+DrawControls.defaultProps = {
+    drawMarker: true,
+    drawPolygon: true,
+    drawPolyline: true
+};
 
 DrawControls.propTypes = {
+    /* Show marker button*/
+    drawMarker: PropTypes.bool,
+
+    /* Show polygon button*/
+    drawPolygon: PropTypes.bool,
+
+    /* Show polyline button*/
+    drawPolyline: PropTypes.bool,
+
     /* Coordinates for selected marker*/
     markerCoords: PropTypes.func,
 

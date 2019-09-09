@@ -11,9 +11,9 @@ class LayeredMapDemo extends Component {
                        layers={data.layers}
                        overlay_layers={data.overlay_layers}
                        setProps={(e) => console.log(e)}
-                       show_marker={true}
-                       show_polygon={true}
-                       show_polyline={true}
+                       draw_marker={true}
+                       draw_polygon={true}
+                       draw_polyline={true }
 
            />
   }
