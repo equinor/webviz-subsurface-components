@@ -26,6 +26,7 @@ class CompositeMapLayer extends Component {
         if (item.type === 'polyline') {
             return (
                 <Polyline
+                    onClick={() => this.props.setActiveLayer(item.metadata)}
                     color={item.color}
                     positions={item.positions.map(xy => yx(xy))}
                     key={index}>
@@ -36,6 +37,7 @@ class CompositeMapLayer extends Component {
         if (item.type === 'polygon') {
             return (
                 <Polygon
+                    onClick={() => this.props.setActiveLayer(item.metadata)}
                     color={item.color}
                     positions={item.positions.map(xy => yx(xy))}
                     key={index}>
@@ -46,6 +48,7 @@ class CompositeMapLayer extends Component {
         if (item.type === 'circle') {
             return (
                 <Circle
+                    onClick={() => this.props.setActiveLayer(item.metadata)}
                     color={item.color}
                     center={yx(item.center)}
                     radius={item.radius}
