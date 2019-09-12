@@ -13,7 +13,8 @@ class LayeredMapDemo extends Component {
                        setProps={(e) => console.log(e)}
                        draw_toolbar_marker={true}
                        draw_toolbar_polygon={true}
-                       draw_toolbar_polyline={true }
+                       draw_toolbar_polyline={true}
+                       showScaleY={true}
 
            />
   }

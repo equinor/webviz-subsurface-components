@@ -3,11 +3,11 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import {CRS} from 'leaflet';
 import { LayersControl, Map, ScaleControl, FeatureGroup } from 'react-leaflet'
 import Switch from '../private_components/layered-map-resources/Switch.react'
 import CompositeMapLayer from '../private_components/layered-map-resources/CompositeMapLayer.react'
 import DrawControls from '../private_components/layered-map-resources/DrawControls.react'
+import VerticalZoom from '../private_components/layered-map-resources/VerticalZoom.react'
 import '../private_components/layered-map-resources/layered-map.css'
 
 const { BaseLayer, Overlay } = LayersControl
@@ -19,11 +19,6 @@ class LayeredMap extends Component {
         super(props)
         this.mapRef = React.createRef()
         this.state = {hillShading: this.props.hillShading}
-
-        L.CRS.IndependentY = L.extend({}, L.CRS.Simple, {
-            projection: L.Projection.LonLat,
-            transformation: new L.Transformation(1, 0, -this.props.scaleY, 0)
-        })
     }
 
     handleHillshadingChange(){
@@ -40,7 +35,8 @@ class LayeredMap extends Component {
                      zoom={-3}
                      minZoom={-5}
                      attributionControl={false}
-                     crs={L.CRS.IndependentY}>
+                     crs={L.CRS.Simple}>
+                    { this.props.showScaleY && <VerticalZoom position='topleft' scaleY={this.props.scaleY} minScaleY={1} maxScaleY={10} /> }
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
                     <Switch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
                     <LayersControl position='topright'>
@@ -76,6 +72,7 @@ LayeredMap.defaultProps = {
     height: 800,
     hillShading: true,
     scaleY: 1,
+    showScaleY: false,
     draw_toolbar_marker: false,
     draw_toolbar_polygon: false,
     draw_toolbar_polyline: false
@@ -100,7 +97,13 @@ LayeredMap.propTypes = {
     map_bounds: PropTypes.array,
 
     /**
-     * The scale of the y axis (relative to the x axis). A value >1 increases the visual length of the y axis compared to the x axis.
+     * If to show the vertical scale slider or not.
+     */
+    showScaleY: PropTypes.bool,
+
+    /**
+     * The initial scale of the y axis (relative to the x axis). A value >1 increases the visual length of the y axis compared to the x axis.
+     * Updating this property will override any interactively set y axis scale (which is possible for the user if showScaleY == true).
      */
     scaleY: PropTypes.number,
 
