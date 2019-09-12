@@ -11,9 +11,9 @@ class ImageOverlayWebGL extends Component {
         this.state = {drawMethod: (canvas) => alter_image(this.props.url, this.props.colormap, this.props.hillShading, canvas)}
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.props.hillShading !== nextProps.hillShading || this.props.url !== nextProps.url || this.props.colormap !== nextProps.colormap) {
-            this.setState({drawMethod: (canvas) => alter_image(nextProps.url, nextProps.colormap, nextProps.hillShading, canvas)})
+    componentDidUpdate(prevProps) {
+        if (this.props.hillShading !== prevProps.hillShading || this.props.url !== prevProps.url || this.props.colormap !== prevProps.colormap) {
+            this.setState({drawMethod: (canvas) => alter_image(this.props.url, this.props.colormap, this.props.hillShading, canvas)})
         }
     }
 
