@@ -17,7 +17,7 @@ class VerticalZoom extends MapControl {
     }
 
     componentDidUpdate(prevProps){
-        if(prevProps.scaleY != this.props.scaleY){
+        if(prevProps.scaleY !== this.props.scaleY){
             this.updateVerticalZoom(this.props.scaleY)
         }
     }
@@ -45,7 +45,7 @@ class VerticalZoom extends MapControl {
 
     componentDidMount() {
         // Overriding default MapControl implementation. We need to do the
-        // addTo(map) call in componentWillMount in order for the portal
+        // addTo(map) call in the constructor in order for the portal
         // DOM node to be available for the render function.
     }
 
