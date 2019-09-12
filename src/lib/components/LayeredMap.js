@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import {CRS} from 'leaflet';
 import { LayersControl, Map, ScaleControl, FeatureGroup } from 'react-leaflet'
 import Switch from '../private_components/layered-map-resources/Switch.react'
 import CompositeMapLayer from '../private_components/layered-map-resources/CompositeMapLayer.react'
@@ -35,7 +35,7 @@ class LayeredMap extends Component {
                      zoom={-3}
                      minZoom={-5}
                      attributionControl={false}
-                     crs={L.CRS.Simple}>
+                     crs={CRS.Simple}>
                     { this.props.showScaleY && <VerticalZoom position='topleft' scaleY={this.props.scaleY} minScaleY={1} maxScaleY={10} /> }
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
                     <Switch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
@@ -97,15 +97,15 @@ LayeredMap.propTypes = {
     map_bounds: PropTypes.array,
 
     /**
-     * If to show the vertical scale slider or not.
-     */
-    showScaleY: PropTypes.bool,
-
-    /**
      * The initial scale of the y axis (relative to the x axis). A value >1 increases the visual length of the y axis compared to the x axis.
      * Updating this property will override any interactively set y axis scale (which is possible for the user if showScaleY == true).
      */
     scaleY: PropTypes.number,
+
+    /**
+     * If to show the vertical scale slider or not.
+     */
+    showScaleY: PropTypes.bool,
 
     /**
      * Height of the component
