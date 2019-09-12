@@ -36,7 +36,9 @@ class LayeredMap extends Component {
                      minZoom={-5}
                      attributionControl={false}
                      crs={CRS.Simple}>
-                    { this.props.showScaleY && <VerticalZoom position='topleft' scaleY={this.props.scaleY} minScaleY={1} maxScaleY={10} /> }
+                    { this.props.showScaleY &&
+                        <VerticalZoom position='topleft' scaleY={this.props.scaleY} minScaleY={1} maxScaleY={10} />
+                    }
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
                     <Switch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
                     <LayersControl position='topright'>
