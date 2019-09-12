@@ -97,8 +97,10 @@ LayeredMap.propTypes = {
     map_bounds: PropTypes.array,
 
     /**
-     * The initial scale of the y axis (relative to the x axis). A value >1 increases the visual length of the y axis compared to the x axis.
-     * Updating this property will override any interactively set y axis scale (which is possible for the user if showScaleY == true).
+     * The initial scale of the y axis (relative to the x axis). 
+     * A value >1 increases the visual length of the y axis compared to the x axis.
+     * Updating this property will override any interactively set y axis scale.
+     * This property does not have any effect unless showScaleY is true.
      */
     scaleY: PropTypes.number,
 

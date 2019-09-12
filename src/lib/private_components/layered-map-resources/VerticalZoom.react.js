@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import React from 'react'
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom'
 import { withLeaflet, MapControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 import Slider from '@material-ui/core/Slider'
@@ -12,8 +12,8 @@ class VerticalZoom extends MapControl {
         super(props)
         this.updateVerticalZoom(this.props.scaleY)
 
-        const { map } = this.props.leaflet;
-        this.leafletElement.addTo(map);
+        const { map } = this.props.leaflet
+        this.leafletElement.addTo(map)
     }
 
     componentDidUpdate(prevProps){
@@ -27,8 +27,8 @@ class VerticalZoom extends MapControl {
     }
 
     updateVerticalZoom(scaleY){
-        const { map } = this.props.leaflet;
-        const center = map.getCenter();
+        const { map } = this.props.leaflet
+        const center = map.getCenter()
 
         map.options.crs = L.extend(
             {},
@@ -107,4 +107,4 @@ VerticalZoom.propTypes = {
     maxScaleY: PropTypes.number
 };
 
-export default withLeaflet(VerticalZoom);
+export default withLeaflet(VerticalZoom)
