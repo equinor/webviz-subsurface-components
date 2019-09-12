@@ -2,6 +2,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import {CRS} from 'leaflet';
 import { LayersControl, Map, ScaleControl, FeatureGroup } from 'react-leaflet'
 import Switch from '../private_components/layered-map-resources/Switch.react'
@@ -18,6 +19,11 @@ class LayeredMap extends Component {
         super(props)
         this.mapRef = React.createRef()
         this.state = {hillShading: this.props.hillShading}
+
+        L.CRS.IndependentY = L.extend({}, L.CRS.Simple, {
+            projection: L.Projection.LonLat,
+            transformation: new L.Transformation(1, 0, -this.props.scaleY, 0)
+        })
     }
 
     handleHillshadingChange(){
@@ -34,7 +40,7 @@ class LayeredMap extends Component {
                      zoom={-3}
                      minZoom={-5}
                      attributionControl={false}
-                     crs={CRS.Simple}>
+                     crs={L.CRS.IndependentY}>
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
                     <Switch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
                     <LayersControl position='topright'>
@@ -69,6 +75,7 @@ class LayeredMap extends Component {
 LayeredMap.defaultProps = {
     height: 800,
     hillShading: true,
+    scaleY: 1,
     draw_toolbar_marker: false,
     draw_toolbar_polygon: false,
     draw_toolbar_polyline: false
@@ -91,6 +98,11 @@ LayeredMap.propTypes = {
      * The map bounds of the input data, given as [[xmin, ymin], [xmax, ymax]] (in physical coordinates).
      */
     map_bounds: PropTypes.array,
+
+    /**
+     * The scale of the y axis (relative to the x axis). A value >1 increases the visual length of the y axis compared to the x axis.
+     */
+    scaleY: PropTypes.number,
 
     /**
      * Height of the component
