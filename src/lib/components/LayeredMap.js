@@ -7,6 +7,7 @@ import { LayersControl, Map, ScaleControl, FeatureGroup } from 'react-leaflet'
 import Switch from '../private_components/layered-map-resources/Switch.react'
 import CompositeMapLayer from '../private_components/layered-map-resources/CompositeMapLayer.react'
 import DrawControls from '../private_components/layered-map-resources/DrawControls.react'
+import VerticalZoom from '../private_components/layered-map-resources/VerticalZoom.react'
 import '../private_components/layered-map-resources/layered-map.css'
 
 const { BaseLayer, Overlay } = LayersControl
@@ -35,6 +36,9 @@ class LayeredMap extends Component {
                      minZoom={-5}
                      attributionControl={false}
                      crs={CRS.Simple}>
+                    { this.props.showScaleY &&
+                        <VerticalZoom position='topleft' scaleY={this.props.scaleY} minScaleY={1} maxScaleY={10} />
+                    }
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
                     <Switch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
                     <LayersControl position='topright'>
@@ -69,6 +73,8 @@ class LayeredMap extends Component {
 LayeredMap.defaultProps = {
     height: 800,
     hillShading: true,
+    scaleY: 1,
+    showScaleY: false,
     draw_toolbar_marker: false,
     draw_toolbar_polygon: false,
     draw_toolbar_polyline: false
@@ -91,6 +97,19 @@ LayeredMap.propTypes = {
      * The map bounds of the input data, given as [[xmin, ymin], [xmax, ymax]] (in physical coordinates).
      */
     map_bounds: PropTypes.array,
+
+    /**
+     * The initial scale of the y axis (relative to the x axis). 
+     * A value >1 increases the visual length of the y axis compared to the x axis.
+     * Updating this property will override any interactively set y axis scale.
+     * This property does not have any effect unless showScaleY is true.
+     */
+    scaleY: PropTypes.number,
+
+    /**
+     * If to show the vertical scale slider or not.
+     */
+    showScaleY: PropTypes.bool,
 
     /**
      * Height of the component
