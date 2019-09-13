@@ -212,18 +212,25 @@ function alter_image(map_base64, colormap_base64, hillshading, canvas){
                     gl.canvas.height
                 )
 
+                const light_direction = [1, 1, 1]
+                const vectorLength = Math.sqrt(light_direction[0]**2 + light_direction[1]**2 + light_direction[2]**2)
+        
                 gl.uniform3f(
                     gl.getUniformLocation(program, 'u_light_direction'),
-                    0.57, 0.57, 0.57 // Unit vector in direction [1, 1, 1]
+                    light_direction[0] / vectorLength,
+                    light_direction[1] / vectorLength,
+                    light_direction[2] / vectorLength
                 )
 
+                const elevationScale = 0.03
                 gl.uniform1f(
                     gl.getUniformLocation(program, 'u_elevation_scale'),
-                    0.03
+                    elevationScale
                 )
             }
 
-            gl.drawArrays(gl.TRIANGLES, 0, 6)
+            const numberIndices = 6
+            gl.drawArrays(gl.TRIANGLES, 0, numberIndices)
     })
 }
 
