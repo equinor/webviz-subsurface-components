@@ -1,3 +1,7 @@
+import vertexShaderSource from './vertexShader.vs.glsl'
+import fragmentShaderSourceWithHillshading from './fragmentShaderWithHillshading.fs.glsl'
+import fragmentShaderSourceWithoutHillshading from './fragmentShaderWithoutHillshading.fs.glsl'
+
 function alter_image(map_base64, colormap_base64, hillshading, canvas){
 
     const createShader = (gl, shaderType, shaderSource) => {
@@ -75,87 +79,12 @@ function alter_image(map_base64, colormap_base64, hillshading, canvas){
         gl.uniform1i(gl.getUniformLocation(program, uniformName), textureIndex)
     }
 
-    const vertexShaderSource = `
-        attribute vec2 a_position;
-        attribute vec2 a_texCoord;
-    
-        uniform vec2 u_resolution_vertex;
-    
-        varying vec2 v_texCoord;
-    
-        void main() {
-           // Convert from pixel range ([0, w] x [0, h]) to clip space ([-1, 1] x [-1, 1]):
-           vec2 clipSpace = (a_position / u_resolution_vertex) * 2.0 - 1.0;
-    
-           // Flip y axis
-           gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-    
-           // Pass the texCoord to the fragment shader
-           v_texCoord = a_texCoord;
-        }
-    `
-
-    const fragmentShaderSourceWithoutHillshading = `
-      precision mediump float;
-    
-      uniform sampler2D u_image;
-      uniform sampler2D u_colormap_frame;
-      uniform float u_colormap_length;
-
-      varying vec2 v_texCoord;
-    
-      void main() {
-          float map_array = texture2D(u_image, v_texCoord).r;
-          gl_FragColor = texture2D(u_colormap_frame, vec2((map_array * (u_colormap_length - 1.0) + 0.5) / u_colormap_length, 0.5));
-      }
-    `
-
-    const fragmentShaderSourceWithHillshading = `
-      precision mediump float;
-    
-      uniform sampler2D u_image;
-      uniform sampler2D u_colormap_frame;
-      uniform vec2 u_resolution_fragment;
-      uniform float u_colormap_length;
-      uniform float u_elevation_scale;
-      uniform vec3 u_light_direction;
-
-      varying vec2 v_texCoord;
-    
-      void main() {
-
-          vec2 dl = 1.0/u_resolution_fragment;
-
-          vec2 pixelPos = vec2(gl_FragCoord.x, u_resolution_fragment.y - gl_FragCoord.y);
-
-          float v0 = texture2D(u_image, dl * pixelPos).r;
-          float vx = texture2D(u_image, dl * (pixelPos + vec2(1.0, 0.0))).r;
-          float vy = texture2D(u_image, dl * (pixelPos + vec2(0.0, 1.0))).r;
-
-          // Create tangent vector components along terrain
-          // in x and y directions respectively:
-          vec3 dx = vec3(u_elevation_scale, 0.0, vx - v0);
-          vec3 dy = vec3(0.0, u_elevation_scale, v0 - vy);
-
-          // Calculate terrain normal vector by taking cross product of dx and dy.
-          // Then calculate simple hill shading by taking dot product between
-          // normal vector and light direction vector.
-          float light = 0.5 * dot(normalize(cross(dx, dy)), u_light_direction) + 0.5;
-
-          float map_array = texture2D(u_image, v_texCoord).r;
-          vec4 color = texture2D(u_colormap_frame, vec2((map_array * (u_colormap_length - 1.0) + 0.5) / u_colormap_length, 0.5));
-
-          gl_FragColor = color * vec4(light, light, light, 1.0);
-      }
-    `
-
     const load_image = src =>
         new Promise(resolve => {
             const img = new Image();
             img.src = src
             img.onload = () => resolve(img)
         });
-
 
     Promise.all([load_image(map_base64), load_image(colormap_base64)])
         .then(function([map_image, colormap_image]) {
