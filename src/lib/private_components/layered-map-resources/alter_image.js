@@ -15,6 +15,51 @@ function alter_image(map_base64, colormap_base64, hillshading, canvas){
         return program
     }
 
+    const bindBuffer = (gl, attribName, array) => {
+        /**
+         * Bind data to buffer and link it to a given attribute name in the
+         * current program attached to the WebGL context.
+         *
+         * @param {WebGL context} gl - The WebGL context to use
+         * @param {string} attribName - The attribute name used in the shader code
+         * @param {array} array - The array data to bind to the buffer
+         */
+
+        const program = gl.getParameter(gl.CURRENT_PROGRAM)
+
+        const newBuffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, newBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.STATIC_DRAW)
+        const attribLocation = gl.getAttribLocation(program, attribName)
+        gl.enableVertexAttribArray(attribLocation)
+        gl.bindBuffer(gl.ARRAY_BUFFER, newBuffer)
+        gl.vertexAttribPointer(attribLocation, 2, gl.FLOAT, false, 0, 0)
+    }
+
+    const bindTexture = (gl, textureIndex, uniformName, image) => {
+        /**
+         * Bind texture to a given uniform name in the current program attached
+         * to the WebGL context.
+         *
+         * @param {WebGL context} gl - The WebGL context to use
+         * @param {int} textureIndex - The texture index to use (all computers support <= 4)
+         * @param {string} uniformName - The uniform name used in the shader code
+         * @param {image element} image - The image element to use as input data for the texture
+         */
+
+        const program = gl.getParameter(gl.CURRENT_PROGRAM)
+
+        gl.activeTexture(gl.TEXTURE0 + textureIndex)
+        gl.bindTexture(gl.TEXTURE_2D, gl.createTexture())
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
+        gl.uniform1i(gl.getUniformLocation(program, uniformName), textureIndex)
+    }
+
+
     const vertexShaderSource = `
         attribute vec2 a_position;
         attribute vec2 a_texCoord;
@@ -38,11 +83,13 @@ function alter_image(map_base64, colormap_base64, hillshading, canvas){
       precision mediump float;
     
       uniform sampler2D u_image;
-    
+      uniform sampler2D colormap_frame; // addition from greyscale
+
       varying vec2 v_texCoord;
     
       void main() {
-          gl_FragColor = texture2D(u_image, v_texCoord);
+          float map_array = texture2D(u_image, v_texCoord).r;
+          gl_FragColor = texture2D(colormap_frame, vec2((map_array * (255.0 - 1.0) + 0.5) / 256.0, 0.5));
       }
 `
 
@@ -54,13 +101,12 @@ function alter_image(map_base64, colormap_base64, hillshading, canvas){
         });
 
 
-    Promise.all([load_texture(map_base64)])
-        .then(function(textures) {
+    Promise.all([load_texture(map_base64), load_texture(colormap_base64)])
+        .then(function([map_image, colormap_image]) {
 
-            const map_image = textures[0]
+            const gl = canvas.getContext('webgl', {premultipliedAlpha: false })
+            gl.getExtension('OES_texture_float')
 
-            const gl = canvas.getContext('webgl')
- 
             canvas.width = map_image.width
             canvas.height = map_image.height
 
@@ -77,40 +123,26 @@ function alter_image(map_base64, colormap_base64, hillshading, canvas){
                 createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)
             )
             
-            const positionBuffer = gl.createBuffer()
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)  
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+            gl.useProgram(program)
+
+            bindBuffer(gl, 'a_texCoord', [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1])
+            bindBuffer(gl, 'a_position', [
                 0, 0,
                 map_image.width, 0,
                 0, map_image.height,
                 0, map_image.height,
                 map_image.width, 0,
                 map_image.width, map_image.height
-            ]), gl.STATIC_DRAW)
+            ])
 
-            const texcoordBuffer = gl.createBuffer()
-            gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer)
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]), gl.STATIC_DRAW)
+            bindTexture(gl, 0, 'u_image', map_image)
+            bindTexture(gl, 1, 'colormap_frame', colormap_image)
 
-            gl.bindTexture(gl.TEXTURE_2D, gl.createTexture())
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, map_image)
- 
-            gl.useProgram(program)
-            gl.uniform2f(gl.getUniformLocation(program, 'u_resolution'), gl.canvas.width, gl.canvas.height)
-
-            const positionAttribLocation = gl.getAttribLocation(program, 'a_position')
-            gl.enableVertexAttribArray(positionAttribLocation)
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-            gl.vertexAttribPointer(positionAttribLocation, 2, gl.FLOAT, false, 0, 0)
-
-            const texcoordAttribLocation = gl.getAttribLocation(program, 'a_texCoord')
-            gl.enableVertexAttribArray(texcoordAttribLocation)
-            gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer)
-            gl.vertexAttribPointer(texcoordAttribLocation, 2, gl.FLOAT, false, 0, 0)
+            gl.uniform2f(
+                gl.getUniformLocation(program, 'u_resolution'),
+                gl.canvas.width,
+                gl.canvas.height
+            )
 
             gl.drawArrays(gl.TRIANGLES, 0, 6)
 
