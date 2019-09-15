@@ -48,7 +48,12 @@ class LayeredMap extends Component {
                         {this.props.layers.filter(layer => !layer.base_layer).map((layer) => (
                             <Overlay checked={layer.checked} name={layer.name} key={layer.name}>
 
-                                <CompositeMapLayer setActiveLayer={(metaData) => setProps({'active_layer':metaData})} layer={layer} hillShading={this.state.hillShading} />
+                                <CompositeMapLayer 
+                                    lineCoords={(coords) => setProps({'polyline_points': coords})}
+                                    polygonCoords={(coords) => setProps({'polygon_points': coords})}
+                                    layer={layer} 
+                                    hillShading={this.state.hillShading} 
+                                />
                             </Overlay>
                         ))}
                     </LayersControl>
@@ -72,7 +77,6 @@ class LayeredMap extends Component {
 LayeredMap.defaultProps = {
     height: 800,
     hillShading: true,
-    active_layer: {},
     draw_toolbar_marker: false,
     draw_toolbar_polygon: false,
     draw_toolbar_polyline: false
@@ -133,11 +137,6 @@ LayeredMap.propTypes = {
      * The coordinates of the edited marker
      */
     marker_point: PropTypes.array,
-
-    /**
-     The last clicked overlay layer
-     */
-    active_layer: PropTypes.object,
 
     /**
     * Dash-assigned callback that should be called whenever any of the

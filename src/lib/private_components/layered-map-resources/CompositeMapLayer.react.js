@@ -24,22 +24,24 @@ class CompositeMapLayer extends Component {
 
     renderItem(item, index) {
         if (item.type === 'polyline') {
+            const positions = item.positions.map(xy => yx(xy))
             return (
                 <Polyline
-                    onClick={() => this.props.setActiveLayer(item.metadata)}
+                    onClick={() => this.props.lineCoords(positions)}
                     color={item.color}
-                    positions={item.positions.map(xy => yx(xy))}
+                    positions={positions}
                     key={index}>
                     {this.renderTooltip(item)}
                 </Polyline>
             )
         }
         if (item.type === 'polygon') {
+            const positions = item.positions.map(xy => yx(xy))
             return (
                 <Polygon
-                    onClick={() => this.props.setActiveLayer(item.metadata)}
+                    onClick={() => this.props.polygonCoords(positions)}
                     color={item.color}
-                    positions={item.positions.map(xy => yx(xy))}
+                    positions={positions}
                     key={index}>
                     {this.renderTooltip(item)}
                 </Polygon>
@@ -48,7 +50,6 @@ class CompositeMapLayer extends Component {
         if (item.type === 'circle') {
             return (
                 <Circle
-                    onClick={() => this.props.setActiveLayer(item.metadata)}
                     color={item.color}
                     center={yx(item.center)}
                     radius={item.radius}
@@ -92,7 +93,15 @@ CompositeMapLayer.propTypes = {
     /* Data for one single layer. See parent component LayeredMap for documentation.
      */
     layer: PropTypes.object,
-    hillShading: PropTypes.bool
+
+    /* Add hillshading to an image layer*/
+    hillShading: PropTypes.bool,
+
+    /* Coordinates for selected polyline*/
+    lineCoords: PropTypes.func,
+
+    /* Coordinates for selected polygon*/
+    polygonCoords: PropTypes.func
 };
 
 
