@@ -35,6 +35,7 @@ class LayeredMap extends Component {
                      zoom={-3}
                      minZoom={-5}
                      attributionControl={false}
+
                      crs={CRS.Simple}>
                     { this.props.showScaleY &&
                         <VerticalZoom position='topleft' scaleY={this.props.scaleY} minScaleY={1} maxScaleY={10} />
@@ -49,7 +50,12 @@ class LayeredMap extends Component {
                         ))}
                         {this.props.layers.filter(layer => !layer.base_layer).map((layer) => (
                             <Overlay checked={layer.checked} name={layer.name} key={layer.name}>
-                                <CompositeMapLayer layer={layer} hillShading={this.state.hillShading} />
+                                <CompositeMapLayer 
+                                    lineCoords={(coords) => setProps({'polyline_points': coords})}
+                                    polygonCoords={(coords) => setProps({'polygon_points': coords})}
+                                    layer={layer} 
+                                    hillShading={this.state.hillShading} 
+                                />
                             </Overlay>
                         ))}
                     </LayersControl>
@@ -135,17 +141,17 @@ LayeredMap.propTypes = {
     draw_toolbar_marker: PropTypes.bool,
 
     /**
-     * The coordinates of the edited polyline
+     * Dash provided prop that returns the coordinates of the edited or clicked polyline
      */
     polyline_points: PropTypes.array,
 
     /**
-     * The coordinates of the edited closed polygon
+     * Dash provided prop that returns the coordinates of the edited or clicked polygon
      */
     polygon_points: PropTypes.array,
 
     /**
-     * The coordinates of the edited marker
+     * Dash provided prop that returns the coordinates of the edited or clicked marker
      */
     marker_point: PropTypes.array,
 
