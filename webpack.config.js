@@ -79,6 +79,14 @@ module.exports = (env, argv) => {
                             loader: 'url-loader'
                         }
                     ]
+                },
+                {
+                    test: /\.(fs|vs).glsl$/i,
+                    use: [
+                        {
+                            loader: 'raw-loader'
+                        }
+                    ]
                 }
             ],
         },
