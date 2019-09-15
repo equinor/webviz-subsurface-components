@@ -50,7 +50,6 @@ class LayeredMap extends Component {
                         ))}
                         {this.props.layers.filter(layer => !layer.base_layer).map((layer) => (
                             <Overlay checked={layer.checked} name={layer.name} key={layer.name}>
-
                                 <CompositeMapLayer 
                                     lineCoords={(coords) => setProps({'polyline_points': coords})}
                                     polygonCoords={(coords) => setProps({'polygon_points': coords})}
@@ -142,17 +141,17 @@ LayeredMap.propTypes = {
     draw_toolbar_marker: PropTypes.bool,
 
     /**
-     * The coordinates of the edited polyline
+     * Dash provided prop that returns the coordinates of the edited or clicked polyline
      */
     polyline_points: PropTypes.array,
 
     /**
-     * The coordinates of the edited closed polygon
+     * Dash provided prop that returns the coordinates of the edited or clicked polygon
      */
     polygon_points: PropTypes.array,
 
     /**
-     * The coordinates of the edited marker
+     * Dash provided prop that returns the coordinates of the edited or clicked marker
      */
     marker_point: PropTypes.array,
 
