@@ -1,48 +1,55 @@
 import L from 'leaflet'
-import { withLeaflet, MapControl } from 'react-leaflet'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
+import { withLeaflet, MapControl } from 'react-leaflet'
+
 
 class Colormap extends MapControl {
 
-  createColorBar(node) {
-    const img_div = document.createElement('div')
-    const left_label_div = document.createElement('div')
-    const right_label_div = document.createElement('div')
+    constructor(props){
+        super(props)
 
-    node.classList.add('leaflet-colorbar')
-    img_div.classList.add('leaflet-colorbar-image')
-    right_label_div.classList.add('leaflet-colorbar-right-label')
+        const { map } = this.props.leaflet
+        this.leafletElement.addTo(map)
+    }
 
-    left_label_div.textContent = `${this.props.minvalue} ${this.props.unit}`
-    right_label_div.textContent = `${this.props.maxvalue} ${this.props.unit}`
+    createLeafletElement(props) {
+        const MapInfo = L.Control.extend({
+            onAdd: () => {
+                this.panelDiv = L.DomUtil.create('div', 'leaflet-custom-control')
+                return this.panelDiv;
+            }
+        });
+        return new MapInfo({ position: props.position });
+    }
 
-    node.appendChild(img_div)
-    node.appendChild(left_label_div)
-    node.appendChild(right_label_div)
+    componentDidMount() {
+        // Overriding default MapControl implementation. We need to do the
+        // addTo(map) call in the constructor in order for the portal
+        // DOM node to be available for the render function.
+    }
 
-    const img = new Image()
-    img.src = this.props.colormap
-    img.style.width = '100%'
-    img.style.height = '10px'
-    img_div.appendChild(img)
+    render() {
+        return ReactDOM.createPortal(
+            <div className='leaflet-colorbar'>
+                <div className='leaflet-colorbar-image'>
+                    <img
+                        src={this.props.colormap}
+                        style={{width: '100%', height: '10px'}}
+                    />
+                </div>
+                <div>
+                    {this.props.minvalue} {this.props.unit}
+                </div>
+                <div className='leaflet-colorbar-right-label'>  
+                    {this.props.maxvalue} {this.props.unit}
+                </div>
+            </div>, 
+            this.panelDiv
+        )
+    }
 
-  }
-
-  createLeafletElement(props) {
-    const MapInfo = L.Control.extend({
-      onAdd: () => {
-        this.panelDiv = L.DomUtil.create('div', 'leaflet-custom-control')
-        this.createColorBar(this.panelDiv)
-        return this.panelDiv;
-      }
-    });
-    return new MapInfo({ position: props.position });
-  }
-
-  componentDidMount() {
-    const { map } = this.props.leaflet;
-    this.leafletElement.addTo(map);
-  }
 }
 
 Colormap.propTypes = {
