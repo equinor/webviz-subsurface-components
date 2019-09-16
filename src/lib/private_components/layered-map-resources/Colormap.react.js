@@ -6,25 +6,26 @@ class Colormap extends MapControl {
 
   createColorBar(node) {
     const img_div = document.createElement('div')
-    const left_label_div = document.createElement('div')
-    const right_label_div = document.createElement('div')
+    this.left_label_div = document.createElement('div')
+    this.right_label_div = document.createElement('div')
 
     node.classList.add('leaflet-colorbar')
     img_div.classList.add('leaflet-colorbar-image')
-    right_label_div.classList.add('leaflet-colorbar-right-label')
+    this.left_label_div.classList.add('leaflet-colorbar-left-label')
+    this.right_label_div.classList.add('leaflet-colorbar-right-label')
 
-    left_label_div.textContent = `${this.props.minvalue} ${this.props.unit}`
-    right_label_div.textContent = `${this.props.maxvalue} ${this.props.unit}`
+    this.left_label_div.textContent = `${this.props.minvalue} ${this.props.unit}`
+    this.right_label_div.textContent = `${this.props.maxvalue} ${this.props.unit}`
 
     node.appendChild(img_div)
-    node.appendChild(left_label_div)
-    node.appendChild(right_label_div)
+    node.appendChild(this.left_label_div)
+    node.appendChild(this.right_label_div)
 
-    const img = new Image()
-    img.src = this.props.colormap
-    img.style.width = '100%'
-    img.style.height = '10px'
-    img_div.appendChild(img)
+    this.img = new Image()
+    this.img.src = this.props.colormap
+    this.img.style.width = '100%'
+    this.img.style.height = '10px'
+    img_div.appendChild(this.img)
 
   }
 
@@ -42,6 +43,13 @@ class Colormap extends MapControl {
   componentDidMount() {
     const { map } = this.props.leaflet;
     this.leafletElement.addTo(map);
+  }
+  componentDidUpdate(prevProps) {
+        if (prevProps !== this.props) {
+            this.left_label_div.textContent = `${this.props.minvalue} ${this.props.unit}`
+            this.right_label_div.textContent = `${this.props.maxvalue} ${this.props.unit}`
+            this.img.src = this.props.colormap
+        }
   }
 }
 
