@@ -34,10 +34,7 @@ class Colormap extends MapControl {
         return ReactDOM.createPortal(
             <div className='leaflet-colorbar'>
                 <div className='leaflet-colorbar-image'>
-                    <img
-                        src={this.props.colormap}
-                        style={{width: '100%', height: '10px'}}
-                    />
+                    <img src={this.props.colormap} style={{width: '100%', height: '10px'}} />
                 </div>
                 <div>
                     {this.props.minvalue} {this.props.unit}
