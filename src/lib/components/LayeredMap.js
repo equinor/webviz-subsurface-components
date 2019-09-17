@@ -28,6 +28,8 @@ class LayeredMap extends Component {
     render() {
         const {draw_toolbar_marker, draw_toolbar_polygon, draw_toolbar_polyline, setProps} = this.props
         const showDrawControls = (draw_toolbar_marker || draw_toolbar_polygon || draw_toolbar_polyline) ? true : false
+        const showHillshadingSwitch = this.props.layers.some(layer => layer.data.some(item => item.allowHillshading))
+
         return (
                 <Map id={this.props.id} style={{height: this.props.height}}
                      ref={this.mapRef}
@@ -41,7 +43,6 @@ class LayeredMap extends Component {
                         <VerticalZoom position='topleft' scaleY={this.props.scaleY} minScaleY={1} maxScaleY={10} />
                     }
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
-                    <Switch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
                     <LayersControl position='topright'>
                         {this.props.layers.filter(layer => layer.base_layer).map((layer) => (
                             <BaseLayer checked={layer.checked} name={layer.name} key={layer.name}>
@@ -71,6 +72,9 @@ class LayeredMap extends Component {
                             />
                         </FeatureGroup>
                     )}
+                   { showHillshadingSwitch &&
+                        <Switch position='bottomleft' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)} />
+                    }
                 </Map>
         );
     }
