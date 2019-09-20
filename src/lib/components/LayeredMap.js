@@ -46,16 +46,21 @@ class LayeredMap extends Component {
                     <LayersControl position='topright'>
                         {this.props.layers.filter(layer => layer.base_layer).map((layer) => (
                             <BaseLayer checked={layer.checked} name={layer.name} key={layer.name}>
-                                <CompositeMapLayer layer={layer} hillShading={this.state.hillShading} />
+                                <CompositeMapLayer
+                                    layer={layer}
+                                    hillShading={this.state.hillShading}
+                                    lightDirection={this.props.lightDirection}
+                                />
                             </BaseLayer>
                         ))}
                         {this.props.layers.filter(layer => !layer.base_layer).map((layer) => (
                             <Overlay checked={layer.checked} name={layer.name} key={layer.name}>
                                 <CompositeMapLayer 
-                                    lineCoords={(coords) => setProps({'polyline_points': coords})}
-                                    polygonCoords={(coords) => setProps({'polygon_points': coords})}
                                     layer={layer} 
                                     hillShading={this.state.hillShading} 
+                                    lightDirection={this.props.lightDirection}
+                                    lineCoords={(coords) => setProps({'polyline_points': coords})}
+                                    polygonCoords={(coords) => setProps({'polygon_points': coords})}
                                 />
                             </Overlay>
                         ))}
@@ -83,6 +88,7 @@ class LayeredMap extends Component {
 LayeredMap.defaultProps = {
     height: 800,
     hillShading: true,
+    lightDirection: [-1, 1, 1],
     scaleY: 1,
     showScaleY: false,
     draw_toolbar_marker: false,
@@ -158,6 +164,11 @@ LayeredMap.propTypes = {
      * Dash provided prop that returns the coordinates of the edited or clicked marker
      */
     marker_point: PropTypes.array,
+
+    /**
+     * Light direction.
+     */
+    lightDirection: PropTypes.array,
 
     /**
     * Dash-assigned callback that should be called whenever any of the

@@ -11,7 +11,7 @@ class ImageOverlayWebGL extends Component {
             return <ImageOverlay url={this.props.url} bounds={this.props.bounds} />
         }
         return <CanvasOverlay
-            drawMethod={(canvas) => alter_image(this.props.url, this.props.colormap, this.props.hillShading, canvas)}
+            drawMethod={(canvas) => alter_image(canvas, this.props.url, this.props.colormap, this.props.hillShading, this.props.elevationScale, this.props.lightDirection)}
             bounds={this.props.bounds}
         />
     }
