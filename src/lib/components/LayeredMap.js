@@ -88,7 +88,7 @@ class LayeredMap extends Component {
 LayeredMap.defaultProps = {
     height: 800,
     hillShading: true,
-    lightDirection: [-1, 1, 1],
+    lightDirection: [1, 1, 1],
     scaleY: 1,
     showScaleY: false,
     draw_toolbar_marker: false,

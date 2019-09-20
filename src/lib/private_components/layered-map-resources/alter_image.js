@@ -4,8 +4,6 @@ import fragmentShaderSourceWithoutHillshading from './fragmentShaderWithoutHills
 
 function alter_image(canvas, map_base64, colormap_base64, hillshading, elevation_scale, light_direction){
 
-    console.log(light_direction)
-
     const createShader = (gl, shaderType, shaderSource) => {
         /**
          * Create shader given type and source code
