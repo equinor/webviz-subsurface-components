@@ -227,9 +227,10 @@ export default LayeredMap;
 *     {
 *      'type': 'image',
 *      'url': either base64 encoding of the picture or a path to hosted image,
+*      'colormap': optional - base64 encoding of a 256 x 1 picture representing the colormap
 *      'bounds': [[xmin, ymin],  // The extent of the picture in the rendered map
 *                 [xmax, ymax]]
-       'allowHillshading': true or false  // if the image is to have hill shading or not
+       'allowHillshading': false  // optional - if the image is to have hill shading or not (false is default)
        'elevationScale': scale // optional - see ../private-components/layered-map-resources/ImageOverlayWebGL for definition
 *     }
 */
