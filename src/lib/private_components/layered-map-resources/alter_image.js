@@ -2,7 +2,7 @@ import vertexShaderSource from './vertexShader.vs.glsl'
 import fragmentShaderSourceWithHillshading from './fragmentShaderWithHillshading.fs.glsl'
 import fragmentShaderSourceWithoutHillshading from './fragmentShaderWithoutHillshading.fs.glsl'
 
-function alter_image(map_base64, colormap_base64, hillshading, canvas){
+function alter_image(canvas, map_base64, colormap_base64, hillshading, elevation_scale, light_direction){
 
     const createShader = (gl, shaderType, shaderSource) => {
         /**
@@ -141,7 +141,6 @@ function alter_image(map_base64, colormap_base64, hillshading, canvas){
                     gl.canvas.height
                 )
 
-                const light_direction = [1, 1, 1]
                 const vectorLength = Math.sqrt(light_direction[0]**2 + light_direction[1]**2 + light_direction[2]**2)
         
                 gl.uniform3f(
@@ -151,10 +150,9 @@ function alter_image(map_base64, colormap_base64, hillshading, canvas){
                     light_direction[2] / vectorLength
                 )
 
-                const elevationScale = 0.03
                 gl.uniform1f(
                     gl.getUniformLocation(program, 'u_elevation_scale'),
-                    elevationScale
+                    elevation_scale
                 )
             }
 

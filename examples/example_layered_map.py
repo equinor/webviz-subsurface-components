@@ -110,6 +110,7 @@ if __name__ == '__main__':
                     {
                         'type': 'image',
                         'url': map_data,
+                        'allowHillshading': True,
                         'colormap': colormap,
                         'unit': 'm',
                         'minvalue': min_value,

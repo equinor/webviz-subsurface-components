@@ -28,6 +28,8 @@ class LayeredMap extends Component {
     render() {
         const {draw_toolbar_marker, draw_toolbar_polygon, draw_toolbar_polyline, setProps} = this.props
         const showDrawControls = (draw_toolbar_marker || draw_toolbar_polygon || draw_toolbar_polyline) ? true : false
+        const showHillshadingSwitch = this.props.layers.some(layer => layer.data.some(item => item.allowHillshading))
+
         return (
                 <Map id={this.props.id} style={{height: this.props.height}}
                      ref={this.mapRef}
@@ -41,20 +43,24 @@ class LayeredMap extends Component {
                         <VerticalZoom position='topleft' scaleY={this.props.scaleY} minScaleY={1} maxScaleY={10} />
                     }
                     <ScaleControl position='bottomright' imperial={false} metric={true} />
-                    <Switch position='topright' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)}/>
                     <LayersControl position='topright'>
                         {this.props.layers.filter(layer => layer.base_layer).map((layer) => (
                             <BaseLayer checked={layer.checked} name={layer.name} key={layer.name}>
-                                <CompositeMapLayer layer={layer} hillShading={this.state.hillShading} />
+                                <CompositeMapLayer
+                                    layer={layer}
+                                    hillShading={this.state.hillShading}
+                                    lightDirection={this.props.lightDirection}
+                                />
                             </BaseLayer>
                         ))}
                         {this.props.layers.filter(layer => !layer.base_layer).map((layer) => (
                             <Overlay checked={layer.checked} name={layer.name} key={layer.name}>
                                 <CompositeMapLayer 
-                                    lineCoords={(coords) => setProps({'polyline_points': coords})}
-                                    polygonCoords={(coords) => setProps({'polygon_points': coords})}
                                     layer={layer} 
                                     hillShading={this.state.hillShading} 
+                                    lightDirection={this.props.lightDirection}
+                                    lineCoords={(coords) => setProps({'polyline_points': coords})}
+                                    polygonCoords={(coords) => setProps({'polygon_points': coords})}
                                 />
                             </Overlay>
                         ))}
@@ -71,6 +77,9 @@ class LayeredMap extends Component {
                             />
                         </FeatureGroup>
                     )}
+                   { showHillshadingSwitch &&
+                        <Switch position='bottomleft' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)} />
+                    }
                 </Map>
         );
     }
@@ -79,6 +88,7 @@ class LayeredMap extends Component {
 LayeredMap.defaultProps = {
     height: 800,
     hillShading: true,
+    lightDirection: [1, 1, 1],
     scaleY: 1,
     showScaleY: false,
     draw_toolbar_marker: false,
@@ -156,6 +166,11 @@ LayeredMap.propTypes = {
     marker_point: PropTypes.array,
 
     /**
+     * Light direction.
+     */
+    lightDirection: PropTypes.array,
+
+    /**
     * Dash-assigned callback that should be called whenever any of the
     * properties change
     */
@@ -212,7 +227,10 @@ export default LayeredMap;
 *     {
 *      'type': 'image',
 *      'url': either base64 encoding of the picture or a path to hosted image,
+*      'colormap': optional - base64 encoding of a 256 x 1 picture representing the colormap
 *      'bounds': [[xmin, ymin],  // The extent of the picture in the rendered map
 *                 [xmax, ymax]]
+       'allowHillshading': false  // optional - if the image is to have hill shading or not (false is default)
+       'elevationScale': scale // optional - see ../private-components/layered-map-resources/ImageOverlayWebGL for definition
 *     }
 */

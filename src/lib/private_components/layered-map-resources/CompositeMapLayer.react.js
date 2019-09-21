@@ -65,7 +65,9 @@ class CompositeMapLayer extends Component {
                           url={item.url}
                           colormap={item.colormap}
                           bounds={item.bounds.map(xy => yx(xy))}
-                          hillShading={this.props.hillShading}
+                          hillShading={this.props.hillShading && item.allowHillshading}
+                          elevationScale={item.elevationScale || 0.03}
+                          lightDirection={this.props.lightDirection}
                           key={index}/>
                     { 'colormap' in item && <Colormap colormap={item.colormap} unit={item.unit} minvalue={item.minvalue} maxvalue={item.maxvalue} position='bottomleft' key={'colormap' + index} /> }
                 </>
