@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import FlowMap from '../private_components/map/flow_map';
-import Map2D from '../private_components/map/map2d';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import FlowMap from "../private_components/map/flow_map";
+import Map2D from "../private_components/map/map2d";
 
 const getIndexies = layers => {
     const index = {};
     layers.forEach(kLayer => {
-        kLayer.forEach(({k, i, j, ...layer}) => {
+        kLayer.forEach(({ k, i, j, ...layer }) => {
             if (!index[k]) {
                 index[k] = {};
             }
@@ -15,39 +15,39 @@ const getIndexies = layers => {
             }
             if (!index[k][i][j]) {
                 index[k][i][j] = {};
-                index[k][i][j]['FLOWI+'] = layer['FLOWI+'];
-                index[k][i][j]['FLOWJ+'] = layer['FLOWJ+'];
+                index[k][i][j]["FLOWI+"] = layer["FLOWI+"];
+                index[k][i][j]["FLOWJ+"] = layer["FLOWJ+"];
             }
         });
     });
     return index;
 };
 
-const addNegativeFlow = ({layers, indexies}) =>
+const addNegativeFlow = ({ layers, indexies }) =>
     layers.map(kLayer =>
-        kLayer.map(({i, j, k, ...layer}) => {
+        kLayer.map(({ i, j, k, ...layer }) => {
             let FLOWInegative = 0;
             let FLOWJnegative = 0;
             if (
                 indexies[k][i - 1] &&
                 indexies[k][i - 1][j] &&
-                indexies[k][i - 1][j]['FLOWI+'] !== undefined
+                indexies[k][i - 1][j]["FLOWI+"] !== undefined
             ) {
-                FLOWInegative = indexies[k][i - 1][j]['FLOWI+'];
+                FLOWInegative = indexies[k][i - 1][j]["FLOWI+"];
             }
             if (
                 indexies[k][i][j - 1] &&
-                indexies[k][i][j - 1]['FLOWJ+'] !== undefined
+                indexies[k][i][j - 1]["FLOWJ+"] !== undefined
             ) {
-                FLOWJnegative = indexies[k][i][j - 1]['FLOWJ+'];
+                FLOWJnegative = indexies[k][i][j - 1]["FLOWJ+"];
             }
             return {
                 ...layer,
                 k,
                 i,
                 j,
-                'FLOWI-': FLOWInegative,
-                'FLOWJ-': FLOWJnegative,
+                "FLOWI-": FLOWInegative,
+                "FLOWJ-": FLOWJnegative,
             };
         })
     );
@@ -55,15 +55,15 @@ const addNegativeFlow = ({layers, indexies}) =>
 export function makeFlowLayers(data) {
     const layers = [];
 
-    const coord_scale = data.linearscales.coord[0]
-    const xmin = data.linearscales.coord[1]
-    const ymin = data.linearscales.coord[2]
+    const coord_scale = data.linearscales.coord[0];
+    const xmin = data.linearscales.coord[1];
+    const ymin = data.linearscales.coord[2];
 
-    const val_scale = data.linearscales.value[0]
-    const val_min = data.linearscales.value[1]
+    const val_scale = data.linearscales.value[0];
+    const val_min = data.linearscales.value[1];
 
-    const flow_scale = data.linearscales.flow[0]
-    const flow_min = data.linearscales.flow[1]
+    const flow_scale = data.linearscales.flow[0];
+    const flow_min = data.linearscales.flow[1];
 
     data.values.forEach(values => {
         const kValue = values[2];
@@ -75,30 +75,42 @@ export function makeFlowLayers(data) {
             j: values[1],
             k: values[2],
             points: [
-                [values[3]/coord_scale + xmin, values[7]/coord_scale + ymin],
-                [values[4]/coord_scale + xmin, values[8]/coord_scale + ymin],
-                [values[5]/coord_scale + xmin, values[9]/coord_scale + ymin],
-                [values[6]/coord_scale + xmin, values[10]/coord_scale + ymin]
+                [
+                    values[3] / coord_scale + xmin,
+                    values[7] / coord_scale + ymin,
+                ],
+                [
+                    values[4] / coord_scale + xmin,
+                    values[8] / coord_scale + ymin,
+                ],
+                [
+                    values[5] / coord_scale + xmin,
+                    values[9] / coord_scale + ymin,
+                ],
+                [
+                    values[6] / coord_scale + xmin,
+                    values[10] / coord_scale + ymin,
+                ],
             ],
-            value: values[11]/val_scale + val_min,
-            'FLOWI+': values[12]/flow_scale + flow_min,
-            'FLOWJ+': values[13]/flow_scale + flow_min
+            value: values[11] / val_scale + val_min,
+            "FLOWI+": values[12] / flow_scale + flow_min,
+            "FLOWJ+": values[13] / flow_scale + flow_min,
         });
     });
 
     const indexies = getIndexies(layers);
-    return addNegativeFlow({layers, indexies});
+    return addNegativeFlow({ layers, indexies });
 }
 
-export const make2DLayers = (data) => {
+export const make2DLayers = data => {
     const layers = [];
 
-    const coord_scale = data.linearscales.coord[0]
-    const xmin = data.linearscales.coord[1]
-    const ymin = data.linearscales.coord[2]
+    const coord_scale = data.linearscales.coord[0];
+    const xmin = data.linearscales.coord[1];
+    const ymin = data.linearscales.coord[2];
 
-    const val_scale = data.linearscales.value[0]
-    const val_min = data.linearscales.value[1]
+    const val_scale = data.linearscales.value[0];
+    const val_min = data.linearscales.value[1];
 
     data.values.forEach(values => {
         const kValue = values[2];
@@ -110,12 +122,24 @@ export const make2DLayers = (data) => {
             j: values[1],
             k: values[2],
             points: [
-                [values[3]/coord_scale + xmin, values[7]/coord_scale + ymin],
-                [values[4]/coord_scale + xmin, values[8]/coord_scale + ymin],
-                [values[5]/coord_scale + xmin, values[9]/coord_scale + ymin],
-                [values[6]/coord_scale + xmin, values[10]/coord_scale + ymin]
+                [
+                    values[3] / coord_scale + xmin,
+                    values[7] / coord_scale + ymin,
+                ],
+                [
+                    values[4] / coord_scale + xmin,
+                    values[8] / coord_scale + ymin,
+                ],
+                [
+                    values[5] / coord_scale + xmin,
+                    values[9] / coord_scale + ymin,
+                ],
+                [
+                    values[6] / coord_scale + xmin,
+                    values[10] / coord_scale + ymin,
+                ],
             ],
-            value: values[11]/val_scale + val_min,
+            value: values[11] / val_scale + val_min,
         });
     });
     return layers;
@@ -139,7 +163,7 @@ const initFlowMap = ({
     map.init();
 };
 
-const init2DMap = ({elementSelector, data, height, layerNames}) => {
+const init2DMap = ({ elementSelector, data, height, layerNames }) => {
     const layers = make2DLayers(data);
     const map = new Map2D({
         elementSelector,
@@ -150,9 +174,9 @@ const init2DMap = ({elementSelector, data, height, layerNames}) => {
     map.init();
 };
 
-const parseData = data => (typeof data === 'string' ? JSON.parse(data) : data);
+const parseData = data => (typeof data === "string" ? JSON.parse(data) : data);
 
-const shouldRenderFlowMap = data => 'flow' in data.linearscales;
+const shouldRenderFlowMap = data => "flow" in data.linearscales;
 
 class Map extends Component {
     constructor(props) {
@@ -164,7 +188,7 @@ class Map extends Component {
 
     componentDidMount() {
         if (this.canvas) {
-            const {data, height, layerNames} = this.props;
+            const { data, height, layerNames } = this.props;
             const parsedData = parseData(data);
             const isFlowMap = shouldRenderFlowMap(parsedData);
             const canvasSelector = `#${this.canvasId}`;
@@ -189,7 +213,7 @@ class Map extends Component {
     }
 
     render() {
-        const {height} = this.props;
+        const { height } = this.props;
         return (
             <div
                 style={{
@@ -204,9 +228,9 @@ class Map extends Component {
                             this.canvas = ref;
                         }}
                         style={{
-                            pointerEvents: 'none',
-                            position: 'absolute',
-                            zIndex: '1',
+                            pointerEvents: "none",
+                            position: "absolute",
+                            zIndex: "1",
                         }}
                     />
                 </div>

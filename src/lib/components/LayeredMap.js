@@ -1,51 +1,79 @@
 /* eslint no-inline-comments: 0 */
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import 'leaflet/dist/leaflet.css';
-import {CRS} from 'leaflet';
-import { LayersControl, Map, ScaleControl, FeatureGroup } from 'react-leaflet'
-import Switch from '../private_components/layered-map-resources/Switch.react'
-import CompositeMapLayer from '../private_components/layered-map-resources/CompositeMapLayer.react'
-import DrawControls from '../private_components/layered-map-resources/DrawControls.react'
-import VerticalZoom from '../private_components/layered-map-resources/VerticalZoom.react'
-import '../private_components/layered-map-resources/layered-map.css'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import "leaflet/dist/leaflet.css";
+import { CRS } from "leaflet";
+import { LayersControl, Map, ScaleControl, FeatureGroup } from "react-leaflet";
+import Switch from "../private_components/layered-map-resources/Switch.react";
+import CompositeMapLayer from "../private_components/layered-map-resources/CompositeMapLayer.react";
+import DrawControls from "../private_components/layered-map-resources/DrawControls.react";
+import VerticalZoom from "../private_components/layered-map-resources/VerticalZoom.react";
+import "../private_components/layered-map-resources/layered-map.css";
 
-const { BaseLayer, Overlay } = LayersControl
-const yx = ([x,y]) => {return [y, x]}
+const { BaseLayer, Overlay } = LayersControl;
+const yx = ([x, y]) => {
+    return [y, x];
+};
 
 class LayeredMap extends Component {
-
     constructor(props) {
-        super(props)
-        this.mapRef = React.createRef()
-        this.state = {hillShading: this.props.hillShading}
+        super(props);
+        this.mapRef = React.createRef();
+        this.state = { hillShading: this.props.hillShading };
     }
 
-    handleHillshadingChange(){
-        this.setState({hillShading: !this.state.hillShading})
+    handleHillshadingChange() {
+        this.setState({ hillShading: !this.state.hillShading });
     }
 
     render() {
-        const {draw_toolbar_marker, draw_toolbar_polygon, draw_toolbar_polyline, setProps} = this.props
-        const showDrawControls = (draw_toolbar_marker || draw_toolbar_polygon || draw_toolbar_polyline) ? true : false
-        const showHillshadingSwitch = this.props.layers.some(layer => layer.data.some(item => item.allowHillshading))
+        const {
+            draw_toolbar_marker,
+            draw_toolbar_polygon,
+            draw_toolbar_polyline,
+            setProps,
+        } = this.props;
+        const showDrawControls =
+            draw_toolbar_marker || draw_toolbar_polygon || draw_toolbar_polyline
+                ? true
+                : false;
+        const showHillshadingSwitch = this.props.layers.some(layer =>
+            layer.data.some(item => item.allowHillshading)
+        );
 
         return (
-                <Map id={this.props.id} style={{height: this.props.height}}
-                     ref={this.mapRef}
-                     center={yx(this.props.center)}
-                     zoom={-3}
-                     minZoom={-5}
-                     attributionControl={false}
-
-                     crs={CRS.Simple}>
-                    { this.props.showScaleY &&
-                        <VerticalZoom position='topleft' scaleY={this.props.scaleY} minScaleY={1} maxScaleY={10} />
-                    }
-                    <ScaleControl position='bottomright' imperial={false} metric={true} />
-                    <LayersControl position='topright'>
-                        {this.props.layers.filter(layer => layer.base_layer).map((layer) => (
-                            <BaseLayer checked={layer.checked} name={layer.name} key={layer.name}>
+            <Map
+                id={this.props.id}
+                style={{ height: this.props.height }}
+                ref={this.mapRef}
+                center={yx(this.props.center)}
+                zoom={-3}
+                minZoom={-5}
+                attributionControl={false}
+                crs={CRS.Simple}
+            >
+                {this.props.showScaleY && (
+                    <VerticalZoom
+                        position="topleft"
+                        scaleY={this.props.scaleY}
+                        minScaleY={1}
+                        maxScaleY={10}
+                    />
+                )}
+                <ScaleControl
+                    position="bottomright"
+                    imperial={false}
+                    metric={true}
+                />
+                <LayersControl position="topright">
+                    {this.props.layers
+                        .filter(layer => layer.base_layer)
+                        .map(layer => (
+                            <BaseLayer
+                                checked={layer.checked}
+                                name={layer.name}
+                                key={layer.name}
+                            >
                                 <CompositeMapLayer
                                     layer={layer}
                                     hillShading={this.state.hillShading}
@@ -53,34 +81,55 @@ class LayeredMap extends Component {
                                 />
                             </BaseLayer>
                         ))}
-                        {this.props.layers.filter(layer => !layer.base_layer).map((layer) => (
-                            <Overlay checked={layer.checked} name={layer.name} key={layer.name}>
-                                <CompositeMapLayer 
-                                    layer={layer} 
-                                    hillShading={this.state.hillShading} 
+                    {this.props.layers
+                        .filter(layer => !layer.base_layer)
+                        .map(layer => (
+                            <Overlay
+                                checked={layer.checked}
+                                name={layer.name}
+                                key={layer.name}
+                            >
+                                <CompositeMapLayer
+                                    layer={layer}
+                                    hillShading={this.state.hillShading}
                                     lightDirection={this.props.lightDirection}
-                                    lineCoords={(coords) => setProps({'polyline_points': coords})}
-                                    polygonCoords={(coords) => setProps({'polygon_points': coords})}
+                                    lineCoords={coords =>
+                                        setProps({ polyline_points: coords })
+                                    }
+                                    polygonCoords={coords =>
+                                        setProps({ polygon_points: coords })
+                                    }
                                 />
                             </Overlay>
                         ))}
-                    </LayersControl>
-                    { showDrawControls  && (
-                        <FeatureGroup>
-                            <DrawControls
-                                drawMarker={draw_toolbar_marker}
-                                drawPolygon={draw_toolbar_polygon}
-                                drawPolyline={draw_toolbar_polyline}
-                                lineCoords={(coords) => setProps({'polyline_points': coords})}
-                                markerCoords={(coords) => setProps({'marker_point': coords})}
-                                polygonCoords={(coords) => setProps({'polygon_points': coords})}
-                            />
-                        </FeatureGroup>
-                    )}
-                   { showHillshadingSwitch &&
-                        <Switch position='bottomleft' label='Hillshading' checked={this.props.hillShading} onChange={this.handleHillshadingChange.bind(this)} />
-                    }
-                </Map>
+                </LayersControl>
+                {showDrawControls && (
+                    <FeatureGroup>
+                        <DrawControls
+                            drawMarker={draw_toolbar_marker}
+                            drawPolygon={draw_toolbar_polygon}
+                            drawPolyline={draw_toolbar_polyline}
+                            lineCoords={coords =>
+                                setProps({ polyline_points: coords })
+                            }
+                            markerCoords={coords =>
+                                setProps({ marker_point: coords })
+                            }
+                            polygonCoords={coords =>
+                                setProps({ polygon_points: coords })
+                            }
+                        />
+                    </FeatureGroup>
+                )}
+                {showHillshadingSwitch && (
+                    <Switch
+                        position="bottomleft"
+                        label="Hillshading"
+                        checked={this.props.hillShading}
+                        onChange={this.handleHillshadingChange.bind(this)}
+                    />
+                )}
+            </Map>
         );
     }
 }
@@ -93,7 +142,7 @@ LayeredMap.defaultProps = {
     showScaleY: false,
     draw_toolbar_marker: false,
     draw_toolbar_polygon: false,
-    draw_toolbar_polyline: false
+    draw_toolbar_polyline: false,
 };
 
 LayeredMap.propTypes = {
@@ -115,7 +164,7 @@ LayeredMap.propTypes = {
     map_bounds: PropTypes.array,
 
     /**
-     * The initial scale of the y axis (relative to the x axis). 
+     * The initial scale of the y axis (relative to the x axis).
      * A value >1 increases the visual length of the y axis compared to the x axis.
      * Updating this property will override any interactively set y axis scale.
      * This property does not have any effect unless showScaleY is true.
@@ -130,10 +179,7 @@ LayeredMap.propTypes = {
     /**
      * Height of the component
      */
-    height: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number
-    ]),
+    height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
     /**
      * Add button to draw a polyline
@@ -171,9 +217,9 @@ LayeredMap.propTypes = {
     lightDirection: PropTypes.array,
 
     /**
-    * Dash-assigned callback that should be called whenever any of the
-    * properties change
-    */
+     * Dash-assigned callback that should be called whenever any of the
+     * properties change
+     */
     setProps: PropTypes.func,
 
     /**
@@ -190,8 +236,7 @@ LayeredMap.propTypes = {
      */
     layers: PropTypes.array,
 
-    hillShading: PropTypes.bool
-
+    hillShading: PropTypes.bool,
 };
 
 export default LayeredMap;

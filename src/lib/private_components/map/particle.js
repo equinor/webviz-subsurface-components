@@ -1,4 +1,4 @@
-import {Vector} from './linear_algebra';
+import { Vector } from "./linear_algebra";
 
 /**
  * A particle in a given flow field. The particle decays until it

@@ -21,7 +21,8 @@ tests_require = [
     'percy',
     'selenium',
     'flake8',
-    'pylint'
+    'pylint',
+    'black'
 ]
 
 # 'dash[testing]' to be added in tests_require when

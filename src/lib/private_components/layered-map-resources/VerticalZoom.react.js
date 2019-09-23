@@ -1,46 +1,40 @@
-import L from 'leaflet'
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { withLeaflet, MapControl } from 'react-leaflet'
-import PropTypes from 'prop-types'
-import Slider from '@material-ui/core/Slider'
-
+import L from "leaflet";
+import React from "react";
+import ReactDOM from "react-dom";
+import { withLeaflet, MapControl } from "react-leaflet";
+import PropTypes from "prop-types";
+import Slider from "@material-ui/core/Slider";
 
 class VerticalZoom extends MapControl {
+    constructor(props) {
+        super(props);
+        this.updateVerticalZoom(this.props.scaleY);
 
-    constructor(props){
-        super(props)
-        this.updateVerticalZoom(this.props.scaleY)
-
-        const { map } = this.props.leaflet
-        this.leafletElement.addTo(map)
+        const { map } = this.props.leaflet;
+        this.leafletElement.addTo(map);
     }
 
-    componentDidUpdate(prevProps){
-        if(prevProps.scaleY !== this.props.scaleY){
-            this.updateVerticalZoom(this.props.scaleY)
+    componentDidUpdate(prevProps) {
+        if (prevProps.scaleY !== this.props.scaleY) {
+            this.updateVerticalZoom(this.props.scaleY);
         }
     }
 
-    handleChange(_, scaleY){
-        this.updateVerticalZoom(scaleY)
+    handleChange(_, scaleY) {
+        this.updateVerticalZoom(scaleY);
     }
 
-    updateVerticalZoom(scaleY){
-        const { map } = this.props.leaflet
-        const center = map.getCenter()
+    updateVerticalZoom(scaleY) {
+        const { map } = this.props.leaflet;
+        const center = map.getCenter();
 
-        map.options.crs = L.extend(
-            {},
-            L.CRS.Simple,
-            {
-                projection: L.Projection.LonLat,
-                transformation: new L.Transformation(1, 0, -scaleY, 0)
-            }
-        )
+        map.options.crs = L.extend({}, L.CRS.Simple, {
+            projection: L.Projection.LonLat,
+            transformation: new L.Transformation(1, 0, -scaleY, 0),
+        });
 
-        map.setView(center)
-        map._resetView(map.getCenter(), map.getZoom())
+        map.setView(center);
+        map._resetView(map.getCenter(), map.getZoom());
     }
 
     componentDidMount() {
@@ -52,19 +46,26 @@ class VerticalZoom extends MapControl {
     createLeafletElement(props) {
         const MapInfo = L.Control.extend({
             onAdd: () => {
-                this.panelDiv = L.DomUtil.create('div', 'leaflet-custom-control')
+                this.panelDiv = L.DomUtil.create(
+                    "div",
+                    "leaflet-custom-control"
+                );
 
-                this.panelDiv.addEventListener('mouseover', () => this.props.leaflet.map.dragging.disable())
-                this.panelDiv.addEventListener('mouseout', () => this.props.leaflet.map.dragging.enable())
+                this.panelDiv.addEventListener("mouseover", () =>
+                    this.props.leaflet.map.dragging.disable()
+                );
+                this.panelDiv.addEventListener("mouseout", () =>
+                    this.props.leaflet.map.dragging.enable()
+                );
 
-                this.panelDiv.style.height = '200px'
-                this.panelDiv.style.paddingBottom = '10px'
-                this.panelDiv.style.paddingTop = '10px'
+                this.panelDiv.style.height = "200px";
+                this.panelDiv.style.paddingBottom = "10px";
+                this.panelDiv.style.paddingTop = "10px";
 
-                return this.panelDiv
-            }
-        })
-        return new MapInfo({ position: props.position })
+                return this.panelDiv;
+            },
+        });
+        return new MapInfo({ position: props.position });
     }
 
     render() {
@@ -76,16 +77,16 @@ class VerticalZoom extends MapControl {
                 min={this.props.minScaleY}
                 max={this.props.maxScaleY}
                 onChange={this.handleChange.bind(this)}
-            />, 
+            />,
             this.panelDiv
-        )
+        );
     }
 }
 
 VerticalZoom.defaultProps = {
     scaleY: 1,
     minScaleY: 1,
-    maxScaleY: 10
+    maxScaleY: 10,
 };
 
 VerticalZoom.propTypes = {
@@ -104,7 +105,7 @@ VerticalZoom.propTypes = {
     /**
      * Maximum allowed scaleY
      */
-    maxScaleY: PropTypes.number
+    maxScaleY: PropTypes.number,
 };
 
-export default withLeaflet(VerticalZoom)
+export default withLeaflet(VerticalZoom);

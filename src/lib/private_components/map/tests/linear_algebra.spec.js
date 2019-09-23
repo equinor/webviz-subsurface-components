@@ -1,36 +1,36 @@
-import jsc from 'jsverify';
-import equal from 'deep-equal';
-import {Vector, Matrix} from '../linear_algebra';
+import jsc from "jsverify";
+import equal from "deep-equal";
+import { Vector, Matrix } from "../linear_algebra";
 import {
     arbitraryVector,
     arbitraryMatrix,
     arbitrarySquareMatrix,
-} from './arbitraries';
+} from "./arbitraries";
 
-describe('Vector', () => {
+describe("Vector", () => {
     jsc.property(
-        'construction is inverse with Array.from',
+        "construction is inverse with Array.from",
         jsc.array(jsc.number),
         list => equal(Array.from(new Vector(list)), list)
     );
 
-    jsc.property('value is consistent with input', jsc.array(jsc.nat), arr => {
+    jsc.property("value is consistent with input", jsc.array(jsc.nat), arr => {
         const vector = new Vector(arr);
         return arr.every((e, i) => vector.value(i) === e);
     });
 
     jsc.property(
-        'magnitude is calculated correctly',
+        "magnitude is calculated correctly",
         jsc.number,
         jsc.number,
         (_x, _y) => {
-            const vector = new Vector(_x, _y)
-            return Math.sqrt(_x * _x + _y * _y) === vector.magnitude
-        },
-    )
+            const vector = new Vector(_x, _y);
+            return Math.sqrt(_x * _x + _y * _y) === vector.magnitude;
+        }
+    );
 
     jsc.property(
-        'multiply is mapping multiplication on values',
+        "multiply is mapping multiplication on values",
         jsc.array(jsc.nat),
         jsc.array(jsc.nat),
         (_arr1, _arr2) => {
@@ -47,7 +47,7 @@ describe('Vector', () => {
     );
 
     jsc.property(
-        'scalar multiply is mapping multiplication on values',
+        "scalar multiply is mapping multiplication on values",
         arbitraryVector,
         jsc.number,
         (vector, n) =>
@@ -58,7 +58,7 @@ describe('Vector', () => {
     );
 
     jsc.property(
-        'sum is mapping sum on values',
+        "sum is mapping sum on values",
         jsc.array(jsc.nat),
         jsc.array(jsc.nat),
         (_arr1, _arr2) => {
@@ -75,7 +75,7 @@ describe('Vector', () => {
     );
 
     jsc.property(
-        'minus is mapping subtraction on values',
+        "minus is mapping subtraction on values",
         jsc.array(jsc.nat),
         jsc.array(jsc.nat),
         (_arr1, _arr2) => {
@@ -96,9 +96,9 @@ function matrixToArray(matrix) {
     return Array.from(matrix).map(d => Array.from(d));
 }
 
-describe('Matrix', () => {
+describe("Matrix", () => {
     jsc.property(
-        'construction is inverse with mapping Array.from',
+        "construction is inverse with mapping Array.from",
         arbitraryMatrix(),
         mat => {
             const list = matrixToArray(mat);
@@ -106,7 +106,7 @@ describe('Matrix', () => {
         }
     );
 
-    jsc.property('Matrix gets size from input', arbitraryMatrix(), mat => {
+    jsc.property("Matrix gets size from input", arbitraryMatrix(), mat => {
         const list = matrixToArray(mat);
         const matrix = new Matrix(list);
         if (list.length > 0) {
@@ -119,7 +119,7 @@ describe('Matrix', () => {
     });
 
     jsc.property(
-        'Transpose has row and column size inverted',
+        "Transpose has row and column size inverted",
         arbitraryMatrix(),
         matrix => {
             const trans = matrix.transpose();
@@ -135,7 +135,7 @@ describe('Matrix', () => {
     );
 
     jsc.property(
-        'Transpose inverts row and column',
+        "Transpose inverts row and column",
         arbitraryMatrix(),
         matrix => {
             const trans = matrix.transpose();
@@ -154,12 +154,12 @@ describe('Matrix', () => {
     );
 
     jsc.property(
-        'Determinant is invariant over transpose',
+        "Determinant is invariant over transpose",
         arbitrarySquareMatrix(2, 2),
         matrix => matrix.determinant() === matrix.transpose().determinant()
     );
     jsc.property(
-        'Multiplying with identity matrix is identity',
+        "Multiplying with identity matrix is identity",
         arbitrarySquareMatrix(),
         matrix => {
             const identity = Matrix.identity(matrix.length);
@@ -168,7 +168,7 @@ describe('Matrix', () => {
     );
 
     jsc.property(
-        'Determinant is a multiplicative map',
+        "Determinant is a multiplicative map",
         arbitrarySquareMatrix(2, 2),
         arbitrarySquareMatrix(2, 2),
         (m1, m2) => {

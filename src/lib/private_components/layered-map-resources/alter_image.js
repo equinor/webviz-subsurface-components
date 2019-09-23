@@ -1,9 +1,15 @@
-import vertexShaderSource from './vertexShader.vs.glsl'
-import fragmentShaderSourceWithHillshading from './fragmentShaderWithHillshading.fs.glsl'
-import fragmentShaderSourceWithoutHillshading from './fragmentShaderWithoutHillshading.fs.glsl'
+import vertexShaderSource from "./vertexShader.vs.glsl";
+import fragmentShaderSourceWithHillshading from "./fragmentShaderWithHillshading.fs.glsl";
+import fragmentShaderSourceWithoutHillshading from "./fragmentShaderWithoutHillshading.fs.glsl";
 
-function alter_image(canvas, map_base64, colormap_base64, hillshading, elevation_scale, light_direction){
-
+function alter_image(
+    canvas,
+    map_base64,
+    colormap_base64,
+    hillshading,
+    elevation_scale,
+    light_direction
+) {
     const createShader = (gl, shaderType, shaderSource) => {
         /**
          * Create shader given type and source code
@@ -13,11 +19,11 @@ function alter_image(canvas, map_base64, colormap_base64, hillshading, elevation
          * @param {shaderSource} string - The shader source code
          */
 
-        const shader = gl.createShader(shaderType)
-        gl.shaderSource(shader, shaderSource)
-        gl.compileShader(shader)
-        return shader
-    }
+        const shader = gl.createShader(shaderType);
+        gl.shaderSource(shader, shaderSource);
+        gl.compileShader(shader);
+        return shader;
+    };
 
     const createProgram = (gl, vertexShader, fragmentShader) => {
         /**
@@ -28,12 +34,12 @@ function alter_image(canvas, map_base64, colormap_base64, hillshading, elevation
          * @param {shader} fragmentShader - The compiled fragment shader to attach
          */
 
-        const program = gl.createProgram()
-        gl.attachShader(program, vertexShader)
-        gl.attachShader(program, fragmentShader)
-        gl.linkProgram(program)
-        return program
-    }
+        const program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+        return program;
+    };
 
     const bindBuffer = (gl, attribName, array) => {
         /**
@@ -45,16 +51,16 @@ function alter_image(canvas, map_base64, colormap_base64, hillshading, elevation
          * @param {array} array - The array data to bind to the buffer
          */
 
-        const program = gl.getParameter(gl.CURRENT_PROGRAM)
+        const program = gl.getParameter(gl.CURRENT_PROGRAM);
 
-        const newBuffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, newBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.STATIC_DRAW)
-        const attribLocation = gl.getAttribLocation(program, attribName)
-        gl.enableVertexAttribArray(attribLocation)
-        gl.bindBuffer(gl.ARRAY_BUFFER, newBuffer)
-        gl.vertexAttribPointer(attribLocation, 2, gl.FLOAT, false, 0, 0)
-    }
+        const newBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, newBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.STATIC_DRAW);
+        const attribLocation = gl.getAttribLocation(program, attribName);
+        gl.enableVertexAttribArray(attribLocation);
+        gl.bindBuffer(gl.ARRAY_BUFFER, newBuffer);
+        gl.vertexAttribPointer(attribLocation, 2, gl.FLOAT, false, 0, 0);
+    };
 
     const bindTexture = (gl, textureIndex, uniformName, image) => {
         /**
@@ -67,98 +73,123 @@ function alter_image(canvas, map_base64, colormap_base64, hillshading, elevation
          * @param {image element} image - The image element to use as input data for the texture
          */
 
-        const program = gl.getParameter(gl.CURRENT_PROGRAM)
+        const program = gl.getParameter(gl.CURRENT_PROGRAM);
 
-        gl.activeTexture(gl.TEXTURE0 + textureIndex)
-        gl.bindTexture(gl.TEXTURE_2D, gl.createTexture())
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-        gl.uniform1i(gl.getUniformLocation(program, uniformName), textureIndex)
-    }
+        gl.activeTexture(gl.TEXTURE0 + textureIndex);
+        gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texImage2D(
+            gl.TEXTURE_2D,
+            0,
+            gl.RGBA,
+            gl.RGBA,
+            gl.UNSIGNED_BYTE,
+            image
+        );
+        gl.uniform1i(gl.getUniformLocation(program, uniformName), textureIndex);
+    };
 
     const load_image = src =>
         new Promise(resolve => {
             const img = new Image();
-            img.src = src
-            img.onload = () => resolve(img)
+            img.src = src;
+            img.onload = () => resolve(img);
         });
 
-    Promise.all([load_image(map_base64), load_image(colormap_base64)])
-        .then(function([map_image, colormap_image]) {
+    Promise.all([load_image(map_base64), load_image(colormap_base64)]).then(
+        function([map_image, colormap_image]) {
+            const gl = canvas.getContext("webgl", {
+                premultipliedAlpha: false,
+            });
+            gl.getExtension("OES_texture_float");
 
-            const gl = canvas.getContext('webgl', {premultipliedAlpha: false })
-            gl.getExtension('OES_texture_float')
-
-            canvas.width = map_image.width
-            canvas.height = map_image.height
+            canvas.width = map_image.width;
+            canvas.height = map_image.height;
 
             // Clear canvas
-            gl.clearColor(0, 0, 0, 0)
-            gl.clear(gl.COLOR_BUFFER_BIT)
+            gl.clearColor(0, 0, 0, 0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
 
             // Tell WebGL how to convert from clip space ([-1, 1] x [-1, 1]) back to pixel space ([0, w] x [0, h]):
-            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
             const program = createProgram(
                 gl,
                 createShader(gl, gl.VERTEX_SHADER, vertexShaderSource),
-                createShader(gl, gl.FRAGMENT_SHADER, hillshading ? fragmentShaderSourceWithHillshading : fragmentShaderSourceWithoutHillshading)
-            )
-            
-            gl.useProgram(program)
+                createShader(
+                    gl,
+                    gl.FRAGMENT_SHADER,
+                    hillshading
+                        ? fragmentShaderSourceWithHillshading
+                        : fragmentShaderSourceWithoutHillshading
+                )
+            );
 
-            bindBuffer(gl, 'a_texCoord', [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1])
-            bindBuffer(gl, 'a_position', [
-                0, 0,
-                map_image.width, 0,
-                0, map_image.height,
-                0, map_image.height,
-                map_image.width, 0,
-                map_image.width, map_image.height
-            ])
+            gl.useProgram(program);
 
-            bindTexture(gl, 0, 'u_image', map_image)
-            bindTexture(gl, 1, 'u_colormap_frame', colormap_image)
+            bindBuffer(gl, "a_texCoord", [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]);
+            bindBuffer(gl, "a_position", [
+                0,
+                0,
+                map_image.width,
+                0,
+                0,
+                map_image.height,
+                0,
+                map_image.height,
+                map_image.width,
+                0,
+                map_image.width,
+                map_image.height,
+            ]);
+
+            bindTexture(gl, 0, "u_image", map_image);
+            bindTexture(gl, 1, "u_colormap_frame", colormap_image);
 
             gl.uniform2f(
-                gl.getUniformLocation(program, 'u_resolution_vertex'),
+                gl.getUniformLocation(program, "u_resolution_vertex"),
                 gl.canvas.width,
                 gl.canvas.height
-            )
+            );
 
             gl.uniform1f(
-                gl.getUniformLocation(program, 'u_colormap_length'),
+                gl.getUniformLocation(program, "u_colormap_length"),
                 colormap_image.width
-            )
+            );
 
-            if (hillshading){
+            if (hillshading) {
                 gl.uniform2f(
-                    gl.getUniformLocation(program, 'u_resolution_fragment'),
+                    gl.getUniformLocation(program, "u_resolution_fragment"),
                     gl.canvas.width,
                     gl.canvas.height
-                )
+                );
 
-                const vectorLength = Math.sqrt(light_direction[0]**2 + light_direction[1]**2 + light_direction[2]**2)
-        
+                const vectorLength = Math.sqrt(
+                    light_direction[0] ** 2 +
+                        light_direction[1] ** 2 +
+                        light_direction[2] ** 2
+                );
+
                 gl.uniform3f(
-                    gl.getUniformLocation(program, 'u_light_direction'),
+                    gl.getUniformLocation(program, "u_light_direction"),
                     light_direction[0] / vectorLength,
                     light_direction[1] / vectorLength,
                     light_direction[2] / vectorLength
-                )
+                );
 
                 gl.uniform1f(
-                    gl.getUniformLocation(program, 'u_elevation_scale'),
+                    gl.getUniformLocation(program, "u_elevation_scale"),
                     elevation_scale
-                )
+                );
             }
 
-            const numberIndices = 6
-            gl.drawArrays(gl.TRIANGLES, 0, numberIndices)
-    })
+            const numberIndices = 6;
+            gl.drawArrays(gl.TRIANGLES, 0, numberIndices);
+        }
+    );
 }
 
-export default alter_image
+export default alter_image;

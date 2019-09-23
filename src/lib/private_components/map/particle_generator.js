@@ -1,4 +1,4 @@
-import Particle from './particle';
+import Particle from "./particle";
 /**
  * Generates particles in the given field.
  */
@@ -11,7 +11,7 @@ export default class ParticleGenerator {
      * @returns a randomly generated particle.
      */
     generate() {
-        const {grid} = this.field;
+        const { grid } = this.field;
         let cell;
         while (!cell) {
             const i = Math.floor(Math.random() * grid.numRows);

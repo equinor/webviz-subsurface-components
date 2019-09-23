@@ -1,20 +1,16 @@
-
-
-
-
 #sensitivity-slider-plot {
     position: relative;
 }
 
 .sensitivity-slider-plot__graph-area {
     fill: steelblue;
-    fill-opacity: 0.4
+    fill-opacity: 0.4;
 }
 
 .sensitivity-slider-plot__graph-line {
     stroke: steelblue;
     stroke-width: 1;
-    fill: none
+    fill: none;
 }
 
 .sensitivity-slider-plot__graph-overlay {
@@ -35,7 +31,7 @@
 .sensitivity-slider-plot__graph-focus-circle {
     fill: none;
     stroke: black;
-    r: 4.5
+    r: 4.5;
 }
 
 .sensitivity-slider-plot__graph-focus-line {

@@ -1,10 +1,10 @@
-import sinon from 'sinon';
-import Map2D from '../map2d';
+import sinon from "sinon";
+import Map2D from "../map2d";
 
-describe('Map2d', () => {
+describe("Map2d", () => {
     const createValidMap2d = () => {
         const map = new Map2D({
-            elementSelector: '#map_2d',
+            elementSelector: "#map_2d",
             plotOptions: {
                 xMin: 0,
                 xMax: 0,
@@ -12,23 +12,23 @@ describe('Map2d', () => {
                 yMax: 0,
                 precisionCoord: 0,
                 precisionValues: 0,
-                colorMap: 'viridis',
-                picturePath: '',
-                layerNames: ['name'],
+                colorMap: "viridis",
+                picturePath: "",
+                layerNames: ["name"],
                 minVal: 0,
                 maxVal: 0,
             },
-            layers: [[{points: [[]], value: 0}]],
+            layers: [[{ points: [[]], value: 0 }]],
         });
         return map;
     };
 
-    describe('constructor', () => {});
+    describe("constructor", () => {});
 
-    describe('init', () => {
-        it('should initialize map component', () => {
+    describe("init", () => {
+        it("should initialize map component", () => {
             const map = createValidMap2d();
-            const spy = sinon.spy(map, 'initMap');
+            const spy = sinon.spy(map, "initMap");
 
             map.init();
 
@@ -36,9 +36,9 @@ describe('Map2d', () => {
             spy.restore();
         });
 
-        it('should initialize compass component', () => {
+        it("should initialize compass component", () => {
             const map = createValidMap2d();
-            const spy = sinon.spy(map, 'initCompass');
+            const spy = sinon.spy(map, "initCompass");
 
             map.init();
 
@@ -46,9 +46,9 @@ describe('Map2d', () => {
             spy.restore();
         });
 
-        it('should initialize compass component', () => {
+        it("should initialize compass component", () => {
             const map = createValidMap2d();
-            const spy = sinon.spy(map, 'initCompass');
+            const spy = sinon.spy(map, "initCompass");
 
             map.init();
 
@@ -56,9 +56,9 @@ describe('Map2d', () => {
             spy.restore();
         });
 
-        it('should initialize layer slider component', () => {
+        it("should initialize layer slider component", () => {
             const map = createValidMap2d();
-            const spy = sinon.spy(map, 'initLayerSlider');
+            const spy = sinon.spy(map, "initLayerSlider");
 
             map.init();
 
@@ -66,9 +66,9 @@ describe('Map2d', () => {
             spy.restore();
         });
 
-        it('should initialize infobox component', () => {
+        it("should initialize infobox component", () => {
             const map = createValidMap2d();
-            const spy = sinon.spy(map, 'initInfoBox');
+            const spy = sinon.spy(map, "initInfoBox");
 
             map.init();
 
@@ -76,9 +76,9 @@ describe('Map2d', () => {
             spy.restore();
         });
 
-        it('should initialize depth scale component', () => {
+        it("should initialize depth scale component", () => {
             const map = createValidMap2d();
-            const spy = sinon.spy(map, 'initDepthScale');
+            const spy = sinon.spy(map, "initDepthScale");
 
             map.init();
 
@@ -86,9 +86,9 @@ describe('Map2d', () => {
             spy.restore();
         });
 
-        it('should initialize distance scale component', () => {
+        it("should initialize distance scale component", () => {
             const map = createValidMap2d();
-            const spy = sinon.spy(map, 'initDistanceScale');
+            const spy = sinon.spy(map, "initDistanceScale");
 
             map.init();
 

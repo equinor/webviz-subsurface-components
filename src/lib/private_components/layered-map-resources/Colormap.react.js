@@ -1,25 +1,26 @@
-import L from 'leaflet'
-import React from 'react'
-import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
-import { withLeaflet, MapControl } from 'react-leaflet'
-
+import L from "leaflet";
+import React from "react";
+import ReactDOM from "react-dom";
+import PropTypes from "prop-types";
+import { withLeaflet, MapControl } from "react-leaflet";
 
 class Colormap extends MapControl {
+    constructor(props) {
+        super(props);
 
-    constructor(props){
-        super(props)
-
-        const { map } = this.props.leaflet
-        this.leafletElement.addTo(map)
+        const { map } = this.props.leaflet;
+        this.leafletElement.addTo(map);
     }
 
     createLeafletElement(props) {
         const MapInfo = L.Control.extend({
             onAdd: () => {
-                this.panelDiv = L.DomUtil.create('div', 'leaflet-custom-control')
+                this.panelDiv = L.DomUtil.create(
+                    "div",
+                    "leaflet-custom-control"
+                );
                 return this.panelDiv;
-            }
+            },
         });
         return new MapInfo({ position: props.position });
     }
@@ -32,21 +33,23 @@ class Colormap extends MapControl {
 
     render() {
         return ReactDOM.createPortal(
-            <div className='leaflet-colorbar'>
-                <div className='leaflet-colorbar-image'>
-                    <img src={this.props.colormap} style={{width: '100%', height: '10px'}} />
+            <div className="leaflet-colorbar">
+                <div className="leaflet-colorbar-image">
+                    <img
+                        src={this.props.colormap}
+                        style={{ width: "100%", height: "10px" }}
+                    />
                 </div>
                 <div>
                     {this.props.minvalue} {this.props.unit}
                 </div>
-                <div className='leaflet-colorbar-right-label'>  
+                <div className="leaflet-colorbar-right-label">
                     {this.props.maxvalue} {this.props.unit}
                 </div>
-            </div>, 
+            </div>,
             this.panelDiv
-        )
+        );
     }
-
 }
 
 Colormap.propTypes = {
@@ -60,8 +63,7 @@ Colormap.propTypes = {
     maxvalue: PropTypes.number,
 
     /* Unit to show in color map */
-    unit: PropTypes.string
+    unit: PropTypes.string,
 };
-
 
 export default withLeaflet(Colormap);

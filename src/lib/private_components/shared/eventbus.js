@@ -8,7 +8,7 @@
  */
 export default class EventBus {
     constructor() {
-        this.events = {}
+        this.events = {};
     }
 
     /**
@@ -19,19 +19,19 @@ export default class EventBus {
      */
     on(eventName, handler) {
         if (!eventName) {
-            throw new Error('No event name provided')
+            throw new Error("No event name provided");
         }
         if (!handler) {
-            throw new Error('No handler provided')
+            throw new Error("No handler provided");
         }
 
-        const events = this.events[eventName]
+        const events = this.events[eventName];
 
         if (!events) {
-            this.events[eventName] = []
+            this.events[eventName] = [];
         }
 
-        this.events[eventName].push(handler)
+        this.events[eventName].push(handler);
     }
 
     /**
@@ -46,16 +46,16 @@ export default class EventBus {
      */
     emit(eventName, data) {
         if (!eventName) {
-            throw new Error('No event name provided')
+            throw new Error("No event name provided");
         }
 
-        const events = this.events[eventName]
+        const events = this.events[eventName];
 
         if (!events) {
-            return
+            return;
         }
 
-        events.forEach(e => e(data))
+        events.forEach(e => e(data));
     }
 
     /**
@@ -66,21 +66,21 @@ export default class EventBus {
      */
     off(eventName, handler) {
         if (!eventName) {
-            throw new Error('No event name provided')
+            throw new Error("No event name provided");
         }
 
         if (!handler) {
-            throw new Error('No handler provided')
+            throw new Error("No handler provided");
         }
 
-        const events = this.events[eventName]
+        const events = this.events[eventName];
 
         if (!events) {
-            return
+            return;
         }
 
         this.events[eventName] = this.events[eventName].filter(
-            eventHandler => eventHandler !== handler,
-        )
+            eventHandler => eventHandler !== handler
+        );
     }
 }

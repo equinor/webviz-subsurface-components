@@ -1,9 +1,9 @@
-import jsc from 'jsverify';
-import {affineIndependent, Vector, Matrix} from '../linear_algebra';
-import {Cell} from '../cell';
-import Grid from '../grid';
-import Field from '../field';
-import Particle from '../particle';
+import jsc from "jsverify";
+import { affineIndependent, Vector, Matrix } from "../linear_algebra";
+import { Cell } from "../cell";
+import Grid from "../grid";
+import Field from "../field";
+import Particle from "../particle";
 
 export const arbitrarySizedArray = (arb, size) =>
     jsc.tuple(new Array(size).fill(0).map(() => arb));

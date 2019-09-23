@@ -1,5 +1,5 @@
 function isIterable(object) {
-    return typeof object[Symbol.iterator] === 'function';
+    return typeof object[Symbol.iterator] === "function";
 }
 
 /**
@@ -57,9 +57,9 @@ export class Vector {
                 if (nextIndex < self._data.length) {
                     const index = nextIndex;
                     nextIndex += 1;
-                    return {value: self._data[index], done: false};
+                    return { value: self._data[index], done: false };
                 }
-                return {done: true};
+                return { done: true };
             },
         };
     }
@@ -81,7 +81,7 @@ export class Vector {
      * Magnitude of the vector (L2 norm)
      */
     get magnitude() {
-        return Math.sqrt(this._data.map(x => x ** 2).reduce((a, b) => a + b))
+        return Math.sqrt(this._data.map(x => x ** 2).reduce((a, b) => a + b));
     }
 
     /**
@@ -236,7 +236,7 @@ export class Matrix {
                         done: false,
                     };
                 }
-                return {done: true};
+                return { done: true };
             },
         };
     }
@@ -289,7 +289,7 @@ export class Matrix {
                 this.value(1, 0) * this.value(0, 1)
             );
         }
-        throw Error('Unimplemented determinant of higher dimensions');
+        throw Error("Unimplemented determinant of higher dimensions");
     }
 
     /**

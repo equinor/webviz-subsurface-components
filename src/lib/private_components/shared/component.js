@@ -1,4 +1,4 @@
-import EventBus from './eventbus'
+import EventBus from "./eventbus";
 
 /**
  * Base class representing a part of the visualisation.
@@ -10,27 +10,27 @@ import EventBus from './eventbus'
  */
 export default class Component {
     constructor() {
-        this.eventBus = new EventBus()
+        this.eventBus = new EventBus();
     }
 
     /**
      * See {@link EventBus#on}
      */
     on(eventName, handler) {
-        this.eventBus.on(eventName, handler)
+        this.eventBus.on(eventName, handler);
     }
 
     /**
      * See {@link EventBus#emit}
      */
     emit(eventName, data) {
-        this.eventBus.emit(eventName, data)
+        this.eventBus.emit(eventName, data);
     }
 
     /**
      * See {@link EventBus#off}
      */
     off(eventName, handler) {
-        this.eventBus.off(eventName, handler)
+        this.eventBus.off(eventName, handler);
     }
 }

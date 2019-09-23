@@ -1,5 +1,5 @@
-import {Vector} from './linear_algebra';
-import {outsideUnitSquare} from './cell';
+import { Vector } from "./linear_algebra";
+import { outsideUnitSquare } from "./cell";
 
 /**
  * A velocity Field over a given Grid.
@@ -32,7 +32,7 @@ export default class Field {
      */
     calculateNewCell(position, cell) {
         let [x, y] = position;
-        let {i, j} = cell;
+        let { i, j } = cell;
         while (outsideUnitSquare(x, y)) {
             if (x <= 0) {
                 i -= 1;
