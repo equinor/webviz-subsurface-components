@@ -1,4 +1,4 @@
-import EventBus from './eventbus';
+import EventBus from "./eventbus";
 
 /**
  * Base class representing a part of the visualisation.

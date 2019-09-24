@@ -19,10 +19,10 @@ export default class EventBus {
      */
     on(eventName, handler) {
         if (!eventName) {
-            throw new Error('No event name provided');
+            throw new Error("No event name provided");
         }
         if (!handler) {
-            throw new Error('No handler provided');
+            throw new Error("No handler provided");
         }
 
         const events = this.events[eventName];
@@ -46,7 +46,7 @@ export default class EventBus {
      */
     emit(eventName, data) {
         if (!eventName) {
-            throw new Error('No event name provided');
+            throw new Error("No event name provided");
         }
 
         const events = this.events[eventName];
@@ -66,11 +66,11 @@ export default class EventBus {
      */
     off(eventName, handler) {
         if (!eventName) {
-            throw new Error('No event name provided');
+            throw new Error("No event name provided");
         }
 
         if (!handler) {
-            throw new Error('No handler provided');
+            throw new Error("No handler provided");
         }
 
         const events = this.events[eventName];

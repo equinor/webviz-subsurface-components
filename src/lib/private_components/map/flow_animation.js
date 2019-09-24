@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from "d3";
 
 function distance([x1, y1], [x2, y2]) {
     return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
@@ -27,7 +27,7 @@ export default class FlowAnimation {
         numParticles,
         pixelScale
     ) {
-        if (typeof canvas === 'string') {
+        if (typeof canvas === "string") {
             this._canvas = d3.select(canvas).node();
         } else {
             this._canvas = canvas;
@@ -47,7 +47,7 @@ export default class FlowAnimation {
         this._particleGenerator = particleGenerator;
         this._particles = [];
         this._numParticles = numParticles;
-        this._context = this._canvas.getContext('2d');
+        this._context = this._canvas.getContext("2d");
         const fps = 30;
         this._fpsInterval = 1000 / fps;
         this._particles = Array(this._numParticles);
@@ -74,7 +74,7 @@ export default class FlowAnimation {
      */
     _resetDrawStyle() {
         // fillStyle used for fading particles
-        this._context.fillStyle = 'rgba(0, 0, 0, 0.96)';
+        this._context.fillStyle = "rgba(0, 0, 0, 0.96)";
         // width of particle trails
         this._context.lineWidth = 1;
     }
@@ -84,7 +84,7 @@ export default class FlowAnimation {
      * If any of the particles are dead, they are replaced.
      */
     _stepParticles() {
-        const {field} = this._particleGenerator;
+        const { field } = this._particleGenerator;
         this._particles.forEach((d, i) => {
             if (d.dead) {
                 this._particles[i] = this._particleGenerator.generate();
@@ -154,7 +154,7 @@ export default class FlowAnimation {
     _fadeTrails() {
         if (this._context) {
             const prev = this._context.globalCompositeOperation;
-            this._context.globalCompositeOperation = 'destination-in';
+            this._context.globalCompositeOperation = "destination-in";
             this._context.fillRect(
                 0,
                 0,

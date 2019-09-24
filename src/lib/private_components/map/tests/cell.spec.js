@@ -1,13 +1,13 @@
-import jsc from 'jsverify';
+import jsc from "jsverify";
 import {
     arbitraryCell,
     arbitraryNonEmptyCell,
     arbitraryPoint,
-} from './arbitraries';
+} from "./arbitraries";
 
-describe('Cell', () => {
+describe("Cell", () => {
     jsc.property(
-        'has consistent i setter/getter',
+        "has consistent i setter/getter",
         arbitraryCell,
         jsc.nat,
         (cell, n) => {
@@ -17,7 +17,7 @@ describe('Cell', () => {
     );
 
     jsc.property(
-        'has consistent j setter/getter',
+        "has consistent j setter/getter",
         arbitraryCell,
         jsc.nat,
         (cell, n) => {
@@ -27,7 +27,7 @@ describe('Cell', () => {
     );
 
     jsc.property(
-        'non-empty cells have non-zero jacobian determinant',
+        "non-empty cells have non-zero jacobian determinant",
         arbitraryNonEmptyCell,
         arbitraryPoint,
         (cell, point) => Math.abs(cell.jacobian(point).determinant()) !== 0

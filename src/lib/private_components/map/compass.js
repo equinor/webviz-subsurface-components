@@ -1,12 +1,12 @@
 /* eslint-disable react/require-render-return */
-import * as d3 from 'd3';
-import SVGTransform from './util';
-import Component from './component';
+import * as d3 from "d3";
+import SVGTransform from "./util";
+import Component from "./component";
 
 export default class Compass extends Component {
-    static validate({parentElement}) {
+    static validate({ parentElement }) {
         if (!parentElement) {
-            throw new Error('Parent element not provided.');
+            throw new Error("Parent element not provided.");
         }
     }
 
@@ -29,7 +29,7 @@ export default class Compass extends Component {
         this.parentElement = config.parentElement;
         this.position = config.initialPosition
             ? config.initialPosition
-            : {x: 0, y: 0};
+            : { x: 0, y: 0 };
         this.initialRotation = config.initialRotation
             ? config.initialRotation
             : 0;
@@ -39,7 +39,7 @@ export default class Compass extends Component {
         this.rotationAngle = 0;
     }
 
-    setPosition({x, y}) {
+    setPosition({ x, y }) {
         this.position.x = x;
         this.position.y = y;
 
@@ -55,7 +55,7 @@ export default class Compass extends Component {
     _dragStarted() {
         const [x, y] = d3.mouse(this.element.node());
 
-        this.element.selectAll('polygon').attr('fill', '#A75C7C');
+        this.element.selectAll("polygon").attr("fill", "#A75C7C");
 
         this.dragStartAngle = this.constructor.calculateAngleFromCoord(x, y);
     }
@@ -70,38 +70,38 @@ export default class Compass extends Component {
 
         this.applyTransform();
 
-        this.emit('dragged', this.rotationAngle);
+        this.emit("dragged", this.rotationAngle);
     }
 
     _createElement() {
-        this.element = this.parentElement.append('g').attr('id', 'g_compass');
+        this.element = this.parentElement.append("g").attr("id", "g_compass");
     }
 
     _dragEnded() {
-        this.element.selectAll('polygon').attr('fill', '#DA8FAF');
+        this.element.selectAll("polygon").attr("fill", "#DA8FAF");
     }
 
     initDragEvents() {
         this.element.call(
             d3
                 .drag()
-                .on('start', this._dragStarted.bind(this))
-                .on('drag', this._dragged.bind(this))
-                .on('end', this._dragEnded.bind(this))
+                .on("start", this._dragStarted.bind(this))
+                .on("drag", this._dragged.bind(this))
+                .on("end", this._dragEnded.bind(this))
         );
     }
 
     applyTransform() {
         const transform = new SVGTransform();
 
-        transform.addTransform('translate', [this.position.x, this.position.y]);
-        transform.addTransform('rotate', [
+        transform.addTransform("translate", [this.position.x, this.position.y]);
+        transform.addTransform("rotate", [
             -this.initialRotation + this.rotationAngle,
             100,
             100,
         ]);
 
-        this.element.attr('transform', transform.toString());
+        this.element.attr("transform", transform.toString());
     }
 
     renderContainer() {
@@ -112,54 +112,54 @@ export default class Compass extends Component {
 
     renderShape() {
         const compassCoords = [
-            '100,30 85,85 30,100 85,115 100,170 115,115 170,100 115,85',
-            '100,100 85,115 100,170',
-            '100,100 115,115 170,100',
-            '100,100 100,30, 115,85',
-            '100,100 85,85 30,100',
+            "100,30 85,85 30,100 85,115 100,170 115,115 170,100 115,85",
+            "100,100 85,115 100,170",
+            "100,100 115,115 170,100",
+            "100,100 100,30, 115,85",
+            "100,100 85,85 30,100",
         ];
 
         this.element
-            .selectAll('polygon')
+            .selectAll("polygon")
             .data(compassCoords)
             .enter()
-            .append('polygon')
-            .attr('points', d => d)
-            .attr('fill', '#DA8FAF')
-            .attr('opacity', '0.5')
-            .style('pointer-events', 'visiblePainted');
+            .append("polygon")
+            .attr("points", d => d)
+            .attr("fill", "#DA8FAF")
+            .attr("opacity", "0.5")
+            .style("pointer-events", "visiblePainted");
     }
 
     renderLetters() {
         this.element
-            .append('text')
-            .attr('x', 100)
-            .attr('y', 20)
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'middle')
-            .text('N');
+            .append("text")
+            .attr("x", 100)
+            .attr("y", 20)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .text("N");
 
         this.element
-            .append('text')
-            .attr('x', 180)
-            .attr('y', 100)
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'middle')
-            .text('E');
+            .append("text")
+            .attr("x", 180)
+            .attr("y", 100)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .text("E");
         this.element
-            .append('text')
-            .attr('x', 100)
-            .attr('y', 180)
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'middle')
-            .text('S');
+            .append("text")
+            .attr("x", 100)
+            .attr("y", 180)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .text("S");
         this.element
-            .append('text')
-            .attr('x', 20)
-            .attr('y', 100)
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'middle')
-            .text('W');
+            .append("text")
+            .attr("x", 20)
+            .attr("y", 100)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .text("W");
     }
 
     render() {

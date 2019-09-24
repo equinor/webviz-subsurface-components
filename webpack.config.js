@@ -1,10 +1,9 @@
-const path = require('path');
-const packagejson = require('./package.json');
+const path = require("path");
+const packagejson = require("./package.json");
 
-const dashLibraryName = packagejson.name.replace(/-/g, '_');
+const dashLibraryName = packagejson.name.replace(/-/g, "_");
 
 module.exports = (env, argv) => {
-
     let mode;
 
     const overrides = module.exports || {};
@@ -21,26 +20,29 @@ module.exports = (env, argv) => {
 
     // else take webpack default (production)
     else {
-        mode = 'production';
+        mode = "production";
     }
 
     let filename = (overrides.output || {}).filename;
-    if(!filename) {
-        const modeSuffix = mode === 'development' ? 'dev' : 'min';
+    if (!filename) {
+        const modeSuffix = mode === "development" ? "dev" : "min";
         filename = `${dashLibraryName}.${modeSuffix}.js`;
     }
 
-    const entry = overrides.entry || {main: './src/lib/index.js'};
+    const entry = overrides.entry || { main: "./src/lib/index.js" };
 
-    const devtool = overrides.devtool || (
-        mode === 'development' ? "eval-source-map" : 'none'
-    );
+    const devtool =
+        overrides.devtool ||
+        (mode === "development" ? "eval-source-map" : "none");
 
-    const externals = ('externals' in overrides) ? overrides.externals : ({
-        react: 'React',
-        'react-dom': 'ReactDOM',
-        'plotly.js': 'Plotly',
-    });
+    const externals =
+        "externals" in overrides
+            ? overrides.externals
+            : {
+                  react: "React",
+                  "react-dom": "ReactDOM",
+                  "plotly.js": "Plotly",
+              };
 
     return {
         mode,
@@ -49,7 +51,7 @@ module.exports = (env, argv) => {
             path: path.resolve(__dirname, dashLibraryName),
             filename,
             library: dashLibraryName,
-            libraryTarget: 'window',
+            libraryTarget: "window",
         },
         externals,
         module: {
@@ -58,38 +60,38 @@ module.exports = (env, argv) => {
                     test: /\.js$/,
                     exclude: /node_modules/,
                     use: {
-                        loader: 'babel-loader',
-                    }
+                        loader: "babel-loader",
+                    },
                 },
                 {
                     test: /\.css$/,
                     use: [
                         {
-                            loader: 'style-loader',
+                            loader: "style-loader",
                         },
                         {
-                            loader: 'css-loader',
-                        }
-                    ]
+                            loader: "css-loader",
+                        },
+                    ],
                 },
                 {
                     test: /\.(png|jpg|gif|svg)$/i,
                     use: [
                         {
-                            loader: 'url-loader'
-                        }
-                    ]
+                            loader: "url-loader",
+                        },
+                    ],
                 },
                 {
                     test: /\.(fs|vs).glsl$/i,
                     use: [
                         {
-                            loader: 'raw-loader'
-                        }
-                    ]
-                }
+                            loader: "raw-loader",
+                        },
+                    ],
+                },
             ],
         },
-        devtool
-    }
+        devtool,
+    };
 };

@@ -1,35 +1,36 @@
-import L from 'leaflet'
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { withLeaflet, MapControl } from 'react-leaflet'
-import PropTypes from 'prop-types'
-import MaterialSwitch from '@material-ui/core/Switch'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-
+import L from "leaflet";
+import React from "react";
+import ReactDOM from "react-dom";
+import { withLeaflet, MapControl } from "react-leaflet";
+import PropTypes from "prop-types";
+import MaterialSwitch from "@material-ui/core/Switch";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 class Switch extends MapControl {
+    constructor(props) {
+        super(props);
+        this.state = { checked: this.props.checked };
 
-    constructor(props){
-        super(props)
-        this.state = {checked: this.props.checked}
-
-        const { map } = this.props.leaflet
-        this.leafletElement.addTo(map)
+        const { map } = this.props.leaflet;
+        this.leafletElement.addTo(map);
     }
 
-    handleChange(){
-        this.setState({checked: !this.state.checked})
-        this.props.onChange()
+    handleChange() {
+        this.setState({ checked: !this.state.checked });
+        this.props.onChange();
     }
 
     createLeafletElement(props) {
         const MapInfo = L.Control.extend({
             onAdd: () => {
-                this.panelDiv = L.DomUtil.create('div', 'leaflet-custom-control')
-                return this.panelDiv
-            }
-        })
-        return new MapInfo({ position: props.position })
+                this.panelDiv = L.DomUtil.create(
+                    "div",
+                    "leaflet-custom-control"
+                );
+                return this.panelDiv;
+            },
+        });
+        return new MapInfo({ position: props.position });
     }
 
     componentDidMount() {
@@ -41,12 +42,17 @@ class Switch extends MapControl {
     render() {
         return ReactDOM.createPortal(
             <FormControlLabel
-                control={<MaterialSwitch checked={this.state.checked} onChange={this.handleChange.bind(this)} />}
+                control={
+                    <MaterialSwitch
+                        checked={this.state.checked}
+                        onChange={this.handleChange.bind(this)}
+                    />
+                }
                 label={this.props.label}
-                style={{paddingLeft: '10px'}}
-            />, 
+                style={{ paddingLeft: "10px" }}
+            />,
             this.panelDiv
-        )
+        );
     }
 }
 
@@ -58,7 +64,7 @@ Switch.propTypes = {
     handleChange: PropTypes.func,
 
     /* Initial value of the swith */
-    checked: PropTypes.bool
+    checked: PropTypes.bool,
 };
 
-export default withLeaflet(Switch)
+export default withLeaflet(Switch);

@@ -44,11 +44,11 @@ export default class SVGTransform {
 
         const transformString = transforms.reduce(
             (accumulator, currentValue) => {
-                const values = currentValue[1].join(',');
+                const values = currentValue[1].join(",");
 
                 return `${accumulator} ${currentValue[0]}(${values})`;
             },
-            ''
+            ""
         );
 
         return transformString;

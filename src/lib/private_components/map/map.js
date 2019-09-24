@@ -1,23 +1,23 @@
 /* eslint-disable react/require-render-return */
-import * as d3 from 'd3';
-import Component from './component';
+import * as d3 from "d3";
+import Component from "./component";
 
 export default class Map extends Component {
     static validate(config) {
         if (!config.parentElement) {
-            throw new Error('Parent element not provided');
+            throw new Error("Parent element not provided");
         }
 
         if (!config.coords) {
-            throw new Error('Coords not provided');
+            throw new Error("Coords not provided");
         }
 
         if (!config.values) {
-            throw new Error('Values not provided');
+            throw new Error("Values not provided");
         }
 
         if (!config.colorScale) {
-            throw new Error('Color scale not provided');
+            throw new Error("Color scale not provided");
         }
     }
 
@@ -47,7 +47,7 @@ export default class Map extends Component {
         this.mapTransform = transform;
 
         if (this.element) {
-            this.element.attr('transform', this.getMapTransform());
+            this.element.attr("transform", this.getMapTransform());
         }
     }
 
@@ -76,27 +76,27 @@ export default class Map extends Component {
         const self = this;
 
         this.map = this.element
-            .selectAll('polygon')
+            .selectAll("polygon")
             .data(this.coords[this.layer]);
 
         this.map
             .enter()
-            .append('polygon')
+            .append("polygon")
             .merge(this.map)
-            .attr('points', d =>
+            .attr("points", d =>
                 d
-                    .map(([x, y]) => [x - self.xMin, self.yMax - y].join(','))
-                    .join(' ')
+                    .map(([x, y]) => [x - self.xMin, self.yMax - y].join(","))
+                    .join(" ")
             )
-            .attr('fill', (d, i) => self.color(i))
-            .on('mousemove', function onmousemove(d, i) {
-                self.emit('mousemove', {
+            .attr("fill", (d, i) => self.color(i))
+            .on("mousemove", function onmousemove(d, i) {
+                self.emit("mousemove", {
                     x: d3.mouse(this)[0],
                     y: d3.mouse(this)[1],
                     value: self.values[self.layer][i],
                 });
             })
-            .on('mouseleave', () => self.emit('mouseleave'));
+            .on("mouseleave", () => self.emit("mouseleave"));
 
         this.map.exit().remove();
 
@@ -110,11 +110,11 @@ export default class Map extends Component {
             this.mapHeight = node.getBoundingClientRect().height;
         }
 
-        this.element.attr('transform', this.getMapTransform());
+        this.element.attr("transform", this.getMapTransform());
     }
 
     renderContainer() {
-        this.element = this.parentElement.append('g').attr('id', 'g_map_cells');
+        this.element = this.parentElement.append("g").attr("id", "g_map_cells");
     }
 
     render() {

@@ -1,9 +1,9 @@
-import jsc from 'jsverify';
-import {arbitraryGrid} from './arbitraries';
+import jsc from "jsverify";
+import { arbitraryGrid } from "./arbitraries";
 
-describe('Grid', () => {
+describe("Grid", () => {
     jsc.property(
-        'gives undefined cell for bad coords',
+        "gives undefined cell for bad coords",
         arbitraryGrid,
         jsc.nat,
         jsc.nat,

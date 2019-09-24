@@ -1,4 +1,4 @@
-import {Vector, Matrix} from './linear_algebra';
+import { Vector, Matrix } from "./linear_algebra";
 
 const oneVector = new Vector(1, 1);
 
@@ -58,14 +58,14 @@ export class Cell {
      * @returns {float} - maximum speed (in normal coordinates) within the cell
      */
     get maxNormalSpeed() {
-        const normalCornerSpeeds = []
-        const corners = [[0, 0], [0, 1], [1, 0], [1, 1]]
+        const normalCornerSpeeds = [];
+        const corners = [[0, 0], [0, 1], [1, 0], [1, 1]];
         corners.forEach(corner => {
-            const position = new Vector(corner[0], corner[1])
-            const speed = this.normalVelocity(position).magnitude
-            normalCornerSpeeds.push(speed)
-        })
-        return Math.max(...normalCornerSpeeds.map(x => x || 0))
+            const position = new Vector(corner[0], corner[1]);
+            const speed = this.normalVelocity(position).magnitude;
+            normalCornerSpeeds.push(speed);
+        });
+        return Math.max(...normalCornerSpeeds.map(x => x || 0));
     }
 
     /**
@@ -101,7 +101,7 @@ export class Cell {
      */
     denormalize([x, y]) {
         if (x > 1 || x < 0 || y > 1 || y < 0) {
-            throw Error('asked to normalize values outside unit square');
+            throw Error("asked to normalize values outside unit square");
         }
         const shapeValues = new Vector(
             (1 - x) * (1 - y),

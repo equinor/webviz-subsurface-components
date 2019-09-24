@@ -1,28 +1,25 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import HistoryMatching from '../private_components/hm-resources/history_matching'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import HistoryMatching from "../private_components/hm-resources/history_matching";
 
-const parseData = data => (typeof data === 'string' ? JSON.parse(data) : data);
+const parseData = data => (typeof data === "string" ? JSON.parse(data) : data);
 
 class HistoryMatch extends Component {
-    
     constructor(props) {
         super(props);
         this.elementId = `container-${props.id}`;
     }
 
     componentDidMount() {
-        const {data, height} = this.props;
+        const { data, height } = this.props;
         const parsedData = parseData(data);
         const elementSelector = `#${this.elementId}`;
         const hm = new HistoryMatching();
-        hm.init(elementSelector, parsedData)
+        hm.init(elementSelector, parsedData);
     }
 
     render() {
-        return (
-            <div id={this.elementId}/>
-        );
+        return <div id={this.elementId} />;
     }
 }
 
@@ -32,10 +29,8 @@ HistoryMatch.defaultProps = {
 
 HistoryMatch.propTypes = {
     id: PropTypes.string.isRequired,
-    
+
     data: PropTypes.object,
-    
-    
 };
 
 export default HistoryMatch;
