@@ -19,7 +19,7 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - npm install
+  - npm install --ignore-scripts
   - pip install .[dependencies]
   - pip install dash[dev]
   - pip install .[tests]
