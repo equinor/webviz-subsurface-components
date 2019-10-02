@@ -20,7 +20,7 @@ before_install:
 
 install:
   - npm ci --ignore-scripts
-  - # npm run postinstall
+  - npm run postinstall
   - pip install .[dependencies]
   - pip install dash[dev]
   - pip install .[tests]
