@@ -19,7 +19,8 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - npm install
+  - npm ci --ignore-scripts
+  - npm run postinstall
   - pip install .[dependencies]
   - pip install dash[dev]
   - pip install .[tests]
