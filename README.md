@@ -31,7 +31,7 @@ then:
 
 1. Install npm packages
     ```
-    npm install --ignore-scripts
+    npm ci --ignore-scripts
     ```
 2. Run the project's own `postinstall` script
     ```
