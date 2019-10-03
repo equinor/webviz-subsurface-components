@@ -47,8 +47,6 @@
         "react": "^16.9.0",
         "react-docgen": "^2.20.1",
         "react-dom": "^16.9.0",
-        "sinon": "^7.4.1",
-        "sinon-chai": "^3.3.0",
         "style-loader": "^0.21.0",
         "url-loader": "^2.1.0",
         "webpack": "^4.39.3",
