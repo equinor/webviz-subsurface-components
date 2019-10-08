@@ -15,6 +15,17 @@ const yx = ([x, y]) => {
     return [y, x];
 };
 
+class LayerWrapper extends Component {
+    render() {
+        return this.props.showLayersControl ? (
+            <LayersControl position="topright" hideSingleBase={true}>
+                {this.props.children}
+            </LayersControl>
+        ) : (
+            this.props.children
+        );
+    }
+}
 class LayeredMap extends Component {
     constructor(props) {
         super(props);
@@ -41,6 +52,28 @@ class LayeredMap extends Component {
             layer.data.some(item => item.allowHillshading)
         );
 
+        const showLayersControl = this.props.layers.length > 1;
+
+        const renderBaseLayer = (layer, key) => (
+            <CompositeMapLayer
+                layer={layer}
+                key={key}
+                hillShading={this.state.hillShading}
+                lightDirection={this.props.lightDirection}
+            />
+        );
+
+        const renderOverlayLayer = (layer, key) => (
+            <CompositeMapLayer
+                layer={layer}
+                key={key}
+                hillShading={this.state.hillShading}
+                lightDirection={this.props.lightDirection}
+                lineCoords={coords => setProps({ polyline_points: coords })}
+                polygonCoords={coords => setProps({ polygon_points: coords })}
+            />
+        );
+
         return (
             <Map
                 id={this.props.id}
@@ -65,44 +98,38 @@ class LayeredMap extends Component {
                     imperial={false}
                     metric={true}
                 />
-                <LayersControl position="topright">
+                <LayerWrapper showLayersControl={showLayersControl}>
                     {this.props.layers
                         .filter(layer => layer.base_layer)
-                        .map(layer => (
-                            <BaseLayer
-                                checked={layer.checked}
-                                name={layer.name}
-                                key={layer.name}
-                            >
-                                <CompositeMapLayer
-                                    layer={layer}
-                                    hillShading={this.state.hillShading}
-                                    lightDirection={this.props.lightDirection}
-                                />
-                            </BaseLayer>
-                        ))}
+                        .map(layer =>
+                            showLayersControl ? (
+                                <BaseLayer
+                                    checked={layer.checked}
+                                    name={layer.name}
+                                    key={layer.name}
+                                >
+                                    {renderBaseLayer(layer)}
+                                </BaseLayer>
+                            ) : (
+                                renderBaseLayer(layer, layer.name)
+                            )
+                        )}
                     {this.props.layers
                         .filter(layer => !layer.base_layer)
-                        .map(layer => (
-                            <Overlay
-                                checked={layer.checked}
-                                name={layer.name}
-                                key={layer.name}
-                            >
-                                <CompositeMapLayer
-                                    layer={layer}
-                                    hillShading={this.state.hillShading}
-                                    lightDirection={this.props.lightDirection}
-                                    lineCoords={coords =>
-                                        setProps({ polyline_points: coords })
-                                    }
-                                    polygonCoords={coords =>
-                                        setProps({ polygon_points: coords })
-                                    }
-                                />
-                            </Overlay>
-                        ))}
-                </LayersControl>
+                        .map(layer =>
+                            showLayersControl ? (
+                                <Overlay
+                                    checked={layer.checked}
+                                    name={layer.name}
+                                    key={layer.name}
+                                >
+                                    {renderOverlayLayer(layer)}
+                                </Overlay>
+                            ) : (
+                                renderOverlayLayer(layer, layer.name)
+                            )
+                        )}
+                </LayerWrapper>
                 {showDrawControls && (
                     <FeatureGroup>
                         <DrawControls
