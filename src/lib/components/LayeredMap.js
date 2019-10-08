@@ -26,6 +26,7 @@ class LayerWrapper extends Component {
         );
     }
 }
+
 class LayeredMap extends Component {
     constructor(props) {
         super(props);
