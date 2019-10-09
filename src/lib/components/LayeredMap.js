@@ -27,7 +27,7 @@ class LayeredMap extends Component {
         this.setState({ hillShading: !this.state.hillShading });
     }
 
-    componentDidMount() {
+    resetZoomLevel() {
         const [[xmin, ymin], [xmax, ymax]] = this.props.map_bounds;
         const width = this.mapRef.current.container.offsetWidth;
         const height = this.mapRef.current.container.offsetHeight;
@@ -39,6 +39,16 @@ class LayeredMap extends Component {
 
         this.mapRef.current.leafletElement.options.minZoom = initial_zoom - 2;
         this.mapRef.current.leafletElement.setZoom(initial_zoom);
+    }
+
+    componentDidMount() {
+        this.resetZoomLevel();
+    }
+
+    componentDidUpdate() {
+        if (!this.props.persistentViewPort) {
+            this.resetZoomLevel();
+        }
     }
 
     render() {
@@ -173,6 +183,7 @@ LayeredMap.defaultProps = {
     draw_toolbar_marker: false,
     draw_toolbar_polygon: false,
     draw_toolbar_polyline: false,
+    persistentViewPort: true,
 };
 
 LayeredMap.propTypes = {
@@ -267,6 +278,11 @@ LayeredMap.propTypes = {
     layers: PropTypes.array,
 
     hillShading: PropTypes.bool,
+
+    /**
+     * If true, the view port will not change when properties are updated.
+     */
+    persistentViewPort: PropTypes.bool,
 };
 
 export default LayeredMap;
