@@ -3,13 +3,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "leaflet/dist/leaflet.css";
 import { CRS } from "leaflet";
-import {
-    LayersControl,
-    Map,
-    ScaleControl,
-    FeatureGroup,
-    LeafletContext,
-} from "react-leaflet";
+import { LayersControl, Map, ScaleControl, FeatureGroup } from "react-leaflet";
 import Switch from "../private_components/layered-map-resources/Switch.react";
 import CompositeMapLayer from "../private_components/layered-map-resources/CompositeMapLayer.react";
 import DrawControls from "../private_components/layered-map-resources/DrawControls.react";
