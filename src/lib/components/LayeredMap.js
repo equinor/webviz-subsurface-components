@@ -45,7 +45,7 @@ class LayeredMap extends Component {
         this.resetZoomLevel();
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         if (this.props.uirevision !== prevProps.uirevision) {
             this.resetZoomLevel();
         }
