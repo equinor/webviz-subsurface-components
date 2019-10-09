@@ -46,7 +46,7 @@ class LayeredMap extends Component {
     }
 
     componentDidUpdate() {
-        if (!this.props.persistentViewPort) {
+        if (this.props.uirevision !== this.props.uirevision) {
             this.resetZoomLevel();
         }
     }
@@ -183,7 +183,7 @@ LayeredMap.defaultProps = {
     draw_toolbar_marker: false,
     draw_toolbar_polygon: false,
     draw_toolbar_polyline: false,
-    persistentViewPort: true,
+    uirevision: "",
 };
 
 LayeredMap.propTypes = {
@@ -280,9 +280,10 @@ LayeredMap.propTypes = {
     hillShading: PropTypes.bool,
 
     /**
-     * If true, the view port will not change when properties are updated.
+     * Following the same approach as Plotly Dash:
+     * If the string uireivision changes, reset the viewport.
      */
-    persistentViewPort: PropTypes.bool,
+    uirevision: PropTypes.string,
 };
 
 export default LayeredMap;
