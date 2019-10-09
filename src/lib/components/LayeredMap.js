@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { CRS } from "leaflet";
 import { LayersControl, Map, ScaleControl, FeatureGroup } from "react-leaflet";
 import Switch from "../private_components/layered-map-resources/Switch.react";
+import OptionalLayerControl from "../private_components/layered-map-resources/OptionalLayerControl.react";
 import CompositeMapLayer from "../private_components/layered-map-resources/CompositeMapLayer.react";
 import DrawControls from "../private_components/layered-map-resources/DrawControls.react";
 import VerticalZoom from "../private_components/layered-map-resources/VerticalZoom.react";
@@ -14,18 +15,6 @@ const { BaseLayer, Overlay } = LayersControl;
 const yx = ([x, y]) => {
     return [y, x];
 };
-
-class LayerWrapper extends Component {
-    render() {
-        return this.props.showLayersControl ? (
-            <LayersControl position="topright" hideSingleBase={true}>
-                {this.props.children}
-            </LayersControl>
-        ) : (
-            this.props.children
-        );
-    }
-}
 
 class LayeredMap extends Component {
     constructor(props) {
@@ -99,7 +88,7 @@ class LayeredMap extends Component {
                     imperial={false}
                     metric={true}
                 />
-                <LayerWrapper showLayersControl={showLayersControl}>
+                <OptionalLayerControl showLayersControl={showLayersControl}>
                     {this.props.layers
                         .filter(layer => layer.base_layer)
                         .map(layer =>
@@ -130,7 +119,7 @@ class LayeredMap extends Component {
                                 renderOverlayLayer(layer, layer.name)
                             )
                         )}
-                </LayerWrapper>
+                </OptionalLayerControl>
                 {showDrawControls && (
                     <FeatureGroup>
                         <DrawControls
