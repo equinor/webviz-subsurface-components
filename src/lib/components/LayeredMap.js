@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { CRS } from "leaflet";
 import { LayersControl, Map, ScaleControl, FeatureGroup } from "react-leaflet";
 import Switch from "../private_components/layered-map-resources/Switch.react";
+import OptionalLayerControl from "../private_components/layered-map-resources/OptionalLayerControl.react";
 import CompositeMapLayer from "../private_components/layered-map-resources/CompositeMapLayer.react";
 import DrawControls from "../private_components/layered-map-resources/DrawControls.react";
 import VerticalZoom from "../private_components/layered-map-resources/VerticalZoom.react";
@@ -41,6 +42,28 @@ class LayeredMap extends Component {
             layer.data.some(item => item.allowHillshading)
         );
 
+        const showLayersControl = this.props.layers.length > 1;
+
+        const renderBaseLayer = (layer, key) => (
+            <CompositeMapLayer
+                layer={layer}
+                key={key}
+                hillShading={this.state.hillShading}
+                lightDirection={this.props.lightDirection}
+            />
+        );
+
+        const renderOverlay = (layer, key) => (
+            <CompositeMapLayer
+                layer={layer}
+                key={key}
+                hillShading={this.state.hillShading}
+                lightDirection={this.props.lightDirection}
+                lineCoords={coords => setProps({ polyline_points: coords })}
+                polygonCoords={coords => setProps({ polygon_points: coords })}
+            />
+        );
+
         return (
             <Map
                 id={this.props.id}
@@ -65,44 +88,38 @@ class LayeredMap extends Component {
                     imperial={false}
                     metric={true}
                 />
-                <LayersControl position="topright">
+                <OptionalLayerControl showLayersControl={showLayersControl}>
                     {this.props.layers
                         .filter(layer => layer.base_layer)
-                        .map(layer => (
-                            <BaseLayer
-                                checked={layer.checked}
-                                name={layer.name}
-                                key={layer.name}
-                            >
-                                <CompositeMapLayer
-                                    layer={layer}
-                                    hillShading={this.state.hillShading}
-                                    lightDirection={this.props.lightDirection}
-                                />
-                            </BaseLayer>
-                        ))}
+                        .map(layer =>
+                            showLayersControl ? (
+                                <BaseLayer
+                                    checked={layer.checked}
+                                    name={layer.name}
+                                    key={layer.name}
+                                >
+                                    {renderBaseLayer(layer)}
+                                </BaseLayer>
+                            ) : (
+                                renderBaseLayer(layer, layer.name)
+                            )
+                        )}
                     {this.props.layers
                         .filter(layer => !layer.base_layer)
-                        .map(layer => (
-                            <Overlay
-                                checked={layer.checked}
-                                name={layer.name}
-                                key={layer.name}
-                            >
-                                <CompositeMapLayer
-                                    layer={layer}
-                                    hillShading={this.state.hillShading}
-                                    lightDirection={this.props.lightDirection}
-                                    lineCoords={coords =>
-                                        setProps({ polyline_points: coords })
-                                    }
-                                    polygonCoords={coords =>
-                                        setProps({ polygon_points: coords })
-                                    }
-                                />
-                            </Overlay>
-                        ))}
-                </LayersControl>
+                        .map(layer =>
+                            showLayersControl ? (
+                                <Overlay
+                                    checked={layer.checked}
+                                    name={layer.name}
+                                    key={layer.name}
+                                >
+                                    {renderOverlay(layer)}
+                                </Overlay>
+                            ) : (
+                                renderOverlay(layer, layer.name)
+                            )
+                        )}
+                </OptionalLayerControl>
                 {showDrawControls && (
                     <FeatureGroup>
                         <DrawControls
