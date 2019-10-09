@@ -3,7 +3,13 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "leaflet/dist/leaflet.css";
 import { CRS } from "leaflet";
-import { LayersControl, Map, ScaleControl, FeatureGroup } from "react-leaflet";
+import {
+    LayersControl,
+    Map,
+    ScaleControl,
+    FeatureGroup,
+    LeafletContext,
+} from "react-leaflet";
 import Switch from "../private_components/layered-map-resources/Switch.react";
 import CompositeMapLayer from "../private_components/layered-map-resources/CompositeMapLayer.react";
 import DrawControls from "../private_components/layered-map-resources/DrawControls.react";
@@ -24,6 +30,20 @@ class LayeredMap extends Component {
 
     handleHillshadingChange() {
         this.setState({ hillShading: !this.state.hillShading });
+    }
+
+    componentDidMount() {
+        const [[xmin, ymin], [xmax, ymax]] = this.props.map_bounds;
+        const width = this.mapRef.current.container.offsetWidth;
+        const height = this.mapRef.current.container.offsetHeight;
+
+        const initial_zoom = Math.min(
+            Math.log2(height / (ymax - ymin)),
+            Math.log2(width / (xmax - xmin))
+        );
+
+        this.mapRef.current.leafletElement.options.minZoom = initial_zoom - 2;
+        this.mapRef.current.leafletElement.setZoom(initial_zoom);
     }
 
     render() {
@@ -47,8 +67,7 @@ class LayeredMap extends Component {
                 style={{ height: this.props.height }}
                 ref={this.mapRef}
                 center={yx(this.props.center)}
-                zoom={-3}
-                minZoom={-5}
+                zoom={0}
                 attributionControl={false}
                 crs={CRS.Simple}
             >
