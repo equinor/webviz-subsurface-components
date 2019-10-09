@@ -53,7 +53,7 @@ class LayeredMap extends Component {
             />
         );
 
-        const renderOverlayLayer = (layer, key) => (
+        const renderOverlay = (layer, key) => (
             <CompositeMapLayer
                 layer={layer}
                 key={key}
@@ -113,10 +113,10 @@ class LayeredMap extends Component {
                                     name={layer.name}
                                     key={layer.name}
                                 >
-                                    {renderOverlayLayer(layer)}
+                                    {renderOverlay(layer)}
                                 </Overlay>
                             ) : (
-                                renderOverlayLayer(layer, layer.name)
+                                renderOverlay(layer, layer.name)
                             )
                         )}
                 </OptionalLayerControl>
