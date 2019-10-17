@@ -52,11 +52,16 @@ class LayeredMap extends Component {
             });
         });
 
-        return [[Math.min(...x_arr), Math.min(...y_arr)], [Math.max(...x_arr), Math.max(...y_arr)]];
+        return [
+            [Math.min(...x_arr), Math.min(...y_arr)],
+            [Math.max(...x_arr), Math.max(...y_arr)],
+        ];
     }
 
-    resetZoomLevel() {
+    resetView() {
         const [[xmin, ymin], [xmax, ymax]] = this.calculateBounds();
+        const center = [0.5 * (xmin + xmax), 0.5 * (ymin + ymax)];
+
         const width = this.mapRef.current.container.offsetWidth;
         const height = this.mapRef.current.container.offsetHeight;
 
@@ -66,16 +71,16 @@ class LayeredMap extends Component {
         );
 
         this.mapRef.current.leafletElement.options.minZoom = initial_zoom - 2;
-        this.mapRef.current.leafletElement.setZoom(initial_zoom);
+        this.mapRef.current.leafletElement.setView(yx(center), initial_zoom);
     }
 
     componentDidMount() {
-        this.resetZoomLevel();
+        this.resetView();
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.uirevision !== prevProps.uirevision) {
-            this.resetZoomLevel();
+            this.resetView();
         }
     }
 
@@ -121,8 +126,6 @@ class LayeredMap extends Component {
                 id={this.props.id}
                 style={{ height: this.props.height }}
                 ref={this.mapRef}
-                center={yx(this.props.center)}
-                zoom={0}
                 attributionControl={false}
                 crs={CRS.Simple}
             >
@@ -221,11 +224,6 @@ LayeredMap.propTypes = {
      * components in an app.
      */
     id: PropTypes.string.isRequired,
-
-    /**
-     * Center [x, y] of map when initially loaded (in physical coordinates).
-     */
-    center: PropTypes.array,
 
     /**
      * The initial scale of the y axis (relative to the x axis).

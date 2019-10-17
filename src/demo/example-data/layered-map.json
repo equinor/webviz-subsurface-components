@@ -1,6 +1,4 @@
 {
-    "map_bounds": [[432204, 6475078], [437720, 6481112]],
-    "center": [435200, 6478000],
     "layers": [
         {
             "name": "A seismic horizon with colormap",

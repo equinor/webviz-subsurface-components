@@ -8,7 +8,6 @@ class LayeredMapDemo extends Component {
         return (
             <LayeredMap
                 id={"layered-map-demo"}
-                center={data.center}
                 layers={data.layers}
                 overlay_layers={data.overlay_layers}
                 setProps={e => console.log(e)}

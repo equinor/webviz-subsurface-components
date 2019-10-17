@@ -88,8 +88,6 @@ if __name__ == '__main__':
     # https://creativecommons.org/licenses/by-nc-sa/4.0/
     map_data = np.loadtxt('./example-data/layered-map-data.npz.gz')
 
-    center = [435200, 6478000]
-
     min_value = int(np.nanmin(map_data))
     max_value = int(np.nanmax(map_data))
 
@@ -157,18 +155,13 @@ if __name__ == '__main__':
     ]
 
     with open('../src/demo/example-data/layered-map.json', 'w') as fh:
-        json.dump({
-            'center': center,
-            'layers': layers
-        }, fh)
+        json.dump({'layers': layers}, fh)
 
     app = dash.Dash(__name__)
 
     app.layout = html.Div(children=[
         webviz_subsurface_components.LayeredMap(
             id='volve-map',
-            map_bounds=map_bounds,
-            center=center,
             layers=layers
         ),
         html.Pre(id='polyline'),
@@ -177,7 +170,7 @@ if __name__ == '__main__':
     ])
 
     @app.callback(Output('polyline', 'children'),
-                  [Input('volve-map', 'line_points')])
+                  [Input('volve-map', 'polyline_points')])
     def get_edited_line(coords):
         return f'Edited polyline: {json.dumps(coords)}'
 
