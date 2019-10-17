@@ -88,9 +88,6 @@ if __name__ == '__main__':
     # https://creativecommons.org/licenses/by-nc-sa/4.0/
     map_data = np.loadtxt('./example-data/layered-map-data.npz.gz')
 
-    map_bounds = [[432204, 6475078],
-                  [437720, 6481112]]
-
     center = [435200, 6478000]
 
     min_value = int(np.nanmin(map_data))
@@ -161,7 +158,6 @@ if __name__ == '__main__':
 
     with open('../src/demo/example-data/layered-map.json', 'w') as fh:
         json.dump({
-            'map_bounds': map_bounds,
             'center': center,
             'layers': layers
         }, fh)

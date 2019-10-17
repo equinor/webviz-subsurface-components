@@ -27,8 +27,36 @@ class LayeredMap extends Component {
         this.setState({ hillShading: !this.state.hillShading });
     }
 
+    calculateBounds() {
+        let x_arr = [];
+        let y_arr = [];
+
+        this.props.layers.map(layer => {
+            layer.data.map(item => {
+                if (["polyline", "polygon"].includes(item.type)) {
+                    item.positions.map(xy => {
+                        x_arr.push(xy[0]);
+                        y_arr.push(xy[1]);
+                    });
+                } else if (item.type === "circle") {
+                    x_arr.push(item.center[0] + item.radius);
+                    x_arr.push(item.center[0] - item.radius);
+                    y_arr.push(item.center[1] + item.radius);
+                    y_arr.push(item.center[1] - item.radius);
+                } else if (item.type === "image") {
+                    x_arr.push(item.bounds[0][0]);
+                    x_arr.push(item.bounds[1][0]);
+                    y_arr.push(item.bounds[0][1]);
+                    y_arr.push(item.bounds[1][1]);
+                }
+            });
+        });
+
+        return [[Math.min(...x_arr), Math.min(...y_arr)], [Math.max(...x_arr), Math.max(...y_arr)]];
+    }
+
     resetZoomLevel() {
-        const [[xmin, ymin], [xmax, ymax]] = this.props.map_bounds;
+        const [[xmin, ymin], [xmax, ymax]] = this.calculateBounds();
         const width = this.mapRef.current.container.offsetWidth;
         const height = this.mapRef.current.container.offsetHeight;
 
@@ -198,11 +226,6 @@ LayeredMap.propTypes = {
      * Center [x, y] of map when initially loaded (in physical coordinates).
      */
     center: PropTypes.array,
-
-    /**
-     * The map bounds of the input data, given as [[xmin, ymin], [xmax, ymax]] (in physical coordinates).
-     */
-    map_bounds: PropTypes.array,
 
     /**
      * The initial scale of the y axis (relative to the x axis).
