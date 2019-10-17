@@ -28,8 +28,8 @@ class LayeredMap extends Component {
     }
 
     calculateBounds() {
-        let x_arr = [];
-        let y_arr = [];
+        const x_arr = [];
+        const y_arr = [];
 
         this.props.layers.map(layer => {
             layer.data.map(item => {
