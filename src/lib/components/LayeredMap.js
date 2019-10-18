@@ -79,7 +79,7 @@ class LayeredMap extends Component {
     setEvents() {
         this.mapRef.current.leafletElement.on("zoomanim", ev => {
             this.props.sync_ids
-                .filter(id => id != this.props.id)
+                .filter(id => id !== this.props.id)
                 .map(id => {
                     if (_layeredmap_references[id].getZoom() != ev.zoom) {
                         _layeredmap_references[id].setView(ev.center, ev.zoom);
@@ -89,7 +89,7 @@ class LayeredMap extends Component {
 
         this.mapRef.current.leafletElement.on("move", ev => {
             this.props.sync_ids
-                .filter(id => id != this.props.id)
+                .filter(id => id !== this.props.id)
                 .map(id => {
                     if (typeof ev.originalEvent !== "undefined") {
                         _layeredmap_references[id].setView(
