@@ -6,16 +6,36 @@ const data = require("./example-data/layered-map.json");
 class LayeredMapDemo extends Component {
     render() {
         return (
-            <LayeredMap
-                id={"layered-map-demo"}
-                layers={data.layers}
-                overlay_layers={data.overlay_layers}
-                setProps={e => console.log(e)}
-                draw_toolbar_marker={true}
-                draw_toolbar_polygon={true}
-                draw_toolbar_polyline={true}
-                showScaleY={true}
-            />
+            <div
+                style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}
+            >
+                <div>
+                    <LayeredMap
+                        id={"layered-map-demo1"}
+                        sync_ids={["layered-map-demo2"]}
+                        layers={data.layers}
+                        overlay_layers={data.overlay_layers}
+                        setProps={e => console.log(e)}
+                        draw_toolbar_marker={true}
+                        draw_toolbar_polygon={true}
+                        draw_toolbar_polyline={true}
+                        showScaleY={true}
+                    />
+                </div>
+                <div>
+                    <LayeredMap
+                        id={"layered-map-demo2"}
+                        sync_ids={["layered-map-demo1"]}
+                        layers={data.layers}
+                        overlay_layers={data.overlay_layers}
+                        setProps={e => console.log(e)}
+                        draw_toolbar_marker={true}
+                        draw_toolbar_polygon={true}
+                        draw_toolbar_polyline={true}
+                        showScaleY={true}
+                    />
+                </div>
+            </div>
         );
     }
 }

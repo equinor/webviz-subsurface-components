@@ -16,6 +16,8 @@ const yx = ([x, y]) => {
     return [y, x];
 };
 
+const _layeredmap_references = {};
+
 class LayeredMap extends Component {
     constructor(props) {
         super(props);
@@ -74,8 +76,41 @@ class LayeredMap extends Component {
         this.mapRef.current.leafletElement.setView(yx(center), initial_zoom);
     }
 
+    setEvents() {
+        this.mapRef.current.leafletElement.on("zoomanim", ev => {
+            this.props.sync_ids
+                .filter(id => id != this.props.id)
+                .map(id => {
+                    if (_layeredmap_references[id].getZoom() != ev.zoom) {
+                        _layeredmap_references[id].setView(ev.center, ev.zoom);
+                    }
+                });
+        });
+
+        this.mapRef.current.leafletElement.on("move", ev => {
+            this.props.sync_ids
+                .filter(id => id != this.props.id)
+                .map(id => {
+                    if (typeof ev.originalEvent !== "undefined") {
+                        _layeredmap_references[id].setView(
+                            ev.target.getCenter()
+                        );
+                    }
+                });
+        });
+    }
     componentDidMount() {
         this.resetView();
+
+        this.setEvents();
+
+        _layeredmap_references[
+            this.props.id
+        ] = this.mapRef.current.leafletElement;
+    }
+
+    componentWillUnmount() {
+        delete _layeredmap_references[this.props.id];
     }
 
     componentDidUpdate(prevProps) {
@@ -207,6 +242,7 @@ class LayeredMap extends Component {
 
 LayeredMap.defaultProps = {
     height: 800,
+    sync_ids: [],
     hillShading: true,
     lightDirection: [1, 1, 1],
     scaleY: 1,
@@ -224,6 +260,13 @@ LayeredMap.propTypes = {
      * components in an app.
      */
     id: PropTypes.string.isRequired,
+
+    /**
+     * IDs of other LayeredMap components which should be updated with same zoom/pan
+     * as in this one when the user changes zoom/pan in this component instance.
+     * For convenience, you can include the same ID as this instance (it will be ignored).
+     */
+    sync_ids: PropTypes.array,
 
     /**
      * The initial scale of the y axis (relative to the x axis).
