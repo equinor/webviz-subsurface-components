@@ -16,6 +16,8 @@ const yx = ([x, y]) => {
     return [y, x];
 };
 
+const _layeredmap_references = {};
+
 class LayeredMap extends Component {
     constructor(props) {
         super(props);
@@ -25,6 +27,98 @@ class LayeredMap extends Component {
 
     handleHillshadingChange() {
         this.setState({ hillShading: !this.state.hillShading });
+    }
+
+    calculateBounds() {
+        const x_arr = [];
+        const y_arr = [];
+
+        this.props.layers.map(layer => {
+            layer.data.map(item => {
+                if (["polyline", "polygon"].includes(item.type)) {
+                    item.positions.map(xy => {
+                        x_arr.push(xy[0]);
+                        y_arr.push(xy[1]);
+                    });
+                } else if (item.type === "circle") {
+                    x_arr.push(item.center[0] + item.radius);
+                    x_arr.push(item.center[0] - item.radius);
+                    y_arr.push(item.center[1] + item.radius);
+                    y_arr.push(item.center[1] - item.radius);
+                } else if (item.type === "image") {
+                    x_arr.push(item.bounds[0][0]);
+                    x_arr.push(item.bounds[1][0]);
+                    y_arr.push(item.bounds[0][1]);
+                    y_arr.push(item.bounds[1][1]);
+                }
+            });
+        });
+
+        return [
+            [Math.min(...x_arr), Math.min(...y_arr)],
+            [Math.max(...x_arr), Math.max(...y_arr)],
+        ];
+    }
+
+    resetView() {
+        const [[xmin, ymin], [xmax, ymax]] = this.calculateBounds();
+        const center = [0.5 * (xmin + xmax), 0.5 * (ymin + ymax)];
+
+        const width = this.mapRef.current.container.offsetWidth;
+        const height = this.mapRef.current.container.offsetHeight;
+
+        const initial_zoom = Math.min(
+            Math.log2(height / (ymax - ymin)),
+            Math.log2(width / (xmax - xmin))
+        );
+
+        this.mapRef.current.leafletElement.options.minZoom = initial_zoom - 2;
+        this.mapRef.current.leafletElement.setView(yx(center), initial_zoom);
+    }
+
+    setEvents() {
+        this.mapRef.current.leafletElement.on("zoomanim", ev => {
+            this.props.sync_ids
+                .filter(id => id !== this.props.id)
+                .map(id => {
+                    if (_layeredmap_references[id].getZoom() !== ev.zoom) {
+                        _layeredmap_references[id].setView(ev.center, ev.zoom);
+                    }
+                });
+        });
+
+        this.mapRef.current.leafletElement.on("move", ev => {
+            this.props.sync_ids
+                .filter(id => id !== this.props.id)
+                .map(id => {
+                    // Only react if move event is from a real user interaction
+                    // (originalEvent is undefined if viewport is programatically changed).
+                    if (typeof ev.originalEvent !== "undefined") {
+                        _layeredmap_references[id].setView(
+                            ev.target.getCenter()
+                        );
+                    }
+                });
+        });
+    }
+    componentDidMount() {
+        this.resetView();
+
+        this.setEvents();
+
+        _layeredmap_references[
+            this.props.id
+        ] = this.mapRef.current.leafletElement;
+    }
+
+    componentWillUnmount() {
+        delete _layeredmap_references[this.props.id];
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.uirevision !== prevProps.uirevision) {
+            this.resetView();
+        }
     }
 
     render() {
@@ -69,9 +163,6 @@ class LayeredMap extends Component {
                 id={this.props.id}
                 style={{ height: this.props.height }}
                 ref={this.mapRef}
-                center={yx(this.props.center)}
-                zoom={-3}
-                minZoom={-5}
                 attributionControl={false}
                 crs={CRS.Simple}
             >
@@ -153,6 +244,7 @@ class LayeredMap extends Component {
 
 LayeredMap.defaultProps = {
     height: 800,
+    sync_ids: [],
     hillShading: true,
     lightDirection: [1, 1, 1],
     scaleY: 1,
@@ -160,6 +252,7 @@ LayeredMap.defaultProps = {
     draw_toolbar_marker: false,
     draw_toolbar_polygon: false,
     draw_toolbar_polyline: false,
+    uirevision: "",
 };
 
 LayeredMap.propTypes = {
@@ -171,14 +264,11 @@ LayeredMap.propTypes = {
     id: PropTypes.string.isRequired,
 
     /**
-     * Center [x, y] of map when initially loaded (in physical coordinates).
+     * IDs of other LayeredMap components which should be updated with same zoom/pan
+     * as in this one when the user changes zoom/pan in this component instance.
+     * For convenience, you can include the same ID as this instance (it will be ignored).
      */
-    center: PropTypes.array,
-
-    /**
-     * The map bounds of the input data, given as [[xmin, ymin], [xmax, ymax]] (in physical coordinates).
-     */
-    map_bounds: PropTypes.array,
+    sync_ids: PropTypes.array,
 
     /**
      * The initial scale of the y axis (relative to the x axis).
@@ -254,6 +344,12 @@ LayeredMap.propTypes = {
     layers: PropTypes.array,
 
     hillShading: PropTypes.bool,
+
+    /**
+     * Following the same approach as Plotly Dash:
+     * If the string uireivision changes, reset the viewport.
+     */
+    uirevision: PropTypes.string,
 };
 
 export default LayeredMap;
