@@ -92,7 +92,7 @@ class LayeredMap extends Component {
                 .filter(id => id !== this.props.id)
                 .map(id => {
                     // Only react if move event is from a real user interaction
-                    // (originalEvent is undefined if viewport is programatically changed). 
+                    // (originalEvent is undefined if viewport is programatically changed).
                     if (typeof ev.originalEvent !== "undefined") {
                         _layeredmap_references[id].setView(
                             ev.target.getCenter()
