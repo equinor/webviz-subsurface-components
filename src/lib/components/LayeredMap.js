@@ -81,7 +81,7 @@ class LayeredMap extends Component {
             this.props.sync_ids
                 .filter(id => id !== this.props.id)
                 .map(id => {
-                    if (_layeredmap_references[id].getZoom() != ev.zoom) {
+                    if (_layeredmap_references[id].getZoom() !== ev.zoom) {
                         _layeredmap_references[id].setView(ev.center, ev.zoom);
                     }
                 });
