@@ -13,11 +13,7 @@ package_name = package["name"].replace(" ", "_").replace("-", "_")
 
 install_requires = ["dash~=1.1"]
 
-tests_require = [
-    "selenium",
-    "pylint",
-    "black",
-]
+tests_require = ["selenium", "pylint", "black"]
 
 # 'dash[testing]' to be added in tests_require when
 # https://github.com/pypa/pip/issues/4957 is closed.
