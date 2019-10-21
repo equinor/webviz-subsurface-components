@@ -14,11 +14,7 @@ package_name = package["name"].replace(" ", "_").replace("-", "_")
 install_requires = ["dash~=1.1"]
 
 tests_require = [
-    "chromedriver-binary>=74.0.3729.6.0",
-    "ipdb",
-    "percy",
     "selenium",
-    "flake8",
     "pylint",
     "black",
 ]
