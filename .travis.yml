@@ -25,7 +25,7 @@ install:
   - pip install dash[dev]
   - pip install .[tests]
   - pip install dash[testing]
-  - wget https://chromedriver.storage.googleapis.com/76.0.3809.12/chromedriver_linux64.zip
+  - wget https://chromedriver.storage.googleapis.com/$(wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)/chromedriver_linux64.zip
   - unzip chromedriver_linux64.zip
   - export PATH=$PATH:$PWD
 
