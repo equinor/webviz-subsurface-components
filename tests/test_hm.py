@@ -20,4 +20,7 @@ def test_render_hm(dash_duo):
 
     dash_duo.start_server(app)
 
-    dash_duo.wait_for_text_to_equal('#title', 'Misfit overview for Iteration 0', timeout=4)
+    # Get text of first data series
+    my_component = dash_duo.wait_for_element_by_css_selector('#g_history_matching_plot > text', timeout=4)
+
+    assert 'Misfit overview for Iteration 0' == my_component.text
