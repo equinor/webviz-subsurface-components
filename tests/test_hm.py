@@ -20,4 +20,6 @@ def test_render_hm(dash_duo):
 
     dash_duo.start_server(app)
 
-    dash_duo.wait_for_text_to_equal('#title', 'Misfit overview for Iteration 0', timeout=4)
+    print(dash_duo.get_logs())
+
+    #dash_duo.wait_for_text_to_equal('#title', 'Misfit overview for Iteration 0', timeout=4)
