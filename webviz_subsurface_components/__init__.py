@@ -13,7 +13,9 @@ from ._imports_ import *
 from ._imports_ import __all__
 
 try:
-    __version__ = get_distribution(__name__).version
+    # Dash fingerprint system does not work with +. E.g. a development version tag like
+    # 0.0.10.dev25+gbe9818b.d20191103 will break Dash's fingerprint system.
+    __version__ = get_distribution(__name__).version.replace("+", ".")
 except DistributionNotFound:
     # package is not installed
     pass
@@ -42,12 +44,9 @@ _this_module = _sys.modules[__name__]
 _js_dist = [
     {
         "relative_package_path": "webviz_subsurface_components.min.js",
+        "dev_package_path": "webviz_subsurface_components.dev.js",
         "namespace": package_name,
-    },
-    {
-        "relative_package_path": "webviz_subsurface_components.dev.js",
-        "namespace": package_name,
-    },
+    }
 ]
 
 _css_dist = []
