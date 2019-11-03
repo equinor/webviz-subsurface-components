@@ -15,7 +15,7 @@ from ._imports_ import __all__
 try:
     # Dash fingerprint system does not work with +. E.g. a development version tag like
     # 0.0.10.dev11+abcd1234.d20191103 will break Dash's fingerprint system.
-    # Need to replace + with some supporter character as long as
+    # Need to replace + with some supported character as long as
     # https://github.com/plotly/dash/issues/995 is open.
     __version__ = get_distribution(__name__).version.replace("+", ".")
 except DistributionNotFound:
