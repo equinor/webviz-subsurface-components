@@ -30,7 +30,7 @@ install:
   - export PATH=$PATH:$PWD
 
 script:
-  - black --check webviz_subsurface_components setup.py
+  - black --check webviz_subsurface_components examples setup.py
   - npm run test
   - npm run linting
   - npm run build:all
