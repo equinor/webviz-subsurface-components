@@ -159,14 +159,12 @@ data = generate_synthetic_data(num_groups=50,
                                num_iter=4,
                                num_realizations=100)
 
-hm_data = (json.dumps(HistoryMatch(data).get_data()))
-
 app = dash.Dash(__name__)
 
 app.layout = html.Div(children=[
 
     webviz_subsurface_components.HistoryMatch(id='parameters',
-                data=hm_data)
+                data=HistoryMatch(data).get_data())
     ])
 
 if __name__ == '__main__':
