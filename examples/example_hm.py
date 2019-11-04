@@ -15,13 +15,13 @@ def generate_synthetic_data(num_groups, num_iter, num_realizations):
     come from  an assisted history matching run.
     """
 
-    obs_group_names = ["Obs. group " + str(i) for i in range(num_groups)]
+    obs_group_names = [f"Obs. group {i}" for i in range(num_groups)]
     number_dp = np.random.randint(low=10, high=100, size=num_groups)
 
     df = pd.DataFrame()
 
     for i in range(num_iter):
-        ensemble_name = "Iteration " + str(i)
+        ensemble_name = f"Iteration {i}"
 
         # Random test data following
         # chisquared distribution (i.e. normal distribution squared):
@@ -34,7 +34,7 @@ def generate_synthetic_data(num_groups, num_iter, num_realizations):
         neg = misfits * (1 - split)
 
         for j in range(num_realizations):
-            realization_name = "Realization " + str(j)
+            realization_name = f"Realization {j}"
 
             scale = 1.0 + np.random.rand() * 0.4
             realization_pos = scale * pos
