@@ -53,7 +53,7 @@ _js_dist = [
 
 _css_dist = [
     {
-        "relative_package_path": ["webviz_subsurface_components.css",],
+        "relative_package_path": "webviz_subsurface_components.css",
         "namespace": package_name,
     }
 ]
