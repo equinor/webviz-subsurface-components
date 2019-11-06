@@ -32,7 +32,9 @@ class LayeredMap extends Component {
     calculateBounds() {
         const x_arr = [];
         const y_arr = [];
-
+        if (this.props.layers.length == 0) {
+            return [[0, 0], [1, 1]];
+        }
         this.props.layers.map(layer => {
             layer.data.map(item => {
                 if (["polyline", "polygon"].includes(item.type)) {
@@ -63,7 +65,6 @@ class LayeredMap extends Component {
     resetView() {
         const [[xmin, ymin], [xmax, ymax]] = this.calculateBounds();
         const center = [0.5 * (xmin + xmax), 0.5 * (ymin + ymax)];
-
         const width = this.mapRef.current.container.offsetWidth;
         const height = this.mapRef.current.container.offsetHeight;
 
