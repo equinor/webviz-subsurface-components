@@ -32,7 +32,7 @@ class LayeredMap extends Component {
     calculateBounds() {
         const x_arr = [];
         const y_arr = [];
-        if (this.props.layers.length == 0) {
+        if (this.props.layers.length === 0) {
             return [[0, 0], [1, 1]];
         }
         this.props.layers.map(layer => {
@@ -117,7 +117,10 @@ class LayeredMap extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.uirevision !== prevProps.uirevision) {
+        if (
+            this.props.uirevision === "" ||
+            this.props.uirevision !== prevProps.uirevision
+        ) {
             this.resetView();
         }
     }
