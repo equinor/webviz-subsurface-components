@@ -50,7 +50,9 @@ class App extends Component {
                     <option value="Morris">Morris</option>
                     <option value="SubsurfaceMap">SubsurfaceMap</option>
                     <option value="LayeredMap">LayeredMap</option>
-                    <option value="CompletionOverview">CompletionOverview</option>
+                    <option value="CompletionOverview">
+                        CompletionOverview
+                    </option>
                 </select>
                 {this.renderDemo()}
             </div>

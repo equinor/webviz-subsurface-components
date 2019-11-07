@@ -1,48 +1,34 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import * as d3 from "d3";
+import render_completion from "../private_components/completion_overview/render_completion";
 
+// For en gitt sortering har bronnene et gitt x-koordinat.
+//   - Initier én SVG-gruppe per brønn. Behold disse i en dictionary.
+//   - Lag også rects for hvert lagt (men som i utgangspunktet ikke vises).
+
+// For time-slider: Når flyttes over bestemt tidsintervall:
+//   - Fjern/legg til kompletteringene på tidspunktet den er på.
+//
 
 class CompletionOverview extends Component {
-
     constructor(props) {
         super(props);
-        this.props.width = "100%";
-        this.props.height = "400px";
+        this.props.height = 300;
+        this.props.id = "some-id";
     }
 
-    componentDidMount(){
-        const number_layers = 20;
-        const color_range = d3.scaleOrdinal().domain(d3.range(number_layers)).range(d3.schemeSet3);
-
-        const layer2pixels = d3.scaleLinear()
-          .domain([0, number_layers]) // unit: km
-          .range([0, this.props.height]) // unit: pixels
-
-        d3.select("#some-id").append("rect")
-                             .attr("width", 200)
-                             .attr("height", 200);
-
-        d3.select("#some-id")
-          .selectAll("rect.bar_neg")
-          .data(d3.range(number_layers))
-            .enter()
-            .append("rect")
-            .attr("x", (d) => 100)
-            .attr("y", (d) => layer2pixels(d))
-            .attr("width", 100)
-            .attr("height", 100)
-            .attr("fill", (d) => myColor(d))
+    componentDidMount() {
+        render_completion(
+            this.props.id,
+            this.props.layers,
+            this.props.data,
+            this.props.height
+        );
     }
 
     render() {
-        return (
-            <div>
-                <svg id="some-id" width={this.props.width} height={this.props.height}></svg>
-            </div>
-        );
+        return <div id={this.props.id} width="100%"></div>;
     }
 }
-
 
 export default CompletionOverview;
