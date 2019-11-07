@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import render_completion from "../private_components/completion_overview/render_completion";
 
-
 class CompletionOverview extends Component {
     constructor(props) {
         super(props);
