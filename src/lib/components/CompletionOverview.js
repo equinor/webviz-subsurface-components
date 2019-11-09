@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import render_completion from "../private_components/completion_overview/render_completion";
+import CompletionOverviewD3 from "../private_components/completion_overview/render_completion";
 
 class CompletionOverview extends Component {
     constructor(props) {
@@ -10,7 +10,7 @@ class CompletionOverview extends Component {
     }
 
     componentDidMount() {
-        render_completion(
+        this.completion_overview = new CompletionOverviewD3(
             this.props.id,
             this.props.layers,
             this.props.data,

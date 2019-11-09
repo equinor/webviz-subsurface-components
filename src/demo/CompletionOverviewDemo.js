@@ -39,6 +39,162 @@ const data = {
                 kvkh: 20,
             },
         },
+        "Y-1H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-2H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-3H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-4H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+    },
+    "2020-10-01": {
+        "X-1H": {
+            1: {
+                state: "perforated",
+                kvkh: 10,
+            },
+        },
+        "X-2H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "X-3H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-1H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-2H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-3H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-4H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+    },
+    "2021-10-01": {
+        "X-1H": {
+            1: {
+                state: "perforated",
+                kvkh: 10,
+            },
+        },
+        "X-2H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "X-3H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-1H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-2H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-3H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-4H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+    },
+    "2022-10-01": {
+        "X-1H": {
+            1: {
+                state: "perforated",
+                kvkh: 10,
+            },
+        },
+        "X-2H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "X-3H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-1H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-2H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-3H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
+        "Y-4H": {
+            2: {
+                state: "perforated",
+                kvkh: 20,
+            },
+        },
     },
 };
 
