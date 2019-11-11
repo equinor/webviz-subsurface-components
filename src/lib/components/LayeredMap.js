@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { CRS } from "leaflet";
 import { LayersControl, Map, ScaleControl, FeatureGroup } from "react-leaflet";
 import Switch from "../private_components/layered-map-resources/Switch.react";
+import ValueInfoBox from "../private_components/layered-map-resources/ValueInfoBox.react";
 import OptionalLayerControl from "../private_components/layered-map-resources/OptionalLayerControl.react";
 import CompositeMapLayer from "../private_components/layered-map-resources/CompositeMapLayer.react";
 import DrawControls from "../private_components/layered-map-resources/DrawControls.react";
@@ -23,6 +24,8 @@ class LayeredMap extends Component {
         super(props);
         this.mapRef = React.createRef();
         this.state = { hillShading: this.props.hillShading };
+
+        this.state = { x: "", y: "", z: "" };
     }
 
     handleHillshadingChange() {
@@ -87,7 +90,16 @@ class LayeredMap extends Component {
                 });
         });
 
-        this.mapRef.current.leafletElement.on("onlayeredmapmove", (e) => {console.log(e)});
+        this.mapRef.current.leafletElement.on("onlayeredmapmove", ev => {
+            this.setState({ z: ev.z });
+        });
+
+        this.mapRef.current.leafletElement.on("mousemove", ev => {
+            this.setState({
+                x: Math.floor(ev.latlng.lng),
+                y: Math.floor(ev.latlng.lat),
+            });
+        });
 
         this.mapRef.current.leafletElement.on("move", ev => {
             this.props.sync_ids
@@ -239,6 +251,12 @@ class LayeredMap extends Component {
                         onChange={this.handleHillshadingChange.bind(this)}
                     />
                 )}
+                <ValueInfoBox
+                    position="bottomleft"
+                    x={this.state.x}
+                    y={this.state.y}
+                    z={this.state.z}
+                />
             </Map>
         );
     }

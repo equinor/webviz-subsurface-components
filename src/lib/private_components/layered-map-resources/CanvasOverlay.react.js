@@ -67,21 +67,21 @@ class CanvasOverlay extends MapLayer {
         this._reset();
 
         this.el.onmousemove = e => {
-            if (this.props.original_data.loaded){
-            const client_rect = this.el.getBoundingClientRect();
-            const x = Math.floor(
-                (e.layerX / client_rect.width) *
-                    this.props.original_data.ImageData.width
-            );
-            const y = Math.floor(
-                (e.layerY / client_rect.height) *
-                    this.props.original_data.ImageData.height
-            );
-            const z = this.props.original_data.ImageData.data[
-                (y * this.props.original_data.ImageData.width + x) * 4
-            ];
+            if (this.props.original_data.loaded) {
+                const client_rect = this.el.getBoundingClientRect();
+                const x = Math.floor(
+                    (e.layerX / client_rect.width) *
+                        this.props.original_data.ImageData.width
+                );
+                const y = Math.floor(
+                    (e.layerY / client_rect.height) *
+                        this.props.original_data.ImageData.height
+                );
+                const z = this.props.original_data.ImageData.data[
+                    (y * this.props.original_data.ImageData.width + x) * 4
+                ];
 
-            this._map.fire("onlayeredmapmove", { x: x, y: y, z: z }, true)
+                this._map.fire("onlayeredmapmove", { x: x, y: y, z: z }, true);
             }
         };
     }

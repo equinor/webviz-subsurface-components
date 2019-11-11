@@ -12,7 +12,7 @@ class ImageOverlayWebGL extends Component {
             );
         }
 
-        this.original_data = {loaded: false};
+        this.original_data = { loaded: false };
         const image = new Image();
         image.onload = () => {
             const offscreen_canvas = document.createElement("canvas");
@@ -26,7 +26,7 @@ class ImageOverlayWebGL extends Component {
                 offscreen_canvas.width,
                 offscreen_canvas.height
             );
-            this.original_data["loaded"] = true
+            this.original_data["loaded"] = true;
         };
         image.src = this.props.url;
 
