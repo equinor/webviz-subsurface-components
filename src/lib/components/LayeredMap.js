@@ -32,7 +32,9 @@ class LayeredMap extends Component {
     calculateBounds() {
         const x_arr = [];
         const y_arr = [];
-
+        if (this.props.layers.length === 0) {
+            return [[0, 0], [1, 1]];
+        }
         this.props.layers.map(layer => {
             layer.data.map(item => {
                 if (["polyline", "polygon"].includes(item.type)) {
@@ -63,7 +65,6 @@ class LayeredMap extends Component {
     resetView() {
         const [[xmin, ymin], [xmax, ymax]] = this.calculateBounds();
         const center = [0.5 * (xmin + xmax), 0.5 * (ymin + ymax)];
-
         const width = this.mapRef.current.container.offsetWidth;
         const height = this.mapRef.current.container.offsetHeight;
 
@@ -116,7 +117,10 @@ class LayeredMap extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.uirevision !== prevProps.uirevision) {
+        if (
+            this.props.uirevision === "" ||
+            this.props.uirevision !== prevProps.uirevision
+        ) {
             this.resetView();
         }
     }
@@ -346,8 +350,9 @@ LayeredMap.propTypes = {
     hillShading: PropTypes.bool,
 
     /**
-     * Following the same approach as Plotly Dash:
-     * If the string uireivision changes, reset the viewport.
+     * A string to control if map bounds should be recalculated on prop change.
+        Recalculation will occur if the string is set to empty or is different than the
+        last prop change.
      */
     uirevision: PropTypes.string,
 };
