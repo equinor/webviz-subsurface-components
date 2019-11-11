@@ -11,6 +11,24 @@ class ImageOverlayWebGL extends Component {
                 <ImageOverlay url={this.props.url} bounds={this.props.bounds} />
             );
         }
+
+        this.original_data = {};
+        const image = new Image();
+        image.onload = () => {
+            const offscreen_canvas = document.createElement("canvas");
+            const ctx = offscreen_canvas.getContext("2d");
+            offscreen_canvas.width = image.width;
+            offscreen_canvas.height = image.height;
+            ctx.drawImage(image, 0, 0);
+            this.original_data["ImageData"] = ctx.getImageData(
+                0,
+                0,
+                offscreen_canvas.width,
+                offscreen_canvas.height
+            );
+        };
+        image.src = this.props.url;
+
         return (
             <CanvasOverlay
                 drawMethod={canvas =>
@@ -24,6 +42,7 @@ class ImageOverlayWebGL extends Component {
                     )
                 }
                 bounds={this.props.bounds}
+                original_data={this.original_data}
             />
         );
     }
