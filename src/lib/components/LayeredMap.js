@@ -350,8 +350,9 @@ LayeredMap.propTypes = {
     hillShading: PropTypes.bool,
 
     /**
-     * Following the same approach as Plotly Dash:
-     * If the string uireivision changes, reset the viewport.
+     * A string to control if map bounds should be recalculated on prop change.
+        Recalculation will occur if the string is set to empty or is different than the
+        last prop change.
      */
     uirevision: PropTypes.string,
 };
