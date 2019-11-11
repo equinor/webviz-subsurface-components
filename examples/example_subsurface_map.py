@@ -3,7 +3,8 @@ import dash
 import dash_html_components as html
 import webviz_subsurface_components
 
-with open("../src/demo/data.json", "r") as json_file:
+
+with open("../src/demo/example-data/subsurface-map.json", "r") as json_file:  
     data = json.load(json_file)
 
 app = dash.Dash(__name__)
