@@ -87,6 +87,8 @@ class LayeredMap extends Component {
                 });
         });
 
+        this.mapRef.current.leafletElement.on("onlayeredmapmove", (e) => {console.log(e)});
+
         this.mapRef.current.leafletElement.on("move", ev => {
             this.props.sync_ids
                 .filter(id => id !== this.props.id)

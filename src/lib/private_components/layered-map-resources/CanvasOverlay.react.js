@@ -66,11 +66,8 @@ class CanvasOverlay extends MapLayer {
         this.props.drawMethod(this.el);
         this._reset();
 
-        this.el.addEventListener("onlayeredmapmove", e => {
-            console.log(e.detail);
-        });
-
         this.el.onmousemove = e => {
+            if (this.props.original_data.loaded){
             const client_rect = this.el.getBoundingClientRect();
             const x = Math.floor(
                 (e.layerX / client_rect.width) *
@@ -84,11 +81,8 @@ class CanvasOverlay extends MapLayer {
                 (y * this.props.original_data.ImageData.width + x) * 4
             ];
 
-            this.el.dispatchEvent(
-                new CustomEvent("onlayeredmapmove", {
-                    detail: { x: x, y: y, z: z },
-                })
-            );
+            this._map.fire("onlayeredmapmove", { x: x, y: y, z: z }, true)
+            }
         };
     }
 
