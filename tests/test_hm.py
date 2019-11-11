@@ -23,4 +23,4 @@ def test_render_hm(dash_duo):
         "#g_history_matching_plot > text", timeout=4
     )
 
-    assert "Misfit overview for Iteration 0" == my_component.text
+    assert my_component.text == "Misfit overview for Iteration 0"

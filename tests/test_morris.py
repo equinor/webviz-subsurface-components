@@ -29,4 +29,4 @@ def test_render(dash_duo):
         "#sensitivity-slider-plot__graph-container > svg > g > text"
     )
 
-    assert "FOPT" == my_component.text
+    assert my_component.text == "FOPT"
