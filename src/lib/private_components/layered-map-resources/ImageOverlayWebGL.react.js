@@ -20,13 +20,13 @@ class ImageOverlayWebGL extends Component {
             offscreen_canvas.width = image.width;
             offscreen_canvas.height = image.height;
             ctx.drawImage(image, 0, 0);
-            this.original_data["ImageData"] = ctx.getImageData(
+            this.original_data.ImageData = ctx.getImageData(
                 0,
                 0,
                 offscreen_canvas.width,
                 offscreen_canvas.height
             );
-            this.original_data["loaded"] = true;
+            this.original_data.loaded = true;
         };
         image.src = this.props.url;
 

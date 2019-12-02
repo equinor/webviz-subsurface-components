@@ -77,8 +77,13 @@ class CanvasOverlay extends MapLayer {
                     ((e.clientY - client_rect.top) / client_rect.height) *
                         this.props.original_data.ImageData.height
                 );
+
+                const NUMBER_COLOR_CHANNELS = 4; // RGBA
+                const NUMBER_DISCRETIZATION_LEVELS = 255; // RGBA
+
                 const z = this.props.original_data.ImageData.data[
-                    (y * this.props.original_data.ImageData.width + x) * 4
+                    (y * this.props.original_data.ImageData.width + x) *
+                        NUMBER_COLOR_CHANNELS
                 ];
 
                 const z_string =
@@ -86,7 +91,7 @@ class CanvasOverlay extends MapLayer {
                         ? `${Math.floor(
                               ((this.props.maxvalue - this.props.minvalue) *
                                   (z - 1)) /
-                                  255 +
+                                  NUMBER_DISCRETIZATION_LEVELS +
                                   this.props.minvalue
                           )} ${this.props.unit}`
                         : null;
@@ -116,6 +121,15 @@ CanvasOverlay.propTypes = {
 
     /* Function which should be used for drawing the generated canvas */
     drawMethod: PropTypes.func,
+
+    /* Minimum value of color map */
+    minvalue: PropTypes.number,
+
+    /* Maximum value of color map */
+    maxvalue: PropTypes.number,
+
+    /* Unit to show in color map */
+    unit: PropTypes.string,
 };
 
 export default withLeaflet(CanvasOverlay);

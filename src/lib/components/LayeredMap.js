@@ -23,7 +23,12 @@ class LayeredMap extends Component {
     constructor(props) {
         super(props);
         this.mapRef = React.createRef();
-        this.state = { hillShading: this.props.hillShading, x: null, y: null, z: null };
+        this.state = {
+            hillShading: this.props.hillShading,
+            x: null,
+            y: null,
+            z: null,
+        };
     }
 
     handleHillshadingChange() {
@@ -94,14 +99,16 @@ class LayeredMap extends Component {
         });
 
         this.mapRef.current.leafletElement.on("click", ev => {
+            const Z_UPDATE_INTERVAL = 50; // milliseconds
+
             this.setState({
                 x: Math.floor(ev.latlng.lng),
                 y: Math.floor(ev.latlng.lat),
                 z:
                     "z_timestamp" in this.state &&
-                    Date.now() - this.state.z_timestamp < 50
+                    Date.now() - this.state.z_timestamp < Z_UPDATE_INTERVAL
                         ? this.state.z
-                        : null, // Nullify z value if more than 50 ms since populated
+                        : null, // Nullify z value if more than specified interval since populated
             });
         });
 

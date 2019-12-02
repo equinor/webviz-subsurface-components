@@ -50,6 +50,15 @@ class ValueInfoBox extends MapControl {
     }
 }
 
-ValueInfoBox.propTypes = {};
+ValueInfoBox.propTypes = {
+    /* x coordinate to show */
+    x: PropTypes.number,
+
+    /* y coordinate to show */
+    y: PropTypes.number,
+
+    /* z string to show (number + unit) */
+    z: PropTypes.string,
+};
 
 export default withLeaflet(ValueInfoBox);
