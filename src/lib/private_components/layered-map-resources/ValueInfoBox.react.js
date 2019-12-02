@@ -32,12 +32,18 @@ class ValueInfoBox extends MapControl {
     }
 
     render() {
+        this.panelDiv.style.visibility =
+            this.props.x !== null ? "visible" : "hidden";
+
+        const x_element = this.props.x ? <div>x = {this.props.x} m</div> : "";
+        const y_element = this.props.y ? <div>y = {this.props.y} m</div> : "";
+        const z_element = this.props.z ? <div>z = {this.props.z}</div> : "";
+
         return ReactDOM.createPortal(
-            <div>
-                UTMX: {this.props.x} m<br />
-                UTMY: {this.props.y} m<br />
-                Depth: {this.props.z} TVDmsl
-                <br />
+            <div className="leaflet-valueinfobox">
+                {x_element}
+                {y_element}
+                {z_element}
             </div>,
             this.panelDiv
         );

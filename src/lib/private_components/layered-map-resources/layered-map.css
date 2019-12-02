@@ -20,3 +20,7 @@
 .leaflet-colorbar-right-label {
     text-align: right;
 }
+
+.leaflet-valueinfobox {
+    padding: 5px;
+}

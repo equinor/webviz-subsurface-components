@@ -44,6 +44,9 @@ class ImageOverlayWebGL extends Component {
                 }
                 bounds={this.props.bounds}
                 original_data={this.original_data}
+                minvalue={this.props.minvalue}
+                maxvalue={this.props.maxvalue}
+                unit={this.props.unit}
             />
         );
     }

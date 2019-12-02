@@ -25,7 +25,7 @@ class LayeredMap extends Component {
         this.mapRef = React.createRef();
         this.state = { hillShading: this.props.hillShading };
 
-        this.state = { x: "", y: "", z: "" };
+        this.state = { x: null, y: null, z: null };
     }
 
     handleHillshadingChange() {
@@ -90,14 +90,19 @@ class LayeredMap extends Component {
                 });
         });
 
-        this.mapRef.current.leafletElement.on("onlayeredmapmove", ev => {
-            this.setState({ z: ev.z });
+        this.mapRef.current.leafletElement.on("onlayeredmapclick", ev => {
+            this.setState({ z: ev.z, z_timestamp: Date.now() });
         });
 
-        this.mapRef.current.leafletElement.on("mousemove", ev => {
+        this.mapRef.current.leafletElement.on("click", ev => {
             this.setState({
                 x: Math.floor(ev.latlng.lng),
                 y: Math.floor(ev.latlng.lat),
+                z:
+                    "z_timestamp" in this.state &&
+                    Date.now() - this.state.z_timestamp < 50
+                        ? this.state.z
+                        : null, // Nullify z value if more than 50 ms since populated
             });
         });
 
