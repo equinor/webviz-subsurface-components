@@ -23,9 +23,7 @@ class LayeredMap extends Component {
     constructor(props) {
         super(props);
         this.mapRef = React.createRef();
-        this.state = { hillShading: this.props.hillShading };
-
-        this.state = { x: null, y: null, z: null };
+        this.state = { hillShading: this.props.hillShading, x: null, y: null, z: null };
     }
 
     handleHillshadingChange() {
