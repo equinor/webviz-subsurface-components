@@ -78,8 +78,10 @@ class CanvasOverlay extends MapLayer {
                         this.props.original_data.ImageData.height
                 );
 
-                const NUMBER_COLOR_CHANNELS = 4; // RGBA
-                const NUMBER_DISCRETIZATION_LEVELS = 255; // RGBA
+                // RGBA
+                const NUMBER_COLOR_CHANNELS = 4;
+
+                const NUMBER_DISCRETIZATION_LEVELS = 255;
 
                 const z = this.props.original_data.ImageData.data[
                     (y * this.props.original_data.ImageData.width + x) *

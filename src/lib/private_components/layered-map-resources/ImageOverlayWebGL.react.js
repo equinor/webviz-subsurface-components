@@ -72,6 +72,15 @@ ImageOverlayWebGL.propTypes = {
      * Light direction (array of length 3), used when hillShading is true.
      */
     lightDirection: PropTypes.array,
+
+    /* Minimum value of color map */
+    minvalue: PropTypes.number,
+
+    /* Maximum value of color map */
+    maxvalue: PropTypes.number,
+
+    /* Unit to show in color map */
+    unit: PropTypes.string,
 };
 
 export default ImageOverlayWebGL;
