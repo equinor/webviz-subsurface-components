@@ -11,7 +11,12 @@ export const arbitrarySizedArray = (arb, size) =>
 export const arbitraryCell = arbitrarySizedArray(jsc.number, 14).smap(
     ([c1, c2, c3, c4, c5, c6, c7, c8, i, j, fx0, fx1, fy0, fy1]) =>
         new Cell(
-            [[c1, c2], [c3, c4], [c5, c6], [c7, c8]],
+            [
+                [c1, c2],
+                [c3, c4],
+                [c5, c6],
+                [c7, c8],
+            ],
             i,
             j,
             fx0,
@@ -66,9 +71,10 @@ function arbitraryMatrixArray(maxn, maxm) {
     });
 }
 
-export const arbitraryVector = jsc
-    .array(jsc.number)
-    .smap(l => new Vector(l), v => Array.from(v));
+export const arbitraryVector = jsc.array(jsc.number).smap(
+    l => new Vector(l),
+    v => Array.from(v)
+);
 
 export function arbitraryMatrix(maxm, maxn) {
     return arbitraryMatrixArray(maxm, maxn).smap(
@@ -102,9 +108,10 @@ function distinctIndecies(cells) {
     return newCells;
 }
 
-export const arbitraryGrid = jsc
-    .array(arbitraryNonEmptyCell)
-    .smap(l => new Grid(distinctIndecies(l)), g => g.getCells());
+export const arbitraryGrid = jsc.array(arbitraryNonEmptyCell).smap(
+    l => new Grid(distinctIndecies(l)),
+    g => g.getCells()
+);
 
 export const arbitraryField = arbitraryGrid.smap(
     g => new Field(g),
