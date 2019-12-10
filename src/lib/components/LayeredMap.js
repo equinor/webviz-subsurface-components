@@ -33,7 +33,10 @@ class LayeredMap extends Component {
         const x_arr = [];
         const y_arr = [];
         if (this.props.layers.length === 0) {
-            return [[0, 0], [1, 1]];
+            return [
+                [0, 0],
+                [1, 1],
+            ];
         }
         this.props.layers.map(layer => {
             layer.data.map(item => {

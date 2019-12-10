@@ -25,7 +25,10 @@ export class Cell {
         this._corners = new Matrix(corners);
         this._i = i;
         this._j = j;
-        this._flux = new Matrix([[fluxX0, fluxY0], [fluxX1, fluxY1]]);
+        this._flux = new Matrix([
+            [fluxX0, fluxY0],
+            [fluxX1, fluxY1],
+        ]);
         this._leftFlux = this._flux.row(0);
         this._rightFlux = this._flux.row(1);
     }
@@ -59,7 +62,12 @@ export class Cell {
      */
     get maxNormalSpeed() {
         const normalCornerSpeeds = [];
-        const corners = [[0, 0], [0, 1], [1, 0], [1, 1]];
+        const corners = [
+            [0, 0],
+            [0, 1],
+            [1, 0],
+            [1, 1],
+        ];
         corners.forEach(corner => {
             const position = new Vector(corner[0], corner[1]);
             const speed = this.normalVelocity(position).magnitude;
@@ -83,7 +91,10 @@ export class Cell {
             );
         }
         const shapeDerivates = new Matrix(
-            [[y - 1, 1 - y, y, -y], [x - 1, -x, x, 1 - x]],
+            [
+                [y - 1, 1 - y, y, -y],
+                [x - 1, -x, x, 1 - x],
+            ],
             true,
             2,
             4
