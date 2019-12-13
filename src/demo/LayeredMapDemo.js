@@ -20,6 +20,7 @@ class LayeredMapDemo extends Component {
                         draw_toolbar_polygon={true}
                         draw_toolbar_polyline={true}
                         showScaleY={true}
+                        uirevision="someinitialstring"
                     />
                 </div>
                 <div>
@@ -33,6 +34,7 @@ class LayeredMapDemo extends Component {
                         draw_toolbar_polygon={true}
                         draw_toolbar_polyline={true}
                         showScaleY={true}
+                        uirevision="someinitialstring"
                     />
                 </div>
             </div>

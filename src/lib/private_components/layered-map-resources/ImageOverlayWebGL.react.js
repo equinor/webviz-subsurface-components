@@ -11,6 +11,25 @@ class ImageOverlayWebGL extends Component {
                 <ImageOverlay url={this.props.url} bounds={this.props.bounds} />
             );
         }
+
+        this.original_data = { loaded: false };
+        const image = new Image();
+        image.onload = () => {
+            const offscreen_canvas = document.createElement("canvas");
+            const ctx = offscreen_canvas.getContext("2d");
+            offscreen_canvas.width = image.width;
+            offscreen_canvas.height = image.height;
+            ctx.drawImage(image, 0, 0);
+            this.original_data.ImageData = ctx.getImageData(
+                0,
+                0,
+                offscreen_canvas.width,
+                offscreen_canvas.height
+            );
+            this.original_data.loaded = true;
+        };
+        image.src = this.props.url;
+
         return (
             <CanvasOverlay
                 drawMethod={canvas =>
@@ -24,6 +43,10 @@ class ImageOverlayWebGL extends Component {
                     )
                 }
                 bounds={this.props.bounds}
+                original_data={this.original_data}
+                minvalue={this.props.minvalue}
+                maxvalue={this.props.maxvalue}
+                unit={this.props.unit}
             />
         );
     }
@@ -49,6 +72,15 @@ ImageOverlayWebGL.propTypes = {
      * Light direction (array of length 3), used when hillShading is true.
      */
     lightDirection: PropTypes.array,
+
+    /* Minimum value of color map */
+    minvalue: PropTypes.number,
+
+    /* Maximum value of color map */
+    maxvalue: PropTypes.number,
+
+    /* Unit to show in color map */
+    unit: PropTypes.string,
 };
 
 export default ImageOverlayWebGL;

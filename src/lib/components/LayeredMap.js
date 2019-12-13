@@ -3,8 +3,15 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "leaflet/dist/leaflet.css";
 import { CRS } from "leaflet";
-import { LayersControl, Map, ScaleControl, FeatureGroup } from "react-leaflet";
+import {
+    LayersControl,
+    Map,
+    ScaleControl,
+    FeatureGroup,
+    CircleMarker,
+} from "react-leaflet";
 import Switch from "../private_components/layered-map-resources/Switch.react";
+import ValueInfoBox from "../private_components/layered-map-resources/ValueInfoBox.react";
 import OptionalLayerControl from "../private_components/layered-map-resources/OptionalLayerControl.react";
 import CompositeMapLayer from "../private_components/layered-map-resources/CompositeMapLayer.react";
 import DrawControls from "../private_components/layered-map-resources/DrawControls.react";
@@ -22,7 +29,12 @@ class LayeredMap extends Component {
     constructor(props) {
         super(props);
         this.mapRef = React.createRef();
-        this.state = { hillShading: this.props.hillShading };
+        this.state = {
+            hillShading: this.props.hillShading,
+            x: null,
+            y: null,
+            z: null,
+        };
     }
 
     handleHillshadingChange() {
@@ -80,15 +92,52 @@ class LayeredMap extends Component {
         this.mapRef.current.leafletElement.setView(yx(center), initial_zoom);
     }
 
+    updateCircleMarkerPosition(x, y) {
+        const Z_UPDATE_INTERVAL = 50; // milliseconds
+
+        this.setState({
+            x: x,
+            y: y,
+            z:
+                "z_timestamp" in this.state &&
+                Date.now() - this.state.z_timestamp < Z_UPDATE_INTERVAL
+                    ? this.state.z
+                    : null, // Nullify z value if more than specified interval since populated
+        });
+    }
+
     setEvents() {
         this.mapRef.current.leafletElement.on("zoomanim", ev => {
             this.props.sync_ids
                 .filter(id => id !== this.props.id)
                 .map(id => {
-                    if (_layeredmap_references[id].getZoom() !== ev.zoom) {
-                        _layeredmap_references[id].setView(ev.center, ev.zoom);
+                    if (
+                        _layeredmap_references[
+                            id
+                        ].mapRef.current.leafletElement.getZoom() !== ev.zoom
+                    ) {
+                        _layeredmap_references[
+                            id
+                        ].mapRef.current.leafletElement.setView(
+                            ev.center,
+                            ev.zoom
+                        );
                     }
                 });
+        });
+
+        this.mapRef.current.leafletElement.on("onlayeredmapclick", ev => {
+            this.setState({ z: ev.z, z_timestamp: Date.now() });
+        });
+
+        this.mapRef.current.leafletElement.on("click", ev => {
+            this.updateCircleMarkerPosition(ev.latlng.lng, ev.latlng.lat);
+            this.props.sync_ids.map(id => {
+                _layeredmap_references[id].updateCircleMarkerPosition(
+                    ev.latlng.lng,
+                    ev.latlng.lat
+                );
+            });
         });
 
         this.mapRef.current.leafletElement.on("move", ev => {
@@ -98,7 +147,9 @@ class LayeredMap extends Component {
                     // Only react if move event is from a real user interaction
                     // (originalEvent is undefined if viewport is programatically changed).
                     if (typeof ev.originalEvent !== "undefined") {
-                        _layeredmap_references[id].setView(
+                        _layeredmap_references[
+                            id
+                        ].mapRef.current.leafletElement.setView(
                             ev.target.getCenter()
                         );
                     }
@@ -110,9 +161,7 @@ class LayeredMap extends Component {
 
         this.setEvents();
 
-        _layeredmap_references[
-            this.props.id
-        ] = this.mapRef.current.leafletElement;
+        _layeredmap_references[this.props.id] = this;
     }
 
     componentWillUnmount() {
@@ -244,6 +293,23 @@ class LayeredMap extends Component {
                         onChange={this.handleHillshadingChange.bind(this)}
                     />
                 )}
+                {this.state.x !== null && (
+                    <>
+                        <CircleMarker
+                            center={[this.state.y, this.state.x]}
+                            color="red"
+                            radius={5}
+                        />
+
+                        <ValueInfoBox
+                            position="bottomleft"
+                            x={this.state.x}
+                            y={this.state.y}
+                            z={this.state.z}
+                        />
+                    </>
+                )}
+                }
             </Map>
         );
     }

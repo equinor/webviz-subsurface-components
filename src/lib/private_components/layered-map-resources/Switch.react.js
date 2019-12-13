@@ -44,8 +44,8 @@ class Switch extends MapControl {
             <FormControlLabel
                 control={
                     <MaterialSwitch
+                        onClick={this.handleChange.bind(this)}
                         checked={this.state.checked}
-                        onChange={this.handleChange.bind(this)}
                     />
                 }
                 label={this.props.label}

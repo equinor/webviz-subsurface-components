@@ -68,6 +68,9 @@ class CompositeMapLayer extends Component {
                         }
                         elevationScale={item.elevationScale || 0.03}
                         lightDirection={this.props.lightDirection}
+                        minvalue={item.minvalue}
+                        maxvalue={item.maxvalue}
+                        unit={item.unit}
                         key={index}
                     />
                     {"colormap" in item && (
