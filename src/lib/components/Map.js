@@ -218,7 +218,6 @@ class Map extends Component {
             <div
                 style={{
                     height: `${height}px`,
-                    marginBottom: `${height}px`,
                 }}
             >
                 <div id={this.elementId}>
