@@ -1,5 +1,5 @@
 /* eslint no-inline-comments: 0 */
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
 import "leaflet/dist/leaflet.css";
 import { CRS } from "leaflet";
@@ -294,7 +294,7 @@ class LayeredMap extends Component {
                     />
                 )}
                 {this.state.x !== null && (
-                    <>
+                    <Fragment>
                         <CircleMarker
                             center={[this.state.y, this.state.x]}
                             color="red"
@@ -307,7 +307,7 @@ class LayeredMap extends Component {
                             y={this.state.y}
                             z={this.state.z}
                         />
-                    </>
+                    </Fragment>
                 )}
                 }
             </Map>
