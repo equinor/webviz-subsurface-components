@@ -217,7 +217,7 @@ class LayeredMap extends Component {
         return (
             <Map
                 id={this.props.id}
-                style={{ height: this.props.height }}
+                style={{ zIndex: 0, height: this.props.height }}
                 ref={this.mapRef}
                 attributionControl={false}
                 crs={CRS.Simple}
