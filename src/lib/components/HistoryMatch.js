@@ -29,7 +29,7 @@ HistoryMatch.defaultProps = {
 
 HistoryMatch.propTypes = {
     id: PropTypes.string.isRequired,
-
+    height: PropTypes.number,
     data: PropTypes.object,
 };
 
