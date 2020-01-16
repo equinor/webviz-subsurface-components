@@ -1,21 +1,26 @@
 {
     "name": "webviz_subsurface_components",
     "description": "Custom Dash components for use in Webviz",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/equinor/webviz-subsurface-components.git"
+    },
+    "bugs": {
+        "url": "https://github.com/equinor/webviz-subsurface-components/issues"
+    },
+    "homepage": "https://github.com/equinor/webviz-subsurface-components",
     "main": "build/index.js",
     "scripts": {
         "start": "webpack-serve ./webpack.serve.config.js --open",
         "postinstall": "cp ./package.json webviz_subsurface_components/package.json",
-        "validate-init": "python _validate_init.py",
-        "prepublishOnly": "npm run validate-init",
-        "build:js-dev": "webpack --mode development",
         "build:js": "webpack --mode production",
-        "build:py": "dash-generate-components ./src/lib/components webviz_subsurface_components",
-        "build:all": "npm run build:js && npm run build:js-dev && npm run build:py",
-        "test": "jest",
+        "build:js-dev": "webpack --mode development",
+        "build:py_and_r": "dash-generate-components ./src/lib/components webviz_subsurface_components -p package-info.json --r-prefix ''",
+        "build": "npm run build:js && npm run build:js-dev && npm run build:py_and_r",
         "format": "prettier --write *.js *.json 'src/**/*.+(js|jsx|json|css)'",
         "linting": "prettier --check *.js *.json 'src/**/*.+(js|jsx|json|css)'"
     },
-    "author": "R&T Equinor",
+    "author": "R&T Equinor <akia@equinor.com>",
     "license": "LGPL",
     "dependencies": {
         "@material-ui/core": "^4.3.3",
@@ -30,17 +35,14 @@
         "@babel/core": "^7.5.5",
         "@babel/preset-env": "^7.5.5",
         "@babel/preset-react": "^7.0.0",
-        "babel-eslint": "^9.0.0",
-        "babel-loader": "^8.0.0",
-        "chai": "^4.2.0",
+        "babel-eslint": "^10.0.2",
+        "babel-loader": "^8.0.6",
         "copyfiles": "^2.0.0",
         "css-loader": "^2.1.1",
         "eslint": "^5.16.0",
         "eslint-config-prettier": "^4.3.0",
         "eslint-plugin-import": "^2.18.2",
         "eslint-plugin-react": "^7.14.3",
-        "jest": "^24.9.0",
-        "jsverify": "^0.8.4",
         "mini-css-extract-plugin": "^0.8.0",
         "npm": "^6.13.4",
         "optimize-css-assets-webpack-plugin": "^5.0.3",

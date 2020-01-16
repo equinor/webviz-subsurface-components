@@ -1,14 +1,12 @@
 import PropTypes from "prop-types";
 import L from "leaflet";
 import { MapLayer, withLeaflet } from "react-leaflet";
-import { toLatLngBounds } from "leaflet/src/geo/LatLngBounds";
-import { Bounds } from "leaflet/src/geometry/Bounds";
 
 class CanvasOverlay extends MapLayer {
     constructor(props) {
         super(props);
         this._map = this.props.leaflet.map;
-        this._bounds = toLatLngBounds(this.props.bounds);
+        this._bounds = L.latLngBounds(this.props.bounds);
     }
 
     createLeafletElement() {
@@ -29,7 +27,7 @@ class CanvasOverlay extends MapLayer {
     }
 
     _reset() {
-        const bounds = new Bounds(
+        const bounds = new L.Bounds(
             this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
             this._map.latLngToLayerPoint(this._bounds.getSouthEast())
         );
@@ -104,7 +102,7 @@ class CanvasOverlay extends MapLayer {
 
     componentDidUpdate(prevProps) {
         if (this.props.drawMethod !== prevProps.drawMethod) {
-            this._bounds = toLatLngBounds(this.props.bounds);
+            this._bounds = L.latLngBounds(this.props.bounds);
             this._reset();
             this.props.drawMethod(this.el);
         }
