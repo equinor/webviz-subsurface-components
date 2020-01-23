@@ -1,13 +1,12 @@
+from collections import OrderedDict
+
 import numpy as np
 import pandas as pd
-from collections import OrderedDict
 from scipy.stats import chi2
-import json
-import webviz_subsurface_components
 import dash
-from dash.dependencies import Input, Output
 import dash_html_components as html
-import dash_core_components as dcc
+
+import webviz_subsurface_components
 
 
 def generate_synthetic_data(num_groups, num_iter, num_realizations):

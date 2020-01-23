@@ -245,14 +245,6 @@ export default function sensitivitySliderPlot(
         },
 
         initParameterDomains() {
-            function applyPadding(d, i) {
-                const padding =
-                    i === 0
-                        ? (1 - this._parameterDomainPadding.bottom) * d
-                        : (1 + this._parameterDomainPadding.top) * d;
-                return padding;
-            }
-
             const allMainValues = this._parameters.reduce(
                 (sum, param) => sum.concat(param.main),
                 []
