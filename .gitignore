@@ -3,6 +3,13 @@
 webviz_subsurface_components/**/*
 !webviz_subsurface_components/__init__.py
 
+DESCRIPTION
+NAMESPACE
+R/
+man/
+inst/
+.Rbuildignore
+
 # Created by .ignore support plugin (hsz.mobi)
 ### VisualStudioCode template
 .vscode/*
