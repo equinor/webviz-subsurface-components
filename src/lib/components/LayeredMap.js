@@ -170,8 +170,8 @@ class LayeredMap extends Component {
 
     componentDidUpdate(prevProps) {
         if (
-            this.props.uirevision === "" ||
-            this.props.uirevision !== prevProps.uirevision
+            this.props.uirevision !== prevProps.uirevision ||
+            (this.props.layers.length > 0 && prevProps.layers.length === 0)
         ) {
             this.resetView();
         }
@@ -309,7 +309,6 @@ class LayeredMap extends Component {
                         />
                     </Fragment>
                 )}
-                }
             </Map>
         );
     }
@@ -420,8 +419,8 @@ LayeredMap.propTypes = {
 
     /**
      * A string to control if map bounds should be recalculated on prop change.
-        Recalculation will occur if the string is set to empty or is different than the
-        last prop change.
+       Recalculation will occur if this string changes (or when the layers array property
+       goes from zero to non-zero length).
      */
     uirevision: PropTypes.string,
 };
