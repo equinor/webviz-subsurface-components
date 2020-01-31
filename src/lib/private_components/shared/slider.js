@@ -49,6 +49,7 @@ export default class Slider extends Component {
         this.dimension = DIMENSION[this.orientation];
         this.axis = AXIS[this.orientation];
         this.selectedIndex = 0;
+        this.hideCurrentTick = config.hideCurrentTick || false;
 
         if (this.orientation === ORIENTATION.HORIZONTAL) {
             this.currentValuePosition =
@@ -67,7 +68,10 @@ export default class Slider extends Component {
         this.renderContainer();
         this.renderLine();
         this.renderTicks();
-        this.renderCurrentTick();
+
+        if (!this.hideCurrentTick) {
+            this.renderCurrentTick();
+        }
         this.renderHandle();
     }
 
@@ -251,7 +255,9 @@ export default class Slider extends Component {
         this.container.selectAll(".ticks").remove();
 
         this.renderTicks();
-        this.renderCurrentTick();
+        if (!this.hideCurrentTick) {
+            this.renderCurrentTick();
+        }
 
         this.slideEnd(this.selectedIndex);
     }

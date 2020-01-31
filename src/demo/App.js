@@ -4,11 +4,12 @@ import HistoryMatchDemo from "./HistoryMatchDemo";
 import MorrisDemo from "./MorrisDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
+import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "LayeredMap" };
+        this.state = { value: "PriorPosteriorDistribution" };
     }
 
     onChange(e) {
@@ -29,6 +30,9 @@ class App extends Component {
             case "LayeredMap": {
                 return <LayeredMapDemo />;
             }
+            case "PriorPosteriorDistribution": {
+                return <PriorPosteriorDistributionDemo />;
+            }
             default: {
                 return null;
             }
@@ -46,6 +50,9 @@ class App extends Component {
                     <option value="Morris">Morris</option>
                     <option value="SubsurfaceMap">SubsurfaceMap</option>
                     <option value="LayeredMap">LayeredMap</option>
+                    <option value="PriorPosteriorDistribution">
+                        PriorPosteriorDistribution
+                    </option>
                 </select>
                 {this.renderDemo()}
             </div>
