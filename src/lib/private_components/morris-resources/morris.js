@@ -1,5 +1,5 @@
-/* eslint no-shadow: "off" */
-/* Fix this lint when rewriting the whole file */
+/* eslint-disable no-magic-numbers,no-global-assign,no-native-reassign,no-unused-vars,no-invalid-this */
+/* Fix lint when/if rewriting the whole file */
 
 import * as d3 from "d3";
 

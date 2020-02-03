@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import { Vector, Matrix } from "./linear_algebra";
 
 const oneVector = new Vector(1, 1);

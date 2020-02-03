@@ -11,7 +11,7 @@ class HistoryMatch extends Component {
     }
 
     componentDidMount() {
-        const { data, height } = this.props;
+        const { data } = this.props;
         const parsedData = parseData(data);
         const elementSelector = `#${this.elementId}`;
         const hm = new HistoryMatching();

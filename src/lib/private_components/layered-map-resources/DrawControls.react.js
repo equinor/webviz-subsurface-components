@@ -35,6 +35,7 @@ const getShapeType = layer => {
     if (layer instanceof L.Polyline) {
         return "polyline";
     }
+    throw new Error("Unknown shape type");
 };
 
 class DrawControls extends Component {

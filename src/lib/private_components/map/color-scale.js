@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 /**
  * Component for displaying a colour bar for various values
  * (e.g. a depth colour bar on a map)

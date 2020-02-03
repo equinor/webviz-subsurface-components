@@ -10,7 +10,7 @@ describe("Grid", () => {
         (grid, i, j) => {
             const cell = grid.getCell(i, j);
             if (i > grid.numRows || j > grid.numColumn(i) || i < 0 || j < 0) {
-                return cell === undefined;
+                return typeof cell === "undefined";
             }
             return true;
         }

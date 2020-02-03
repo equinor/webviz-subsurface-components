@@ -89,7 +89,7 @@ export default class Map extends Component {
                     .join(" ")
             )
             .attr("fill", (d, i) => self.color(i))
-            .on("mousemove", function onmousemove(d, i) {
+            .on("mousemove", (d, i) => {
                 self.emit("mousemove", {
                     x: d3.mouse(this)[0],
                     y: d3.mouse(this)[1],
@@ -102,11 +102,11 @@ export default class Map extends Component {
 
         const node = this.element.node();
 
-        if (this.mapWidth === undefined && node) {
+        if (typeof this.mapWidth === "undefined" && node) {
             this.mapWidth = node.getBoundingClientRect().width;
         }
 
-        if (this.mapHeight === undefined && node) {
+        if (typeof this.mapHeight === "undefined" && node) {
             this.mapHeight = node.getBoundingClientRect().height;
         }
 

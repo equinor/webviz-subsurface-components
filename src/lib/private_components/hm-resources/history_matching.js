@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import * as d3 from "d3";
 import HistoryMatchingPlot from "./history_matching_plot";
 import Slider from "../shared/slider";
@@ -22,11 +23,14 @@ export default class HistoryMatching {
             top: 100,
         };
 
+        // width of plot area
         this.plotWidth =
             d3.select(this.container).node().offsetWidth -
             this.margin.left -
-            this.margin.right; // width of plot area
-        this.plotHeight = 20 * (this.data.iterations[0].labels.length + 1); // height of plot area
+            this.margin.right;
+
+        // height of plot area
+        this.plotHeight = 20 * (this.data.iterations[0].labels.length + 1);
 
         d3.select(this.container)
             .selectAll("*")
@@ -89,10 +93,11 @@ export default class HistoryMatching {
 
     initResize() {
         const resize = () => {
+            // width of plot area
             this.plotWidth =
                 d3.select(this.container).node().offsetWidth -
                 this.margin.left -
-                this.margin.right; // width of plot area
+                this.margin.right;
             this.initVisualisation();
             this.initIterationPicker();
             this.initPlot();

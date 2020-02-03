@@ -1,3 +1,4 @@
+/* eslint-disable no-invalid-this */
 import * as d3 from "d3";
 import Component from "./component";
 import "./slider.css";
@@ -24,6 +25,7 @@ const AXIS = {
     VERTICAL: "y",
 };
 
+const TICKOFFSET = 4;
 const SNAP_DURATION = 500;
 const HANDLE_RADIUS = 8;
 
@@ -111,8 +113,9 @@ export default class Slider extends Component {
     }
 
     slideMove(pos) {
-        pos = this.scale(this.scale.invert(pos)); // Use d3's clamp to avoid going outside range
-        this.bar.attr(`c${this.axis}`, pos);
+        // Use d3's clamp to avoid going outside range
+        const clamp_pos = this.scale(this.scale.invert(pos));
+        this.bar.attr(`c${this.axis}`, clamp_pos);
 
         const index = Math.round(this.scale.invert(pos));
         if (index !== this.selectedIndex) {
@@ -123,12 +126,15 @@ export default class Slider extends Component {
         this.container
             .select(".currentTick")
             .text(this.data[this.selectedIndex])
-            .attr(this.axis, pos);
+            .attr(this.axis, clamp_pos);
     }
 
     slideEnd(pos) {
-        pos = this.scale(this.scale.invert(pos)); // Use d3's clamp to avoid going outside range
-        const finalPosition = this.scale(Math.round(this.scale.invert(pos)));
+        // Use d3's clamp to avoid going outside range
+        const clamp_pos = this.scale(this.scale.invert(pos));
+        const finalPosition = this.scale(
+            Math.round(this.scale.invert(clamp_pos))
+        );
 
         this.bar
             .transition()
@@ -182,7 +188,7 @@ export default class Slider extends Component {
             position === TICKPOSITION.TOP
         ) {
             return {
-                transform: `translate(0,-${HANDLE_RADIUS / 2 + 4})`,
+                transform: `translate(0,-${HANDLE_RADIUS / 2 + TICKOFFSET})`,
                 "text-anchor": "middle",
                 "dominant-baseline": "text-after-edge",
             };
@@ -192,7 +198,7 @@ export default class Slider extends Component {
             position === TICKPOSITION.BOTTOM
         ) {
             return {
-                transform: `translate(0,${HANDLE_RADIUS / 2 + 4})`,
+                transform: `translate(0,${HANDLE_RADIUS / 2 + TICKOFFSET})`,
                 "text-anchor": "middle",
                 "dominant-baseline": "text-before-edge",
             };
@@ -202,7 +208,7 @@ export default class Slider extends Component {
             position === TICKPOSITION.LEFT
         ) {
             return {
-                transform: `translate(-${HANDLE_RADIUS / 2 + 4}, 0)`,
+                transform: `translate(-${HANDLE_RADIUS / 2 + TICKOFFSET}, 0)`,
                 "text-anchor": "end",
                 "dominant-baseline": "central",
             };
@@ -212,7 +218,7 @@ export default class Slider extends Component {
             position === TICKPOSITION.RIGHT
         ) {
             return {
-                transform: `translate(${HANDLE_RADIUS / 2 + 4}, 0)`,
+                transform: `translate(${HANDLE_RADIUS / 2 + TICKOFFSET}, 0)`,
                 "text-anchor": "start",
                 "dominant-baseline": "central",
             };

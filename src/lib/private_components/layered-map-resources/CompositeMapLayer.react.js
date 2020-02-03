@@ -9,6 +9,8 @@ const yx = ([x, y]) => {
     return [y, x];
 };
 
+const DEFAULT_ELEVATION_SCALE = 0.03;
+
 class CompositeMapLayer extends Component {
     renderTooltip(item) {
         if ("tooltip" in item) {
@@ -66,7 +68,9 @@ class CompositeMapLayer extends Component {
                         hillShading={
                             this.props.hillShading && item.allowHillshading
                         }
-                        elevationScale={item.elevationScale || 0.03}
+                        elevationScale={
+                            item.elevationScale || DEFAULT_ELEVATION_SCALE
+                        }
                         lightDirection={this.props.lightDirection}
                         minvalue={item.minvalue}
                         maxvalue={item.maxvalue}
@@ -114,6 +118,9 @@ CompositeMapLayer.propTypes = {
 
     /* Coordinates for selected polyline*/
     lineCoords: PropTypes.func,
+
+    /* Vector specifiyng the light direction*/
+    lightDirection: PropTypes.array,
 
     /* Coordinates for selected polygon*/
     polygonCoords: PropTypes.func,

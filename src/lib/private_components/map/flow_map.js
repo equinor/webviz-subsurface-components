@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import * as d3 from "d3";
 import Map2D from "./map2d";
 import FlowAnimation from "./flow_animation";

@@ -1,4 +1,4 @@
-/* eslint-disable react/require-render-return */
+/* eslint-disable react/require-render-return,no-magic-numbers */
 import * as d3 from "d3";
 import SVGTransform from "./util";
 import Component from "./component";

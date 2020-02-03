@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import jsc from "jsverify";
 import { affineIndependent, Vector, Matrix } from "../linear_algebra";
 import { Cell } from "../cell";

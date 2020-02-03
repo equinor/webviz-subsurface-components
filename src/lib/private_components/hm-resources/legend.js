@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 export default class Legend {
     constructor(config = {}) {
         this.validate(config);

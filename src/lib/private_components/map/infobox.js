@@ -1,4 +1,4 @@
-/* eslint-disable react/require-render-return */
+/* eslint-disable react/require-render-return,no-magic-numbers */
 import Component from "./component";
 
 export default class InfoBox extends Component {

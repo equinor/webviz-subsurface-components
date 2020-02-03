@@ -1,3 +1,4 @@
+/* eslint-disable no-undefined */
 import { Vector } from "./linear_algebra";
 import { outsideUnitSquare } from "./cell";
 
