@@ -30,6 +30,7 @@ def array_to_png(Z, shift=True, colormap=False):
        Otherwise it is either stored as RGB or RGBA (depending on if the size
        of the third dimension is three or four, respectively).
     """
+    
 
     Z -= np.nanmin(Z)
 

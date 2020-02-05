@@ -4,11 +4,12 @@ import HistoryMatchDemo from "./HistoryMatchDemo";
 import MorrisDemo from "./MorrisDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
+import LeafletImperativeDemo from "./LeafletImperativeDemo";
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "LayeredMap" };
+        this.state = { value: "LeafletImperative" };
     }
 
     onChange(e) {
@@ -29,6 +30,9 @@ class App extends Component {
             case "LayeredMap": {
                 return <LayeredMapDemo />;
             }
+            case "LeafletImperative": {
+                return <LeafletImperativeDemo />;
+            }
             default: {
                 return null;
             }
@@ -46,6 +50,7 @@ class App extends Component {
                     <option value="Morris">Morris</option>
                     <option value="SubsurfaceMap">SubsurfaceMap</option>
                     <option value="LayeredMap">LayeredMap</option>
+                    <option value="LeafletImperative">LeafletImperative</option>
                 </select>
                 {this.renderDemo()}
             </div>
