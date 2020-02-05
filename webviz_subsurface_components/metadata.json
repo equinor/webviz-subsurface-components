@@ -1,0 +1,409 @@
+{
+  "src/lib/components/HistoryMatch.js": {
+    "description": "",
+    "displayName": "HistoryMatch",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": true,
+        "description": ""
+      },
+      "height": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "800",
+          "computed": false
+        }
+      },
+      "data": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": ""
+      }
+    }
+  },
+  "src/lib/components/LayeredMap.js": {
+    "description": "",
+    "displayName": "LayeredMap",
+    "methods": [
+      {
+        "name": "handleHillshadingChange",
+        "docblock": null,
+        "modifiers": [],
+        "params": [],
+        "returns": null
+      },
+      {
+        "name": "calculateBounds",
+        "docblock": null,
+        "modifiers": [],
+        "params": [],
+        "returns": null
+      },
+      {
+        "name": "resetView",
+        "docblock": null,
+        "modifiers": [],
+        "params": [],
+        "returns": null
+      },
+      {
+        "name": "updateCircleMarkerPosition",
+        "docblock": null,
+        "modifiers": [],
+        "params": [
+          {
+            "name": "x",
+            "type": null
+          },
+          {
+            "name": "y",
+            "type": null
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "setEvents",
+        "docblock": null,
+        "modifiers": [],
+        "params": [],
+        "returns": null
+      }
+    ],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": true,
+        "description": "The ID of this component, used to identify dash components\nin callbacks. The ID needs to be unique across all of the\ncomponents in an app."
+      },
+      "sync_ids": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "IDs of other LayeredMap components which should be updated with same zoom/pan\nas in this one when the user changes zoom/pan in this component instance.\nFor convenience, you can include the same ID as this instance (it will be ignored).",
+        "defaultValue": {
+          "value": "[]",
+          "computed": false
+        }
+      },
+      "scaleY": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "The initial scale of the y axis (relative to the x axis).\nA value >1 increases the visual length of the y axis compared to the x axis.\nUpdating this property will override any interactively set y axis scale.\nThis property does not have any effect unless showScaleY is true.",
+        "defaultValue": {
+          "value": "1",
+          "computed": false
+        }
+      },
+      "showScaleY": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "If to show the vertical scale slider or not.",
+        "defaultValue": {
+          "value": "false",
+          "computed": false
+        }
+      },
+      "height": {
+        "type": {
+          "name": "union",
+          "value": [
+            {
+              "name": "string"
+            },
+            {
+              "name": "number"
+            }
+          ]
+        },
+        "required": false,
+        "description": "Height of the component",
+        "defaultValue": {
+          "value": "800",
+          "computed": false
+        }
+      },
+      "draw_toolbar_polyline": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "Add button to draw a polyline",
+        "defaultValue": {
+          "value": "false",
+          "computed": false
+        }
+      },
+      "draw_toolbar_polygon": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "Add button to draw a polygon",
+        "defaultValue": {
+          "value": "false",
+          "computed": false
+        }
+      },
+      "draw_toolbar_marker": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "Add button to draw a marker",
+        "defaultValue": {
+          "value": "false",
+          "computed": false
+        }
+      },
+      "polyline_points": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "Dash provided prop that returns the coordinates of the edited or clicked polyline"
+      },
+      "polygon_points": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "Dash provided prop that returns the coordinates of the edited or clicked polygon"
+      },
+      "marker_point": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "Dash provided prop that returns the coordinates of the edited or clicked marker"
+      },
+      "lightDirection": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "Light direction.",
+        "defaultValue": {
+          "value": "[1, 1, 1]",
+          "computed": false
+        }
+      },
+      "setProps": {
+        "type": {
+          "name": "func"
+        },
+        "required": false,
+        "description": "Dash-assigned callback that should be called whenever any of the\nproperties change"
+      },
+      "layers": {
+        "type": {
+          "name": "array"
+        },
+        "required": false,
+        "description": "An array of different layers. Each layer is a dictionary with the following structure:\n          {\n           'name': 'Name of my layer',  // Name of the layer (appears in the map layer control)\n           'base_layer': true,\n           'checked': false, // If it should be checked initially (only one base layer can have this as True)\n           'data': [ ... ] // A list of the different map components this layer consists of (see below for the allowed components)\n          }\n\nFor overlay layers ('base_layer' == false), 'checked' can be tru for an arbitrary number of overlay layers.\nFor base layers maximum one layer should be checked."
+      },
+      "hillShading": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "true",
+          "computed": false
+        }
+      },
+      "uirevision": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "A string to control if map bounds should be recalculated on prop change.\n       Recalculation will occur if this string changes (or when the layers array property\n       goes from zero to non-zero length).",
+        "defaultValue": {
+          "value": "\"\"",
+          "computed": false
+        }
+      }
+    }
+  },
+  "src/lib/components/Leaflet.js": {
+    "description": "",
+    "displayName": "Leaflet",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": ""
+      },
+      "options": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "{}",
+          "computed": false
+        }
+      },
+      "baseLayer": {
+        "type": {
+          "name": "object"
+        },
+        "required": false,
+        "description": ""
+      },
+      "width": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "\"100%\"",
+          "computed": false
+        }
+      },
+      "height": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "\"800px\"",
+          "computed": false
+        }
+      },
+      "simpleCRS": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "false",
+          "computed": false
+        }
+      }
+    }
+  },
+  "src/lib/components/Map.js": {
+    "description": "",
+    "displayName": "Map",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": true,
+        "description": "The ID of this component, used to identify dash components\nin callbacks. The ID needs to be unique across all of the\ncomponents in an app."
+      },
+      "data": {
+        "type": {
+          "name": "object"
+        },
+        "required": true,
+        "description": "The data the Map component should render (JSON format)."
+      },
+      "height": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "The height of the Map component",
+        "defaultValue": {
+          "value": "800",
+          "computed": false
+        }
+      },
+      "layerNames": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "string"
+          }
+        },
+        "required": false,
+        "description": "The name of individual layers",
+        "defaultValue": {
+          "value": "[]",
+          "computed": false
+        }
+      }
+    }
+  },
+  "src/lib/components/Morris.js": {
+    "description": "",
+    "displayName": "Morris",
+    "methods": [],
+    "props": {
+      "id": {
+        "type": {
+          "name": "string"
+        },
+        "required": true,
+        "description": ""
+      },
+      "parameter": {
+        "type": {
+          "name": "string"
+        },
+        "required": false,
+        "description": ""
+      },
+      "output": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "object"
+          }
+        },
+        "required": false,
+        "description": ""
+      },
+      "parameters": {
+        "type": {
+          "name": "arrayOf",
+          "value": {
+            "name": "object"
+          }
+        },
+        "required": false,
+        "description": ""
+      },
+      "height": {
+        "type": {
+          "name": "number"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "800",
+          "computed": false
+        }
+      }
+    }
+  }
+}

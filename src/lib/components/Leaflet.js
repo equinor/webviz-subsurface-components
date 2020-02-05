@@ -32,7 +32,6 @@ function Leaflet({
         zoom: 0,
         maxZoom: 10,
         maxBounds: null,
-        noWrap: true,
         ...options,
     };
     const mapRef = useRef(null);
@@ -59,7 +58,7 @@ function Leaflet({
         if (baseLayer.type === "tiles") {
             baseLayers.current.clearLayers();
             L.tileLayer(baseLayer.url, {
-                attribution:
+                noWrap:true,attribution:
                     '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
             }).addTo(baseLayers.current);
         }
@@ -67,11 +66,11 @@ function Leaflet({
         if (baseLayer.type === "tiles_sidebyside") {
             baseLayers.current.clearLayers();
             var layer = L.tileLayer(baseLayer.url_left, {
-                attribution:
+                noWrap:true,attribution:
                     '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
             }).addTo(baseLayers.current);
             var layer2 = L.tileLayer(baseLayer.url_right, {
-                attribution:
+                noWrap:true,attribution:
                     '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
             }).addTo(baseLayers.current);
             

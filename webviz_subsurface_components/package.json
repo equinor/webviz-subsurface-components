@@ -1,0 +1,64 @@
+{
+    "name": "webviz_subsurface_components",
+    "description": "Custom Dash components for use in Webviz",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/equinor/webviz-subsurface-components.git"
+    },
+    "bugs": {
+        "url": "https://github.com/equinor/webviz-subsurface-components/issues"
+    },
+    "homepage": "https://github.com/equinor/webviz-subsurface-components",
+    "main": "build/index.js",
+    "scripts": {
+        "start": "webpack-serve ./webpack.serve.config.js --open",
+        "postinstall": "cp ./package.json webviz_subsurface_components/package.json",
+        "build:js": "webpack --mode production",
+        "build:js-dev": "webpack --mode development",
+        "build:py_and_r": "dash-generate-components ./src/lib/components webviz_subsurface_components -p package-info.json --r-prefix ''",
+        "build": "npm run build:js && npm run build:js-dev && npm run build:py_and_r",
+        "format": "prettier --write *.js *.json 'src/**/*.+(js|jsx|json|css)'",
+        "linting": "prettier --check *.js *.json 'src/**/*.+(js|jsx|json|css)'"
+    },
+    "author": "R&T Equinor <akia@equinor.com>",
+    "license": "LGPL",
+    "dependencies": {
+        "@material-ui/core": "^4.3.3",
+        "d3": "^5.11.0",
+        "leaflet": "^1.5.1",
+        "leaflet-draw": "^1.0.4",
+        "ramda": "^0.25.0",
+        "react-leaflet": "^2.4.0",
+        "react-leaflet-draw": "^0.19.0"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.5.5",
+        "@babel/preset-env": "^7.5.5",
+        "@babel/preset-react": "^7.0.0",
+        "babel-eslint": "^10.0.2",
+        "babel-loader": "^8.0.6",
+        "copyfiles": "^2.0.0",
+        "css-loader": "^2.1.1",
+        "eslint": "^5.16.0",
+        "eslint-config-prettier": "^4.3.0",
+        "eslint-plugin-import": "^2.18.2",
+        "eslint-plugin-react": "^7.14.3",
+        "mini-css-extract-plugin": "^0.8.0",
+        "npm": "^6.13.7",
+        "optimize-css-assets-webpack-plugin": "^5.0.3",
+        "prettier": "^1.18.2",
+        "raw-loader": "^3.1.0",
+        "react": "^16.9.0",
+        "react-docgen": "^2.20.1",
+        "react-dom": "^16.9.0",
+        "style-loader": "^1.0.0",
+        "url-loader": "^2.1.0",
+        "webpack": "^4.41.2",
+        "webpack-cli": "^3.3.7",
+        "webpack-serve": "^1.0.2"
+    },
+    "engines": {
+        "node": ">=12.14.0",
+        "npm": ">=6.13.4"
+    }
+}

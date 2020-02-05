@@ -5,6 +5,16 @@ import dash_html_components as html
 import webviz_subsurface_components
 
 from example_layered_map import array_to_png
+from PIL import Image
+import io, base64
+
+def img_to_b64_string(path):
+    with open(path, 'rb') as img:
+        b64 = base64.b64encode(img.read()).decode("ascii")
+        return f"data:image/png;base64,{b64}"
+
+leftImg = img_to_b64_string('./example-data/left.png')
+rightImg = img_to_b64_string("./example-data/right.png")
 
 
 arr = np.loadtxt("./example-data/layered-map-data.npz.gz")
@@ -21,6 +31,7 @@ app.layout = html.Div(
                 html.Div(
                     style={"flex": 1, "margin": "10px"},
                     children=[
+                    html.P("image"),
                         webviz_subsurface_components.Leaflet(
                         	height='400px',
                             id="image",
@@ -36,12 +47,14 @@ app.layout = html.Div(
                 html.Div(
                     style={"flex": 1, "margin": "10px"},
                     children=[
+                        html.P("Local tiles"),
                         webviz_subsurface_components.Leaflet(
                         	height='400px',
                             id="tile",
-                            options={"center": [60.39, 5.32], 'zoom':10, 'maxZoom':16},
+                            simpleCRS=True,
+                            options={"center": [-100,75], 'zoom':0, 'maxZoom':5},
                             baseLayer={
-                                "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                "url": "./assets/tiles/{z}/{x}/{y}.png",
                                 "type": "tiles",
                             },
                         )
@@ -55,13 +68,14 @@ app.layout = html.Div(
                 html.Div(
                     style={"flex": 1, "margin": "10px"},
                     children=[
+                    html.P("Image side-by-side"),
                         webviz_subsurface_components.Leaflet(
                         	height='400px',
                             id="image2",
                             simpleCRS=True,
                             baseLayer={
-                                "url_left":imageUrl,
-                                "url_right":imageUrl,
+                                "url_left":leftImg,
+                                "url_right":rightImg,
                                 "bounds": imageBounds,
                                 "type": "image_sidebyside",
                             },
@@ -71,6 +85,7 @@ app.layout = html.Div(
                 html.Div(
                     style={"flex": 1, "margin": "10px"},
                     children=[
+                    html.P("Tiles side-by-side"),
                         webviz_subsurface_components.Leaflet(
                         	height='400px',
                             id="tile2",
