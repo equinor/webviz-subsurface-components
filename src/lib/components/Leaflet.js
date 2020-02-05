@@ -45,13 +45,13 @@ function Leaflet({
         ...mapOptions,
         crs: (simpleCRS ? L.CRS.Simple: L.CRS.EPSG3857 )
         });
-    });
+    }, []);
 
     // add layer groups
     useEffect(() => {
         baseLayers.current = L.layerGroup().addTo(mapRef.current);
         overlayLayers.current = L.layerGroup().addTo(mapRef.current);
-    });
+    }, []);
 
     //Set baselayer
     useEffect(() => {
