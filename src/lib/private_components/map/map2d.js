@@ -1,3 +1,4 @@
+/* eslint-disable no-undefined,react/prop-types,no-magic-numbers */
 import * as d3 from "d3";
 import Map from "./map";
 import Compass from "./compass";

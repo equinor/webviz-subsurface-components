@@ -1,3 +1,4 @@
+/* eslint-disable no-undefined */
 import { range } from "./util";
 /**
  * Two dimensional grid of Cells.

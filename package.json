@@ -18,7 +18,7 @@
         "build:py_and_r": "dash-generate-components ./src/lib/components webviz_subsurface_components -p package-info.json --r-prefix ''",
         "build": "npm run build:js && npm run build:js-dev && npm run build:py_and_r",
         "format": "prettier --write *.js *.json 'src/**/*.+(js|jsx|json|css)'",
-        "linting": "prettier --check *.js *.json 'src/**/*.+(js|jsx|json|css)'"
+        "linting": "prettier --check *.js *.json 'src/**/*.+(js|jsx|json|css)' && eslint src/"
     },
     "author": "R&T Equinor <akia@equinor.com>",
     "license": "LGPL",

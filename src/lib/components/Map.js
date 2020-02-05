@@ -31,13 +31,13 @@ const addNegativeFlow = ({ layers, indexies }) =>
             if (
                 indexies[k][i - 1] &&
                 indexies[k][i - 1][j] &&
-                indexies[k][i - 1][j]["FLOWI+"] !== undefined
+                typeof indexies[k][i - 1][j]["FLOWI+"] !== "undefined"
             ) {
                 FLOWInegative = indexies[k][i - 1][j]["FLOWI+"];
             }
             if (
                 indexies[k][i][j - 1] &&
-                indexies[k][i][j - 1]["FLOWJ+"] !== undefined
+                typeof indexies[k][i][j - 1]["FLOWJ+"] !== "undefined"
             ) {
                 FLOWJnegative = indexies[k][i][j - 1]["FLOWJ+"];
             }

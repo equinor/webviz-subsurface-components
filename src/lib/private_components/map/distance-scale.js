@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 export default class DistanceScale {
     constructor(config = {}) {
         this.validate(config);
@@ -8,7 +9,7 @@ export default class DistanceScale {
             throw new Error("Parent element not provided");
         }
 
-        if (config.initialK === undefined) {
+        if (typeof config.initialK === "undefined") {
             throw new Error("Initial K value not provided");
         }
 
@@ -16,7 +17,7 @@ export default class DistanceScale {
             throw new Error("Initial K cannot be 0 or undefined");
         }
 
-        if (config.origMeter2Px === undefined) {
+        if (typeof config.origMeter2Px === "undefined") {
             throw new Error("origMeter2Px not provided");
         }
 
@@ -63,7 +64,8 @@ export default class DistanceScale {
     // to automatically decide on the optimal number of subscales (and length of them)
     // such that each subscale corresponds to an integer number of km.
     renderScale() {
-        const meter2px = this.k * this.origMeter2Px; // px = meter * meter2px;
+        // px = meter * meter2px;
+        const meter2px = this.k * this.origMeter2Px;
 
         const gScaleMaxWidth = 400;
 

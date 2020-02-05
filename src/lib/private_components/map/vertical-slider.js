@@ -1,10 +1,6 @@
-/* eslint-disable react/require-render-return */
+/* eslint-disable react/require-render-return,no-magic-numbers */
 import * as d3 from "d3";
 import Component from "./component";
-
-function appendClone() {
-    return this.parentNode.appendChild(this.cloneNode(true));
-}
 
 export default class VerticalSlider extends Component {
     static validate(config) {
@@ -48,6 +44,10 @@ export default class VerticalSlider extends Component {
         }
     }
 
+    appendClone() {
+        return this.parentNode.appendChild(this.cloneNode(true));
+    }
+
     setPosition({ x, y }) {
         this.position.x = x;
         this.position.y = y;
@@ -85,13 +85,13 @@ export default class VerticalSlider extends Component {
                 "style",
                 "stroke-linecap: round; stroke: #000; stroke-opacity: 0.3; stroke-width: 10px"
             )
-            .select(appendClone)
+            .select(this.appendClone)
             .attr("class", "track-inset")
             .attr(
                 "style",
                 "stroke-linecap: round; stroke: #ddd; stroke-width: 8px"
             )
-            .select(appendClone)
+            .select(this.appendClone)
             .attr("class", "track-overlay")
             .attr(
                 "style",

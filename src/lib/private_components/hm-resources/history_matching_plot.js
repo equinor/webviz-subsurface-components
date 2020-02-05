@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import * as d3 from "d3";
 import Component from "../shared/component";
 import Legend from "./legend";

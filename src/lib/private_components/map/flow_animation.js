@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import * as d3 from "d3";
 
 function distance([x1, y1], [x2, y2]) {

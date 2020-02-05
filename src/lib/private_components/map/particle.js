@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import { Vector } from "./linear_algebra";
 
 /**
