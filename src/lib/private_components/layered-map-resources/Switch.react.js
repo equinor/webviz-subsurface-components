@@ -4,7 +4,6 @@ import ReactDOM from "react-dom";
 import { withLeaflet, MapControl } from "react-leaflet";
 import PropTypes from "prop-types";
 import MaterialSwitch from "@material-ui/core/Switch";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 class Switch extends MapControl {
     constructor(props) {
@@ -41,16 +40,13 @@ class Switch extends MapControl {
 
     render() {
         return ReactDOM.createPortal(
-            <FormControlLabel
-                control={
-                    <MaterialSwitch
-                        onClick={this.handleChange.bind(this)}
-                        checked={this.state.checked}
-                    />
-                }
-                label={this.props.label}
-                style={{ paddingLeft: "10px" }}
-            />,
+            <div style={{ paddingLeft: "10px", paddingRight: "10px" }}>
+                <MaterialSwitch
+                    onClick={this.handleChange.bind(this)}
+                    checked={this.state.checked}
+                />
+                {this.props.label}
+            </div>,
             this.panelDiv
         );
     }
