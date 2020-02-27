@@ -31,26 +31,41 @@ class D3PriorPosterior {
         this.height_fraction_histogram = 0.6;
     }
 
-    createXScale() {
+    createXAndColorScale() {
         /* Create the x-axis scale, and color scale, used when plotting the data.
          */
 
-        const global_min = Math.min(
+        this.global_min = Math.min(
             ...this.data.values.map(values => Math.min(...values))
         );
-        const global_max = Math.max(
+
+        this.global_max = Math.max(
             ...this.data.values.map(values => Math.max(...values))
         );
 
         this.x_scale = d3
             .scaleLinear()
-            .domain([global_min, global_max])
+            .domain([this.global_min, this.global_max])
             .range([0, this.width_plot]);
 
         this.color_scale = d3
             .scaleLinear()
-            .domain([global_min, global_max])
+            .domain([this.global_min, this.global_max])
             .range(["blue", "red"]);
+    }
+
+    updateTooltipLocation(x_value) {
+        const normalized_x =
+            (x_value - this.global_min) / (this.global_max - this.global_min);
+        const tooltip_width = this.tooltip.node().getBoundingClientRect().width;
+
+        this.tooltip
+            .style(
+                "left",
+                d3.event.clientX - tooltip_width * normalized_x + "px"
+            )
+            .style("top", d3.event.clientY - 60 + "px")
+            .style("opacity", 1.0);
     }
 
     calculateBins() {
@@ -94,6 +109,11 @@ class D3PriorPosterior {
 
         this.width = this.container.node().offsetWidth;
 
+        this.tooltip = this.container
+            .append("div")
+            .classed("prior_posterior_tooltip", true)
+            .style("opacity", 0);
+
         this.svg = d3
             .select("#" + this.container_id)
             .append("svg")
@@ -102,7 +122,7 @@ class D3PriorPosterior {
             .style("overflow", "visible");
 
         this.createMainGroup();
-        this.createXScale();
+        this.createXAndColorScale();
 
         this.renderPileChart();
         this.renderHistogram();
@@ -159,6 +179,7 @@ class D3PriorPosterior {
             .data(this.bins[this.iteration_index])
             .enter()
             .append("rect")
+            .classed("prior_posterior_rect", true)
             .attr("x", d => this.x_scale(d.x0))
             .attr("y", d => this.y_scale(d.percent))
             .attr("width", d => this.x_scale(d.x1) - this.x_scale(d.x0))
@@ -166,7 +187,20 @@ class D3PriorPosterior {
                 "height",
                 d => this.height_histogram - this.y_scale(d.percent)
             )
-            .style("fill", d => this.color_scale(0.5 * (d.x1 + d.x0)));
+            .style("fill", d => this.color_scale(0.5 * (d.x1 + d.x0)))
+            .on("mouseover", (_, i) => {
+                this.tooltip
+                    .style("opacity", 1)
+                    .text(
+                        this.bins[this.iteration_index][i].percent.toPrecision(
+                            2
+                        ) + " %"
+                    );
+            })
+            .on("mousemove", d => {
+                this.updateTooltipLocation(d.x1);
+            })
+            .on("mouseout", () => this.tooltip.style("opacity", 0));
     }
 
     updateHistogram() {
@@ -186,11 +220,6 @@ class D3PriorPosterior {
     }
 
     renderPileChart() {
-        const tooltip = this.container
-            .append("div")
-            .classed("prior_posterior_tooltip", true)
-            .style("opacity", 0);
-
         const temp_nodes = {};
 
         this.data.values.forEach((values, iter_index) =>
@@ -232,25 +261,18 @@ class D3PriorPosterior {
             .append("circle")
             .classed("prior_posterior_circle", true)
             .on("mouseover", d => {
-                tooltip
-                    .transition()
-                    .duration(200)
-                    .style("opacity", 0.9);
-                tooltip
+                this.tooltip
+                    .style("opacity", 1)
                     .html(
                         d.id +
                             "<br>Value: " +
                             d.values[this.iteration_index].toPrecision(5)
-                    )
-                    .style("left", d3.event.pageX - 40 + "px")
-                    .style("top", d3.event.pageY - 40 + "px");
+                    );
             })
-            .on("mouseout", () =>
-                tooltip
-                    .transition()
-                    .duration(500)
-                    .style("opacity", 0)
-            );
+            .on("mousemove", d =>
+                this.updateTooltipLocation(d.values[this.iteration_index])
+            )
+            .on("mouseout", () => this.tooltip.style("opacity", 0));
 
         this.pile_chart_circles
             .attr("r", d =>
