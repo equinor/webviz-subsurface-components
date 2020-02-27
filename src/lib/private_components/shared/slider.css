@@ -4,6 +4,10 @@
     stroke-linecap: round;
 }
 
+.ticks {
+    pointer-events: none;
+}
+
 .slider {
     stroke-width: 8px;
 }

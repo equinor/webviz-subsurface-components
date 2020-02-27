@@ -2,6 +2,10 @@
     stroke: black;
 }
 
+.prior_posterior_rect:hover {
+    opacity: 0.8;
+}
+
 .prior_posterior_circle:hover {
     fill: yellow;
 }
