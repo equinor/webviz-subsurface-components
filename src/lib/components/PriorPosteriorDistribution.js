@@ -32,7 +32,7 @@ class PriorPosteriorDistribution extends Component {
 }
 
 PriorPosteriorDistribution.defaultProps = {
-    height: 800,
+    height: 700,
 };
 
 PriorPosteriorDistribution.propTypes = {

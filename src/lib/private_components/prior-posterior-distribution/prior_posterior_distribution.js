@@ -59,12 +59,13 @@ class D3PriorPosterior {
             (x_value - this.global_min) / (this.global_max - this.global_min);
         const tooltip_width = this.tooltip.node().getBoundingClientRect().width;
 
+        const mouse_position = d3.mouse(this.svg.node());
         this.tooltip
             .style(
                 "left",
-                d3.event.clientX - tooltip_width * normalized_x + "px"
+                mouse_position[0] - tooltip_width * normalized_x + "px"
             )
-            .style("top", d3.event.clientY - 60 + "px")
+            .style("top", mouse_position[1] - 20 + "px")
             .style("opacity", 1.0);
     }
 
@@ -193,7 +194,7 @@ class D3PriorPosterior {
                     .style("opacity", 1)
                     .text(
                         this.bins[this.iteration_index][i].percent.toPrecision(
-                            2
+                            3
                         ) + " %"
                     );
             })

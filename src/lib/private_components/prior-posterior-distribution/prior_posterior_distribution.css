@@ -12,12 +12,12 @@
 
 div.prior_posterior_tooltip {
     position: absolute;
-    padding: 3px;
+    padding: 5px;
     background: black;
     color: white;
     text-align: center;
     font-size: 12px;
     border: 0px;
-    border-radius: 10px;
+    border-radius: 7px;
     pointer-events: none;
 }
