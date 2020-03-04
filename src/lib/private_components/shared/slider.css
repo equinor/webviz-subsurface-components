@@ -9,12 +9,13 @@
 }
 
 .slider {
-    stroke-width: 8px;
+    stroke-width: 10px;
 }
 
 .slider-inset {
-    stroke: #b20276;
-    stroke-width: 8px;
+    stroke: #d5eaf4;
+    opacity: 0.8;
+    stroke-width: 20px;
 }
 
 .slider-overlay {
@@ -23,8 +24,5 @@
 }
 
 .handle {
-    fill: #fff;
-    stroke: #b20276;
-    stroke-opacity: 0.5;
-    stroke-width: 1.25px;
+    fill: #243746;
 }

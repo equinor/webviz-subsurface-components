@@ -4,25 +4,27 @@ import D3PriorPosterior from "../private_components/prior-posterior-distribution
 
 class PriorPosteriorDistribution extends Component {
     componentDidMount() {
-        this.renderPlot();
-        window.addEventListener("resize", this.renderPlot.bind(this));
-    }
-
-    renderPlot() {
         this.d3priorposterior = new D3PriorPosterior(
             this.props.height,
             this.props.id,
             this.props.data
         );
+
         this.d3priorposterior.renderPlot();
+
+        window.addEventListener("resize", () =>
+            this.d3priorposterior.renderPlot()
+        );
     }
 
     componentDidUpdate(prevProps) {
-        if (
-            this.props.height !== prevProps.height ||
-            this.props.data !== prevProps.data
-        ) {
-            this.renderPlot();
+        if (this.props.data !== prevProps.data) {
+            this.d3priorposterior.updateData(this.props.data);
+            this.d3priorposterior.renderPlot();
+        }
+
+        if (this.props.height !== prevProps.height) {
+            this.d3priorposterior.renderPlot();
         }
     }
 
