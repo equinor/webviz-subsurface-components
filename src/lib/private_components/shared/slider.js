@@ -27,7 +27,7 @@ const AXIS = {
 
 const TICKOFFSET = 4;
 const SNAP_DURATION = 500;
-const HANDLE_RADIUS = 8;
+const HANDLE_RADIUS = 10;
 
 /**
  * Generic D3 based slider. Fixed to a discrete number of steps.
@@ -48,7 +48,7 @@ export default class Slider extends Component {
         this.orientation = config.orientation || ORIENTATION.HORIZONTAL;
         this.dimension = DIMENSION[this.orientation];
         this.axis = AXIS[this.orientation];
-        this.selectedIndex = 0;
+        this.selectedIndex = config.selectedIndex || 0;
         this.hideCurrentTick = config.hideCurrentTick || false;
 
         if (this.orientation === ORIENTATION.HORIZONTAL) {
@@ -182,8 +182,8 @@ export default class Slider extends Component {
             .attr("transform", tickProp.transform)
             .attr("text-anchor", tickProp["text-anchor"])
             .attr("dominant-baseline", tickProp["dominant-baseline"])
-            .text(this.data[0])
-            .attr(this.axis, this.scale(0));
+            .text(this.data[this.selectedIndex])
+            .attr(this.axis, this.scale(this.selectedIndex));
     }
 
     _calculateTickProperties(position) {
@@ -237,7 +237,8 @@ export default class Slider extends Component {
         this.bar = this.container
             .insert("circle", ".slider-overlay")
             .attr("class", "handle")
-            .attr("r", HANDLE_RADIUS);
+            .attr("r", HANDLE_RADIUS)
+            .attr(`c${this.axis}`, this.scale(this.selectedIndex));
     }
 
     setData(data) {

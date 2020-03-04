@@ -31,6 +31,14 @@ class D3PriorPosterior {
         this.height_fraction_histogram = 0.6;
     }
 
+    updateData(data) {
+        this.data = data;
+        if (this.iteration_index >= this.data.iterations.length) {
+            // New data contains fewer iterations, change user selected iteration number
+            this.iteration_index = this.data.iterations.length - 1;
+        }
+    }
+
     createXAndColorScale() {
         /* Create the x-axis scale, and color scale, used when plotting the data.
          */
@@ -314,6 +322,7 @@ class D3PriorPosterior {
                 y: 120,
             },
             hideCurrentTick: true,
+            selectedIndex: bins.findIndex(x => x === this.number_bins),
             numberOfVisibleTicks: bins.length,
         });
 
@@ -339,6 +348,7 @@ class D3PriorPosterior {
                 x: 100,
                 y: 40,
             },
+            selectedIndex: this.iteration_index,
             numberOfVisibleTicks: this.data.iterations.length,
         });
 
