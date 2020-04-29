@@ -41,6 +41,7 @@ setup(
     tests_require=tests_require,
     extras_require={"tests": tests_require, "dependencies": install_requires},
     setup_requires=["setuptools_scm~=3.2"],
+    python_requires="~=3.6",
     use_scm_version=True,
     classifiers=[
         "Programming Language :: Python :: 3",
