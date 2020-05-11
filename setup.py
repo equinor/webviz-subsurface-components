@@ -22,6 +22,7 @@ tests_require = [
     "pylint~=2.4",
     "scipy~=1.2",
     "selenium~=3.141",
+    "bandit",
 ]
 
 # 'dash[testing]' to be added in tests_require when

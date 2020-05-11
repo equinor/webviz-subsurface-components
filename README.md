@@ -1,5 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/webviz-subsurface-components.svg)](https://badge.fury.io/py/webviz-subsurface-components)
-[![Build Status](https://travis-ci.org/equinor/webviz-subsurface-components.svg?branch=master)](https://travis-ci.org/equinor/webviz-subsurface-components)
+[![Build Status](https://github.com/equinor/webviz-subsurface-components/workflows/webviz-subsurface-components/badge.svg)](https://github.com/equinor/webviz-subsurface-components/actions?query=branch%3Amaster)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/equinor/webviz-subsurface-components.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/equinor/webviz-subsurface-components/alerts/)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/equinor/webviz-subsurface-components.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/equinor/webviz-subsurface-components/context:javascript)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/equinor/webviz-subsurface-components.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/equinor/webviz-subsurface-components/context:python)

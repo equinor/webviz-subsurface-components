@@ -1,0 +1,80 @@
+name: webviz-subsurface-components
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  release:
+    types:
+      - published
+  schedule:
+    # Run CI daily and check that tests are working with latest dependencies
+    - cron:  '0 0 * * *'
+
+jobs:
+
+  webviz-subsurface-components:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8']
+
+    steps:
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v2
+
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 📦 Install build dependencies
+        run: |
+          npm ci --ignore-scripts
+          npm run postinstall
+          pip install .[dependencies]
+          pip install dash[dev]
+  
+      - name: 🏗️ Build JavaScript part
+        run: |
+          npm run build
+
+      - name: 📦 Install webviz-subsurface-components with dependencies
+        run: |
+          pip install --upgrade pip
+          pip install .
+
+      - name: 📦 Install test dependencies
+        run: |
+          pip install .[tests]
+          pip install dash[testing]
+          wget https://chromedriver.storage.googleapis.com/$(wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+  
+      - name: 🧾 List all installed packages
+        run: pip freeze
+
+      - name: 🕵️ Check code style & linting
+        run: |
+          npm run linting
+          black --check webviz_subsurface_components tests setup.py
+          bandit -r -c ./bandit.yml webviz_subsurface_components tests setup.py
+
+      - name: 🤖 Run tests
+        run: |
+          npm run test
+          pytest ./tests --headless
+        
+      - name: 🚢 Build and deploy Python package
+        if: github.event_name == 'release' && matrix.python-version == '3.6'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.pypi_webviz_token }}
+        run: |
+          export SETUPTOOLS_SCM_PRETEND_VERSION=${GITHUB_REF//refs\/tags\//}
+          python -m pip install --upgrade setuptools wheel twine
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
