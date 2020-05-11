@@ -1,4 +1,4 @@
-/* eslint-disable no-invalid-this */
+/* eslint-disable no-invalid-this,react/require-render-return */
 import * as d3 from "d3";
 import Component from "./component";
 import "./slider.css";

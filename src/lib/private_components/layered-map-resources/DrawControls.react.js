@@ -61,7 +61,7 @@ class DrawControls extends Component {
     }
 
     removeLayers(layertype) {
-        const { edit } = this.refs;
+        const { edit } = this.refs; // eslint-disable-line react/no-string-refs
         const layerContainer = edit.leafletElement.options.edit.featureGroup;
         const layers = layerContainer._layers;
         const layer_ids = Object.keys(layers);
@@ -100,7 +100,7 @@ class DrawControls extends Component {
         const { drawPolygon, drawMarker, drawPolyline } = this.props;
         return (
             <EditControl
-                ref={"edit"}
+                ref={"edit"} // eslint-disable-line react/no-string-refs
                 position="topright"
                 onEdited={this._onEdited.bind(this)}
                 onCreated={this._onCreated.bind(this)}
