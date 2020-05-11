@@ -11,21 +11,21 @@ with open(os.path.join("webviz_subsurface_components", "package.json")) as f:
 
 package_name = package["name"].replace(" ", "_").replace("-", "_")
 
-install_requires = ["dash~=1.6"]
+INSTALL_REQUIRES = ["dash>=1.6"]
 
-tests_require = [
-    "black~=19.10b0",
-    "matplotlib~=3.0",
-    "numpy~=1.14",
-    "pandas~=0.25",
-    "Pillow~=6.0",
-    "pylint~=2.4",
-    "scipy~=1.2",
-    "selenium~=3.141",
+TESTS_REQUIRE = [
     "bandit",
+    "black>=19.10b0",
+    "matplotlib>=3.0",
+    "numpy>=1.14",
+    "pandas>=0.25",
+    "Pillow>=6.0",
+    "pylint>=2.4",
+    "scipy>=1.2",
+    "selenium>=3.141",
 ]
 
-# 'dash[testing]' to be added in tests_require when
+# 'dash[testing]' to be added in TEST_REQUIRE when
 # https://github.com/pypa/pip/issues/4957 is closed.
 
 setup(
@@ -38,10 +38,10 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/equinor/webviz-subsurface-components",
-    install_requires=install_requires,
-    tests_require=tests_require,
-    extras_require={"tests": tests_require, "dependencies": install_requires},
-    setup_requires=["setuptools_scm~=3.2"],
+    install_requires=INSTALL_REQUIRES,
+    tests_require=TESTS_REQUIRE,
+    extras_require={"tests": TESTS_REQUIRE, "dependencies": INSTALL_REQUIRES},
+    setup_requires=["setuptools_scm>=3.2"],
     python_requires="~=3.6",
     use_scm_version=True,
     classifiers=[
