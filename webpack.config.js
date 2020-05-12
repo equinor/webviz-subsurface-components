@@ -51,6 +51,9 @@ module.exports = (env, argv) => {
     return {
         mode,
         entry,
+        resolve: {
+            extensions: [".ts", ".tsx", ".js", ".jsx"],
+        },
         output: {
             path: path.resolve(__dirname, dashLibraryName),
             filename,
@@ -74,11 +77,9 @@ module.exports = (env, argv) => {
         module: {
             rules: [
                 {
-                    test: /\.js$/,
+                    test: /\.(t|j)s?$/,
                     exclude: /node_modules/,
-                    use: {
-                        loader: "babel-loader",
-                    },
+                    use: { loader: "ts-loader" },
                 },
                 {
                     test: /\.css$/,
@@ -107,6 +108,12 @@ module.exports = (env, argv) => {
                             loader: "raw-loader",
                         },
                     ],
+                },
+                {
+                    enforce: "pre",
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    loader: "source-map-loader",
                 },
             ],
         },

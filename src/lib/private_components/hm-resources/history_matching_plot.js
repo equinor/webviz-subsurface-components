@@ -1,4 +1,4 @@
-/* eslint-disable no-magic-numbers */
+/* eslint-disable no-magic-numbers,react/require-render-return */
 import * as d3 from "d3";
 import Component from "../shared/component";
 import Legend from "./legend";
