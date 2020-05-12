@@ -4,49 +4,40 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 
 const packagejson = require("./package.json");
-
 const dashLibraryName = packagejson.name.replace(/-/g, "_");
 
 module.exports = (env, argv) => {
     let mode;
 
-    const overrides = module.exports || {};
-
     // if user specified mode flag take that value
     if (argv && argv.mode) {
         mode = argv.mode;
     }
-
-    // else if configuration object is already set (module.exports) use that value
-    else if (overrides.mode) {
-        mode = overrides.mode;
-    }
-
     // else take webpack default (production)
     else {
         mode = "production";
     }
 
-    let filename = (overrides.output || {}).filename;
-    if (!filename) {
-        const modeSuffix = mode === "development" ? "dev" : "min";
-        filename = `${dashLibraryName}.${modeSuffix}.js`;
-    }
+    const entry = {
+        main: argv && argv.entry ? argv.entry : "./src/lib/index.js",
+    };
+    const demo = entry.main !== "./src/lib/index.js";
 
-    const entry = overrides.entry || { main: "./src/lib/index.js" };
+    const filename_js = demo
+        ? "output.js"
+        : `${dashLibraryName}.${mode === "development" ? "dev" : "min"}.js`;
+    const filename_css = demo ? "output.css" : `${dashLibraryName}.css`;
 
     const devtool =
-        overrides.devtool ||
-        (mode === "development" ? "eval-source-map" : "none");
+        argv.devtool || (mode === "development" ? "eval-source-map" : "none");
 
-    const externals =
-        "externals" in overrides
-            ? overrides.externals
-            : {
-                  react: "React",
-                  "react-dom": "ReactDOM",
-                  "plotly.js": "Plotly",
-              };
+    const externals = demo
+        ? undefined
+        : {
+              react: "React",
+              "react-dom": "ReactDOM",
+              "plotly.js": "Plotly",
+          };
 
     return {
         mode,
@@ -55,8 +46,8 @@ module.exports = (env, argv) => {
             extensions: [".ts", ".tsx", ".js", ".jsx"],
         },
         output: {
-            path: path.resolve(__dirname, dashLibraryName),
-            filename,
+            path: demo ? __dirname : path.resolve(__dirname, dashLibraryName),
+            filename: filename_js,
             library: dashLibraryName,
             libraryTarget: "window",
         },
@@ -69,9 +60,7 @@ module.exports = (env, argv) => {
         externals,
         plugins: [
             new MiniCssExtractPlugin({
-                // Options similar to the same options in webpackOptions.output
-                // all options are optional
-                filename: `${dashLibraryName}.css`,
+                filename: filename_css,
             }),
         ],
         module: {
@@ -85,10 +74,7 @@ module.exports = (env, argv) => {
                     test: /\.css$/,
                     use: [
                         {
-                            loader:
-                                mode === "production"
-                                    ? MiniCssExtractPlugin.loader
-                                    : "style-loader",
+                            loader: MiniCssExtractPlugin.loader,
                         },
                         "css-loader",
                     ],

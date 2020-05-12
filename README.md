@@ -80,3 +80,25 @@ then:
     -   Make sure the stylesheets are added to the `_css_dist` dict in
         `webviz_subsurface_components/__init__.py` so dash will serve them
         automatically when the component suite is requested.
+
+# Automatically upload demo application
+
+This repository has a GitHub workflow which can automatically build and deploy a demo
+app with your changes, to GitHub pages.
+
+- On push to your feature branch, in your fork, the workflow will build and deploy a 
+  demo app to your fork's GitHub page, given that your commit message includes the
+  substring `[deploy test]`.
+- On merge to `master` in the main repository, a build + deploy will be done to the
+  official GitHub page in the main repository.
+
+For this to work in your own fork, you will need to create a branch `gh-pages`
+(this you only need to do once). One way of creating this branch is e.g.:
+```bash
+git checkout --orphan gh-pages
+git rm -rf .
+git commit --allow-empty
+git push origin gh-pages
+```
+
+You are encouraged to rebase and squash/fixup unnecessary commits before pull request is merged to `master`.

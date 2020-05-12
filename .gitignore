@@ -3,6 +3,9 @@
 webviz_subsurface_components/**/*
 !webviz_subsurface_components/__init__.py
 
+output.css
+output.js
+
 DESCRIPTION
 NAMESPACE
 R/
