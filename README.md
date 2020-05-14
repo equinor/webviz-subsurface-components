@@ -10,7 +10,8 @@
 # Webviz subsurface components
 
 `webviz_subsurface_components` is a Dash/React component library for use in `webviz`,
-which have in common that they are geared towards subsurface dashboards.
+which have in common that they are geared towards subsurface dashboards. There is an online
+demo available at https://equinor.github.io/webviz-subsurface-components/.
 
 ## How to install the components
 
@@ -81,7 +82,7 @@ then:
         `webviz_subsurface_components/__init__.py` so dash will serve them
         automatically when the component suite is requested.
 
-# Automatically upload demo application
+### Automatically upload demo application
 
 This repository has a GitHub workflow which can automatically build and deploy a demo
 app with your changes, to GitHub pages.
@@ -97,7 +98,7 @@ For this to work in your own fork, you will need to create a branch `gh-pages`
 ```bash
 git checkout --orphan gh-pages
 git rm -rf .
-git commit --allow-empty
+git commit --allow-empty -m  "Create GitHub pages branch"
 git push origin gh-pages
 ```
 
