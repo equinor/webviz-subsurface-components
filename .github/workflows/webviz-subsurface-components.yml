@@ -91,7 +91,7 @@ jobs:
           git fetch origin gh-pages
           git checkout --track origin/gh-pages
           git clean -f -f -d -x
-          git rm -r *
+          git rm -r --ignore-unmatch *
 
           mv ../{index.html,output.css,output.js} .
 
