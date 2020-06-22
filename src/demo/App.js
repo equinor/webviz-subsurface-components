@@ -1,15 +1,18 @@
 /* eslint no-magic-numbers: 0 */
 import React, { Component } from "react";
+
+// Components
 import HistoryMatchDemo from "./HistoryMatchDemo";
 import MorrisDemo from "./MorrisDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
+import NewLayeredMapDemo from "./NewLayeredMapDemo";
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "PriorPosteriorDistribution" };
+        this.state = { value: "NewLayeredMap" };
     }
 
     onChange(e) {
@@ -18,6 +21,9 @@ class App extends Component {
 
     renderDemo() {
         switch (this.state.value) {
+            case "NewLayeredMap": {
+                return <NewLayeredMapDemo />
+            }
             case "HistoryMatch": {
                 return <HistoryMatchDemo />;
             }
@@ -46,6 +52,7 @@ class App extends Component {
                     value={this.state.value}
                     onChange={this.onChange.bind(this)}
                 >
+                    <option value="NewLayeredMap">NewLayeredMap</option>
                     <option value="HistoryMatch">HistoryMatch</option>
                     <option value="Morris">Morris</option>
                     <option value="SubsurfaceMap">SubsurfaceMap</option>
