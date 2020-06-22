@@ -1,7 +1,5 @@
-import L, { latLngBounds, Util, DomUtil, Bounds } from 'leaflet';
-import draw from '../webgl/drawFunc'
-
-import alter_image from '../../../private_components/layered-map-resources/alter_image';
+import L, { latLngBounds, Util, DomUtil, Bounds, Point} from 'leaflet';
+import drawFunc from '../webgl/drawFunc';
 
 // Utils
 import { loadImage } from '../webgl/webglutils';
@@ -16,6 +14,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
     initialize: function(url, bounds, options) {
         this._url = url;
         this.setBounds(bounds);
+        this._crl = options.crl || null;
 
         this._colormap = options.colormap || '';
 
@@ -87,18 +86,16 @@ L.ImageWebGLOverlay = L.Layer.extend({
 		if (this._zoomAnimated) { DomUtil.addClass(canvasTag, 'leaflet-zoom-animated'); }
 
         // TODO: Replace this function with custom draw function
-        alter_image(canvasTag, this._url, this._colormap)
+        drawFunc(canvasTag, this._url, this._colormap)
         
         this._canvas = canvasTag;
     },
 
     _reset: function() {
         const canvas = this._canvas;
-        const bounds = new Bounds(
-            this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
-            this._map.latLngToLayerPoint(this._bounds.getSouthEast())
-        );
+        const bounds = this._calcBounds();
         const size = bounds.getSize();
+
 
         // Update the position of the canvas-element
         DomUtil.setPosition(canvas, bounds.min);
@@ -118,7 +115,24 @@ L.ImageWebGLOverlay = L.Layer.extend({
 		if (this._canvas && this.options.zIndex) {
 			this._canvas.style.zIndex = this.options.zIndex;
 		}
-	},
+    },
+    
+    _calcBounds: function() {
+        const northWest = this._bounds.getNorthWest();
+        const southEast = this._bounds.getSouthEast();
+        if(this._crl) {
+
+            return new Bounds(
+                new Point(northWest.lat, northWest.lng),
+                new Point(southEast.lat, southEast.lng),
+            )
+        } else {
+            return new Bounds(
+                this._map.latLngToLayerPoint(northWest),
+                this._map.latLngToLayerPoint(southEast)
+            );
+        }
+    }
 
 });
 
