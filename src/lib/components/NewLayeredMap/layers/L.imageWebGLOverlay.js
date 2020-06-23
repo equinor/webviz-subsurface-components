@@ -14,7 +14,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
     initialize: function(url, bounds, options) {
         this._url = url;
         this.setBounds(bounds);
-        this._crl = options.crl || null;
+        this._CRS = options.CRS || null;
 
         this._colormap = options.colormap || '';
 
@@ -120,18 +120,11 @@ L.ImageWebGLOverlay = L.Layer.extend({
     _calcBounds: function() {
         const northWest = this._bounds.getNorthWest();
         const southEast = this._bounds.getSouthEast();
-        if(this._crl) {
-
-            return new Bounds(
-                new Point(northWest.lat, northWest.lng),
-                new Point(southEast.lat, southEast.lng),
-            )
-        } else {
-            return new Bounds(
-                this._map.latLngToLayerPoint(northWest),
-                this._map.latLngToLayerPoint(southEast)
-            );
-        }
+      
+        return new Bounds(
+            this._map.latLngToLayerPoint(northWest),
+            this._map.latLngToLayerPoint(southEast)
+        );
     }
 
 });

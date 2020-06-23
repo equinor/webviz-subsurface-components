@@ -14,13 +14,28 @@ const TEMP_IMAGE = exampleData.layers[0].data[0].url;
 const TEMP_COLORMAP = exampleData.layers[0].data[0].colormap;
 const DEFAULT_BOUNDS = [[0, 0], [30, 30]]
 
+const stringToCRS = (crsString) => {
+    switch(crsString) {
+        case 'simple': {
+            return L.CRS.Simple;
+        }
+
+        default:
+            return L.CRS.Earth;
+    }
+}
 
 class LayeredMap extends Component {
 
     constructor(props) {
+        const data = props.data || [];
         this.state = {
             map: null,
-            layers: props.layers || [],
+            layers: data.layers || [],
+            minZoom: data.minZoom || -5,
+            zoom: data.zoom || 1,
+            crs: stringToCRS(data.crs),
+            center: data.center || [0, 0],
             bounds: null,
         }
 
@@ -29,9 +44,10 @@ class LayeredMap extends Component {
 
     componentDidMount() {
         const map = L.map(this.mapEl, {
-            CRS: L.CRS.Simple,
-            center: [432205, 6475078],
-            zoom: 1
+            crs: this.state.crs,
+            center: this.state.center,
+            zoom: this.state.zoom,
+            minZoom: this.state.minZoom,
         });
 
         this.setState({map: map}, () => {
@@ -75,7 +91,7 @@ class LayeredMap extends Component {
                 if(colormap) {
                     newLayer = L.imageWebGLOverlay(url, bounds, {
                         colormap: colormap,
-                        clr: L.CRS.Simple,
+                        /* CRS: L.CRS.Simple, */
                     });
                 } else {
                     newLayer = L.imageOverlay(url, bounds, {
