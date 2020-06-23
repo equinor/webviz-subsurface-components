@@ -1,9 +1,21 @@
-export const loadImage = src =>
+export const loadImage = (src, config = {}) =>
     new Promise(resolve => {
         const img = new Image();
+        
+        if(config.crossOrigin || config.crossOrigin === '') {
+            requestCORSIfNotSameOrigin(img, src, config.crossOrigin === true ? '' : config.crossOrigin);
+        }
+
         img.src = src;
+
         img.onload = () => resolve(img);
 });
+
+export const requestCORSIfNotSameOrigin = (img, url, value) => {
+    if ((new URL(url, window.location.href)).origin !== window.location.origin && !url.startsWith("data:")) {
+        img.crossOrigin = value;
+    }
+  }
 
 export const createShader = (gl, shaderType, shaderSource) => {
     /**
@@ -17,6 +29,7 @@ export const createShader = (gl, shaderType, shaderSource) => {
     const shader = gl.createShader(shaderType);
     gl.shaderSource(shader, shaderSource);
     gl.compileShader(shader);
+    didShaderCompile(gl, shader, shaderType);
     return shader;
 };
 
@@ -85,8 +98,7 @@ export const bindTexture = (gl, textureIndex, uniformName, image) => {
         image
     );
     gl.uniform1i(gl.getUniformLocation(program, uniformName), textureIndex);
-};
-
+}
 
 export const didShaderCompile = (gl, shader, name) => {
     if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -106,7 +118,6 @@ export const didProgramLink = (gl, program) => {
 
 export const isProgramValid = (gl, program) => {
     if(!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-        console.error("ERROR:  validating program!", gl.getProgramInfoLog(program));
         return false;
     }
     return true;

@@ -6,16 +6,24 @@ import shaderFragment from '../shaders/fragmentShader.fs.glsl';
 import { 
     loadImage, createProgram, createShader, 
     bindBuffer, bindTexture,
+} from './webglUtils';
 
-} from './webglutils';
-
-export default async (canvas, image, colormap, fragmentShader = '') => {
+export default async (canvas, image, colormap, config = {}) => {
+    
     const gl = canvas.getContext("webgl", {
         premultipliedAlpha: false,
     });
     gl.getExtension("OES_texture_float");
+    
+    const imagesToLoad = [loadImage(image, config)]; 
+    if (colormap) {
+        imagesToLoad.push(loadImage(colormap, config));
+    }
 
-    const [loadedImage, loadedColorMap] = await Promise.all([loadImage(image), loadImage(colormap)]);
+    const [loadedImage, loadedColorMap = null] = await Promise.all(imagesToLoad).catch(console.error);
+
+
+
     canvas.width = loadedImage.width;
     canvas.height = loadedImage.height;
 
@@ -31,7 +39,7 @@ export default async (canvas, image, colormap, fragmentShader = '') => {
         gl,
         createShader(gl, gl.VERTEX_SHADER, shaderVertex),
         createShader(gl, gl.FRAGMENT_SHADER, shaderFragment)
-    );    
+    );   
 
     // Initialize program
     gl.useProgram(program);
@@ -55,7 +63,11 @@ export default async (canvas, image, colormap, fragmentShader = '') => {
 
     // Create buffers for textures (image, and colormap)
     bindTexture(gl, 0, "u_image", loadedImage);
+
+
     bindTexture(gl, 1, "u_colormap_frame", loadedColorMap);
+ 
+        
 
     // Initialize uniforms
     gl.uniform2f(
@@ -70,7 +82,7 @@ export default async (canvas, image, colormap, fragmentShader = '') => {
     );
 
 
-    switch(fragmentShader) {
+    switch(config.fragmentShader) {
 
         case 'hillshading': {
 
@@ -85,4 +97,5 @@ export default async (canvas, image, colormap, fragmentShader = '') => {
     const numberIndices = 6;
     gl.drawArrays(gl.TRIANGLES, 0, numberIndices);    
 
+    return gl;
 }

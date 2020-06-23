@@ -2,7 +2,7 @@ import L, { latLngBounds, Util, DomUtil, Bounds, Point} from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
 
 // Utils
-import { loadImage } from '../webgl/webglutils';
+import { loadImage } from '../webgl/webglUtils';
 
 /**
  * ImageWebGLOverlay is a layer that draws an image into the map

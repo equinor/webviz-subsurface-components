@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 // Leaflet
 import L from 'leaflet';
 import './layers/L.imageWebGLOverlay';
+import './layers/L.tileWebGLLayer';
 
 // Assets
 import exampleData from '../../../demo/example-data/layered-map.json';
@@ -21,22 +22,22 @@ const stringToCRS = (crsString) => {
         }
 
         default:
-            return L.CRS.Earth;
+            return L.CRS.EPSG3857;
     }
 }
 
 class LayeredMap extends Component {
 
     constructor(props) {
-        const data = props.data || [];
         this.state = {
             map: null,
-            layers: data.layers || [],
-            minZoom: data.minZoom || -5,
-            zoom: data.zoom || 1,
-            crs: stringToCRS(data.crs),
-            center: data.center || [0, 0],
-            bounds: null,
+            layers: props.layers || [],
+            minZoom: props.minZoom || -5,
+            maxZoom: props.maxZoom || 15,
+            zoom: props.zoom || 1,
+            crs: stringToCRS(props.crs),
+            center: props.center || [0, 0],
+            bounds: props.bounds,
         }
 
         this.mapEl = createRef();
@@ -48,29 +49,34 @@ class LayeredMap extends Component {
             center: this.state.center,
             zoom: this.state.zoom,
             minZoom: this.state.minZoom,
+            maxZoom: this.state.maxZoom,
         });
 
         this.setState({map: map}, () => {
-            let firstBounds = null;
-            this.state.layers.forEach((layer) => {
-                (layer.data || []).forEach((layerMap) => {
-                    const [_, bounds, _ ] = this.addLayerDataToMap(layerMap);
-                    firstBounds = firstBounds === null ? bounds : firstBounds;
-                })
-            })
-
-            console.log("Last bounds:", firstBounds);
-            map.fitBounds(firstBounds);
-            this.setState({bounds: firstBounds})
+           /*  this.state.layers.forEach((layer) => {
+                (layer.data || []).forEach(this.addLayerDataToMap)
+            }) */
+            
+            if(this.state.bounds) {
+                map.fitBounds(this.state.bounds);
+            }
         });
 
 
-        
 
-       /*  L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        // L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        /* L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
+            colormap: exampleData.layers[0].data[0].colormap
+        }).addTo(map); */
+
+        L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
         L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map); */
+        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
+
 
         
     }
