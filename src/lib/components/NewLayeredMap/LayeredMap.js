@@ -32,6 +32,8 @@ const stringToCRS = (crsString) => {
 class LayeredMap extends Component {
 
     constructor(props) {
+        super(props);
+        
         this.state = {
             map: null,
             layers: props.layers || [],

@@ -12,6 +12,8 @@ import { Slider } from '@material-ui/core';
 class VerticalZoom extends React.Component {
 
     constructor(props) {
+        super(props);
+
         this.state = {};
 
         this.updateVerticalZoom = this.updateVerticalZoom.bind(this);
