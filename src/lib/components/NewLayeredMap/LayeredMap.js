@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import L from 'leaflet';
 import './layers/L.imageWebGLOverlay';
 import './layers/L.tileWebGLLayer';
+import DrawControls from './DrawControls';
 
 // Components
 import Controls from './components/Controls';
@@ -58,33 +59,98 @@ class LayeredMap extends Component {
             maxZoom: this.state.maxZoom,
         });
 
+
+
         this.setState({map: map}, () => {
             this.state.layers.forEach((layer) => {
                 (layer.data || []).forEach(this.addLayerDataToMap)
-            })
+
+            }) 
             
             if(this.state.bounds) {
                 map.fitBounds(this.state.bounds);
             }
         });
 
+        const baseMap = this.addLayersToMap(map);
+
+
+        // const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+
+        // var baseMap = {
+        //     'Map' : baseLayer
+        // };
 
         // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+
+
+        this.addCircle([40.7,-74.22655], {color: 'red', fillColor: '#f03', fillOpacity: 0.5, radius: 900000}, map);
+
+
+        this.addPoylgon([            
+            [50.742,-64.22055],
+            [40.710,-54.22955],
+            [30.703,-34.24655]],
+            map);
+
         
         // L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-      /*   L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
+
+
+
+        const image_overlay = L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
             colormap: exampleData.layers[0].data[0].colormap
         }).addTo(map);
+
+        const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        let layerMap = {};
+
+        this.addLayerControl(map, layerMap);
+        this.addToolbar(map);
+
 
         L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
         L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map); */
+
+        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
         
     }
 
+    addOverlay = (overlay, layerName, layerMap) => {
+        layerMap[layerName] = overlay;
+    }
+
+    addLayer = (layer, layerName, layerMap) => {
+        layerMap[layerName] = layer;
+    }
+
+
+    addLayerControl = (map, mapLayers) => {
+        // L.control.layers(this.baseMaps, this.overlayMaps).addTo(this.map)
+        L.control.layers(mapLayers).addTo(map);
+    }
+    // this.state.layers.forEach((layer) => {
+    //     (layer.data || []).forEach(this.addLayerDataToMap)
+    // }) 
+
+    addLayersToMap = (map) => {
+        let layerMap = {};
+        this.state.layers.forEach(layer => {
+            layerMap[layer.name] = this.addLayerDataToMap(layer.data);
+        })
+        console.log("layermap: " + layerMap)
+        return layerMap;
+        
+
+    }
+
+    // if it's a polygon, a line or a circle, add to the same layer
     addLayerDataToMap = (layerData) => {
+        console.log("data: " + layerData.type)
         if(!layerData) {
             return;
         }
@@ -95,13 +161,15 @@ class LayeredMap extends Component {
         const bounds = layerData.bounds || DEFAULT_BOUNDS;
 
         switch(layerData.type) {
-            
             case 'image': {
                 if(colormap) {
+                    console.log("image " + newLayer)
                     newLayer = L.imageWebGLOverlay(url, bounds, {
                         colormap: colormap,
                         /* CRS: L.CRS.Simple, */
                     });
+                console.log("image layer " + newLayer)
+
                 } else {
                     newLayer = L.imageOverlay(url, bounds, {
                         
@@ -116,15 +184,36 @@ class LayeredMap extends Component {
             }
         
         }
-
+        console.log("layer " + newLayer)
         if(newLayer) {
             newLayer.addTo(this.state.map);
         }
-
-        return [url, bounds, colormap];
+        return newLayer;
+        // return [url, bounds, colormap];
     }
 
-    render() {        
+    addPoylgon(coordinateArray, map) {
+            L.polygon(coordinateArray).addTo(map)
+    }
+
+    addCircle(c, properties, map) {
+        L.circle(c, properties).addTo(map)
+    }
+
+
+    addToolbar(map) {
+        const drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+        const drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
+    }
+
+
+    render() {
         return (
             <div>
                 <div

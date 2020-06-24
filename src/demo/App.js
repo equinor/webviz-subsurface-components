@@ -8,6 +8,8 @@ import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import NewLayeredMapDemo from "./NewLayeredMapDemo";
+import REGLTesting from "./REGLTesting";
+import LayeredMapTest from "./LayerMapTest";
 
 class App extends Component {
     constructor(props) {
@@ -39,6 +41,12 @@ class App extends Component {
             case "PriorPosteriorDistribution": {
                 return <PriorPosteriorDistributionDemo />;
             }
+            // case "REGLTesting": {
+            //     return <REGLTesting />;
+            // }
+            case "LayeredMapTest": {
+                return <LayeredMapTest />;
+            }
             default: {
                 return null;
             }
@@ -60,6 +68,9 @@ class App extends Component {
                     <option value="PriorPosteriorDistribution">
                         PriorPosteriorDistribution
                     </option>
+                    <option value="REGLTesting">REGLTesting</option>
+                    <option value="LayeredMapTest">LayeredMapTest</option>
+
                 </select>
                 {this.renderDemo()}
             </div>
