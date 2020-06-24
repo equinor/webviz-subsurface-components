@@ -15,7 +15,7 @@ const NewLayeredMapDemo = () => {
                 center={[432205, 6475078]}
                 bounds={[[432205, 6475078], [437720, 6481113]]}
                 crs="simple"
-                minZoon={1}
+                minZoom={1}
                 controls={{
                     scaleY: {
                         scaleY: 1,
