@@ -28,8 +28,16 @@ const stringToCRS = (crsString) => {
 
 class LayeredMap extends Component {
 
+    static mapReferences = {};
+
+    static getMR = () => {
+        return this.mapReferences
+    }
+
     constructor(props) {
         this.state = {
+            id: props.id,
+            syncedMaps: props.syncedMaps,
             map: null,
             layers: props.layers || [],
             minZoom: props.minZoom || -5,
@@ -39,9 +47,11 @@ class LayeredMap extends Component {
             center: props.center || [0, 0],
             bounds: props.bounds,
         }
-
+        
         this.mapEl = createRef();
+
     }
+
 
     componentDidMount() {
         const map = L.map(this.mapEl, {
@@ -53,24 +63,21 @@ class LayeredMap extends Component {
         });
 
         this.setState({map: map}, () => {
-           /*  this.state.layers.forEach((layer) => {
-                (layer.data || []).forEach(this.addLayerDataToMap)
-            }) */
-            
             if(this.state.bounds) {
                 map.fitBounds(this.state.bounds);
             }
         });
 
+        LayeredMap.mapReferences[this.state.id] = map;
 
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
         // L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        /* L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
+        L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
             colormap: exampleData.layers[0].data[0].colormap
-        }).addTo(map); */
+        }).addTo(map);
 
         L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
@@ -78,8 +85,48 @@ class LayeredMap extends Component {
         L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
 
 
+        this.setEvents(map);
+        console.log("This map's ID: ",this.state.id, "current references: ", LayeredMap.mapReferences);
         
     }
+
+    // TODO: Fix issue with maps changing eachother at the same time
+    setEvents = (map) => {
+        map.on('zoomanim', e => {
+            this.state.syncedMaps.map(id => {
+                if (
+                    map.getZoom() !== LayeredMap.mapReferences[id].getZoom()
+                ) {
+                    LayeredMap.mapReferences[id].setView(
+                        map.getCenter(),
+                        map.getZoom()
+                    )
+                    console.log("this is ", this.state.id, " changing zoom of ", id)
+                }
+            })
+            
+
+        })
+        
+        map.on('move', e => {
+            /* console.log("Zoomend => current zoomlevel: ", map.getZoom());
+            console.log("Zoomend => current center: ", map.getCenter()); */
+            this.state.syncedMaps.map(id => {
+                if (
+                    typeof e.originalEvent !== "undefined"
+                ) {
+                    LayeredMap.mapReferences[id].setView(
+                        e.target.getCenter()
+                    )
+                }
+                
+            })
+            
+
+        })
+    }
+
+
 
     addLayerDataToMap = (layerData) => {
         if(!layerData) {
@@ -121,6 +168,14 @@ class LayeredMap extends Component {
         return [url, bounds, colormap];
     }
 
+    // TODO: Fiks dette 
+    setZoom = (zoom) => {
+        // this.state.map.setZoom(zoom);
+        console.log("trying to zoom");
+        console.log(this.state.map.getZoom())
+    }
+
+
     render() {
         return (
             <div>
@@ -137,6 +192,10 @@ class LayeredMap extends Component {
 
 LayeredMap.propTypes = {
     layers: PropTypes.array,
+
+    id: PropTypes.string,
+    
+    syncedMaps: PropTypes.array,
 }
 
 export default LayeredMap;
