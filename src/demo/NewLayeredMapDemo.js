@@ -23,6 +23,12 @@ const NewLayeredMapDemo = () => {
                         maxScaleY: 10,
                         position: 'topleft',
                     },
+                    drawTools: {
+                        drawMarker: true,
+                        drawPolygon: true,
+                        drawPolyline: true,
+                        position: "topright",
+                    }
                 }}
             />
         </div>
