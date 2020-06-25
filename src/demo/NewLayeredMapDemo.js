@@ -11,6 +11,7 @@ const NewLayeredMapDemo = () => {
     return (
         <div style={{maxWidth: 1000, margin: 'auto', display: 'block', border: '1px solid black', marginTop: 24}}>
             <LayeredMap 
+                setProps={e => console.log(e)}
                 layers={exampleData.layers}
                 center={[432205, 6475078]}
                 bounds={[[432205, 6475078], [437720, 6481113]]}
@@ -28,6 +29,7 @@ const NewLayeredMapDemo = () => {
                         drawPolygon: true,
                         drawPolyline: true,
                         position: "topright",
+                        
                     }
                 }}
             />

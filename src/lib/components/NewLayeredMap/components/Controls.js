@@ -8,25 +8,6 @@ import DrawControls from './DrawControls';
 
 class Controls extends Component {
 
-
-    // render() {
-    //     return (
-    //         <div>
-    //             {
-    //                 this.props.scaleY && (
-    //                     <VerticalZoom 
-    //                         map={this.props.map}
-    //                         position={this.props.scaleY.position}
-    //                         minScaleY={this.props.scaleY.minScaleY}
-    //                         maxScaleY={this.props.scaleY.maxScaleY}
-    //                         scaleY={this.props.scaleY.scaleY || 1}
-    //                     />
-    //                 )
-    //             }
-    //         </div>
-    //     )
-
-    // }
     render() {
         return (
             <div>
@@ -38,10 +19,15 @@ class Controls extends Component {
                         drawMarker={this.props.drawTools.drawMarker}
                         drawPolygon={this.props.drawTools.drawPolygon}
                         drawPolyline={this.props.drawTools.drawPolyline}
-                        markerCoords={this.props.drawTools.markerCoords}
-                        markerCoords={this.props.drawTools.markerCoords}
-                        lineCoords={this.props.drawTools.lineCoords}
-                        polygonCoords={this.props.drawTools.polygonCoords}
+                        lineCoords={coords =>
+                            this.props.setProps({ polyline_points: coords })
+                        }
+                        markerCoords={coords =>
+                            this.props.setProps({ marker_point: coords })
+                        }
+                        polygonCoords={coords =>
+                            this.props.setProps({ polygon_points: coords })
+                        }
                     />
                     )
                 }
@@ -68,6 +54,7 @@ class Controls extends Component {
 
 Controls.propTypes = {
     map: PropTypes.object.isRequired,
+    setProps: PropTypes.func,
 
     scaleY: PropTypes.shape({
         scaleY: PropTypes.number,
@@ -84,6 +71,7 @@ Controls.propTypes = {
         markerCoords: PropTypes.func,
         lineCoords: PropTypes.func,
         polygonCoords: PropTypes.func,
+        
     })
 }
 

@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import L from 'leaflet';
 import './layers/L.imageWebGLOverlay';
 import './layers/L.tileWebGLLayer';
-import DrawControls from './DrawControls';
 
 // Components
 import Controls from './components/Controls';
@@ -33,8 +32,10 @@ const stringToCRS = (crsString) => {
 class LayeredMap extends Component {
 
     constructor(props) {
+        console.log("props:")
+        console.log(props)
         super(props);
-        
+
         this.state = {
             map: null,
             layers: props.layers || [],
@@ -72,19 +73,6 @@ class LayeredMap extends Component {
             }
         });
 
-        const baseMap = this.addLayersToMap(map);
-
-
-        // const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-
-        // var baseMap = {
-        //     'Map' : baseLayer
-        // };
-
-        // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-
 
         this.addCircle([40.7,-74.22655], {color: 'red', fillColor: '#f03', fillOpacity: 0.5, radius: 900000}, map);
 
@@ -96,21 +84,6 @@ class LayeredMap extends Component {
             map);
 
         
-        // L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-
-
-
-        const image_overlay = L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
-            colormap: exampleData.layers[0].data[0].colormap
-        }).addTo(map);
-
-        const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        let layerMap = {};
-
-        this.addLayerControl(map, layerMap);
-        this.addToolbar(map);
-
 
         L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
@@ -120,8 +93,8 @@ class LayeredMap extends Component {
         
     }
 
-    addOverlay = (overlay, layerName, layerMap) => {
-        layerMap[layerName] = overlay;
+    addOverlay = (overlay, layerName, overlayMap) => {
+        overlayMap[layerName] = overlay;
     }
 
     addLayer = (layer, layerName, layerMap) => {
@@ -129,28 +102,22 @@ class LayeredMap extends Component {
     }
 
 
-    addLayerControl = (map, mapLayers) => {
-        // L.control.layers(this.baseMaps, this.overlayMaps).addTo(this.map)
-        L.control.layers(mapLayers).addTo(map);
+    addLayerControl = (map, mapLayer, overlayMap) => {
+        L.control.layers(mapLayer, overlayMap).addTo(map);
     }
-    // this.state.layers.forEach((layer) => {
-    //     (layer.data || []).forEach(this.addLayerDataToMap)
-    // }) 
+
 
     addLayersToMap = (map) => {
         let layerMap = {};
         this.state.layers.forEach(layer => {
             layerMap[layer.name] = this.addLayerDataToMap(layer.data);
         })
-        console.log("layermap: " + layerMap)
         return layerMap;
         
 
     }
 
-    // if it's a polygon, a line or a circle, add to the same layer
     addLayerDataToMap = (layerData) => {
-        console.log("data: " + layerData.type)
         if(!layerData) {
             return;
         }
@@ -163,12 +130,10 @@ class LayeredMap extends Component {
         switch(layerData.type) {
             case 'image': {
                 if(colormap) {
-                    console.log("image " + newLayer)
                     newLayer = L.imageWebGLOverlay(url, bounds, {
                         colormap: colormap,
                         /* CRS: L.CRS.Simple, */
                     });
-                console.log("image layer " + newLayer)
 
                 } else {
                     newLayer = L.imageOverlay(url, bounds, {
@@ -184,12 +149,10 @@ class LayeredMap extends Component {
             }
         
         }
-        console.log("layer " + newLayer)
         if(newLayer) {
             newLayer.addTo(this.state.map);
         }
-        return newLayer;
-        // return [url, bounds, colormap];
+        return [url, bounds, colormap];
     }
 
     addPoylgon(coordinateArray, map) {
@@ -199,19 +162,6 @@ class LayeredMap extends Component {
     addCircle(c, properties, map) {
         L.circle(c, properties).addTo(map)
     }
-
-
-    addToolbar(map) {
-        const drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
-        const drawControl = new L.Control.Draw({
-            edit: {
-                featureGroup: drawnItems
-            }
-        });
-        map.addControl(drawControl);
-    }
-
 
     render() {
         return (
@@ -223,6 +173,7 @@ class LayeredMap extends Component {
                     {
                         this.state.map && (
                             <Controls 
+                                setProps={e => console.log(e)}
                                 map={this.state.map}
                                 {...this.state.controls}
                             />
@@ -237,6 +188,11 @@ class LayeredMap extends Component {
 
 LayeredMap.propTypes = {
     layers: PropTypes.array,
+    setProps: PropTypes.func,
+    polyline_points: PropTypes.array,
+    polygon_points: PropTypes.array,
+    marker_point: PropTypes.array,
+
 }
 
 export default LayeredMap;

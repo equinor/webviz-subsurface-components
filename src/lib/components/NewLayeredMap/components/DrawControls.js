@@ -37,30 +37,15 @@ const getShapeType = layer => {
 };
 
 class DrawControls extends Component {
-    _onEdited(e) {
-        e.layers.eachLayer(layer => {
-            const layertype = getShapeType(layer);
-            if (layertype === "polyline") {
-                const coords = layer._latlngs.map(p => {
-                    return [p.lat, p.lng];
-                });
-                this.props.lineCoords(coords);
-            }
-            if (layertype === "polygon") {
-                const coords = layer._latlngs[0].map(p => {
-                    return [p.lat, p.lng];
-                });
-                this.props.polygonCoords(coords);
-            }
-            if (layertype === "marker") {
-                this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
-            }
-        });
-    }
 
-    removeLayers(layertype) {
-        const { edit } = this.refs; // eslint-disable-line react/no-string-refs
-        const layerContainer = edit.leafletElement.options.edit.featureGroup;
+    constructor(props) {
+        this.addToolbar = this.addToolbar.bind(this);
+    }
+    
+
+    removeLayers(layertype, featureGroup) {
+        console.log(featureGroup)
+        const layerContainer = featureGroup.options.edit.featureGroup
         const layers = layerContainer._layers;
         const layer_ids = Object.keys(layers);
         for (let i = 0; i < layer_ids.length - 1; i++) {
@@ -71,75 +56,74 @@ class DrawControls extends Component {
         }
     }
 
-    _onCreated(e) {
-        console.log("woooooooooooow")
-        const type = e.layerType;
-        const layer = e.layer;
-        if (type === "marker") {
-            this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
-            this.removeLayers("marker");
-        }
-        if (type === "polyline") {
-            const coords = layer._latlngs.map(p => {
-                return [p.lat, p.lng];
-            });
-            this.props.lineCoords(coords);
-            this.removeLayers("polyline");
-        }
-        if (type === "polygon") {
-            const coords = layer._latlngs[0].map(p => {
-                return [p.lat, p.lng];
-            });
-            this.props.polygonCoords(coords);
-            this.removeLayers("polygon");
-        }
-    }
-
-    addToolbar(map) {
+    addToolbar = (map) => {
         const drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
         const drawControl = new L.Control.Draw({
-            position: 'topright',
-
+            position: this.props.position,
+            edit : {
+                featureGroup: drawnItems
+            },
             draw: {
                 rectangle: false,
-                circle: true,
+                circle: false,
                 circlemarker: false,
                 polygon: this.props.drawPolygon,
                 marker: this.props.drawMarker,
                 polyline: this.props.drawPolyline,
             }
+
         });
         
-        //TODO make this work as a separate function
-        map.on(L.Draw.Event.CREATED, function (e) {
-        console.log("this is working")
+        let that = this;
 
+        map.on(L.Draw.Event.CREATED, function (e) {
             const type = e.layerType;
             const layer = e.layer;
+            drawnItems.addLayer(layer)
+
+
             if (type === "marker") {
-                this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
-                this.removeLayers("marker");
+                props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
+                that.removeLayers("marker", drawControl);
             }
             if (type === "polyline") {
                 const coords = layer._latlngs.map(p => {
                     return [p.lat, p.lng];
                 });
-                this.props.lineCoords(coords);
-                this.removeLayers("polyline");
+                props.lineCoords(coords);
+                that.removeLayers("polyline", drawControl);
             }
             if (type === "polygon") {
                 const coords = layer._latlngs[0].map(p => {
                     return [p.lat, p.lng];
                 });
-                this.props.polygonCoords(coords);
-                this.removeLayers("polygon");
+                props.polygonCoords(coords);
+                that.removeLayers("polygon", drawControl);
             }
          });
+        
+    
          map.on(L.Draw.Event.EDITED, function (e) {
-            this._onEdited.bind(e);
+            e.layers.eachLayer(layer => {
+                const layertype = getShapeType(layer);
+                if (layertype === "polyline") {
+                    const coords = layer._latlngs.map(p => {
+                        return [p.lat, p.lng];
+                    });
+                    this.props.lineCoords(coords);
+                }
+                if (layertype === "polygon") {
+                    const coords = layer._latlngs[0].map(p => {
+                        return [p.lat, p.lng];
+                    });
+                    this.props.polygonCoords(coords);
+                }
+                if (layertype === "marker") {
+                    this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
+                }
+            });
          });
-
 
         map.addControl(drawControl);
     }
@@ -148,10 +132,7 @@ class DrawControls extends Component {
     render() {
         const { drawPolygon, drawMarker, drawPolyline } = this.props;
         this.addToolbar(this.props.map);
-        return (
-            <div> 
-            </div>
-        );
+        return (null);
     }
 }
 DrawControls.defaultProps = {
@@ -159,11 +140,7 @@ DrawControls.defaultProps = {
     drawPolygon: true,
     drawPolyline: true,
     position: "topright",
-    markerCoords: PropTypes.func,
-
-    lineCoords: PropTypes.func,
     
-    polygonCoords: PropTypes.func,
 };
 
 DrawControls.propTypes = {
