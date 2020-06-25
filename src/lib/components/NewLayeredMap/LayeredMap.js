@@ -31,10 +31,13 @@ const stringToCRS = (crsString) => {
 
 class LayeredMap extends Component {
 
+    static mapReferences = {};
+
     constructor(props) {
         super(props);
         
         this.state = {
+            id: props.id,
             map: null,
             layers: props.layers || [],
             minZoom: props.minZoom || -5,
@@ -45,9 +48,11 @@ class LayeredMap extends Component {
             bounds: props.bounds,
             controls: props.controls || {},
         }
-
+        
         this.mapEl = createRef();
+
     }
+
 
     componentDidMount() {
         const map = L.map(this.mapEl, {
@@ -59,29 +64,64 @@ class LayeredMap extends Component {
         });
 
         this.setState({map: map}, () => {
+
             this.state.layers.forEach((layer) => {
                 (layer.data || []).forEach(this.addLayerDataToMap)
             })
-            
+
             if(this.state.bounds) {
                 map.fitBounds(this.state.bounds);
             }
         });
 
+        LayeredMap.mapReferences[this.state.id] = map;
 
         // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
         // L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-      /*   L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
+         L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
             colormap: exampleData.layers[0].data[0].colormap
         }).addTo(map);
 
         L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
         L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map); */
+        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
+
+        this.setEvents(map);
         
+    }
+
+    setEvents = (map) => {
+        map.on('zoomanim', e => {
+            this.props.syncedMaps.map(id => {
+                // e.zoom provides zoom level after zoom unlike getZoom()
+                if (
+                    e.zoom !== LayeredMap.mapReferences[id].getZoom()
+                ) {
+                    LayeredMap.mapReferences[id].setView(
+                        e.center,
+                        e.zoom
+                    )
+                }
+            })
+        })
+        
+        map.on('move', e => {
+            // Only react if move event is from a real user interaction
+            // (originalEvent is undefined if viewport is programatically changed).
+            this.props.syncedMaps.map(id => {
+                if (
+                    typeof e.originalEvent !== "undefined"
+                ) {
+                    LayeredMap.mapReferences[id].setView(
+                        e.target.getCenter()
+                    )
+                }
+                
+            })
+        })
     }
 
     addLayerDataToMap = (layerData) => {
@@ -124,6 +164,7 @@ class LayeredMap extends Component {
         return [url, bounds, colormap];
     }
 
+
     render() {        
         return (
             <div>
@@ -148,6 +189,10 @@ class LayeredMap extends Component {
 
 LayeredMap.propTypes = {
     layers: PropTypes.array,
+
+    id: PropTypes.string,
+    
+    syncedMaps: PropTypes.array,
 }
 
 export default LayeredMap;
