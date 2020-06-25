@@ -31,12 +31,13 @@ const stringToCRS = (crsString) => {
 
 class LayeredMap extends Component {
 
+    static mapReferences = {};
+
     constructor(props) {
-        console.log("props:")
-        console.log(props)
         super(props);
 
         this.state = {
+            id: props.id,
             map: null,
             layers: props.layers || [],
             minZoom: props.minZoom || -5,
@@ -47,9 +48,11 @@ class LayeredMap extends Component {
             bounds: props.bounds,
             controls: props.controls || {},
         }
-
+        
         this.mapEl = createRef();
+
     }
+
 
     componentDidMount() {
         const map = L.map(this.mapEl, {
@@ -63,58 +66,67 @@ class LayeredMap extends Component {
 
 
         this.setState({map: map}, () => {
+
             this.state.layers.forEach((layer) => {
                 (layer.data || []).forEach(this.addLayerDataToMap)
+            })
 
-            }) 
-            
             if(this.state.bounds) {
                 map.fitBounds(this.state.bounds);
             }
         });
 
 
-        this.addCircle([40.7,-74.22655], {color: 'red', fillColor: '#f03', fillOpacity: 0.5, radius: 900000}, map);
+        LayeredMap.mapReferences[this.state.id] = map;
 
 
-        this.addPoylgon([            
-            [50.742,-64.22055],
-            [40.710,-54.22955],
-            [30.703,-34.24655]],
-            map);
 
-        
+         L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
+            colormap: exampleData.layers[0].data[0].colormap
+        }).addTo(map);
+
+
 
         L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
         L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-
         L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
+
+        this.setEvents(map);
         
-    }
 
-    addOverlay = (overlay, layerName, overlayMap) => {
-        overlayMap[layerName] = overlay;
-    }
-
-    addLayer = (layer, layerName, layerMap) => {
-        layerMap[layerName] = layer;
     }
 
 
-    addLayerControl = (map, mapLayer, overlayMap) => {
-        L.control.layers(mapLayer, overlayMap).addTo(map);
-    }
-
-
-    addLayersToMap = (map) => {
-        let layerMap = {};
-        this.state.layers.forEach(layer => {
-            layerMap[layer.name] = this.addLayerDataToMap(layer.data);
+    setEvents = (map) => {
+        map.on('zoomanim', e => {
+            this.props.syncedMaps.map(id => {
+                // e.zoom provides zoom level after zoom unlike getZoom()
+                if (
+                    e.zoom !== LayeredMap.mapReferences[id].getZoom()
+                ) {
+                    LayeredMap.mapReferences[id].setView(
+                        e.center,
+                        e.zoom
+                    )
+                }
+            })
         })
-        return layerMap;
         
-
+        map.on('move', e => {
+            // Only react if move event is from a real user interaction
+            // (originalEvent is undefined if viewport is programatically changed).
+            this.props.syncedMaps.map(id => {
+                if (
+                    typeof e.originalEvent !== "undefined"
+                ) {
+                    LayeredMap.mapReferences[id].setView(
+                        e.target.getCenter()
+                    )
+                }
+                
+            })
+        })
     }
 
     addLayerDataToMap = (layerData) => {
@@ -163,7 +175,8 @@ class LayeredMap extends Component {
         L.circle(c, properties).addTo(map)
     }
 
-    render() {
+
+    render() {        
         return (
             <div>
                 <div
@@ -192,7 +205,8 @@ LayeredMap.propTypes = {
     polyline_points: PropTypes.array,
     polygon_points: PropTypes.array,
     marker_point: PropTypes.array,
-
+    id: PropTypes.string,
+    syncedMaps: PropTypes.array,
 }
 
 export default LayeredMap;
