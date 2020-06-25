@@ -92,36 +92,47 @@ class LayeredMap extends Component {
         this.setEvents(map);
         
     }
-
+    
     setEvents = (map) => {
-        map.on('zoomanim', e => {
-            this.props.syncedMaps.map(id => {
-                // e.zoom provides zoom level after zoom unlike getZoom()
-                if (
-                    e.zoom !== LayeredMap.mapReferences[id].getZoom()
-                ) {
-                    LayeredMap.mapReferences[id].setView(
-                        e.center,
-                        e.zoom
-                    )
-                }
+       
+        if (this.props.syncOpt.includes('zoom')) {
+            map.on('zoomanim', e => {
+                this.props.syncedMaps.map(id => {
+                    // e.zoom provides zoom level after zoom unlike getZoom()
+                    if (
+                        e.zoom !== LayeredMap.mapReferences[id].getZoom()
+                    ) {
+                        LayeredMap.mapReferences[id].setView(
+                            e.center,
+                            e.zoom
+                        )
+                    }
+                })
             })
-        })
+        }
+            
         
-        map.on('move', e => {
-            // Only react if move event is from a real user interaction
-            // (originalEvent is undefined if viewport is programatically changed).
-            this.props.syncedMaps.map(id => {
-                if (
-                    typeof e.originalEvent !== "undefined"
-                ) {
-                    LayeredMap.mapReferences[id].setView(
-                        e.target.getCenter()
-                    )
-                }
-                
+        if (this.props.syncOpt.includes('pos')) {
+            map.on('move', e => {
+                // Only react if move event is from a real user interaction
+                // (originalEvent is undefined if viewport is programatically changed).
+                this.props.syncedMaps.map(id => {
+                    if (
+                        typeof e.originalEvent !== "undefined"
+                    ) {
+                        LayeredMap.mapReferences[id].setView(
+                            e.target.getCenter()
+                        )
+                    }
+                    
+                })
             })
-        })
+        }
+
+        if (this.props.syncOpt.includes('draw')) {
+
+        }
+    
     }
 
     addLayerDataToMap = (layerData) => {
@@ -193,6 +204,8 @@ LayeredMap.propTypes = {
     id: PropTypes.string,
     
     syncedMaps: PropTypes.array,
+
+    syncOpt: PropTypes.array,
 }
 
 export default LayeredMap;

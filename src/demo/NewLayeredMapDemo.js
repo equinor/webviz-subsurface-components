@@ -15,24 +15,42 @@ const NewLayeredMapDemo = () => {
                 <LayeredMap 
                     id={"NewLayeredMap-1"}
                     syncedMaps={["NewLayeredMap-2"]}
+                    syncOpt={['zoom', 'pos']}
                     layers={exampleData.layers}
                     center={[0, 0]/* [432205, 6475078] */}
                     bounds={null /* [[432205, 6475078], [437720, 6481113]] */}
                     crs="earth"
                     minZoom={1}
                     zoom = {2}
+                    controls={{
+                        scaleY: {
+                            scaleY: 1,
+                            minScaleY: 1,
+                            maxScaleY: 10,
+                            position: 'topleft'
+                        },
+                    }}
                 />
             </div>
             <div >
                 <LayeredMap
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1"]}
+                    syncOpt={['zoom', 'pos']}
                     layers={exampleData.layers}
                     center={[0, 0]/* [432205, 6475078] */}
                     bounds={null /* [[432205, 6475078], [437720, 6481113]] */}
                     crs="earth"
                     minZoom={1}
                     zoom = {2}
+                    controls={{
+                        scaleY: {
+                            scaleY: 1,
+                            minScaleY: 1,
+                            maxScaleY: 10,
+                            position: 'topleft'
+                        },
+                    }}
                 />
             </div>
         </div>
