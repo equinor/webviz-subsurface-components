@@ -30,10 +30,6 @@ class LayeredMap extends Component {
 
     static mapReferences = {};
 
-    static getMR = () => {
-        return this.mapReferences
-    }
-
     constructor(props) {
         this.state = {
             id: props.id,
@@ -90,27 +86,24 @@ class LayeredMap extends Component {
         
     }
 
-    // TODO: Fix issue with maps changing eachother at the same time
     setEvents = (map) => {
         map.on('zoomanim', e => {
             this.state.syncedMaps.map(id => {
+                // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
-                    map.getZoom() !== LayeredMap.mapReferences[id].getZoom()
+                    e.zoom !== LayeredMap.mapReferences[id].getZoom()
                 ) {
                     LayeredMap.mapReferences[id].setView(
-                        map.getCenter(),
-                        map.getZoom()
+                        e.center,
+                        e.zoom
                     )
-                    console.log("this is ", this.state.id, " changing zoom of ", id)
                 }
             })
-            
-
         })
         
         map.on('move', e => {
-            /* console.log("Zoomend => current zoomlevel: ", map.getZoom());
-            console.log("Zoomend => current center: ", map.getCenter()); */
+            // Only react if move event is from a real user interaction
+            // (originalEvent is undefined if viewport is programatically changed).
             this.state.syncedMaps.map(id => {
                 if (
                     typeof e.originalEvent !== "undefined"
@@ -121,12 +114,8 @@ class LayeredMap extends Component {
                 }
                 
             })
-            
-
         })
     }
-
-
 
     addLayerDataToMap = (layerData) => {
         if(!layerData) {
@@ -166,13 +155,6 @@ class LayeredMap extends Component {
         }
 
         return [url, bounds, colormap];
-    }
-
-    // TODO: Fiks dette 
-    setZoom = (zoom) => {
-        // this.state.map.setZoom(zoom);
-        console.log("trying to zoom");
-        console.log(this.state.map.getZoom())
     }
 
 
