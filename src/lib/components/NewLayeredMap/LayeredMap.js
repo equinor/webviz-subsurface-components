@@ -38,7 +38,6 @@ class LayeredMap extends Component {
         
         this.state = {
             id: props.id,
-            syncedMaps: props.syncedMaps,
             map: null,
             layers: props.layers || [],
             minZoom: props.minZoom || -5,
@@ -81,7 +80,7 @@ class LayeredMap extends Component {
         
         // L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-      /*   L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
+         L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
             colormap: exampleData.layers[0].data[0].colormap
         }).addTo(map);
 
@@ -96,7 +95,7 @@ class LayeredMap extends Component {
 
     setEvents = (map) => {
         map.on('zoomanim', e => {
-            this.state.syncedMaps.map(id => {
+            this.props.syncedMaps.map(id => {
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
                     e.zoom !== LayeredMap.mapReferences[id].getZoom()
@@ -112,7 +111,7 @@ class LayeredMap extends Component {
         map.on('move', e => {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
-            this.state.syncedMaps.map(id => {
+            this.props.syncedMaps.map(id => {
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
