@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 // Leaflet
 import L from 'leaflet';
 import './layers/L.imageWebGLOverlay';
-import './layers/L.tileWebGLLayer';
+import './layers/L.tileWebGLLayerV2';
 
 // Components
 import Controls from './components/Controls';
@@ -59,9 +59,9 @@ class NewLayeredMap extends Component {
         });
 
         this.setState({map: map}, () => {
-            this.state.layers.forEach((layer) => {
+           /*  this.state.layers.forEach((layer) => {
                 (layer.data || []).forEach(this.addLayerDataToMap)
-            })
+            }) */
             
             if(this.state.bounds) {
                 map.fitBounds(this.state.bounds);
@@ -71,16 +71,16 @@ class NewLayeredMap extends Component {
 
         // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
-        // L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-      /*   L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
+       /*  L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
             colormap: exampleData.layers[0].data[0].colormap
-        }).addTo(map);
+        }).addTo(map); */
 
         L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
         L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map); */
+        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
         
     }
 

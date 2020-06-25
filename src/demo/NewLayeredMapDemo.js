@@ -11,10 +11,11 @@ const NewLayeredMapDemo = () => {
     return (
         <div style={{maxWidth: 1000, margin: 'auto', display: 'block', border: '1px solid black', marginTop: 24}}>
             <LayeredMap 
+                id="hello_world"
                 layers={exampleData.layers}
-                center={[432205, 6475078]}
-                bounds={[[432205, 6475078], [437720, 6481113]]}
-                crs="simple"
+                center={[0, 0] /* [432205, 6475078] */}
+                /* bounds={[[432205, 6475078], [437720, 6481113]]} */
+                crs="earth"
                 minZoom={1}
                 controls={{
                     scaleY: {
