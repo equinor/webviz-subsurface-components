@@ -80,13 +80,16 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
     _initCanvas: function() {
         const canvasTag =  DomUtil.create('canvas');
+        const gl = this._gl = canvasTag.getContext("webgl", {
+            premultipliedAlpha: false,
+        })
         
         // Add neccessary CSS-classes
         DomUtil.addClass(canvasTag, 'leaflet-canvas-layer');
 		if (this._zoomAnimated) { DomUtil.addClass(canvasTag, 'leaflet-zoom-animated'); }
 
         // TODO: Replace this function with custom draw function
-        drawFunc(canvasTag, this._url, this._colormap)
+        drawFunc(gl, canvasTag, this._url, this._colormap)
         
         this._canvas = canvasTag;
     },

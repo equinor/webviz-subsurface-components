@@ -1,8 +1,5 @@
 import L, { DomUtil, DomEvent, Util, Browser, GridLayer } from 'leaflet';
-import drawFunc from '../webgl/drawFunc';
-
-import exampleData from '../../../../demo/example-data/new-layered-map.json';
-
+import drawFunc from '../webgl/draw';
 
 L.TileWebGLLayer = L.GridLayer.extend({
 
@@ -15,34 +12,17 @@ L.TileWebGLLayer = L.GridLayer.extend({
         crossOrigin: false,
 	},
 
-    initialize: function(url, options) {
+    initialize: function(url, colormap, options) {
         this._url = url;
-		options = Util.setOptions(this, options);
+        this._colormap = colormap;
+        this._canvas = null;
+        this._glContext;
 		
+        options = Util.setOptions(this, options);
 		// for https://github.com/Leaflet/Leaflet/issues/137
 		if (!Browser.android) {
 			this.on('tileunload', this._onTileRemove);
 		}
-    },
-
-    onAdd: function(map) {
-        L.GridLayer.prototype.onAdd.call(this, map);
-
-        // Add canvas to the map
-        const canvas = this._canvas = DomUtil.create('canvas');
-        const pane = map.getPane(this.options.pane);
-        const container = map.getContainer();
-        console.log("Pane:", pane, typeof pane);
-        console.log(pane.clientWidth, pane.clientHeight, container.clientWidth, container.clientHeight);
-        canvas.width = `${container.clientWidth}px`;
-        canvas.height = `${container.clientHeight}px`;
-        pane.appendChild(canvas);
-
-    },
-
-    onRemove: function(map) {
-        L.DomUtil.remove(this._canvas);
-        L.GridLayer.prototype.onRemove.call(this, map);
     },
 
     setUrl: function(url, noRedraw) {
@@ -59,21 +39,28 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
     },
 
+    onAdd: function(map) {
+        L.GridLayer.prototype.onAdd.call(this, map);
+
+        const canvas = this._canvas = DomUtil.create('canvas');
+
+        this._glContext = canvas.getContext("webgl", {
+            premultipliedAlpha: false,
+        });
+    },
+
     createTile: function(coords, done) {
-        const tile = DomUtil.create('div');
+        const tile = DomUtil.create('img');
 
-       /*  drawFunc(tile, this.getTileUrl(coords), exampleData.layers[0].data[0].colormap, {
-			crossOrigin: '', //false, //'anonymous' , // this.options.crossOrigin === true ? '' : this.options.crossOrigin,
+        drawFunc(this._glContext, this._canvas, this.getTileUrl(coords), this._colormap, {
+			crossOrigin: '',
 		})
-		.then(() => {
-
+		.then((glContext) => {
+            const image = this._canvas.toDataURL();
+			tile.src = image;
 			done(null, tile);
+		})
 
-			
-		}) */
-
-		
-        
 		return tile;
     },
 
@@ -98,15 +85,6 @@ L.TileWebGLLayer = L.GridLayer.extend({
     
 
 	// ----------- PRIVATE FUNCTIONS ------------------
-	
-	_onTileRemove: function ({coords, tile}) {
-		if (!L.Browser.android) {
-			tile.onload = () => {};
-		}
-
-		console.log(tile.glContext);
-		// tile.glContext.getExtension('WEBGL_lose_context').loseContext();
-	},
 
     _getZoomForUrl: function () {
 		let zoom =          this._tileZoom;
@@ -137,7 +115,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
 });
 
-L.tileWebGLLayer = (url, options = {}) => {
-    return new L.TileWebGLLayer(url, options);
+L.tileWebGLLayer = (url, colormap, options = {}) => {
+    return new L.TileWebGLLayer(url, colormap, options);
 }
 

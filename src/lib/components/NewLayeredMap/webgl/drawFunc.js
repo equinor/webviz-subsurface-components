@@ -8,11 +8,8 @@ import {
     bindBuffer, bindTexture,
 } from './webglUtils';
 
-export default async (canvas, image, colormap, config = {}) => {
+export default async (gl, canvas, image, colormap, config = {}) => {
     
-    const gl = canvas.getContext("webgl", {
-        premultipliedAlpha: false,
-    });
     gl.getExtension("OES_texture_float");
     
     const imagesToLoad = [loadImage(image, config)]; 
