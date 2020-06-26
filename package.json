@@ -28,7 +28,6 @@
         "@types/react": "^16.9.35",
         "@types/react-dom": "^16.9.8",
         "d3": "^5.11.0",
-        "gl-matrix": "^3.3.0",
         "leaflet": "^1.6.0",
         "leaflet-draw": "^1.0.4",
         "ramda": "^0.25.0",
