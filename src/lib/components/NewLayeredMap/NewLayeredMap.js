@@ -74,7 +74,7 @@ class NewLayeredMap extends Component {
             }
         });
 
-        LayeredMap.mapReferences[this.state.id] = map;
+        NewLayeredMap.mapReferences[this.state.id] = map;
 
         // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
@@ -82,7 +82,7 @@ class NewLayeredMap extends Component {
             shader: 'hillshading'
         }).addTo(map); */
 
-         L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
+     /*    L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
             colormap: exampleData.layers[0].data[0].colormap
         }).addTo(map); */
 
@@ -100,9 +100,9 @@ class NewLayeredMap extends Component {
             this.props.syncedMaps.map(id => {
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
-                    e.zoom !== LayeredMap.mapReferences[id].getZoom()
+                    e.zoom !== NewLayeredMap.mapReferences[id].getZoom()
                 ) {
-                    LayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].setView(
                         e.center,
                         e.zoom
                     )
@@ -117,7 +117,7 @@ class NewLayeredMap extends Component {
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
-                    LayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].setView(
                         e.target.getCenter()
                     )
                 }
