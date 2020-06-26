@@ -11,12 +11,12 @@ import { loadImage } from '../webgl/webglUtils';
  */
 L.ImageWebGLOverlay = L.Layer.extend({
 
-    initialize: function(url, bounds, options) {
+    initialize: function(url, bounds, colormap, options) {
         this._url = url;
         this.setBounds(bounds);
         this._CRS = options.CRS || null;
 
-        this._colormap = options.colormap || '';
+        this._colormap = colormap || '';
 
 		Util.setOptions(this, options);
     },
@@ -89,7 +89,10 @@ L.ImageWebGLOverlay = L.Layer.extend({
 		if (this._zoomAnimated) { DomUtil.addClass(canvasTag, 'leaflet-zoom-animated'); }
 
         // TODO: Replace this function with custom draw function
-        drawFunc(gl, canvasTag, this._url, this._colormap)
+        drawFunc(gl, canvasTag, this._url, this._colormap, {
+            ...this.options,
+            shader: this.options.shader,
+        })
         
         this._canvas = canvasTag;
     },
@@ -133,6 +136,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
 });
 
 
-L.imageWebGLOverlay = (url, bounds, options = {}) => {
-    return new L.ImageWebGLOverlay(url, bounds, options);
+L.imageWebGLOverlay = (url, bounds, colormap, options = {}) => {
+    return new L.ImageWebGLOverlay(url, bounds, colormap, options);
 }

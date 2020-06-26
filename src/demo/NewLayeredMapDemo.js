@@ -13,10 +13,11 @@ const NewLayeredMapDemo = () => {
             <LayeredMap 
                 id="hello_world"
                 layers={exampleData.layers}
-                center={[0, 0] /* [432205, 6475078] */}
-                /* bounds={[[432205, 6475078], [437720, 6481113]]} */
+                center={[0, 0]}
+                // center={[432205, 6475078]}
+                // bounds={[[432205, 6475078], [437720, 6481113]]}
                 crs="earth"
-                minZoom={1}
+                minZoom={-5}
                 controls={{
                     scaleY: {
                         scaleY: 1,

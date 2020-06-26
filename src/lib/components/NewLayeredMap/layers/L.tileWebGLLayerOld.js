@@ -1,5 +1,8 @@
 import L, { DomUtil, DomEvent, Util, Browser, GridLayer } from 'leaflet';
-import drawFunc from '../webgl/draw';
+import drawFunc from '../webgl/drawFunc';
+
+import exampleData from '../../../../demo/example-data/new-layered-map.json';
+
 
 L.TileWebGLLayer = L.GridLayer.extend({
 
@@ -12,13 +15,10 @@ L.TileWebGLLayer = L.GridLayer.extend({
         crossOrigin: false,
 	},
 
-    initialize: function(url, colormap, options) {
+    initialize: function(url, options) {
         this._url = url;
-        this._colormap = colormap;
-        this._canvas = null;
-        this._glContext;
+		options = Util.setOptions(this, options);
 		
-        options = Util.setOptions(this, options);
 		// for https://github.com/Leaflet/Leaflet/issues/137
 		if (!Browser.android) {
 			this.on('tileunload', this._onTileRemove);
@@ -39,28 +39,21 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
     },
 
-    onAdd: function(map) {
-        L.GridLayer.prototype.onAdd.call(this, map);
-
-        const canvas = this._canvas = DomUtil.create('canvas');
-
-        this._glContext = canvas.getContext("webgl", {
-            premultipliedAlpha: false,
-        });
-    },
-
     createTile: function(coords, done) {
-        const tile = DomUtil.create('img');
+        const tile = DomUtil.create('canvas');
 
-        drawFunc(this._glContext, this._canvas, this.getTileUrl(coords), this._colormap, {
-			crossOrigin: '',
+        drawFunc(tile, this.getTileUrl(coords), exampleData.layers[0].data[0].colormap /* this.options.colormap || null */, {
+			crossOrigin: '', //false, //'anonymous' , // this.options.crossOrigin === true ? '' : this.options.crossOrigin,
 		})
 		.then((glContext) => {
-            const image = this._canvas.toDataURL();
-			tile.src = image;
+			tile.src = null;
 			done(null, tile);
+			tile.glContext = glContext;
+			/* tile.glContext = glContext; */
 		})
 
+		
+        
 		return tile;
     },
 
@@ -85,6 +78,15 @@ L.TileWebGLLayer = L.GridLayer.extend({
     
 
 	// ----------- PRIVATE FUNCTIONS ------------------
+	
+	_onTileRemove: function ({coords, tile}) {
+		if (!L.Browser.android) {
+			tile.onload = () => {};
+		}
+
+		console.log(tile.glContext);
+		// tile.glContext.getExtension('WEBGL_lose_context').loseContext();
+	},
 
     _getZoomForUrl: function () {
 		let zoom =          this._tileZoom;
@@ -115,7 +117,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
 });
 
-L.tileWebGLLayer = (url, colormap, options = {}) => {
-    return new L.TileWebGLLayer(url, colormap, options);
+L.tileWebGLLayer = (url, options = {}) => {
+    return new L.TileWebGLLayer(url, options);
 }
 

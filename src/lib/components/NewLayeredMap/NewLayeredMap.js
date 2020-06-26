@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 // Leaflet
 import L from 'leaflet';
 import './layers/L.imageWebGLOverlay';
-import './layers/L.tileWebGLLayerV3';
+import './layers/L.tileWebGLLayer';
 
 // Components
 import Controls from './components/Controls';
@@ -37,7 +37,7 @@ class NewLayeredMap extends Component {
         this.state = {
             map: null,
             layers: props.layers || [],
-            minZoom: props.minZoom || -5,
+            minZoom: props.minZoom || 1,
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
@@ -59,9 +59,9 @@ class NewLayeredMap extends Component {
         });
 
         this.setState({map: map}, () => {
-           /*  this.state.layers.forEach((layer) => {
+            this.state.layers.forEach((layer) => {
                 (layer.data || []).forEach(this.addLayerDataToMap)
-            }) */
+            })
             
             if(this.state.bounds) {
                 map.fitBounds(this.state.bounds);
@@ -71,7 +71,9 @@ class NewLayeredMap extends Component {
 
         // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
-        L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        /* L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', TEMP_COLORMAP, {
+            shader: 'hillshading'
+        }).addTo(map); */
 
       /*   L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
             colormap: exampleData.layers[0].data[0].colormap
@@ -98,20 +100,29 @@ class NewLayeredMap extends Component {
             
             case 'image': {
                 if(colormap) {
-                    newLayer = L.imageWebGLOverlay(url, bounds, {
-                        colormap: colormap,
-                        /* CRS: L.CRS.Simple, */
+                    newLayer = L.imageWebGLOverlay(url, bounds, colormap, {
+                        ...layerData,
+                        shader: layerData.shader,
                     });
                 } else {
                     newLayer = L.imageOverlay(url, bounds, {
-                        
+                        ...layerData,
                     });
                 }
                 break;
             }
 
             case 'tile': {
-                newLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+                if(colormap) {
+                    newLayer = L.tileWebGLLayer(url, colormap, {
+                        ...layerData,
+                        shader: layerData.shader,
+                    })
+                } else {
+                    newLayer = L.tileLayer(url, {
+                        ...layerData
+                    });
+                }
                 break;
             }
         
