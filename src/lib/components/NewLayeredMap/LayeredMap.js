@@ -8,15 +8,18 @@ import './layers/L.tileWebGLLayer';
 
 // Components
 import Controls from './components/Controls';
+import CompositeMapLayers from './components/CompositeMapLayers'
 
 // Assets
 import exampleData from '../../../demo/example-data/layered-map.json';
+import CompositeMapLayer from '../../private_components/layered-map-resources/CompositeMapLayer.react';
 
 // Constants
 // const TEMP_IMAGE = 'https://i.pinimg.com/originals/67/dd/14/67dd1431cf0d806254a34ad6c0eb0eb5.jpg';
 const TEMP_IMAGE = exampleData.layers[0].data[0].url;
 const TEMP_COLORMAP = exampleData.layers[0].data[0].colormap;
-const DEFAULT_BOUNDS = [[0, 0], [30, 30]]
+// const DEFAULT_BOUNDS = [[0, 0], [30, 30]]
+const DEFAULT_BOUNDS = [[432205, 6475078], [437720, 6481113]]
 
 const stringToCRS = (crsString) => {
     switch(crsString) {
@@ -44,7 +47,7 @@ class LayeredMap extends Component {
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
-            center: props.center || [0, 0],
+            center: props.center || [432205, 6475078],
             bounds: props.bounds,
             controls: props.controls || {},
         }
@@ -68,7 +71,7 @@ class LayeredMap extends Component {
         this.setState({map: map}, () => {
 
             this.state.layers.forEach((layer) => {
-                (layer.data || []).forEach(this.addLayerDataToMap)
+                (layer.data || []).forEach(this.addLayerDataToMap);
             })
 
             if(this.state.bounds) {
@@ -87,10 +90,10 @@ class LayeredMap extends Component {
 
 
 
-        L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
+        /* L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
         L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
+        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map); */
 
         this.setEvents(map);
         
@@ -156,7 +159,11 @@ class LayeredMap extends Component {
             }
 
             case 'tile': {
-                newLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+                if(colormap) {
+                    // TODO: Add new TileWebGLLayer here
+                } else {
+                    newLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+                }
                 break;
             }
         
@@ -167,16 +174,11 @@ class LayeredMap extends Component {
         return [url, bounds, colormap];
     }
 
-    addPoylgon(coordinateArray, map) {
-            L.polygon(coordinateArray).addTo(map)
-    }
-
-    addCircle(c, properties, map) {
-        L.circle(c, properties).addTo(map)
-    }
-
-
-    render() {        
+    render() {    
+        const overlayLayers = this.state.layers
+            .filter((layer) => layer.name === "Some overlay layer")
+            .map((layer) => layer.data);
+        
         return (
             <div>
                 <div
@@ -189,6 +191,15 @@ class LayeredMap extends Component {
                                 setProps={e => console.log(e)}
                                 map={this.state.map}
                                 {...this.state.controls}
+                            />
+                        )
+                    }
+                    {
+                        this.state.map && (
+                            <CompositeMapLayers 
+                            layer={overlayLayers}
+                            map={this.state.map}
+                        
                             />
                         )
                     }

@@ -1,9 +1,13 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
-import ImageOverlayWebGL from "./ImageOverlayWebGL.react";
 import Colormap from "./Colormap.react";
 
-import { Circle, LayerGroup, Polygon, Polyline, Tooltip } from "react-leaflet";
+import L from 'leaflet';
+import '../layers/L.imageWebGLOverlay';
+import '../layers/L.tileWebGLLayer';
+// \src\lib\components\NewLayeredMap\components\CompositeMapLayers.js
+// import './layers/L.imageWebGLOverlay';
+// import './layers/L.tileWebGLLayer';
 
 const yx = ([x, y]) => {
     return [y, x];
@@ -21,164 +25,114 @@ class CompositeMapLayer extends Component {
     //     }
     //     return null;
     // }
+
+    addTooltip(item, shapeObject) {
+        if ("tooltip" in item) {
+            return shapeObject.bindTooltip(item.tooltip);
+        }
+        return shapeObject;
+    }
     
     makePolyline = (item, pos) => {
-        return  L.Polyline(coordinates, {
-            onClick: () => this.props.lineCoords(positions),
-            color: item.color,
-            positions: pos
-        });
+        return this.addTooltip(item, 
+                    (L.Polyline(pos, {
+                        onClick: () => this.props.lineCoords(positions),
+                        color: item.color,
+                        positions: pos
+                    })
+        ));
     }
 
     makePolygon = (item, pos) => {
-        return  L.Polyline(coordinates, {
-            onClick: () => this.props.polygonCoords(positions),
-            color: item.color,
-            positions: pos
-        });
+        return this.addTooltip(item, 
+                    (L.Polygon(pos, {
+                        onClick: () => this.props.polygonCoords(positions),
+                        color: item.color,
+                        positions: pos
+                    })
+        ));
     }
 
     makeCircle = (item) => {
-        return  L.Polyline(coordinates, {
-            color: item.color,
-            center : yx(item.center),
-            radius : item.radius
-        });
+        return  this.addTooltip(item, 
+                    (L.Circle(pos, {
+                        color: item.color,
+                        center : yx(item.center),
+                        radius : item.radius
+                    })
+        ));
+    }
+    // add default bounds?
+    addImage = (image, layerGroup) => {
+        if ("colormap" in image){
+            layerGroup.addLayer(L.imageWebGLOverlay(image.url, image.bounds, {
+                colormap: image.colormap
+            }));
+        } else {
+            layerGroup.addLayer(L.imageOverlay(image.url, image.bounds))
+        }
     }
 
 
-
-
-    addItem(item) {
+    //pass in layer.data
+    addItem(item, layerGroup) {
         switch(item.type) {
             case "polyline":
                 const positions = item.positions.map(xy => yx(xy));
-                return this.makePolyline(item, positions);
+                layerGroup.addLayer(this.makePolyline(item, positions));
+                break;
 
             case "polygon":
                 const positions = item.positions.map(xy => yx(xy));
-                return this.makePolygon(item, positions);
+                layerGroup.addLayer(this.makePolygon(item, positions));
+                break;
 
             case "circle":
-                return this.makeCircle(item);
+                layerGroup.addLayer(this.makeCircle(item));
+                break;
+                
+            case "image":
+                this.addImage(item, layerGroup);
+                break;
 
             default:
-                break;
+                break; // add error message here?
           }
-        
-
     }
 
     createLayerGroup = () => {
-        const layerObjects = {}
-        const layer = this.props.layer
+        // console.log(this.props.map)
+        const denver = L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.'),
+        const layerGroup = L.layerGroup([denver]);
+        const layer = this.props.layer;
 
-        layer.data.forEach.forEach((item) => {
+        console.log("props: ", this.props)
+        console.log("layer group before: ", layerGroup.getLayers())
+        console.log("polygon", layer[0][0]);
+        console.log("polygon type: ", layer[0][0].type);
+        console.log("circle", layer[0][1]);
 
-        })
-    }
-    addLayerGroup = (layer) => {
-        L.layerGroup(group_name).addTo(this.props.map);
+        console.log("layers: ",  layer)
 
+        for (let i = 0; i < layer[0].length; i++ ) {
+            console.log("adding item: ", layer[0][i])
+            this.addItem(layer[0][i], layerGroup);
+        }
         
-    }
-    createLayer() {
-        const layerInfo = this.props.layer;
 
-        
+        /* layer.forEach((item) => {
+        }) */
+        console.log("layer group after: ", layerGroup.getLayers())
+        layerGroup.setZIndex(1000);
+        layerGroup.addTo(this.props.map);
     }
-
-    renderItem(item, index) {
-        if (item.type === "polyline") {
-            const positions = item.positions.map(xy => yx(xy));
-            this.makePolyline(item)
-            return (
-                <Polyline
-                    onClick={() => this.props.lineCoords(positions)}
-                    color={item.color}
-                    positions={positions}
-                    key={index}
-                >
-                    {this.renderTooltip(item)}
-                </Polyline>
-            );
-        }
-        if (item.type === "polygon") {
-            const positions = item.positions.map(xy => yx(xy));
-            return (
-                <Polygon
-                    onClick={() => this.props.polygonCoords(positions)}
-                    color={item.color}
-                    positions={positions}
-                    key={index}
-                >
-                    {this.renderTooltip(item)}
-                </Polygon>
-            );
-        }
-        if (item.type === "circle") {
-            return (
-                <Circle
-                    color={item.color}
-                    center={yx(item.center)}
-                    radius={item.radius}
-                    key={index}
-                >
-                    {this.renderTooltip(item)}
-                </Circle>
-            );
-        }
-        if (item.type === "image") {
-            return (
-                <>
-                    <ImageOverlayWebGL
-                        url={item.url}
-                        colormap={item.colormap}
-                        bounds={item.bounds.map(xy => yx(xy))}
-                        hillShading={
-                            this.props.hillShading && item.allowHillshading
-                        }
-                        elevationScale={
-                            item.elevationScale || DEFAULT_ELEVATION_SCALE
-                        }
-                        lightDirection={this.props.lightDirection}
-                        minvalue={item.minvalue}
-                        maxvalue={item.maxvalue}
-                        unit={item.unit}
-                        key={index}
-                    />
-                    {"colormap" in item && (
-                        <Colormap
-                            colormap={item.colormap}
-                            unit={item.unit}
-                            minvalue={item.minvalue}
-                            maxvalue={item.maxvalue}
-                            position="bottomleft"
-                            key={"colormap" + index}
-                        />
-                    )}
-                </>
-            );
-        }
-        return null;
-    }
-
-    // goes through objects in layers, add them each to a map, makes map a layer group
+  
 
 
  
     render() {
-        return (
-            <LayerGroup>
-                {this.props.layer.data.map((item, index) => {
-                    return (
-                        <Fragment key={index}>
-                            {this.renderItem(item, index)}
-                        </Fragment>
-                    );
-                })}
-            </LayerGroup>
-        );
+        this.createLayerGroup();
+        return (null);
     }
 }
 
@@ -187,7 +141,7 @@ CompositeMapLayer.propTypes = {
 
     /* Data for one single layer. See parent component LayeredMap for documentation.
      */
-    layer: PropTypes.object,
+    layer: PropTypes.array,
 
     /* Add hillshading to an image layer*/
     hillShading: PropTypes.bool,

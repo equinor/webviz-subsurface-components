@@ -16,11 +16,12 @@ const NewLayeredMapDemo = () => {
                     id={"NewLayeredMap-1"}
                     syncedMaps={["NewLayeredMap-2"]}
                     layers={exampleData.layers}
-                    center={[0, 0]/* [432205, 6475078] */}
-                    bounds={null /* [[432205, 6475078], [437720, 6481113]] */}
-                    crs="earth"
-                    minZoom={1}
-                    zoom = {2}
+                    center={[432205, 6475078]/* [432205, 6475078] */}
+                    bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                    // crs="earth"
+                    crs="simple"
+                    minZoom={-5}
+                    zoom = {-5}
                     setProps={e => console.log(e)}
                     controls={{
                         scaleY: {
@@ -44,11 +45,12 @@ const NewLayeredMapDemo = () => {
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1"]}
                     layers={exampleData.layers}
-                    center={[0, 0]/* [432205, 6475078] */}
-                    bounds={null /* [[432205, 6475078], [437720, 6481113]] */}
-                    crs="earth"
-                    minZoom={1}
-                    zoom = {2}
+                    center={[432205, 6475078]}
+                    bounds={[[432205, 6475078], [437720, 6481113]]}
+                    // crs="earth"
+                    crs="simple"
+                    minZoom={-5}
+                    zoom = {-5}
                     setProps={e => console.log(e)}
                     controls={{
                         scaleY: {

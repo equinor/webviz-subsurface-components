@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
+
+//TODO : Feature? Add drawn images to a .json file 
+
 // work around broken icons when using webpack, see https://github.com/PaulLeCam/react-leaflet/issues/255
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -104,7 +107,7 @@ class DrawControls extends Component {
          });
         
     
-         map.on(L.Draw.Event.EDITED, function (e) {
+        map.on(L.Draw.Event.EDITED, function (e) {
             e.layers.eachLayer(layer => {
                 const layertype = getShapeType(layer);
                 if (layertype === "polyline") {
