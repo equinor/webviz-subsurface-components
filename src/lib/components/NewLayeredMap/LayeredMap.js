@@ -19,7 +19,7 @@ import CompositeMapLayer from '../../private_components/layered-map-resources/Co
 const TEMP_IMAGE = exampleData.layers[0].data[0].url;
 const TEMP_COLORMAP = exampleData.layers[0].data[0].colormap;
 // const DEFAULT_BOUNDS = [[0, 0], [30, 30]]
-const DEFAULT_BOUNDS = [[432205, 6475078], [437720, 6481113]]
+const DEFAULT_BOUNDS = [[6475078, 432205], [6481113, 437720]]
 
 const stringToCRS = (crsString) => {
     switch(crsString) {
@@ -47,7 +47,7 @@ class LayeredMap extends Component {
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
-            center: props.center || [432205, 6475078],
+            center: props.center || [6475078, 432205],
             bounds: props.bounds,
             controls: props.controls || {},
         }
@@ -175,9 +175,12 @@ class LayeredMap extends Component {
     }
 
     render() {    
-        const overlayLayers = this.state.layers
+        /* const overlayLayers = this.state.layers
             .filter((layer) => layer.name === "Some overlay layer")
             .map((layer) => layer.data);
+
+        const allLayers = this.state.layers */
+        
         
         return (
             <div>
@@ -197,7 +200,7 @@ class LayeredMap extends Component {
                     {
                         this.state.map && (
                             <CompositeMapLayers 
-                            layer={overlayLayers}
+                            layer={this.state.layers}
                             map={this.state.map}
                         
                             />

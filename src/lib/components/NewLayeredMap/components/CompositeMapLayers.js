@@ -1,13 +1,9 @@
-import React, { Component, Fragment } from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
-import Colormap from "./Colormap.react";
 
 import L from 'leaflet';
 import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
-// \src\lib\components\NewLayeredMap\components\CompositeMapLayers.js
-// import './layers/L.imageWebGLOverlay';
-// import './layers/L.tileWebGLLayer';
 
 const yx = ([x, y]) => {
     return [y, x];
@@ -17,17 +13,10 @@ const DEFAULT_ELEVATION_SCALE = 0.03;
 
 class CompositeMapLayer extends Component {
 
-    // renderTooltip(item) {
-    //     if ("tooltip" in item) {
-    //         item.bindTooltip(item.tooltip).addTo(map);
-
-    //         return <Tooltip sticky={true}>{item.tooltip}</Tooltip>;
-    //     }
-    //     return null;
-    // }
 
     addTooltip(item, shapeObject) {
         if ("tooltip" in item) {
+            console.log("shape inside addtooltip", shapeObject)
             return shapeObject.bindTooltip(item.tooltip);
         }
         return shapeObject;
@@ -35,7 +24,7 @@ class CompositeMapLayer extends Component {
     
     makePolyline = (item, pos) => {
         return this.addTooltip(item, 
-                    (L.Polyline(pos, {
+                    (L.polyline(pos, {
                         onClick: () => this.props.lineCoords(positions),
                         color: item.color,
                         positions: pos
@@ -45,17 +34,17 @@ class CompositeMapLayer extends Component {
 
     makePolygon = (item, pos) => {
         return this.addTooltip(item, 
-                    (L.Polygon(pos, {
+                    (L.polygon(pos, {
                         onClick: () => this.props.polygonCoords(positions),
                         color: item.color,
                         positions: pos
                     })
-        ));
+        )).addTo(this.props.map);
     }
 
     makeCircle = (item) => {
         return  this.addTooltip(item, 
-                    (L.Circle(pos, {
+                    (L.circle(yx(item.center), {
                         color: item.color,
                         center : yx(item.center),
                         radius : item.radius
@@ -83,7 +72,9 @@ class CompositeMapLayer extends Component {
                 break;
 
             case "polygon":
+                console.log("positions before: ", item.positions)
                 const positions = item.positions.map(xy => yx(xy));
+                console.log("positions after: ", positions)
                 layerGroup.addLayer(this.makePolygon(item, positions));
                 break;
 
@@ -99,31 +90,34 @@ class CompositeMapLayer extends Component {
                 break; // add error message here?
           }
     }
+    createMultipleLayers() {
+        L.control.layers([]).addTo(this.props.map);
 
-    createLayerGroup = () => {
-        // console.log(this.props.map)
-        const denver = L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.'),
-        const layerGroup = L.layerGroup([denver]);
-        const layer = this.props.layer;
 
-        console.log("props: ", this.props)
-        console.log("layer group before: ", layerGroup.getLayers())
-        console.log("polygon", layer[0][0]);
-        console.log("polygon type: ", layer[0][0].type);
-        console.log("circle", layer[0][1]);
+        const layers = this.props.layer;
+        for (let i = 0; i < layers.length; i++) {
+            this.createLayerGroup(layers);
+        }
+        
+    }
 
-        console.log("layers: ",  layer)
+    createLayerGroup = (layer) => {
+        const layerGroup = L.layerGroup([]);
 
-        for (let i = 0; i < layer[0].length; i++ ) {
+
+        for (let i = 0; i < layer.data.length; i++ ) {
             console.log("adding item: ", layer[0][i])
             this.addItem(layer[0][i], layerGroup);
         }
-        
+
+        if(layer.base_layer) 
+        const layer_name = layer.name;
+        baseMaps[layer.name] = layerGroup
+             
+
 
         /* layer.forEach((item) => {
         }) */
-        console.log("layer group after: ", layerGroup.getLayers())
-        layerGroup.setZIndex(1000);
         layerGroup.addTo(this.props.map);
     }
   
@@ -131,7 +125,7 @@ class CompositeMapLayer extends Component {
 
  
     render() {
-        this.createLayerGroup();
+        this.createMultipleLayers();
         return (null);
     }
 }
