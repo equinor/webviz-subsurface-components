@@ -29,7 +29,7 @@ const stringToCRS = (crsString) => {
     }
 }
 
-class LayeredMap extends Component {
+class NewLayeredMap extends Component {
 
     constructor(props) {
         super(props);
@@ -37,7 +37,7 @@ class LayeredMap extends Component {
         this.state = {
             map: null,
             layers: props.layers || [],
-            minZoom: props.minZoom || -5,
+            minZoom: props.minZoom || 1,
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
@@ -71,16 +71,18 @@ class LayeredMap extends Component {
 
         // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
-        // L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        /* L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', TEMP_COLORMAP, {
+            shader: 'hillshading'
+        }).addTo(map); */
 
       /*   L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
             colormap: exampleData.layers[0].data[0].colormap
-        }).addTo(map);
+        }).addTo(map); */
 
         L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
         L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map); */
+        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
         
     }
 
@@ -98,20 +100,29 @@ class LayeredMap extends Component {
             
             case 'image': {
                 if(colormap) {
-                    newLayer = L.imageWebGLOverlay(url, bounds, {
-                        colormap: colormap,
-                        /* CRS: L.CRS.Simple, */
+                    newLayer = L.imageWebGLOverlay(url, bounds, colormap, {
+                        ...layerData,
+                        shader: layerData.shader,
                     });
                 } else {
                     newLayer = L.imageOverlay(url, bounds, {
-                        
+                        ...layerData,
                     });
                 }
                 break;
             }
 
             case 'tile': {
-                newLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+                if(colormap) {
+                    newLayer = L.tileWebGLLayer(url, colormap, {
+                        ...layerData,
+                        shader: layerData.shader,
+                    })
+                } else {
+                    newLayer = L.tileLayer(url, {
+                        ...layerData
+                    });
+                }
                 break;
             }
         
@@ -146,8 +157,38 @@ class LayeredMap extends Component {
 
 }
 
-LayeredMap.propTypes = {
+NewLayeredMap.propTypes = {
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    id: PropTypes.string.isRequired,
+
+    /**
+     * The layers
+     */
     layers: PropTypes.array,
+
+    /**
+     * Configuration for map controls
+     */
+    controls: PropTypes.object,
+
+    /**
+     * 
+     */
+    bounds: PropTypes.array,
+
+    /**
+     * 
+     */
+    minZoom: PropTypes.number,
+
+    /**
+     * 
+     */
+    crs: PropTypes.string,
 }
 
-export default LayeredMap;
+export default NewLayeredMap;
