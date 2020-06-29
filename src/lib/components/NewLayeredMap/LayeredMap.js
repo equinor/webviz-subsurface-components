@@ -11,15 +11,15 @@ import Controls from './components/Controls';
 import CompositeMapLayers from './components/CompositeMapLayers'
 
 // Assets
-import exampleData from '../../../demo/example-data/layered-map.json';
+import exampleData from '../../../demo/example-data/new-layered-map.json';
 import CompositeMapLayer from '../../private_components/layered-map-resources/CompositeMapLayer.react';
 
 // Constants
 // const TEMP_IMAGE = 'https://i.pinimg.com/originals/67/dd/14/67dd1431cf0d806254a34ad6c0eb0eb5.jpg';
 const TEMP_IMAGE = exampleData.layers[0].data[0].url;
 const TEMP_COLORMAP = exampleData.layers[0].data[0].colormap;
-// const DEFAULT_BOUNDS = [[0, 0], [30, 30]]
-const DEFAULT_BOUNDS = [[6475078, 432205], [6481113, 437720]]
+const DEFAULT_BOUNDS = [[0, 0], [30, 30]]
+// const DEFAULT_BOUNDS = [[6475078, 432205], [6481113, 437720]]
 
 const stringToCRS = (crsString) => {
     switch(crsString) {
@@ -38,7 +38,6 @@ class LayeredMap extends Component {
 
     constructor(props) {
         super(props);
-
         this.state = {
             id: props.id,
             map: null,
@@ -66,38 +65,10 @@ class LayeredMap extends Component {
             maxZoom: this.state.maxZoom,
         });
 
-
-
-        this.setState({map: map}, () => {
-
-            this.state.layers.forEach((layer) => {
-                (layer.data || []).forEach(this.addLayerDataToMap);
-            })
-
-            if(this.state.bounds) {
-                map.fitBounds(this.state.bounds);
-            }
-        });
-
-
-        LayeredMap.mapReferences[this.state.id] = map;
-
-
-
-         L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
-            colormap: exampleData.layers[0].data[0].colormap
-        }).addTo(map);
-
-
-
-        /* L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
-        L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map); */
-
-        this.setEvents(map);
         
-
+        this.setState({map: map});
+        LayeredMap.mapReferences[this.state.id] = map;
+        this.setEvents(map);
     }
 
 
@@ -132,55 +103,8 @@ class LayeredMap extends Component {
         })
     }
 
-    addLayerDataToMap = (layerData) => {
-        if(!layerData) {
-            return;
-        }
-
-        let newLayer = null;
-        const url = layerData.url;
-        const colormap = layerData.colormap;
-        const bounds = layerData.bounds || DEFAULT_BOUNDS;
-
-        switch(layerData.type) {
-            case 'image': {
-                if(colormap) {
-                    newLayer = L.imageWebGLOverlay(url, bounds, {
-                        colormap: colormap,
-                        /* CRS: L.CRS.Simple, */
-                    });
-
-                } else {
-                    newLayer = L.imageOverlay(url, bounds, {
-                        
-                    });
-                }
-                break;
-            }
-
-            case 'tile': {
-                if(colormap) {
-                    // TODO: Add new TileWebGLLayer here
-                } else {
-                    newLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
-                }
-                break;
-            }
-        
-        }
-        if(newLayer) {
-            newLayer.addTo(this.state.map);
-        }
-        return [url, bounds, colormap];
-    }
 
     render() {    
-        /* const overlayLayers = this.state.layers
-            .filter((layer) => layer.name === "Some overlay layer")
-            .map((layer) => layer.data);
-
-        const allLayers = this.state.layers */
-        
         
         return (
             <div>
@@ -200,9 +124,9 @@ class LayeredMap extends Component {
                     {
                         this.state.map && (
                             <CompositeMapLayers 
-                            layer={this.state.layers}
-                            map={this.state.map}
-                        
+                                layer={this.props.layers}
+                                map={this.state.map}
+    
                             />
                         )
                     }

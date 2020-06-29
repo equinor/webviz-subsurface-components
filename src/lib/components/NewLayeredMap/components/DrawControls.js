@@ -44,10 +44,8 @@ class DrawControls extends Component {
     constructor(props) {
         this.addToolbar = this.addToolbar.bind(this);
     }
-    
 
     removeLayers(layertype, featureGroup) {
-        console.log(featureGroup)
         const layerContainer = featureGroup.options.edit.featureGroup
         const layers = layerContainer._layers;
         const layer_ids = Object.keys(layers);

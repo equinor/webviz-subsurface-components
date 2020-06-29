@@ -8,21 +8,21 @@ import '../layers/L.tileWebGLLayer';
 const yx = ([x, y]) => {
     return [y, x];
 };
+const DEFAULT_BOUNDS = [[0, 0], [30, 30]];
 
 const DEFAULT_ELEVATION_SCALE = 0.03;
 
 class CompositeMapLayer extends Component {
 
-
     addTooltip(item, shapeObject) {
         if ("tooltip" in item) {
-            console.log("shape inside addtooltip", shapeObject)
             return shapeObject.bindTooltip(item.tooltip);
         }
         return shapeObject;
     }
     
-    makePolyline = (item, pos) => {
+    makePolyline = (item) => {
+        const pos = item.positions.map(xy => yx(xy));
         return this.addTooltip(item, 
                     (L.polyline(pos, {
                         onClick: () => this.props.lineCoords(positions),
@@ -32,14 +32,15 @@ class CompositeMapLayer extends Component {
         ));
     }
 
-    makePolygon = (item, pos) => {
+    makePolygon = (item) => {
+        const pos = item.positions.map(xy => yx(xy));
         return this.addTooltip(item, 
                     (L.polygon(pos, {
                         onClick: () => this.props.polygonCoords(positions),
                         color: item.color,
                         positions: pos
                     })
-        )).addTo(this.props.map);
+        ));
     }
 
     makeCircle = (item) => {
@@ -53,29 +54,26 @@ class CompositeMapLayer extends Component {
     }
     // add default bounds?
     addImage = (image, layerGroup) => {
+        const bounds = image.bounds.map(xy => yx(xy));
         if ("colormap" in image){
-            layerGroup.addLayer(L.imageWebGLOverlay(image.url, image.bounds, {
+
+            layerGroup.addLayer(L.imageWebGLOverlay(image.url, bounds, {
                 colormap: image.colormap
             }));
         } else {
-            layerGroup.addLayer(L.imageOverlay(image.url, image.bounds))
+            layerGroup.addLayer(L.imageOverlay(image.url, bounds))
         }
     }
 
 
-    //pass in layer.data
     addItem(item, layerGroup) {
         switch(item.type) {
             case "polyline":
-                const positions = item.positions.map(xy => yx(xy));
-                layerGroup.addLayer(this.makePolyline(item, positions));
+                layerGroup.addLayer(this.makePolyline(item));
                 break;
 
             case "polygon":
-                console.log("positions before: ", item.positions)
-                const positions = item.positions.map(xy => yx(xy));
-                console.log("positions after: ", positions)
-                layerGroup.addLayer(this.makePolygon(item, positions));
+                layerGroup.addLayer(this.makePolygon(item));
                 break;
 
             case "circle":
@@ -91,38 +89,41 @@ class CompositeMapLayer extends Component {
           }
     }
     createMultipleLayers() {
-        L.control.layers([]).addTo(this.props.map);
-
+        const layerControl = L.control.layers([]).addTo(this.props.map);
 
         const layers = this.props.layer;
         for (let i = 0; i < layers.length; i++) {
-            this.createLayerGroup(layers);
+            this.createLayerGroup(layers[i], layerControl);
         }
         
     }
 
-    createLayerGroup = (layer) => {
-        const layerGroup = L.layerGroup([]);
+    createLayerGroup = (layer, layerControl) => {
+        const layerGroup = L.layerGroup();
 
-
+        //adds object to a layer
         for (let i = 0; i < layer.data.length; i++ ) {
-            console.log("adding item: ", layer[0][i])
-            this.addItem(layer[0][i], layerGroup);
+            this.addItem(layer.data[i], layerGroup);
         }
 
-        if(layer.base_layer) 
-        const layer_name = layer.name;
-        baseMaps[layer.name] = layerGroup
-             
+        if(layer.checked) {
+            layerGroup.addTo(this.props.map);
+        }
 
+        // adds layers to the layerControl
+        if(layer.base_layer) {
+            layerControl.addBaseLayer(layerGroup, layer.name);
 
-        /* layer.forEach((item) => {
-        }) */
-        layerGroup.addTo(this.props.map);
+            // Fits the map bounds if layer is a base layer
+            // TODO: improve bounds optimization?
+                const bounds = layer.data[0].bounds ? layer.data[0].bounds.map(xy => yx(xy)) : DEFAULT_BOUNDS;
+                this.props.map.fitBounds(bounds);
+        } else {
+            layerControl.addOverlay(layerGroup, layer.name);
+        }
+
     }
   
-
-
  
     render() {
         this.createMultipleLayers();
