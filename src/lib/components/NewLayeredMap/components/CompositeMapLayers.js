@@ -14,6 +14,29 @@ const DEFAULT_ELEVATION_SCALE = 0.03;
 
 class CompositeMapLayer extends Component {
 
+    constructor(props) {
+        super(props);
+
+        // TODO: Add all layers by id in state
+        this.state = {
+            layers: {
+
+            }
+        }
+    }
+
+    componentDidMount() {
+        this.createMultipleLayers();
+    }
+
+    componentDidUpdate(prevProps) {
+        // TODO: Add, delete or update layers based on this.props.layers.
+    }
+
+    componentWillUnmount() {
+        // TODO: Remove all layers from the map
+    }
+
     addTooltip(item, shapeObject) {
         if ("tooltip" in item) {
             return shapeObject.bindTooltip(item.tooltip);
@@ -56,7 +79,6 @@ class CompositeMapLayer extends Component {
     addImage = (image, layerGroup) => {
         const bounds = image.bounds.map(xy => yx(xy));
         if ("colormap" in image){
-            console.log("colormap", image.colormap)
             layerGroup.addLayer(L.imageWebGLOverlay(image.url, bounds, image.colormap, {
                 shader: image.shader
             }));
@@ -82,7 +104,6 @@ class CompositeMapLayer extends Component {
                 
             case "image":
                 this.addImage(item, layerGroup);
-                console.log(item)
                 break;
 
             default:
@@ -117,7 +138,6 @@ class CompositeMapLayer extends Component {
 
             // Fits the map bounds if layer is a base layer
             // TODO: improve bounds optimization?
-                console.log(layer.data[0].bounds)
                 const bounds = layer.data[0].bounds ? layer.data[0].bounds.map(xy => yx(xy)) : DEFAULT_BOUNDS;
                 this.props.map.fitBounds(bounds);
         } else {
@@ -128,7 +148,6 @@ class CompositeMapLayer extends Component {
   
  
     render() {
-        this.createMultipleLayers();
         return (null);
     }
 }

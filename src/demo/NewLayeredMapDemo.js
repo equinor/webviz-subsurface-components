@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // Components
 import NewLayeredMap from '../lib/components/NewLayeredMap';
@@ -9,6 +9,14 @@ import { NewLayeredMap } from '../lib/index';
 
 const NewLayeredMapDemo = () => {
 
+    const [switchValue, setSwitchValue] = useState(false);
+
+    const onChange = (changes) => {
+        if(changes.switch) {
+            setSwitchValue(changes.switch.value);
+        }
+    }
+
     return (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>
             <div >
@@ -18,55 +26,66 @@ const NewLayeredMapDemo = () => {
                     layers={exampleData.layers}
                     /*center={[432205, 6475078], [432205, 6475078]} */
                     bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
-                    crs="earth"
+                    // crs="earth"
                     crs="simple"
                     minZoom={-5}
                     zoom = {-5} 
-                    setProps={e => console.log(e)}
-                    controls={{
-                        scaleY: {
-                            scaleY: 1,
-                            minScaleY: 1,
-                            maxScaleY: 10,
-                            position: 'topleft',
-                        },
-                        drawTools: {
-                            drawMarker: true,
-                            drawPolygon: true,
-                            drawPolyline: true,
-                            position: "topright",
-                            
-                        }
+                    // setProps={e => console.log(e)}
+
+                    minZoom={-5}
+                    zoom = {-5}
+                    scaleY={{
+                        scaleY: 1,
+                        minScaleY: 1,
+                        maxScaleY: 10,
+                        position: 'topleft',
                     }}
+                        drawTools = {{
+                        drawMarker: true,
+                        drawPolygon: true,
+                        drawPolyline: true,
+                        position: "topright",
+                        
+                    }}
+                    switch={{
+                        value: switchValue,
+                        label: 'Useless toggle',
+                        position: 'bottomleft'
+                    }}
+                    setProps={onChange}
                 />
             </div>
             <div >
-                <NewLayeredMap
+                <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1"]}
                     layers={exampleData.layers}
-                    center={[432205, 6475078]}
-                    bounds={[[432205, 6475078], [437720, 6481113]]}
-                    crs="earth"
+                    /*center={[432205, 6475078], [432205, 6475078]} */
+                    bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                    // crs="earth"
                     crs="simple"
                     minZoom={-5}
-                    zoom = {-5}
-                    setProps={e => console.log(e)}
-                    controls={{
-                        scaleY: {
-                            scaleY: 1,
-                            minScaleY: 1,
-                            maxScaleY: 10,
-                            position: 'topleft',
-                        },
-                        drawTools: {
-                            drawMarker: true,
-                            drawPolygon: true,
-                            drawPolyline: true,
-                            position: "topright",
-                            
-                        }
+                    zoom = {-5} 
+                    // setProps={e => console.log(e)}
+                    scaleY={{
+                        scaleY: 1,
+                        minScaleY: 1,
+                        maxScaleY: 10,
+                        position: 'topleft',
                     }}
+                    drawTools = {{
+                        drawMarker: true,
+                        drawPolygon: true,
+                        drawPolyline: true,
+                        position: "topright",
+                        
+                    }}
+                    switch={{
+                        value: switchValue,
+                        label: 'Useless toggle',
+                        position: 'bottomleft'
+                    }}
+                    setProps={onChange}
                 />
             </div>
         </div>

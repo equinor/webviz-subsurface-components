@@ -45,6 +45,13 @@ class DrawControls extends Component {
         this.addToolbar = this.addToolbar.bind(this);
     }
 
+    
+    componentDidMount() {
+        const { drawPolygon, drawMarker, drawPolyline } = this.props;
+        this.addToolbar(this.props.map);
+    }
+
+
     removeLayers(layertype, featureGroup) {
         const layerContainer = featureGroup.options.edit.featureGroup
         const layers = layerContainer._layers;
@@ -131,8 +138,7 @@ class DrawControls extends Component {
 
 
     render() {
-        const { drawPolygon, drawMarker, drawPolyline } = this.props;
-        this.addToolbar(this.props.map);
+
         return (null);
     }
 }
