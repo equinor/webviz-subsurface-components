@@ -30,7 +30,7 @@ const stringToCRS = (crsString) => {
     }
 }
 
-class LayeredMap extends Component {
+class NewLayeredMap extends Component {
 
     static mapReferences = {};
 
@@ -41,7 +41,7 @@ class LayeredMap extends Component {
             id: props.id,
             map: null,
             layers: props.layers || [],
-            minZoom: props.minZoom || -5,
+            minZoom: props.minZoom || 1,
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
@@ -70,20 +70,14 @@ class LayeredMap extends Component {
 
             this.state.layers.forEach((layer) => {
                 (layer.data || []).forEach(this.addLayerDataToMap)
-<<<<<<< HEAD
-
-            }) 
-            
-=======
             })
 
->>>>>>> 77c9e7dc61734bad10168b56f7ba85fda3688829
             if(this.state.bounds) {
                 map.fitBounds(this.state.bounds);
             }
         });
 
-<<<<<<< HEAD
+
         const baseMap = this.addLayersToMap(map);
 
 
@@ -93,9 +87,7 @@ class LayeredMap extends Component {
         // var baseMap = {
         //     'Map' : baseLayer
         // };
-=======
-        LayeredMap.mapReferences[this.state.id] = map;
->>>>>>> 77c9e7dc61734bad10168b56f7ba85fda3688829
+
 
         // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
@@ -111,18 +103,13 @@ class LayeredMap extends Component {
             map);
 
         
-        // L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        /* L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', TEMP_COLORMAP, {
+            shader: 'hillshading'
+        }).addTo(map); */
 
-<<<<<<< HEAD
 
 
 
-        const image_overlay = L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
-=======
-         L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
->>>>>>> 77c9e7dc61734bad10168b56f7ba85fda3688829
-            colormap: exampleData.layers[0].data[0].colormap
-        }).addTo(map);
 
         const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let layerMap = {};
@@ -134,56 +121,21 @@ class LayeredMap extends Component {
         L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
         L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
         L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-<<<<<<< HEAD
-
-        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
-        
-    }
-
-    addOverlay = (overlay, layerName, layerMap) => {
-        layerMap[layerName] = overlay;
-    }
-
-    addLayer = (layer, layerName, layerMap) => {
-        layerMap[layerName] = layer;
-    }
-
-
-    addLayerControl = (map, mapLayers) => {
-        // L.control.layers(this.baseMaps, this.overlayMaps).addTo(this.map)
-        L.control.layers(mapLayers).addTo(map);
-    }
-    // this.state.layers.forEach((layer) => {
-    //     (layer.data || []).forEach(this.addLayerDataToMap)
-    // }) 
-
-    addLayersToMap = (map) => {
-        let layerMap = {};
-        this.state.layers.forEach(layer => {
-            layerMap[layer.name] = this.addLayerDataToMap(layer.data);
-        })
-        console.log("layermap: " + layerMap)
-        return layerMap;
-=======
         L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
 
         this.setEvents(map);
->>>>>>> 77c9e7dc61734bad10168b56f7ba85fda3688829
         
 
     }
 
-<<<<<<< HEAD
-    // if it's a polygon, a line or a circle, add to the same layer
-=======
     setEvents = (map) => {
         map.on('zoomanim', e => {
             this.props.syncedMaps.map(id => {
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
-                    e.zoom !== LayeredMap.mapReferences[id].getZoom()
+                    e.zoom !== NewLayeredMap.mapReferences[id].getZoom()
                 ) {
-                    LayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].setView(
                         e.center,
                         e.zoom
                     )
@@ -198,7 +150,7 @@ class LayeredMap extends Component {
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
-                    LayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].setView(
                         e.target.getCenter()
                     )
                 }
@@ -207,7 +159,6 @@ class LayeredMap extends Component {
         })
     }
 
->>>>>>> 77c9e7dc61734bad10168b56f7ba85fda3688829
     addLayerDataToMap = (layerData) => {
         console.log("data: " + layerData.type)
         if(!layerData) {
@@ -222,23 +173,31 @@ class LayeredMap extends Component {
         switch(layerData.type) {
             case 'image': {
                 if(colormap) {
-                    console.log("image " + newLayer)
-                    newLayer = L.imageWebGLOverlay(url, bounds, {
-                        colormap: colormap,
-                        /* CRS: L.CRS.Simple, */
+                    newLayer = L.imageWebGLOverlay(url, bounds, colormap, {
+                        ...layerData,
+                        shader: layerData.shader,
                     });
                 console.log("image layer " + newLayer)
 
                 } else {
                     newLayer = L.imageOverlay(url, bounds, {
-                        
+                        ...layerData,
                     });
                 }
                 break;
             }
 
             case 'tile': {
-                newLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+                if(colormap) {
+                    newLayer = L.tileWebGLLayer(url, colormap, {
+                        ...layerData,
+                        shader: layerData.shader,
+                    })
+                } else {
+                    newLayer = L.tileLayer(url, {
+                        ...layerData
+                    });
+                }
                 break;
             }
         
@@ -272,11 +231,7 @@ class LayeredMap extends Component {
     }
 
 
-<<<<<<< HEAD
-    render() {
-=======
     render() {        
->>>>>>> 77c9e7dc61734bad10168b56f7ba85fda3688829
         return (
             <div>
                 <div
@@ -298,12 +253,43 @@ class LayeredMap extends Component {
 
 }
 
-LayeredMap.propTypes = {
+NewLayeredMap.propTypes = {
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    id: PropTypes.string.isRequired,
+
+    /**
+     * The layers
+     */
     layers: PropTypes.array,
 
-    id: PropTypes.string,
-    
+    /**
+     * Configuration for map controls
+     */
+    controls: PropTypes.object,
+
+    /**
+     * 
+     */
+    bounds: PropTypes.array,
+
+    /**
+     * 
+     */
+    minZoom: PropTypes.number,
+
+    /**
+     * 
+     */
+    crs: PropTypes.string,
+
+    /**
+     * Ids of other LayeredMap instances that should be synced with this instance  
+     */    
     syncedMaps: PropTypes.array,
 }
 
-export default LayeredMap;
+export default NewLayeredMap;

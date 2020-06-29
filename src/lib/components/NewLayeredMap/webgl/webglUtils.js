@@ -1,3 +1,5 @@
+import { didProgramLink, didShaderCompile } from './errorUtils';
+
 export const loadImage = (src, config = {}) =>
     new Promise(resolve => {
         const img = new Image();
@@ -11,7 +13,10 @@ export const loadImage = (src, config = {}) =>
         img.onload = () => resolve(img);
 });
 
-export const requestCORSIfNotSameOrigin = (img, url, value) => {
+export const loadShader = (shaderPath) => 
+    fetch(shaderPath).then((res) => res.text());
+
+const requestCORSIfNotSameOrigin = (img, url, value) => {
     if ((new URL(url, window.location.href)).origin !== window.location.origin && !url.startsWith("data:")) {
         img.crossOrigin = value;
     }
@@ -46,8 +51,23 @@ export const createProgram = (gl, vertexShader, fragmentShader) => {
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
+    didProgramLink(gl, program);
     return program;
 };
+
+export const createAndInitProgram = (gl, shaderVertex, shaderFragment) => {
+    // Initialize shaders
+    const program = createProgram(
+        gl,
+        createShader(gl, gl.VERTEX_SHADER, shaderVertex),
+        createShader(gl, gl.FRAGMENT_SHADER, shaderFragment)
+    );   
+
+    // Initialize program
+    gl.useProgram(program);
+    return program;
+}
+
 
 export const bindBuffer = (gl, attribName, array) => {
     /**
@@ -100,25 +120,3 @@ export const bindTexture = (gl, textureIndex, uniformName, image) => {
     gl.uniform1i(gl.getUniformLocation(program, uniformName), textureIndex);
 }
 
-export const didShaderCompile = (gl, shader, name) => {
-    if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error(`ERROR: Was not able to compile the  ${name} shader`, gl.getShaderInfoLog(shader))
-        return false;
-    }
-    return true;
-}
-
-export const didProgramLink = (gl, program) => {
-    if(!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.error("ERROR:  linking program!", gl.getProgramInfoLog(program));
-        return false;
-    }
-    return true;
-}
-
-export const isProgramValid = (gl, program) => {
-    if(!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-        return false;
-    }
-    return true;
-}
