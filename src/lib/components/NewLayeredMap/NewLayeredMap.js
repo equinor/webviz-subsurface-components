@@ -97,7 +97,7 @@ class NewLayeredMap extends Component {
 
     setEvents = (map) => {
         map.on('zoomanim', e => {
-            this.props.syncedMaps.map(id => {
+            (this.props.syncedMaps || []).map(id => {
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
                     e.zoom !== NewLayeredMap.mapReferences[id].getZoom()
@@ -113,7 +113,7 @@ class NewLayeredMap extends Component {
         map.on('move', e => {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
-            this.props.syncedMaps.map(id => {
+            (this.props.syncedMaps || []).map(id => {
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
@@ -187,7 +187,9 @@ class NewLayeredMap extends Component {
                         this.state.map && (
                             <Controls 
                                 map={this.state.map}
-                                {...this.state.controls}
+                                setProps={this.props.setProps}
+                                scaleY={this.props.scaleY}
+                                switch={this.props.switch}
                             />
                         )
                     }
@@ -212,9 +214,24 @@ NewLayeredMap.propTypes = {
     layers: PropTypes.array,
 
     /**
-     * Configuration for map controls
+     * ScaleY is a configuration for creating a slider for scaling the Y-axis.
      */
-    controls: PropTypes.object,
+    scaleY: PropTypes.shape({
+        scaleY: PropTypes.number,
+        maxScaleY: PropTypes.number,
+        minScaleY: PropTypes.number,
+        position: PropTypes.string,
+    }),
+
+    /**
+     * Switch is a configuration for creating a switch-toggle.
+     */
+    switch: PropTypes.shape({
+        value: PropTypes.bool,
+        disabled: PropTypes.bool,
+        position: PropTypes.string,
+        label: PropTypes.string,
+    }),
 
     /**
      * 

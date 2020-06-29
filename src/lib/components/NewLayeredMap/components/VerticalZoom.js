@@ -28,6 +28,10 @@ class VerticalZoom extends React.Component {
         }
     }
 
+    componentWillUnmount() {
+        this.removeMapControl();
+    }
+
     componentDidUpdate(prevProps) {
         if (prevProps.scaleY !== this.props.scaleY) {
             this.updateVerticalZoom(this.props.scaleY);

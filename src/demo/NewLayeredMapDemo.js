@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // Components
 import LayeredMap from '../lib/components/NewLayeredMap';
@@ -8,6 +8,14 @@ import exampleData from './example-data/new-layered-map.json';
 import { NewLayeredMap } from '../lib/index';
 
 const NewLayeredMapDemo = () => {
+
+    const [switchValue, setSwitchValue] = useState(false);
+
+    const onChange = (changes) => {
+        if(changes.switch) {
+            setSwitchValue(changes.switch.value);
+        }
+    }
 
     return (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>
@@ -22,6 +30,13 @@ const NewLayeredMapDemo = () => {
                     crs="earth"
                     minZoom={1}
                     zoom = {2}
+                    scaleY={null}
+                    switch={{
+                        value: switchValue,
+                        label: 'Useless toggle',
+                        position: 'bottomleft'
+                    }}
+                    setProps={onChange}
                 />
             </div>
             <div >
