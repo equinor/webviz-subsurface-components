@@ -45,7 +45,7 @@ class Controls extends Component {
 Controls.propTypes = {
     map: PropTypes.object.isRequired,
 
-    setProps: PropTypes.func.isRequired,
+    setProps: PropTypes.func,
 
     scaleY: PropTypes.shape({
         scaleY: PropTypes.number,
