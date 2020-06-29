@@ -56,9 +56,9 @@ class CompositeMapLayer extends Component {
     addImage = (image, layerGroup) => {
         const bounds = image.bounds.map(xy => yx(xy));
         if ("colormap" in image){
-
-            layerGroup.addLayer(L.imageWebGLOverlay(image.url, bounds, {
-                colormap: image.colormap
+            console.log("colormap", image.colormap)
+            layerGroup.addLayer(L.imageWebGLOverlay(image.url, bounds, image.colormap, {
+                shader: image.shader
             }));
         } else {
             layerGroup.addLayer(L.imageOverlay(image.url, bounds))
@@ -82,6 +82,7 @@ class CompositeMapLayer extends Component {
                 
             case "image":
                 this.addImage(item, layerGroup);
+                console.log(item)
                 break;
 
             default:
@@ -116,6 +117,7 @@ class CompositeMapLayer extends Component {
 
             // Fits the map bounds if layer is a base layer
             // TODO: improve bounds optimization?
+                console.log(layer.data[0].bounds)
                 const bounds = layer.data[0].bounds ? layer.data[0].bounds.map(xy => yx(xy)) : DEFAULT_BOUNDS;
                 this.props.map.fitBounds(bounds);
         } else {

@@ -27,6 +27,9 @@ const yx = ([x, y]) => {
 const _layeredmap_references = {};
 
 class LayeredMap extends Component {
+
+    static layeredMapReferences = {};
+
     constructor(props) {
         super(props);
         this.mapRef = React.createRef();

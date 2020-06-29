@@ -32,7 +32,7 @@ const stringToCRS = (crsString) => {
     }
 }
 
-class LayeredMap extends Component {
+class NewLayeredMap extends Component {
 
     static mapReferences = {};
 
@@ -42,7 +42,7 @@ class LayeredMap extends Component {
             id: props.id,
             map: null,
             layers: props.layers || [],
-            minZoom: props.minZoom || -5,
+            minZoom: props.minZoom || 1,
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
@@ -67,7 +67,7 @@ class LayeredMap extends Component {
 
         
         this.setState({map: map});
-        LayeredMap.mapReferences[this.state.id] = map;
+        NewLayeredMap.mapReferences[this.state.id] = map;
         this.setEvents(map);
     }
 
@@ -77,9 +77,9 @@ class LayeredMap extends Component {
             this.props.syncedMaps.map(id => {
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
-                    e.zoom !== LayeredMap.mapReferences[id].getZoom()
+                    e.zoom !== NewLayeredMap.mapReferences[id].getZoom()
                 ) {
-                    LayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].setView(
                         e.center,
                         e.zoom
                     )
@@ -94,7 +94,7 @@ class LayeredMap extends Component {
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
-                    LayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].setView(
                         e.target.getCenter()
                     )
                 }
@@ -137,14 +137,49 @@ class LayeredMap extends Component {
 
 }
 
-LayeredMap.propTypes = {
+NewLayeredMap.propTypes = {
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    // id: PropTypes.string.isRequired,
+
+    /**
+     * The layers
+     */
     layers: PropTypes.array,
     setProps: PropTypes.func,
     polyline_points: PropTypes.array,
     polygon_points: PropTypes.array,
     marker_point: PropTypes.array,
     id: PropTypes.string,
+
+    /**
+     * Configuration for map controls
+     */
+    controls: PropTypes.object,
+
+    /**
+     * 
+     */
+    bounds: PropTypes.array,
+
+    /**
+     * 
+     */
+    minZoom: PropTypes.number,
+
+    /**
+     * 
+     */
+    crs: PropTypes.string,
+
+    /**
+     * Ids of other LayeredMap instances that should be synced with this instance  
+     */    
+
     syncedMaps: PropTypes.array,
 }
 
-export default LayeredMap;
+export default NewLayeredMap;
