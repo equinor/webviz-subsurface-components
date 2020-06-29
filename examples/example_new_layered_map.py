@@ -30,9 +30,19 @@ if __name__ == "__main__":
 
     layers = [
         {
-            "name": "A seismic horizon with colormap",
-            "base_layer": True,
-            "checked": True,
+            "data": [
+                {
+                    "type": "tile",
+                    "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
+                    "shader": {
+                        "type": "none",
+                        "elevationScale": 0.01
+                    }
+                }
+            ]
+        },
+        {
             "data": [
                 {
                     "type": "image",
@@ -42,54 +52,24 @@ if __name__ == "__main__":
                     "unit": "m",
                     "minvalue": min_value,
                     "maxvalue": max_value,
-                    "bounds": [[432205, 6475078], [437720, 6481113]],
+                    "bounds": [[0, 0], [-30, -30]],
                 },
             ],
-        },
-        {
-            "name": "The same map without colormap",
-            "base_layer": True,
-            "checked": False,
-            "data": [
-                {
-                    "type": "image",
-                    "url": map_data,
-                    "bounds": [[432205, 6475078], [437720, 6481113]],
-                }
-            ],
-        },
-        {
-            "name": "Some overlay layer",
-            "base_layer": False,
-            "checked": False,
-            "data": [
-                {
-                    "type": "polygon",
-                    "positions": [
-                        [436204, 6475077],
-                        [438204, 6480077],
-                        [432204, 6475077],
-                    ],
-                    "color": "blue",
-                    "tooltip": "This is a blue polygon",
-                },
-                {
-                    "type": "circle",
-                    "center": [435200, 6478000],
-                    "color": "red",
-                    "radius": 2,
-                    "tooltip": "This is a red circle",
-                },
-            ],
-        },
+        }
     ]
 
+    layered_map_component = webviz_subsurface_components.NewLayeredMap(
+        id="example-map", 
+        layers=layers, 
+    )
 
     app = dash.Dash(__name__)
 
     app.layout = html.Div(
         children=[
-            webviz_subsurface_components.NewLayeredMap(id="volve-map", layers=layers, bounds=[[432205, 6475078], [437720, 6481113]], minZoom=-5, crs='simple', controls={"scaleY": {}}),
+            html.Div(id='hidden-div'),
+            html.Button('Toggle shader', id='map-shader-toggle-btn'),
+            layered_map_component,
             html.Pre(id="polyline"),
             html.Pre(id="marker"),
             html.Pre(id="polygon"),
@@ -97,5 +77,18 @@ if __name__ == "__main__":
     )
 
   
+
+    @app.callback(
+        Output('hidden-div', 'children'),
+        [
+            Input(component_id='map-shader-toggle-btn', component_property='n_clicks')
+        ]
+    )
+    def toggle_between_shaders(n_clicks):
+        print("n_clicks:", n_clicks)
+        print("Current shader:", layers[0]['data'][0]['shader']['type'])
+        layers[0]['data'][0]['shader']['type'] = None if layers[0]['data'][0]['shader']['type'] is 'hillshading' else 'hillshading'
+        return layers[0]['data'][0]['shader']['type']
+        
 
     app.run_server(debug=True)
