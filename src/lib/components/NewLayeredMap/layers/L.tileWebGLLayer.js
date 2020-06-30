@@ -83,7 +83,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
         });
 
         L.GridLayer.prototype.onAdd.call(this, map);
-    },
+	},
 
     createTile: function(coords, done) {
 		// Create image-tag and assign on load- and error-listeners

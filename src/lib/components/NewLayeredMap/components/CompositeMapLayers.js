@@ -20,8 +20,8 @@ class CompositeMapLayers extends Component {
         // TODO: Add all layers by id in state
         this.state = {
             layers: {
-
-            }
+                    
+            },
         }
     }
 
@@ -29,15 +29,46 @@ class CompositeMapLayers extends Component {
         this.createMultipleLayers();
     }
 
-    componentDidUpdate(prevProps) {
+    /* componentDidUpdate(prevProps) {
+        const layers = this.props.layer;
+        for (const layer in layers) {
+            switch(layer.action) {
+                case "update":
+                    if (this.state.layers[layer.id]) {
+                        this.props.map.removeLayer(layer);
+                        this.createLayerGroup(layer, this.state.layerControl);
+                    }
+                    break;
+
+                case "delete":
+                    if (this.state.layers[layer.id]) {
+                        this.props.map.removeLayer(layer);
+                        this.setState({[layer.id]: undefined});
+                        
+                    }
+                    break;
+                default:
+                    // add
+                    if (!this.state.layers[layer.id]) {
+                        this.createLayerGroup(layer, this.state.layerControl);
+                    } 
+                    break;
+            }
+    } */
         // TODO: Add, delete or update layers based on this.props.layers.
-    }
+        // TODO: alle layers må ha id, filtrer vekk de som ikke har det i newLayeredMap
+        // legg på action (add, update eller delete)
+        // add by default
+    // }
 
-    componentWillUnmount() {
-        // TODO: Remove all layers from the map
-    }
+    // componentWillUnmount() {
+    //     // TODO: Remove all layers from the map
+    //     this.props.map.eachLayer(function (layer) {
+    //         this.props.map.removeLayer(layer);
+    //     });
+    // }
 
-    addTooltip(item, shapeObject) {
+    addTooltip = (item, shapeObject) => {
         if ("tooltip" in item) {
             return shapeObject.bindTooltip(item.tooltip);
         }
@@ -109,7 +140,7 @@ class CompositeMapLayers extends Component {
 
 
     addItem(item, layerGroup) {
-        console.log(item);
+        // console.log(item);
 
         switch(item.type) {
             case "polyline":
@@ -136,8 +167,15 @@ class CompositeMapLayers extends Component {
                 break; // add error message here?
           }
     }
+
+    addScaleLayer = (map) => {
+        L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
+    }
+
     createMultipleLayers() {
+        this.addScaleLayer(this.props.map);
         const layerControl = L.control.layers([]).addTo(this.props.map);
+        this.setState({layerControl: layerControl});
 
         const layers = this.props.layer;
         for (let i = 0; i < layers.length; i++) {
@@ -146,9 +184,20 @@ class CompositeMapLayers extends Component {
         
     }
 
+  
     createLayerGroup = (layer, layerControl) => {
         const layerGroup = L.layerGroup();
-
+        const layerToState = Object.assign({}, this.state.layers);
+        layerToState[layer.id] = layer;
+        console.log("Layer ID: ", layer.id, " Layer name: ", layer.name)
+        console.log("layertostate: ", layerToState);
+        
+        
+        // To make sure one does not lose data due to race conditions 
+        this.setState(prevState => ({
+            layers: Object.assign({}, prevState.layers, {[layer.id]: layerGroup})
+        }), () => console.log("NewState:", this.state.layers))
+        
         //adds object to a layer
         for (let i = 0; i < layer.data.length; i++ ) {
             this.addItem(layer.data[i], layerGroup);

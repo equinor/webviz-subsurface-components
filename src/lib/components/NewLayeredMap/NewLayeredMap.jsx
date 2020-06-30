@@ -62,6 +62,7 @@ class NewLayeredMap extends Component {
             zoom: this.state.zoom,
             minZoom: this.state.minZoom,
             maxZoom: this.state.maxZoom,
+            attributionControl: false,
         });
 
         
