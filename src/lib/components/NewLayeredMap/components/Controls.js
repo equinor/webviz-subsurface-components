@@ -1,17 +1,40 @@
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 // Components
 import VerticalZoom from './VerticalZoom';
+import DrawControls from './DrawControls';
 import Switch from './Switch';
 
 class Controls extends Component {
 
-
     render() {
         return (
             <div>
-                {
+                <div> {
+                    this.props.drawTools && (
+                    <DrawControls
+                        map={this.props.map}
+                        position={this.props.drawTools.position}
+                        drawMarker={this.props.drawTools.drawMarker}
+                        drawPolygon={this.props.drawTools.drawPolygon}
+                        drawPolyline={this.props.drawTools.drawPolyline}
+                        lineCoords={coords =>
+                            this.props.setProps({ polyline_points: coords })
+                        }
+                        markerCoords={coords =>
+                            this.props.setProps({ marker_point: coords })
+                        }
+                        polygonCoords={coords =>
+                            this.props.setProps({ polygon_points: coords })
+                        }
+                    />
+                    )
+                }
+                </div>
+                <div>
+                    {
                     this.props.scaleY && (
                         <VerticalZoom 
                             map={this.props.map}
@@ -21,8 +44,9 @@ class Controls extends Component {
                             scaleY={this.props.scaleY.scaleY || 1}
                         />
                     )
-                }
-
+                    }
+                </div>
+                <div>
                 {
                     this.props.switch && (
                         <Switch
@@ -35,7 +59,8 @@ class Controls extends Component {
                         />
                     )
                 }
-            </div>
+                </div>
+            </div>    
         )
 
     }
@@ -44,6 +69,7 @@ class Controls extends Component {
 
 Controls.propTypes = {
     map: PropTypes.object.isRequired,
+    setProps: PropTypes.func,
 
     setProps: PropTypes.func,
 
@@ -53,6 +79,16 @@ Controls.propTypes = {
         minScaleY: PropTypes.number,
         position: PropTypes.string,
     }),
+
+    drawTools: PropTypes.shape({
+        position: PropTypes.string,
+        drawMarker: PropTypes.bool,
+        drawPolygon: PropTypes.bool,
+        drawPolyline: PropTypes.bool,
+        markerCoords: PropTypes.func,
+        lineCoords: PropTypes.func,
+        polygonCoords: PropTypes.func,
+    }),
     
     switch: PropTypes.shape({
         value: PropTypes.bool,
@@ -61,5 +97,6 @@ Controls.propTypes = {
         label: PropTypes.string,
     })
 }
+
 
 export default Controls;

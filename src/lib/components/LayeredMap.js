@@ -15,6 +15,7 @@ import ValueInfoBox from "../private_components/layered-map-resources/ValueInfoB
 import OptionalLayerControl from "../private_components/layered-map-resources/OptionalLayerControl.react";
 import CompositeMapLayer from "../private_components/layered-map-resources/CompositeMapLayer.react";
 import DrawControls from "../private_components/layered-map-resources/DrawControls.react";
+
 import VerticalZoom from "../private_components/layered-map-resources/VerticalZoom.react";
 import "../private_components/layered-map-resources/layered-map.css";
 

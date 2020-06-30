@@ -26,9 +26,19 @@ L.ImageWebGLOverlay = L.Layer.extend({
         if(!this._canvas) {
             this._initCanvas();
         }
-
+        
         this.getPane().appendChild(this._canvas);
         this._reset();
+    },
+
+    onRemove: function(map) {
+        this._map = map;
+        if (!this._map) {
+            return
+        }
+        if (this._canvas) {
+            this._canvas.remove();
+        }
     },
 
     getEvents: function() {

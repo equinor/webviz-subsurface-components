@@ -8,15 +8,17 @@ import './layers/L.tileWebGLLayer';
 
 // Components
 import Controls from './components/Controls';
+import CompositeMapLayers from './components/CompositeMapLayers'
 
 // Assets
-import exampleData from '../../../demo/example-data/layered-map.json';
+import exampleData from '../../../demo/example-data/new-layered-map.json';
 
 // Constants
 // const TEMP_IMAGE = 'https://i.pinimg.com/originals/67/dd/14/67dd1431cf0d806254a34ad6c0eb0eb5.jpg';
 const TEMP_IMAGE = exampleData.layers[0].data[0].url;
 const TEMP_COLORMAP = exampleData.layers[0].data[0].colormap;
 const DEFAULT_BOUNDS = [[0, 0], [30, 30]]
+// const DEFAULT_BOUNDS = [[6475078, 432205], [6481113, 437720]]
 
 const stringToCRS = (crsString) => {
     switch(crsString) {
@@ -35,7 +37,6 @@ class NewLayeredMap extends Component {
 
     constructor(props) {
         super(props);
-        
         this.state = {
             id: props.id,
             map: null,
@@ -44,7 +45,7 @@ class NewLayeredMap extends Component {
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
-            center: props.center || [0, 0],
+            center: props.center || [6475078, 432205],
             bounds: props.bounds,
             controls: props.controls || {},
         }
@@ -63,37 +64,12 @@ class NewLayeredMap extends Component {
             maxZoom: this.state.maxZoom,
         });
 
-        this.setState({map: map}, () => {
-
-            this.state.layers.forEach((layer) => {
-                (layer.data || []).forEach(this.addLayerDataToMap)
-            })
-
-            if(this.state.bounds) {
-                map.fitBounds(this.state.bounds);
-            }
-        });
-
+        
+        this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = map;
-
-        // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        
-        /* L.tileWebGLLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', TEMP_COLORMAP, {
-            shader: 'hillshading'
-        }).addTo(map); */
-
-     /*    L.imageWebGLOverlay(exampleData.layers[0].data[0].url, DEFAULT_BOUNDS, {
-            colormap: exampleData.layers[0].data[0].colormap
-        }).addTo(map); */
-
-        L.polyline([[0 ,0], [0, 30]], {color: 'red'}).addTo(map);
-        L.polyline([[0 ,30], [30, 30]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,30], [30, 0]], {color: 'red'}).addTo(map);
-        L.polyline([[30 ,0], [0, 0]], {color: 'red'}).addTo(map);
-
         this.setEvents(map);
-        
     }
+
 
     setEvents = (map) => {
         map.on('zoomanim', e => {
@@ -126,57 +102,17 @@ class NewLayeredMap extends Component {
         })
     }
 
-    addLayerDataToMap = (layerData) => {
-        if(!layerData) {
-            return;
+    setPropsExist = (value) => {
+        if(!this.props.setProps) {
+            console.log(value);
+        } else {
+            this.props.setProps(value);
         }
-
-        let newLayer = null;
-        const url = layerData.url;
-        const colormap = layerData.colormap;
-        const bounds = layerData.bounds || DEFAULT_BOUNDS;
-
-        switch(layerData.type) {
-            
-            case 'image': {
-                if(colormap) {
-                    newLayer = L.imageWebGLOverlay(url, bounds, colormap, {
-                        ...layerData,
-                        shader: layerData.shader,
-                    });
-                } else {
-                    newLayer = L.imageOverlay(url, bounds, {
-                        ...layerData,
-                    });
-                }
-                break;
-            }
-
-            case 'tile': {
-                if(colormap) {
-                    newLayer = L.tileWebGLLayer(url, colormap, {
-                        ...layerData,
-                        shader: layerData.shader,
-                    })
-                } else {
-                    newLayer = L.tileLayer(url, {
-                        ...layerData
-                    });
-                }
-                break;
-            }
-        
-        }
-
-        if(newLayer) {
-            newLayer.addTo(this.state.map);
-        }
-
-        return [url, bounds, colormap];
     }
 
 
-    render() {        
+    render() {    
+        
         return (
             <div>
                 <div
@@ -186,10 +122,20 @@ class NewLayeredMap extends Component {
                     {
                         this.state.map && (
                             <Controls 
+                                setProps={this.setPropsExist}
                                 map={this.state.map}
-                                setProps={this.props.setProps}
                                 scaleY={this.props.scaleY}
                                 switch={this.props.switch}
+                                drawTools={this.props.drawTools}
+                            />
+                        )
+                    }
+                    {
+                        this.state.map && (
+                            <CompositeMapLayers 
+                                layer={this.props.layers}
+                                map={this.state.map}
+    
                             />
                         )
                     }
@@ -206,12 +152,17 @@ NewLayeredMap.propTypes = {
      * in callbacks. The ID needs to be unique across all of the
      * components in an app.
      */
-    id: PropTypes.string.isRequired,
+    // id: PropTypes.string.isRequired,
 
     /**
      * The layers
      */
     layers: PropTypes.array,
+    setProps: PropTypes.func,
+    polylinePoints: PropTypes.array,
+    polygonPoints: PropTypes.array,
+    markerPoint: PropTypes.array,
+    id: PropTypes.string,
 
     /**
      * ScaleY is a configuration for creating a slider for scaling the Y-axis.
@@ -251,6 +202,7 @@ NewLayeredMap.propTypes = {
     /**
      * Ids of other LayeredMap instances that should be synced with this instance  
      */    
+
     syncedMaps: PropTypes.array,
 }
 
