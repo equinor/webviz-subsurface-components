@@ -1,1 +1,1 @@
-export { default } from './NewLayeredMap';
+export { default } from './NewLayeredMap.jsx';
