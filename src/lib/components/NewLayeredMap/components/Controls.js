@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 // Components
-import VerticalZoom from './VerticalZoom.jsx';
-import DrawControls from './DrawControls.jsx';
+import VerticalZoom from './VerticalZoom';
+import DrawControls from './DrawControls';
 import Switch from './Switch';
 
 class Controls extends Component {

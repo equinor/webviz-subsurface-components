@@ -16,6 +16,10 @@ try:
     __version__ = get_distribution(__name__).version
 except DistributionNotFound:
     # package is not installed
+
+    # Use the local package instead - set a random version
+    # To run locally, make sure to uninstall the webviz_subsurface_components package in the environment
+    __version__ = "1.0.0"
     pass
 
 if not hasattr(_dash, "development"):

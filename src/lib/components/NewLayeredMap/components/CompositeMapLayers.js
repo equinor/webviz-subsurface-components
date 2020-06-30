@@ -12,7 +12,7 @@ const DEFAULT_BOUNDS = [[0, 0], [30, 30]];
 
 const DEFAULT_ELEVATION_SCALE = 0.03;
 
-class CompositeMapLayer extends Component {
+class CompositeMapLayers extends Component {
 
     constructor(props) {
         super(props);
@@ -178,24 +178,19 @@ class CompositeMapLayer extends Component {
     }
 }
 
-CompositeMapLayer.propTypes = {
+CompositeMapLayers.propTypes = {
     map: PropTypes.object.isRequired,
 
     /* Data for one single layer. See parent component LayeredMap for documentation.
      */
     layer: PropTypes.array,
 
-    /* Add hillshading to an image layer*/
-    hillShading: PropTypes.bool,
-
     /* Coordinates for selected polyline*/
     lineCoords: PropTypes.func,
 
-    /* Vector specifiyng the light direction*/
-    lightDirection: PropTypes.array,
-
     /* Coordinates for selected polygon*/
     polygonCoords: PropTypes.func,
+
 };
 
-export default CompositeMapLayer;
+export default CompositeMapLayers;

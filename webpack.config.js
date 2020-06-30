@@ -66,7 +66,7 @@ module.exports = (env, argv) => {
         module: {
             rules: [
                 {
-                    test: /\.(t|j)s(x?)?$/,
+                    test: /\.(t|j)s?x?$/,
                     exclude: /node_modules/,
                     use: { loader: "ts-loader" },
                 },

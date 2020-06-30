@@ -30,6 +30,9 @@ if __name__ == "__main__":
 
     layers = [
         {
+            "name": "Map",
+            "baseLayer": True,
+            "checked": True,
             "data": [
                 {
                     "type": "tile",
@@ -44,6 +47,8 @@ if __name__ == "__main__":
         },
         {
             "name": "Something",
+            "baseLayer": True,
+            "checked": False,
             "data": [
                 {
                     "type": "image",
@@ -61,7 +66,10 @@ if __name__ == "__main__":
 
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
         id="example-map", 
-        layers=layers, 
+        layers=layers,
+        switch={
+            "value": False
+        }
     )
 
     app = dash.Dash(__name__)

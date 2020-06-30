@@ -7,8 +7,8 @@ import './layers/L.imageWebGLOverlay';
 import './layers/L.tileWebGLLayer';
 
 // Components
-import Controls from './components/Controls.jsx';
-import CompositeMapLayers from './components/CompositeMapLayers.jsx'
+import Controls from './components/Controls';
+import CompositeMapLayers from './components/CompositeMapLayers'
 
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
