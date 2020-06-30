@@ -92,7 +92,7 @@ class CompositeMapLayer extends Component {
         return newImageLayer;
     }
 
-    addTile = (tileData, layerGroup) => {
+    addTile = (tileData) => {
         let newTileLayer = null;
         if("colormap" in tileData) {
             newTileLayer = L.tileWebGLLayer(tileData.url, tileData.colormap, {
