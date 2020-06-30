@@ -12,7 +12,6 @@ import CompositeMapLayers from './components/CompositeMapLayers'
 
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
-import CompositeMapLayer from '../../private_components/layered-map-resources/CompositeMapLayer.react';
 
 // Constants
 // const TEMP_IMAGE = 'https://i.pinimg.com/originals/67/dd/14/67dd1431cf0d806254a34ad6c0eb0eb5.jpg';
@@ -103,6 +102,12 @@ class NewLayeredMap extends Component {
         })
     }
 
+    setPropsExist = () => {
+        if(!this.props.setProps) {
+            console.log(this.props.setProps);
+        }
+    }
+
 
     render() {    
         
@@ -115,7 +120,7 @@ class NewLayeredMap extends Component {
                     {
                         this.state.map && (
                             <Controls 
-                                setProps={e => console.log(e)}
+                                setProps={this.setPropsExist}
                                 map={this.state.map}
                                 setProps={this.props.setProps}
                                 scaleY={this.props.scaleY}
@@ -153,9 +158,9 @@ NewLayeredMap.propTypes = {
      */
     layers: PropTypes.array,
     setProps: PropTypes.func,
-    polyline_points: PropTypes.array,
-    polygon_points: PropTypes.array,
-    marker_point: PropTypes.array,
+    polylinePoints: PropTypes.array,
+    polygonPoints: PropTypes.array,
+    markerPoint: PropTypes.array,
     id: PropTypes.string,
 
     /**
