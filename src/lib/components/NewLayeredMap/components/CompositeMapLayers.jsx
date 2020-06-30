@@ -76,7 +76,7 @@ class CompositeMapLayer extends Component {
         ));
     }
     // add default bounds?
-    addImage = (imageData, layerGroup) => {
+    addImage = (imageData) => {
         const bounds = imageData.bounds.map(xy => yx(xy));
         let newImageLayer = null;
         if ("colormap" in imageData){
