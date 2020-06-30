@@ -125,7 +125,7 @@ class CompositeMapLayer extends Component {
                 break;
                 
             case "image":
-                layerGroup.addLayer(this.addImage(item, layerGroup));
+                layerGroup.addLayer(this.addImage(item));
                 break;
 
             case "tile": 
