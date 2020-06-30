@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import NewLayeredMap from '../lib/components/NewLayeredMap';
 
 // Assets
-import exampleData from './example-data/layered-map.json';
+import exampleData from './example-data/new-layered-map.json';
 import { NewLayeredMap } from '../lib/index';
 
 const NewLayeredMapDemo = () => {
@@ -24,23 +24,24 @@ const NewLayeredMapDemo = () => {
                     id={"NewLayeredMap-1"}
                     syncedMaps={["NewLayeredMap-2"]}
                     layers={exampleData.layers}
+                    center={[0, 0]}
                     /*center={[432205, 6475078], [432205, 6475078]} */
-                    bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                   // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
                     // crs="earth"
-                    crs="simple"
-                    minZoom={-5}
-                    zoom = {-5} 
+                    //crs="earth"
+                    //minZoom={-5}
+                    //zoom = {-5} 
                     // setProps={e => console.log(e)}
 
-                    minZoom={-5}
-                    zoom = {-5}
-                    scaleY={{
+                    //minZoom={-5}
+                    //zoom = {-5}
+                   /*  scaleY={{
                         scaleY: 1,
                         minScaleY: 1,
                         maxScaleY: 10,
                         position: 'topleft',
-                    }}
-                        drawTools = {{
+                    }} */
+                    drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,
                         drawPolyline: true,
@@ -61,18 +62,18 @@ const NewLayeredMapDemo = () => {
                     syncedMaps={["NewLayeredMap-1"]}
                     layers={exampleData.layers}
                     /*center={[432205, 6475078], [432205, 6475078]} */
-                    bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                    // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
                     // crs="earth"
-                    crs="simple"
+                    // crs="simple"
                     minZoom={-5}
                     zoom = {-5} 
                     // setProps={e => console.log(e)}
-                    scaleY={{
+                   /*  scaleY={{
                         scaleY: 1,
                         minScaleY: 1,
                         maxScaleY: 10,
                         position: 'topleft',
-                    }}
+                    }} */
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,
