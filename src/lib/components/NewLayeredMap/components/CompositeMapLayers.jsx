@@ -129,7 +129,7 @@ class CompositeMapLayer extends Component {
                 break;
 
             case "tile": 
-                layerGroup.addLayer(this.addTile(item, layerGroup));
+                layerGroup.addLayer(this.addTile(item));
                 break;
 
             default:
