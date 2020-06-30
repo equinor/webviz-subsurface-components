@@ -102,9 +102,11 @@ class NewLayeredMap extends Component {
         })
     }
 
-    setPropsExist = () => {
+    setPropsExist = (value) => {
         if(!this.props.setProps) {
-            console.log(this.props.setProps);
+            console.log(value);
+        } else {
+            this.props.setProps(value);
         }
     }
 
@@ -122,7 +124,6 @@ class NewLayeredMap extends Component {
                             <Controls 
                                 setProps={this.setPropsExist}
                                 map={this.state.map}
-                                setProps={this.props.setProps}
                                 scaleY={this.props.scaleY}
                                 switch={this.props.switch}
                                 drawTools={this.props.drawTools}
