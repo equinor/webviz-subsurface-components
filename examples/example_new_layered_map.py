@@ -43,6 +43,7 @@ if __name__ == "__main__":
             ]
         },
         {
+            "name": "Something",
             "data": [
                 {
                     "type": "image",

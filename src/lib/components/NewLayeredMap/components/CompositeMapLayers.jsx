@@ -76,19 +76,41 @@ class CompositeMapLayer extends Component {
         ));
     }
     // add default bounds?
-    addImage = (image, layerGroup) => {
-        const bounds = image.bounds.map(xy => yx(xy));
-        if ("colormap" in image){
-            layerGroup.addLayer(L.imageWebGLOverlay(image.url, bounds, image.colormap, {
-                shader: image.shader
-            }));
+    addImage = (imageData) => {
+        const bounds = imageData.bounds.map(xy => yx(xy));
+        let newImageLayer = null;
+        if ("colormap" in imageData){
+            newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, imageData.colormap, {
+                ...imageData,
+                shader: imageData.shader
+            });
         } else {
-            layerGroup.addLayer(L.imageOverlay(image.url, bounds))
+            newImageLayer = L.imageOverlay(imageData.url, bounds, {
+                ...imageData,
+            })
         }
+        return newImageLayer;
+    }
+
+    addTile = (tileData) => {
+        let newTileLayer = null;
+        if("colormap" in tileData) {
+            newTileLayer = L.tileWebGLLayer(tileData.url, tileData.colormap, {
+                ...tileData.colormap,
+                shader: tileData.shader,
+            })
+        } else {
+            newTileLayer = L.tileLayer(tileData.url, {
+                ...tileData,
+            })
+        }
+        return newTileLayer;
     }
 
 
     addItem(item, layerGroup) {
+        console.log(item);
+
         switch(item.type) {
             case "polyline":
                 layerGroup.addLayer(this.makePolyline(item));
@@ -103,7 +125,11 @@ class CompositeMapLayer extends Component {
                 break;
                 
             case "image":
-                this.addImage(item, layerGroup);
+                layerGroup.addLayer(this.addImage(item));
+                break;
+
+            case "tile": 
+                layerGroup.addLayer(this.addTile(item));
                 break;
 
             default:
@@ -133,13 +159,13 @@ class CompositeMapLayer extends Component {
         }
 
         // adds layers to the layerControl
-        if(layer.base_layer) {
+        if(layer.baseLayer) {
             layerControl.addBaseLayer(layerGroup, layer.name);
 
             // Fits the map bounds if layer is a base layer
             // TODO: improve bounds optimization?
-                const bounds = layer.data[0].bounds ? layer.data[0].bounds.map(xy => yx(xy)) : DEFAULT_BOUNDS;
-                this.props.map.fitBounds(bounds);
+            const bounds = layer.data[0].bounds ? layer.data[0].bounds.map(xy => yx(xy)) : DEFAULT_BOUNDS;
+            this.props.map.fitBounds(bounds);
         } else {
             layerControl.addOverlay(layerGroup, layer.name);
         }

@@ -1,11 +1,9 @@
 {
-    "layerToggles": {
-        "current": "ID1",
-        "data": ["ID1", "ID2"]
-    },
-
     "layers": [
         {
+            "name": "Hello world",
+            "checked": true,
+            "baseLayer": true,
             "data": [
                 {
                     "type": "tile",
@@ -20,8 +18,7 @@
         },
         {
             "name": "A seismic horizon with colormap",
-            "base_layer": true,
-            "checked": true,
+            "baseLayer": true,
             "data": [
                 {
                     "type": "image",
@@ -39,7 +36,7 @@
         },
         {
             "name": "Some overlay layer",
-            "base_layer": false,
+            "baseLayer": false,
             "checked": false,
             "data": [
                 {
