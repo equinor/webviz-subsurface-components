@@ -1,5 +1,6 @@
 import L, { latLngBounds, Util, DomUtil, Bounds, Point} from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
+import { buildColormapFromHexColors } from '../colorscale';
 
 // Utils
 import { loadImage } from '../webgl/webglUtils';
@@ -11,19 +12,19 @@ import { loadImage } from '../webgl/webglUtils';
  */
 L.ImageWebGLOverlay = L.Layer.extend({
 
-    initialize: function(url, bounds, colormap, options) {
+    initialize: function(url, bounds, options) {
         this._url = url;
         this.setBounds(bounds);
         this._CRS = options.CRS || null;
 
-        this._colormap = colormap || '';
-
-		Util.setOptions(this, options);
+        Util.setOptions(this, options);
     },
 
     onAdd: function(map) {
         this._map = map;
         if(!this._canvas) {
+            this._initColormap();
+            console.log(this._colormap);
             this._initCanvas();
         }
         
@@ -107,6 +108,23 @@ L.ImageWebGLOverlay = L.Layer.extend({
         this._canvas = canvasTag;
     },
 
+    _initColormap: function() {
+        if(typeof this.options.colorScale === 'string') {
+            this._colormap = this.options.colorScale;
+		} else {
+            const colors = this.options.colorScale;
+            this._colormap = buildColormapFromHexColors(colors);
+        }
+		
+        
+        const img = new Image();
+        img.src = this._colormap;
+        img.onload = () => {
+            console.log(img, img.width, img.height);
+        }
+        document.body.appendChild(img);
+    },
+
     _reset: function() {
         const canvas = this._canvas;
         const bounds = this._calcBounds();
@@ -141,11 +159,11 @@ L.ImageWebGLOverlay = L.Layer.extend({
             this._map.latLngToLayerPoint(northWest),
             this._map.latLngToLayerPoint(southEast)
         );
-    }
+    },
 
 });
 
 
-L.imageWebGLOverlay = (url, bounds, colormap, options = {}) => {
-    return new L.ImageWebGLOverlay(url, bounds, colormap, options);
+L.imageWebGLOverlay = (url, bounds, options = {}) => {
+    return new L.ImageWebGLOverlay(url, bounds, options);
 }

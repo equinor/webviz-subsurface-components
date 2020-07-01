@@ -1,5 +1,6 @@
 import L, { DomUtil, DomEvent, Util, Browser, GridLayer } from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
+import { buildColormapFromHexColors } from '../colorscale';
 
 /**
  * TileWebGLLayer is a tileLayer for rendering tile-based images with WebGL. It executes WebGL code for colormaps and
@@ -38,18 +39,21 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		/**
 		 * @param {Boolean|String} - A cross-origin attribute that should be added to the tiles.
 		 */
-        crossOrigin: false,
+		crossOrigin: false,
+		
+		/**
+		 * @param {Array<String>} - An array of hexcolors for defining the colormap used on the tiles.
+		 */
+		colorScale: ["#FFFFFF", "#000000"],
 	},
 
-    initialize: function(url, colormapUrl, options) {
+    initialize: function(url, options) {
         this._url = url;
-        this._colormapUrl = colormapUrl;
-		this._fragmentShader = options.fragmentShader || null;
 		this._canvas = null;
-        this._glContext = null,
+		this._glContext = null,
 		
 		options = Util.setOptions(this, options);
-		
+
 		// for https://github.com/Leaflet/Leaflet/issues/137
 		if (!Browser.android) {
 			this.on('tileunload', this._onTileRemove);
@@ -80,7 +84,9 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
         this._glContext = canvas.getContext("webgl", {
             premultipliedAlpha: false,
-        });
+		});
+		
+		this._initColormap();
 
         L.GridLayer.prototype.onAdd.call(this, map);
     },
@@ -174,9 +180,19 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		done(e, tile);
 	},
 
+	_initColormap: function() {
+		if(typeof this.options.colorScale === 'string') {
+			this._colormapUrl = this.options.colorScale;
+			return;
+		}
+		
+		const colors = this.options.colorScale;
+		this._colormapUrl = buildColormapFromHexColors(colors);
+	}
+
 });
 
-L.tileWebGLLayer = (url, colormapUrl, options = {}) => {
-    return new L.TileWebGLLayer(url, colormapUrl, options);
+L.tileWebGLLayer = (url, options = {}) => {
+    return new L.TileWebGLLayer(url, options);
 }
 
