@@ -168,9 +168,10 @@ class CompositeMapLayers extends Component {
     addImage = (imageData) => {
         const bounds = imageData.bounds.map(xy => yx(xy));
         let newImageLayer = null;
-        if ("colormap" in imageData){
-            newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, imageData.colormap, {
+        if (imageData.colorScale || imageData.colormap){
+            newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
                 ...imageData,
+                colorScale: imageData.colorScale || imageData.colormap,
                 shader: imageData.shader
             });
         } else {
@@ -183,9 +184,10 @@ class CompositeMapLayers extends Component {
 
     addTile = (tileData) => {
         let newTileLayer = null;
-        if("colormap" in tileData) {
-            newTileLayer = L.tileWebGLLayer(tileData.url, tileData.colormap, {
+        if(tileData.colorScale || tileData.colormap) {
+            newTileLayer = L.tileWebGLLayer(tileData.url, {
                 ...tileData.colormap,
+                colorScale: tileData.colorScale || tileData.colormap,
                 shader: tileData.shader,
             })
         } else {
