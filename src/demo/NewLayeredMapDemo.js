@@ -28,7 +28,7 @@ const NewLayeredMapDemo = () => {
             <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
-                    syncedMaps={["NewLayeredMap-2"]}
+                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-3"]}
                     layers={layer}
                     // center={[0, 0]}
                     center={[432205, 6475078], [432205, 6475078]}
@@ -58,7 +58,7 @@ const NewLayeredMapDemo = () => {
             <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
-                    syncedMaps={["NewLayeredMap-1"]}
+                    syncedMaps={["NewLayeredMap-1", "NewLayeredMap-3"]}
                     layers={layer2}
                     center={[432205, 6475078], [432205, 6475078]}
                     bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
@@ -90,8 +90,8 @@ const NewLayeredMapDemo = () => {
             </div>
             <div>
                 <NewLayeredMap 
-                    id={"NewLayeredMap-1"}
-                    syncedMaps={["NewLayeredMap-2"]}
+                    id={"NewLayeredMap-3"}
+                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
                     layers={layer3}
                     // center={[0, 0]}
                     center={[432205, 6475078], [432205, 6475078]}
