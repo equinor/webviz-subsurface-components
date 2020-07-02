@@ -29,7 +29,10 @@
                     "elevationScale": 0.002,
                     "allowHillshading": true,
                     "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
-                    "colorScale": ["#ffffff", "#440154", "#450557", "#45095b", "#460e5e", "#461261", "#471564", "#471968", "#471c6b", "#481f6e", "#482271", "#482575", "#482878", "#472c7a", "#462f7c", "#44327e", "#433580", "#423881", "#413b83", "#403e84", "#404185", "#3f4487", "#3e4688", "#3e4989", "#3b4c8a", "#374f8c", "#35538d", "#32568d", "#30588e", "#2f5b8e", "#2e5e8f", "#2d618f", "#2e638f", "#2f668e", "#31688e", "#2d6b8f", "#2a6d90", "#277090", "#247291", "#227491", "#207791", "#207990", "#207b90", "#217e90", "#23808f", "#26828e", "#22858f", "#1d878f", "#198a90", "#168d90", "#128f8f", "#11928f", "#10948e", "#12978d", "#15998c", "#1a9c8b", "#1f9e89", "#1da088", "#1da388", "#1da587", "#1ea786", "#1faa84", "#22ac83", "#25ae81", "#28b07f", "#2cb37d", "#30b57b", "#35b779", "#39b977", "#3ebb74", "#43be72", "#48c06f", "#4dc26c", "#52c469", "#58c666", "#5dc863", "#63ca5f", "#68cc5c", "#6ece58", "#74d055", "#7bd151", "#81d34e", "#87d54a", "#8ed646", "#94d842", "#9ad93e", "#a1da3a", "#a8dc35", "#aedd30", "#b5de2b", "#bcdf29", "#c2e028", "#c9e126", "#cfe225", "#d6e324", "#dce423", "#e3e423", "#e9e523", "#f0e623", "#f6e624", "#fde725"],
+                    "colorScale": {
+                        "colors": ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+                        "prefixZeroAlpha": true
+                    },
                     "unit": "m",
                     "minvalue": 2782,
                     "maxvalue": 3513,

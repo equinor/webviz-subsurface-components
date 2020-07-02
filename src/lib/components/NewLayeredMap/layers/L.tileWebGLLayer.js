@@ -1,6 +1,6 @@
 import L, { DomUtil, DomEvent, Util, Browser, GridLayer } from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
-import { buildColormapFromHexColors } from '../colorscale';
+import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
 
 /**
  * TileWebGLLayer is a tileLayer for rendering tile-based images with WebGL. It executes WebGL code for colormaps and
@@ -181,13 +181,25 @@ L.TileWebGLLayer = L.GridLayer.extend({
 	},
 
 	_initColormap: function() {
-		if(typeof this.options.colorScale === 'string') {
-			this._colormapUrl = this.options.colorScale;
-			return;
-		}
-		
-		const colors = this.options.colorScale;
-		this._colormapUrl = buildColormapFromHexColors(colors);
+		const colorScale = this.options.colorScale;
+        if(typeof colorScale === 'string') {
+            // The given colorScale is a base64 image
+            this._colormapUrl = colorScale;
+        } 
+        else if(Array.isArray(colorScale)) {
+            // The given colorScale is an array of hexColors
+            const colors = colorScale;
+            this._colormapUrl = buildColormapFromHexColors(colors);
+        } 
+        else if(typeof colorScale === 'object' && colorScale !== null) {
+            // The given colorScale is an object
+            /**
+             * @type {import('../colorscale/index').ColorScaleConfig}
+             */
+            const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale);
+            const colors = colorScaleCfg.colors;
+            this._colormapUrl = buildColormapFromHexColors(colors, colorScaleCfg);
+        }
 	}
 
 });
