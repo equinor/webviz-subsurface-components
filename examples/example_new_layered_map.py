@@ -107,7 +107,7 @@ if __name__ == "__main__":
             html.Div(id='hidden-div2'),
             html.Button('Toggle shader', id='map-shader-toggle-btn'),
             html.Button('Update layer', id='layer-update-btn'),
-            html.Button('Delete layer', id='layer-delete-btn', value ='p'),
+            html.Button('Delete layer', id='layer-delete-btn', value='value'),
             html.Button('Add layer', id='layer-add-btn'),
             layered_map_component,
             html.Pre(id="polyline"),
@@ -115,8 +115,7 @@ if __name__ == "__main__":
             html.Pre(id="polygon"),
         ]
     )
-
-
+ 
     @app.callback(
         Output('hidden-div', 'children'),
         [
@@ -143,33 +142,21 @@ if __name__ == "__main__":
     #     ]
     # )
 
+
+
     @app.callback(
-        Output('hidden-div2', 'children'),
+        Output('example-map', 'layers'),
         [
-            Input(component_id='layer-delete-btn', component_property='value')
+            Input(component_id='layer-delete-btn', component_property = 'value')
         ]
     )
     def remove_layer(value):
         layers[1]['action'] = 'delete'
         print("action: ", layers[1]['action'])
+        print("new layer 1: ", layers[1])
+        return layers
     # change props of layered_map_component
 
-  
-    )
-        print("remove", value)
-        return value
-
-
-    
-    # @app.callback(
-    #     Output('hidden-div', 'children'),
-    #     [
-    #         Input(component_id='layer-add-btn', component_property='add')
-    #     ]
-    # )
 
 
 
-    
- 
-    app.run_server(debug=True)
