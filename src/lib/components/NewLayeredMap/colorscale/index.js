@@ -4,13 +4,11 @@
 
  /**
   * @typedef {Object} ColorScaleConfig
-  * @property {Boolean|undefined} prefixZeroAlpha - Decides if the first color should have an alpha equals to 0.
-  * @property {Boolean|undefined} suffixZeroAlpha - Decides if the last color should have an alpha equals to 0.
+  * @property {Boolean|undefined} prefixZeroAlpha - Decides if the first color have an alpha equals to 0.
   * @description A set of default configuration values for building colormaps. 
   */
 export const DEFAULT_COLORSCALE_CONFIG = {
     prefixZeroAlpha: true,
-    suffixZeroAlpha: false,
 }
 
 /**
@@ -81,12 +79,12 @@ export const buildColormap = (colors, config = {}) => {
     if(config.prefixZeroAlpha && colors.length > 0) {
         colors[0][3] = 0;
     }
-    if(config.suffixZeroAlpha && colors.length > 0) {
-        colors[colors.length - 1][3] = 0;
-    }
+
+    const t0 = performance.now();
 
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext("2d");
+
 
     // Set pixel by pixel with fillStyle and fillRect. An alternative is to use ImageData, but according to
     // this post - fillRect was more performant:
@@ -109,7 +107,11 @@ export const buildColormap = (colors, config = {}) => {
     ctx.putImageData(imageData, 0, 0);
 
 
-    return canvas.toDataURL("image/png");
+    const url =  canvas.toDataURL("image/png");
+    const t1 = performance.now();
+    console.log(`Time: ${t1-t0} ms`)
+
+    return url;
 }
 
 /**
@@ -121,6 +123,7 @@ export const buildColormapFromHexColors = (hexColors, config = {}) => {
     const width = config.width || 256;
     const colors = hexColors.map(hexToRGB);
     const interpolated = interpolateColors(colors, width, config);
+    console.log(interpolated.length, interpolated);
     return buildColormap(interpolated, config);
 }
 
