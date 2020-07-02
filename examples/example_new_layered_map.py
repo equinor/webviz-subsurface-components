@@ -6,15 +6,10 @@ from matplotlib import cm
 
 import dash
 from dash.dependencies import Input, Output
-
-
 import dash_html_components as html
 import webviz_subsurface_components
-import dash_colorscales
 
 from example_layered_map import array_to_png
-
-
 
 if __name__ == "__main__":
 
@@ -32,11 +27,6 @@ if __name__ == "__main__":
     colormap = array_to_png(
         cm.get_cmap("viridis", 256)([np.linspace(0, 1, 256)]), colormap=True
     )
-
-    switch = {
-        "value": True,
-        "label": "Hillshading"
-    }
 
     layers = [
         {
@@ -77,28 +67,18 @@ if __name__ == "__main__":
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
         id="example-map", 
         layers=layers,
-        switch=switch,
+        switch={
+            "value": False
+        }
     )
 
     app = dash.Dash(__name__)
 
     app.layout = html.Div(
         children=[
-            html.Div(id='content', children=[
-                html.Div(id='controls', children=[
-                    html.Button('Toggle shader', id='map-shader-toggle-btn'),
-                    html.Div(id='output'),
-                    dash_colorscales.DashColorscales(
-                        id='colorscale-picker',
-                        nSwatches=7,
-                        fixSwatches=True,
-                    ),
-                ]),
-                layered_map_component,
-            ], style={'display': 'grid', 'grid-template-columns': '500px auto'}),
             html.Div(id='hidden-div'),
-            html.Div(id='hidden-div2'),
-            
+            html.Button('Toggle shader', id='map-shader-toggle-btn'),
+            layered_map_component,
             html.Pre(id="polyline"),
             html.Pre(id="marker"),
             html.Pre(id="polygon"),
@@ -114,27 +94,10 @@ if __name__ == "__main__":
         ]
     )
     def toggle_between_shaders(n_clicks):
-        print("The button was clicked!:", n_clicks)
+        print("n_clicks:", n_clicks)
         print("Current shader:", layers[0]['data'][0]['shader']['type'])
         layers[0]['data'][0]['shader']['type'] = None if layers[0]['data'][0]['shader']['type'] is 'hillshading' else 'hillshading'
         return layers[0]['data'][0]['shader']['type']
-    
-    @app.callback(
-        Output('hidden-div2', 'children'),
-        [
-            Input('example-map', 'switch')
-        ]
-    )
-    def toggle_switch_value(value):
-        print(value)
-        print("New value:", not value.value)
-        return str(value)
-
-    @app.callback(
-        Output('output', 'children'),
-        [Input('colorscale-picker', 'colorscale')])
-    def display_output(colorscale):
-        return json.dumps(colorscale)
         
 
     app.run_server(debug=True)
