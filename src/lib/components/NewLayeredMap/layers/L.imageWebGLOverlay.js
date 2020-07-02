@@ -1,5 +1,6 @@
 import L, { latLngBounds, Util, DomUtil, Bounds, Point} from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
+import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
 
 // Utils
 import { loadImage } from '../webgl/webglUtils';
@@ -11,19 +12,18 @@ import { loadImage } from '../webgl/webglUtils';
  */
 L.ImageWebGLOverlay = L.Layer.extend({
 
-    initialize: function(url, bounds, colormap, options) {
+    initialize: function(url, bounds, options) {
         this._url = url;
         this.setBounds(bounds);
         this._CRS = options.CRS || null;
 
-        this._colormap = colormap || '';
-
-		Util.setOptions(this, options);
+        Util.setOptions(this, options);
     },
 
     onAdd: function(map) {
         this._map = map;
         if(!this._canvas) {
+            this._initColormap();
             this._initCanvas();
         }
         
@@ -99,12 +99,35 @@ L.ImageWebGLOverlay = L.Layer.extend({
 		if (this._zoomAnimated) { DomUtil.addClass(canvasTag, 'leaflet-zoom-animated'); }
 
         // TODO: Replace this function with custom draw function
-        drawFunc(gl, canvasTag, this._url, this._colormap, {
+        drawFunc(gl, canvasTag, this._url, this._colormapUrl, {
             ...this.options,
             shader: this.options.shader,
         })
         
         this._canvas = canvasTag;
+    },
+
+    _initColormap: function() {
+        const colorScale = this.options.colorScale;
+        if(typeof colorScale === 'string') {
+            // The given colorScale is a base64 image
+            this._colormapUrl = colorScale;
+        } 
+        else if(Array.isArray(colorScale)) {
+            // The given colorScale is an array of hexColors
+            const colors = colorScale;
+            this._colormapUrl = buildColormapFromHexColors(colors);
+        } 
+        else if(typeof colorScale === 'object' && colorScale !== null) {
+            // The given colorScale is an object
+            /**
+             * @type {import('../colorscale/index').ColorScaleConfig}
+             */
+            const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale);
+            console.log("CFG:", colorScaleCfg);
+            const colors = colorScaleCfg.colors;
+            this._colormapUrl = buildColormapFromHexColors(colors, colorScaleCfg);
+        }
     },
 
     _reset: function() {
@@ -141,11 +164,11 @@ L.ImageWebGLOverlay = L.Layer.extend({
             this._map.latLngToLayerPoint(northWest),
             this._map.latLngToLayerPoint(southEast)
         );
-    }
+    },
 
 });
 
 
-L.imageWebGLOverlay = (url, bounds, colormap, options = {}) => {
-    return new L.ImageWebGLOverlay(url, bounds, colormap, options);
+L.imageWebGLOverlay = (url, bounds, options = {}) => {
+    return new L.ImageWebGLOverlay(url, bounds, options);
 }
