@@ -71,6 +71,10 @@ class NewLayeredMap extends Component {
         this.setEvents(map);
     }
 
+    componentDidUpdate() {
+        console.log("New Layered map CDU triggered");
+    }
+
 
     setEvents = (map) => {
         map.on('zoomanim', e => {

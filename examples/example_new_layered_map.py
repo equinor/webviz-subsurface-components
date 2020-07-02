@@ -71,24 +71,6 @@ if __name__ == "__main__":
                 }
             ]
         },
-        {
-            "name": "Something",
-            "baseLayer": True,
-            "checked": False,
-            "action": "delete",
-            "data": [
-                {
-                    "type": "image",
-                    "url": map_data,
-                    "allowHillshading": True,
-                    "colormap": colormap,
-                    "unit": "m",
-                    "minvalue": min_value,
-                    "maxvalue": max_value,
-                    "bounds": [[0, 0], [-30, -30]],
-                },
-            ],
-        }
     ]
 
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
@@ -108,7 +90,7 @@ if __name__ == "__main__":
             html.Button('Toggle shader', id='map-shader-toggle-btn'),
             html.Button('Update layer', id='layer-update-btn'),
             html.Button('Delete layer', id='layer-delete-btn', value='value'),
-            html.Button('Add layer', id='layer-add-btn'),
+            html.Button('Add layer', id='layer-add-btn', value='value'),
             layered_map_component,
             html.Pre(id="polyline"),
             html.Pre(id="marker"),
@@ -124,6 +106,7 @@ if __name__ == "__main__":
     )
     def new_toggle(n_clicks):
         print("first toggle working: ", n_clicks)
+        print("when toggle pressed, layer[1]:", layered_map_component.layers[1])
 
         # return layers[1]['data'][0]['shader']['type']
 
@@ -135,27 +118,59 @@ if __name__ == "__main__":
 
         
 
-    # @app.callback(
-    #     Output('hidden-div', 'children'),
-    #     [
-    #         Input(component_id='layer-update-btn', component_property='value')
-    #     ]
-    # )
-
-
-
     @app.callback(
         Output('example-map', 'layers'),
         [
-            Input(component_id='layer-delete-btn', component_property = 'value')
+            Input('layer-add-btn', 'n_clicks')
         ]
     )
-    def remove_layer(value):
-        layers[1]['action'] = 'delete'
-        print("action: ", layers[1]['action'])
-        print("new layer 1: ", layers[1])
-        return layers
-    # change props of layered_map_component
+    def add_layer(n_clicks):
+        # if len(layers) < 5:
+            newLayers = []
+            newLayers.extend(layers)
+            newLayers.append({
+                "name": "Something",
+                "baseLayer": True,
+                "checked": False,
+                "action": "add",
+                "data": [
+                    {
+                        "type": "image",
+                        "url": map_data,
+                        "allowHillshading": True,
+                        "colormap": colormap,
+                        "unit": "m",
+                        "minvalue": min_value,
+                        "maxvalue": max_value,
+                        "bounds": [[0, 0], [-30, -30]],
+                    },
+                ],
+            })
+            print("layer length: ", len(layers))
+            return newLayers
+            
+
+
+
+    # @app.callback(
+    #     Output('example-map', 'layers'),
+    #     [
+    #         Input('layer-delete-btn', 'n_clicks')
+    #     ]
+    # )
+    # def remove_layer(n_clicks):
+    #     print("pressed: " )
+    #     print("remove layer is triggered\n")
+    #     layers[1]['action'] = 'delete'
+    #     print("layered component action: ",  layers[1]['action'] )
+        
+    #     # print("action: ", layers[1]['action'])
+    #     # print("new layer 1: ", layers[1])
+    #     # print("new layer 1: ", layers[1])
+    #     return layers
+    # # change props of layered_map_component
+
+    app.run_server(debug=True)
 
 
 

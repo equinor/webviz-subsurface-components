@@ -11,9 +11,18 @@ const NewLayeredMapDemo = () => {
 
     const [switchValue, setSwitchValue] = useState(false);
 
+    const layers = exampleData.layers
+
     const onChange = (changes) => {
         if(changes.switch) {
             setSwitchValue(changes.switch.value);
+            console.log('toggle toggled');
+            if (!layers[0].action == 'delete') {
+                layers[0].action = 'delete';
+            } else {
+                layers[0].action = 'add';
+            }
+                
         }
     }
 
@@ -23,7 +32,7 @@ const NewLayeredMapDemo = () => {
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
                     syncedMaps={["NewLayeredMap-2"]}
-                    layers={exampleData.layers}
+                    layers={layers}
                     center={[0, 0]}
                     /*center={[432205, 6475078], [432205, 6475078]} */
                    // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
@@ -60,7 +69,7 @@ const NewLayeredMapDemo = () => {
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1"]}
-                    layers={exampleData.layers}
+                    layers={layers}
                     /*center={[432205, 6475078], [432205, 6475078]} */
                     // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
                     // crs="earth"

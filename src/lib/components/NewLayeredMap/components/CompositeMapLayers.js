@@ -32,29 +32,53 @@ class CompositeMapLayers extends Component {
         
     }
 
+    printLayerNames = () =>  {
+        this.props.map.eachLayer(function(layer) {
+            console.log(layer.name + "\n")
+        });
+    }
+    //TODO remove things from layercontrol
     componentDidUpdate(prevProps) {
-        if (prevProps.layers !== this.props.layers) {
-            const layers = this.props.layer;
-            for (const layer of layers) {
+        console.log("update triggered\n")
+        console.log("props: ", this.props.layer[1]);
+        console.log("prevproperties: ",  prevProps.layer[1]);
+        const layers = this.props.layer;
+        for (const layer of layers) {
+            if (prevProps != this.props) {
                 switch(layer.action) {
                     case "update":
+                        console.log("update triggered: ", layer.name)
+                        console.log("\nlayer before update: ", layer)
                         if (this.state.layers[layer.id]) {
                             this.props.map.removeLayer(layer);
                             this.createLayerGroup(layers);
                         }
+                        console.log("\nlayer after update: ", layer)
+
                         break;
 
                     case "delete":
+                        console.log("case: delete, layer: ", layer.name)
                         if (this.state.layers[layer.id]) {
+                            console.log("removing layer: ", layer.name)
+                            console.log("\n layers before deletion: ")
+                            this.printLayerNames();
                             this.props.map.removeLayer(layer);
+                            if (!this.props.map.hasLayer(layer)) {
+                                console.log("layer with name: ", layer.name, " was actually removed from the map");
+                            }
                             this.removeLayerFromState(layer.id);
+                            console.log("\n layers after deletion: ")
+                            this.printLayerNames();
                         }
                         break;
+                    case "add":
+                            console.log("added layer:", layer)
+                            if (!this.state.layers[layer.id]) {
+                                this.createLayerGroup(layer);
+                            }
+                            break; 
                     default:
-                        // add
-                        if (!this.state.layers[layer.id]) {
-                            this.createLayerGroup(layer);
-                        } 
                         break;
                 }
             }
@@ -68,8 +92,10 @@ class CompositeMapLayers extends Component {
 
     componentWillUnmount() {
         // TODO: Remove all layers from the map
-        this.props.map.eachLayer(function (layer) {
-            this.props.map.removeLayer(layer);
+        console.log("CWU triggered in CML")
+        const map = this.props.map
+        map.eachLayer(function (layer) {
+            map.removeLayer(layer);
         });
         this.state.layers = undefined; // ?
     }
@@ -80,7 +106,7 @@ class CompositeMapLayers extends Component {
         }
         return shapeObject;
     }
-    
+
     makePolyline = (item) => {
         const pos = item.positions.map(xy => yx(xy));
         return this.addTooltip(item, 
@@ -144,7 +170,6 @@ class CompositeMapLayers extends Component {
         return newTileLayer;
     }
 
-
     addItem(item, layerGroup) {
         // console.log(item);
 
@@ -200,7 +225,7 @@ class CompositeMapLayers extends Component {
         // To make sure one does not lose data due to race conditions 
         this.setState(prevState => ({
             layers: Object.assign({}, prevState.layers, {[layer.id]: layerGroup})
-        }), () => console.log("NewState:", this.state.layers))
+        }));
 
         //adds object to a layer
         for (const item of layer.data) {
