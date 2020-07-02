@@ -3,7 +3,7 @@
         {
             "name": "Hello world",
             "id": 1, 
-            "action": null,
+            "action": "update",
             "checked": true,
             "baseLayer": true,
             "data": [

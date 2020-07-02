@@ -17,7 +17,6 @@ class CompositeMapLayers extends Component {
     constructor(props) {
         super(props);
 
-        // TODO: Add all layers by id in state
         this.state = {
             layers: {
                     
@@ -37,45 +36,72 @@ class CompositeMapLayers extends Component {
             console.log(layer.name + "\n")
         });
     }
-    //TODO remove things from layercontrol
+
+    updateLayer = (curLayer, newLayer) => {
+        console.log("got to updateLayer()");
+        switch(newLayer.data[0].type) {
+            case 'image':
+                break;
+
+            case 'tile':
+                console.log("case: tile")
+                console.log("NewLayer", newLayer.data[0].colormap)
+                curLayer.getLayers()[0].update(newLayer.data[0].colormap, {
+                    ...newLayer.colormap,
+                    shader: newLayer.shader,
+                });
+                console.log("properties after: ", curLayer)
+                break;
+
+            case "polyline":
+                break;
+
+            case "polygon":
+                break;
+
+            case "circle":
+                break;
+ 
+        }
+    }
+
+    //TODO: make update work
     componentDidUpdate(prevProps) {
-        console.log("update triggered\n")
-        console.log("props: ", this.props.layer[1]);
-        console.log("prevproperties: ",  prevProps.layer[1]);
-        const layers = this.props.layer;
-        for (const layer of layers) {
-            if (prevProps != this.props) {
-                switch(layer.action) {
+        // console.log("props: ", this.props.layer[1]);
+        // console.log("prevproperties: ",  prevProps.layer[1]);
+        if (prevProps != this.props) {
+            const layers = this.props.layer;
+
+            for (const propLayer of layers) {
+                switch(propLayer.action) {
                     case "update":
-                        console.log("update triggered: ", layer.name)
-                        console.log("\nlayer before update: ", layer)
-                        if (this.state.layers[layer.id]) {
-                            this.props.map.removeLayer(layer);
-                            this.createLayerGroup(layers);
+                        console.log("\nlayer before update: ", propLayer)
+                        const stateLayer = this.state.layers[propLayer.id]
+                        if (stateLayer) {
+                            this.updateLayer(stateLayer, propLayer);
+                            // stateLayer.remove();
+                            // this.state.layerControl.removeLayer(stateLayer);
+                            // this.createLayerGroup(propLayer);
                         }
-                        console.log("\nlayer after update: ", layer)
+                        console.log("\nlayer after update: ", propLayer)
 
                         break;
 
                     case "delete":
-                        console.log("case: delete, layer: ", layer.name)
-                        if (this.state.layers[layer.id]) {
-                            console.log("removing layer: ", layer.name)
-                            console.log("\n layers before deletion: ")
-                            this.printLayerNames();
-                            this.props.map.removeLayer(layer);
-                            if (!this.props.map.hasLayer(layer)) {
-                                console.log("layer with name: ", layer.name, " was actually removed from the map");
-                            }
-                            this.removeLayerFromState(layer.id);
-                            console.log("\n layers after deletion: ")
-                            this.printLayerNames();
+                        console.log("case: delete, layer: ", propLayer.name)
+                        if (this.state.layers[propLayer.id]) {
+                            // state layer is the layer object that's active on the map
+                            // propLayer is the layer object from props
+                            const stateLayer = this.state.layers[propLayer.id];
+                            stateLayer.remove();
+                            this.state.layerControl.removeLayer(stateLayer);
+                            this.removeLayerFromState(propLayer.id);
                         }
                         break;
                     case "add":
-                            console.log("added layer:", layer)
-                            if (!this.state.layers[layer.id]) {
-                                this.createLayerGroup(layer);
+                            if (!this.state.layers[propLayer.id]) {
+                                this.createLayerGroup(propLayer);
+                                console.log("added layer:", propLayer)
                             }
                             break; 
                     default:
@@ -213,9 +239,14 @@ class CompositeMapLayers extends Component {
     }
  
     removeLayerFromState = (id) => {
-        this.setState(prevState => ({
-            layers: Object.assign({}, prevState.layers, {[id]: undefined})
-        }));
+        console.log("layers in state before delete: ", )
+        this.setState(prevState => {
+           const newLayers = Object.assign({}, prevState.layers);
+           delete newLayers[id];
+           return {
+               layers: newLayers
+           };
+        }, () => console.log("layers in state after delete: ", this.state.layers));
     }
 
   
