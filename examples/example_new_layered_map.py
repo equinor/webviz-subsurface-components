@@ -90,6 +90,12 @@ if __name__ == "__main__":
         switch={
             "value": False,
             "label": "Hillshading",
+        },
+        drawTools={
+            "drawMarker": True,
+            "drawPolygon": True,
+            "drawPolyline": True,
+            "position": "topright",   
         }
     )
 
@@ -142,10 +148,8 @@ if __name__ == "__main__":
             newLayers = add_layer(newLayers)
      
         elif (delete_n_clicks is not None and delete_n_clicks > state['delete_n_clicks']):
-            print("deleted layer", layers[0]['action'] )
             newLayers = delete_layer(newLayers)
         elif (colorscale is not None and colorscale != state['colorscale']):
-            print("updated layer")
             newLayers = update_layer(newLayers, colorscale)
         elif (switch is not None and state['switch']['value'] is not switch['value']):
             newLayers = toggle_shader(newLayers, switch)
@@ -158,7 +162,6 @@ if __name__ == "__main__":
         
         layers = newLayers
 
-        print("NewLayers:", layers)
 
         return newLayers
 
@@ -167,7 +170,6 @@ if __name__ == "__main__":
         return layers
         
     def add_layer(layers):
-        print("added layer")
         if len(layers) < 5:
             layers.append({
                 "name": "Something",
@@ -209,8 +211,6 @@ if __name__ == "__main__":
     def toggle_shader(new_layers: List, switch) -> List:
         layer_to_change = [x for x in new_layers if x['id'] == 3][0]
         cur_data = layer_to_change["data"][0]
-        # cur_shader = cur_data["shader"]
-        # cur_shader_type = cur_shader["type"]
 
         update = [
             {
@@ -218,10 +218,8 @@ if __name__ == "__main__":
                 "action": "update",
                 "data": [
                     {
-                        # **cur_data,
                         "type": "tile",
                         "shader": {
-                          #  **cur_shader,
                             "type": 'hillshading' if switch['value'] is True else None,
                         }
                     }

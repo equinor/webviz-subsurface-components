@@ -152,17 +152,17 @@ NewLayeredMap.propTypes = {
      * in callbacks. The ID needs to be unique across all of the
      * components in an app.
      */
-    // id: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
 
     /**
      * The layers
      */
     layers: PropTypes.array,
+
+    /**
+     * For reacting to changes in controls
+     */
     setProps: PropTypes.func,
-    polylinePoints: PropTypes.array,
-    polygonPoints: PropTypes.array,
-    markerPoint: PropTypes.array,
-    id: PropTypes.string,
 
     /**
      * ScaleY is a configuration for creating a slider for scaling the Y-axis.
@@ -184,6 +184,17 @@ NewLayeredMap.propTypes = {
         label: PropTypes.string,
     }),
 
+
+    /**
+     * DrawTools is a configuration for enabling drawing of polylines and areas.
+     */
+    drawTools: PropTypes.shape({
+        drawMarker: PropTypes.bool,
+        drawPolygon: PropTypes.bool,
+        drawPolyline: PropTypes.bool,
+        position: PropTypes.string,
+    }),
+
     /**
      * 
      */
@@ -202,7 +213,6 @@ NewLayeredMap.propTypes = {
     /**
      * Ids of other LayeredMap instances that should be synced with this instance  
      */    
-
     syncedMaps: PropTypes.array,
 }
 
