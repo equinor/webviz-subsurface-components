@@ -14,11 +14,7 @@ import CompositeMapLayers from './components/CompositeMapLayers'
 import exampleData from '../../../demo/example-data/new-layered-map.json';
 
 // Constants
-// const TEMP_IMAGE = 'https://i.pinimg.com/originals/67/dd/14/67dd1431cf0d806254a34ad6c0eb0eb5.jpg';
-const TEMP_IMAGE = exampleData.layers[0].data[0].url;
-const TEMP_COLORMAP = exampleData.layers[0].data[0].colormap;
 const DEFAULT_BOUNDS = [[0, 0], [30, 30]]
-// const DEFAULT_BOUNDS = [[6475078, 432205], [6481113, 437720]]
 
 const stringToCRS = (crsString) => {
     switch(crsString) {

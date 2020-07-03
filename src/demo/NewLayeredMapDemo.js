@@ -22,43 +22,44 @@ const NewLayeredMapDemo = () => {
             console.log('toggle value', changes.switch.value);
             console.log('action: ', layers[0].action)
             if (changes.switch.value == true) {
-                layers[0].data[0].colormap = worldsBestColormap;
+                layers[1].data[0].colorScale = worldsBestColormap;
             } else {
-                layers[0].data[0].colormap = oldBoringColormap;
+                layers[1].data[0].colorScale = oldBoringColormap;
             }
             console.log('action after change ', layers[0].action)
         }
     }
 
-
-    const layer = exampleData.layers.slice(1);
-    const layer2 = JSON.parse(JSON.stringify(layer));
-    layer2[0].data[0].colorScale = null;
-    const layer3 = JSON.parse(JSON.stringify(layer2));
-    layer3[0].data[0].colormap = null;
+    // const layer = exampleData.layers.slice(1);
+    // const layer2 = JSON.parse(JSON.stringify(layer));
+    // layer2[0].data[0].colorScale = null;
+    // const layer3 = JSON.parse(JSON.stringify(layer2));
+    // layer3[0].data[0].colormap = null;
 
     return (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>
             <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
-                    syncedMaps={["NewLayeredMap-2"]}
-                    layers={layers}
-                    center={[0, 0]}
-                    /*center={[432205, 6475078], [432205, 6475078]} */
-                   // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-3"]}
+                    layers={exampleData.layers}
+                    // center={[0, 0]}
+                    center={[432205, 6475078], [432205, 6475078]} 
+                    bounds={[[432205, 6475078], [437720, 6481113]] [[432205, 6475078], [437720, 6481113]]}
                     // crs="earth"
                     //crs="earth"
                     //minZoom={-5}
                     //zoom = {-5} 
                     // setProps={e => console.log(e)}
-                    //minZoom={-5}
-                    /* scaleY={{
+
+                    minZoom={-5}
+                    zoom = {-5}
+                    scaleY={{
                         scaleY: 1,
                         minScaleY: 1,
                         maxScaleY: 10,
                         position: 'topleft',
-                    }} */
+                    }}
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,
@@ -77,21 +78,21 @@ const NewLayeredMapDemo = () => {
             <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
-                    syncedMaps={["NewLayeredMap-1"]}
-                    layers={layers}
+                    syncedMaps={["NewLayeredMap-1", "NewLayeredMap-3"]}
+                    layers={exampleData.layers}
                     /*center={[432205, 6475078], [432205, 6475078]} */
                     // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
                     // crs="earth"
-                    // crs="simple"
-                   // minZoom={-5}
-                    //zoom = {-5} 
+                    crs="simple"
+                    minZoom={-5}
+                    zoom = {-5} 
                     // setProps={e => console.log(e)}
-                    scaleY={{
-                        scaleY: 1,
-                        minScaleY: 1,
-                        maxScaleY: 10,
-                        position: 'topleft',
-                    }}
+                    // scaleY={{
+                    //     scaleY: 1,
+                    //     minScaleY: 1,
+                    //     maxScaleY: 10,
+                    //     position: 'topleft',
+                    // }}
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,
@@ -109,9 +110,9 @@ const NewLayeredMapDemo = () => {
             </div>
             <div>
                 <NewLayeredMap 
-                    id={"NewLayeredMap-1"}
-                    syncedMaps={["NewLayeredMap-2"]}
-                    layers={layer3}
+                    id={"NewLayeredMap-3"}
+                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
+                    layers={exampleData.layers}
                     // center={[0, 0]}
                     center={[432205, 6475078], [432205, 6475078]}
                     bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
@@ -122,36 +123,6 @@ const NewLayeredMapDemo = () => {
                         maxScaleY: 10,
                         position: 'topleft',
                     }}
-                    drawTools = {{
-                        drawMarker: true,
-                        drawPolygon: true,
-                        drawPolyline: true,
-                        position: "topright",
-                        
-                    }}
-                    switch={{
-                        value: switchValue,
-                        label: 'Useless toggle',
-                        position: 'bottomleft'
-                    }}
-                    setProps={onChange}
-                />
-            </div>
-            <div>
-                <NewLayeredMap 
-                    id={"NewLayeredMap-1"}
-                    syncedMaps={["NewLayeredMap-2"]}
-                    layers={layer3}
-                    // center={[0, 0]}
-                    //center={[432205, 6475078], [432205, 6475078]}
-                    //bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
-                    //minZoom={-5}
-                    /* scaleY={{
-                        scaleY: 1,
-                        minScaleY: 1,
-                        maxScaleY: 10,
-                        position: 'topleft',
-                    }} */
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,

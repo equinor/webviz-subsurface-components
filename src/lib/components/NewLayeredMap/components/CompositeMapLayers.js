@@ -35,6 +35,9 @@ class CompositeMapLayers extends Component {
     updateLayer = (curLayer, newLayer) => {
         switch(newLayer.data[0].type) {
             case 'image':
+                curLayer.getLayers()[0].updateOptions({
+                    ...newLayer.data[0],
+                });
                 break;
 
             case 'tile':
@@ -64,10 +67,7 @@ class CompositeMapLayers extends Component {
                     case "update":
                         const stateLayer = this.state.layers[propLayerData.id]
                         if (stateLayer) {
-                            this.updateLayer(stateLayer, propLayer);
-                            // stateLayer.remove();
-                            // this.state.layerControl.removeLayer(stateLayer);
-                            // this.createLayerGroup(propLayer);
+                            this.updateLayer(stateLayer, propLayerData);
                         }
 
                         break;
@@ -77,7 +77,7 @@ class CompositeMapLayers extends Component {
                             const stateLayer = this.state.layers[propLayerData.id];
                             stateLayer.remove();
                             this.state.layerControl.removeLayer(stateLayer);
-                            this.removeLayerFromState(propLayer.id);
+                            this.removeLayerFromState(propLayerData.id);
                         }
                         break;
                     case "add":

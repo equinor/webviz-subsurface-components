@@ -24,6 +24,7 @@
             "id": 3, 
             "baseLayer": true,
             "checked": true,
+            "action": "update",
             "data": [
                 {
                     "type": "image",

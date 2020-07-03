@@ -122,18 +122,14 @@ L.TileWebGLLayer = L.GridLayer.extend({
         return Util.template(this._url, Util.extend(urlData, this.options));
 	},
 	
-	update: function (colormapUrl, options) {
-		console.log("trying to update in TILELAYER")
-        if (this._colormapUrl != colormapUrl) {
-			console.log("changing the color map")		
-			this._colormapUrl = colormapUrl;
-		}
-		
+	updateOptions: function (options) {
 		options = Util.setOptions(this, {
 			...this.options,
 			...options,
 		});
-		this.redraw();
+
+		this._initColormap();
+		this._redrawAllTiles();
 	},
     
 

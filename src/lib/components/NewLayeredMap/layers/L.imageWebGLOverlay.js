@@ -93,6 +93,16 @@ L.ImageWebGLOverlay = L.Layer.extend({
         return this._canvas;
     },
 
+    updateOptions: function(options) {
+        options = Util.setOptions(this, {
+			...this.options,
+			...options,
+		});
+
+		this._initColormap();
+		this._draw();
+    },
+
 
     // ------ PRIVATE FUNCTIONS -------
 
@@ -105,14 +115,17 @@ L.ImageWebGLOverlay = L.Layer.extend({
         // Add neccessary CSS-classes
         DomUtil.addClass(canvasTag, 'leaflet-canvas-layer');
 		if (this._zoomAnimated) { DomUtil.addClass(canvasTag, 'leaflet-zoom-animated'); }
+        
+        this._canvas = canvasTag;
+        this._draw();
+    },
 
+    _draw: function() {
         // TODO: Replace this function with custom draw function
-        drawFunc(gl, canvasTag, this._url, this._colormapUrl, {
+        drawFunc(this._gl, this._canvas, this._url, this._colormapUrl, {
             ...this.options,
             shader: this.options.shader,
         })
-        
-        this._canvas = canvasTag;
     },
 
     _initColormap: function() {
