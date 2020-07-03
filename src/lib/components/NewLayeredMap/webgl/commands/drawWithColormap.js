@@ -28,7 +28,5 @@ export default (gl, canvas, loadedImage, loadedColorMap) => {
         .setVertexCount(6)
         .build();
 
-    
-
     drawCommand(gl, canvas, drawCmd);
 }

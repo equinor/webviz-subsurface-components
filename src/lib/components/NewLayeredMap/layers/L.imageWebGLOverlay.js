@@ -12,6 +12,14 @@ import { loadImage } from '../webgl/webglUtils';
  */
 L.ImageWebGLOverlay = L.Layer.extend({
 
+    options: {
+
+        /**
+		 * @param {Array<String>} - An array of hexcolors for defining the colormap used on the tiles.
+		 */
+		colorScale: ["#FFFFFF", "#000000"],
+    },
+
     initialize: function(url, bounds, options) {
         this._url = url;
         this.setBounds(bounds);
@@ -123,8 +131,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
             /**
              * @type {import('../colorscale/index').ColorScaleConfig}
              */
-            const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale);
-            console.log("CFG:", colorScaleCfg);
+            const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
             const colors = colorScaleCfg.colors;
             this._colormapUrl = buildColormapFromHexColors(colors, colorScaleCfg);
         }
