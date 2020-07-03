@@ -6,6 +6,7 @@ from matplotlib import cm
 from typing import List
 
 import dash
+import dash_colorscales
 from dash.dependencies import Input, Output
 import dash_html_components as html
 import webviz_subsurface_components
@@ -32,7 +33,8 @@ if __name__ == "__main__":
     state = {
         'add_n_clicks': 0,
         'delete_n_clicks': 0,
-        'update_n_clicks': 0,
+        'switch': { "value": False },
+        'colorscale': None,
     }
     
     layers = [
@@ -86,7 +88,8 @@ if __name__ == "__main__":
         id="example-map", 
         layers=layers,
         switch={
-            "value": False
+            "value": False,
+            "label": "Hillshading",
         }
     )
 
@@ -97,38 +100,41 @@ if __name__ == "__main__":
             html.Div(id='hidden-div'),
             html.Div(id='hidden-div2'),
             html.Button('Toggle shader', id='map-shader-toggle-btn'),
-            html.Button('Update layer', id='layer-update-btn'),
+            
+            # dcc.Dropdown('Select colorscale', id='layer-colorscale'), # Use this one -> https://github.com/plotly/dash-colorscales
             html.Button('Delete layer', id='layer-delete-btn'),
             html.Button('Add layer', id='layer-add-btn'),
-            layered_map_component,
+            html.Div(children=[
+                html.Div([
+                    dash_colorscales.DashColorscales(
+                        id='layer-colorscale',
+                        nSwatches=7,
+                        fixSwatches=True
+                    ),
+                    html.P(id='output', children=''),
+                ]),
+                layered_map_component,
+            ], style={'display': 'grid', 'gridTemplateColumns': '400px auto'}),
             html.Pre(id="polyline"),
             html.Pre(id="marker"),
             html.Pre(id="polygon"),
         ]
     )
  
-    @app.callback(
-        Output('hidden-div', 'children'),
-        [
-            Input(component_id='map-shader-toggle-btn', component_property='n_clicks')
-        ]
-    )
-    def new_toggle(n_clicks):
-        pass
 
-    
     @app.callback(
         Output('example-map', 'layers'),
         [
             Input('layer-add-btn', 'n_clicks'),
             Input('layer-delete-btn', 'n_clicks'),
-            Input('layer-update-btn', 'n_clicks'),
+            Input('layer-colorscale', 'colorscale'),
+            Input('example-map', 'switch'),
         ]
     )
 
-    def add_layer(add_n_clicks, delete_n_clicks, update_n_clicks):
-        
-        print("n_clicks ",  add_n_clicks, delete_n_clicks, update_n_clicks)
+    def change_layer(add_n_clicks, delete_n_clicks, colorscale, switch):
+        global layers
+        # print("n_clicks ",  add_n_clicks, delete_n_clicks, update_n_clicks)
         
         newLayers = []
         newLayers.extend(layers)
@@ -138,19 +144,24 @@ if __name__ == "__main__":
         elif (delete_n_clicks is not None and delete_n_clicks > state['delete_n_clicks']):
             print("deleted layer", layers[0]['action'] )
             newLayers = delete_layer(newLayers)
-        elif (update_n_clicks is not None and update_n_clicks > state['update_n_clicks']):
+        elif (colorscale is not None and colorscale != state['colorscale']):
             print("updated layer")
-            newLayers = update_layer(newLayers)
+            newLayers = update_layer(newLayers, colorscale)
+        elif (switch is not None and state['switch']['value'] is not switch['value']):
+            newLayers = toggle_shader(newLayers, switch)
         
-        # print("length of newLayers: ", len(newLayers))
-
         state['add_n_clicks'] = add_n_clicks or 0
         state['delete_n_clicks'] = delete_n_clicks or 0
-        state['update_n_clicks'] = update_n_clicks or 0
+        state['colorscale'] = colorscale
+        state['switch'] = switch
+
+        
+        layers = newLayers
+
+        print("NewLayers:", layers)
 
         return newLayers
 
-    # Does not work properly yet plz fix
     def delete_layer(layers):
         layers[1]['action'] = 'delete'
         return layers
@@ -179,30 +190,46 @@ if __name__ == "__main__":
             })
         return layers
 
-    def update_layer(layers: List) -> List:
-       layer_to_change = [x for x in layers if x['id'] == 3][0]
-       cur_data = layer_to_change["data"][0]
-       cur_shader = cur_data["shader"]
-       cur_shader_type = cur_shader["type"]
+    def update_layer(layers: List, colorScale: List[str]) -> List:
+        update = [
+            {
+                "id": 3,
+                "action": "update",
+                "data": [
+                    {   
+                        "type": 'tile',
+                        "colorScale": colorScale, 
+                    }
+                ]
+            }
+        ]
+        return update
 
-       update = [
-           {
-               "id": 3,
-               "action": "update",
+
+    def toggle_shader(new_layers: List, switch) -> List:
+        layer_to_change = [x for x in new_layers if x['id'] == 3][0]
+        cur_data = layer_to_change["data"][0]
+        # cur_shader = cur_data["shader"]
+        # cur_shader_type = cur_shader["type"]
+
+        update = [
+            {
+                "id": 3,
+                "action": "update",
                 "data": [
                     {
-                        **cur_data,
+                        # **cur_data,
+                        "type": "tile",
                         "shader": {
-                            **cur_shader,
-                            "type": None if cur_shader_type == 'hillshading' else 'hillshading',
+                          #  **cur_shader,
+                            "type": 'hillshading' if switch['value'] is True else None,
                         }
                     }
                 ]
-           }
-       ]
-       print("Update:" ,update)
-       return update
+            }
+        ]
 
+        return update
        
 
     app.run_server(debug=True)

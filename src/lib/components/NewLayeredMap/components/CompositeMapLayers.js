@@ -31,26 +31,16 @@ class CompositeMapLayers extends Component {
         
     }
 
-    printLayerNames = () =>  {
-        this.props.map.eachLayer(function(layer) {
-            console.log(layer.name + "\n")
-        });
-    }
-
+    // TODO: fix for overlay stuff as well
     updateLayer = (curLayer, newLayer) => {
-        console.log("got to updateLayer()");
         switch(newLayer.data[0].type) {
             case 'image':
                 break;
 
             case 'tile':
-                console.log("case: tile")
-                console.log("NewLayer", newLayer.data[0].colormap)
-                curLayer.getLayers()[0].update(newLayer.data[0].colormap, {
-                    ...newLayer.colormap,
-                    shader: newLayer.shader,
+                curLayer.getLayers()[0].updateOptions({
+                    ...newLayer.data[0],
                 });
-                console.log("properties after: ", curLayer)
                 break;
 
             case "polyline":
@@ -67,41 +57,32 @@ class CompositeMapLayers extends Component {
 
     //TODO: make update work
     componentDidUpdate(prevProps) {
-        // console.log("props: ", this.props.layer[1]);
-        // console.log("prevproperties: ",  prevProps.layer[1]);
-        if (prevProps != this.props) {
-            const layers = this.props.layer;
-
-            for (const propLayer of layers) {
-                switch(propLayer.action) {
+        if (prevProps !== this.props) {
+            const layers = this.props.layers;
+            for (const propLayerData of layers) {
+                switch(propLayerData.action) {
                     case "update":
-                        console.log("\nlayer before update: ", propLayer)
-                        const stateLayer = this.state.layers[propLayer.id]
+                        const stateLayer = this.state.layers[propLayerData.id]
                         if (stateLayer) {
                             this.updateLayer(stateLayer, propLayer);
                             // stateLayer.remove();
                             // this.state.layerControl.removeLayer(stateLayer);
                             // this.createLayerGroup(propLayer);
                         }
-                        console.log("\nlayer after update: ", propLayer)
 
                         break;
 
                     case "delete":
-                        console.log("case: delete, layer: ", propLayer.name)
-                        if (this.state.layers[propLayer.id]) {
-                            // state layer is the layer object that's active on the map
-                            // propLayer is the layer object from props
-                            const stateLayer = this.state.layers[propLayer.id];
+                        if (this.state.layers[propLayerData.id]) {
+                            const stateLayer = this.state.layers[propLayerData.id];
                             stateLayer.remove();
                             this.state.layerControl.removeLayer(stateLayer);
                             this.removeLayerFromState(propLayer.id);
                         }
                         break;
                     case "add":
-                            if (!this.state.layers[propLayer.id]) {
-                                this.createLayerGroup(propLayer);
-                                console.log("added layer:", propLayer)
+                            if (!this.state.layers[propLayerData.id]) {
+                                this.createLayerGroup(propLayerData);
                             }
                             break; 
                     default:
@@ -118,7 +99,6 @@ class CompositeMapLayers extends Component {
 
     componentWillUnmount() {
         // TODO: Remove all layers from the map
-        console.log("CWU triggered in CML")
         const map = this.props.map
         map.eachLayer(function (layer) {
             map.removeLayer(layer);
@@ -199,7 +179,6 @@ class CompositeMapLayers extends Component {
     }
 
     addItem(item, layerGroup) {
-        // console.log(item);
 
         switch(item.type) {
             case "polyline":
@@ -241,14 +220,13 @@ class CompositeMapLayers extends Component {
     }
  
     removeLayerFromState = (id) => {
-        console.log("layers in state before delete: ", )
         this.setState(prevState => {
            const newLayers = Object.assign({}, prevState.layers);
            delete newLayers[id];
            return {
                layers: newLayers
            };
-        }, () => console.log("layers in state after delete: ", this.state.layers));
+        });
     }
 
   

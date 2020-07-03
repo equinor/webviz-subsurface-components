@@ -65,14 +65,13 @@ class NewLayeredMap extends Component {
             attributionControl: false,
         });
 
-        console.log("layers in NewLayeredMap", this.props.layers);
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = map;
         this.setEvents(map);
     }
 
     componentDidUpdate() {
-        console.log("New Layered map CDU triggered");
+        
     }
 
 
