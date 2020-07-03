@@ -65,7 +65,7 @@ class NewLayeredMap extends Component {
             attributionControl: false,
         });
 
-        
+        console.log("layers in NewLayeredMap", this.props.layers);
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = map;
         this.setEvents(map);
@@ -138,7 +138,7 @@ class NewLayeredMap extends Component {
                     {
                         this.state.map && (
                             <CompositeMapLayers 
-                                layer={this.props.layers}
+                                layers={this.props.layers}
                                 map={this.state.map}
     
                             />

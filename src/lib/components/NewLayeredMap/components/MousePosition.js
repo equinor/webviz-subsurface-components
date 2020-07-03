@@ -11,6 +11,10 @@ class MousePosition extends Component {
         this.createEvent();
     }
 
+    componentDidUpdate() {
+
+    }
+
     addControl = () => {
         let Position = L.Control.extend({ 
             options: {
@@ -50,7 +54,7 @@ class MousePosition extends Component {
 
 
 MousePosition.defaultProps = {
-    position: "bottomleft",
+    position: "bottomleft"
 };
 
 

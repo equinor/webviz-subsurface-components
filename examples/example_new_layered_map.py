@@ -3,6 +3,7 @@ import json
 import base64
 import numpy as np
 from matplotlib import cm
+from typing import List
 
 import dash
 from dash.dependencies import Input, Output
@@ -28,10 +29,17 @@ if __name__ == "__main__":
         cm.get_cmap("magma", 256)([np.linspace(0, 1, 256)]), colormap=True
     )
 
+    state = {
+        'add_n_clicks': 0,
+        'delete_n_clicks': 0,
+        'update_n_clicks': 0,
+    }
+    
     layers = [
                 {
             "name": "Some overlay layer",
             "base_layer": False,
+            "id": 0,
             "action": None,
             "checked": False,
             "data": [
@@ -56,6 +64,7 @@ if __name__ == "__main__":
         },
         {
             "name": "Map",
+            "id": 3,
             "baseLayer": True,
             "checked": True,
             "action": None,
@@ -89,8 +98,8 @@ if __name__ == "__main__":
             html.Div(id='hidden-div2'),
             html.Button('Toggle shader', id='map-shader-toggle-btn'),
             html.Button('Update layer', id='layer-update-btn'),
-            html.Button('Delete layer', id='layer-delete-btn', value='value'),
-            html.Button('Add layer', id='layer-add-btn', value='value'),
+            html.Button('Delete layer', id='layer-delete-btn'),
+            html.Button('Add layer', id='layer-add-btn'),
             layered_map_component,
             html.Pre(id="polyline"),
             html.Pre(id="marker"),
@@ -105,31 +114,53 @@ if __name__ == "__main__":
         ]
     )
     def new_toggle(n_clicks):
-        print("first toggle working: ", n_clicks)
-        print("when toggle pressed, layer[1]:", layered_map_component.layers[1])
+        pass
 
-        # return layers[1]['data'][0]['shader']['type']
-
-    # def toggle_between_shaders(n_clicks):
-    #     print("2nd togggle working :", n_clicks)
-    #     print("Current shader:", layers[1]['data'][0]['shader']['type'])
-    #     layers[1]['data'][0]['shader']['type'] = None if layers[0]['data'][0]['shader']['type'] is 'hillshading' else 'hillshading'
-    #     return layers[1]['data'][0]['shader']['type']
-
-        
-
+    
     @app.callback(
         Output('example-map', 'layers'),
         [
-            Input('layer-add-btn', 'n_clicks')
+            Input('layer-add-btn', 'n_clicks'),
+            Input('layer-delete-btn', 'n_clicks'),
+            Input('layer-update-btn', 'n_clicks'),
         ]
     )
-    def add_layer(n_clicks):
-        # if len(layers) < 5:
-            newLayers = []
-            newLayers.extend(layers)
-            newLayers.append({
+
+    def add_layer(add_n_clicks, delete_n_clicks, update_n_clicks):
+        
+        print("n_clicks ",  add_n_clicks, delete_n_clicks, update_n_clicks)
+        
+        newLayers = []
+        newLayers.extend(layers)
+        if (add_n_clicks is not None and add_n_clicks > state['add_n_clicks']):            
+            newLayers = add_layer(newLayers)
+     
+        elif (delete_n_clicks is not None and delete_n_clicks > state['delete_n_clicks']):
+            print("deleted layer", layers[0]['action'] )
+            newLayers = delete_layer(newLayers)
+        elif (update_n_clicks is not None and update_n_clicks > state['update_n_clicks']):
+            print("updated layer")
+            newLayers = update_layer(newLayers)
+        
+        # print("length of newLayers: ", len(newLayers))
+
+        state['add_n_clicks'] = add_n_clicks or 0
+        state['delete_n_clicks'] = delete_n_clicks or 0
+        state['update_n_clicks'] = update_n_clicks or 0
+
+        return newLayers
+
+    # Does not work properly yet plz fix
+    def delete_layer(layers):
+        layers[1]['action'] = 'delete'
+        return layers
+        
+    def add_layer(layers):
+        print("added layer")
+        if len(layers) < 5:
+            layers.append({
                 "name": "Something",
+                "id": 2,
                 "baseLayer": True,
                 "checked": False,
                 "action": "add",
@@ -139,36 +170,40 @@ if __name__ == "__main__":
                         "url": map_data,
                         "allowHillshading": True,
                         "colormap": colormap,
-                        "unit": "m",
+                        "unit": "m",    
                         "minvalue": min_value,
                         "maxvalue": max_value,
                         "bounds": [[0, 0], [-30, -30]],
                     },
                 ],
             })
-            print("layer length: ", len(layers))
-            return newLayers
-            
+        return layers
 
+    def update_layer(layers: List) -> List:
+       layer_to_change = [x for x in layers if x['id'] == 3][0]
+       cur_data = layer_to_change["data"][0]
+       cur_shader = cur_data["shader"]
+       cur_shader_type = cur_shader["type"]
 
+       update = [
+           {
+               "id": 3,
+               "action": "update",
+                "data": [
+                    {
+                        **cur_data,
+                        "shader": {
+                            **cur_shader,
+                            "type": None if cur_shader_type == 'hillshading' else 'hillshading',
+                        }
+                    }
+                ]
+           }
+       ]
+       print("Update:" ,update)
+       return update
 
-    # @app.callback(
-    #     Output('example-map', 'layers'),
-    #     [
-    #         Input('layer-delete-btn', 'n_clicks')
-    #     ]
-    # )
-    # def remove_layer(n_clicks):
-    #     print("pressed: " )
-    #     print("remove layer is triggered\n")
-    #     layers[1]['action'] = 'delete'
-    #     print("layered component action: ",  layers[1]['action'] )
-        
-    #     # print("action: ", layers[1]['action'])
-    #     # print("new layer 1: ", layers[1])
-    #     # print("new layer 1: ", layers[1])
-    #     return layers
-    # # change props of layered_map_component
+       
 
     app.run_server(debug=True)
 

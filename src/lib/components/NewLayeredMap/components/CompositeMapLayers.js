@@ -233,7 +233,7 @@ class CompositeMapLayers extends Component {
 
     createMultipleLayers() {
         this.addScaleLayer(this.props.map);
-        const layers = this.props.layer;
+        const layers = this.props.layers;
         for (const layer of layers) {
             this.createLayerGroup(layer);
         }
@@ -293,7 +293,7 @@ CompositeMapLayers.propTypes = {
 
     /* Data for one single layer. See parent component LayeredMap for documentation.
      */
-    layer: PropTypes.array,
+    layers: PropTypes.array,
 
     /* Coordinates for selected polyline*/
     lineCoords: PropTypes.func,
