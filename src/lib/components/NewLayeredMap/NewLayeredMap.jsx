@@ -62,12 +62,16 @@ class NewLayeredMap extends Component {
             zoom: this.state.zoom,
             minZoom: this.state.minZoom,
             maxZoom: this.state.maxZoom,
+            attributionControl: false,
         });
 
-        
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = map;
         this.setEvents(map);
+    }
+
+    componentDidUpdate() {
+        
     }
 
 
@@ -133,7 +137,7 @@ class NewLayeredMap extends Component {
                     {
                         this.state.map && (
                             <CompositeMapLayers 
-                                layer={this.props.layers}
+                                layers={this.props.layers}
                                 map={this.state.map}
     
                             />

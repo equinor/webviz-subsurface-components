@@ -17,33 +17,102 @@ class CompositeMapLayers extends Component {
     constructor(props) {
         super(props);
 
-        // TODO: Add all layers by id in state
         this.state = {
             layers: {
-
-            }
+                    
+            },
         }
     }
 
     componentDidMount() {
-        this.createMultipleLayers();
+        const layerControl = L.control.layers([]).addTo(this.props.map);
+        
+        this.setState({layerControl: layerControl}, () => this.createMultipleLayers())
+        
     }
 
-    componentDidUpdate(prevProps) {
-        // TODO: Add, delete or update layers based on this.props.layers.
+    // TODO: fix for overlay stuff as well
+    updateLayer = (curLayer, newLayer) => {
+        switch(newLayer.data[0].type) {
+            case 'image':
+                break;
+
+            case 'tile':
+                curLayer.getLayers()[0].updateOptions({
+                    ...newLayer.data[0],
+                });
+                break;
+
+            case "polyline":
+                break;
+
+            case "polygon":
+                break;
+
+            case "circle":
+                break;
+ 
+        }
     }
+
+    //TODO: make update work
+    componentDidUpdate(prevProps) {
+        if (prevProps !== this.props) {
+            const layers = this.props.layers;
+            for (const propLayerData of layers) {
+                switch(propLayerData.action) {
+                    case "update":
+                        const stateLayer = this.state.layers[propLayerData.id]
+                        if (stateLayer) {
+                            this.updateLayer(stateLayer, propLayer);
+                            // stateLayer.remove();
+                            // this.state.layerControl.removeLayer(stateLayer);
+                            // this.createLayerGroup(propLayer);
+                        }
+
+                        break;
+
+                    case "delete":
+                        if (this.state.layers[propLayerData.id]) {
+                            const stateLayer = this.state.layers[propLayerData.id];
+                            stateLayer.remove();
+                            this.state.layerControl.removeLayer(stateLayer);
+                            this.removeLayerFromState(propLayer.id);
+                        }
+                        break;
+                    case "add":
+                            if (!this.state.layers[propLayerData.id]) {
+                                this.createLayerGroup(propLayerData);
+                            }
+                            break; 
+                    default:
+                        break;
+                }
+            }
+        }
+        
+    }
+        // TODO: Add, delete or update layers based on this.props.layers.
+        // TODO: alle layers må ha id, filtrer vekk de som ikke har det i newLayeredMap
+        // legg på action (add, update eller delete)
+        // add by default
 
     componentWillUnmount() {
         // TODO: Remove all layers from the map
+        const map = this.props.map
+        map.eachLayer(function (layer) {
+            map.removeLayer(layer);
+        });
+        this.state.layers = undefined; // ?
     }
 
-    addTooltip(item, shapeObject) {
+    addTooltip = (item, shapeObject) => {
         if ("tooltip" in item) {
             return shapeObject.bindTooltip(item.tooltip);
         }
         return shapeObject;
     }
-    
+
     makePolyline = (item) => {
         const pos = item.positions.map(xy => yx(xy));
         return this.addTooltip(item, 
@@ -109,9 +178,7 @@ class CompositeMapLayers extends Component {
         return newTileLayer;
     }
 
-
     addItem(item, layerGroup) {
-        console.log(item);
 
         switch(item.type) {
             case "polyline":
@@ -138,22 +205,42 @@ class CompositeMapLayers extends Component {
                 break; // add error message here?
           }
     }
-    createMultipleLayers() {
-        const layerControl = L.control.layers([]).addTo(this.props.map);
 
-        const layers = this.props.layer;
-        for (let i = 0; i < layers.length; i++) {
-            this.createLayerGroup(layers[i], layerControl);
+    addScaleLayer = (map) => {
+        L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
+    }
+
+    createMultipleLayers() {
+        this.addScaleLayer(this.props.map);
+        const layers = this.props.layers;
+        for (const layer of layers) {
+            this.createLayerGroup(layer);
         }
         
     }
+ 
+    removeLayerFromState = (id) => {
+        this.setState(prevState => {
+           const newLayers = Object.assign({}, prevState.layers);
+           delete newLayers[id];
+           return {
+               layers: newLayers
+           };
+        });
+    }
 
-    createLayerGroup = (layer, layerControl) => {
+  
+    createLayerGroup = (layer) => {
         const layerGroup = L.layerGroup();
 
+        // To make sure one does not lose data due to race conditions 
+        this.setState(prevState => ({
+            layers: Object.assign({}, prevState.layers, {[layer.id]: layerGroup})
+        }));
+
         //adds object to a layer
-        for (let i = 0; i < layer.data.length; i++ ) {
-            this.addItem(layer.data[i], layerGroup);
+        for (const item of layer.data) {
+            this.addItem(item, layerGroup);
         }
 
         if(layer.checked) {
@@ -162,19 +249,18 @@ class CompositeMapLayers extends Component {
 
         // adds layers to the layerControl
         if(layer.baseLayer) {
-            layerControl.addBaseLayer(layerGroup, layer.name);
+            this.state.layerControl.addBaseLayer(layerGroup, layer.name);
 
             // Fits the map bounds if layer is a base layer
             // TODO: improve bounds optimization?
             const bounds = layer.data[0].bounds ? layer.data[0].bounds.map(xy => yx(xy)) : DEFAULT_BOUNDS;
             this.props.map.fitBounds(bounds);
         } else {
-            layerControl.addOverlay(layerGroup, layer.name);
+            this.state.layerControl.addOverlay(layerGroup, layer.name);
         }
-
     }
+    
   
- 
     render() {
         return (null);
     }
@@ -185,7 +271,7 @@ CompositeMapLayers.propTypes = {
 
     /* Data for one single layer. See parent component LayeredMap for documentation.
      */
-    layer: PropTypes.array,
+    layers: PropTypes.array,
 
     /* Coordinates for selected polyline*/
     lineCoords: PropTypes.func,

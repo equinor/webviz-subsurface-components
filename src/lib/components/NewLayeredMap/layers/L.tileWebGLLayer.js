@@ -80,47 +80,61 @@ L.TileWebGLLayer = L.GridLayer.extend({
     },
 
     onAdd: function(map) {
-		const canvas = this._canvas = DomUtil.create('canvas');
+        const canvas = this._canvas = DomUtil.create('canvas');
 
-        this._glContext = canvas.getContext("webgl", {
-            premultipliedAlpha: false,
-		});
-		
-		this._initColormap();
+            this._glContext = canvas.getContext("webgl", {
+                premultipliedAlpha: false,
+        });
 
-		L.GridLayer.prototype.onAdd.call(this, map);
-    },
+        this._initColormap();
+        L.GridLayer.prototype.onAdd.call(this, map);
+	  },
+
 
     createTile: function(coords, done) {
-		// Create image-tag and assign on load- and error-listeners
-		const tile = DomUtil.create('canvas');
-		DomEvent.on(tile, 'load', Util.bind(this._tileOnLoad, this, done, tile));
-		DomEvent.on(tile, 'error', Util.bind(this._tileOnError, this, done, tile));
-		tile.width = this.options.tileSize;
-		tile.height = this.options.tileSize;
+        // Create image-tag and assign on load- and error-listeners
+        const tile = DomUtil.create('canvas');
+        DomEvent.on(tile, 'load', Util.bind(this._tileOnLoad, this, done, tile));
+        DomEvent.on(tile, 'error', Util.bind(this._tileOnError, this, done, tile));
+        tile.width = this.options.tileSize;
+        tile.height = this.options.tileSize;
 
-		// Make sure the image gets the correct crossOrigin attribute, due to CORS-issues.
-		if (this.options.crossOrigin || this.options.crossOrigin === '') {
-			tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
-		}
+        // Make sure the image gets the correct crossOrigin attribute, due to CORS-issues.
+        if (this.options.crossOrigin || this.options.crossOrigin === '') {
+          tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
+        }
 
-		this._draw(tile, coords, done);
-        
+        this._draw(tile, coords, done);
 
-		return tile;
+
+        return tile;
     },
 
     getTileUrl: function (coords) {
-		var urlData = {
-            s: this._getSubdomain(coords),
-			x: coords.x,
-			y: coords.y,
-			z: this._getZoomForUrl()
-		};
+        var urlData = {
+                s: this._getSubdomain(coords),
+          x: coords.x,
+          y: coords.y,
+          z: this._getZoomForUrl()
+        };
 
-        // Insert the {x, y, z} values from the data object into the url-template.
-		return Util.template(this._url, Util.extend(urlData, this.options));
-    },
+            // Insert the {x, y, z} values from the data object into the url-template.
+        return Util.template(this._url, Util.extend(urlData, this.options));
+	},
+	
+	update: function (colormapUrl, options) {
+		console.log("trying to update in TILELAYER")
+        if (this._colormapUrl != colormapUrl) {
+			console.log("changing the color map")		
+			this._colormapUrl = colormapUrl;
+		}
+		
+		options = Util.setOptions(this, {
+			...this.options,
+			...options,
+		});
+		this.redraw();
+	},
     
 
 	// ----------- PRIVATE FUNCTIONS ------------------

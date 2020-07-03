@@ -2,6 +2,8 @@
     "layers": [
         {
             "name": "Hello world",
+            "id": 1, 
+            "action": "update",
             "checked": true,
             "baseLayer": true,
             "data": [
@@ -19,6 +21,7 @@
         },
         {
             "name": "A seismic horizon with colormap",
+            "id": 3, 
             "baseLayer": true,
             "checked": true,
             "data": [
@@ -42,6 +45,8 @@
         },
         {
             "name": "Some overlay layer",
+            "id": 4,
+            "action": null,
             "baseLayer": false,
             "checked": false,
             "data": [
