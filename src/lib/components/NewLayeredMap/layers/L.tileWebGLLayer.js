@@ -80,52 +80,46 @@ L.TileWebGLLayer = L.GridLayer.extend({
     },
 
     onAdd: function(map) {
-		const canvas = this._canvas = DomUtil.create('canvas');
+        const canvas = this._canvas = DomUtil.create('canvas');
 
-        this._glContext = canvas.getContext("webgl", {
-            premultipliedAlpha: false,
-		});
-		
-		this._initColormap();
+            this._glContext = canvas.getContext("webgl", {
+                premultipliedAlpha: false,
+        });
 
+        this._initColormap();
         L.GridLayer.prototype.onAdd.call(this, map);
-	},
+	  },
+
 
     createTile: function(coords, done) {
-		// Create image-tag and assign on load- and error-listeners
-		const tile = DomUtil.create('img');
-		DomEvent.on(tile, 'load', Util.bind(this._tileOnLoad, this, done, tile));
-		DomEvent.on(tile, 'error', Util.bind(this._tileOnError, this, done, tile));
+        // Create image-tag and assign on load- and error-listeners
+        const tile = DomUtil.create('canvas');
+        DomEvent.on(tile, 'load', Util.bind(this._tileOnLoad, this, done, tile));
+        DomEvent.on(tile, 'error', Util.bind(this._tileOnError, this, done, tile));
+        tile.width = this.options.tileSize;
+        tile.height = this.options.tileSize;
 
-		// Make sure the image gets the correct crossOrigin attribute, due to CORS-issues.
-		if (this.options.crossOrigin || this.options.crossOrigin === '') {
-			tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
-		}
+        // Make sure the image gets the correct crossOrigin attribute, due to CORS-issues.
+        if (this.options.crossOrigin || this.options.crossOrigin === '') {
+          tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
+        }
 
-        drawFunc(this._glContext, this._canvas, this.getTileUrl(coords), this._colormapUrl, {
-			...this.options,
-			crossOrigin: '',
-			shader: this.options.shader,
-		})
-		.then(() => {
-			const image = this._canvas.toDataURL();
-			tile.alt = '';
-			tile.src = image;
-		})
+        this._draw(tile, coords, done);
 
-		return tile;
+
+        return tile;
     },
 
     getTileUrl: function (coords) {
-		var urlData = {
-            s: this._getSubdomain(coords),
-			x: coords.x,
-			y: coords.y,
-			z: this._getZoomForUrl()
-		};
+        var urlData = {
+                s: this._getSubdomain(coords),
+          x: coords.x,
+          y: coords.y,
+          z: this._getZoomForUrl()
+        };
 
-        // Insert the {x, y, z} values from the data object into the url-template.
-		return Util.template(this._url, Util.extend(urlData, this.options));
+            // Insert the {x, y, z} values from the data object into the url-template.
+        return Util.template(this._url, Util.extend(urlData, this.options));
 	},
 	
 	update: function (colormapUrl, options) {
@@ -144,6 +138,30 @@ L.TileWebGLLayer = L.GridLayer.extend({
     
 
 	// ----------- PRIVATE FUNCTIONS ------------------
+
+	_draw: function(tile, coords, done) {
+		
+		drawFunc(this._glContext, this._canvas, this.getTileUrl(coords), this._colormapUrl, {
+			...this.options,
+			crossOrigin: '',
+			shader: this.options.shader,
+		})
+		.then(() => {
+			const ctx = tile.getContext('2d');
+			ctx.drawImage(this._canvas, 0, 0);
+			
+			if(done) {
+				done(null, tile);
+			}
+		})
+	},
+
+	_redrawAllTiles: function() {
+
+		for(let { el, coords } of Object.values(this._tiles)) {
+			this._draw(el, coords, null);
+		}
+	},
 
     _getZoomForUrl: function () {
 		let zoom =          this._tileZoom;
@@ -205,12 +223,12 @@ L.TileWebGLLayer = L.GridLayer.extend({
             const colors = colorScale;
             this._colormapUrl = buildColormapFromHexColors(colors);
         } 
-        else if(typeof colorScale === 'object' && colorScale !== null) {
+        else if(typeof colorScale === 'object' || !colorScale) {
             // The given colorScale is an object
             /**
              * @type {import('../colorscale/index').ColorScaleConfig}
              */
-            const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale);
+            const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
             const colors = colorScaleCfg.colors;
             this._colormapUrl = buildColormapFromHexColors(colors, colorScaleCfg);
         }
