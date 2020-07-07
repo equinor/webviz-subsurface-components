@@ -16,7 +16,7 @@ export default async (gl, canvas, image, colormap, config = {}) => {
 
     // Select which draw command to draw
     const shader = config.shader || {};
-    const logScale = config.logScale || {};
+    const scale = config.scale || {};
     switch(shader.type) {
 
         case 'hillshading': {
@@ -27,7 +27,7 @@ export default async (gl, canvas, image, colormap, config = {}) => {
                 loadedColorMap,
                 shader.elevationScale || null,
                 shader.lightDirection || null,
-                logScale,
+                scale,
 
             )
             break;
@@ -35,7 +35,7 @@ export default async (gl, canvas, image, colormap, config = {}) => {
 
 
         default: {
-            drawWithColormap(gl, canvas, loadedImage, loadedColorMap, config.logScale);
+            drawWithColormap(gl, canvas, loadedImage, loadedColorMap, scale);
         }
     }
 }

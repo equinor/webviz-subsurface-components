@@ -8,10 +8,20 @@ import fragmentShader from '../../shaders/baseFragmentShader.fs.glsl';
 /**
  * @param {WebGLRenderingContext} gl
  */
-export default (gl, canvas, loadedImage, loadedColorMap, logScale) => {
+export default (gl, canvas, loadedImage, loadedColorMap, scale) => {
     const width = loadedImage.width;
     const height = loadedImage.height;
-
+    const scaleType = 0; // default, linear
+    switch(scale) { // cannot pass strings to the shader, could add a map instead if there are many options? 
+        case "log":
+            scaleType = 1;
+            break;
+        case "something":
+            scaleType = 2;
+            break;
+        default:
+            break;
+      }
     canvas.width = width;
     canvas.height = height;
 
@@ -24,7 +34,7 @@ export default (gl, canvas, loadedImage, loadedColorMap, logScale) => {
         .addTexture('u_colormap_frame', 1, loadedColorMap)
         .addUniformF('u_resolution_vertex', gl.canvas.width, gl.canvas.height)  
         .addUniformF('u_colormap_length', loadedColorMap.width)
-        .addUniformF('u_log_scale', logScale)  
+        .addUniformF('u_scale', scaleType)  
         .setVertexCount(6)
         .build();
 

@@ -3,7 +3,7 @@ precision mediump float;
 uniform sampler2D u_image;
 uniform sampler2D u_colormap_frame;
 uniform float u_colormap_length;
-uniform bool u_log_scale; // varying?
+uniform float u_scale; // varying?
 
 varying vec2 v_texCoord;
 
@@ -27,12 +27,13 @@ float map_log(float value, float from1, float to1, float from2, float to2) {
 
 void main() {
     float color_value = texture2D(u_image, v_texCoord).r;
-    float mapped_color_value = 10.0; 
-    if (u_log_scale){
+    float mapped_color_value = 0.0; 
+    if (u_scale == 1.0) {
         mapped_color_value = map_log(color_value, 0.0, 1.0, 0.0, u_colormap_length - 1.0); // from 0 to 1 and from 0 to 255
     } else {
         mapped_color_value = map(color_value, 0.0, 1.0, 0.0, u_colormap_length - 1.0); // from 0 to 1 and from 0 to 255
     }
     vec2 colormap_coord = vec2((mapped_color_value) / u_colormap_length, 0.0);
+
     gl_FragColor = texture2D(u_colormap_frame, colormap_coord);
 }

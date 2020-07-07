@@ -125,7 +125,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         drawFunc(this._gl, this._canvas, this._url, this._colormapUrl, {
             ...this.options,
             shader: this.options.shader,
-            logScale: this.options.colorScale.logScale,
+            scale: this.options.colorScale.scale,
         })
     },
 
