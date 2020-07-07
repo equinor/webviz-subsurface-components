@@ -228,10 +228,7 @@ if __name__ == "__main__":
         ]
 
         return update
-       
+    
+    print("App: ", app)
 
     app.run_server(debug=True)
-
-
-
-

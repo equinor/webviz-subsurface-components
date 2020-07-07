@@ -1,5 +1,4 @@
-import DrawCmdBuilder from '../drawCmdBuilder';
-import drawCommand from '../drawCmd';
+import DrawCmdBuilder from '../eqGL/builder';
 
 // Shaders
 import vertexShader from '../../shaders/baseVertexShader.vs.glsl';
@@ -28,5 +27,8 @@ export default (gl, canvas, loadedImage, loadedColorMap) => {
         .setVertexCount(6)
         .build();
 
-    drawCommand(gl, canvas, drawCmd);
+    drawCmd(gl, canvas);
+
+   /*  const drawCmd = new DrawCmdBuilder()
+        .setVertexShader */
 }

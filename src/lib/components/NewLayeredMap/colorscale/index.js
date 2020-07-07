@@ -1,5 +1,5 @@
 /**
- * @typedef {Array<Number>} Color
+ * @typedef {Array<Number>} Color - [r, g, b, a]
  */
 
  /**

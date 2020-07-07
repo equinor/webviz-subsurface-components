@@ -1,5 +1,4 @@
-import DrawCmdBuilder from '../drawCmdBuilder';
-import drawCommand from '../drawCmd';
+import DrawCmdBuilder from '../eqGL/builder';
 
 // Shaders
 import vertexShader from '../../shaders/baseVertexShader.vs.glsl';
@@ -49,7 +48,5 @@ export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDi
         .addUniformF("u_light_direction", ...lightDirection.map(dir => dir/vectorLength))
         .addUniformF("u_elevation_scale", elevationScale)
 
-    const drawCmd = drawCmdBuilder.build();
-
-    drawCommand(gl, canvas, drawCmd);
+    drawCmdBuilder.build()(gl, canvas);
 }
