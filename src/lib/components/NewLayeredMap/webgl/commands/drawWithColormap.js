@@ -8,8 +8,7 @@ import fragmentShader from '../../shaders/baseFragmentShader.fs.glsl';
 /**
  * @param {WebGLRenderingContext} gl
  */
-export default (gl, canvas, loadedImage, loadedColorMap) => {
-
+export default (gl, canvas, loadedImage, loadedColorMap, logScale) => {
     const width = loadedImage.width;
     const height = loadedImage.height;
 
@@ -24,7 +23,8 @@ export default (gl, canvas, loadedImage, loadedColorMap) => {
         .addTexture('u_image', 0, loadedImage)
         .addTexture('u_colormap_frame', 1, loadedColorMap)
         .addUniformF('u_resolution_vertex', gl.canvas.width, gl.canvas.height)  
-        .addUniformF('u_colormap_length', loadedColorMap.width)  
+        .addUniformF('u_colormap_length', loadedColorMap.width)
+        .addUniformF('u_log_scale', logScale)  
         .setVertexCount(6)
         .build();
 

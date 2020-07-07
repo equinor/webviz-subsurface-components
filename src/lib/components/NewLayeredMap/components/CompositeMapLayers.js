@@ -152,7 +152,7 @@ class CompositeMapLayers extends Component {
             newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
                 ...imageData,
                 colorScale: imageData.colorScale || imageData.colormap,
-                shader: imageData.shader
+                shader: imageData.shader,
             });
         } else {
             newImageLayer = L.imageOverlay(imageData.url, bounds, {

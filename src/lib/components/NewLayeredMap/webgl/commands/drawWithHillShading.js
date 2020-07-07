@@ -11,7 +11,7 @@ const DEFAULT_LIGHT_DIRECTION = [1, 1, 1];
 /**
  * @param {WebGLRenderingContext} gl
  */
-export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDirection) => {
+export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDirection, logScale) => {
 
     if(!elevationScale) {
         elevationScale = DEFAULT_ELEVATION_SCALE;
@@ -25,7 +25,6 @@ export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDi
 
     canvas.width = width;
     canvas.height = height;
-
     const drawCmdBuilder = new DrawCmdBuilder()
         .setVertexShader(vertexShader)
         .setFragmentShader(fragmentShader)
@@ -34,7 +33,8 @@ export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDi
         .addTexture('u_image', 0, loadedImage)
         .addTexture('u_colormap_frame', 1, loadedColorMap)
         .addUniformF('u_resolution_vertex', gl.canvas.width, gl.canvas.height)  
-        .addUniformF('u_colormap_length', loadedColorMap.width) 
+        .addUniformF('u_colormap_length', loadedColorMap.width)
+        .addUniformF('u_log_scale', logScale)    
         .setVertexCount(6);
 
     // Add hillshading properties
