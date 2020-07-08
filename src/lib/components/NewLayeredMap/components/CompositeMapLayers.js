@@ -145,7 +145,20 @@ class CompositeMapLayers extends Component {
         ));
     }
     // add default bounds?
+    getColorCutOffPoints(min, max, cutMin, cutMax) {
+        const topCutRGB = Math.round(255 - (Math.abs((cutMax - max)) / (max - min)) * 255)
+        const bottomCutRGB = Math.round(255 - ((cutMin - min) / (max - min)) * 255)
+        return [bottomCutRGB, topCutRGB]
+
+
+
+    }
     addImage = (imageData) => {
+        imageData.cutoffPoints = this.getColorCutOffPoints(imageData.minvalue,
+            imageData.maxvalue,
+            imageData.cutPointMin,
+            imageData.cutPointMax,
+            )
         const bounds = imageData.bounds.map(xy => yx(xy));
         let newImageLayer = null;
         if (imageData.colorScale || imageData.colormap){
@@ -163,12 +176,18 @@ class CompositeMapLayers extends Component {
     }
 
     addTile = (tileData) => {
+        tileData.cutoffPoints = this.getColorCutOffPoints(tileData.minvalue,
+            tileData.maxvalue,
+            tileData.cutPointMin,
+            tileData.cutPointMax,
+            )
         let newTileLayer = null;
         if(tileData.colorScale || tileData.colormap) {
             newTileLayer = L.tileWebGLLayer(tileData.url, {
                 ...tileData.colormap,
                 colorScale: tileData.colorScale || tileData.colormap,
                 shader: tileData.shader,
+                cutOffPoints: tileData.cutoffPoints,
             })
         } else {
             newTileLayer = L.tileLayer(tileData.url, {

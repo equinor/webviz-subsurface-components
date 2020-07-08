@@ -13,6 +13,7 @@ class MousePosition extends Component {
 
     componentDidUpdate() {
 
+
     }
 
     addControl = () => {
@@ -27,24 +28,39 @@ class MousePosition extends Component {
               return latlng;
             },
     
-            updateHTML: function(lat, lng) {
-              this._latlng.innerHTML = "Lat: " + lat + "   Lng: " + lng;
+            updateHTML: function(x, y, z) {
+              this._latlng.innerHTML = "x: " + x + "   y: " + y + " z: " + z;
             }
           });
           this.position = new Position();
           this.props.map.addControl(this.position);
     }
 
+ 
+
     createEvent() {
-        this.props.map.addEventListener('mousemove', (event) => {
-            let lat = Math.round(event.latlng.lat * 100000) / 100000;
-            let lng = Math.round(event.latlng.lng * 100000) / 100000;
-            this.position.updateHTML(lat, lng);
-          });
+      this.el = L.DomUtil.get("leaflet-zoom-animated");
+      // var test2 = document.getElementsByClassName("leaflet-canvas-layer leaflet-zoom-animated");
+      
+      this.props.map.addEventListener('click', (event) => {
+  
+        // console.log("ctx iamgeData: ", test)
+        // console.log("test", test2)
+     
+        let x = Math.round(event.latlng.lng );
+        let y = Math.round(event.latlng.lat );
+        // let x = Math.round(event.containerPoint.x * 100000) / 100000; // e.clientx
+        // let y = Math.round(event.containerPoint.y * 100000) / 100000; //e.clienty
+        
+        const z = (y * 1111 + x) / 4
+        console.log("\nx: ", x , "\ny", y)
+
+        this.position.updateHTML(x, y, z);
+      });
     }
 
-    setLatLng = (lat, lng)  => {
-        this.position.updateHTML(lat,lng)
+    setLatLng = (lat, lng, z)  => {
+        this.position.updateHTML(lat,lng, z)
     }
     render() { 
         return (null);

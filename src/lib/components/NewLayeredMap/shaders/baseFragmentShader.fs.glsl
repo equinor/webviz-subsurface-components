@@ -6,7 +6,7 @@ uniform float u_colormap_length;
 uniform float u_scale; // varying?
 
 varying vec2 v_texCoord;
-
+//++offsets
 // Global min max: https://www.gamedev.net/forums/topic/559942-glsl--find-global-min-and-max-in-texture/
 
 // Maps a value from a given interval to a target interval

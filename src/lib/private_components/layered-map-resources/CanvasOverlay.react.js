@@ -4,7 +4,9 @@ import { MapLayer, withLeaflet } from "react-leaflet";
 
 class CanvasOverlay extends MapLayer {
     constructor(props) {
+        console.log("props before super:", props)
         super(props);
+        console.log("props after super:", props)
         this._map = this.props.leaflet.map;
         this._bounds = L.latLngBounds(this.props.bounds);
     }
@@ -63,10 +65,12 @@ class CanvasOverlay extends MapLayer {
         super.componentDidMount();
         this.props.drawMethod(this.el);
         this._reset();
-
+        
         this.el.onclick = e => {
             if (this.props.original_data.loaded) {
                 const client_rect = this.el.getBoundingClientRect();
+                console.log("original data: ", this.props)
+
                 const x = Math.floor(
                     ((e.clientX - client_rect.left) / client_rect.width) *
                         this.props.original_data.ImageData.width
@@ -75,6 +79,12 @@ class CanvasOverlay extends MapLayer {
                     ((e.clientY - client_rect.top) / client_rect.height) *
                         this.props.original_data.ImageData.height
                 );
+
+                console.log("\ne.clientX: ", e.clientX,
+                            "\nclient_rect.left: ", client_rect.left,
+                            "\nclient_rect.width: ", client_rect.width,
+                            "\ncanvas width: ", this.props.original_data.ImageData.width,
+                            "\nx: ", x)
 
                 // RGBA
                 const NUMBER_COLOR_CHANNELS = 4;
@@ -85,6 +95,10 @@ class CanvasOverlay extends MapLayer {
                     (y * this.props.original_data.ImageData.width + x) *
                         NUMBER_COLOR_CHANNELS
                 ];
+                console.log("z: ", z)
+                console.log("this.props.original_data.ImageData.data", this.props.original_data.ImageData.data)
+                console.log("width: ", this.props.original_data.ImageData.width)
+                
 
                 const z_string =
                     z > 0

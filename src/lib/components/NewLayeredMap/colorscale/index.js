@@ -78,6 +78,15 @@ export const interpolateColors = (colors, steps = 256, config = {}) => {
  * @returns {String} A dataURL-string.
  */
 export const buildColormap = (colors, config = {}) => {
+    if (config.cutOffPoints[0] == 255)
+        config.cutOffPoints[0] = 0
+    
+    for (const i = 0; i < colors.length; i++) {
+        if (i >config.cutOffPoints[0] && i < config.cutOffPoints[1]) {
+            colors[i][3] = 0;
+        }
+    }
+
     if(config.prefixZeroAlpha && colors.length > 0) {
         colors[0][3] = 0;
     }
@@ -87,6 +96,7 @@ export const buildColormap = (colors, config = {}) => {
 
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext("2d");
+
 
     // Set pixel by pixel with fillStyle and fillRect. An alternative is to use ImageData, but according to
     // this post - fillRect was more performant:
