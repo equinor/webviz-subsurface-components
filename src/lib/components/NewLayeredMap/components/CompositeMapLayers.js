@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import L from 'leaflet';
 import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
+import Colorbar from './Colorbar'
+import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
 
 const yx = ([x, y]) => {
     return [y, x];
@@ -33,6 +35,13 @@ class CompositeMapLayers extends Component {
 
     // TODO: fix for overlay stuff as well
     updateLayer = (curLayer, newLayer) => {
+        const newState = {colormap: newLayer.data[0].colormap,
+            colorscale: newLayer.data[0].colorScale,
+            minvalue: newLayer.data[0].minvalue,
+            maxvalue: newLayer.data[0].maxvalue
+            };
+        this.updateStateForColorbar(newState); 
+        
         switch(newLayer.data[0].type) {
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
@@ -41,6 +50,7 @@ class CompositeMapLayers extends Component {
                 break;
 
             case 'tile':
+
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
                 });
@@ -144,7 +154,7 @@ class CompositeMapLayers extends Component {
                     })
         ));
     }
-    // add default bounds?
+
     getColorCutOffPoints(min, max, cutMin, cutMax) {
         if (cutMax > max)
             cutMax = max;
@@ -156,10 +166,27 @@ class CompositeMapLayers extends Component {
 
         return [maxColorValue, minColorValue];
 
+    }
 
+    updateStateForColorbar = (newState) => {
+        const oldState = {colormap: this.state.colormap,
+                          colorscale: this.state.colorScale,
+                          minvalue: this.state.minvalue,
+                          maxvalue: this.state.maxvalue
+                          }
+        if (oldState != newState) {
+            this.setState(newState, );
+        }
 
     }
     addImage = (imageData) => {
+        const newState = {colormap: imageData.colormap,
+                          colorscale: imageData.colorScale,
+                          minvalue: imageData.minvalue,
+                          maxvalue: imageData.maxvalue
+                          };
+        this.updateStateForColorbar(newState); 
+
         imageData.cutoffPoints = this.getColorCutOffPoints(
                                             imageData.minvalue,
                                             imageData.maxvalue,
@@ -185,6 +212,13 @@ class CompositeMapLayers extends Component {
     }
 
     addTile = (tileData) => {
+        const newState = {colormap: tileData.colormap,
+                          colorscale: tileData.colorScale,
+                          minvalue: tileData.minvalue,
+                          maxvalue: tileData.maxvalue
+                          };
+        this.updateStateForColorbar(newState); 
+
         tileData.cutoffPoints = this.getColorCutOffPoints(
                                         tileData.minvalue,
                                         tileData.maxvalue,
@@ -288,14 +322,22 @@ class CompositeMapLayers extends Component {
             this.state.layerControl.addOverlay(layerGroup, layer.name);
         }
     }
-    
+
   
     render() {
-        return (null);
+        return (<Colorbar
+                colorscale = {this.state.colorscale}
+                colormap = {this.state.colormap}
+                minvalue = {this.state.minvalue}
+                maxvalue = {this.state.maxvalue}
+                map = {this.props.map}
+                unit = {"m"}
+        />);
     }
 }
 
 CompositeMapLayers.propTypes = {
+
     map: PropTypes.object.isRequired,
 
     /* Data for one single layer. See parent component LayeredMap for documentation.
