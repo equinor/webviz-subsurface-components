@@ -5,7 +5,7 @@ import { loadImage } from './webglUtils';
 
 export default async (gl, canvas, image, colormap, config = {}) => {
     
-    gl.getExtension("OES_texture_float");
+gl.getExtension("OES_texture_float");
     
     const imagesToLoad = [loadImage(image, config)]; 
     if (colormap) {
@@ -17,6 +17,10 @@ export default async (gl, canvas, image, colormap, config = {}) => {
     // Select which draw command to draw
     const shader = config.shader || {};
     const scale = config.scale || {};
+    const cutoffPoints = config.cutoffPoints || {};
+    const cutoffMethod = config.cutoffMethod || {};
+
+
     switch(shader.type) {
 
         case 'hillshading': {
@@ -28,14 +32,13 @@ export default async (gl, canvas, image, colormap, config = {}) => {
                 shader.elevationScale || null,
                 shader.lightDirection || null,
                 scale,
-
+                cutoffPoints
             )
             break;
         }
 
-
         default: {
-            drawWithColormap(gl, canvas, loadedImage, loadedColorMap, scale);
+            drawWithColormap(gl, canvas, loadedImage, loadedColorMap, scale, cutoffPoints, cutoffMethod);
         }
     }
 }

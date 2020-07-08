@@ -4,6 +4,9 @@ uniform sampler2D u_image;
 uniform sampler2D u_colormap_frame;
 uniform float u_colormap_length;
 uniform float u_scale; // varying?
+uniform float u_max_color_value;
+uniform float u_min_color_value;
+uniform float u_cutoff_method;
 
 varying vec2 v_texCoord;
 //++offsets
@@ -11,9 +14,17 @@ varying vec2 v_texCoord;
 
 // Maps a value from a given interval to a target interval
 //takes in a 0.0-1.0, maps it to 0-255
+
 float map(float value, float from1, float to1, float from2, float to2) {
-    // return (1.0 * to2); //value * 255, value ranges from 1  to 0 
-    return ((value - from1)/(to1 - from1))*(to2 - from2) + from2; // (red - 0 / (1-0)) * (255 - 0)
+    float linear_value = ((value - from1)/(to1 - from1))*(to2 - from2) + from2 +1.0; // +1.0 fixes f(0) = -n 
+    if (linear_value > u_max_color_value) {
+        linear_value = 0.0;
+    }
+    if (linear_value < u_min_color_value) {
+        linear_value = 0.0;
+    }
+    return linear_value;
+
 }
 
 

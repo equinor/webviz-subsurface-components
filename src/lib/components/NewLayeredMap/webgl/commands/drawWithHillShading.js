@@ -11,7 +11,7 @@ const DEFAULT_LIGHT_DIRECTION = [1, 1, 1];
 /**
  * @param {WebGLRenderingContext} gl
  */
-export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDirection, scale) => {
+export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDirection, scale, cutoffPoints) => {
 
     if(!elevationScale) {
         elevationScale = DEFAULT_ELEVATION_SCALE;
@@ -33,6 +33,8 @@ export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDi
 
     const width = loadedImage.width;
     const height = loadedImage.height;
+    const maxColorValue = cutoffPoints[0];
+    const minColorValue = cutoffPoints[1]  == 255 ? 0: 255- cutoffPoints[1];
 
     canvas.width = width;
     canvas.height = height;
@@ -46,6 +48,8 @@ export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDi
         .addUniformF('u_resolution_vertex', gl.canvas.width, gl.canvas.height)  
         .addUniformF('u_colormap_length', loadedColorMap.width)
         .addUniformF('u_scale', scaleType)    
+        .addUniformF('u_bottom_cut', maxColorValue)  
+        .addUniformF('u_top_cut', minColorValue)  
         .setVertexCount(6);
 
     // Add hillshading properties

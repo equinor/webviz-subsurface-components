@@ -8,7 +8,9 @@ import fragmentShader from '../../shaders/baseFragmentShader.fs.glsl';
 /**
  * @param {WebGLRenderingContext} gl
  */
-export default (gl, canvas, loadedImage, loadedColorMap, scale) => {
+export default (gl, canvas, loadedImage, loadedColorMap, scale, cutoffPoints, cutoffMethod) => {
+    const maxColorValue = cutoffPoints[0];
+    const minColorValue = cutoffPoints[1]  == 255 ? 0: 255- cutoffPoints[1];
     const width = loadedImage.width;
     const height = loadedImage.height;
     const scaleType = 0; // default, linear
@@ -22,6 +24,7 @@ export default (gl, canvas, loadedImage, loadedColorMap, scale) => {
         default:
             break;
       }
+    const cutoffMethodTest = cutoffMethod == "delete" ? 0 : 1; // remove  this?
     canvas.width = width;
     canvas.height = height;
 
@@ -35,6 +38,9 @@ export default (gl, canvas, loadedImage, loadedColorMap, scale) => {
         .addUniformF('u_resolution_vertex', gl.canvas.width, gl.canvas.height)  
         .addUniformF('u_colormap_length', loadedColorMap.width)
         .addUniformF('u_scale', scaleType)  
+        .addUniformF('u_max_color_value', maxColorValue)  
+        .addUniformF('u_min_color_value', minColorValue)
+        .addUniformF('u_cutoff_method', cutoffMethodTest)  
         .setVertexCount(6)
         .build();
 

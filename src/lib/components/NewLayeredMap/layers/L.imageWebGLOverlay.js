@@ -126,12 +126,14 @@ L.ImageWebGLOverlay = L.Layer.extend({
             ...this.options,
             shader: this.options.shader,
             scale: this.options.colorScale.scale,
+            cutoffPoints: this.options.cutoffPoints,
+            cutoffMethod: this.options.cutoffMethod,
         })
     },
 
     _initColormap: function() {
         const colorScale = this.options.colorScale;
-        const cutOffpoints = this.options.cutoffPoints
+        const cutOffpoints = this.options.cutoffPoints;
 
         if(typeof colorScale === 'string') {
             // The given colorScale is a base64 image
