@@ -1,4 +1,4 @@
-import DrawCmdBuilder from '../eqGL/builder';
+import EQGL from '../eqGL';
 
 // Shaders
 import vertexShader from '../../shaders/baseVertexShader.vs.glsl';
@@ -25,16 +25,18 @@ export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDi
     canvas.width = width;
     canvas.height = height;
 
-    const drawCmdBuilder = new DrawCmdBuilder()
-        .setVertexShader(vertexShader)
-        .setFragmentShader(fragmentShader)
-        .addAttribute('a_texCoord', [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]) // The vertices of two triangles, creating a square
-        .addAttribute('a_position', [0, 0, width, 0, 0, height, 0, height, width, 0, width, height])
-        .addTexture('u_image', 0, loadedImage)
-        .addTexture('u_colormap_frame', 1, loadedColorMap)
-        .addUniformF('u_resolution_vertex', gl.canvas.width, gl.canvas.height)  
-        .addUniformF('u_colormap_length', loadedColorMap.width) 
-        .setVertexCount(6);
+    const eqGL = EQGL(gl, canvas);
+
+    const drawCmdBuilder = eqGL.new()
+        .vert(vertexShader)
+        .frag(fragmentShader)
+        .attribute('a_texCoord', [0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]) // The vertices of two triangles, creating a square
+        .attribute('a_position', [0, 0, width, 0, 0, height, 0, height, width, 0, width, height])
+        .texture('u_image', 0, loadedImage)
+        .texture('u_colormap_frame', 1, loadedColorMap)
+        .uniformf('u_resolution_vertex', gl.canvas.width, gl.canvas.height)  
+        .uniformf('u_colormap_length', loadedColorMap.width) 
+        .vertexCount(6);
 
     // Add hillshading properties
     const vectorLength = Math.sqrt(
@@ -44,9 +46,9 @@ export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDi
     );
 
     drawCmdBuilder
-        .addUniformF("u_resolution_fragment", gl.canvas.width, gl.canvas.height)
-        .addUniformF("u_light_direction", ...lightDirection.map(dir => dir/vectorLength))
-        .addUniformF("u_elevation_scale", elevationScale)
+        .uniformf("u_resolution_fragment", gl.canvas.width, gl.canvas.height)
+        .uniformf("u_light_direction", ...lightDirection.map(dir => dir/vectorLength))
+        .uniformf("u_elevation_scale", elevationScale)
 
-    drawCmdBuilder.build()(gl, canvas);
+    drawCmdBuilder.build()();
 }

@@ -1,5 +1,8 @@
 import { EQGLContext, FrameBuffer } from './index';
 import drawCmd from './draw';
+import Variable from './variable';
+
+let CMD_COUNTER = 0;
 
 /**
  * DrawCmdBuilder is a builder for building draw commands that can be used
@@ -82,7 +85,7 @@ class DrawCmdBuilder {
 
     /**
      * 
-     * @param {FrameBuffer} framebuffer 
+     * @param {FrameBuffer|Variable} framebuffer 
      */
     framebuffer(framebuffer) {
         this._framebuffer = framebuffer;
@@ -92,6 +95,8 @@ class DrawCmdBuilder {
     build() {
         
         this.cmd = {
+            id: CMD_COUNTER++,
+
             frag: this._fragmentShader,
             vert: this._vertexShader,
 
@@ -108,7 +113,7 @@ class DrawCmdBuilder {
             framebuffer: this._framebuffer,
         }
 
-        return () => drawCmd(this._context, this.cmd);
+        return (props) => drawCmd(this._context, this.cmd, props);
     }
 }
 

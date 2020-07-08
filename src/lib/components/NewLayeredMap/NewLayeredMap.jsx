@@ -73,7 +73,11 @@ class NewLayeredMap extends Component {
 
     setEvents = (map) => {
         map.on('zoomanim', e => {
-            (this.props.syncedMaps || []).map(id => {
+            (this.props.syncedMaps || []).forEach(id => {
+                if(!NewLayeredMap.mapReferences[id]) {
+                    return;
+                }
+
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
                     e.zoom !== NewLayeredMap.mapReferences[id].getZoom()
@@ -89,7 +93,11 @@ class NewLayeredMap extends Component {
         map.on('move', e => {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
-            (this.props.syncedMaps || []).map(id => {
+            (this.props.syncedMaps || []).forEach(id => {
+                if(!NewLayeredMap.mapReferences[id]) {
+                    return;
+                }
+
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {

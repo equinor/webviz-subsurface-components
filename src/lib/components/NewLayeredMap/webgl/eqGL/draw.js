@@ -1,15 +1,18 @@
 import { EQGLContext, FrameBuffer } from './index';
+import Variable from './variable';
 import {  
-    bindBuffer, bindTexture, createAndInitProgram
-} from '../webglUtils';
+    bindBuffer, bindTexture, createAndInitProgram, createProgram, createShader
+} from './utils';
 
 /**
  * A number, or a string containing a number.
  * @typedef {Object} DrawCmd
+ * @property {Number} id
  * @property {Object} attributes - The attributes - { [attributeName]: { value } }
  * @property {Object} uniforms - The uniforms - { [uniformName]: { value, type } }
  * @property {Object} textures - The textures - { [textureName]: { textureUnit, textureImage }}
  * @property {Number} vertexCount - The number of indicies to draw with gl.drawArrays(..., ..., vertexCount)
+ * @property {Array<Number>} bgColor - The color of clear the canvas with
  * @property {String} frag - The fragment shader
  * @property {String} vert - The vertex shader
  * @property {FrameBuffer} framebuffer - The framebuffer to render the texture to
@@ -21,72 +24,145 @@ import {
  * @param {EQGLContext} context - The EQGLContext
  * @param {DrawCmd} cmd - The command to draw
  */
-export const drawCommand = (context, cmd) => {
+export const drawCommand = (context, cmd, props = {}) => {
     const gl = context._gl;
     const canvas = gl.canvas;
 
+    const timer = new Timer(cmd.id);
+
+    timer.run();
     // Check if one should write to a framebuffer or directly to the canvas
-    if(cmd.framebuffer) {
-        cmd.framebuffer.bind(gl);
+    const framebuffer = extractValue(cmd.framebuffer, props);
+    if(framebuffer) {
+        framebuffer.bind(gl);
     } else {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null); // Write directly to the canvas
     }
+    timer.stop();
+    timer.print("Framebuffer");
     
     // Clear canvas
     gl.clearColor(...(cmd.bgColor || [0, 0, 0, 0]));
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+    timer.run();
     if(cmd.viewport) {
-        gl.viewport(...cmd.viewport);
+        gl.viewport(...(extractValue(cmd.viewport, props)));
     } else {
         // Tell WebGL how to convert from clip space ([-1, 1] x [-1, 1]) back to pixel space ([0, w] x [0, h]):
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     }
-
-
-    // Initialize shaders
-    const program = createAndInitProgram(
-        gl,
-        cmd.vert,
-        cmd.frag
-    );
+    timer.stop();
+    timer.print("Viewport");
     
+
+
+    // Initialize program and shaders
+    timer.run();
+    let program = null;
+    if(context._programs[cmd.id]) {
+        const { p, vert, frag } = context._programs[cmd.id];
+        program = p; //createProgram(gl, vert, frag);
+    } else {
+        // A program has not yet been made for this command - create one
+        const vert = createShader(gl, gl.VERTEX_SHADER, extractValue(cmd.vert, props));
+        const frag = createShader(gl, gl.FRAGMENT_SHADER, extractValue(cmd.frag, props));
+        program = createProgram(gl, vert, frag);
+        context._addProgram(cmd.id, program, vert, frag);
+    }
+    gl.useProgram(program);
+    timer.stop();
+    timer.print("Program");
+    
+    
+    timer.run();
     // Add the attributes
     Object.entries(cmd.attributes)
         .forEach(([attributeName, { value }]) => {
-            bindBuffer(gl, attributeName, value);
+            bindBuffer(gl, attributeName, extractValue(value, props));
         });
+    timer.stop();
+    timer.print("Attributes")
 
+    timer.run();
     // Add the textures
     Object.entries(cmd.textures)
-        .forEach(([textureName, { textureUnit, textureImage }]) => {
-            if(textureImage instanceof Image) {
-                bindTexture(gl, textureUnit, textureName, textureImage);
-            } 
-            else if(textureUnit instanceof FrameBuffer) {
-                const uniformLocation = gl.getUniformLocation(program, textureName);
-                gl.uniform1i(uniformLocation, textureUnit.index())
-            }
-            else {
-                const uniformLocation = gl.getUniformLocation(program, textureName);
-                gl.uniform1i(uniformLocation, textureUnit);
-            }
-        })
-
+    .forEach(([textureName, { textureUnit, textureImage }]) => {
+        textureUnit = extractValue(textureUnit, props); // In case the first variable (textureUnit) is a Variable
+        
+        if(textureImage instanceof Image) {
+            bindTexture(gl, textureUnit, textureName, textureImage);
+        } 
+        else if(textureUnit instanceof FrameBuffer) {
+            const uniformLocation = gl.getUniformLocation(program, textureName);
+            gl.uniform1i(uniformLocation, textureUnit.index())
+        }
+        else {
+            const uniformLocation = gl.getUniformLocation(program, textureName);
+            gl.uniform1i(uniformLocation, textureUnit);
+        }
+    })
+    timer.stop();
+    timer.print("Textures")
+    
+    timer.run();
     // Add uniforms
     Object.entries(cmd.uniforms)
         .forEach(([uniformName, { value, type = '1f' }]) => {
+            const uniformValue = extractValue(value, props);
+
             const uniformLocation = gl.getUniformLocation(program, uniformName);
             const uniformFuncName = `uniform${type}`;
             if(gl[uniformFuncName] instanceof Function) {
-                gl[uniformFuncName](uniformLocation, ...value);
+                gl[uniformFuncName](uniformLocation, ...uniformValue);
             } else {
                 console.error(`Did not find gl.${uniformFuncName}. Did you give an incorrect type?`)
             }
         });
+    timer.stop();
+    timer.print("Uniforms")
+        
 
     // Draw onto the canvas
     gl.drawArrays(gl.TRIANGLES, 0, cmd.vertexCount); 
+}
+
+/**
+ * 
+ * @param {Variable} variable 
+ * @param {Object.<any>} props 
+ */
+const extractValue = (variable, props) => {
+    if(variable instanceof Variable) {
+        return props[variable.name];
+    }
+    else if(Array.isArray(variable) && variable.some(v => v instanceof Variable)) {
+        const v = variable.filter(v => v instanceof Variable)[0];
+        return props[v.name];
+    }
+    return variable;
+}
+
+function Timer(id) {
+    this.id = id;
+    this.start = null;
+    this.end = null;
+}
+
+Timer.prototype.run = function() {
+    this.start = performance.now();
+}
+
+Timer.prototype.stop = function() {
+    this.end = performance.now();
+}
+
+Timer.prototype.print = function(prefix){
+    if(this.id !== 3) {
+        return;
+    }
+
+    console.log("[", prefix, "] Time:", (this.end - this.start), "ms");
 }
 
 export default drawCommand;

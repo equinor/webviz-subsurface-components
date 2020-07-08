@@ -10,5 +10,5 @@ void main() {
     float l = dot(n, sunDirection);
     l = 0.5 * l + 0.5;
     gl_FragColor = vec4(l, l, l, 1.0);
-    // gl_FragColor = texture2D(tNormal, gl_FragCoord.xy / resolution);
+    //gl_FragColor = texture2D(tNormal, gl_FragCoord.xy / resolution);
 }

@@ -12,6 +12,6 @@ void main() {
     vec3 dx = vec3(pixelScale, 0.0, px - p0);
     vec3 dy = vec3(0.0, pixelScale, py - p0);
     vec3 n = normalize(cross(dx, dy));
-    gl_FragColor = vec4(0.5 * n + 0.5, 1.0);
-    //gl_FragColor = vec4(n, 1.0);
+    // gl_FragColor = vec4(0.5 * n + 0.5, 1.0);
+    gl_FragColor = vec4(n, 1.0);
 }

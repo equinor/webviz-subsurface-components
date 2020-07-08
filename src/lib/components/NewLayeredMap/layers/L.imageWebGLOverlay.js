@@ -2,9 +2,6 @@ import L, { latLngBounds, Util, DomUtil, Bounds, Point} from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
 import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
 
-// Utils
-import { loadImage } from '../webgl/webglUtils';
-
 /**
  * ImageWebGLOverlay is a layer that draws an image into the map
  * with help of WebGL. This opens up for usages for colormaps and
@@ -126,6 +123,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
             ...this.options,
             shader: this.options.shader,
         })
+        .catch(console.error);
     },
 
     _initColormap: function() {
