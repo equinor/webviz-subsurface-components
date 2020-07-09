@@ -99,7 +99,7 @@ export default async (gl, canvas, loadedImage, loadedColorMap) => {
         .texture("tNormal", fboNormal)
         .texture("tSrc", eqGL.variable("src"))
         .uniform("sunDirection", "3f", eqGL.variable("sunDirection"))
-        .uniformf("pixelScale", 11000)
+        .uniformf("pixelScale", 9000)
         .uniformf("resolution", loadedImage.width, loadedImage.height)
         .viewport(0, 0, loadedImage.width, loadedImage.height)
         .framebuffer(eqGL.variable("dest"))
@@ -107,7 +107,7 @@ export default async (gl, canvas, loadedImage, loadedColorMap) => {
         .build();
 
     
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 128; i++) {
         const sunDirection = vec3.normalize(
             [],
             vec3.add(
@@ -126,7 +126,7 @@ export default async (gl, canvas, loadedImage, loadedColorMap) => {
         shadowPP.swap();
     }
 
-  /*   const ambientPP = PingPong(eqGL, {
+    const ambientPP = PingPong(eqGL, {
         width: loadedImage.width,
         height: loadedImage.height,
     });
@@ -144,18 +144,18 @@ export default async (gl, canvas, loadedImage, loadedColorMap) => {
         .framebuffer(eqGL.variable("dest"))
         .viewport(0, 0, loadedImage.width, loadedImage.height)
         .vertexCount(6)
-        .build(); */
+        .build();
 
-   /*  for (let i = 0; i < 128; i++) {
+    for (let i = 0; i < 128; i++) {
         ambientCmd({
             direction: vec3.random([], Math.random()),
             src: ambientPP.ping(),
             dest: ambientPP.pong()
         });
         ambientPP.swap();
-    } */
+    }
 
-    /* const finalCmd = eqGL.new()
+    const finalCmd = eqGL.new()
         .vert(elevationVShader)
         .frag(combinedFShader)
         .attribute("position", [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
@@ -165,9 +165,9 @@ export default async (gl, canvas, loadedImage, loadedColorMap) => {
         .uniformf("resolution", loadedImage.width, loadedImage.height)
         .viewport(0, 0, loadedImage.width, loadedImage.height)
         .vertexCount(6)
-        .build(); */
+        .build();
 
-    //finalCmd();
+    finalCmd();
 }
 
 
