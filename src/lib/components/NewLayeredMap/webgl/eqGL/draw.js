@@ -30,7 +30,6 @@ export const drawCommand = (context, cmd, props = {}) => {
 
     const timer = new Timer(cmd.id);
 
-    timer.run();
     // Check if one should write to a framebuffer or directly to the canvas
     const framebuffer = extractValue(cmd.framebuffer, props);
     if(framebuffer) {
@@ -38,27 +37,21 @@ export const drawCommand = (context, cmd, props = {}) => {
     } else {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null); // Write directly to the canvas
     }
-    timer.stop();
-    timer.print("Framebuffer");
     
     // Clear canvas
     gl.clearColor(...(cmd.bgColor || [0, 0, 0, 0]));
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    timer.run();
     if(cmd.viewport) {
         gl.viewport(...(extractValue(cmd.viewport, props)));
     } else {
         // Tell WebGL how to convert from clip space ([-1, 1] x [-1, 1]) back to pixel space ([0, w] x [0, h]):
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     }
-    timer.stop();
-    timer.print("Viewport");
     
 
 
     // Initialize program and shaders
-    timer.run();
     let program = null;
     if(context._programs[cmd.id]) {
         const { p, vert, frag } = context._programs[cmd.id];
@@ -71,20 +64,14 @@ export const drawCommand = (context, cmd, props = {}) => {
         context._addProgram(cmd.id, program, vert, frag);
     }
     gl.useProgram(program);
-    timer.stop();
-    timer.print("Program");
     
     
-    timer.run();
     // Add the attributes
     Object.entries(cmd.attributes)
         .forEach(([attributeName, { value }]) => {
             bindBuffer(gl, attributeName, extractValue(value, props));
         });
-    timer.stop();
-    timer.print("Attributes")
 
-    timer.run();
     // Add the textures
     Object.entries(cmd.textures)
     .forEach(([textureName, { textureUnit, textureImage }]) => {
@@ -102,10 +89,7 @@ export const drawCommand = (context, cmd, props = {}) => {
             gl.uniform1i(uniformLocation, textureUnit);
         }
     })
-    timer.stop();
-    timer.print("Textures")
     
-    timer.run();
     // Add uniforms
     Object.entries(cmd.uniforms)
         .forEach(([uniformName, { value, type = '1f' }]) => {
@@ -119,8 +103,6 @@ export const drawCommand = (context, cmd, props = {}) => {
                 console.error(`Did not find gl.${uniformFuncName}. Did you give an incorrect type?`)
             }
         });
-    timer.stop();
-    timer.print("Uniforms")
         
 
     // Draw onto the canvas
@@ -158,10 +140,6 @@ Timer.prototype.stop = function() {
 }
 
 Timer.prototype.print = function(prefix){
-    if(this.id !== 3) {
-        return;
-    }
-
     console.log("[", prefix, "] Time:", (this.end - this.start), "ms");
 }
 
