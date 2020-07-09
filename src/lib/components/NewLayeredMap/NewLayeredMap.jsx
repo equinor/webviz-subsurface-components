@@ -27,7 +27,12 @@ const stringToCRS = (crsString) => {
     }
 }
 
+// TODO: make context work
+
+// const DrawLayerContext = React.createContext({hi: "hi there fella"});
+
 class NewLayeredMap extends Component {
+
 
     static mapReferences = {};
 
@@ -42,6 +47,7 @@ class NewLayeredMap extends Component {
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
             center: props.center || [6475078, 432205],
+            // center: props.center || [0, 0],
             bounds: props.bounds,
             controls: props.controls || {},
         }
@@ -110,8 +116,14 @@ class NewLayeredMap extends Component {
         }
     }
 
+    // passDrawLayer = (drawLayer) => {
+    //     const DrawLayerContext = React.createContext(drawLayer);
+    // }
 
-    render() {    
+
+    render() {   
+
+        
         
         return (
             <div>
@@ -121,13 +133,15 @@ class NewLayeredMap extends Component {
                     
                     {
                         this.state.map && (
-                            <Controls 
-                                setProps={this.setPropsExist}
-                                map={this.state.map}
-                                scaleY={this.props.scaleY}
-                                switch={this.props.switch}
-                                drawTools={this.props.drawTools}
-                            />
+                            // <DrawLayerContext.Provider value="Hello mf">
+                                <Controls 
+                                    setProps={this.setPropsExist}
+                                    map={this.state.map}
+                                    scaleY={this.props.scaleY}
+                                    switch={this.props.switch}
+                                    drawTools={this.props.drawTools}
+                                />
+                            // </DrawLayerContext.Provider>
                         )
                     }
                     {
@@ -135,7 +149,7 @@ class NewLayeredMap extends Component {
                             <CompositeMapLayers 
                                 layers={this.props.layers}
                                 map={this.state.map}
-    
+                                // passDrawLayer ={this.passDrawLayer}
                             />
                         )
                     }
@@ -215,5 +229,4 @@ NewLayeredMap.propTypes = {
      */    
     syncedMaps: PropTypes.array,
 }
-
 export default NewLayeredMap;

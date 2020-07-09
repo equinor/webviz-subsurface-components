@@ -4,7 +4,7 @@
             "name": "Hello world",
             "id": 1, 
             "action": "update",
-            "checked": true,
+            "checked": false,
             "baseLayer": true,
             "data": [
                 {

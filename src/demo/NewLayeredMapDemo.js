@@ -46,7 +46,7 @@ const NewLayeredMapDemo = () => {
                     // center={[0, 0]}
                     center={[432205, 6475078], [432205, 6475078]} 
                     bounds={[[432205, 6475078], [437720, 6481113]] [[432205, 6475078], [437720, 6481113]]}
-                    // crs="earth"
+                    crs="simple"
                     //crs="earth"
                     //minZoom={-5}
                     //zoom = {-5} 
@@ -54,12 +54,12 @@ const NewLayeredMapDemo = () => {
 
                     minZoom={-5}
                     zoom = {-5}
-                    scaleY={{
-                        scaleY: 1,
-                        minScaleY: 1,
-                        maxScaleY: 10,
-                        position: 'topleft',
-                    }}
+                    // scaleY={{
+                    //     scaleY: 1,
+                    //     minScaleY: 1,
+                    //     maxScaleY: 10,
+                    //     position: 'topleft',
+                    // }}
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,
@@ -114,15 +114,16 @@ const NewLayeredMapDemo = () => {
                     syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
                     layers={exampleData.layers}
                     // center={[0, 0]}
-                    center={[432205, 6475078], [432205, 6475078]}
-                    bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                    crs="simple"
+                    // center={[432205, 6475078], [432205, 6475078]}
+                    // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
                     minZoom={-5}
-                    scaleY={{
-                        scaleY: 1,
-                        minScaleY: 1,
-                        maxScaleY: 10,
-                        position: 'topleft',
-                    }}
+                    // scaleY={{
+                    //     scaleY: 1,
+                    //     minScaleY: 1,
+                    //     maxScaleY: 10,
+                    //     position: 'topleft',
+                    // }}
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,

@@ -5,6 +5,8 @@ import L from 'leaflet';
 import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
 
+
+
 const yx = ([x, y]) => {
     return [y, x];
 };
@@ -118,7 +120,7 @@ class CompositeMapLayers extends Component {
         return this.addTooltip(item, 
                     (L.polyline(pos, {
                         onClick: () => this.props.lineCoords(positions),
-                        color: item.color,
+                        color: item.color || "blue",
                         positions: pos
                     })
         ));
@@ -129,7 +131,7 @@ class CompositeMapLayers extends Component {
         return this.addTooltip(item, 
                     (L.polygon(pos, {
                         onClick: () => this.props.polygonCoords(positions),
-                        color: item.color,
+                        color: item.color || "blue",
                         positions: pos
                     })
         ));
@@ -145,7 +147,7 @@ class CompositeMapLayers extends Component {
     makeCircle = (item) => {
         return  this.addTooltip(item, 
                     (L.circle(yx(item.center), {
-                        color: item.color,
+                        color: item.color || "red",
                         center : yx(item.center),
                         radius : item.radius
                     })
@@ -228,6 +230,7 @@ class CompositeMapLayers extends Component {
         for (const layer of layers) {
             this.createLayerGroup(layer);
         }
+        this.createDrawLayer();
         
     }
  
@@ -241,9 +244,9 @@ class CompositeMapLayers extends Component {
         });
     }
 
-    // TODO: refactor the name of layerGroup to featureGroup
+    // TODO: refactor the name of layerGroup to featureGroup or change this back
     createLayerGroup = (layer) => {
-        const layerGroup = L.featureGroup();
+        const layerGroup = L.layerGroup();
 
         // To make sure one does not lose data due to race conditions 
         this.setState(prevState => ({
@@ -271,10 +274,36 @@ class CompositeMapLayers extends Component {
             this.state.layerControl.addOverlay(layerGroup, layer.name);
         }
     }
+
+    createDrawLayer = () => {
+        const drawLayer = L.featureGroup();
+        console.log("creating drawlayer")
+
+        // const DrawLayerContext = React.createContext("hi");
+        
+
+        this.setState(prevState => ({
+            layers: Object.assign({}, prevState.layers, {0: drawLayer})
+        }), () => {
+            console.log("drawLayer: ", this.state.layers[0]);
+            // this.render()
+        });
+
+        drawLayer.addTo(this.props.map);
+
+        this.state.layerControl.addOverlay(drawLayer, "draw Layer");
+
+        // this.props.passDrawLayer(drawLayer);
+    }
     
   
     render() {
-        return (null);
+        return (
+            // <DrawLayerContext.Provider value={this.state.layers.drawLayer}>
+            
+            // </DrawLayerContext.Provider>
+            null
+        );
     }
 }
 
@@ -292,5 +321,7 @@ CompositeMapLayers.propTypes = {
     polygonCoords: PropTypes.func,
 
 };
+
+// export const DrawLayerContext = React.createContext("hi");
 
 export default CompositeMapLayers;

@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 import { NewLayeredMap } from "../../../index";
+// import { DrawLayerContext } from './CompositeMapLayers'
+// import { DrawLayerContext } from '../NewLayeredMap'
 
 
 //TODO : Feature? Add drawn images to a static object
@@ -42,6 +44,7 @@ const getShapeType = layer => {
 
 class DrawControls extends Component {
 
+    // TODO: make it so that only data stays here, and the layergroup is initiated in CML
     static syncedDrawLayer = {
         "name": "syncedDrawLayer",
         "id": 19, 
@@ -77,6 +80,7 @@ class DrawControls extends Component {
     componentDidMount() {
         const { drawPolygon, drawMarker, drawPolyline } = this.props;
         this.addToolbar(this.props.map);
+        // console.log(this.context)
     }
 
 
@@ -91,8 +95,6 @@ class DrawControls extends Component {
             }
         }
     }
-
-    // TODO: clean up this so that it will use the featureGroup of syncedDrawLayers if it exists
 
     addToolbar = (map) => {
         const drawnItems = new L.FeatureGroup();
@@ -119,14 +121,20 @@ class DrawControls extends Component {
             const type = e.layerType;
             const layer = e.layer;
             drawnItems.addLayer(layer)
-
+            // console.log("context: ", that.context)
+            
+            if (props.syncDrawings) {
+                DrawControls.syncedDrawLayer.data = DrawControls.syncedDrawLayer.data.filter((drawing) => {
+                    return drawing.type !== type;
+                })
+                const newLayer = {type: type}
+            }
 
             if (type === "marker") {
                 console.log('new marker');
-                props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
-                console.log("new marker coords: ", [layer._latlng.lat, layer._latlng.lng])
+                // props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
+                props.syncDrawings && (newLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
                 that.removeLayers("marker", drawControl);
-                
             }
             if (type === "polyline") {
                 console.log('new polygon');
@@ -135,7 +143,7 @@ class DrawControls extends Component {
                 });
                 props.lineCoords(coords);
                 that.removeLayers("polyline", drawControl);
-                console.log('new polygon');
+                props.syncDrawings && (newLayer["positions"] = coords);
             }
             if (type === "polygon") {
                 console.log('new polygon');
@@ -143,11 +151,14 @@ class DrawControls extends Component {
                     return [p.lat, p.lng];
                 });
                 props.polygonCoords(coords);
+                props.syncDrawings && (newLayer["positions"] = coords); 
                 that.removeLayers("polygon", drawControl);
                 
             }
             if (props.syncDrawings) {
-                that.drawToSyncedLayer(e)
+                DrawControls.syncedDrawLayer.data.push(newLayer);
+                console.log("synced layer data: ", DrawControls.syncedDrawLayer.data);
+                this.drawToSyncLayer
             }
          });
         
@@ -177,44 +188,19 @@ class DrawControls extends Component {
          });
 
         map.addControl(drawControl);
+
     }
-
-    drawToSyncedLayer = (drawEvent) => {
-        const type = drawEvent.layerType
-        const layer = drawEvent.layer
-        console.log("old drawLayer: ", DrawControls.syncedDrawLayer.data)
-        DrawControls.syncedDrawLayer.data = DrawControls.syncedDrawLayer.data.filter((drawing) => {
-            return drawing.type !== type;
-        })
-        // console.log("new drawLayer: ", DrawControls.syncedDrawLayer.data);
-        // if (type === "marker") {
-
-        //     props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
-        //     console.log("new marker coords: ", [layer._latlng.lat, layer._latlng.lng])
-        // }
-        // if (type === "polyline") {
-        //     console.log('new polygon');
-        //     const coords = layer._latlngs.map(p => {
-        //         return [p.lat, p.lng];
-        //     });
-        //     props.lineCoords(coords);
-        //     console.log('new polygon');
-        // }
-        // if (type === "polygon") {
-        //     console.log('new polygon');
-        //     const coords = layer._latlngs[0].map(p => {
-        //         return [p.lat, p.lng];
-        //     });
-        //     props.polygonCoords(coords);
-        // }
-    }
-
 
     render() {
-
-        return (null);
+        return (
+            null
+        );
     }
 }
+// DrawControls.contextType = DrawLayerContext;
+// DrawControls.contextType = MagicContext;
+
+
 DrawControls.defaultProps = {
     drawMarker: true,
     drawPolygon: true,

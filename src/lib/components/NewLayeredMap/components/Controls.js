@@ -23,23 +23,26 @@ class Controls extends Component {
                 <div> {
                     
                     this.props.drawTools && (
-                    <DrawControls
-                        map={this.props.map}
-                        position={this.props.drawTools.position}
-                        drawMarker={this.props.drawTools.drawMarker}
-                        drawPolygon={this.props.drawTools.drawPolygon}
-                        drawPolyline={this.props.drawTools.drawPolyline}
-                        lineCoords={coords =>
-                            this.props.setProps({ polyline_points: coords })
-                        }
-                        markerCoords={coords =>
-                            this.props.setProps({ marker_point: coords })
-                        }
-                        polygonCoords={coords =>
-                            this.props.setProps({ polygon_points: coords })
-                        }
-                        syncDrawings={true}
-                    />
+                    // <DrawLayerContext.Provider value={"Hello mf"}>
+                        <DrawControls
+                            map={this.props.map}
+                            position={this.props.drawTools.position}
+                            drawMarker={this.props.drawTools.drawMarker}
+                            drawPolygon={this.props.drawTools.drawPolygon}
+                            drawPolyline={this.props.drawTools.drawPolyline}
+                            lineCoords={coords =>
+                                this.props.setProps({ polyline_points: coords })
+                            }
+                            markerCoords={coords =>
+                                this.props.setProps({ marker_point: coords })
+                            }
+                            polygonCoords={coords =>
+                                this.props.setProps({ polygon_points: coords })
+                            }
+                            syncDrawings={true}
+                        />
+                    // </DrawLayerContext.Provider> 
+                    
                     )
                 }
                 </div>
@@ -107,6 +110,7 @@ Controls.propTypes = {
         label: PropTypes.string,
     })
 }
+// Controls.contextType = DrawLayerContext;
 
 
 export default Controls;
