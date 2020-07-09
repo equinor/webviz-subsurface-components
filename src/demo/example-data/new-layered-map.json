@@ -67,6 +67,11 @@
                     "color": "red",
                     "radius": 2,
                     "tooltip": "This is a red circle"
+                },
+                {
+                    "type": "marker",
+                    "position": [435200, 6478000],
+                    "tooltip": "This is a blue marker"
                 }
             ]
         }

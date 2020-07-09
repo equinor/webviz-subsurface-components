@@ -4,7 +4,7 @@ import base64
 import numpy as np
 from matplotlib import cm
 from typing import List
-# from xtgeo import RegularSurface
+from xtgeo import RegularSurface
 
 import dash
 import dash_colorscales
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     app = dash.Dash(__name__)
 
     # initialize server for providing tiles at the same localhost as dash is running
-    server = tile_server(app.server)
+    # server = tile_server(app.server)
 
 
 
@@ -179,46 +179,27 @@ if __name__ == "__main__":
         return layers
 
     # changes the arrays to the desired view
-    # def get_surface_arr(surface, unrotate=True, flip=True):
-    #             if unrotate:
-    #                 surface.unrotate()
-    #             x, y, z = surface.get_xyz_values()
-    #             if flip:
-    #                 x = np.flip(x.transpose(), axis=0)
-    #                 y = np.flip(y.transpose(), axis=0)
-    #                 z = np.flip(z.transpose(), axis=0)
-    #             z.filled(np.nan)
-    #             return [x, y, z]
+    def get_surface_arr(surface, unrotate=True, flip=True):
+                if unrotate:
+                    surface.unrotate()
+                x, y, z = surface.get_xyz_values()
+                if flip:
+                    x = np.flip(x.transpose(), axis=0)
+                    y = np.flip(y.transpose(), axis=0)
+                    z = np.flip(z.transpose(), axis=0)
+                z.filled(np.nan)
+                return [x, y, z]
     
     def add_layer(layers):
         if len(layers) < 5:
-            # file_ = 'examples\\example-data\\reek_surfaces\\TopLowerReek_50inc.irapbin'
-            # surface = RegularSurface(file_)
-            # zvalues = get_surface_arr(surface)[2]
-            # bounds = [[surface.xmin, surface.ymin], [surface.xmax, surface.ymax]]
+            file_ = 'examples\\example-data\\reek_surfaces\\TopLowerReek_50inc.irapbin'
+            surface = RegularSurface(file_)
+            zvalues = get_surface_arr(surface)[2]
+            bounds = [[surface.xmin, surface.ymin], [surface.xmax, surface.ymax]]
             # min_value = min_value if min_value is not None else np.nanmin(zvalues)
             # max_value = max_value if max_value is not None else np.nanmax(zvalues)
-            # layers.append({
-            #     "name": "surface",
-            #     "id": 2,
-            #     "baseLayer": True,
-            #     "checked": False,
-            #     "action": "add",
-            #     "data": [
-            #         {
-            #             "type": "image",
-            #             "url": array_to_png(zvalues.copy()),
-            #             "allowHillshading": True,
-            #             "colormap": colormap,
-            #             "unit": "",    
-            #             "minvalue": None,
-            #             "maxvalue": None,
-            #             "bounds": [[0,0], [30, 30]],
-            #         },
-            #     ],
-            # })
             layers.append({
-                "name": "Something",
+                "name": "surface",
                 "id": 2,
                 "baseLayer": True,
                 "checked": False,
@@ -226,16 +207,35 @@ if __name__ == "__main__":
                 "data": [
                     {
                         "type": "image",
-                        "url": map_data,
+                        "url": array_to_png(zvalues.copy()),
                         "allowHillshading": True,
                         "colormap": colormap,
-                        "unit": "m",    
-                        "minvalue": min_value,
-                        "maxvalue": max_value,
-                        "bounds": [[0, 0], [-30, -30]],
+                        "unit": "",    
+                        "minvalue": None,
+                        "maxvalue": None,
+                        "bounds": [[0,0], [30, 30]],
                     },
                 ],
             })
+            # layers.append({
+            #     "name": "Something",
+            #     "id": 2,
+            #     "baseLayer": True,
+            #     "checked": False,
+            #     "action": "add",
+            #     "data": [
+            #         {
+            #             "type": "image",
+            #             "url": map_data,
+            #             "allowHillshading": True,
+            #             "colormap": colormap,
+            #             "unit": "m",    
+            #             "minvalue": min_value,
+            #             "maxvalue": max_value,
+            #             "bounds": [[0, 0], [-30, -30]],
+            #         },
+            #     ],
+            # })
         return layers
 
     def update_layer(layers: List, colorScale: List[str]) -> List:

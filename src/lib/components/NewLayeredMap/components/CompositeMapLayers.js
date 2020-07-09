@@ -14,12 +14,15 @@ const DEFAULT_ELEVATION_SCALE = 0.03;
 
 class CompositeMapLayers extends Component {
 
+    // TODO: should this actually be here?
+    // static syncedDrawLayer = {}
+
     constructor(props) {
         super(props);
 
         this.state = {
             layers: {
-                    
+                
             },
         }
     }
@@ -92,10 +95,7 @@ class CompositeMapLayers extends Component {
         }
         
     }
-        // TODO: Add, delete or update layers based on this.props.layers.
         // TODO: alle layers må ha id, filtrer vekk de som ikke har det i newLayeredMap
-        // legg på action (add, update eller delete)
-        // add by default
 
     componentWillUnmount() {
         // TODO: Remove all layers from the map
@@ -133,6 +133,13 @@ class CompositeMapLayers extends Component {
                         positions: pos
                     })
         ));
+    }
+
+    makeMarker = (item) => {
+        const pos = yx(item.position);
+        return  this.addTooltip(item, 
+                    L.marker(pos)
+        );
     }
 
     makeCircle = (item) => {
@@ -192,6 +199,10 @@ class CompositeMapLayers extends Component {
             case "circle":
                 layerGroup.addLayer(this.makeCircle(item));
                 break;
+            
+            case "marker":
+                layerGroup.addLayer(this.makeMarker(item));
+                break;
                 
             case "image":
                 layerGroup.addLayer(this.addImage(item));
@@ -210,6 +221,7 @@ class CompositeMapLayers extends Component {
         L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
     }
 
+    // TODO: generalize for drawlayer
     createMultipleLayers() {
         this.addScaleLayer(this.props.map);
         const layers = this.props.layers;
@@ -229,9 +241,9 @@ class CompositeMapLayers extends Component {
         });
     }
 
-  
+    // TODO: refactor the name of layerGroup to featureGroup
     createLayerGroup = (layer) => {
-        const layerGroup = L.layerGroup();
+        const layerGroup = L.featureGroup();
 
         // To make sure one does not lose data due to race conditions 
         this.setState(prevState => ({
