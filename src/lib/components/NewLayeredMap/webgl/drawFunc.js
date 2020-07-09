@@ -38,7 +38,7 @@ export default async (gl, canvas, image, colormap, config = {}) => {
         default: {
             //drawWithColormap(gl, canvas, loadedImage, loadedColorMap);
             const [loadedImage2] = await Promise.all([Utils.loadImage(TEMP_IMAGE, {crossOrigin: ''})]).catch(console.error);
-            const [loadedImage3] = await Promise.all([Utils.loadImage(TEST_IMAGE, {crossOrigin: true})]).catch(console.error)
+            // const [loadedImage3] = await Promise.all([Utils.loadImage(TEST_IMAGE, {crossOrigin: true})]).catch(console.error)
             drawWithNewHillShading(gl, canvas, loadedImage, loadedColorMap);
         }
     }
