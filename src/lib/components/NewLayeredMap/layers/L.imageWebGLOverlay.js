@@ -127,7 +127,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
             shader: this.options.shader,
             scale: this.options.colorScale.scale,
             cutoffPoints: this.options.cutoffPoints,
-            cutoffMethod: this.options.cutoffMethod,
         })
     },
 

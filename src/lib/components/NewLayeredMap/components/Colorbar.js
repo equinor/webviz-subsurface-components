@@ -27,15 +27,9 @@ class Colorbar extends Component {
     }
     //checks whether a colorscale exsits, if so, the colormap is updated to the colorscale 
     checkColormap = () => {
-        console.log("color scale", this.props.colorscale)
-        // if (this.props.colorscale != undefined) {
-        //     console.log("lenght of clorscale: ", this.props.colorscale.colors)
-        // }
         if (this.props.colorscale != undefined) {
-            if (this.props.colorscale.colors != undefined ) {
                 this.setState({colormap : this.buildColormap(this.props.colorscale)
-                    }, );
-            }
+                }, );
         }
     }
 

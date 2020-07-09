@@ -16,7 +16,7 @@ class ImageOverlayWebGL extends Component {
         const image = new Image();
         image.onload = () => {
             const offscreen_canvas = document.createElement("canvas");
-            const ctx = offscreen_canvas.getContext("2d");
+            const ctx = offscreen_canvas.getContext("webgl");
             offscreen_canvas.width = image.width;
             offscreen_canvas.height = image.height;
             ctx.drawImage(image, 0, 0);

@@ -193,7 +193,6 @@ class CompositeMapLayers extends Component {
                                             imageData.colorScale.cutPointMin,
                                             imageData.colorScale.cutPointMax,
                                             );
-        imageData.cutoffMethod = imageData.colorScale.cutoffMethod;
         const bounds = imageData.bounds.map(xy => yx(xy));
         let newImageLayer = null;
         if (imageData.colorScale || imageData.colormap){

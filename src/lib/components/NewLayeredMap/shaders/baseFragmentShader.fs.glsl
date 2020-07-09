@@ -6,7 +6,6 @@ uniform float u_colormap_length;
 uniform float u_scale; // varying?
 uniform float u_max_color_value;
 uniform float u_min_color_value;
-uniform float u_cutoff_method;
 
 varying vec2 v_texCoord;
 //++offsets

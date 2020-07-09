@@ -17,7 +17,7 @@
                     },
                     "colorScale": {
                         "colors": ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
-                        "scale": "log"
+                        "scale": "linear"
                     },
                     "minvalue": 2782,
                     "maxvalue": 3513
@@ -41,10 +41,9 @@
                     "colorScale": {
                         "colors": ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
                         "prefixZeroAlpha": true,
-                        "scale": "log",
+                        "scale": "linear",
                         "cutPointMin": 2782,
-                        "cutPointMax": 3300,
-                        "cutoffMethod" : "fill"
+                        "cutPointMax": 3300
                     },
                     "unit": "m",
                     "minvalue": 2782,

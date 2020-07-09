@@ -12,8 +12,6 @@ class MousePosition extends Component {
     }
 
     componentDidUpdate() {
-
-
     }
 
     addControl = () => {
@@ -39,23 +37,53 @@ class MousePosition extends Component {
  
 
     createEvent() {
-      this.el = L.DomUtil.get("leaflet-zoom-animated");
-      // var test2 = document.getElementsByClassName("leaflet-canvas-layer leaflet-zoom-animated");
+      this.el = L.DomUtil.create("canvas", "leaflet-canvas-layer leaflet-zoom-animated");      
+
+      const canvases = document.getElementsByClassName('leaflet-canvas-layer leaflet-zoom-animated');
+
+
       
+      const width = 0;
+      const height = 0;
+      const ctx = null;
+
+      document.addEventListener('DOMContentLoaded', (event) => {
+        const img    = canvases[1].toDataURL("image/png")
+        console.log("img", img);
+        width = canvases[1].width;
+        height = canvases[1].width;
+        ctx = canvases[1].getContext("webgl", {preserveDrawingBuffer: true});
+      });
+
+
       this.props.map.addEventListener('click', (event) => {
-  
-        // console.log("ctx iamgeData: ", test)
-        // console.log("test", test2)
-     
+        console.log(event.target)
         let x = Math.round(event.latlng.lng );
         let y = Math.round(event.latlng.lat );
-        // let x = Math.round(event.containerPoint.x * 100000) / 100000; // e.clientx
-        // let y = Math.round(event.containerPoint.y * 100000) / 100000; //e.clienty
         
-        const z = (y * 1111 + x) / 4
-        console.log("\nx: ", x , "\ny", y)
+        console.log("x: ", x, " y: ", y);
+        console.log("width:", width, " height, ", height);
+        console.log("ctx: ", ctx);
 
-        this.position.updateHTML(x, y, z);
+        const pixels = new Uint8Array(ctx.drawingBufferWidth * ctx.drawingBufferHeight * 4);
+        ctx.readPixels(
+          0, 
+          0, 
+          ctx.drawingBufferWidth, 
+          ctx.drawingBufferHeight, 
+          ctx.RGBA, 
+          ctx.UNSIGNED_BYTE, 
+          pixels);
+
+          console.log(pixels)
+
+          var pixelR = pixels[4 * (y * ctx.drawingBufferWidth + x)];
+          var pixelG = pixels[4 * (y * ctx.drawingBufferWidth + x) + 1];
+          var pixelB = pixels[4 * (y * ctx.drawingBufferWidth + x) + 2];
+          var pixelA = pixels[4 * (y * ctx.drawingBufferWidth + x) + 3];
+          console.log(pixelR, pixelG, pixelB, pixelA )
+                
+        this.position.updateHTML(x, y, x);
       });
     }
 

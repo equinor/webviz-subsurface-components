@@ -69,7 +69,6 @@ class CanvasOverlay extends MapLayer {
         this.el.onclick = e => {
             if (this.props.original_data.loaded) {
                 const client_rect = this.el.getBoundingClientRect();
-                console.log("original data: ", this.props)
 
                 const x = Math.floor(
                     ((e.clientX - client_rect.left) / client_rect.width) *
@@ -95,9 +94,8 @@ class CanvasOverlay extends MapLayer {
                     (y * this.props.original_data.ImageData.width + x) *
                         NUMBER_COLOR_CHANNELS
                 ];
-                console.log("z: ", z)
-                console.log("this.props.original_data.ImageData.data", this.props.original_data.ImageData.data)
-                console.log("width: ", this.props.original_data.ImageData.width)
+                console.log("z: ", y * this.props.original_data.ImageData.width + x)
+                console.log("width: ", this.props.original_data.ImageData.data)
                 
 
                 const z_string =

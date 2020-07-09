@@ -8,12 +8,13 @@ import fragmentShader from '../../shaders/baseFragmentShader.fs.glsl';
 /**
  * @param {WebGLRenderingContext} gl
  */
-export default (gl, canvas, loadedImage, loadedColorMap, scale, cutoffPoints, cutoffMethod) => {
+
+export default (gl, canvas, loadedImage, loadedColorMap, scale, cutoffPoints) => {
     const maxColorValue = cutoffPoints[0];
     const minColorValue = cutoffPoints[1]  == 255 ? 0: 255- cutoffPoints[1];
     const width = loadedImage.width;
     const height = loadedImage.height;
-    const scaleType = 0; // default, linear
+    const scaleType = 0; // default is 0, which is linear
     switch(scale) { // cannot pass strings to the shader, could add a map instead if there are many options? 
         case "log":
             scaleType = 1;
@@ -24,7 +25,6 @@ export default (gl, canvas, loadedImage, loadedColorMap, scale, cutoffPoints, cu
         default:
             break;
       }
-    const cutoffMethodTest = cutoffMethod == "delete" ? 0 : 1; // remove  this?
     canvas.width = width;
     canvas.height = height;
 
@@ -40,7 +40,6 @@ export default (gl, canvas, loadedImage, loadedColorMap, scale, cutoffPoints, cu
         .addUniformF('u_scale', scaleType)  
         .addUniformF('u_max_color_value', maxColorValue)  
         .addUniformF('u_min_color_value', minColorValue)
-        .addUniformF('u_cutoff_method', cutoffMethodTest)  
         .setVertexCount(6)
         .build();
 

@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import { withLeaflet, MapControl } from "react-leaflet";
 
-class Colormap extends L.Control {
+class Colormap extends MapControl {
     constructor(props) {
         super(props);
 

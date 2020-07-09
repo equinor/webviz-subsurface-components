@@ -18,7 +18,6 @@ gl.getExtension("OES_texture_float");
     const shader = config.shader || {};
     const scale = config.scale || {};
     const cutoffPoints = config.cutoffPoints || {};
-    const cutoffMethod = config.cutoffMethod || {};
 
 
     switch(shader.type) {
@@ -38,7 +37,7 @@ gl.getExtension("OES_texture_float");
         }
 
         default: {
-            drawWithColormap(gl, canvas, loadedImage, loadedColorMap, scale, cutoffPoints, cutoffMethod);
+            drawWithColormap(gl, canvas, loadedImage, loadedColorMap, scale, cutoffPoints);
         }
     }
 }
