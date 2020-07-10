@@ -28,8 +28,6 @@ export const drawCommand = (context, cmd, props = {}) => {
     const gl = context._gl;
     const canvas = gl.canvas;
 
-    const timer = new Timer(cmd.id);
-
     // Check if one should write to a framebuffer or directly to the canvas
     const framebuffer = extractValue(cmd.framebuffer, props);
     if(framebuffer) {
@@ -123,24 +121,6 @@ const extractValue = (variable, props) => {
         return props[v.name];
     }
     return variable;
-}
-
-function Timer(id) {
-    this.id = id;
-    this.start = null;
-    this.end = null;
-}
-
-Timer.prototype.run = function() {
-    this.start = performance.now();
-}
-
-Timer.prototype.stop = function() {
-    this.end = performance.now();
-}
-
-Timer.prototype.print = function(prefix){
-    console.log("[", prefix, "] Time:", (this.end - this.start), "ms");
 }
 
 export default drawCommand;
