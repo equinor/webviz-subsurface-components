@@ -3,8 +3,7 @@ import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 import { NewLayeredMap } from "../../../index";
-// import { DrawLayerContext } from './CompositeMapLayers'
-// import { DrawLayerContext } from '../NewLayeredMap'
+import Context from '../Context'
 
 
 //TODO : Feature? Add drawn images to a static object
@@ -97,12 +96,10 @@ class DrawControls extends Component {
     }
 
     addToolbar = (map) => {
-        const drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
         const drawControl = new L.Control.Draw({
             position: this.props.position,
             edit : {
-                featureGroup: drawnItems
+                featureGroup: this.context.drawLayer
             },
             draw: {
                 rectangle: false,
@@ -114,14 +111,11 @@ class DrawControls extends Component {
             }
 
         });
-        
-        let that = this;
 
-        map.on(L.Draw.Event.CREATED, function (e) {
+        map.on(L.Draw.Event.CREATED, (e) => {
             const type = e.layerType;
             const layer = e.layer;
-            drawnItems.addLayer(layer)
-            // console.log("context: ", that.context)
+            this.context.drawLayer.addLayer(layer)
             
             if (props.syncDrawings) {
                 DrawControls.syncedDrawLayer.data = DrawControls.syncedDrawLayer.data.filter((drawing) => {
@@ -134,7 +128,7 @@ class DrawControls extends Component {
                 console.log('new marker');
                 // props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
                 props.syncDrawings && (newLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
-                that.removeLayers("marker", drawControl);
+                this.removeLayers("marker", drawControl);
             }
             if (type === "polyline") {
                 console.log('new polygon');
@@ -142,7 +136,7 @@ class DrawControls extends Component {
                     return [p.lat, p.lng];
                 });
                 props.lineCoords(coords);
-                that.removeLayers("polyline", drawControl);
+                this.removeLayers("polyline", drawControl);
                 props.syncDrawings && (newLayer["positions"] = coords);
             }
             if (type === "polygon") {
@@ -152,7 +146,7 @@ class DrawControls extends Component {
                 });
                 props.polygonCoords(coords);
                 props.syncDrawings && (newLayer["positions"] = coords); 
-                that.removeLayers("polygon", drawControl);
+                this.removeLayers("polygon", drawControl);
                 
             }
             if (props.syncDrawings) {
@@ -163,7 +157,7 @@ class DrawControls extends Component {
          });
         
     
-        map.on(L.Draw.Event.EDITED, function (e) {
+        map.on(L.Draw.Event.EDITED, (e) => {
             e.layers.eachLayer(layer => {
                 const layertype = getShapeType(layer);
                 if (layertype === "polyline") {
@@ -197,8 +191,7 @@ class DrawControls extends Component {
         );
     }
 }
-// DrawControls.contextType = DrawLayerContext;
-// DrawControls.contextType = MagicContext;
+DrawControls.contextType = Context;
 
 
 DrawControls.defaultProps = {

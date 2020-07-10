@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import L from 'leaflet';
 import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
-
+import Context from '../Context'
 
 
 const yx = ([x, y]) => {
@@ -31,6 +31,7 @@ class CompositeMapLayers extends Component {
 
     componentDidMount() {
         const layerControl = L.control.layers([]).addTo(this.props.map);
+        console.log("this is my beatiful context: ", this.context)
         
         this.setState({layerControl: layerControl}, () => this.createMultipleLayers())
         
@@ -244,7 +245,6 @@ class CompositeMapLayers extends Component {
         });
     }
 
-    // TODO: refactor the name of layerGroup to featureGroup or change this back
     createLayerGroup = (layer) => {
         const layerGroup = L.layerGroup();
 
@@ -276,28 +276,18 @@ class CompositeMapLayers extends Component {
     }
 
     createDrawLayer = () => {
-        const drawLayer = L.featureGroup();
-        console.log("creating drawlayer")
-
-        // const DrawLayerContext = React.createContext("hi");
-        
-
         this.setState(prevState => ({
-            layers: Object.assign({}, prevState.layers, {0: drawLayer})
-        }), () => {
-            console.log("drawLayer: ", this.state.layers[0]);
-            // this.render()
-        });
+            layers: Object.assign({}, prevState.layers, {drawLayer: this.context.drawLayer})
+        }));
 
-        drawLayer.addTo(this.props.map);
+        this.context.drawLayer.addTo(this.props.map);
 
-        this.state.layerControl.addOverlay(drawLayer, "draw Layer");
-
-        // this.props.passDrawLayer(drawLayer);
+        this.state.layerControl.addOverlay(this.context.drawLayer, "draw Layer");
     }
     
   
     render() {
+        console.log(this.context)
         return (
             // <DrawLayerContext.Provider value={this.state.layers.drawLayer}>
             
@@ -306,6 +296,7 @@ class CompositeMapLayers extends Component {
         );
     }
 }
+CompositeMapLayers.contextType = Context;
 
 CompositeMapLayers.propTypes = {
     map: PropTypes.object.isRequired,

@@ -9,6 +9,7 @@ import './layers/L.tileWebGLLayer';
 // Components
 import Controls from './components/Controls';
 import CompositeMapLayers from './components/CompositeMapLayers'
+import Context from './Context'
 
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
@@ -27,17 +28,21 @@ const stringToCRS = (crsString) => {
     }
 }
 
+// Contexts
+// export const DrawLayerContext = React.createContext({drawLayer: "hi there"});
+// console.log("DrawLayerContext in newlayeredmap", DrawLayerContext)
+
 // TODO: make context work
 
 // const DrawLayerContext = React.createContext({hi: "hi there fella"});
 
 class NewLayeredMap extends Component {
 
-
     static mapReferences = {};
 
     constructor(props) {
         super(props);
+        const drawLayer = new L.featureGroup();
         this.state = {
             id: props.id,
             map: null,
@@ -50,6 +55,7 @@ class NewLayeredMap extends Component {
             // center: props.center || [0, 0],
             bounds: props.bounds,
             controls: props.controls || {},
+            drawLayer: drawLayer,
         }
         
         this.mapEl = createRef();
@@ -130,35 +136,34 @@ class NewLayeredMap extends Component {
                 <div
                     ref={el => this.mapEl = el} 
                     style={{height: '90vh'}}>
-                    
-                    {
-                        this.state.map && (
-                            // <DrawLayerContext.Provider value="Hello mf">
-                                <Controls 
-                                    setProps={this.setPropsExist}
-                                    map={this.state.map}
-                                    scaleY={this.props.scaleY}
-                                    switch={this.props.switch}
-                                    drawTools={this.props.drawTools}
-                                />
-                            // </DrawLayerContext.Provider>
-                        )
-                    }
-                    {
-                        this.state.map && (
-                            <CompositeMapLayers 
-                                layers={this.props.layers}
-                                map={this.state.map}
-                                // passDrawLayer ={this.passDrawLayer}
-                            />
-                        )
-                    }
+                        <Context.Provider value={{drawLayer: this.state.drawLayer}}>
+                            {
+                                this.state.map && (
+                                        <Controls 
+                                            setProps={this.setPropsExist}
+                                            map={this.state.map}
+                                            scaleY={this.props.scaleY}
+                                            switch={this.props.switch}
+                                            drawTools={this.props.drawTools}
+                                        />
+                                )
+                            }
+                            {
+                                this.state.map && (
+                                    <CompositeMapLayers 
+                                        layers={this.props.layers}
+                                        map={this.state.map}
+                                    />
+                                )
+                            }
+                        </Context.Provider>
                 </div>
             </div>
         )
     }
 
 }
+NewLayeredMap.contextType = Context;
 
 NewLayeredMap.propTypes = {
     /**
