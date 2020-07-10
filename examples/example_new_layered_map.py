@@ -203,6 +203,19 @@ if __name__ == "__main__":
                         "colorScale": colorScale, 
                     }
                 ]
+            },
+            {
+                "id": 2,
+                "action": "update",
+                "data": [
+                    {
+                        "type": "image",
+                        "colorScale": {
+                            "colors": colorScale,
+                            "prefixZeroAlpha": True,
+                        }
+                    }
+                ]
             }
         ]
         return update
@@ -219,6 +232,18 @@ if __name__ == "__main__":
                 "data": [
                     {
                         "type": "tile",
+                        "shader": {
+                            "type": 'hillshading' if switch['value'] is True else None,
+                        }
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "action": "update",
+                "data": [
+                    {
+                        "type": "image",
                         "shader": {
                             "type": 'hillshading' if switch['value'] is True else None,
                         }

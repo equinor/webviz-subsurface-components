@@ -11,6 +11,9 @@
 export const DEFAULT_COLORSCALE_CONFIG = {
     prefixZeroAlpha: true,
     suffixZeroAlpha: false,
+    scale: 'linear',
+    minColorValue: 0,
+    maxColorValue: 255,
 }
 
 /**

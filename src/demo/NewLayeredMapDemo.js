@@ -24,14 +24,13 @@ const NewLayeredMapDemo = () => {
         }
     }
 
-    // const layer = exampleData.layers.slice(1);
-    // const layer2 = JSON.parse(JSON.stringify(layer));
-    // layer2[0].data[0].colorScale = null;
-    // const layer3 = JSON.parse(JSON.stringify(layer2));
-    // layer3[0].data[0].colormap = null;
+    const layer2 = JSON.parse(JSON.stringify(layers));
+    layer2[0].data[0].shader.type = null;
+    layer2[0].data[0].colorScale.prefixZeroAlpha = true;
+
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "2fr auto auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr auto" }}>
             <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
@@ -69,11 +68,11 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            {/* <div >
+            <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-3"]}
-                    layers={layers}
+                    layers={layer2}
                     // bounds={[[432205, 6475078], [437720, 6481113]]}
                     // crs="earth"
                     crs="simple"
@@ -101,7 +100,7 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            <div>
+           {/*  <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-3"}
                     syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}

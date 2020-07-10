@@ -92,6 +92,14 @@ class DrawCmdBuilder {
         return this;
     }
 
+    /**
+     * @param {DrawCmdBuilder} builder 
+     */
+    extend(builder) {
+        Object.assign(this, builder);
+        return this;
+    }
+
     build() {
         
         this.cmd = {
