@@ -17,7 +17,30 @@ const DEFAULT_ELEVATION_SCALE = 0.03;
 class CompositeMapLayers extends Component {
 
     // TODO: should this actually be here?
-    // static syncedDrawLayer = {}
+    static syncedDrawLayer = {
+        "name": "syncedDrawLayer",
+        "id": 19, 
+        "action": "update",
+        "checked": true,
+        "baseLayer": false,
+        "data": [
+            {
+                "type": "marker",
+                "position": [435200, 6478000],
+                "tooltip": "This is a blue marker"
+            },
+            {
+                "type": "polygon",
+                "positions": [
+                    [436204, 6475077],
+                    [438204, 6480077],
+                    [432204, 6475077]
+                ],
+                "color": "blue",
+                "tooltip": "This is a blue polygon"
+            }
+        ]
+    }
 
     constructor(props) {
         super(props);
@@ -31,7 +54,6 @@ class CompositeMapLayers extends Component {
 
     componentDidMount() {
         const layerControl = L.control.layers([]).addTo(this.props.map);
-        console.log("this is my beatiful context: ", this.context)
         
         this.setState({layerControl: layerControl}, () => this.createMultipleLayers())
         
@@ -231,7 +253,7 @@ class CompositeMapLayers extends Component {
         for (const layer of layers) {
             this.createLayerGroup(layer);
         }
-        this.createDrawLayer();
+        this.addDrawLayerToMap();
         
     }
  
@@ -275,25 +297,19 @@ class CompositeMapLayers extends Component {
         }
     }
 
-    createDrawLayer = () => {
+    addDrawLayerToMap = () => {
         this.setState(prevState => ({
             layers: Object.assign({}, prevState.layers, {drawLayer: this.context.drawLayer})
         }));
 
         this.context.drawLayer.addTo(this.props.map);
 
-        this.state.layerControl.addOverlay(this.context.drawLayer, "draw Layer");
+        this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     }
     
   
     render() {
-        console.log(this.context)
-        return (
-            // <DrawLayerContext.Provider value={this.state.layers.drawLayer}>
-            
-            // </DrawLayerContext.Provider>
-            null
-        );
+        return (null);
     }
 }
 CompositeMapLayers.contextType = Context;

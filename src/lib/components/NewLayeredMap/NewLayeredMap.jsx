@@ -39,6 +39,9 @@ const stringToCRS = (crsString) => {
 class NewLayeredMap extends Component {
 
     static mapReferences = {};
+    static syncedDrawLayer = {
+        
+    };
 
     constructor(props) {
         super(props);
@@ -122,9 +125,9 @@ class NewLayeredMap extends Component {
         }
     }
 
-    // passDrawLayer = (drawLayer) => {
-    //     const DrawLayerContext = React.createContext(drawLayer);
-    // }
+    changeSyncedDrawLayer = (newLayer) => {
+
+    }
 
 
     render() {   
@@ -136,7 +139,12 @@ class NewLayeredMap extends Component {
                 <div
                     ref={el => this.mapEl = el} 
                     style={{height: '90vh'}}>
-                        <Context.Provider value={{drawLayer: this.state.drawLayer}}>
+                        <Context.Provider value={{
+                                drawLayer: this.state.drawLayer,
+                                syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
+                                changeSyncedDrawLayer: this.changeSyncedDrawLayer,
+                            }}
+                        >
                             {
                                 this.state.map && (
                                         <Controls 

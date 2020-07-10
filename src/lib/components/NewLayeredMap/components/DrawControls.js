@@ -79,7 +79,7 @@ class DrawControls extends Component {
     componentDidMount() {
         const { drawPolygon, drawMarker, drawPolyline } = this.props;
         this.addToolbar(this.props.map);
-        // console.log(this.context)
+        console.log(this.context.syncedDrawLayer)
     }
 
 
@@ -125,26 +125,20 @@ class DrawControls extends Component {
             }
 
             if (type === "marker") {
-                console.log('new marker');
-                // props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
                 props.syncDrawings && (newLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
                 this.removeLayers("marker", drawControl);
             }
             if (type === "polyline") {
-                console.log('new polygon');
                 const coords = layer._latlngs.map(p => {
                     return [p.lat, p.lng];
                 });
-                props.lineCoords(coords);
                 this.removeLayers("polyline", drawControl);
                 props.syncDrawings && (newLayer["positions"] = coords);
             }
             if (type === "polygon") {
-                console.log('new polygon');
                 const coords = layer._latlngs[0].map(p => {
                     return [p.lat, p.lng];
                 });
-                props.polygonCoords(coords);
                 props.syncDrawings && (newLayer["positions"] = coords); 
                 this.removeLayers("polygon", drawControl);
                 
@@ -152,7 +146,6 @@ class DrawControls extends Component {
             if (props.syncDrawings) {
                 DrawControls.syncedDrawLayer.data.push(newLayer);
                 console.log("synced layer data: ", DrawControls.syncedDrawLayer.data);
-                this.drawToSyncLayer
             }
          });
         
@@ -161,22 +154,19 @@ class DrawControls extends Component {
             e.layers.eachLayer(layer => {
                 const layertype = getShapeType(layer);
                 if (layertype === "polyline") {
-                    console.log('edited polyline');
                     const coords = layer._latlngs.map(p => {
                         return [p.lat, p.lng];
                     });
-                    this.props.lineCoords(coords);
+                    // props.syncDrawings && ()
                 }
                 if (layertype === "polygon") {
-                    console.log('edited polygon');
                     const coords = layer._latlngs[0].map(p => {
                         return [p.lat, p.lng];
                     });
-                    this.props.polygonCoords(coords);
+                    // props.syncDrawings && ()
                 }
                 if (layertype === "marker") {
-                    console.log('edited marker');
-                    this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
+                    // props.syncDrawings && ()
                 }
             });
          });
@@ -186,9 +176,7 @@ class DrawControls extends Component {
     }
 
     render() {
-        return (
-            null
-        );
+        return (null);
     }
 }
 DrawControls.contextType = Context;
