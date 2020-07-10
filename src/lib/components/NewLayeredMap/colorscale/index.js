@@ -9,7 +9,7 @@
   * @description A set of default configuration values for building colormaps. 
   */
 export const DEFAULT_COLORSCALE_CONFIG = {
-    prefixZeroAlpha: true,
+    prefixZeroAlpha: false,
     suffixZeroAlpha: false,
     scale: 'linear',
     minColorValue: 0,
