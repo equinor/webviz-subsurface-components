@@ -1,6 +1,7 @@
 precision highp float;
 
 uniform sampler2D u_image;
+uniform sampler2D u_raw_image;
 uniform vec2 u_resolution;
 
 // Colorscale configurations
@@ -26,7 +27,7 @@ float map_log(float value, float from1, float to1, float from2, float to2) {
 }
 
 // Calculate color value
-vec4 calcColorValue(float color_value, float scale_type) {
+vec4 calcColorValue(float color_value, float raw_value, float scale_type) {
     float mapped_color_value = 0.0; 
     if (scale_type == 1.0) {
         mapped_color_value = map_log(color_value, 0.0, 1.0, 0.0, u_colormap_length - 1.0); // from 0 to 1 and from 0 to 255
@@ -34,7 +35,7 @@ vec4 calcColorValue(float color_value, float scale_type) {
         mapped_color_value = map(color_value, 0.0, 1.0, 0.0, u_colormap_length - 1.0); // from 0 to 1 and from 0 to 255
     }
 
-    if (mapped_color_value > u_max_color_value || mapped_color_value < u_min_color_value) {
+    if (raw_value > u_max_color_value/255.0 || raw_value < u_min_color_value/255.0) {
         return vec4(0.0, 0.0, 0.0, 0.0);
     }
 
@@ -44,9 +45,10 @@ vec4 calcColorValue(float color_value, float scale_type) {
 
 void main() {
     float color_value = texture2D(u_image, gl_FragCoord.xy/u_resolution).r; // [r, g, b] -> [x, y ,z] => |v|
+    float raw_value = texture2D(u_raw_image, gl_FragCoord.xy/u_resolution).r;
 
     if(color_value < 0.0) {
         color_value = 0.0;
     }
-    gl_FragColor = calcColorValue(color_value, u_scale_type);
+    gl_FragColor = calcColorValue(color_value, raw_value, u_scale_type);
 }

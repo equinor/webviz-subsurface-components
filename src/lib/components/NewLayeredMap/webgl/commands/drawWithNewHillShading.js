@@ -160,8 +160,8 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             softShadowsCmd({
                 sunDirection: sunDirection,
                 src: shadowPP.ping(),
-               // dest: i === 127 ? undefined : shadowPP.pong()
-               dest: shadowPP.pong()
+                // dest: i === 19 ? undefined : shadowPP.pong()
+                dest: shadowPP.pong()
             });
             shadowPP.swap();
         }
@@ -209,7 +209,7 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             .vertexCount(6)
             .build();
             
-            finalCmd();
+        finalCmd();
     }
 
     if(!noColor) {
@@ -219,6 +219,7 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             .frag(colorFShader)
             .attribute("position", [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
             .texture("u_image", fboFinal)
+            .texture("u_raw_image", 6, loadedImage)
             .texture("u_colormap", 4, loadedColorMap)
             .uniformf("u_colormap_length", loadedColorMap.width)
             .uniformf("u_resolution", loadedImage.width, loadedImage.height)

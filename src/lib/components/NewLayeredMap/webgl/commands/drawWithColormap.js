@@ -32,7 +32,8 @@ export default (gl, canvas, loadedImage, loadedColorMap, options = {}) => {
         .frag(colorFShader)
         .attribute('position', [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
         .texture('u_image', 2, loadedImage)
-        .texture('u_colormap', 3, loadedColorMap)
+        .texture('u_raw_image', 3, loadedImage)
+        .texture('u_colormap', 4, loadedColorMap)
         .uniformf("u_colormap_length", loadedColorMap.width)
         .uniformf("u_resolution", loadedImage.width, loadedImage.height)
         .uniformf("u_scale_type", scaleType === 'log' ? 1.0 : 0.0) // 1.0 is logarithmic
