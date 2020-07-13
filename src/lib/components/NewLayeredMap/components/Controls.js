@@ -6,20 +6,12 @@ import PropTypes from 'prop-types';
 import VerticalZoom from './VerticalZoom';
 import DrawControls from './DrawControls';
 import Switch from './Switch';
-import MousePostion from './MousePosition';
 
 class Controls extends Component {
 
     render() {
         return (
             <div>
-
-                <div> {
-                    <MousePostion
-                        map={this.props.map}
-                    />
-                }
-                </div>
                 <div> {
                     
                     this.props.drawTools && (

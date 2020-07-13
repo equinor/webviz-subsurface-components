@@ -23,13 +23,26 @@ const NewLayeredMapDemo = () => {
             console.log('toggle value', changes.switch.value);
             console.log('action: ', layers[0].action)
             if (changes.switch.value == true) {
-                layers[1].data[0].colorScale.colors = colorArr;
+                layers[1].data[0].colorScale = worldsBestColormap;
             } else {
-                layers[1].data[0].colorScale.colors = colorArr2;
+                layers[1].data[0].colorScale = oldBoringColormap;
             }
             console.log('action after change ', layers[0].action)
         }
     }
+    // const onChange = (changes) => {
+    //     if(changes.switch) {
+    //         setSwitchValue(changes.switch.value);
+    //         console.log('toggle value', changes.switch.value);
+    //         console.log('action: ', layers[0].action)
+    //         if (changes.switch.value == true) {
+    //             layers[1].data[0].colorScale.colors = colorArr;
+    //         } else {
+    //             layers[1].data[0].colorScale.colors = colorArr2;
+    //         }
+    //         console.log('action after change ', layers[0].action)
+    //     }
+    // }
 
     // const layer = exampleData.layers.slice(1);
     // const layer2 = JSON.parse(JSON.stringify(layer));

@@ -16,7 +16,7 @@ class ImageOverlayWebGL extends Component {
         const image = new Image();
         image.onload = () => {
             const offscreen_canvas = document.createElement("canvas");
-            const ctx = offscreen_canvas.getContext("webgl");
+            const ctx = offscreen_canvas.getContext("2d");
             offscreen_canvas.width = image.width;
             offscreen_canvas.height = image.height;
             ctx.drawImage(image, 0, 0);
@@ -28,6 +28,7 @@ class ImageOverlayWebGL extends Component {
             );
             this.original_data.loaded = true;
         };
+        // console.log("image url: ", this.props.url)
         image.src = this.props.url;
 
         return (

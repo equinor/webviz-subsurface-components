@@ -5,18 +5,21 @@ import L from "leaflet";
 
 
 class MousePosition extends Component {
-
+  
     componentDidMount() {
         this.addControl();
         this.createEvent();
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
+      if (this.props != prevProps) {
+          this.createEvent();
+      }
     }
 
     addControl = () => {
         let Position = L.Control.extend({ 
-            options: {
+            options: {  
               position: this.props.position
             },
     
@@ -34,68 +37,111 @@ class MousePosition extends Component {
           this.props.map.addControl(this.position);
     }
 
- 
 
+    //Get original imagedata
     createEvent() {
-      this.el = L.DomUtil.create("canvas", "leaflet-canvas-layer leaflet-zoom-animated");      
 
-      const canvases = document.getElementsByClassName('leaflet-canvas-layer leaflet-zoom-animated');
+        document.addEventListener('imageOverlayURL', async (event) => {
+            console.log("ImageOverlayURL:", event, event.url);
 
+            const url = event.url;
 
-      
-      const width = 0;
-      const height = 0;
-      const ctx = null;
+            /**
+             * @type {Image}
+             */
+            const image = await new Promise((res, rej) => {
+                const image = new Image();
+                image.onload = () => {
+                    image.src = url;
+                    res(image);
+                }
+            });
+            
 
-      document.addEventListener('DOMContentLoaded', (event) => {
-        const img    = canvases[1].toDataURL("image/png")
-        console.log("img", img);
-        width = canvases[1].width;
-        height = canvases[1].width;
-        ctx = canvases[1].getContext("webgl", {preserveDrawingBuffer: true});
-      });
+            const canvas = this.canvas = this.canvas || document.createElement('canvas');
+            this.ctx = this.canvas.getContext("2d");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            this.ctx.drawImage(image, 0, 0);
 
+            this.imageData = this.ctx.getImageData(
+                0,
+                0,
+                this.canvas.width,
+                this.canvas.height
+            );
 
-      this.props.map.addEventListener('click', (event) => {
-        console.log(event.target)
-        let x = Math.round(event.latlng.lng );
-        let y = Math.round(event.latlng.lat );
+            console.log("width", this.canvas.width, " heuight ", this.canvas.height)
+            
+        });
+
+        //TODO add indicator for cursor
+        const NUMBER_COLOR_CHANNELS = 4;
+        const NUMBER_DISCRETIZATION_LEVELS = 255;
+
+        this.props.map.addEventListener('click', (event) => {
+            console.log("clicked")
+            if(!this.canvas) {
+                return;
+            }
+
+            // // this.ctx = this.canvas.getContext("2d");
+            this.imageData = this.ctx.getImageData(
+                0,
+                0,
+                this.canvas.width,
+                this.canvas.height
+            );
+            console.log("image data, mouse pos: ", this.imageData.data)
+            this.client_rect = this.canvas.getBoundingClientRect();
+            console.log("Rect: ", this.client_rect);
         
-        console.log("x: ", x, " y: ", y);
-        console.log("width:", width, " height, ", height);
-        console.log("ctx: ", ctx);
+            const screenX = ((event.originalEvent.clientX - this.client_rect.left) / this.client_rect.width) * this.canvas.width
+            const screenY = ((event.originalEvent.clientY - this.client_rect.top) / this.client_rect.height) * this.canvas.height
 
-        const pixels = new Uint8Array(ctx.drawingBufferWidth * ctx.drawingBufferHeight * 4);
-        ctx.readPixels(
-          0, 
-          0, 
-          ctx.drawingBufferWidth, 
-          ctx.drawingBufferHeight, 
-          ctx.RGBA, 
-          ctx.UNSIGNED_BYTE, 
-          pixels);
+            
+            const x = Math.round(event.latlng.lng );
+            const y = Math.round(event.latlng.lat );
+            
 
-          console.log(pixels)
+            //method used in the original implementation, https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
+            const redIndex = Math.floor((screenY * this.imageData.width + screenX) * NUMBER_COLOR_CHANNELS);
+            const z = this.imageData.data[redIndex]
+            console.log("red value from array: ", z)
 
-          var pixelR = pixels[4 * (y * ctx.drawingBufferWidth + x)];
-          var pixelG = pixels[4 * (y * ctx.drawingBufferWidth + x) + 1];
-          var pixelB = pixels[4 * (y * ctx.drawingBufferWidth + x) + 2];
-          var pixelA = pixels[4 * (y * ctx.drawingBufferWidth + x) + 3];
-          console.log(pixelR, pixelG, pixelB, pixelA )
-                
-        this.position.updateHTML(x, y, x);
-      });
+            
+
+            const red = this.ctx.getImageData(screenX, screenY, 1, 1).data[0];
+            console.log("red value from click", red)
+
+
+            const z_string = this.getZValue(red);
+
+            this.setLatLng(x, y, z_string);
+
+
+        })
+    }
+
+    getZValue = (r) => {
+
+      return Math.floor(
+        ((this.props.maxvalue - this.props.minvalue) *
+            (r - 1)) /
+            255 +
+            this.props.minvalue
+    );
+
     }
 
     setLatLng = (lat, lng, z)  => {
         this.position.updateHTML(lat,lng, z)
     }
-    render() { 
-        return (null);
-    }
-    
-}
 
+    render() {
+        return (null)      
+    }
+}
 
 MousePosition.defaultProps = {
     position: "bottomleft"
@@ -105,7 +151,8 @@ MousePosition.defaultProps = {
 
 MousePosition.propTypes = {
     map: PropTypes.object.isRequired,
-
+    minvalue : PropTypes.number,
+    maxvalue : PropTypes.number,
     position: PropTypes.string,
 };
 

@@ -27,10 +27,16 @@ class Colorbar extends Component {
     }
     //checks whether a colorscale exsits, if so, the colormap is updated to the colorscale 
     checkColormap = () => {
-        if (this.props.colorscale != undefined) {
-                this.setState({colormap : this.buildColormap(this.props.colorscale)
+        if (this.props.colorscale != undefined ) {
+            if (this.props.colorscale.typeOf == 'string') {
+                    this.setState({colormap : this.buildColormap(this.props.colorscale)
+                    }, );
+            } else {
+                this.setState({colormap : this.props.colorscale
                 }, );
+            }
         }
+
     }
 
     buildColormap = (colorScale) => {
@@ -86,8 +92,10 @@ Colorbar.propTypes = {
     /* Colormap, given as base64 picture data string */
     colormap: PropTypes.string,
 
-    colorscale: PropTypes.object,
-
+    colorscale: PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.string
+      ]),
     /* Minimum value of color map */
     minvalue: PropTypes.number,
 

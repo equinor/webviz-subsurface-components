@@ -145,7 +145,6 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		.then(() => {
 			const ctx = tile.getContext('2d');
 			ctx.drawImage(this._canvas, 0, 0);
-			
 			if(done) {
 				done(null, tile);
 			}
