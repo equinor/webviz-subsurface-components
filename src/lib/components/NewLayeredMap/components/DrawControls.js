@@ -79,17 +79,16 @@ class DrawControls extends Component {
     componentDidMount() {
         const { drawPolygon, drawMarker, drawPolyline } = this.props;
         this.addToolbar(this.props.map);
-        console.log(this.context.syncedDrawLayer)
     }
 
 
-    removeLayers(layertype, featureGroup) {
+    removeLayers(layerType, featureGroup) {
         const layerContainer = featureGroup.options.edit.featureGroup
         const layers = layerContainer._layers;
         const layer_ids = Object.keys(layers);
         for (let i = 0; i < layer_ids.length - 1; i++) {
             const layer = layers[layer_ids[i]];
-            if (getShapeType(layer) === layertype) {
+            if (getShapeType(layer) === layerType) {
                 layerContainer.removeLayer(layer._leaflet_id);
             }
         }
@@ -118,9 +117,6 @@ class DrawControls extends Component {
             this.context.drawLayer.addLayer(layer)
             
             if (props.syncDrawings) {
-                // DrawControls.syncedDrawLayer.data = DrawControls.syncedDrawLayer.data.filter((drawing) => {
-                //     return drawing.type !== type;
-                // })
                 this.context.syncedDrawLayerDelete(type);
                 const newLayer = {type: type}
             }
@@ -145,32 +141,48 @@ class DrawControls extends Component {
                 
             }
             if (props.syncDrawings) {
-                this.context.syncedDrawLayerAdd(newLayer);
-                console.log(this.context.drawLayer.getLayers())
+                this.context.syncedDrawLayerAdd([newLayer]);
             }
          });
         
     
         map.on(L.Draw.Event.EDITED, (e) => {
+            if (props.syncDrawings) {
+                const newLayers = []
+            }
             e.layers.eachLayer(layer => {
-                const layertype = getShapeType(layer);
-                if (layertype === "polyline") {
+                const layerType = getShapeType(layer);
+                if (props.syncDrawings) {
+                    this.context.syncedDrawLayerDelete(layerType);
+                    const editedLayer = {type: layerType}
+                }
+                this.context.syncedDrawLayerDelete(layerType);
+                if (layerType === "polyline") {
                     const coords = layer._latlngs.map(p => {
                         return [p.lat, p.lng];
                     });
-                    // props.syncDrawings && ()
+                    props.syncDrawings && (editedLayer["positions"] = coords);
                 }
-                if (layertype === "polygon") {
+                if (layerType === "polygon") {
                     const coords = layer._latlngs[0].map(p => {
                         return [p.lat, p.lng];
                     });
-                    // props.syncDrawings && ()
+                    props.syncDrawings && (editedLayer["positions"] = coords);
                 }
-                if (layertype === "marker") {
-                    // props.syncDrawings && ()
+                if (layerType === "marker") {
+                    props.syncDrawings && (editedLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
                 }
+                props.syncDrawings && (newLayers.push(editedLayer))
             });
-         });
+            props.syncDrawings && (this.context.syncedDrawLayerAdd(newLayers));
+        });
+
+        map.on(L.Draw.Event.DELETED, (e) => {
+            e.layers.eachLayer(layer => {
+                const layerType = getShapeType(layer);
+                this.context.syncedDrawLayerDelete(layerType, true);
+            });
+        })
 
         map.addControl(drawControl);
 

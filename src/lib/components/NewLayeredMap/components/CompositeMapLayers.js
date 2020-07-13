@@ -16,31 +16,6 @@ const DEFAULT_ELEVATION_SCALE = 0.03;
 
 class CompositeMapLayers extends Component {
 
-    // TODO: should this actually be here?
-    static syncedDrawLayer = {
-        "name": "syncedDrawLayer",
-        "id": 19, 
-        "action": "update",
-        "checked": true,
-        "baseLayer": false,
-        "data": [
-            {
-                "type": "marker",
-                "position": [435200, 6478000],
-                "tooltip": "This is a blue marker"
-            },
-            {
-                "type": "polygon",
-                "positions": [
-                    [436204, 6475077],
-                    [438204, 6480077],
-                    [432204, 6475077]
-                ],
-                "color": "blue",
-                "tooltip": "This is a blue polygon"
-            }
-        ]
-    }
 
     constructor(props) {
         super(props);
@@ -61,38 +36,36 @@ class CompositeMapLayers extends Component {
 
     // TODO: fix for overlay stuff as well
     updateLayer = (curLayer, newLayer) => {
-        for (const i; i < newLayer.data.length(); i++) {
-            switch(newLayer.data[0].type) {
-                case 'image':
-                    curLayer.getLayers()[0].updateOptions({
-                        ...newLayer.data[0],
-                    });
-                    break;
-    
-                case 'tile':
-                    curLayer.getLayers()[0].updateOptions({
-                        ...newLayer.data[0],
-                    });
-                    break;
-    
-                case "polyline":
-                    break;
-    
-                case "polygon":
+        switch(newLayer.data[0].type) {
+            case 'image':
+                curLayer.getLayers()[0].updateOptions({
+                    ...newLayer.data[0],
+                });
+                break;
 
-                    break;
+            case 'tile':
+                curLayer.getLayers()[0].updateOptions({
+                    ...newLayer.data[0],
+                });
+                break;
+
+            case "polyline":
+                break;
+
+            case "polygon":
+
+                break;
+
+            case "circle":
+                break;
     
-                case "circle":
-                    break;
-     
-            }
         }
     }
 
     //TODO: make update work
     componentDidUpdate(prevProps) {
-        console.log("SDL in CDU in CML:", this.context.syncedDrawLayer);
         if (prevProps !== this.props) {
+            this.updateDrawLayer();
             const layers = this.props.layers;
             for (const propLayerData of layers) {
                 switch(propLayerData.action) {
@@ -141,8 +114,8 @@ class CompositeMapLayers extends Component {
         return shapeObject;
     }
 
-    makePolyline = (item) => {
-        const pos = item.positions.map(xy => yx(xy));
+    makePolyline = (item, swapXY) => {
+        const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
         return this.addTooltip(item, 
                     (L.polyline(pos, {
                         onClick: () => this.props.lineCoords(positions),
@@ -152,8 +125,8 @@ class CompositeMapLayers extends Component {
         ));
     }
 
-    makePolygon = (item) => {
-        const pos = item.positions.map(xy => yx(xy));
+    makePolygon = (item, swapXY) => {
+        const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
         return this.addTooltip(item, 
                     (L.polygon(pos, {
                         onClick: () => this.props.polygonCoords(positions),
@@ -163,16 +136,18 @@ class CompositeMapLayers extends Component {
         ));
     }
 
-    makeMarker = (item) => {
-        const pos = yx(item.position);
+    makeMarker = (item, swapXY) => {
+        const pos = swapXY ? yx(item.position): item.position;
+        
         return  this.addTooltip(item, 
                     L.marker(pos)
         );
     }
 
-    makeCircle = (item) => {
+    makeCircle = (item, swapXY) => {
+        const center = swapXY ? yx(item.center) : item.center;
         return  this.addTooltip(item, 
-                    (L.circle(yx(item.center), {
+                    (L.circle(center, {
                         color: item.color || "red",
                         center : yx(item.center),
                         radius : item.radius
@@ -213,31 +188,31 @@ class CompositeMapLayers extends Component {
         return newTileLayer;
     }
 
-    addItem(item, layerGroup) {
-
+    // Assumes that coordinate data comes in on the format of (y,x) by default
+    addItem(item, layerGroup, swapXY = true) {
         switch(item.type) {
             case "polyline":
-                layerGroup.addLayer(this.makePolyline(item));
+                layerGroup.addLayer(this.makePolyline(item, swapXY));
                 break;
 
             case "polygon":
-                layerGroup.addLayer(this.makePolygon(item));
+                layerGroup.addLayer(this.makePolygon(item, swapXY));
                 break;
 
             case "circle":
-                layerGroup.addLayer(this.makeCircle(item));
+                layerGroup.addLayer(this.makeCircle(item, swapXY));
                 break;
             
             case "marker":
-                layerGroup.addLayer(this.makeMarker(item));
+                layerGroup.addLayer(this.makeMarker(item, swapXY));
                 break;
                 
             case "image":
-                layerGroup.addLayer(this.addImage(item));
+                layerGroup.addLayer(this.addImage(item, swapXY));
                 break;
 
             case "tile": 
-                layerGroup.addLayer(this.addTile(item));
+                layerGroup.addLayer(this.addTile(item, swapXY));
                 break;
 
             default:
@@ -271,7 +246,7 @@ class CompositeMapLayers extends Component {
     }
 
     createLayerGroup = (layer) => {
-        const layerGroup = L.layerGroup();
+        const layerGroup = L.featureGroup();
 
         // To make sure one does not lose data due to race conditions 
         this.setState(prevState => ({
@@ -310,16 +285,15 @@ class CompositeMapLayers extends Component {
         this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     }
 
-    updateDrawLayer = (newLayerData) => {
-        this.state.drawLayer.clearLayers();
-        for (const item of newLayerData) {
-            this.addItem(item, this.state.drawLayer);
+    updateDrawLayer = () => {
+        this.context.drawLayer.clearLayers();
+        for (const item of this.context.syncedDrawLayer.data) {
+            this.addItem(item, this.context.drawLayer, false);
         }
     }
     
   
     render() {
-        console.log("syncedDrawLayer in cml: ", this.context.syncedDrawLayer)
         return (null);
     }
 }

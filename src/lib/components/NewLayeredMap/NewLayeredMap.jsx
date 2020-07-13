@@ -29,12 +29,8 @@ const stringToCRS = (crsString) => {
 }
 
 // Contexts
-// export const DrawLayerContext = React.createContext({drawLayer: "hi there"});
-// console.log("DrawLayerContext in newlayeredmap", DrawLayerContext)
 
 // TODO: make context work
-
-// const DrawLayerContext = React.createContext({hi: "hi there fella"});
 
 class NewLayeredMap extends Component {
 
@@ -131,17 +127,31 @@ class NewLayeredMap extends Component {
         }
     }
 
-    syncedDrawLayerAdd = (newLayer) => {
-        NewLayeredMap.syncedDrawLayer.data.push(newLayer)
-        // console.log("[ SDL ]: ", NewLayeredMap.syncedDrawLayer)
-        this.render()
+    syncedDrawLayerAdd = (newLayers) => {
+        for (const layer of newLayers) {
+            NewLayeredMap.syncedDrawLayer.data.push(layer);
+        }
+        for (const id of this.props.syncedMaps) {
+            NewLayeredMap.mapReferences[id].redraw(); 
+        }
+        
     }
 
-    syncedDrawLayerDelete = (layerType) => {
-        // console.log(layerType)
+    syncedDrawLayerDelete = (layerType, shouldRedraw) => {
         NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
             return drawing.type !== layerType;
         })
+        if (shouldRedraw) {
+            for (const id of this.props.syncedMaps) {
+                NewLayeredMap.mapReferences[id].redraw(); 
+            }
+        }
+    }
+
+    redraw = () => {
+        // console.log("[", this.props.id, "]: forceupdate")
+        // console.log("[", this.props.id, "]:", NewLayeredMap.syncedDrawLayer);
+        this.forceUpdate();
     }
 
     render() {   
