@@ -1,5 +1,5 @@
 /**
- * @typedef {Array<Number>} Color
+ * @typedef {Array<Number>} Color - [r, g, b, a]
  */
 
  /**
@@ -9,8 +9,11 @@
   * @description A set of default configuration values for building colormaps. 
   */
 export const DEFAULT_COLORSCALE_CONFIG = {
-    prefixZeroAlpha: true,
+    prefixZeroAlpha: false,
     suffixZeroAlpha: false,
+    scale: 'linear',
+    cutPointMin: 0,
+    cutPointMax: 255,
 }
 
 /**

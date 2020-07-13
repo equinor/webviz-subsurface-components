@@ -203,6 +203,19 @@ if __name__ == "__main__":
                         "colorScale": colorScale, 
                     }
                 ]
+            },
+            {
+                "id": 2,
+                "action": "update",
+                "data": [
+                    {
+                        "type": "image",
+                        "colorScale": {
+                            "colors": colorScale,
+                            "prefixZeroAlpha": True,
+                        }
+                    }
+                ]
             }
         ]
         return update
@@ -224,14 +237,23 @@ if __name__ == "__main__":
                         }
                     }
                 ]
+            },
+            {
+                "id": 2,
+                "action": "update",
+                "data": [
+                    {
+                        "type": "image",
+                        "shader": {
+                            "type": 'hillshading' if switch['value'] is True else None,
+                        }
+                    }
+                ]
             }
         ]
 
         return update
-       
+    
+    print("App: ", app)
 
     app.run_server(debug=True)
-
-
-
-
