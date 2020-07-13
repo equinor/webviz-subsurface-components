@@ -118,9 +118,10 @@ class DrawControls extends Component {
             this.context.drawLayer.addLayer(layer)
             
             if (props.syncDrawings) {
-                DrawControls.syncedDrawLayer.data = DrawControls.syncedDrawLayer.data.filter((drawing) => {
-                    return drawing.type !== type;
-                })
+                // DrawControls.syncedDrawLayer.data = DrawControls.syncedDrawLayer.data.filter((drawing) => {
+                //     return drawing.type !== type;
+                // })
+                this.context.syncedDrawLayerDelete(type);
                 const newLayer = {type: type}
             }
 
@@ -144,8 +145,8 @@ class DrawControls extends Component {
                 
             }
             if (props.syncDrawings) {
-                DrawControls.syncedDrawLayer.data.push(newLayer);
-                console.log("synced layer data: ", DrawControls.syncedDrawLayer.data);
+                this.context.syncedDrawLayerAdd(newLayer);
+                console.log(this.context.drawLayer.getLayers())
             }
          });
         

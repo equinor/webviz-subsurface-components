@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import L from 'leaflet';
-export default React.createContext({drawLayer: "hi"});
+export default React.createContext({
+    drawLayer: {}, 
+    syncedDrawLayer: {data: []},
+    syncedDrawLayerAdd: () => {},
+    syncedDrawLayerDelete: () => {},
+});
 
 // class DrawLayerContextProvider extends Component {
 //     constructor(props) {

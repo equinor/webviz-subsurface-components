@@ -61,33 +61,37 @@ class CompositeMapLayers extends Component {
 
     // TODO: fix for overlay stuff as well
     updateLayer = (curLayer, newLayer) => {
-        switch(newLayer.data[0].type) {
-            case 'image':
-                curLayer.getLayers()[0].updateOptions({
-                    ...newLayer.data[0],
-                });
-                break;
+        for (const i; i < newLayer.data.length(); i++) {
+            switch(newLayer.data[0].type) {
+                case 'image':
+                    curLayer.getLayers()[0].updateOptions({
+                        ...newLayer.data[0],
+                    });
+                    break;
+    
+                case 'tile':
+                    curLayer.getLayers()[0].updateOptions({
+                        ...newLayer.data[0],
+                    });
+                    break;
+    
+                case "polyline":
+                    break;
+    
+                case "polygon":
 
-            case 'tile':
-                curLayer.getLayers()[0].updateOptions({
-                    ...newLayer.data[0],
-                });
-                break;
-
-            case "polyline":
-                break;
-
-            case "polygon":
-                break;
-
-            case "circle":
-                break;
- 
+                    break;
+    
+                case "circle":
+                    break;
+     
+            }
         }
     }
 
     //TODO: make update work
     componentDidUpdate(prevProps) {
+        console.log("SDL in CDU in CML:", this.context.syncedDrawLayer);
         if (prevProps !== this.props) {
             const layers = this.props.layers;
             for (const propLayerData of layers) {
@@ -118,7 +122,6 @@ class CompositeMapLayers extends Component {
                 }
             }
         }
-        
     }
         // TODO: alle layers må ha id, filtrer vekk de som ikke har det i newLayeredMap
 
@@ -306,9 +309,17 @@ class CompositeMapLayers extends Component {
 
         this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     }
+
+    updateDrawLayer = (newLayerData) => {
+        this.state.drawLayer.clearLayers();
+        for (const item of newLayerData) {
+            this.addItem(item, this.state.drawLayer);
+        }
+    }
     
   
     render() {
+        console.log("syncedDrawLayer in cml: ", this.context.syncedDrawLayer)
         return (null);
     }
 }

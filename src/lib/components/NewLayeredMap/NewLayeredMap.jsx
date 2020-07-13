@@ -40,7 +40,9 @@ class NewLayeredMap extends Component {
 
     static mapReferences = {};
     static syncedDrawLayer = {
-        
+        data: [
+
+        ]
     };
 
     constructor(props) {
@@ -77,7 +79,7 @@ class NewLayeredMap extends Component {
         });
 
         this.setState({map: map});
-        NewLayeredMap.mapReferences[this.state.id] = map;
+        NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
     }
 
@@ -91,9 +93,9 @@ class NewLayeredMap extends Component {
             (this.props.syncedMaps || []).map(id => {
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
-                    e.zoom !== NewLayeredMap.mapReferences[id].getZoom()
+                    e.zoom !== NewLayeredMap.mapReferences[id].getMap().getZoom()
                 ) {
-                    NewLayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].getMap().setView(
                         e.center,
                         e.zoom
                     )
@@ -108,13 +110,17 @@ class NewLayeredMap extends Component {
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
-                    NewLayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].getMap().setView(
                         e.target.getCenter()
                     )
                 }
                 
             })
         })
+    }
+
+    getMap = () => {
+        return this.state.map
     }
 
     setPropsExist = (value) => {
@@ -125,14 +131,20 @@ class NewLayeredMap extends Component {
         }
     }
 
-    changeSyncedDrawLayer = (newLayer) => {
-
+    syncedDrawLayerAdd = (newLayer) => {
+        NewLayeredMap.syncedDrawLayer.data.push(newLayer)
+        // console.log("[ SDL ]: ", NewLayeredMap.syncedDrawLayer)
+        this.render()
     }
 
+    syncedDrawLayerDelete = (layerType) => {
+        // console.log(layerType)
+        NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
+            return drawing.type !== layerType;
+        })
+    }
 
     render() {   
-
-        
         
         return (
             <div>
@@ -142,7 +154,8 @@ class NewLayeredMap extends Component {
                         <Context.Provider value={{
                                 drawLayer: this.state.drawLayer,
                                 syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
-                                changeSyncedDrawLayer: this.changeSyncedDrawLayer,
+                                syncedDrawLayerAdd: this.syncedDrawLayerAdd,
+                                syncedDrawLayerDelete: this.syncedDrawLayerDelete,
                             }}
                         >
                             {
