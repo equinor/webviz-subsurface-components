@@ -6,6 +6,7 @@ uniform sampler2D tSrc;
 uniform vec3 direction;
 uniform vec2 resolution;
 uniform float pixelScale;
+uniform float n;
 
 void main() {
     vec2 ires = 1.0 / resolution;
@@ -31,7 +32,7 @@ void main() {
         }
         vec2 ptex = ires * (p + 0.5);
         if (ptex.x < 0.0 || ptex.x > 1.0 || ptex.y < 0.0 || ptex.y > 1.0) {
-            gl_FragColor = vec4(src + vec3(1.0/128.0), 1.0);
+            gl_FragColor = vec4(src + vec3(1.0/n), 1.0);
             return;
         }
         vec4 e = texture2D(tElevation, ptex);
@@ -42,6 +43,6 @@ void main() {
             return;
         }
     }
-    gl_FragColor = vec4(src + vec3(1.0/128.0), 1.0);
+    gl_FragColor = vec4(src + vec3(1.0/n), 1.0);
 }
   

@@ -6,6 +6,7 @@ uniform sampler2D tSrc;
 uniform vec3 sunDirection;
 uniform vec2 resolution;
 uniform float pixelScale;
+uniform float n; // The number of iterations
 
 void main() {
     vec2 ires = 1.0 / resolution;
@@ -33,7 +34,7 @@ void main() {
         // Did we exit the tile?
         vec2 ptex = ires * (p + 0.5);
         if (ptex.x < 0.0 || ptex.x > 1.0 || ptex.y < 0.0 || ptex.y > 1.0) {
-            gl_FragColor = vec4(src + vec3(1.0/128.0) * clamp(dot(n0, sunDirection), 0.0, 1.0), 1.0);
+            gl_FragColor = vec4(src + vec3(1.0/n) * clamp(dot(n0, sunDirection), 0.0, 1.0), 1.0);
             return;
         }
 
@@ -46,6 +47,6 @@ void main() {
             return;
         }
     }
-    gl_FragColor = vec4(src + vec3(1.0/128.0) * clamp(dot(n0, sunDirection), 0.0, 1.0), 1.0);
+    gl_FragColor = vec4(src + vec3(1.0/n) * clamp(dot(n0, sunDirection), 0.0, 1.0), 1.0);
 }
   

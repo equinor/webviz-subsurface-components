@@ -21,6 +21,7 @@ const DEFAULT_SUN_DIRECTION = vec3.normalize([], [1, 1, 1]);
  * @property {Number} pixelScale
  * @property {Number} elevationScale
  * @property {Boolean} shadows
+ * @property {Number} shadowIterations
  * @property {String} scaleType
  * @property {Number} cutPointMin
  * @property {Number} cutPointMax
@@ -37,11 +38,13 @@ const DEFAULT_SUN_DIRECTION = vec3.normalize([], [1, 1, 1]);
  * @param {HillshadingOptions} options
  */
 export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => {
-    const { 
+    const {
+        // Hillshading options
         pixelScale = DEFAULT_PIXEL_SCALE, 
         elevationScale = DEFAULT_ELEVATION_SCALE, 
         shadows = false, 
         sunDirection = DEFAULT_SUN_DIRECTION,
+        shadowIterations = null, 
 
         // ColorScale type
         scaleType = 'linear', 
@@ -50,7 +53,6 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
         noColor = false,
     } = options;
 
-    console.log(cutPointMin, cutPointMax)
 
     gl.getExtension('OES_texture_float');
     //gl.getExtension('OES_texture_float_linear');
@@ -71,6 +73,9 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
 
     canvas.width = width;
     canvas.height = height;
+
+    // The number of iterations for soft-shadows and ambient light
+    let N = shadowIterations || calcN(width, height);
 
     const fboElevation = eqGL.framebuffer({ width: width, height: height});
 
@@ -141,13 +146,14 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             .uniform("sunDirection", "3f", eqGL.variable("sunDirection"))
             .uniformf("pixelScale", pixelScale)
             .uniformf("resolution", loadedImage.width, loadedImage.height)
+            .uniformf("n", N)
             .viewport(0, 0, loadedImage.width, loadedImage.height)
             .framebuffer(eqGL.variable("dest"))
             .vertexCount(6)
             .build();
     
         
-        for (let i = 0; i < 128; i++) {
+        for (let i = 0; i < N; i++) {
             const sunDirection = vec3.normalize(
                 [],
                 vec3.add(
@@ -160,7 +166,7 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             softShadowsCmd({
                 sunDirection: sunDirection,
                 src: shadowPP.ping(),
-                // dest: i === 19 ? undefined : shadowPP.pong()
+                // dest: i === N - 1 ? undefined : shadowPP.pong()
                 dest: shadowPP.pong()
             });
             shadowPP.swap();
@@ -182,12 +188,13 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             .uniform("direction", "3f", eqGL.variable("direction"))
             .uniformf("pixelScale", 152.70299374405343)
             .uniformf("resolution", loadedImage.width, loadedImage.height)
+            .uniformf("n", N)
             .framebuffer(eqGL.variable("dest"))
             .viewport(0, 0, loadedImage.width, loadedImage.height)
             .vertexCount(6)
             .build();
     
-        for (let i = 0; i < 128; i++) {
+        for (let i = 0; i < N; i++) {
             ambientCmd({
                 direction: vec3.random([], Math.random()),
                 src: ambientPP.ping(),
@@ -265,3 +272,32 @@ function PingPong(eqGL, opts) {
       swap
     };
   }
+
+/**
+ * The purpose of this function is to make the soft-shadows and ambient-lightning iterations
+ * not so costly. For small images N = 128 is fine, but for bigger images N = 10 is too much.
+ * 
+ * This function is not throughly tested on different sizes and can not be considered perfect.
+ * @param {Number} width 
+ * @param {Number} height
+ * @returns {Number}
+ */
+function calcN(width, height) {
+    const resolution = width*height;
+    console.log(width, height);
+
+    if(resolution <= 90000) { // 300x300
+        return 128;
+    }
+    else if(resolution <= 360000) { // 600x600
+        return 84;
+    }
+    else if(resolution <= 490000) { // 700x700
+        return 48; 
+    }
+    else if(resolution <= 810000) { // 900x900
+        return 18;
+    }
+
+    return 8; // resoltion > 900x900
+}
