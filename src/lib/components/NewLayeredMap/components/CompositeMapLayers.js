@@ -7,6 +7,7 @@ import '../layers/L.tileWebGLLayer';
 import Colorbar from './Colorbar'
 import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
 import MousePostion from './MousePosition';
+import Context from '../Context'
 
 
 const yx = ([x, y]) => {
@@ -18,12 +19,38 @@ const DEFAULT_ELEVATION_SCALE = 0.03;
 
 class CompositeMapLayers extends Component {
 
+    // TODO: should this actually be here?
+    static syncedDrawLayer = {
+        "name": "syncedDrawLayer",
+        "id": 19, 
+        "action": "update",
+        "checked": true,
+        "baseLayer": false,
+        "data": [
+            {
+                "type": "marker",
+                "position": [435200, 6478000],
+                "tooltip": "This is a blue marker"
+            },
+            {
+                "type": "polygon",
+                "positions": [
+                    [436204, 6475077],
+                    [438204, 6480077],
+                    [432204, 6475077]
+                ],
+                "color": "blue",
+                "tooltip": "This is a blue polygon"
+            }
+        ]
+    }
+
     constructor(props) {
         super(props);
 
         this.state = {
             layers: {
-                    
+                
             },
         }
     }
@@ -37,11 +64,12 @@ class CompositeMapLayers extends Component {
 
     // TODO: fix for overlay stuff as well
     updateLayer = (curLayer, newLayer) => {
-        const newState = {colormap: newLayer.data[0].colormap,
+        const newState = {
+            colormap: newLayer.data[0].colormap,
             colorscale: newLayer.data[0].colorScale,
             minvalue: newLayer.data[0].minvalue,
             maxvalue: newLayer.data[0].maxvalue
-            };
+        };
         this.updateStateForColorbar(newState); 
         
         switch(newLayer.data[0].type) {
@@ -66,12 +94,13 @@ class CompositeMapLayers extends Component {
 
             case "circle":
                 break;
- 
+     
         }
     }
 
     //TODO: make update work
     componentDidUpdate(prevProps) {
+        console.log("SDL in CDU in CML:", this.context.syncedDrawLayer);
         if (prevProps !== this.props) {
             const layers = this.props.layers;
             for (const propLayerData of layers) {
@@ -102,12 +131,8 @@ class CompositeMapLayers extends Component {
                 }
             }
         }
-        
     }
-        // TODO: Add, delete or update layers based on this.props.layers.
         // TODO: alle layers må ha id, filtrer vekk de som ikke har det i newLayeredMap
-        // legg på action (add, update eller delete)
-        // add by default
 
     componentWillUnmount() {
         // TODO: Remove all layers from the map
@@ -130,7 +155,7 @@ class CompositeMapLayers extends Component {
         return this.addTooltip(item, 
                     (L.polyline(pos, {
                         onClick: () => this.props.lineCoords(positions),
-                        color: item.color,
+                        color: item.color || "blue",
                         positions: pos
                     })
         ));
@@ -141,16 +166,23 @@ class CompositeMapLayers extends Component {
         return this.addTooltip(item, 
                     (L.polygon(pos, {
                         onClick: () => this.props.polygonCoords(positions),
-                        color: item.color,
+                        color: item.color || "blue",
                         positions: pos
                     })
         ));
     }
 
+    makeMarker = (item) => {
+        const pos = yx(item.position);
+        return  this.addTooltip(item, 
+                    L.marker(pos)
+        );
+    }
+
     makeCircle = (item) => {
         return  this.addTooltip(item, 
                     (L.circle(yx(item.center), {
-                        color: item.color,
+                        color: item.color || "red",
                         center : yx(item.center),
                         radius : item.radius
                     })
@@ -281,6 +313,10 @@ class CompositeMapLayers extends Component {
             case "circle":
                 layerGroup.addLayer(this.makeCircle(item));
                 break;
+            
+            case "marker":
+                layerGroup.addLayer(this.makeMarker(item));
+                break;
                 
             case "image":
                 layerGroup.addLayer(this.addImage(item));
@@ -299,12 +335,14 @@ class CompositeMapLayers extends Component {
         L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
     }
 
+    // TODO: generalize for drawlayer
     createMultipleLayers() {
         this.addScaleLayer(this.props.map);
         const layers = this.props.layers;
         for (const layer of layers) {
             this.createLayerGroup(layer);
         }
+        this.addDrawLayerToMap();
         
     }
  
@@ -318,7 +356,6 @@ class CompositeMapLayers extends Component {
         });
     }
 
-  
     createLayerGroup = (layer) => {
         const layerGroup = L.layerGroup();
 
@@ -374,7 +411,26 @@ class CompositeMapLayers extends Component {
             </div>
         );
     }
+
+    addDrawLayerToMap = () => {
+        this.setState(prevState => ({
+            layers: Object.assign({}, prevState.layers, {drawLayer: this.context.drawLayer})
+        }));
+
+        this.context.drawLayer.addTo(this.props.map);
+
+        this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
+    }
+
+    updateDrawLayer = (newLayerData) => {
+        this.state.drawLayer.clearLayers();
+        for (const item of newLayerData) {
+            this.addItem(item, this.state.drawLayer);
+        }
+    }
+    
 }
+CompositeMapLayers.contextType = Context;
 
 CompositeMapLayers.propTypes = {
 
@@ -391,5 +447,7 @@ CompositeMapLayers.propTypes = {
     polygonCoords: PropTypes.func,
 
 };
+
+// export const DrawLayerContext = React.createContext("hi");
 
 export default CompositeMapLayers;
