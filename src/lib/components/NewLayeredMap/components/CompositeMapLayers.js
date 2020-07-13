@@ -74,7 +74,6 @@ class CompositeMapLayers extends Component {
                         if (stateLayer) {
                             this.updateLayer(stateLayer, propLayerData);
                         }
-
                         break;
 
                     case "delete":
@@ -85,11 +84,13 @@ class CompositeMapLayers extends Component {
                             this.removeLayerFromState(propLayerData.id);
                         }
                         break;
+
                     case "add":
-                            if (!this.state.layers[propLayerData.id]) {
-                                this.createLayerGroup(propLayerData);
-                            }
-                            break; 
+                        if (!this.state.layers[propLayerData.id]) {
+                            this.createLayerGroup(propLayerData);
+                        }
+                        break; 
+
                     default:
                         break;
                 }

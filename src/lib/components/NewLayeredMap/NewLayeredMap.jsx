@@ -131,27 +131,23 @@ class NewLayeredMap extends Component {
         for (const layer of newLayers) {
             NewLayeredMap.syncedDrawLayer.data.push(layer);
         }
-        for (const id of this.props.syncedMaps) {
-            NewLayeredMap.mapReferences[id].redraw(); 
-        }
+        this.redrawSyncedMaps();
         
     }
 
-    syncedDrawLayerDelete = (layerType, shouldRedraw) => {
+    syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
         NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
-            return drawing.type !== layerType;
+            return !layerTypes.includes(drawing.type);
         })
         if (shouldRedraw) {
-            for (const id of this.props.syncedMaps) {
-                NewLayeredMap.mapReferences[id].redraw(); 
-            }
+            this.redrawSyncedMaps();
         }
     }
 
-    redraw = () => {
-        // console.log("[", this.props.id, "]: forceupdate")
-        // console.log("[", this.props.id, "]:", NewLayeredMap.syncedDrawLayer);
-        this.forceUpdate();
+    redrawSyncedMaps = () => {
+        for (const id of this.props.syncedMaps) {
+            NewLayeredMap.mapReferences[id].forceUpdate(); 
+        }
     }
 
     render() {   
