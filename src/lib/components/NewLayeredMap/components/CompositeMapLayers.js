@@ -34,7 +34,6 @@ class CompositeMapLayers extends Component {
         
     }
 
-    // TODO: fix for overlay stuff as well
     updateLayer = (curLayer, newLayer) => {
         switch(newLayer.data[0].type) {
             case 'image':
@@ -48,21 +47,9 @@ class CompositeMapLayers extends Component {
                     ...newLayer.data[0],
                 });
                 break;
-
-            case "polyline":
-                break;
-
-            case "polygon":
-
-                break;
-
-            case "circle":
-                break;
-    
         }
     }
 
-    //TODO: make update work
     componentDidUpdate(prevProps) {
         if (prevProps !== this.props) {
             if (this.props.syncDrawings) {
@@ -99,7 +86,6 @@ class CompositeMapLayers extends Component {
             }
         }
     }
-        // TODO: alle layers må ha id, filtrer vekk de som ikke har det i newLayeredMap
 
     componentWillUnmount() {
         // TODO: Remove all layers from the map
@@ -157,7 +143,7 @@ class CompositeMapLayers extends Component {
                     })
         ));
     }
-    // add default bounds?
+
     addImage = (imageData) => {
         const bounds = imageData.bounds.map(xy => yx(xy));
         let newImageLayer = null;
@@ -227,7 +213,6 @@ class CompositeMapLayers extends Component {
         L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
     }
 
-    // TODO: generalize for drawlayer
     createMultipleLayers() {
         this.addScaleLayer(this.props.map);
         const layers = this.props.layers;
@@ -316,7 +301,5 @@ CompositeMapLayers.propTypes = {
     polygonCoords: PropTypes.func,
 
 };
-
-// export const DrawLayerContext = React.createContext("hi");
 
 export default CompositeMapLayers;

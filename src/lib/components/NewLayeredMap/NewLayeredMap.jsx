@@ -28,10 +28,6 @@ const stringToCRS = (crsString) => {
     }
 }
 
-// Contexts
-
-// TODO: make context work
-
 class NewLayeredMap extends Component {
 
     static mapReferences = {};

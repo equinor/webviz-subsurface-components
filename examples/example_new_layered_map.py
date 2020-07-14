@@ -192,33 +192,12 @@ if __name__ == "__main__":
     
     def add_layer(layers):
         if len(layers) < 5:
-            file_ = 'examples\\example-data\\reek_surfaces\\TopLowerReek_50inc.irapbin'
-            surface = RegularSurface(file_)
-            zvalues = get_surface_arr(surface)[2]
-            bounds = [[surface.xmin, surface.ymin], [surface.xmax, surface.ymax]]
-            # min_value = min_value if min_value is not None else np.nanmin(zvalues)
-            # max_value = max_value if max_value is not None else np.nanmax(zvalues)
-            layers.append({
-                "name": "surface",
-                "id": 2,
-                "baseLayer": True,
-                "checked": False,
-                "action": "add",
-                "data": [
-                    {
-                        "type": "image",
-                        "url": array_to_png(zvalues.copy()),
-                        "allowHillshading": True,
-                        "colormap": colormap,
-                        "unit": "",    
-                        "minvalue": None,
-                        "maxvalue": None,
-                        "bounds": [[0,0], [30, 30]],
-                    },
-                ],
-            })
+            # file_ = 'examples\\example-data\\reek_surfaces\\TopLowerReek_50inc.irapbin'
+            # surface = RegularSurface(file_)
+            # zvalues = get_surface_arr(surface)[2]
+            # bounds = [[surface.xmin, surface.ymin], [surface.xmax, surface.ymax]]
             # layers.append({
-            #     "name": "Something",
+            #     "name": "surface",
             #     "id": 2,
             #     "baseLayer": True,
             #     "checked": False,
@@ -226,16 +205,35 @@ if __name__ == "__main__":
             #     "data": [
             #         {
             #             "type": "image",
-            #             "url": map_data,
+            #             "url": array_to_png(zvalues.copy()),
             #             "allowHillshading": True,
             #             "colormap": colormap,
-            #             "unit": "m",    
-            #             "minvalue": min_value,
-            #             "maxvalue": max_value,
-            #             "bounds": [[0, 0], [-30, -30]],
+            #             "unit": "",    
+            #             "minvalue": None,
+            #             "maxvalue": None,
+            #             "bounds": [[0,0], [30, 30]],
             #         },
             #     ],
             # })
+            layers.append({
+                "name": "Something",
+                "id": 2,
+                "baseLayer": True,
+                "checked": False,
+                "action": "add",
+                "data": [
+                    {
+                        "type": "image",
+                        "url": map_data,
+                        "allowHillshading": True,
+                        "colormap": colormap,
+                        "unit": "m",    
+                        "minvalue": min_value,
+                        "maxvalue": max_value,
+                        "bounds": [[0, 0], [-30, -30]],
+                    },
+                ],
+            })
         return layers
 
     def update_layer(layers: List, colorScale: List[str]) -> List:

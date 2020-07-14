@@ -5,9 +5,6 @@ import L from "leaflet";
 import { NewLayeredMap } from "../../../index";
 import Context from '../Context'
 
-
-//TODO : Feature? Add drawn images to a static object
-
 // work around broken icons when using webpack, see https://github.com/PaulLeCam/react-leaflet/issues/255
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -197,14 +194,17 @@ DrawControls.propTypes = {
     /* Show polyline button*/
     drawPolyline: PropTypes.bool,
 
-    /* Coordinates for selected marker*/
+    /* Function to emit marker coordinates to dash */
     markerCoords: PropTypes.func,
 
-    /* Coordinates for selected polyline*/
+    /* Function to emit polyline coordinates to dash */
     lineCoords: PropTypes.func,
 
-    /* Coordinates for selected polygon*/
+    /* Function to emit polygon coordinates to dash */
     polygonCoords: PropTypes.func,
+
+    /* Boolean to toggle sync drawing */
+    syncDrawings: PropTypes.bool,
 };
 
 export default DrawControls;

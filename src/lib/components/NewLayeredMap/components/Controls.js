@@ -23,7 +23,6 @@ class Controls extends Component {
                 <div> {
                     
                     this.props.drawTools && (
-                    // <DrawLayerContext.Provider value={"Hello mf"}>
                         <DrawControls
                             map={this.props.map}
                             position={this.props.drawTools.position}
@@ -41,7 +40,6 @@ class Controls extends Component {
                             }
                             syncDrawings={this.props.syncDrawings}
                         />
-                    // </DrawLayerContext.Provider> 
                     
                     )
                 }
@@ -110,7 +108,6 @@ Controls.propTypes = {
         label: PropTypes.string,
     })
 }
-// Controls.contextType = DrawLayerContext;
 
 
 export default Controls;
