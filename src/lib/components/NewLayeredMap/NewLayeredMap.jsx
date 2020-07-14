@@ -172,6 +172,7 @@ class NewLayeredMap extends Component {
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
                                             drawTools={this.props.drawTools}
+                                            syncDrawings={this.props.syncedMaps ? true : false}
                                         />
                                 )
                             }
@@ -180,6 +181,7 @@ class NewLayeredMap extends Component {
                                     <CompositeMapLayers 
                                         layers={this.props.layers}
                                         map={this.state.map}
+                                        syncDrawings={this.props.syncedMaps ? true : false}
                                     />
                                 )
                             }
@@ -260,5 +262,20 @@ NewLayeredMap.propTypes = {
      * Ids of other LayeredMap instances that should be synced with this instance  
      */    
     syncedMaps: PropTypes.array,
+
+    /**
+     * Dash provided prop that returns the coordinates of the edited or clicked polyline
+     */
+    polyline_points: PropTypes.array,
+
+    /**
+     * Dash provided prop that returns the coordinates of the edited or clicked polygon
+     */
+    polygon_points: PropTypes.array,
+
+    /**
+     * Dash provided prop that returns the coordinates of the edited or clicked marker
+     */
+    marker_point: PropTypes.array,
 }
 export default NewLayeredMap;

@@ -65,7 +65,9 @@ class CompositeMapLayers extends Component {
     //TODO: make update work
     componentDidUpdate(prevProps) {
         if (prevProps !== this.props) {
-            this.updateDrawLayer();
+            if (this.props.syncDrawings) {
+                this.reSyncDrawLayer();
+            }
             const layers = this.props.layers;
             for (const propLayerData of layers) {
                 switch(propLayerData.action) {
@@ -286,7 +288,7 @@ class CompositeMapLayers extends Component {
         this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     }
 
-    updateDrawLayer = () => {
+    reSyncDrawLayer = () => {
         this.context.drawLayer.clearLayers();
         for (const item of this.context.syncedDrawLayer.data) {
             this.addItem(item, this.context.drawLayer, false);

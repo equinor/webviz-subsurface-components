@@ -97,20 +97,23 @@ class DrawControls extends Component {
                     const coords = layer._latlngs.map(p => {
                         return [p.lat, p.lng];
                     });
-                    this.removeLayers("polyline", drawControl);
                     props.syncDrawings && (newLayer["positions"] = coords);
+                    this.props.lineCoords(coords);
+                    this.removeLayers("polyline", drawControl);
                     break;
 
                 case "polygon":
                     const coords = layer._latlngs[0].map(p => {
                         return [p.lat, p.lng];
                     });
-                    props.syncDrawings && (newLayer["positions"] = coords); 
+                    props.syncDrawings && (newLayer["positions"] = coords);
+                    this.props.polygonCoords(coords); 
                     this.removeLayers("polygon", drawControl);
                     break;
 
                 case "marker":
                     props.syncDrawings && (newLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
+                    this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
                     this.removeLayers("marker", drawControl);
                     break;
             }
@@ -134,6 +137,7 @@ class DrawControls extends Component {
                             return [p.lat, p.lng];
                         });
                         props.syncDrawings && (editedLayer["positions"] = coords);
+                        this.props.lineCoords(coords);
                         break;
 
                     case "polygon":
@@ -141,10 +145,12 @@ class DrawControls extends Component {
                             return [p.lat, p.lng];
                         });
                         props.syncDrawings && (editedLayer["positions"] = coords);
+                        this.props.polygonCoords(coords);
                         break;
 
                     case "marker":
                         props.syncDrawings && (editedLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
+                        this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
                         break;
                     }
                 props.syncDrawings && (newLayers.push(editedLayer))

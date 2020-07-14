@@ -39,7 +39,7 @@ class Controls extends Component {
                             polygonCoords={coords =>
                                 this.props.setProps({ polygon_points: coords })
                             }
-                            syncDrawings={true}
+                            syncDrawings={this.props.syncDrawings}
                         />
                     // </DrawLayerContext.Provider> 
                     

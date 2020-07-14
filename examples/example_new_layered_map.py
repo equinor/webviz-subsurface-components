@@ -274,6 +274,18 @@ if __name__ == "__main__":
         ]
 
         return update
+    
+    @app.callback(Output("polyline", "children"), [Input("example-map", "polyline_points")])
+    def get_edited_line(coords):
+        return f"Edited polyline: {json.dumps(coords)}"
+
+    @app.callback(Output("marker", "children"), [Input("example-map", "marker_point")])
+    def get_edited_line(coords):
+        return f"Edited marker: {json.dumps(coords)}"
+
+    @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
+    def get_edited_line(coords):
+        return f"Edited closed polygon: {json.dumps(coords)}"
        
 
     app.run_server(debug=True)
