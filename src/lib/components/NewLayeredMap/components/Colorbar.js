@@ -3,10 +3,10 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 
-import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorScale';
+import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
 
 
-class Colorbar extends Component {
+class ColorBar extends Component {
 
     constructor(props) {
         super(props);
@@ -18,25 +18,25 @@ class Colorbar extends Component {
 
     componentDidMount() {
         this.addControl();
-        this.checkColormap();
+        this.checkColorMap();
     }
     componentDidUpdate(prevProps) {
         if (prevProps !== this.props) {
-            this.checkColormap();
+            this.checkColorMap();
         }
     }
     
-    checkColormap = () => {
+    checkColorMap = () => {
         if (this.props.colorScale !== undefined) {
-            if (this.props.colorScale.typeOf != 'string') {
-                this.setState({colorMap : this.buildColormap(this.props.colorScale)});
+            if (typeof this.props.colorScale !== 'string') {
+                this.setState({colorMap : this.buildColorMapImage(this.props.colorScale)});
             } else { // if  the colorMap is passed to the colorScale as a string
                 this.setState({colorMap : this.props.colorScale});
             }
         }
     }
 
-    buildColormap = (colorScale) => {
+    buildColorMapImage = (colorScale) => {
         const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
         const colors = colorScaleCfg.colors;
         return buildColormapFromHexColors(colors, colorScaleCfg);
@@ -45,8 +45,8 @@ class Colorbar extends Component {
     addControl = () => {
         const colorbar = L.Control.extend({
             options: {
-                position: "bottomright",
-              },
+                position: this.props.position || "bottomright",
+            },
             onAdd: () => {
                 this.panelDiv = L.DomUtil.create(
                     "div",
@@ -82,24 +82,23 @@ class Colorbar extends Component {
     }
 }
 
-Colorbar.propTypes = {
+ColorBar.propTypes = {
     map: PropTypes.object,
 
-    /* Colormap, given as base64 picture data string */
-    colorMap: PropTypes.string,
 
     colorScale: PropTypes.oneOfType([
         PropTypes.object,
         PropTypes.string
-      ]),
+    ]),
+
     /* Minimum value of color map */
-    minvalue: PropTypes.number,
+    minvalue: PropTypes.number.isRequired,
 
     /* Maximum value of color map */
-    maxvalue: PropTypes.number,
+    maxvalue: PropTypes.number.isRequired,
 
     /* Unit to show in color map */
     unit: PropTypes.string,
 };
 
-export default Colorbar;
+export default ColorBar;

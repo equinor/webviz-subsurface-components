@@ -23,24 +23,10 @@ const NewLayeredMapDemo = () => {
             }
         }
     }
-    // const onChange = (changes) => {
-    //     if(changes.switch) {
-    //         setSwitchValue(changes.switch.value);
-    //         console.log('toggle value', changes.switch.value);
-    //         console.log('action: ', layers[0].action)
-    //         if (changes.switch.value == true) {
-    //             layers[1].data[0].colorScale.colors = colorArr;
-    //         } else {
-    //             layers[1].data[0].colorScale.colors = colorArr2;
-    //         }
-    //         console.log('action after change ', layers[0].action)
-    //     }
-    // }
 
     const layer2 = JSON.parse(JSON.stringify(layers));
-    layer2[0].data[0].shader.type = null;
+    layer2[0].data[0].shader.type = 'none';
     layer2[0].data[0].colorScale.prefixZeroAlpha = true;
-
 
     return (
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr auto" }}>

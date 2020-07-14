@@ -65,6 +65,8 @@ app.run_server(debug=True)
 To update the layers basically provide a new list of _layers_ into the component with the changes to apply by id.
 
 ```python
+COLORSCALE = ['#032333', '#2a3393', '#754792', '#b15d81', '#ea7859', '#fbb33c', '#e7fa5a']
+
 layers = [
     {
         "id": 1,
@@ -76,7 +78,6 @@ layers = [
                 "type": "image",
                 "url": "LOCAL_IMAGE_FILE",
                 "bounds": [[0, 0], [-30, -30]],
-                "colorScale": ['#032333', '#2a3393', '#754792', '#b15d81', '#ea7859', '#fbb33c', '#e7fa5a']
             }
         ]
     }
@@ -91,17 +92,19 @@ new_layered_map = webviz_subsurface_components.NewLayeredMap(
 
 app.layout = html.Div(
     children=[
-        new_layered_map
+        new_layered_map,
+        html.Button(id='layer-add-btn'),
     ]
 )
 
 @app.callback(
-    Output('example-map', 'layers'),
+    Output('test-map', 'layers'),
     [Input('layer-add-btn', 'n_clicks')]
 )
 def toggle_shader(n_clicks):
 
     if n_clicks is not None:
+        # Add hillshading and custom colors
         return [
             {
                 "id": 1,            # Required,
@@ -112,7 +115,10 @@ def toggle_shader(n_clicks):
                         "shader": {
                             "type": 'hillshading' if n_clicks%2 == 1 else None, 
                             "shadows": True,
-                        }
+                            "elevationScale": 4.0,
+                            "pixelScale": 200
+                        },
+                        "colorScale": COLORSCALE if n_clicks%2 == 1 else None 
                     }
                 ]
             }

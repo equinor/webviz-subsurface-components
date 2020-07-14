@@ -5,7 +5,7 @@ import { Utils } from './eqGL';
 
 export default async (gl, canvas, image, colormap, config = {}) => {
     
-gl.getExtension("OES_texture_float");
+    gl.getExtension("OES_texture_float");
     
     const imagesToLoad = [Utils.loadImage(image, config)]; 
     if (colormap) {
@@ -16,23 +16,20 @@ gl.getExtension("OES_texture_float");
 
     // Select which draw command to draw
     const shader = config.shader || {};
-    const scale = config.scale || {};
-    const cutoffPoints = config.cutoffPoints || {};
-
 
     switch(shader.type) {
 
         // Old hillshader
-        case 'hillshadings': {
+        case 'soft-hillshading': {
             drawWithHillShading(
                 gl, 
                 canvas, 
                 loadedImage, 
                 loadedColorMap,
-                shader.elevationScale || null,
-                shader.lightDirection || null,
-                scale,
-                cutoffPoints
+                {
+                    ...config.colorScale,
+                    ...shader,    
+                }
             )
             break;
         }
