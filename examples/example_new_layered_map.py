@@ -4,6 +4,7 @@ import base64
 import numpy as np
 from matplotlib import cm
 from typing import List
+from xtgeo import RegularSurface
 
 import dash
 import dash_colorscales
@@ -11,7 +12,10 @@ from dash.dependencies import Input, Output
 import dash_html_components as html
 import webviz_subsurface_components
 
+
 from example_layered_map import array_to_png
+# TODO: Remove tile_server before pushing
+from tile_server import tile_server
 
 if __name__ == "__main__":
 
@@ -20,7 +24,7 @@ if __name__ == "__main__":
     # Volve Licence partners under CC BY-NC-SA 4.0 license, and only
     # used here as an example data set.
     # https://creativecommons.org/licenses/by-nc-sa/4.0/
-    map_data = np.loadtxt("examples/example-data/layered-map-data.npz.gz")
+    map_data = np.loadtxt('examples/example-data/layered-map-data.npz.gz')
 
     min_value = int(np.nanmin(map_data))
     max_value = int(np.nanmax(map_data))
@@ -101,6 +105,11 @@ if __name__ == "__main__":
 
     app = dash.Dash(__name__)
 
+    # initialize server for providing tiles at the same localhost as dash is running
+    # server = tile_server(app.server)
+
+
+
     app.layout = html.Div(
         children=[
             html.Div(id='hidden-div'),
@@ -168,9 +177,44 @@ if __name__ == "__main__":
     def delete_layer(layers):
         layers[1]['action'] = 'delete'
         return layers
-        
+
+    # changes the arrays to the desired view
+    def get_surface_arr(surface, unrotate=True, flip=True):
+                if unrotate:
+                    surface.unrotate()
+                x, y, z = surface.get_xyz_values()
+                if flip:
+                    x = np.flip(x.transpose(), axis=0)
+                    y = np.flip(y.transpose(), axis=0)
+                    z = np.flip(z.transpose(), axis=0)
+                z.filled(np.nan)
+                return [x, y, z]
+    
     def add_layer(layers):
         if len(layers) < 5:
+            # file_ = 'examples\\example-data\\reek_surfaces\\TopLowerReek_50inc.irapbin'
+            # surface = RegularSurface(file_)
+            # zvalues = get_surface_arr(surface)[2]
+            # bounds = [[surface.xmin, surface.ymin], [surface.xmax, surface.ymax]]
+            # layers.append({
+            #     "name": "surface",
+            #     "id": 2,
+            #     "baseLayer": True,
+            #     "checked": False,
+            #     "action": "add",
+            #     "data": [
+            #         {
+            #             "type": "image",
+            #             "url": array_to_png(zvalues.copy()),
+            #             "allowHillshading": True,
+            #             "colormap": colormap,
+            #             "unit": "",    
+            #             "minvalue": None,
+            #             "maxvalue": None,
+            #             "bounds": [[0,0], [30, 30]],
+            #         },
+            #     ],
+            # })
             layers.append({
                 "name": "Something",
                 "id": 2,
@@ -195,7 +239,7 @@ if __name__ == "__main__":
     def update_layer(layers: List, colorScale: List[str]) -> List:
         update = [
             {
-                "id": 3,
+                "id": 2,
                 "action": "update",
                 "data": [
                     {   
@@ -254,6 +298,18 @@ if __name__ == "__main__":
 
         return update
     
-    print("App: ", app)
+
+    @app.callback(Output("polyline", "children"), [Input("example-map", "polyline_points")])
+    def get_edited_line(coords):
+        return f"Edited polyline: {json.dumps(coords)}"
+
+    @app.callback(Output("marker", "children"), [Input("example-map", "marker_point")])
+    def get_edited_line(coords):
+        return f"Edited marker: {json.dumps(coords)}"
+
+    @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
+    def get_edited_line(coords):
+        return f"Edited closed polygon: {json.dumps(coords)}"
+       
 
     app.run_server(debug=True)

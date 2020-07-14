@@ -23,22 +23,24 @@ class Controls extends Component {
                 <div> {
                     
                     this.props.drawTools && (
-                    <DrawControls
-                        map={this.props.map}
-                        position={this.props.drawTools.position}
-                        drawMarker={this.props.drawTools.drawMarker}
-                        drawPolygon={this.props.drawTools.drawPolygon}
-                        drawPolyline={this.props.drawTools.drawPolyline}
-                        lineCoords={coords =>
-                            this.props.setProps({ polyline_points: coords })
-                        }
-                        markerCoords={coords =>
-                            this.props.setProps({ marker_point: coords })
-                        }
-                        polygonCoords={coords =>
-                            this.props.setProps({ polygon_points: coords })
-                        }
-                    />
+                        <DrawControls
+                            map={this.props.map}
+                            position={this.props.drawTools.position}
+                            drawMarker={this.props.drawTools.drawMarker}
+                            drawPolygon={this.props.drawTools.drawPolygon}
+                            drawPolyline={this.props.drawTools.drawPolyline}
+                            lineCoords={coords =>
+                                this.props.setProps({ polyline_points: coords })
+                            }
+                            markerCoords={coords =>
+                                this.props.setProps({ marker_point: coords })
+                            }
+                            polygonCoords={coords =>
+                                this.props.setProps({ polygon_points: coords })
+                            }
+                            syncDrawings={this.props.syncDrawings}
+                        />
+                    
                     )
                 }
                 </div>

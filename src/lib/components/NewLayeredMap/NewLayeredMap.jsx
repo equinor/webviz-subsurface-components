@@ -9,6 +9,7 @@ import './layers/L.tileWebGLLayer';
 // Components
 import Controls from './components/Controls';
 import CompositeMapLayers from './components/CompositeMapLayers'
+import Context from './Context'
 
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
@@ -30,9 +31,15 @@ const stringToCRS = (crsString) => {
 class NewLayeredMap extends Component {
 
     static mapReferences = {};
+    static syncedDrawLayer = {
+        data: [
+
+        ]
+    };
 
     constructor(props) {
         super(props);
+        const drawLayer = new L.featureGroup();
         this.state = {
             id: props.id,
             map: null,
@@ -42,8 +49,10 @@ class NewLayeredMap extends Component {
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
             center: props.center || [6475078, 432205],
+            // center: props.center || [0, 0],
             bounds: props.bounds,
             controls: props.controls || {},
+            drawLayer: drawLayer,
         }
         
         this.mapEl = createRef();
@@ -62,7 +71,7 @@ class NewLayeredMap extends Component {
         });
 
         this.setState({map: map});
-        NewLayeredMap.mapReferences[this.state.id] = map;
+        NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
     }
 
@@ -80,9 +89,9 @@ class NewLayeredMap extends Component {
 
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
-                    e.zoom !== NewLayeredMap.mapReferences[id].getZoom()
+                    e.zoom !== NewLayeredMap.mapReferences[id].getMap().getZoom()
                 ) {
-                    NewLayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].getMap().setView(
                         e.center,
                         e.zoom
                     )
@@ -101,13 +110,17 @@ class NewLayeredMap extends Component {
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
-                    NewLayeredMap.mapReferences[id].setView(
+                    NewLayeredMap.mapReferences[id].getMap().setView(
                         e.target.getCenter()
                     )
                 }
                 
             })
         })
+    }
+
+    getMap = () => {
+        return this.state.map
     }
 
     setPropsExist = (value) => {
@@ -118,41 +131,72 @@ class NewLayeredMap extends Component {
         }
     }
 
+    syncedDrawLayerAdd = (newLayers) => {
+        for (const layer of newLayers) {
+            NewLayeredMap.syncedDrawLayer.data.push(layer);
+        }
+        this.redrawSyncedMaps();
+        
+    }
 
-    render() {    
+    syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
+        NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
+            return !layerTypes.includes(drawing.type);
+        })
+        if (shouldRedraw) {
+            this.redrawSyncedMaps();
+        }
+    }
+
+    redrawSyncedMaps = () => {
+        for (const id of this.props.syncedMaps) {
+            NewLayeredMap.mapReferences[id].forceUpdate(); 
+        }
+    }
+
+    render() {   
         
         return (
             <div>
                 <div
                     ref={el => this.mapEl = el} 
                     style={{height: '90vh'}}>
-                    
-                    {
-                        this.state.map && (
-                            <Controls 
-                                setProps={this.setPropsExist}
-                                map={this.state.map}
-                                scaleY={this.props.scaleY}
-                                switch={this.props.switch}
-                                drawTools={this.props.drawTools}
-                            />
-                        )
-                    }
-                    {
-                        this.state.map && (
-                            <CompositeMapLayers 
-                                layers={this.props.layers}
-                                map={this.state.map}
-    
-                            />
-                        )
-                    }
+                        <Context.Provider value={{
+                                drawLayer: this.state.drawLayer,
+                                syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
+                                syncedDrawLayerAdd: this.syncedDrawLayerAdd,
+                                syncedDrawLayerDelete: this.syncedDrawLayerDelete,
+                            }}
+                        >
+                            {
+                                this.state.map && (
+                                        <Controls 
+                                            setProps={this.setPropsExist}
+                                            map={this.state.map}
+                                            scaleY={this.props.scaleY}
+                                            switch={this.props.switch}
+                                            drawTools={this.props.drawTools}
+                                            syncDrawings={this.props.syncDrawings}
+                                        />
+                                )
+                            }
+                            {
+                                this.state.map && (
+                                    <CompositeMapLayers 
+                                        layers={this.props.layers}
+                                        map={this.state.map}
+                                        syncDrawings={this.props.syncDrawings}
+                                    />
+                                )
+                            }
+                        </Context.Provider>
                 </div>
             </div>
         )
     }
 
 }
+NewLayeredMap.contextType = Context;
 
 NewLayeredMap.propTypes = {
     /**
@@ -222,6 +266,25 @@ NewLayeredMap.propTypes = {
      * Ids of other LayeredMap instances that should be synced with this instance  
      */    
     syncedMaps: PropTypes.array,
-}
 
+    /**
+     * Boolean deciding whether or not to sync drawings between maps  
+     */
+    syncDrawings: PropTypes.bool,
+
+    /**
+     * Dash provided prop that returns the coordinates of the edited or clicked polyline
+     */
+    polyline_points: PropTypes.array,
+
+    /**
+     * Dash provided prop that returns the coordinates of the edited or clicked polygon
+     */
+    polygon_points: PropTypes.array,
+
+    /**
+     * Dash provided prop that returns the coordinates of the edited or clicked marker
+     */
+    marker_point: PropTypes.array,
+}
 export default NewLayeredMap;
