@@ -59,7 +59,7 @@ for(let i = 0; i < 10; i++) {
 ```
 
 ### Using framebuffers
-To use framebuffers in EqGL is quite similar to ReGL. For a bigger example, take a look at the [hillshader](https://github.com/equinor/webviz-subsurface-components/tree/master/src/lib/components/NewLayeredMap/webgl/commands/drawWithNewHillShading.js).
+To use framebuffers in EqGL is quite similar to ReGL. For a bigger example, take a look at the [hillshader](https://github.com/equinor/webviz-subsurface-components/tree/master/src/lib/components/NewLayeredMap/webgl/commands/drawWithAdvancedHillShading.js).
 ```javascript
 // The framebuffer textures now uses floats
 gl.getExtension('OES_texture_float');
