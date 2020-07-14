@@ -197,7 +197,7 @@ class NewLayeredMap extends Component {
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
                                             drawTools={this.props.drawTools}
-                                            mousePosition = {this.props.mousePosition}
+                                            mouseCoords = {this.props.mouseCoords}
                                             syncDrawings={this.props.syncDrawings}
                                         />
                                 )
@@ -208,6 +208,7 @@ class NewLayeredMap extends Component {
                                         layers={this.props.layers}
                                         map={this.state.map}
                                         syncDrawings={this.props.syncDrawings}
+                                        colorBar={this.props.colorBar}
                                     />
                                 )
                             }
@@ -241,8 +242,8 @@ NewLayeredMap.propTypes = {
     /**
      * Mouse properties configuration
      */
-    mousePosition: PropTypes.shape({
-        coordinatePosition: PropTypes.string
+    mouseCoords: PropTypes.shape({
+        position: PropTypes.string
     }),
     /**
      * ScaleY is a configuration for creating a slider for scaling the Y-axis.
@@ -272,6 +273,13 @@ NewLayeredMap.propTypes = {
         drawMarker: PropTypes.bool,
         drawPolygon: PropTypes.bool,
         drawPolyline: PropTypes.bool,
+        position: PropTypes.string,
+    }),
+
+    /**
+     * ColorBar is a box that displays the colorScale.
+     */
+    colorBar: PropTypes.shape({
         position: PropTypes.string,
     }),
 
@@ -320,4 +328,6 @@ NewLayeredMap.propTypes = {
      */
     click_position: PropTypes.array,
 }
+
+
 export default NewLayeredMap;

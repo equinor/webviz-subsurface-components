@@ -13,35 +13,34 @@ const NewLayeredMapDemo = () => {
 
     const layers = exampleData.layers.slice(1)
 
-    // const onChange = (changes) => {
-    //     if(changes.switch) {
-    //         setSwitchValue(changes.switch.value);
-    //         if (changes.switch.value == true) {
-    //             layers[0].data[0].shader.type = 'hillshading';
-    //         } else {
-    //             layers[0].data[0].shader.type = null;
-    //         }
-    //     }
-    // }
-
-    const colorArr = ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"];
-    const colorArr2 = ["#09c12c", "#0b66bc", "#4e9ba3", "#73031b", "#428a67", "#0381a2", "#ece210", "#fb9f3a", "#fdca26", "#f0f921"];
-
     const onChange = (changes) => {
         if(changes.switch) {
             setSwitchValue(changes.switch.value);
             if (changes.switch.value == true) {
-                layers[1].data[0].colorScale.colors = colorArr;
+                layers[0].data[0].shader.type = 'hillshading';
             } else {
-                layers[1].data[0].colorScale.colors = colorArr2;
+                layers[0].data[0].shader.type = null;
             }
         }
     }
 
-    const layer2 = JSON.parse(JSON.stringify(layers));
-    layer2[0].data[0].shader.type = null;
-    layer2[0].data[0].colorScale.prefixZeroAlpha = true;
+    // const colorArr = ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"];
+    // const colorArr2 = ["#09c12c", "#0b66bc", "#4e9ba3", "#73031b", "#428a67", "#0381a2", "#ece210", "#fb9f3a", "#fdca26", "#f0f921"];
 
+    // const onChange = (changes) => {
+    //     if(changes.switch) {
+    //         setSwitchValue(changes.switch.value);
+    //         if (changes.switch.value == true) {
+    //             layers[0].data[0].colorScale.colors = colorArr;
+    //         } else {
+    //             layers[0].data[0].colorScale.colors = colorArr2;
+    //         }
+    //     }
+    // }
+
+    const layer2 = JSON.parse(JSON.stringify(layers));
+    layer2[0].data[0].shader.type = 'none';
+    layer2[0].data[0].colorScale.prefixZeroAlpha = true;
 
     return (
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr auto" }}>
@@ -107,8 +106,8 @@ const NewLayeredMapDemo = () => {
                     //     maxScaleY: 10,
                     //     position: 'topleft',
                     // }}
-                    mousePosition = {{
-                        coordinatePosition: "bottomright",
+                    mouseCoords = {{
+                        position: "bottomleft",
                     }}
                     drawTools = {{
                         drawMarker: true,

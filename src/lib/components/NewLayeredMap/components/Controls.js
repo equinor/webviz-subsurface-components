@@ -15,11 +15,11 @@ class Controls extends Component {
             <div>
 
                 <div> {
-                    this.props.mousePosition && (
+                    this.props.mouseCoords && (
                         <MousePosition
                             map ={this.props.map}
                             setProps={this.props.setProps}
-                            position ={this.props.mousePosition.coordinatePosition}
+                            position ={this.props.mouseCoords.position}
                         />
                     )
                 }

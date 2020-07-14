@@ -120,7 +120,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
 		this._initColormap();
         this._draw();
         
-        console.log("DID UPDATE! ?")
         this._triggerOnChanged();
     },
 

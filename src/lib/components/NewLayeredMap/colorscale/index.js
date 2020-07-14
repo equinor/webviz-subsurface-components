@@ -11,7 +11,7 @@
 export const DEFAULT_COLORSCALE_CONFIG = {
     prefixZeroAlpha: false,
     suffixZeroAlpha: false,
-    scale: 'linear',
+    scaleType: 'linear',
     cutPointMin: 0,
     cutPointMax: 255,
 }

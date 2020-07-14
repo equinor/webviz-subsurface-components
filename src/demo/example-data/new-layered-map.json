@@ -40,9 +40,9 @@
                         "cutPointMin": 0,
                         "cutPointMax": 255
                     },
-                    "colorScale": {
+                    "colorScale":  {
                         "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
-                        "prefixZeroAlpha": true,
+                        "prefixZeroAlpha": false,
                         "scaleType": "linear",
                         "cutPointMin": 2782,
                         "cutPointMax": 3513
