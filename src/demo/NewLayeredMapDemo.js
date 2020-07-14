@@ -42,6 +42,7 @@ const NewLayeredMapDemo = () => {
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
                     syncedMaps={["NewLayeredMap-2", "NewLayeredMap-3"]}
+                    syncDrawings={true}
                     layers={exampleData.layers}
                     // center={[0, 0]}
                     center={[432205, 6475078], [432205, 6475078]} 
@@ -79,6 +80,7 @@ const NewLayeredMapDemo = () => {
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-3"]}
+                    syncDrawings={true}
                     layers={exampleData.layers}
                     /*center={[432205, 6475078], [432205, 6475078]} */
                     // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
@@ -112,6 +114,7 @@ const NewLayeredMapDemo = () => {
                 <NewLayeredMap 
                     id={"NewLayeredMap-3"}
                     syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
+                    syncDrawings={true}
                     layers={exampleData.layers}
                     // center={[0, 0]}
                     crs="simple"

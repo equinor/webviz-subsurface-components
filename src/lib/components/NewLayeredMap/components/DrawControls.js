@@ -156,9 +156,25 @@ class DrawControls extends Component {
         });
 
         map.on(L.Draw.Event.DELETED, (e) => {
+            if (props.syncDrawings) {
+                const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
+                this.context.syncedDrawLayerDelete(deletedLayers, true);
+            }
+        })
 
-            const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
-            this.context.syncedDrawLayerDelete(deletedLayers, true);
+        map.on('click', (e) => {
+            const newLayer = {
+                type: "circle",
+                center: [e.latlng.lat, e.latlng.lng],
+                color: "red",
+                radius: 50,
+            }
+            this.context.drawLayer.addLayer(L.circle(newLayer.center, newLayer));
+            this.removeLayers("circle", drawControl);
+            if (props.syncDrawings) {
+                this.context.syncedDrawLayerDelete(["circle"]);
+                this.context.syncedDrawLayerAdd([newLayer]);
+            }
         })
 
         map.addControl(drawControl);

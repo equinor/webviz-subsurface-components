@@ -138,7 +138,7 @@ class CompositeMapLayers extends Component {
         return  this.addTooltip(item, 
                     (L.circle(center, {
                         color: item.color || "red",
-                        center : yx(item.center),
+                        center : center,
                         radius : item.radius
                     })
         ));
