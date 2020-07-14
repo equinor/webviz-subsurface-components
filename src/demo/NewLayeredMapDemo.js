@@ -23,6 +23,19 @@ const NewLayeredMapDemo = () => {
             }
         }
     }
+    // const onChange = (changes) => {
+    //     if(changes.switch) {
+    //         setSwitchValue(changes.switch.value);
+    //         console.log('toggle value', changes.switch.value);
+    //         console.log('action: ', layers[0].action)
+    //         if (changes.switch.value == true) {
+    //             layers[1].data[0].colorScale.colors = colorArr;
+    //         } else {
+    //             layers[1].data[0].colorScale.colors = colorArr2;
+    //         }
+    //         console.log('action after change ', layers[0].action)
+    //     }
+    // }
 
     const layer2 = JSON.parse(JSON.stringify(layers));
     layer2[0].data[0].shader.type = null;
@@ -60,6 +73,9 @@ const NewLayeredMapDemo = () => {
                         position: "topright",
                         
                     }}
+                    mousePosition = {{
+                        coordinatePosition: "bottomright",
+                    }}
                     switch={{
                         value: switchValue,
                         label: 'Hillshading',
@@ -85,6 +101,9 @@ const NewLayeredMapDemo = () => {
                     //     maxScaleY: 10,
                     //     position: 'topleft',
                     // }}
+                    mousePosition = {{
+                        coordinatePosition: "bottomright",
+                    }}
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,

@@ -91,6 +91,7 @@ export const buildColormap = (colors, config = {}) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext("2d");
 
+
     // Set pixel by pixel with fillStyle and fillRect. An alternative is to use ImageData, but according to
     // this post - fillRect was more performant:
     // https://stackoverflow.com/questions/4899799/whats-the-best-way-to-set-a-single-pixel-in-an-html5-canvas

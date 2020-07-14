@@ -6,22 +6,25 @@ import PropTypes from 'prop-types';
 import VerticalZoom from './VerticalZoom';
 import DrawControls from './DrawControls';
 import Switch from './Switch';
-import MousePostion from './MousePosition';
+import MousePosition from './MousePosition'
 
 class Controls extends Component {
-
+    
     render() {
         return (
             <div>
 
                 <div> {
-                    <MousePostion
-                        map={this.props.map}
-                    />
+                    this.props.mousePosition && (
+                        <MousePosition
+                            map ={this.props.map}
+                            setProps={this.props.setProps}
+                            position ={this.props.mousePosition.coordinatePosition}
+                        />
+                    )
                 }
                 </div>
                 <div> {
-                    
                     this.props.drawTools && (
                         <DrawControls
                             map={this.props.map}
@@ -84,6 +87,9 @@ Controls.propTypes = {
 
     setProps: PropTypes.func,
 
+    mousePosition: PropTypes.shape({
+        coordinatePosition: PropTypes.string,
+    }),
     scaleY: PropTypes.shape({
         scaleY: PropTypes.number,
         maxScaleY: PropTypes.number,
@@ -108,6 +114,7 @@ Controls.propTypes = {
         label: PropTypes.string,
     })
 }
+// Controls.contextType = DrawLayerContext;
 
 
 export default Controls;
