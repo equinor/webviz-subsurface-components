@@ -9,41 +9,49 @@ import { NewLayeredMap } from '../lib/index';
 
 const NewLayeredMapDemo = () => {
 
-    const [switchValue, setSwitchValue] = useState(false);
+    const [switchValue, setSwitchValue] = useState(true);
 
-    const layers = exampleData.layers
+    const layers = exampleData.layers.slice(1)
 
-    const worldsBestColormap = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAA2UlEQVQ4T51TSQ7DMAgcnEtv/XZ/TTUsNtBUqnqIMDALcrAAwPPx0gXBUgHjBVjcX9Rr7dKBKfzEbZ3Cp98CIKbfz7I12U/9c/aa19vZePea5ieAiDpGmGtEcvT0iTN86f/Boyf9zJNxnbzVR899yxe8j3rwar16msYaWk239jhs9fyVp7Tc88L8Zn60eLF1pu0ZvJ5rmcl52U9P9+OPjxh3YriKn7iGD11bjKGXOFsg4jK6J5cp/cn1xXS9b/jsOe8LPh6Ihp/GI/Ec8FzRc0BDs+M18Ozf898yFZ4Lp0OHxQAAAABJRU5ErkJggg=="
-    const oldBoringColormap =  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg=="
+    // const onChange = (changes) => {
+    //     if(changes.switch) {
+    //         setSwitchValue(changes.switch.value);
+    //         if (changes.switch.value == true) {
+    //             layers[0].data[0].shader.type = 'hillshading';
+    //         } else {
+    //             layers[0].data[0].shader.type = null;
+    //         }
+    //     }
+    // }
+
+    const colorArr = ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"];
+    const colorArr2 = ["#09c12c", "#0b66bc", "#4e9ba3", "#73031b", "#428a67", "#0381a2", "#ece210", "#fb9f3a", "#fdca26", "#f0f921"];
 
     const onChange = (changes) => {
         if(changes.switch) {
             setSwitchValue(changes.switch.value);
-            console.log('toggle value', changes.switch.value);
-            console.log('action: ', layers[0].action)
             if (changes.switch.value == true) {
-                layers[1].data[0].colorScale = worldsBestColormap;
+                layers[1].data[0].colorScale.colors = colorArr;
             } else {
-                layers[1].data[0].colorScale = oldBoringColormap;
+                layers[1].data[0].colorScale.colors = colorArr2;
             }
-            console.log('action after change ', layers[0].action)
         }
     }
 
-    // const layer = exampleData.layers.slice(1);
-    // const layer2 = JSON.parse(JSON.stringify(layer));
-    // layer2[0].data[0].colorScale = null;
-    // const layer3 = JSON.parse(JSON.stringify(layer2));
-    // layer3[0].data[0].colormap = null;
+    const layer2 = JSON.parse(JSON.stringify(layers));
+    layer2[0].data[0].shader.type = null;
+    layer2[0].data[0].colorScale.prefixZeroAlpha = true;
+
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr auto" }}>
             <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
                     syncedMaps={["NewLayeredMap-2", "NewLayeredMap-3"]}
                     syncDrawings={true}
-                    layers={exampleData.layers}
+                    // layers={exampleData.layers}
+                    layers={layers}
                     // center={[0, 0]}
                     center={[432205, 6475078], [432205, 6475078]} 
                     bounds={[[432205, 6475078], [437720, 6481113]] [[432205, 6475078], [437720, 6481113]]}
@@ -68,9 +76,12 @@ const NewLayeredMapDemo = () => {
                         position: "topright",
                         
                     }}
+                    mousePosition = {{
+                        coordinatePosition: "bottomright",
+                    }}
                     switch={{
                         value: switchValue,
-                        label: 'Useless toggle',
+                        label: 'Hillshading',
                         position: 'bottomleft'
                     }}
                     setProps={onChange}
@@ -81,7 +92,8 @@ const NewLayeredMapDemo = () => {
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-3"]}
                     syncDrawings={true}
-                    layers={exampleData.layers}
+                    // layers={exampleData.layers}
+                    layers={layers}
                     /*center={[432205, 6475078], [432205, 6475078]} */
                     // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
                     // crs="earth"
@@ -95,6 +107,9 @@ const NewLayeredMapDemo = () => {
                     //     maxScaleY: 10,
                     //     position: 'topleft',
                     // }}
+                    mousePosition = {{
+                        coordinatePosition: "bottomright",
+                    }}
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,
@@ -104,7 +119,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     switch={{
                         value: switchValue,
-                        label: 'Useless toggle',
+                        label: 'Hillshading',
                         position: 'bottomleft'
                     }}
                     setProps={onChange}
@@ -136,13 +151,13 @@ const NewLayeredMapDemo = () => {
                     }}
                     switch={{
                         value: switchValue,
-                        label: 'Useless toggle',
+                        label: 'Hillshading',
                         position: 'bottomleft'
                     }}
                     setProps={onChange}
                 />
             </div>
-        </div>
+        </ div>
         
     )
 }

@@ -1,24 +1,29 @@
-import { drawWithColormap, drawWithHillShading } from './commands';
+import { drawWithColormap, drawWithHillShading, drawWithNewHillShading } from './commands';
 
 // Utils
-import { loadImage } from './webglUtils';
+import { Utils } from './eqGL';
 
 export default async (gl, canvas, image, colormap, config = {}) => {
     
-    gl.getExtension("OES_texture_float");
+gl.getExtension("OES_texture_float");
     
-    const imagesToLoad = [loadImage(image, config)]; 
+    const imagesToLoad = [Utils.loadImage(image, config)]; 
     if (colormap) {
-        imagesToLoad.push(loadImage(colormap, config));
+        imagesToLoad.push(Utils.loadImage(colormap, config));
     }
 
     const [loadedImage, loadedColorMap = null] = await Promise.all(imagesToLoad).catch(console.error);
 
     // Select which draw command to draw
     const shader = config.shader || {};
+    const scale = config.scale || {};
+    const cutoffPoints = config.cutoffPoints || {};
+
+
     switch(shader.type) {
 
-        case 'hillshading': {
+        // Old hillshader
+        case 'hillshadings': {
             drawWithHillShading(
                 gl, 
                 canvas, 
@@ -26,13 +31,26 @@ export default async (gl, canvas, image, colormap, config = {}) => {
                 loadedColorMap,
                 shader.elevationScale || null,
                 shader.lightDirection || null,
+                scale,
+                cutoffPoints
             )
+            break;
+        }
+
+        case 'hillshading': {
+            drawWithNewHillShading(gl, canvas, loadedImage, loadedColorMap, {
+                ...config.colorScale,
+                ...shader,
+            });
             break;
         }
 
 
         default: {
-            drawWithColormap(gl, canvas, loadedImage, loadedColorMap);
+            drawWithColormap(gl, canvas, loadedImage, loadedColorMap, {
+                ...config.colorScale,
+                ...shader,
+            });
         }
     }
 }

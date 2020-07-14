@@ -28,6 +28,14 @@ const stringToCRS = (crsString) => {
     }
 }
 
+// Contexts
+// export const DrawLayerContext = React.createContext({drawLayer: "hi there"});
+// console.log("DrawLayerContext in newlayeredmap", DrawLayerContext)
+
+// TODO: make context work
+
+// const DrawLayerContext = React.createContext({hi: "hi there fella"});
+
 class NewLayeredMap extends Component {
 
     static mapReferences = {};
@@ -53,6 +61,8 @@ class NewLayeredMap extends Component {
             bounds: props.bounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
+            // Used to make possible to display z-value
+            focusedImageLayer: null,
         }
         
         this.mapEl = createRef();
@@ -81,8 +91,13 @@ class NewLayeredMap extends Component {
 
 
     setEvents = (map) => {
+
         map.on('zoomanim', e => {
-            (this.props.syncedMaps || []).map(id => {
+            (this.props.syncedMaps || []).forEach(id => {
+                if(!NewLayeredMap.mapReferences[id]) {
+                    return;
+                }
+
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
                     e.zoom !== NewLayeredMap.mapReferences[id].getMap().getZoom()
@@ -98,7 +113,11 @@ class NewLayeredMap extends Component {
         map.on('move', e => {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
-            (this.props.syncedMaps || []).map(id => {
+            (this.props.syncedMaps || []).forEach(id => {
+                if(!NewLayeredMap.mapReferences[id]) {
+                    return;
+                }
+
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
@@ -145,6 +164,15 @@ class NewLayeredMap extends Component {
         }
     }
 
+    /**
+     * @param {HTMLCanvasElement} onScreenCanvas
+     */
+    setFocucedImageLayer = (url, onScreenCanvas, minvalue, maxvalue) => {
+        this.setState({
+            focusedImageLayer: { url: url, canvas: onScreenCanvas, minvalue: minvalue, maxvalue: maxvalue}
+        })
+    }
+    
     render() {   
         
         return (
@@ -157,6 +185,8 @@ class NewLayeredMap extends Component {
                                 syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
                                 syncedDrawLayerAdd: this.syncedDrawLayerAdd,
                                 syncedDrawLayerDelete: this.syncedDrawLayerDelete,
+                                focusedImageLayer: this.state.focusedImageLayer,
+                                setFocusedImageLayer: this.setFocucedImageLayer,
                             }}
                         >
                             {
@@ -167,6 +197,7 @@ class NewLayeredMap extends Component {
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
                                             drawTools={this.props.drawTools}
+                                            mousePosition = {this.props.mousePosition}
                                             syncDrawings={this.props.syncDrawings}
                                         />
                                 )
@@ -190,6 +221,7 @@ class NewLayeredMap extends Component {
 NewLayeredMap.contextType = Context;
 
 NewLayeredMap.propTypes = {
+   
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
@@ -206,7 +238,12 @@ NewLayeredMap.propTypes = {
      * For reacting to changes in controls
      */
     setProps: PropTypes.func,
-
+    /**
+     * Mouse properties configuration
+     */
+    mousePosition: PropTypes.shape({
+        coordinatePosition: PropTypes.string
+    }),
     /**
      * ScaleY is a configuration for creating a slider for scaling the Y-axis.
      */
@@ -277,5 +314,10 @@ NewLayeredMap.propTypes = {
      * Dash provided prop that returns the coordinates of the edited or clicked marker
      */
     marker_point: PropTypes.array,
+
+    /**
+     * Map coordinates of a mouse click
+     */
+    click_position: PropTypes.array,
 }
 export default NewLayeredMap;
