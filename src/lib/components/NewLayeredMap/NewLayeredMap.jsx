@@ -61,6 +61,12 @@ class NewLayeredMap extends Component {
             bounds: props.bounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
+
+            // Used to make possible to display z-value
+            focusedImageLayer: null,
+
+            //Used for adding mouseposition in controls
+            
         }
         
         this.mapEl = createRef();
@@ -89,6 +95,7 @@ class NewLayeredMap extends Component {
 
 
     setEvents = (map) => {
+
         map.on('zoomanim', e => {
             (this.props.syncedMaps || []).map(id => {
                 // e.zoom provides zoom level after zoom unlike getZoom()
@@ -134,7 +141,7 @@ class NewLayeredMap extends Component {
     syncedDrawLayerAdd = (newLayer) => {
         NewLayeredMap.syncedDrawLayer.data.push(newLayer)
         // console.log("[ SDL ]: ", NewLayeredMap.syncedDrawLayer)
-        this.render()
+        this.render() // TODO: Replace with forceUpdate()
     }
 
     syncedDrawLayerDelete = (layerType) => {
@@ -143,6 +150,16 @@ class NewLayeredMap extends Component {
             return drawing.type !== layerType;
         })
     }
+
+    /**
+     * @param {HTMLCanvasElement} onScreenCanvas
+     */
+    setFocucedImageLayer = (url, onScreenCanvas, minvalue, maxvalue) => {
+        this.setState({
+            focusedImageLayer: { url: url, canvas: onScreenCanvas, minvalue: minvalue, maxvalue: maxvalue}
+        })
+    }
+
 
     render() {   
         
@@ -156,12 +173,15 @@ class NewLayeredMap extends Component {
                                 syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
                                 syncedDrawLayerAdd: this.syncedDrawLayerAdd,
                                 syncedDrawLayerDelete: this.syncedDrawLayerDelete,
+
+                                focusedImageLayer: this.state.focusedImageLayer,
+                                setFocusedImageLayer: this.setFocucedImageLayer,
                             }}
                         >
                             {
                                 this.state.map && (
                                         <Controls 
-                                            setProps={this.setPropsExist}
+                                            setProps={this.setPropsExist} //coords [x,y,z]
                                             map={this.state.map}
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
@@ -187,6 +207,10 @@ class NewLayeredMap extends Component {
 NewLayeredMap.contextType = Context;
 
 NewLayeredMap.propTypes = {
+    /**
+     * Map coordinates of a mouse click
+     */
+    click_coords: PropTypes.array,
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the

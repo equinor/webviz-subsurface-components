@@ -104,7 +104,7 @@ class DrawControls extends Component {
             draw: {
                 rectangle: false,
                 circle: false,
-                circlemarker: false,
+                circlemarker: true,
                 polygon: this.props.drawPolygon,
                 marker: this.props.drawMarker,
                 polyline: this.props.drawPolyline,

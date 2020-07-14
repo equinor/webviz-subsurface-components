@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 
-import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
+import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorScale';
 
 
 class Colorbar extends Component {
@@ -11,7 +11,7 @@ class Colorbar extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            colormap : this.props.colormap
+            colorMap : this.props.colorMap
         }
         this.addControl();
     }
@@ -25,18 +25,15 @@ class Colorbar extends Component {
             this.checkColormap();
         }
     }
-    //checks whether a colorscale exsits, if so, the colormap is updated to the colorscale 
+    
     checkColormap = () => {
-        if (this.props.colorscale != undefined ) {
-            if (this.props.colorscale.typeOf == 'string') {
-                    this.setState({colormap : this.buildColormap(this.props.colorscale)
-                    }, );
-            } else {
-                this.setState({colormap : this.props.colorscale
-                }, );
+        if (this.props.colorScale !== undefined) {
+            if (this.props.colorScale.typeOf != 'string') {
+                this.setState({colorMap : this.buildColormap(this.props.colorScale)});
+            } else { // if  the colorMap is passed to the colorScale as a string
+                this.setState({colorMap : this.props.colorScale});
             }
         }
-
     }
 
     buildColormap = (colorScale) => {
@@ -46,7 +43,6 @@ class Colorbar extends Component {
     }
 
     addControl = () => {
-
         const colorbar = L.Control.extend({
             options: {
                 position: "bottomright",
@@ -70,7 +66,7 @@ class Colorbar extends Component {
             <div className="leaflet-colorbar">
                 <div className="leaflet-colorbar-image">
                     <img
-                        src={this.state.colormap}
+                        src={this.state.colorMap}
                         style={{ width: "100%", height: "10px" }}
                     />
                 </div>
@@ -90,9 +86,9 @@ Colorbar.propTypes = {
     map: PropTypes.object,
 
     /* Colormap, given as base64 picture data string */
-    colormap: PropTypes.string,
+    colorMap: PropTypes.string,
 
-    colorscale: PropTypes.oneOfType([
+    colorScale: PropTypes.oneOfType([
         PropTypes.object,
         PropTypes.string
       ]),

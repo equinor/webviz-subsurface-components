@@ -6,16 +6,24 @@ import PropTypes from 'prop-types';
 import VerticalZoom from './VerticalZoom';
 import DrawControls from './DrawControls';
 import Switch from './Switch';
+import MousePosition from './MousePosition'
 
 class Controls extends Component {
-
+    
     render() {
         return (
             <div>
+
+                <div>
+                    <MousePosition
+                        map ={this.props.map}
+                        setProps={this.props.setProps}
+                    />
+                </div>
                 <div> {
                     
                     this.props.drawTools && (
-                    // <DrawLayerContext.Provider value={"Hello mf"}>
+
                         <DrawControls
                             map={this.props.map}
                             position={this.props.drawTools.position}
@@ -33,7 +41,6 @@ class Controls extends Component {
                             }
                             syncDrawings={true}
                         />
-                    // </DrawLayerContext.Provider> 
                     
                     )
                 }

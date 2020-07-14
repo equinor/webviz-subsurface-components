@@ -1,159 +1,180 @@
-import React, { Component } from "react";
+import React, { Component, useEffect, useContext, useState, useRef } from "react";
 import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
+// Components
+import Context from '../Context';
 
-class MousePosition extends Component {
-  
-    componentDidMount() {
-        this.addControl();
-        this.createEvent();
+// Constants
+const NUMBER_COLOR_CHANNELS = 4;
+const NUMBER_DISCRETIZATION_LEVELS = 255;
+
+const MousePosition = (props) => {
+    const { focusedImageLayer } = useContext(Context);
+
+    const stateRef = useRef({});
+
+    // ComponentDidMount
+    useEffect(() => {
+        addControl();
+        subscribeToMapClick();
+    }, [])
+
+    useEffect(() => {
+        updateCanvas();
+    }, [focusedImageLayer])
+
+    useEffect(() => {
+        updateProps();
+    }, [props])
+
+    const updateStateCanvas = (canvas, onScreenCanvas, ctx, minvalue, maxvalue) => {
+        stateRef.current = { ...stateRef.current, canvas, ctx, onScreenCanvas, minvalue, maxvalue, props};
     }
 
-    componentDidUpdate(prevProps) {
-      if (this.props != prevProps) {
-          this.createEvent();
-      }
+    const updateProps = () => {
+        stateRef.current.props = props;
     }
 
-    addControl = () => {
-        let Position = L.Control.extend({ 
+    const addControl = () => {
+        let MousePosControl = L.Control.extend({ 
             options: {  
-              position: this.props.position
+                position: props.position
             },
     
             onAdd: function (map) {
-              const latlng = L.DomUtil.create('div', 'mouseposition');
-              this._latlng = latlng;
-              return latlng;
+                const latlng = L.DomUtil.create('div', 'mouseposition');
+                this._latlng = latlng;
+                return latlng;
             },
     
-            updateHTML: function(x, y, z) {
-              this._latlng.innerHTML = "x: " + x + "   y: " + y + " z: " + z;
+            updateHTML: function(x, y, z) { // TODO: add default measurement unit, make it passable with props
+                this._latlng.innerHTML ="<span style = 'background-color: #ffffff; border: 2px solid #ccc; padding:3px; border-radius: 5px;'>"
+                                       + "x: " + x + "m y: " + y + "m z: " + z  + "m" +"</span>"
             }
-          });
-          this.position = new Position();
-          this.props.map.addControl(this.position);
-    }
-
-
-    //Get original imagedata
-    createEvent() {
-
-        document.addEventListener('imageOverlayURL', async (event) => {
-            console.log("ImageOverlayURL:", event, event.url);
-
-            const url = event.url;
-
-            /**
-             * @type {Image}
-             */
-            const image = await new Promise((res, rej) => {
-                const image = new Image();
-                image.onload = () => {
-                    image.src = url;
-                    res(image);
-                }
-            });
-            
-
-            const canvas = this.canvas = this.canvas || document.createElement('canvas');
-            this.ctx = this.canvas.getContext("2d");
-            canvas.width = image.width;
-            canvas.height = image.height;
-            this.ctx.drawImage(image, 0, 0);
-
-            this.imageData = this.ctx.getImageData(
-                0,
-                0,
-                this.canvas.width,
-                this.canvas.height
-            );
-
-            console.log("width", this.canvas.width, " heuight ", this.canvas.height)
-            
         });
+        const mousePosCtrl = new MousePosControl();
+        props.map.addControl(mousePosCtrl);
+        stateRef.current = stateRef.current || {};
+        stateRef.current.control = mousePosCtrl;
+    };
 
-        //TODO add indicator for cursor
-        const NUMBER_COLOR_CHANNELS = 4;
-        const NUMBER_DISCRETIZATION_LEVELS = 255;
+    const updateCanvas = async () => {
+        const { url, canvas, minvalue, maxvalue} = focusedImageLayer || {};
+        if(!url) {
+            return;
+        }
+        const onScreenCanvas = canvas;
 
-        this.props.map.addEventListener('click', (event) => {
-            console.log("clicked")
-            if(!this.canvas) {
-                return;
+        /**
+         * @type {Image}
+         */
+        const image = await new Promise((res, rej) => {
+            const image = new Image();
+            image.onload = () => {
+                res(image);
             }
-
-            // // this.ctx = this.canvas.getContext("2d");
-            this.imageData = this.ctx.getImageData(
-                0,
-                0,
-                this.canvas.width,
-                this.canvas.height
-            );
-            console.log("image data, mouse pos: ", this.imageData.data)
-            this.client_rect = this.canvas.getBoundingClientRect();
-            console.log("Rect: ", this.client_rect);
+            image.src = url;
+        });
         
-            const screenX = ((event.originalEvent.clientX - this.client_rect.left) / this.client_rect.width) * this.canvas.width
-            const screenY = ((event.originalEvent.clientY - this.client_rect.top) / this.client_rect.height) * this.canvas.height
 
-            
-            const x = Math.round(event.latlng.lng );
-            const y = Math.round(event.latlng.lat );
-            
+        const imageCanvas = document.createElement('canvas');
+        const ctx = imageCanvas.getContext("2d");
+        imageCanvas.width = image.width;
+        imageCanvas.height = image.height;
+        ctx.drawImage(image, 0, 0);
 
-            //method used in the original implementation, https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
-            const redIndex = Math.floor((screenY * this.imageData.width + screenX) * NUMBER_COLOR_CHANNELS);
-            const z = this.imageData.data[redIndex]
-            console.log("red value from array: ", z)
-
-            
-
-            const red = this.ctx.getImageData(screenX, screenY, 1, 1).data[0];
-            console.log("red value from click", red)
-
-
-            const z_string = this.getZValue(red);
-
-            this.setLatLng(x, y, z_string);
-
-
-        })
+        updateStateCanvas(imageCanvas, onScreenCanvas, ctx, minvalue, maxvalue);
     }
 
-    getZValue = (r) => {
+    const onCanvasMouseMove = (event) => {
+        const { canvas, ctx, onScreenCanvas} = stateRef.current || {};
+        if(!canvas) {
+            return;
+        }
+        const clientRect = onScreenCanvas.getBoundingClientRect();
+        const screenX = ((event.originalEvent.clientX - clientRect.left) / clientRect.width) * canvas.width;
+        const screenY = ((event.originalEvent.clientY - clientRect.top) / clientRect.height) * canvas.height;
 
-      return Math.floor(
-        ((this.props.maxvalue - this.props.minvalue) *
-            (r - 1)) /
-            255 +
-            this.props.minvalue
-    );
+        const x = Math.round(event.latlng.lng);
+        const y = Math.round(event.latlng.lat);
+        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally 
+        const z = getZValue(red);
 
+        z = mapZValue(red)
+
+        setLatLng(x, y, z);
     }
 
-    setLatLng = (lat, lng, z)  => {
-        this.position.updateHTML(lat,lng, z)
+    const onCanvasMouseClick = (event) => {
+        const { canvas, ctx, onScreenCanvas, props} = stateRef.current || {};
+        if(!canvas) {
+            return;
+        }
+        const clientRect = onScreenCanvas.getBoundingClientRect();
+        const screenX = ((event.originalEvent.clientX - clientRect.left) / clientRect.width) * canvas.width;
+        const screenY = ((event.originalEvent.clientY - clientRect.top) / clientRect.height) * canvas.height;
+
+        if(screenX === Infinity || screenY === Infinity) {
+            return;
+        }
+
+        const x = Math.round(event.latlng.lng);
+        const y = Math.round(event.latlng.lat);
+        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally 
+        const z = mapZValue(red);
+        
+        if(props.setProps) {
+            props.setProps({click_position: [x, y, z]});
+        }
+        
     }
 
-    render() {
-        return (null)      
+    const subscribeToMapClick = () => {
+        props.map.addEventListener('mousemove', onCanvasMouseMove)
+        props.map.addEventListener('click', onCanvasMouseClick)
     }
+
+    const mapZValue = (redColorvalue) => {
+        const { minvalue, maxvalue } = stateRef.current || {};
+        return Math.floor(minvalue + ((maxvalue - minvalue) / (255 - 0)) * (redColorvalue - 0))
+
+    }
+    
+    //OLD method
+    const getZValue = (redColorValue) => {
+        const { props } = stateRef.current;
+
+        return Math.floor(
+          ((props.maxvalue - props.minvalue) *
+              (redColorValue - 1)) /
+              NUMBER_DISCRETIZATION_LEVELS +
+              props.minvalue
+        );
+    }
+  
+    const setLatLng = (x, y, z)  => {
+        const { control } = stateRef.current || {};
+        if(control) {
+            control.updateHTML(x, y, z)
+        }
+    }
+
+    return null;
 }
 
+
 MousePosition.defaultProps = {
-    position: "bottomleft"
-};
-
-
+    position: "bottomleft",
+}
 
 MousePosition.propTypes = {
+    setProps: PropTypes.oneOfType(PropTypes.function, PropTypes.none),
     map: PropTypes.object.isRequired,
     minvalue : PropTypes.number,
-    maxvalue : PropTypes.number,
+    maxvalue: PropTypes.number,
     position: PropTypes.string,
-};
+}
 
 export default MousePosition;

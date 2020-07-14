@@ -26,8 +26,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
         this._CRS = options.CRS || null;
 
         Util.setOptions(this, options);
-
-        this._emitURL();
     },
 
     onAdd: function(map) {
@@ -41,6 +39,8 @@ L.ImageWebGLOverlay = L.Layer.extend({
         this.getPane().appendChild(this._onscreenCanvas);
 
         this._reset();
+
+        this._triggerOnChanged();
     },
 
     onRemove: function(map) {
@@ -73,6 +73,14 @@ L.ImageWebGLOverlay = L.Layer.extend({
 		return this._bounds;
     },
 
+    getUrl: function() {
+        return this._url;
+    },
+
+    getCanvas: function() {
+        return this._onscreenCanvas;
+    },
+
     // ----- SETTERS -----
 
     setZIndex: function (value) {
@@ -89,7 +97,11 @@ L.ImageWebGLOverlay = L.Layer.extend({
 			this._reset();
 		}
 		return this;
-	},
+    },
+    
+    onLayerChanged: function(listener) {
+        this._listener = listener;
+    },
     
     /**
      * @returns {HTMLCanvasElement} Returns the canvas element
@@ -106,20 +118,17 @@ L.ImageWebGLOverlay = L.Layer.extend({
         
         if(options.url !== this._url) {
             this._url = options.url;
-            this._emitURL();
         }
 
 		this._initColormap();
-		this._draw();
+        this._draw();
+        
+        console.log("DID UPDATE! ?")
+        this._triggerOnChanged();
     },
 
 
     // ------ PRIVATE FUNCTIONS -------
-
-    _emitURL: function() {
-        const event = new Event('imageOverlayURL', { url: this._url });
-        window.dispatchEvent(event);
-    },
 
     _initCanvas: function() {
         const canvasTag =  DomUtil.create('canvas');
@@ -137,6 +146,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         this._onscreenCanvas = onscreenCanvasTag;
         this._canvas = canvasTag;
         this._draw();
+
     },
 
     _draw: function() {
@@ -218,6 +228,12 @@ L.ImageWebGLOverlay = L.Layer.extend({
             this._map.latLngToLayerPoint(southEast)
         );
     },
+
+    _triggerOnChanged: function() {
+        if(this._listener) {
+            this._listener(this);
+        }
+    }
 
 });
 

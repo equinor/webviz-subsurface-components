@@ -5,8 +5,6 @@ import L from 'leaflet';
 import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
 import Colorbar from './Colorbar'
-import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
-import MousePostion from './MousePosition';
 import Context from '../Context'
 
 
@@ -57,16 +55,14 @@ class CompositeMapLayers extends Component {
 
     componentDidMount() {
         const layerControl = L.control.layers([]).addTo(this.props.map);
-        
         this.setState({layerControl: layerControl}, () => this.createMultipleLayers())
-        
     }
 
     // TODO: fix for overlay stuff as well
     updateLayer = (curLayer, newLayer) => {
         const newState = {
-            colormap: newLayer.data[0].colormap,
-            colorscale: newLayer.data[0].colorScale,
+            colorMap: newLayer.data[0].colorMap,
+            colorScale: newLayer.data[0].colorScale,
             minvalue: newLayer.data[0].minvalue,
             maxvalue: newLayer.data[0].maxvalue
         };
@@ -100,9 +96,8 @@ class CompositeMapLayers extends Component {
 
     //TODO: make update work
     componentDidUpdate(prevProps) {
-        console.log("SDL in CDU in CML:", this.context.syncedDrawLayer);
-        if (prevProps !== this.props) {
-            const layers = this.props.layers;
+        if (prevProps.layers !== this.props.layers) {
+            const layers = (this.props.layers || []).filter(layer = layer.id);
             for (const propLayerData of layers) {
                 switch(propLayerData.action) {
                     case "update":
@@ -132,7 +127,6 @@ class CompositeMapLayers extends Component {
             }
         }
     }
-        // TODO: alle layers må ha id, filtrer vekk de som ikke har det i newLayeredMap
 
     componentWillUnmount() {
         // TODO: Remove all layers from the map
@@ -189,6 +183,11 @@ class CompositeMapLayers extends Component {
         ));
     }
 
+    /**
+     * Calculates cutOffPoints based on given a min/max values and min/max-cutoff-points between 0 and 255.a
+     * @example
+     * getColorCutOffPoints(0, 1000, 500, 1000) // { 127, 255 } 
+     */
     getColorCutOffPoints(min, max, cutMin, cutMax) {
         if (cutMax > max) {
             cutMax = max;
@@ -200,14 +199,17 @@ class CompositeMapLayers extends Component {
         const maxColorValue = Math.round(255 - (Math.abs((cutMax - max)) / (max - min)) * 255) /// clear colors below this
         const minColorValue = Math.round(255 - ((cutMin - min) / (max - min)) * 255)
 
-        return [maxColorValue, minColorValue];
+        return {
+            cutPointMin: minColorValue,
+            cutPointMax: maxColorValue,
+        };
 
     }
 
     updateStateForColorbar = (newState) => {
         const oldState = {
-            colormap: this.state.colormap,
-            colorscale: this.state.colorScale,
+            colorMap: this.state.colorMap,
+            colorScale: this.state.colorScale,
             minvalue: this.state.minvalue,
             maxvalue: this.state.maxvalue
         }
@@ -216,49 +218,31 @@ class CompositeMapLayers extends Component {
         }
 
     }
-
-    updateStateForMouse = (newState) => {
-        const oldState = {
-            minvalue: this.state.minvalue,
-            maxvalue: this.state.maxvalue,
-        };
-        if (oldState != newState) {
-            this.setState(newState);
-        }
-
-    }
     
     addImage = (imageData) => {
         const newColorBarState = {
-            colormap: imageData.colormap,
-            colorscale: imageData.colorScale,
+            colorMap: imageData.colorMap,
+            colorScale: imageData.colorScale,
             minvalue: imageData.minvalue,
             maxvalue: imageData.maxvalue
         };
         this.updateStateForColorbar(newColorBarState); 
 
-        const newMouseState = {
-            minvalue: imageData.minvalue,
-            maxvalue: imageData.maxvalue,
-        };
-        this.updateStateForMouse(newMouseState);
-
-
-        imageData.cutoffPoints = this.getColorCutOffPoints(
+        const cutOffPoints = this.getColorCutOffPoints(
             imageData.minvalue,
             imageData.maxvalue,
-            imageData.colorScale.cutPointMin,
-            imageData.colorScale.cutPointMax,
+            (imageData.colorScale || {}).cutPointMin,
+            (imageData.colorScale || {}).cutPointMax,
         );
 
         const bounds = imageData.bounds.map(xy => yx(xy));
         let newImageLayer = null;
-        if (imageData.colorScale || imageData.colormap){
+        if (imageData.colorScale || imageData.colorMap){
             newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
                 ...imageData,
-                colorScale: imageData.colorScale || imageData.colormap,
+                colorScale: imageData.colorScale || imageData.colorMap,
                 shader: imageData.shader,
-                cutoffPoints: imageData.cutoffPoints,
+                ...cutOffPoints,
             });
         } else {
             newImageLayer = L.imageOverlay(imageData.url, bounds, {
@@ -269,27 +253,28 @@ class CompositeMapLayers extends Component {
     }
 
     addTile = (tileData) => {
-        const newState = {
-            colormap: tileData.colormap,
-            colorscale: tileData.colorScale,
+        const newColorBarState = {
+            colorMap: tileData.colorMap,
+            colorScale: tileData.colorScale,
             minvalue: tileData.minvalue,
             maxvalue: tileData.maxvalue
         };
-        this.updateStateForColorbar(newState); 
+        this.updateStateForColorbar(newColorBarState); 
 
-        tileData.cutoffPoints = this.getColorCutOffPoints(
+        const cutOffPoints = this.getColorCutOffPoints(
             tileData.minvalue,
             tileData.maxvalue,
-            tileData.colorScale.cutPointMin,
-            tileData.colorScale.cutPointMax,
+            (tileData.colorScale || {}).cutPointMin,
+            (tileData.colorScale || {}).cutPointMax,
         );
+
         let newTileLayer = null;
-        if(tileData.colorScale || tileData.colormap) {
+        if(tileData.colorScale || tileData.colorMap) {
             newTileLayer = L.tileWebGLLayer(tileData.url, {
-                ...tileData.colormap,
-                colorScale: tileData.colorScale || tileData.colormap,
+                ...tileData.colorMap,
+                colorScale: tileData.colorScale || tileData.colorMap,
                 shader: tileData.shader,
-                cutOffPoints: tileData.cutoffPoints,
+                ...cutOffPoints,
             })
         } else {
             newTileLayer = L.tileLayer(tileData.url, {
@@ -319,7 +304,11 @@ class CompositeMapLayers extends Component {
                 break;
                 
             case "image":
-                layerGroup.addLayer(this.addImage(item));
+                const imageLayer = this.addImage(item);
+                layerGroup.addLayer(imageLayer);
+                imageLayer.onLayerChanged((imgLayer) => {
+                    this.setFocusedImageLayer(imgLayer.getUrl(), imgLayer.getCanvas(), imgLayer.options.minvalue, imgLayer.options.maxvalue);
+                });
                 break;
 
             case "tile": 
@@ -386,32 +375,6 @@ class CompositeMapLayers extends Component {
         }
     }
 
-
-  
-    render() {
-        return (
-            <div>
-                <div>
-                    <MousePostion
-                        map ={this.props.map}
-                        minvalue = {this.state.minvalue}
-                        maxvalue = {this.state.maxvalue} 
-                    />
-                </div>
-                <div>
-                    <Colorbar
-                        colorscale = {this.state.colorscale}
-                        colormap = {this.state.colormap}
-                        minvalue = {this.state.minvalue}
-                        maxvalue = {this.state.maxvalue}
-                        map = {this.props.map}
-                        unit = {"m"}
-                    />
-                </div>
-            </div>
-        );
-    }
-
     addDrawLayerToMap = () => {
         this.setState(prevState => ({
             layers: Object.assign({}, prevState.layers, {drawLayer: this.context.drawLayer})
@@ -427,6 +390,30 @@ class CompositeMapLayers extends Component {
         for (const item of newLayerData) {
             this.addItem(item, this.state.drawLayer);
         }
+    }
+
+    setFocusedImageLayer = (url, onScreenCanvas, minvalue, maxvalue) => {
+        const updateFunc = this.context.setFocusedImageLayer;
+        if(updateFunc) {
+            updateFunc(url, onScreenCanvas, minvalue, maxvalue);
+        }
+    }
+
+    render() {
+        return (
+            <div>
+                <div>
+                    <Colorbar
+                        colorScale = {this.state.colorScale}
+                        colorMap = {this.state.colorMap}
+                        minvalue = {this.state.minvalue}
+                        maxvalue = {this.state.maxvalue}
+                        map = {this.props.map}
+                        unit = {"m"}
+                    />
+                </div>
+            </div>
+        );
     }
     
 }

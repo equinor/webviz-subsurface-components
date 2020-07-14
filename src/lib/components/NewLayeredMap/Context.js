@@ -1,25 +1,22 @@
-import React, { Component } from 'react';
+import React from 'react';
 import L from 'leaflet';
-export default React.createContext({
+
+const Context = React.createContext({
     drawLayer: {}, 
     syncedDrawLayer: {data: []},
     syncedDrawLayerAdd: () => {},
     syncedDrawLayerDelete: () => {},
+    focusedImageURL: null,
 });
+export default Context;
 
-// class DrawLayerContextProvider extends Component {
-//     constructor(props) {
-//         super(props);
+export const WithContext = Component => {
 
-//         // const drawLayer = new L.featureGroup();
-//         this.state = {
-//             drawLayer: drawLayer
-//         }
-//     }
-
-//     render() {
-//         return null
-//     }
-// }
-
-// export { DrawLayerContextProvider, Consumer as DrawLayerContextConsumer };
+    return React.forwardRef((props, ref) => {
+        return (
+            <Context.Consumer>
+                { context => <Component ctx={context} {...props} ref={ref} />}
+            </Context.Consumer>
+        )
+    })
+}

@@ -153,7 +153,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
 	_redrawAllTiles: function() {
 
-		for(let { el, coords } of Object.values(this._tiles)) {
+		for(let { el, coords } of Object.values(this._tiles || {})) {
 			this._draw(el, coords, null);
 		}
 	},
