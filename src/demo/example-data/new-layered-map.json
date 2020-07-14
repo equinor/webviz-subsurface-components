@@ -3,8 +3,8 @@
         {
             "name": "Hello world",
             "id": 1, 
-            "action": "update",
-            "checked": true,
+            "action": null,
+            "checked": false,
             "baseLayer": true,
             "data": [
                 {
@@ -73,6 +73,11 @@
                     "color": "red",
                     "radius": 2,
                     "tooltip": "This is a red circle"
+                },
+                {
+                    "type": "marker",
+                    "position": [435200, 6478000],
+                    "tooltip": "This is a blue marker"
                 }
             ]
         }

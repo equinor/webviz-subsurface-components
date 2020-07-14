@@ -2,9 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
-
-
-//TODO : Feature? Add drawn images to a .json file 
+import { NewLayeredMap } from "../../../index";
+import Context from '../Context'
 
 // work around broken icons when using webpack, see https://github.com/PaulLeCam/react-leaflet/issues/255
 
@@ -52,25 +51,23 @@ class DrawControls extends Component {
     }
 
 
-    removeLayers(layertype, featureGroup) {
+    removeLayers(layerType, featureGroup) {
         const layerContainer = featureGroup.options.edit.featureGroup
         const layers = layerContainer._layers;
         const layer_ids = Object.keys(layers);
         for (let i = 0; i < layer_ids.length - 1; i++) {
             const layer = layers[layer_ids[i]];
-            if (getShapeType(layer) === layertype) {
+            if (getShapeType(layer) === layerType) {
                 layerContainer.removeLayer(layer._leaflet_id);
             }
         }
     }
 
     addToolbar = (map) => {
-        const drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
         const drawControl = new L.Control.Draw({
             position: this.props.position,
             edit : {
-                featureGroup: drawnItems
+                featureGroup: this.context.drawLayer
             },
             draw: {
                 rectangle: false,
@@ -82,66 +79,99 @@ class DrawControls extends Component {
             }
 
         });
-        
-        let that = this;
 
-        map.on(L.Draw.Event.CREATED, function (e) {
+        map.on(L.Draw.Event.CREATED, (e) => {
             const type = e.layerType;
             const layer = e.layer;
-            drawnItems.addLayer(layer)
-
-
-            if (type === "marker") {
-                props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
-                that.removeLayers("marker", drawControl);
+            this.context.drawLayer.addLayer(layer)
+            
+            if (props.syncDrawings) {
+                this.context.syncedDrawLayerDelete(type);
+                const newLayer = {type: type}
             }
-            if (type === "polyline") {
-                const coords = layer._latlngs.map(p => {
-                    return [p.lat, p.lng];
-                });
-                props.lineCoords(coords);
-                that.removeLayers("polyline", drawControl);
-            }
-            if (type === "polygon") {
-                const coords = layer._latlngs[0].map(p => {
-                    return [p.lat, p.lng];
-                });
-                props.polygonCoords(coords);
-                that.removeLayers("polygon", drawControl);
-            }
-         });
-        
-    
-        map.on(L.Draw.Event.EDITED, function (e) {
-            e.layers.eachLayer(layer => {
-                const layertype = getShapeType(layer);
-                if (layertype === "polyline") {
+            switch(type) {
+                case "polyline":
                     const coords = layer._latlngs.map(p => {
                         return [p.lat, p.lng];
                     });
+                    props.syncDrawings && (newLayer["positions"] = coords);
                     this.props.lineCoords(coords);
-                }
-                if (layertype === "polygon") {
+                    this.removeLayers("polyline", drawControl);
+                    break;
+
+                case "polygon":
                     const coords = layer._latlngs[0].map(p => {
                         return [p.lat, p.lng];
                     });
-                    this.props.polygonCoords(coords);
-                }
-                if (layertype === "marker") {
+                    props.syncDrawings && (newLayer["positions"] = coords);
+                    this.props.polygonCoords(coords); 
+                    this.removeLayers("polygon", drawControl);
+                    break;
+
+                case "marker":
+                    props.syncDrawings && (newLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
                     this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
+                    this.removeLayers("marker", drawControl);
+                    break;
+            }
+            props.syncDrawings && (this.context.syncedDrawLayerAdd([newLayer]));
+        });
+        
+    
+        map.on(L.Draw.Event.EDITED, (e) => {
+            if (props.syncDrawings) {
+                const newLayers = []
+            }
+            e.layers.eachLayer(layer => {
+                const layerType = getShapeType(layer);
+                if (props.syncDrawings) {
+                    this.context.syncedDrawLayerDelete([layerType]);
+                    const editedLayer = {type: layerType}
                 }
+                switch(layerType) {
+                    case "polyline":
+                        const coords = layer._latlngs.map(p => {
+                            return [p.lat, p.lng];
+                        });
+                        props.syncDrawings && (editedLayer["positions"] = coords);
+                        this.props.lineCoords(coords);
+                        break;
+
+                    case "polygon":
+                        const coords = layer._latlngs[0].map(p => {
+                            return [p.lat, p.lng];
+                        });
+                        props.syncDrawings && (editedLayer["positions"] = coords);
+                        this.props.polygonCoords(coords);
+                        break;
+
+                    case "marker":
+                        props.syncDrawings && (editedLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
+                        this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
+                        break;
+                    }
+                props.syncDrawings && (newLayers.push(editedLayer))
             });
-         });
+            props.syncDrawings && (this.context.syncedDrawLayerAdd(newLayers));
+        });
+
+        map.on(L.Draw.Event.DELETED, (e) => {
+
+            const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
+            this.context.syncedDrawLayerDelete(deletedLayers, true);
+        })
 
         map.addControl(drawControl);
+
     }
 
-
     render() {
-
         return (null);
     }
 }
+DrawControls.contextType = Context;
+
+
 DrawControls.defaultProps = {
     drawMarker: true,
     drawPolygon: true,
@@ -164,14 +194,17 @@ DrawControls.propTypes = {
     /* Show polyline button*/
     drawPolyline: PropTypes.bool,
 
-    /* Coordinates for selected marker*/
+    /* Function to emit marker coordinates to dash */
     markerCoords: PropTypes.func,
 
-    /* Coordinates for selected polyline*/
+    /* Function to emit polyline coordinates to dash */
     lineCoords: PropTypes.func,
 
-    /* Coordinates for selected polygon*/
+    /* Function to emit polygon coordinates to dash */
     polygonCoords: PropTypes.func,
+
+    /* Boolean to toggle sync drawing */
+    syncDrawings: PropTypes.bool,
 };
 
 export default DrawControls;
