@@ -144,6 +144,17 @@ class CompositeMapLayers extends Component {
         ));
     }
 
+    makecircleMarker = (item, swapXY) => {
+        const center = swapXY ? yx(item.center) : item.center;
+        return  this.addTooltip(item, 
+                    (L.circleMarker(center, {
+                        color: item.color || "red",
+                        center : center,
+                        radius : item.radius || 4,
+                    })
+        ));
+    }
+
     addImage = (imageData) => {
         const bounds = imageData.bounds.map(xy => yx(xy));
         let newImageLayer = null;
@@ -190,6 +201,10 @@ class CompositeMapLayers extends Component {
 
             case "circle":
                 layerGroup.addLayer(this.makeCircle(item, swapXY));
+                break;
+            
+            case "circleMarker":
+                layerGroup.addLayer(this.makecircleMarker(item, swapXY));
                 break;
             
             case "marker":

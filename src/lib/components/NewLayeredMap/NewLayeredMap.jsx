@@ -128,7 +128,6 @@ class NewLayeredMap extends Component {
             NewLayeredMap.syncedDrawLayer.data.push(layer);
         }
         this.redrawSyncedMaps();
-        
     }
 
     syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {

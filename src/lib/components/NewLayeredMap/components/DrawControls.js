@@ -26,6 +26,9 @@ const getShapeType = layer => {
     if (layer instanceof L.Circle) {
         return "circle";
     }
+    if (layer instanceof L.CircleMarker) {
+        return "circleMarker";
+    }
     if (layer instanceof L.Marker) {
         return "marker";
     }
@@ -149,13 +152,19 @@ class DrawControls extends Component {
                         props.syncDrawings && (editedLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
                         this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
                         break;
-                    }
-                props.syncDrawings && (newLayers.push(editedLayer))
+                    
+                    case "circleMarker":
+                        props.syncDrawings && (editedLayer["center"] = [layer._latlng.lat, layer._latlng.lng]);
+                        console.log(editedLayer)
+                        break;
+                }
+                props.syncDrawings && (newLayers.push(editedLayer));
             });
             props.syncDrawings && (this.context.syncedDrawLayerAdd(newLayers));
         });
 
         map.on(L.Draw.Event.DELETED, (e) => {
+            
             if (props.syncDrawings) {
                 const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
                 this.context.syncedDrawLayerDelete(deletedLayers, true);
@@ -163,17 +172,17 @@ class DrawControls extends Component {
         })
 
         map.on('click', (e) => {
-            const newLayer = {
-                type: "circle",
+            const circleMarker = {
+                type: "circleMarker",
                 center: [e.latlng.lat, e.latlng.lng],
                 color: "red",
-                radius: 50,
+                radius: 4,
             }
-            this.context.drawLayer.addLayer(L.circle(newLayer.center, newLayer));
-            this.removeLayers("circle", drawControl);
+            this.context.drawLayer.addLayer(L.circleMarker(circleMarker.center, circleMarker));
+            this.removeLayers("circleMarker", drawControl);
             if (props.syncDrawings) {
-                this.context.syncedDrawLayerDelete(["circle"]);
-                this.context.syncedDrawLayerAdd([newLayer]);
+                this.context.syncedDrawLayerDelete(["circleMarker"]);
+                this.context.syncedDrawLayerAdd([circleMarker]);
             }
         })
 
