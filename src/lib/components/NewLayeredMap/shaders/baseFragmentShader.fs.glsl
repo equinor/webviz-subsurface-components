@@ -19,7 +19,7 @@ float map_log(float value, float from1, float to1, float from2, float to2) {
 }
 
 void main() {
-    float color_value = texture2D(u_image, v_texCoord).r;
+    float color_value = texture2D(u_image, v_texCoord).r; // [r, g, b] -> [x, y ,z] => |v|
     float mapped_color_value = map(color_value, 0.0, 1.0, 0.0, u_colormap_length - 1.0);
     vec2 colormap_coord = vec2((mapped_color_value) / u_colormap_length, 0.0);
     gl_FragColor = texture2D(u_colormap_frame, colormap_coord);
