@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
-import { NewLayeredMap } from "../../../index";
-import Context from '../Context'
+import Context from '../Context';
+
+
 
 // work around broken icons when using webpack, see https://github.com/PaulLeCam/react-leaflet/issues/255
 
@@ -40,17 +41,43 @@ const getShapeType = layer => {
 
 class DrawControls extends Component {
 
+    // TODO: make it so that only data stays here, and the layergroup is initiated in CML
+    static syncedDrawLayer = {
+        "name": "syncedDrawLayer",
+        "id": 19, 
+        "action": "update",
+        "checked": true,
+        "baseLayer": false,
+        "data": [
+            {
+                "type": "marker",
+                "position": [435200, 6478000],
+                "tooltip": "This is a blue marker"
+            },
+            {
+                "type": "polygon",
+                "positions": [
+                    [436204, 6475077],
+                    [438204, 6480077],
+                    [432204, 6475077]
+                ],
+                "color": "blue",
+                "tooltip": "This is a blue polygon"
+            }
+        ]
+    }
+
+    
+
     constructor(props) {
         this.addToolbar = this.addToolbar.bind(this);
     }
 
-    
     componentDidMount() {
         const { drawPolygon, drawMarker, drawPolyline } = this.props;
         this.addToolbar(this.props.map);
     }
-
-
+    
     removeLayers(layerType, featureGroup) {
         const layerContainer = featureGroup.options.edit.featureGroup
         const layers = layerContainer._layers;

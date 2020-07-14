@@ -284,7 +284,7 @@ function PingPong(eqGL, opts) {
  */
 function calcN(width, height) {
     const resolution = width*height;
-    console.log(width, height);
+    // console.log(width, height);
 
     if(resolution <= 90000) { // 300x300
         return 128;

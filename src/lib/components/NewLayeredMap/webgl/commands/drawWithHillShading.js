@@ -10,7 +10,7 @@ const DEFAULT_LIGHT_DIRECTION = [1, 1, 1];
 /**
  * @param {WebGLRenderingContext} gl
  */
-export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDirection) => {
+export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDirection, scale, cutoffPoints) => {
 
     if(!elevationScale) {
         elevationScale = DEFAULT_ELEVATION_SCALE;
@@ -18,9 +18,22 @@ export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDi
     if(!lightDirection) {
         lightDirection = DEFAULT_LIGHT_DIRECTION;
     }
+    const scaleType = 0; // default, linear
+    switch(scale) { // cannot pass strings to the shader, could add a map instead if there are many options? 
+        case "log":
+            scaleType = 1;
+            break;
+        case "something":
+            scaleType = 2;
+            break;
+        default:
+            break;
+    }
 
     const width = loadedImage.width;
     const height = loadedImage.height;
+    const maxColorValue = cutoffPoints[0];
+    const minColorValue = cutoffPoints[1]  == 255 ? 0: 255- cutoffPoints[1];
 
     canvas.width = width;
     canvas.height = height;
@@ -36,6 +49,9 @@ export default (gl, canvas, loadedImage, loadedColorMap, elevationScale, lightDi
         .texture('u_colormap_frame', 1, loadedColorMap)
         .uniformf('u_resolution_vertex', gl.canvas.width, gl.canvas.height)  
         .uniformf('u_colormap_length', loadedColorMap.width) 
+        .addUniformF('u_scale', scaleType)    
+        .addUniformF('u_bottom_cut', maxColorValue)  
+        .addUniformF('u_top_cut', minColorValue)  
         .vertexCount(6);
 
     // Add hillshading properties

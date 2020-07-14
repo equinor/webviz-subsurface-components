@@ -145,7 +145,6 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		.then(() => {
 			const ctx = tile.getContext('2d');
 			ctx.drawImage(this._canvas, 0, 0);
-			
 			if(done) {
 				done(null, tile);
 			}
@@ -154,7 +153,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
 	_redrawAllTiles: function() {
 
-		for(let { el, coords } of Object.values(this._tiles)) {
+		for(let { el, coords } of Object.values(this._tiles || {})) {
 			this._draw(el, coords, null);
 		}
 	},
@@ -225,7 +224,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
              * @type {import('../colorscale/index').ColorScaleConfig}
              */
             const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
-            const colors = colorScaleCfg.colors;
+			const colors = colorScaleCfg.colors;
             this._colormapUrl = buildColormapFromHexColors(colors, colorScaleCfg);
         }
 	}

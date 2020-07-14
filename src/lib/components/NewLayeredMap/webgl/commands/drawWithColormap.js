@@ -21,7 +21,7 @@ export default (gl, canvas, loadedImage, loadedColorMap, options = {}) => {
 
     const width = loadedImage.width;
     const height = loadedImage.height;
-
+  
     canvas.width = width;
     canvas.height = height;
 
