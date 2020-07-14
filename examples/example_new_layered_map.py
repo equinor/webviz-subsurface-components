@@ -192,12 +192,29 @@ if __name__ == "__main__":
     
     def add_layer(layers):
         if len(layers) < 5:
-            file_ = 'examples\\example-data\\reek_surfaces\\TopLowerReek_50inc.irapbin'
-            surface = RegularSurface(file_)
-            zvalues = get_surface_arr(surface)[2]
-            bounds = [[surface.xmin, surface.ymin], [surface.xmax, surface.ymax]]
-            # min_value = min_value if min_value is not None else np.nanmin(zvalues)
-            # max_value = max_value if max_value is not None else np.nanmax(zvalues)
+            # file_ = 'examples\\example-data\\reek_surfaces\\TopLowerReek_50inc.irapbin'
+            # surface = RegularSurface(file_)
+            # zvalues = get_surface_arr(surface)[2]
+            # bounds = [[surface.xmin, surface.ymin], [surface.xmax, surface.ymax]]
+            # layers.append({
+            #     "name": "surface",
+            #     "id": 2,
+            #     "baseLayer": True,
+            #     "checked": False,
+            #     "action": "add",
+            #     "data": [
+            #         {
+            #             "type": "image",
+            #             "url": array_to_png(zvalues.copy()),
+            #             "allowHillshading": True,
+            #             "colormap": colormap,
+            #             "unit": "",    
+            #             "minvalue": None,
+            #             "maxvalue": None,
+            #             "bounds": [[0,0], [30, 30]],
+            #         },
+            #     ],
+            # })
             layers.append({
                 "name": "surface",
                 "id": 2,
@@ -249,6 +266,19 @@ if __name__ == "__main__":
                         "colorScale": colorScale, 
                     }
                 ]
+            },
+            {
+                "id": 2,
+                "action": "update",
+                "data": [
+                    {
+                        "type": "image",
+                        "colorScale": {
+                            "colors": colorScale,
+                            "prefixZeroAlpha": True,
+                        }
+                    }
+                ]
             }
         ]
         return update
@@ -270,14 +300,35 @@ if __name__ == "__main__":
                         }
                     }
                 ]
+            },
+            {
+                "id": 2,
+                "action": "update",
+                "data": [
+                    {
+                        "type": "image",
+                        "shader": {
+                            "type": 'hillshading' if switch['value'] is True else None,
+                        }
+                    }
+                ]
             }
         ]
 
         return update
+    
+
+    @app.callback(Output("polyline", "children"), [Input("example-map", "polyline_points")])
+    def get_edited_line(coords):
+        return f"Edited polyline: {json.dumps(coords)}"
+
+    @app.callback(Output("marker", "children"), [Input("example-map", "marker_point")])
+    def get_edited_line(coords):
+        return f"Edited marker: {json.dumps(coords)}"
+
+    @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
+    def get_edited_line(coords):
+        return f"Edited closed polygon: {json.dumps(coords)}"
        
 
     app.run_server(debug=True)
-
-
-
-

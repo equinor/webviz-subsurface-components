@@ -21,9 +21,7 @@ class Controls extends Component {
                     />
                 </div>
                 <div> {
-                    
                     this.props.drawTools && (
-
                         <DrawControls
                             map={this.props.map}
                             position={this.props.drawTools.position}
@@ -39,7 +37,7 @@ class Controls extends Component {
                             polygonCoords={coords =>
                                 this.props.setProps({ polygon_points: coords })
                             }
-                            syncDrawings={true}
+                            syncDrawings={this.props.syncDrawings}
                         />
                     
                     )

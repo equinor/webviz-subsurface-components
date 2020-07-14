@@ -1,2 +1,3 @@
 export { default as drawWithColormap } from './drawWithColormap';
 export { default as drawWithHillShading } from './drawWithHillShading';
+export { default as drawWithNewHillShading } from './drawWithNewHillShading';

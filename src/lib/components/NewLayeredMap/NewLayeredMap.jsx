@@ -61,12 +61,8 @@ class NewLayeredMap extends Component {
             bounds: props.bounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
-
             // Used to make possible to display z-value
             focusedImageLayer: null,
-
-            //Used for adding mouseposition in controls
-            
         }
         
         this.mapEl = createRef();
@@ -97,7 +93,11 @@ class NewLayeredMap extends Component {
     setEvents = (map) => {
 
         map.on('zoomanim', e => {
-            (this.props.syncedMaps || []).map(id => {
+            (this.props.syncedMaps || []).forEach(id => {
+                if(!NewLayeredMap.mapReferences[id]) {
+                    return;
+                }
+
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
                     e.zoom !== NewLayeredMap.mapReferences[id].getMap().getZoom()
@@ -113,7 +113,11 @@ class NewLayeredMap extends Component {
         map.on('move', e => {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
-            (this.props.syncedMaps || []).map(id => {
+            (this.props.syncedMaps || []).forEach(id => {
+                if(!NewLayeredMap.mapReferences[id]) {
+                    return;
+                }
+
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
@@ -150,6 +154,11 @@ class NewLayeredMap extends Component {
             return drawing.type !== layerType;
         })
     }
+    redrawSyncedMaps = () => {
+        for (const id of this.props.syncedMaps) {
+            NewLayeredMap.mapReferences[id].forceUpdate(); 
+        }
+    }
 
     /**
      * @param {HTMLCanvasElement} onScreenCanvas
@@ -173,7 +182,6 @@ class NewLayeredMap extends Component {
                                 syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
                                 syncedDrawLayerAdd: this.syncedDrawLayerAdd,
                                 syncedDrawLayerDelete: this.syncedDrawLayerDelete,
-
                                 focusedImageLayer: this.state.focusedImageLayer,
                                 setFocusedImageLayer: this.setFocucedImageLayer,
                             }}
@@ -181,11 +189,12 @@ class NewLayeredMap extends Component {
                             {
                                 this.state.map && (
                                         <Controls 
-                                            setProps={this.setPropsExist} //coords [x,y,z]
+                                            setProps={this.setPropsExist}
                                             map={this.state.map}
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
                                             drawTools={this.props.drawTools}
+                                            syncDrawings={this.props.syncDrawings}
                                         />
                                 )
                             }
@@ -194,6 +203,7 @@ class NewLayeredMap extends Component {
                                     <CompositeMapLayers 
                                         layers={this.props.layers}
                                         map={this.state.map}
+                                        syncDrawings={this.props.syncDrawings}
                                     />
                                 )
                             }
@@ -207,10 +217,7 @@ class NewLayeredMap extends Component {
 NewLayeredMap.contextType = Context;
 
 NewLayeredMap.propTypes = {
-    /**
-     * Map coordinates of a mouse click
-     */
-    click_coords: PropTypes.array,
+   
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
@@ -278,5 +285,30 @@ NewLayeredMap.propTypes = {
      * Ids of other LayeredMap instances that should be synced with this instance  
      */    
     syncedMaps: PropTypes.array,
+
+    /**
+     * Boolean deciding whether or not to sync drawings between maps  
+     */
+    syncDrawings: PropTypes.bool,
+
+    /**
+     * Dash provided prop that returns the coordinates of the edited or clicked polyline
+     */
+    polyline_points: PropTypes.array,
+
+    /**
+     * Dash provided prop that returns the coordinates of the edited or clicked polygon
+     */
+    polygon_points: PropTypes.array,
+
+    /**
+     * Dash provided prop that returns the coordinates of the edited or clicked marker
+     */
+    marker_point: PropTypes.array,
+
+    /**
+     * Map coordinates of a mouse click
+     */
+    click_position: PropTypes.array,
 }
 export default NewLayeredMap;

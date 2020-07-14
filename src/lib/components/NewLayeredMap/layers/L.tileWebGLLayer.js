@@ -82,8 +82,8 @@ L.TileWebGLLayer = L.GridLayer.extend({
     onAdd: function(map) {
         const canvas = this._canvas = DomUtil.create('canvas');
 
-            this._glContext = canvas.getContext("webgl", {
-                premultipliedAlpha: false,
+		this._glContext = canvas.getContext("webgl", {
+			premultipliedAlpha: false,
         });
 
         this._initColormap();
