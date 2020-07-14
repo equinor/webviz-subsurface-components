@@ -4,9 +4,7 @@ import { MapLayer, withLeaflet } from "react-leaflet";
 
 class CanvasOverlay extends MapLayer {
     constructor(props) {
-        console.log("props before super:", props)
         super(props);
-        console.log("props after super:", props)
         this._map = this.props.leaflet.map;
         this._bounds = L.latLngBounds(this.props.bounds);
     }

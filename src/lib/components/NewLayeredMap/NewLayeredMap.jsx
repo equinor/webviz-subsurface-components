@@ -142,10 +142,11 @@ class NewLayeredMap extends Component {
         }
     }
 
-    syncedDrawLayerAdd = (newLayer) => {
-        NewLayeredMap.syncedDrawLayer.data.push(newLayer)
-        // console.log("[ SDL ]: ", NewLayeredMap.syncedDrawLayer)
-        this.render() // TODO: Replace with forceUpdate()
+    syncedDrawLayerAdd = (newLayers) => {
+        for (const layer of newLayers) {
+            NewLayeredMap.syncedDrawLayer.data.push(layer);
+        }
+        this.redrawSyncedMaps();
     }
 
     syncedDrawLayerDelete = (layerType) => {
@@ -194,6 +195,7 @@ class NewLayeredMap extends Component {
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
                                             drawTools={this.props.drawTools}
+                                            mousePosition = {this.props.mousePosition}
                                             syncDrawings={this.props.syncDrawings}
                                         />
                                 )
@@ -234,7 +236,12 @@ NewLayeredMap.propTypes = {
      * For reacting to changes in controls
      */
     setProps: PropTypes.func,
-
+    /**
+     * Mouse properties configuration
+     */
+    mousePosition: PropTypes.shape({
+        coordinatePosition: PropTypes.string
+    }),
     /**
      * ScaleY is a configuration for creating a slider for scaling the Y-axis.
      */

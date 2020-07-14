@@ -73,6 +73,9 @@ const NewLayeredMapDemo = () => {
                         position: "topright",
                         
                     }}
+                    mousePosition = {{
+                        coordinatePosition: "bottomright",
+                    }}
                     switch={{
                         value: switchValue,
                         label: 'Hillshading',
@@ -98,6 +101,9 @@ const NewLayeredMapDemo = () => {
                     //     maxScaleY: 10,
                     //     position: 'topleft',
                     // }}
+                    mousePosition = {{
+                        coordinatePosition: "bottomright",
+                    }}
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,

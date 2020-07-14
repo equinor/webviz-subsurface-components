@@ -14,11 +14,15 @@ class Controls extends Component {
         return (
             <div>
 
-                <div>
-                    <MousePosition
-                        map ={this.props.map}
-                        setProps={this.props.setProps}
-                    />
+                <div> {
+                    this.props.mousePosition && (
+                        <MousePosition
+                            map ={this.props.map}
+                            setProps={this.props.setProps}
+                            position ={this.props.mousePosition.coordinatePosition}
+                        />
+                    )
+                }
                 </div>
                 <div> {
                     this.props.drawTools && (
@@ -83,6 +87,9 @@ Controls.propTypes = {
 
     setProps: PropTypes.func,
 
+    mousePosition: PropTypes.shape({
+        coordinatePosition: PropTypes.string,
+    }),
     scaleY: PropTypes.shape({
         scaleY: PropTypes.number,
         maxScaleY: PropTypes.number,

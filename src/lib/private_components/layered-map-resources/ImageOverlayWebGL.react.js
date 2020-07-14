@@ -28,7 +28,6 @@ class ImageOverlayWebGL extends Component {
             );
             this.original_data.loaded = true;
         };
-        // console.log("image url: ", this.props.url)
         image.src = this.props.url;
 
         return (

@@ -209,7 +209,6 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
 	_initColormap: function() {
 		const colorScale = this.options.colorScale;
-        const cutOffpoints = this.options.cutOffPoints
         if(typeof colorScale === 'string') {
             // The given colorScale is a base64 image
             this._colormapUrl = colorScale;
@@ -217,7 +216,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
         else if(Array.isArray(colorScale)) {
             // The given colorScale is an array of hexColors
             const colors = colorScale;
-            this._colormapUrl = buildColormapFromHexColors(colors, cutOffpoints);
+            this._colormapUrl = buildColormapFromHexColors(colors);
         } 
         else if(typeof colorScale === 'object' || !colorScale) {
             // The given colorScale is an object
@@ -226,7 +225,6 @@ L.TileWebGLLayer = L.GridLayer.extend({
              */
             const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
 			const colors = colorScaleCfg.colors;
-			colorScaleCfg.cutOffPoints = cutOffpoints
             this._colormapUrl = buildColormapFromHexColors(colors, colorScaleCfg);
         }
 	}
