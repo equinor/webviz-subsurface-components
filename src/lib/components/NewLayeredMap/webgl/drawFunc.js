@@ -1,4 +1,4 @@
-import { drawWithColormap, drawWithHillShading, drawWithNewHillShading } from './commands';
+import { drawWithColormap, drawWithHillShading, drawWithAdvancedHillShading } from './commands';
 
 // Utils
 import { Utils } from './eqGL';
@@ -17,6 +17,11 @@ export default async (gl, canvas, image, colormap, config = {}) => {
     // Select which draw command to draw
     const shader = config.shader || {};
 
+    const cutOffPoints = {
+        cutPointMin: config.cutPointMin || 0,
+        cutPointMax: config.cutPointMax || 1000,
+    }
+
     switch(shader.type) {
 
         // Old hillshader
@@ -28,16 +33,17 @@ export default async (gl, canvas, image, colormap, config = {}) => {
                 loadedColorMap,
                 {
                     ...config.colorScale,
-                    ...shader,    
+                    ...shader,
                 }
             )
             break;
         }
 
         case 'hillshading': {
-            drawWithNewHillShading(gl, canvas, loadedImage, loadedColorMap, {
+            drawWithAdvancedHillShading(gl, canvas, loadedImage, loadedColorMap, {
                 ...config.colorScale,
                 ...shader,
+                ...cutOffPoints,
             });
             break;
         }
@@ -47,6 +53,7 @@ export default async (gl, canvas, image, colormap, config = {}) => {
             drawWithColormap(gl, canvas, loadedImage, loadedColorMap, {
                 ...config.colorScale,
                 ...shader,
+                ...cutOffPoints,
             });
         }
     }

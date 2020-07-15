@@ -62,6 +62,7 @@ class CompositeMapLayers extends Component {
             this.reSyncDrawLayer();
         }
         if (prevProps.layers !== this.props.layers) {
+
             const layers = (this.props.layers || []).filter(layer => layer.id);
             for (const propLayerData of layers) {
                 switch(propLayerData.action) {
@@ -176,7 +177,7 @@ class CompositeMapLayers extends Component {
         }
 
         const maxColorValue = Math.round(255 - (Math.abs((cutMax - max)) / (max - min)) * 255) /// clear colors below this
-        const minColorValue = Math.round(255 - ((cutMin - min) / (max - min)) * 255)
+        const minColorValue = Math.round(((cutMin - min) / (max - min)) * 255)
 
         return {
             cutPointMin: minColorValue,
@@ -212,7 +213,7 @@ class CompositeMapLayers extends Component {
             (imageData.colorScale || {}).cutPointMax,
         );
 
-        const bounds = imageData.bounds.map(xy => yx(xy));
+        const bounds = (imageData.bounds || []).map(xy => yx(xy));
         let newImageLayer = null;
         if (imageData.colorScale){
             newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
@@ -247,6 +248,7 @@ class CompositeMapLayers extends Component {
         let newTileLayer = null;
         if(tileData.colorScale) {
             newTileLayer = L.tileWebGLLayer(tileData.url, {
+                ...tileData,
                 colorScale: tileData.colorScale,
                 shader: tileData.shader,
                 ...cutOffPoints,
@@ -346,8 +348,11 @@ class CompositeMapLayers extends Component {
 
             // Fits the map bounds if layer is a base layer
             // TODO: improve bounds optimization?
-            const bounds = layer.data[0].bounds ? layer.data[0].bounds.map(xy => yx(xy)) : DEFAULT_BOUNDS;
-            this.props.map.fitBounds(bounds);
+            if(layer.data && layer.data.length > 0) {
+                const bounds = layer.data[0].bounds ? layer.data[0].bounds.map(xy => yx(xy)) : DEFAULT_BOUNDS;
+                this.props.map.fitBounds(bounds);
+            }
+
         } else {
             this.state.layerControl.addOverlay(layerGroup, layer.name);
         }
