@@ -215,18 +215,14 @@ class CompositeMapLayers extends Component {
 
         const bounds = (imageData.bounds || []).map(xy => yx(xy));
         let newImageLayer = null;
-        if (imageData.colorScale){
-            newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
-                ...imageData,
-                colorScale: imageData.colorScale,
-                shader: imageData.shader,
-                ...cutOffPoints,
-            });
-        } else {
-            newImageLayer = L.imageOverlay(imageData.url, bounds, {
-                ...imageData,
-            })
-        }
+        
+        newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
+            ...imageData,
+            colorScale: imageData.colorScale,
+            shader: imageData.shader,
+            ...cutOffPoints,
+        });
+        
         return newImageLayer;
     }
 

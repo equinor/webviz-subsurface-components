@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 
-import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
+import { buildColormap } from '../colorscale';
 
 
 class ColorBar extends Component {
@@ -27,23 +27,11 @@ class ColorBar extends Component {
     }
     
     checkColorMap = () => {
-        if (this.props.colorScale !== undefined) {
-            if (typeof this.props.colorScale !== 'string') {
-                this.setState({colorMap : this.buildColorMapImage(this.props.colorScale)});
-            } else { // if  the colorMap is passed to the colorScale as a string
-                this.setState({colorMap : this.props.colorScale});
-            }
-        }
-    }
-
-    buildColorMapImage = (colorScale) => {
-        const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
-        const colors = colorScaleCfg.colors;
-        return buildColormapFromHexColors(colors, colorScaleCfg);
+        this.setState({colorMap: buildColormap(this.props.colorScale)})
     }
 
     addControl = () => {
-        const colorbar = L.Control.extend({
+        const ColorBarCtrl = L.Control.extend({
             options: {
                 position: this.props.position || "bottomright",
             },
@@ -55,7 +43,7 @@ class ColorBar extends Component {
                 return this.panelDiv;
             },
         });
-        this.colorbar = new colorbar();
+        this.colorbar = new ColorBarCtrl();
 
         this.props.map.addControl(this.colorbar);
     }

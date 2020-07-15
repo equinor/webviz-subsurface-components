@@ -1,9 +1,9 @@
-import { drawWithColormap, drawWithHillShading, drawWithAdvancedHillShading } from './commands';
+import { drawRawImage ,drawWithColormap, drawWithHillShading, drawWithAdvancedHillShading } from './commands';
 
 // Utils
 import { Utils } from './eqGL';
 
-export default async (gl, canvas, image, colormap, config = {}) => {
+export default async (gl, canvas, image, colormap = null, config = {}) => {
     
     gl.getExtension("OES_texture_float");
     
@@ -22,40 +22,50 @@ export default async (gl, canvas, image, colormap, config = {}) => {
         cutPointMax: config.cutPointMax || 1000,
     }
 
-    switch(shader.type) {
+    if(loadedColorMap) {
 
-        // Old hillshader
-        case 'soft-hillshading': {
-            drawWithHillShading(
-                gl, 
-                canvas, 
-                loadedImage, 
-                loadedColorMap,
-                {
+        switch(shader.type) {
+
+            // Old hillshader
+            case 'soft-hillshading': {
+                drawWithHillShading(
+                    gl, 
+                    canvas, 
+                    loadedImage, 
+                    loadedColorMap,
+                    {
+                        ...config.colorScale,
+                        ...shader,
+                    }
+                )
+                break;
+            }
+    
+            case 'hillshading': {
+                drawWithAdvancedHillShading(gl, canvas, loadedImage, loadedColorMap, {
                     ...config.colorScale,
                     ...shader,
-                }
-            )
-            break;
+                    ...cutOffPoints,
+                });
+                break;
+            }
+    
+    
+            default: {
+                // Draw the image with colormap
+                drawWithColormap(gl, canvas, loadedImage, loadedColorMap, {
+                    ...config.colorScale,
+                    ...shader,
+                    ...cutOffPoints,
+                });
+            }
         }
 
-        case 'hillshading': {
-            drawWithAdvancedHillShading(gl, canvas, loadedImage, loadedColorMap, {
-                ...config.colorScale,
-                ...shader,
-                ...cutOffPoints,
-            });
-            break;
-        }
-
-
-        default: {
-            drawWithColormap(gl, canvas, loadedImage, loadedColorMap, {
-                ...config.colorScale,
-                ...shader,
-                ...cutOffPoints,
-            });
-        }
+    } else {
+        // Draw the image raw - without colormap
+        drawRawImage(gl, canvas, loadedImage, {
+            ...cutOffPoints
+        })
     }
 }
 
