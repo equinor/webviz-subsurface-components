@@ -79,7 +79,7 @@ class NewLayeredMap extends Component {
             maxZoom: this.state.maxZoom,
             attributionControl: false,
         });
-
+        console.log("using New BUILD");
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
@@ -146,7 +146,8 @@ class NewLayeredMap extends Component {
         for (const layer of newLayers) {
             NewLayeredMap.syncedDrawLayer.data.push(layer);
         }
-        this.redrawSyncedMaps();
+        console.log(NewLayeredMap.syncedDrawLayer)
+        this.redrawAllSyncedMaps();
     }
 
     syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
@@ -154,14 +155,18 @@ class NewLayeredMap extends Component {
             return !layerTypes.includes(drawing.type);
         })
         if (shouldRedraw) {
-            this.redrawSyncedMaps();
+            console.log("redrawing everything from delete")
+            this.redrawAllSyncedMaps();
         }
     }
 
-    redrawSyncedMaps = () => {
+    redrawAllSyncedMaps = () => {
         for (const id of this.props.syncedMaps) {
             NewLayeredMap.mapReferences[id].forceUpdate(); 
         }
+        // When using the component in dash with multiple maps drawing won't work
+        // If not added to the map through the reSyncDrawLayer due to how setProps works
+        this.forceUpdate();
     }
 
     /**
@@ -287,6 +292,11 @@ NewLayeredMap.propTypes = {
      * 
      */
     bounds: PropTypes.array,
+
+    /**
+     * 
+     */
+    center: PropTypes.array,
 
     /**
      * 

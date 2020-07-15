@@ -73,7 +73,11 @@ class DrawControls extends Component {
     
 
     constructor(props) {
+        super(props);
         this.addToolbar = this.addToolbar.bind(this);
+        this.state = {
+            editing: false
+        }
     }
 
     componentDidMount() {
@@ -113,8 +117,9 @@ class DrawControls extends Component {
         map.on(L.Draw.Event.CREATED, (e) => {
             const type = e.layerType;
             const layer = e.layer;
+            // console.log("the magic disappearing layer: ", layer)
             this.context.drawLayer.addLayer(layer)
-            
+            console.log("layers in DL after add: ", this.context.drawLayer.getLayers())
             if (props.syncDrawings) {
                 this.context.syncedDrawLayerDelete(type);
                 const newLayer = {type: type}
@@ -140,10 +145,16 @@ class DrawControls extends Component {
 
                 case "marker":
                     props.syncDrawings && (newLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
+                    // console.log("layers in DL after add to syncedLayer: ", this.context.drawLayer.getLayers())
                     this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
+                    // console.log("layers in DL after emitting marker coordinates: ", this.context.drawLayer.getLayers())
                     this.removeLayers("marker", drawControl);
+                    // console.log("layers in DL after remove layers: ", this.context.drawLayer.getLayers())
+
+                    
                     break;
             }
+            console.log("DL after finishing the method: ", this.context.drawLayer.getLayers())
             props.syncDrawings && (this.context.syncedDrawLayerAdd([newLayer]));
         });
         
@@ -185,9 +196,12 @@ class DrawControls extends Component {
                         console.log(editedLayer)
                         break;
                 }
+                console.log(editedLayer)
                 props.syncDrawings && (newLayers.push(editedLayer));
             });
+            console.log("I got here")
             props.syncDrawings && (this.context.syncedDrawLayerAdd(newLayers));
+            this.setState({editing: false});
         });
 
         map.on(L.Draw.Event.DELETED, (e) => {
@@ -198,6 +212,14 @@ class DrawControls extends Component {
             }
         })
 
+        map.on('draw:editstart', (e) => {
+            this.setState({editing: true});
+        })
+
+        // map.on('draw:editstop', (e) => {
+            
+        // })
+
         map.on('click', (e) => {
             const circleMarker = {
                 type: "circleMarker",
@@ -205,11 +227,13 @@ class DrawControls extends Component {
                 color: "red",
                 radius: 4,
             }
-            this.context.drawLayer.addLayer(L.circleMarker(circleMarker.center, circleMarker));
-            this.removeLayers("circleMarker", drawControl);
-            if (props.syncDrawings) {
-                this.context.syncedDrawLayerDelete(["circleMarker"]);
-                this.context.syncedDrawLayerAdd([circleMarker]);
+            if (!this.state.editing) {
+                this.context.drawLayer.addLayer(L.circleMarker(circleMarker.center, circleMarker));
+                this.removeLayers("circleMarker", drawControl);
+                if (props.syncDrawings) {
+                    this.context.syncedDrawLayerDelete(["circleMarker"]);
+                    this.context.syncedDrawLayerAdd([circleMarker]);
+                }
             }
         })
 

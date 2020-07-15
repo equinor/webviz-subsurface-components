@@ -40,7 +40,8 @@ class CompositeMapLayers extends Component {
             maxvalue: newLayer.data[0].maxvalue
         };
         this.updateStateForColorbar(newState); 
-        
+        console.log("this is a tileLayer:", curLayer.getLayers()[0] instanceof L.TileWebGLLayer);
+        console.log("this is an imageLayer:", curLayer.getLayers()[0] instanceof L.ImageWebGLOverlay);
         switch(newLayer.data[0].type) {
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
@@ -49,7 +50,6 @@ class CompositeMapLayers extends Component {
                 break;
 
             case 'tile':
-
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
                 });
@@ -62,7 +62,7 @@ class CompositeMapLayers extends Component {
             this.reSyncDrawLayer();
         }
         if (prevProps.layers !== this.props.layers) {
-
+            console.log("updating")
             const layers = (this.props.layers || []).filter(layer => layer.id);
             for (const propLayerData of layers) {
                 switch(propLayerData.action) {
@@ -227,6 +227,8 @@ class CompositeMapLayers extends Component {
                 ...imageData,
             })
         }
+        console.log("add image returns a ImageWebGLOverlay", newImageLayer instanceof L.ImageWebGLOverlay)
+        console.log("add image returns a ImageOverlay", newImageLayer instanceof L.ImageOverlay)
         return newImageLayer;
     }
 
@@ -377,6 +379,7 @@ class CompositeMapLayers extends Component {
     }
 
     reSyncDrawLayer = () => {
+        console.log("DL in CML: ", this.context.drawLayer.getLayers())
         this.context.drawLayer.clearLayers();
         for (const item of this.context.syncedDrawLayer.data) {
             this.addItem(item, this.context.drawLayer, false);
