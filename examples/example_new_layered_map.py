@@ -216,7 +216,7 @@ if __name__ == "__main__":
             #     ],
             # })
             layers.append({
-                "name": "surface",
+                "name": "Something",
                 "id": 2,
                 "baseLayer": True,
                 "checked": False,
@@ -224,35 +224,16 @@ if __name__ == "__main__":
                 "data": [
                     {
                         "type": "image",
-                        "url": array_to_png(zvalues.copy()),
+                        "url": map_data,
                         "allowHillshading": True,
                         "colormap": colormap,
-                        "unit": "",    
-                        "minvalue": None,
-                        "maxvalue": None,
-                        "bounds": [[0,0], [30, 30]],
+                        "unit": "m",    
+                        "minvalue": min_value,
+                        "maxvalue": max_value,
+                        "bounds": [[0, 0], [-30, -30]],
                     },
                 ],
             })
-            # layers.append({
-            #     "name": "Something",
-            #     "id": 2,
-            #     "baseLayer": True,
-            #     "checked": False,
-            #     "action": "add",
-            #     "data": [
-            #         {
-            #             "type": "image",
-            #             "url": map_data,
-            #             "allowHillshading": True,
-            #             "colormap": colormap,
-            #             "unit": "m",    
-            #             "minvalue": min_value,
-            #             "maxvalue": max_value,
-            #             "bounds": [[0, 0], [-30, -30]],
-            #         },
-            #     ],
-            # })
         return layers
 
     def update_layer(layers: List, colorScale: List[str]) -> List:

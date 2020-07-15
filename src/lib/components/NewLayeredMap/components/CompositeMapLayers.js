@@ -56,14 +56,12 @@ class CompositeMapLayers extends Component {
                 break;
         }
     }
-
+    
     componentDidUpdate(prevProps) {
+        if (this.props.syncDrawings) {
+            this.reSyncDrawLayer();
+        }
         if (prevProps.layers !== this.props.layers) {
-            
-            // Resync the draw layer when layers update
-            if (this.props.syncDrawings) {
-                this.reSyncDrawLayer();
-            }
 
             const layers = (this.props.layers || []).filter(layer => layer.id);
             for (const propLayerData of layers) {
@@ -148,8 +146,19 @@ class CompositeMapLayers extends Component {
         return  this.addTooltip(item, 
                     (L.circle(center, {
                         color: item.color || "red",
-                        center : yx(item.center),
+                        center : center,
                         radius : item.radius
+                    })
+        ));
+    }
+
+    makecircleMarker = (item, swapXY) => {
+        const center = swapXY ? yx(item.center) : item.center;
+        return  this.addTooltip(item, 
+                    (L.circleMarker(center, {
+                        color: item.color || "red",
+                        center : center,
+                        radius : item.radius || 4,
                     })
         ));
     }
@@ -267,16 +276,16 @@ class CompositeMapLayers extends Component {
                 layerGroup.addLayer(this.makeCircle(item, swapXY));
                 break;
             
-            case "marker":
-                layerGroup.addLayer(this.makeMarker(item, swapXY));
+            case "circleMarker":
+                layerGroup.addLayer(this.makecircleMarker(item, swapXY));
                 break;
             
             case "marker":
-                layerGroup.addLayer(this.makeMarker(item));
+                layerGroup.addLayer(this.makeMarker(item, swapXY));
                 break;
                 
             case "image":
-                const imageLayer = this.addImage(item);
+                const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
                     this.setFocusedImageLayer(imgLayer.getUrl(), imgLayer.getCanvas(), imgLayer.options.minvalue, imgLayer.options.maxvalue);
@@ -296,7 +305,6 @@ class CompositeMapLayers extends Component {
         L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
     }
 
-    // TODO: generalize for drawlayer
     createMultipleLayers() {
         this.addScaleLayer(this.props.map);
         const layers = this.props.layers;
@@ -360,12 +368,6 @@ class CompositeMapLayers extends Component {
         this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     }
 
-    updateDrawLayer = (newLayerData) => {
-        this.state.drawLayer.clearLayers();
-        for (const item of newLayerData) {
-            this.addItem(item, this.state.drawLayer);
-        }
-    }
 
     setFocusedImageLayer = (url, onScreenCanvas, minvalue, maxvalue) => {
         const updateFunc = this.context.setFocusedImageLayer;
@@ -380,6 +382,7 @@ class CompositeMapLayers extends Component {
             this.addItem(item, this.context.drawLayer, false);
         }
     }
+    
   
     render() {
         return (

@@ -149,12 +149,15 @@ class NewLayeredMap extends Component {
         this.redrawSyncedMaps();
     }
 
-    syncedDrawLayerDelete = (layerType) => {
-        // console.log(layerType)
+    syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
         NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
-            return drawing.type !== layerType;
+            return !layerTypes.includes(drawing.type);
         })
+        if (shouldRedraw) {
+            this.redrawSyncedMaps();
+        }
     }
+
     redrawSyncedMaps = () => {
         for (const id of this.props.syncedMaps) {
             NewLayeredMap.mapReferences[id].forceUpdate(); 
@@ -169,8 +172,7 @@ class NewLayeredMap extends Component {
             focusedImageLayer: { url: url, canvas: onScreenCanvas, minvalue: minvalue, maxvalue: maxvalue}
         })
     }
-
-
+    
     render() {   
         
         return (
