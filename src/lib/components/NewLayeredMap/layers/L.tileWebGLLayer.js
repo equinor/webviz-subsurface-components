@@ -209,7 +209,11 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
 	_initColormap: function() {
 		const colorScale = this.options.colorScale;
-        this._colormapUrl = buildColormap(colorScale);
+		if(!colorScale) {
+			this._colormapUrl = null;
+		} else {
+			this._colormapUrl = buildColormap(colorScale);
+		}
 	}
 
 });

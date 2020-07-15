@@ -41,7 +41,15 @@ if __name__ == "__main__":
         mouseCoords={
             "position": "bottomleft"
         },
-        colorBar={}
+        colorBar={
+            "position": "bottomright"
+        },
+        scaleY={
+
+        },
+        drawControls={
+            
+        }
         
     )
 
@@ -135,8 +143,11 @@ if __name__ == "__main__":
                         {
                             "type": "image",
                             "colorScale": {
-                                "colors": colorscale
+                                "colors": colorscale,
+                                "prefixZeroAlpha": True,
                             },
+                            "minvalue": 1200,
+                            "maxvalue": 2200
                         }
                     ],
                    
