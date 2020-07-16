@@ -130,9 +130,50 @@ app.run_server(debug=True)
 
 ## 🔰 Documentations
 
-### ❤ ColorScales
+### ❤ **ColorScales**
 
-### 🌋 Shaders
+**Description**
+
+Colorscale property is used to generate and apply a colormap to a desired layer.
+It is capable of doing so by either generating a colormap from hexadecimal colors
+provided by the user or by user providing the colormap directly (see examples below)
+
+<br /> 
+
+**Options**
+
+| Name | Type  | Description  |
+|-----------------|------------------|---------------|
+| colors          | Array of strings | Used when generating a colormap based on hexadecimal values. Each of the hexadecimal color value should be represented  as a string within the array.                                            |
+| prefixAlphaZero | Boolean          | Indicates whether the first color of the colormap should be set to transparent.                                                                                                                  |
+| scaleType       | String           | Indicates the type of scale that should be used when generating the colormap. It is set to linear by default. Currently supported scale types:  	• "log" 	• "linear".                        |
+| cutPointMin     | Integer          | Indicates the minimum height value represented in the map. Any value below it is set to transparent. If a value is lower than the minimum global value, it is set to the global minimum.  |
+| cutPointMax     | Integer          | Indicates the maximum height value represented in the map. Any value below it is set to transparent. If a value is higher than the maximum global value, it is set to the global maximum. |
+
+<br /> 
+
+**Example usage**
+
+The colorscale may be used in one of the following ways:
+
+ - Specifying the hexadecimal color array along with the desired options as an      object
+
+
+        "colorScale":  {
+            "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+            "prefixZeroAlpha": false,
+            "scaleType": "linear",
+            "cutPointMin": 3000,
+            "cutPointMax": 3513
+        },
+
+ - Assigning a colormap to the colorscale directly as a string
+    
+
+        "colorscale: "data:image/png;base64,    iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
+
+
+### 🌋 **Shaders**
 
 ### 🏴‍☠️Options 
 
