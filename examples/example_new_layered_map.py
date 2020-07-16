@@ -137,7 +137,7 @@ if __name__ == "__main__":
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
         id="example-map",
         syncedMaps=["example-map2"],
-        syncDrawings=True, 
+        # syncDrawings=True, 
         layers=layers,
         switch={
             "value": False,
@@ -198,7 +198,7 @@ if __name__ == "__main__":
                 ]),
                 layered_map_component,
                 layered_map_component2,
-            ], style={'display': 'grid', 'gridTemplateColumns': '400px 530px 530px'}),
+            ], style={'display': 'grid', 'gridTemplateColumns': '400px 530px 530px', 'minHeight': '90vh'}),
             html.Pre(id="polyline"),
             html.Pre(id="marker"),
             html.Pre(id="polygon"),
