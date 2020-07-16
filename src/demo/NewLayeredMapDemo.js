@@ -35,7 +35,7 @@ const NewLayeredMapDemo = () => {
     }
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", height: '500px'}}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", height: '90vh'}}>
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
@@ -54,6 +54,9 @@ const NewLayeredMapDemo = () => {
 
                     minZoom={-5}
                     // zoom = {-5}
+                    colorBar={{
+                        position: 'bottomleft'
+                    }}
                     scaleY={{
                         scaleY: 1,
                         minScaleY: 1,
@@ -78,15 +81,15 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            <div>
+            {/* <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-3"]}
                     syncDrawings={true}
                     // layers={exampleData.layers}
                     layers={layers}
-                    /*center={[432205, 6475078], [432205, 6475078]} */
-                    // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                    // center={[432205, 6475078], [432205, 6475078]}
+                    // bounds={[[432205, 6475078], [437720, 6481113]]}
                     // crs="earth"
                     crs="simple"
                     minZoom={-5}
@@ -124,7 +127,7 @@ const NewLayeredMapDemo = () => {
                     // center={[0, 0]}
                     crs="simple"
                     // center={[432205, 6475078], [432205, 6475078]}
-                    // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                    // bounds={[[432205, 6475078], [437720, 6481113]]}
                     minZoom={-5}
                     // scaleY={{
                     //     scaleY: 1,
@@ -146,7 +149,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div>
+            </div> */}
         </ div>
         
     )
