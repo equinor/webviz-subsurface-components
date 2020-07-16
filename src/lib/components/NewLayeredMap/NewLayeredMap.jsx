@@ -48,8 +48,8 @@ class NewLayeredMap extends Component {
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
-            center: props.center || [6475078, 432205],
-            // center: props.center || [0, 0],
+            // center: [432205, 6475078],
+            center: props.center || [0, 0],
             bounds: props.bounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
@@ -73,7 +73,6 @@ class NewLayeredMap extends Component {
             attributionControl: false,
             zoomAnimation: true,
         });
-
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
@@ -141,7 +140,7 @@ class NewLayeredMap extends Component {
         for (const layer of newLayers) {
             NewLayeredMap.syncedDrawLayer.data.push(layer);
         }
-        this.redrawSyncedMaps();
+        this.redrawAllSyncedMaps();
     }
 
     syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
@@ -149,15 +148,18 @@ class NewLayeredMap extends Component {
             return !layerTypes.includes(drawing.type);
         })
         if (shouldRedraw) {
-            this.redrawSyncedMaps();
+            this.redrawAllSyncedMaps();
         }
     }
 
-    redrawSyncedMaps = () => {
+    redrawAllSyncedMaps = () => {
         for (const id of this.props.syncedMaps) {
             const otherMap = NewLayeredMap.mapReferences[id];
             otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
         }
+        // When using the component in dash with multiple maps drawing won't work
+        // If not added to the map through the reSyncDrawLayer due to how setProps works
+        this.forceUpdate();
     }
 
     /**
@@ -279,10 +281,16 @@ NewLayeredMap.propTypes = {
         position: PropTypes.string,
     }),
 
+    center: PropTypes.array,
     /**
      * 
      */
     bounds: PropTypes.array,
+
+    /**
+     * 
+     */
+    center: PropTypes.array,
 
     /**
      * 

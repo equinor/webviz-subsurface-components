@@ -42,38 +42,14 @@ const getShapeType = layer => {
     throw new Error("Unknown shape type");
 };
 
-class DrawControls extends Component {
-
-    // TODO: make it so that only data stays here, and the layergroup is initiated in CML
-    static syncedDrawLayer = {
-        "name": "syncedDrawLayer",
-        "id": 19, 
-        "action": "update",
-        "checked": true,
-        "baseLayer": false,
-        "data": [
-            {
-                "type": "marker",
-                "position": [435200, 6478000],
-                "tooltip": "This is a blue marker"
-            },
-            {
-                "type": "polygon",
-                "positions": [
-                    [436204, 6475077],
-                    [438204, 6480077],
-                    [432204, 6475077]
-                ],
-                "color": "blue",
-                "tooltip": "This is a blue polygon"
-            }
-        ]
-    }
-
-    
+class DrawControls extends Component {    
 
     constructor(props) {
+        super(props);
         this.addToolbar = this.addToolbar.bind(this);
+        this.state = {
+            editing: false
+        }
     }
 
     componentDidMount() {
@@ -189,6 +165,7 @@ class DrawControls extends Component {
                 props.syncDrawings && (newLayers.push(editedLayer));
             });
             props.syncDrawings && (this.context.syncedDrawLayerAdd(newLayers));
+            this.setState({editing: false});
         });
 
         map.on(L.Draw.Event.DELETED, (e) => {
@@ -196,6 +173,15 @@ class DrawControls extends Component {
                 const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
                 this.context.syncedDrawLayerDelete(deletedLayers, true);
             }
+            this.setState({editing: false});
+        })
+
+        map.on('draw:editstart', (e) => {
+            this.setState({editing: true});
+        })
+
+        map.on('draw:deletestart', (e) => {
+            this.setState({editing: true});
         })
 
         map.on('click', (e) => {
@@ -205,11 +191,13 @@ class DrawControls extends Component {
                 color: "red",
                 radius: 4,
             }
-            this.context.drawLayer.addLayer(L.circleMarker(circleMarker.center, circleMarker));
-            this.removeLayers("circleMarker", drawControl);
-            if (props.syncDrawings) {
-                this.context.syncedDrawLayerDelete(["circleMarker"]);
-                this.context.syncedDrawLayerAdd([circleMarker]);
+            if (!this.state.editing) {
+                this.context.drawLayer.addLayer(L.circleMarker(circleMarker.center, circleMarker));
+                this.removeLayers("circleMarker", drawControl);
+                if (props.syncDrawings) {
+                    this.context.syncedDrawLayerDelete(["circleMarker"]);
+                    this.context.syncedDrawLayerAdd([circleMarker]);
+                }
             }
         })
 
