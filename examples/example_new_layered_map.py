@@ -170,9 +170,11 @@ if __name__ == "__main__":
             html.Pre(id="polyline"),
             html.Pre(id="marker"),
             html.Pre(id="polygon"),
+            html.Pre(id="polyline2"),
+            html.Pre(id="marker2"),
+            html.Pre(id="polygon2"),
         ]
     )
- 
 
     @app.callback(
         Output('example-map', 'layers'),
@@ -347,6 +349,6 @@ if __name__ == "__main__":
     @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
     def get_edited_line(coords):
         return f"Edited closed polygon: {json.dumps(coords)}"
-       
+
 
     app.run_server(debug=True)

@@ -42,35 +42,7 @@ const getShapeType = layer => {
     throw new Error("Unknown shape type");
 };
 
-class DrawControls extends Component {
-
-    // TODO: make it so that only data stays here, and the layergroup is initiated in CML
-    static syncedDrawLayer = {
-        "name": "syncedDrawLayer",
-        "id": 19, 
-        "action": "update",
-        "checked": true,
-        "baseLayer": false,
-        "data": [
-            {
-                "type": "marker",
-                "position": [435200, 6478000],
-                "tooltip": "This is a blue marker"
-            },
-            {
-                "type": "polygon",
-                "positions": [
-                    [436204, 6475077],
-                    [438204, 6480077],
-                    [432204, 6475077]
-                ],
-                "color": "blue",
-                "tooltip": "This is a blue polygon"
-            }
-        ]
-    }
-
-    
+class DrawControls extends Component {    
 
     constructor(props) {
         super(props);
@@ -117,9 +89,7 @@ class DrawControls extends Component {
         map.on(L.Draw.Event.CREATED, (e) => {
             const type = e.layerType;
             const layer = e.layer;
-            // console.log("the magic disappearing layer: ", layer)
             this.context.drawLayer.addLayer(layer)
-            console.log("layers in DL after add: ", this.context.drawLayer.getLayers())
             if (props.syncDrawings) {
                 this.context.syncedDrawLayerDelete(type);
                 const newLayer = {type: type}
@@ -145,16 +115,10 @@ class DrawControls extends Component {
 
                 case "marker":
                     props.syncDrawings && (newLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
-                    // console.log("layers in DL after add to syncedLayer: ", this.context.drawLayer.getLayers())
                     this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
-                    // console.log("layers in DL after emitting marker coordinates: ", this.context.drawLayer.getLayers())
                     this.removeLayers("marker", drawControl);
-                    // console.log("layers in DL after remove layers: ", this.context.drawLayer.getLayers())
-
-                    
                     break;
             }
-            console.log("DL after finishing the method: ", this.context.drawLayer.getLayers())
             props.syncDrawings && (this.context.syncedDrawLayerAdd([newLayer]));
         });
         
@@ -193,13 +157,10 @@ class DrawControls extends Component {
                     
                     case "circleMarker":
                         props.syncDrawings && (editedLayer["center"] = [layer._latlng.lat, layer._latlng.lng]);
-                        console.log(editedLayer)
                         break;
                 }
-                console.log(editedLayer)
                 props.syncDrawings && (newLayers.push(editedLayer));
             });
-            console.log("I got here")
             props.syncDrawings && (this.context.syncedDrawLayerAdd(newLayers));
             this.setState({editing: false});
         });
@@ -210,15 +171,16 @@ class DrawControls extends Component {
                 const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
                 this.context.syncedDrawLayerDelete(deletedLayers, true);
             }
+            this.setState({editing: false});
         })
 
         map.on('draw:editstart', (e) => {
             this.setState({editing: true});
         })
 
-        // map.on('draw:editstop', (e) => {
-            
-        // })
+        map.on('draw:deletestart', (e) => {
+            this.setState({editing: true});
+        })
 
         map.on('click', (e) => {
             const circleMarker = {

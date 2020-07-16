@@ -28,14 +28,6 @@ const stringToCRS = (crsString) => {
     }
 }
 
-// Contexts
-// export const DrawLayerContext = React.createContext({drawLayer: "hi there"});
-// console.log("DrawLayerContext in newlayeredmap", DrawLayerContext)
-
-// TODO: make context work
-
-// const DrawLayerContext = React.createContext({hi: "hi there fella"});
-
 class NewLayeredMap extends Component {
 
     static mapReferences = {};
@@ -79,7 +71,7 @@ class NewLayeredMap extends Component {
             maxZoom: this.state.maxZoom,
             attributionControl: false,
         });
-        console.log("using New BUILD");
+        console.log("ultra new main frame here");
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);

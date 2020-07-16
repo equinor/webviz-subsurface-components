@@ -40,8 +40,6 @@ class CompositeMapLayers extends Component {
             maxvalue: newLayer.data[0].maxvalue
         };
         this.updateStateForColorbar(newState); 
-        console.log("this is a tileLayer:", curLayer.getLayers()[0] instanceof L.TileWebGLLayer);
-        console.log("this is an imageLayer:", curLayer.getLayers()[0] instanceof L.ImageWebGLOverlay);
         switch(newLayer.data[0].type) {
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
@@ -62,7 +60,6 @@ class CompositeMapLayers extends Component {
             this.reSyncDrawLayer();
         }
         if (prevProps.layers !== this.props.layers) {
-            console.log("updating")
             const layers = (this.props.layers || []).filter(layer => layer.id);
             for (const propLayerData of layers) {
                 switch(propLayerData.action) {
@@ -96,7 +93,6 @@ class CompositeMapLayers extends Component {
     }
 
     componentWillUnmount() {
-        // TODO: Remove all layers from the map
         const map = this.props.map
         map.eachLayer(function (layer) {
             map.removeLayer(layer);
@@ -226,9 +222,7 @@ class CompositeMapLayers extends Component {
             newImageLayer = L.imageOverlay(imageData.url, bounds, {
                 ...imageData,
             })
-        }
-        console.log("add image returns a ImageWebGLOverlay", newImageLayer instanceof L.ImageWebGLOverlay)
-        console.log("add image returns a ImageOverlay", newImageLayer instanceof L.ImageOverlay)
+        } 
         return newImageLayer;
     }
 
@@ -379,8 +373,14 @@ class CompositeMapLayers extends Component {
     }
 
     reSyncDrawLayer = () => {
-        console.log("DL in CML: ", this.context.drawLayer.getLayers())
-        this.context.drawLayer.clearLayers();
+        /**
+         * For some reason moving the marker while using multiple maps in dash
+         * throws an error in leaflet. Everything works fine as long as this is
+         * surrounded in a try catch
+         */ 
+        try {
+            this.context.drawLayer.clearLayers();
+        } catch (error) {}
         for (const item of this.context.syncedDrawLayer.data) {
             this.addItem(item, this.context.drawLayer, false);
         }
