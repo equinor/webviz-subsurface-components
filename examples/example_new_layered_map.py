@@ -14,7 +14,6 @@ import webviz_subsurface_components
 
 
 from example_layered_map import array_to_png
-# TODO: Remove tile_server before pushing
 from tile_server import tile_server
 
 if __name__ == "__main__":
@@ -114,12 +113,53 @@ if __name__ == "__main__":
                 }
             ]
         },
+        {
+            "name": "Something",
+            "id": 2,
+            "baseLayer": True,
+            "checked": True,
+            "action": "add",
+            "data": [
+                {
+                    "type": "image",
+                    "url": map_data,
+                    "allowHillshading": True,
+                    "colormap": colormap,
+                    "unit": "m",    
+                    "minvalue": min_value,
+                    "maxvalue": max_value,
+                    "bounds": [[0, 0], [-30, -30]],
+                },
+            ],
+        }
     ]
 
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
+<<<<<<< HEAD
         center= [432205, 6475078],
         bounds = [[432205, 6475078], [437720, 6481113]],       
         id="example-map", 
+=======
+        id="example-map",
+        syncedMaps=["example-map2"],
+        syncDrawings=True, 
+        layers=layers,
+        switch={
+            "value": False,
+            "label": "Hillshading",
+        },
+        drawTools={
+            "drawMarker": True,
+            "drawPolygon": True,
+            "drawPolyline": True,
+            "position": "topright",   
+        }
+    )
+    layered_map_component2 = webviz_subsurface_components.NewLayeredMap(
+        id="example-map2",
+        syncedMaps=["example-map"],
+        syncDrawings=True, 
+>>>>>>> ea38f9bd917a867e8b2f484c45377da9d13068da
         layers=layers,
         switch={
             "value": False,
@@ -163,13 +203,16 @@ if __name__ == "__main__":
                     html.P(id='output', children=''),
                 ]),
                 layered_map_component,
-            ], style={'display': 'grid', 'gridTemplateColumns': '400px auto'}),
+                layered_map_component2,
+            ], style={'display': 'grid', 'gridTemplateColumns': '400px 530px 530px'}),
             html.Pre(id="polyline"),
             html.Pre(id="marker"),
             html.Pre(id="polygon"),
+            html.Pre(id="polyline2"),
+            html.Pre(id="marker2"),
+            html.Pre(id="polygon2"),
         ]
     )
- 
 
     @app.callback(
         Output('example-map', 'layers'),
@@ -383,9 +426,16 @@ if __name__ == "__main__":
     # def get_edited_line(coords):
     #     return f"Edited marker: {json.dumps(coords)}"
 
+<<<<<<< HEAD
     # @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
     # def get_edited_line(coords):
     #     return f"Edited closed polygon: {json.dumps(coords)}"
        
+=======
+    @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
+    def get_edited_line(coords):
+        return f"Edited closed polygon: {json.dumps(coords)}"
+
+>>>>>>> ea38f9bd917a867e8b2f484c45377da9d13068da
 
     app.run_server(debug=True)

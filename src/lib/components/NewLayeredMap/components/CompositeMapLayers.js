@@ -40,6 +40,7 @@ class CompositeMapLayers extends Component {
 
     updateLayer = (curLayer, newLayer) => {
 <<<<<<< HEAD
+<<<<<<< HEAD
         const cutOffPoints = this.getColorCutOffPoints(
             newLayer.data[0].minvalue,
             newLayer.data[0].maxvalue,
@@ -56,6 +57,9 @@ class CompositeMapLayers extends Component {
         
 =======
 >>>>>>> fa8f127928f76e9d0591ecbca5fd3075803b4ae3
+=======
+
+>>>>>>> ea38f9bd917a867e8b2f484c45377da9d13068da
         switch(newLayer.data[0].type) {
             
             case 'image':
@@ -117,7 +121,6 @@ class CompositeMapLayers extends Component {
     }
 
     componentWillUnmount() {
-        // TODO: Remove all layers from the map
         const map = this.props.map
         map.eachLayer(function (layer) {
             map.removeLayer(layer);
@@ -233,6 +236,7 @@ class CompositeMapLayers extends Component {
 
         const bounds = (imageData.bounds || []).map(xy => yx(xy));
         let newImageLayer = null;
+
         
         newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
             ...imageData,
@@ -404,7 +408,14 @@ class CompositeMapLayers extends Component {
     }
 
     reSyncDrawLayer = () => {
-        this.context.drawLayer.clearLayers();
+        /**
+         * For some reason moving the marker while using multiple maps in dash
+         * throws an error in leaflet. Everything works fine as long as this is
+         * surrounded in a try catch
+         */ 
+        try {
+            this.context.drawLayer.clearLayers();
+        } catch (error) {}
         for (const item of this.context.syncedDrawLayer.data) {
             this.addItem(item, this.context.drawLayer, false);
         }
