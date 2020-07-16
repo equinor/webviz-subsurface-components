@@ -6,14 +6,15 @@
   * @typedef {Object} ColorScaleConfig
   * @property {Boolean|undefined} prefixZeroAlpha - Decides if the first color should have an alpha equals to 0.
   * @property {Boolean|undefined} suffixZeroAlpha - Decides if the last color should have an alpha equals to 0.
+  * @property {String} scaleType
+  * @property {Number} cutPointMin
+  * @property {Number} cutPointMax
   * @description A set of default configuration values for building colormaps. 
   */
 export const DEFAULT_COLORSCALE_CONFIG = {
     prefixZeroAlpha: false,
     suffixZeroAlpha: false,
     scaleType: 'linear',
-    cutPointMin: 0,
-    cutPointMax: 255,
 }
 
 /**
@@ -80,7 +81,7 @@ export const interpolateColors = (colors, steps = 256, config = {}) => {
  * @param {ColorScaleConfig} config
  * @returns {String} A dataURL-string.
  */
-export const buildColormap = (colors, config = {}) => {
+export const buildColormapWithCfg = (colors, config = {}) => {
     if(config.prefixZeroAlpha && colors.length > 0) {
         colors[0][3] = 0;
     }
@@ -117,6 +118,32 @@ export const buildColormap = (colors, config = {}) => {
 }
 
 /**
+ * 
+ * @param {String|Object|Array<String>} colorScale 
+ */
+export const buildColormap = (colorScale) => {
+    if(typeof colorScale === 'string') {
+        // The given colorScale is already a base64 image
+        return colorScale;
+    } 
+    else if(Array.isArray(colorScale)) {
+        // The given colorScale is an array of hexColors
+        return buildColormapFromHexColors(colorScale, DEFAULT_COLORSCALE_CONFIG);
+    } 
+    else if(typeof colorScale === 'object' || !colorScale) {
+        // The given colorScale is an object
+        /**
+         * @type {ColorScaleConfig}
+         */
+        const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
+        const colors = colorScaleCfg.colors;
+        return buildColormapFromHexColors(colors, colorScaleCfg);
+    } else {
+        return null;
+    }
+}
+
+/**
  * buildColormapFromHexColors builds a N x 1 colormap image based on an array of colors in hex-format.
  * @param {Array<String>} hexColors
  * @returns {String} A dataURL-string.
@@ -125,7 +152,7 @@ export const buildColormapFromHexColors = (hexColors, config = {}) => {
     const width = config.width || 256;
     const colors = hexColors.map(hexToRGB);
     const interpolated = interpolateColors(colors, width, config);
-    return buildColormap(interpolated, config);
+    return buildColormapWithCfg(interpolated, config);
 }
 
 /**

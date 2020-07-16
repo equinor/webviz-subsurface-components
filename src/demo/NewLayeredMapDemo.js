@@ -7,6 +7,14 @@ import NewLayeredMap from '../lib/components/NewLayeredMap';
 import exampleData from './example-data/new-layered-map.json';
 import { NewLayeredMap } from '../lib/index';
 
+const DEFAULT_COLORMAP = {
+    "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+    "prefixZeroAlpha": false,
+    "scaleType": "linear",
+    "cutPointMin": 2782,
+    "cutPointMax": 3513
+};
+
 const NewLayeredMapDemo = () => {
 
     const [switchValue, setSwitchValue] = useState(true);
@@ -16,35 +24,19 @@ const NewLayeredMapDemo = () => {
     const onChange = (changes) => {
         if(changes.switch) {
             setSwitchValue(changes.switch.value);
-            if (changes.switch.value == true) {
+            if (changes.switch.value === true) {
                 layers[0].data[0].shader.type = 'hillshading';
+                layers[0].data[0].colorScale = DEFAULT_COLORMAP;
             } else {
                 layers[0].data[0].shader.type = null;
+                layers[0].data[0].colorScale = null;
             }
         }
     }
 
-    // const colorArr = ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"];
-    // const colorArr2 = ["#09c12c", "#0b66bc", "#4e9ba3", "#73031b", "#428a67", "#0381a2", "#ece210", "#fb9f3a", "#fdca26", "#f0f921"];
-
-    // const onChange = (changes) => {
-    //     if(changes.switch) {
-    //         setSwitchValue(changes.switch.value);
-    //         if (changes.switch.value == true) {
-    //             layers[0].data[0].colorScale.colors = colorArr;
-    //         } else {
-    //             layers[0].data[0].colorScale.colors = colorArr2;
-    //         }
-    //     }
-    // }
-
-    const layer2 = JSON.parse(JSON.stringify(layers));
-    layer2[0].data[0].shader.type = 'none';
-    layer2[0].data[0].colorScale.prefixZeroAlpha = true;
-
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr auto" }}>
-            <div >
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", height: '90vh'}}>
+            <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
                     syncedMaps={["NewLayeredMap-2", "NewLayeredMap-3"]}
@@ -61,13 +53,16 @@ const NewLayeredMapDemo = () => {
                     // setProps={e => console.log(e)}
 
                     minZoom={-5}
-                    zoom = {-5}
-                    // scaleY={{
-                    //     scaleY: 1,
-                    //     minScaleY: 1,
-                    //     maxScaleY: 10,
-                    //     position: 'topleft',
-                    // }}
+                    // zoom = {-5}
+                    colorBar={{
+                        position: 'bottomleft'
+                    }}
+                    scaleY={{
+                        scaleY: 1,
+                        minScaleY: 1,
+                        maxScaleY: 10,
+                        position: 'topleft',
+                    }}
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,
@@ -75,8 +70,8 @@ const NewLayeredMapDemo = () => {
                         position: "topright",
                         
                     }}
-                    mousePosition = {{
-                        coordinatePosition: "bottomright",
+                    mouseCoords = {{
+                        position: "bottomright",
                     }}
                     switch={{
                         value: switchValue,
@@ -86,20 +81,19 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            <div >
+            {/* <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-3"]}
                     syncDrawings={true}
                     // layers={exampleData.layers}
                     layers={layers}
-                    /*center={[432205, 6475078], [432205, 6475078]} */
-                    // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                    // center={[432205, 6475078], [432205, 6475078]}
+                    // bounds={[[432205, 6475078], [437720, 6481113]]}
                     // crs="earth"
                     crs="simple"
                     minZoom={-5}
                     zoom = {-5} 
-                    // setProps={e => console.log(e)}
                     // scaleY={{
                     //     scaleY: 1,
                     //     minScaleY: 1,
@@ -133,7 +127,7 @@ const NewLayeredMapDemo = () => {
                     // center={[0, 0]}
                     crs="simple"
                     // center={[432205, 6475078], [432205, 6475078]}
-                    // bounds={[[432205, 6475078], [437720, 6481113]] /* [[432205, 6475078], [437720, 6481113]] */}
+                    // bounds={[[432205, 6475078], [437720, 6481113]]}
                     minZoom={-5}
                     // scaleY={{
                     //     scaleY: 1,
@@ -155,7 +149,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div>
+            </div> */}
         </ div>
         
     )

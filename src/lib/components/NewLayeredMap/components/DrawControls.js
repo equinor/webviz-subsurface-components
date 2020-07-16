@@ -94,6 +94,7 @@ class DrawControls extends Component {
                 this.context.syncedDrawLayerDelete(type);
                 const newLayer = {type: type}
             }
+
             switch(type) {
                 case "polyline":
                     const coords = layer._latlngs.map(p => {
@@ -124,9 +125,11 @@ class DrawControls extends Component {
         
     
         map.on(L.Draw.Event.EDITED, (e) => {
+            console.log("EDITED!");
             if (props.syncDrawings) {
                 const newLayers = []
             }
+
             e.layers.eachLayer(layer => {
                 const layerType = getShapeType(layer);
                 if (props.syncDrawings) {
@@ -166,7 +169,6 @@ class DrawControls extends Component {
         });
 
         map.on(L.Draw.Event.DELETED, (e) => {
-            
             if (props.syncDrawings) {
                 const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
                 this.context.syncedDrawLayerDelete(deletedLayers, true);

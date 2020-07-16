@@ -13,6 +13,8 @@ const NUMBER_DISCRETIZATION_LEVELS = 255;
 const MousePosition = (props) => {
     const { focusedImageLayer } = useContext(Context);
 
+    // As useState-values are not available in eventListeners,
+    // stateRef is. Using that to maintain state instead.
     const stateRef = useRef({});
 
     // ComponentDidMount
@@ -61,11 +63,17 @@ const MousePosition = (props) => {
     };
 
     const updateCanvas = async () => {
-        const { url, canvas, minvalue, maxvalue} = focusedImageLayer || {};
-        if(!url) {
+        if(!focusedImageLayer) {
             return;
         }
-        const onScreenCanvas = canvas;
+
+        const url = focusedImageLayer.getUrl ? focusedImageLayer.getUrl() : null;
+        const onScreenCanvas = focusedImageLayer.getCanvas ? focusedImageLayer.getCanvas() : null;
+        const minvalue = (focusedImageLayer.options || {}).minvalue;
+        const maxvalue = (focusedImageLayer.options || {}).maxvalue;
+        if(!url || !onScreenCanvas || !minvalue || !maxvalue) {
+            return;
+        }
 
         /**
          * @type {Image}
@@ -171,7 +179,7 @@ MousePosition.defaultProps = {
 
 MousePosition.propTypes = {
     position: PropTypes.string,
-    setProps: PropTypes.oneOfType([PropTypes.function, PropTypes.none]),
+    setProps: PropTypes.oneOfType([PropTypes.func, PropTypes.any]),
     map: PropTypes.object.isRequired,
     minvalue : PropTypes.number,
     maxvalue: PropTypes.number,

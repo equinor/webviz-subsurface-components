@@ -1,19 +1,22 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
+import Context from '../Context'
 
+// Leaflet
 import L from 'leaflet';
 import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
+
+// Components
 import ColorBar from './ColorBar'
-import Context from '../Context'
 
-
+// Helper functions
 const yx = ([x, y]) => {
     return [y, x];
 };
-const DEFAULT_BOUNDS = [[0, 0], [30, 30]];
 
-const DEFAULT_ELEVATION_SCALE = 0.03;
+// Constants
+const DEFAULT_BOUNDS = [[0, 0], [30, 30]];
 
 class CompositeMapLayers extends Component {
 
@@ -25,6 +28,7 @@ class CompositeMapLayers extends Component {
             layers: {
                 
             },
+            layerControl: null,
         }
     }
 
@@ -34,12 +38,7 @@ class CompositeMapLayers extends Component {
     }
 
     updateLayer = (curLayer, newLayer) => {
-        const newState = {
-            colorScale: newLayer.data[0].colorScale,
-            minvalue: newLayer.data[0].minvalue,
-            maxvalue: newLayer.data[0].maxvalue
-        };
-        this.updateStateForColorbar(newState); 
+
         switch(newLayer.data[0].type) {
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
@@ -97,7 +96,6 @@ class CompositeMapLayers extends Component {
         map.eachLayer(function (layer) {
             map.removeLayer(layer);
         });
-        this.state.layers = undefined; // ?
     }
 
     addTooltip = (item, shapeObject) => {
@@ -181,26 +179,8 @@ class CompositeMapLayers extends Component {
         };
 
     }
-
-    updateStateForColorbar = (newState) => {
-        const oldState = {
-            colorScale: this.state.colorScale,
-            minvalue: this.state.minvalue,
-            maxvalue: this.state.maxvalue
-        }
-        if (oldState !== newState) {
-            this.setState(newState);
-        }
-
-    }
     
     addImage = (imageData) => {
-        const newColorBarState = {
-            colorScale: imageData.colorScale,
-            minvalue: imageData.minvalue,
-            maxvalue: imageData.maxvalue
-        };
-        this.updateStateForColorbar(newColorBarState); 
 
         const cutOffPoints = this.getColorCutOffPoints(
             imageData.minvalue,
@@ -211,29 +191,20 @@ class CompositeMapLayers extends Component {
 
         const bounds = (imageData.bounds || []).map(xy => yx(xy));
         let newImageLayer = null;
-        if (imageData.colorScale){
-            newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
-                ...imageData,
-                colorScale: imageData.colorScale,
-                shader: imageData.shader,
-                ...cutOffPoints,
-            });
-        } else {
-            newImageLayer = L.imageOverlay(imageData.url, bounds, {
-                ...imageData,
-            })
-        } 
+
+        
+        newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
+            ...imageData,
+            colorScale: imageData.colorScale,
+            shader: imageData.shader,
+            ...cutOffPoints,
+        });
+        
         return newImageLayer;
     }
 
     addTile = (tileData) => {
-        const newColorBarState = {
-            colorScale: tileData.colorScale,
-            minvalue: tileData.minvalue,
-            maxvalue: tileData.maxvalue
-        };
-        this.updateStateForColorbar(newColorBarState); 
-
+     
         const cutOffPoints = this.getColorCutOffPoints(
             tileData.minvalue,
             tileData.maxvalue,
@@ -284,7 +255,7 @@ class CompositeMapLayers extends Component {
                 const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
-                    this.setFocusedImageLayer(imgLayer.getUrl(), imgLayer.getCanvas(), imgLayer.options.minvalue, imgLayer.options.maxvalue);
+                    this.setFocusedImageLayer(imgLayer);
                 });
 
                 break;
@@ -392,14 +363,11 @@ class CompositeMapLayers extends Component {
             <div>
                 <div>
                     {
-                        (this.state.colorScale && this.state.minvalue && this.state.maxvalue) &&
+                        (this.props.colorBar) &&
                         <ColorBar
-                            colorScale = {this.state.colorScale}
-                            minvalue = {this.state.minvalue}
-                            maxvalue = {this.state.maxvalue}
                             map = {this.props.map}
                             position = {(this.props.colorBar || {}).position}
-                            unit = {this.props.unit || "m"}
+                            unit = {(this.props.colorBar || {}).unit}
                         />
                     }
                 </div>

@@ -53,7 +53,8 @@ class NewLayeredMap extends Component {
             bounds: props.bounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
-            // Used to make possible to display z-value
+
+            // The imageLayer in focus - for calculating z value and showing colormap for
             focusedImageLayer: null,
         }
         
@@ -70,6 +71,7 @@ class NewLayeredMap extends Component {
             minZoom: this.state.minZoom,
             maxZoom: this.state.maxZoom,
             attributionControl: false,
+            zoomAnimation: true,
         });
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = this;
@@ -84,6 +86,7 @@ class NewLayeredMap extends Component {
     setEvents = (map) => {
 
         map.on('zoomanim', e => {
+            
             (this.props.syncedMaps || []).forEach(id => {
                 if(!NewLayeredMap.mapReferences[id]) {
                     return;
@@ -151,7 +154,8 @@ class NewLayeredMap extends Component {
 
     redrawAllSyncedMaps = () => {
         for (const id of this.props.syncedMaps) {
-            NewLayeredMap.mapReferences[id].forceUpdate(); 
+            const otherMap = NewLayeredMap.mapReferences[id];
+            otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
         }
         // When using the component in dash with multiple maps drawing won't work
         // If not added to the map through the reSyncDrawLayer due to how setProps works
@@ -161,19 +165,19 @@ class NewLayeredMap extends Component {
     /**
      * @param {HTMLCanvasElement} onScreenCanvas
      */
-    setFocucedImageLayer = (url, onScreenCanvas, minvalue, maxvalue) => {
+    setFocucedImageLayer = (layer) => {
         this.setState({
-            focusedImageLayer: { url: url, canvas: onScreenCanvas, minvalue: minvalue, maxvalue: maxvalue}
+            focusedImageLayer: layer,
         })
     }
     
     render() {   
         
         return (
-            <div>
+            <div style={{height: '100%', width: '100%'}}>
                 <div
                     ref={el => this.mapEl = el} 
-                    style={{height: '90vh'}}>
+                    style={{height: '100%'}}>
                         <Context.Provider value={{
                                 drawLayer: this.state.drawLayer,
                                 syncedDrawLayer: NewLayeredMap.syncedDrawLayer,

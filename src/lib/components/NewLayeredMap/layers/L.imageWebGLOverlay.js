@@ -1,6 +1,6 @@
 import L, { latLngBounds, Util, DomUtil, Bounds, Point} from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
-import { buildColormapFromHexColors, DEFAULT_COLORSCALE_CONFIG } from '../colorscale';
+import { buildColormap } from '../colorscale';
 
 /**
  * ImageWebGLOverlay is a layer that draws an image into the map
@@ -14,13 +14,12 @@ L.ImageWebGLOverlay = L.Layer.extend({
         /**
          * @param {Array<String>} - An array of hexcolors for defining the colormap used on the tiles.
          */
-        colorScale: ["#FFFFFF", "#000000"],
+        colorScale: null,
     },
 
     initialize: function(url, bounds, options) {
         this._url = url;
         this.setBounds(bounds);
-        this._CRS = options.CRS || null;
 
         Util.setOptions(this, options);
     },
@@ -58,12 +57,11 @@ L.ImageWebGLOverlay = L.Layer.extend({
 			viewreset: this._reset
         };
 
-        if (this._zoomAnimated) {
+        if (this._zoomAnimated) {   
 			events.zoomanim = this._animateZoom;
-		}
+        }
         
         return events;
-
     },
 
     getBounds: function () {
@@ -99,13 +97,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
     onLayerChanged: function(listener) {
         this._listener = listener;
     },
-    
-    /**
-     * @returns {HTMLCanvasElement} Returns the canvas element
-     */
-    getElement: function() {
-        return this._canvas;
-    },
 
     updateOptions: function(options) {
         options = Util.setOptions(this, {
@@ -117,7 +108,12 @@ L.ImageWebGLOverlay = L.Layer.extend({
             this._url = options.url;
         }
 
-		this._initColormap();
+        if(!options.colorScale) {
+            this._colormapUrl = null;
+        } else {
+            this._initColormap();
+        }
+
         this._draw();
         
         this._triggerOnChanged();
@@ -130,7 +126,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
         const canvasTag =  DomUtil.create('canvas');
         const onscreenCanvasTag = DomUtil.create('canvas');
 
-        
         const gl = this._gl = canvasTag.getContext("webgl", {
             premultipliedAlpha: false
         })
@@ -149,8 +144,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
         drawFunc(this._gl, this._canvas, this._url, this._colormapUrl, {
             ...this.options,
             shader: this.options.shader,
-            scale: this.options.colorScale.scale,
-            cutoffPoints: this.options.cutoffPoints,
         })
         .then(() => {
             // Draw from the webgl-canvas to the onscreenCanvas
@@ -164,30 +157,14 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
     _initColormap: function() {
         const colorScale = this.options.colorScale;
-
-        if(typeof colorScale === 'string') {
-            // The given colorScale is a base64 image
-            this._colormapUrl = colorScale;
-        } 
-        else if(Array.isArray(colorScale)) {
-            // The given colorScale is an array of hexColors
-            const colors = colorScale;
-            this._colormapUrl = buildColormapFromHexColors(colors);
-        } 
-        else if(typeof colorScale === 'object' && colorScale !== null) {
-            // The given colorScale is an object
-            /**
-             * @type {import('../colorscale/index').ColorScaleConfig}
-             */
-            
-            const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
-            const colors = colorScaleCfg.colors;
-            this._colormapUrl = buildColormapFromHexColors(colors, colorScaleCfg);
-        }
+		if(!colorScale) {
+			this._colormapUrl = null;
+		} else {
+			this._colormapUrl = buildColormap(colorScale);
+		}
     },
 
     _reset: function() {
-        const canvas = this._canvas;
         const onscreenCanvas = this._onscreenCanvas;
 
         const bounds = this._calcBounds();
@@ -195,7 +172,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
 
         // Update the position of the canvas-element
-        DomUtil.setPosition(canvas, bounds.min);
         DomUtil.setPosition(onscreenCanvas, bounds.min);
 
         onscreenCanvas.style.width = `${size.x}px`;
