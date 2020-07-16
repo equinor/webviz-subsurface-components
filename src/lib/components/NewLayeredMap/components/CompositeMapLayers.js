@@ -40,7 +40,6 @@ class CompositeMapLayers extends Component {
             maxvalue: newLayer.data[0].maxvalue
         };
         this.updateStateForColorbar(newState); 
-        
         switch(newLayer.data[0].type) {
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
@@ -284,7 +283,7 @@ class CompositeMapLayers extends Component {
                 const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
-                    this.setFocusedImageLayer(imgLayer.getUrl(), imgLayer.getCanvas(), imgLayer.options.minvalue, imgLayer.options.maxvalue);
+                    this.setFocusedImageLayer(imgLayer);
                 });
 
                 break;
