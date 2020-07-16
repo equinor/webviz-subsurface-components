@@ -128,16 +128,16 @@ export const buildColormap = (colorScale) => {
     } 
     else if(Array.isArray(colorScale)) {
         // The given colorScale is an array of hexColors
-        return buildColormapFromHexColors(colorScale, DEFAULT_COLORSCALE_CONFIG);
+        return colorScale.length > 0 ? buildColormapFromHexColors(colorScale, DEFAULT_COLORSCALE_CONFIG) : null;
     } 
-    else if(typeof colorScale === 'object' || !colorScale) {
+    else if(typeof colorScale === 'object') {
         // The given colorScale is an object
         /**
          * @type {ColorScaleConfig}
          */
         const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
         const colors = colorScaleCfg.colors;
-        return buildColormapFromHexColors(colors, colorScaleCfg);
+        return colors && colors.length > 0 ? buildColormapFromHexColors(colors, colorScaleCfg) : null;
     } else {
         return null;
     }

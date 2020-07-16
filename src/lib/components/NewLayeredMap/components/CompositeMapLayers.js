@@ -195,6 +195,8 @@ class CompositeMapLayers extends Component {
         
         newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
             ...imageData,
+            minvalue: imageData.minvalue,
+            maxvalue: imageData.maxvalue,
             colorScale: imageData.colorScale,
             shader: imageData.shader,
             ...cutOffPoints,
@@ -216,6 +218,8 @@ class CompositeMapLayers extends Component {
         if(tileData.colorScale) {
             newTileLayer = L.tileWebGLLayer(tileData.url, {
                 ...tileData,
+                minvalue: tileData.minvalue,
+                maxvalue: tileData.maxvalue,
                 colorScale: tileData.colorScale,
                 shader: tileData.shader,
                 ...cutOffPoints,
