@@ -39,23 +39,6 @@ class CompositeMapLayers extends Component {
     }
 
     updateLayer = (curLayer, newLayer) => {
-<<<<<<< HEAD
-        const cutOffPoints = this.getColorCutOffPoints(
-            newLayer.data[0].minvalue,
-            newLayer.data[0].maxvalue,
-            (newLayer.data[0].colorScale || {}).cutPointMin,
-            (newLayer.data[0].colorScale || {}).cutPointMax,
-        );
-
-        const newState = {
-            colorScale: newLayer.data[0].colorScale,
-            minvalue: newLayer.data[0].minvalue,
-            maxvalue: newLayer.data[0].maxvalue
-        };
-        this.updateStateForColorbar(newState); 
-        
-=======
->>>>>>> fa8f127928f76e9d0591ecbca5fd3075803b4ae3
         switch(newLayer.data[0].type) {
             
             case 'image':
@@ -205,25 +188,9 @@ class CompositeMapLayers extends Component {
         };
 
     }
-<<<<<<< HEAD
-
-    updateStateForColorbar = (newState) => {
-        const oldState = {
-            colorScale: this.state.colorScale,
-            minvalue: this.state.minvalue,
-            maxvalue: this.state.maxvalue,
-        }
-        if (oldState !== newState) {
-            this.setState(newState);
-        }
-    }
-    
-    addImage = (imageData) => {
-=======
     
     addImage = (imageData) => {
 
->>>>>>> fa8f127928f76e9d0591ecbca5fd3075803b4ae3
         const cutOffPoints = this.getColorCutOffPoints(
             imageData.minvalue,
             imageData.maxvalue,
@@ -294,17 +261,12 @@ class CompositeMapLayers extends Component {
                 
             case "image":
                 const checked = item.checked == true && item.baseLayer == true ? true : false;
-                if (checked) {
-                    const newColorBarState = {
-                        colorScale: imageData.colorScale,
-                        minvalue: imageData.minvalue,
-                        maxvalue: imageData.maxvalue
-                    };
-                    this.updateStateForColorbar(newColorBarState); 
-                }
-
                 const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
+
+                if (checked) {
+                    this.setFocusedImageLayer(imageLayer);
+                }
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
                     this.setFocusedImageLayer(imgLayer);
                 });
@@ -320,12 +282,7 @@ class CompositeMapLayers extends Component {
 
     updateColorbarUponBaseMapChange = () => {
         this.props.map.on('baselayerchange', (e) => {
-            const newState = {
-                colorScale: Object.values(e.layer._layers)[0].options.colorScale,
-                minvalue: Object.values(e.layer._layers)[0].options.minvalue,
-                maxvalue: Object.values(e.layer._layers)[0].options.maxvalue,
-            }
-            this.updateStateForColorbar(newState)
+            this.setFocusedImageLayer(Object.values(e.layer._layers)[0]);
         });
     }
     addScaleLayer = (map) => {

@@ -188,7 +188,6 @@ if __name__ == "__main__":
 
     def change_layer(add_n_clicks, delete_n_clicks, colorscale, switch, cut_point_min, cut_point_max, log_n_clicks):
         global layers
-        # print("n_clicks ",  add_n_clicks, delete_n_clicks, update_n_clicks)        
         newLayers = []
         newLayers.extend(layers)
         if (add_n_clicks is not None and add_n_clicks > state['add_n_clicks']):            
@@ -320,7 +319,6 @@ if __name__ == "__main__":
         return update
 
     def update_cut_point_min(layers, value):
-        print("value received: ", value)
         layers[0]['data'][0]['colorScale']['cutPointMin'] = value
         print("new cutoffpoint min:" ,layers[0]['data'][0]['colorScale']['cutPointMin'])
         return layers 
@@ -363,7 +361,6 @@ if __name__ == "__main__":
             }
 
         ]
-        print("new cutoffpoint max:" ,layers[0]['data'][0]['colorScale']['cutPointMax'])
         return update
 
     def toggle_log(layers, n_clicks):
@@ -371,7 +368,6 @@ if __name__ == "__main__":
             layers[0]['data'][0]['colorScale']['scaleType'] = 'log'
         else:
             layers[0]['data'][0]['colorScale']['scaleType'] = 'linear'
-        print("wooow, ", layers[0]['data'][0]['colorScale']['cutPointMin'])
         return layers
 
 

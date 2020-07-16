@@ -46,18 +46,8 @@ const ColorBar = (props) => {
         } else {
             setColorMap(null);
         }
-<<<<<<< HEAD
     }
     
-    checkColorMap = () => {
-        this.setState({colorMap: buildColormap(this.props.colorScale)})
-<<<<<<< HEAD
-=======
->>>>>>> 9d50045e673206d48c1df88fe400cf3821ab556a
-=======
->>>>>>> fa8f127928f76e9d0591ecbca5fd3075803b4ae3
->>>>>>> interns-dev
-    }
 
     const addControl = () => {
         let panelDiv = null;
