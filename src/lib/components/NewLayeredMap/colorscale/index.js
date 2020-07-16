@@ -15,8 +15,6 @@ export const DEFAULT_COLORSCALE_CONFIG = {
     prefixZeroAlpha: false,
     suffixZeroAlpha: false,
     scaleType: 'linear',
-    cutPointMin: 0,
-    cutPointMax: 255,
 }
 
 /**
@@ -130,7 +128,7 @@ export const buildColormap = (colorScale) => {
     } 
     else if(Array.isArray(colorScale)) {
         // The given colorScale is an array of hexColors
-        return buildColormapFromHexColors(colorScale);
+        return buildColormapFromHexColors(colorScale, DEFAULT_COLORSCALE_CONFIG);
     } 
     else if(typeof colorScale === 'object' || !colorScale) {
         // The given colorScale is an object
@@ -140,6 +138,8 @@ export const buildColormap = (colorScale) => {
         const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
         const colors = colorScaleCfg.colors;
         return buildColormapFromHexColors(colors, colorScaleCfg);
+    } else {
+        return null;
     }
 }
 

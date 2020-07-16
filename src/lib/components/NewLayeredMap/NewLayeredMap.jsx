@@ -53,7 +53,8 @@ class NewLayeredMap extends Component {
             bounds: props.bounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
-            // Used to make possible to display z-value
+
+            // The imageLayer in focus - for calculating z value and showing colormap for
             focusedImageLayer: null,
         }
         
@@ -154,16 +155,17 @@ class NewLayeredMap extends Component {
 
     redrawSyncedMaps = () => {
         for (const id of this.props.syncedMaps) {
-            NewLayeredMap.mapReferences[id].forceUpdate(); 
+            const otherMap = NewLayeredMap.mapReferences[id];
+            otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
         }
     }
 
     /**
      * @param {HTMLCanvasElement} onScreenCanvas
      */
-    setFocucedImageLayer = (url, onScreenCanvas, minvalue, maxvalue) => {
+    setFocucedImageLayer = (layer) => {
         this.setState({
-            focusedImageLayer: { url: url, canvas: onScreenCanvas, minvalue: minvalue, maxvalue: maxvalue}
+            focusedImageLayer: layer,
         })
     }
     
