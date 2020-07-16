@@ -172,7 +172,7 @@ MousePosition.defaultProps = {
 
 MousePosition.propTypes = {
     position: PropTypes.string,
-    setProps: PropTypes.oneOfType([PropTypes.function, PropTypes.none]),
+    setProps: PropTypes.oneOfType([PropTypes.func, PropTypes.any]),
     map: PropTypes.object.isRequired,
     minvalue : PropTypes.number,
     maxvalue: PropTypes.number,

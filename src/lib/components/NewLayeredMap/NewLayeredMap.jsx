@@ -28,14 +28,6 @@ const stringToCRS = (crsString) => {
     }
 }
 
-// Contexts
-// export const DrawLayerContext = React.createContext({drawLayer: "hi there"});
-// console.log("DrawLayerContext in newlayeredmap", DrawLayerContext)
-
-// TODO: make context work
-
-// const DrawLayerContext = React.createContext({hi: "hi there fella"});
-
 class NewLayeredMap extends Component {
 
     static mapReferences = {};
@@ -78,6 +70,7 @@ class NewLayeredMap extends Component {
             minZoom: this.state.minZoom,
             maxZoom: this.state.maxZoom,
             attributionControl: false,
+            zoomAnimation: true,
         });
 
         this.setState({map: map});
@@ -93,6 +86,7 @@ class NewLayeredMap extends Component {
     setEvents = (map) => {
 
         map.on('zoomanim', e => {
+            
             (this.props.syncedMaps || []).forEach(id => {
                 if(!NewLayeredMap.mapReferences[id]) {
                     return;
@@ -176,10 +170,10 @@ class NewLayeredMap extends Component {
     render() {   
         
         return (
-            <div>
+            <div style={{height: '100%', width: '100%'}}>
                 <div
                     ref={el => this.mapEl = el} 
-                    style={{height: '90vh'}}>
+                    style={{height: '100%'}}>
                         <Context.Provider value={{
                                 drawLayer: this.state.drawLayer,
                                 syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
