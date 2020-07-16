@@ -49,9 +49,10 @@ const MousePosition = (props) => {
                 return latlng;
             },
     
-            updateHTML: function(x, y, z) { // TODO: add default measurement unit, make it passable with props
+            updateHTML: function(x, y, z, zNotZero) { // TODO: add default measurement unit, make it passable with props
+                const z_string = zNotZero? " z: " + z + "m" : "";
                 this._latlng.innerHTML ="<span style = 'background-color: #ffffff; border: 2px solid #ccc; padding:3px; border-radius: 5px;'>"
-                                       + "x: " + x + "m y: " + y + "m z: " + z  + "m" +"</span>"
+                                       + "x: " + x + "m y: " + y + "m"  + z_string +"</span>"
             }
         });
         const mousePosCtrl = new MousePosControl();
@@ -104,7 +105,7 @@ const MousePosition = (props) => {
 
         z = mapZValue(red)
 
-        setLatLng(x, y, z);
+        setLatLng(x, y, z, red > 0);
     }
 
     const onCanvasMouseClick = (event) => {
@@ -154,10 +155,10 @@ const MousePosition = (props) => {
         );
     }
   
-    const setLatLng = (x, y, z)  => {
+    const setLatLng = (x, y, z, zNotZero)  => {
         const { control } = stateRef.current || {};
         if(control) {
-            control.updateHTML(x, y, z)
+            control.updateHTML(x, y, z, zNotZero)
         }
     }
 

@@ -33,6 +33,8 @@ class ColorBar extends Component {
             } else { // if  the colorMap is passed to the colorScale as a string
                 this.setState({colorMap : this.props.colorScale});
             }
+        } else if (this.props.colormap !== undefined) {
+            this.setState({colorMap : this.props.colormap});
         }
     }
 
