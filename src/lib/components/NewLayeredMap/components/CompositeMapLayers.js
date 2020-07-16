@@ -35,20 +35,29 @@ class CompositeMapLayers extends Component {
     componentDidMount() {
         const layerControl = L.control.layers([]).addTo(this.props.map);
         this.setState({layerControl: layerControl}, () => this.createMultipleLayers())
+        this.updateColorbarUponBaseMapChange();
     }
 
     updateLayer = (curLayer, newLayer) => {
 
-        switch(newLayer.data[0].type) {
+        const cutOffPoints = this.getColorCutOffPoints(
+            newLayer.data[0].minvalue,
+            newLayer.data[0].maxvalue,
+            (newLayer.data[0].colorScale || {}).cutPointMin,
+            (newLayer.data[0].colorScale || {}).cutPointMax,
+        );
+        switch(newLayer.data[0].type) {  
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
+                    ...cutOffPoints,
                 });
                 break;
 
             case 'tile':
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
+                    ...cutOffPoints,
                 });
                 break;
         }
@@ -252,12 +261,16 @@ class CompositeMapLayers extends Component {
                 break;
                 
             case "image":
+                const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
+                if (checked) {
+                    this.setFocusedImageLayer(imgLayer);
+                }
+
                 const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
                     this.setFocusedImageLayer(imgLayer);
                 });
-
                 break;
             case "tile": 
                 layerGroup.addLayer(this.addTile(item, swapXY));
@@ -268,6 +281,11 @@ class CompositeMapLayers extends Component {
           }
     }
 
+    updateColorbarUponBaseMapChange = () => {
+        this.props.map.on('baselayerchange', (e) => {
+            this.setFocusedImageLayer(Object.values(e.layer._layers)[0]);
+        });
+    }
     addScaleLayer = (map) => {
         L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
     }

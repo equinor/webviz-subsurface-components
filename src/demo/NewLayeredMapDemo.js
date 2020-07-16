@@ -43,8 +43,8 @@ const NewLayeredMapDemo = () => {
                     syncDrawings={true}
                     // layers={exampleData.layers}
                     layers={layers}
-                    // center={[0, 0]}
-                    center={[432205, 6475078], [432205, 6475078]} 
+                    center={[0, 0]}
+                    // center={[432205, 6475078], [432205, 6475078]} 
                     bounds={[[432205, 6475078], [437720, 6481113]] [[432205, 6475078], [437720, 6481113]]}
                     crs="simple"
                     //crs="earth"

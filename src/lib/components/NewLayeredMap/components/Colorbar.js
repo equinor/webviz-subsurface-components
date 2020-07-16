@@ -47,6 +47,7 @@ const ColorBar = (props) => {
             setColorMap(null);
         }
     }
+    
 
     const addControl = () => {
         let panelDiv = null;

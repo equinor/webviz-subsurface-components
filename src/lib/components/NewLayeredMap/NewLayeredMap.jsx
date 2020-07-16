@@ -48,8 +48,8 @@ class NewLayeredMap extends Component {
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
-            center: props.center || [6475078, 432205],
-            // center: props.center || [0, 0],
+            // center: [432205, 6475078],
+            center: props.center || [0, 0],
             bounds: props.bounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
@@ -281,6 +281,7 @@ NewLayeredMap.propTypes = {
         position: PropTypes.string,
     }),
 
+    center: PropTypes.array,
     /**
      * 
      */

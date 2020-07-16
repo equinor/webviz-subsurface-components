@@ -4,10 +4,10 @@ import base64
 import numpy as np
 from matplotlib import cm
 from typing import List
-from xtgeo import RegularSurface
 
 import dash
 import dash_colorscales
+import dash_core_components as dcc
 from dash.dependencies import Input, Output
 import dash_html_components as html
 import webviz_subsurface_components
@@ -38,13 +38,41 @@ if __name__ == "__main__":
         'delete_n_clicks': 0,
         'switch': { "value": False },
         'colorscale': None,
+        'cut_point_min': min_value,
+        'cut_point_max': max_value,
+        'log_n_clicks': 0,
+
     }
     
     layers = [
+        {
+            "name": "A seismic horizon with colormap",
+            "id": 1, 
+            "baseLayer": True,
+            "checked": True,
+            "action": "update",
+            "data": [
                 {
+                    "type": "image",
+                    "url": map_data,
+                    "colorScale":  {
+                        "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+                        "prefixZeroAlpha": False,
+                        "scaleType": "linear",
+                        "cutPointMin": min_value,
+                        "cutPointMax": max_value 
+                        },
+                    "allowHillshading": True,
+                    "minvalue": min_value,
+                    "maxvalue": max_value,
+                    "bounds": [[0, 0], [-30, -30]]
+                },
+            ],
+        },
+        {
             "name": "Some overlay layer",
             "base_layer": False,
-            "id": 0,
+            "id": 2,
             "action": None,
             "checked": False,
             "data": [
@@ -60,9 +88,9 @@ if __name__ == "__main__":
                 },
                 {
                     "type": "circle",
-                    "center": [435200, 6478000],
+                    "center": [0, 0],
                     "color": "red",
-                    "radius": 2,
+                    "radius": 200000,
                     "tooltip": "This is a red circle",
                 },
             ],
@@ -107,6 +135,11 @@ if __name__ == "__main__":
     ]
 
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
+<<<<<<< HEAD
+        center= [432205, 6475078],
+        bounds = [[432205, 6475078], [437720, 6481113]],       
+        id="example-map", 
+=======
         id="example-map",
         syncedMaps=["example-map2"],
         syncDrawings=True, 
@@ -126,10 +159,14 @@ if __name__ == "__main__":
         id="example-map2",
         syncedMaps=["example-map"],
         syncDrawings=True, 
+>>>>>>> ea38f9bd917a867e8b2f484c45377da9d13068da
         layers=layers,
         switch={
-            "value": False,
+            "value": True,
             "label": "Hillshading",
+        },
+        mouseCoords={
+            "coordinatePosition": "bottomright",
         },
         drawTools={
             "drawMarker": True,
@@ -145,16 +182,17 @@ if __name__ == "__main__":
     # server = tile_server(app.server)
 
 
-
     app.layout = html.Div(
         children=[
             html.Div(id='hidden-div'),
             html.Div(id='hidden-div2'),
             html.Button('Toggle shader', id='map-shader-toggle-btn'),
-            
+            html.Button('Toggle log', id='map-log-toggle-btn'),
             # dcc.Dropdown('Select colorscale', id='layer-colorscale'), # Use this one -> https://github.com/plotly/dash-colorscales
             html.Button('Delete layer', id='layer-delete-btn'),
             html.Button('Add layer', id='layer-add-btn'),
+            html.Div(["Cut below: ", dcc.Input(id='maximum-value', type='number')]),
+            html.Div(["Cut above: ", dcc.Input(id='minimum-value', type='number')]),
             html.Div(children=[
                 html.Div([
                     dash_colorscales.DashColorscales(
@@ -183,38 +221,48 @@ if __name__ == "__main__":
             Input('layer-delete-btn', 'n_clicks'),
             Input('layer-colorscale', 'colorscale'),
             Input('example-map', 'switch'),
+            Input('maximum-value','value'),
+            Input('minimum-value','value'),
+            Input('map-log-toggle-btn', 'n_clicks')
+
+            
         ]
     )
 
-    def change_layer(add_n_clicks, delete_n_clicks, colorscale, switch):
+    def change_layer(add_n_clicks, delete_n_clicks, colorscale, switch, cut_point_min, cut_point_max, log_n_clicks):
         global layers
-        # print("n_clicks ",  add_n_clicks, delete_n_clicks, update_n_clicks)
-        
         newLayers = []
         newLayers.extend(layers)
         if (add_n_clicks is not None and add_n_clicks > state['add_n_clicks']):            
             newLayers = add_layer(newLayers)
-     
         elif (delete_n_clicks is not None and delete_n_clicks > state['delete_n_clicks']):
             newLayers = delete_layer(newLayers)
         elif (colorscale is not None and colorscale != state['colorscale']):
             newLayers = update_layer(newLayers, colorscale)
         elif (switch is not None and state['switch']['value'] is not switch['value']):
             newLayers = toggle_shader(newLayers, switch)
+        elif (cut_point_min is not None and cut_point_min != state['cut_point_min']):
+            newLayers = update_cut_point_min(newLayers, cut_point_min)
+        elif (cut_point_max is not None and cut_point_max != state['cut_point_max']):
+            newLayers = update_cut_point_max(newLayers, cut_point_max)
+        elif (log_n_clicks is not None and log_n_clicks > state['log_n_clicks']):
+            newLayers = toggle_log(newLayers, log_n_clicks)
+        
         
         state['add_n_clicks'] = add_n_clicks or 0
         state['delete_n_clicks'] = delete_n_clicks or 0
         state['colorscale'] = colorscale
         state['switch'] = switch
-
+        state['cut_point_min'] = cut_point_min or 0
+        state['cut_point_max'] = cut_point_min or 0
+        state['log_n_clicks'] = log_n_clicks or 0
         
         layers = newLayers
-
 
         return newLayers
 
     def delete_layer(layers):
-        layers[1]['action'] = 'delete'
+        # layers[1]['action'] = 'delete'
         return layers
 
     # changes the arrays to the desired view
@@ -231,29 +279,6 @@ if __name__ == "__main__":
     
     def add_layer(layers):
         if len(layers) < 5:
-            # file_ = 'examples\\example-data\\reek_surfaces\\TopLowerReek_50inc.irapbin'
-            # surface = RegularSurface(file_)
-            # zvalues = get_surface_arr(surface)[2]
-            # bounds = [[surface.xmin, surface.ymin], [surface.xmax, surface.ymax]]
-            # layers.append({
-            #     "name": "surface",
-            #     "id": 2,
-            #     "baseLayer": True,
-            #     "checked": False,
-            #     "action": "add",
-            #     "data": [
-            #         {
-            #             "type": "image",
-            #             "url": array_to_png(zvalues.copy()),
-            #             "allowHillshading": True,
-            #             "colormap": colormap,
-            #             "unit": "",    
-            #             "minvalue": None,
-            #             "maxvalue": None,
-            #             "bounds": [[0,0], [30, 30]],
-            #         },
-            #     ],
-            # })
             layers.append({
                 "name": "Something",
                 "id": 2,
@@ -265,7 +290,7 @@ if __name__ == "__main__":
                         "type": "image",
                         "url": map_data,
                         "allowHillshading": True,
-                        "colormap": colormap,
+                        # "colormap": colormap,
                         "unit": "m",    
                         "minvalue": min_value,
                         "maxvalue": max_value,
@@ -303,7 +328,6 @@ if __name__ == "__main__":
         ]
         return update
 
-
     def toggle_shader(new_layers: List, switch) -> List:
         layer_to_change = [x for x in new_layers if x['id'] == 3][0]
         cur_data = layer_to_change["data"][0]
@@ -336,19 +360,78 @@ if __name__ == "__main__":
         ]
 
         return update
-    
 
-    @app.callback(Output("polyline", "children"), [Input("example-map", "polyline_points")])
-    def get_edited_line(coords):
-        return f"Edited polyline: {json.dumps(coords)}"
+    def update_cut_point_min(layers, value):
+        layers[0]['data'][0]['colorScale']['cutPointMin'] = value
+        print("new cutoffpoint min:" ,layers[0]['data'][0]['colorScale']['cutPointMin'])
+        return layers 
+        # update = [
+        #     {
+        #         "id": 1,
+        #         "action": "update",
+        #         "data": [
+        #             {   
+        #                 "type": 'image',
+        #                 "colorScale":  {
+        #                     "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+        #                     "prefixZeroAlpha": False,
+        #                     "scaleType": "linear",
+        #                     "cutPointMin": value,
+        #                 },
+        #             }
+        #         ]
+        #     },
 
-    @app.callback(Output("marker", "children"), [Input("example-map", "marker_point")])
-    def get_edited_line(coords):
-        return f"Edited marker: {json.dumps(coords)}"
+        # ]
+        # return update
 
+    def update_cut_point_max(layers, value):
+        # layers[0]['data'][0]['colorScale']['cutPointMax'] = value
+        # return layers
+        update = [
+            {
+                "id": 1,
+                "action": "update",
+                "data": [
+                    {   
+                        "type": 'image',
+                        "colorScale":  {
+                            "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+                            "cutPointMax": value,
+                        },
+                    }
+                ]
+            }
+
+        ]
+        return update
+
+    def toggle_log(layers, n_clicks):
+        if n_clicks % 2 == 0:
+            layers[0]['data'][0]['colorScale']['scaleType'] = 'log'
+        else:
+            layers[0]['data'][0]['colorScale']['scaleType'] = 'linear'
+        return layers
+
+
+    # @app.callback(Output("polyline", "children"), [Input("example-map", "polyline_points")])
+    # def get_edited_line(coords):
+    #     return f"Edited polyline: {json.dumps(coords)}"
+
+    # @app.callback(Output("marker", "children"), [Input("example-map", "marker_point")])
+    # def get_edited_line(coords):
+    #     return f"Edited marker: {json.dumps(coords)}"
+
+<<<<<<< HEAD
+    # @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
+    # def get_edited_line(coords):
+    #     return f"Edited closed polygon: {json.dumps(coords)}"
+       
+=======
     @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
     def get_edited_line(coords):
         return f"Edited closed polygon: {json.dumps(coords)}"
 
+>>>>>>> ea38f9bd917a867e8b2f484c45377da9d13068da
 
     app.run_server(debug=True)
