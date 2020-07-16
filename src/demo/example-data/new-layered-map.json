@@ -1,15 +1,9 @@
 {
     "layers": [
         {
-<<<<<<< HEAD
-            "name": "woooow",
-            "id": 55, 
-            "action": null,
-=======
             "name": "Hello world",
             "id": 1, 
             "action": "update",
->>>>>>> ea38f9bd917a867e8b2f484c45377da9d13068da
             "checked": false,
             "baseLayer": true,
             "data": [
