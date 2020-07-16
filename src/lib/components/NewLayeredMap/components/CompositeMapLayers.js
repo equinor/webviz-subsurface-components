@@ -42,11 +42,6 @@ class CompositeMapLayers extends Component {
         switch(newLayer.data[0].type) {
             
             case 'image':
-                const imageLayer = curLayer.getLayers()[0];
-                imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
-                    this.setFocusedImageLayer(imgLayer.getUrl(), imgLayer.getCanvas(), imgLayer.options.minvalue, imgLayer.options.maxvalue);
-                });
-
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
                     ...cutOffPoints,
