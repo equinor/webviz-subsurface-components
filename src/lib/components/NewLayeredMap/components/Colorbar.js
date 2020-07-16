@@ -1,41 +1,71 @@
-import L from "leaflet";
-import React, { Component } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
+import Context from '../Context';
 
+// Leaflet
+import L from "leaflet";
+
+// Utils
 import { buildColormap } from '../colorscale';
 
 
-class ColorBar extends Component {
+const ColorBar = (props) => {
+    const { focusedImageLayer = {} } = useContext(Context);
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            colorMap : this.props.colorMap
-        }
-        this.addControl();
+    // State
+    const [control, setControl] = useState(null);
+    const [colorMap, setColorMap] = useState(null);
+    const [minMaxValue, setMinMaxValue]= useState([0 , 0])
+
+
+    useEffect(() => {
+        addControl();
+        createNewColorMap();
+    }, [])
+
+    const focusedDependencyArray = () => {
+        const options = (focusedImageLayer || {}).options || {};
+        return [options.colorScale, options.minvalue, options.maxvalue];
     }
 
-    componentDidMount() {
-        this.addControl();
-        this.checkColorMap();
-    }
-    componentDidUpdate(prevProps) {
-        if (prevProps !== this.props) {
-            this.checkColorMap();
+    useEffect(() => {
+        createNewColorMap();
+    }, focusedDependencyArray())
+
+    const createNewColorMap = () => {
+        if(!focusedImageLayer) {
+            return;
         }
+
+        const options = (focusedImageLayer.options || {})
+        const colorScale = options.colorScale;
+        if(colorScale) {
+            setColorMap(buildColormap(colorScale))
+            setMinMaxValue([options.minvalue, options.maxvalue])
+        } else {
+            setColorMap(null);
+        }
+<<<<<<< HEAD
     }
     
     checkColorMap = () => {
         this.setState({colorMap: buildColormap(this.props.colorScale)})
+<<<<<<< HEAD
+=======
+>>>>>>> 9d50045e673206d48c1df88fe400cf3821ab556a
+=======
+>>>>>>> fa8f127928f76e9d0591ecbca5fd3075803b4ae3
+>>>>>>> interns-dev
     }
 
-    addControl = () => {
+    const addControl = () => {
+        let panelDiv = null;
         const ColorBarCtrl = L.Control.extend({
             options: {
-                position: this.props.position || "bottomright",
+                position: props.position || "bottomright",
             },
-            onAdd: () => {
+            onAdd: function() {
                 this.panelDiv = L.DomUtil.create(
                     "div",
                     "leaflet-custom-control"
@@ -43,50 +73,44 @@ class ColorBar extends Component {
                 return this.panelDiv;
             },
         });
-        this.colorbar = new ColorBarCtrl();
-
-        this.props.map.addControl(this.colorbar);
+        const newColorBarCtrl = new ColorBarCtrl();
+        props.map.addControl(newColorBarCtrl);
+        setControl(newColorBarCtrl);
     }
 
 
-    render() {
-        return ReactDOM.createPortal(
-            <div className="leaflet-colorbar">
-                <div className="leaflet-colorbar-image">
-                    <img
-                        src={this.state.colorMap}
-                        style={{ width: "100%", height: "10px" }}
-                    />
-                </div>
-                <div>
-                    {this.props.minvalue} {this.props.unit}
-                </div>
-                <div className="leaflet-colorbar-right-label">
-                    {this.props.maxvalue} {this.props.unit}
-                </div>
-            </div>,
-            this.panelDiv
-        );
+    if(!colorMap || minMaxValue.length !== 2 || !control) {
+        return null;
     }
+
+    return ReactDOM.createPortal(
+        <div className="leaflet-colorbar">
+            <div className="leaflet-colorbar-image">
+                <img
+                    src={colorMap}
+                    style={{ width: "100%", height: "10px" }}
+                />
+            </div>
+            <div>
+                {minMaxValue[0]} {props.unit}
+            </div>
+            <div className="leaflet-colorbar-right-label">
+                {minMaxValue[1]} {props.unit}
+            </div>
+        </div>,
+        control.panelDiv
+    );
 }
 
 ColorBar.propTypes = {
     map: PropTypes.object,
 
-
-    colorScale: PropTypes.oneOfType([
-        PropTypes.object,
-        PropTypes.string
-    ]),
-
-    /* Minimum value of color map */
-    minvalue: PropTypes.number.isRequired,
-
-    /* Maximum value of color map */
-    maxvalue: PropTypes.number.isRequired,
-
     /* Unit to show in color map */
     unit: PropTypes.string,
 };
+
+ColorBar.defaultProps = {
+    unit: "m",
+}
 
 export default ColorBar;
