@@ -39,8 +39,14 @@ class CompositeMapLayers extends Component {
     }
 
     updateLayer = (curLayer, newLayer) => {
-        switch(newLayer.data[0].type) {
-            
+
+        const cutOffPoints = this.getColorCutOffPoints(
+            newLayer.data[0].minvalue,
+            newLayer.data[0].maxvalue,
+            (newLayer.data[0].colorScale || {}).cutPointMin,
+            (newLayer.data[0].colorScale || {}).cutPointMax,
+        );
+        switch(newLayer.data[0].type) {  
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
@@ -95,7 +101,6 @@ class CompositeMapLayers extends Component {
     }
 
     componentWillUnmount() {
-        // TODO: Remove all layers from the map
         const map = this.props.map
         map.eachLayer(function (layer) {
             map.removeLayer(layer);
@@ -195,6 +200,7 @@ class CompositeMapLayers extends Component {
 
         const bounds = (imageData.bounds || []).map(xy => yx(xy));
         let newImageLayer = null;
+
         
         newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
             ...imageData,
@@ -255,13 +261,13 @@ class CompositeMapLayers extends Component {
                 break;
                 
             case "image":
-                const checked = item.checked == true && item.baseLayer == true ? true : false;
+                const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
+                if (checked) {
+                    this.setFocusedImageLayer(imgLayer);
+                }
+
                 const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
-
-                if (checked) {
-                    this.setFocusedImageLayer(imageLayer);
-                }
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
                     this.setFocusedImageLayer(imgLayer);
                 });
@@ -356,7 +362,14 @@ class CompositeMapLayers extends Component {
     }
 
     reSyncDrawLayer = () => {
-        this.context.drawLayer.clearLayers();
+        /**
+         * For some reason moving the marker while using multiple maps in dash
+         * throws an error in leaflet. Everything works fine as long as this is
+         * surrounded in a try catch
+         */ 
+        try {
+            this.context.drawLayer.clearLayers();
+        } catch (error) {}
         for (const item of this.context.syncedDrawLayer.data) {
             this.addItem(item, this.context.drawLayer, false);
         }
