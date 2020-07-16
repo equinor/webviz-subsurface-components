@@ -71,7 +71,6 @@ class NewLayeredMap extends Component {
             maxZoom: this.state.maxZoom,
             attributionControl: false,
         });
-        console.log("ultra new main frame here");
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
@@ -138,7 +137,6 @@ class NewLayeredMap extends Component {
         for (const layer of newLayers) {
             NewLayeredMap.syncedDrawLayer.data.push(layer);
         }
-        console.log(NewLayeredMap.syncedDrawLayer)
         this.redrawAllSyncedMaps();
     }
 
@@ -147,7 +145,6 @@ class NewLayeredMap extends Component {
             return !layerTypes.includes(drawing.type);
         })
         if (shouldRedraw) {
-            console.log("redrawing everything from delete")
             this.redrawAllSyncedMaps();
         }
     }
