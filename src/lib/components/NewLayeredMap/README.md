@@ -127,3 +127,15 @@ def toggle_shader(n_clicks):
 
 app.run_server(debug=True)
 ```
+
+## 🔰 Documentations
+
+### ❤ ColorScales
+
+### 🌋 Shaders
+
+### 🏴‍☠️Options 
+
+| Name |  Type | Description |
+|------|-------|-------------|
+| Hello| What  | asdf        |

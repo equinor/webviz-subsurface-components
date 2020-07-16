@@ -252,4 +252,21 @@ if __name__ == "__main__":
     def display_cutoff_minmax(value):
         return f'CutOff MinMax Slider: {value[0]}-{value[1]}'
 
+    #
+    #   DRAW TOOLS
+    #
+    @app.callback(
+        Output('output', 'children'),
+        [
+            Input('test-map', 'click_position'),
+            Input('test-map', 'polyline_points'),
+            Input('test-map', 'polygon_points'),
+        ]
+    )
+    def clicked_position(click_position, polyline_points, polygon_points):
+        print("CLICKED:", click_position)
+        print("POLYLINE:", polyline_points)
+        print("POLYGON:", polygon_points)
+        return None
+
     app.run_server(debug=True)
