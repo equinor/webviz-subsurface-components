@@ -54,6 +54,9 @@ const NewLayeredMapDemo = () => {
 
                     minZoom={-5}
                     // zoom = {-5}
+                    colorBar={{
+                        position: 'bottomleft'
+                    }}
                     scaleY={{
                         scaleY: 1,
                         minScaleY: 1,

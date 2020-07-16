@@ -47,7 +47,7 @@ if __name__ == "__main__":
         scaleY={
 
         },
-        drawControls={
+        drawTools={
             
         }
         
@@ -145,9 +145,7 @@ if __name__ == "__main__":
                             "colorScale": {
                                 "colors": colorscale,
                                 "prefixZeroAlpha": True,
-                            },
-                            "minvalue": 1200,
-                            "maxvalue": 2200
+                            }
                         }
                     ],
                    

@@ -11,7 +11,7 @@ import { buildColormap } from '../colorscale';
 
 
 const ColorBar = (props) => {
-    const { focusedImageLayer } = useContext(Context);
+    const { focusedImageLayer = {} } = useContext(Context);
 
     // State
     const [control, setControl] = useState(null);
@@ -24,14 +24,20 @@ const ColorBar = (props) => {
         createNewColorMap();
     }, [])
 
+    const focusedDependencyArray = () => {
+        const options = (focusedImageLayer || {}).options || {};
+        return [options.colorScale, options.minvalue, options.maxvalue];
+    }
+
     useEffect(() => {
-        if(focusedImageLayer) {
-            createNewColorMap();
+        createNewColorMap();
+    }, focusedDependencyArray())
+
+    const createNewColorMap = () => {
+        if(!focusedImageLayer) {
+            return;
         }
 
-    }, [focusedImageLayer])
-    
-    const createNewColorMap = () => {
         const options = (focusedImageLayer.options || {})
         const colorScale = options.colorScale;
         if(colorScale) {
