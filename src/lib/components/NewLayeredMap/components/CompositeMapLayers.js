@@ -265,13 +265,14 @@ class CompositeMapLayers extends Component {
                 break;
                 
             case "image":
-                const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
-                if (checked) {
-                    this.setFocusedImageLayer(imgLayer);
-                }
-
                 const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
+                
+                const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
+                if (checked) {
+                    this.setFocusedImageLayer(imageLayer);
+                }
+
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
                     this.setFocusedImageLayer(imgLayer);
                 });

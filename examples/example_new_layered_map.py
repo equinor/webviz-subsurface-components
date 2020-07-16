@@ -135,11 +135,6 @@ if __name__ == "__main__":
     ]
 
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
-<<<<<<< HEAD
-        center= [432205, 6475078],
-        bounds = [[432205, 6475078], [437720, 6481113]],       
-        id="example-map", 
-=======
         id="example-map",
         syncedMaps=["example-map2"],
         syncDrawings=True, 
@@ -159,7 +154,6 @@ if __name__ == "__main__":
         id="example-map2",
         syncedMaps=["example-map"],
         syncDrawings=True, 
->>>>>>> ea38f9bd917a867e8b2f484c45377da9d13068da
         layers=layers,
         switch={
             "value": True,
@@ -422,16 +416,9 @@ if __name__ == "__main__":
     # def get_edited_line(coords):
     #     return f"Edited marker: {json.dumps(coords)}"
 
-<<<<<<< HEAD
-    # @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
-    # def get_edited_line(coords):
-    #     return f"Edited closed polygon: {json.dumps(coords)}"
-       
-=======
     @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
     def get_edited_line(coords):
         return f"Edited closed polygon: {json.dumps(coords)}"
 
->>>>>>> ea38f9bd917a867e8b2f484c45377da9d13068da
 
     app.run_server(debug=True)
