@@ -27,25 +27,7 @@ class ColorBar extends Component {
     }
     
     checkColorMap = () => {
-<<<<<<< HEAD
-        if (this.props.colorScale !== undefined) {
-            if (typeof this.props.colorScale !== 'string') {
-                this.setState({colorMap : this.buildColorMapImage(this.props.colorScale)});
-            } else { // if  the colorMap is passed to the colorScale as a string
-                this.setState({colorMap : this.props.colorScale});
-            }
-        } else if (this.props.colormap !== undefined) {
-            this.setState({colorMap : this.props.colormap});
-        }
-    }
-
-    buildColorMapImage = (colorScale) => {
-        const colorScaleCfg = Object.assign({}, DEFAULT_COLORSCALE_CONFIG, colorScale || {});
-        const colors = colorScaleCfg.colors;
-        return buildColormapFromHexColors(colors, colorScaleCfg);
-=======
         this.setState({colorMap: buildColormap(this.props.colorScale)})
->>>>>>> 9d50045e673206d48c1df88fe400cf3821ab556a
     }
 
     addControl = () => {

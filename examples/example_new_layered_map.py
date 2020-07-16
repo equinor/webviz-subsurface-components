@@ -122,7 +122,7 @@ if __name__ == "__main__":
         id="example-map", 
         layers=layers,
         switch={
-            "value": False,
+            "value": True,
             "label": "Hillshading",
         },
         mouseCoords={
