@@ -14,7 +14,6 @@ import Context from './Context'
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
 
-
 const stringToCRS = (crsString) => {
     switch(crsString) {
         case 'earth': {

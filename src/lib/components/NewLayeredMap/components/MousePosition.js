@@ -23,9 +23,15 @@ const MousePosition = (props) => {
         subscribeToMapClick();
     }, [])
 
+
+    const focusedDependencyArray = () => {
+        const options = (focusedImageLayer || {}).options || {};
+        return [options.minvalue, options.maxvalue];
+    }
+
     useEffect(() => {
         updateCanvas();
-    }, [focusedImageLayer])
+    }, focusedDependencyArray())
 
     useEffect(() => {
         updateProps();

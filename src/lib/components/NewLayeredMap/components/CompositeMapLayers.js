@@ -39,25 +39,16 @@ class CompositeMapLayers extends Component {
     }
 
     updateLayer = (curLayer, newLayer) => {
-
-        const cutOffPoints = this.getColorCutOffPoints(
-            newLayer.data[0].minvalue,
-            newLayer.data[0].maxvalue,
-            (newLayer.data[0].colorScale || {}).cutPointMin,
-            (newLayer.data[0].colorScale || {}).cutPointMax,
-        );
         switch(newLayer.data[0].type) {  
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
-                    ...cutOffPoints,
                 });
                 break;
 
             case 'tile':
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
-                    ...cutOffPoints,
                 });
                 break;
         }
@@ -166,63 +157,21 @@ class CompositeMapLayers extends Component {
         ));
     }
 
-    /**
-     * Calculates cutOffPoints based on given a min/max values and min/max-cutoff-points between 0 and 255.a
-     * @example
-     * getColorCutOffPoints(0, 1000, 500, 1000) // { 127, 255 } 
-     */
-    getColorCutOffPoints(min, max, cutMin, cutMax) {
-        if (cutMax > max) {
-            cutMax = max;
-        }
-        if (cutMin < min) {
-            cutMin = min;
-        }
-
-        const maxColorValue = Math.round(255 - (Math.abs((cutMax - max)) / (max - min)) * 255) /// clear colors below this
-        const minColorValue = Math.round(((cutMin - min) / (max - min)) * 255)
-
-        return {
-            cutPointMin: minColorValue,
-            cutPointMax: maxColorValue,
-        };
-
-    }
-    
     addImage = (imageData) => {
-
-        const cutOffPoints = this.getColorCutOffPoints(
-            imageData.minvalue,
-            imageData.maxvalue,
-            (imageData.colorScale || {}).cutPointMin,
-            (imageData.colorScale || {}).cutPointMax,
-        );
-
         const bounds = (imageData.bounds || []).map(xy => yx(xy));
         let newImageLayer = null;
-
-        
         newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
             ...imageData,
             minvalue: imageData.minvalue,
             maxvalue: imageData.maxvalue,
             colorScale: imageData.colorScale,
             shader: imageData.shader,
-            ...cutOffPoints,
         });
         
         return newImageLayer;
     }
 
     addTile = (tileData) => {
-     
-        const cutOffPoints = this.getColorCutOffPoints(
-            tileData.minvalue,
-            tileData.maxvalue,
-            (tileData.colorScale || {}).cutPointMin,
-            (tileData.colorScale || {}).cutPointMax,
-        );
-
         let newTileLayer = null;
         if(tileData.colorScale) {
             newTileLayer = L.tileWebGLLayer(tileData.url, {
@@ -231,7 +180,6 @@ class CompositeMapLayers extends Component {
                 maxvalue: tileData.maxvalue,
                 colorScale: tileData.colorScale,
                 shader: tileData.shader,
-                ...cutOffPoints,
             })
         } else {
             newTileLayer = L.tileLayer(tileData.url, {
@@ -359,10 +307,11 @@ class CompositeMapLayers extends Component {
         this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     }
 
-    setFocusedImageLayer = (url, onScreenCanvas, minvalue, maxvalue) => {
+    setFocusedImageLayer = (layer) => {
+ 
         const updateFunc = this.context.setFocusedImageLayer;
         if(updateFunc) {
-            updateFunc(url, onScreenCanvas, minvalue, maxvalue);
+            updateFunc(layer);
         }
     }
 
