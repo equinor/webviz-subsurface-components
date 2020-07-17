@@ -255,7 +255,7 @@ if __name__ == "__main__":
         elif (global_max is not None and global_max != state['global_max']):
             newLayers = update_global_max(newLayers, global_max)
         elif (global_min is not None and global_min != state['global_min']):
-            newLayers = update_global_min(newLayers, global_max)   
+            newLayers = update_global_min(newLayers, global_min)   
         elif (log_n_clicks is not None and log_n_clicks > state['log_n_clicks']):
             newLayers = toggle_log(newLayers, log_n_clicks)
         
@@ -264,9 +264,9 @@ if __name__ == "__main__":
         state['delete_n_clicks'] = delete_n_clicks or 0
         state['colorscale'] = colorscale
         state['switch'] = switch
-        state['cut_point_min'] = cut_point_min or min_value
+        state['cut_point_min'] = cut_point_min or 0
         state['cut_point_max'] = cut_point_max or max_value
-        state['global_min'] = global_min or min_value
+        state['global_min'] = global_min or 0
         state['global_max'] = global_max or max_value
         state['log_n_clicks'] = log_n_clicks or 0
         layers = newLayers
@@ -386,7 +386,6 @@ if __name__ == "__main__":
                         "type": 'image',
                         "colorScale":  {
                             "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
-                            "prefixZeroAlpha": True,
                             "cutPointMin": value,
                         },
                     }
@@ -408,7 +407,6 @@ if __name__ == "__main__":
                         "type": 'image',
                         "colorScale":  {
                             "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
-                            "prefixZeroAlpha": True,
                             "cutPointMax": value,
                         },
                     }
