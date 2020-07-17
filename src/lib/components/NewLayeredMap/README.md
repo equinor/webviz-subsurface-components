@@ -381,10 +381,10 @@ colorBar={
 
 These props specify the different aspects of syncronization between maps.
 
-| Name             | Type        | Description                                                                                                                                                                                                        | Example input          |
-|------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|
-| **syncedMaps**   | *String[ ]* | An array of ids of maps you want to sync this map with in terms of zoom, movement and potentially drawings. Including the id of this map will not cause any errors. e.g `id="map-1", syncedMaps=["map-1", "map-2"]` is fine. |
-| **syncDrawings** | *Boolean*   | Specifies whether or not this map should sync drawings between the maps in syncedMaps.  False by default.           |                        |
+| Name             | Type        | Description                                                                                                                                                                                                                    | Example input          |
+|------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|
+| **syncedMaps**   | *String[ ]* | An array of ids of maps you want to sync this map with in terms of zoom, movement and potentially drawings. Including the id of this map will not cause any errors. e.g `id="map-1",  syncedMaps=["map-1", "map-2"]`  is fine. | ["map-1",..., "map-n"] |
+| **syncDrawings** | Boolean     | Should this map draw to the maps in *syncedMaps*? False by default.                                                                                                                                                            |                        |
 
 -------------------------------
 
@@ -412,7 +412,7 @@ def get_polygon_coords(coords):
 
 | Name                | Output format             | Description                                       |
 |---------------------|---------------------------|---------------------------------------------------|
-| **click_position**  | {[x, y]}                  | Coordinates of the last clicked area of the map   |
-| **marker_point**    | {[x, y]}                  | Coordinates of the last placed marker on the map  |
-| **polyline_points** | {[x1, y1], ..., [xn, yn]} | Coordinates of the last drawn polyline on the map |
-| **polygon_points**  | {[x1, y1], ..., [xn, yn]} | Coordinates of the last drawn polygon on the map  |
+| **click_position**  | `{[x, y]}`                  | Coordinates of the last clicked area of the map   |
+| **marker_point**    | `{[x, y]}`                  | Coordinates of the last placed marker on the map  |
+| **polyline_points** | `{[[x1, y1], ..., [xn, yn]]}` | Coordinates of the last drawn polyline on the map |
+| **polygon_points**  | `{[[x1, y1], ..., [xn, yn]]}` | Coordinates of the last drawn polygon on the map  |
