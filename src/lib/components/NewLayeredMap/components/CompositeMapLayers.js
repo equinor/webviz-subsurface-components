@@ -55,7 +55,7 @@ class CompositeMapLayers extends Component {
     }
     
     componentDidUpdate(prevProps) {
-        if (this.props.syncDrawings) {
+        if (this.props.syncedMaps) {
             this.reSyncDrawLayer();
         }
         if (prevProps.layers !== this.props.layers) {
@@ -239,6 +239,7 @@ class CompositeMapLayers extends Component {
             this.setFocusedImageLayer(Object.values(e.layer._layers)[0]);
         });
     }
+
     addScaleLayer = (map) => {
         L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
     }
@@ -306,7 +307,6 @@ class CompositeMapLayers extends Component {
         this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     }
 
-
     setFocusedImageLayer = (layer) => {
  
         const updateFunc = this.context.setFocusedImageLayer;
@@ -321,13 +321,43 @@ class CompositeMapLayers extends Component {
          * throws an error in leaflet. Everything works fine as long as this is
          * surrounded in a try catch
          */ 
-        try {
-            this.context.drawLayer.clearLayers();
-        } catch (error) {}
+        
         for (const item of this.context.syncedDrawLayer.data) {
-            this.addItem(item, this.context.drawLayer, false);
+            if (this.props.syncedMaps.includes(item.creatorId)) {
+                this.context.drawLayer.eachLayer(layer => {
+                    try {
+                        if(this.getShapeType(layer) === item.type) {
+                            this.context.drawLayer.removeLayer(layer);
+                        }
+                    } catch (error) {}
+                })
+                this.addItem(item, this.context.drawLayer, false);
+            }   
         }
     }
+
+    // TODO: Move to utils
+    getShapeType = layer => {
+        if (layer instanceof L.Rectangle) {
+            return "rectangle";
+        }
+        if (layer instanceof L.Circle) {
+            return "circle";
+        }
+        if (layer instanceof L.CircleMarker) {
+            return "circleMarker";
+        }
+        if (layer instanceof L.Marker) {
+            return "marker";
+        }
+        if (layer instanceof L.Polygon) {
+            return "polygon";
+        }
+        if (layer instanceof L.Polyline) {
+            return "polyline";
+        }
+        throw new Error("Unknown shape type");
+    };
     
   
     render() {
