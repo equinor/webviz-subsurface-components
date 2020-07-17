@@ -385,3 +385,34 @@ These props specify the different aspects of syncronization between maps.
 |------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|
 | **syncedMaps**   | *String[ ]* | An array of ids of maps you want to sync this map with in terms of zoom, movement and potentially drawings. Currently you have to be careful not to put the id of this map in the array as this will cause errors. | ["map-1", "map-2",...] |
 | **syncDrawings** | *Boolean*   | Specifies whether or not this map should sync drawings between the maps in syncedMaps. This currently only works if all the maps you want to sync drawings between have this enabled.  False by default.           |                        |
+
+-------------------------------
+
+### 🎙 Listeners
+
+There are some listeners the python user can access using callbacks, such as the coordinates of a mouse click or a drawing.
+
+Example:
+
+```python
+app.layout = html.Div(
+    children=[
+        layered_map_component,
+        html.Pre(id="polygon")
+    ]
+)
+
+@app.callback(
+     Output("polygon", "children"),
+     [Input("example-map", "polygon_points")]
+)
+def get_polygon_coords(coords):
+    return f"polygon coordinates: {json.dumps(coords)}"
+```
+
+| Name                | Output format             | Description                                       |
+|---------------------|---------------------------|---------------------------------------------------|
+| **click_position**  | {[x, y]}                  | Coordinates of the last clicked area of the map   |
+| **marker_point**    | {[x, y]}                  | Coordinates of the last placed marker on the map  |
+| **polyline_points** | {[x1, y1], ..., [xn, yn]} | Coordinates of the last drawn polyline on the map |
+| **polygon_points**  | {[x1, y1], ..., [xn, yn]} | Coordinates of the last drawn polygon on the map  |
