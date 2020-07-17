@@ -246,6 +246,173 @@ If the normal hillshading-shader is too heavy computational, there is also a sof
 
 ### 🏴‍☠️Options 
 
-| Name |  Type | Description |
-|------|-------|-------------|
-| Hello| What  | asdf        |
+-----------------
+### 🎰 Props
+The props available to the newLayeredMap component
+
+#### *Props:* Map specifics
+| Name              | Type                    | Description                                                                                                                                                                                                                    | Example input                                   | Default         |
+|-------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|-----------------|
+| **id**            | *String* Required       | The ID for the map. Used to sync maps and to reference the component in Dash.                                                                                                                                                  | "example-map"                                   | None            |
+| **layers**        | *objects[ ]*             | The array of layer objects to be added to the map.                                                                                                                                                                             | See more detailed description for  layer input. | []              |
+| **center**        | *Coordinate* (number[ ]) | A coordinate as an array of numbers. Determines the starting center point for the map.                                                                                                                                         | [15,15]                                         | [0,0]           |
+| **defaultBounds** | *Coordinates[ ]*         | Array of two coordinates to specify the initial bounds of the map                                                                                                                                                              | [\[50,50] [100,100]]                             | [\[0,0] [30,30]] |
+| **zoom**          | *Number*                | Initial zoom level of the map                                                                                                                                                                                                  | 5                                               | 1               |
+| **minZoom**       | *Number*                | The minimum zoom level allowed                                                                                                                                                                                                 | -10                                             | 1               |
+| **maxZoom**       | *Number*                | The maximum zoom level allowed                                                                                                                                                                                                 | 10                                              | 15              |
+| **crs**           | *String*                | String which sets the coordinate referencing system. The default is set to Simple, and will be the best option in most cases. Alternatively, one can set this as "earth" which will provide a crs commonly used for tile maps. | ""                                              | "Simple"        |
+
+#### *Props:* Map tools
+
+
+These props are all object props, meaning you pass them to the component on a JSON format:
+
+```python
+
+drawTools={
+    #tool props
+}
+
+layered_map_component = webviz_subsurface_components.NewLayeredMap(
+        id="example-map",
+        ...,
+        drawTools={
+            "drawMarker": True,
+            "drawPolygon": True,
+            "drawPolyline": True,
+            "position": "top-right"
+        },
+        ...
+)
+```
+Note that all of these tools have the `"position"` tool prop, which decides the tool's position in the map view.
+
+---------
+
+##### scaleY
+Adds a slider which can scale the Y axis of the map.
+
+Example:
+```python
+scaleY={
+        "scaleY": 1,
+        "minScaleY": 1,
+        "maxScaleY": 5,
+        "position": 'top-left',
+    }
+```
+| Name      | Type     | Description            |
+|-----------|----------|------------------------|
+| scaleY    | *Number* | Current slider value   |
+| minScaleY | *Number* | Minimum slider value   |
+| maxScaleY | *Number* | Maximum slider value   |
+
+--------------
+
+##### drawTools
+Adds tools for drawing, editing and removing various shapes.
+
+Example:
+
+```python
+drawTools={
+        "drawMarker": True,
+        "drawPolygon": True,
+        "drawPolyline": True,
+        "position": "top-right"
+    }
+```
+| Name         | Type      | Description                     |
+|--------------|-----------|---------------------------------|
+| drawMarker   | *Boolean* | Turns on the marker draw tool   |
+| drawPolygon  | *Boolean* | Turns on the polygon draw tool  |
+| drawPolyline | *Boolean* | Turns on the polyline draw tool |
+
+--------------
+##### switch
+Adds a switch toggle
+
+Example:
+
+```python
+switch={
+        "value": False,
+        "disabled": False,
+        "label": "hillshading",
+        "position": "bottom-left"
+    }
+```
+
+| Name     | Type      | Description                             |
+|----------|-----------|-----------------------------------------|
+| value    | *Boolean* | The initial value of the switch         |
+| disabled | *Boolean* | If the switch should be disabled or not |
+| label    | *String*  | The label for the switch                |
+
+-------------------
+
+##### mouseCoords
+Adds a display for the live x, y, z coordinates of the mouse.
+
+Example:
+
+```python
+mouseCoords={
+        "position": "bottom-right"
+    }
+```
+
+-----------------
+
+##### colorBar
+Adds a display of the current color scale with min and max z values.
+
+Example:
+
+```python
+colorBar={
+        "position": "bottom-right"
+    }
+```
+
+--------------------
+
+#### *Props:* Map syncronization
+
+These props specify the different aspects of syncronization between maps.
+
+| Name             | Type        | Description                                                                                                                                                                                                        | Example input          |
+|------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|
+| **syncedMaps**   | *String[ ]* | An array of ids of maps you want to sync this map with in terms of zoom, movement and potentially drawings. Currently you have to be careful not to put the id of this map in the array as this will cause errors. | ["map-1", "map-2",...] |
+| **syncDrawings** | *Boolean*   | Specifies whether or not this map should sync drawings between the maps in syncedMaps. This currently only works if all the maps you want to sync drawings between have this enabled.  False by default.           |                        |
+
+-------------------------------
+
+### 🎙 Listeners
+
+There are some listeners the python user can access using callbacks, such as the coordinates of a mouse click or a drawing.
+
+Example:
+
+```python
+app.layout = html.Div(
+    children=[
+        layered_map_component,
+        html.Pre(id="polygon")
+    ]
+)
+
+@app.callback(
+     Output("polygon", "children"),
+     [Input("example-map", "polygon_points")]
+)
+def get_polygon_coords(coords):
+    return f"polygon coordinates: {json.dumps(coords)}"
+```
+
+| Name                | Output format             | Description                                       |
+|---------------------|---------------------------|---------------------------------------------------|
+| **click_position**  | {[x, y]}                  | Coordinates of the last clicked area of the map   |
+| **marker_point**    | {[x, y]}                  | Coordinates of the last placed marker on the map  |
+| **polyline_points** | {[x1, y1], ..., [xn, yn]} | Coordinates of the last drawn polyline on the map |
+| **polygon_points**  | {[x1, y1], ..., [xn, yn]} | Coordinates of the last drawn polygon on the map  |

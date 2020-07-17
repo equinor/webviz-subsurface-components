@@ -139,7 +139,7 @@ if __name__ == "__main__":
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
         id="example-map",
         syncedMaps=["example-map2"],
-        syncDrawings=True, 
+        # syncDrawings=True, 
         layers=layers,
         colorBar={
             "position": 'bottomleft'

@@ -16,12 +16,12 @@ import exampleData from '../../../demo/example-data/new-layered-map.json';
 
 const stringToCRS = (crsString) => {
     switch(crsString) {
-        case 'simple': {
-            return L.CRS.Simple;
+        case 'earth': {
+            return L.CRS.EPSG3857;
         }
 
         default:
-            return L.CRS.EPSG3857;
+            return L.CRS.Simple;
     }
 }
 
@@ -47,7 +47,7 @@ class NewLayeredMap extends Component {
             crs: stringToCRS(props.crs),
             // center: [432205, 6475078],
             center: props.center || [0, 0],
-            bounds: props.bounds,
+            defaultBounds: props.defaultBounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
 
@@ -282,17 +282,22 @@ NewLayeredMap.propTypes = {
     /**
      * 
      */
-    bounds: PropTypes.array,
+    defaultBounds: PropTypes.array,
 
     /**
      * 
      */
-    center: PropTypes.array,
+    zoom: PropTypes.number,
 
     /**
      * 
      */
     minZoom: PropTypes.number,
+
+    /**
+     * 
+     */
+    maxZoom: PropTypes.number,
 
     /**
      * 
