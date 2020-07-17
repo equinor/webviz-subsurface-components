@@ -14,9 +14,6 @@ import Context from './Context'
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
 
-// Constants
-const DEFAULT_BOUNDS = [[0, 0], [30, 30]]
-
 const stringToCRS = (crsString) => {
     switch(crsString) {
         case 'simple': {

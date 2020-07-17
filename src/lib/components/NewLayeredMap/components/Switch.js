@@ -46,6 +46,7 @@ class Switch extends React.Component {
     }
 
     handleChange = (event) => {
+        console.log("Switch handle change")
         if(this.props.setProps) {
             const curProps = Object.assign({}, this.props);
             delete curProps.map;
