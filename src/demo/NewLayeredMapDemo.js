@@ -35,17 +35,17 @@ const NewLayeredMapDemo = () => {
     }
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", height: '90vh'}}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: '90vh', width: '150vh'}}>
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
-                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-3"]}
+                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
                     syncDrawings={true}
                     // layers={exampleData.layers}
                     layers={layers}
                     center={[0, 0]}
                     // center={[432205, 6475078], [432205, 6475078]} 
-                    defaultBounds={[[432205, 6475078], [437720, 6481113]] [[432205, 6475078], [437720, 6481113]]}
+                    // defaultBounds={[[432205, 6475078], [437720, 6481113]] [[432205, 6475078], [437720, 6481113]]}
                     crs="simple"
                     //crs="earth"
                     //minZoom={-5}
@@ -81,10 +81,10 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            {/* <div >
+            <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
-                    syncedMaps={["NewLayeredMap-1", "NewLayeredMap-3"]}
+                    syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
                     syncDrawings={true}
                     // layers={exampleData.layers}
                     layers={layers}
@@ -121,13 +121,13 @@ const NewLayeredMapDemo = () => {
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-3"}
-                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
+                    syncedMaps={["NewLayeredMap-4", "NewLayeredMap-3"]}
                     syncDrawings={true}
                     layers={exampleData.layers}
                     // center={[0, 0]}
                     crs="simple"
-                    // center={[432205, 6475078], [432205, 6475078]}
-                    // defaultBounds={[[432205, 6475078], [437720, 6481113]]}
+                    center={[432205, 6475078], [432205, 6475078]}
+                    defaultBounds={[[432205, 6475078], [437720, 6481113]]}
                     minZoom={-5}
                     // scaleY={{
                     //     scaleY: 1,
@@ -149,7 +149,39 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div> */}
+            </div>
+            <div>
+                <NewLayeredMap 
+                    id={"NewLayeredMap-4"}
+                    syncedMaps={["NewLayeredMap-3", "NewLayeredMap-4"]}
+                    syncDrawings={false}
+                    layers={exampleData.layers}
+                    // center={[0, 0]}
+                    crs="simple"
+                    center={[432205, 6475078], [432205, 6475078]}
+                    defaultBounds={[[432205, 6475078], [437720, 6481113]]}
+                    minZoom={-5}
+                    // scaleY={{
+                    //     scaleY: 1,
+                    //     minScaleY: 1,
+                    //     maxScaleY: 10,
+                    //     position: 'topleft',
+                    // }}
+                    drawTools = {{
+                        drawMarker: true,
+                        drawPolygon: true,
+                        drawPolyline: true,
+                        position: "topright",
+                        
+                    }}
+                    switch={{
+                        value: switchValue,
+                        label: 'Hillshading',
+                        position: 'bottomleft'
+                    }}
+                    setProps={onChange}
+                />
+            </div>
         </ div>
         
     )
