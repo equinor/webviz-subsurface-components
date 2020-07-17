@@ -359,10 +359,10 @@ class CompositeMapLayers extends Component {
     }
 
 
-    setFocusedImageLayer = (url, onScreenCanvas, minvalue, maxvalue) => {
+    setFocusedImageLayer = (layer) => {
         const updateFunc = this.context.setFocusedImageLayer;
         if(updateFunc) {
-            updateFunc(url, onScreenCanvas, minvalue, maxvalue);
+            updateFunc(layer);
         }
     }
 
