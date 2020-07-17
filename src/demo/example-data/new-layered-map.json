@@ -24,33 +24,10 @@
             ]
         },
         {
-            "name": "Hello world",
-            "id": 1, 
-            "action": null,
-            "checked": true,
-            "baseLayer": true,
-            "data": [
-                {
-                    "type": "tile",
-                    "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
-                    "shader": {
-                        "type": "none"
-                    },
-                    "colorScale": {
-                        "colors":  ["#09c12c", "#0b66bc", "#4e9ba3", "#73031b", "#428a67", "#0381a2", "#ece210", "#fb9f3a", "#fdca26", "#f0f921"],
-                        "scaleType": "linear"
-                    },
-                    "minvalue": 2782,
-                    "maxvalue": 3513
-                }
-            ]
-        },
-        {
             "name": "A seismic horizon with colormap",
             "id": 3, 
             "baseLayer": true,
-            "checked": false,
+            "checked": true,
             "action": "update",
             "data": [
                 {
@@ -65,7 +42,7 @@
                         "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
                         "prefixZeroAlpha": false,
                         "scaleType": "linear",
-                        "cutPointMin": 3000,
+                        "cutPointMin": 2782,
                         "cutPointMax": 3513
                     },
                     "minvalue": 2782,

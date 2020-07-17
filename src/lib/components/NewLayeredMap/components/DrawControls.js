@@ -125,7 +125,7 @@ class DrawControls extends Component {
         
     
         map.on(L.Draw.Event.EDITED, (e) => {
-            console.log("EDITED!");
+
             if (props.syncDrawings) {
                 const newLayers = []
             }
@@ -184,7 +184,7 @@ class DrawControls extends Component {
             this.setState({editing: true});
         })
 
-        map.on('click', (e) => {
+        map.on('mouseup', (e) => {
             const circleMarker = {
                 type: "circleMarker",
                 center: [e.latlng.lat, e.latlng.lng],
