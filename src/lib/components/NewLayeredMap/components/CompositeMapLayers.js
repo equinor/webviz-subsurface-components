@@ -215,7 +215,6 @@ class CompositeMapLayers extends Component {
             case "image":
                 const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
-                console.log("image layer : ", imageLayer)
                 
                 const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
                 if (checked) {
