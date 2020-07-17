@@ -11,6 +11,8 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
     options: {
 
+		crossOrigin: false,
+
         /**
          * @param {Array<String>} - An array of hexcolors for defining the colormap used on the tiles.
          */
@@ -144,6 +146,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         drawFunc(this._gl, this._canvas, this._url, this._colormapUrl, {
             ...this.options,
             shader: this.options.shader,
+            crossOrigin:  this.options.crossOrigin || '',
         })
         .then(() => {
             // Draw from the webgl-canvas to the onscreenCanvas

@@ -38,7 +38,7 @@ export const drawCommand = (context, cmd, props = {}) => {
     
     // Clear canvas
     gl.clearColor(...(cmd.bgColor || [0, 0, 0, 0]));
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     if(cmd.viewport) {
         gl.viewport(...(extractValue(cmd.viewport, props)));
@@ -83,6 +83,7 @@ export const drawCommand = (context, cmd, props = {}) => {
             gl.uniform1i(uniformLocation, textureUnit.index())
         }
         else {
+            // Only a textureUnit (Number) was provided.
             const uniformLocation = gl.getUniformLocation(program, textureName);
             gl.uniform1i(uniformLocation, textureUnit);
         }
@@ -108,16 +109,18 @@ export const drawCommand = (context, cmd, props = {}) => {
 }
 
 /**
- * 
+ * extractValue extracts a value from props if the given variable-value has a type of Variable.
+ * Unless, it just returns the normal value.
  * @param {Variable} variable 
  * @param {Object.<any>} props 
+ * @returns {any}
  */
 const extractValue = (variable, props) => {
     if(variable instanceof Variable) {
         return props[variable.name];
     }
-    else if(Array.isArray(variable) && variable.some(v => v instanceof Variable)) {
-        const v = variable.filter(v => v instanceof Variable)[0];
+    else if(Array.isArray(variable) && variable.some(v => v instanceof Variable)) { // The uniformf-method gives an array
+        const v = variable.find(v => v instanceof Variable);
         return props[v.name];
     }
     return variable;

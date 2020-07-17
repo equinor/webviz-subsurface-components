@@ -1,7 +1,6 @@
 export const loadImage = (src, config = {}) =>
     new Promise(resolve => {
         const img = new Image();
-        
         if(config.crossOrigin || config.crossOrigin === '') {
             requestCORSIfNotSameOrigin(img, src, config.crossOrigin === true ? '' : config.crossOrigin);
         }

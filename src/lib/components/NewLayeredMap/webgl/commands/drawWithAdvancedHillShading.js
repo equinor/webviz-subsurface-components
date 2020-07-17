@@ -30,7 +30,11 @@ const DEFAULT_SUN_DIRECTION = vec3.normalize([], [1, 1, 1]);
 /**
  * @description - This hillshader is heavly inspiried by the Rye Terrell's advanced map shading tutorial:
  *                                                  https://wwwtyro.net/2019/03/21/advanced-map-shading.html
- * A known issue is that the soft-shadows are quite GPU-heavy and is quite slow for big images.
+ * 
+ * A known issue is that the soft-shadows are quite GPU-heavy and is quite slow for big images. High number of
+ * shadow-iterations might be fatal for the browser on big images.
+ * 
+ * @author Anders Hallem Iversen
  * @param {WebGLRenderingContext} gl
  * @param {HTMLCanvasElement} canvas
  * @param {HTMLImageElement} loadedImage
@@ -40,7 +44,7 @@ const DEFAULT_SUN_DIRECTION = vec3.normalize([], [1, 1, 1]);
 export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => {
     const {
         // Hillshading options
-        pixelScale = DEFAULT_PIXEL_SCALE, 
+        pixelScale = DEFAULT_PIXEL_SCALE,
         elevationScale = DEFAULT_ELEVATION_SCALE, 
         shadows = false, 
         sunDirection = DEFAULT_SUN_DIRECTION,
@@ -53,6 +57,7 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
         noColor = false,
     } = options;
 
+    console.log(loadedImage, loadedImage.crossOrigin)
 
     gl.getExtension('OES_texture_float');
     //gl.getExtension('OES_texture_float_linear');
@@ -104,12 +109,14 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
         .uniformf("resolution", loadedImage.width, loadedImage.height)
         .vertexCount(6)
         .viewport(0, 0, loadedImage.width, loadedImage.height)
-        .framebuffer(fboNormal)
+        //.framebuffer(fboNormal)
         .build();
     
     normalCmd();
 
-   const fboFinal = eqGL.framebuffer({width: width, height: height});
+    return;
+
+    const fboFinal = eqGL.framebuffer({width: width, height: height});
 
     if(!shadows) {
 

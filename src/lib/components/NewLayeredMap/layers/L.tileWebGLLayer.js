@@ -101,7 +101,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
         // Make sure the image gets the correct crossOrigin attribute, due to CORS-issues.
         if (this.options.crossOrigin || this.options.crossOrigin === '') {
-          tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
+          	tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
         }
 
         this._draw(tile, coords, done);
