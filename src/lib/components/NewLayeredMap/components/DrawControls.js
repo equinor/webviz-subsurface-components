@@ -20,6 +20,8 @@ L.Icon.Default.mergeOptions({
  *    https://stackoverflow.com/questions/18014907/leaflet-draw-retrieve-layer-type-on-drawedited-event
  **/
 
+
+ // TODO: Move to utils
 const getShapeType = layer => {
     if (layer instanceof L.Rectangle) {
         return "rectangle";
