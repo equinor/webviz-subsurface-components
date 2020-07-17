@@ -18,15 +18,17 @@ The component can be either used as an Dash-component or as a plain React compon
 
 ### Getting started
 Downloading the component
+
+#### Unofficial version
 ```
-pip install -i https://test.pypi.org/simple/ webviz-subsurface-components
+pip install -i https://test.pypi.org/simple/ webviz-beta==0.0.7
 ```
 
 ### Using the component
 
 ```python
 import dash
-import webviz-subsurface-components
+import webviz_beta
 
 layers = [
     {
@@ -46,7 +48,7 @@ layers = [
 
 app = dash.Dash(__name__)
 
-new_layered_map = webviz_subsurface_components.NewLayeredMap(
+new_layered_map = webviz_beta.NewLayeredMap(
     id='test-map',
     layers=layers,
 )
@@ -85,7 +87,7 @@ layers = [
 
 app = dash.Dash(__name__)
 
-new_layered_map = webviz_subsurface_components.NewLayeredMap(
+new_layered_map = webviz_beta.NewLayeredMap(
     id='test-map',
     layers=layers,
 )
