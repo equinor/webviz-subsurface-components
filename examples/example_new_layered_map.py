@@ -236,7 +236,11 @@ if __name__ == "__main__":
         ]
     )
 
+<<<<<<< HEAD
     def change_layer(add_n_clicks, colorscale, switch, delete_n_layer, cut_point_min, cut_point_max, global_max, global_min, log_n_clicks):
+=======
+    def change_layer(add_n_clicks, delete_n_clicks, colorscale, switch, cut_point_min, cut_point_max, global_max, global_min, log_n_clicks):
+>>>>>>> interns-dev
         global layers
         newLayers = []
         newLayers.extend(layers)

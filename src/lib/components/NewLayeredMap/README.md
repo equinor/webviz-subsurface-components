@@ -18,15 +18,17 @@ The component can be either used as an Dash-component or as a plain React compon
 
 ### Getting started
 Downloading the component
+
+#### Unofficial version
 ```
-pip install -i https://test.pypi.org/simple/ webviz-subsurface-components
+pip install -i https://test.pypi.org/simple/ webviz-beta==0.0.7
 ```
 
 ### Using the component
 
 ```python
 import dash
-import webviz-subsurface-components
+import webviz_beta
 
 layers = [
     {
@@ -46,7 +48,7 @@ layers = [
 
 app = dash.Dash(__name__)
 
-new_layered_map = webviz_subsurface_components.NewLayeredMap(
+new_layered_map = webviz_beta.NewLayeredMap(
     id='test-map',
     layers=layers,
 )
@@ -85,7 +87,7 @@ layers = [
 
 app = dash.Dash(__name__)
 
-new_layered_map = webviz_subsurface_components.NewLayeredMap(
+new_layered_map = webviz_beta.NewLayeredMap(
     id='test-map',
     layers=layers,
 )
@@ -381,10 +383,10 @@ colorBar={
 
 These props specify the different aspects of syncronization between maps.
 
-| Name             | Type        | Description                                                                                                                                                                                                        | Example input          |
-|------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|
-| **syncedMaps**   | *String[ ]* | An array of ids of maps you want to sync this map with in terms of zoom, movement and potentially drawings. Currently you have to be careful not to put the id of this map in the array as this will cause errors. | ["map-1", "map-2",...] |
-| **syncDrawings** | *Boolean*   | Specifies whether or not this map should sync drawings between the maps in syncedMaps. This currently only works if all the maps you want to sync drawings between have this enabled.  False by default.           |                        |
+| Name             | Type        | Description                                                                                                                                                                                                                    | Example input          |
+|------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|
+| **syncedMaps**   | *String[ ]* | An array of ids of maps you want to sync this map with in terms of zoom, movement and potentially drawings. Including the id of this map will not cause any errors. e.g `id="map-1",  syncedMaps=["map-1", "map-2"]`  is fine. | ["map-1",..., "map-n"] |
+| **syncDrawings** | Boolean     | Should this map draw to the maps in *syncedMaps*? False by default.                                                                                                                                                            |                        |
 
 -------------------------------
 
@@ -412,7 +414,7 @@ def get_polygon_coords(coords):
 
 | Name                | Output format             | Description                                       |
 |---------------------|---------------------------|---------------------------------------------------|
-| **click_position**  | {[x, y]}                  | Coordinates of the last clicked area of the map   |
-| **marker_point**    | {[x, y]}                  | Coordinates of the last placed marker on the map  |
-| **polyline_points** | {[x1, y1], ..., [xn, yn]} | Coordinates of the last drawn polyline on the map |
-| **polygon_points**  | {[x1, y1], ..., [xn, yn]} | Coordinates of the last drawn polygon on the map  |
+| **click_position**  | `{[x, y]}`                  | Coordinates of the last clicked area of the map   |
+| **marker_point**    | `{[x, y]}`                  | Coordinates of the last placed marker on the map  |
+| **polyline_points** | `{[[x1, y1], ..., [xn, yn]]}` | Coordinates of the last drawn polyline on the map |
+| **polygon_points**  | `{[[x1, y1], ..., [xn, yn]]}` | Coordinates of the last drawn polygon on the map  |
