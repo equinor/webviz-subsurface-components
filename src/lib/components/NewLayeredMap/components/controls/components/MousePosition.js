@@ -4,7 +4,7 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
 // Components
-import Context from '../Context';
+import Context from '../../../Context';
 
 // Constants
 const NUMBER_COLOR_CHANNELS = 4;

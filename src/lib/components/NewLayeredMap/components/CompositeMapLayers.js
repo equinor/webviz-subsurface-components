@@ -7,8 +7,18 @@ import L from 'leaflet';
 import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
 
-// Components
-import ColorBar from './ColorBar'
+// Utils
+import { 
+    getShapeType, 
+    makePolyline,
+    makePolygon,
+    makeCircle,
+    makeMarker,
+    makeCircleMarker,
+    addImage,
+    addTile
+
+} from './leafletUtils'
 
 // Helper functions
 const yx = ([x, y]) => {
@@ -98,122 +108,31 @@ class CompositeMapLayers extends Component {
         });
     }
 
-    addTooltip = (item, shapeObject) => {
-        if ("tooltip" in item) {
-            return shapeObject.bindTooltip(item.tooltip);
-        }
-        return shapeObject;
-    }
-
-    makePolyline = (item, swapXY) => {
-        const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
-        return this.addTooltip(item, 
-                    (L.polyline(pos, {
-                        onClick: () => this.props.lineCoords(positions),
-                        color: item.color || "blue",
-                        positions: pos
-                    })
-        ));
-    }
-
-    makePolygon = (item, swapXY) => {
-        const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
-        return this.addTooltip(item, 
-                    (L.polygon(pos, {
-                        onClick: () => this.props.polygonCoords(positions),
-                        color: item.color || "blue",
-                        positions: pos
-                    })
-        ));
-    }
-
-    makeMarker = (item, swapXY) => {
-        const pos = swapXY ? yx(item.position): item.position;
-        
-        return  this.addTooltip(item, 
-                    L.marker(pos)
-        );
-    }
-
-    makeCircle = (item, swapXY) => {
-        const center = swapXY ? yx(item.center) : item.center;
-        return  this.addTooltip(item, 
-                    (L.circle(center, {
-                        color: item.color || "red",
-                        center : center,
-                        radius : item.radius
-                    })
-        ));
-    }
-
-    makecircleMarker = (item, swapXY) => {
-        const center = swapXY ? yx(item.center) : item.center;
-        return  this.addTooltip(item, 
-                    (L.circleMarker(center, {
-                        color: item.color || "red",
-                        center : center,
-                        radius : item.radius || 4,
-                    })
-        ));
-    }
-
-    addImage = (imageData) => {
-        const bounds = (imageData.bounds || []).map(xy => yx(xy));
-        let newImageLayer = null;
-        newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
-            ...imageData,
-            minvalue: imageData.minvalue,
-            maxvalue: imageData.maxvalue,
-            colorScale: imageData.colorScale,
-            shader: imageData.shader,
-        });
-        
-        return newImageLayer;
-    }
-
-    addTile = (tileData) => {
-        let newTileLayer = null;
-        if(tileData.colorScale) {
-            newTileLayer = L.tileWebGLLayer(tileData.url, {
-                ...tileData,
-                minvalue: tileData.minvalue,
-                maxvalue: tileData.maxvalue,
-                colorScale: tileData.colorScale,
-                shader: tileData.shader,
-            })
-        } else {
-            newTileLayer = L.tileLayer(tileData.url, {
-                ...tileData,
-            })
-        }
-        return newTileLayer;
-    }
-
     // Assumes that coordinate data comes in on the format of (y,x) by default
-    addItem(item, layerGroup, swapXY = true) {
+    addItemToLayer(item, layerGroup, swapXY = true) {
         switch(item.type) {
             case "polyline":
-                layerGroup.addLayer(this.makePolyline(item, swapXY));
+                layerGroup.addLayer(makePolyline(item, swapXY, this.props.lineCoords));
                 break;
 
             case "polygon":
-                layerGroup.addLayer(this.makePolygon(item, swapXY));
+                layerGroup.addLayer(makePolygon(item, swapXY, this.props.polygonCoords));
                 break;
 
             case "circle":
-                layerGroup.addLayer(this.makeCircle(item, swapXY));
+                layerGroup.addLayer(makeCircle(item, swapXY));
                 break;
             
             case "circleMarker":
-                layerGroup.addLayer(this.makecircleMarker(item, swapXY));
+                layerGroup.addLayer(makeCircleMarker(item, swapXY));
                 break;
             
             case "marker":
-                layerGroup.addLayer(this.makeMarker(item, swapXY));
+                layerGroup.addLayer(makeMarker(item, swapXY));
                 break;
                 
             case "image":
-                const imageLayer = this.addImage(item, swapXY);
+                const imageLayer = addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
                 
                 const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
@@ -226,7 +145,7 @@ class CompositeMapLayers extends Component {
                 });
                 break;
             case "tile": 
-                layerGroup.addLayer(this.addTile(item, swapXY));
+                layerGroup.addLayer(addTile(item, swapXY));
                 break;
 
             default:
@@ -244,16 +163,6 @@ class CompositeMapLayers extends Component {
         L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
     }
 
-    createMultipleLayers() {
-        this.addScaleLayer(this.props.map);
-        const layers = this.props.layers;
-        for (const layer of layers) {
-            this.createLayerGroup(layer);
-        }
-        this.addDrawLayerToMap();
-        
-    }
- 
     removeLayerFromState = (id) => {
         this.setState(prevState => {
            const newLayers = Object.assign({}, prevState.layers);
@@ -262,6 +171,16 @@ class CompositeMapLayers extends Component {
                layers: newLayers
            };
         });
+    }
+
+    createMultipleLayers() {
+        this.addScaleLayer(this.props.map);
+        const layers = this.props.layers;
+        for (const layer of layers) {
+            this.createLayerGroup(layer);
+        }
+        this.addDrawLayerToMap();
+        
     }
 
     createLayerGroup = (layer) => {
@@ -274,7 +193,7 @@ class CompositeMapLayers extends Component {
 
         //adds object to a layer
         for (const item of layer.data) {
-            this.addItem(item, layerGroup);
+            this.addItemToLayer(item, layerGroup);
         }
 
         if(layer.checked) {
@@ -303,12 +222,10 @@ class CompositeMapLayers extends Component {
         }));
 
         this.context.drawLayer.addTo(this.props.map);
-
         this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     }
 
-    setFocusedImageLayer = (layer) => {
- 
+    setFocusedImageLayer = (layer) => { 
         const updateFunc = this.context.setFocusedImageLayer;
         if(updateFunc) {
             updateFunc(layer);
@@ -326,55 +243,19 @@ class CompositeMapLayers extends Component {
             if (this.props.syncedMaps.includes(item.creatorId)) {
                 this.context.drawLayer.eachLayer(layer => {
                     try {
-                        if(this.getShapeType(layer) === item.type) {
+                        if(getShapeType(layer) === item.type) {
                             this.context.drawLayer.removeLayer(layer);
                         }
                     } catch (error) {}
                 })
-                this.addItem(item, this.context.drawLayer, false);
+                this.addItemToLayer(item, this.context.drawLayer, false);
             }   
         }
     }
-
-    // TODO: Move to utils
-    getShapeType = layer => {
-        if (layer instanceof L.Rectangle) {
-            return "rectangle";
-        }
-        if (layer instanceof L.Circle) {
-            return "circle";
-        }
-        if (layer instanceof L.CircleMarker) {
-            return "circleMarker";
-        }
-        if (layer instanceof L.Marker) {
-            return "marker";
-        }
-        if (layer instanceof L.Polygon) {
-            return "polygon";
-        }
-        if (layer instanceof L.Polyline) {
-            return "polyline";
-        }
-        throw new Error("Unknown shape type");
-    };
     
   
     render() {
-        return (
-            <div>
-                <div>
-                    {
-                        (this.props.colorBar) &&
-                        <ColorBar
-                            map = {this.props.map}
-                            position = {(this.props.colorBar || {}).position}
-                            unit = {(this.props.colorBar || {}).unit}
-                        />
-                    }
-                </div>
-            </div>
-        );
+        return null;
     }
     
 }

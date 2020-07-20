@@ -3,10 +3,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 // Components
-import VerticalZoom from './VerticalZoom';
-import DrawControls from './DrawControls';
-import Switch from './Switch';
-import MousePosition from './MousePosition'
+import VerticalZoom from './components/VerticalZoom/VerticalZoom';
+import DrawControls from './components/DrawControls';
+import ColorBar from './components/Colorbar'
+import Switch from './components/Switch/Switch';
+import MousePosition from './components/MousePosition'
 
 class Controls extends Component {
     
@@ -73,6 +74,16 @@ class Controls extends Component {
                         />
                     )
                 }
+                </div>
+                <div>
+                    {
+                        (this.props.colorBar) &&
+                        <ColorBar
+                            map = {this.props.map}
+                            position = {(this.props.colorBar || {}).position}
+                            unit = {(this.props.colorBar || {}).unit}
+                        />
+                    }
                 </div>
             </div>    
         )

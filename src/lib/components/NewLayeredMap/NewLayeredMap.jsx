@@ -7,7 +7,7 @@ import './layers/L.imageWebGLOverlay';
 import './layers/L.tileWebGLLayer';
 
 // Components
-import Controls from './components/Controls';
+import Controls from './components/controls/Controls';
 import CompositeMapLayers from './components/CompositeMapLayers'
 import Context from './Context'
 
@@ -194,6 +194,7 @@ class NewLayeredMap extends Component {
                                             map={this.state.map}
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
+                                            colorBar={this.props.colorBar}
                                             drawTools={this.props.drawTools}
                                             mouseCoords = {this.props.mouseCoords}
                                             syncDrawings={this.props.syncDrawings}
@@ -205,7 +206,6 @@ class NewLayeredMap extends Component {
                                     <CompositeMapLayers 
                                         layers={this.props.layers}
                                         map={this.state.map}
-                                        colorBar={this.props.colorBar}
                                         syncedMaps={[...this.props.syncedMaps, this.state.id]}
                                     />
                                 )

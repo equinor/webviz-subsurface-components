@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
-import Context from '../Context';
+import Context from '../../../Context';
 
 // Leaflet
 import L from "leaflet";
 
 // Utils
-import { buildColormap } from '../colorscale';
+import { buildColormap } from '../../../colorscale';
 
 
 const ColorBar = (props) => {
