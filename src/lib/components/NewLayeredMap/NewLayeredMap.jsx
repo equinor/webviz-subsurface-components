@@ -152,7 +152,7 @@ class NewLayeredMap extends Component {
     }
 
     redrawAllSyncedMaps = () => {
-        for (const id of this.props.syncedMaps) {
+        for (const id of this.props.syncedMaps || []) {
             if (id !== this.state.id) {
                 const otherMap = NewLayeredMap.mapReferences[id];
                 otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
@@ -207,7 +207,7 @@ class NewLayeredMap extends Component {
                                         layers={this.props.layers}
                                         map={this.state.map}
                                         colorBar={this.props.colorBar}
-                                        syncedMaps={[...this.props.syncedMaps, this.state.id]}
+                                        syncedMaps={[...this.props.syncedMaps || [], this.state.id]}
                                     />
                                 )
                             }
