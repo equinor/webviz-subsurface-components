@@ -71,6 +71,7 @@ class CompositeMapLayers extends Component {
 
                     case "delete":
                         if (this.state.layers[propLayerData.id]) {
+                            this.setFocusedImageLayer(null)
                             const stateLayer = this.state.layers[propLayerData.id];
                             stateLayer.remove();
                             this.state.layerControl.removeLayer(stateLayer);
@@ -215,7 +216,7 @@ class CompositeMapLayers extends Component {
             case "image":
                 const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
-                
+                this.setFocusedImageLayer(imageLayer)
                 const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
                 if (checked) {
                     this.setFocusedImageLayer(imageLayer);

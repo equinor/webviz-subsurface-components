@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     state = {
         'add_n_clicks': 0,
-        'delete_n_clicks': 0,
+        'delete_n_layer': 0,
         'switch': { "value": False },
         'colorscale': None,
         'cut_point_min': min_value,
@@ -58,7 +58,7 @@ if __name__ == "__main__":
                     "type": "image",
                     "url": map_data,
                     "colorScale":  {
-                        "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+                        "colors":["#5aec87", "#5c1787", "#4e11cf", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
                         "prefixZeroAlpha": False,
                         "scaleType": "linear",
                         "cutPointMin": min_value,
@@ -191,8 +191,8 @@ if __name__ == "__main__":
             html.Button('Toggle shader', id='map-shader-toggle-btn'),
             html.Button('Toggle log', id='map-log-toggle-btn'),
             # dcc.Dropdown('Select colorscale', id='layer-colorscale'), # Use this one -> https://github.com/plotly/dash-colorscales
-            html.Button('Delete layer', id='layer-delete-btn'),
             html.Button('Add layer', id='layer-add-btn'),
+            html.Div(["Delete layer by id: ", dcc.Input(id='delete-layer-id', type='number')]),
             html.Div(["Cut below: ", dcc.Input(id='maximum-value', type='number')]),
             html.Div(["Cut above: ", dcc.Input(id='minimum-value', type='number')]),
             html.Div(["Global min value: ", dcc.Input(id='global-minimum-value', type='number')]),            
@@ -223,9 +223,9 @@ if __name__ == "__main__":
         Output('example-map', 'layers'),
         [
             Input('layer-add-btn', 'n_clicks'),
-            Input('layer-delete-btn', 'n_clicks'),
             Input('layer-colorscale', 'colorscale'),
             Input('example-map', 'switch'),
+            Input('delete-layer-id', 'value'),
             Input('maximum-value','value'),
             Input('minimum-value','value'), 
             Input('global-maximum-value','value'),
@@ -236,18 +236,18 @@ if __name__ == "__main__":
         ]
     )
 
-    def change_layer(add_n_clicks, delete_n_clicks, colorscale, switch, cut_point_min, cut_point_max, global_max, global_min, log_n_clicks):
+    def change_layer(add_n_clicks, colorscale, switch, delete_n_layer, cut_point_min, cut_point_max, global_max, global_min, log_n_clicks):
         global layers
         newLayers = []
         newLayers.extend(layers)
         if (add_n_clicks is not None and add_n_clicks > state['add_n_clicks']):            
             newLayers = add_layer(newLayers)
-        elif (delete_n_clicks is not None and delete_n_clicks > state['delete_n_clicks']):
-            newLayers = delete_layer(newLayers)
         elif (colorscale is not None and colorscale != state['colorscale']):
             newLayers = update_layer(newLayers, colorscale)
         elif (switch is not None and state['switch']['value'] is not switch['value']):
             newLayers = toggle_shader(newLayers, switch)
+        elif (delete_n_layer is not None and delete_n_layer != state['delete_n_layer']):
+            newLayers = delete_layer(newLayers, delete_n_layer)
         elif (cut_point_min is not None and cut_point_min != state['cut_point_min']):
             newLayers = update_cut_point_min(newLayers, cut_point_min)
         elif (cut_point_max is not None and cut_point_max != state['cut_point_max']):
@@ -261,7 +261,7 @@ if __name__ == "__main__":
         
         
         state['add_n_clicks'] = add_n_clicks or 0
-        state['delete_n_clicks'] = delete_n_clicks or 0
+        state['delete_n_layer'] = delete_n_layer or 0
         state['colorscale'] = colorscale
         state['switch'] = switch
         state['cut_point_min'] = cut_point_min or 0
@@ -273,9 +273,15 @@ if __name__ == "__main__":
 
         return newLayers
 
-    def delete_layer(layers):
-        # layers[1]['action'] = 'delete'
-        return layers
+    def delete_layer(layers, layer_id):
+        delete = [
+            {
+                "id": layer_id,
+                "action": "delete",
+            },
+
+        ]
+        return delete
 
     # changes the arrays to the desired view
     def get_surface_arr(surface, unrotate=True, flip=True):
@@ -290,26 +296,31 @@ if __name__ == "__main__":
                 return [x, y, z]
     
     def add_layer(layers):
-        if len(layers) < 5:
-            layers.append({
-                "name": "Something",
-                "id": 2,
-                "baseLayer": True,
-                "checked": False,
-                "action": "add",
-                "data": [
-                    {
-                        "type": "image",
-                        "url": map_data,
-                        "allowHillshading": True,
-                        # "colormap": colormap,
-                        "unit": "m",    
-                        "minvalue": min_value,
-                        "maxvalue": max_value,
-                        "bounds": [[0, 0], [-30, -30]],
-                    },
-                ],
-            })
+        layers.append(
+        {
+            "name": "a very cool layer",
+            "id": 2, 
+            "baseLayer": True,
+            "checked": False,
+            "action": "add",
+            "data": [
+                {
+                    "type": "image",
+                    "url": map_data,
+                    "colorScale":  {
+                        "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+                        "prefixZeroAlpha": False,
+                        "scaleType": "linear",
+                        "cutPointMin": min_value,
+                        "cutPointMax": max_value 
+                        },
+                    "allowHillshading": True,
+                    "minvalue": min_value,
+                    "maxvalue": max_value,
+                    "bounds": [[0, 0], [-30, -30]]
+                },
+            ],
+        })
         return layers
 
     def update_layer(layers: List, colorScale: List[str]) -> List:

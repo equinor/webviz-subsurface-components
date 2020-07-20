@@ -78,7 +78,7 @@ const MousePosition = (props) => {
         const onScreenCanvas = focusedImageLayer.getCanvas ? focusedImageLayer.getCanvas() : null;
         const minvalue = (focusedImageLayer.options || {}).minvalue;
         const maxvalue = (focusedImageLayer.options || {}).maxvalue;
-        if(!url || !onScreenCanvas || !minvalue || !maxvalue) {
+        if(!url || !onScreenCanvas || !minvalue || !maxvalue) { // TODO fix minvalue = 0
             return;
         }
 
