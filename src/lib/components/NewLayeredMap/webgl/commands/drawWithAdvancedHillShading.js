@@ -11,6 +11,8 @@ import ambientFShader from '../../shaders/hillshading/ambient.fs.glsl';
 import combinedFShader from '../../shaders/hillshading/combined.fs.glsl';
 import colorFShader from '../../shaders/color.fs.glsl';
 
+import imageFShader from '../../shaders/image.fs.glsl';
+
 // CONSTANTS
 const DEFAULT_PIXEL_SCALE = 8000;
 const DEFAULT_ELEVATION_SCALE = 1.0;
@@ -57,16 +59,10 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
         noColor = false,
     } = options;
 
-    console.log(loadedImage, loadedImage.crossOrigin)
-
     gl.getExtension('OES_texture_float');
-    //gl.getExtension('OES_texture_float_linear');
-
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
-    // gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true)
-    // gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, true)
-    // gl.pixelStorei(gl.UNPACK_ALIGNMENT, true)
 
+   
     /**
      * @type {EQGLContext}
      */
@@ -83,22 +79,22 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
     let N = shadowIterations || calcN(width, height);
 
     const fboElevation = eqGL.framebuffer({ width: width, height: height});
-
+    
     const elevationCmd = eqGL.new()
         .vert(positionVShader)
         .frag(elevationFShader)
         .attribute("position", [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
-        .texture("tElevation", 0, loadedImage)
+        .texture("tElevation", eqGL.texture({image: loadedImage}))
         .uniformf("elevationScale", elevationScale)
         .uniformf("resolution", loadedImage.width, loadedImage.height)
         .vertexCount(6)
         .viewport(0, 0, loadedImage.width, loadedImage.height)
         .framebuffer(fboElevation)
         .build();
-
+        
     elevationCmd();
 
-    const fboNormal = eqGL.framebuffer({ width: width, height: height});
+    const fboNormal = eqGL.framebuffer({ width: width, height: height });
 
     const normalCmd = eqGL.new()
         .vert(positionVShader)
@@ -109,18 +105,16 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
         .uniformf("resolution", loadedImage.width, loadedImage.height)
         .vertexCount(6)
         .viewport(0, 0, loadedImage.width, loadedImage.height)
-        //.framebuffer(fboNormal)
+        .framebuffer(fboNormal)
         .build();
     
     normalCmd();
-
-    return;
 
     const fboFinal = eqGL.framebuffer({width: width, height: height});
 
     if(!shadows) {
 
-        // Render the image without shadows
+        // Render the image without shadows - just add some direct lights
         const directCmd = eqGL.new()
             .vert(positionVShader)
             .frag(directLightningsFShader)
@@ -128,9 +122,9 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             .texture("tNormal", fboNormal)
             .uniformf("sunDirection", sunDirection)
             .uniformf("resolution", loadedImage.width, loadedImage.height)
-            .vertexCount(6)
             .viewport(0, 0, loadedImage.width, loadedImage.height)
             .framebuffer(noColor ? null : fboFinal)
+            .vertexCount(6)
             .build();
         
         directCmd();
@@ -247,7 +241,16 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             colorScaleCmd();
     }
         
-
+    var numTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+    for (var unit = 0; unit <= numTextureUnits; unit++) {
+        gl.activeTexture(gl.TEXTURE0 + unit);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
 

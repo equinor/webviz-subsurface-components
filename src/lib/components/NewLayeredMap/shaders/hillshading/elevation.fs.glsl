@@ -13,4 +13,5 @@ void main() {
 
     // Scale the elevation and write it out.
     gl_FragColor = vec4(vec3(e * elevationScale), 1.0);
+    // gl_FragColor = 10000.0*vec4(e, e, e, 1.0);
 }

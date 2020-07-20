@@ -1,9 +1,10 @@
 import DrawCmdBuilder from './builder';
 import FrameBuffer from './framebuffer';
 import Variable from './variable';
+import Texture from './texture';
 
 export { default as FrameBuffer } from './framebuffer';
-export * as Utils from './utils';
+export * as Utils from './webglutils';
 
 export class EQGLContext {
 
@@ -44,6 +45,17 @@ export class EQGLContext {
      */
     variable(variableName) {
         return new Variable(variableName);
+    }
+
+
+    /**
+     * 
+     * @param {Object} options 
+     * @param {HTMLImageElement} options.image
+     * @param {Object} options.params - Custom gl.texParamteri-configuration
+     */
+    texture(options = {}) {
+        return new Texture(this._gl, options);
     }
 
 

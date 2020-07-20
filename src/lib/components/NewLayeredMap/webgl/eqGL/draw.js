@@ -2,19 +2,20 @@ import { EQGLContext, FrameBuffer } from './index';
 import Variable from './variable';
 import {  
     bindBuffer, bindTexture, createAndInitProgram, createProgram, createShader
-} from './utils';
+} from './webglutils';
+import Texture from './texture';
 
 /**
  * A number, or a string containing a number.
  * @typedef {Object} DrawCmd
  * @property {Number} id
+ * @property {String} frag - The fragment shader
+ * @property {String} vert - The vertex shader
  * @property {Object} attributes - The attributes - { [attributeName]: { value } }
  * @property {Object} uniforms - The uniforms - { [uniformName]: { value, type } }
  * @property {Object} textures - The textures - { [textureName]: { textureUnit, textureImage }}
  * @property {Number} vertexCount - The number of indicies to draw with gl.drawArrays(..., ..., vertexCount)
  * @property {Array<Number>} bgColor - The color of clear the canvas with
- * @property {String} frag - The fragment shader
- * @property {String} vert - The vertex shader
  * @property {FrameBuffer} framebuffer - The framebuffer to render the texture to
  * @property {Array<Number>} viewport - [x, y, width, height]
  */
@@ -81,6 +82,10 @@ export const drawCommand = (context, cmd, props = {}) => {
         else if(textureUnit instanceof FrameBuffer) {
             const uniformLocation = gl.getUniformLocation(program, textureName);
             gl.uniform1i(uniformLocation, textureUnit.index())
+        }
+        else if(textureUnit instanceof Texture) {
+            const uniformLocation = gl.getUniformLocation(program, textureName);
+            gl.uniform1i(uniformLocation, textureUnit.bind(gl))
         }
         else {
             // Only a textureUnit (Number) was provided.
