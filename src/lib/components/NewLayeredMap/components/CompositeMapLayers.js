@@ -41,6 +41,9 @@ class CompositeMapLayers extends Component {
     updateLayer = (curLayer, newLayer) => {
         switch(newLayer.data[0].type) {  
             case 'image':
+                this.setFocusedImageLayer(newLayer.data[0]);
+                console.log("current layer: ", curLayer)
+                console.log("new layer: ", newLayer)
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
                 });
@@ -272,7 +275,11 @@ class CompositeMapLayers extends Component {
         this.setState(prevState => ({
             layers: Object.assign({}, prevState.layers, {[layer.id]: layerGroup})
         }));
-
+        //Makes sure that the correct information is displayed when first loading the map
+        const checked = layer.checked && layer.baseLayer && layer.data.type == "image" ? true : false; 
+        if (checked) {
+            this.setFocusedImageLayer(layer.data);
+        }
         //adds object to a layer
         for (const item of layer.data) {
             this.addItem(item, layerGroup);

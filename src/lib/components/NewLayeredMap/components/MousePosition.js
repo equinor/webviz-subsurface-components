@@ -78,7 +78,7 @@ const MousePosition = (props) => {
         const onScreenCanvas = focusedImageLayer.getCanvas ? focusedImageLayer.getCanvas() : null;
         const minvalue = (focusedImageLayer.options || {}).minvalue;
         const maxvalue = (focusedImageLayer.options || {}).maxvalue;
-        if(!url || !onScreenCanvas || !minvalue || !maxvalue) { // TODO fix minvalue = 0
+        if(!url || !onScreenCanvas || minvalue == null || !maxvalue) { // TODO fix minvalue = 0
             return;
         }
 
@@ -111,6 +111,10 @@ const MousePosition = (props) => {
         const clientRect = onScreenCanvas.getBoundingClientRect();
         const screenX = ((event.originalEvent.clientX - clientRect.left) / clientRect.width) * canvas.width;
         const screenY = ((event.originalEvent.clientY - clientRect.top) / clientRect.height) * canvas.height;
+
+        if(screenX === Infinity || screenY === Infinity) {
+            return;
+        }
 
         const x = Math.round(event.latlng.lng);
         const y = Math.round(event.latlng.lat);

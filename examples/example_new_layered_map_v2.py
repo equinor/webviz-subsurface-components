@@ -15,7 +15,7 @@ CUTOFF_SLIDER_VALUE = 'cutOffSliderValue'
 
 def load_test_data():
     data = None
-    with open('./example-data/test-data.json') as f:
+    with open('examples/example-data/test-data.json') as f:
         data = json.load(f)
     return data
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         id='test-map',
         syncedMaps=['test-map-2'],
         layers=layers,
-        bounds=[[0, 0], [-30, -30]],
+        defaultBounds=[[0, 0], [-30, -30]],
         minZoom=-5,
         mouseCoords={
             "position": "bottomleft"
@@ -61,7 +61,7 @@ if __name__ == "__main__":
         id='test-map-2',
         syncedMaps=['test-map'],
         layers=layers,
-        bounds=[[0, 0], [-30, -30]],
+        defaultBounds=[[0, 0], [-30, -30]],
         crs='simple',
         minZoom=-5,
         mouseCoords={
