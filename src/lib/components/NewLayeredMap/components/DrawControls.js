@@ -78,9 +78,9 @@ class DrawControls extends Component {
                 featureGroup: this.context.drawLayer
             },
             draw: {
-                rectangle: false,
-                circle: false,
                 circlemarker: false,
+                rectangle: this.props.drawRectangle,
+                circle: this.props.drawCircle,
                 polygon: this.props.drawPolygon,
                 marker: this.props.drawMarker,
                 polyline: this.props.drawPolyline,
@@ -218,6 +218,8 @@ DrawControls.defaultProps = {
     drawMarker: true,
     drawPolygon: true,
     drawPolyline: true,
+    drawCircle: false,
+    drawRectanlge: false,
     position: "topright",
     
 };

@@ -9,7 +9,7 @@ import dash
 import dash_colorscales
 import dash_core_components as dcc
 from dash_extensions.callback import CallbackGrouper
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_html_components as html
 import webviz_subsurface_components
 
@@ -41,6 +41,8 @@ if __name__ == "__main__":
         'scale_type': "linear",
         'cut_point_min': min_value,
         'cut_point_max': max_value,
+        'pixel_scale': 10000,
+        'elevation_scale': 1,
     }
     
     layers = [
@@ -49,7 +51,7 @@ if __name__ == "__main__":
             "id": 1, 
             "baseLayer": True,
             "checked": True,
-            "action": "update",
+            "action": None,
             "data": [
                 {
                     "type": "image",
@@ -73,7 +75,7 @@ if __name__ == "__main__":
             "id": 44, 
             "baseLayer": True,
             "checked": False,
-            "action": "update",
+            "action": None,
             "data": [
                 {
                     "type": "image",
@@ -81,7 +83,14 @@ if __name__ == "__main__":
                     "allowHillshading": True,
                     "minvalue": min_value,
                     "maxvalue": max_value,
-                    "bounds": [[0, 0], [-30, -30]]
+                    "bounds": [[0, 0], [-30, -30]],
+                    "colorScale":  {
+                        "colors": DEFAULT_COLORSCALE_COLORS,
+                        "prefixZeroAlpha": False,
+                        "scaleType": "linear",
+                        "cutPointMin": min_value,
+                        "cutPointMax": max_value,
+                    },
                 },
             ],
         },
@@ -104,6 +113,12 @@ if __name__ == "__main__":
             ]
         },
     ]
+    test_tools = {
+        "drawMarker": True,
+        "drawPolygon": False,
+        "drawPolyline": False,
+        "position": "bottomleft", 
+    }
 
     new_layered_map_1 = webviz_subsurface_components.NewLayeredMap(
         id="example-map",
@@ -161,35 +176,102 @@ if __name__ == "__main__":
 
     app.layout = html.Div(
         children=[
-            html.Button('Sync map 1', id='sync-map2-btn'),
-            html.Button('Sync map 2', id='sync-map1-btn'),
-            html.Button('Toggle shader', id='shader-toggle-btn'),
-            html.Button('Add layer', id='layer-add-btn'),
-            html.Button('Toggle log', id='log-toggle-btn'),
-            html.Div(["Delete layer by id: ", dcc.Input(id='delete-layer-id', type='number', size = "5")]),
+            html.Div([
+                html.Div([
+                    "Layer to edit:",
+                    dcc.Dropdown(
+                        id = "selected-layer",
+                        options=[
+                            {'label': 'A seismic horizon with colormap', 'value': '1'},
+                            {'label': 'A seismic horizon without colormap', 'value': '44'},
+                            {'label': 'Map', 'value': '3'},
+                        ],
+                        value='1',
+                    ),  
+                ]),
+                html.Button('Sync map 1', id='sync-map2-btn'),
+                html.Button('Sync map 2', id='sync-map1-btn'),
+                html.Button('Add layer', id='layer-add-btn'),
+                html.Button('Toggle log', id='log-toggle-btn'),
+                html.Button('Toggle shader', id='shader-toggle-btn'),
+                html.Button('Hillshading-Shadows', id='shading-submit-val', n_clicks=0),
+                dcc.Input(id='delete-layer-id', type='number', size = "2", placeholder="Delete layer by id"),
+                html.Div([
+                    "Draw tools",
+                    dcc.Checklist(
+                        id = 'draw-tools-options',
+                        options=[
+                            {'label': 'Circle', 'value': 'drawCircle'},
+                            {'label': 'Polyline', 'value': 'drawPolyline'},
+                            {'label': 'Polygon', 'value': 'drawPolygon'},
+                            {'label': 'Marker', 'value': 'drawMarker'},
+                            {'label': 'Rectangle', 'value': 'drawRectanlge'},
+                        ],
+                        value=['drawMarker', 'drawPolygon', 'drawPolyline'],
+                        labelStyle={'display': 'inline-block'}
+                    )  
+                ]),
+
+            ]),
             html.Div(
                 children=[
                     html.Div(children=[
 						html.Div(children = [
-							html.H4(id='min-max-output-container'),
+							html.H6("Elevation scale value", id='elevation-scale-container'),
+							dcc.Slider(
+								id='elevation-scale',
+								min=0.0,
+								max=10.0,
+								step=0.1,
+								value=1.0,
+                                marks={
+                                    0: {'label': '0'},
+                                    10: {'label': '10'}
+                                },
+							),
+						]),
+    						html.Div(children = [
+							html.H6("Pixel scale value", id='pixel-scale-container'),
+							dcc.Slider(
+								id='pixel-scale',
+								min=2500,
+								max=25000,
+								step=10,
+								value=11000,
+                                marks={
+                                    2500: {'label': '2500'},
+                                    25000: {'label': '25000'}
+                                },
+							),
+						]),
+						html.Div(children = [
+							html.H6("Minimum, maximum map values", id='min-max-output-container'),
 							dcc.RangeSlider(
 								id='min-max-slider',
 								min=min_value - 1000,
 								max=max_value + 1000,
 								step=0.5,
 								value=[min_value, max_value],
+                                marks={
+                                    str(min_value - 1000): str(min_value - 1000),
+                                    str(max_value + 1000): str(max_value + 1000)
+                                },
 							),
 						]),
 					html.Div(children = [
-						html.H4(id='cut-output-container'),
+						html.H6("Cutoff points", id='cut-output-container'),
 						dcc.RangeSlider(
 							id='cut-slider',
 							min=min_value,
 							max=max_value,
 							step=0.5,
 							value=[min_value, max_value],
+                            marks={
+                                min_value: str(min_value),
+                                max_value: str(max_value)
+                            },
 							),
-					]),
+					    ]),
                         dash_colorscales.DashColorscales(
                             id='layer-colorscale',
                             nSwatches=7,
@@ -213,6 +295,23 @@ if __name__ == "__main__":
             html.Pre(id="polygon2"),
         ]
     )
+#
+#                           SUPPORTIVE FUNCTIONS
+#
+    def change_layer(layers, update_layer):
+        update_layer_id = update_layer['id']
+        for n in range(len(layers)):
+            if(layers[n]['id'] == update_layer_id):
+                layers[n] = update_layer
+        return layers
+
+    def get_layer_type(layer_id, layers): 
+        for layer in layers:
+            if(str(layer['id']) == str(layer_id)):
+                if (layer['data'][0]['type'] == "image"):
+                    return "image"
+        return "tile"
+
 
 #
 #                           MAP 1 CALLBACKS
@@ -226,10 +325,7 @@ if __name__ == "__main__":
     )
 
     def sync_map(n_clicks):
-        print("got here")
         sync_test = False if n_clicks % 2 else True
-        print("syncing first map", sync_test)
-
         return sync_test
 
 #
@@ -251,6 +347,97 @@ if __name__ == "__main__":
 #                           SHARED CALLBACKS
 #
     for map in callbackMaps:
+
+        @cg.callback(
+            Output(map, 'drawTools'),
+            [
+                Input('draw-tools-options', 'value') 
+            ]
+        )
+
+        def update_draw_tools_options(value):
+            global test_tools
+            new_options = {"position": "topleft"}
+            for draw_option in value:
+                new_options[draw_option] = True
+            return test_tools
+
+        @cg.callback(
+            Output(map, 'layers'),
+            [
+                Input('elevation-scale', 'value'),
+                Input('pixel-scale', 'value')
+            ],
+                State('selected-layer', 'value')
+        )
+
+        def update_shadow_scales(elevation_scale, pixel_scale, layer_id):
+            global layers
+
+            layer_type = get_layer_type(layer_id, layers)
+
+            state['elevation_scale'] = elevation_scale
+            state['pixel_scale'] = pixel_scale
+            update_layer = [
+                {
+                    "id": int(layer_id),
+                    "action": "update",
+                    "data": [
+                        {
+                            "type": layer_type,
+                            "shader": {
+                                "type": 'hillshading',
+                                "shadows": True,
+                                "elevationScale": state['elevation_scale'],
+                                "pixelScale": state['pixel_scale']
+                            },
+                        }
+                    ]
+                }   
+            ]
+            layers = change_layer(layers, update_layer[0])
+            return layers
+
+        @cg.callback(
+            Output(map, 'layers'),
+            [
+                Input('shading-submit-val', 'n_clicks')
+            ],
+            [
+                State('elevation-scale', 'value'),
+                State('pixel-scale', 'value'),
+                State('selected-layer', 'value')
+
+            ]
+        )
+
+        def update_hillshading_with_shadows(n_clicks, elevation_scale, pixel_scale, layer_id): 
+            global layers
+
+            layer_type = get_layer_type(layer_id, layers)
+
+            state['elevation_scale'] = elevation_scale
+            state['pixel_scale'] = pixel_scale
+            update_layer = [
+                {
+                    "id": int(layer_id),
+                    "action": "update",
+                    "data": [
+                        {
+                            "type": layer_type,
+                            "shader": {
+                                "type": 'hillshading',
+                                "shadows": True if n_clicks % 2 == 1 else False,
+                                "elevationScale": state['elevation_scale'],
+                                "pixelScale": state['pixel_scale']
+                            },
+                        }
+                    ]
+                }   
+            ]
+            layers = change_layer(layers, update_layer[0])
+            return layers
+
         @cg.callback(
             Output(map, 'layers'),
             # Output('example-map-2', 'layers'), impossible to have mutliple outputs in same callback
@@ -262,31 +449,31 @@ if __name__ == "__main__":
         def add_layer(add_n_clicks):
             global layers
             layers.append(
-            {
-                "name": "a very cool layer",
-                "id": 2, 
-                "baseLayer": True,
-                "checked": False,
-                "action": "add",
-                "data": [
-                    {
-                        "type": "image",
-                        "url": map_data,
-                        "colorScale":  {
-                            "colors":DEFAULT_COLORSCALE_COLORS,
-                            "prefixZeroAlpha": False,
-                            "scaleType": "linear",
-                            "cutPointMin": min_value,
-                            "cutPointMax": max_value, 
-                            },
-                        "allowHillshading": True,
-                        "minvalue": min_value,
-                        "maxvalue": max_value,
-                        "bounds": [[0, 0], [-30, -30]]
-                    },
-                ],
-            })
-
+                {
+                    "name": "a very cool layer",
+                    "id": 2, 
+                    "baseLayer": True,
+                    "checked": False,
+                    "action": "add",
+                    "data": [
+                        {
+                            "type": "image",
+                            "url": map_data,
+                            "colorScale":  {
+                                "colors":DEFAULT_COLORSCALE_COLORS,
+                                "prefixZeroAlpha": False,
+                                "scaleType": "linear",
+                                "cutPointMin": min_value,
+                                "cutPointMax": max_value, 
+                                },
+                            "allowHillshading": True,
+                            "minvalue": min_value,
+                            "maxvalue": max_value,
+                            "bounds": [[0, 0], [-30, -30]]
+                        },
+                    ],
+                }
+            ) 
             return layers
 
 
@@ -295,28 +482,35 @@ if __name__ == "__main__":
             [
                 Input('layer-colorscale', 'colorscale'),
 
-            ]
+            ],
+                State('selected-layer', 'value')
+
         )
 
-        def update_colorcsale(colorScale):
-            global layers 
-            layers.append( 
-            {
-                "id": 1,
-                "action": "update",
-                "data": [
-                    {
-                        "type": "image",
-                        "colorScale": {
-                            "colors": colorScale,
-                            "scaleType": state['scale_type'],
-                            "prefixZeroAlpha": True,
-                            "cutPointMin": state['cut_point_min'],
-                            "cutPointMax": state['cut_point_max']
+        def update_colorcsale(colorScale, layer_id):
+            global layers
+
+            layer_type = get_layer_type(layer_id, layers)
+
+            update_layer = [
+                {
+                    "id": int(layer_id),
+                    "action": "update",
+                    "data": [
+                        {
+                            "type": layer_type,
+                            "colorScale": {
+                                "colors": colorScale,
+                                "scaleType": state['scale_type'],
+                                "prefixZeroAlpha": True,
+                                "cutPointMin": state['cut_point_min'],
+                                "cutPointMax": state['cut_point_max']
+                            }
                         }
-                    }
-                ]
-            })
+                    ]
+                }
+            ] 
+            layers = change_layer(layers, update_layer[0])
             state['colorscale'] = colorScale
             return layers
 
@@ -330,61 +524,81 @@ if __name__ == "__main__":
 
         def delete_layer(layer_id):
             global layers
-            layers.append(
+            update_layer = [
                 {
-                    "id": layer_id,
+                    "id": int(layer_id),
                     "action": "delete",
                 }
-            )
+            ]
+
+            layers = change_layer(layers, update_layer[0])
             return layers
 
 
         @cg.callback(
-            dash.dependencies.Output(map, 'layers'),
-            [dash.dependencies.Input('min-max-slider', 'value')])
+            Output(map, 'layers'),
+            [
+                Input('min-max-slider', 'value')
+            ],
+                State('selected-layer', 'value')
+        )
 
-        def update_global_min_max(value):
+        def update_global_min_max(min_max_value, layer_id):
             global layers
-            layers.append(
+
+            layer_type = get_layer_type(layer_id, layers)
+
+            update_layer = [
                 {
-                    "id": 1,
+                    "id": int(layer_id),
                     "action": "update",
                     "data": [
                         {   
-                            "type": 'image',
-                            "minvalue": value[0],
-                            "maxvalue": value[1],
+                            "type": layer_type,
+                            "minvalue": min_max_value[0],
+                            "maxvalue": min_max_value[1],
                         }
                     ]
                 }
-            )
+            ]
+
+            layers = change_layer(layers, update_layer[0])
             return layers
 
         #updates the text for min/max values
         @cg.callback(
-            dash.dependencies.Output('min-max-output-container', 'children'),
-            [dash.dependencies.Input('min-max-slider', 'value')])
+            Output('min-max-output-container', 'children'),
+            [
+                Input('min-max-slider', 'value')
+            ]
+        )
+
 
         def update_min_max_text(value): 
-            return 'Min/max"{}"'.format(value)
-
-
+            return 'Global Min / Max"{}"'.format(value)
 
         @cg.callback(
-            dash.dependencies.Output(map, 'layers'),
-            [dash.dependencies.Input('cut-slider', 'value')])
+            Output(map, 'layers'),
+            [
+                Input('cut-slider', 'value')
+            ],
+                State('selected-layer', 'value')
+        )
 
-        def update_global_min_max(value):
+        def update_cut_points(value, layer_id):
             global layers
+
+            layer_type = get_layer_type(layer_id, layers)
+
             state['cut_point_min'] = value[0]
             state['cut_point_max'] = value[1]
-            layers.append(
+            update_layer = [
                 {
-                    "id": 1,
+                    "id": int(layer_id),
                     "action": "update",
                     "data": [
                         {   
-                            "type": 'image',
+                            "type": layer_type,
                             "colorScale":  {
                                 "colors": state['colorscale'],
                                 "cutPointMin": value[0],
@@ -394,34 +608,66 @@ if __name__ == "__main__":
                         }
                     ]
                 }
-            )
+            ]
+
+            layers = change_layer(layers, update_layer[0])
             return layers
 
         #updates the text for min/max values
         @cg.callback(
-            dash.dependencies.Output('cut-output-container', 'children'),
-            [dash.dependencies.Input('cut-slider', 'value')])
+            Output('cut-output-container', 'children'),
+            [
+                Input('cut-slider', 'value')
+            ]
+        )
 
         def update_cut_points_text(value): 
-            return 'Cut Min/max"{}"'.format(value)
+            return 'Cutoff Min / Max"{}"'.format(value)
+        
+        #updates the text for elevation scale
+        @cg.callback(
+            Output('elevation-scale-container', 'children'),
+            [
+                Input('elevation-scale', 'value')
+            ]
+        )
+
+        def update_elevation_text(value): 
+            return 'Elevation scale value: "{}"'.format(value)
+
+        #updates the text for pixel scale
+        @cg.callback(
+            Output('pixel-scale-container', 'children'),
+            [
+                Input('pixel-scale', 'value')
+            ]
+        )
+
+        def update_pixel_text(value): 
+            return 'Pixel scale value: "{}"'.format(value)
 
         @cg.callback(
             Output(map, 'layers'),
             [
                 Input('log-toggle-btn', 'n_clicks'),
-            ]
+            ],
+                State('selected-layer', 'value')
+
         )
 
-        def toggle_log(n_clicks):
+        def toggle_log(n_clicks, layer_id):
             global layers
+
+            layer_type = get_layer_type(layer_id, layers)
+
             log_value = "linear" if n_clicks % 2 else "log"
-            layers.append(
+            update_layer = [ 
                 {
-                    "id": 1,
+                    "id": int(layer_id),
                     "action": "update",
                     "data": [
                         {   
-                            "type": 'image',
+                            "type": layer_type,
                             "colorScale":  {
                                 "colors": state['colorscale'],
                                 "scaleType": log_value,
@@ -431,26 +677,32 @@ if __name__ == "__main__":
                         }
                     ]
                 }
-            )
+            ]
             state['scale_type'] = log_value
+            layers = change_layer(layers, update_layer[0])
             return layers
 
         @cg.callback(
             Output(map, 'layers'),
             [
                 Input('shader-toggle-btn', 'n_clicks'),
-            ]
+            ],
+                State('selected-layer', 'value')
+
         )
 
-        def toggle_shading(n_clicks):
+        def toggle_shading(n_clicks, layer_id):
             global layers
-            layers.append(
+
+            layer_type = get_layer_type(layer_id, layers)
+
+            update_layer = [
                 {
-                    "id": 1,
+                    "id": int(layer_id),
                     "action": "update",
                     "data": [
                         {
-                            "type": "image",
+                            "type": layer_type,
                             "shader": {
                                 "type": 'hillshading' if n_clicks % 2 == 1 else None,
                                 # "shadows": False,
@@ -459,8 +711,9 @@ if __name__ == "__main__":
                             },
                         }
                     ]
-                }            
-            )
+                }   
+            ]
+            layers = change_layer(layers, update_layer[0])
             return layers
 
 
@@ -468,17 +721,17 @@ if __name__ == "__main__":
 #                               OTHER CALLBACKS
 #
 
-    @app.callback(Output("polyline", "children"), [Input("example-map", "polyline_points")])
-    def get_edited_line(coords):
-        return f"Edited polyline: {json.dumps(coords)}"
+    # @app.callback(Output("polyline", "children"), [Input("example-map", "polyline_points")])
+    # def get_edited_line(coords):
+    #     return f"Edited polyline: {json.dumps(coords)}"
 
-    @app.callback(Output("marker", "children"), [Input("example-map", "marker_point")])
-    def get_edited_line(coords):
-        return f"Edited marker: {json.dumps(coords)}"
+    # @app.callback(Output("marker", "children"), [Input("example-map", "marker_point")])
+    # def get_edited_line(coords):
+    #     return f"Edited marker: {json.dumps(coords)}"
 
-    @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
-    def get_edited_line(coords):
-        return f"Edited closed polygon: {json.dumps(coords)}"
+    # @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
+    # def get_edited_line(coords):
+    #     return f"Edited closed polygon: {json.dumps(coords)}"
 
 
     cg.register(app)     

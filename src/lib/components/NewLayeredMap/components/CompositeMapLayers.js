@@ -41,12 +41,10 @@ class CompositeMapLayers extends Component {
     updateLayer = (curLayer, newLayer) => {
         switch(newLayer.data[0].type) {  
             case 'image':
-                this.setFocusedImageLayer(newLayer.data[0]);
-                console.log("current layer: ", curLayer)
-                console.log("new layer: ", newLayer)
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
-                });
+                }); 
+                this.setFocusedImageLayer(curLayer.getLayers()[0]);
                 break;
 
             case 'tile':
@@ -219,12 +217,8 @@ class CompositeMapLayers extends Component {
             case "image":
                 const imageLayer = this.addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
-                this.setFocusedImageLayer(imageLayer)
-                const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
-                if (checked) {
-                    this.setFocusedImageLayer(imageLayer);
-                }
-
+                // this.setFocusedImageLayer(imageLayer)
+ 
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
                     this.setFocusedImageLayer(imgLayer);
                 });
