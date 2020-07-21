@@ -15,10 +15,12 @@ L.SwitchControl = L.Control.extend({
         this.panelDiv.addEventListener("mouseover", () => {
             map.dragging.disable();
             map.doubleClickZoom.disable();
+            // map._handlers.forEach(function(handler){handler.disable();});
         });
         this.panelDiv.addEventListener("mouseout", () => {
             map.dragging.enable();
             map.doubleClickZoom.enable();
+           // map._handlers.forEach(function(handler){handler.enable();});
         });
 
         return this.panelDiv;

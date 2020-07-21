@@ -14,7 +14,6 @@ import Context from './Context'
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
 
-
 const stringToCRS = (crsString) => {
     switch(crsString) {
         case 'earth': {
@@ -86,7 +85,7 @@ class NewLayeredMap extends Component {
         map.on('zoomanim', e => {
             
             (this.props.syncedMaps || []).forEach(id => {
-                if(!NewLayeredMap.mapReferences[id]) {
+                if(!NewLayeredMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
 
@@ -106,7 +105,7 @@ class NewLayeredMap extends Component {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
             (this.props.syncedMaps || []).forEach(id => {
-                if(!NewLayeredMap.mapReferences[id]) {
+                if(!NewLayeredMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
 
@@ -136,6 +135,7 @@ class NewLayeredMap extends Component {
 
     syncedDrawLayerAdd = (newLayers) => {
         for (const layer of newLayers) {
+            layer["creatorId"] = this.state.id;
             NewLayeredMap.syncedDrawLayer.data.push(layer);
         }
         this.redrawAllSyncedMaps();
@@ -152,8 +152,10 @@ class NewLayeredMap extends Component {
 
     redrawAllSyncedMaps = () => {
         for (const id of this.props.syncedMaps) {
-            const otherMap = NewLayeredMap.mapReferences[id];
-            otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
+            if (id !== this.state.id) {
+                const otherMap = NewLayeredMap.mapReferences[id];
+                otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
+            }
         }
         // When using the component in dash with multiple maps drawing won't work
         // If not added to the map through the reSyncDrawLayer due to how setProps works
@@ -203,8 +205,8 @@ class NewLayeredMap extends Component {
                                     <CompositeMapLayers 
                                         layers={this.props.layers}
                                         map={this.state.map}
-                                        syncDrawings={this.props.syncDrawings}
                                         colorBar={this.props.colorBar}
+                                        syncedMaps={[...this.props.syncedMaps, this.state.id]}
                                     />
                                 )
                             }
