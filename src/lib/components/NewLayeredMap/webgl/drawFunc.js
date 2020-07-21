@@ -17,10 +17,12 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
     // Select which draw command to draw
     const shader = config.shader || {};
 
-    const cutOffPoints = {
-        cutPointMin: config.cutPointMin || 0,
-        cutPointMax: config.cutPointMax || 1000,
-    }
+    const cutOffPoints = calcCutOffPoints(
+        config.minvalue,
+        config.maxvalue,
+        (config.colorScale || {}).cutPointMin,
+        (config.colorScale || {}).cutPointMax,
+    );
 
     if(loadedColorMap) {
 
@@ -69,3 +71,33 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
     }
 }
 
+/**
+ * Calculates cutOffPoints based on given a min/max values and min/max-cutoff-points between 0 and 255.
+ * @example
+ * calcCutOffPoints(0, 1000, 500, 1000) // { 127, 255 } 
+ */
+const calcCutOffPoints = (min, max, cutMin, cutMax) => {
+    // If min and max is not provided, there will be no cutOff
+    if(!min || !max) {
+        return {
+            cutPointMin: 0,
+            cutPointMax: 256,
+        };
+    }
+
+    if (cutMax > max) {
+        cutMax = max;
+    }
+    if (cutMin < min) {
+        cutMin = min;
+    }
+
+    const maxColorValue = Math.round(255 - (Math.abs((cutMax - max)) / (max - min)) * 255);
+    const minColorValue = Math.round(((cutMin - min) / (max - min)) * 255);
+
+    return {
+        cutPointMin: minColorValue,
+        cutPointMax: maxColorValue,
+    };
+
+}
