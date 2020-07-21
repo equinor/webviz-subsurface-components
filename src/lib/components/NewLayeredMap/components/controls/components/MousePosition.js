@@ -4,7 +4,7 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
 // Components
-import Context from '../Context';
+import Context from '../../../Context';
 
 // Constants
 const NUMBER_COLOR_CHANNELS = 4;
@@ -23,9 +23,15 @@ const MousePosition = (props) => {
         subscribeToMapClick();
     }, [])
 
+
+    const focusedDependencyArray = () => {
+        const options = (focusedImageLayer || {}).options || {};
+        return [options.minvalue, options.maxvalue];
+    }
+
     useEffect(() => {
         updateCanvas();
-    }, [focusedImageLayer])
+    }, focusedDependencyArray())
 
     useEffect(() => {
         updateProps();

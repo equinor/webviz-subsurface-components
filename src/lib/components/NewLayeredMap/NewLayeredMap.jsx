@@ -7,13 +7,12 @@ import './layers/L.imageWebGLOverlay';
 import './layers/L.tileWebGLLayer';
 
 // Components
-import Controls from './components/Controls';
+import Controls from './components/controls/Controls';
 import CompositeMapLayers from './components/CompositeMapLayers'
 import Context from './Context'
 
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
-
 
 const stringToCRS = (crsString) => {
     switch(crsString) {
@@ -145,7 +144,9 @@ class NewLayeredMap extends Component {
         const layers = this.state.drawLayerData.filter((drawing) => {
             return !layerTypes.includes(drawing.type);
         })
-        this.setState({drawLayerData: layers});
+        if (layers !== this.state.layers) {
+            this.setState({drawLayerData: layers});
+        }    
     }
 
     syncedDrawLayerAdd = (newLayers) => {
@@ -161,7 +162,7 @@ class NewLayeredMap extends Component {
         NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
             return !syncedMaps.includes(drawing.creatorId) || !layerTypes.includes(drawing.type);
         })
-        !layerTypes.includes("circleMarker") && (console.log("layers in syncedDrawLayer: ", NewLayeredMap.syncedDrawLayer))
+        // !layerTypes.includes("circleMarker") && (console.log("layers in syncedDrawLayer: ", NewLayeredMap.syncedDrawLayer))
         if (shouldRedraw) {
             this.redrawAllSyncedMaps();
         }
@@ -216,6 +217,7 @@ class NewLayeredMap extends Component {
                                             map={this.state.map}
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
+                                            colorBar={this.props.colorBar}
                                             drawTools={this.props.drawTools}
                                             mouseCoords = {this.props.mouseCoords}
                                             syncDrawings={this.props.syncDrawings}
@@ -227,8 +229,8 @@ class NewLayeredMap extends Component {
                                     <CompositeMapLayers 
                                         layers={this.props.layers}
                                         map={this.state.map}
-                                        colorBar={this.props.colorBar}
-                                        syncedMaps={[...this.props.syncedMaps || [], this.state.id]}
+                                        syncedMaps={[...this.props.syncedMaps, this.state.id]}
+                                        syncDrawings={this.props.syncDrawings}
                                     />
                                 )
                             }

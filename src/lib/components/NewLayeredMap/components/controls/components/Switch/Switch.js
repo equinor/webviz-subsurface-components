@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 // Leaflet imports
 import L from 'leaflet';
-import '../controls/L.SwitchControl.js';
+import './L.SwitchControl.js';
 
 // Material UI components
 import MaterialSwitch from "@material-ui/core/Switch";
@@ -46,6 +46,7 @@ class Switch extends React.Component {
     }
 
     handleChange = (event) => {
+        console.log("Switch handle change")
         if(this.props.setProps) {
             const curProps = Object.assign({}, this.props);
             delete curProps.map;

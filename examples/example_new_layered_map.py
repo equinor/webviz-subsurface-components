@@ -40,6 +40,8 @@ if __name__ == "__main__":
         'colorscale': None,
         'cut_point_min': min_value,
         'cut_point_max': max_value,
+        'global_min': min_value,
+        'global_max': max_value,
         'log_n_clicks': 0,
 
     }
@@ -68,70 +70,70 @@ if __name__ == "__main__":
                     "bounds": [[0, 0], [-30, -30]]
                 },
             ],
-        },
-        {
-            "name": "Some overlay layer",
-            "base_layer": False,
-            "id": 2,
-            "action": None,
-            "checked": False,
-            "data": [
-                {
-                    "type": "polygon",
-                    "positions": [
-                        [436204, 6475077],
-                        [438204, 6480077],
-                        [432204, 6475077],
-                    ],
-                    "color": "blue",
-                    "tooltip": "This is a blue polygon",
-                },
-                {
-                    "type": "circle",
-                    "center": [0, 0],
-                    "color": "red",
-                    "radius": 200000,
-                    "tooltip": "This is a red circle",
-                },
-            ],
-        },
-        {
-            "name": "Map",
-            "id": 3,
-            "baseLayer": True,
-            "checked": False,
-            "action": None,
-            "data": [
-                {
-                    "type": "tile",
-                    "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
-                    "shader": {
-                        "type": "none",
-                        "elevationScale": 0.01
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Something",
-            "id": 2,
-            "baseLayer": True,
-            "checked": False,
-            "action": "add",
-            "data": [
-                {
-                    "type": "image",
-                    "url": map_data,
-                    "allowHillshading": True,
-                    "colormap": colormap,
-                    "unit": "m",    
-                    "minvalue": min_value,
-                    "maxvalue": max_value,
-                    "bounds": [[0, 0], [-30, -30]],
-                },
-            ],
         }
+        # {
+        #     "name": "Some overlay layer",
+        #     "base_layer": False,
+        #     "id": 2,
+        #     "action": None,
+        #     "checked": False,
+        #     "data": [
+        #         {
+        #             "type": "polygon",
+        #             "positions": [
+        #                 [436204, 6475077],
+        #                 [438204, 6480077],
+        #                 [432204, 6475077],
+        #             ],
+        #             "color": "blue",
+        #             "tooltip": "This is a blue polygon",
+        #         },
+        #         {
+        #             "type": "circle",
+        #             "center": [0, 0],
+        #             "color": "red",
+        #             "radius": 200000,
+        #             "tooltip": "This is a red circle",
+        #         },
+        #     ],
+        # },
+        # {
+        #     "name": "Map",
+        #     "id": 3,
+        #     "baseLayer": True,
+        #     "checked": False,
+        #     "action": None,
+        #     "data": [
+        #         {
+        #             "type": "tile",
+        #             "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        #             "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
+        #             "shader": {
+        #                 "type": "none",
+        #                 "elevationScale": 0.01
+        #             }
+        #         }
+        #     ]
+        # },
+        # {
+        #     "name": "Something",
+        #     "id": 2,
+        #     "baseLayer": True,
+        #     "checked": True,
+        #     "action": "add",
+        #     "data": [
+        #         {
+        #             "type": "image",
+        #             "url": map_data,
+        #             "allowHillshading": True,
+        #             "colormap": colormap,
+        #             "unit": "m",    
+        #             "minvalue": min_value,
+        #             "maxvalue": max_value,
+        #             "bounds": [[0, 0], [-30, -30]],
+        #         },
+        #     ],
+        # }
     ]
 
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
@@ -139,6 +141,12 @@ if __name__ == "__main__":
         syncedMaps=["example-map2"],
         syncDrawings=True, 
         layers=layers,
+        colorBar={
+            "position": 'bottomleft'
+        },
+        mouseCoords={
+            "coordinatePosition": "bottomright",
+        },
         switch={
             "value": False,
             "label": "Hillshading",
@@ -225,6 +233,8 @@ if __name__ == "__main__":
             html.Button('Add layer', id='layer-add-btn'),
             html.Div(["Cut below: ", dcc.Input(id='maximum-value', type='number')]),
             html.Div(["Cut above: ", dcc.Input(id='minimum-value', type='number')]),
+            html.Div(["Global min value: ", dcc.Input(id='global-minimum-value', type='number')]),            
+            html.Div(["Global max value: ", dcc.Input(id='global-maximum-value', type='number')]),
             html.Div(children=[
                 html.Div([
                     dash_colorscales.DashColorscales(
@@ -239,12 +249,14 @@ if __name__ == "__main__":
                 layered_map_component3,
                 layered_map_component4,
             ], style={'display': 'grid', 'gridTemplateColumns': '400px 530px 530px', 'minHeight': '90vh'}),
-            html.Pre(id="polyline"),
-            html.Pre(id="marker"),
-            html.Pre(id="polygon"),
-            html.Pre(id="polyline2"),
-            html.Pre(id="marker2"),
-            html.Pre(id="polygon2"),
+                # layered_map_component2,
+            # style={'display': 'grid', 'gridTemplateColumns': '400px 530px 530px'},
+            # html.Pre(id="polyline"),
+            # html.Pre(id="marker"),
+            # html.Pre(id="polygon"),
+            # html.Pre(id="polyline2"),
+            # html.Pre(id="marker2"),
+            # html.Pre(id="polygon2"),
         ]
     )
 
@@ -256,14 +268,16 @@ if __name__ == "__main__":
             Input('layer-colorscale', 'colorscale'),
             Input('example-map', 'switch'),
             Input('maximum-value','value'),
-            Input('minimum-value','value'),
+            Input('minimum-value','value'), 
+            Input('global-maximum-value','value'),
+            Input('global-minimum-value','value'),
             Input('map-log-toggle-btn', 'n_clicks')
 
             
         ]
     )
 
-    def change_layer(add_n_clicks, delete_n_clicks, colorscale, switch, cut_point_min, cut_point_max, log_n_clicks):
+    def change_layer(add_n_clicks, delete_n_clicks, colorscale, switch, cut_point_min, cut_point_max, global_max, global_min, log_n_clicks):
         global layers
         newLayers = []
         newLayers.extend(layers)
@@ -279,6 +293,10 @@ if __name__ == "__main__":
             newLayers = update_cut_point_min(newLayers, cut_point_min)
         elif (cut_point_max is not None and cut_point_max != state['cut_point_max']):
             newLayers = update_cut_point_max(newLayers, cut_point_max)
+        elif (global_max is not None and global_max != state['global_max']):
+            newLayers = update_global_max(newLayers, global_max)
+        elif (global_min is not None and global_min != state['global_min']):
+            newLayers = update_global_min(newLayers, global_min)   
         elif (log_n_clicks is not None and log_n_clicks > state['log_n_clicks']):
             newLayers = toggle_log(newLayers, log_n_clicks)
         
@@ -288,9 +306,10 @@ if __name__ == "__main__":
         state['colorscale'] = colorscale
         state['switch'] = switch
         state['cut_point_min'] = cut_point_min or 0
-        state['cut_point_max'] = cut_point_min or 0
+        state['cut_point_max'] = cut_point_max or max_value
+        state['global_min'] = global_min or 0
+        state['global_max'] = global_max or max_value
         state['log_n_clicks'] = log_n_clicks or 0
-        
         layers = newLayers
 
         return newLayers
@@ -340,7 +359,7 @@ if __name__ == "__main__":
     def update_layer(layers: List, colorScale: List[str]) -> List:
         update = [
             {
-                "id": 2,
+                "id": 1,
                 "action": "update",
                 "data": [
                     {   
@@ -350,7 +369,7 @@ if __name__ == "__main__":
                 ]
             },
             {
-                "id": 2,
+                "id": 1,
                 "action": "update",
                 "data": [
                     {
@@ -371,7 +390,7 @@ if __name__ == "__main__":
 
         update = [
             {
-                "id": 3,
+                "id": 1,
                 "action": "update",
                 "data": [
                     {
@@ -383,7 +402,7 @@ if __name__ == "__main__":
                 ]
             },
             {
-                "id": 2,
+                "id": 1,
                 "action": "update",
                 "data": [
                     {
@@ -399,28 +418,26 @@ if __name__ == "__main__":
         return update
 
     def update_cut_point_min(layers, value):
-        layers[0]['data'][0]['colorScale']['cutPointMin'] = value
-        print("new cutoffpoint min:" ,layers[0]['data'][0]['colorScale']['cutPointMin'])
-        return layers 
-        # update = [
-        #     {
-        #         "id": 1,
-        #         "action": "update",
-        #         "data": [
-        #             {   
-        #                 "type": 'image',
-        #                 "colorScale":  {
-        #                     "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
-        #                     "prefixZeroAlpha": False,
-        #                     "scaleType": "linear",
-        #                     "cutPointMin": value,
-        #                 },
-        #             }
-        #         ]
-        #     },
+        # layers[0]['data'][0]['colorScale']['cutPointMin'] = value
+        # print("new cutoffpoint min:" ,layers[0]['data'][0]['colorScale']['cutPointMin'])
+        # return layers 
+        update = [
+            {
+                "id": 1,
+                "action": "update",
+                "data": [
+                    {   
+                        "type": 'image',
+                        "colorScale":  {
+                            "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+                            "cutPointMin": value,
+                        },
+                    }
+                ]
+            },
 
-        # ]
-        # return update
+        ]
+        return update
 
     def update_cut_point_max(layers, value):
         # layers[0]['data'][0]['colorScale']['cutPointMax'] = value
@@ -443,6 +460,37 @@ if __name__ == "__main__":
         ]
         return update
 
+    def update_global_max(layers, value):
+        update = [
+            {
+                "id": 1,
+                "action": "update",
+                "data": [
+                    {   
+                        "type": 'image',
+                        "maxvalue": value,
+                    }
+                ]
+            }
+
+        ]
+        return update
+
+    def update_global_min(layers, value):
+        update = [
+            {
+                "id": 1,
+                "action": "update",
+                "data": [
+                    {   
+                        "type": 'image',
+                        "minvalue": value,
+                    }
+                ]
+            }
+        ]
+        return update
+
     def toggle_log(layers, n_clicks):
         if n_clicks % 2 == 0:
             layers[0]['data'][0]['colorScale']['scaleType'] = 'log'
@@ -459,9 +507,9 @@ if __name__ == "__main__":
     # def get_edited_line(coords):
     #     return f"Edited marker: {json.dumps(coords)}"
 
-    @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
-    def get_edited_line(coords):
-        return f"Edited closed polygon: {json.dumps(coords)}"
+    # @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
+    # def get_edited_line(coords):
+    #     return f"Edited closed polygon: {json.dumps(coords)}"
 
 
     app.run_server(debug=True)

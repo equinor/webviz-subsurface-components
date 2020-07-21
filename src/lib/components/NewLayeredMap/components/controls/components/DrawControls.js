@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
-import Context from '../Context';
+import Context from '../../../Context';
+
+import { getShapeType } from '../../leafletUtils'
 
 
 
@@ -20,29 +22,6 @@ L.Icon.Default.mergeOptions({
  *    https://stackoverflow.com/questions/18014907/leaflet-draw-retrieve-layer-type-on-drawedited-event
  **/
 
-
- // TODO: Move to utils
-const getShapeType = layer => {
-    if (layer instanceof L.Rectangle) {
-        return "rectangle";
-    }
-    if (layer instanceof L.Circle) {
-        return "circle";
-    }
-    if (layer instanceof L.CircleMarker) {
-        return "circleMarker";
-    }
-    if (layer instanceof L.Marker) {
-        return "marker";
-    }
-    if (layer instanceof L.Polygon) {
-        return "polygon";
-    }
-    if (layer instanceof L.Polyline) {
-        return "polyline";
-    }
-    throw new Error("Unknown shape type");
-};
 
 class DrawControls extends Component {    
 
@@ -120,6 +99,8 @@ class DrawControls extends Component {
                     this.removeLayers("marker", drawControl);
                     break;
             }
+            const d = new Date();
+            newLayer["creationTime"] = d.getTime();
             props.syncDrawings ? this.context.syncedDrawLayerAdd([newLayer]) : this.context.drawLayerAdd([newLayer]);
         });
         
@@ -129,9 +110,7 @@ class DrawControls extends Component {
 
             e.layers.eachLayer(layer => {
                 const layerType = getShapeType(layer);
-                if (props.syncDrawings) {
-                    this.context.syncedDrawLayerDelete([layerType]);
-                }
+                props.syncDrawings ? this.context.syncedDrawLayerDelete([layerType]) : this.context.drawLayerDelete([layerType]);
                 const editedLayer = {type: layerType};
                 switch(layerType) {
                     case "polyline":
@@ -159,6 +138,8 @@ class DrawControls extends Component {
                         editedLayer["center"] = [layer._latlng.lat, layer._latlng.lng];
                         break;
                 }
+                const d = new Date();
+                editedLayer["creationTime"] = d.getTime();
                 newLayers.push(editedLayer);
             });
             props.syncDrawings ? this.context.syncedDrawLayerAdd(newLayers) : this.context.drawLayerAdd(newLayers);
@@ -180,8 +161,10 @@ class DrawControls extends Component {
         })
 
         map.on('mouseup', (e) => {
+            const d = new Date();
             const circleMarker = {
                 type: "circleMarker",
+                creationTime: d.getTime(),
                 center: [e.latlng.lat, e.latlng.lng],
                 color: "red",
                 radius: 4,

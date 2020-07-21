@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 // Leaflet
 import L from 'leaflet';
-import '../controls/L.VerticalZoom';
+import './L.VerticalZoom';
 
 // Material UI Components
 import { Slider } from '@material-ui/core';
