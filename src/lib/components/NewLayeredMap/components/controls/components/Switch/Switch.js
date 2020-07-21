@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 // Leaflet imports
 import L from 'leaflet';
-import '../controls/L.SwitchControl.js';
+import './L.SwitchControl.js';
 
 // Material UI components
 import MaterialSwitch from "@material-ui/core/Switch";
