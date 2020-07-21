@@ -1,4 +1,4 @@
-let TEXTURE_INDEX_COUNT = -1;
+import { nextTextureIndex } from './texture';
 
 class FrameBuffer {
     
@@ -9,13 +9,9 @@ class FrameBuffer {
      * @param {Number} width 
      * @param {Number} height 
      */
-    constructor(gl, width, height) {
-        if(TEXTURE_INDEX_COUNT === -1) {
-            TEXTURE_INDEX_COUNT = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-        }
-
-
-        this._textureIndex = TEXTURE_INDEX_COUNT--;
+    constructor(gl, textureIndex, width, height) {
+        
+        this._textureIndex = textureIndex;
         this._fb = this._createFrameBuffer(gl);
         this._texture = this._createTexture(gl, width, height);
     }
@@ -36,15 +32,14 @@ class FrameBuffer {
      */
     _createTexture(gl, width, height) {
         const tex = gl.createTexture();
-        gl.activeTexture(gl.TEXTURE0 + this._textureIndex);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this._fb);
+        gl.activeTexture(gl.TEXTURE0 + this._textureIndex);
         gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.FLOAT, null);
-       // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER , gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.FLOAT, null);
         gl.framebufferTexture2D(
             gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0
         );

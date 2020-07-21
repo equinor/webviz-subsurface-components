@@ -1,6 +1,6 @@
 import L, { DomUtil, DomEvent, Util, Browser, GridLayer } from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
-import { buildColormap } from '../colorscale';
+import { buildColormap } from '../utils/colorScale';
 
 /**
  * TileWebGLLayer is a tileLayer for rendering tile-based images with WebGL. It executes WebGL code for colormaps and
@@ -101,7 +101,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
         // Make sure the image gets the correct crossOrigin attribute, due to CORS-issues.
         if (this.options.crossOrigin || this.options.crossOrigin === '') {
-          tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
+          	tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
         }
 
         this._draw(tile, coords, done);

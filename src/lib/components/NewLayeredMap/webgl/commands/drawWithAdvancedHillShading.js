@@ -3,6 +3,7 @@ import vec3 from '../vec3';
 
 // Shaders
 import positionVShader from '../../shaders/position.vs.glsl';
+import bgclearVShader from '../../shaders/bgclear.fs.glsl';
 import elevationFShader from '../../shaders/hillshading/elevation.fs.glsl';
 import normalsFShader from '../../shaders/hillshading/normals.fs.glsl';
 import directLightningsFShader from '../../shaders/hillshading/directlightning.fs.glsl';
@@ -10,6 +11,8 @@ import softShadowFShader from '../../shaders/hillshading/softshadow.fs.glsl';
 import ambientFShader from '../../shaders/hillshading/ambient.fs.glsl';
 import combinedFShader from '../../shaders/hillshading/combined.fs.glsl';
 import colorFShader from '../../shaders/color.fs.glsl';
+
+import imageFShader from '../../shaders/image.fs.glsl';
 
 // CONSTANTS
 const DEFAULT_PIXEL_SCALE = 8000;
@@ -30,7 +33,11 @@ const DEFAULT_SUN_DIRECTION = vec3.normalize([], [1, 1, 1]);
 /**
  * @description - This hillshader is heavly inspiried by the Rye Terrell's advanced map shading tutorial:
  *                                                  https://wwwtyro.net/2019/03/21/advanced-map-shading.html
- * A known issue is that the soft-shadows are quite GPU-heavy and is quite slow for big images.
+ * 
+ * A known issue is that the soft-shadows are quite GPU-heavy and is quite slow for big images. High number of
+ * shadow-iterations might be fatal for the browser on big images.
+ * 
+ * @author Anders Hallem Iversen
  * @param {WebGLRenderingContext} gl
  * @param {HTMLCanvasElement} canvas
  * @param {HTMLImageElement} loadedImage
@@ -40,7 +47,7 @@ const DEFAULT_SUN_DIRECTION = vec3.normalize([], [1, 1, 1]);
 export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => {
     const {
         // Hillshading options
-        pixelScale = DEFAULT_PIXEL_SCALE, 
+        pixelScale = DEFAULT_PIXEL_SCALE,
         elevationScale = DEFAULT_ELEVATION_SCALE, 
         shadows = false, 
         sunDirection = DEFAULT_SUN_DIRECTION,
@@ -51,17 +58,14 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
         cutPointMin = 0.0,
         cutPointMax = 256.0,
         noColor = false,
+
+        setBlackToAlpha = false,
     } = options;
 
-
     gl.getExtension('OES_texture_float');
-    //gl.getExtension('OES_texture_float_linear');
-
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
-    // gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true)
-    // gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, true)
-    // gl.pixelStorei(gl.UNPACK_ALIGNMENT, true)
 
+   
     /**
      * @type {EQGLContext}
      */
@@ -77,23 +81,45 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
     // The number of iterations for soft-shadows and ambient light
     let N = shadowIterations || calcN(width, height);
 
-    const fboElevation = eqGL.framebuffer({ width: width, height: height});
+    const rawTexture = eqGL.texture({image: loadedImage});
+    let inputTexture = rawTexture;
 
+    if(setBlackToAlpha) {
+        const fboAlpha = eqGL.framebuffer({width: width, height: height});
+
+        const glClearCmd = eqGL.new()
+        .vert(positionVShader)
+        .frag(bgclearVShader)
+        .attribute("position", [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
+        .texture("u_image", inputTexture)
+        .uniformf("u_resolution", loadedImage.width, loadedImage.height)
+        .framebuffer(fboAlpha)
+        .viewport(0, 0, loadedImage.width, loadedImage.height)
+        .vertexCount(6)
+        .build();
+    
+        glClearCmd();
+
+        inputTexture = fboAlpha;
+    }
+
+    const fboElevation = eqGL.framebuffer({ width: width, height: height});
+    
     const elevationCmd = eqGL.new()
         .vert(positionVShader)
         .frag(elevationFShader)
         .attribute("position", [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
-        .texture("tElevation", 0, loadedImage)
+        .texture("tElevation", inputTexture)
         .uniformf("elevationScale", elevationScale)
         .uniformf("resolution", loadedImage.width, loadedImage.height)
         .vertexCount(6)
         .viewport(0, 0, loadedImage.width, loadedImage.height)
         .framebuffer(fboElevation)
         .build();
-
+        
     elevationCmd();
 
-    const fboNormal = eqGL.framebuffer({ width: width, height: height});
+    const fboNormal = eqGL.framebuffer({ width: width, height: height });
 
     const normalCmd = eqGL.new()
         .vert(positionVShader)
@@ -109,11 +135,11 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
     
     normalCmd();
 
-   const fboFinal = eqGL.framebuffer({width: width, height: height});
+    const fboFinal = eqGL.framebuffer({width: width, height: height});
 
     if(!shadows) {
 
-        // Render the image without shadows
+        // Render the image without shadows - just add some direct lights
         const directCmd = eqGL.new()
             .vert(positionVShader)
             .frag(directLightningsFShader)
@@ -121,9 +147,9 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             .texture("tNormal", fboNormal)
             .uniformf("sunDirection", sunDirection)
             .uniformf("resolution", loadedImage.width, loadedImage.height)
-            .vertexCount(6)
             .viewport(0, 0, loadedImage.width, loadedImage.height)
             .framebuffer(noColor ? null : fboFinal)
+            .vertexCount(6)
             .build();
         
         directCmd();
@@ -226,8 +252,8 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             .frag(colorFShader)
             .attribute("position", [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
             .texture("u_image", fboFinal)
-            .texture("u_raw_image", 6, loadedImage)
-            .texture("u_colormap", 4, loadedColorMap)
+            .texture("u_raw_image", rawTexture)
+            .texture("u_colormap", eqGL.texture({image: loadedColorMap}))
             .uniformf("u_colormap_length", loadedColorMap.width)
             .uniformf("u_resolution", loadedImage.width, loadedImage.height)
             .uniformf("u_scale_type", scaleType === 'log' ? 1.0 : 0.0) // 1.0 is logarithmic
@@ -240,7 +266,7 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             colorScaleCmd();
     }
         
-
+    eqGL.clean();
 }
 
 
