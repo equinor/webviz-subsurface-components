@@ -9,7 +9,7 @@ import './layers/L.tileWebGLLayer';
 // Components
 import Controls from './components/Controls';
 import CompositeMapLayers from './components/CompositeMapLayers'
-import Context from './Context'
+import Context from './context'
 
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
