@@ -18,7 +18,7 @@ import {
     addImage,
     addTile
 
-} from './leafletUtils'
+} from '../utils/leaflet'
 
 // Helper functions
 const yx = ([x, y]) => {

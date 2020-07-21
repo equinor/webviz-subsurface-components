@@ -4,7 +4,7 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 import Context from '../../../Context';
 
-import { getShapeType } from '../../leafletUtils'
+import { getShapeType } from '../../../utils/leaflet'
 
 
 
