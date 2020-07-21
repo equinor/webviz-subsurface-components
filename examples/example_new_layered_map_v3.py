@@ -84,13 +84,7 @@ if __name__ == "__main__":
                     "minvalue": min_value,
                     "maxvalue": max_value,
                     "bounds": [[0, 0], [-30, -30]],
-                    "colorScale":  {
-                        "colors": DEFAULT_COLORSCALE_COLORS,
-                        "prefixZeroAlpha": False,
-                        "scaleType": "linear",
-                        "cutPointMin": min_value,
-                        "cutPointMax": max_value,
-                    },
+
                 },
             ],
         },
@@ -102,6 +96,13 @@ if __name__ == "__main__":
             "action": None,
             "data": [
                 {
+                    "colorScale":  {
+                        "colors": DEFAULT_COLORSCALE_COLORS,
+                        "prefixZeroAlpha": False,
+                        "scaleType": "linear",
+                        "cutPointMin": min_value,
+                        "cutPointMax": max_value,
+                    },
                     "type": "tile",
                     "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                     "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
