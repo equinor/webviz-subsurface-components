@@ -29,6 +29,12 @@ class CompositeMapLayers extends Component {
                 
             },
             layerControl: null,
+            drawFrom: {
+                marker: null,
+                circleMarker: null,
+                polygon: null,
+                polyline: null,
+            }
         }
     }
 
@@ -372,19 +378,33 @@ class CompositeMapLayers extends Component {
          * throws an error in leaflet. Everything works fine as long as this is
          * surrounded in a try catch
          */ 
-        
+        try {
+            this.context.drawLayer.clearLayers();
+        } catch (error) {}
+
+        const syncedItems = []
+
         for (const item of this.context.syncedDrawLayer.data) {
             if (this.props.syncedMaps.includes(item.creatorId)) {
-                this.context.drawLayer.eachLayer(layer => {
-                    try {
-                        if(this.getShapeType(layer) === item.type) {
-                            this.context.drawLayer.removeLayer(layer);
-                        }
-                    } catch (error) {}
-                })
+                // this.context.drawLayer.eachLayer(layer => {
+                //     try {
+                //         if(this.getShapeType(layer) === item.type) {
+                //             this.context.drawLayer.removeLayer(layer);
+                //         }
+                //     } catch (error) {}
+                // })
                 this.addItem(item, this.context.drawLayer, false);
+                syncedItems.push(item.type);
+                console.log("syncedItems: ", syncedItems)
             }   
         }
+        for (const item of this.context.drawLayerData) {
+            if (!syncedItems.includes(item.type)) {
+                console.log("adding item from state")
+                this.addItem(item, this.context.drawLayer, false);
+            }
+        }
+        
     }
 
     // TODO: Move to utils

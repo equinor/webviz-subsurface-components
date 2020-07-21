@@ -92,17 +92,15 @@ class DrawControls extends Component {
             const type = e.layerType;
             const layer = e.layer;
             this.context.drawLayer.addLayer(layer)
-            if (props.syncDrawings) {
-                this.context.syncedDrawLayerDelete(type);
-                const newLayer = {type: type}
-            }
+            props.syncDrawings ? this.context.syncedDrawLayerDelete(type) : this.context.drawLayerDelete(type)
+            const newLayer = {type: type}
 
             switch(type) {
                 case "polyline":
                     const coords = layer._latlngs.map(p => {
                         return [p.lat, p.lng];
                     });
-                    props.syncDrawings && (newLayer["positions"] = coords);
+                    newLayer["positions"] = coords;
                     this.props.lineCoords(coords);
                     this.removeLayers("polyline", drawControl);
                     break;
@@ -111,39 +109,36 @@ class DrawControls extends Component {
                     const coords = layer._latlngs[0].map(p => {
                         return [p.lat, p.lng];
                     });
-                    props.syncDrawings && (newLayer["positions"] = coords);
+                    newLayer["positions"] = coords;
                     this.props.polygonCoords(coords); 
                     this.removeLayers("polygon", drawControl);
                     break;
 
                 case "marker":
-                    props.syncDrawings && (newLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
+                    newLayer["position"] = [layer._latlng.lat, layer._latlng.lng];
                     this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
                     this.removeLayers("marker", drawControl);
                     break;
             }
-            props.syncDrawings && (this.context.syncedDrawLayerAdd([newLayer]));
+            props.syncDrawings ? this.context.syncedDrawLayerAdd([newLayer]) : this.context.drawLayerAdd([newLayer]);
         });
         
     
         map.on(L.Draw.Event.EDITED, (e) => {
-
-            if (props.syncDrawings) {
-                const newLayers = []
-            }
+            const newLayers = []
 
             e.layers.eachLayer(layer => {
                 const layerType = getShapeType(layer);
                 if (props.syncDrawings) {
                     this.context.syncedDrawLayerDelete([layerType]);
-                    const editedLayer = {type: layerType}
                 }
+                const editedLayer = {type: layerType};
                 switch(layerType) {
                     case "polyline":
                         const coords = layer._latlngs.map(p => {
                             return [p.lat, p.lng];
                         });
-                        props.syncDrawings && (editedLayer["positions"] = coords);
+                        editedLayer["positions"] = coords;
                         this.props.lineCoords(coords);
                         break;
 
@@ -151,30 +146,28 @@ class DrawControls extends Component {
                         const coords = layer._latlngs[0].map(p => {
                             return [p.lat, p.lng];
                         });
-                        props.syncDrawings && (editedLayer["positions"] = coords);
+                        editedLayer["positions"] = coords;
                         this.props.polygonCoords(coords);
                         break;
 
                     case "marker":
-                        props.syncDrawings && (editedLayer["position"] = [layer._latlng.lat, layer._latlng.lng]);
+                        editedLayer["position"] = [layer._latlng.lat, layer._latlng.lng];
                         this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
                         break;
                     
                     case "circleMarker":
-                        props.syncDrawings && (editedLayer["center"] = [layer._latlng.lat, layer._latlng.lng]);
+                        editedLayer["center"] = [layer._latlng.lat, layer._latlng.lng];
                         break;
                 }
-                props.syncDrawings && (newLayers.push(editedLayer));
+                newLayers.push(editedLayer);
             });
-            props.syncDrawings && (this.context.syncedDrawLayerAdd(newLayers));
+            props.syncDrawings ? this.context.syncedDrawLayerAdd(newLayers) : this.context.drawLayerAdd(newLayers);
             this.setState({editing: false});
         });
 
         map.on(L.Draw.Event.DELETED, (e) => {
-            if (props.syncDrawings) {
-                const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
-                this.context.syncedDrawLayerDelete(deletedLayers, true);
-            }
+            const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
+            props.syncDrawings ? this.context.syncedDrawLayerDelete(deletedLayers, true) : this.context.drawLayerDelete(deletedLayers)
             this.setState({editing: false});
         })
 
@@ -199,6 +192,9 @@ class DrawControls extends Component {
                 if (props.syncDrawings) {
                     this.context.syncedDrawLayerDelete(["circleMarker"]);
                     this.context.syncedDrawLayerAdd([circleMarker]);
+                } else {
+                    this.context.drawLayerDelete(["circleMarker"]);
+                    this.context.drawLayerAdd([circleMarker]);
                 }
             }
         })

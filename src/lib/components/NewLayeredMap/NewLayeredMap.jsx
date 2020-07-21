@@ -51,6 +51,7 @@ class NewLayeredMap extends Component {
             defaultBounds: props.defaultBounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
+            drawLayerData: [],
 
             // The imageLayer in focus - for calculating z value and showing colormap for
             focusedImageLayer: null,
@@ -134,6 +135,19 @@ class NewLayeredMap extends Component {
         }
     }
 
+    drawLayerAdd = (newLayers) => {
+        this.setState(prevState => ({
+            drawLayerData: [...prevState.drawLayerData, ...newLayers]
+        }))
+    }
+
+    drawLayerDelete = (layerTypes) => {
+        const layers = this.state.drawLayerData.filter((drawing) => {
+            return !layerTypes.includes(drawing.type);
+        })
+        this.setState({drawLayerData: layers});
+    }
+
     syncedDrawLayerAdd = (newLayers) => {
         for (const layer of newLayers) {
             layer["creatorId"] = this.state.id;
@@ -143,19 +157,23 @@ class NewLayeredMap extends Component {
     }
 
     syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
+        const syncedMaps = [...this.props.syncedMaps, this.state.id];
         NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
-            return !layerTypes.includes(drawing.type);
+            return !syncedMaps.includes(drawing.creatorId) || !layerTypes.includes(drawing.type);
         })
+        !layerTypes.includes("circleMarker") && (console.log("layers in syncedDrawLayer: ", NewLayeredMap.syncedDrawLayer))
         if (shouldRedraw) {
             this.redrawAllSyncedMaps();
         }
     }
 
     redrawAllSyncedMaps = () => {
-        for (const id of this.props.syncedMaps || []) {
-            if (id !== this.state.id) {
-                const otherMap = NewLayeredMap.mapReferences[id];
-                otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
+        if (this.props.syncDrawings) {
+            for (const id of this.props.syncedMaps || []) {
+                if (id !== this.state.id) {
+                    const otherMap = NewLayeredMap.mapReferences[id];
+                    otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
+                }
             }
         }
         // When using the component in dash with multiple maps drawing won't work
@@ -181,7 +199,10 @@ class NewLayeredMap extends Component {
                     style={{height: '100%'}}>
                         <Context.Provider value={{
                                 drawLayer: this.state.drawLayer,
+                                drawLayerData: this.state.drawLayerData,
                                 syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
+                                drawLayerAdd: this.drawLayerAdd,
+                                drawLayerDelete: this.drawLayerDelete,
                                 syncedDrawLayerAdd: this.syncedDrawLayerAdd,
                                 syncedDrawLayerDelete: this.syncedDrawLayerDelete,
                                 focusedImageLayer: this.state.focusedImageLayer,

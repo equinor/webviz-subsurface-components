@@ -117,7 +117,7 @@ if __name__ == "__main__":
             "name": "Something",
             "id": 2,
             "baseLayer": True,
-            "checked": True,
+            "checked": False,
             "action": "add",
             "data": [
                 {
