@@ -1,6 +1,6 @@
 import L, { DomUtil, DomEvent, Util, Browser, GridLayer } from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
-import { buildColormap } from '../colorscale';
+import { buildColormap } from '../utils/colorScale';
 
 /**
  * TileWebGLLayer is a tileLayer for rendering tile-based images with WebGL. It executes WebGL code for colormaps and

@@ -1,27 +1,11 @@
-let TEXTURE_INDEX_COUNT = -1;
-
-/**
- * 
- * @param {WebGLRenderingContext} gl 
- */
-export const nextTextureIndex = (gl) => {
-    if(TEXTURE_INDEX_COUNT === -1) {
-        TEXTURE_INDEX_COUNT = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
-    }
-    
-    console.log("TextureIndex:", TEXTURE_INDEX_COUNT)
-    return TEXTURE_INDEX_COUNT--;
-}
-
-
 class Texture {
 
-    constructor(gl, options = {}) {
+    constructor(gl, textureIndex, options = {}) {
         if (!options.image || !(options.image instanceof HTMLImageElement)) {
             throw new TypeError('image is not defined or is not an image')
         }
 
-        this._textureIndex = nextTextureIndex(gl);
+        this._textureIndex = textureIndex;
         this._options = options;
     }
 

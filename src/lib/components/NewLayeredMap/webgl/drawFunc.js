@@ -1,7 +1,7 @@
 import { drawRawImage ,drawWithColormap, drawWithHillShading, drawWithAdvancedHillShading } from './commands';
 
 // Utils
-import { Utils } from './eqGL';
+import Utils from '../utils';
 
 export default async (gl, canvas, image, colormap = null, config = {}) => {
     
@@ -12,7 +12,7 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
         imagesToLoad.push(Utils.loadImage(colormap, config));
     }
 
-    const [loadedImage, loadedColorMap = null] = await Promise.all(imagesToLoad).catch(console.error);
+    let [loadedImage, loadedColorMap = null] = await Promise.all(imagesToLoad).catch(console.error);
 
     // Select which draw command to draw
     const shader = config.shader || {};

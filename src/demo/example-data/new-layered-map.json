@@ -36,7 +36,8 @@
                     "shader": {
                         "type": "hillshading",
                         "shadows": true,
-                        "noColor": false
+                        "noColor": false,
+                        "setBlackToAlpha": true
                     },
                     "colorScale":  {
                         "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],

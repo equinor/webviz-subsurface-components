@@ -9,9 +9,9 @@ class FrameBuffer {
      * @param {Number} width 
      * @param {Number} height 
      */
-    constructor(gl, width, height) {
+    constructor(gl, textureIndex, width, height) {
         
-        this._textureIndex = nextTextureIndex(gl);
+        this._textureIndex = textureIndex;
         this._fb = this._createFrameBuffer(gl);
         this._texture = this._createTexture(gl, width, height);
     }

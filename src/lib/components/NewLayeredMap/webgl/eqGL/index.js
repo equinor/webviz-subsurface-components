@@ -19,6 +19,8 @@ export class EQGLContext {
 
         // Store already compiled programs
         this._programs = {};
+
+        this.TEXTURE_INDEX_COUNT = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
     }
 
     /**
@@ -36,7 +38,7 @@ export class EQGLContext {
     framebuffer(options) {
         const width = options.width || 0;
         const height = options.height || 0;
-        return new FrameBuffer(this._gl, width, height);
+        return new FrameBuffer(this._gl, this._nextTextureIndex(), width, height);
     }
 
     /**
@@ -55,12 +57,20 @@ export class EQGLContext {
      * @param {Object} options.params - Custom gl.texParamteri-configuration
      */
     texture(options = {}) {
-        return new Texture(this._gl, options);
+        return new Texture(this._gl, this._nextTextureIndex(), options);
     }
 
 
     _addProgram(cmdId, program, vert, frag) {
         this._programs[cmdId] = { p: program, vert, frag };
+    }
+
+    _nextTextureIndex = () => {
+        if(this.TEXTURE_INDEX_COUNT === -1) {
+            this.TEXTURE_INDEX_COUNT = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
+        }
+        
+        return this.TEXTURE_INDEX_COUNT--;
     }
 }
 
