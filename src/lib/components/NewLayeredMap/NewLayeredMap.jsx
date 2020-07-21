@@ -7,7 +7,7 @@ import './layers/L.imageWebGLOverlay';
 import './layers/L.tileWebGLLayer';
 
 // Components
-import Controls from './components/controls/Controls';
+import Controls from './components/Controls';
 import CompositeMapLayers from './components/CompositeMapLayers'
 import Context from './Context'
 
