@@ -7,7 +7,7 @@ import Context from '../../../Context';
 import L from "leaflet";
 
 // Utils
-import { buildColormap } from '../../../colorscale';
+import { buildColormap } from '../utils/colorScale';
 
 
 const ColorBar = (props) => {

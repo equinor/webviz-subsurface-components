@@ -12,7 +12,7 @@ void main() {
     vec2 ires = 1.0 / resolution;
     vec3 src = texture2D(tSrc, gl_FragCoord.xy * ires).rgb;
     vec4 e0 = texture2D(tElevation, gl_FragCoord.xy * ires);
-    vec3 n0 = texture2D(tNormal, gl_FragCoord.xy * ires).rgb;
+    vec4 n0 = texture2D(tNormal, gl_FragCoord.xy * ires).rgba;
     vec2 sr = normalize(sunDirection.xy);
 
     vec2 p0 = gl_FragCoord.xy;
@@ -34,7 +34,7 @@ void main() {
         // Did we exit the tile?
         vec2 ptex = ires * (p + 0.5);
         if (ptex.x < 0.0 || ptex.x > 1.0 || ptex.y < 0.0 || ptex.y > 1.0) {
-            gl_FragColor = vec4(src + vec3(1.0/n) * clamp(dot(n0, sunDirection), 0.0, 1.0), 1.0);
+            gl_FragColor = vec4(src + vec3(1.0/n) * clamp(dot(n0.rgb, sunDirection), 0.0, 1.0), n0.a);
             return;
         }
 
@@ -43,10 +43,10 @@ void main() {
         float t = distance(p + 0.5, p0);
         float z = e0.r + t * pixelScale * sunDirection.z;
         if (e.r > z) {
-            gl_FragColor = vec4(src, 1.0);
+            gl_FragColor = vec4(src, n0.a);
             return;
         }
     }
-    gl_FragColor = vec4(src + vec3(1.0/n) * clamp(dot(n0, sunDirection), 0.0, 1.0), 1.0);
+    gl_FragColor = vec4(src + vec3(1.0/n) * clamp(dot(n0.rgb, sunDirection), 0.0, 1.0), n0.a);
 }
   

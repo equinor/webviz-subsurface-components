@@ -1,6 +1,6 @@
-import L, { latLngBounds, Util, DomUtil, Bounds, Point} from 'leaflet';
+import L, { latLngBounds, Util, DomUtil, Bounds, Point } from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
-import { buildColormap } from '../colorscale';
+import Utils from '../utils';
 
 /**
  * ImageWebGLOverlay is a layer that draws an image into the map
@@ -11,17 +11,27 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
     options: {
 
+		crossOrigin: false,
+
         /**
          * @param {Array<String>} - An array of hexcolors for defining the colormap used on the tiles.
          */
         colorScale: null,
+
+
+        /**
+         * @param {Number} - If the image should scale into a different size
+         */
+        imageScale: null, 
     },
 
     initialize: function(url, bounds, options) {
         this._url = url;
         this.setBounds(bounds);
-
-        Util.setOptions(this, options);
+        Util.setOptions(this, {
+            ...options,
+            url,
+        });
     },
 
     onAdd: function(map) {
@@ -99,13 +109,15 @@ L.ImageWebGLOverlay = L.Layer.extend({
     },
 
     updateOptions: function(options) {
+        const promisesToWaitFor = [];
+
         options = Util.setOptions(this, {
 			...this.options,
 			...options,
         });
         
         if(options.url !== this._url) {
-            this._url = options.url;
+            promisesToWaitFor.push(this._initUrl())
         }
 
         if(!options.colorScale) {
@@ -114,9 +126,11 @@ L.ImageWebGLOverlay = L.Layer.extend({
             this._initColormap();
         }
 
-        this._draw();
-        
-        this._triggerOnChanged();
+        Promise.all(promisesToWaitFor)
+        .then(() => {
+            this._draw();
+            this._triggerOnChanged();
+        })
     },
 
 
@@ -136,14 +150,42 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
         this._onscreenCanvas = onscreenCanvasTag;
         this._canvas = canvasTag;
-        this._draw();
 
+
+        this._initUrl()
+        .then(() => {
+            this._draw();
+        });
+    },
+
+    _initColormap: function() {
+        const colorScale = this.options.colorScale;
+		if(!colorScale) {
+			this._colormapUrl = null;
+		} else {
+			this._colormapUrl = Utils.buildColormap(colorScale);
+		}
+    },
+
+    _initUrl: function() {
+        let imageScale = this.options.imageScale;
+        if(this.options.imageScale && imageScale > 0.0 && imageScale !== 1.0) {
+            imageScale = Math.min(imageScale, 10.0); 
+            return Utils.scaleImage(this.options.url, imageScale, imageScale)
+            .then((scaledImageUrl) => {
+                this._url = scaledImageUrl;
+            }) 
+        } else {
+            this._url = this.options.url;
+            return Promise.resolve() 
+        }
     },
 
     _draw: function() {
         drawFunc(this._gl, this._canvas, this._url, this._colormapUrl, {
             ...this.options,
             shader: this.options.shader,
+            crossOrigin:  this.options.crossOrigin || '',
         })
         .then(() => {
             // Draw from the webgl-canvas to the onscreenCanvas
@@ -153,15 +195,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
             ctx.drawImage(this._canvas, 0, 0);
         })
         .catch(console.error);
-    },
-
-    _initColormap: function() {
-        const colorScale = this.options.colorScale;
-		if(!colorScale) {
-			this._colormapUrl = null;
-		} else {
-			this._colormapUrl = buildColormap(colorScale);
-		}
     },
 
     _reset: function() {
