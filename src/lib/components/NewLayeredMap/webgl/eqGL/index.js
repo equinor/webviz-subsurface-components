@@ -72,6 +72,26 @@ export class EQGLContext {
         
         return this.TEXTURE_INDEX_COUNT--;
     }
+
+    /**
+     * Cleans and clears the entrie context.
+     */
+    clean = () => {
+        const numTextureUnits = this._gl.getParameter(this._gl.MAX_TEXTURE_IMAGE_UNITS);
+        for (let unit = 0; unit <= numTextureUnits; unit++) {
+            this._gl.activeTexture(this._gl.TEXTURE0 + unit);
+            this._gl.bindTexture(this._gl.TEXTURE_2D, null);
+            this._gl.bindTexture(this._gl.TEXTURE_CUBE_MAP, null);
+        }
+        this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);
+        this._gl.bindBuffer(this._gl.ELEMENT_ARRAY_BUFFER, null);
+        this._gl.bindRenderbuffer(this._gl.RENDERBUFFER, null);
+        this._gl.bindFramebuffer(this._gl.FRAMEBUFFER, null);
+
+        this._canvas = null;
+        this._gl = null;
+        this._programs = null;
+    }
 }
 
 

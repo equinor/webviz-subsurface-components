@@ -126,7 +126,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
             this._initColormap();
         }
 
-        console.log("Promises:", promisesToWaitFor);
         Promise.all(promisesToWaitFor)
         .then(() => {
             this._draw();
