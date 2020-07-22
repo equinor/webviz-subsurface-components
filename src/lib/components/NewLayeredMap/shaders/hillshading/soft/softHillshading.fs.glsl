@@ -14,7 +14,8 @@ varying vec2 v_texCoord;
 void main() {
     vec2 pixelPos = vec2(gl_FragCoord.x, u_resolution.y - gl_FragCoord.y);
 
-    float v0 = texture2D(u_image, pixelPos / u_resolution).r;
+    vec4 rgba = texture2D(u_image, pixelPos / u_resolution).rgba;
+    float v0 = rgba.r;
     float vx = texture2D(u_image, (pixelPos + vec2(1.0, 0.0)) / u_resolution).r;
     float vy = texture2D(u_image, (pixelPos + vec2(0.0, 1.0)) / u_resolution).r;
 
@@ -31,5 +32,5 @@ void main() {
     float map_array = texture2D(u_image, v_texCoord).r;
     vec4 color = texture2D(u_colormap, vec2((map_array * (u_colormap_length - 1.0) + 0.5) / u_colormap_length, 0.5));
 
-    gl_FragColor = color * vec4(light, light, light, 1.0);
+    gl_FragColor = color * vec4(light, light, light, rgba.a);
 }

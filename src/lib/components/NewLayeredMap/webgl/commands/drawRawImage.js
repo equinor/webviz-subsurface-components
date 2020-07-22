@@ -3,6 +3,7 @@ import EQGL from '../eqGL';
 // Shaders
 import positionVShader from '../../shaders/position.vs.glsl';
 import imageFShader from '../../shaders/image.fs.glsl';
+import blackAlphaFShader from '../../shaders/blackalpha.fs.glsl';
 
 /**
  * @param {WebGLRenderingContext} gl
@@ -11,6 +12,8 @@ export default (gl, canvas, loadedImage, options = {}) => {
     const { 
         cutPointMin = 0.0,
         cutPointMax = 1000.0,
+
+        setBlackToAlpha = false,
     } = options;
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -23,11 +26,33 @@ export default (gl, canvas, loadedImage, options = {}) => {
 
     const eqGL = EQGL(gl, canvas);
 
+    const rawTexture = eqGL.texture({ image: loadedImage });
+    let inputTexture = rawTexture;
+
+    if(setBlackToAlpha) {
+        const fboBlackAlpha = eqGL.framebuffer({width: width, height: height});
+
+        const blackToAlphaCmd = eqGL.new()
+            .vert(positionVShader)
+            .frag(blackAlphaFShader)
+            .attribute('position', [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
+            .texture('u_image', inputTexture)
+            .uniformf("u_resolution", loadedImage.width, loadedImage.height)
+            .viewport(0, 0, width, height)
+            .framebuffer(fboBlackAlpha)
+            .vertexCount(6)
+            .build();
+
+        blackToAlphaCmd();
+
+        inputTexture = fboBlackAlpha;
+    }
+
     const drawCmd = eqGL.new()
         .vert(positionVShader)
         .frag(imageFShader)
         .attribute('position', [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
-        .texture('u_image', 2, loadedImage)
+        .texture('u_image', inputTexture)
         .uniformf("u_resolution", loadedImage.width, loadedImage.height)
         .uniformf("u_max_color_value", cutPointMax)
         .uniformf("u_min_color_value", cutPointMin)

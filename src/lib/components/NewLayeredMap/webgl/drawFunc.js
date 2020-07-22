@@ -16,6 +16,7 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
 
     // Select which draw command to draw
     const shader = config.shader || {};
+    const colorScale = config.colorScale || {};
 
     const cutOffPoints = calcCutOffPoints(
         config.minvalue,
@@ -36,7 +37,7 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
                     loadedImage, 
                     loadedColorMap,
                     {
-                        ...config.colorScale,
+                        ...colorScale,
                         ...shader,
                     }
                 )
@@ -45,7 +46,7 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
     
             case 'hillshading': {
                 drawWithAdvancedHillShading(gl, canvas, loadedImage, loadedColorMap, {
-                    ...config.colorScale,
+                    ...colorScale,
                     ...shader,
                     ...cutOffPoints,
                 });
@@ -56,7 +57,7 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
             default: {
                 // Draw the image with colormap
                 drawWithColormap(gl, canvas, loadedImage, loadedColorMap, {
-                    ...config.colorScale,
+                    ...colorScale,
                     ...shader,
                     ...cutOffPoints,
                 });
@@ -66,6 +67,8 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
     } else {
         // Draw the image raw - without colormap
         drawRawImage(gl, canvas, loadedImage, {
+            ...colorScale,
+            ...shader,
             ...cutOffPoints
         })
     }

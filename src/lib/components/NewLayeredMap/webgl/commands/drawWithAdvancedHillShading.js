@@ -3,7 +3,6 @@ import vec3 from '../vec3';
 
 // Shaders
 import positionVShader from '../../shaders/position.vs.glsl';
-import bgclearVShader from '../../shaders/bgclear.fs.glsl';
 import elevationFShader from '../../shaders/hillshading/elevation.fs.glsl';
 import normalsFShader from '../../shaders/hillshading/normals.fs.glsl';
 import directLightningsFShader from '../../shaders/hillshading/directlightning.fs.glsl';
@@ -11,8 +10,6 @@ import softShadowFShader from '../../shaders/hillshading/softshadow.fs.glsl';
 import ambientFShader from '../../shaders/hillshading/ambient.fs.glsl';
 import combinedFShader from '../../shaders/hillshading/combined.fs.glsl';
 import colorFShader from '../../shaders/color.fs.glsl';
-
-import imageFShader from '../../shaders/image.fs.glsl';
 
 // CONSTANTS
 const DEFAULT_PIXEL_SCALE = 8000;
@@ -82,34 +79,13 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
     let N = shadowIterations || calcN(width, height);
 
     const rawTexture = eqGL.texture({image: loadedImage});
-    let inputTexture = rawTexture;
-
-    if(setBlackToAlpha) {
-        const fboAlpha = eqGL.framebuffer({width: width, height: height});
-
-        const glClearCmd = eqGL.new()
-        .vert(positionVShader)
-        .frag(bgclearVShader)
-        .attribute("position", [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
-        .texture("u_image", inputTexture)
-        .uniformf("u_resolution", loadedImage.width, loadedImage.height)
-        .framebuffer(fboAlpha)
-        .viewport(0, 0, loadedImage.width, loadedImage.height)
-        .vertexCount(6)
-        .build();
-    
-        glClearCmd();
-
-        inputTexture = fboAlpha;
-    }
-
     const fboElevation = eqGL.framebuffer({ width: width, height: height});
     
     const elevationCmd = eqGL.new()
         .vert(positionVShader)
         .frag(elevationFShader)
         .attribute("position", [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
-        .texture("tElevation", inputTexture)
+        .texture("tElevation", rawTexture)
         .uniformf("elevationScale", elevationScale)
         .uniformf("resolution", loadedImage.width, loadedImage.height)
         .vertexCount(6)
@@ -259,6 +235,7 @@ export default async (gl, canvas, loadedImage, loadedColorMap, options = {}) => 
             .uniformf("u_scale_type", scaleType === 'log' ? 1.0 : 0.0) // 1.0 is logarithmic
             .uniformf("u_max_color_value", cutPointMax)
             .uniformf("u_min_color_value", cutPointMin)
+            .uniformi("u_black_to_alpha", Boolean(setBlackToAlpha))
             .viewport(0, 0, loadedImage.width, loadedImage.height)
             .vertexCount(6)
             .build();
