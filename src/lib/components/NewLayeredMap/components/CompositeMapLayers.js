@@ -52,7 +52,8 @@ class CompositeMapLayers extends Component {
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
-                });
+                }); 
+                this.setFocusedImageLayer(curLayer.getLayers()[0]);
                 break;
 
             case 'tile':
@@ -80,6 +81,7 @@ class CompositeMapLayers extends Component {
 
                     case "delete":
                         if (this.state.layers[propLayerData.id]) {
+                            this.setFocusedImageLayer(null)
                             const stateLayer = this.state.layers[propLayerData.id];
                             stateLayer.remove();
                             this.state.layerControl.removeLayer(stateLayer);
@@ -133,12 +135,8 @@ class CompositeMapLayers extends Component {
             case "image":
                 const imageLayer = addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
-                
-                const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
-                if (checked) {
-                    this.setFocusedImageLayer(imageLayer);
-                }
-
+                // this.setFocusedImageLayer(imageLayer)
+ 
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
                     this.setFocusedImageLayer(imgLayer);
                 });
@@ -189,7 +187,11 @@ class CompositeMapLayers extends Component {
         this.setState(prevState => ({
             layers: Object.assign({}, prevState.layers, {[layer.id]: layerGroup})
         }));
-
+        //Makes sure that the correct information is displayed when first loading the map
+        const checked = layer.checked && layer.baseLayer && layer.data.type == "image" ? true : false; 
+        if (checked) {
+            this.setFocusedImageLayer(layer.data);
+        }
         //adds object to a layer
         for (const item of layer.data) {
             this.addItemToLayer(item, layerGroup);

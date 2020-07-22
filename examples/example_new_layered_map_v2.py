@@ -15,7 +15,7 @@ CUTOFF_SLIDER_VALUE = 'cutOffSliderValue'
 
 def load_test_data():
     data = None
-    with open('./example-data/test-data.json') as f:
+    with open('examples/example-data/test-data.json') as f:
         data = json.load(f)
     return data
 
