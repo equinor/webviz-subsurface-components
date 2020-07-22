@@ -38,12 +38,6 @@ class CompositeMapLayers extends Component {
                 
             },
             layerControl: null,
-            drawings: {
-                marker: null,
-                circleMarker: null,
-                polygon: null,
-                polyline: null,
-            }
         }
     }
 

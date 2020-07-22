@@ -28,9 +28,6 @@ class DrawControls extends Component {
     constructor(props) {
         super(props);
         this.addToolbar = this.addToolbar.bind(this);
-        this.state = {
-            editing: false
-        }
     }
 
     componentDidMount() {
