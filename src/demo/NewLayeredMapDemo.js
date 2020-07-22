@@ -30,13 +30,13 @@ const NewLayeredMapDemo = () => {
                 layers[0].data[0].colorScale = DEFAULT_COLORMAP;
             } else {
                 layers[0].data[0].shader.type = null;
-                layers[0].data[0].colorScale = null;
+               // layers[0].data[0].colorScale = null;
             }
         }
     }
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: '90vh', width: '150vh'}}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", height: '90vh'}}>
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
@@ -82,7 +82,7 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            <div >
+            {/* <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
@@ -118,71 +118,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div>
-            <div>
-                <NewLayeredMap 
-                    id={"NewLayeredMap-3"}
-                    syncedMaps={["NewLayeredMap-4", "NewLayeredMap-3"]}
-                    syncDrawings={true}
-                    layers={exampleData.layers}
-                    // center={[0, 0]}
-                    crs="simple"
-                    center={[432205, 6475078], [432205, 6475078]}
-                    defaultBounds={[[432205, 6475078], [437720, 6481113]]}
-                    minZoom={-5}
-                    // scaleY={{
-                    //     scaleY: 1,
-                    //     minScaleY: 1,
-                    //     maxScaleY: 10,
-                    //     position: 'topleft',
-                    // }}
-                    drawTools = {{
-                        drawMarker: true,
-                        drawPolygon: true,
-                        drawPolyline: true,
-                        position: "topright",
-                        
-                    }}
-                    switch={{
-                        value: switchValue,
-                        label: 'Hillshading',
-                        position: 'bottomleft'
-                    }}
-                    setProps={onChange}
-                />
-            </div>
-            <div>
-                <NewLayeredMap 
-                    id={"NewLayeredMap-4"}
-                    syncedMaps={["NewLayeredMap-3", "NewLayeredMap-4"]}
-                    syncDrawings={false}
-                    layers={exampleData.layers}
-                    // center={[0, 0]}
-                    crs="simple"
-                    center={[432205, 6475078], [432205, 6475078]}
-                    defaultBounds={[[432205, 6475078], [437720, 6481113]]}
-                    minZoom={-5}
-                    // scaleY={{
-                    //     scaleY: 1,
-                    //     minScaleY: 1,
-                    //     maxScaleY: 10,
-                    //     position: 'topleft',
-                    // }}
-                    drawTools = {{
-                        drawMarker: true,
-                        drawPolygon: true,
-                        drawPolyline: true,
-                        position: "topright",
-                        
-                    }}
-                    switch={{
-                        value: switchValue,
-                        label: 'Hillshading',
-                        position: 'bottomleft'
-                    }}
-                    setProps={onChange}
-                />
-            </div>
+            </div> */}
         </ div>
         
     )

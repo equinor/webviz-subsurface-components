@@ -61,6 +61,21 @@ class DrawCmdBuilder {
         return this;
     }
 
+    uniformi(uniformName) {
+        const args = arguments;
+        const values = Object.values(args).slice(1); // Remove the "uniformName"
+        if(values.length === 0) {
+            return;
+        }   
+
+        let type = `${values.length}i`; // Assume it is not an array
+        if(Array.isArray(values[0])) {
+            type = `${values[0].length}iv`; // It is an array
+        }
+        this.uniform(uniformName, type, values );
+        return this;
+    }
+
     uniform(uniformName, type, value) {
         this._uniforms[uniformName] = { value, type };
         return this;
