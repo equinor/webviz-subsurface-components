@@ -4,14 +4,13 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
 // Context
-import Context from '../../../Context';
+import Context from '../../../context';
 
 // Constants
 const NUMBER_COLOR_CHANNELS = 4;
 const NUMBER_DISCRETIZATION_LEVELS = 255;
 
 
-// TODO: Fix context mode so that it's dynamic
 const MousePosition = (props) => {
     const { focusedImageLayer, mode } = useContext(Context);
 

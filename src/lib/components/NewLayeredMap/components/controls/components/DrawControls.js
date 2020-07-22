@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
-import Context from '../../../Context';
+import Context from '../../../context';
 
-import { getShapeType } from '../../leafletUtils'
+import { getShapeType } from '../../../utils/leaflet'
 
 
 
