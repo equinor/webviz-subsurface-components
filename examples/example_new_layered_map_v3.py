@@ -36,10 +36,6 @@ if __name__ == "__main__":
 
     state = {
         'switch': { "value": False },
-        'colorscale': DEFAULT_COLORSCALE_COLORS,
-        'scale_type': "linear",
-        'cut_point_min': min_value,
-        'cut_point_max': max_value,
         'pixel_scale': 10000,
         'elevation_scale': 1,
     }
@@ -356,15 +352,15 @@ if __name__ == "__main__":
     #Callbacks are made for each of the maps as specified in callbackMaps defined above
     for map in callbackMaps:
 
-        # @cg.callback(
-        #     Output(map, 'layerChangeMethod'),
-        #     [
-        #         Input('layer-change-method', 'value')
-        #     ]
-        # )
+        @cg.callback(
+            Output(map, 'layerChangeMethod'),
+            [
+                Input('layer-change-method', 'value')
+            ]
+        )
 
-        # def change_layer_change_method(value):
-        #     return value
+        def change_layer_change_method(value):
+            return value
 
         @cg.callback(
             Output(map, 'drawTools'),
@@ -523,17 +519,12 @@ if __name__ == "__main__":
                             "type": layer_type,
                             "colorScale": {
                                 "colors": colorScale,
-                                "scaleType": state['scale_type'],
-                                "prefixZeroAlpha": True,
-                                "cutPointMin": state['cut_point_min'],
-                                "cutPointMax": state['cut_point_max']
                             }
                         }
                     ]
                 }
             ] 
             layers = change_layer(layers, update_layer[0])
-            state['colorscale'] = colorScale
             return layers
 
 
@@ -622,10 +613,8 @@ if __name__ == "__main__":
                         {   
                             "type": layer_type,
                             "colorScale":  {
-                                "colors": state['colorscale'],
                                 "cutPointMin": value[0],
                                 "cutPointMax": value[1],
-                                "scaleType": state['scale_type']
                             },
                         }
                     ]
@@ -691,10 +680,7 @@ if __name__ == "__main__":
                         {   
                             "type": layer_type,
                             "colorScale":  {
-                                "colors": state['colorscale'],
                                 "scaleType": log_value,
-                                "cutPointMin": state['cut_point_min'],
-                                "cutPointMax": state['cut_point_max'],
                             },
                         }
                     ]

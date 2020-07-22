@@ -94,6 +94,18 @@ L.ImageWebGLOverlay = L.Layer.extend({
 		return this;
     },
     
+    reUseColorscale: function (newOptions) {
+        const newColorScaleOptions = newOptions.colorScale;
+        const updatedColorScale = this.options.colorScale;
+
+        if(this.options.colorScale) {
+            for (const property in newColorScaleOptions) {
+                updatedColorScale[property] = newColorScaleOptions[property]
+                console.log(`${property}: ${newColorScaleOptions[property]}`);
+              }
+        }
+        return updatedColorScale;
+    },
 
     setBounds: function (bounds) {
 		this._bounds = latLngBounds(bounds);
@@ -111,9 +123,14 @@ L.ImageWebGLOverlay = L.Layer.extend({
     updateOptions: function(options) {
         const promisesToWaitFor = [];
 
+        if(this.options.colorScale) {
+            const newColorScale = this.reUseColorscale(options)
+            options.colorScale = newColorScale
+        }
+
         options = Util.setOptions(this, {
 			...this.options,
-			...options,
+            ...options,
         });
         
         if(options.url !== this._url) {
