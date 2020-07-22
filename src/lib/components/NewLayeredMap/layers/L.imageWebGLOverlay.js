@@ -109,6 +109,10 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
     updateOptions: function(options) {
         const promisesToWaitFor = [];
+	    
+    	if(options.colorScale && options.colorScale instanceof Object && this.options.colorScale instanceof Object) {
+    		options.colorScale = Object.assign(this.options.colorScale, options.colorScale)
+   	}       	   
 
         options = Util.setOptions(this, {
 			...this.options,
@@ -122,9 +126,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
         if(!options.colorScale) {
             this._colormapUrl = null;
         } else {
-            if(options.colorScale instanceof Object && this.options.colorScale instanceof Object) {
-                options.colorScale = Object.assign(this.options.colorScale, options.colorScale)
-            }
             this._initColormap();
         }
 
