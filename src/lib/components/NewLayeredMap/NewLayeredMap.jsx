@@ -376,7 +376,7 @@ NewLayeredMap.propTypes = {
     /**
      * Allows to choose between replacing the layers or updating them
      */
-    layerChangeMethod,
+    layerChangeMethod : PropTypes.string,
 }
 
 

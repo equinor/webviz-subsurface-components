@@ -196,8 +196,8 @@ if __name__ == "__main__":
                     ),  
                 ]),
          
-                html.Button('Sync map 1', id='sync-map2-btn'),
-                html.Button('Sync map 2', id='sync-map1-btn'),
+                html.Button('Toggle sync map 1', id='sync-map1-btn'),
+                html.Button('Toggle sync map 2', id='sync-map2-btn'),
                 html.Button('Add layer', id='layer-add-btn'),
                 html.Button('Toggle log', id='log-toggle-btn'),
                 html.Button('Toggle shader', id='shader-toggle-btn'),
