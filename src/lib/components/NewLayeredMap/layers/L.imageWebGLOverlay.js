@@ -100,8 +100,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
         if(this.options.colorScale) {
             for (const property in newColorScaleOptions) {
-                updatedColorScale[property] = newColorScaleOptions[property]
-                console.log(`${property}: ${newColorScaleOptions[property]}`);
+                updatedColorScale[property] = newColorScaleOptions[property];
               }
         }
         return updatedColorScale;
