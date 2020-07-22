@@ -143,21 +143,21 @@ class DrawControls extends Component {
                 newLayers.push(editedLayer);
             });
             props.syncDrawings ? this.context.syncedDrawLayerAdd(newLayers) : this.context.drawLayerAdd(newLayers);
-            this.setState({editing: false});
+            this.context.setMode(null);
         });
 
         map.on(L.Draw.Event.DELETED, (e) => {
             const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
             props.syncDrawings ? this.context.syncedDrawLayerDelete(deletedLayers, true) : this.context.drawLayerDelete(deletedLayers)
-            this.setState({editing: false});
+            this.context.setMode(null);
         })
 
         map.on('draw:editstart', (e) => {
-            this.setState({editing: true});
+            this.context.setMode("editing");
         })
 
         map.on('draw:deletestart', (e) => {
-            this.setState({editing: true});
+            this.context.setMode("editing");
         })
 
         map.on('mouseup', (e) => {
@@ -169,7 +169,7 @@ class DrawControls extends Component {
                 color: "red",
                 radius: 4,
             }
-            if (!this.state.editing) {
+            if (this.context.mode !== "editing") {
                 this.context.drawLayer.addLayer(L.circleMarker(circleMarker.center, circleMarker));
                 this.removeLayers("circleMarker", drawControl);
                 if (props.syncDrawings) {

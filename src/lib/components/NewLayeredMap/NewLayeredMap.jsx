@@ -51,6 +51,7 @@ class NewLayeredMap extends Component {
             controls: props.controls || {},
             drawLayer: drawLayer,
             drawLayerData: [],
+            mode: "facinating",
 
             // The imageLayer in focus - for calculating z value and showing colormap for
             focusedImageLayer: null,
@@ -162,7 +163,6 @@ class NewLayeredMap extends Component {
         NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
             return !syncedMaps.includes(drawing.creatorId) || !layerTypes.includes(drawing.type);
         })
-        // !layerTypes.includes("circleMarker") && (console.log("layers in syncedDrawLayer: ", NewLayeredMap.syncedDrawLayer))
         if (shouldRedraw) {
             this.redrawAllSyncedMaps();
         }
@@ -190,6 +190,16 @@ class NewLayeredMap extends Component {
             focusedImageLayer: layer,
         })
     }
+
+    /**
+     * @param {String} mode
+     * can be "editing" or null
+     */
+    setMode = newMode => {
+        this.setState({
+            mode: newMode
+        })
+    }
     
     render() {   
         
@@ -202,6 +212,8 @@ class NewLayeredMap extends Component {
                                 drawLayer: this.state.drawLayer,
                                 drawLayerData: this.state.drawLayerData,
                                 syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
+                                mode: this.state.mode,
+                                setMode: this.setMode,
                                 drawLayerAdd: this.drawLayerAdd,
                                 drawLayerDelete: this.drawLayerDelete,
                                 syncedDrawLayerAdd: this.syncedDrawLayerAdd,
