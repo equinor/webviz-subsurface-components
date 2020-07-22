@@ -102,7 +102,7 @@ export const drawCommand = (context, cmd, props = {}) => {
             const uniformLocation = gl.getUniformLocation(program, uniformName);
             const uniformFuncName = `uniform${type}`;
             if(gl[uniformFuncName] instanceof Function) {
-                gl[uniformFuncName](uniformLocation, ...uniformValue);
+                gl[uniformFuncName](uniformLocation, ...(Array.isArray(uniformValue) ? uniformValue : [uniformValue]));
             } else {
                 console.error(`Did not find gl.${uniformFuncName}. Did you give an incorrect type?`)
             }

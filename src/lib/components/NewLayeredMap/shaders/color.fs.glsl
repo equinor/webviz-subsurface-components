@@ -9,7 +9,8 @@ uniform sampler2D u_colormap;
 uniform float u_colormap_length;
 uniform float u_max_color_value;
 uniform float u_min_color_value;
-uniform float u_scale_type; // varying?
+uniform float u_scale_type;
+uniform bool u_black_to_alpha;
 
 // Maps a value from a given interval to a target interval
 // For example can take in a 0.0-1.0, and map it to 0-255
@@ -27,18 +28,22 @@ float map_log(float value, float from1, float to1, float from2, float to2) {
 }
 
 // Calculate color value
-vec4 calcColorValue(vec4 colors, float raw_value, float scale_type) {
+vec4 calcColorValue(vec4 colors, vec4 raw_colors, float scale_type) {
     float color_value = colors.r;
     if(color_value < 0.0) {
         color_value = 0.0;
     }
-
+    float raw_value = raw_colors.r;
 
     float mapped_color_value = 0.0; 
     if (scale_type == 1.0) {
         mapped_color_value = map_log(color_value, 0.0, 1.0, 0.0, u_colormap_length - 1.0); // from 0 to 1 and from 0 to 255
     } else {
         mapped_color_value = map(color_value, 0.0, 1.0, 0.0, u_colormap_length - 1.0); // from 0 to 1 and from 0 to 255
+    }
+
+    if (u_black_to_alpha == true && raw_colors.r == 0.0 && raw_colors.g == 0.0 && raw_colors.b == 0.0) {
+        return vec4(0.0, 0.0, 0.0, 0.0);
     }
 
     if (raw_value > u_max_color_value/255.0 || raw_value < u_min_color_value/255.0 || colors.a == 0.0) {
@@ -51,7 +56,7 @@ vec4 calcColorValue(vec4 colors, float raw_value, float scale_type) {
 
 void main() {
     vec4 colors = texture2D(u_image, gl_FragCoord.xy/u_resolution).rgba;
-    float raw_value = texture2D(u_raw_image, gl_FragCoord.xy/u_resolution).r;
+    vec4 raw_colors = texture2D(u_raw_image, gl_FragCoord.xy/u_resolution).rgba;
 
-    gl_FragColor = calcColorValue(colors, raw_value, u_scale_type);
+    gl_FragColor = calcColorValue(colors, raw_colors, u_scale_type);
 }

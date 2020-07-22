@@ -12,6 +12,7 @@ export default (gl, canvas, loadedImage, loadedColorMap, options = {}) => {
         scaleType = 'linear',
         cutPointMin = 0.0,
         cutPointMax = 1000.0,
+        setBlackToAlpha = false,
     } = options;
 
     gl.getExtension('OES_texture_float');
@@ -39,6 +40,7 @@ export default (gl, canvas, loadedImage, loadedColorMap, options = {}) => {
         .uniformf("u_scale_type", scaleType === 'log' ? 1.0 : 0.0) // 1.0 is logarithmic
         .uniformf("u_max_color_value", cutPointMax)
         .uniformf("u_min_color_value", cutPointMin)
+        .uniformi("u_black_to_alpha", Boolean(setBlackToAlpha))
         .viewport(0, 0, width, height)  
         .vertexCount(6)
         .build();
