@@ -36,7 +36,7 @@ const NewLayeredMapDemo = () => {
     }
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", height: '90vh'}}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: '90vh'}}>
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
@@ -82,7 +82,7 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            {/* <div >
+            <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
@@ -118,7 +118,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div> */}
+            </div>
         </ div>
         
     )

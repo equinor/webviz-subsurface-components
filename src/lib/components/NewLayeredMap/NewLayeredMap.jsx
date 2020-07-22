@@ -243,6 +243,7 @@ class NewLayeredMap extends Component {
                                         map={this.state.map}
                                         syncedMaps={[...this.props.syncedMaps, this.state.id]}
                                         syncDrawings={this.props.syncDrawings}
+                                        updateMode={this.props.updateMode}
                                     />
                                 )
                             }
@@ -352,6 +353,14 @@ NewLayeredMap.propTypes = {
      * Boolean deciding whether or not to sync drawings between maps  
      */
     syncDrawings: PropTypes.bool,
+
+    /**
+     * Specifies how the map will handle layer updates.
+     * By default it will use the action prop in layer data to add/update/delete layers,
+     * but if set to "reset", upon changing the layers prop, it will delete all current layers
+     * and only draw the new ones.
+     */
+    updateMode: PropTypes.String,
 
     /**
      * Dash provided prop that returns the coordinates of the edited or clicked polyline

@@ -49,7 +49,7 @@ if __name__ == "__main__":
     layers = [
         {
             "name": "A seismic horizon with colormap",
-            "id": 1, 
+            "id": 1,
             "baseLayer": True,
             "checked": True,
             "action": "update",
@@ -466,7 +466,7 @@ if __name__ == "__main__":
                 "id": 1,
                 "action": "update",
                 "data": [
-                    {   
+                    {
                         "type": 'image',
                         "maxvalue": value,
                     }
