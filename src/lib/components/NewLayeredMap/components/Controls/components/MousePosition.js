@@ -3,15 +3,16 @@ import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
-// Components
+// Context
 import Context from '../../../context';
 
 // Constants
 const NUMBER_COLOR_CHANNELS = 4;
 const NUMBER_DISCRETIZATION_LEVELS = 255;
 
+
 const MousePosition = (props) => {
-    const { focusedImageLayer } = useContext(Context);
+    const { focusedImageLayer, mode } = useContext(Context);
 
     // As useState-values are not available in eventListeners,
     // stateRef is. Using that to maintain state instead.
@@ -37,8 +38,16 @@ const MousePosition = (props) => {
         updateProps();
     }, [props])
 
+    useEffect(() => {
+        updateMode(mode);
+    }, [mode])
+
     const updateStateCanvas = (canvas, onScreenCanvas, ctx, minvalue, maxvalue) => {
         stateRef.current = { ...stateRef.current, canvas, ctx, onScreenCanvas, minvalue, maxvalue, props};
+    }
+
+    const updateMode = mode => {
+        stateRef.current.mode = mode
     }
 
     const updateProps = () => {
@@ -143,8 +152,9 @@ const MousePosition = (props) => {
         const y = Math.round(event.latlng.lat);
         const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally 
         const z = mapZValue(red);
-        
-        if(props.setProps) {
+
+
+        if(props.setProps && stateRef.current.mode !== "editing") {
             props.setProps({click_position: [x, y, z]});
         }
         
