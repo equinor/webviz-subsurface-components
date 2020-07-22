@@ -23,15 +23,20 @@ L.ImageWebGLOverlay = L.Layer.extend({
          * @param {Number} - If the image should scale into a different size
          */
         imageScale: null, 
+
+        /**
+         * Default bounds
+         */
+        bounds: [[0, 0], [30, 30]],
     },
 
     initialize: function(url, bounds, options) {
         this._url = url;
-        this.setBounds(bounds);
         Util.setOptions(this, {
             ...options,
             url,
         });
+        this.setBounds((bounds || []).length > 0 ? bounds : this.options.bounds);
     },
 
     onAdd: function(map) {
@@ -96,6 +101,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
     
 
     setBounds: function (bounds) {
+        console.log("Bounds:", bounds);
 		this._bounds = latLngBounds(bounds);
 
 		if (this._map) {

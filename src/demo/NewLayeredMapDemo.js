@@ -19,7 +19,7 @@ const NewLayeredMapDemo = () => {
 
     const [switchValue, setSwitchValue] = useState(true);
 
-    const layers = exampleData.layers.slice(1)
+    const layers = exampleData.layers.slice(1, 2)
 
     const onChange = (changes) => {
         // console.log("Changes :D", changes);
@@ -30,7 +30,7 @@ const NewLayeredMapDemo = () => {
                 layers[0].data[0].colorScale = DEFAULT_COLORMAP;
             } else {
                 layers[0].data[0].shader.type = null;
-               // layers[0].data[0].colorScale = null;
+                layers[0].data[0].colorScale = null;
             }
         }
     }
@@ -47,7 +47,7 @@ const NewLayeredMapDemo = () => {
                     center={[0, 0]}
                     // center={[432205, 6475078], [432205, 6475078]} 
                     // defaultBounds={[[432205, 6475078], [437720, 6481113]] [[432205, 6475078], [437720, 6481113]]}
-                    crs="simple"
+                    crs="earth"
                     //crs="earth"
                     //minZoom={-5}
                     //zoom = {-5} 
@@ -58,12 +58,12 @@ const NewLayeredMapDemo = () => {
                     colorBar={{
                         position: 'bottomleft'
                     }}
-                    scaleY={{
+                   /*  scaleY={{
                         scaleY: 1,
                         minScaleY: 1,
                         maxScaleY: 10,
                         position: 'topleft',
-                    }}
+                    }} */
                     drawTools = {{
                         drawMarker: true,
                         drawPolygon: true,

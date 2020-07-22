@@ -4,7 +4,7 @@
             "name": "Hello world",
             "id": 1, 
             "action": "update",
-            "checked": false,
+            "checked": true,
             "baseLayer": true,
             "data": [
                 {
@@ -12,7 +12,33 @@
                     "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                     "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
                     "shader": {
-                        "type": "none"
+                        "type": "none",
+                        "noColor": true
+                    },
+                    "colorScale": {
+                        "colors": ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
+                        "scaleType": "linear"
+                    },
+                    "minvalue": 2782,
+                    "maxvalue": 3513
+                }
+            ]
+        },
+        {
+            "name": "RainViewer Tiles",
+            "id": "RAINVIEWER", 
+            "action": "update",
+            "checked": true,
+            "baseLayer": true,
+            "data": [
+                {
+                    "type": "tile",
+                    "crossOrigin": true,
+                    "url": "https://tilecache.rainviewer.com/v2/radar/1595410200/512/{z}/{x}/{y}/1/1.png",
+                    "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
+                    "shader": {
+                        "type": "none",
+                        "noColor": true
                     },
                     "colorScale": {
                         "colors": ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
