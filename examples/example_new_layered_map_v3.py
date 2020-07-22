@@ -353,7 +353,7 @@ if __name__ == "__main__":
     for map in callbackMaps:
 
         @cg.callback(
-            Output(map, 'layerChangeMethod'),
+            Output(map, 'updateStrategy'),
             [
                 Input('layer-change-method', 'value')
             ]
