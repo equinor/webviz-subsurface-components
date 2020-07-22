@@ -7,9 +7,12 @@ uniform vec2 resolution;
 void main() {
 
     vec2 ires = 1.0 / resolution;
-    float softShadow = texture2D(tSoftShadow, ires * gl_FragCoord.xy).r;
+    vec4 softShadowColors = texture2D(tSoftShadow, ires * gl_FragCoord.xy).rgba;
+
+    float softShadow = softShadowColors.r;
     float ambient = texture2D(tAmbient, ires * gl_FragCoord.xy).r;
+
     // float l = 4.0 * softShadow + 0.25 * ambient;
     float l = 1.0 * softShadow + 0.25 * ambient;
-    gl_FragColor = vec4(l,l,l, 1.0);
+    gl_FragColor = vec4(l,l,l, softShadowColors.a);
 }

@@ -22,7 +22,7 @@ const NewLayeredMapDemo = () => {
     const layers = exampleData.layers.slice(1)
 
     const onChange = (changes) => {
-        console.log("Changes :D", changes);
+        // console.log("Changes :D", changes);
         if(changes.switch) {
             setSwitchValue(changes.switch.value);
             if (changes.switch.value === true) {
@@ -71,9 +71,9 @@ const NewLayeredMapDemo = () => {
                         position: "topright",
                         
                     }}
-                    mouseCoords = {{
+                  /*   mouseCoords = {{
                         position: "bottomright",
-                    }}
+                    }} */
                     switch={{
                         value: switchValue,
                         label: 'Hillshading',

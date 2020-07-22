@@ -54,7 +54,6 @@ if __name__ == "__main__":
         drawTools={
             
         }
-        
     )
 
     new_layered_map_2 = NewLayeredMap(

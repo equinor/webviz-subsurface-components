@@ -282,7 +282,7 @@ layered_map_component = webviz_subsurface_components.NewLayeredMap(
             "drawMarker": True,
             "drawPolygon": True,
             "drawPolyline": True,
-            "position": "top-right"
+            "position": "topright"
         },
         ...
 )
@@ -300,7 +300,7 @@ scaleY={
         "scaleY": 1,
         "minScaleY": 1,
         "maxScaleY": 5,
-        "position": 'top-left',
+        "position": 'topleft',
     }
 ```
 | Name      | Type     | Description            |
@@ -321,7 +321,7 @@ drawTools={
         "drawMarker": True,
         "drawPolygon": True,
         "drawPolyline": True,
-        "position": "top-right"
+        "position": "topright"
     }
 ```
 | Name         | Type      | Description                     |
@@ -341,7 +341,7 @@ switch={
         "value": False,
         "disabled": False,
         "label": "hillshading",
-        "position": "bottom-left"
+        "position": "bottomleft"
     }
 ```
 
@@ -360,7 +360,7 @@ Example:
 
 ```python
 mouseCoords={
-        "position": "bottom-right"
+        "position": "bottomright"
     }
 ```
 
@@ -373,7 +373,7 @@ Example:
 
 ```python
 colorBar={
-        "position": "bottom-right"
+        "position": "bottomright"
     }
 ```
 

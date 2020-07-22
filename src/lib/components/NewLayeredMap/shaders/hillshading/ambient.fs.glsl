@@ -12,8 +12,8 @@ void main() {
     vec2 ires = 1.0 / resolution;
     vec3 src = texture2D(tSrc, gl_FragCoord.xy * ires).rgb;
     vec4 e0 = texture2D(tElevation, gl_FragCoord.xy * ires);
-    vec3 n0 = texture2D(tNormal, gl_FragCoord.xy * ires).rgb;
-    vec3 sr3d = normalize(n0 + direction);
+    vec4 n0 = texture2D(tNormal, gl_FragCoord.xy * ires).rgba;
+    vec3 sr3d = normalize(n0.rgb + direction);
 
     vec2 sr = normalize(sr3d.xy);
     vec2 p0 = gl_FragCoord.xy;
@@ -32,17 +32,17 @@ void main() {
         }
         vec2 ptex = ires * (p + 0.5);
         if (ptex.x < 0.0 || ptex.x > 1.0 || ptex.y < 0.0 || ptex.y > 1.0) {
-            gl_FragColor = vec4(src + vec3(1.0/n), 1.0);
+            gl_FragColor = vec4(src + vec3(1.0/n), n0.a);
             return;
         }
         vec4 e = texture2D(tElevation, ptex);
         float t = distance(p + 0.5, p0);
         float z = e0.r + t * pixelScale * sr3d.z;
         if (e.r > z) {
-            gl_FragColor = vec4(src, 1.0);
+            gl_FragColor = vec4(src, n0.a);
             return;
         }
     }
-    gl_FragColor = vec4(src + vec3(1.0/n), 1.0);
+    gl_FragColor = vec4(src + vec3(1.0/n), n0.a);
 }
   

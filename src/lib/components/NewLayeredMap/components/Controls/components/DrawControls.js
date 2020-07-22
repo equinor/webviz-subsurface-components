@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
-import Context from '../Context';
+import Context from '../../../context';
+
+import { getShapeType } from '../../../utils/leaflet'
 
 
 
@@ -20,29 +22,6 @@ L.Icon.Default.mergeOptions({
  *    https://stackoverflow.com/questions/18014907/leaflet-draw-retrieve-layer-type-on-drawedited-event
  **/
 
-
- // TODO: Move to utils
-const getShapeType = layer => {
-    if (layer instanceof L.Rectangle) {
-        return "rectangle";
-    }
-    if (layer instanceof L.Circle) {
-        return "circle";
-    }
-    if (layer instanceof L.CircleMarker) {
-        return "circleMarker";
-    }
-    if (layer instanceof L.Marker) {
-        return "marker";
-    }
-    if (layer instanceof L.Polygon) {
-        return "polygon";
-    }
-    if (layer instanceof L.Polyline) {
-        return "polyline";
-    }
-    throw new Error("Unknown shape type");
-};
 
 class DrawControls extends Component {    
 

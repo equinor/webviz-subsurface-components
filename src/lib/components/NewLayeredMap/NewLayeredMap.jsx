@@ -9,7 +9,7 @@ import './layers/L.tileWebGLLayer';
 // Components
 import Controls from './components/Controls';
 import CompositeMapLayers from './components/CompositeMapLayers'
-import Context from './Context'
+import Context from './context'
 
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
@@ -50,6 +50,8 @@ class NewLayeredMap extends Component {
             defaultBounds: props.defaultBounds,
             controls: props.controls || {},
             drawLayer: drawLayer,
+            drawLayerData: [],
+            mode: null,
 
             // The imageLayer in focus - for calculating z value and showing colormap for
             focusedImageLayer: null,
@@ -133,6 +135,21 @@ class NewLayeredMap extends Component {
         }
     }
 
+    drawLayerAdd = (newLayers) => {
+        this.setState(prevState => ({
+            drawLayerData: [...prevState.drawLayerData, ...newLayers]
+        }))
+    }
+
+    drawLayerDelete = (layerTypes) => {
+        const layers = this.state.drawLayerData.filter((drawing) => {
+            return !layerTypes.includes(drawing.type);
+        })
+        if (layers !== this.state.layers) {
+            this.setState({drawLayerData: layers});
+        }    
+    }
+
     syncedDrawLayerAdd = (newLayers) => {
         for (const layer of newLayers) {
             layer["creatorId"] = this.state.id;
@@ -142,8 +159,9 @@ class NewLayeredMap extends Component {
     }
 
     syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
+        const syncedMaps = [...this.props.syncedMaps, this.state.id];
         NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
-            return !layerTypes.includes(drawing.type);
+            return !syncedMaps.includes(drawing.creatorId) || !layerTypes.includes(drawing.type);
         })
         if (shouldRedraw) {
             this.redrawAllSyncedMaps();
@@ -151,10 +169,12 @@ class NewLayeredMap extends Component {
     }
 
     redrawAllSyncedMaps = () => {
-        for (const id of this.props.syncedMaps) {
-            if (id !== this.state.id) {
-                const otherMap = NewLayeredMap.mapReferences[id];
-                otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
+        if (this.props.syncDrawings) {
+            for (const id of this.props.syncedMaps || []) {
+                if (id !== this.state.id) {
+                    const otherMap = NewLayeredMap.mapReferences[id];
+                    otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
+                }
             }
         }
         // When using the component in dash with multiple maps drawing won't work
@@ -170,6 +190,16 @@ class NewLayeredMap extends Component {
             focusedImageLayer: layer,
         })
     }
+
+    /**
+     * @param {String} mode
+     * can be "editing" or null
+     */
+    setMode = newMode => {
+        this.setState({
+            mode: newMode
+        })
+    }
     
     render() {   
         
@@ -180,7 +210,12 @@ class NewLayeredMap extends Component {
                     style={{height: '100%'}}>
                         <Context.Provider value={{
                                 drawLayer: this.state.drawLayer,
+                                drawLayerData: this.state.drawLayerData,
                                 syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
+                                mode: this.state.mode,
+                                setMode: this.setMode,
+                                drawLayerAdd: this.drawLayerAdd,
+                                drawLayerDelete: this.drawLayerDelete,
                                 syncedDrawLayerAdd: this.syncedDrawLayerAdd,
                                 syncedDrawLayerDelete: this.syncedDrawLayerDelete,
                                 focusedImageLayer: this.state.focusedImageLayer,
@@ -194,6 +229,7 @@ class NewLayeredMap extends Component {
                                             map={this.state.map}
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
+                                            colorBar={this.props.colorBar}
                                             drawTools={this.props.drawTools}
                                             mouseCoords = {this.props.mouseCoords}
                                             syncDrawings={this.props.syncDrawings}
@@ -205,8 +241,8 @@ class NewLayeredMap extends Component {
                                     <CompositeMapLayers 
                                         layers={this.props.layers}
                                         map={this.state.map}
-                                        colorBar={this.props.colorBar}
                                         syncedMaps={[...this.props.syncedMaps, this.state.id]}
+                                        syncDrawings={this.props.syncDrawings}
                                     />
                                 )
                             }
