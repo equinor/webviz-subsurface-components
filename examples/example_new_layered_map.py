@@ -139,7 +139,7 @@ if __name__ == "__main__":
     layered_map_component = webviz_subsurface_components.NewLayeredMap(
         id="example-map",
         syncedMaps=["example-map2"],
-        # syncDrawings=True, 
+        syncDrawings=True, 
         layers=layers,
         colorBar={
             "position": 'bottomleft'
@@ -162,6 +162,44 @@ if __name__ == "__main__":
         id="example-map2",
         syncedMaps=["example-map"],
         syncDrawings=True, 
+        layers=layers,
+        switch={
+            "value": True,
+            "label": "Hillshading",
+        },
+        mouseCoords={
+            "coordinatePosition": "bottomright",
+        },
+        drawTools={
+            "drawMarker": True,
+            "drawPolygon": True,
+            "drawPolyline": True,
+            "position": "topright",   
+        }
+    )
+    layered_map_component3 = webviz_subsurface_components.NewLayeredMap(
+        id="example-map3",
+        syncedMaps=["example-map4"],
+        syncDrawings=True, 
+        layers=layers,
+        switch={
+            "value": True,
+            "label": "Hillshading",
+        },
+        mouseCoords={
+            "coordinatePosition": "bottomright",
+        },
+        drawTools={
+            "drawMarker": True,
+            "drawPolygon": True,
+            "drawPolyline": True,
+            "position": "topright",   
+        }
+    )
+    layered_map_component4 = webviz_subsurface_components.NewLayeredMap(
+        id="example-map4",
+        syncedMaps=["example-map3"],
+        # syncDrawings=True, 
         layers=layers,
         switch={
             "value": True,
@@ -207,8 +245,11 @@ if __name__ == "__main__":
                     html.P(id='output', children=''),
                 ]),
                 layered_map_component,
+                layered_map_component2,
+                layered_map_component3,
+                layered_map_component4,
+            ], style={'display': 'grid', 'gridTemplateColumns': '400px 530px 530px', 'minHeight': '90vh'}),
                 # layered_map_component2,
-            ],  style={'display': 'grid', 'gridTemplateColumns': '1fr 1fr', 'minHeight': '90vh' })
             # style={'display': 'grid', 'gridTemplateColumns': '400px 530px 530px'},
             # html.Pre(id="polyline"),
             # html.Pre(id="marker"),
@@ -290,7 +331,10 @@ if __name__ == "__main__":
                 return [x, y, z]
     
     def add_layer(layers):
+
+        
         if len(layers) < 5:
+
             layers.append({
                 "name": "Something",
                 "id": 2,

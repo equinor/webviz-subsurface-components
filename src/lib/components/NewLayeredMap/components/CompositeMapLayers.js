@@ -17,7 +17,6 @@ import {
     makeCircleMarker,
     addImage,
     addTile
-
 } from '../utils/leaflet'
 
 // Helper functions
@@ -238,20 +237,30 @@ class CompositeMapLayers extends Component {
          * throws an error in leaflet. Everything works fine as long as this is
          * surrounded in a try catch
          */ 
-        
+        try {
+            this.context.drawLayer.clearLayers();
+        } catch (error) {}
+
+        const itemsToDraw = {}
+
         for (const item of this.context.syncedDrawLayer.data) {
             if (this.props.syncedMaps.includes(item.creatorId)) {
-                this.context.drawLayer.eachLayer(layer => {
-                    try {
-                        if(getShapeType(layer) === item.type) {
-                            this.context.drawLayer.removeLayer(layer);
-                        }
-                    } catch (error) {}
-                })
-                this.addItemToLayer(item, this.context.drawLayer, false);
+                this.props.syncDrawings ? this.addItemToLayer(item, this.context.drawLayer, false) : itemsToDraw[item.type] = item;
             }   
         }
+
+        for (const item of this.context.drawLayerData) {
+            if (!itemsToDraw[item.type] || itemsToDraw[item.type].creationTime < item.creationTime) {
+                this.addItemToLayer(item, this.context.drawLayer, false);
+                delete itemsToDraw[item.type]
+            }
+        }
+
+        Object.values(itemsToDraw).forEach(item => {
+            this.addItemToLayer(item, this.context.drawLayer, false);
+        })     
     }
+
     
   
     render() {
