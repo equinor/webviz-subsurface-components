@@ -40,7 +40,7 @@ if __name__ == "__main__":
         id='test-map',
         syncedMaps=['test-map-2'],
         layers=layers,
-        bounds=[[0, 0], [-30, -30]],
+        defaultBounds=[[0, 0], [-30, -30]],
         minZoom=-5,
         mouseCoords={
             "position": "bottomleft"
@@ -54,14 +54,13 @@ if __name__ == "__main__":
         drawTools={
             
         }
-        
     )
 
     new_layered_map_2 = NewLayeredMap(
         id='test-map-2',
         syncedMaps=['test-map'],
         layers=layers,
-        bounds=[[0, 0], [-30, -30]],
+        defaultBounds=[[0, 0], [-30, -30]],
         crs='simple',
         minZoom=-5,
         mouseCoords={

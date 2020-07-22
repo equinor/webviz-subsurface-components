@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import Context from '../Context'
+import Context from '../context'
 
 // Leaflet
 import L from 'leaflet';
@@ -17,8 +17,7 @@ import {
     makeCircleMarker,
     addImage,
     addTile
-
-} from './leafletUtils'
+} from '../utils/leaflet'
 
 // Helper functions
 const yx = ([x, y]) => {
@@ -267,7 +266,6 @@ class CompositeMapLayers extends Component {
             this.addItemToLayer(item, this.context.drawLayer, false);
         })     
     }
-
 
     
   

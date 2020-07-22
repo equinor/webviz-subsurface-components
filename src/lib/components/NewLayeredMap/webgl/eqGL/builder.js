@@ -1,6 +1,7 @@
 import { EQGLContext, FrameBuffer } from './index';
 import drawCmd from './draw';
 import Variable from './variable';
+import Texture from './texture';
 
 let CMD_COUNTER = 0;
 
@@ -65,6 +66,26 @@ class DrawCmdBuilder {
         return this;
     }
 
+    /**
+     * 
+     * @param {String} textureName 
+     * @param {Number|Texture|FrameBuffer|Variable} textureUnit 
+     * @param {HTMLImageElement} textureImage
+     * 
+     * @example
+     * // With texture
+     * eqGL.new().texture("u_image", eqGl.texture({image}))
+     * 
+     * @example
+     * // With raw image and custom textureIndex
+     * eqGL.new().texture("u_image", 0, image)
+     * 
+     * @example
+     * // With framebuffer
+     * const fb = eqGl.framebuffer({width, height})
+     * ...
+     * eqGL.new().texture("u_image", fb)
+     */
     texture(textureName, textureUnit, textureImage) {
         this._textures[textureName] = {
             textureUnit,
