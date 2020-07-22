@@ -336,6 +336,11 @@ NewLayeredMap.propTypes = {
      * Map coordinates of a mouse click
      */
     click_position: PropTypes.array,
+
+    /**
+     * Allows to choose between replacing the layers or updating them
+     */
+    layerChangeMethod,
 }
 
 

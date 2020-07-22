@@ -14,7 +14,6 @@ import dash_html_components as html
 import webviz_subsurface_components
 
 from example_layered_map import array_to_png
-from tile_server import tile_server
 
 DEFAULT_COLORSCALE_COLORS = ["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"]
 
@@ -103,6 +102,8 @@ if __name__ == "__main__":
                         "cutPointMin": min_value,
                         "cutPointMax": max_value,
                     },
+                    "minvalue": min_value,
+                    "maxvalue": max_value,
                     "type": "tile",
                     "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                     "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
@@ -114,12 +115,6 @@ if __name__ == "__main__":
             ]
         },
     ]
-    test_tools = {
-        "drawMarker": True,
-        "drawPolygon": False,
-        "drawPolyline": False,
-        "position": "bottomleft", 
-    }
 
     new_layered_map_1 = webviz_subsurface_components.NewLayeredMap(
         id="example-map",
@@ -166,14 +161,13 @@ if __name__ == "__main__":
             "position": "topright",   
         }
     )
+    #ID's of the maps for which the callbacks are going to be made for. Required for shared callbacks
     callbackMaps = ['example-map', 'example-map-2']
 
     app = dash.Dash(__name__)
+    
+    # Dash extension used to call multiple callbacks on the same output
     cg = CallbackGrouper()
-
-    # initialize server for providing tiles at the same localhost as dash is running
-    # server = tile_server(app.server)
-
 
     app.layout = html.Div(
         children=[
@@ -190,12 +184,24 @@ if __name__ == "__main__":
                         value='1',
                     ),  
                 ]),
+                html.Div([
+                    "Layer update method",
+                    dcc.RadioItems(
+                        id = 'layer-change-method',
+                        options=[
+                            {'label': 'Update', 'value': 'update'},
+                            {'label': 'Replace', 'value': 'replace'},
+                        ],
+                        value='update',
+                    ),  
+                ]),
+         
                 html.Button('Sync map 1', id='sync-map2-btn'),
                 html.Button('Sync map 2', id='sync-map1-btn'),
                 html.Button('Add layer', id='layer-add-btn'),
                 html.Button('Toggle log', id='log-toggle-btn'),
                 html.Button('Toggle shader', id='shader-toggle-btn'),
-                html.Button('Hillshading-Shadows', id='shading-submit-val', n_clicks=0),
+                html.Button('Toggle shadows', id='shading-submit-val', n_clicks=0),
                 dcc.Input(id='delete-layer-id', type='number', size = "2", placeholder="Delete layer by id"),
                 html.Div([
                     "Draw tools",
@@ -347,7 +353,18 @@ if __name__ == "__main__":
 #
 #                           SHARED CALLBACKS
 #
+    #Callbacks are made for each of the maps as specified in callbackMaps defined above
     for map in callbackMaps:
+
+        # @cg.callback(
+        #     Output(map, 'layerChangeMethod'),
+        #     [
+        #         Input('layer-change-method', 'value')
+        #     ]
+        # )
+
+        # def change_layer_change_method(value):
+        #     return value
 
         @cg.callback(
             Output(map, 'drawTools'),
@@ -356,29 +373,34 @@ if __name__ == "__main__":
             ]
         )
 
+        #TODO remove or implement componentDidUpdate in drawTools
         def update_draw_tools_options(value):
-            global test_tools
             new_options = {"position": "topleft"}
             for draw_option in value:
                 new_options[draw_option] = True
-            return test_tools
+            return new_options
 
+        #Updates elevation and pixel scales based on their corresponding sliders
         @cg.callback(
             Output(map, 'layers'),
             [
                 Input('elevation-scale', 'value'),
                 Input('pixel-scale', 'value')
             ],
-                State('selected-layer', 'value')
+            [
+                State('selected-layer', 'value'),
+                State('shading-submit-val', 'n_clicks'),
+            ]
         )
 
-        def update_shadow_scales(elevation_scale, pixel_scale, layer_id):
+        def update_shadow_scales(elevation_scale, pixel_scale, layer_id, n_clicks):
             global layers
 
             layer_type = get_layer_type(layer_id, layers)
 
-            state['elevation_scale'] = elevation_scale
-            state['pixel_scale'] = pixel_scale
+            state['elevation_scale'] = elevation_scale if n_clicks % 2 == 1 else None
+            state['pixel_scale'] = pixel_scale if n_clicks % 2 == 1 else None
+
             update_layer = [
                 {
                     "id": int(layer_id),
@@ -387,8 +409,8 @@ if __name__ == "__main__":
                         {
                             "type": layer_type,
                             "shader": {
-                                "type": 'hillshading',
-                                "shadows": True,
+                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
+                                "shadows": True if n_clicks % 2 == 1 else False,
                                 "elevationScale": state['elevation_scale'],
                                 "pixelScale": state['pixel_scale']
                             },
@@ -418,7 +440,7 @@ if __name__ == "__main__":
             layer_type = get_layer_type(layer_id, layers)
 
             state['elevation_scale'] = elevation_scale
-            state['pixel_scale'] = pixel_scale
+            state['pixel_scale'] = pixel_scale 
             update_layer = [
                 {
                     "id": int(layer_id),
@@ -427,7 +449,7 @@ if __name__ == "__main__":
                         {
                             "type": layer_type,
                             "shader": {
-                                "type": 'hillshading',
+                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
                                 "shadows": True if n_clicks % 2 == 1 else False,
                                 "elevationScale": state['elevation_scale'],
                                 "pixelScale": state['pixel_scale']
@@ -441,7 +463,6 @@ if __name__ == "__main__":
 
         @cg.callback(
             Output(map, 'layers'),
-            # Output('example-map-2', 'layers'), impossible to have mutliple outputs in same callback
             [
                 Input('layer-add-btn', 'n_clicks'),
             ]
@@ -566,7 +587,7 @@ if __name__ == "__main__":
             layers = change_layer(layers, update_layer[0])
             return layers
 
-        #updates the text for min/max values
+        #Updates the text for min/max slider
         @cg.callback(
             Output('min-max-output-container', 'children'),
             [
@@ -614,7 +635,7 @@ if __name__ == "__main__":
             layers = change_layer(layers, update_layer[0])
             return layers
 
-        #updates the text for min/max values
+        #Updates the text for cut-off slider
         @cg.callback(
             Output('cut-output-container', 'children'),
             [
@@ -661,7 +682,7 @@ if __name__ == "__main__":
 
             layer_type = get_layer_type(layer_id, layers)
 
-            log_value = "linear" if n_clicks % 2 else "log"
+            log_value = "linear" if n_clicks % 2 == 0 else "log"
             update_layer = [ 
                 {
                     "id": int(layer_id),
@@ -722,18 +743,35 @@ if __name__ == "__main__":
 #                               OTHER CALLBACKS
 #
 
-    # @app.callback(Output("polyline", "children"), [Input("example-map", "polyline_points")])
-    # def get_edited_line(coords):
-    #     return f"Edited polyline: {json.dumps(coords)}"
+    @app.callback(
+        Output("polyline", "children"),
+        [
+            Input("example-map", "polyline_points")
+        ]
+    )
 
-    # @app.callback(Output("marker", "children"), [Input("example-map", "marker_point")])
-    # def get_edited_line(coords):
-    #     return f"Edited marker: {json.dumps(coords)}"
+    def get_edited_line(coords):
+        return f"Edited polyline: {json.dumps(coords)}"
 
-    # @app.callback(Output("polygon", "children"), [Input("example-map", "polygon_points")])
-    # def get_edited_line(coords):
-    #     return f"Edited closed polygon: {json.dumps(coords)}"
+    @app.callback(
+        Output("marker", "children"), 
+        [
+            Input("example-map", "marker_point")
+        ]
+    )
 
+    def get_edited_line(coords):
+        return f"Edited marker: {json.dumps(coords)}"
+
+    @app.callback(
+        Output("polygon", "children"), 
+        [
+            Input("example-map", "polygon_points")
+        ]
+    )
+
+    def get_edited_line(coords):
+        return f"Edited closed polygon: {json.dumps(coords)}"
 
     cg.register(app)     
 
