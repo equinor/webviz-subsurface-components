@@ -8,8 +8,7 @@ import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
 
 // Utils
-import { 
-    getShapeType, 
+import {
     makePolyline,
     makePolygon,
     makeCircle,
@@ -65,16 +64,13 @@ class CompositeMapLayers extends Component {
     }
     
     componentDidUpdate(prevProps) {
-        console.log("got to cdu")
         this.reSyncDrawLayer();
         console.log(this.props.updateMode)
         if (prevProps.layers !== this.props.layers) {
             if (this.props.updateMode == "replace") {
-                console.log("working, you're amazing!")
                 this.removeAllLayers();
                 this.createMultipleLayers();
             } else {
-                console.log("not working")
                 const layers = (this.props.layers || []).filter(layer => layer.id);
                 for (const propLayerData of layers) {
                     switch(propLayerData.action) {
