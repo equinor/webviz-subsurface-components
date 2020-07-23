@@ -355,12 +355,9 @@ NewLayeredMap.propTypes = {
     syncDrawings: PropTypes.bool,
 
     /**
-     * Specifies how the map will handle layer updates.
-     * By default it will use the action prop in layer data to add/update/delete layers,
-     * but if set to "reset", upon changing the layers prop, it will delete all current layers
-     * and only draw the new ones.
+     * Allows to choose between replacing the layers or updating them
      */
-    updateMode: PropTypes.String,
+    updateMode: PropTypes.string,
 
     /**
      * Dash provided prop that returns the coordinates of the edited or clicked polyline
@@ -380,7 +377,7 @@ NewLayeredMap.propTypes = {
     /**
      * Map coordinates of a mouse click
      */
-    click_position: PropTypes.array,
+    click_position: PropTypes.array,   
 }
 
 

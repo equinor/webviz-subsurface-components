@@ -52,7 +52,8 @@ class CompositeMapLayers extends Component {
             case 'image':
                 curLayer.getLayers()[0].updateOptions({
                     ...newLayer.data[0],
-                });
+                }); 
+                this.setFocusedImageLayer(curLayer.getLayers()[0]);
                 break;
 
             case 'tile':
@@ -64,12 +65,16 @@ class CompositeMapLayers extends Component {
     }
     
     componentDidUpdate(prevProps) {
+        console.log("got to cdu")
         this.reSyncDrawLayer();
+        console.log(this.props.updateMode)
         if (prevProps.layers !== this.props.layers) {
-            if (this.props.updateMode === "reset") {
+            if (this.props.updateMode == "replace") {
+                console.log("working, you're amazing!")
                 this.removeAllLayers();
                 this.createMultipleLayers();
             } else {
+                console.log("not working")
                 const layers = (this.props.layers || []).filter(layer => layer.id);
                 for (const propLayerData of layers) {
                     switch(propLayerData.action) {
@@ -111,8 +116,9 @@ class CompositeMapLayers extends Component {
     }
 
     removeAllLayers = () => {
+        const map = this.props.map
         this.setState({layers: {}});
-        this.props.map.eachLayer(layer => {
+        map.eachLayer(layer => {
             this.state.layerControl.removeLayer(layer);
             map.removeLayer(layer);
         })
@@ -144,12 +150,8 @@ class CompositeMapLayers extends Component {
             case "image":
                 const imageLayer = addImage(item, swapXY);
                 layerGroup.addLayer(imageLayer);
-                
-                const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
-                if (checked) {
-                    this.setFocusedImageLayer(imageLayer);
-                }
-
+                // this.setFocusedImageLayer(imageLayer)
+ 
                 imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
                     this.setFocusedImageLayer(imgLayer);
                 });
@@ -200,7 +202,11 @@ class CompositeMapLayers extends Component {
         this.setState(prevState => ({
             layers: Object.assign({}, prevState.layers, {[layer.id]: layerGroup})
         }));
-
+        //Makes sure that the correct information is displayed when first loading the map
+        const checked = layer.checked && layer.baseLayer && layer.data.type == "image" ? true : false; 
+        if (checked) {
+            this.setFocusedImageLayer(layer.data);
+        }
         //adds object to a layer
         for (const item of layer.data) {
             this.addItemToLayer(item, layerGroup);
