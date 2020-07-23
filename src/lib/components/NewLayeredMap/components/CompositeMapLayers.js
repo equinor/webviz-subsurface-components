@@ -48,13 +48,20 @@ class CompositeMapLayers extends Component {
     }
 
     updateLayer = (curLayer, newLayer) => {
+        const focusedImageLayer = this.context.focusedImageLayer || {};
+
         switch(newLayer.data[0].type) {  
             case 'image':
-                curLayer.getLayers()[0].updateOptions({
+                const imageLayer = curLayer.getLayers()[0];
+                imageLayer.updateOptions({
                     ...newLayer.data[0],
-                }); 
-                this.setFocusedImageLayer(curLayer.getLayers()[0]);
+                });
+
+                if(focusedImageLayer._leaflet_id === imageLayer._leaflet_id) {
+                    this.setFocusedImageLayer(curLayer.getLayers()[0]);
+                }
                 break;
+
 
             case 'tile':
                 curLayer.getLayers()[0].updateOptions({
@@ -81,7 +88,7 @@ class CompositeMapLayers extends Component {
 
                     case "delete":
                         if (this.state.layers[propLayerData.id]) {
-                            this.setFocusedImageLayer(null)
+                            // this.setFocusedImageLayer(null)
                             const stateLayer = this.state.layers[propLayerData.id];
                             stateLayer.remove();
                             this.state.layerControl.removeLayer(stateLayer);
@@ -111,43 +118,41 @@ class CompositeMapLayers extends Component {
 
     // Assumes that coordinate data comes in on the format of (y,x) by default
     addItemToLayer(item, layerGroup, swapXY = true) {
+        let newItem = null;
         switch(item.type) {
             case "polyline":
-                layerGroup.addLayer(makePolyline(item, swapXY, this.props.lineCoords));
+                newItem = makePolyline(item, swapXY, this.props.lineCoords);
                 break;
 
             case "polygon":
-                layerGroup.addLayer(makePolygon(item, swapXY, this.props.polygonCoords));
+                newItem = makePolygon(item, swapXY, this.props.polygonCoords);
                 break;
 
             case "circle":
-                layerGroup.addLayer(makeCircle(item, swapXY));
+                newItem = makeCircle(item, swapXY);
                 break;
             
             case "circleMarker":
-                layerGroup.addLayer(makeCircleMarker(item, swapXY));
+                newItem = makeCircleMarker(item, swapXY);
                 break;
             
             case "marker":
-                layerGroup.addLayer(makeMarker(item, swapXY));
+                newItem = makeMarker(item, swapXY);
                 break;
                 
             case "image":
                 const imageLayer = addImage(item, swapXY);
-                layerGroup.addLayer(imageLayer);
-                // this.setFocusedImageLayer(imageLayer)
- 
-                imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
-                    this.setFocusedImageLayer(imgLayer);
-                });
+                newItem = imageLayer;
                 break;
             case "tile": 
-                layerGroup.addLayer(addTile(item, swapXY));
+                newItem = addTile(item, swapXY);
                 break;
 
             default:
                 break; // add error message here?
-          }
+        }
+        layerGroup.addLayer(newItem);
+        return newItem;
     }
 
     updateColorbarUponBaseMapChange = () => {
@@ -187,14 +192,15 @@ class CompositeMapLayers extends Component {
         this.setState(prevState => ({
             layers: Object.assign({}, prevState.layers, {[layer.id]: layerGroup})
         }));
-        //Makes sure that the correct information is displayed when first loading the map
-        const checked = layer.checked && layer.baseLayer && layer.data.type == "image" ? true : false; 
-        if (checked) {
-            this.setFocusedImageLayer(layer.data);
-        }
-        //adds object to a layer
+        // Makes sure that the correct information is displayed when first loading the map
+        const checked = layer.checked && layer.baseLayer && layer.data.length > 0 && layer.data[0].type == "image" ? true : false; 
+        
+        // Adds object to a layer
         for (const item of layer.data) {
-            this.addItemToLayer(item, layerGroup);
+            const createdLayer = this.addItemToLayer(item, layerGroup);
+            if(checked) {
+                this.setFocusedImageLayer(createdLayer);
+            }
         }
 
         if(layer.checked) {
