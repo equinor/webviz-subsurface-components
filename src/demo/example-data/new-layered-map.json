@@ -13,6 +13,7 @@
                     "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
                     "shader": {
                         "type": "none",
+                        "shadows": true,
                         "noColor": true
                     },
                     "colorScale": {
@@ -20,7 +21,8 @@
                         "scaleType": "linear"
                     },
                     "minvalue": 2782,
-                    "maxvalue": 3513
+                    "maxvalue": 3513,
+                    "drawStrategy": "adjacent"
                 }
             ]
         },
@@ -32,12 +34,13 @@
             "baseLayer": true,
             "data": [
                 {
-                    "type": "tile",
+                    "type": "image",
                     "crossOrigin": true,
-                    "url": "https://tilecache.rainviewer.com/v2/radar/1595410200/512/{z}/{x}/{y}/1/1.png",
+                    "url": "https://tilecache.rainviewer.com/v2/radar/1595410200/512/1/0/1/1/1.png",
                     "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
                     "shader": {
                         "type": "none",
+                        "shadows": true,
                         "noColor": true
                     },
                     "colorScale": {

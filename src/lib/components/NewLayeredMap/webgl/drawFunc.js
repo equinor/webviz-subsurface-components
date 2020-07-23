@@ -14,6 +14,8 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
 
     let [loadedImage, loadedColorMap = null] = await Promise.all(imagesToLoad).catch(console.error);
 
+    console.log(loadedImage.width);
+
     // Select which draw command to draw
     const shader = config.shader || {};
     const colorScale = config.colorScale || {};

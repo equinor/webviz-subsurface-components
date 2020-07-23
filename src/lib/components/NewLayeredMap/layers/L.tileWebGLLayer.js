@@ -2,6 +2,10 @@ import L, { DomUtil, DomEvent, Util, Browser, GridLayer } from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
 import { buildColormap } from '../utils/colorScale';
 
+import { imagesToGrid } from '../utils/image'
+
+const DRAW_STRATEGY_ADJACENT = 'adjacent';
+
 /**
  * TileWebGLLayer is a tileLayer for rendering tile-based images with WebGL. It executes WebGL code for colormaps and
  * shaders and then convert the drawn canvas into an image that will be assigned to a tile.
@@ -44,7 +48,12 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		/**
 		 * @param {Array<String>} - An array of hexcolors for defining the colormap used on the tiles.
 		 */
-		colorScale: ["#FFFFFF", "#000000"],
+		colorScale: null,
+		
+		/**
+		 * @param {String} - How one should draw the tiles. Can be either null, "adjacent", "full"
+		 */
+		drawStrategy: null,
 	},
 
     initialize: function(url, options) {
@@ -52,6 +61,12 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		this._canvas = null;
 		this._glContext = null,
 		
+		/**
+		 * Caching loaded images - used with drawStrategy "adjacent"
+		 * @type {Object.<HTMLImageElement>}
+		 */
+		this._loadedTiles = {};
+
 		options = Util.setOptions(this, options);
 
 		// for https://github.com/Leaflet/Leaflet/issues/137
@@ -135,16 +150,37 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
 	// ----------- PRIVATE FUNCTIONS ------------------
 
-	_draw: function(tile, coords, done) {
-		
-		drawFunc(this._glContext, this._canvas, this.getTileUrl(coords), this._colormapUrl, {
+	_draw: async function(tile, coords, done) {
+		const drawOptions = {
 			...this.options,
 			crossOrigin: '',
 			shader: this.options.shader,
-		})
+		};
+		let url = null;
+
+		// Draw a tile with the other 8 adjacent tiles
+		if(this.options.drawStrategy === DRAW_STRATEGY_ADJACENT) {
+			const tiles = this._getAdjacentTiles(coords);
+			console.log("Tiles:", tiles, Object.values(tiles).length);
+			const [mergedUrl, loadedImages] = await imagesToGrid(Object.values(tiles), 3, 3, drawOptions)
+			// Object.keys(tiles).forEach((key, i) => this._loadedTiles[key] = loadedImages[i]);
+			url = mergedUrl
+		} else {
+			url = this.getTileUrl(coords);
+		}
+
+	
+		drawFunc(this._glContext, this._canvas, url, this._colormapUrl, drawOptions)
 		.then(() => {
 			const ctx = tile.getContext('2d');
-			ctx.drawImage(this._canvas, 0, 0);
+
+			if(this.options.drawStrategy === DRAW_STRATEGY_ADJACENT) {
+				const size = this._canvas.width/3;
+				ctx.drawImage(this._canvas, size, size, size, size);
+			} else {
+				ctx.drawImage(this._canvas, 0, 0);
+			}
+
 			if(done) {
 				done(null, tile);
 			}
@@ -214,8 +250,21 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		} else {
 			this._colormapUrl = buildColormap(colorScale);
 		}
-	}
+	},
 
+	/**
+	 * @returns {Object.<HTMLImageElement|String>} - {key: Image}
+	 */
+	_getAdjacentTiles: function(coords, size = 1) {
+		const adjacentTiles = {};
+		for(let x = coords.x - size; x <= coords.x + size; x++) {
+			for(let y = coords.y - size; y <= coords.y + size; y++) {
+				const adjacentUrl = this.getTileUrl({x, y, z: coords.z});
+				adjacentTiles[adjacentUrl] = this._loadedTiles[adjacentUrl] || adjacentUrl; 
+			}
+		}
+		return adjacentTiles;
+	}
 });
 
 L.tileWebGLLayer = (url, options = {}) => {

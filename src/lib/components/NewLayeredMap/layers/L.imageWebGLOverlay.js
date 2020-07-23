@@ -101,7 +101,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
     
 
     setBounds: function (bounds) {
-        console.log("Bounds:", bounds);
 		this._bounds = latLngBounds(bounds);
 
 		if (this._map) {
@@ -122,10 +121,12 @@ L.ImageWebGLOverlay = L.Layer.extend({
 			...options,
         });
         
+        // Update the URL
         if(options.url !== this._url) {
             promisesToWaitFor.push(this._initUrl())
         }
 
+        // Update the colorScale
         if(!options.colorScale) {
             this._colormapUrl = null;
         } else {
@@ -174,16 +175,18 @@ L.ImageWebGLOverlay = L.Layer.extend({
     },
 
     _initUrl: function() {
+        // Scale image if options.imageScale is provided
         let imageScale = this.options.imageScale;
         if(this.options.imageScale && imageScale > 0.0 && imageScale !== 1.0) {
-            imageScale = Math.min(imageScale, 10.0); 
+            
+            imageScale = Math.min(imageScale, 20.0); // Max is 20 
             return Utils.scaleImage(this.options.url, imageScale, imageScale)
             .then((scaledImageUrl) => {
                 this._url = scaledImageUrl;
             }) 
         } else {
             this._url = this.options.url;
-            return Promise.resolve() 
+            return Promise.resolve();
         }
     },
 
