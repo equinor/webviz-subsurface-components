@@ -41,36 +41,67 @@ export const scaleImage = async (loadedImage, scaleX, scaleY) => {
 /**
  * 
  * @param {Array<String|HTMLImageElement>} tiles
- * @param {Number} xDim
- * @param {Number} yDim
- * @returns {[String, Array<HTMLImageElement>]} Base64 URL of the merged image
+ * @param {Number} dimX
+ * @param {Number} dimY
+ * @returns {[String, Array<HTMLImageElement>, Number]} Base64 URL of the merged image
  */
-export const imagesToGrid = async (tiles, xDim = 3, yDim = 3, options = {}) => {
+export const tilesToImage = async (tiles, options = {}) => {
 
-    if(xDim*yDim !== tiles.length) {
+    if(tiles.length === 0) {
         return null;
     }
 
+    let [minX, maxX, minY, maxY] = [Number.MAX_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MIN_VALUE];
+    tiles.forEach(({coords}) => {
+        if(coords.x > maxX) {
+            maxX = coords.x;
+        }
+        if(coords.x < minX) {
+            minX = coords.x;
+        }
+        if(coords.y > maxY) {
+            maxY = coords.y;
+        }
+        if(coords.y < minY) {
+            minY = coords.y;
+        }
+    })
+    const dimX = maxX - minX + 1;
+    const dimY = maxY - minY + 1;
+
     // Make sure all the images are HTMLImageElement.
-    const imagePromises = tiles.map((img) => (
-        typeof img === 'string' ? loadImage(img, options) : Promise.resolve(img)
-    ));
-    const images = await Promise.all(imagePromises);
+    tiles.forEach((tile) => {
+        tile.image = typeof tile.image === 'string' ? 
+            loadImage(tile.image, options).catch(() => null) 
+            : Promise.resolve(tile.image);
+    });
+    const loadedTiles = await Promise.all(tiles.map(tile => tile.image));
 
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext("2d");
-    const size = images[0].width;
-    canvas.width = size*3;
-    canvas.height = size*3;
+    const size = loadedTiles[0].width;
+    canvas.width = size*dimX;
+    canvas.height = size*dimY;
 
     // Merge them into a grid
-    for(let i = 0; i < images.length; i++) {
-        const x = i%3;
-        const y = i/3;
+    for(let i = 0; i < loadedTiles.length; i++) {
+        const tile = tiles[i];
+        const coords = tile.coords;
+        const x = coords.x - minX;
+        const y = coords.y - minY;
+        const image = loadedTiles[i];
 
-        if(images[i] instanceof HTMLImageElement) {
-            ctx.drawImage(images[i], x*size, y*size, size, size);
+        if(image instanceof HTMLImageElement) {
+            ctx.drawImage(image, x*size, y*size, size, size);
         }
     }
-    return [canvas.toDataURL(), images];
+    return {
+        url: canvas.toDataURL(),
+        size: size,
+        minX: minX,
+        minY: minY,
+        maxX: maxX,
+        maxY: maxY,
+        loadedImages: loadedTiles,
+    }
 }

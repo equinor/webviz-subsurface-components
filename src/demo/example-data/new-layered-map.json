@@ -22,7 +22,7 @@
                     },
                     "minvalue": 2782,
                     "maxvalue": 3513,
-                    "drawStrategy": "adjacent"
+                    "drawStrategy": "full"
                 }
             ]
         },

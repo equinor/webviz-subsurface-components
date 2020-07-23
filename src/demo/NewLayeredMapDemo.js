@@ -27,6 +27,8 @@ const NewLayeredMapDemo = () => {
             setSwitchValue(changes.switch.value);
             if (changes.switch.value === true) {
                 layers[0].data[0].shader.type = 'hillshading';
+                layers[0].data[0].shader.shadows = true;
+                layers[0].data[0].shader.shadowIterations = 1;
                 layers[0].data[0].colorScale = DEFAULT_COLORMAP;
             } else {
                 layers[0].data[0].shader.type = null;

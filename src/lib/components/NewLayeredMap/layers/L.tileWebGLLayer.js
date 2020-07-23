@@ -2,9 +2,11 @@ import L, { DomUtil, DomEvent, Util, Browser, GridLayer } from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
 import { buildColormap } from '../utils/colorScale';
 
-import { imagesToGrid } from '../utils/image'
+import { tilesToImage } from '../utils/image'
 
+const DRAW_STRATEGY_NORMAL = 'normal';
 const DRAW_STRATEGY_ADJACENT = 'adjacent';
+const DRAW_STRATEGY_FULL = 'full';
 
 /**
  * TileWebGLLayer is a tileLayer for rendering tile-based images with WebGL. It executes WebGL code for colormaps and
@@ -73,6 +75,18 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		if (!Browser.android) {
 			this.on('tileunload', this._onTileRemove);
 		}
+
+		if(options.drawStrategy === DRAW_STRATEGY_FULL) {
+			this.on('load', () => {
+				if(!this._isMounted) {
+					console.log("LOADED!");
+					this._drawAllTiles();
+				}
+				this._isMounted = true;
+			})
+		}
+
+
     },
 
 	/**
@@ -102,8 +116,20 @@ L.TileWebGLLayer = L.GridLayer.extend({
         });
 
         this._initColormap();
-        L.GridLayer.prototype.onAdd.call(this, map);
-	  },
+		L.GridLayer.prototype.onAdd.call(this, map);
+
+		if(this.options.drawStrategy === DRAW_STRATEGY_FULL) {
+			map.on('moveend', () => this._triggerFullDraw());
+			map.on('zoomend', () => this._triggerFullDraw());
+		}
+	},
+
+	onRemove: function(map) {
+		map.off('moveend', () => this._triggerFullDraw());
+		map.off('zoomend', () => this._triggerFullDraw());
+
+		L.GridLayer.prototype.onRemove.call(this, map);
+	},
 
 
     createTile: function(coords, done) {
@@ -119,7 +145,11 @@ L.TileWebGLLayer = L.GridLayer.extend({
           	tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
         }
 
-        this._draw(tile, coords, done);
+        if(this.options.drawStrategy !== DRAW_STRATEGY_FULL) {
+			this._draw(tile, coords, done);
+		} else {
+			setTimeout(() => done(null, tile), 1000);
+		}
 
 
         return tile;
@@ -144,43 +174,25 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		});
 
 		this._initColormap();
-		this._redrawAllTiles();
+
+		if(this.options.drawStrategy === DRAW_STRATEGY_FULL) {
+			this._drawAllTiles();
+		} else {
+			this._redrawAllTiles();
+		}
 	},
     
 
 	// ----------- PRIVATE FUNCTIONS ------------------
 
 	_draw: async function(tile, coords, done) {
-		const drawOptions = {
-			...this.options,
-			crossOrigin: '',
-			shader: this.options.shader,
-		};
-		let url = null;
-
-		// Draw a tile with the other 8 adjacent tiles
-		if(this.options.drawStrategy === DRAW_STRATEGY_ADJACENT) {
-			const tiles = this._getAdjacentTiles(coords);
-			console.log("Tiles:", tiles, Object.values(tiles).length);
-			const [mergedUrl, loadedImages] = await imagesToGrid(Object.values(tiles), 3, 3, drawOptions)
-			// Object.keys(tiles).forEach((key, i) => this._loadedTiles[key] = loadedImages[i]);
-			url = mergedUrl
-		} else {
-			url = this.getTileUrl(coords);
-		}
-
+		const drawOptions = this._getDrawOptions();
 	
-		drawFunc(this._glContext, this._canvas, url, this._colormapUrl, drawOptions)
+		drawFunc(this._glContext, this._canvas, this._url, this._colormapUrl, drawOptions)
 		.then(() => {
 			const ctx = tile.getContext('2d');
-
-			if(this.options.drawStrategy === DRAW_STRATEGY_ADJACENT) {
-				const size = this._canvas.width/3;
-				ctx.drawImage(this._canvas, size, size, size, size);
-			} else {
-				ctx.drawImage(this._canvas, 0, 0);
-			}
-
+			ctx.drawImage(this._canvas, 0, 0);
+			
 			if(done) {
 				done(null, tile);
 			}
@@ -192,6 +204,30 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		for(let { el, coords } of Object.values(this._tiles || {})) {
 			this._draw(el, coords, null);
 		}
+	},
+
+	_drawAllTiles: async function() {
+		const drawOptions = this._getDrawOptions();
+
+		const tiles = Object.values(this._tiles || {})
+			.filter(tile => tile.current)
+			.map(tile => ({...tile, image: this.getTileUrl(tile.coords)}))
+
+
+		// Merge the tiles into a single image
+		const { url, size, minX, minY } = await tilesToImage(tiles, drawOptions);
+
+		// Draw image
+		drawFunc(this._glContext, this._canvas, url, this._colormapUrl, drawOptions)
+		.then(() => {
+			// Disitrbute parts of the drawn image onto corresponding tiles
+			tiles.forEach(({ coords, el}) => {
+				const x = coords.x - minX;
+				const y = coords.y - minY;
+				const ctx = el.getContext('2d');
+				ctx.drawImage(this._canvas, x*size, y*size, size, size, 0, 0, size, size);
+			})
+		})
 	},
 
     _getZoomForUrl: function () {
@@ -252,18 +288,20 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		}
 	},
 
-	/**
-	 * @returns {Object.<HTMLImageElement|String>} - {key: Image}
-	 */
-	_getAdjacentTiles: function(coords, size = 1) {
-		const adjacentTiles = {};
-		for(let x = coords.x - size; x <= coords.x + size; x++) {
-			for(let y = coords.y - size; y <= coords.y + size; y++) {
-				const adjacentUrl = this.getTileUrl({x, y, z: coords.z});
-				adjacentTiles[adjacentUrl] = this._loadedTiles[adjacentUrl] || adjacentUrl; 
-			}
+	_getDrawOptions: function() {
+		return {
+			...this.options,
+			crossOrigin: '',
 		}
-		return adjacentTiles;
+	},
+
+	_triggerFullDraw: function() {
+		if(this._fullDrawTimeout) {
+			clearTimeout(this._fullDrawTimeout);
+		}
+		this._fullDrawTimeout = setTimeout(() => {
+			this._drawAllTiles();
+		}, 1200);
 	}
 });
 
