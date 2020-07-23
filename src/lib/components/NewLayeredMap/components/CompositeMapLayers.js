@@ -8,8 +8,7 @@ import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
 
 // Utils
-import { 
-    getShapeType, 
+import {
     makePolyline,
     makePolygon,
     makeCircle,
@@ -65,38 +64,41 @@ class CompositeMapLayers extends Component {
     }
     
     componentDidUpdate(prevProps) {
-        if (this.props.syncedMaps) {
-            this.reSyncDrawLayer();
-        }
+        this.reSyncDrawLayer();
+        console.log(this.props.updateMode)
         if (prevProps.layers !== this.props.layers) {
-            const layers = (this.props.layers || []).filter(layer => layer.id);
-            for (const propLayerData of layers) {
-                switch(propLayerData.action) {
-                    case "update":
-                        const stateLayer = this.state.layers[propLayerData.id]
-                        if (stateLayer) {
-                            this.updateLayer(stateLayer, propLayerData);
-                        }
-                        break;
+            if (this.props.updateMode == "replace") {
+                this.removeAllLayers();
+                this.createMultipleLayers();
+            } else {
+                const layers = (this.props.layers || []).filter(layer => layer.id);
+                for (const propLayerData of layers) {
+                    switch(propLayerData.action) {
+                        case "update":
+                            const stateLayer = this.state.layers[propLayerData.id]
+                            if (stateLayer) {
+                                this.updateLayer(stateLayer, propLayerData);
+                            }
+                            break;
 
-                    case "delete":
-                        if (this.state.layers[propLayerData.id]) {
-                            this.setFocusedImageLayer(null)
-                            const stateLayer = this.state.layers[propLayerData.id];
-                            stateLayer.remove();
-                            this.state.layerControl.removeLayer(stateLayer);
-                            this.removeLayerFromState(propLayerData.id);
-                        }
-                        break;
+                        case "delete":
+                            if (this.state.layers[propLayerData.id]) {
+                                const stateLayer = this.state.layers[propLayerData.id];
+                                stateLayer.remove();
+                                this.state.layerControl.removeLayer(stateLayer);
+                                this.removeLayerFromState(propLayerData.id);
+                            }
+                            break;
 
-                    case "add":
-                        if (!this.state.layers[propLayerData.id]) {
-                            this.createLayerGroup(propLayerData);
-                        }
-                        break; 
+                        case "add":
+                            if (!this.state.layers[propLayerData.id]) {
+                                this.createLayerGroup(propLayerData);
+                            }
+                            break; 
 
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -107,6 +109,15 @@ class CompositeMapLayers extends Component {
         map.eachLayer(function (layer) {
             map.removeLayer(layer);
         });
+    }
+
+    removeAllLayers = () => {
+        const map = this.props.map
+        this.setState({layers: {}});
+        map.eachLayer(layer => {
+            this.state.layerControl.removeLayer(layer);
+            map.removeLayer(layer);
+        })
     }
 
     // Assumes that coordinate data comes in on the format of (y,x) by default

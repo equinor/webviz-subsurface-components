@@ -61,7 +61,7 @@ if __name__ == "__main__":
                     "allowHillshading": True,
                     "minvalue": min_value,
                     "maxvalue": max_value,
-                    "bounds": [[0, 0], [-30, -30]]
+                    "bounds": [[0, 0], [30, 30]]
                 },
             ],
         },
@@ -78,7 +78,7 @@ if __name__ == "__main__":
                     "allowHillshading": True,
                     "minvalue": min_value,
                     "maxvalue": max_value,
-                    "bounds": [[0, 0], [-30, -30]],
+                    "bounds": [[0, 0], [30, 30]],
 
                 },
             ],
@@ -132,7 +132,8 @@ if __name__ == "__main__":
             "drawPolygon": True,
             "drawPolyline": True,
             "position": "topright",   
-        }
+        },
+        updateMode="",
     )
 
     new_layered_map_2 = webviz_subsurface_components.NewLayeredMap(
@@ -155,7 +156,9 @@ if __name__ == "__main__":
             "drawPolygon": True,
             "drawPolyline": True,
             "position": "topright",   
-        }
+        },
+        updateMode="",
+
     )
     #ID's of the maps for which the callbacks are going to be made for. Required for shared callbacks
     callbackMaps = ['example-map', 'example-map-2']
@@ -197,6 +200,7 @@ if __name__ == "__main__":
                 html.Button('Add layer', id='layer-add-btn'),
                 html.Button('Toggle log', id='log-toggle-btn'),
                 html.Button('Toggle shader', id='shader-toggle-btn'),
+                html.Button('Toggle shader - replace', id='shader-toggle-replace-btn'),
                 html.Button('Toggle shadows', id='shading-submit-val', n_clicks=0),
                 dcc.Input(id='delete-layer-id', type='number', size = "2", placeholder="Delete layer by id"),
                 html.Div([
@@ -353,7 +357,7 @@ if __name__ == "__main__":
     for map in callbackMaps:
 
         @cg.callback(
-            Output(map, 'updateStrategy'),
+            Output(map, 'updateMode'),
             [
                 Input('layer-change-method', 'value')
             ]
@@ -723,7 +727,54 @@ if __name__ == "__main__":
             ]
             layers = change_layer(layers, update_layer[0])
             return layers
+        
+        @cg.callback(
+            Output(map, 'layers'),
+            [
+                Input('shader-toggle-replace-btn', 'n_clicks'),
+            ],
+                State('selected-layer', 'value')
 
+        )
+
+        def toggle_shading_with_replace(n_clicks, layer_id):
+            global layers
+
+            layer_type = get_layer_type(layer_id, layers)
+
+            update_layer = [
+                {
+                    "id": int(layer_id),
+                    "name": "A seismic horizon without colormap",
+                    "checked": True,
+                    "data": [
+                        {
+                            "url": map_data,
+                            "allowHillshading": True,
+                            "minvalue": min_value,
+                            "maxvalue": max_value,
+                            "bounds": [[0, 0], [30, 30]],
+                            "type": layer_type,
+                            "allowHillshading": True,
+                            "colorScale":  {
+                                "colors":DEFAULT_COLORSCALE_COLORS,
+                                "prefixZeroAlpha": False,
+                                "scaleType": "linear",
+                                "cutPointMin": min_value,
+                                "cutPointMax": max_value, 
+                                },
+                            "shader": {
+                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
+                                # "shadows": False,
+                                # "elevationScale": 1.0,
+                                # "pixelScale": 11000
+                            },
+                        }
+                    ]
+                }
+            ]
+            layers = change_layer(layers, update_layer[0])
+            return layers
 
 #
 #                               OTHER CALLBACKS
