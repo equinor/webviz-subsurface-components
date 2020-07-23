@@ -243,6 +243,7 @@ class NewLayeredMap extends Component {
                                         map={this.state.map}
                                         syncedMaps={[...this.props.syncedMaps, this.state.id]}
                                         syncDrawings={this.props.syncDrawings}
+                                        updateMode={this.props.updateMode}
                                     />
                                 )
                             }
@@ -354,6 +355,11 @@ NewLayeredMap.propTypes = {
     syncDrawings: PropTypes.bool,
 
     /**
+     * Allows to choose between replacing the layers or updating them
+     */
+    updateMode: PropTypes.string,
+
+    /**
      * Dash provided prop that returns the coordinates of the edited or clicked polyline
      */
     polyline_points: PropTypes.array,
@@ -371,12 +377,7 @@ NewLayeredMap.propTypes = {
     /**
      * Map coordinates of a mouse click
      */
-    click_position: PropTypes.array,
-
-    /**
-     * Allows to choose between replacing the layers or updating them
-     */
-    updateStrategy : PropTypes.string,
+    click_position: PropTypes.array,   
 }
 
 
