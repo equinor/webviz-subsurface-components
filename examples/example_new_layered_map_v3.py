@@ -133,6 +133,12 @@ if __name__ == "__main__":
             "drawPolyline": True,
             "position": "topright",   
         },
+        scaleY={
+            "scaleY": 1,
+            "minScaleY": 1,
+            "maxScaleY": 10,
+            "position": 'topleft',
+        },
         updateMode="",
     )
 
@@ -199,7 +205,6 @@ if __name__ == "__main__":
                 html.Button('Toggle sync map 2', id='sync-map2-btn'),
                 html.Button('Add layer', id='layer-add-btn'),
                 html.Button('Toggle log', id='log-toggle-btn'),
-                html.Button('Toggle shader', id='shader-toggle-btn'),
                 html.Button('Toggle shader - replace', id='shader-toggle-replace-btn'),
                 html.Button('Toggle shadows', id='shading-submit-val', n_clicks=0),
                 dcc.Input(id='delete-layer-id', type='number', size = "2", placeholder="Delete layer by id"),
@@ -396,26 +401,26 @@ if __name__ == "__main__":
             ],
             [
                 State('selected-layer', 'value'),
-                State('shading-submit-val', 'n_clicks'),
+                State('shading-submit-val', 'n_clicks')
             ]
         )
 
         def update_shadow_scales(elevation_scale, pixel_scale, layer_id, n_clicks):
             layer_type = get_layer_type(layer_id, layers)
 
-            state['elevation_scale'] = elevation_scale if n_clicks % 2 == 1 else None
-            state['pixel_scale'] = pixel_scale if n_clicks % 2 == 1 else None
-
+            state['elevation_scale'] = elevation_scale if n_clicks % 2 else None
+            state['pixel_scale'] = pixel_scale if n_clicks % 2 else None
+ 
             update_layer = [
                 {
-                    "id": int(layer_id),
+                    "id": int(layer_id), 
                     "action": "update",
                     "data": [
                         {
                             "type": layer_type,
                             "shader": {
-                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
-                                "shadows": True if n_clicks % 2 == 1 else False,
+                                "type": 'hillshading' if n_clicks % 2 else None,
+                                "shadows": True if n_clicks % 2 else False,
                                 "elevationScale": state['elevation_scale'],
                                 "pixelScale": state['pixel_scale']
                             },
@@ -428,7 +433,7 @@ if __name__ == "__main__":
         @cg.callback(
             Output(map, 'layers'),
             [
-                Input('shading-submit-val', 'n_clicks')
+                Input('shading-submit-val', 'n_clicks'),
             ],
             [
                 State('elevation-scale', 'value'),
@@ -451,8 +456,8 @@ if __name__ == "__main__":
                         {
                             "type": layer_type,
                             "shader": {
-                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
-                                "shadows": True if n_clicks % 2 == 1 else False,
+                                "type": 'hillshading' if n_clicks % 2 else None,
+                                "shadows": True if n_clicks % 2 else False,
                                 "elevationScale": state['elevation_scale'],
                                 "pixelScale": state['pixel_scale']
                             },
@@ -527,7 +532,6 @@ if __name__ == "__main__":
                     ]
                 }
             ] 
-            layers = change_layer(layers, update_layer[0])
             return update_layer
 
 
@@ -717,13 +721,13 @@ if __name__ == "__main__":
         @cg.callback(
             Output(map, 'layers'),
             [
-                Input('shader-toggle-btn', 'n_clicks'),
+                Input(map, 'switch'),
             ],
                 State('selected-layer', 'value')
 
         )
 
-        def toggle_shading(n_clicks, layer_id):
+        def toggle_shading(switch, layer_id):
             layer_type = get_layer_type(layer_id, layers)
 
             update_layer = [
@@ -734,10 +738,7 @@ if __name__ == "__main__":
                         {
                             "type": layer_type,
                             "shader": {
-                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
-                                # "shadows": False,
-                                # "elevationScale": 1.0,
-                                # "pixelScale": 11000
+                                "type": 'hillshading' if switch['value']else None,
                             },
                         }
                     ]
