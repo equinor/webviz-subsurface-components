@@ -72,7 +72,6 @@ class CompositeMapLayers extends Component {
     
     componentDidUpdate(prevProps) {
         this.reSyncDrawLayer();
-        console.log(this.props.updateMode)
         if (prevProps.layers !== this.props.layers) {
             if (this.props.updateMode == "replace") {
                 this.removeAllLayers();
@@ -168,7 +167,6 @@ class CompositeMapLayers extends Component {
 
     updateColorbarUponBaseMapChange = () => {
         this.props.map.on('baselayerchange', (e) => {
-            console.log("baselayer change", Object.values(e.layer._layers)[0])
             this.setFocusedImageLayer(Object.values(e.layer._layers)[0]);
         });
     }

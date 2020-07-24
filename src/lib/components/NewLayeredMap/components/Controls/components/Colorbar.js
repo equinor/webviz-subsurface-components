@@ -41,16 +41,15 @@ const ColorBar = (props) => {
         if(!focusedImageLayer) {
             return;
         }
-        console.log("focusedImageLayer ", focusedImageLayer)
-
+        
         const options = (focusedImageLayer.options || {})
         const colorScale = options.colorScale;
         if(colorScale) {
             setColorMap(buildColormap(colorScale))
             setMinMaxValue([options.minvalue, options.maxvalue])
-        } else if (true) {
-            setColorMap(buildColormap())
-
+        } else if (!colorScale && options.url){
+            setColorMap(["#FFFFFF"]);
+            setMinMaxValue([options.minvalue, options.maxvalue])
         } else {
             setColorMap(null);
         }

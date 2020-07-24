@@ -24,10 +24,11 @@ const MousePosition = (props) => {
         subscribeToMapClick();
     }, [])
 
-
     const focusedDependencyArray = () => {
         const options = (focusedImageLayer || {}).options || {};
-        return [options.minvalue, options.maxvalue];
+        const newURL = focusedImageLayer? focusedImageLayer.getUrl() : null
+        const newCanvas = focusedImageLayer? focusedImageLayer.getCanvas() : null
+        return [newCanvas, newURL, options.minvalue, options.maxvalue];
     }
 
     useEffect(() => {
@@ -140,9 +141,11 @@ const MousePosition = (props) => {
         if(!canvas) {
             return;
         }
+
         const clientRect = onScreenCanvas.getBoundingClientRect();
         const screenX = ((event.originalEvent.clientX - clientRect.left) / clientRect.width) * canvas.width;
         const screenY = ((event.originalEvent.clientY - clientRect.top) / clientRect.height) * canvas.height;
+
 
         if(screenX === Infinity || screenY === Infinity) {
             return;
