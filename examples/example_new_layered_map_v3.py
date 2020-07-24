@@ -517,7 +517,6 @@ if __name__ == "__main__":
 
         def update_colorcsale(colorScale, layer_id):
             layer_type = get_layer_type(layer_id, layers)
-
             update_layer = [
                 {
                     "id": int(layer_id),
