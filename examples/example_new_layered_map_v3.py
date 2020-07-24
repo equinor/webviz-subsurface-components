@@ -513,7 +513,6 @@ if __name__ == "__main__":
             global layers
 
             layer_type = get_layer_type(layer_id, layers)
-
             update_layer = [
                 {
                     "id": int(layer_id),
