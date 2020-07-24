@@ -168,6 +168,7 @@ class CompositeMapLayers extends Component {
 
     updateColorbarUponBaseMapChange = () => {
         this.props.map.on('baselayerchange', (e) => {
+            console.log("baselayer change", Object.values(e.layer._layers)[0])
             this.setFocusedImageLayer(Object.values(e.layer._layers)[0]);
         });
     }

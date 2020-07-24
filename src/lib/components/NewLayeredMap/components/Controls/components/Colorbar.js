@@ -28,7 +28,6 @@ const ColorBar = (props) => {
         if(!focusedImageLayer) {
             return [null, null, null];
         }
-
         const options = focusedImageLayer.options;
         return [JSON.stringify(options.colorScale), options.minvalue, options.maxvalue];
     }
@@ -42,12 +41,16 @@ const ColorBar = (props) => {
         if(!focusedImageLayer) {
             return;
         }
+        console.log("focusedImageLayer ", focusedImageLayer)
 
         const options = (focusedImageLayer.options || {})
         const colorScale = options.colorScale;
         if(colorScale) {
             setColorMap(buildColormap(colorScale))
             setMinMaxValue([options.minvalue, options.maxvalue])
+        } else if (true) {
+            setColorMap(buildColormap())
+
         } else {
             setColorMap(null);
         }

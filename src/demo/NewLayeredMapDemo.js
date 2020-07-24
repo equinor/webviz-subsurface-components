@@ -85,7 +85,7 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            <div >
+            {/* <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
@@ -124,7 +124,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div>
+            </div> */}
         </ div>
         
     )
