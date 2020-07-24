@@ -3,7 +3,6 @@ The new layered map component is a component for layered map data, like tile-dat
 
 ## 📋 Table of contents
 - [Usage](#usage)
-    - [Getting started](#getting-started)
     <br>
 - [Props](#props)
     - [Map specifics](#props-map-specifics)
@@ -15,6 +14,11 @@ The new layered map component is a component for layered map data, like tile-dat
     - [Structure](#structure)
     - [Layer types](#layer-types)
     - [Updating layers](#updating-layers)
+    <br>
+    - [Color scales](#colorscales)
+    - [Shaders](#shaders)
+    <br>
+- [Listeners](#listeners)
     <br>
 - [Serving tiles with Dash]()
 
@@ -85,7 +89,9 @@ app.run_server(debug=True)
 <br>
 
 ## 🎰 Props
-The props available to the newLayeredMap component
+**The props available to the newLayeredMap component**
+
+<br>
 
 ### *Props:* Map specifics
 | Name              | Type                    | Description                                                                                                                                                                                                                    | Example input                                   | Default         |

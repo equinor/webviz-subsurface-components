@@ -30,7 +30,6 @@ const NewLayeredMapDemo = () => {
                 layers[0].data[0].colorScale = DEFAULT_COLORMAP;
             } else {
                 layers[0].data[0].shader.type = null;
-               // layers[0].data[0].colorScale = null;
             }
         }
     }
@@ -40,8 +39,9 @@ const NewLayeredMapDemo = () => {
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
-                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
-                    syncDrawings={true}
+                    // syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
+                    // syncDrawings={true}
+                    updateMode={"replace"}
                     // layers={exampleData.layers}
                     layers={layers}
                     center={[0, 0]}
@@ -82,7 +82,7 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            <div >
+            {/* <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
@@ -118,7 +118,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div>
+            </div>  */}
         </ div>
         
     )

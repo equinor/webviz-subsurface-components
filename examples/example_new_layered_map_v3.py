@@ -746,6 +746,7 @@ if __name__ == "__main__":
                 {
                     "id": int(layer_id),
                     "name": "A seismic horizon without colormap",
+                    "baseLayer": True,
                     "checked": True,
                     "data": [
                         {
