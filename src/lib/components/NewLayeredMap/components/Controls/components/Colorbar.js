@@ -29,7 +29,6 @@ const ColorBar = (props) => {
             return [null, null, null];
         }
 
->>>>>>> interns-dev
         const options = focusedImageLayer.options;
         return [JSON.stringify(options.colorScale), options.minvalue, options.maxvalue];
     }
