@@ -79,7 +79,6 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		if(options.drawStrategy === DRAW_STRATEGY_FULL) {
 			this.on('load', () => {
 				if(!this._isMounted) {
-					console.log("LOADED!");
 					this._drawAllTiles();
 				}
 				this._isMounted = true;
@@ -188,7 +187,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
 	_draw: async function(tile, coords, done) {
 		const drawOptions = this._getDrawOptions();
 	
-		drawFunc(this._glContext, this._canvas, this._url, this._colormapUrl, drawOptions)
+		drawFunc(this._glContext, this._canvas, this.getTileUrl(coords), this._colormapUrl, drawOptions)
 		.then(() => {
 			const ctx = tile.getContext('2d');
 			ctx.drawImage(this._canvas, 0, 0);

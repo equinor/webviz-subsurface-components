@@ -19,7 +19,7 @@ const NewLayeredMapDemo = () => {
 
 
     const [switchValue, setSwitchValue] = useState(true);
-    const [layers, setLayers] = useState(exampleData.layers.slice(1, 3));
+    const [layers, setLayers] = useState(exampleData.layers.slice(0, 3));
 
 
     const onChange = (changes) => {
