@@ -43,7 +43,7 @@ const NewLayeredMapDemo = () => {
     }
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: '90vh'}}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: '1fr 1fr', height: '90vh'}}>
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
@@ -84,6 +84,66 @@ const NewLayeredMapDemo = () => {
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
+                    syncDrawings={true}
+                    layers={layers}
+                    colorBar={{
+                        position: 'bottomleft'
+                    }}
+                    crs="simple"
+                    minZoom={-5}
+                    zoom = {-5} 
+                    mouseCoords = {{
+                        position: "bottomleft",
+                    }}
+                    drawTools = {{
+                        drawMarker: true,
+                        drawPolygon: true,
+                        drawPolyline: true,
+                        position: "topright",
+                        
+                    }}
+                    switch={{
+                        value: switchValue,
+                        label: 'Hillshading',
+                        position: 'bottomleft'
+                    }}
+                    setProps={onChange}
+                />
+            </div>
+            <div >
+                <NewLayeredMap 
+                    id={"NewLayeredMap-3"}
+                    syncedMaps={["NewLayeredMap-4"]}
+                   // syncDrawings={true}
+                    layers={layers}
+                    colorBar={{
+                        position: 'bottomleft'
+                    }}
+                    crs="simple"
+                    minZoom={-5}
+                    zoom = {-5} 
+                    mouseCoords = {{
+                        position: "bottomleft",
+                    }}
+                    drawTools = {{
+                        drawMarker: true,
+                        drawPolygon: true,
+                        drawPolyline: true,
+                        position: "topright",
+                        
+                    }}
+                    switch={{
+                        value: switchValue,
+                        label: 'Hillshading',
+                        position: 'bottomleft'
+                    }}
+                    setProps={onChange}
+                />
+            </div> 
+            <div >
+                <NewLayeredMap 
+                    id={"NewLayeredMap-4"}
+                    syncedMaps={["NewLayeredMap-3"]}
                     syncDrawings={true}
                     layers={layers}
                     colorBar={{
