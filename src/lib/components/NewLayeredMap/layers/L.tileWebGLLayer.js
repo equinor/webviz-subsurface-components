@@ -2,6 +2,12 @@ import L, { DomUtil, DomEvent, Util, Browser, GridLayer } from 'leaflet';
 import drawFunc from '../webgl/drawFunc';
 import { buildColormap } from '../utils/colorScale';
 
+import { tilesToImage } from '../utils/image'
+
+const DRAW_STRATEGY_NORMAL = 'normal';
+const DRAW_STRATEGY_ADJACENT = 'adjacent';
+const DRAW_STRATEGY_FULL = 'full';
+
 /**
  * TileWebGLLayer is a tileLayer for rendering tile-based images with WebGL. It executes WebGL code for colormaps and
  * shaders and then convert the drawn canvas into an image that will be assigned to a tile.
@@ -44,7 +50,12 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		/**
 		 * @param {Array<String>} - An array of hexcolors for defining the colormap used on the tiles.
 		 */
-		colorScale: ["#FFFFFF", "#000000"],
+		colorScale: null,
+		
+		/**
+		 * @param {String} - How one should draw the tiles. Can be either null, "adjacent", "full"
+		 */
+		drawStrategy: null,
 	},
 
     initialize: function(url, options) {
@@ -52,12 +63,30 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		this._canvas = null;
 		this._glContext = null,
 		
+		/**
+		 * Caching loaded images - used with drawStrategy "adjacent"
+		 * @type {Object.<HTMLImageElement>}
+		 */
+		this._loadedTiles = {};
+
 		options = Util.setOptions(this, options);
 
 		// for https://github.com/Leaflet/Leaflet/issues/137
 		if (!Browser.android) {
 			this.on('tileunload', this._onTileRemove);
 		}
+
+		if(options.drawStrategy === DRAW_STRATEGY_FULL) {
+			this.on('load', () => {
+				if(!this._isMounted) {
+					console.log("LOADED!");
+					this._drawAllTiles();
+				}
+				this._isMounted = true;
+			})
+		}
+
+
     },
 
 	/**
@@ -87,8 +116,20 @@ L.TileWebGLLayer = L.GridLayer.extend({
         });
 
         this._initColormap();
-        L.GridLayer.prototype.onAdd.call(this, map);
-	  },
+		L.GridLayer.prototype.onAdd.call(this, map);
+
+		if(this.options.drawStrategy === DRAW_STRATEGY_FULL) {
+			map.on('moveend', () => this._triggerFullDraw());
+			map.on('zoomend', () => this._triggerFullDraw());
+		}
+	},
+
+	onRemove: function(map) {
+		map.off('moveend', () => this._triggerFullDraw());
+		map.off('zoomend', () => this._triggerFullDraw());
+
+		L.GridLayer.prototype.onRemove.call(this, map);
+	},
 
 
     createTile: function(coords, done) {
@@ -104,7 +145,11 @@ L.TileWebGLLayer = L.GridLayer.extend({
           	tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
         }
 
-        this._draw(tile, coords, done);
+        if(this.options.drawStrategy !== DRAW_STRATEGY_FULL) {
+			this._draw(tile, coords, done);
+		} else {
+			setTimeout(() => done(null, tile), 1000);
+		}
 
 
         return tile;
@@ -129,22 +174,25 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		});
 
 		this._initColormap();
-		this._redrawAllTiles();
+
+		if(this.options.drawStrategy === DRAW_STRATEGY_FULL) {
+			this._drawAllTiles();
+		} else {
+			this._redrawAllTiles();
+		}
 	},
     
 
 	// ----------- PRIVATE FUNCTIONS ------------------
 
-	_draw: function(tile, coords, done) {
-		
-		drawFunc(this._glContext, this._canvas, this.getTileUrl(coords), this._colormapUrl, {
-			...this.options,
-			crossOrigin: '',
-			shader: this.options.shader,
-		})
+	_draw: async function(tile, coords, done) {
+		const drawOptions = this._getDrawOptions();
+	
+		drawFunc(this._glContext, this._canvas, this._url, this._colormapUrl, drawOptions)
 		.then(() => {
 			const ctx = tile.getContext('2d');
 			ctx.drawImage(this._canvas, 0, 0);
+			
 			if(done) {
 				done(null, tile);
 			}
@@ -156,6 +204,30 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		for(let { el, coords } of Object.values(this._tiles || {})) {
 			this._draw(el, coords, null);
 		}
+	},
+
+	_drawAllTiles: async function() {
+		const drawOptions = this._getDrawOptions();
+
+		const tiles = Object.values(this._tiles || {})
+			.filter(tile => tile.current)
+			.map(tile => ({...tile, image: this.getTileUrl(tile.coords)}))
+
+
+		// Merge the tiles into a single image
+		const { url, size, minX, minY } = await tilesToImage(tiles, drawOptions);
+
+		// Draw image
+		drawFunc(this._glContext, this._canvas, url, this._colormapUrl, drawOptions)
+		.then(() => {
+			// Disitrbute parts of the drawn image onto corresponding tiles
+			tiles.forEach(({ coords, el}) => {
+				const x = coords.x - minX;
+				const y = coords.y - minY;
+				const ctx = el.getContext('2d');
+				ctx.drawImage(this._canvas, x*size, y*size, size, size, 0, 0, size, size);
+			})
+		})
 	},
 
     _getZoomForUrl: function () {
@@ -214,8 +286,23 @@ L.TileWebGLLayer = L.GridLayer.extend({
 		} else {
 			this._colormapUrl = buildColormap(colorScale);
 		}
-	}
+	},
 
+	_getDrawOptions: function() {
+		return {
+			...this.options,
+			crossOrigin: '',
+		}
+	},
+
+	_triggerFullDraw: function() {
+		if(this._fullDrawTimeout) {
+			clearTimeout(this._fullDrawTimeout);
+		}
+		this._fullDrawTimeout = setTimeout(() => {
+			this._drawAllTiles();
+		}, 1200);
+	}
 });
 
 L.tileWebGLLayer = (url, options = {}) => {

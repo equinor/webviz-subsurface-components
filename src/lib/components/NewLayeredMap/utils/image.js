@@ -4,9 +4,9 @@ export const loadImage = (src, config = {}) =>
         if(config.crossOrigin || config.crossOrigin === '') {
             requestCORSIfNotSameOrigin(img, src, config.crossOrigin === true ? '' : config.crossOrigin);
         }
-
+        
+        img.crossOrigin = 'anonymous'
         img.src = src;
-
         img.onload = () => resolve(img);
 });
 
@@ -25,7 +25,6 @@ const requestCORSIfNotSameOrigin = (img, url, value) => {
  * @returns {Promise<HTMLImageElement>}
  */
 export const scaleImage = async (loadedImage, scaleX, scaleY) => {
-
     if(typeof loadedImage === 'string') {
         loadedImage = await loadImage(loadedImage);
     }
@@ -37,4 +36,72 @@ export const scaleImage = async (loadedImage, scaleX, scaleY) => {
     ctx.scale(scaleX, scaleY);
     ctx.drawImage(loadedImage, 0, 0);
     return scaleCanvas.toDataURL("image/png");
+}
+
+/**
+ * 
+ * @param {Array<String|HTMLImageElement>} tiles
+ * @param {Number} dimX
+ * @param {Number} dimY
+ * @returns {[String, Array<HTMLImageElement>, Number]} Base64 URL of the merged image
+ */
+export const tilesToImage = async (tiles, options = {}) => {
+
+    if(tiles.length === 0) {
+        return null;
+    }
+
+    let [minX, maxX, minY, maxY] = [Number.MAX_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MIN_VALUE];
+    tiles.forEach(({coords}) => {
+        if(coords.x > maxX) {
+            maxX = coords.x;
+        }
+        if(coords.x < minX) {
+            minX = coords.x;
+        }
+        if(coords.y > maxY) {
+            maxY = coords.y;
+        }
+        if(coords.y < minY) {
+            minY = coords.y;
+        }
+    })
+    const dimX = maxX - minX + 1;
+    const dimY = maxY - minY + 1;
+
+    // Make sure all the images are HTMLImageElement.
+    tiles.forEach((tile) => {
+        tile.image = typeof tile.image === 'string' ? 
+            loadImage(tile.image, options).catch(() => null) 
+            : Promise.resolve(tile.image);
+    });
+    const loadedTiles = await Promise.all(tiles.map(tile => tile.image));
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext("2d");
+    const size = loadedTiles[0].width;
+    canvas.width = size*dimX;
+    canvas.height = size*dimY;
+
+    // Merge them into a grid
+    for(let i = 0; i < loadedTiles.length; i++) {
+        const tile = tiles[i];
+        const coords = tile.coords;
+        const x = coords.x - minX;
+        const y = coords.y - minY;
+        const image = loadedTiles[i];
+
+        if(image instanceof HTMLImageElement) {
+            ctx.drawImage(image, x*size, y*size, size, size);
+        }
+    }
+    return {
+        url: canvas.toDataURL(),
+        size: size,
+        minX: minX,
+        minY: minY,
+        maxX: maxX,
+        maxY: maxY,
+        loadedImages: loadedTiles,
+    }
 }

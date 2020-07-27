@@ -25,16 +25,18 @@ export default (gl, canvas, loadedImage, loadedColorMap, options = {}) => {
   
     canvas.width = width;
     canvas.height = height;
-
+    
     const eqGL = EQGL(gl, canvas);
+
+    const rawTexture = eqGL.texture({image: loadedImage})
 
     const drawCmd = eqGL.new()
         .vert(positionVShader)
         .frag(colorFShader)
         .attribute('position', [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
-        .texture('u_image', 2, loadedImage)
-        .texture('u_raw_image', 3, loadedImage)
-        .texture('u_colormap', 4, loadedColorMap)
+        .texture('u_image', rawTexture)
+        .texture('u_raw_image', rawTexture)
+        .texture('u_colormap', eqGL.texture({image: loadedColorMap}))
         .uniformf("u_colormap_length", loadedColorMap.width)
         .uniformf("u_resolution", loadedImage.width, loadedImage.height)
         .uniformf("u_scale_type", scaleType === 'log' ? 1.0 : 0.0) // 1.0 is logarithmic
