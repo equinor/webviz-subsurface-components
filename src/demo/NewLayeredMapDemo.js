@@ -11,8 +11,8 @@ const DEFAULT_COLORMAP = {
     "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
     "prefixZeroAlpha": false,
     "scaleType": "linear",
-    "cutPointMin": 2782,
-    "cutPointMax": 3513
+    "cutPointMin": 3400,
+    "cutPointMax": 3500
 };
 
 const NewLayeredMapDemo = () => {
@@ -21,10 +21,11 @@ const NewLayeredMapDemo = () => {
     const [switchValue, setSwitchValue] = useState(true);
     const [layers, setLayers] = useState(exampleData.layers.slice(0, 3));
 
-
+    
     const onChange = (changes) => {
         console.log("Changes :D", changes);
         const newLayers = Object.assign([], layers);
+        newLayers[0].data[0].colorScale = DEFAULT_COLORMAP;
         if(changes.switch) {
             setSwitchValue(changes.switch.value);
             newLayers[0].action = "update";
@@ -47,7 +48,7 @@ const NewLayeredMapDemo = () => {
     }
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: '1fr 1fr', height: '90vh'}}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: '1fr 1fr', height: '180vh'}}>
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
@@ -84,7 +85,7 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            <div >
+            {/* <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
@@ -173,7 +174,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div> 
+            </div>  */}
         </ div>
         
     )

@@ -49,7 +49,7 @@ const ColorBar = (props) => {
             setColorMap(buildColormap(colorScale))
             setMinMaxValue([options.minvalue, options.maxvalue])
         } else if (!colorScale && options.url){
-            setColorMap(["#FFFFFF"]);
+            setColorMap(buildColormap(["#FFFFFF"]));
             setMinMaxValue([options.minvalue, options.maxvalue])
         } else {
             setColorMap(null);
@@ -84,11 +84,13 @@ const ColorBar = (props) => {
     return ReactDOM.createPortal(
         <div className="leaflet-colorbar">
             <div className="leaflet-colorbar-image">
-                <img
-                    key={colorMap}
-                    src={colorMap}
-                    style={{ width: "100%", height: "10px" }}
-                />
+                {colorMap &&
+                    <img
+                        key={colorMap}
+                        src={colorMap}
+                        style={{ width: "100%", height: "10px" }}
+                    />
+                }
             </div>
             <div>
                 {minMaxValue[0]} {props.unit}

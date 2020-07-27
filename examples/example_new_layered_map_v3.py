@@ -651,6 +651,9 @@ if __name__ == "__main__":
                         {   
                             "type": layer_type,
                             "colorScale":  {
+                                "colors": DEFAULT_COLORSCALE_COLORS,
+                                "prefixZeroAlpha": False,
+                                "scaleType": "linear",
                                 "cutPointMin": value[0],
                                 "cutPointMax": value[1],
                             },

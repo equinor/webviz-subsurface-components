@@ -455,7 +455,7 @@ Shapes also have a `"tooltip"` prop which will display text on hover
 
 ### Updating layers
 
-There are two supported ways of doing this. One uses the _action_ field in the layer object to add, update or delete a single layer by id. The other one simply replaces all existing layers with whatever new _layers_ list you provide it with.
+Updating layers is how we make changes to the map during runtime. There are two supported ways of doing this. One uses the _action_ field in the layer object to add, update or delete a single layer by id. The other one simply replaces all existing layers with whatever new _layers_ list you provide it with.
 
 #### Updating layers with action
 
