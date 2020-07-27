@@ -4,7 +4,6 @@ import { drawRawImage ,drawWithColormap, drawWithHillShading, drawWithAdvancedHi
 import Utils from '../utils';
 
 export default async (gl, canvas, image, colormap = null, config = {}) => {
-    
     gl.getExtension("OES_texture_float");
     
     const imagesToLoad = [Utils.loadImage(image, config)]; 

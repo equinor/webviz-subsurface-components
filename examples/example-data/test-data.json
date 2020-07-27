@@ -4,6 +4,7 @@
         "name": "Hello World Test Image",
         "baseLayer": true,
         "checked": true,
+        "action": "add",
         "data": [
             {
                 "type": "image",

@@ -116,7 +116,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         const promisesToWaitFor = [];
 	    
     	if(options.colorScale && options.colorScale instanceof Object && this.options.colorScale instanceof Object) {
-    		options.colorScale = Object.assign(this.options.colorScale, options.colorScale)
+    		options.colorScale = Object.assign({}, this.options.colorScale, options.colorScale)
    	    }       	   
 
         options = Util.setOptions(this, {
@@ -194,6 +194,11 @@ L.ImageWebGLOverlay = L.Layer.extend({
     },
 
     _draw: function() {
+        if(!this._gl) {
+            console.warn('ImageWebGLLayer is missing a webgl-context', this._leaflet_id)
+            return;
+        }
+
         drawFunc(this._gl, this._canvas, this._url, this._colormapUrl, {
             ...this.options,
             shader: this.options.shader,
