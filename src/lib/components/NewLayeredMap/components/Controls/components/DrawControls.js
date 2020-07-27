@@ -40,7 +40,7 @@ class DrawControls extends Component {
 
     componentDidUpdate(prevProps) {
         if(this.props.drawPolygon !== prevProps.drawPolygon
-           || this.props.drawPolyline != prevProps.drawPolyline
+           || this.props.drawPolyline !== prevProps.drawPolyline
            || this.props.drawMarker != prevProps.drawMarker
         ) {
             this.props.map.removeControl(this.state.drawControl);
