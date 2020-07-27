@@ -71,7 +71,6 @@ class CompositeMapLayers extends Component {
     
     componentDidUpdate(prevProps) {
         this.reSyncDrawLayer();
-
         if (prevProps.layers !== this.props.layers) {
             if (this.props.updateMode === "replace") {
                 this.removeAllLayers();

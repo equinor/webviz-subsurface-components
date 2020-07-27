@@ -136,6 +136,13 @@ const MousePosition = (props) => {
         setLatLng(x, y, z, red > 0);
     }
 
+    const mapXCoordinateToCanvas = (x, clientRect, canvas) => {
+        return ((x - clientRect.left) / clientRect.width) * canvas.width;
+    }
+    const mapYCoordinateToCanvas = (y, clientRect, canvas) => {
+        return ((y - clientRect.top) / clientRect.height) * canvas.height;
+    }
+
     const onCanvasMouseClick = (event) => {
         const { canvas, ctx, onScreenCanvas, props} = stateRef.current || {};
         if(!canvas) {
@@ -143,8 +150,8 @@ const MousePosition = (props) => {
         }
 
         const clientRect = onScreenCanvas.getBoundingClientRect();
-        const screenX = ((event.originalEvent.clientX - clientRect.left) / clientRect.width) * canvas.width;
-        const screenY = ((event.originalEvent.clientY - clientRect.top) / clientRect.height) * canvas.height;
+        const screenX = mapXCoordinateToCanvas(event.originalEvent.clientX, clientRect, canvas);
+        const screenY = mapYCoordinateToCanvas(event.originalEvent.clientY, clientRect, canvas);
 
 
         if(screenX === Infinity || screenY === Infinity) {
@@ -156,11 +163,37 @@ const MousePosition = (props) => {
         const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally 
         const z = mapZValue(red);
 
+        // Used to disable map.on("click") events when pressed on the controls
+        const controlsList = document.getElementsByClassName("leaflet-custom-control leaflet-control")
+        const forbiddenCoordinates = [];
 
-        if(props.setProps && stateRef.current.mode !== "editing") {
+        for (const control of controlsList) {
+            const controlBounds = control.getBoundingClientRect();
+
+            const forbiddenYValueRange = [mapYCoordinateToCanvas(controlBounds.y, controlBounds, canvas), mapYCoordinateToCanvas((controlBounds.y + controlBounds.height), controlBounds, canvas)]
+            const forbiddenXValueRange = [mapXCoordinateToCanvas(controlBounds.x, controlBounds, canvas), mapXCoordinateToCanvas((controlBounds.x + controlBounds.width), controlBounds, canvas)]
+
+            forbiddenCoordinates.push([forbiddenYValueRange, forbiddenXValueRange])
+        }
+
+        if(props.setProps && stateRef.current.mode !== "editing" && !isForbidden(event.originalEvent.clientX, event.originalEvent.clientY, forbiddenCoordinates)) {
             props.setProps({click_position: [x, y, z]});
         }
         
+    }
+
+    const isForbidden = (x, y, forbiddenCoordinates) => {
+        const forbidden = false;
+        for (const coordinates of forbiddenCoordinates) {
+            const xRange = coordinates[0]
+            const yRange = coordinates[1]
+
+            if ( (x > xRange[0] && x < xRange[1]) && (y > yRange[0] && y < yRange[1]) ) {
+                forbidden = true;
+            }
+        }
+
+        return forbidden;
     }
 
     const subscribeToMapClick = () => {
