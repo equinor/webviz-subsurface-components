@@ -23,14 +23,13 @@ The new layered map component is a component for layered map data, like tile-dat
 - [Serving tiles with Dash]()
 
 ## 🌤 Features
-* Image-layer support
 * WebGL Image-layer support
-* Tile-layer support
 * WebGL Time-layer support
 * Custom colorscales
     * Logarithmic option
     * Cutoff points options   
 * Advanced hillshading
+* Soft hillshading
 * Drawing of polylines, polygons, circles, and markers
 * Movement synchronization between multiple instances
 
@@ -596,10 +595,14 @@ The colorscale may be used in one of the following ways:
             "cutPointMax": 3513
         },
 
+ - Defining the color array without defining an object
+
+        "colorScale": ["#0d0887", "#46039f", "#7201a8", "#9c179e"],
+
  - Assigning a colormap to the colorscale directly as a string
     
 
-        "colorscale: "data:image/png;base64,    iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
+        "colorScale": "URL_TO_COLORMAP_HERE",
 
 <br>
 
@@ -627,8 +630,14 @@ Shaders only works for only two layer types - _image_- and _tile_-layers. You ca
 
 <br>
 
+#### Base props
+| Name            | Type    | Description| Default |
+|-----------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| type            | String  | The type of shader that should be used. It can either be null, hillshading or soft-hillshading.                                                                                                  | null    |
+| setBlackToAlpha | Boolean | If true, all colors with RGB(0,0,0) will have the alpha be set to 0.0, making all the black in the image transparent. This is useful if your images have a black background you want to remove.  | false   |
+
 #### 🏔 Hillshading
-Hillshading is a shader that generates elevation and senes of relief to images. It can be generated to the following way:
+Hillshading is a shader that generates elevation and senes of relief to images. It can be enabled the following way:
 ```javascript
 {
     "shader": {
@@ -637,7 +646,7 @@ Hillshading is a shader that generates elevation and senes of relief to images. 
     }
 }
 ```
-This kind of hillshading might be expensive for huge images, especially with shadows. Shadows are the most expensive computation of the hillshading, so if it is not needed, make sure it is not enabled. However, the usages of the shadows can be optimized a bit, as the shadows are generated in _N_ iterations, where _N_ is automatically adjusted based on image size. With small images like 256x256, _N_ is set to 128, which shows really great shadows, but if you do the same for a 1000x1000 images, your browser might not handle it at all, and is therefore automatically set to _N_ = 8 for the biggest images. The result are not as great as before, but it is decent. On the other hand, it is possible force _N_ to be something else, which can be set with the _shadowIterations_-field:
+This kind of hillshading is expensive for huge images, especially with shadows. Shadows are the most expensive computation of the hillshading, so if it is not needed, make sure it is not enabled. However, the usages of the shadows can be optimized a bit, as the shadows are generated in _N_ iterations, where _N_ is automatically adjusted based on image size. With small images like 256x256, _N_ is set to 128, which shows really great shadows, but if you do the same for a 1000x1000 image your browser might not handle it at all, and is therefore automatically set to _N_ = 8 for the biggest images. The result are not as great as before, but it is decent. On the other hand, it is possible force _N_ to be something else, which can be set with the _shadowIterations_-field:
 ```javascript
 {
     "shader": {
@@ -657,8 +666,8 @@ Here is a brief visualization of the hillshader with different kind of shadow-co
 | elevationScale   | Number        | ElevationScale is a variable for scaling the generated elevation of the image. The greater the scale, the higher the "_mountains_". If you have _shadows_ enabled, but see no shadows, maybe your elevation is too low.                     | 1.0       |
 | shadows          | Boolean       | If shadows should be applied to the provided image or not. Note that shadows is quite heavy computational, especially for big images. Try to decrease the _shadowsIterations_ field if you have troubles rendering with shadows.            | false     |
 | shadowIterations | Number        | The number of iterations the shadows should be applied on. The higher number of iterations the greater the result, but also more heavy the generation gets. Your browser might not support too high iteration-number, especially on Chrome. | null      |
-| sunDirection     | Array<Number> | A vector of length 3 indicating the direction from the surface to the sun. Should be a normalized vector with values between 0 and 1.                                                                                                       | [1, 1, 1] |
-
+| sunDirection     | Array<Number> | A vector of length 3 indicating the direction from the surface to the sun. Should be a normalized vector with values between 0 and 1.| [1, 1, 1] |
+| noColor          | Boolean       |  If true, the color-step is skipped and the colormap will not be drawn to the canvas. Instead direct lighting will be used, displaying a grayscale image. | false |            
 <br>
 
 #### Soft hillshading
@@ -688,7 +697,7 @@ If the normal hillshading-shader is too heavy computational, there is also a sof
 
 <br>
 
-### 🎙 Listeners
+## 🎙 Listeners
 
 There are some listeners the python user can access using callbacks, such as the coordinates of a mouse click or a drawing.
 

@@ -26,7 +26,7 @@ const drawCmd = builder
     .vert(vertexShader);
     .frag(fragmentShader);
     .attribute("attributeName", 12 /* Attribute value */)
-    .texture("uniformName", textureIndex, image)
+    .texture("uniformName", eqGL.texture({image: image }))
     .uniformf("uniformName2", 100, 200) // gl.uniform2f(...)
     .build()
 
@@ -46,7 +46,7 @@ const drawCmd = builder
     .vert(vertexShader);
     .frag(fragmentShader);
     .attribute("attributeName", 12)
-    .texture("uniformName", textureIndex, image)
+    .texture("uniformName", eqGL.texture({ image }))
     .uniformf("uniformName2", 100, 200)
     .uniformf("uniformName3", eqGl.variable("myVar")) // The variable
     .build()
@@ -71,7 +71,7 @@ const elevationCmd = eqGL.new()
     .vert(positionVShader)
     .frag(elevationFShader)
     .attribute("position", [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])
-    .texture("tElevation", 0, loadedImage)
+    .texture("tElevation", 0, loadedImage) // Manually set the textureUnit
     .vertexCount(6)
     .viewport(0, 0, loadedImage.width, loadedImage.height)
     .framebuffer(fboElevation) // Set framebuffer
@@ -93,6 +93,54 @@ const normalCmd = eqGL.new()
 normalCmd();
 ```
 
+## ⛺ Textures
+Textures are basically images passed to the shaders. Normally, in WebGL, you would have to bind textures to buffers by assigning the textures with a _textureUnit_ number. Keeping track of these numbers be cumbersome, but can be avoided by letting EqGL keep track of them for you. There are mulitple ways of using textures in EqGL:
+
+### Letting EqGL keep track of everything (recommended)
+EqGL has a _texture_ method that binds the image to a buffer and automatically assigns it a _textureUnit_ number.
+```javascript
+const tex = eqGL.texture({ image: image })
+
+const drawCmd = eqGL.new()
+    .vert(vertexShader);
+    .frag(fragmentShader);
+    .texture("uniformName", tex) // Using the texture
+    .build()
+```
+
+### Doing it manually
+```javascript
+const drawCmd = eqGL.new()
+    .vert(vertexShader);
+    .frag(fragmentShader);
+    .texture("uniformName", textureUnit, image)
+    .build()
+```
+
+### Using framebuffers
+Framebuffers are basically textures stored in a buffer, which can be used as _Sample2D_ inputs:
+```javascript
+// Creating a new framebuffer
+const fbo = eqGL.framebuffer({ width: width, height: height});
+
+const firstCmd = eqGL.new()
+    .vert(vertexShader);
+    .frag(fragmentShader);
+    .texture("uniformName", eqGL.texture({ image }))
+    .framebuffer(fbo) // Drawing to the framebuffer
+    .build()
+
+firstCmd()
+
+const secondCmd = eqGL.new()
+    .vert(vertexShader);
+    .frag(fragmentShader);
+    .texture("uniformName", fbo) // <-- Using the framebuffer as a texture
+    .build()
+
+secondCmd()
+```
+
 ## 🌌 Further work and improvements
 ### Improvements
 * Currently the framebuffer creates a new texture with floats. This requires the user to enable the extension _OES_texture_float_. It might not always be necessary to use gl.FLOAT and might be better with gl.UNSIGNED_BYTE. Therefore, it would be nice to make it possible to be explicit when one wants to use floats, just like in ReGL:
@@ -106,6 +154,5 @@ eqGL.framebuffer({
 ```
 ### Further work
 * Support more WebGL features
-    * Maybe `egGL.texture({ texture: image, flipY: true })` would be handy, since now one have to manually define a _texture-index_. EqGL can do this internally, just like the framebuffer.
     * Add support for renderbuffers. 
     * What do [ReGL](https://github.com/regl-project/regl) have that we do not? 🤔 
