@@ -27,12 +27,14 @@ const NewLayeredMapDemo = () => {
         if(changes.switch) {
             setSwitchValue(changes.switch.value);
             if (changes.switch.value === true) {
-                // layers[0].data[0].shader.type = 'hillshading';
+                layers[1].data[0].shader.type = 'hillshading';
                 // layers[0].data[0].colorScale = DEFAULT_COLORMAP;
                 // console.log("layers[0]", layers[0])
-                layers[0].data[0].colorScale = {"colors": ["#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953"] };
+                // layers[0].data[0].colorScale = {"colors": ["#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953"] };
             } else {
-                layers[0].data[0].colorScale = {"colors": ["#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921"] };
+                layers[1].data[0].shader.type = null;
+
+                // layers[0].data[0].colorScale = {"colors": ["#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921"] };
                // layers[0].data[0].colorScale = null;
             }
         }

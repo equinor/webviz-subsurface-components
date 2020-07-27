@@ -153,11 +153,36 @@ const MousePosition = (props) => {
         const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally 
         const z = mapZValue(red);
 
+        const controlsList = document.getElementsByClassName("leaflet-custom-control leaflet-control")
+        const forbiddenCoordinates = [];
 
-        if(props.setProps && stateRef.current.mode !== "editing") {
+        for (const control of controlsList) {
+            const controlBounds = control.getBoundingClientRect();
+            const forbiddenYValueRange = [controlBounds.y, (controlBounds.y + controlBounds.height)]
+            const forbiddenXValueRange = [controlBounds.x, (controlBounds.x + controlBounds.width)]
+
+            forbiddenCoordinates.push([forbiddenYValueRange, forbiddenXValueRange])
+
+        }
+
+        if(props.setProps && stateRef.current.mode !== "editing" && !isForbidden(event.originalEvent.clientX, event.originalEvent.clientY, forbiddenCoordinates)) {
             props.setProps({click_position: [x, y, z]});
         }
         
+    }
+
+    const isForbidden = (x, y, forbiddenCoordinates) => {
+        const forbidden = false;
+        for (const coordinates of forbiddenCoordinates) {
+            const xRange = coordinates[0]
+            const yRange = coordinates[1]
+
+            if ( (x > xRange[0] && x < xRange[1]) && (y > yRange[0] && y < yRange[1]) ) {
+                forbidden = true;
+            }
+        }
+
+        return forbidden;
     }
 
     const subscribeToMapClick = () => {
