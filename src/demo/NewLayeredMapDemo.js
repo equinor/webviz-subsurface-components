@@ -15,27 +15,78 @@ const DEFAULT_COLORMAP = {
     "cutPointMax": 3513
 };
 
+
+const testLayers = [
+    {
+        id: 10,
+        name: "TEST1",
+        baseLayer: true,
+        checked: true,
+        action: "add",
+        data: [
+            {
+                type: "image",
+                url: exampleData.layers[1].data[0].url,
+                colorScale: {
+                    colors: ["#2A4365", "#2C5282", "#2B6CB0", "#3182CE", "#4299E1", "#63B3ED", "#90CDF4", "#BEE3F8", "#EBF8FF"],
+                },
+                bounds: exampleData.layers[1].data[0].bounds,
+                shader: {
+                    setBlackToAlpha: true,
+                },
+                minvalue: 20,
+                maxvalue: 120,
+            }
+        ]
+    },
+    {
+        id: 11,
+        name: "TEST2",
+        baseLayer: true,
+        checked: true,
+        action: "add",
+        data: [
+            {
+                type: "image",
+                url: exampleData.layers[1].data[0].url,
+                colorScale: {
+                    colors: ["#234E52", "#285E61", "#2C7A7B", "#319795", "#38B2AC", "#4FD1C5", "#81E6D9", "#B2F5EA", "#E6FFFA"],
+                },
+                bounds: exampleData.layers[1].data[0].bounds,
+                shader: {
+                    setBlackToAlpha: true,
+                },
+                minvalue: 500,
+                maxvalue: 800,
+            }
+        ]
+    }
+]
+
 const NewLayeredMapDemo = () => {
 
 
     const [switchValue, setSwitchValue] = useState(true);
-
-    const layers = exampleData.layers.slice(1,3)
+    const [layers, setLayers] = useState(exampleData.layers.slice(1, 3).reverse());
 
     const onChange = (changes) => {
-        // console.log("Changes :D", changes);
+        console.log("Changes :D", changes);
+        const newLayers = Object.assign([], layers);
         if(changes.switch) {
             setSwitchValue(changes.switch.value);
+            newLayers[0].action = "update";
             if (changes.switch.value === true) {
-                // layers[0].data[0].shader.type = 'hillshading';
-                // layers[0].data[0].colorScale = DEFAULT_COLORMAP;
-                // console.log("layers[0]", layers[0])
-                layers[0].data[0].colorScale = {"colors": ["#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953"] };
+                newLayers[0].data[0].shader.type = 'hillshading';
+                newLayers[0].data[0].shader.shadows = true;
+                newLayers[0].data[0].colorScale = DEFAULT_COLORMAP;
             } else {
-                layers[0].data[0].colorScale = {"colors": ["#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921"] };
-               // layers[0].data[0].colorScale = null;
+                newLayers[0].data[0].shader.type = null;
+                newLayers[0].data[0].colorScale = {
+                    "colors": ["#000000", "#ffffff"]
+                };
             }
         }
+        setLayers(newLayers)
     }
 
     return (

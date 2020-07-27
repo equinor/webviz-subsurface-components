@@ -3,8 +3,8 @@
         {
             "name": "Hello world",
             "id": 1, 
-            "action": "update",
-            "checked": false,
+            "action": "add",
+            "checked": true,
             "baseLayer": true,
             "data": [
                 {
@@ -27,8 +27,8 @@
             "name": "A seismic horizon without colormap",
             "id": 2, 
             "baseLayer": true,
-            "checked": false,
-            "action": "update",
+            "checked": true,
+            "action": "add",
             "data": [
                 {
                     "type": "image",

@@ -32,17 +32,15 @@ class CompositeMapLayers extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            layers: {
-                
-            },
-            layerControl: null,
-        }
+        this.layerControl = null;
+        this.layers = {};
+        this.baseLayersById = {}; // { [baseLayerId]: true }
     }
 
     componentDidMount() {
         const layerControl = L.control.layers([]).addTo(this.props.map);
-        this.setState({layerControl: layerControl}, () => this.createMultipleLayers())
+        this.layerControl = layerControl;
+        this.createMultipleLayers();
         this.updateColorbarUponBaseMapChange();
     }
 
@@ -72,9 +70,9 @@ class CompositeMapLayers extends Component {
     
     componentDidUpdate(prevProps) {
         this.reSyncDrawLayer();
-        console.log(this.props.updateMode)
+        
         if (prevProps.layers !== this.props.layers) {
-            if (this.props.updateMode == "replace") {
+            if (this.props.updateMode === "replace") {
                 this.removeAllLayers();
                 this.createMultipleLayers();
             } else {
@@ -82,23 +80,24 @@ class CompositeMapLayers extends Component {
                 for (const propLayerData of layers) {
                     switch(propLayerData.action) {
                         case "update":
-                            const stateLayer = this.state.layers[propLayerData.id]
+                            const stateLayer = this.layers[propLayerData.id]
                             if (stateLayer) {
                                 this.updateLayer(stateLayer, propLayerData);
                             }
                             break;
 
                         case "delete":
-                            if (this.state.layers[propLayerData.id]) {
-                                const stateLayer = this.state.layers[propLayerData.id];
+                            if (this.layers[propLayerData.id]) {
+                                const stateLayer = this.layers[propLayerData.id];
                                 stateLayer.remove();
-                                this.state.layerControl.removeLayer(stateLayer);
+                                this.layerControl.removeLayer(stateLayer);
                                 this.removeLayerFromState(propLayerData.id);
+                                delete this.baseLayersById[propLayerData.id];
                             }
                             break;
 
                         case "add":
-                            if (!this.state.layers[propLayerData.id]) {
+                            if (!this.layers[propLayerData.id]) {
                                 this.createLayerGroup(propLayerData);
                             }
                             break; 
@@ -120,11 +119,13 @@ class CompositeMapLayers extends Component {
 
     removeAllLayers = () => {
         const map = this.props.map
-        this.setState({layers: {}});
+        this.layers = {};
         map.eachLayer(layer => {
-            this.state.layerControl.removeLayer(layer);
+            this.layerControl.removeLayer(layer);
             map.removeLayer(layer);
         })
+        
+        this.baseLayersById = {}; // Reset
     }
 
     // Assumes that coordinate data comes in on the format of (y,x) by default
@@ -168,7 +169,8 @@ class CompositeMapLayers extends Component {
 
     updateColorbarUponBaseMapChange = () => {
         this.props.map.on('baselayerchange', (e) => {
-            this.setFocusedImageLayer(Object.values(e.layer._layers)[0]);
+            const layer = Object.values(e.layer._layers)[0];
+            this.setFocusedImageLayer(layer);
         });
     }
 
@@ -177,18 +179,17 @@ class CompositeMapLayers extends Component {
     }
 
     removeLayerFromState = (id) => {
-        this.setState(prevState => {
-           const newLayers = Object.assign({}, prevState.layers);
-           delete newLayers[id];
-           return {
-               layers: newLayers
-           };
-        });
+        delete this.layers[id];
+
+        if(this.baseLayersById[id]) {
+            delete this.baseLayersById[id];
+        }
     }
 
-    createMultipleLayers() {
+    async createMultipleLayers() {
         this.addScaleLayer(this.props.map);
-        const layers = this.props.layers;
+        const layers = this.props.layers
+            .filter(layer => layer.action !== 'delete');
         for (const layer of layers) {
             this.createLayerGroup(layer);
         }
@@ -198,29 +199,29 @@ class CompositeMapLayers extends Component {
 
     createLayerGroup = (layer) => {
         const layerGroup = L.featureGroup();
+        this.layers[layer.id] = layerGroup;
 
-        // To make sure one does not lose data due to race conditions 
-        this.setState(prevState => ({
-            layers: Object.assign({}, prevState.layers, {[layer.id]: layerGroup})
-        }));
         // Makes sure that the correct information is displayed when first loading the map
-        const checked = layer.checked && layer.baseLayer && layer.data.length > 0 && layer.data[0].type == "image" ? true : false; 
+        const checkedAsImageLayer = layer.checked && layer.baseLayer && layer.data.length > 0 && layer.data[0].type === "image" ? true : false; 
         
+        const activeLayer = this.getActiveBaseLayer();
+
         // Adds object to a layer
         for (const item of layer.data) {
             const createdLayer = this.addItemToLayer(item, layerGroup);
-            if(checked) {
+            if(checkedAsImageLayer && !activeLayer) {
                 this.setFocusedImageLayer(createdLayer);
             }
         }
 
-        if(layer.checked) {
+        if(layer.checked && !activeLayer) {
             layerGroup.addTo(this.props.map);
         }
 
         // adds layers to the layerControl
         if(layer.baseLayer) {
-            this.state.layerControl.addBaseLayer(layerGroup, layer.name);
+            this.layerControl.addBaseLayer(layerGroup, layer.name);
+            this.baseLayersById[layer.id] = true;
 
             // Fits the map bounds if layer is a base layer
             // TODO: improve bounds optimization?
@@ -230,17 +231,15 @@ class CompositeMapLayers extends Component {
             }
 
         } else {
-            this.state.layerControl.addOverlay(layerGroup, layer.name);
+            this.layerControl.addOverlay(layerGroup, layer.name);
         }
     }
 
     addDrawLayerToMap = () => {
-        this.setState(prevState => ({
-            layers: Object.assign({}, prevState.layers, {drawLayer: this.context.drawLayer})
-        }));
+        this.layers.drawLayer = this.context.drawLayer;
 
         this.context.drawLayer.addTo(this.props.map);
-        this.state.layerControl.addOverlay(this.context.drawLayer, "Drawings");
+        this.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     }
 
     setFocusedImageLayer = (layer) => { 
@@ -278,6 +277,12 @@ class CompositeMapLayers extends Component {
         Object.values(itemsToDraw).forEach(item => {
             this.addItemToLayer(item, this.context.drawLayer, false);
         })     
+    }
+
+    getActiveBaseLayer() {
+        const baseLayerIds = Object.keys(this.baseLayersById || {});
+        const layers = baseLayerIds.map((id) => this.layers[id]).filter((l) => l);
+        return layers.find(layer => this.props.map.hasLayer(layer));
     }
 
     
