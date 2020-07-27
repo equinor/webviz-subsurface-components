@@ -114,7 +114,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
     		options.colorScale = Object.assign(this.options.colorScale, options.colorScale)
    	    }       	   
 
-        // console.log("new colorscale: ", options.colorScale)
         options = Util.setOptions(this, {
 			...this.options,
             ...options,
