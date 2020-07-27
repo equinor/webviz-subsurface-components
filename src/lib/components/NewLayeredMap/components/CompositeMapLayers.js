@@ -44,6 +44,7 @@ class CompositeMapLayers extends Component {
         const layerControl = L.control.layers([]).addTo(this.props.map);
         this.setState({layerControl: layerControl}, () => this.createMultipleLayers())
         this.updateColorbarUponBaseMapChange();
+        this.addScaleLayer(this.props.map);
     }
 
     updateLayer = (curLayer, newLayer) => {
@@ -72,7 +73,6 @@ class CompositeMapLayers extends Component {
     
     componentDidUpdate(prevProps) {
         this.reSyncDrawLayer();
-        console.log(this.props.updateMode)
         if (prevProps.layers !== this.props.layers) {
             if (this.props.updateMode == "replace") {
                 this.removeAllLayers();
@@ -120,11 +120,19 @@ class CompositeMapLayers extends Component {
 
     removeAllLayers = () => {
         const map = this.props.map
-        this.setState({layers: {}});
-        map.eachLayer(layer => {
+        this.context.drawLayerDelete("all");
+        Object.values(this.state.layers).forEach(layer => {
             this.state.layerControl.removeLayer(layer);
-            map.removeLayer(layer);
         })
+
+        // TODO: check if the last invisible layer is duplicated if we don't remove it
+        // For some reason there exists at least one layer which is not in state
+        map.eachLayer(layer => {
+            layer.remove();
+        });
+        this.setState({
+            layers: {}
+        });
     }
 
     // Assumes that coordinate data comes in on the format of (y,x) by default
@@ -187,13 +195,11 @@ class CompositeMapLayers extends Component {
     }
 
     createMultipleLayers() {
-        this.addScaleLayer(this.props.map);
         const layers = this.props.layers;
         for (const layer of layers) {
             this.createLayerGroup(layer);
         }
         this.addDrawLayerToMap();
-        
     }
 
     createLayerGroup = (layer) => {
@@ -306,3 +312,4 @@ CompositeMapLayers.propTypes = {
 };
 
 export default CompositeMapLayers;
+
