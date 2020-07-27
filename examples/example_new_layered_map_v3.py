@@ -133,6 +133,12 @@ if __name__ == "__main__":
             "drawPolyline": True,
             "position": "topright",   
         },
+        scaleY={
+            "scaleY": 1,
+            "minScaleY": 1,
+            "maxScaleY": 10,
+            "position": 'topleft',
+        },
         updateMode="",
     )
 
@@ -164,7 +170,7 @@ if __name__ == "__main__":
     callbackMaps = ['example-map', 'example-map-2']
 
     app = dash.Dash(__name__)
-    
+
     # Dash extension used to call multiple callbacks on the same output
     cg = CallbackGrouper()
 
@@ -199,7 +205,6 @@ if __name__ == "__main__":
                 html.Button('Toggle sync map 2', id='sync-map2-btn'),
                 html.Button('Add layer', id='layer-add-btn'),
                 html.Button('Toggle log', id='log-toggle-btn'),
-                html.Button('Toggle shader', id='shader-toggle-btn'),
                 html.Button('Toggle shader - replace', id='shader-toggle-replace-btn'),
                 html.Button('Toggle shadows', id='shading-submit-val', n_clicks=0),
                 dcc.Input(id='delete-layer-id', type='number', size = "2", placeholder="Delete layer by id"),
@@ -208,11 +213,9 @@ if __name__ == "__main__":
                     dcc.Checklist(
                         id = 'draw-tools-options',
                         options=[
-                            {'label': 'Circle', 'value': 'drawCircle'},
                             {'label': 'Polyline', 'value': 'drawPolyline'},
                             {'label': 'Polygon', 'value': 'drawPolygon'},
                             {'label': 'Marker', 'value': 'drawMarker'},
-                            {'label': 'Rectangle', 'value': 'drawRectanlge'},
                         ],
                         value=['drawMarker', 'drawPolygon', 'drawPolyline'],
                         labelStyle={'display': 'inline-block'}
@@ -257,7 +260,7 @@ if __name__ == "__main__":
 								id='min-max-slider',
 								min=min_value - 1000,
 								max=max_value + 1000,
-								step=0.5,
+								step=1,
 								value=[min_value, max_value],
                                 marks={
                                     str(min_value - 1000): str(min_value - 1000),
@@ -271,7 +274,7 @@ if __name__ == "__main__":
 							id='cut-slider',
 							min=min_value,
 							max=max_value,
-							step=0.5,
+							step=1,
 							value=[min_value, max_value],
                             marks={
                                 min_value: str(min_value),
@@ -302,6 +305,8 @@ if __name__ == "__main__":
             html.Pre(id="polygon2"),
         ]
     )
+
+
 #
 #                           SUPPORTIVE FUNCTIONS
 #
@@ -372,12 +377,19 @@ if __name__ == "__main__":
                 Input('draw-tools-options', 'value') 
             ]
         )
-
+        
         #TODO remove or implement componentDidUpdate in drawTools
         def update_draw_tools_options(value):
-            new_options = {"position": "topleft"}
+            new_options = {
+                "drawMarker": False,
+                "drawPolygon": False,
+                "drawPolyline": False,
+                "drawRectangle": False,
+                "drawCircle":False,
+            }
             for draw_option in value:
                 new_options[draw_option] = True
+
             return new_options
 
         #Updates elevation and pixel scales based on their corresponding sliders
@@ -389,28 +401,26 @@ if __name__ == "__main__":
             ],
             [
                 State('selected-layer', 'value'),
-                State('shading-submit-val', 'n_clicks'),
+                State('shading-submit-val', 'n_clicks')
             ]
         )
 
         def update_shadow_scales(elevation_scale, pixel_scale, layer_id, n_clicks):
-            global layers
-
             layer_type = get_layer_type(layer_id, layers)
 
-            state['elevation_scale'] = elevation_scale if n_clicks % 2 == 1 else None
-            state['pixel_scale'] = pixel_scale if n_clicks % 2 == 1 else None
-
+            state['elevation_scale'] = elevation_scale if n_clicks % 2 else None
+            state['pixel_scale'] = pixel_scale if n_clicks % 2 else None
+ 
             update_layer = [
                 {
-                    "id": int(layer_id),
+                    "id": int(layer_id), 
                     "action": "update",
                     "data": [
                         {
                             "type": layer_type,
                             "shader": {
-                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
-                                "shadows": True if n_clicks % 2 == 1 else False,
+                                "type": 'hillshading' if n_clicks % 2 else None,
+                                "shadows": True if n_clicks % 2 else False,
                                 "elevationScale": state['elevation_scale'],
                                 "pixelScale": state['pixel_scale']
                             },
@@ -418,13 +428,12 @@ if __name__ == "__main__":
                     ]
                 }   
             ]
-            layers = change_layer(layers, update_layer[0])
-            return layers
+            return update_layer
 
         @cg.callback(
             Output(map, 'layers'),
             [
-                Input('shading-submit-val', 'n_clicks')
+                Input('shading-submit-val', 'n_clicks'),
             ],
             [
                 State('elevation-scale', 'value'),
@@ -435,8 +444,6 @@ if __name__ == "__main__":
         )
 
         def update_hillshading_with_shadows(n_clicks, elevation_scale, pixel_scale, layer_id): 
-            global layers
-
             layer_type = get_layer_type(layer_id, layers)
 
             state['elevation_scale'] = elevation_scale
@@ -449,8 +456,8 @@ if __name__ == "__main__":
                         {
                             "type": layer_type,
                             "shader": {
-                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
-                                "shadows": True if n_clicks % 2 == 1 else False,
+                                "type": 'hillshading' if n_clicks % 2 else None,
+                                "shadows": True if n_clicks % 2 else False,
                                 "elevationScale": state['elevation_scale'],
                                 "pixelScale": state['pixel_scale']
                             },
@@ -458,8 +465,7 @@ if __name__ == "__main__":
                     ]
                 }   
             ]
-            layers = change_layer(layers, update_layer[0])
-            return layers
+            return update_layer
 
         @cg.callback(
             Output(map, 'layers'),
@@ -510,8 +516,6 @@ if __name__ == "__main__":
         )
 
         def update_colorcsale(colorScale, layer_id):
-            global layers
-
             layer_type = get_layer_type(layer_id, layers)
             update_layer = [
                 {
@@ -527,8 +531,7 @@ if __name__ == "__main__":
                     ]
                 }
             ] 
-            layers = change_layer(layers, update_layer[0])
-            return layers
+            return update_layer
 
 
         @cg.callback(
@@ -539,16 +542,13 @@ if __name__ == "__main__":
         )
 
         def delete_layer(layer_id):
-            global layers
             update_layer = [
                 {
                     "id": int(layer_id),
                     "action": "delete",
                 }
             ]
-
-            layers = change_layer(layers, update_layer[0])
-            return layers
+            return update_layer
 
 
         @cg.callback(
@@ -560,8 +560,6 @@ if __name__ == "__main__":
         )
 
         def update_global_min_max(min_max_value, layer_id):
-            global layers
-
             layer_type = get_layer_type(layer_id, layers)
 
             update_layer = [
@@ -578,8 +576,7 @@ if __name__ == "__main__":
                 }
             ]
 
-            layers = change_layer(layers, update_layer[0])
-            return layers
+            return update_layer
 
         #Updates the text for min/max slider
         @cg.callback(
@@ -594,16 +591,48 @@ if __name__ == "__main__":
             return 'Global Min / Max"{}"'.format(value)
 
         @cg.callback(
+            Output('cut-slider', 'min'),
+            [
+                Input('min-max-slider', 'value')  
+            ]
+        )
+
+        def update_min_cutoffpoints_in_dash(value):
+            return int(value[0]) 
+
+        @cg.callback(
+            Output('cut-slider', 'max'),
+            [
+                Input('min-max-slider', 'value')  
+            ]
+        )
+
+        def update_max_cutoffpoints_in_dash(value):
+            return int(value[1])
+
+        @cg.callback(
+            Output('cut-slider', 'marks'),
+            [
+                Input('min-max-slider', 'value')
+            ]
+        )
+        
+        def update_cutoff_marks(value):
+            print("new cutoff marks: ", value) 
+            return  {
+                round(value[0]) : str(round(value[0])), 
+                round(value[1]) : str(round(value[1])) 
+            }
+
+        @cg.callback(
             Output(map, 'layers'),
             [
-                Input('cut-slider', 'value')
-            ],
+                Input('cut-slider', 'value') 
+            ], 
                 State('selected-layer', 'value')
         )
 
         def update_cut_points(value, layer_id):
-            global layers
-
             layer_type = get_layer_type(layer_id, layers)
 
             state['cut_point_min'] = value[0]
@@ -624,8 +653,7 @@ if __name__ == "__main__":
                 }
             ]
 
-            layers = change_layer(layers, update_layer[0])
-            return layers
+            return update_layer
 
         #Updates the text for cut-off slider
         @cg.callback(
@@ -670,8 +698,6 @@ if __name__ == "__main__":
         )
 
         def toggle_log(n_clicks, layer_id):
-            global layers
-
             layer_type = get_layer_type(layer_id, layers)
 
             log_value = "linear" if n_clicks % 2 == 0 else "log"
@@ -689,22 +715,18 @@ if __name__ == "__main__":
                     ]
                 }
             ]
-            state['scale_type'] = log_value
-            layers = change_layer(layers, update_layer[0])
-            return layers
+            return update_layer
 
         @cg.callback(
             Output(map, 'layers'),
             [
-                Input('shader-toggle-btn', 'n_clicks'),
+                Input(map, 'switch'),
             ],
                 State('selected-layer', 'value')
 
         )
 
-        def toggle_shading(n_clicks, layer_id):
-            global layers
-
+        def toggle_shading(switch, layer_id):
             layer_type = get_layer_type(layer_id, layers)
 
             update_layer = [
@@ -715,17 +737,13 @@ if __name__ == "__main__":
                         {
                             "type": layer_type,
                             "shader": {
-                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
-                                # "shadows": False,
-                                # "elevationScale": 1.0,
-                                # "pixelScale": 11000
+                                "type": 'hillshading' if switch['value']else None,
                             },
                         }
                     ]
                 }   
             ]
-            layers = change_layer(layers, update_layer[0])
-            return layers
+            return update_layer
         
         @cg.callback(
             Output(map, 'layers'),
@@ -737,8 +755,6 @@ if __name__ == "__main__":
         )
 
         def toggle_shading_with_replace(n_clicks, layer_id):
-            global layers
-
             layer_type = get_layer_type(layer_id, layers)
 
             update_layer = [
@@ -773,8 +789,7 @@ if __name__ == "__main__":
                     ]
                 }
             ]
-            layers = change_layer(layers, update_layer[0])
-            return layers
+            return update_layer 
 
 #
 #                               OTHER CALLBACKS

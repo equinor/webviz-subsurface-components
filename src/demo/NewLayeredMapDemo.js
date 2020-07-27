@@ -75,9 +75,9 @@ const NewLayeredMapDemo = () => {
                         position: "topright",
                         
                     }}
-                  /*   mouseCoords = {{
+                     mouseCoords = {{
                         position: "bottomright",
-                    }} */
+                    }} 
                     switch={{
                         value: switchValue,
                         label: 'Hillshading',
