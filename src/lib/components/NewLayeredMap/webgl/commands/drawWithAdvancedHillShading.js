@@ -303,5 +303,5 @@ function calcN(width, height) {
         return 8;
     }
 
-    return 1; // resoltion > 900x900
+    return 1; // resolution >= 1792x1280
 }
