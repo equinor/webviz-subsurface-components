@@ -15,59 +15,12 @@ const DEFAULT_COLORMAP = {
     "cutPointMax": 3513
 };
 
-
-const testLayers = [
-    {
-        id: 10,
-        name: "TEST1",
-        baseLayer: true,
-        checked: true,
-        action: "add",
-        data: [
-            {
-                type: "image",
-                url: exampleData.layers[1].data[0].url,
-                colorScale: {
-                    colors: ["#2A4365", "#2C5282", "#2B6CB0", "#3182CE", "#4299E1", "#63B3ED", "#90CDF4", "#BEE3F8", "#EBF8FF"],
-                },
-                bounds: exampleData.layers[1].data[0].bounds,
-                shader: {
-                    setBlackToAlpha: true,
-                },
-                minvalue: 20,
-                maxvalue: 120,
-            }
-        ]
-    },
-    {
-        id: 11,
-        name: "TEST2",
-        baseLayer: true,
-        checked: true,
-        action: "add",
-        data: [
-            {
-                type: "image",
-                url: exampleData.layers[1].data[0].url,
-                colorScale: {
-                    colors: ["#234E52", "#285E61", "#2C7A7B", "#319795", "#38B2AC", "#4FD1C5", "#81E6D9", "#B2F5EA", "#E6FFFA"],
-                },
-                bounds: exampleData.layers[1].data[0].bounds,
-                shader: {
-                    setBlackToAlpha: true,
-                },
-                minvalue: 500,
-                maxvalue: 800,
-            }
-        ]
-    }
-]
-
 const NewLayeredMapDemo = () => {
 
 
     const [switchValue, setSwitchValue] = useState(true);
-    const [layers, setLayers] = useState(exampleData.layers.slice(1, 3).reverse());
+    const [layers, setLayers] = useState(exampleData.layers.slice(1, 3));
+
 
     const onChange = (changes) => {
         console.log("Changes :D", changes);
@@ -94,22 +47,12 @@ const NewLayeredMapDemo = () => {
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
-                    // syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
-                    // syncDrawings={true}
-                    updateMode={"replace"}
-                    // layers={exampleData.layers}
+                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
+                    syncDrawings={true}
                     layers={layers}
                     center={[0, 0]}
-                    // center={[432205, 6475078], [432205, 6475078]} 
-                    // defaultBounds={[[432205, 6475078], [437720, 6481113]] [[432205, 6475078], [437720, 6481113]]}
                     crs="simple"
-                    //crs="earth"
-                    //minZoom={-5}
-                    //zoom = {-5} 
-                    // setProps={e => console.log(e)}
-
                     minZoom={-5}
-                    // zoom = {-5}
                     colorBar={{
                         position: 'bottomleft'
                     }}
@@ -137,28 +80,18 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            {/* <div >
+            <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
                     syncDrawings={true}
-                    // layers={exampleData.layers}
                     layers={layers}
                     colorBar={{
                         position: 'bottomleft'
                     }}
-                    // center={[432205, 6475078], [432205, 6475078]}
-                    // defaultBounds={[[432205, 6475078], [437720, 6481113]]}
-                    // crs="earth"
                     crs="simple"
                     minZoom={-5}
                     zoom = {-5} 
-                    // scaleY={{
-                    //     scaleY: 1,
-                    //     minScaleY: 1,
-                    //     maxScaleY: 10,
-                    //     position: 'topleft',
-                    // }}
                     mouseCoords = {{
                         position: "bottomleft",
                     }}
@@ -176,7 +109,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div>  */}
+            </div> 
         </ div>
         
     )
