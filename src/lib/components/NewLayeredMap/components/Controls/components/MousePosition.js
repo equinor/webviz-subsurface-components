@@ -163,7 +163,7 @@ const MousePosition = (props) => {
         const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally 
         const z = mapZValue(red);
 
-        // Used to diasble map.on("click") events when pressed on the controls
+        // Used to disable map.on("click") events when pressed on the controls
         const controlsList = document.getElementsByClassName("leaflet-custom-control leaflet-control")
         const forbiddenCoordinates = [];
 
@@ -174,8 +174,8 @@ const MousePosition = (props) => {
             const forbiddenXValueRange = [mapXCoordinateToCanvas(controlBounds.x, controlBounds, canvas), mapXCoordinateToCanvas((controlBounds.x + controlBounds.width), controlBounds, canvas)]
 
             forbiddenCoordinates.push([forbiddenYValueRange, forbiddenXValueRange])
-
         }
+
         if(props.setProps && stateRef.current.mode !== "editing" && !isForbidden(event.originalEvent.clientX, event.originalEvent.clientY, forbiddenCoordinates)) {
             props.setProps({click_position: [x, y, z]});
         }
