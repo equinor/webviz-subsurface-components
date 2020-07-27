@@ -28,7 +28,6 @@ const ColorBar = (props) => {
         if(!focusedImageLayer) {
             return [null, null, null];
         }
-<<<<<<< HEAD
 =======
 
 >>>>>>> interns-dev
