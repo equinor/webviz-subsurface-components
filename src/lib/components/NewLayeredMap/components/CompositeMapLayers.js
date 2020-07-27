@@ -8,8 +8,7 @@ import '../layers/L.imageWebGLOverlay';
 import '../layers/L.tileWebGLLayer';
 
 // Utils
-import { 
-    getShapeType, 
+import {
     makePolyline,
     makePolygon,
     makeCircle,
@@ -45,15 +44,24 @@ class CompositeMapLayers extends Component {
         const layerControl = L.control.layers([]).addTo(this.props.map);
         this.setState({layerControl: layerControl}, () => this.createMultipleLayers())
         this.updateColorbarUponBaseMapChange();
+        this.addScaleLayer(this.props.map);
     }
 
     updateLayer = (curLayer, newLayer) => {
+        const focusedImageLayer = this.context.focusedImageLayer || {};
+
         switch(newLayer.data[0].type) {  
             case 'image':
-                curLayer.getLayers()[0].updateOptions({
+                const imageLayer = curLayer.getLayers()[0];
+                imageLayer.updateOptions({
                     ...newLayer.data[0],
                 });
+
+                if(focusedImageLayer._leaflet_id === imageLayer._leaflet_id) {
+                    this.setFocusedImageLayer(curLayer.getLayers()[0]);
+                }
                 break;
+
 
             case 'tile':
                 curLayer.getLayers()[0].updateOptions({
@@ -64,37 +72,40 @@ class CompositeMapLayers extends Component {
     }
     
     componentDidUpdate(prevProps) {
-        if (this.props.syncedMaps) {
-            this.reSyncDrawLayer();
-        }
+        this.reSyncDrawLayer();
         if (prevProps.layers !== this.props.layers) {
-            const layers = (this.props.layers || []).filter(layer => layer.id);
-            for (const propLayerData of layers) {
-                switch(propLayerData.action) {
-                    case "update":
-                        const stateLayer = this.state.layers[propLayerData.id]
-                        if (stateLayer) {
-                            this.updateLayer(stateLayer, propLayerData);
-                        }
-                        break;
+            if (this.props.updateMode == "replace") {
+                this.removeAllLayers();
+                this.createMultipleLayers();
+            } else {
+                const layers = (this.props.layers || []).filter(layer => layer.id);
+                for (const propLayerData of layers) {
+                    switch(propLayerData.action) {
+                        case "update":
+                            const stateLayer = this.state.layers[propLayerData.id]
+                            if (stateLayer) {
+                                this.updateLayer(stateLayer, propLayerData);
+                            }
+                            break;
 
-                    case "delete":
-                        if (this.state.layers[propLayerData.id]) {
-                            const stateLayer = this.state.layers[propLayerData.id];
-                            stateLayer.remove();
-                            this.state.layerControl.removeLayer(stateLayer);
-                            this.removeLayerFromState(propLayerData.id);
-                        }
-                        break;
+                        case "delete":
+                            if (this.state.layers[propLayerData.id]) {
+                                const stateLayer = this.state.layers[propLayerData.id];
+                                stateLayer.remove();
+                                this.state.layerControl.removeLayer(stateLayer);
+                                this.removeLayerFromState(propLayerData.id);
+                            }
+                            break;
 
-                    case "add":
-                        if (!this.state.layers[propLayerData.id]) {
-                            this.createLayerGroup(propLayerData);
-                        }
-                        break; 
+                        case "add":
+                            if (!this.state.layers[propLayerData.id]) {
+                                this.createLayerGroup(propLayerData);
+                            }
+                            break; 
 
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -107,49 +118,60 @@ class CompositeMapLayers extends Component {
         });
     }
 
+    removeAllLayers = () => {
+        const map = this.props.map
+        this.context.drawLayerDelete("all");
+        Object.values(this.state.layers).forEach(layer => {
+            this.state.layerControl.removeLayer(layer);
+        })
+
+        // TODO: check if the last invisible layer is duplicated if we don't remove it
+        // For some reason there exists at least one layer which is not in state
+        map.eachLayer(layer => {
+            layer.remove();
+        });
+        this.setState({
+            layers: {}
+        });
+    }
+
     // Assumes that coordinate data comes in on the format of (y,x) by default
     addItemToLayer(item, layerGroup, swapXY = true) {
+        let newItem = null;
         switch(item.type) {
             case "polyline":
-                layerGroup.addLayer(makePolyline(item, swapXY, this.props.lineCoords));
+                newItem = makePolyline(item, swapXY, this.props.lineCoords);
                 break;
 
             case "polygon":
-                layerGroup.addLayer(makePolygon(item, swapXY, this.props.polygonCoords));
+                newItem = makePolygon(item, swapXY, this.props.polygonCoords);
                 break;
 
             case "circle":
-                layerGroup.addLayer(makeCircle(item, swapXY));
+                newItem = makeCircle(item, swapXY);
                 break;
             
             case "circleMarker":
-                layerGroup.addLayer(makeCircleMarker(item, swapXY));
+                newItem = makeCircleMarker(item, swapXY);
                 break;
             
             case "marker":
-                layerGroup.addLayer(makeMarker(item, swapXY));
+                newItem = makeMarker(item, swapXY);
                 break;
                 
             case "image":
                 const imageLayer = addImage(item, swapXY);
-                layerGroup.addLayer(imageLayer);
-                
-                const checked = item.checked == true && item.baseLayer == true ? true : false; // TODO: item.checked = undefined now
-                if (checked) {
-                    this.setFocusedImageLayer(imageLayer);
-                }
-
-                imageLayer.onLayerChanged && imageLayer.onLayerChanged((imgLayer) => {
-                    this.setFocusedImageLayer(imgLayer);
-                });
+                newItem = imageLayer;
                 break;
             case "tile": 
-                layerGroup.addLayer(addTile(item, swapXY));
+                newItem = addTile(item, swapXY);
                 break;
 
             default:
                 break; // add error message here?
-          }
+        }
+        layerGroup.addLayer(newItem);
+        return newItem;
     }
 
     updateColorbarUponBaseMapChange = () => {
@@ -173,13 +195,11 @@ class CompositeMapLayers extends Component {
     }
 
     createMultipleLayers() {
-        this.addScaleLayer(this.props.map);
         const layers = this.props.layers;
         for (const layer of layers) {
             this.createLayerGroup(layer);
         }
         this.addDrawLayerToMap();
-        
     }
 
     createLayerGroup = (layer) => {
@@ -189,10 +209,15 @@ class CompositeMapLayers extends Component {
         this.setState(prevState => ({
             layers: Object.assign({}, prevState.layers, {[layer.id]: layerGroup})
         }));
-
-        //adds object to a layer
+        // Makes sure that the correct information is displayed when first loading the map
+        const checked = layer.checked && layer.baseLayer && layer.data.length > 0 && layer.data[0].type == "image" ? true : false; 
+        
+        // Adds object to a layer
         for (const item of layer.data) {
-            this.addItemToLayer(item, layerGroup);
+            const createdLayer = this.addItemToLayer(item, layerGroup);
+            if(checked) {
+                this.setFocusedImageLayer(createdLayer);
+            }
         }
 
         if(layer.checked) {
@@ -287,3 +312,4 @@ CompositeMapLayers.propTypes = {
 };
 
 export default CompositeMapLayers;
+

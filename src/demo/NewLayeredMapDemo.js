@@ -17,31 +17,35 @@ const DEFAULT_COLORMAP = {
 
 const NewLayeredMapDemo = () => {
 
+
     const [switchValue, setSwitchValue] = useState(true);
 
-    const layers = exampleData.layers.slice(1)
+    const layers = exampleData.layers.slice(1,3)
 
     const onChange = (changes) => {
         // console.log("Changes :D", changes);
         if(changes.switch) {
             setSwitchValue(changes.switch.value);
             if (changes.switch.value === true) {
-                layers[0].data[0].shader.type = 'hillshading';
-                layers[0].data[0].colorScale = DEFAULT_COLORMAP;
+                // layers[0].data[0].shader.type = 'hillshading';
+                // layers[0].data[0].colorScale = DEFAULT_COLORMAP;
+                // console.log("layers[0]", layers[0])
+                layers[0].data[0].colorScale = {"colors": ["#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953", "#ed7953"] };
             } else {
-                layers[0].data[0].shader.type = null;
+                layers[0].data[0].colorScale = {"colors": ["#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921", "#f0f921"] };
                // layers[0].data[0].colorScale = null;
             }
         }
     }
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", height: '90vh'}}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: '90vh'}}>
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
-                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
-                    syncDrawings={true}
+                    // syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
+                    // syncDrawings={true}
+                    updateMode={"replace"}
                     // layers={exampleData.layers}
                     layers={layers}
                     center={[0, 0]}
@@ -71,9 +75,9 @@ const NewLayeredMapDemo = () => {
                         position: "topright",
                         
                     }}
-                  /*   mouseCoords = {{
+                     mouseCoords = {{
                         position: "bottomright",
-                    }} */
+                    }} 
                     switch={{
                         value: switchValue,
                         label: 'Hillshading',
@@ -89,6 +93,9 @@ const NewLayeredMapDemo = () => {
                     syncDrawings={true}
                     // layers={exampleData.layers}
                     layers={layers}
+                    colorBar={{
+                        position: 'bottomleft'
+                    }}
                     // center={[432205, 6475078], [432205, 6475078]}
                     // defaultBounds={[[432205, 6475078], [437720, 6481113]]}
                     // crs="earth"
@@ -118,7 +125,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div> */}
+            </div>  */}
         </ div>
         
     )

@@ -99,7 +99,6 @@ L.ImageWebGLOverlay = L.Layer.extend({
 		return this;
     },
     
-
     setBounds: function (bounds) {
 		this._bounds = latLngBounds(bounds);
 
@@ -115,10 +114,14 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
     updateOptions: function(options) {
         const promisesToWaitFor = [];
+	    
+    	if(options.colorScale && options.colorScale instanceof Object && this.options.colorScale instanceof Object) {
+    		options.colorScale = Object.assign(this.options.colorScale, options.colorScale)
+   	    }       	   
 
         options = Util.setOptions(this, {
 			...this.options,
-			...options,
+            ...options,
         });
         
         // Update the URL

@@ -25,8 +25,12 @@ const ColorBar = (props) => {
     }, [])
 
     const focusedDependencyArray = () => {
-        const options = (focusedImageLayer || {}).options || {};
-        return [options.colorScale, options.minvalue, options.maxvalue];
+        if(!focusedImageLayer) {
+            return [null, null, null];
+        }
+
+        const options = focusedImageLayer.options;
+        return [JSON.stringify(options.colorScale), options.minvalue, options.maxvalue];
     }
 
     useEffect(() => {
@@ -34,14 +38,18 @@ const ColorBar = (props) => {
     }, focusedDependencyArray())
 
     const createNewColorMap = () => {
+        
         if(!focusedImageLayer) {
             return;
         }
-
+        
         const options = (focusedImageLayer.options || {})
         const colorScale = options.colorScale;
         if(colorScale) {
             setColorMap(buildColormap(colorScale))
+            setMinMaxValue([options.minvalue, options.maxvalue])
+        } else if (!colorScale && options.url){
+            setColorMap(["#FFFFFF"]);
             setMinMaxValue([options.minvalue, options.maxvalue])
         } else {
             setColorMap(null);
@@ -77,6 +85,7 @@ const ColorBar = (props) => {
         <div className="leaflet-colorbar">
             <div className="leaflet-colorbar-image">
                 <img
+                    key={colorMap}
                     src={colorMap}
                     style={{ width: "100%", height: "10px" }}
                 />

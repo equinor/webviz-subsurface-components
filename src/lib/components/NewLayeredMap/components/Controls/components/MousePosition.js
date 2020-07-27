@@ -24,10 +24,11 @@ const MousePosition = (props) => {
         subscribeToMapClick();
     }, [])
 
-
     const focusedDependencyArray = () => {
         const options = (focusedImageLayer || {}).options || {};
-        return [options.minvalue, options.maxvalue];
+        const newURL = focusedImageLayer? focusedImageLayer.getUrl() : null
+        const newCanvas = focusedImageLayer? focusedImageLayer.getCanvas() : null
+        return [newCanvas, newURL, options.minvalue, options.maxvalue];
     }
 
     useEffect(() => {
@@ -87,7 +88,7 @@ const MousePosition = (props) => {
         const onScreenCanvas = focusedImageLayer.getCanvas ? focusedImageLayer.getCanvas() : null;
         const minvalue = (focusedImageLayer.options || {}).minvalue;
         const maxvalue = (focusedImageLayer.options || {}).maxvalue;
-        if(!url || !onScreenCanvas || !minvalue || !maxvalue) {
+        if(!url || !onScreenCanvas || !(typeof minvalue === "number") || !maxvalue) {
             return;
         }
 
@@ -121,6 +122,10 @@ const MousePosition = (props) => {
         const screenX = ((event.originalEvent.clientX - clientRect.left) / clientRect.width) * canvas.width;
         const screenY = ((event.originalEvent.clientY - clientRect.top) / clientRect.height) * canvas.height;
 
+        if(screenX === Infinity || screenY === Infinity) {
+            return;
+        }
+
         const x = Math.round(event.latlng.lng);
         const y = Math.round(event.latlng.lat);
         const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally 
@@ -136,9 +141,11 @@ const MousePosition = (props) => {
         if(!canvas) {
             return;
         }
+
         const clientRect = onScreenCanvas.getBoundingClientRect();
         const screenX = ((event.originalEvent.clientX - clientRect.left) / clientRect.width) * canvas.width;
         const screenY = ((event.originalEvent.clientY - clientRect.top) / clientRect.height) * canvas.height;
+
 
         if(screenX === Infinity || screenY === Infinity) {
             return;

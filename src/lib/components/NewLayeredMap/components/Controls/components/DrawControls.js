@@ -27,12 +27,24 @@ class DrawControls extends Component {
 
     constructor(props) {
         super(props);
-        this.addToolbar = this.addToolbar.bind(this);
+        this.state = {
+            drawControl : null
+        }
     }
 
     componentDidMount() {
         const { drawPolygon, drawMarker, drawPolyline } = this.props;
-        this.addToolbar(this.props.map);
+        this.createDrawControl();
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.drawPolygon !== prevProps.drawPolygon
+           || this.props.drawPolyline !== prevProps.drawPolyline
+           || this.props.drawMarker !== prevProps.drawMarker
+        ) {
+            this.props.map.removeControl(this.state.drawControl);
+            this.createDrawControl();
+        }
     }
     
     removeLayers(layerType, featureGroup) {
@@ -40,29 +52,39 @@ class DrawControls extends Component {
         const layers = layerContainer._layers;
         const layer_ids = Object.keys(layers);
         for (let i = 0; i < layer_ids.length - 1; i++) {
-            const layer = layers[layer_ids[i]];
+            const layer = layers[layer_ids[i]]
             if (getShapeType(layer) === layerType) {
                 layerContainer.removeLayer(layer._leaflet_id);
             }
         }
     }
 
-    addToolbar = (map) => {
+    createDrawControl = () => {
         const drawControl = new L.Control.Draw({
             position: this.props.position,
             edit : {
                 featureGroup: this.context.drawLayer
             },
             draw: {
-                rectangle: false,
-                circle: false,
                 circlemarker: false,
+                rectangle: this.props.drawRectangle,
+                circle: this.props.drawCircle,
                 polygon: this.props.drawPolygon,
                 marker: this.props.drawMarker,
                 polyline: this.props.drawPolyline,
+
             }
 
         });
+        this.setState({drawControl: drawControl}, () => {
+            this.addCircleMarker(this.props.map)
+            this.addToolbar(this.props.map)
+        })
+
+
+    }
+
+    addToolbar = (map) => {
 
         map.on(L.Draw.Event.CREATED, (e) => {
             const type = e.layerType;
@@ -78,7 +100,7 @@ class DrawControls extends Component {
                     });
                     newLayer["positions"] = coords;
                     this.props.lineCoords(coords);
-                    this.removeLayers("polyline", drawControl);
+                    this.removeLayers("polyline", this.state.drawControl);
                     break;
 
                 case "polygon":
@@ -87,13 +109,13 @@ class DrawControls extends Component {
                     });
                     newLayer["positions"] = coords;
                     this.props.polygonCoords(coords); 
-                    this.removeLayers("polygon", drawControl);
+                    this.removeLayers("polygon", this.state.drawControl);
                     break;
 
                 case "marker":
                     newLayer["position"] = [layer._latlng.lat, layer._latlng.lng];
                     this.props.markerCoords([layer._latlng.lat, layer._latlng.lng]);
-                    this.removeLayers("marker", drawControl);
+                    this.removeLayers("marker", this.state.drawControl);
                     break;
             }
             const d = new Date();
@@ -157,6 +179,11 @@ class DrawControls extends Component {
             this.context.setMode("editing");
         })
 
+        map.addControl(this.state.drawControl);
+
+    }
+
+    addCircleMarker = (map) => {
         map.on('mouseup', (e) => {
             const d = new Date();
             const circleMarker = {
@@ -168,7 +195,7 @@ class DrawControls extends Component {
             }
             if (this.context.mode !== "editing") {
                 this.context.drawLayer.addLayer(L.circleMarker(circleMarker.center, circleMarker));
-                this.removeLayers("circleMarker", drawControl);
+                this.removeLayers("circleMarker", this.state.drawControl);
                 if (props.syncDrawings) {
                     this.context.syncedDrawLayerDelete(["circleMarker"]);
                     this.context.syncedDrawLayerAdd([circleMarker]);
@@ -178,8 +205,6 @@ class DrawControls extends Component {
                 }
             }
         })
-
-        map.addControl(drawControl);
 
     }
 
@@ -194,6 +219,8 @@ DrawControls.defaultProps = {
     drawMarker: true,
     drawPolygon: true,
     drawPolyline: true,
+    drawCircle: false,
+    drawRectanlge: false,
     position: "topright",
     
 };
