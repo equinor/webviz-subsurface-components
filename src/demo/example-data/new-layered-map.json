@@ -26,8 +26,6 @@
         {
             "name": "A seismic horizon without colormap",
             "id": 2, 
-<<<<<<< HEAD
-=======
             "baseLayer": true,
             "checked": false,
             "action": "update",
@@ -50,7 +48,6 @@
         {
             "name": "A seismic horizon with colormap",
             "id": 3, 
->>>>>>> interns-dev
             "baseLayer": true,
             "checked": true,
             "action": null,
