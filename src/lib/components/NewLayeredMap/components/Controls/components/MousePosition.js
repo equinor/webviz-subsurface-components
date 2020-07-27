@@ -26,8 +26,8 @@ const MousePosition = (props) => {
 
     const focusedDependencyArray = () => {
         const options = (focusedImageLayer || {}).options || {};
-        const newURL = focusedImageLayer? focusedImageLayer.getUrl() : null
-        const newCanvas = focusedImageLayer? focusedImageLayer.getCanvas() : null
+        const newURL = focusedImageLayer && focusedImageLayer.getUrl ? focusedImageLayer.getUrl() : null
+        const newCanvas = focusedImageLayer && focusedImageLayer.getCanvas ? focusedImageLayer.getCanvas() : null
         return [newCanvas, newURL, options.minvalue, options.maxvalue];
     }
 

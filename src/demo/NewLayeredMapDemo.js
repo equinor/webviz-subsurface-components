@@ -29,13 +29,17 @@ const NewLayeredMapDemo = () => {
             setSwitchValue(changes.switch.value);
             newLayers[0].action = "update";
             if (changes.switch.value === true) {
-                newLayers[0].data[0].shader.type = 'hillshading';
+                // newLayers[0].data[0].shader.type = 'hillshading';
                 newLayers[0].data[0].shader.shadows = true;
                 newLayers[0].data[0].colorScale = DEFAULT_COLORMAP;
+                newLayers[0].data[0].colorScale.cutPointMin = 3400;
+                newLayers[0].data[0].colorScale.cutPointMax = 3500;
             } else {
                 newLayers[0].data[0].shader.type = null;
                 newLayers[0].data[0].colorScale = {
-                    "colors": ["#000000", "#ffffff"]
+                   
+                    "cutPointMin": 3400,
+                    "cutPointMax": 3500,
                 };
             }
         }

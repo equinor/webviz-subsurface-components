@@ -186,10 +186,12 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
 	_draw: async function(tile, coords, done) {
 		const drawOptions = this._getDrawOptions();
+		console.log("DrawOptions:", drawOptions.colorScale);
 	
 		drawFunc(this._glContext, this._canvas, this.getTileUrl(coords), this._colormapUrl, drawOptions)
 		.then(() => {
 			const ctx = tile.getContext('2d');
+			ctx.clearRect(0, 0, tile.width, tile.height);
 			ctx.drawImage(this._canvas, 0, 0);
 			
 			if(done) {
