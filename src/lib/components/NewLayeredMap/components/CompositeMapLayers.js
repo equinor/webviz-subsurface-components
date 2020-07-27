@@ -41,7 +41,7 @@ class CompositeMapLayers extends Component {
         const layerControl = L.control.layers([]).addTo(this.props.map);
         this.layerControl = layerControl;
         this.createMultipleLayers();
-        this.updateColorbarUponBaseMapChange();
+        this.updateUponBaseMapChange();
         this.addScaleLayer(this.props.map);
     }
 
@@ -173,10 +173,13 @@ class CompositeMapLayers extends Component {
         return newItem;
     }
 
-    updateColorbarUponBaseMapChange = () => {
+    updateUponBaseMapChange = () => {
         this.props.map.on('baselayerchange', (e) => {
             const layer = Object.values(e.layer._layers)[0];
             this.setFocusedImageLayer(layer);
+
+            const bounds = layer.getBounds ? layer.getBounds() : DEFAULT_BOUNDS;
+            this.props.map.fitBounds(bounds);
         });
     }
 
@@ -202,6 +205,9 @@ class CompositeMapLayers extends Component {
     }
 
     createLayerGroup = (layer) => {
+        if (this.layers[layer.id]) {
+            return;
+        }
         const layerGroup = L.featureGroup();
         this.layers[layer.id] = layerGroup;
 
@@ -229,7 +235,7 @@ class CompositeMapLayers extends Component {
 
             // Fits the map bounds if layer is a base layer
             // TODO: improve bounds optimization?
-            if(layer.data && layer.data.length > 0) {
+            if(layer.data && layer.data.length > 0 && !activeLayer) {
                 const bounds = layer.data[0].bounds ? layer.data[0].bounds.map(xy => yx(xy)) : DEFAULT_BOUNDS;
                 this.props.map.fitBounds(bounds);
             }
