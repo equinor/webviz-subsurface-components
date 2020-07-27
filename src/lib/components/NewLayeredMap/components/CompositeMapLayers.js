@@ -42,6 +42,7 @@ class CompositeMapLayers extends Component {
         this.layerControl = layerControl;
         this.createMultipleLayers();
         this.updateColorbarUponBaseMapChange();
+        this.addScaleLayer(this.props.map);
     }
 
     updateLayer = (curLayer, newLayer) => {
@@ -70,7 +71,7 @@ class CompositeMapLayers extends Component {
     
     componentDidUpdate(prevProps) {
         this.reSyncDrawLayer();
-        
+
         if (prevProps.layers !== this.props.layers) {
             if (this.props.updateMode === "replace") {
                 this.removeAllLayers();
@@ -119,12 +120,18 @@ class CompositeMapLayers extends Component {
 
     removeAllLayers = () => {
         const map = this.props.map
-        this.layers = {};
-        map.eachLayer(layer => {
+        this.context.drawLayerDelete("all");
+        Object.values(this.layers).forEach(layer => {
             this.layerControl.removeLayer(layer);
-            map.removeLayer(layer);
         })
-        
+
+        // TODO: check if the last invisible layer is duplicated if we don't remove it
+        // For some reason there exists at least one layer which is not in state
+        map.eachLayer(layer => {
+            layer.remove();
+        });
+        this.layers = {};
+      
         this.baseLayersById = {}; // Reset
     }
 
@@ -186,15 +193,13 @@ class CompositeMapLayers extends Component {
         }
     }
 
-    async createMultipleLayers() {
-        this.addScaleLayer(this.props.map);
-        const layers = this.props.layers
-            .filter(layer => layer.action !== 'delete');
+
+    createMultipleLayers() {
+        const layers = (this.props.layers || []).filter(layer => layer.action !== 'delete');
         for (const layer of layers) {
             this.createLayerGroup(layer);
         }
         this.addDrawLayerToMap();
-        
     }
 
     createLayerGroup = (layer) => {
@@ -311,3 +316,4 @@ CompositeMapLayers.propTypes = {
 };
 
 export default CompositeMapLayers;
+

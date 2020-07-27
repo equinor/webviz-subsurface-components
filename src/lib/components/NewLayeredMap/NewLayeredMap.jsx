@@ -142,6 +142,10 @@ class NewLayeredMap extends Component {
     }
 
     drawLayerDelete = (layerTypes) => {
+        if (layerTypes === "all") {
+            this.setState({drawLayerData: []});
+            return
+        }
         const layers = this.state.drawLayerData.filter((drawing) => {
             return !layerTypes.includes(drawing.type);
         })
@@ -241,7 +245,7 @@ class NewLayeredMap extends Component {
                                     <CompositeMapLayers 
                                         layers={this.props.layers}
                                         map={this.state.map}
-                                        syncedMaps={[...this.props.syncedMaps, this.state.id]}
+                                        syncedMaps={[...(this.props.syncedMaps || []), this.state.id]}
                                         syncDrawings={this.props.syncDrawings}
                                         updateMode={this.props.updateMode}
                                     />
