@@ -30,6 +30,7 @@ export default (gl, canvas, loadedImage, options = {}) => {
     let inputTexture = rawTexture;
 
     if(setBlackToAlpha) {
+        // Set black (0, 0, 0) color-values with alpha = 0
         const fboBlackAlpha = eqGL.framebuffer({width: width, height: height});
 
         const blackToAlphaCmd = eqGL.new()

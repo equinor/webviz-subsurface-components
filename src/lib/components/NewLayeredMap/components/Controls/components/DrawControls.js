@@ -30,7 +30,6 @@ class DrawControls extends Component {
         this.state = {
             drawControl : null
         }
-        // this.addToolbar = this.addToolbar.bind(this);
     }
 
     componentDidMount() {

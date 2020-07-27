@@ -86,8 +86,7 @@ export const makeCircleMarker = (item, swapXY) => {
 
 export const addImage = (imageData) => {
     const bounds = (imageData.bounds || []).map(xy => yx(xy));
-    let newImageLayer = null;
-    newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
+    const newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
         ...imageData,
         minvalue: imageData.minvalue,
         maxvalue: imageData.maxvalue,
@@ -106,7 +105,6 @@ export const addTile = (tileData) => {
         colorScale: tileData.colorScale,
         shader: tileData.shader,
     })
-    
     return newTileLayer;
 }
 
