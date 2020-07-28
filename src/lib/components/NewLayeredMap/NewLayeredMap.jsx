@@ -91,7 +91,7 @@ class NewLayeredMap extends Component {
 
     componentWillMount() {
         // Clear onSizeChange listener
-        clearTimeout(this.onSizeChange);
+        this.onSizeChange && this.onSizeChange();
     }
 
 
