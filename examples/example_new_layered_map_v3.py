@@ -124,6 +124,7 @@ if __name__ == "__main__":
         colorBar={
             "position": 'bottomleft'
         },
+        defaultBounds=[[0, 0], [30, 30]],
         mouseCoords={
             "coordinatePosition": "bottomright",
         },
@@ -483,9 +484,7 @@ if __name__ == "__main__":
         )
 
         def add_layer(add_n_clicks):
-            global layers
-            layers.append(
-                {
+            new_layer = [{
                     "name": "a very cool layer",
                     "id": 2, 
                     "baseLayer": True,
@@ -508,9 +507,8 @@ if __name__ == "__main__":
                             "bounds": [[0, 0], [-30, -30]]
                         },
                     ],
-                }
-            ) 
-            return layers
+                }]
+            return new_layer
 
 
         @cg.callback(
@@ -653,9 +651,6 @@ if __name__ == "__main__":
                         {   
                             "type": layer_type,
                             "colorScale":  {
-                                "colors": DEFAULT_COLORSCALE_COLORS,
-                                "prefixZeroAlpha": False,
-                                "scaleType": "linear",
                                 "cutPointMin": value[0],
                                 "cutPointMax": value[1],
                             },
