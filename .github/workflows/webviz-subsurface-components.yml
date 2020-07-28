@@ -19,14 +19,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
+        # Pin to 3.7.7, waiting for https://github.com/actions/virtual-environments/issues/1202
+        python-version: ['3.6', '3.7.7', '3.8']
 
     steps:
       - name: 📖 Checkout commit locally
         uses: actions/checkout@v2
 
       - name: 🐍 Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
