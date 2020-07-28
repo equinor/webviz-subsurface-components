@@ -79,10 +79,12 @@ class NewLayeredMap extends Component {
         NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
 
-        // If the width or height of the map changes, leaflet need to recalculate its dimensions
-        this.onSizeChange = onSizeChange(this.mapEl, () => {
-            map.invalidateSize();
-        })
+        if(this.props.syncMapSize) {
+            // If the width or height of the map changes, leaflet need to recalculate its dimensions
+            this.onSizeChange = onSizeChange(this.mapEl, () => {
+                map.invalidateSize();
+            }, 500);
+        }
     }
 
     componentDidUpdate() {
@@ -395,6 +397,13 @@ NewLayeredMap.propTypes = {
      * Map coordinates of a mouse click
      */
     click_position: PropTypes.array,   
+
+
+    /**
+     * syncMapSize makes the map listen for changes in width and height and automatically recalculates
+     * the map dimensions when changes occur.
+     */
+    syncMapSize: PropTypes.bool,
 }
 
 
