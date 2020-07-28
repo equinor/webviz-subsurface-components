@@ -1,6 +1,6 @@
-import vertexShaderSource from "./vertexShader.vs.glsl";
-import fragmentShaderSourceWithHillshading from "./fragmentShaderWithHillshading.fs.glsl";
-import fragmentShaderSourceWithoutHillshading from "./fragmentShaderWithoutHillshading.fs.glsl";
+import vertexShaderSource from "../shaders/vertexShader.vs.glsl";
+import fragmentShaderSourceWithHillshading from "../shaders/fragmentShaderWithHillshading.fs.glsl";
+import fragmentShaderSourceWithoutHillshading from "../shaders/fragmentShaderWithoutHillshading.fs.glsl";
 
 function alter_image(
     canvas,

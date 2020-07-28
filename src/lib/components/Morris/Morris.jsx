@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import MorrisMethod from "../private_components/morris-resources/morris";
-import "../private_components/morris-resources/morris.css";
+import MorrisMethod from "./utils/morris";
+import "./morris.css";
 
 const parseData = data => (typeof data === "string" ? JSON.parse(data) : data);
 

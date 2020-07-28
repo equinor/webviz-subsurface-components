@@ -1,4 +1,4 @@
-import jsc from "jsverify";
+import jsc from "./jsverify";
 import {
     arbitraryCell,
     arbitraryNonEmptyCell,

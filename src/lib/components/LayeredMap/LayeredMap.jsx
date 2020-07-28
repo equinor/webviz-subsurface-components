@@ -10,13 +10,13 @@ import {
     FeatureGroup,
     CircleMarker,
 } from "react-leaflet";
-import Switch from "../private_components/layered-map-resources/Switch.react";
-import ValueInfoBox from "../private_components/layered-map-resources/ValueInfoBox.react";
-import OptionalLayerControl from "../private_components/layered-map-resources/OptionalLayerControl.react";
-import CompositeMapLayer from "../private_components/layered-map-resources/CompositeMapLayer.react";
-import DrawControls from "../private_components/layered-map-resources/DrawControls.react";
-import VerticalZoom from "../private_components/layered-map-resources/VerticalZoom.react";
-import "../private_components/layered-map-resources/layered-map.css";
+import Switch from "./components/Switch.react";
+import ValueInfoBox from "./components/ValueInfoBox.react";
+import OptionalLayerControl from "./components/OptionalLayerControl.react";
+import CompositeMapLayer from "./components/CompositeMapLayer.react";
+import DrawControls from "./components/DrawControls.react";
+import VerticalZoom from "./components/VerticalZoom.react";
+import "./layered-map.css";
 
 const { BaseLayer, Overlay } = LayersControl;
 const yx = ([x, y]) => {

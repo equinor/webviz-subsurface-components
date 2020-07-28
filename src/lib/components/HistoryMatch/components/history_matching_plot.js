@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers,react/require-render-return */
 import * as d3 from "d3";
-import Component from "../shared/component";
-import Legend from "./legend";
+import Component from "../../../shared/component";
+import Legend from "../utils/legend";
 
 export default class HistoryMatchingPlot extends Component {
     constructor(config = {}) {
