@@ -226,6 +226,9 @@ class CompositeMapLayers extends Component {
 
         if(layer.checked && !activeLayer) {
             layerGroup.addTo(this.props.map);
+        } else if(layer.checked && !layer.baseLayer) {
+            // Always add baseLayer if it is checked
+            layerGroup.addTo(this.props.map);
         }
 
         // adds layers to the layerControl
