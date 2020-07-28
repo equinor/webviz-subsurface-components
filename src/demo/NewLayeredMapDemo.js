@@ -19,7 +19,7 @@ const NewLayeredMapDemo = () => {
 
 
     const [switchValue, setSwitchValue] = useState(true);
-    const [layers, setLayers] = useState(exampleData.layers.slice(0, 3));
+    const [layers, setLayers] = useState(exampleData.layers.slice(1, 3));
 
     
     const onChange = (changes) => {
@@ -30,16 +30,16 @@ const NewLayeredMapDemo = () => {
             setSwitchValue(changes.switch.value);
             newLayers[0].action = "update";
             if (changes.switch.value === true) {
-                // newLayers[0].data[0].shader.type = 'hillshading';
+                newLayers[0].data[0].shader.type = 'hillshading';
                 newLayers[0].data[0].shader.shadows = true;
                 newLayers[0].data[0].colorScale = DEFAULT_COLORMAP;
-                newLayers[0].data[0].colorScale.cutPointMin = 3400;
+                newLayers[0].data[0].colorScale.cutPointMin = 2700;
                 newLayers[0].data[0].colorScale.cutPointMax = 3500;
             } else {
                 newLayers[0].data[0].shader.type = null;
                 newLayers[0].data[0].colorScale = {
                    
-                    "cutPointMin": 3400,
+                    "cutPointMin": 2700,
                     "cutPointMax": 3500,
                 };
             }
@@ -48,7 +48,7 @@ const NewLayeredMapDemo = () => {
     }
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: '1fr 1fr', height: '180vh'}}>
+        <div style={{ display: 'grid', gridTemplateColumns: "1fr 1fr", gridTemplateRows: '1fr 1fr', height: '180vh'}}>
             <div>
                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}

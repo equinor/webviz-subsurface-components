@@ -8,11 +8,14 @@ import './layers/L.tileWebGLLayer';
 
 // Components
 import Controls from './components/Controls';
-import CompositeMapLayers from './components/CompositeMapLayers'
-import Context from './context'
+import CompositeMapLayers from './components/CompositeMapLayers';
+import Context from './context';
 
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
+
+// Utils
+import { onSizeChange } from './utils/element';
 
 const stringToCRS = (crsString) => {
     switch(crsString) {
@@ -75,10 +78,22 @@ class NewLayeredMap extends Component {
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
+
+        if(this.props.syncMapSize) {
+            // If the width or height of the map changes, leaflet need to recalculate its dimensions
+            this.onSizeChange = onSizeChange(this.mapEl, () => {
+                map.invalidateSize();
+            }, 500);
+        }
     }
 
     componentDidUpdate() {
         
+    }
+
+    componentWillMount() {
+        // Clear onSizeChange listener
+        this.onSizeChange && this.onSizeChange();
     }
 
 
@@ -382,6 +397,13 @@ NewLayeredMap.propTypes = {
      * Map coordinates of a mouse click
      */
     click_position: PropTypes.array,   
+
+
+    /**
+     * syncMapSize makes the map listen for changes in width and height and automatically recalculates
+     * the map dimensions when changes occur.
+     */
+    syncMapSize: PropTypes.bool,
 }
 
 
