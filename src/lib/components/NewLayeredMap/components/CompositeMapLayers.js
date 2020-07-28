@@ -139,15 +139,15 @@ class CompositeMapLayers extends Component {
         let newItem = null;
         switch(item.type) {
             case "polyline":
-                newItem = makePolyline(item, swapXY, this.props.lineCoords);
+                newItem = makePolyline(item, swapXY, this.props.setProps);
                 break;
 
             case "polygon":
-                newItem = makePolygon(item, swapXY, this.props.polygonCoords);
+                newItem = makePolygon(item, swapXY, this.props.setProps);
                 break;
 
             case "circle":
-                newItem = makeCircle(item, swapXY);
+                newItem = makeCircle(item, swapXY, this.props.setProps);
                 break;
             
             case "circleMarker":
@@ -155,7 +155,7 @@ class CompositeMapLayers extends Component {
                 break;
             
             case "marker":
-                newItem = makeMarker(item, swapXY);
+                newItem = makeMarker(item, swapXY, this.props.setProps);
                 break;
                 
             case "image":
