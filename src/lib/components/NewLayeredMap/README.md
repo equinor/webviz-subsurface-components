@@ -455,13 +455,108 @@ Shapes also have a `"tooltip"` prop which will display text on hover
 
 ### Updating layers
 
-Updating layers is how we make changes to the map during runtime. There are two supported ways of doing this. One uses the _action_ field in the layer object to add, update or delete a single layer by id. The other one simply replaces all existing layers with whatever new _layers_ list you provide it with.
+Updating layers is how we make changes to the map during runtime. There are two supported ways of doing this. One uses the _action_ field in the layer object to add, update or delete layers by id. The other one simply replaces all existing layers with whatever new _layers_ list you provide it with.
+
+We will use the following layers as an example:
+```python
+[
+    {
+        "id": 1,           
+        "name": "Tile layer"
+        "baseLayer": True,  
+        "checked": True,
+        "data": [
+            {
+                "type": "tile",
+                "url": "TILE_URL",
+                "shader": {
+                    "type": 'hillshading', 
+                    "shadows": True,
+                    "elevationScale": 4.0,
+                    "pixelScale": 200
+                }
+            }
+        ]
+    },
+    {
+        "id": 123,
+        "name": "Image layer",
+        "baseLayer": True,
+        "checked": False,
+        "data": [
+            {
+                "type": "image",
+                "url": "BASE64_IMAGE_URL",
+                "shader": {
+                    ... 
+                },
+                "colorScale":  {
+                    ...                             
+                },
+                "minvalue": 0,
+                "maxvalue": 1000,
+                "bounds": [[0, 0], [100, 100]],
+                "unit": "m"
+            }
+        ]
+    }
+]
+```
 
 #### Updating layers with action
 
-To update the layers basically provide a new list of _layers_ into the component with the changes to apply by id and specify what you want to do (add/update/delete) with the action field. The default behaviour of the component is to add if nothing else is specified. Please note that adding a layer requires a unique id. Nothing will happen when trying to add a layer with an id that already exists.
+The default way of changing layers is with the _action_ field in the layer object.
+The component stores all the layers you give it internally, so if you wish to change something, you simply write a callback which returns a list with the layer objects you wish to change to the _layers_ prop.
 
-Provided the dash app from the previous example, this would be how we create a toggle button to update the color scale and hillshading it with _action_.
+
+##### Add
+
+To add a layer set `"action" : "add"` in the layer, and return a list with the new layer(s) you want to add to _layers_. Again, note that you do not need to pass it the current layers, as they will be stored in the component even if you change the _layers_ prop.
+
+```python
+# UPDATE WITH ACTION
+@app.callback(
+    Output('test-map', 'layers'),
+    [Input('layer-add-btn', 'n_clicks')]
+)
+def add_layer(n_clicks):
+    # Check if button has been pressed
+    if n_clicks is not None:
+        return [
+            {
+                "id": 3,                        # Required,
+                "action": "add",                # Required
+                "name": "New Tile Layer"
+                "baseLayer": True,
+                "checked": False,
+                "data": [
+                    {
+                        "type": "tile",         # Required
+                        "url": "SOME_TILE_URL",
+                    }
+                ]
+            },
+            {
+                # You can pass as many new layers as you want
+                ...
+            }
+        ]
+    # If button has not been pressed
+    return []
+
+```
+
+Please note that adding a layer requires a unique id. Nothing will happen when trying to add a layer with an id that already exists.
+
+<br>
+
+##### Update
+
+To update existing layer(s) provide a layer object with the id and type of the layer(s) you want to change and the fields that are to be updated.
+
+Please note that if you change a field which takes an object such as a shader, the component does not store the individual options/subfields of that object. This means that you have to provide all the options you want to have in the updated layer.
+
+Provided the Layers in the the previous example, this would be how we create a toggle button to update the color scale and hillshading of the tile layer with _action_.
 ```python
 COLORSCALE = ['#032333', '#2a3393', '#754792', '#b15d81', '#ea7859', '#fbb33c', '#e7fa5a']
 
@@ -482,7 +577,9 @@ def toggle_shader(n_clicks):
                 "data": [
                     {
                         "type": "tile",  # Required
+                        # Entire shader object
                         "shader": {
+                            # Toggle
                             "type": 'hillshading' if n_clicks%2 == 1 else None, 
                             "shadows": True,
                             "elevationScale": 4.0,
@@ -499,8 +596,40 @@ def toggle_shader(n_clicks):
 
 <br>
 
+##### Delete
+
+To delete a layer you only need to pass the id and `"action": "delete"`.
+
+This will delete the layer we added in the add example:
+
+```python
+@app.callback(
+    Output('test-map', 'layers'),
+    [Input('layer-add-btn', 'n_clicks')]
+)
+def delete_layer(n_clicks):
+    # n_clicks tracks number of times the button has been clicked
+    if n_clicks is not None:
+        # Delete layer with id: 3
+        return [
+            {
+                "id": 2,            # Required,
+                "action": "delete", # Required
+            }
+        ]
+    return []
+```
+
+<br>
+
 #### Updating layers with replace
 
+Changing layers with `"updateMode": "replace"`, simply removes all existing layers, and adds the ones you provide to the map. This is mainly recomended e.g. if you're going to look at a new set of data in the application during runtime. 
+It is also possible to use it for updating layer fields, but it requires ALL the layers and fields to be returned. A way of doing this could be to maintain a list in python which is updated whenever something changes and then sent as a prop to the component. 
+
+<br>
+
+Here is an example of what updating the shader with replace enabled would look like. Please note that after this operation, this will be the only layer present on the map.
 
 ```python
 @cg.callback(
@@ -513,42 +642,31 @@ def toggle_shader(n_clicks):
         )
 
         def toggle_shading_with_replace(n_clicks, layer_id):
-            global layers
 
-            layer_type = get_layer_type(layer_id, layers)
-
-            update_layer = [
+            layers = [
                 {
-                    "id": int(layer_id),
-                    "name": "A seismic horizon without colormap",
+                    "id": 1,
+                    "name": "Tile layer",
+                    "baseLayer": True,
                     "checked": True,
                     "data": [
                         {
-                            "url": map_data,
-                            "allowHillshading": True,
-                            "minvalue": min_value,
-                            "maxvalue": max_value,
-                            "bounds": [[0, 0], [30, 30]],
-                            "type": layer_type,
-                            "allowHillshading": True,
-                            "colorScale":  {
-                                "colors":DEFAULT_COLORSCALE_COLORS,
-                                "prefixZeroAlpha": False,
-                                "scaleType": "linear",
-                                "cutPointMin": min_value,
-                                "cutPointMax": max_value, 
-                                },
+                            "type": "tile",
+                            "url": "TILE_URL",
                             "shader": {
                                 "type": 'hillshading' if n_clicks % 2 == 1 else None,
-                                # "shadows": False,
-                                # "elevationScale": 1.0,
-                                # "pixelScale": 11000
+                                "shadows": True,
+                                "elevationScale": 4.0,
+                                "pixelScale": 200
                             },
                         }
                     ]
-                }
+                },
+                {
+                    # Other layers we want to keep     
+                },
+                ...
             ]
-            layers = change_layer(layers, update_layer[0])
             return layers
 ```
 
@@ -727,3 +845,56 @@ def get_polygon_coords(coords):
 | **marker_point**    | `{[x, y]}`                  | Coordinates of the last placed marker on the map  |
 | **polyline_points** | `{[[x1, y1], ..., [xn, yn]]}` | Coordinates of the last drawn polyline on the map |
 | **polygon_points**  | `{[[x1, y1], ..., [xn, yn]]}` | Coordinates of the last drawn polygon on the map  |
+
+<br>
+
+--------------
+
+<br>
+
+## Serving tiles with dash
+
+Dash is using an underlying flask server during runtime which can be accessed from the dash app. We can use this flask server to serve tiles.
+
+Assuming you have pregenerated tiles ready to go on a disk, this example of a very simple tile server will work.
+
+```python
+import os.path
+from flask import Flask, send_file
+
+class tile_server():
+
+    def __init__(self, flask_server):
+
+        app = flask_app
+
+        @app.route('/tiles/<zoom>/<y>/<x>')
+        def tiles(zoom, x, y):
+            default = r'_path_to_default_tile\tiles\0\{zoom}\{x}\{y}.png'
+            filename = r'_path_to_tiles\tiles\0\%s\%s\%s.png' % (zoom, x, y)
+            if os.path.isfile(filename):
+                return send_file(filename)
+            else:
+                return send_file(default)
+```
+
+<br>
+
+We would also need to instanciate it in our dash app and pass it the instance of the flask server
+
+```python
+from tile_server import tile_server
+
+if __name__ == "__main__":
+    
+...
+
+    app = dash.Dash(__name__)
+
+    # initialize server for providing tiles at the same localhost as dash is running
+    server = tile_server(app.server)
+
+...
+
+    app.run_server(debug=True)
+```

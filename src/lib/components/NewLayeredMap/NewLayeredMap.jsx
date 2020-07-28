@@ -124,7 +124,7 @@ class NewLayeredMap extends Component {
     }
 
     getMap = () => {
-        return this.state.map
+        return this.state.map;
     }
 
     setPropsExist = (value) => {
