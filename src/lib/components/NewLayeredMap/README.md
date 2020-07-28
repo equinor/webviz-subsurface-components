@@ -103,8 +103,8 @@ app.run_server(debug=True)
 | **zoom**          | *Number*                | Initial zoom level of the map                                                                                                                                                                                                  | 5                                               | 1               |
 | **minZoom**       | *Number*                | The minimum zoom level allowed                                                                                                                                                                                                 | -10                                             | 1               |
 | **maxZoom**       | *Number*                | The maximum zoom level allowed                                                                                                                                                                                                 | 10                                              | 15              |
-| **crs**           | *String*                | String which sets the coordinate referencing system. The default is set to Simple, and will be the best option in most cases. Alternatively, one can set this as "earth" which will provide a crs commonly used for tile maps. | ""                                              | "Simple"        |
-
+| **crs**           | *String*                | String which sets the coordinate referencing system. The default is set to Simple, and will be the best option in most cases. Alternatively, one can set this as "earth" which will provide a crs commonly used for tile maps. | ""                                              | "simple"        |
+| syncMapSize       | *Boolean*                 | If true, the map will then listen for changes in height and width, and recalculate the map-dimensions when changes occur. Can be useful when the map does not have a specific width or height when it mounts, for example when _display: none_ is used.                                        | true             | false |
 <br>
 
 ### *Props:* Map tools
