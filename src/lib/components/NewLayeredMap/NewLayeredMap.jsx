@@ -8,11 +8,14 @@ import './layers/L.tileWebGLLayer';
 
 // Components
 import Controls from './components/Controls';
-import CompositeMapLayers from './components/CompositeMapLayers'
-import Context from './context'
+import CompositeMapLayers from './components/CompositeMapLayers';
+import Context from './context';
 
 // Assets
 import exampleData from '../../../demo/example-data/new-layered-map.json';
+
+// Utils
+import { onSizeChange } from './utils/element';
 
 const stringToCRS = (crsString) => {
     switch(crsString) {
@@ -75,10 +78,20 @@ class NewLayeredMap extends Component {
         this.setState({map: map});
         NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
+
+        // If the width or height of the map changes, leaflet need to recalculate its dimensions
+        this.onSizeChange = onSizeChange(this.mapEl, () => {
+            map.invalidateSize();
+        })
     }
 
     componentDidUpdate() {
         
+    }
+
+    componentWillMount() {
+        // Clear onSizeChange listener
+        this.onSizeChange && this.onSizeChange();
     }
 
 
@@ -124,7 +137,7 @@ class NewLayeredMap extends Component {
     }
 
     getMap = () => {
-        return this.state.map
+        return this.state.map;
     }
 
     setPropsExist = (value) => {
