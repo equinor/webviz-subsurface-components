@@ -212,6 +212,8 @@ if __name__ == "__main__":
                 html.Button('Toggle shader - replace', id='shader-toggle-replace-btn'),
                 html.Button('Toggle shadows', id='shading-submit-val', n_clicks=0),
                 dcc.Input(id='delete-layer-id', type='number', size = "2", placeholder="Delete layer by id"),
+                html.Button('Submit', id='delete-submit', n_clicks=0),
+
                 html.Div([
                     "Draw tools",
                     dcc.Checklist(
@@ -543,11 +545,12 @@ if __name__ == "__main__":
         @cg.callback(
             Output(map, 'layers'),
             [
-                Input('delete-layer-id', 'value'),
-            ]
+                Input('delete-submit', 'n_clicks')
+            ],
+                State('delete-layer-id', 'value'),
         )
 
-        def delete_layer(layer_id):
+        def delete_layer(n_clicks, layer_id):
             update_layer = [
                 {
                     "id": int(layer_id),
@@ -624,7 +627,6 @@ if __name__ == "__main__":
         )
         
         def update_cutoff_marks(value):
-            print("new cutoff marks: ", value) 
             return  {
                 round(value[0]) : str(round(value[0])), 
                 round(value[1]) : str(round(value[1])) 
