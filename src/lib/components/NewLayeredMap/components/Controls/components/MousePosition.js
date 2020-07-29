@@ -28,7 +28,7 @@ const MousePosition = (props) => {
         const options = (focusedImageLayer || {}).options || {};
         const newURL = focusedImageLayer && focusedImageLayer.getUrl ? focusedImageLayer.getUrl() : null
         const newCanvas = focusedImageLayer && focusedImageLayer.getCanvas ? focusedImageLayer.getCanvas() : null
-        return [newCanvas, newURL, options.minvalue, options.maxvalue];
+        return [newCanvas, newURL, options.minvalue, options.maxvalue, options.unit];
     }
 
     useEffect(() => {
@@ -43,8 +43,8 @@ const MousePosition = (props) => {
         updateMode(mode);
     }, [mode])
 
-    const updateStateCanvas = (canvas, onScreenCanvas, ctx, minvalue, maxvalue) => {
-        stateRef.current = { ...stateRef.current, canvas, ctx, onScreenCanvas, minvalue, maxvalue, props};
+    const updateStateCanvas = (canvas, onScreenCanvas, ctx, minvalue, maxvalue, unit) => {
+        stateRef.current = { ...stateRef.current, canvas, ctx, onScreenCanvas, minvalue, maxvalue, unit, props};
     }
 
     const updateMode = mode => {
@@ -67,10 +67,11 @@ const MousePosition = (props) => {
                 return latlng;
             },
     
-            updateHTML: function(x, y, z, zNotZero) { // TODO: add default measurement unit, make it passable with props
-                const z_string = zNotZero? " z: " + z + "m" : "";
+            updateHTML: function(x, y, z, zNotZero, unit) { // TODO: add default measurement unit, make it passable with props
+                const unit = unit === undefined ? 'm' : unit
+                const z_string = zNotZero? " z: " + z + unit : "";
                 this._latlng.innerHTML ="<span style = 'background-color: #ffffff; border: 2px solid #ccc; padding:3px; border-radius: 5px;'>"
-                                       + "x: " + x + "m y: " + y + "m"  + z_string +"</span>"
+                                       + "x: " + x + unit + " y: " + y + unit  + z_string +"</span>"
             }
         });
         const mousePosCtrl = new MousePosControl();
@@ -88,6 +89,7 @@ const MousePosition = (props) => {
         const onScreenCanvas = focusedImageLayer.getCanvas ? focusedImageLayer.getCanvas() : null;
         const minvalue = (focusedImageLayer.options || {}).minvalue;
         const maxvalue = (focusedImageLayer.options || {}).maxvalue;
+        const unit = (focusedImageLayer.options || {}).unit;
         if(!url || !onScreenCanvas || !(typeof minvalue === "number") || !maxvalue) {
             return;
         }
@@ -110,7 +112,7 @@ const MousePosition = (props) => {
         imageCanvas.height = image.height;
         ctx.drawImage(image, 0, 0);
 
-        updateStateCanvas(imageCanvas, onScreenCanvas, ctx, minvalue, maxvalue);
+        updateStateCanvas(imageCanvas, onScreenCanvas, ctx, minvalue, maxvalue, unit);
     }
 
     const onCanvasMouseMove = (event) => {
@@ -220,9 +222,9 @@ const MousePosition = (props) => {
     }
   
     const setLatLng = (x, y, z, zNotZero)  => {
-        const { control } = stateRef.current || {};
+        const { control, unit } = stateRef.current || {};
         if(control) {
-            control.updateHTML(x, y, z, zNotZero)
+            control.updateHTML(x, y, z, zNotZero, unit)
         }
     }
 

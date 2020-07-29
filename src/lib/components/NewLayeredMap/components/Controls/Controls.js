@@ -81,7 +81,6 @@ class Controls extends Component {
                         <ColorBar
                             map = {this.props.map}
                             position = {(this.props.colorBar || {}).position}
-                            unit = {(this.props.colorBar || {}).unit}
                         />
                     }
                 </div>
