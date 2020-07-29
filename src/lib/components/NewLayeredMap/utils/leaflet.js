@@ -41,7 +41,7 @@ export const makePolyline = (item, swapXY, setProps) => {
                     positions: pos
                 })
     ));
-    shape.on('click', () => {
+    shape.on('mouseup', () => {
         setProps({clicked_shape: item});
     })
     return shape;
@@ -55,7 +55,7 @@ export const makePolygon = (item, swapXY, setProps) => {
                     positions: pos
                 })
     ));
-    shape.on('click', () => {
+    shape.on('mouseup', () => {
         setProps({clicked_shape: item});
     })
     return shape;
@@ -66,7 +66,7 @@ export const makeMarker = (item, swapXY, setProps) => {
     const shape = addTooltip(item, 
                 L.marker(pos)
     );
-    shape.on('click', () => {
+    shape.on('mouseup', () => {
         setProps({clicked_shape: item});
     })
     return shape;
@@ -81,7 +81,7 @@ export const makeCircle = (item, swapXY, setProps) => {
                     radius : item.radius
                 })
     ));
-    shape.on('click', () => {
+    shape.on('mouseup', () => {
         setProps({clicked_shape: item});
     })
     return shape;
@@ -121,4 +121,5 @@ export const addTile = (tileData) => {
     })
     return newTileLayer;
 }
+
 
