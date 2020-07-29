@@ -17,25 +17,37 @@ const ColorBar = (props) => {
     const [control, setControl] = useState(null);
     const [colorMap, setColorMap] = useState(null);
     const [minMaxValue, setMinMaxValue]= useState([0 , 0])
+    const [unit, setUnit] = useState(null);
 
 
     useEffect(() => {
         addControl();
         createNewColorMap();
+        updateUnit();
     }, [])
 
     const focusedDependencyArray = () => {
         if(!focusedImageLayer) {
-            return [null, null, null];
+            return [null, null, null, null];
         }
 
         const options = focusedImageLayer.options;
-        return [JSON.stringify(options.colorScale), options.minvalue, options.maxvalue];
+        return [JSON.stringify(options.colorScale), options.minvalue, options.maxvalue, options.unit];
     }
 
     useEffect(() => {
         createNewColorMap();
+        updateUnit();
     }, focusedDependencyArray())
+
+    const updateUnit = () => {
+        if(!focusedImageLayer) {
+            return;
+        }
+        const options = (focusedImageLayer.options || {});
+        const unit = options.unit ? options.unit : "m";
+        setUnit(unit)
+    }
 
     const createNewColorMap = () => {
         
@@ -93,10 +105,10 @@ const ColorBar = (props) => {
                 }
             </div>
             <div>
-                {minMaxValue[0]} {props.unit}
+                {minMaxValue[0]} {unit}
             </div>
             <div className="leaflet-colorbar-right-label">
-                {minMaxValue[1]} {props.unit}
+                {minMaxValue[1]} {unit}
             </div>
         </div>,
         control.panelDiv
@@ -106,12 +118,6 @@ const ColorBar = (props) => {
 ColorBar.propTypes = {
     map: PropTypes.object,
 
-    /* Unit to show in color map */
-    unit: PropTypes.string,
 };
-
-ColorBar.defaultProps = {
-    unit: "m",
-}
 
 export default ColorBar;
