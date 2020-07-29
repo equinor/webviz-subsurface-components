@@ -280,7 +280,7 @@ class CompositeMapLayers extends Component {
                 this.props.syncDrawings ? this.addItemToLayer(item, this.context.drawLayer, false) : itemsToDraw[item.type] = item;
             }   
         }
-        console.log(itemsToDraw)
+        
         // TODO: See if we can optimize the switch between drawing from the synced drawlayer and from state
         if (!this.props.syncDrawings) {
             for (const item of this.context.drawLayerData) {
