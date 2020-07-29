@@ -342,7 +342,9 @@ NewLayeredMap.propTypes = {
     /**
      * UnitScale is a box that displays the the current unit scale on the map.
      */
-    unitScale: PropTypes.bool,
+    unitScale: PropTypes.shape({
+        position: PropTypes.string,
+    }),
 
     center: PropTypes.array,
     /**

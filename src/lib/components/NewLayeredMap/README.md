@@ -20,7 +20,7 @@ The new layered map component is a component for layered map data, like tile-dat
     <br>
 - [Listeners](#listeners)
     <br>
-- [Serving tiles with Dash]()
+- [Serving tiles with Dash](#serving-tiles-with-dash)
 
 ## 🌤 Features
 * WebGL Image-layer support
@@ -83,12 +83,14 @@ app.run_server(debug=True)
 
 ```
 
+<br>
+
 ----
 
 <br>
 
 ## 🎰 Props
-**The props available to the newLayeredMap component**
+**The props available to the component**
 
 <br>
 
@@ -104,13 +106,13 @@ app.run_server(debug=True)
 | **minZoom**       | *Number*                | The minimum zoom level allowed                                                                                                                                                                                                 | -10                                             | 1               |
 | **maxZoom**       | *Number*                | The maximum zoom level allowed                                                                                                                                                                                                 | 10                                              | 15              |
 | **crs**           | *String*                | String which sets the coordinate referencing system. The default is set to Simple, and will be the best option in most cases. Alternatively, one can set this as "earth" which will provide a crs commonly used for tile maps. | ""                                              | "simple"        |
-| syncMapSize       | *Boolean*                 | If true, the map will then listen for changes in height and width, and recalculate the map-dimensions when changes occur. Can be useful when the map does not have a specific width or height when it mounts, for example when _display: none_ is used.                                        | true             | false |
+| **autoScaleMap**       | *Boolean*                 | If true, the map will then listen for changes in height and width, and recalculate the map-dimensions when changes occur. Can be useful when the map does not have a specific width or height when it mounts, for example when _display: none_ is used.                                        | true             | false |
 <br>
 
 ### *Props:* Map tools
 
 
-These props are all object props, meaning you pass them to the component on a JSON format:
+These props are all object props, meaning you pass them to the component using JSON format:
 
 ```python
 layered_map_component = webviz_subsurface_components.NewLayeredMap(
@@ -196,6 +198,19 @@ Example:
 
 ```python
 colorBar={
+        "position": "bottomleft"
+    }
+```
+
+<br>
+
+#### unitScale
+Adds a small unit scale to the map. It will read the unit field of the currently selected layer and can be set to either feet or metres (metres by default).
+
+Example:
+
+```python
+unitScale={
         "position": "bottomright"
     }
 ```

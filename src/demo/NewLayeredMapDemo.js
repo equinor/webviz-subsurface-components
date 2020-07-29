@@ -122,7 +122,9 @@ const NewLayeredMapDemo = () => {
                     syncedMaps={["NewLayeredMap-4"]}
                    // syncDrawings={true}
                     layers={layers}
-                    unitScale = "bottomright"
+                    unitScale={{ 
+                        position: "bottomright" 
+                    }}
                     colorBar={{
                         position: 'bottomleft'
                     }}

@@ -307,9 +307,7 @@ if __name__ == "__main__":
             html.Pre(id="polyline"),
             html.Pre(id="marker"),
             html.Pre(id="polygon"),
-            html.Pre(id="polyline2"),
-            html.Pre(id="marker2"),
-            html.Pre(id="polygon2"),
+            html.Pre(id="clicked_shape"),
         ]
     )
 
@@ -797,6 +795,8 @@ if __name__ == "__main__":
             ]
             return update_layer 
 
+
+
 #
 #                               OTHER CALLBACKS
 #
@@ -830,6 +830,16 @@ if __name__ == "__main__":
 
     def get_edited_line(coords):
         return f"Edited closed polygon: {json.dumps(coords)}"
+
+    @app.callback(
+        Output("clicked_shape", "children"), 
+        [
+            Input("example-map", "clicked_shape")
+        ]
+    )
+
+    def get_clicked_shape(coords):
+        return f"Clicked shape: {json.dumps(coords)}"
 
     cg.register(app)     
 
