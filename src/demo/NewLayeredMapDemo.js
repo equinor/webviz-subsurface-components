@@ -74,7 +74,7 @@ const NewLayeredMapDemo = () => {
                         position: "topright",
                         
                     }}
-                     mouseCoords = {{
+                    mouseCoords = {{
                         position: "bottomright",
                     }} 
                     switch={{
@@ -82,6 +82,7 @@ const NewLayeredMapDemo = () => {
                         label: 'Hillshading',
                         position: 'bottomleft'
                     }}
+                    unitScale={{}}
                     setProps={onChange}
                 />
             </div>
@@ -121,6 +122,7 @@ const NewLayeredMapDemo = () => {
                     syncedMaps={["NewLayeredMap-4"]}
                    // syncDrawings={true}
                     layers={layers}
+                    unitScale = "bottomright"
                     colorBar={{
                         position: 'bottomleft'
                     }}

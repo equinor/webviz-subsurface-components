@@ -42,7 +42,6 @@ class CompositeMapLayers extends Component {
         this.layerControl = layerControl;
         this.createMultipleLayers();
         this.updateUponBaseMapChange();
-        this.addScaleLayer(this.props.map);
     }
 
     updateLayer = (curLayer, newLayer) => {
@@ -183,9 +182,6 @@ class CompositeMapLayers extends Component {
         });
     }
 
-    addScaleLayer = (map) => {
-        L.control.scale({imperial: false, position: "bottomright"}).addTo(map);
-    }
 
     removeLayerFromState = (id) => {
         delete this.layers[id];
