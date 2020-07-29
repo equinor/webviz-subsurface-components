@@ -1,1 +1,1 @@
-export { default } from './LayeredMap';
+export { default } from "./LayeredMap";

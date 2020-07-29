@@ -1,1 +1,1 @@
-export { default } from './PriorPosteriorDistribution';
+export { default } from "./PriorPosteriorDistribution";
