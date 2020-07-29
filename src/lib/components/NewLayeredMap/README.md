@@ -351,7 +351,7 @@ More information on:
 <br>
 
 #### Shapes and drawings 
-The component supports a wide variety of shapes and drawings. Namely:
+The component supports a variety of shapes and drawings. Namely:
 
 - [Polyline](#polyline)
 - [Polygon](#polygon)
@@ -361,7 +361,8 @@ The component supports a wide variety of shapes and drawings. Namely:
 
 These can be drawn onto the map using the draw tools, or you can pass them as layers. It is common to put all the drawings you wish to see at the same time into one layer, so that you won't have to toggle every single drawing in the layer controls.
 
-Shapes also have a `"tooltip"` prop which will display text on hover
+Shapes also have a `"tooltip"` prop which will display text on hover.
+These shape objects (except for the circleMarker) will be emited on click with the [clicked_shape listener](#listeners). It is possible for the python user to add extra fields, such as `"name"` or `"shapeID"` (the names are up to you) e.g. in order to simplify editing a single shape in a layer.
 
 ```python
 {
@@ -845,6 +846,7 @@ def get_polygon_coords(coords):
 | **marker_point**    | `{[x, y]}`                  | Coordinates of the last placed marker on the map  |
 | **polyline_points** | `{[[x1, y1], ..., [xn, yn]]}` | Coordinates of the last drawn polyline on the map |
 | **polygon_points**  | `{[[x1, y1], ..., [xn, yn]]}` | Coordinates of the last drawn polygon on the map  |
+| **clicked_shape**  | [Shape object](#shapes-and-drawings) | JSON object containing the details of last shape clicked   |
 
 <br>
 
@@ -886,7 +888,7 @@ We would also need to instanciate it in our dash app and pass it the instance of
 from tile_server import tile_server
 
 if __name__ == "__main__":
-    
+
 ...
 
     app = dash.Dash(__name__)

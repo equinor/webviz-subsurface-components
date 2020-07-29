@@ -19,7 +19,7 @@ const NewLayeredMapDemo = () => {
 
 
     const [switchValue, setSwitchValue] = useState(true);
-    const [layers, setLayers] = useState(exampleData.layers.slice(1, 3));
+    const [layers, setLayers] = useState(exampleData.layers.slice(1, 5));
 
     
     const onChange = (changes) => {
@@ -49,8 +49,8 @@ const NewLayeredMapDemo = () => {
 
     return (
         <div style={{ display: 'grid', gridTemplateColumns: "1fr 1fr", gridTemplateRows: '1fr 1fr', height: '180vh'}}>
-            <div>
-                <NewLayeredMap 
+           {/* <div>
+                 <NewLayeredMap 
                     id={"NewLayeredMap-1"}
                     syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
                     syncDrawings={true}
@@ -85,7 +85,7 @@ const NewLayeredMapDemo = () => {
                     setProps={onChange}
                 />
             </div>
-            {/* <div >
+             <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-2"}
                     syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
@@ -114,7 +114,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div>
+            </div> */}
             <div >
                 <NewLayeredMap 
                     id={"NewLayeredMap-3"}
@@ -174,7 +174,7 @@ const NewLayeredMapDemo = () => {
                     }}
                     setProps={onChange}
                 />
-            </div>  */}
+            </div>  
         </ div>
         
     )

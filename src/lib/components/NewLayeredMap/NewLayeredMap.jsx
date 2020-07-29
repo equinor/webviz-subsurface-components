@@ -263,6 +263,7 @@ class NewLayeredMap extends Component {
                                         syncedMaps={[...(this.props.syncedMaps || []), this.state.id]}
                                         syncDrawings={this.props.syncDrawings}
                                         updateMode={this.props.updateMode}
+                                        setProps={this.setPropsExist}
                                     />
                                 )
                             }
@@ -379,6 +380,14 @@ NewLayeredMap.propTypes = {
     updateMode: PropTypes.string,
 
     /**
+     * syncMapSize makes the map listen for changes in width and height and automatically recalculates
+     * the map dimensions when changes occur.
+     * 
+     * // TODO: maybe give this a different name?
+     */
+    syncMapSize: PropTypes.bool,
+
+    /**
      * Dash provided prop that returns the coordinates of the edited or clicked polyline
      */
     polyline_points: PropTypes.array,
@@ -398,12 +407,11 @@ NewLayeredMap.propTypes = {
      */
     click_position: PropTypes.array,   
 
-
     /**
-     * syncMapSize makes the map listen for changes in width and height and automatically recalculates
-     * the map dimensions when changes occur.
+     * Shape clicked on JSON format
      */
-    syncMapSize: PropTypes.bool,
+    clicked_shape: PropTypes.object,
+
 }
 
 
