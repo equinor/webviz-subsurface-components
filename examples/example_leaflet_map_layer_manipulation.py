@@ -116,7 +116,7 @@ if __name__ == "__main__":
         },
     ]
 
-    new_layered_map_1 = webviz_subsurface_components.NewLayeredMap(
+    leaflet_map_1 = webviz_subsurface_components.LeafletMap(
         id="example-map",
         syncedMaps=["example-map-2", "example-map"],
         syncDrawings=True, 
@@ -153,7 +153,7 @@ if __name__ == "__main__":
             ]),
             html.Div(
                 children=[
-                    new_layered_map_1,
+                    leaflet_map_1,
                 ]
             , style={'display': 'grid', 'gridTemplateColumns': '1fr 1fr', 'minHeight': '90vh' }),
         ]

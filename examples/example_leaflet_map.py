@@ -116,7 +116,7 @@ if __name__ == "__main__":
         },
     ]
 
-    new_layered_map_1 = webviz_subsurface_components.NewLayeredMap(
+    leaflet_map_1 = webviz_subsurface_components.LeafletMap(
         id="example-map",
         syncedMaps=["example-map-2", "example-map"],
         syncDrawings=True, 
@@ -147,7 +147,7 @@ if __name__ == "__main__":
         updateMode="",
     )
 
-    new_layered_map_2 = webviz_subsurface_components.NewLayeredMap(
+    leaflet_map_2 = webviz_subsurface_components.LeafletMap(
         id="example-map-2",
         syncedMaps=["example-map-2", "example-map"],
         syncDrawings=True, 
@@ -298,8 +298,8 @@ if __name__ == "__main__":
                     ]),
                     html.Div(
                         children=[
-                            new_layered_map_1,
-                            new_layered_map_2,
+                            leaflet_map_1,
+                            leaflet_map_2,
                         ]
                     , style={'display': 'grid', 'gridTemplateColumns': '1fr 1fr', 'minHeight': '90vh' })
                 ], style={'display': 'grid', 'gridTemplateColumns': '400px auto'}
@@ -445,7 +445,6 @@ if __name__ == "__main__":
                 State('elevation-scale', 'value'),
                 State('pixel-scale', 'value'),
                 State('selected-layer', 'value')
-
             ]
         )
 
@@ -513,10 +512,8 @@ if __name__ == "__main__":
             Output(map, 'layers'),
             [
                 Input('layer-colorscale', 'colorscale'),
-
             ],
                 State('selected-layer', 'value')
-
         )
 
         def update_colorcsale(colorScale, layer_id):
@@ -698,7 +695,6 @@ if __name__ == "__main__":
                 Input('log-toggle-btn', 'n_clicks'),
             ],
                 State('selected-layer', 'value')
-
         )
 
         def toggle_log(n_clicks, layer_id):
@@ -727,7 +723,6 @@ if __name__ == "__main__":
                 Input(map, 'switch'),
             ],
                 State('selected-layer', 'value')
-
         )
 
         def toggle_shading(switch, layer_id):
@@ -755,7 +750,6 @@ if __name__ == "__main__":
                 Input('shader-toggle-replace-btn', 'n_clicks'),
             ],
                 State('selected-layer', 'value')
-
         )
 
         def toggle_shading_with_replace(n_clicks, layer_id):

@@ -1,5 +1,5 @@
-# 🌍 LayeredMap Component
-The new layered map component is a component for layered map data, like tile-data and webgl images. 
+# 🌍 LeafletMap Component
+The new leafletMap component is a component for layered map data, like tile-data and webgl images. 
 
 ## 📋 Table of contents
 - [Usage](#usage)
@@ -48,7 +48,7 @@ pip install -i https://test.pypi.org/simple/ webviz-beta==0.0.7
 
 ```python
 import dash
-import webviz_beta
+from webviz_subsurface_components import LeafletMap
 
 layers = [
     {
@@ -68,14 +68,14 @@ layers = [
 
 app = dash.Dash(__name__)
 
-new_layered_map = webviz_beta.NewLayeredMap(
+leaflet_map = LeafletMap(
     id='test-map',
     layers=layers,
 )
 
 app.layout = html.Div(
     children=[
-        new_layered_map
+        leaflet_map
     ]
 )
 
@@ -115,7 +115,7 @@ app.run_server(debug=True)
 These props are all object props, meaning you pass them to the component using JSON format:
 
 ```python
-layered_map_component = webviz_subsurface_components.NewLayeredMap(
+map_component = webviz_subsurface_components.LeafletMap(
         id="example-map",
         ...,
         drawTools={                     # Map tool
@@ -234,7 +234,7 @@ These props specify the different aspects of syncronization between maps.
 
 ## 📚 Layers
 
-Layers make the basis for the layered map component. Changing the map means adding, updating or deleting a layer in some way.
+Layers make the basis for the leafletMap component. Changing the map means adding, updating or deleting a layer in some way.
 
 This component is using leaflet.js, meaning we divide layers into two categories:
 - **Base layers:**
@@ -840,7 +840,7 @@ Example:
 ```python
 app.layout = html.Div(
     children=[
-        layered_map_component,
+        leaflet_map_component,
         html.Pre(id="polygon")
     ]
 )
