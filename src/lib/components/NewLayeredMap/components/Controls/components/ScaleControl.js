@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
-import ReactDOM from "react-dom";
+import { useState, useEffect, useContext} from "react";
 import PropTypes from "prop-types";
 import Context from '../../../context';
 

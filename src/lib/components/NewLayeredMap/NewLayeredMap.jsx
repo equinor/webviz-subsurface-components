@@ -79,7 +79,7 @@ class NewLayeredMap extends Component {
         NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
 
-        if(this.props.syncMapSize) {
+        if(this.props.autoScaleMap) {
             // If the width or height of the map changes, leaflet need to recalculate its dimensions
             this.onSizeChange = onSizeChange(this.mapEl, () => {
                 map.invalidateSize();
@@ -88,7 +88,7 @@ class NewLayeredMap extends Component {
     }
 
     componentDidUpdate() {
-        
+ 
     }
 
     componentWillMount() {
@@ -264,6 +264,7 @@ class NewLayeredMap extends Component {
                                         syncedMaps={[...(this.props.syncedMaps || []), this.state.id]}
                                         syncDrawings={this.props.syncDrawings}
                                         updateMode={this.props.updateMode}
+                                        setProps={this.setPropsExist}
                                     />
                                 )
                             }
@@ -385,6 +386,12 @@ NewLayeredMap.propTypes = {
     updateMode: PropTypes.string,
 
     /**
+     * autoScaleMap makes the map listen for changes in width and height and automatically recalculates
+     * the map dimensions when changes occur.
+     */
+    autoScaleMap: PropTypes.bool,
+
+    /**
      * Dash provided prop that returns the coordinates of the edited or clicked polyline
      */
     polyline_points: PropTypes.array,
@@ -404,12 +411,11 @@ NewLayeredMap.propTypes = {
      */
     click_position: PropTypes.array,   
 
-
     /**
-     * syncMapSize makes the map listen for changes in width and height and automatically recalculates
-     * the map dimensions when changes occur.
+     * Shape clicked on JSON format
      */
-    syncMapSize: PropTypes.bool,
+    clicked_shape: PropTypes.object,
+
 }
 
 

@@ -35,42 +35,56 @@ const addTooltip = (item, shapeObject) => {
 // Layer utils
 export const makePolyline = (item, swapXY, setProps) => {
     const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
-    return addTooltip(item, 
+    const shape = addTooltip(item, 
                 (L.polyline(pos, {
-                    onClick: () => setProps(positions),
                     color: item.color || "blue",
                     positions: pos
                 })
     ));
+    shape.on('mouseup', () => {
+        setProps({clicked_shape: item});
+    })
+    return shape;
 }
 
 export const makePolygon = (item, swapXY, setProps) => {
     const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
-    return addTooltip(item, 
+    const shape = addTooltip(item, 
                 (L.polygon(pos, {
-                    onClick: () => setProps(positions),
                     color: item.color || "blue",
                     positions: pos
                 })
     ));
+    shape.on('mouseup', () => {
+        setProps({clicked_shape: item});
+    })
+    return shape;
 }
 
-export const makeMarker = (item, swapXY) => {
+export const makeMarker = (item, swapXY, setProps) => {
     const pos = swapXY ? yx(item.position): item.position;
-    return  addTooltip(item, 
+    const shape = addTooltip(item, 
                 L.marker(pos)
     );
+    shape.on('mouseup', () => {
+        setProps({clicked_shape: item});
+    })
+    return shape;
 }
 
-export const makeCircle = (item, swapXY) => {
+export const makeCircle = (item, swapXY, setProps) => {
     const center = swapXY ? yx(item.center) : item.center;
-    return  addTooltip(item, 
+    const shape = addTooltip(item, 
                 (L.circle(center, {
                     color: item.color || "red",
                     center : center,
                     radius : item.radius
                 })
     ));
+    shape.on('mouseup', () => {
+        setProps({clicked_shape: item});
+    })
+    return shape;
 }
 
 export const makeCircleMarker = (item, swapXY) => {
@@ -107,4 +121,5 @@ export const addTile = (tileData) => {
     })
     return newTileLayer;
 }
+
 

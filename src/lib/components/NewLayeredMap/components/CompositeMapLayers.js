@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import Context from '../context'
+import Context from '../context';
 
 // Leaflet
 import L from 'leaflet';
@@ -138,15 +138,15 @@ class CompositeMapLayers extends Component {
         let newItem = null;
         switch(item.type) {
             case "polyline":
-                newItem = makePolyline(item, swapXY, this.props.lineCoords);
+                newItem = makePolyline(item, swapXY, this.props.setProps);
                 break;
 
             case "polygon":
-                newItem = makePolygon(item, swapXY, this.props.polygonCoords);
+                newItem = makePolygon(item, swapXY, this.props.setProps);
                 break;
 
             case "circle":
-                newItem = makeCircle(item, swapXY);
+                newItem = makeCircle(item, swapXY, this.props.setProps);
                 break;
             
             case "circleMarker":
@@ -154,7 +154,7 @@ class CompositeMapLayers extends Component {
                 break;
             
             case "marker":
-                newItem = makeMarker(item, swapXY);
+                newItem = makeMarker(item, swapXY, this.props.setProps);
                 break;
                 
             case "image":
@@ -263,7 +263,8 @@ class CompositeMapLayers extends Component {
          * For some reason moving the marker while using multiple maps in dash
          * throws an error in leaflet. Everything works fine as long as this is
          * surrounded in a try catch
-         */ 
+         */
+        
         try {
             this.context.drawLayer.clearLayers();
         } catch (error) {}
@@ -275,13 +276,18 @@ class CompositeMapLayers extends Component {
                 this.props.syncDrawings ? this.addItemToLayer(item, this.context.drawLayer, false) : itemsToDraw[item.type] = item;
             }   
         }
-
-        for (const item of this.context.drawLayerData) {
-            if (!itemsToDraw[item.type] || itemsToDraw[item.type].creationTime < item.creationTime) {
-                this.addItemToLayer(item, this.context.drawLayer, false);
-                delete itemsToDraw[item.type]
+        
+        // TODO: See if we can optimize the switch between drawing from the synced drawlayer and from state
+        if (!this.props.syncDrawings) {
+            for (const item of this.context.drawLayerData) {
+                if (!itemsToDraw[item.type] || itemsToDraw[item.type].creationTime < item.creationTime) {
+                    this.addItemToLayer(item, this.context.drawLayer, false);
+                    console.log("won't draw", item.type, " from synclayer")
+                    delete itemsToDraw[item.type]
+                }
             }
         }
+        
 
         Object.values(itemsToDraw).forEach(item => {
             this.addItemToLayer(item, this.context.drawLayer, false);

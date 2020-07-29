@@ -30,12 +30,15 @@ class DrawControls extends Component {
         this.state = {
             drawControl : null
         }
+
+        this.syncDrawingsRef = React.createRef();
     }
 
     componentDidMount() {
         const { drawPolygon, drawMarker, drawPolyline } = this.props;
         this.createDrawControl();
     }
+
 
     componentDidUpdate(prevProps) {
         if(this.props.drawPolygon !== prevProps.drawPolygon
@@ -45,6 +48,9 @@ class DrawControls extends Component {
             this.props.map.removeControl(this.state.drawControl);
             this.createDrawControl();
         }
+
+        // Make sure to update the props.syncDrawings reference
+        this.syncDrawingsRef.current = this.props.syncDrawings;
     }
     
     removeLayers(layerType, featureGroup) {
@@ -76,6 +82,7 @@ class DrawControls extends Component {
             }
 
         });
+        
         this.setState({drawControl: drawControl}, () => {
             this.addCircleMarker(this.props.map)
             this.addToolbar(this.props.map)
@@ -87,10 +94,12 @@ class DrawControls extends Component {
     addToolbar = (map) => {
 
         map.on(L.Draw.Event.CREATED, (e) => {
+            const syncDrawings = this.syncDrawingsRef.current || false;
+
             const type = e.layerType;
             const layer = e.layer;
             this.context.drawLayer.addLayer(layer)
-            props.syncDrawings ? this.context.syncedDrawLayerDelete(type) : this.context.drawLayerDelete(type)
+            syncDrawings ? this.context.syncedDrawLayerDelete(type) : this.context.drawLayerDelete(type)
             const newLayer = {type: type}
 
             switch(type) {
@@ -120,16 +129,19 @@ class DrawControls extends Component {
             }
             const d = new Date();
             newLayer["creationTime"] = d.getTime();
-            props.syncDrawings ? this.context.syncedDrawLayerAdd([newLayer]) : this.context.drawLayerAdd([newLayer]);
+            // TODO: create ref to read syncDrawings    
+            syncDrawings ? this.context.syncedDrawLayerAdd([newLayer]) : this.context.drawLayerAdd([newLayer]);
         });
         
     
         map.on(L.Draw.Event.EDITED, (e) => {
+            const syncDrawings = this.syncDrawingsRef.current || false;
+
             const newLayers = []
 
             e.layers.eachLayer(layer => {
                 const layerType = getShapeType(layer);
-                props.syncDrawings ? this.context.syncedDrawLayerDelete([layerType]) : this.context.drawLayerDelete([layerType]);
+                syncDrawings ? this.context.syncedDrawLayerDelete([layerType]) : this.context.drawLayerDelete([layerType]);
                 const editedLayer = {type: layerType};
                 switch(layerType) {
                     case "polyline":
@@ -161,13 +173,15 @@ class DrawControls extends Component {
                 editedLayer["creationTime"] = d.getTime();
                 newLayers.push(editedLayer);
             });
-            props.syncDrawings ? this.context.syncedDrawLayerAdd(newLayers) : this.context.drawLayerAdd(newLayers);
+            syncDrawings ? this.context.syncedDrawLayerAdd(newLayers) : this.context.drawLayerAdd(newLayers);
             this.context.setMode(null);
         });
 
         map.on(L.Draw.Event.DELETED, (e) => {
+            const syncDrawings = this.syncDrawingsRef.current || false;
+
             const deletedLayers = e.layers.getLayers().map(layer => getShapeType(layer));
-            props.syncDrawings ? this.context.syncedDrawLayerDelete(deletedLayers, true) : this.context.drawLayerDelete(deletedLayers)
+            syncDrawings ? this.context.syncedDrawLayerDelete(deletedLayers, true) : this.context.drawLayerDelete(deletedLayers)
             this.context.setMode(null);
         })
 
@@ -185,6 +199,8 @@ class DrawControls extends Component {
 
     addCircleMarker = (map) => {
         map.on('mouseup', (e) => {
+            const syncDrawings = this.syncDrawingsRef.current || false;
+
             const d = new Date();
             const circleMarker = {
                 type: "circleMarker",
@@ -196,7 +212,7 @@ class DrawControls extends Component {
             if (this.context.mode !== "editing") {
                 this.context.drawLayer.addLayer(L.circleMarker(circleMarker.center, circleMarker));
                 this.removeLayers("circleMarker", this.state.drawControl);
-                if (props.syncDrawings) {
+                if (syncDrawings) {
                     this.context.syncedDrawLayerDelete(["circleMarker"]);
                     this.context.syncedDrawLayerAdd([circleMarker]);
                 } else {
