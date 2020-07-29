@@ -79,7 +79,7 @@ class NewLayeredMap extends Component {
         NewLayeredMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
 
-        if(this.props.syncMapSize) {
+        if(this.props.autoScaleMap) {
             // If the width or height of the map changes, leaflet need to recalculate its dimensions
             this.onSizeChange = onSizeChange(this.mapEl, () => {
                 map.invalidateSize();
@@ -380,12 +380,10 @@ NewLayeredMap.propTypes = {
     updateMode: PropTypes.string,
 
     /**
-     * syncMapSize makes the map listen for changes in width and height and automatically recalculates
+     * autoScaleMap makes the map listen for changes in width and height and automatically recalculates
      * the map dimensions when changes occur.
-     * 
-     * // TODO: maybe give this a different name?
      */
-    syncMapSize: PropTypes.bool,
+    autoScaleMap: PropTypes.bool,
 
     /**
      * Dash provided prop that returns the coordinates of the edited or clicked polyline
