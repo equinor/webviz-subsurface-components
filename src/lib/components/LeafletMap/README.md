@@ -115,7 +115,7 @@ app.run_server(debug=True)
 These props are all object props, meaning you pass them to the component using JSON format:
 
 ```python
-map_component = webviz_subsurface_components.LeafletMap(
+leaflet_map_component = webviz_subsurface_components.LeafletMap(
         id="example-map",
         ...,
         drawTools={                     # Map tool
