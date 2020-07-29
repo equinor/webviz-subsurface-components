@@ -249,6 +249,7 @@ class NewLayeredMap extends Component {
                                             scaleY={this.props.scaleY}
                                             switch={this.props.switch}
                                             colorBar={this.props.colorBar}
+                                            unitScale={this.props.unitScale}
                                             drawTools={this.props.drawTools}
                                             mouseCoords = {this.props.mouseCoords}
                                             syncDrawings={this.props.syncDrawings}
@@ -336,6 +337,11 @@ NewLayeredMap.propTypes = {
     colorBar: PropTypes.shape({
         position: PropTypes.string,
     }),
+
+    /**
+     * UnitScale is a box that displays the the current unit scale on the map.
+     */
+    unitScale: PropTypes.bool,
 
     center: PropTypes.array,
     /**

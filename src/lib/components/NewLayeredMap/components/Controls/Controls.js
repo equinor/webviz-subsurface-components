@@ -5,9 +5,10 @@ import PropTypes from 'prop-types';
 // Components
 import VerticalZoom from './components/VerticalZoom/VerticalZoom';
 import DrawControls from './components/DrawControls';
-import ColorBar from './components/Colorbar'
+import ColorBar from './components/Colorbar';
+import ScaleControl from './components/ScaleControl';
 import Switch from './components/Switch/Switch';
-import MousePosition from './components/MousePosition'
+import MousePosition from './components/MousePosition';
 
 class Controls extends Component {
     
@@ -81,6 +82,14 @@ class Controls extends Component {
                         <ColorBar
                             map = {this.props.map}
                             position = {(this.props.colorBar || {}).position}
+                        />
+                    }
+                </div>
+                <div>
+                    {   (this.props.unitScale) &&
+                        <ScaleControl 
+                            map = {this.props.map}
+                            position = {(this.props.unitScale || {}).position}
                         />
                     }
                 </div>

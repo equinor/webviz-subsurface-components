@@ -74,7 +74,7 @@ const NewLayeredMapDemo = () => {
                         position: "topright",
                         
                     }}
-                     mouseCoords = {{
+                    mouseCoords = {{
                         position: "bottomright",
                     }} 
                     switch={{
@@ -82,6 +82,7 @@ const NewLayeredMapDemo = () => {
                         label: 'Hillshading',
                         position: 'bottomleft'
                     }}
+                    unitScale={{}}
                     setProps={onChange}
                 />
             </div>
