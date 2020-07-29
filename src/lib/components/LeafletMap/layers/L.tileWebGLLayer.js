@@ -4,8 +4,6 @@ import { buildColormap } from '../utils/colorScale';
 
 import { tilesToImage } from '../utils/image'
 
-const DRAW_STRATEGY_NORMAL = 'normal';
-const DRAW_STRATEGY_ADJACENT = 'adjacent';
 const DRAW_STRATEGY_FULL = 'full';
 
 /**
