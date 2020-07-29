@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
 // Components
-import NewLayeredMap from '../lib/components/NewLayeredMap';
+import LeafletMap from '../lib/components/LeafletMap';
 
 // Assets
-import exampleData from './example-data/new-layered-map.json';
-import { NewLayeredMap } from '../lib/index';
+import exampleData from './example-data/leaflet-map.json';
+import { LeafletMap } from '../lib/index';
 
 const DEFAULT_COLORMAP = {
     "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
@@ -15,7 +15,7 @@ const DEFAULT_COLORMAP = {
     "cutPointMax": 3500
 };
 
-const NewLayeredMapDemo = () => {
+const LeafletMapDemo = () => {
 
 
     const [switchValue, setSwitchValue] = useState(true);
@@ -50,9 +50,9 @@ const NewLayeredMapDemo = () => {
     return (
         <div style={{ display: 'grid', gridTemplateColumns: "1fr 1fr", gridTemplateRows: '1fr 1fr', height: '180vh'}}>
            {/* <div>
-                 <NewLayeredMap 
-                    id={"NewLayeredMap-1"}
-                    syncedMaps={["NewLayeredMap-2", "NewLayeredMap-1"]}
+                 <LeafletMap 
+                    id={"LeafletMap-1"}
+                    syncedMaps={["LeafletMap-2", "LeafletMap-1"]}
                     syncDrawings={true}
                     layers={layers}
                     center={[0, 0]}
@@ -87,9 +87,9 @@ const NewLayeredMapDemo = () => {
                 />
             </div>
              <div >
-                <NewLayeredMap 
-                    id={"NewLayeredMap-2"}
-                    syncedMaps={["NewLayeredMap-1", "NewLayeredMap-2"]}
+                <LeafletMap 
+                    id={"LeafletMap-2"}
+                    syncedMaps={["LeafletMap-1", "LeafletMap-2"]}
                     syncDrawings={true}
                     layers={layers}
                     colorBar={{
@@ -117,9 +117,9 @@ const NewLayeredMapDemo = () => {
                 />
             </div> */}
             <div >
-                <NewLayeredMap 
-                    id={"NewLayeredMap-3"}
-                    syncedMaps={["NewLayeredMap-4"]}
+                <LeafletMap 
+                    id={"LeafletMap-3"}
+                    syncedMaps={["LeafletMap-4"]}
                    // syncDrawings={true}
                     layers={layers}
                     unitScale={{ 
@@ -150,9 +150,9 @@ const NewLayeredMapDemo = () => {
                 />
             </div> 
             <div >
-                <NewLayeredMap 
-                    id={"NewLayeredMap-4"}
-                    syncedMaps={["NewLayeredMap-3"]}
+                <LeafletMap 
+                    id={"LeafletMap-4"}
+                    syncedMaps={["LeafletMap-3"]}
                     syncDrawings={true}
                     layers={layers}
                     colorBar={{
@@ -184,4 +184,4 @@ const NewLayeredMapDemo = () => {
     )
 }
 
-export default NewLayeredMapDemo;
+export default LeafletMapDemo;

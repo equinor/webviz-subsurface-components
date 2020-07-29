@@ -1,5 +1,5 @@
-# 🌍 LayeredMap Component
-The new layered map component is a component for layered map data, like tile-data and webgl images. 
+# 🌍 LeafletMap Component
+The new leafletMap component is a component for layered map data, like tile-data and webgl images. 
 
 ## 📋 Table of contents
 - [Usage](#usage)
@@ -13,7 +13,13 @@ The new layered map component is a component for layered map data, like tile-dat
 - [Layers](#layers)
     - [Structure](#structure)
     - [Layer types](#layer-types)
+        - [Image layers](#image-layers)
+        - [Tile layers](#tile-layers)
+        - [Shapes and drawings](#shapes-and-drawings)
+    <br>    
     - [Updating layers](#updating-layers)
+        - [With action](#updating-layers-with-action)
+        - [With replace](#updating-layers-with-replace)
     <br>
     - [Color scales](#colorscales)
     - [Shaders](#shaders)
@@ -24,31 +30,32 @@ The new layered map component is a component for layered map data, like tile-dat
 
 ## 🌤 Features
 * WebGL Image-layer support
-* WebGL Time-layer support
+* WebGL Tile-layer support
 * Custom colorscales
     * Logarithmic option
     * Cutoff points options   
 * Advanced hillshading
 * Soft hillshading
 * Drawing of polylines, polygons, circles, and markers
-* Movement synchronization between multiple instances
+* Movement and draw synchronization between multiple instances
 
 ## 🌋 Usage
 The component can be either used as an Dash-component or as a plain React component. This README will focus on Dash usages of the component.
 
 ### Getting started
-Downloading the component
 
-#### Unofficial version
+#### Installation
 ```
-pip install -i https://test.pypi.org/simple/ webviz-beta==0.0.7
+pip install webviz-subsurface-components 
 ```
 
 ### Using the component
 
+This is a very basic example of how the component can be used.
+
 ```python
 import dash
-import webviz_beta
+from webviz_subsurface_components import LeafletMap
 
 layers = [
     {
@@ -68,14 +75,14 @@ layers = [
 
 app = dash.Dash(__name__)
 
-new_layered_map = webviz_beta.NewLayeredMap(
+leaflet_map = LeafletMap(
     id='test-map',
     layers=layers,
 )
 
 app.layout = html.Div(
     children=[
-        new_layered_map
+        leaflet_map
     ]
 )
 
@@ -115,7 +122,7 @@ app.run_server(debug=True)
 These props are all object props, meaning you pass them to the component using JSON format:
 
 ```python
-layered_map_component = webviz_subsurface_components.NewLayeredMap(
+leaflet_map_component = webviz_subsurface_components.LeafletMap(
         id="example-map",
         ...,
         drawTools={                     # Map tool
@@ -137,11 +144,11 @@ Adds a slider which can scale the Y axis of the map.
 Example:
 ```python
 scaleY={
-        "scaleY": 1,                # Current slider value
-        "minScaleY": 1,             # Min slider value
-        "maxScaleY": 5,             # Max slider value
-        "position": 'topleft',
-    }
+    "scaleY": 1,                # Current slider value
+    "minScaleY": 1,             # Min slider value
+    "maxScaleY": 5,             # Max slider value
+    "position": 'topleft',
+}
 ```
 
 <br>
@@ -153,11 +160,11 @@ Example:
 
 ```python
 drawTools={
-        "drawMarker": True,         # Toggles marker draw tool
-        "drawPolygon": True,        # Toggles polygon draw tool
-        "drawPolyline": True,       # Toggles polyline draw tool
-        "position": "topright"
-    }
+    "drawMarker": True,         # Toggles marker draw tool
+    "drawPolygon": True,        # Toggles polygon draw tool
+    "drawPolyline": True,       # Toggles polyline draw tool
+    "position": "topright"
+}
 ```
 
 <br>
@@ -173,7 +180,7 @@ switch={
     "disabled": False,              # Toggles switch disable
     "label": "hillshading",         # Label text for the switch
     "position": "bottomleft"
-    }
+}
 ```
 
 <br>
@@ -185,8 +192,8 @@ Example:
 
 ```python
 mouseCoords={
-        "position": "bottomright"
-    }
+    "position": "bottomright"
+}
 ```
 
 <br>
@@ -198,8 +205,8 @@ Example:
 
 ```python
 colorBar={
-        "position": "bottomleft"
-    }
+    "position": "bottomleft"
+}
 ```
 
 <br>
@@ -211,8 +218,8 @@ Example:
 
 ```python
 unitScale={
-        "position": "bottomright"
-    }
+    "position": "bottomright"
+}
 ```
 
 <br>
@@ -234,7 +241,7 @@ These props specify the different aspects of syncronization between maps.
 
 ## 📚 Layers
 
-Layers make the basis for the layered map component. Changing the map means adding, updating or deleting a layer in some way.
+Layers make the basis for the LeafletMap component. Changing the map means adding, updating or deleting a layer in some way.
 
 This component is using leaflet.js, meaning we divide layers into two categories:
 - **Base layers:**
@@ -294,8 +301,8 @@ Currently the component supports three Layer types which can go inside the data 
 
 ```python
 {
-    "id": 123,
-    "name": "Image layer",
+    "id": 123,                                  # REQUIRED
+    "name": "Image layer",                      # REQUIRED
     "baseLayer": True,                          # Usually base layer
     "checked": True,
     
@@ -318,7 +325,7 @@ Currently the component supports three Layer types which can go inside the data 
 }
 ```
 
-Image layers supports images on a base64 format with the displayed specification props. 
+Image layers supports images on a base64 format, or a CORS supported url with the displayed specification props. 
 Please note that an image layer typically only has one layer data object. It is possible to have several image layer data objects in on layer, but you have to be careful to make sure the bounds of the images do not intersect.
 Several images in the same layer will only show up as one layer in the layer control.
 
@@ -332,8 +339,8 @@ More information on:
 
 ```python
 {
-    "id": 123,
-    "name": "Tile layer",
+    "id": 123,                          # REQUIRED
+    "name": "Tile layer",               # REQUIRED
     "baseLayer": True,                  # Usually base layer
     "checked": True,
 
@@ -350,6 +357,7 @@ More information on:
             "minvalue": 0,              # Min z-value
             "maxvalue": 1000,           # Max z-value
             "unit": "m"                 # Unit for the z-value (for display purposes)
+            "drawStrategy": None        # None or "full". See shaders section
         }
     ]
 }
@@ -518,12 +526,14 @@ We will use the following layers as an example:
     }
 ]
 ```
+<br>
 
 #### Updating layers with action
 
 The default way of changing layers is with the _action_ field in the layer object.
 The component stores all the layers you give it internally, so if you wish to change something, you simply write a callback which returns a list with the layer objects you wish to change to the _layers_ prop.
 
+<br>
 
 ##### Add
 
@@ -619,6 +629,7 @@ To delete a layer you only need to pass the id and `"action": "delete"`.
 This will delete the layer we added in the add example:
 
 ```python
+# DELETE WITH ACTION
 @app.callback(
     Output('test-map', 'layers'),
     [Input('layer-add-btn', 'n_clicks')]
@@ -626,7 +637,7 @@ This will delete the layer we added in the add example:
 def delete_layer(n_clicks):
     # n_clicks tracks number of times the button has been clicked
     if n_clicks is not None:
-        # Delete layer with id: 3
+        # Delete layer with id: 2
         return [
             {
                 "id": 2,            # Required,
@@ -770,6 +781,8 @@ Shaders only works for only two layer types - _image_- and _tile_-layers. You ca
 | type            | String  | The type of shader that should be used. It can either be null, hillshading or soft-hillshading.                                                                                                  | null    |
 | setBlackToAlpha | Boolean | If true, all colors with RGB(0,0,0) will have the alpha be set to 0.0, making all the black in the image transparent. This is useful if your images have a black background you want to remove.  | false   |
 
+<br>
+
 #### 🏔 Hillshading
 Hillshading is a shader that generates elevation and senes of relief to images. It can be enabled the following way:
 ```javascript
@@ -793,6 +806,17 @@ This kind of hillshading is expensive for huge images, especially with shadows. 
 Here is a brief visualization of the hillshader with different kind of shadow-configuration.
 ![ShadowComparison](https://user-images.githubusercontent.com/31648998/87668347-394d8b00-c76c-11ea-94d0-b221a168930c.png)
 
+When using shadows with TileLayer one can notice that the generated shadows are not continuous between the tiles, because the TileLayer draws all the tiles indepedently. However, a solution is to draw all the tiles all at once, which can be done by changing the _draw-strategy_ for the TileLayer the following way:
+```python
+{
+    "type": "tile",
+    ...
+    "drawStrategy": "full",
+}
+```
+
+<br>
+
 ##### Hillshading options
 | Name             | Type          | Description                                                                                                                                                                                                                                 | Default   |
 |------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
@@ -800,8 +824,7 @@ Here is a brief visualization of the hillshader with different kind of shadow-co
 | elevationScale   | Number        | ElevationScale is a variable for scaling the generated elevation of the image. The greater the scale, the higher the "_mountains_". If you have _shadows_ enabled, but see no shadows, maybe your elevation is too low.                     | 1.0       |
 | shadows          | Boolean       | If shadows should be applied to the provided image or not. Note that shadows is quite heavy computational, especially for big images. Try to decrease the _shadowsIterations_ field if you have troubles rendering with shadows.            | false     |
 | shadowIterations | Number        | The number of iterations the shadows should be applied on. The higher number of iterations the greater the result, but also more heavy the generation gets. Your browser might not support too high iteration-number, especially on Chrome. | null      |
-| sunDirection     | Array<Number> | A vector of length 3 indicating the direction from the surface to the sun. Should be a normalized vector with values between 0 and 1.| [1, 1, 1] |
-| noColor          | Boolean       |  If true, the color-step is skipped and the colormap will not be drawn to the canvas. Instead direct lighting will be used, displaying a grayscale image. | false |            
+
 <br>
 
 #### Soft hillshading
@@ -816,35 +839,35 @@ If the normal hillshading-shader is too heavy computational, there is also a sof
     ...
 }
 ```
-
+ 
 <br>
-
+ 
 ##### Soft hillshading options
 | Name           | Type          | Description                                                                                                       | Default   |
 |----------------|---------------|-------------------------------------------------------------------------------------------------------------------|-----------|
 | elevationScale | Number        | A variable for scaling the generated elevation of the image. The greater the scale, the higher the "_mountains_". | 0.03      |
 | lightDirection | Array<Number> | A vector of length 3 indicating the direction from the surface to the sun.                                        | [1, 1, 1] |
-
+ 
 <br>
-
+ 
 -------------------------------
-
+ 
 <br>
-
+ 
 ## 🎙 Listeners
-
+ 
 There are some listeners the python user can access using callbacks, such as the coordinates of a mouse click or a drawing.
-
+ 
 Example:
-
+ 
 ```python
 app.layout = html.Div(
     children=[
-        layered_map_component,
+        leaflet_map_component,
         html.Pre(id="polygon")
     ]
 )
-
+ 
 @app.callback(
      Output("polygon", "children"),
      [Input("example-map", "polygon_points")]
@@ -852,7 +875,7 @@ app.layout = html.Div(
 def get_polygon_coords(coords):
     return f"polygon coordinates: {json.dumps(coords)}"
 ```
-
+ 
 <br>
 
 | Name                | Output format             | Description                                       |

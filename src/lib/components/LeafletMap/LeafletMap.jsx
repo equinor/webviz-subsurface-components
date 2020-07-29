@@ -12,7 +12,7 @@ import CompositeMapLayers from './components/CompositeMapLayers';
 import Context from './context';
 
 // Assets
-import exampleData from '../../../demo/example-data/new-layered-map.json';
+import exampleData from '../../../demo/example-data/leaflet-map.json';
 
 // Utils
 import { onSizeChange } from './utils/element';
@@ -28,7 +28,7 @@ const stringToCRS = (crsString) => {
     }
 }
 
-class NewLayeredMap extends Component {
+class LeafletMap extends Component {
 
     static mapReferences = {};
     static syncedDrawLayer = {
@@ -66,6 +66,7 @@ class NewLayeredMap extends Component {
 
 
     componentDidMount() {
+        
         const map = L.map(this.mapEl, {
             crs: this.state.crs,
             center: this.state.center,
@@ -76,7 +77,7 @@ class NewLayeredMap extends Component {
             zoomAnimation: true,
         });
         this.setState({map: map});
-        NewLayeredMap.mapReferences[this.state.id] = this;
+        LeafletMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
 
         if(this.props.autoScaleMap) {
@@ -102,15 +103,15 @@ class NewLayeredMap extends Component {
         map.on('zoomanim', e => {
             
             (this.props.syncedMaps || []).forEach(id => {
-                if(!NewLayeredMap.mapReferences[id] || id === this.state.id) {
+                if(!LeafletMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
 
                 // e.zoom provides zoom level after zoom unlike getZoom()
                 if (
-                    e.zoom !== NewLayeredMap.mapReferences[id].getMap().getZoom()
+                    e.zoom !== LeafletMap.mapReferences[id].getMap().getZoom()
                 ) {
-                    NewLayeredMap.mapReferences[id].getMap().setView(
+                    LeafletMap.mapReferences[id].getMap().setView(
                         e.center,
                         e.zoom
                     )
@@ -122,14 +123,14 @@ class NewLayeredMap extends Component {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
             (this.props.syncedMaps || []).forEach(id => {
-                if(!NewLayeredMap.mapReferences[id] || id === this.state.id) {
+                if(!LeafletMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
 
                 if (
                     typeof e.originalEvent !== "undefined"
                 ) {
-                    NewLayeredMap.mapReferences[id].getMap().setView(
+                    LeafletMap.mapReferences[id].getMap().setView(
                         e.target.getCenter()
                     )
                 }
@@ -172,14 +173,14 @@ class NewLayeredMap extends Component {
     syncedDrawLayerAdd = (newLayers) => {
         for (const layer of newLayers) {
             layer["creatorId"] = this.state.id;
-            NewLayeredMap.syncedDrawLayer.data.push(layer);
+            LeafletMap.syncedDrawLayer.data.push(layer);
         }
         this.redrawAllSyncedMaps();
     }
 
     syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
         const syncedMaps = [...this.props.syncedMaps, this.state.id];
-        NewLayeredMap.syncedDrawLayer.data = NewLayeredMap.syncedDrawLayer.data.filter((drawing) => {
+        LeafletMap.syncedDrawLayer.data = LeafletMap.syncedDrawLayer.data.filter((drawing) => {
             return !syncedMaps.includes(drawing.creatorId) || !layerTypes.includes(drawing.type);
         })
         if (shouldRedraw) {
@@ -191,7 +192,7 @@ class NewLayeredMap extends Component {
         if (this.props.syncDrawings) {
             for (const id of this.props.syncedMaps || []) {
                 if (id !== this.state.id) {
-                    const otherMap = NewLayeredMap.mapReferences[id];
+                    const otherMap = LeafletMap.mapReferences[id];
                     otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
                 }
             }
@@ -230,7 +231,7 @@ class NewLayeredMap extends Component {
                         <Context.Provider value={{
                                 drawLayer: this.state.drawLayer,
                                 drawLayerData: this.state.drawLayerData,
-                                syncedDrawLayer: NewLayeredMap.syncedDrawLayer,
+                                syncedDrawLayer: LeafletMap.syncedDrawLayer,
                                 mode: this.state.mode,
                                 setMode: this.setMode,
                                 drawLayerAdd: this.drawLayerAdd,
@@ -275,9 +276,9 @@ class NewLayeredMap extends Component {
     }
 
 }
-NewLayeredMap.contextType = Context;
+LeafletMap.contextType = Context;
 
-NewLayeredMap.propTypes = {
+LeafletMap.propTypes = {
    
     /**
      * The ID of this component, used to identify dash components
@@ -421,4 +422,4 @@ NewLayeredMap.propTypes = {
 }
 
 
-export default NewLayeredMap;
+export default LeafletMap;
