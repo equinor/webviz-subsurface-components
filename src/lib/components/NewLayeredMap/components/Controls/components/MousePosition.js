@@ -200,7 +200,7 @@ const MousePosition = (props) => {
 
     const subscribeToMapClick = () => {
         props.map.addEventListener('mousemove', onCanvasMouseMove)
-        props.map.addEventListener('click', onCanvasMouseClick)
+        props.map.addEventListener('mouseup', onCanvasMouseClick)
     }
 
     const mapZValue = (redColorvalue) => {

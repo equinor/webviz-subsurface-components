@@ -286,7 +286,6 @@ class CompositeMapLayers extends Component {
             for (const item of this.context.drawLayerData) {
                 if (!itemsToDraw[item.type] || itemsToDraw[item.type].creationTime < item.creationTime) {
                     this.addItemToLayer(item, this.context.drawLayer, false);
-                    console.log("won't draw", item.type, " from synclayer")
                     delete itemsToDraw[item.type]
                 }
             }

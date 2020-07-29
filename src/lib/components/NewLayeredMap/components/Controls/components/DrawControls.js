@@ -129,7 +129,7 @@ class DrawControls extends Component {
             }
             const d = new Date();
             newLayer["creationTime"] = d.getTime();
-            // TODO: create ref to read syncDrawings    
+  
             syncDrawings ? this.context.syncedDrawLayerAdd([newLayer]) : this.context.drawLayerAdd([newLayer]);
         });
         
