@@ -87,7 +87,7 @@ class NewLayeredMap extends Component {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate() {
  
     }
 
