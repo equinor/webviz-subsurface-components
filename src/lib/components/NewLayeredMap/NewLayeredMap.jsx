@@ -88,7 +88,7 @@ class NewLayeredMap extends Component {
     }
 
     componentDidUpdate() {
-        
+ 
     }
 
     componentWillMount() {

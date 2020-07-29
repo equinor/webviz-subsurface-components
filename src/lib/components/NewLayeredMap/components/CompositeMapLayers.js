@@ -267,7 +267,8 @@ class CompositeMapLayers extends Component {
          * For some reason moving the marker while using multiple maps in dash
          * throws an error in leaflet. Everything works fine as long as this is
          * surrounded in a try catch
-         */ 
+         */
+        
         try {
             this.context.drawLayer.clearLayers();
         } catch (error) {}
@@ -279,13 +280,18 @@ class CompositeMapLayers extends Component {
                 this.props.syncDrawings ? this.addItemToLayer(item, this.context.drawLayer, false) : itemsToDraw[item.type] = item;
             }   
         }
-
-        for (const item of this.context.drawLayerData) {
-            if (!itemsToDraw[item.type] || itemsToDraw[item.type].creationTime < item.creationTime) {
-                this.addItemToLayer(item, this.context.drawLayer, false);
-                delete itemsToDraw[item.type]
+        
+        // TODO: See if we can optimize the switch between drawing from the synced drawlayer and from state
+        if (!this.props.syncDrawings) {
+            for (const item of this.context.drawLayerData) {
+                if (!itemsToDraw[item.type] || itemsToDraw[item.type].creationTime < item.creationTime) {
+                    this.addItemToLayer(item, this.context.drawLayer, false);
+                    console.log("won't draw", item.type, " from synclayer")
+                    delete itemsToDraw[item.type]
+                }
             }
         }
+        
 
         Object.values(itemsToDraw).forEach(item => {
             this.addItemToLayer(item, this.context.drawLayer, false);
