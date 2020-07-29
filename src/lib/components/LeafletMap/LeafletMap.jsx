@@ -66,8 +66,7 @@ class LeafletMap extends Component {
 
 
     componentDidMount() {
-        console.log("wooooooooooooow");
-
+        
         const map = L.map(this.mapEl, {
             crs: this.state.crs,
             center: this.state.center,
