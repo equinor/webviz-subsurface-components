@@ -169,6 +169,11 @@ L.TileWebGLLayer = L.GridLayer.extend({
     },
 
     updateOptions: function() {
+        Util.setOptions(this, {
+            ...this.options,
+            ...options,
+        });
+
         this._initColormap();
 
         if (this.options.drawStrategy === DRAW_STRATEGY_FULL) {
