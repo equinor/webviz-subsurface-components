@@ -1,22 +1,21 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
+import React from "react";
+import ReactDOM from "react-dom";
+import PropTypes from "prop-types";
 
 // Leaflet imports
-import L from 'leaflet';
-import './L.SwitchControl.js';
+import L from "leaflet";
+import "./L.SwitchControl.js";
 
 // Material UI components
 import MaterialSwitch from "@material-ui/core/Switch";
 
 class Switch extends React.Component {
-
     constructor(props) {
         super(props);
 
         this.state = {
             switchCtrl: null,
-        }
+        };
     }
 
     componentDidMount() {
@@ -34,19 +33,19 @@ class Switch extends React.Component {
         this.setState({
             switchCtrl,
         });
-    }
+    };
 
     removeSwitch = () => {
-        if(!this.state.switchCtrl) {
+        if (!this.state.switchCtrl) {
             return;
         }
 
         this.state.switchCtrl.remove();
-        this.setState({ switchCtrl: null })
-    }
+        this.setState({ switchCtrl: null });
+    };
 
     handleChange = (event) => {
-        if(this.props.setProps) {
+        if (this.props.setProps) {
             const curProps = Object.assign({}, this.props);
             delete curProps.map;
             delete curProps.setProps;
@@ -55,16 +54,15 @@ class Switch extends React.Component {
                 switch: {
                     ...curProps,
                     value: event.target.checked,
-                }
-            })
+                },
+            });
         }
-    }
+    };
 
     render() {
-        if(!this.state.switchCtrl || !this.state.switchCtrl.panelDiv) {
+        if (!this.state.switchCtrl || !this.state.switchCtrl.panelDiv) {
             return null;
         }
-
 
         return ReactDOM.createPortal(
             <div style={{ paddingLeft: "10px", paddingRight: "10px" }}>
@@ -73,17 +71,16 @@ class Switch extends React.Component {
                     onChange={this.handleChange}
                     checked={this.props.value}
                 />
-                { this.props.label }
-            </div>
-        , this.state.switchCtrl.panelDiv)
+                {this.props.label}
+            </div>,
+            this.state.switchCtrl.panelDiv
+        );
     }
-
 }
 
 Switch.propTypes = {
-
     map: PropTypes.object.isRequired,
-    
+
     value: PropTypes.bool,
 
     setProps: PropTypes.func,
@@ -91,11 +88,10 @@ Switch.propTypes = {
     position: PropTypes.string,
 
     label: PropTypes.string,
-}
+};
 
 Switch.defaultProps = {
-
-    position: 'bottomleft'
-}
+    position: "bottomleft",
+};
 
 export default Switch;

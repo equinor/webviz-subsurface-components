@@ -1,24 +1,24 @@
 /**
  * !NB - This file implements only the necessary functions of gl-matrix's Vec3
- * instead of installing the entire dependency. If the demand of gl-matrix functionality 
- * increases, one might transition over to the gl-matrix package instead. 
+ * instead of installing the entire dependency. If the demand of gl-matrix functionality
+ * increases, one might transition over to the gl-matrix package instead.
  */
 
 /**
- * @typedef {Array<Number>} Vec3 
+ * @typedef {Array<Number>} Vec3
  */
 
- /**
-  * @returns {Vec3}
-  */
-export const create = (x = 0, y = 0, z = 0) =>  {
+/**
+ * @returns {Vec3}
+ */
+export const create = (x = 0, y = 0, z = 0) => {
     return [x, y, z];
-}
+};
 
 /**
- * @param {Vec} out 
- * @param {Vec} vec 
- * @param {Vec} vec2 
+ * @param {Vec} out
+ * @param {Vec} vec
+ * @param {Vec} vec2
  * @returns {Vec}
  */
 export const add = (out, vec, vec2) => {
@@ -26,12 +26,12 @@ export const add = (out, vec, vec2) => {
     out[1] = vec[1] + vec2[1];
     out[2] = vec[2] + vec2[2];
     return out;
-}
+};
 
 /**
- * @param {Vec3} out 
- * @param {Vec3} vec 
- * @param {Number} scale 
+ * @param {Vec3} out
+ * @param {Vec3} vec
+ * @param {Number} scale
  * @returns {Vec3}
  */
 export const scale = (out, vec, scale) => {
@@ -39,12 +39,12 @@ export const scale = (out, vec, scale) => {
     out[1] = vec[1] * scale;
     out[2] = vec[2] * scale;
     return out;
-}
+};
 
 /**
- * 
- * @param {Vec} out 
- * @param {Vec} vec 
+ *
+ * @param {Vec} out
+ * @param {Vec} vec
  * @returns {Vec}
  */
 export const normalize = (out, vec) => {
@@ -52,8 +52,8 @@ export const normalize = (out, vec) => {
     let y = vec[1];
     let z = vec[2];
 
-    let length = x*x + y*y + z*z;
-    if(length > 0) {
+    let length = x * x + y * y + z * z;
+    if (length > 0) {
         length = 1 / Math.sqrt(length);
     }
 
@@ -61,27 +61,26 @@ export const normalize = (out, vec) => {
     out[1] = vec[1] * length;
     out[2] = vec[2] * length;
     return out;
-}
+};
 
 /**
- * 
- * @param {Vec} out 
- * @param {Number} scale 
+ *
+ * @param {Vec} out
+ * @param {Number} scale
  * @returns {Vec}
  */
 export const random = (out, scale) => {
     scale = scale || 1.0;
-  
+
     let r = Math.random() * 2.0 * Math.PI;
     let z = Math.random() * 2.0 - 1.0;
     let zScale = Math.sqrt(1.0 - z * z) * scale;
-  
+
     out[0] = Math.cos(r) * zScale;
     out[1] = Math.sin(r) * zScale;
     out[2] = z * scale;
     return out;
-}
-
+};
 
 export default {
     create,
@@ -89,5 +88,4 @@ export default {
     scale,
     normalize,
     random,
-}
-
+};
