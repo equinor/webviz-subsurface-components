@@ -63,11 +63,10 @@ class CanvasOverlay extends MapLayer {
         super.componentDidMount();
         this.props.drawMethod(this.el);
         this._reset();
-        
+
         this.el.onclick = e => {
             if (this.props.original_data.loaded) {
                 const client_rect = this.el.getBoundingClientRect();
-
                 const x = Math.floor(
                     ((e.clientX - client_rect.left) / client_rect.width) *
                         this.props.original_data.ImageData.width
