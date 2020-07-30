@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
 const Context = React.createContext({
-    drawLayer: {}, 
-    syncedDrawLayer: {data: []},
+    drawLayer: {},
+    syncedDrawLayer: { data: [] },
     syncedDrawLayerAdd: () => {},
     syncedDrawLayerDelete: () => {},
 });

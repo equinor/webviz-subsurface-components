@@ -1,16 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
+import React from "react";
+import ReactDOM from "react-dom";
+import PropTypes from "prop-types";
 
 // Leaflet
-import L from 'leaflet';
-import './L.VerticalZoom';
+import L from "leaflet";
+import "./L.VerticalZoom";
 
 // Material UI Components
-import { Slider } from '@material-ui/core';
+import { Slider } from "@material-ui/core";
 
 class VerticalZoom extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -23,7 +22,7 @@ class VerticalZoom extends React.Component {
     componentDidMount() {
         this.createNewMapControl();
 
-        if(this.props.scaleY) {
+        if (this.props.scaleY) {
             this.updateVerticalZoom(this.props.scaleY);
         }
     }
@@ -40,22 +39,22 @@ class VerticalZoom extends React.Component {
 
     createNewMapControl() {
         this.removeMapControl();
-        
+
         const verticalZoomCtrl = L.verticalZoom(this.props.position);
         verticalZoomCtrl.addTo(this.props.map);
 
         this.setState({
             verticalZoomCtrl: verticalZoomCtrl,
-        })
+        });
     }
 
     removeMapControl() {
-        if(!this.state.verticalZoomCtrl) {
+        if (!this.state.verticalZoomCtrl) {
             return;
         }
 
         this.state.verticalZoomCtrl.remove();
-        this.setState({verticalZoomCtrl: null});
+        this.setState({ verticalZoomCtrl: null });
     }
 
     onSliderValueChange(event, sliderValue) {
@@ -63,7 +62,7 @@ class VerticalZoom extends React.Component {
     }
 
     updateVerticalZoom(scaleY) {
-        if(this.state.scaleY === scaleY) {
+        if (this.state.scaleY === scaleY) {
             return;
         }
 
@@ -79,11 +78,14 @@ class VerticalZoom extends React.Component {
         map.setView(center, zoom);
         map._resetView(center, zoom);
 
-        this.setState({scaleY: scaleY})
+        this.setState({ scaleY: scaleY });
     }
 
     render() {
-        if(!this.state.verticalZoomCtrl || !this.state.verticalZoomCtrl.panelDiv) {
+        if (
+            !this.state.verticalZoomCtrl ||
+            !this.state.verticalZoomCtrl.panelDiv
+        ) {
             return null;
         }
 
@@ -96,11 +98,9 @@ class VerticalZoom extends React.Component {
                 max={this.props.maxScaleY}
                 onChange={this.onSliderValueChange}
             />,
-            this.state.verticalZoomCtrl.panelDiv,
+            this.state.verticalZoomCtrl.panelDiv
         );
     }
-
-
 }
 
 VerticalZoom.propTypes = {
@@ -111,13 +111,13 @@ VerticalZoom.propTypes = {
 
     minScaleY: PropTypes.number,
     maxScaleY: PropTypes.number,
-}
+};
 
 VerticalZoom.defaultProps = {
-    position: 'topleft',
+    position: "topleft",
 
     minScaleY: 1,
     maxScaleY: 10,
-}
+};
 
 export default VerticalZoom;

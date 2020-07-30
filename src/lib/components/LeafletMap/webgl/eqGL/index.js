@@ -1,17 +1,16 @@
-import DrawCmdBuilder from './builder';
-import FrameBuffer from './framebuffer';
-import Variable from './variable';
-import Texture from './texture';
+import DrawCmdBuilder from "./builder";
+import FrameBuffer from "./framebuffer";
+import Variable from "./variable";
+import Texture from "./texture";
 
-export { default as FrameBuffer } from './framebuffer';
-export * as Utils from './webglutils';
+export { default as FrameBuffer } from "./framebuffer";
+export * as Utils from "./webglutils";
 
 export class EQGLContext {
-
     /**
-     * 
-     * @param {WebGLRenderingContext} gl 
-     * @param {HTMLCanvasElement} canvas 
+     *
+     * @param {WebGLRenderingContext} gl
+     * @param {HTMLCanvasElement} canvas
      */
     constructor(gl, canvas) {
         this._gl = gl;
@@ -20,7 +19,8 @@ export class EQGLContext {
         // Store already compiled programs
         this._programs = {};
 
-        this.TEXTURE_INDEX_COUNT = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
+        this.TEXTURE_INDEX_COUNT =
+            gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
     }
 
     /**
@@ -38,7 +38,12 @@ export class EQGLContext {
     framebuffer(options) {
         const width = options.width || 0;
         const height = options.height || 0;
-        return new FrameBuffer(this._gl, this._nextTextureIndex(), width, height);
+        return new FrameBuffer(
+            this._gl,
+            this._nextTextureIndex(),
+            width,
+            height
+        );
     }
 
     /**
@@ -49,10 +54,9 @@ export class EQGLContext {
         return new Variable(variableName);
     }
 
-
     /**
-     * 
-     * @param {Object} options 
+     *
+     * @param {Object} options
      * @param {HTMLImageElement} options.image
      * @param {Object} options.params - Custom gl.texParamteri-configuration
      */
@@ -60,24 +64,26 @@ export class EQGLContext {
         return new Texture(this._gl, this._nextTextureIndex(), options);
     }
 
-
     _addProgram(cmdId, program, vert, frag) {
         this._programs[cmdId] = { p: program, vert, frag };
     }
 
     _nextTextureIndex = () => {
-        if(this.TEXTURE_INDEX_COUNT === -1) {
-            this.TEXTURE_INDEX_COUNT = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
+        if (this.TEXTURE_INDEX_COUNT === -1) {
+            this.TEXTURE_INDEX_COUNT =
+                gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
         }
-        
+
         return this.TEXTURE_INDEX_COUNT--;
-    }
+    };
 
     /**
      * Cleans and clears the entrie context.
      */
     clean = () => {
-        const numTextureUnits = this._gl.getParameter(this._gl.MAX_TEXTURE_IMAGE_UNITS);
+        const numTextureUnits = this._gl.getParameter(
+            this._gl.MAX_TEXTURE_IMAGE_UNITS
+        );
         for (let unit = 0; unit <= numTextureUnits; unit++) {
             this._gl.activeTexture(this._gl.TEXTURE0 + unit);
             this._gl.bindTexture(this._gl.TEXTURE_2D, null);
@@ -91,10 +97,8 @@ export class EQGLContext {
         this._canvas = null;
         this._gl = null;
         this._programs = null;
-    }
+    };
 }
-
-
 
 /**
  * @typedef {Function} eqGL
@@ -108,7 +112,6 @@ export class EQGLContext {
  */
 const eqGL = (gl, canvas) => {
     return new EQGLContext(gl, canvas);
-}
+};
 
 export default eqGL;
-

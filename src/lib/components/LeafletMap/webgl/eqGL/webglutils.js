@@ -1,4 +1,4 @@
-export const loadShader = (shaderPath) => 
+export const loadShader = (shaderPath) =>
     fetch(shaderPath).then((res) => res.text());
 
 export const createShader = (gl, shaderType, shaderSource) => {
@@ -27,7 +27,7 @@ export const createProgram = (gl, vertexShader, fragmentShader) => {
      */
 
     const program = gl.createProgram();
-    gl.attachShader(program, vertexShader)
+    gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
     didProgramLink(gl, program);
@@ -40,12 +40,12 @@ export const createAndInitProgram = (gl, shaderVertex, shaderFragment) => {
         gl,
         createShader(gl, gl.VERTEX_SHADER, shaderVertex),
         createShader(gl, gl.FRAGMENT_SHADER, shaderFragment)
-    );   
+    );
 
     // Initialize program
     gl.useProgram(program);
     return program;
-}
+};
 
 export const bindBuffer = (gl, attribName, array) => {
     /**
@@ -87,36 +87,34 @@ export const bindTexture = (gl, textureIndex, uniformName, image) => {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        image
-    );
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.uniform1i(gl.getUniformLocation(program, uniformName), textureIndex);
-}
+};
 
 export const didShaderCompile = (gl, shader, name) => {
-    if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error(`ERROR: Was not able to compile the ${name} shader. Vertex: ${name === gl.VERTEX_SHADER} - Frag: ${name === gl.FRAGMENT_SHADER}`, gl.getShaderInfoLog(shader))
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error(
+            `ERROR: Was not able to compile the ${name} shader. Vertex: ${
+                name === gl.VERTEX_SHADER
+            } - Frag: ${name === gl.FRAGMENT_SHADER}`,
+            gl.getShaderInfoLog(shader)
+        );
         return false;
     }
     return true;
-}
+};
 
 export const didProgramLink = (gl, program) => {
-    if(!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
         console.error("ERROR: linking program!", gl.getProgramInfoLog(program));
         return false;
     }
     return true;
-}
+};
 
 export const isProgramValid = (gl, program) => {
-    if(!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
+    if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
         return false;
     }
     return true;
-}
+};

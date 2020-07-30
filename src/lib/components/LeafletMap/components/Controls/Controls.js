@@ -1,70 +1,61 @@
-
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 // Components
-import VerticalZoom from './components/VerticalZoom/VerticalZoom';
-import DrawControls from './components/DrawControls';
-import ColorBar from './components/Colorbar';
-import ScaleControl from './components/ScaleControl';
-import Switch from './components/Switch/Switch';
-import MousePosition from './components/MousePosition';
+import VerticalZoom from "./components/VerticalZoom/VerticalZoom";
+import DrawControls from "./components/DrawControls";
+import ColorBar from "./components/Colorbar";
+import ScaleControl from "./components/ScaleControl";
+import Switch from "./components/Switch/Switch";
+import MousePosition from "./components/MousePosition";
 
 class Controls extends Component {
-    
     render() {
         return (
             <div>
-
-                <div> {
-                    this.props.mouseCoords && (
+                <div>
+                    {this.props.mouseCoords && (
                         <MousePosition
-                            map ={this.props.map}
+                            map={this.props.map}
                             setProps={this.props.setProps}
-                            position ={this.props.mouseCoords.position}
+                            position={this.props.mouseCoords.position}
                         />
-                    )
-                }
+                    )}
                 </div>
-                <div> {
-                    this.props.drawTools && (
+                <div>
+                    {this.props.drawTools && (
                         <DrawControls
                             map={this.props.map}
                             position={this.props.drawTools.position}
                             drawMarker={this.props.drawTools.drawMarker}
                             drawPolygon={this.props.drawTools.drawPolygon}
                             drawPolyline={this.props.drawTools.drawPolyline}
-                            lineCoords={coords =>
+                            lineCoords={(coords) =>
                                 this.props.setProps({ polyline_points: coords })
                             }
-                            markerCoords={coords =>
+                            markerCoords={(coords) =>
                                 this.props.setProps({ marker_point: coords })
                             }
-                            polygonCoords={coords =>
+                            polygonCoords={(coords) =>
                                 this.props.setProps({ polygon_points: coords })
                             }
                             syncDrawings={this.props.syncDrawings}
                         />
-                    
-                    )
-                }
+                    )}
                 </div>
                 <div>
-                    {
-                    this.props.scaleY && (
-                        <VerticalZoom 
+                    {this.props.scaleY && (
+                        <VerticalZoom
                             map={this.props.map}
                             position={this.props.scaleY.position}
                             minScaleY={this.props.scaleY.minScaleY}
                             maxScaleY={this.props.scaleY.maxScaleY}
                             scaleY={this.props.scaleY.scaleY || 1}
                         />
-                    )
-                    }
+                    )}
                 </div>
                 <div>
-                {
-                    this.props.switch && (
+                    {this.props.switch && (
                         <Switch
                             map={this.props.map}
                             setProps={this.props.setProps}
@@ -73,31 +64,27 @@ class Controls extends Component {
                             disabled={this.props.switch.disabled}
                             label={this.props.switch.label}
                         />
-                    )
-                }
+                    )}
                 </div>
                 <div>
-                    {
-                        (this.props.colorBar) &&
+                    {this.props.colorBar && (
                         <ColorBar
-                            map = {this.props.map}
-                            position = {(this.props.colorBar || {}).position}
+                            map={this.props.map}
+                            position={(this.props.colorBar || {}).position}
                         />
-                    }
+                    )}
                 </div>
                 <div>
-                    {   (this.props.unitScale) &&
-                        <ScaleControl 
-                            map = {this.props.map}
-                            position = {(this.props.unitScale || {}).position}
+                    {this.props.unitScale && (
+                        <ScaleControl
+                            map={this.props.map}
+                            position={(this.props.unitScale || {}).position}
                         />
-                    }
+                    )}
                 </div>
-            </div>    
-        )
-
+            </div>
+        );
     }
-
 }
 
 Controls.propTypes = {
@@ -126,15 +113,13 @@ Controls.propTypes = {
         lineCoords: PropTypes.func,
         polygonCoords: PropTypes.func,
     }),
-    
+
     switch: PropTypes.shape({
         value: PropTypes.bool,
         disabled: PropTypes.bool,
         position: PropTypes.string,
         label: PropTypes.string,
-    })
-}
-// Controls.contextType = DrawLayerContext;
-
+    }),
+};
 
 export default Controls;

@@ -1,4 +1,4 @@
-export const getShapeType = layer => {
+export const getShapeType = (layer) => {
     if (layer instanceof L.Rectangle) {
         return "rectangle";
     }
@@ -30,76 +30,78 @@ const addTooltip = (item, shapeObject) => {
         return shapeObject.bindTooltip(item.tooltip);
     }
     return shapeObject;
-}
+};
 
 // Layer utils
 export const makePolyline = (item, swapXY, setProps) => {
-    const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
-    const shape = addTooltip(item, 
-                (L.polyline(pos, {
-                    color: item.color || "blue",
-                    positions: pos
-                })
-    ));
-    shape.on('mouseup', () => {
-        setProps({clicked_shape: item});
-    })
+    const pos = swapXY ? item.positions.map((xy) => yx(xy)) : item.positions;
+    const shape = addTooltip(
+        item,
+        L.polyline(pos, {
+            color: item.color || "blue",
+            positions: pos,
+        })
+    );
+    shape.on("mouseup", () => {
+        setProps({ clicked_shape: item });
+    });
     return shape;
-}
+};
 
 export const makePolygon = (item, swapXY, setProps) => {
-    const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
-    const shape = addTooltip(item, 
-                (L.polygon(pos, {
-                    color: item.color || "blue",
-                    positions: pos
-                })
-    ));
-    shape.on('mouseup', () => {
-        setProps({clicked_shape: item});
-    })
+    const pos = swapXY ? item.positions.map((xy) => yx(xy)) : item.positions;
+    const shape = addTooltip(
+        item,
+        L.polygon(pos, {
+            color: item.color || "blue",
+            positions: pos,
+        })
+    );
+    shape.on("mouseup", () => {
+        setProps({ clicked_shape: item });
+    });
     return shape;
-}
+};
 
 export const makeMarker = (item, swapXY, setProps) => {
-    const pos = swapXY ? yx(item.position): item.position;
-    const shape = addTooltip(item, 
-                L.marker(pos)
-    );
-    shape.on('mouseup', () => {
-        setProps({clicked_shape: item});
-    })
+    const pos = swapXY ? yx(item.position) : item.position;
+    const shape = addTooltip(item, L.marker(pos));
+    shape.on("mouseup", () => {
+        setProps({ clicked_shape: item });
+    });
     return shape;
-}
+};
 
 export const makeCircle = (item, swapXY, setProps) => {
     const center = swapXY ? yx(item.center) : item.center;
-    const shape = addTooltip(item, 
-                (L.circle(center, {
-                    color: item.color || "red",
-                    center : center,
-                    radius : item.radius
-                })
-    ));
-    shape.on('mouseup', () => {
-        setProps({clicked_shape: item});
-    })
+    const shape = addTooltip(
+        item,
+        L.circle(center, {
+            color: item.color || "red",
+            center: center,
+            radius: item.radius,
+        })
+    );
+    shape.on("mouseup", () => {
+        setProps({ clicked_shape: item });
+    });
     return shape;
-}
+};
 
 export const makeCircleMarker = (item, swapXY) => {
     const center = swapXY ? yx(item.center) : item.center;
-    return  addTooltip(item, 
-                (L.circleMarker(center, {
-                    color: item.color || "red",
-                    center : center,
-                    radius : item.radius || 4,
-                })
-    ));
-}
+    return addTooltip(
+        item,
+        L.circleMarker(center, {
+            color: item.color || "red",
+            center: center,
+            radius: item.radius || 4,
+        })
+    );
+};
 
 export const addImage = (imageData) => {
-    const bounds = (imageData.bounds || []).map(xy => yx(xy));
+    const bounds = (imageData.bounds || []).map((xy) => yx(xy));
     const newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
         ...imageData,
         minvalue: imageData.minvalue,
@@ -107,9 +109,9 @@ export const addImage = (imageData) => {
         colorScale: imageData.colorScale,
         shader: imageData.shader,
     });
-    
+
     return newImageLayer;
-}
+};
 
 export const addTile = (tileData) => {
     const newTileLayer = L.tileWebGLLayer(tileData.url, {
@@ -118,8 +120,6 @@ export const addTile = (tileData) => {
         maxvalue: tileData.maxvalue,
         colorScale: tileData.colorScale,
         shader: tileData.shader,
-    })
+    });
     return newTileLayer;
-}
-
-
+};

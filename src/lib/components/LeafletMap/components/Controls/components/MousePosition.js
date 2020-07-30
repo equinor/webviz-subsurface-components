@@ -1,15 +1,20 @@
-import React, { Component, useEffect, useContext, useState, useRef } from "react";
+import React, {
+    Component,
+    useEffect,
+    useContext,
+    useState,
+    useRef,
+} from "react";
 import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
 // Context
-import Context from '../../../context';
+import Context from "../../../context";
 
 // Constants
 const NUMBER_COLOR_CHANNELS = 4;
 const NUMBER_DISCRETIZATION_LEVELS = 255;
-
 
 const MousePosition = (props) => {
     const { focusedImageLayer, mode } = useContext(Context);
@@ -22,57 +27,94 @@ const MousePosition = (props) => {
     useEffect(() => {
         addControl();
         subscribeToMapClick();
-    }, [])
+    }, []);
 
     const focusedDependencyArray = () => {
         const options = (focusedImageLayer || {}).options || {};
-        const newURL = focusedImageLayer && focusedImageLayer.getUrl ? focusedImageLayer.getUrl() : null
-        const newCanvas = focusedImageLayer && focusedImageLayer.getCanvas ? focusedImageLayer.getCanvas() : null
-        return [newCanvas, newURL, options.minvalue, options.maxvalue, options.unit];
-    }
+        const newURL =
+            focusedImageLayer && focusedImageLayer.getUrl
+                ? focusedImageLayer.getUrl()
+                : null;
+        const newCanvas =
+            focusedImageLayer && focusedImageLayer.getCanvas
+                ? focusedImageLayer.getCanvas()
+                : null;
+        return [
+            newCanvas,
+            newURL,
+            options.minvalue,
+            options.maxvalue,
+            options.unit,
+        ];
+    };
 
     useEffect(() => {
         updateCanvas();
-    }, focusedDependencyArray())
+    }, focusedDependencyArray());
 
     useEffect(() => {
         updateProps();
-    }, [props])
+    }, [props]);
 
     useEffect(() => {
         updateMode(mode);
-    }, [mode])
+    }, [mode]);
 
-    const updateStateCanvas = (canvas, onScreenCanvas, ctx, minvalue, maxvalue, unit) => {
-        stateRef.current = { ...stateRef.current, canvas, ctx, onScreenCanvas, minvalue, maxvalue, unit, props};
-    }
+    const updateStateCanvas = (
+        canvas,
+        onScreenCanvas,
+        ctx,
+        minvalue,
+        maxvalue,
+        unit
+    ) => {
+        stateRef.current = {
+            ...stateRef.current,
+            canvas,
+            ctx,
+            onScreenCanvas,
+            minvalue,
+            maxvalue,
+            unit,
+            props,
+        };
+    };
 
-    const updateMode = mode => {
-        stateRef.current.mode = mode
-    }
+    const updateMode = (mode) => {
+        stateRef.current.mode = mode;
+    };
 
     const updateProps = () => {
         stateRef.current.props = props;
-    }
+    };
 
     const addControl = () => {
-        let MousePosControl = L.Control.extend({ 
-            options: {  
-                position: props.position
+        let MousePosControl = L.Control.extend({
+            options: {
+                position: props.position,
             },
-    
+
             onAdd: function (map) {
-                const latlng = L.DomUtil.create('div', 'mouseposition');
+                const latlng = L.DomUtil.create("div", "mouseposition");
                 this._latlng = latlng;
                 return latlng;
             },
-    
-            updateHTML: function(x, y, z, zNotZero, unit) { // TODO: add default measurement unit, make it passable with props
-                const unit = unit === undefined ? 'm' : unit
-                const z_string = zNotZero? " z: " + z + unit : "";
-                this._latlng.innerHTML ="<span style = 'background-color: #ffffff; border: 2px solid #ccc; padding:3px; border-radius: 5px;'>"
-                                       + "x: " + x + unit + " y: " + y + unit  + z_string +"</span>"
-            }
+
+            updateHTML: function (x, y, z, zNotZero, unit) {
+                // TODO: add default measurement unit, make it passable with props
+                const unit = unit === undefined ? "m" : unit;
+                const z_string = zNotZero ? " z: " + z + unit : "";
+                this._latlng.innerHTML =
+                    "<span style = 'background-color: #ffffff; border: 2px solid #ccc; padding:3px; border-radius: 5px;'>" +
+                    "x: " +
+                    x +
+                    unit +
+                    " y: " +
+                    y +
+                    unit +
+                    z_string +
+                    "</span>";
+            },
         });
         const mousePosCtrl = new MousePosControl();
         props.map.addControl(mousePosCtrl);
@@ -81,16 +123,25 @@ const MousePosition = (props) => {
     };
 
     const updateCanvas = async () => {
-        if(!focusedImageLayer) {
+        if (!focusedImageLayer) {
             return;
         }
 
-        const url = focusedImageLayer.getUrl ? focusedImageLayer.getUrl() : null;
-        const onScreenCanvas = focusedImageLayer.getCanvas ? focusedImageLayer.getCanvas() : null;
+        const url = focusedImageLayer.getUrl
+            ? focusedImageLayer.getUrl()
+            : null;
+        const onScreenCanvas = focusedImageLayer.getCanvas
+            ? focusedImageLayer.getCanvas()
+            : null;
         const minvalue = (focusedImageLayer.options || {}).minvalue;
         const maxvalue = (focusedImageLayer.options || {}).maxvalue;
         const unit = (focusedImageLayer.options || {}).unit;
-        if(!url || !onScreenCanvas || !(typeof minvalue === "number") || !maxvalue) {
+        if (
+            !url ||
+            !onScreenCanvas ||
+            !(typeof minvalue === "number") ||
+            !maxvalue
+        ) {
             return;
         }
 
@@ -101,148 +152,197 @@ const MousePosition = (props) => {
             const image = new Image();
             image.onload = () => {
                 res(image);
-            }
+            };
             image.src = url;
         });
-        
 
-        const imageCanvas = document.createElement('canvas');
+        const imageCanvas = document.createElement("canvas");
         const ctx = imageCanvas.getContext("2d");
         imageCanvas.width = image.width;
         imageCanvas.height = image.height;
         ctx.drawImage(image, 0, 0);
 
-        updateStateCanvas(imageCanvas, onScreenCanvas, ctx, minvalue, maxvalue, unit);
-    }
+        updateStateCanvas(
+            imageCanvas,
+            onScreenCanvas,
+            ctx,
+            minvalue,
+            maxvalue,
+            unit
+        );
+    };
 
     const onCanvasMouseMove = (event) => {
-        const { canvas, ctx, onScreenCanvas} = stateRef.current || {};
-        if(!canvas) {
+        const { canvas, ctx, onScreenCanvas } = stateRef.current || {};
+        if (!canvas) {
             return;
         }
         const clientRect = onScreenCanvas.getBoundingClientRect();
-        const screenX = ((event.originalEvent.clientX - clientRect.left) / clientRect.width) * canvas.width;
-        const screenY = ((event.originalEvent.clientY - clientRect.top) / clientRect.height) * canvas.height;
+        const screenX =
+            ((event.originalEvent.clientX - clientRect.left) /
+                clientRect.width) *
+            canvas.width;
+        const screenY =
+            ((event.originalEvent.clientY - clientRect.top) /
+                clientRect.height) *
+            canvas.height;
 
-        if(screenX === Infinity || screenY === Infinity) {
+        if (screenX === Infinity || screenY === Infinity) {
             return;
         }
 
         const x = Math.round(event.latlng.lng);
         const y = Math.round(event.latlng.lat);
-        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally 
+        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally
         const z = getZValue(red);
 
-        z = mapZValue(red)
+        z = mapZValue(red);
 
         setLatLng(x, y, z, red > 0);
-    }
+    };
 
     const mapXCoordinateToCanvas = (x, clientRect, canvas) => {
         return ((x - clientRect.left) / clientRect.width) * canvas.width;
-    }
+    };
     const mapYCoordinateToCanvas = (y, clientRect, canvas) => {
         return ((y - clientRect.top) / clientRect.height) * canvas.height;
-    }
+    };
 
     const onCanvasMouseClick = (event) => {
-        const { canvas, ctx, onScreenCanvas, props} = stateRef.current || {};
-        if(!canvas) {
+        const { canvas, ctx, onScreenCanvas, props } = stateRef.current || {};
+        if (!canvas) {
             return;
         }
 
         const clientRect = onScreenCanvas.getBoundingClientRect();
-        const screenX = mapXCoordinateToCanvas(event.originalEvent.clientX, clientRect, canvas);
-        const screenY = mapYCoordinateToCanvas(event.originalEvent.clientY, clientRect, canvas);
+        const screenX = mapXCoordinateToCanvas(
+            event.originalEvent.clientX,
+            clientRect,
+            canvas
+        );
+        const screenY = mapYCoordinateToCanvas(
+            event.originalEvent.clientY,
+            clientRect,
+            canvas
+        );
 
-
-        if(screenX === Infinity || screenY === Infinity) {
+        if (screenX === Infinity || screenY === Infinity) {
             return;
         }
 
         const x = Math.round(event.latlng.lng);
         const y = Math.round(event.latlng.lat);
-        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally 
+        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally
         const z = mapZValue(red);
 
         // Used to disable map.on("click") events when pressed on the controls
-        const controlsList = document.getElementsByClassName("leaflet-custom-control leaflet-control")
+        const controlsList = document.getElementsByClassName(
+            "leaflet-custom-control leaflet-control"
+        );
         const forbiddenCoordinates = [];
 
         for (const control of controlsList) {
             const controlBounds = control.getBoundingClientRect();
 
-            const forbiddenYValueRange = [mapYCoordinateToCanvas(controlBounds.y, controlBounds, canvas), mapYCoordinateToCanvas((controlBounds.y + controlBounds.height), controlBounds, canvas)]
-            const forbiddenXValueRange = [mapXCoordinateToCanvas(controlBounds.x, controlBounds, canvas), mapXCoordinateToCanvas((controlBounds.x + controlBounds.width), controlBounds, canvas)]
+            const forbiddenYValueRange = [
+                mapYCoordinateToCanvas(controlBounds.y, controlBounds, canvas),
+                mapYCoordinateToCanvas(
+                    controlBounds.y + controlBounds.height,
+                    controlBounds,
+                    canvas
+                ),
+            ];
+            const forbiddenXValueRange = [
+                mapXCoordinateToCanvas(controlBounds.x, controlBounds, canvas),
+                mapXCoordinateToCanvas(
+                    controlBounds.x + controlBounds.width,
+                    controlBounds,
+                    canvas
+                ),
+            ];
 
-            forbiddenCoordinates.push([forbiddenYValueRange, forbiddenXValueRange])
+            forbiddenCoordinates.push([
+                forbiddenYValueRange,
+                forbiddenXValueRange,
+            ]);
         }
 
-        if(props.setProps && stateRef.current.mode !== "editing" && !isForbidden(event.originalEvent.clientX, event.originalEvent.clientY, forbiddenCoordinates)) {
-            props.setProps({click_position: [x, y, z]});
+        if (
+            props.setProps &&
+            stateRef.current.mode !== "editing" &&
+            !isForbidden(
+                event.originalEvent.clientX,
+                event.originalEvent.clientY,
+                forbiddenCoordinates
+            )
+        ) {
+            props.setProps({ click_position: [x, y, z] });
         }
-        
-    }
+    };
 
     const isForbidden = (x, y, forbiddenCoordinates) => {
         const forbidden = false;
         for (const coordinates of forbiddenCoordinates) {
-            const xRange = coordinates[0]
-            const yRange = coordinates[1]
+            const xRange = coordinates[0];
+            const yRange = coordinates[1];
 
-            if ( (x > xRange[0] && x < xRange[1]) && (y > yRange[0] && y < yRange[1]) ) {
+            if (
+                x > xRange[0] &&
+                x < xRange[1] &&
+                y > yRange[0] &&
+                y < yRange[1]
+            ) {
                 forbidden = true;
             }
         }
 
         return forbidden;
-    }
+    };
 
     const subscribeToMapClick = () => {
-        props.map.addEventListener('mousemove', onCanvasMouseMove)
-        props.map.addEventListener('mouseup', onCanvasMouseClick)
-    }
+        props.map.addEventListener("mousemove", onCanvasMouseMove);
+        props.map.addEventListener("mouseup", onCanvasMouseClick);
+    };
 
     const mapZValue = (redColorvalue) => {
         const { minvalue, maxvalue } = stateRef.current || {};
-        return Math.floor(minvalue + ((maxvalue - minvalue) / (255 - 0)) * (redColorvalue - 0))
+        return Math.floor(
+            minvalue + ((maxvalue - minvalue) / (255 - 0)) * (redColorvalue - 0)
+        );
+    };
 
-    }
-    
     //OLD method
     const getZValue = (redColorValue) => {
         const { props } = stateRef.current;
 
         return Math.floor(
-          ((props.maxvalue - props.minvalue) *
-              (redColorValue - 1)) /
-              NUMBER_DISCRETIZATION_LEVELS +
-              props.minvalue
+            ((props.maxvalue - props.minvalue) * (redColorValue - 1)) /
+                NUMBER_DISCRETIZATION_LEVELS +
+                props.minvalue
         );
-    }
-  
-    const setLatLng = (x, y, z, zNotZero)  => {
+    };
+
+    const setLatLng = (x, y, z, zNotZero) => {
         const { control, unit } = stateRef.current || {};
-        if(control) {
-            control.updateHTML(x, y, z, zNotZero, unit)
+        if (control) {
+            control.updateHTML(x, y, z, zNotZero, unit);
         }
-    }
+    };
 
     return null;
-}
-
+};
 
 MousePosition.defaultProps = {
     position: "bottomleft",
-}
+};
 
 MousePosition.propTypes = {
     position: PropTypes.string,
     setProps: PropTypes.oneOfType([PropTypes.func, PropTypes.any]),
     map: PropTypes.object.isRequired,
-    minvalue : PropTypes.number,
+    minvalue: PropTypes.number,
     maxvalue: PropTypes.number,
     position: PropTypes.string,
-}
+};
 
 export default MousePosition;
