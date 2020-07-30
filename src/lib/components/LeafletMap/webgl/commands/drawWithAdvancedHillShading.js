@@ -1,4 +1,4 @@
-import EQGL, { EQGLContext } from "../eqGL";
+import EQGL from "../eqGL";
 import vec3 from "../vec3";
 
 // Shaders

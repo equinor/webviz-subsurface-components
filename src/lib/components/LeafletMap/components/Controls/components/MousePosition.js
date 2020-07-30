@@ -1,10 +1,4 @@
-import {
-    Component,
-    useEffect,
-    useContext,
-    useState,
-    useRef,
-} from "react";
+import { useEffect, useContext, useRef } from "react";
 import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
@@ -13,10 +7,8 @@ import L from "leaflet";
 import Context from "../../../context";
 
 // Constants
-const NUMBER_COLOR_CHANNELS = 4;
-const NUMBER_DISCRETIZATION_LEVELS = 255;
 
-const MousePosition = (props) => {
+const MousePosition = props => {
     const { focusedImageLayer, mode } = useContext(Context);
 
     // As useState-values are not available in eventListeners,
@@ -80,7 +72,7 @@ const MousePosition = (props) => {
         };
     };
 
-    const updateMode = (mode) => {
+    const updateMode = mode => {
         stateRef.current.mode = mode;
     };
 
@@ -94,24 +86,24 @@ const MousePosition = (props) => {
                 position: props.position,
             },
 
-            onAdd: function (map) {
+            onAdd: function() {
                 const latlng = L.DomUtil.create("div", "mouseposition");
                 this._latlng = latlng;
                 return latlng;
             },
 
-            updateHTML: function (x, y, z, zNotZero, unit) {
+            updateHTML: function(x, y, z, zNotZero, unit) {
                 // TODO: add default measurement unit, make it passable with props
-                const unit = unit === undefined ? "m" : unit;
-                const z_string = zNotZero ? " z: " + z + unit : "";
+                const newUnit = unit === undefined ? "m" : unit;
+                const z_string = zNotZero ? " z: " + z + newUnit : "";
                 this._latlng.innerHTML =
                     "<span style = 'background-color: #ffffff; border: 2px solid #ccc; padding:3px; border-radius: 5px;'>" +
                     "x: " +
                     x +
-                    unit +
+                    newUnit +
                     " y: " +
                     y +
-                    unit +
+                    newUnit +
                     z_string +
                     "</span>";
             },
@@ -148,7 +140,7 @@ const MousePosition = (props) => {
         /**
          * @type {Image}
          */
-        const image = await new Promise((res, rej) => {
+        const image = await new Promise(res => {
             const image = new Image();
             image.onload = () => {
                 res(image);
@@ -172,7 +164,7 @@ const MousePosition = (props) => {
         );
     };
 
-    const onCanvasMouseMove = (event) => {
+    const onCanvasMouseMove = event => {
         const { canvas, ctx, onScreenCanvas } = stateRef.current || {};
         if (!canvas) {
             return;
@@ -194,9 +186,7 @@ const MousePosition = (props) => {
         const x = Math.round(event.latlng.lng);
         const y = Math.round(event.latlng.lat);
         const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally
-        const z = getZValue(red);
-
-        z = mapZValue(red);
+        const z = mapZValue(red);
 
         setLatLng(x, y, z, red > 0);
     };
@@ -208,7 +198,7 @@ const MousePosition = (props) => {
         return ((y - clientRect.top) / clientRect.height) * canvas.height;
     };
 
-    const onCanvasMouseClick = (event) => {
+    const onCanvasMouseClick = event => {
         const { canvas, ctx, onScreenCanvas, props } = stateRef.current || {};
         if (!canvas) {
             return;
@@ -281,7 +271,7 @@ const MousePosition = (props) => {
     };
 
     const isForbidden = (x, y, forbiddenCoordinates) => {
-        const forbidden = false;
+        let forbidden = false;
         for (const coordinates of forbiddenCoordinates) {
             const xRange = coordinates[0];
             const yRange = coordinates[1];
@@ -304,21 +294,10 @@ const MousePosition = (props) => {
         props.map.addEventListener("mouseup", onCanvasMouseClick);
     };
 
-    const mapZValue = (redColorvalue) => {
+    const mapZValue = redColorvalue => {
         const { minvalue, maxvalue } = stateRef.current || {};
         return Math.floor(
             minvalue + ((maxvalue - minvalue) / (255 - 0)) * (redColorvalue - 0)
-        );
-    };
-
-    //OLD method
-    const getZValue = (redColorValue) => {
-        const { props } = stateRef.current;
-
-        return Math.floor(
-            ((props.maxvalue - props.minvalue) * (redColorValue - 1)) /
-                NUMBER_DISCRETIZATION_LEVELS +
-                props.minvalue
         );
     };
 
@@ -342,7 +321,6 @@ MousePosition.propTypes = {
     map: PropTypes.object.isRequired,
     minvalue: PropTypes.number,
     maxvalue: PropTypes.number,
-    position: PropTypes.string,
 };
 
 export default MousePosition;

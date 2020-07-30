@@ -1,4 +1,4 @@
-import L, { latLngBounds, Util, DomUtil, Bounds, Point } from "leaflet";
+import L, { latLngBounds, Util, DomUtil, Bounds } from "leaflet";
 import drawFunc from "../webgl/drawFunc";
 import Utils from "../utils";
 
@@ -30,7 +30,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         ],
     },
 
-    initialize: function (url, bounds, options) {
+    initialize: function(url, bounds, options) {
         this._url = url;
         Util.setOptions(this, {
             ...options,
@@ -41,7 +41,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         );
     },
 
-    onAdd: function (map) {
+    onAdd: function(map) {
         this._map = map;
 
         if (!this._onscreenCanvas) {
@@ -56,7 +56,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         this._triggerOnChanged();
     },
 
-    onRemove: function (map) {
+    onRemove: function(map) {
         this._map = map;
         if (!this._map) {
             return;
@@ -67,7 +67,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         }
     },
 
-    getEvents: function () {
+    getEvents: function() {
         const events = {
             zoom: this._reset,
             viewreset: this._reset,
@@ -80,27 +80,27 @@ L.ImageWebGLOverlay = L.Layer.extend({
         return events;
     },
 
-    getBounds: function () {
+    getBounds: function() {
         return this._bounds;
     },
 
-    getUrl: function () {
+    getUrl: function() {
         return this._url;
     },
 
-    getCanvas: function () {
+    getCanvas: function() {
         return this._onscreenCanvas;
     },
 
     // ----- SETTERS -----
 
-    setZIndex: function (value) {
+    setZIndex: function(value) {
         this.options.zIndex = value;
         this._updateZIndex();
         return this;
     },
 
-    setBounds: function (bounds) {
+    setBounds: function(bounds) {
         this._bounds = latLngBounds(bounds);
 
         if (this._map) {
@@ -109,11 +109,11 @@ L.ImageWebGLOverlay = L.Layer.extend({
         return this;
     },
 
-    onLayerChanged: function (listener) {
+    onLayerChanged: function(listener) {
         this._listener = listener;
     },
 
-    updateOptions: function (options) {
+    updateOptions: function(options) {
         const promisesToWaitFor = [];
 
         if (
@@ -153,13 +153,13 @@ L.ImageWebGLOverlay = L.Layer.extend({
 
     // ------ PRIVATE FUNCTIONS -------
 
-    _initCanvas: function () {
+    _initCanvas: function() {
         const canvasTag = DomUtil.create("canvas");
         const onscreenCanvasTag = DomUtil.create("canvas");
 
-        const gl = (this._gl = canvasTag.getContext("webgl", {
+        this._gl = canvasTag.getContext("webgl", {
             premultipliedAlpha: false,
-        }));
+        });
 
         // Add neccessary CSS-classes
         DomUtil.addClass(onscreenCanvasTag, "leaflet-canvas-layer");
@@ -175,7 +175,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         });
     },
 
-    _initColormap: function () {
+    _initColormap: function() {
         const colorScale = this.options.colorScale;
         if (!colorScale) {
             this._colormapUrl = null;
@@ -184,7 +184,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         }
     },
 
-    _initUrl: function () {
+    _initUrl: function() {
         // Scale image if options.imageScale is provided
         let imageScale = this.options.imageScale;
         if (this.options.imageScale && imageScale > 0.0 && imageScale !== 1.0) {
@@ -193,7 +193,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
                 this.options.url,
                 imageScale,
                 imageScale
-            ).then((scaledImageUrl) => {
+            ).then(scaledImageUrl => {
                 this._url = scaledImageUrl;
             });
         } else {
@@ -202,7 +202,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         }
     },
 
-    _draw: function () {
+    _draw: function() {
         if (!this._gl) {
             console.warn(
                 "ImageWebGLLayer is missing a webgl-context",
@@ -226,7 +226,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
             .catch(console.error);
     },
 
-    _reset: function () {
+    _reset: function() {
         const onscreenCanvas = this._onscreenCanvas;
 
         const bounds = this._calcBounds();
@@ -239,7 +239,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         onscreenCanvas.style.height = `${size.y}px`;
     },
 
-    _animateZoom: function (e) {
+    _animateZoom: function(e) {
         const scale = this._map.getZoomScale(e.zoom);
         const offset = this._map._latLngBoundsToNewLayerBounds(
             this._bounds,
@@ -249,13 +249,13 @@ L.ImageWebGLOverlay = L.Layer.extend({
         DomUtil.setTransform(this._onscreenCanvas, offset, scale);
     },
 
-    _updateZIndex: function () {
+    _updateZIndex: function() {
         if (this._onscreenCanvas && this.options.zIndex) {
             this._onscreenCanvas.style.zIndex = this.options.zIndex;
         }
     },
 
-    _calcBounds: function () {
+    _calcBounds: function() {
         const northWest = this._bounds.getNorthWest();
         const southEast = this._bounds.getSouthEast();
 
@@ -265,7 +265,7 @@ L.ImageWebGLOverlay = L.Layer.extend({
         );
     },
 
-    _triggerOnChanged: function () {
+    _triggerOnChanged: function() {
         if (this._listener) {
             this._listener(this);
         }

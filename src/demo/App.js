@@ -9,7 +9,6 @@ import LayeredMapDemo from "./LayeredMapDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import LeafletMapDemo from "./LeafletMapDemo";
 
-
 class App extends Component {
     constructor(props) {
         super(props);
@@ -23,7 +22,7 @@ class App extends Component {
     renderDemo() {
         switch (this.state.value) {
             case "LeafletMap": {
-                return <LeafletMapDemo />
+                return <LeafletMapDemo />;
             }
             case "HistoryMatch": {
                 return <HistoryMatchDemo />;

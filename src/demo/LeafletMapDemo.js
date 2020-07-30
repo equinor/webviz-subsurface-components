@@ -5,7 +5,6 @@ import LeafletMap from "../lib/components/LeafletMap";
 
 // Assets
 import exampleData from "./example-data/leaflet-map.json";
-import { LeafletMap } from "../lib/index";
 
 const DEFAULT_COLORMAP = {
     colors: [
@@ -30,7 +29,7 @@ const LeafletMapDemo = () => {
     const [switchValue, setSwitchValue] = useState(true);
     const [layers, setLayers] = useState(exampleData.layers.slice(1, 5));
 
-    const onChange = (changes) => {
+    const onChange = changes => {
         const newLayers = Object.assign([], layers);
         if (changes.switch) {
             setSwitchValue(changes.switch.value);

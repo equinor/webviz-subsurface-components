@@ -1,7 +1,4 @@
-import { EQGLContext, FrameBuffer } from "./index";
 import drawCmd from "./draw";
-import Variable from "./variable";
-import Texture from "./texture";
 
 let CMD_COUNTER = 0;
 
@@ -155,7 +152,7 @@ class DrawCmdBuilder {
             framebuffer: this._framebuffer,
         };
 
-        return (props) => drawCmd(this._context, this.cmd, props);
+        return props => drawCmd(this._context, this.cmd, props);
     }
 }
 

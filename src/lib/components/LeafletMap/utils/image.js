@@ -1,5 +1,5 @@
 export const loadImage = (src, config = {}) =>
-    new Promise((resolve) => {
+    new Promise(resolve => {
         const img = new Image();
         if (config.crossOrigin || config.crossOrigin === "") {
             requestCORSIfNotSameOrigin(
@@ -80,13 +80,13 @@ export const tilesToImage = async (tiles, options = {}) => {
     const dimY = maxY - minY + 1;
 
     // Make sure all the images are HTMLImageElement.
-    tiles.forEach((tile) => {
+    tiles.forEach(tile => {
         tile.image =
             typeof tile.image === "string"
                 ? loadImage(tile.image, options).catch(() => null)
                 : Promise.resolve(tile.image);
     });
-    const loadedTiles = await Promise.all(tiles.map((tile) => tile.image));
+    const loadedTiles = await Promise.all(tiles.map(tile => tile.image));
 
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");

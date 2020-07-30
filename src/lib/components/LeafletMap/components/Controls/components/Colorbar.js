@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import Context from "../../../context";
@@ -9,7 +9,7 @@ import L from "leaflet";
 // Utils
 import { buildColormap } from "../../../utils/colorScale";
 
-const ColorBar = (props) => {
+const ColorBar = props => {
     const { focusedImageLayer = {} } = useContext(Context);
 
     // State
@@ -71,12 +71,11 @@ const ColorBar = (props) => {
     };
 
     const addControl = () => {
-        let panelDiv = null;
         const ColorBarCtrl = L.Control.extend({
             options: {
                 position: props.position || "bottomright",
             },
-            onAdd: function () {
+            onAdd: function() {
                 this.panelDiv = L.DomUtil.create(
                     "div",
                     "leaflet-custom-control"
