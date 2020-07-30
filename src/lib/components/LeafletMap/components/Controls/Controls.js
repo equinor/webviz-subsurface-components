@@ -30,13 +30,13 @@ class Controls extends Component {
                             drawMarker={this.props.drawTools.drawMarker}
                             drawPolygon={this.props.drawTools.drawPolygon}
                             drawPolyline={this.props.drawTools.drawPolyline}
-                            lineCoords={(coords) =>
+                            lineCoords={coords =>
                                 this.props.setProps({ polyline_points: coords })
                             }
-                            markerCoords={(coords) =>
+                            markerCoords={coords =>
                                 this.props.setProps({ marker_point: coords })
                             }
-                            polygonCoords={(coords) =>
+                            polygonCoords={coords =>
                                 this.props.setProps({ polygon_points: coords })
                             }
                             syncDrawings={this.props.syncDrawings}
