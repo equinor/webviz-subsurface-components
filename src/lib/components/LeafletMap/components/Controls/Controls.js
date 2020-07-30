@@ -14,7 +14,6 @@ class Controls extends Component {
         return (
             <div>
                 <div>
-                    {" "}
                     {this.props.mouseCoords && (
                         <MousePosition
                             map={this.props.map}
@@ -24,7 +23,6 @@ class Controls extends Component {
                     )}
                 </div>
                 <div>
-                    {" "}
                     {this.props.drawTools && (
                         <DrawControls
                             map={this.props.map}
@@ -123,6 +121,5 @@ Controls.propTypes = {
         label: PropTypes.string,
     }),
 };
-// Controls.contextType = DrawLayerContext;
 
 export default Controls;
