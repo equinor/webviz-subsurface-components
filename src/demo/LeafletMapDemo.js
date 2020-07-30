@@ -49,7 +49,6 @@ const LeafletMapDemo = () => {
             }
             setLayers(newLayers);
         }
-        
     };
 
     return (

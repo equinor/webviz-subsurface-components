@@ -168,7 +168,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
         return Util.template(this._url, Util.extend(urlData, this.options));
     },
 
-    updateOptions: function() {
+    updateOptions: function(options) {
         Util.setOptions(this, {
             ...this.options,
             ...options,

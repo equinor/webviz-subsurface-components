@@ -98,7 +98,7 @@ Controls.propTypes = {
     colorBar: PropTypes.shape({
         position: PropTypes.string,
     }),
-    
+
     unitScale: PropTypes.shape({
         position: PropTypes.string,
     }),
