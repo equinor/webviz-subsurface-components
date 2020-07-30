@@ -1,18 +1,17 @@
-import { EQGLContext, FrameBuffer } from './index';
-import drawCmd from './draw';
-import Variable from './variable';
-import Texture from './texture';
+import { EQGLContext, FrameBuffer } from "./index";
+import drawCmd from "./draw";
+import Variable from "./variable";
+import Texture from "./texture";
 
 let CMD_COUNTER = 0;
 
 /**
  * DrawCmdBuilder is a builder for building draw commands that can be used
- * in WebGL environments. It basically creates a configuration on how to draw with WebGL. 
+ * in WebGL environments. It basically creates a configuration on how to draw with WebGL.
  */
 class DrawCmdBuilder {
-
     /**
-     * 
+     *
      * @param {EQGLContext} context
      */
     constructor(context) {
@@ -49,30 +48,30 @@ class DrawCmdBuilder {
     uniformf(uniformName) {
         const args = arguments;
         const values = Object.values(args).slice(1); // Remove the "uniformName"
-        if(values.length === 0) {
+        if (values.length === 0) {
             return;
-        }   
+        }
 
         let type = `${values.length}f`; // Assume it is not an array
-        if(Array.isArray(values[0])) {
+        if (Array.isArray(values[0])) {
             type = `${values[0].length}fv`; // It is an array
         }
-        this.uniform(uniformName, type, values );
+        this.uniform(uniformName, type, values);
         return this;
     }
 
     uniformi(uniformName) {
         const args = arguments;
         const values = Object.values(args).slice(1); // Remove the "uniformName"
-        if(values.length === 0) {
+        if (values.length === 0) {
             return;
-        }   
+        }
 
         let type = `${values.length}i`; // Assume it is not an array
-        if(Array.isArray(values[0])) {
+        if (Array.isArray(values[0])) {
             type = `${values[0].length}iv`; // It is an array
         }
-        this.uniform(uniformName, type, values );
+        this.uniform(uniformName, type, values);
         return this;
     }
 
@@ -82,19 +81,19 @@ class DrawCmdBuilder {
     }
 
     /**
-     * 
-     * @param {String} textureName 
-     * @param {Number|Texture|FrameBuffer|Variable} textureUnit 
+     *
+     * @param {String} textureName
+     * @param {Number|Texture|FrameBuffer|Variable} textureUnit
      * @param {HTMLImageElement} textureImage
-     * 
+     *
      * @example
      * // With texture
      * eqGL.new().texture("u_image", eqGl.texture({image}))
-     * 
+     *
      * @example
      * // With raw image and custom textureIndex
      * eqGL.new().texture("u_image", 0, image)
-     * 
+     *
      * @example
      * // With framebuffer
      * const fb = eqGl.framebuffer({width, height})
@@ -105,7 +104,7 @@ class DrawCmdBuilder {
         this._textures[textureName] = {
             textureUnit,
             textureImage,
-        }
+        };
         return this;
     }
 
@@ -120,8 +119,8 @@ class DrawCmdBuilder {
     }
 
     /**
-     * 
-     * @param {FrameBuffer|Variable} framebuffer 
+     *
+     * @param {FrameBuffer|Variable} framebuffer
      */
     framebuffer(framebuffer) {
         this._framebuffer = framebuffer;
@@ -129,7 +128,7 @@ class DrawCmdBuilder {
     }
 
     /**
-     * @param {DrawCmdBuilder} builder 
+     * @param {DrawCmdBuilder} builder
      */
     extend(builder) {
         Object.assign(this, builder);
@@ -137,7 +136,6 @@ class DrawCmdBuilder {
     }
 
     build() {
-        
         this.cmd = {
             id: CMD_COUNTER++,
 
@@ -155,11 +153,10 @@ class DrawCmdBuilder {
             viewport: this._viewport,
 
             framebuffer: this._framebuffer,
-        }
+        };
 
         return (props) => drawCmd(this._context, this.cmd, props);
     }
 }
-
 
 export default DrawCmdBuilder;

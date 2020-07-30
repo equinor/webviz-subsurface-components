@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
-import Context from '../../../context';
+import Context from "../../../context";
 
 // Leaflet
 import L from "leaflet";
 
 // Utils
-import { buildColormap } from '../../../utils/colorScale';
-
+import { buildColormap } from "../../../utils/colorScale";
 
 const ColorBar = (props) => {
     const { focusedImageLayer = {} } = useContext(Context);
@@ -16,58 +15,60 @@ const ColorBar = (props) => {
     // State
     const [control, setControl] = useState(null);
     const [colorMap, setColorMap] = useState(null);
-    const [minMaxValue, setMinMaxValue]= useState([0 , 0])
+    const [minMaxValue, setMinMaxValue] = useState([0, 0]);
     const [unit, setUnit] = useState(null);
-
 
     useEffect(() => {
         addControl();
         createNewColorMap();
         updateUnit();
-    }, [])
+    }, []);
 
     const focusedDependencyArray = () => {
-        if(!focusedImageLayer) {
+        if (!focusedImageLayer) {
             return [null, null, null, null];
         }
 
         const options = focusedImageLayer.options;
-        return [JSON.stringify(options.colorScale), options.minvalue, options.maxvalue, options.unit];
-    }
+        return [
+            JSON.stringify(options.colorScale),
+            options.minvalue,
+            options.maxvalue,
+            options.unit,
+        ];
+    };
 
     useEffect(() => {
         createNewColorMap();
         updateUnit();
-    }, focusedDependencyArray())
+    }, focusedDependencyArray());
 
     const updateUnit = () => {
-        if(!focusedImageLayer) {
+        if (!focusedImageLayer) {
             return;
         }
-        const options = (focusedImageLayer.options || {});
+        const options = focusedImageLayer.options || {};
         const unit = options.unit ? options.unit : "m";
-        setUnit(unit)
-    }
+        setUnit(unit);
+    };
 
     const createNewColorMap = () => {
-        
-        if(!focusedImageLayer) {
+        if (!focusedImageLayer) {
             return;
         }
-        
-        const options = (focusedImageLayer.options || {})
+
+        const options = focusedImageLayer.options || {};
         const colorScale = options.colorScale;
-        if(colorScale) {
-            setColorMap(buildColormap(colorScale))
-            setMinMaxValue([options.minvalue, options.maxvalue])
-        } else if (!colorScale && options.url){
+        if (colorScale) {
+            setColorMap(buildColormap(colorScale));
+            setMinMaxValue([options.minvalue, options.maxvalue]);
+        } else if (!colorScale && options.url) {
             setColorMap(buildColormap(["#FFFFFF"]));
-            setMinMaxValue([options.minvalue, options.maxvalue])
+            setMinMaxValue([options.minvalue, options.maxvalue]);
         } else {
             setColorMap(null);
         }
-    }
-    
+    };
 
     const addControl = () => {
         let panelDiv = null;
@@ -75,7 +76,7 @@ const ColorBar = (props) => {
             options: {
                 position: props.position || "bottomright",
             },
-            onAdd: function() {
+            onAdd: function () {
                 this.panelDiv = L.DomUtil.create(
                     "div",
                     "leaflet-custom-control"
@@ -86,23 +87,22 @@ const ColorBar = (props) => {
         const newColorBarCtrl = new ColorBarCtrl();
         props.map.addControl(newColorBarCtrl);
         setControl(newColorBarCtrl);
-    }
+    };
 
-
-    if(!colorMap || minMaxValue.length !== 2 || !control) {
+    if (!colorMap || minMaxValue.length !== 2 || !control) {
         return null;
     }
 
     return ReactDOM.createPortal(
         <div className="leaflet-colorbar">
             <div className="leaflet-colorbar-image">
-                {colorMap &&
+                {colorMap && (
                     <img
                         key={colorMap}
                         src={colorMap}
                         style={{ width: "100%", height: "10px" }}
                     />
-                }
+                )}
             </div>
             <div>
                 {minMaxValue[0]} {unit}
@@ -113,11 +113,10 @@ const ColorBar = (props) => {
         </div>,
         control.panelDiv
     );
-}
+};
 
 ColorBar.propTypes = {
     map: PropTypes.object,
-
 };
 
 export default ColorBar;
