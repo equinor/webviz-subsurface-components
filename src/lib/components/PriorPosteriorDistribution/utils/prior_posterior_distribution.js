@@ -1,8 +1,7 @@
 /* eslint-disable no-magic-numbers */
 
 import * as d3 from "d3";
-import Slider from "../shared/slider";
-import "./prior_posterior_distribution.css";
+import Slider from "../../../shared/slider";
 
 class D3PriorPosterior {
     constructor(height, container_id, data) {

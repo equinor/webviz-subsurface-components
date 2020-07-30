@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import HistoryMatching from "../private_components/hm-resources/history_matching";
+import HistoryMatching from "./utils/history_matching";
 
 const parseData = data => (typeof data === "string" ? JSON.parse(data) : data);
 

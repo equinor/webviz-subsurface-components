@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import FlowMap from "../private_components/map/flow_map";
-import Map2D from "../private_components/map/map2d";
+import FlowMap from "./utils/flow_map";
+import Map2D from "./utils/map2d";
 
 const getIndexies = layers => {
     const index = {};

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import D3PriorPosterior from "../private_components/prior-posterior-distribution/prior_posterior_distribution";
+import "./prior_posterior_distribution.css";
+import D3PriorPosterior from "./utils/prior_posterior_distribution";
 
 class PriorPosteriorDistribution extends Component {
     componentDidMount() {
