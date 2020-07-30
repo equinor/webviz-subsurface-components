@@ -1,40 +1,34 @@
-import React, { Component, createRef } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component, createRef } from "react";
+import PropTypes from "prop-types";
 
 // Leaflet
-import L from 'leaflet';
-import './layers/L.imageWebGLOverlay';
-import './layers/L.tileWebGLLayer';
+import L from "leaflet";
+import "./layers/L.imageWebGLOverlay";
+import "./layers/L.tileWebGLLayer";
 
 // Components
-import Controls from './components/Controls';
-import CompositeMapLayers from './components/CompositeMapLayers';
-import Context from './context';
-
-// Assets
-import exampleData from '../../../demo/example-data/leaflet-map.json';
+import Controls from "./components/Controls";
+import CompositeMapLayers from "./components/CompositeMapLayers";
+import Context from "./context";
 
 // Utils
-import { onSizeChange } from './utils/element';
+import { onSizeChange } from "./utils/element";
 
-const stringToCRS = (crsString) => {
-    switch(crsString) {
-        case 'earth': {
+const stringToCRS = crsString => {
+    switch (crsString) {
+        case "earth": {
             return L.CRS.EPSG3857;
         }
 
         default:
             return L.CRS.Simple;
     }
-}
+};
 
 class LeafletMap extends Component {
-
     static mapReferences = {};
     static syncedDrawLayer = {
-        data: [
-
-        ]
+        data: [],
     };
 
     constructor(props) {
@@ -51,22 +45,18 @@ class LeafletMap extends Component {
             // center: [432205, 6475078],
             center: props.center || [0, 0],
             defaultBounds: props.defaultBounds,
-            controls: props.controls || {},
             drawLayer: drawLayer,
             drawLayerData: [],
             mode: null,
 
             // The imageLayer in focus - for calculating z value and showing colormap for
             focusedImageLayer: null,
-        }
-        
-        this.mapEl = createRef();
+        };
 
+        this.mapEl = createRef();
     }
 
-
     componentDidMount() {
-        
         const map = L.map(this.mapEl, {
             crs: this.state.crs,
             center: this.state.center,
@@ -76,34 +66,33 @@ class LeafletMap extends Component {
             attributionControl: false,
             zoomAnimation: true,
         });
-        this.setState({map: map});
+        this.setState({ map: map });
         LeafletMap.mapReferences[this.state.id] = this;
         this.setEvents(map);
 
-        if(this.props.autoScaleMap) {
+        if (this.props.autoScaleMap) {
             // If the width or height of the map changes, leaflet need to recalculate its dimensions
-            this.onSizeChange = onSizeChange(this.mapEl, () => {
-                map.invalidateSize();
-            }, 500);
+            this.onSizeChange = onSizeChange(
+                this.mapEl,
+                () => {
+                    map.invalidateSize();
+                },
+                500
+            );
         }
     }
 
-    componentDidUpdate() {
- 
-    }
+    componentDidUpdate() {}
 
-    componentWillMount() {
+    componentWillUnmount() {
         // Clear onSizeChange listener
         this.onSizeChange && this.onSizeChange();
     }
 
-
-    setEvents = (map) => {
-
-        map.on('zoomanim', e => {
-            
+    setEvents = map => {
+        map.on("zoomanim", e => {
             (this.props.syncedMaps || []).forEach(id => {
-                if(!LeafletMap.mapReferences[id] || id === this.state.id) {
+                if (!LeafletMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
 
@@ -111,105 +100,106 @@ class LeafletMap extends Component {
                 if (
                     e.zoom !== LeafletMap.mapReferences[id].getMap().getZoom()
                 ) {
-                    LeafletMap.mapReferences[id].getMap().setView(
-                        e.center,
-                        e.zoom
-                    )
+                    LeafletMap.mapReferences[id]
+                        .getMap()
+                        .setView(e.center, e.zoom);
                 }
-            })
-        })
-        
-        map.on('move', e => {
+            });
+        });
+
+        map.on("move", e => {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
             (this.props.syncedMaps || []).forEach(id => {
-                if(!LeafletMap.mapReferences[id] || id === this.state.id) {
+                if (!LeafletMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
 
-                if (
-                    typeof e.originalEvent !== "undefined"
-                ) {
-                    LeafletMap.mapReferences[id].getMap().setView(
-                        e.target.getCenter()
-                    )
+                if (typeof e.originalEvent !== "undefined") {
+                    LeafletMap.mapReferences[id]
+                        .getMap()
+                        .setView(e.target.getCenter());
                 }
-                
-            })
-        })
-    }
+            });
+        });
+    };
 
     getMap = () => {
         return this.state.map;
-    }
+    };
 
-    setPropsExist = (value) => {
-        if(!this.props.setProps) {
+    setPropsExist = value => {
+        if (!this.props.setProps) {
             console.log(value);
         } else {
             this.props.setProps(value);
         }
-    }
+    };
 
-    drawLayerAdd = (newLayers) => {
+    drawLayerAdd = newLayers => {
         this.setState(prevState => ({
-            drawLayerData: [...prevState.drawLayerData, ...newLayers]
-        }))
-    }
+            drawLayerData: [...prevState.drawLayerData, ...newLayers],
+        }));
+    };
 
-    drawLayerDelete = (layerTypes) => {
+    drawLayerDelete = layerTypes => {
         if (layerTypes === "all") {
-            this.setState({drawLayerData: []});
-            return
+            this.setState({ drawLayerData: [] });
+            return;
         }
-        const layers = this.state.drawLayerData.filter((drawing) => {
+        const layers = this.state.drawLayerData.filter(drawing => {
             return !layerTypes.includes(drawing.type);
-        })
+        });
         if (layers !== this.state.layers) {
-            this.setState({drawLayerData: layers});
-        }    
-    }
+            this.setState({ drawLayerData: layers });
+        }
+    };
 
-    syncedDrawLayerAdd = (newLayers) => {
+    syncedDrawLayerAdd = newLayers => {
         for (const layer of newLayers) {
             layer["creatorId"] = this.state.id;
             LeafletMap.syncedDrawLayer.data.push(layer);
         }
         this.redrawAllSyncedMaps();
-    }
+    };
 
     syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
         const syncedMaps = [...this.props.syncedMaps, this.state.id];
-        LeafletMap.syncedDrawLayer.data = LeafletMap.syncedDrawLayer.data.filter((drawing) => {
-            return !syncedMaps.includes(drawing.creatorId) || !layerTypes.includes(drawing.type);
-        })
+        LeafletMap.syncedDrawLayer.data = LeafletMap.syncedDrawLayer.data.filter(
+            drawing => {
+                return (
+                    !syncedMaps.includes(drawing.creatorId) ||
+                    !layerTypes.includes(drawing.type)
+                );
+            }
+        );
         if (shouldRedraw) {
             this.redrawAllSyncedMaps();
         }
-    }
+    };
 
     redrawAllSyncedMaps = () => {
         if (this.props.syncDrawings) {
             for (const id of this.props.syncedMaps || []) {
                 if (id !== this.state.id) {
                     const otherMap = LeafletMap.mapReferences[id];
-                    otherMap && otherMap.forceUpdate && otherMap.forceUpdate(); 
+                    otherMap && otherMap.forceUpdate && otherMap.forceUpdate();
                 }
             }
         }
         // When using the component in dash with multiple maps drawing won't work
         // If not added to the map through the reSyncDrawLayer due to how setProps works
         this.forceUpdate();
-    }
+    };
 
     /**
      * @param {HTMLCanvasElement} onScreenCanvas
      */
-    setFocucedImageLayer = (layer) => {
+    setFocucedImageLayer = layer => {
         this.setState({
             focusedImageLayer: layer,
-        })
-    }
+        });
+    };
 
     /**
      * @param {String} mode
@@ -217,69 +207,64 @@ class LeafletMap extends Component {
      */
     setMode = newMode => {
         this.setState({
-            mode: newMode
-        })
-    }
-    
-    render() {   
-        
+            mode: newMode,
+        });
+    };
+
+    render() {
         return (
-            <div style={{height: '100%', width: '100%'}}>
-                <div
-                    ref={el => this.mapEl = el} 
-                    style={{height: '100%'}}>
-                        <Context.Provider value={{
-                                drawLayer: this.state.drawLayer,
-                                drawLayerData: this.state.drawLayerData,
-                                syncedDrawLayer: LeafletMap.syncedDrawLayer,
-                                mode: this.state.mode,
-                                setMode: this.setMode,
-                                drawLayerAdd: this.drawLayerAdd,
-                                drawLayerDelete: this.drawLayerDelete,
-                                syncedDrawLayerAdd: this.syncedDrawLayerAdd,
-                                syncedDrawLayerDelete: this.syncedDrawLayerDelete,
-                                focusedImageLayer: this.state.focusedImageLayer,
-                                setFocusedImageLayer: this.setFocucedImageLayer,
-                            }}
-                        >
-                            {
-                                this.state.map && (
-                                        <Controls 
-                                            setProps={this.setPropsExist}
-                                            map={this.state.map}
-                                            scaleY={this.props.scaleY}
-                                            switch={this.props.switch}
-                                            colorBar={this.props.colorBar}
-                                            unitScale={this.props.unitScale}
-                                            drawTools={this.props.drawTools}
-                                            mouseCoords = {this.props.mouseCoords}
-                                            syncDrawings={this.props.syncDrawings}
-                                        />
-                                )
-                            }
-                            {
-                                this.state.map && (
-                                    <CompositeMapLayers 
-                                        layers={this.props.layers}
-                                        map={this.state.map}
-                                        syncedMaps={[...(this.props.syncedMaps || []), this.state.id]}
-                                        syncDrawings={this.props.syncDrawings}
-                                        updateMode={this.props.updateMode}
-                                        setProps={this.setPropsExist}
-                                    />
-                                )
-                            }
-                        </Context.Provider>
+            <div style={{ height: "100%", width: "100%" }}>
+                <div ref={el => (this.mapEl = el)} style={{ height: "100%" }}>
+                    <Context.Provider
+                        value={{
+                            drawLayer: this.state.drawLayer,
+                            drawLayerData: this.state.drawLayerData,
+                            syncedDrawLayer: LeafletMap.syncedDrawLayer,
+                            mode: this.state.mode,
+                            setMode: this.setMode,
+                            drawLayerAdd: this.drawLayerAdd,
+                            drawLayerDelete: this.drawLayerDelete,
+                            syncedDrawLayerAdd: this.syncedDrawLayerAdd,
+                            syncedDrawLayerDelete: this.syncedDrawLayerDelete,
+                            focusedImageLayer: this.state.focusedImageLayer,
+                            setFocusedImageLayer: this.setFocucedImageLayer,
+                        }}
+                    >
+                        {this.state.map && (
+                            <Controls
+                                setProps={this.setPropsExist}
+                                map={this.state.map}
+                                scaleY={this.props.scaleY}
+                                switch={this.props.switch}
+                                colorBar={this.props.colorBar}
+                                unitScale={this.props.unitScale}
+                                drawTools={this.props.drawTools}
+                                mouseCoords={this.props.mouseCoords}
+                                syncDrawings={this.props.syncDrawings}
+                            />
+                        )}
+                        {this.state.map && (
+                            <CompositeMapLayers
+                                layers={this.props.layers}
+                                map={this.state.map}
+                                syncedMaps={[
+                                    ...(this.props.syncedMaps || []),
+                                    this.state.id,
+                                ]}
+                                syncDrawings={this.props.syncDrawings}
+                                updateMode={this.props.updateMode}
+                                setProps={this.setPropsExist}
+                            />
+                        )}
+                    </Context.Provider>
                 </div>
             </div>
-        )
+        );
     }
-
 }
 LeafletMap.contextType = Context;
 
 LeafletMap.propTypes = {
-   
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
@@ -300,7 +285,7 @@ LeafletMap.propTypes = {
      * Mouse properties configuration
      */
     mouseCoords: PropTypes.shape({
-        position: PropTypes.string
+        position: PropTypes.string,
     }),
     /**
      * ScaleY is a configuration for creating a slider for scaling the Y-axis.
@@ -321,7 +306,6 @@ LeafletMap.propTypes = {
         position: PropTypes.string,
         label: PropTypes.string,
     }),
-
 
     /**
      * DrawTools is a configuration for enabling drawing of polylines and areas.
@@ -349,37 +333,38 @@ LeafletMap.propTypes = {
 
     center: PropTypes.array,
     /**
-     * 
+     *
      */
     defaultBounds: PropTypes.array,
 
     /**
-     * 
+     *
      */
     zoom: PropTypes.number,
 
     /**
-     * 
+     *
      */
     minZoom: PropTypes.number,
 
     /**
-     * 
+     *
      */
     maxZoom: PropTypes.number,
 
     /**
-     * 
+     *
      */
     crs: PropTypes.string,
 
     /**
-     * Ids of other LayeredMap instances that should be synced with this instance  
-     */    
+     * Ids of other LayeredMap instances that should be synced with this instance
+     */
+
     syncedMaps: PropTypes.array,
 
     /**
-     * Boolean deciding whether or not to sync drawings between maps  
+     * Boolean deciding whether or not to sync drawings between maps
      */
     syncDrawings: PropTypes.bool,
 
@@ -412,14 +397,12 @@ LeafletMap.propTypes = {
     /**
      * Map coordinates of a mouse click
      */
-    click_position: PropTypes.array,   
+    click_position: PropTypes.array,
 
     /**
      * Shape clicked on JSON format
      */
     clicked_shape: PropTypes.object,
-
-}
-
+};
 
 export default LeafletMap;
