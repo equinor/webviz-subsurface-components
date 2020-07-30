@@ -53,7 +53,7 @@ then:
     The second of these commands appears to be necessary as long as
     [this `pip` issue is open](https://github.com/pypa/pip/issues/4957).
 
-### Write component code in `src/lib/components/<component_name>.react.js`
+### Write component code in `src/lib/components/<component_name>/<component_name>.jsx`
 
 - The demo app is in `src/demo` and is where you will import an example of your
   component. To start the existing demo app, run `npm start`.
@@ -81,6 +81,19 @@ then:
     -   Make sure the stylesheets are added to the `_css_dist` dict in
         `webviz_subsurface_components/__init__.py` so dash will serve them
         automatically when the component suite is requested.
+
+- Every file related to the component should be located in the component directory, unless the file is shared between multiple components. Only the component you want to export as a Dash-component should have the `.jsx`-extension, the rest of the sub-components should have `.js`. For example the file-structure should look something like this:
+```
+src
+|--lib
+    |----<component_name>
+        |----components
+              |----<sub_component>.js
+        |----utils
+        |----<component_name>.jsx
+        |----<component_name>.css
+        |----index.js
+```
 
 ### Automatically upload demo application
 

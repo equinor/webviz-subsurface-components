@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers */
 import * as d3 from "d3";
-import HistoryMatchingPlot from "./history_matching_plot";
-import Slider from "../shared/slider";
+import HistoryMatchingPlot from "../components/history_matching_plot";
+import Slider from "../../../shared/slider";
 
 export default class HistoryMatching {
     init(container, data) {

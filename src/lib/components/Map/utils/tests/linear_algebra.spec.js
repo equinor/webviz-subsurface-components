@@ -1,5 +1,5 @@
-import jsc from "jsverify";
-import equal from "deep-equal";
+import jsc from "./jsverify";
+import equal from "./deep-equal";
 import { Vector, Matrix } from "../linear_algebra";
 import {
     arbitraryVector,

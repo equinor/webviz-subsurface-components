@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { ImageOverlay } from "react-leaflet";
 import CanvasOverlay from "./CanvasOverlay.react";
-import alter_image from "./alter_image";
+import alter_image from "../webgl/alter_image";
 
 class ImageOverlayWebGL extends Component {
     render() {
