@@ -1,36 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 // Components
-import LeafletMap from '../lib/components/LeafletMap';
+import LeafletMap from "../lib/components/LeafletMap";
 
 // Assets
-import exampleData from './example-data/leaflet-map.json';
-import { LeafletMap } from '../lib/index';
+import exampleData from "./example-data/leaflet-map.json";
+import { LeafletMap } from "../lib/index";
 
 const DEFAULT_COLORMAP = {
-    "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
-    "prefixZeroAlpha": false,
-    "scaleType": "linear",
-    "cutPointMin": 3400,
-    "cutPointMax": 3500
+    colors: [
+        "#0d0887",
+        "#46039f",
+        "#7201a8",
+        "#9c179e",
+        "#bd3786",
+        "#d8576b",
+        "#ed7953",
+        "#fb9f3a",
+        "#fdca26",
+        "#f0f921",
+    ],
+    prefixZeroAlpha: false,
+    scaleType: "linear",
+    cutPointMin: 3400,
+    cutPointMax: 3500,
 };
 
 const LeafletMapDemo = () => {
-
-
     const [switchValue, setSwitchValue] = useState(true);
     const [layers, setLayers] = useState(exampleData.layers.slice(1, 5));
 
-    
     const onChange = (changes) => {
-        console.log("Changes :D", changes);
         const newLayers = Object.assign([], layers);
         newLayers[0].data[0].colorScale = DEFAULT_COLORMAP;
-        if(changes.switch) {
+        if (changes.switch) {
             setSwitchValue(changes.switch.value);
             newLayers[0].action = "update";
             if (changes.switch.value === true) {
-                newLayers[0].data[0].shader.type = 'hillshading';
+                newLayers[0].data[0].shader.type = "hillshading";
                 newLayers[0].data[0].shader.shadows = true;
                 newLayers[0].data[0].colorScale = DEFAULT_COLORMAP;
                 newLayers[0].data[0].colorScale.cutPointMin = 2700;
@@ -38,18 +45,24 @@ const LeafletMapDemo = () => {
             } else {
                 newLayers[0].data[0].shader.type = null;
                 newLayers[0].data[0].colorScale = {
-                   
-                    "cutPointMin": 2700,
-                    "cutPointMax": 3500,
+                    cutPointMin: 2700,
+                    cutPointMax: 3500,
                 };
             }
         }
-        setLayers(newLayers)
-    }
+        setLayers(newLayers);
+    };
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: "1fr 1fr", gridTemplateRows: '1fr 1fr', height: '180vh'}}>
-           {/* <div>
+        <div
+            style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gridTemplateRows: "1fr 1fr",
+                height: "180vh",
+            }}
+        >
+            {/* <div>
                  <LeafletMap 
                     id={"LeafletMap-1"}
                     syncedMaps={["LeafletMap-2", "LeafletMap-1"]}
@@ -116,72 +129,69 @@ const LeafletMapDemo = () => {
                     setProps={onChange}
                 />
             </div> */}
-            <div >
-                <LeafletMap 
+            <div>
+                <LeafletMap
                     id={"LeafletMap-3"}
                     syncedMaps={["LeafletMap-4"]}
-                   // syncDrawings={true}
+                    // syncDrawings={true}
                     layers={layers}
-                    unitScale={{ 
-                        position: "bottomright" 
+                    unitScale={{
+                        position: "bottomright",
                     }}
                     colorBar={{
-                        position: 'bottomleft'
+                        position: "bottomleft",
                     }}
                     crs="simple"
                     minZoom={-5}
-                    zoom = {-5} 
-                    mouseCoords = {{
+                    zoom={-5}
+                    mouseCoords={{
                         position: "bottomleft",
                     }}
-                    drawTools = {{
+                    drawTools={{
                         drawMarker: true,
                         drawPolygon: true,
                         drawPolyline: true,
                         position: "topright",
-                        
                     }}
                     switch={{
                         value: switchValue,
-                        label: 'Hillshading',
-                        position: 'bottomleft'
+                        label: "Hillshading",
+                        position: "bottomleft",
                     }}
                     setProps={onChange}
                 />
-            </div> 
-            <div >
-                <LeafletMap 
+            </div>
+            <div>
+                <LeafletMap
                     id={"LeafletMap-4"}
                     syncedMaps={["LeafletMap-3"]}
                     syncDrawings={true}
                     layers={layers}
                     colorBar={{
-                        position: 'bottomleft'
+                        position: "bottomleft",
                     }}
                     crs="simple"
                     minZoom={-5}
-                    zoom = {-5} 
-                    mouseCoords = {{
+                    zoom={-5}
+                    mouseCoords={{
                         position: "bottomleft",
                     }}
-                    drawTools = {{
+                    drawTools={{
                         drawMarker: true,
                         drawPolygon: true,
                         drawPolyline: true,
                         position: "topright",
-                        
                     }}
                     switch={{
                         value: switchValue,
-                        label: 'Hillshading',
-                        position: 'bottomleft'
+                        label: "Hillshading",
+                        position: "bottomleft",
                     }}
                     setProps={onChange}
                 />
-            </div>  
-        </ div>
-        
-    )
-}
+            </div>
+        </div>
+    );
+};
 
 export default LeafletMapDemo;
