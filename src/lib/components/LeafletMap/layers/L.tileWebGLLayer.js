@@ -65,7 +65,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
              */
             (this._loadedTiles = {});
 
-        options = Util.setOptions(this, options);
+        Util.setOptions(this, options);
 
         // for https://github.com/Leaflet/Leaflet/issues/137
         if (!Browser.android) {
