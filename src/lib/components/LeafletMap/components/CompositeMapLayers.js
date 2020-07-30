@@ -47,10 +47,10 @@ class CompositeMapLayers extends Component {
 
     updateLayer = (curLayer, newLayer) => {
         const focusedImageLayer = this.context.focusedImageLayer || {};
+        const imageLayer = curLayer.getLayers()[0];
 
         switch (newLayer.data[0].type) {
             case "image":
-                const imageLayer = curLayer.getLayers()[0];
                 imageLayer.updateOptions({
                     ...newLayer.data[0],
                 });
@@ -80,12 +80,13 @@ class CompositeMapLayers extends Component {
                 );
                 for (const propLayerData of layers) {
                     switch (propLayerData.action) {
-                        case "update":
+                        case "update": {
                             const stateLayer = this.layers[propLayerData.id];
                             if (stateLayer) {
                                 this.updateLayer(stateLayer, propLayerData);
                             }
                             break;
+                        }
 
                         case "delete":
                             if (this.layers[propLayerData.id]) {
@@ -161,10 +162,12 @@ class CompositeMapLayers extends Component {
                 newItem = makeMarker(item, swapXY, this.props.setProps);
                 break;
 
-            case "image":
+            case "image": {
                 const imageLayer = addImage(item, swapXY);
                 newItem = imageLayer;
                 break;
+            }
+
             case "tile":
                 newItem = addTile(item, swapXY);
                 break;
@@ -278,7 +281,9 @@ class CompositeMapLayers extends Component {
 
         try {
             this.context.drawLayer.clearLayers();
-        } catch (error) {}
+        } catch (error) {
+            null;
+        }
 
         const itemsToDraw = {};
 
@@ -322,6 +327,14 @@ CompositeMapLayers.contextType = Context;
 
 CompositeMapLayers.propTypes = {
     map: PropTypes.object.isRequired,
+
+    updateMode: PropTypes.string,
+
+    setProps: PropTypes.func,
+
+    syncedMaps: PropTypes.array,
+
+    syncDrawings: PropTypes.bool,
 
     /* Data for one single layer. See parent component LayeredMap for documentation.
      */

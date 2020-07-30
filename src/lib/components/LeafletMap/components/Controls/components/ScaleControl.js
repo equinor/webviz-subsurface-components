@@ -4,7 +4,7 @@ import Context from "../../../context";
 
 import L from "leaflet";
 
-const ScaleControl = (props) => {
+const ScaleControl = props => {
     const { focusedImageLayer = {} } = useContext(Context);
 
     // State
@@ -27,17 +27,6 @@ const ScaleControl = (props) => {
         updateScaleControl();
     }, focusedDependencyArray());
 
-    const focusedDependencyArray = () => {
-        const options = (focusedImageLayer || {}).options || {};
-        return [
-            newCanvas,
-            newURL,
-            options.minvalue,
-            options.maxvalue,
-            options.unit,
-        ];
-    };
-
     const updateScaleControl = () => {
         if (scaleControl) {
             props.map.removeControl(scaleControl);
@@ -45,7 +34,7 @@ const ScaleControl = (props) => {
         addControl(props.map);
     };
 
-    const addControl = (map) => {
+    const addControl = map => {
         if (!focusedImageLayer) {
             return;
         }

@@ -1,11 +1,11 @@
 import L from "leaflet";
 
 L.VerticalZoom = L.Control.extend({
-    initialize: function (position) {
+    initialize: function(position) {
         this.setPosition(position);
     },
 
-    onAdd: function (map) {
+    onAdd: function(map) {
         const panelDiv = (this.panelDiv = L.DomUtil.create(
             "div",
             "leaflet-custom-control"
@@ -22,6 +22,6 @@ L.VerticalZoom = L.Control.extend({
     },
 });
 
-L.verticalZoom = (position) => {
+L.verticalZoom = position => {
     return new L.VerticalZoom(position);
 };

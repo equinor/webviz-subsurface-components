@@ -16,7 +16,6 @@ export default (gl, canvas, loadedImage, loadedColorMap, config = {}) => {
     const {
         elevationScale = DEFAULT_ELEVATION_SCALE,
         lightDirection = DEFAULT_LIGHT_DIRECTION,
-        scaleType = "linear",
 
         setBlackToAlpha = false,
     } = config;
@@ -87,7 +86,7 @@ export default (gl, canvas, loadedImage, loadedColorMap, config = {}) => {
         .uniformf("u_resolution", width, height)
         .uniformf(
             "u_light_direction",
-            ...lightDirection.map((dir) => dir / vectorLength)
+            ...lightDirection.map(dir => dir / vectorLength)
         )
         .uniformf("u_elevation_scale", elevationScale)
         .viewport(0, 0, width, height)

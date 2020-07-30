@@ -1,9 +1,8 @@
-import { EQGLContext, FrameBuffer } from "./index";
+import { FrameBuffer } from "./index";
 import Variable from "./variable";
 import {
     bindBuffer,
     bindTexture,
-    createAndInitProgram,
     createProgram,
     createShader,
 } from "./webglutils";
@@ -31,7 +30,6 @@ import Texture from "./texture";
  */
 export const drawCommand = (context, cmd, props = {}) => {
     const gl = context._gl;
-    const canvas = gl.canvas;
 
     // Check if one should write to a framebuffer or directly to the canvas
     const framebuffer = extractValue(cmd.framebuffer, props);
@@ -55,7 +53,7 @@ export const drawCommand = (context, cmd, props = {}) => {
     // Initialize program and shaders
     let program = null;
     if (context._programs[cmd.id]) {
-        const { p, vert, frag } = context._programs[cmd.id];
+        const { p } = context._programs[cmd.id];
         program = p; //createProgram(gl, vert, frag);
     } else {
         // A program has not yet been made for this command - create one
@@ -147,10 +145,10 @@ const extractValue = (variable, props) => {
         return props[variable.name];
     } else if (
         Array.isArray(variable) &&
-        variable.some((v) => v instanceof Variable)
+        variable.some(v => v instanceof Variable)
     ) {
         // The uniformf-method gives an array
-        const v = variable.find((v) => v instanceof Variable);
+        const v = variable.find(v => v instanceof Variable);
         return props[v.name];
     }
     return variable;

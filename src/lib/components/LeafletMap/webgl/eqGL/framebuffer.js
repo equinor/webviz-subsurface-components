@@ -1,5 +1,3 @@
-import { nextTextureIndex } from "./texture";
-
 class FrameBuffer {
     /**
      *

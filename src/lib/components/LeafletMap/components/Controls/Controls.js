@@ -91,10 +91,19 @@ Controls.propTypes = {
     map: PropTypes.object.isRequired,
     setProps: PropTypes.func,
 
-    setProps: PropTypes.func,
+    mouseCoords: PropTypes.shape({
+        position: PropTypes.string,
+    }),
+
+    colorBar: PropTypes.shape({
+        position: PropTypes.string,
+    }),
+    
     unitScale: PropTypes.shape({
         position: PropTypes.string,
     }),
+
+    syncDrawings: PropTypes.bool,
 
     mousePosition: PropTypes.shape({
         coordinatePosition: PropTypes.string,

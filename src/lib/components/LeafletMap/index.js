@@ -1,1 +1,1 @@
-export { default } from "./LeafletMap.jsx";
+export { default } from "./LeafletMap";

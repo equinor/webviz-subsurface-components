@@ -71,7 +71,7 @@ export class EQGLContext {
     _nextTextureIndex = () => {
         if (this.TEXTURE_INDEX_COUNT === -1) {
             this.TEXTURE_INDEX_COUNT =
-                gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
+                this._gl.getParameter(this._gl.MAX_TEXTURE_IMAGE_UNITS) - 1;
         }
 
         return this.TEXTURE_INDEX_COUNT--;
