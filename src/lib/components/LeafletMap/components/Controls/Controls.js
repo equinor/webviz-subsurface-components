@@ -92,7 +92,9 @@ Controls.propTypes = {
     setProps: PropTypes.func,
 
     setProps: PropTypes.func,
-    unitScale: PropTypes.string,
+    unitScale: PropTypes.shape({
+        position: PropTypes.string,
+    }),
 
     mousePosition: PropTypes.shape({
         coordinatePosition: PropTypes.string,

@@ -32,7 +32,6 @@ const LeafletMapDemo = () => {
 
     const onChange = (changes) => {
         const newLayers = Object.assign([], layers);
-        newLayers[0].data[0].colorScale = DEFAULT_COLORMAP;
         if (changes.switch) {
             setSwitchValue(changes.switch.value);
             newLayers[0].action = "update";
@@ -49,8 +48,9 @@ const LeafletMapDemo = () => {
                     cutPointMax: 3500,
                 };
             }
+            setLayers(newLayers);
         }
-        setLayers(newLayers);
+        
     };
 
     return (
