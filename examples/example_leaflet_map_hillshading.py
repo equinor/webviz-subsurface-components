@@ -327,7 +327,7 @@ if __name__ == "__main__":
     )
 
     def update_pixel_text(value): 
-        return 'Pixel scale value: "{}"'.format(value)
+        return f'Pixel scale value: "{value}"'
 
 
     @cg.callback(

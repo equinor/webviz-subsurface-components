@@ -1,31 +1,36 @@
 # 🌍 LeafletMap Component
-The new leafletMap component is a component for layered map data, like tile-data and webgl images. 
+The new leafletMap component is a component for layered map data, like tile-data and WebGL images. 
 
 ## 📋 Table of contents
-- [Usage](#usage)
+- [Usage](#-usage)
     <br>
-- [Props](#props)
+- [Props](#-props)
     - [Map specifics](#props-map-specifics)
     - [Map tools](#props-map-tools)
     - [Map syncronization](#props-map-syncronization)
 
     <br>
-- [Layers](#layers)
+- [Layers](#-layers)
     - [Structure](#structure)
     - [Layer types](#layer-types)
         - [Image layers](#image-layers)
         - [Tile layers](#tile-layers)
         - [Shapes and drawings](#shapes-and-drawings)
-    <br>    
+    <br>   
+    
     - [Updating layers](#updating-layers)
         - [With action](#updating-layers-with-action)
         - [With replace](#updating-layers-with-replace)
+     
+    - [Color scales](#-colorscales)
+    - [Shaders](#-shaders)
+    
     <br>
-    - [Color scales](#colorscales)
-    - [Shaders](#shaders)
+    
+- [Listeners](#-listeners)
+
     <br>
-- [Listeners](#listeners)
-    <br>
+    
 - [Serving tiles with Dash](#serving-tiles-with-dash)
 
 ## 🌤 Features
@@ -703,7 +708,7 @@ Here is an example of what updating the shader with replace enabled would look l
 
 <br>
 
-### ❤ **ColorScales**
+### ❤ ColorScales
 
 **Description**
 
@@ -729,7 +734,7 @@ provided by the user or by user providing the colormap directly (see examples be
 
 The colorscale may be used in one of the following ways:
 
- - Specifying the hexadecimal color array along with the desired options as an      object
+ - Specifying the hexadecimal color array along with the desired options as an object
 
 
         "colorScale":  {
@@ -760,7 +765,7 @@ Currently the component only supports two types of shaders:
 * _soft-hillshading_
 * _hillshading_
 
-Shaders only works for only two layer types - _image_- and _tile_-layers. You can specifiy that you want shading with the following way inside your layer data:
+Shaders only works for two layer types - _image_- and _tile_-layers. You can specify that you want shading with the following way inside your layer data:
 ```javascript
 {
     ...
@@ -784,7 +789,7 @@ Shaders only works for only two layer types - _image_- and _tile_-layers. You ca
 <br>
 
 #### 🏔 Hillshading
-Hillshading is a shader that generates elevation and senes of relief to images. It can be enabled the following way:
+Hillshading is a shader that generates elevation and sense of relief to images. It can be enabled the following way:
 ```javascript
 {
     "shader": {
@@ -856,7 +861,7 @@ If the normal hillshading-shader is too heavy computational, there is also a sof
  
 ## 🎙 Listeners
  
-There are some listeners the python user can access using callbacks, such as the coordinates of a mouse click or a drawing.
+There are some listeners the Python user can access using callbacks, such as the coordinates of a mouse click or a drawing.
  
 Example:
  
@@ -911,16 +916,15 @@ class tile_server():
         @app.route('/tiles/<zoom>/<y>/<x>')
         def tiles(zoom, x, y):
             default = r'_path_to_default_tile\tiles\0\{zoom}\{x}\{y}.png'
-            filename = r'_path_to_tiles\tiles\0\%s\%s\%s.png' % (zoom, x, y)
+            filename = fr"_path_to_tiles\tiles\0\{zoom}\{x}\{y}.png"
             if os.path.isfile(filename):
                 return send_file(filename)
-            else:
-                return send_file(default)
+            return send_file(default)
 ```
 
 <br>
 
-We would also need to instanciate it in our dash app and pass it the instance of the flask server
+We would also need to instantiate it in our dash app and pass it the instance of the flask server
 
 ```python
 from tile_server import tile_server
