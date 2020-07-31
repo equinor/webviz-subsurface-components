@@ -919,8 +919,7 @@ class tile_server():
             filename = fr"_path_to_tiles\tiles\0\{zoom}\{x}\{y}.png"
             if os.path.isfile(filename):
                 return send_file(filename)
-            else:
-                return send_file(default)
+            return send_file(default)
 ```
 
 <br>
