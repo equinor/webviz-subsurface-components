@@ -1,10 +1,10 @@
 import io
 import json
 import base64
-import numpy as np
-from matplotlib import cm
 from typing import List
 
+import numpy as np
+from matplotlib import cm
 import dash
 import dash_colorscales
 import dash_core_components as dcc

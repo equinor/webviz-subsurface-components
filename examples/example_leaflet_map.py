@@ -1,10 +1,10 @@
 import io
 import json
 import base64
-import numpy as np
-from matplotlib import cm
 from typing import List
 
+import numpy as np
+from matplotlib import cm
 import dash
 import dash_colorscales
 import dash_core_components as dcc
@@ -60,7 +60,7 @@ if __name__ == "__main__":
                     },
                     "minvalue": min_value,
                     "maxvalue": max_value,
-                    "bounds": [[0, 0], [30, 30]],
+                    "bounds": [[432205, 6475078], [437720, 6481113]],
                     "shader": {
                         "setBlackToAlpha": True
                     }
@@ -80,7 +80,7 @@ if __name__ == "__main__":
                     "allowHillshading": True,
                     "minvalue": min_value,
                     "maxvalue": max_value,
-                    "bounds": [[0, 0], [30, 30]],
+                    "bounds": [[432205, 6475078], [437720, 6481113]],
                     "shader": {
                         "setBlackToAlpha": True
                     }
@@ -145,6 +145,7 @@ if __name__ == "__main__":
             "position": 'topleft',
         },
         updateMode="",
+        minZoom=-5
     )
 
     leaflet_map_2 = webviz_subsurface_components.LeafletMap(
@@ -169,6 +170,7 @@ if __name__ == "__main__":
             "position": "topright",   
         },
         updateMode="",
+        minZoom=-5
 
     )
     #ID's of the maps for which the callbacks are going to be made for. Required for shared callbacks
@@ -383,7 +385,6 @@ if __name__ == "__main__":
             ]
         )
         
-        #TODO remove or implement componentDidUpdate in drawTools
         def update_draw_tools_options(value):
             new_options = {
                 "drawMarker": False,

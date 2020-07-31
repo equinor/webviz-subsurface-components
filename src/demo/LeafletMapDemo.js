@@ -56,77 +56,9 @@ const LeafletMapDemo = () => {
             style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
-                gridTemplateRows: "1fr 1fr",
-                height: "180vh",
+                height: "90vh",
             }}
         >
-            {/* <div>
-                 <LeafletMap 
-                    id={"LeafletMap-1"}
-                    syncedMaps={["LeafletMap-2", "LeafletMap-1"]}
-                    syncDrawings={true}
-                    layers={layers}
-                    center={[0, 0]}
-                    crs="simple"
-                    minZoom={-5}
-                    colorBar={{
-                        position: 'bottomleft'
-                    }}
-                    scaleY={{
-                        scaleY: 1,
-                        minScaleY: 1,
-                        maxScaleY: 10,
-                        position: 'topleft',
-                    }}
-                    drawTools = {{
-                        drawMarker: true,
-                        drawPolygon: true,
-                        drawPolyline: true,
-                        position: "topright",
-                        
-                    }}
-                    mouseCoords = {{
-                        position: "bottomright",
-                    }} 
-                    switch={{
-                        value: switchValue,
-                        label: 'Hillshading',
-                        position: 'bottomleft'
-                    }}
-                    unitScale={{}}
-                    setProps={onChange}
-                />
-            </div>
-             <div >
-                <LeafletMap 
-                    id={"LeafletMap-2"}
-                    syncedMaps={["LeafletMap-1", "LeafletMap-2"]}
-                    syncDrawings={true}
-                    layers={layers}
-                    colorBar={{
-                        position: 'bottomleft'
-                    }}
-                    crs="simple"
-                    minZoom={-5}
-                    zoom = {-5} 
-                    mouseCoords = {{
-                        position: "bottomleft",
-                    }}
-                    drawTools = {{
-                        drawMarker: true,
-                        drawPolygon: true,
-                        drawPolyline: true,
-                        position: "topright",
-                        
-                    }}
-                    switch={{
-                        value: switchValue,
-                        label: 'Hillshading',
-                        position: 'bottomleft'
-                    }}
-                    setProps={onChange}
-                />
-            </div> */}
             <div>
                 <LeafletMap
                     id={"LeafletMap-3"}

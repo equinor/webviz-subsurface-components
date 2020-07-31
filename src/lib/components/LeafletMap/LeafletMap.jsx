@@ -42,7 +42,6 @@ class LeafletMap extends Component {
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
             crs: stringToCRS(props.crs),
-            // center: [432205, 6475078],
             center: props.center || [0, 0],
             defaultBounds: props.defaultBounds,
             drawLayer: drawLayer,
