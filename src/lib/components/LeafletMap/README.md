@@ -916,7 +916,7 @@ class tile_server():
         @app.route('/tiles/<zoom>/<y>/<x>')
         def tiles(zoom, x, y):
             default = r'_path_to_default_tile\tiles\0\{zoom}\{x}\{y}.png'
-            filename = r'_path_to_tiles\tiles\0\%s\%s\%s.png' % (zoom, x, y)
+            filename = fr"_path_to_tiles\tiles\0\{zoom}\{x}\{y}.png"
             if os.path.isfile(filename):
                 return send_file(filename)
             else:
