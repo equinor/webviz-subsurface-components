@@ -789,7 +789,7 @@ Shaders only works for two layer types - _image_- and _tile_-layers. You can spe
 <br>
 
 #### 🏔 Hillshading
-Hillshading is a shader that generates elevation and senes of relief to images. It can be enabled the following way:
+Hillshading is a shader that generates elevation and sense of relief to images. It can be enabled the following way:
 ```javascript
 {
     "shader": {
