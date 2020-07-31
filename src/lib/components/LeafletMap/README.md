@@ -2,30 +2,35 @@
 The new leafletMap component is a component for layered map data, like tile-data and WebGL images. 
 
 ## 📋 Table of contents
-- [Usage](#usage)
+- [Usage](#-usage)
     <br>
-- [Props](#props)
+- [Props](#-props)
     - [Map specifics](#props-map-specifics)
     - [Map tools](#props-map-tools)
     - [Map syncronization](#props-map-syncronization)
 
     <br>
-- [Layers](#layers)
+- [Layers](#-layers)
     - [Structure](#structure)
     - [Layer types](#layer-types)
         - [Image layers](#image-layers)
         - [Tile layers](#tile-layers)
         - [Shapes and drawings](#shapes-and-drawings)
-    <br>    
+    <br>   
+    
     - [Updating layers](#updating-layers)
         - [With action](#updating-layers-with-action)
         - [With replace](#updating-layers-with-replace)
+     
+    - [Color scales](#-colorscales)
+    - [Shaders](#-shaders)
+    
     <br>
-    - [Color scales](#colorscales)
-    - [Shaders](#shaders)
+    
+- [Listeners](#-listeners)
+
     <br>
-- [Listeners](#listeners)
-    <br>
+    
 - [Serving tiles with Dash](#serving-tiles-with-dash)
 
 ## 🌤 Features
@@ -703,7 +708,7 @@ Here is an example of what updating the shader with replace enabled would look l
 
 <br>
 
-### ❤ **ColorScales**
+### ❤ ColorScales
 
 **Description**
 
