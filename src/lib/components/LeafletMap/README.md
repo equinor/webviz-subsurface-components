@@ -861,7 +861,7 @@ If the normal hillshading-shader is too heavy computational, there is also a sof
  
 ## 🎙 Listeners
  
-There are some listeners the python user can access using callbacks, such as the coordinates of a mouse click or a drawing.
+There are some listeners the Python user can access using callbacks, such as the coordinates of a mouse click or a drawing.
  
 Example:
  
