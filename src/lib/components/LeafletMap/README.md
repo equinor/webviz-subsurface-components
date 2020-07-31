@@ -1,5 +1,5 @@
 # 🌍 LeafletMap Component
-The new leafletMap component is a component for layered map data, like tile-data and webgl images. 
+The new leafletMap component is a component for layered map data, like tile-data and WebGL images. 
 
 ## 📋 Table of contents
 - [Usage](#usage)
