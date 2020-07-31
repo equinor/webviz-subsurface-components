@@ -924,7 +924,7 @@ class tile_server():
 
 <br>
 
-We would also need to instanciate it in our dash app and pass it the instance of the flask server
+We would also need to instantiate it in our dash app and pass it the instance of the flask server
 
 ```python
 from tile_server import tile_server
