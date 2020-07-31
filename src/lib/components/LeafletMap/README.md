@@ -734,7 +734,7 @@ provided by the user or by user providing the colormap directly (see examples be
 
 The colorscale may be used in one of the following ways:
 
- - Specifying the hexadecimal color array along with the desired options as an      object
+ - Specifying the hexadecimal color array along with the desired options as an object
 
 
         "colorScale":  {
