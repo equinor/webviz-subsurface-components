@@ -765,7 +765,7 @@ Currently the component only supports two types of shaders:
 * _soft-hillshading_
 * _hillshading_
 
-Shaders only works for only two layer types - _image_- and _tile_-layers. You can specifiy that you want shading with the following way inside your layer data:
+Shaders only works for two layer types - _image_- and _tile_-layers. You can specify that you want shading with the following way inside your layer data:
 ```javascript
 {
     ...
