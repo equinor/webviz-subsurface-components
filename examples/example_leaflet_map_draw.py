@@ -167,8 +167,7 @@ if __name__ == "__main__":
     )
 
     def sync_map(n_clicks):
-        sync_test = False if n_clicks % 2 else True
-        return sync_test
+        return False if n_clicks % 2 else True
 
 #
 #                           MAP 2 CALLBACKS
