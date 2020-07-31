@@ -189,9 +189,8 @@ if __name__ == "__main__":
 
     def get_layer_type(layer_id, layers): 
         for layer in layers:
-            if(str(layer['id']) == str(layer_id)):
-                if (layer['data'][0]['type'] == "image"):
-                    return "image"
+            if str(layer['id']) == str(layer_id) and layer['data'][0]['type'] == "image":
+                return "image"
         return "tile"
 
 
