@@ -3,6 +3,7 @@ from __future__ import print_function as _
 import os as _os
 import sys as _sys
 import json
+import warnings
 
 from pkg_resources import get_distribution, DistributionNotFound
 
@@ -60,3 +61,19 @@ _css_dist = [
 for _component in __all__:
     setattr(locals()[_component], "_js_dist", _js_dist)
     setattr(locals()[_component], "_css_dist", _css_dist)
+
+
+# Deprecate the LayeredMap component
+
+original_init = LayeredMap.__init__
+
+
+def new_init(self, *args, **kwargs):
+    warnings.warn(
+        "LayeredMap is deprecated and will later be removed - use LeafletMap instead",
+        DeprecationWarning,
+    )
+    return original_init(self, *args, **kwargs)
+
+
+LayeredMap.__init__ = new_init
