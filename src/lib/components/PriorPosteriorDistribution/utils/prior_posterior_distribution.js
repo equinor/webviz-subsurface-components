@@ -129,13 +129,15 @@ class D3PriorPosterior {
             .attr("height", this.height)
             .style("overflow", "visible");
 
-        this.createMainGroup();
-        this.createXAndColorScale();
+        if (this.data.labels.length > 0) {
+            this.createMainGroup();
+            this.createXAndColorScale();
 
-        this.renderPileChart();
-        this.renderHistogram();
-        this.initNumberBinsPicker();
-        this.initIterationPicker();
+            this.renderPileChart();
+            this.renderHistogram();
+            this.initNumberBinsPicker();
+            this.initIterationPicker();
+        }
     }
 
     createMainGroup() {

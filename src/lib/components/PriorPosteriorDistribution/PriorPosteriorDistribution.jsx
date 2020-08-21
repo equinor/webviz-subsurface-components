@@ -36,6 +36,7 @@ class PriorPosteriorDistribution extends Component {
 
 PriorPosteriorDistribution.defaultProps = {
     height: 700,
+    data: { iterations: [], labels: [], values: [] },
 };
 
 PriorPosteriorDistribution.propTypes = {
