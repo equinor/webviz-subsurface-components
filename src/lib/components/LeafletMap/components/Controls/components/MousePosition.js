@@ -296,8 +296,17 @@ const MousePosition = props => {
 
     const mapZValue = redColorvalue => {
         const { minvalue, maxvalue } = stateRef.current || {};
-        return Math.floor(
+        return roundOff(
             minvalue + ((maxvalue - minvalue) / (255 - 0)) * (redColorvalue - 0)
+        );
+    };
+
+    const roundOff = n => {
+        // Returns two significant figures (non-zero) for numbers with an absolute value less
+        // than 1, and two decimal places for numbers with an absolute value greater
+        // than 1.
+        return parseFloat(
+            n.toExponential(Math.max(1, 2 + Math.log10(Math.abs(n))))
         );
     };
 
