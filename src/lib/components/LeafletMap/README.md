@@ -587,7 +587,10 @@ To update existing layer(s) provide a layer object with the id and type of the l
 
 Please note that if you change a field which takes an object such as a shader, the component does not store the individual options/subfields of that object. This means that you have to provide all the options you want to have in the updated layer.
 
+Note that it is possible to use `update` for a component with no initial layers. The initial behaviour will then be `replace` (see below), but will switch to `update` when layers are added.
+
 Provided the Layers in the the previous example, this would be how we create a toggle button to update the color scale and hillshading of the tile layer with _action_.
+
 ```python
 COLORSCALE = ['#032333', '#2a3393', '#754792', '#b15d81', '#ea7859', '#fbb33c', '#e7fa5a']
 
@@ -656,7 +659,7 @@ def delete_layer(n_clicks):
 
 #### Updating layers with replace
 
-Changing layers with `"updateMode": "replace"`, simply removes all existing layers, and adds the ones you provide to the map. This is mainly recomended e.g. if you're going to look at a new set of data in the application during runtime. 
+Changing layers with `"updateMode": "replace"`, simply removes all existing layers, and adds the ones you provide to the map. This is mainly recommended e.g. if you're going to look at a new set of data in the application during runtime. 
 It is also possible to use it for updating layer fields, but it requires ALL the layers and fields to be returned. A way of doing this could be to maintain a list in python which is updated whenever something changes and then sent as a prop to the component. 
 
 <br>
