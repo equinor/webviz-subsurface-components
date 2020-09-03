@@ -162,17 +162,17 @@ export default class HistoryMatchingPlot extends Component {
             {
                 label: "Simulated values too high",
                 box: {
-                    colour: "#34A037",
-                    stroke: "#050",
-                    fillOpacity: 0.7,
+                    colour: this.POSITIVE_BARS_COLOR,
+                    stroke: this.POSITIVE_BARS_STROKE,
+                    fillOpacity: this.POSITIVE_BARS_OPACITY,
                 },
             },
             {
                 label: "Simulated values too low",
                 box: {
-                    colour: "#40537D",
-                    stroke: "#40537D",
-                    fillOpacity: 0.7,
+                    colour: this.NEGATIVE_BARS_COLOR,
+                    stroke: this.NEGATIVE_BARS_STROKE,
+                    fillOpacity: this.NEGATIVE_BARS_OPACITY,
                 },
             },
             {
