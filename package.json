@@ -35,8 +35,14 @@
         "react-leaflet-draw": "^0.19.0"
     },
     "devDependencies": {
+        "@babel/core": "^7.11.6",
+        "@babel/plugin-proposal-class-properties": "^7.10.4",
+        "@babel/preset-env": "^7.11.5",
+        "@babel/preset-react": "^7.10.4",
+        "@babel/preset-typescript": "^7.10.4",
         "@typescript-eslint/eslint-plugin": "^2.32.0",
         "@typescript-eslint/parser": "^2.32.0",
+        "babel-loader": "^8.1.0",
         "copyfiles": "^2.0.0",
         "css-loader": "^2.1.1",
         "eslint": "^7.0.0",
@@ -53,7 +59,6 @@
         "react-docgen": "^2.20.1",
         "react-dom": "^16.9.0",
         "source-map-loader": "^0.2.4",
-        "ts-loader": "^7.0.3",
         "typescript": "^3.8.3",
         "url-loader": "^2.1.0",
         "webpack": "^4.41.2",
