@@ -89,7 +89,7 @@ export default class Map extends Component {
                     .join(" ")
             )
             .attr("fill", (d, i) => self.color(i))
-            .on("mousemove", (d, i) => {
+            .on("mousemove", function(d, i) {
                 self.emit("mousemove", {
                     x: d3.mouse(this)[0],
                     y: d3.mouse(this)[1],
