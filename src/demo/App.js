@@ -2,17 +2,18 @@
 import React, { Component } from "react";
 
 // Components
+import DynamicTreeDemo from "./DynamicTreeDemo";
 import HistoryMatchDemo from "./HistoryMatchDemo";
-import MorrisDemo from "./MorrisDemo";
-import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
-import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import LeafletMapDemo from "./LeafletMapDemo";
+import MorrisDemo from "./MorrisDemo";
+import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
+import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "LeafletMap" };
+        this.state = { value: "DynamicTree" };
     }
 
     onChange(e) {
@@ -21,6 +22,12 @@ class App extends Component {
 
     renderDemo() {
         switch (this.state.value) {
+            case "DynamicTree": {
+                return <DynamicTreeDemo />;
+            }
+            case "LayeredMap": {
+                return <LayeredMapDemo />;
+            }
             case "LeafletMap": {
                 return <LeafletMapDemo />;
             }
@@ -30,14 +37,11 @@ class App extends Component {
             case "Morris": {
                 return <MorrisDemo />;
             }
-            case "SubsurfaceMap": {
-                return <SubsurfaceMapDemo />;
-            }
-            case "LayeredMap": {
-                return <LayeredMapDemo />;
-            }
             case "PriorPosteriorDistribution": {
                 return <PriorPosteriorDistributionDemo />;
+            }
+            case "SubsurfaceMap": {
+                return <SubsurfaceMapDemo />;
             }
             default: {
                 return null;
