@@ -37,7 +37,7 @@ class LeafletMap extends Component {
         this.state = {
             id: props.id,
             map: null,
-            layers: props.layers || [],
+            layers: props.layers,
             minZoom: props.minZoom || 1,
             maxZoom: props.maxZoom || 15,
             zoom: props.zoom || 1,
@@ -90,7 +90,7 @@ class LeafletMap extends Component {
 
     setEvents = map => {
         map.on("zoomanim", e => {
-            (this.props.syncedMaps || []).forEach(id => {
+            this.props.syncedMaps.forEach(id => {
                 if (!LeafletMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
@@ -109,7 +109,7 @@ class LeafletMap extends Component {
         map.on("move", e => {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
-            (this.props.syncedMaps || []).forEach(id => {
+            this.props.syncedMaps.forEach(id => {
                 if (!LeafletMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
@@ -179,7 +179,7 @@ class LeafletMap extends Component {
 
     redrawAllSyncedMaps = () => {
         if (this.props.syncDrawings) {
-            for (const id of this.props.syncedMaps || []) {
+            for (const id of this.props.syncedMaps) {
                 if (id !== this.state.id) {
                     const otherMap = LeafletMap.mapReferences[id];
                     otherMap && otherMap.forceUpdate && otherMap.forceUpdate();
@@ -247,7 +247,7 @@ class LeafletMap extends Component {
                                 layers={this.props.layers}
                                 map={this.state.map}
                                 syncedMaps={[
-                                    ...(this.props.syncedMaps || []),
+                                    ...this.props.syncedMaps,
                                     this.state.id,
                                 ]}
                                 syncDrawings={this.props.syncDrawings}
@@ -262,6 +262,11 @@ class LeafletMap extends Component {
     }
 }
 LeafletMap.contextType = Context;
+
+LeafletMap.defaultProps = {
+    layers: [],
+    syncedMaps: [],
+};
 
 LeafletMap.propTypes = {
     /**
