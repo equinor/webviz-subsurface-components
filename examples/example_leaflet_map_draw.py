@@ -1,3 +1,9 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# Copyright (C) 2020 - Equinor ASA.
+
 import io
 import json
 import base64
@@ -84,7 +90,9 @@ if __name__ == "__main__":
         syncDrawings=True,
         layers=layers,
         colorBar={"position": "bottomleft"},
-        mouseCoords={"coordinatePosition": "bottomright",},
+        mouseCoords={
+            "coordinatePosition": "bottomright",
+        },
         drawTools={
             "drawMarker": True,
             "drawPolygon": True,
@@ -100,7 +108,9 @@ if __name__ == "__main__":
         syncDrawings=True,
         layers=layers,
         colorBar={"position": "bottomleft"},
-        mouseCoords={"coordinatePosition": "bottomright",},
+        mouseCoords={
+            "coordinatePosition": "bottomright",
+        },
         drawTools={
             "drawMarker": True,
             "drawPolygon": True,
@@ -141,7 +151,10 @@ if __name__ == "__main__":
                 ]
             ),
             html.Div(
-                children=[leaflet_map_1, leaflet_map_2,],
+                children=[
+                    leaflet_map_1,
+                    leaflet_map_2,
+                ],
                 style={
                     "display": "grid",
                     "gridTemplateColumns": "1fr 1fr",
@@ -162,7 +175,10 @@ if __name__ == "__main__":
     #
 
     @cg.callback(
-        Output("example-map", "syncDrawings"), [Input("sync-map1-btn", "n_clicks"),]
+        Output("example-map", "syncDrawings"),
+        [
+            Input("sync-map1-btn", "n_clicks"),
+        ],
     )
     def sync_map(n_clicks):
         return False if n_clicks % 2 else True
@@ -172,7 +188,10 @@ if __name__ == "__main__":
     #
 
     @cg.callback(
-        Output("example-map-2", "syncDrawings"), [Input("sync-map2-btn", "n_clicks"),]
+        Output("example-map-2", "syncDrawings"),
+        [
+            Input("sync-map2-btn", "n_clicks"),
+        ],
     )
     def sync_map_2(n_clicks):
         return False if n_clicks % 2 else True

@@ -1,5 +1,11 @@
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Copyright (C) 2020 - Equinor ASA.
+
 # 🌍 LeafletMap Component
-The new leafletMap component is a component for layered map data, like tile-data and WebGL images. 
+The new leafletMap component is a component for layered map data, like tile-data and WebGL images.
 
 ## 📋 Table of contents
 - [Usage](#-usage)
@@ -16,21 +22,21 @@ The new leafletMap component is a component for layered map data, like tile-data
         - [Image layers](#image-layers)
         - [Tile layers](#tile-layers)
         - [Shapes and drawings](#shapes-and-drawings)
-    <br>   
-    
+    <br>
+
     - [Updating layers](#updating-layers)
         - [With action](#updating-layers-with-action)
         - [With replace](#updating-layers-with-replace)
-     
+
     - [Color scales](#-colorscales)
     - [Shaders](#-shaders)
-    
+
     <br>
-    
+
 - [Listeners](#-listeners)
 
     <br>
-    
+
 - [Serving tiles with Dash](#serving-tiles-with-dash)
 
 ## 🌤 Features
@@ -38,7 +44,7 @@ The new leafletMap component is a component for layered map data, like tile-data
 * WebGL Tile-layer support
 * Custom colorscales
     * Logarithmic option
-    * Cutoff points options   
+    * Cutoff points options
 * Advanced hillshading
 * Soft hillshading
 * Drawing of polylines, polygons, circles, and markers
@@ -51,7 +57,7 @@ The component can be either used as an Dash-component or as a plain React compon
 
 #### Installation
 ```
-pip install webviz-subsurface-components 
+pip install webviz-subsurface-components
 ```
 
 ### Using the component
@@ -310,16 +316,16 @@ Currently the component supports three Layer types which can go inside the data 
     "name": "Image layer",                      # REQUIRED
     "baseLayer": True,                          # Usually base layer
     "checked": True,
-    
+
     "data": [
         { # Image layer data object
             "type": "image",                    # REQUIRED
             "url": "BASE64_IMAGE_URL",          # REQUIRED
             "shader": {                         # Shader specifications
-                ... 
+                ...
             },
             "colorScale":  {                    # Color scale specifications
-                ...                             
+                ...
             },
             "minvalue": 0,                      # Min z-value
             "maxvalue": 1000,                   # Max z-value
@@ -330,7 +336,7 @@ Currently the component supports three Layer types which can go inside the data 
 }
 ```
 
-Image layers supports images on a base64 format, or a CORS supported url with the displayed specification props. 
+Image layers supports images on a base64 format, or a CORS supported url with the displayed specification props.
 Please note that an image layer typically only has one layer data object. It is possible to have several image layer data objects in on layer, but you have to be careful to make sure the bounds of the images do not intersect.
 Several images in the same layer will only show up as one layer in the layer control.
 
@@ -378,7 +384,7 @@ More information on:
 
 <br>
 
-#### Shapes and drawings 
+#### Shapes and drawings
 The component supports a variety of shapes and drawings. Namely:
 
 - [Polyline](#polyline)
@@ -413,7 +419,7 @@ These shape objects (except for the circleMarker) will be emited on click with t
         }
     ]
 }
-            
+
 ```
 
 ##### Polyline
@@ -426,8 +432,8 @@ These shape objects (except for the circleMarker) will be emited on click with t
         [1, 1],
         ...
     ]
-    "color": "blue",               
-    "tooltip": "This is a blue polyline"               
+    "color": "blue",
+    "tooltip": "This is a blue polyline"
 }
 ```
 
@@ -441,8 +447,8 @@ These shape objects (except for the circleMarker) will be emited on click with t
         [1, 1],
         ...
     ]
-    "color": "red",               
-    "tooltip": "This is a red polyline"              
+    "color": "red",
+    "tooltip": "This is a red polyline"
 }
 ```
 
@@ -453,7 +459,7 @@ These shape objects (except for the circleMarker) will be emited on click with t
     "type": "circle",
     "center": [0, 0],
     "radius": 10,
-    "color": "green",             
+    "color": "green",
     "tooltip": "This is a green circle"
 }
 ```
@@ -463,9 +469,9 @@ These shape objects (except for the circleMarker) will be emited on click with t
 ```python
 {
     "type": "marker",
-    "position": [0, 0],  
-    "color": "green",             
-    "tooltip": "This is a green marker"           
+    "position": [0, 0],
+    "color": "green",
+    "tooltip": "This is a green marker"
 }
 ```
 
@@ -476,8 +482,8 @@ These shape objects (except for the circleMarker) will be emited on click with t
     "type": "circleMarker",
     "center": [0, 0],
     "radius": 2,
-    "color": "yellow",            
-    "tooltip": "This is a yellow circleMarker"           
+    "color": "yellow",
+    "tooltip": "This is a yellow circleMarker"
 }
 ```
 <br/>
@@ -490,16 +496,16 @@ We will use the following layers as an example:
 ```python
 [
     {
-        "id": 1,           
+        "id": 1,
         "name": "Tile layer"
-        "baseLayer": True,  
+        "baseLayer": True,
         "checked": True,
         "data": [
             {
                 "type": "tile",
                 "url": "TILE_URL",
                 "shader": {
-                    "type": 'hillshading', 
+                    "type": 'hillshading',
                     "shadows": True,
                     "elevationScale": 4.0,
                     "pixelScale": 200
@@ -517,10 +523,10 @@ We will use the following layers as an example:
                 "type": "image",
                 "url": "BASE64_IMAGE_URL",
                 "shader": {
-                    ... 
+                    ...
                 },
                 "colorScale":  {
-                    ...                             
+                    ...
                 },
                 "minvalue": 0,
                 "maxvalue": 1000,
@@ -614,12 +620,12 @@ def toggle_shader(n_clicks):
                         # Entire shader object
                         "shader": {
                             # Toggle
-                            "type": 'hillshading' if n_clicks%2 == 1 else None, 
+                            "type": 'hillshading' if n_clicks%2 == 1 else None,
                             "shadows": True,
                             "elevationScale": 4.0,
                             "pixelScale": 200
                         },
-                        "colorScale": COLORSCALE if n_clicks%2 == 1 else None 
+                        "colorScale": COLORSCALE if n_clicks%2 == 1 else None
                     }
                 ]
             }
@@ -659,8 +665,8 @@ def delete_layer(n_clicks):
 
 #### Updating layers with replace
 
-Changing layers with `"updateMode": "replace"`, simply removes all existing layers, and adds the ones you provide to the map. This is mainly recommended e.g. if you're going to look at a new set of data in the application during runtime. 
-It is also possible to use it for updating layer fields, but it requires ALL the layers and fields to be returned. A way of doing this could be to maintain a list in python which is updated whenever something changes and then sent as a prop to the component. 
+Changing layers with `"updateMode": "replace"`, simply removes all existing layers, and adds the ones you provide to the map. This is mainly recommended e.g. if you're going to look at a new set of data in the application during runtime.
+It is also possible to use it for updating layer fields, but it requires ALL the layers and fields to be returned. A way of doing this could be to maintain a list in python which is updated whenever something changes and then sent as a prop to the component.
 
 <br>
 
@@ -698,7 +704,7 @@ Here is an example of what updating the shader with replace enabled would look l
                     ]
                 },
                 {
-                    # Other layers we want to keep     
+                    # Other layers we want to keep
                 },
                 ...
             ]
@@ -719,7 +725,7 @@ Colorscale property is used to generate and apply a colormap to a desired layer.
 It is capable of doing so by either generating a colormap from hexadecimal colors
 provided by the user or by user providing the colormap directly (see examples below)
 
-<br /> 
+<br />
 
 **Options**
 
@@ -731,7 +737,7 @@ provided by the user or by user providing the colormap directly (see examples be
 | cutPointMin     | Integer          | Indicates the minimum height value represented in the map. Any value below it is set to transparent. If a value is lower than the minimum global value, it is set to the global minimum.  |
 | cutPointMax     | Integer          | Indicates the maximum height value represented in the map. Any value below it is set to transparent. If a value is higher than the maximum global value, it is set to the global maximum. |
 
-<br /> 
+<br />
 
 **Example usage**
 
@@ -753,7 +759,7 @@ The colorscale may be used in one of the following ways:
         "colorScale": ["#0d0887", "#46039f", "#7201a8", "#9c179e"],
 
  - Assigning a colormap to the colorscale directly as a string
-    
+
 
         "colorScale": "URL_TO_COLORMAP_HERE",
 
@@ -847,27 +853,27 @@ If the normal hillshading-shader is too heavy computational, there is also a sof
     ...
 }
 ```
- 
+
 <br>
- 
+
 ##### Soft hillshading options
 | Name           | Type          | Description                                                                                                       | Default   |
 |----------------|---------------|-------------------------------------------------------------------------------------------------------------------|-----------|
 | elevationScale | Number        | A variable for scaling the generated elevation of the image. The greater the scale, the higher the "_mountains_". | 0.03      |
 | lightDirection | Array<Number> | A vector of length 3 indicating the direction from the surface to the sun.                                        | [1, 1, 1] |
- 
+
 <br>
- 
+
 -------------------------------
- 
+
 <br>
- 
+
 ## 🎙 Listeners
- 
+
 There are some listeners the Python user can access using callbacks, such as the coordinates of a mouse click or a drawing.
- 
+
 Example:
- 
+
 ```python
 app.layout = html.Div(
     children=[
@@ -875,7 +881,7 @@ app.layout = html.Div(
         html.Pre(id="polygon")
     ]
 )
- 
+
 @app.callback(
      Output("polygon", "children"),
      [Input("example-map", "polygon_points")]
@@ -883,7 +889,7 @@ app.layout = html.Div(
 def get_polygon_coords(coords):
     return f"polygon coordinates: {json.dumps(coords)}"
 ```
- 
+
 <br>
 
 | Name                | Output format             | Description                                       |

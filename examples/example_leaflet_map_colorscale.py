@@ -1,3 +1,9 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# Copyright (C) 2020 - Equinor ASA.
+
 import io
 import json
 import base64
@@ -96,7 +102,10 @@ if __name__ == "__main__":
                     "type": "tile",
                     "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                     "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
-                    "shader": {"type": "none", "elevationScale": 0.01,},
+                    "shader": {
+                        "type": "none",
+                        "elevationScale": 0.01,
+                    },
                 }
             ],
         },
@@ -106,7 +115,9 @@ if __name__ == "__main__":
         id="example-map",
         layers=layers,
         colorBar={"position": "bottomleft"},
-        mouseCoords={"coordinatePosition": "bottomright",},
+        mouseCoords={
+            "coordinatePosition": "bottomright",
+        },
         updateMode="",
     )
 
@@ -179,7 +190,9 @@ if __name__ == "__main__":
                 ]
             ),
             html.Div(
-                children=[leaflet_map_1,],
+                children=[
+                    leaflet_map_1,
+                ],
                 style={
                     "display": "grid",
                     "gridTemplateColumns": "1fr 1fr",
@@ -201,7 +214,9 @@ if __name__ == "__main__":
 
     @cg.callback(
         Output("example-map", "layers"),
-        [Input("log-toggle-btn", "n_clicks"),],
+        [
+            Input("log-toggle-btn", "n_clicks"),
+        ],
         State("selected-layer", "value"),
     )
     def toggle_log(n_clicks, layer_id):
@@ -213,7 +228,12 @@ if __name__ == "__main__":
                 "id": int(layer_id),
                 "action": "update",
                 "data": [
-                    {"type": layer_type, "colorScale": {"scaleType": log_value,},}
+                    {
+                        "type": layer_type,
+                        "colorScale": {
+                            "scaleType": log_value,
+                        },
+                    }
                 ],
             }
         ]
@@ -221,7 +241,9 @@ if __name__ == "__main__":
 
     @cg.callback(
         Output("example-map", "layers"),
-        [Input("layer-colorscale", "colorscale"),],
+        [
+            Input("layer-colorscale", "colorscale"),
+        ],
         State("selected-layer", "value"),
     )
     def update_colorcsale(colorScale, layer_id):
@@ -230,7 +252,14 @@ if __name__ == "__main__":
             {
                 "id": int(layer_id),
                 "action": "update",
-                "data": [{"type": layer_type, "colorScale": {"colors": colorScale,}}],
+                "data": [
+                    {
+                        "type": layer_type,
+                        "colorScale": {
+                            "colors": colorScale,
+                        },
+                    }
+                ],
             }
         ]
         return update_layer
