@@ -27,7 +27,9 @@ const DEFAULT_COLORMAP = {
 
 const LeafletMapDemo = () => {
     const [layers, setLayers] = useState(exampleData.layers.slice(1, 5));
-    const [switchValue, setSwitchValue] = useState(layers[0].data[0].shader.type == "hillshading");
+    const [switchValue, setSwitchValue] = useState(
+        layers[0].data[0].shader.type == "hillshading"
+    );
 
     const onChange = changes => {
         const newLayers = Object.assign([], layers);
