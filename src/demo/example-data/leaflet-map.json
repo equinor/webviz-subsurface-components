@@ -37,6 +37,7 @@
                     "shader": {
                         "type": "hillshading",
                         "shadows": true,
+                        "shadowIterations": 2,
                         "noColor": false,
                         "setBlackToAlpha": true
                     },
