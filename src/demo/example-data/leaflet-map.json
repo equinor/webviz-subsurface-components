@@ -38,7 +38,7 @@
                         "type": "hillshading",
                         "shadows": true,
                         "shadowIterations": 2,
-                        "noColor": false,
+                        "applyColorScale": true,
                         "setBlackToAlpha": true
                     },
                     "colorScale": {
@@ -65,7 +65,7 @@
                     "shader": {
                         "type": null,
                         "shadows": false,
-                        "noColor": false,
+                        "applyColorScale": true,
                         "setBlackToAlpha": true
                     },
                     "minvalue": 2782,
@@ -88,7 +88,7 @@
                     "shader": {
                         "type": "hillshading",
                         "shadows": false,
-                        "noColor": false,
+                        "applyColorScale": true,
                         "setBlackToAlpha": true
                     },
                     "colorScale":  {

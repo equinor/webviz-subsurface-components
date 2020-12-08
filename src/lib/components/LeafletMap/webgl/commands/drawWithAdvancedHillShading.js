@@ -60,7 +60,7 @@ export default async (
         scaleType = "linear",
         cutPointMin = 0.0,
         cutPointMax = 256.0,
-        noColor = false,
+        applyColorScale = true,
 
         setBlackToAlpha = false,
     } = options;
@@ -130,7 +130,7 @@ export default async (
             .uniformf("sunDirection", sunDirection)
             .uniformf("resolution", loadedImage.width, loadedImage.height)
             .viewport(0, 0, loadedImage.width, loadedImage.height)
-            .framebuffer(noColor ? null : fboFinal)
+            .framebuffer(applyColorScale ? fboFinal : null)
             .vertexCount(6)
             .build();
 
@@ -220,14 +220,14 @@ export default async (
             .texture("tAmbient", ambientPP.ping())
             .uniformf("resolution", loadedImage.width, loadedImage.height)
             .viewport(0, 0, loadedImage.width, loadedImage.height)
-            .framebuffer(noColor ? null : fboFinal)
+            .framebuffer(applyColorScale ? fboFinal : null)
             .vertexCount(6)
             .build();
 
         finalCmd();
     }
 
-    if (!noColor) {
+    if (applyColorScale) {
         // Apply the provided colormap
         const colorScaleCmd = eqGL
             .new()
