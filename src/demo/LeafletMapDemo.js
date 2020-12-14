@@ -9,7 +9,9 @@ import exampleData from "./example-data/leaflet-map.json";
 const LeafletMapDemo = () => {
     const [layers, setLayers] = useState(exampleData.layers.slice(1, 5));
 
-    const [switchValue, setSwitchValue] = useState(layers[0].data[0].shader.applyHillshading);
+    const [switchValue, setSwitchValue] = useState(
+        layers[0].data[0].shader.applyHillshading
+    );
 
     const onChange = changes => {
         const newLayers = Object.assign([], layers);

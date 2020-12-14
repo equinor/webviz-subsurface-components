@@ -68,8 +68,8 @@ export default async (
     } = options;
 
     const interpolationTypes = {
-        "linear": 0,
-        "log": 1
+        linear: 0,
+        log: 1,
     };
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -86,6 +86,8 @@ export default async (
     canvas.height = height;
 
     const dataTexture = eqGL.texture({ image: loadedImage });
+
+    // prettier-ignore
     const quad = [
         -1, -1, //Bottom-Left
         1, -1, // Bottom-Right
@@ -113,7 +115,6 @@ export default async (
         .uniformi("u_interpolation_type", interpolationTypes[scaleType])
         .uniformf("u_remap_colormap", remapPointMin, remapPointMax)
         .uniformf("u_clamp_colormap", cutPointMin, cutPointMax)
-
 
         .uniformf("u_elevation_scale", elevationScale)
         .uniformf("u_pixel_scale", pixelScale)
