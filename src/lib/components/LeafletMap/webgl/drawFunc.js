@@ -47,8 +47,7 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
             ...shader,
             ...cutOffPoints,
         });
-    }
-    else {
+    } else {
         // [0,1] -> [0, 255]
         cutOffPoints.cutPointMin = Math.round(cutOffPoints.cutPointMin * 255);
         cutOffPoints.cutPointMax = Math.round(cutOffPoints.cutPointMax * 255);
@@ -57,10 +56,16 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
             switch (shader.type) {
                 // Old hillshader
                 case "soft-hillshading": {
-                    drawWithHillShading(gl, canvas, loadedImage, loadedColorMap, {
-                        ...colorScale,
-                        ...shader,
-                    });
+                    drawWithHillShading(
+                        gl,
+                        canvas,
+                        loadedImage,
+                        loadedColorMap,
+                        {
+                            ...colorScale,
+                            ...shader,
+                        }
+                    );
                     break;
                 }
 
