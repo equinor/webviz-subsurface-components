@@ -12,30 +12,10 @@ import LeafletMap from "../lib/components/LeafletMap";
 // Assets
 import exampleData from "./example-data/leaflet-map.json";
 
-const DEFAULT_COLORMAP = {
-    colors: [
-        "#0d0887",
-        "#46039f",
-        "#7201a8",
-        "#9c179e",
-        "#bd3786",
-        "#d8576b",
-        "#ed7953",
-        "#fb9f3a",
-        "#fdca26",
-        "#f0f921",
-    ],
-    prefixZeroAlpha: false,
-    scaleType: "linear",
-    cutPointMin: 3400,
-    cutPointMax: 3500,
-};
-
 const LeafletMapDemo = () => {
     const [layers, setLayers] = useState(exampleData.layers.slice(1, 5));
-    const [switchValue, setSwitchValue] = useState(
-        layers[0].data[0].shader.type == "hillshading"
-    );
+
+    const [switchValue, setSwitchValue] = useState(layers[0].data[0].shader.applyHillshading);
 
     const onChange = changes => {
         const newLayers = Object.assign([], layers);
@@ -43,17 +23,9 @@ const LeafletMapDemo = () => {
             setSwitchValue(changes.switch.value);
             newLayers[0].action = "update";
             if (changes.switch.value === true) {
-                newLayers[0].data[0].shader.type = "hillshading";
-                newLayers[0].data[0].shader.shadows = true;
-                newLayers[0].data[0].colorScale = DEFAULT_COLORMAP;
-                newLayers[0].data[0].colorScale.cutPointMin = 2700;
-                newLayers[0].data[0].colorScale.cutPointMax = 3500;
+                newLayers[0].data[0].shader.applyHillshading = true;
             } else {
-                newLayers[0].data[0].shader.type = null;
-                newLayers[0].data[0].colorScale = {
-                    cutPointMin: 2700,
-                    cutPointMax: 3500,
-                };
+                newLayers[0].data[0].shader.applyHillshading = false;
             }
             setLayers(newLayers);
         }
