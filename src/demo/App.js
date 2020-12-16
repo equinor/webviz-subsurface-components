@@ -8,11 +8,12 @@ import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import LeafletMapDemo from "./LeafletMapDemo";
+import MapboxMapDemo from "./MapboxMapDemo";
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "LeafletMap" };
+        this.state = { value: "MapboxMapDemo" };
     }
 
     onChange(e) {
@@ -21,6 +22,9 @@ class App extends Component {
 
     renderDemo() {
         switch (this.state.value) {
+            case "MapboxMapDemo": {
+                return <MapboxMapDemo />;
+            }
             case "LeafletMap": {
                 return <LeafletMapDemo />;
             }
@@ -52,6 +56,7 @@ class App extends Component {
                     value={this.state.value}
                     onChange={this.onChange.bind(this)}
                 >
+                    <option value="MapboxMapDemo">MapboxMapDemo</option>
                     <option value="LeafletMap">LeafletMap</option>
                     <option value="HistoryMatch">HistoryMatch</option>
                     <option value="Morris">Morris</option>
