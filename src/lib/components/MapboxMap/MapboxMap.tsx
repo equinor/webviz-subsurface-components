@@ -44,9 +44,11 @@ function MapboxMap(props: MapboxProps): React.ReactNode {
         }
     }, [map]);
 
-    if (map) {
-        map.setStyle(props.mapStyle);
-    }
+    React.useEffect(() => {
+        if (map) {
+            map.setStyle(props.mapStyle);
+        }
+    }, [props.mapStyle]);
 
     return (
         <div>

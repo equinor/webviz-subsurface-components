@@ -1,6 +1,7 @@
 {
     "styles": [
         {
+            "id": "world-terrain-0",
             "name": "World map - terrain",
             "style": {
                 "version": 8,
@@ -21,10 +22,12 @@
             }
         },
         {
+            "id": "world-streets-0",
             "name": "World map - streets",
             "style": "mapbox://styles/mapbox/streets-v11"
         },
         {
+            "id": "world-satellite-0",
             "name": "World map - satellite",
             "style": "mapbox://styles/mapbox/satellite-v9"
         }
