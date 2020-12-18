@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import mapboxgl from "mapbox-gl";
 
+import 'mapbox-gl/dist/mapbox-gl.css';
 import "./mapbox-map.css";
 
 function MapboxMap(props) {

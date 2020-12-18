@@ -1,6 +1,26 @@
 {
     "styles": [
         {
+            "name": "World map - terrain",
+            "style": {
+                "version": 8,
+                "sources": {
+                    "terrain": {
+                        "type": "raster-dem",
+                        "url": "mapbox://mapbox.terrain-rgb"
+                    }
+                },
+                "layers": [
+                    {
+                        "id": "hillshading",
+                        "source": "terrain",
+                        "source-layer": "mapbox-outdoors",
+                        "type": "hillshade"
+                    }
+                ]
+            }
+        },
+        {
             "name": "World map - streets",
             "style": "mapbox://styles/mapbox/streets-v11"
         },
