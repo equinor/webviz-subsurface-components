@@ -3,7 +3,7 @@
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module"
-  }, 
+  },
   "extends":  [
     "plugin:react/recommended",
     "eslint:recommended",
@@ -16,9 +16,9 @@
         "plugin:react/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:prettier/recommended"
-      ],
-    },
-  ],  
+      ]
+    }
+  ],
   "settings": {
     "react": {
       "version": "detect"
@@ -30,5 +30,5 @@
     "es6": true,
     "jasmine": true,
     "node": true
-  } 
+  }
 }

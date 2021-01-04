@@ -9,6 +9,7 @@ import Map from "./components/Map";
 import Morris from "./components/Morris";
 import LayeredMap from "./components/LayeredMap";
 import LeafletMap from "./components/LeafletMap";
+import DeckGLMap from "./components/DeckGLMap";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
 
 export {
@@ -18,4 +19,5 @@ export {
     LayeredMap,
     PriorPosteriorDistribution,
     LeafletMap,
+    DeckGLMap,
 };
