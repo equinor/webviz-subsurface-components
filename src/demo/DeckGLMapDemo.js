@@ -2,6 +2,8 @@ import React from "react";
 
 import DeckGLMap from "../lib/components/DeckGLMap";
 
+import exampleData from "./example-data/deckgl-map.json";
+
 const DeckGLMapDemo = () => {
     // Viewport settings
     const INITIAL_VIEW_STATE = {
@@ -14,7 +16,7 @@ const DeckGLMapDemo = () => {
 
     return (
         <div style={{ height: "95%" }}>
-            <DeckGLMap viewState={INITIAL_VIEW_STATE} />
+            <DeckGLMap viewState={INITIAL_VIEW_STATE} elevationData={exampleData[1].elevationData} />
         </div>
     );
 };
