@@ -1,14 +1,6 @@
-import io
-import json
-import base64
-from typing import List
-
 import numpy as np
-from matplotlib import cm
 import dash
-import dash_colorscales
 import dash_core_components as dcc
-from dash.dependencies import Input, Output, State
 import dash_html_components as html
 import webviz_subsurface_components
 
