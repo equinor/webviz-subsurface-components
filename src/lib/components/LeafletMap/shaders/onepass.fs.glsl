@@ -8,10 +8,10 @@ uniform vec2 u_resolution;
 
 uniform sampler2D u_colormap;
 uniform int u_interpolation_type;
+uniform float u_value_range;
 uniform vec2 u_remap_colormap;
 uniform vec2 u_clamp_colormap;
 
-uniform bool u_black_to_alpha;
 uniform bool u_apply_color_scale;
 uniform bool u_apply_hillshading;
 
@@ -23,22 +23,19 @@ uniform float u_pixel_scale;
 uniform float u_elevation_scale;
 
 // TODO: Investigate using R32 textures (webgl2) to avoid this transformation.
-// TODO: Investigate using all channels for data (rgba). Check the modifications needed on the data source.
 float elevation_from_rgb(vec3 col) {
-    // From ([0,1], [0,1], [0, 1]) to [0, 256*256*256]
-    return (col.r * 255.0 * 256.0 * 256.0 + col.g* 255.0 * 256.0 + col.b* 255.0) * u_elevation_scale;
+    // Decode Mapbox Terrain RGB: https://docs.mapbox.com/help/troubleshooting/access-elevation-data/
+    return -10000.0 + (col.r * 255.0 * 256.0 * 256.0 + col.g * 255.0 * 256.0 + col.b * 255.0) * 0.1 * u_elevation_scale;
 }
 
 vec4 color_map(float elevation) {
-    float max_elevation = (256.0 * 256.0 * 256.0 - 1.0) * u_elevation_scale;
-
     float colormap_u = 0.0;
     if (u_interpolation_type == INTERP_LOG) {
         // Add one to avoid log(0). The result should be the same.
-        colormap_u = log(elevation + 1.0) / log(max_elevation + 1.0);
+        colormap_u = log(elevation + 1.0) / log(u_value_range + 1.0);
     }
     else { // u_interpolation_type == INTERP_LINEAR
-        colormap_u = elevation / max_elevation;
+        colormap_u = elevation / u_value_range;
     }
 
     // Cutoff
@@ -72,7 +69,7 @@ float light(vec3 normal) {
 void main() {
     vec4 final_color = texture2D(u_data_texture, gl_FragCoord.xy/u_resolution);
 
-    if (u_black_to_alpha && final_color.rgb == vec3(0.0)) {
+    if (final_color.a == 0.0) {
         discard;
     }
 

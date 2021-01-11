@@ -36,7 +36,13 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
         // The "onepass" shader doesn't need a colormap, it can also display the input image,
         // based on the shader's parameters.
 
+        const minmaxValues = {
+            minValue: config.minvalue,
+            maxValue: config.maxvalue,
+        };
+
         drawWithOnePassHillShading(gl, canvas, loadedImage, loadedColorMap, {
+            ...minmaxValues,
             ...colorScale,
             ...shader,
             ...cutOffPoints,
