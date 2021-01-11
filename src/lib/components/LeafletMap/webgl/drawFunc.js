@@ -1,6 +1,4 @@
-import {
-    drawWithTerrainRGB,
-} from "./commands";
+import { drawWithTerrainRGB } from "./commands";
 
 // Utils
 import Utils from "../utils";
