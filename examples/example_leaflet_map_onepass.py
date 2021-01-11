@@ -93,14 +93,18 @@ if __name__ == "__main__":
                             "colors": DEFAULT_COLORSCALE_COLORS,
                             "prefixZeroAlpha": False,
                             "scaleType": "linear",
-                            "cutPointMin": min_value,
-                            "cutPointMax": max_value,
+
+                            "cutPointMin": 0,
+                            "cutPointMax": 1,
+
+                            "remapPointMin": 0,
+                            "remapPointMax": 1,
                         },
                         "minvalue": min_value,
                         "maxvalue": max_value,
                         "bounds": [[432205, 6475078], [437720, 6481113]],
                         "shader": {
-                            "type": "onepass",
+                            "type": "terrainRGB",
                             "applyColorScale": True,
                             "applyHillshading": True,
                             "ambientLightIntensity": 0.5,

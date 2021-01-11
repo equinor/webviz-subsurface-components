@@ -3,7 +3,7 @@ import vec3 from "../vec3";
 
 // Shaders
 import positionVShader from "../../shaders/position.vs.glsl";
-import onepassFSShader from "../../shaders/onepass.fs.glsl";
+import terrainRGBFSShader from "../../shaders/terrainRGB.fs.glsl";
 
 // CONSTANTS
 const DEFAULT_PIXEL_SCALE = 1;
@@ -31,9 +31,7 @@ const DEFAULT_DIFFUSE_LIGHT_INTENSITY = 0.5;
  */
 
 /**
- * @description - This shader combines the hillshading in the previous implementation (drawWithAdvancedHillShading)
- * into only one pass, avoiding processing the framebuffer multiple times. The softshadow feature wasn't ported over
- * since it seems to be very computational intensive while the visualization benefit is questionable.
+ * @description - This draws MapBox Terrain RGB data with a colorscale applied.
  *
  * @param {WebGLRenderingContext} gl
  * @param {HTMLCanvasElement} canvas
@@ -88,6 +86,7 @@ export default async (
     canvas.height = height;
 
     const dataTexture = eqGL.texture({ image: loadedImage });
+    const colormapTexture = loadedColorMap ? eqGL.texture({ image: loadedColorMap }) : null;
 
     // prettier-ignore
     const quad = [
@@ -100,10 +99,10 @@ export default async (
         -1, 1, // Top-Left
     ];
 
-    const onepassCmd = eqGL
+    const terrainRGBCmd = eqGL
         .new()
         .vert(positionVShader)
-        .frag(onepassFSShader)
+        .frag(terrainRGBFSShader)
         .attribute("position", quad)
         .vertexCount(6)
 
@@ -113,7 +112,7 @@ export default async (
         .uniformi("u_apply_color_scale", Boolean(applyColorScale))
         .uniformi("u_apply_hillshading", Boolean(applyHillshading))
 
-        .texture("u_colormap", eqGL.texture({ image: loadedColorMap }))
+        .texture("u_colormap", colormapTexture)
         .uniformi("u_interpolation_type", interpolationTypes[scaleType])
         .uniformf("u_value_range", maxValue - minValue)
         .uniformf("u_remap_colormap", remapPointMin, remapPointMax)
@@ -128,7 +127,7 @@ export default async (
         .viewport(0, 0, loadedImage.width, loadedImage.height)
         .build();
 
-    onepassCmd();
+    terrainRGBCmd();
 
     eqGL.clean();
 };
