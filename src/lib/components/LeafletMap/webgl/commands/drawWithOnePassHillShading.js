@@ -9,12 +9,13 @@ import onepassFSShader from "../../shaders/onepass.fs.glsl";
 const DEFAULT_PIXEL_SCALE = 1;
 const DEFAULT_ELEVATION_SCALE = 1.0;
 const DEFAULT_SUN_DIRECTION = vec3.normalize([], [1, 1, 1]);
-const DEFAULT_AMBIENT_LIGHT_INTENSITY = 0.4;
-const DEFAULT_DIFFUSE_LIGHT_INTENSITY = 1.0;
+const DEFAULT_AMBIENT_LIGHT_INTENSITY = 0.5;
+const DEFAULT_DIFFUSE_LIGHT_INTENSITY = 0.5;
 
 /**
  * @typedef {Object} Options
- * @property {Boolean} setBlackToAlpha - Set alpha = 0 for all black values in the input data.
+ * @property {Number} minValue - Minimum elevation value.
+ * @property {Number} maxValue - Maximum elevation value.
  * @property {Boolean} applyColorScale - Colorscale the data.
  * @property {String} scaleType - "linear"/"log", apply the colorscale linearly or logarithmically.
  * @property {Number} remapPointMin - [0,1], remap the minimum data point to a different point on the colorscale.
@@ -25,8 +26,8 @@ const DEFAULT_DIFFUSE_LIGHT_INTENSITY = 1.0;
  * @property {Number} pixelScale
  * @property {Number} elevationScale
  * @property {vec3} sunDirection - Direction the light is coming from.
- * @property {Number} ambientLightIntesity - Brightness added to all pixels.
- * @property {Number} diffuseLightIntesity - Brightness of surfaces hit by light.
+ * @property {Number} ambientLightIntensity - Brightness added to all pixels.
+ * @property {Number} diffuseLightIntensity - Brightness of surfaces hit by light.
  */
 
 /**
@@ -48,7 +49,8 @@ export default async (
     options = {}
 ) => {
     const {
-        setBlackToAlpha = true,
+        minValue = 0.0,
+        maxValue = 0.0,
 
         // ColorScale type
         applyColorScale = true,
@@ -63,8 +65,8 @@ export default async (
         pixelScale = DEFAULT_PIXEL_SCALE,
         elevationScale = DEFAULT_ELEVATION_SCALE,
         sunDirection = DEFAULT_SUN_DIRECTION,
-        ambientLightIntesity = DEFAULT_AMBIENT_LIGHT_INTENSITY,
-        diffuseLightIntesity = DEFAULT_DIFFUSE_LIGHT_INTENSITY,
+        ambientLightIntensity = DEFAULT_AMBIENT_LIGHT_INTENSITY,
+        diffuseLightIntensity = DEFAULT_DIFFUSE_LIGHT_INTENSITY,
     } = options;
 
     const interpolationTypes = {
@@ -97,6 +99,7 @@ export default async (
         1, 1, // Top-Right
         -1, 1, // Top-Left
     ];
+
     const onepassCmd = eqGL
         .new()
         .vert(positionVShader)
@@ -107,20 +110,20 @@ export default async (
         .texture("u_data_texture", dataTexture)
         .uniformf("u_resolution", loadedImage.width, loadedImage.height)
 
-        .uniformi("u_black_to_alpha", Boolean(setBlackToAlpha))
         .uniformi("u_apply_color_scale", Boolean(applyColorScale))
         .uniformi("u_apply_hillshading", Boolean(applyHillshading))
 
         .texture("u_colormap", eqGL.texture({ image: loadedColorMap }))
         .uniformi("u_interpolation_type", interpolationTypes[scaleType])
+        .uniformf("u_value_range", maxValue - minValue)
         .uniformf("u_remap_colormap", remapPointMin, remapPointMax)
         .uniformf("u_clamp_colormap", cutPointMin, cutPointMax)
 
         .uniformf("u_elevation_scale", elevationScale)
         .uniformf("u_pixel_scale", pixelScale)
         .uniformf("u_sun_direction", sunDirection)
-        .uniformf("u_ambient_light_intensity", ambientLightIntesity)
-        .uniformf("u_diffuse_light_intensity", diffuseLightIntesity)
+        .uniformf("u_ambient_light_intensity", ambientLightIntensity)
+        .uniformf("u_diffuse_light_intensity", diffuseLightIntensity)
 
         .viewport(0, 0, loadedImage.width, loadedImage.height)
         .build();
