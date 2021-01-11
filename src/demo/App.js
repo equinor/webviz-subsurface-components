@@ -8,6 +8,7 @@ import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import LeafletMapDemo from "./LeafletMapDemo";
+import WellCompletionsDemo from "./WellCompletionsDemo";
 
 class App extends Component {
     constructor(props) {
@@ -39,6 +40,9 @@ class App extends Component {
             case "PriorPosteriorDistribution": {
                 return <PriorPosteriorDistributionDemo />;
             }
+            case "WellCompletions": {
+                return <WellCompletionsDemo />;
+            }
             default: {
                 return null;
             }
@@ -60,6 +64,7 @@ class App extends Component {
                     <option value="PriorPosteriorDistribution">
                         PriorPosteriorDistribution
                     </option>
+                    <option value="WellCompletions">WellCompletions</option>
                 </select>
                 {this.renderDemo()}
             </div>
