@@ -86,7 +86,9 @@ export default async (
     canvas.height = height;
 
     const dataTexture = eqGL.texture({ image: loadedImage });
-    const colormapTexture = loadedColorMap ? eqGL.texture({ image: loadedColorMap }) : null;
+    const colormapTexture = loadedColorMap
+        ? eqGL.texture({ image: loadedColorMap })
+        : null;
 
     // prettier-ignore
     const quad = [
