@@ -185,10 +185,10 @@ const MousePosition = props => {
 
         const x = Math.round(event.latlng.lng);
         const y = Math.round(event.latlng.lat);
-        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally
-        const z = mapZValue(red);
+        const [r, g, b, a] = ctx.getImageData(screenX, screenY, 1, 1).data; // TODO: store this locally
+        const z = mapZValue(r, g, b);
 
-        setLatLng(x, y, z, red > 0);
+        setLatLng(x, y, z, a > 0);
     };
 
     const mapXCoordinateToCanvas = (x, clientRect, canvas) => {
@@ -222,8 +222,8 @@ const MousePosition = props => {
 
         const x = Math.round(event.latlng.lng);
         const y = Math.round(event.latlng.lat);
-        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally
-        const z = mapZValue(red);
+        const [r, g, b] = ctx.getImageData(screenX, screenY, 1, 1).data; // TODO: store this locally
+        const z = mapZValue(r, g, b);
 
         // Used to disable map.on("click") events when pressed on the controls
         const controlsList = document.getElementsByClassName(
@@ -294,11 +294,10 @@ const MousePosition = props => {
         props.map.addEventListener("mouseup", onCanvasMouseClick);
     };
 
-    const mapZValue = redColorvalue => {
-        const { minvalue, maxvalue } = stateRef.current || {};
-        return roundOff(
-            minvalue + ((maxvalue - minvalue) / (255 - 0)) * (redColorvalue - 0)
-        );
+    const mapZValue = (r, g, b) => {
+        const { minvalue } = stateRef.current || {};
+        const elevation = -10000.0 + (r * 256.0 * 256.0 + g * 256.0 + b) * 0.1;
+        return roundOff(minvalue + elevation);
     };
 
     const roundOff = n => {

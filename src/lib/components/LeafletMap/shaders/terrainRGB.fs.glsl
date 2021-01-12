@@ -19,13 +19,12 @@ uniform vec3 u_sun_direction;
 uniform float u_ambient_light_intensity;
 uniform float u_diffuse_light_intensity;
 
-uniform float u_pixel_scale;
 uniform float u_elevation_scale;
 
 // TODO: Investigate using R32 textures (webgl2) to avoid this transformation.
 float elevation_from_rgb(vec3 col) {
     // Decode Mapbox Terrain RGB: https://docs.mapbox.com/help/troubleshooting/access-elevation-data/
-    return -10000.0 + (col.r * 255.0 * 256.0 * 256.0 + col.g * 255.0 * 256.0 + col.b * 255.0) * 0.1 * u_elevation_scale;
+    return (-10000.0 + (col.r * 255.0 * 256.0 * 256.0 + col.g * 255.0 * 256.0 + col.b * 255.0) * 0.1) * u_elevation_scale;
 }
 
 vec4 color_map(float elevation) {
@@ -54,8 +53,8 @@ vec3 normal(float elevation) {
     float p0 = elevation;
     float px = elevation_from_rgb(texture2D(u_data_texture, dr * (gl_FragCoord.xy + vec2(1.0, 0.0))).rgb);
     float py = elevation_from_rgb(texture2D(u_data_texture, dr * (gl_FragCoord.xy + vec2(0.0, 1.0))).rgb);
-    vec3 dx = vec3(u_pixel_scale, 0.0, px - p0);
-    vec3 dy = vec3(0.0, u_pixel_scale, py - p0);
+    vec3 dx = vec3(1.0, 0.0, px - p0);
+    vec3 dy = vec3(0.0, 1.0, py - p0);
 
     return normalize(cross(dx, dy));
 }
@@ -76,7 +75,7 @@ void main() {
     float elevation = elevation_from_rgb(final_color.rgb);
 
     if (u_apply_color_scale) {
-        final_color = color_map(elevation);
+        final_color = color_map(abs(elevation));
     }
 
     if (u_apply_hillshading) {
