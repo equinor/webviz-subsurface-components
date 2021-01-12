@@ -6,8 +6,7 @@ import positionVShader from "../../shaders/position.vs.glsl";
 import terrainRGBFSShader from "../../shaders/terrainRGB.fs.glsl";
 
 // CONSTANTS
-const DEFAULT_PIXEL_SCALE = 1;
-const DEFAULT_ELEVATION_SCALE = 1.0;
+const DEFAULT_ELEVATION_SCALE = -1.0;
 const DEFAULT_SUN_DIRECTION = vec3.normalize([], [1, 1, 1]);
 const DEFAULT_AMBIENT_LIGHT_INTENSITY = 0.5;
 const DEFAULT_DIFFUSE_LIGHT_INTENSITY = 0.5;
@@ -23,8 +22,7 @@ const DEFAULT_DIFFUSE_LIGHT_INTENSITY = 0.5;
  * @property {Number} cutPointMin - [0,1], don't display points lower than this threshold.
  * @property {Number} cutPointMax - [0,1], don't display points higher than this threshold.
  * @property {Boolean} applyHillshading - Apply hillshading.
- * @property {Number} pixelScale
- * @property {Number} elevationScale
+ * @property {Number} elevationScale - Multiplier applied to the elevation value
  * @property {vec3} sunDirection - Direction the light is coming from.
  * @property {Number} ambientLightIntensity - Brightness added to all pixels.
  * @property {Number} diffuseLightIntensity - Brightness of surfaces hit by light.
@@ -60,7 +58,6 @@ export default async (
 
         // Hillshading options
         applyHillshading = true,
-        pixelScale = DEFAULT_PIXEL_SCALE,
         elevationScale = DEFAULT_ELEVATION_SCALE,
         sunDirection = DEFAULT_SUN_DIRECTION,
         ambientLightIntensity = DEFAULT_AMBIENT_LIGHT_INTENSITY,
@@ -121,7 +118,6 @@ export default async (
         .uniformf("u_clamp_colormap", cutPointMin, cutPointMax)
 
         .uniformf("u_elevation_scale", elevationScale)
-        .uniformf("u_pixel_scale", pixelScale)
         .uniformf("u_sun_direction", sunDirection)
         .uniformf("u_ambient_light_intensity", ambientLightIntensity)
         .uniformf("u_diffuse_light_intensity", diffuseLightIntensity)
