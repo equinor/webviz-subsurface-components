@@ -21,16 +21,14 @@ def array2d_to_png(Z):
     to base64. This is an example function of how that can be done.
 
     This function encodes the numpy array to a RGBA png.
-    The array is encoded as a heightmap, in Mapbox Terrain RGB format
-    (https://docs.mapbox.com/help/troubleshooting/access-elevation-data/).
+    The array is encoded as a heightmap, in a format similar to Mapbox TerrainRGB
+    (https://docs.mapbox.com/help/troubleshooting/access-elevation-data/),
+    but without the -10000 offset and the 0.1 scale.
     The undefined values are set as having alpha = 0. The height values are
     shifted to start from 0.
     """
 
     shape = Z.shape
-
-    Z -= np.nanmin(Z)
-    Z = 10 * Z + 100000
     Z = np.repeat(Z, 4) # This will flatten the array
 
     Z[0::4][np.isnan(Z[0::4])] = 0  # Red
@@ -77,8 +75,14 @@ if __name__ == "__main__":
     # https://creativecommons.org/licenses/by-nc-sa/4.0/
     map_data = np.loadtxt("examples/example-data/layered-map-data.npz.gz")
 
-    min_value = int(np.nanmin(map_data))
-    max_value = int(np.nanmax(map_data))
+    min_value = np.nanmin(map_data)
+    max_value = np.nanmax(map_data)
+
+    # Shift the values to start from 0 and scale them to cover
+    # the whole RGB range for increased precision.
+    # The client will need to reverse this operation.
+    scale_factor = (256*256*256 - 1) / (max_value - min_value)
+    map_data = (map_data - min_value) * scale_factor
 
     map_data = array2d_to_png(map_data)
 
