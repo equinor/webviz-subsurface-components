@@ -104,10 +104,10 @@ const ColorBar = props => {
                 )}
             </div>
             <div>
-                {minMaxValue[0]} {unit}
+                {minMaxValue[0].toFixed(2)} {unit}
             </div>
             <div className="leaflet-colorbar-right-label">
-                {minMaxValue[1]} {unit}
+                {minMaxValue[1].toFixed(2)} {unit}
             </div>
         </div>,
         control.panelDiv

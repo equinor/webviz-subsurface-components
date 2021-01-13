@@ -22,7 +22,7 @@ const DEFAULT_DIFFUSE_LIGHT_INTENSITY = 0.5;
  * @property {Number} cutPointMin - [0,1], don't display points lower than this threshold.
  * @property {Number} cutPointMax - [0,1], don't display points higher than this threshold.
  * @property {Boolean} applyHillshading - Apply hillshading.
- * @property {Number} elevationScale - Multiplier applied to the elevation value
+ * @property {Number} elevationScale - Multiplier applied to the elevation value when computing the hillshading.
  * @property {vec3} sunDirection - Direction the light is coming from.
  * @property {Number} ambientLightIntensity - Brightness added to all pixels.
  * @property {Number} diffuseLightIntensity - Brightness of surfaces hit by light.

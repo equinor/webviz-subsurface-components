@@ -295,9 +295,12 @@ const MousePosition = props => {
     };
 
     const mapZValue = (r, g, b) => {
-        const { minvalue } = stateRef.current || {};
-        const elevation = -10000.0 + (r * 256.0 * 256.0 + g * 256.0 + b) * 0.1;
-        return roundOff(minvalue + elevation);
+        const { minvalue, maxvalue } = stateRef.current || {};
+
+        const elevation = r * 256.0 * 256.0 + g * 256.0 + b;
+        const scaleFactor =
+            (maxvalue - minvalue) / (256.0 * 256.0 * 256.0 - 1.0);
+        return roundOff(elevation * scaleFactor + minvalue);
     };
 
     const roundOff = n => {

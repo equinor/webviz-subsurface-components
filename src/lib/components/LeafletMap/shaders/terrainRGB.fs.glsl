@@ -23,8 +23,14 @@ uniform float u_elevation_scale;
 
 // TODO: Investigate using R32 textures (webgl2) to avoid this transformation.
 float elevation_from_rgb(vec3 col) {
-    // Decode Mapbox Terrain RGB: https://docs.mapbox.com/help/troubleshooting/access-elevation-data/
-    return (-10000.0 + (col.r * 255.0 * 256.0 * 256.0 + col.g * 255.0 * 256.0 + col.b * 255.0) * 0.1) * u_elevation_scale;
+    // Decode elevation data. Format is similar to the Mapbox Terrain RGB:
+    // https://docs.mapbox.com/help/troubleshooting/access-elevation-data/
+    // but without the -10000 offset and the 0.1 scale.
+    // The elevations are also scaled to cover the whole RGB domain, for better precision,
+    // so we need to scale them down to the original domain.
+    float elevation = col.r * 255.0 * 256.0 * 256.0 + col.g * 255.0 * 256.0 + col.b * 255.0 ;
+    float scale_factor = u_value_range / (256.0*256.0*256.0 - 1.0);
+    return elevation * scale_factor *  u_elevation_scale;
 }
 
 vec4 color_map(float elevation) {
@@ -75,7 +81,8 @@ void main() {
     float elevation = elevation_from_rgb(final_color.rgb);
 
     if (u_apply_color_scale) {
-        final_color = color_map(abs(elevation));
+        // The colorscale shouldn't be affected by the elevation scale.
+        final_color = color_map(elevation / u_elevation_scale);
     }
 
     if (u_apply_hillshading) {
