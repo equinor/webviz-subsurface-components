@@ -1,3 +1,9 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# Copyright (C) 2020 - Equinor ASA.
+
 import io
 import json
 import base64
@@ -96,7 +102,10 @@ if __name__ == "__main__":
                     "type": "tile",
                     "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                     "colormap": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAABCAYAAAAxWXB3AAAAuElEQVR4nI2NyxUDIQwDR6K0lJD+W1nnABgvIZ8DT7JGNnroieRAQjJYMFQ2SDBUk0mrl16odGce05de9Z2zzStLLhEuvurIZzeZOedizd7mT70f7JOe7v7XA/jBBaH4ztn3462z37l1c7/ys1f6QFNZuUZ+1+JZ3oVN79FxctLvLB/XIQuslbe3+eSv7LVyd/KmC9O13Vjf63zt7r3kW7dR/iVuvv/H8NBE1/SiIayhiCZjhDFN5gX8UYgJzVykqAAAAABJRU5ErkJggg==",
-                    "shader": {"type": "none", "elevationScale": 0.01,},
+                    "shader": {
+                        "type": "none",
+                        "elevationScale": 0.01,
+                    },
                 }
             ],
         },
@@ -107,15 +116,25 @@ if __name__ == "__main__":
         syncDrawings=True,
         layers=layers,
         colorBar={"position": "bottomleft"},
-        mouseCoords={"coordinatePosition": "bottomright",},
-        switch={"value": False, "label": "Hillshading",},
+        mouseCoords={
+            "coordinatePosition": "bottomright",
+        },
+        switch={
+            "value": False,
+            "label": "Hillshading",
+        },
         drawTools={
             "drawMarker": True,
             "drawPolygon": True,
             "drawPolyline": True,
             "position": "topright",
         },
-        scaleY={"scaleY": 1, "minScaleY": 1, "maxScaleY": 10, "position": "topleft",},
+        scaleY={
+            "scaleY": 1,
+            "minScaleY": 1,
+            "maxScaleY": 10,
+            "position": "topleft",
+        },
         updateMode="",
     )
 
@@ -196,7 +215,9 @@ if __name__ == "__main__":
                 ]
             ),
             html.Div(
-                children=[leaflet_map_1,],
+                children=[
+                    leaflet_map_1,
+                ],
                 style={
                     "display": "grid",
                     "gridTemplateColumns": "1fr 1fr",
@@ -256,7 +277,9 @@ if __name__ == "__main__":
 
     @cg.callback(
         Output("example-map", "layers"),
-        [Input("shading-submit-val", "n_clicks"),],
+        [
+            Input("shading-submit-val", "n_clicks"),
+        ],
         [
             State("elevation-scale", "value"),
             State("pixel-scale", "value"),
@@ -307,7 +330,9 @@ if __name__ == "__main__":
 
     @cg.callback(
         Output("example-map", "layers"),
-        [Input("example-map", "switch"),],
+        [
+            Input("example-map", "switch"),
+        ],
         State("selected-layer", "value"),
     )
     def toggle_shading(switch, layer_id):
@@ -320,7 +345,9 @@ if __name__ == "__main__":
                 "data": [
                     {
                         "type": layer_type,
-                        "shader": {"type": "hillshading" if switch["value"] else None,},
+                        "shader": {
+                            "type": "hillshading" if switch["value"] else None,
+                        },
                     }
                 ],
             }
@@ -329,7 +356,9 @@ if __name__ == "__main__":
 
     @cg.callback(
         Output("example-map", "layers"),
-        [Input("shader-toggle-replace-btn", "n_clicks"),],
+        [
+            Input("shader-toggle-replace-btn", "n_clicks"),
+        ],
         State("selected-layer", "value"),
     )
     def toggle_shading_with_replace(n_clicks, layer_id):
