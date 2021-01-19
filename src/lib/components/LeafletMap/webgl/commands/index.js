@@ -4,4 +4,4 @@
  *
  * Copyright (C) 2020 - Equinor ASA. */
 
-export { default as drawWithOnePassHillShading } from "./drawWithOnePassHillShading";
+export { default as drawWithTerrainRGB } from "./drawWithTerrainRGB";
