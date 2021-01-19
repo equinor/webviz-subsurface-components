@@ -3,12 +3,11 @@ import Slider from "../../../shared/slider";
 
 export default class D3WellCompletions {
     constructor(container_id, data) {
-        this.container_id = container_id
-        this.data = data
+        this.container_id = container_id;
+        this.data = data;
     }
 
     renderPlot() {
-
         /// this.data.wells.forEach(function (well) { console.log(well.name) })
         //        console.log(this.data)
 
@@ -28,14 +27,10 @@ export default class D3WellCompletions {
             .attr("height", this.height)
             .style("overflow", "visible");
 
-        this.control_g = this.svg
-            .append("g");
-        this.stratigraphy = this.svg
-            .append("g");
-        this.wells = this.svg
-            .append("g");
-        this.completions = this.svg
-            .append("g");
+        this.control_g = this.svg.append("g");
+        this.stratigraphy = this.svg.append("g");
+        this.wells = this.svg.append("g");
+        this.completions = this.svg.append("g");
 
         this.renderStratigraphy();
         this.renderWells();
@@ -45,7 +40,7 @@ export default class D3WellCompletions {
     }
 
     initTimeSlider() {
-        this.time_step_index = 0
+        this.time_step_index = 0;
 
         this.time_slider = new Slider({
             parentElement: this.control_g,
@@ -68,14 +63,12 @@ export default class D3WellCompletions {
     }
 
     _setTimeStep(index) {
-        this.time_step_index = index
+        this.time_step_index = index;
 
         //        console.log(index)
     }
 
-
     renderWells() {
-
         const w = this.width - this.leftHeader;
         const wellWidth = w / Math.max(this.data.wells.length, 1);
         const wellHeight = this.height - this.topHeader;
@@ -88,7 +81,7 @@ export default class D3WellCompletions {
             .data(this.data.wells)
             .enter()
             .append("g")
-            .attr("transform", function (d, i) {
+            .attr("transform", function(d, i) {
                 return "translate(" + (left + (i + 0.5) * wellWidth) + ",0)";
             });
 
@@ -100,7 +93,9 @@ export default class D3WellCompletions {
             .attr("y", 0)
             .attr("dy", ".35em")
             .attr("font-family", "sans-serif")
-            .text(function (d) { return d.name; });
+            .text(function(d) {
+                return d.name;
+            });
         var traj = well
             .append("g")
             .attr("transform", "translate(0," + (top - 4) + ")");
@@ -111,7 +106,6 @@ export default class D3WellCompletions {
     }
 
     renderStratigraphy() {
-
         const w = this.width - this.leftHeader;
         const h = this.height - this.topHeader;
         const barHeight = h / Math.max(this.data.stratigraphy.length, 1);
@@ -123,27 +117,32 @@ export default class D3WellCompletions {
             .data(this.data.stratigraphy)
             .enter()
             .append("g")
-            .attr("transform", function (d, i) {
+            .attr("transform", function(d, i) {
                 return "translate(0," + (topHeader + i * barHeight) + ")";
             });
 
-        var b = bar.append("g")
-            .attr("transform", function (d, i) {
-                return "translate(" + leftHeader + ", 0)";
-            })
+        var b = bar.append("g").attr("transform", function() {
+            return "translate(" + leftHeader + ", 0)";
+        });
         b.append("rect")
             .attr("width", w)
             .attr("height", barHeight + 1)
-            .attr("fill", function (d) { return d.color; })
+            .attr("fill", function(d) {
+                return d.color;
+            });
 
         bar.append("text")
             .style("font-size", "11px")
             .attr("text-anchor", "end")
-            .attr("x", function (d) { return leftHeader - 4; })
+            .attr("x", function() {
+                return leftHeader - 4;
+            })
             .attr("y", barHeight / 2)
             .attr("dy", ".35em")
             .attr("font-family", "sans-serif")
-            .text(function (d) { return d.name; });
+            .text(function(d) {
+                return d.name;
+            });
     }
 
     renderCompletions() {
@@ -160,18 +159,24 @@ export default class D3WellCompletions {
             .data(this.data.wells)
             .enter()
             .append("g")
-            .attr("transform", function (d, i) {
-                return `translate(${leftHeader + (i + 0.5) * wellWidth}, ${0})`
+            .attr("transform", function(d, i) {
+                return `translate(${leftHeader + (i + 0.5) * wellWidth}, ${0})`;
             })
             .selectAll("g")
-            .data(function (d) { return d.completions; })
+            .data(function(d) {
+                return d.completions;
+            })
             .enter()
             .append("g")
-            .attr("transform", function (d, i) {
-                return `translate(${-d * barWidth * 0.5}, ${i * barHeight + topHeader})`
+            .attr("transform", function(d, i) {
+                return `translate(${-d *
+                    barWidth *
+                    0.5}, ${i * barHeight + topHeader})`;
             })
             .append("rect")
-            .attr("width", function (d) { return d * barWidth; })
+            .attr("width", function(d) {
+                return d * barWidth;
+            })
             .attr("height", barHeight)
             .attr("fill", "#111");
     }
