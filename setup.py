@@ -1,3 +1,9 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# Copyright (C) 2020 - Equinor ASA.
+
 import os
 import json
 from setuptools import setup
@@ -15,7 +21,7 @@ INSTALL_REQUIRES = ["dash>=1.6"]
 
 TESTS_REQUIRE = [
     "bandit",
-    "black>=19.10b0",
+    "black",
     "matplotlib>=3.0",
     "numpy>=1.14",
     "pandas>=0.25",
@@ -54,6 +60,6 @@ setup(
         "Topic :: Multimedia :: Graphics",
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Visualization",
-        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     ],
 )
