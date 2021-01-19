@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React, { Component } from "react";
 import D3WellCompletions from "./utils/well_completions";
 
@@ -15,8 +16,12 @@ class WellCompletions extends Component {
     }
 
     render() {
-        return <div id={this.props.id}></div>
+        return <div id={this.props.id}></div>;
     }
 }
 
+WellCompletions.propTypes = {
+    id: PropTypes.string.isRequired,
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+};
 export default WellCompletions;
