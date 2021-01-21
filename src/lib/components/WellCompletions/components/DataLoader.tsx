@@ -1,29 +1,31 @@
 import React, { Fragment, PropsWithChildren, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { updateTimeIndexRange, updateTimesArray } from "../redux/reducer";
-import { DataInput } from "../redux/types";
+import { updateData, updateId, updateTimeIndexRange } from "../redux/reducer";
+import { ComponentProps } from "../WellCompletions";
 
 interface Props {
-    data: DataInput;
+    props: ComponentProps;
 }
 
 const DataLoader: React.FC<Props> = ({
     children,
-    data,
+    props,
 }: PropsWithChildren<Props>) => {
     // Redux
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(updateTimesArray(data.time_steps));
+        dispatch(updateId(props.id));
+        dispatch(updateData(props.data));
+        //Setup initial ui settings
         dispatch(
             updateTimeIndexRange(
-                data.time_steps.length > 0
-                    ? [0, data.time_steps.length - 1]
-                    : [-1, -1]
+                props.data.timeSteps.length > 0
+                    ? [0, props.data.timeSteps.length - 1]
+                    : [0, 0]
             )
         );
-    }, [data]);
+    }, [props]);
 
     return <Fragment>{children}</Fragment>;
 };

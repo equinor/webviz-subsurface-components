@@ -1,23 +1,37 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { setTimeIndexRange, setTimesArray } from "./actions";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Data, UISettings } from "./types";
 
-export interface WellCompletionsState {
-    times: string[];
-    timeIndexRange: [number, number] | undefined;
-}
-
-const initialState: WellCompletionsState = {
-    times: [],
-    timeIndexRange: undefined,
-};
-
-export const slice = createSlice({
-    name: "WellCompletions",
-    initialState,
+export const idSlice = createSlice({
+    name: "id",
+    initialState: "",
     reducers: {
-        updateTimesArray: setTimesArray,
-        updateTimeIndexRange: setTimeIndexRange,
+        updateId: (state, action: PayloadAction<string>) => action.payload,
+    },
+});
+export const dataModelSlice = createSlice({
+    name: "dataModel",
+    initialState: {
+        data: undefined as Data | undefined,
+    },
+    reducers: {
+        updateData: (state, action: PayloadAction<Data>) => {
+            state.data = action.payload;
+        },
+    },
+});
+export const uiSlice = createSlice({
+    name: "ui",
+    initialState: { timeIndexRange: [0, 0] } as UISettings,
+    reducers: {
+        updateTimeIndexRange: (
+            state,
+            action: PayloadAction<[number, number]>
+        ) => {
+            state.timeIndexRange = action.payload;
+        },
     },
 });
 
-export const { updateTimesArray, updateTimeIndexRange } = slice.actions;
+export const { updateId } = idSlice.actions;
+export const { updateData } = dataModelSlice.actions;
+export const { updateTimeIndexRange } = uiSlice.actions;
