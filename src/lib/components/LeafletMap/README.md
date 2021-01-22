@@ -29,7 +29,7 @@ The new leafletMap component is a component for layered map data, like tile-data
         - [With replace](#updating-layers-with-replace)
 
     - [Color scales](#-colorscales)
-    - [Shaders](#-shaders)
+    - [Hillshading](#-hillshading)
 
     <br>
 
@@ -45,8 +45,7 @@ The new leafletMap component is a component for layered map data, like tile-data
 * Custom colorscales
     * Logarithmic option
     * Cutoff points options
-* Advanced hillshading
-* Soft hillshading
+* Hillshading
 * Drawing of polylines, polygons, circles, and markers
 * Movement and draw synchronization between multiple instances
 
@@ -341,7 +340,7 @@ Please note that an image layer typically only has one layer data object. It is 
 Several images in the same layer will only show up as one layer in the layer control.
 
 More information on:
-- [Shader specifications](#shaders)
+- [Shader specifications](#hillshading)
 - [Color scale specifications](#colorscales)
 
 <br>
@@ -379,7 +378,7 @@ More information on:
 Tile layers take in a url for a tile server. Please note that a tile layer should only have one layer data object.
 
 More information on:
-- [Shader specifications](#shaders)
+- [Shader specifications](#hillshading)
 - [Color scale specifications](#colorscales)
 
 <br>
@@ -505,10 +504,7 @@ We will use the following layers as an example:
                 "type": "tile",
                 "url": "TILE_URL",
                 "shader": {
-                    "type": 'hillshading',
-                    "shadows": True,
-                    "elevationScale": 4.0,
-                    "pixelScale": 200
+                    "applyHillshading": True,
                 }
             }
         ]
@@ -620,10 +616,7 @@ def toggle_shader(n_clicks):
                         # Entire shader object
                         "shader": {
                             # Toggle
-                            "type": 'hillshading' if n_clicks%2 == 1 else None,
-                            "shadows": True,
-                            "elevationScale": 4.0,
-                            "pixelScale": 200
+                            "applyHillshading": True if n_clicks%2 == 1 else False,
                         },
                         "colorScale": COLORSCALE if n_clicks%2 == 1 else None
                     }
@@ -695,10 +688,7 @@ Here is an example of what updating the shader with replace enabled would look l
                             "type": "tile",
                             "url": "TILE_URL",
                             "shader": {
-                                "type": 'hillshading' if n_clicks % 2 == 1 else None,
-                                "shadows": True,
-                                "elevationScale": 4.0,
-                                "pixelScale": 200
+                                "applyHillshading": True if n_clicks%2 == 1 else False,
                             },
                         }
                     ]
@@ -731,11 +721,13 @@ provided by the user or by user providing the colormap directly (see examples be
 
 | Name | Type  | Description  |
 |-----------------|------------------|---------------|
-| colors          | Array of strings | Used when generating a colormap based on hexadecimal values. Each of the hexadecimal color value should be represented  as a string within the array.                                            |
-| prefixAlphaZero | Boolean          | Indicates whether the first color of the colormap should be set to transparent.                                                                                                                  |
+| applyColorScale          | Boolean | Whether or not to apply the colorscale. 
+| colors          | Array of strings | Used when generating a colormap based on hexadecimal values. Each of the hexadecimal color value should be represented  as a string within the array.                                                                                                        
 | scaleType       | String           | Indicates the type of scale that should be used when generating the colormap. It is set to linear by default. Currently supported scale types:  	• "log" 	• "linear".                        |
-| cutPointMin     | Integer          | Indicates the minimum height value represented in the map. Any value below it is set to transparent. If a value is lower than the minimum global value, it is set to the global minimum.  |
-| cutPointMax     | Integer          | Indicates the maximum height value represented in the map. Any value below it is set to transparent. If a value is higher than the maximum global value, it is set to the global maximum. |
+| cutPointMin     | Integer          | Don't display points lower than this threshold.  |
+| cutPointMax     | Integer          | Don't display points higher than this threshold. |
+| remapPointMin     | Integer          | Remap the minimum data point to a different point on the colorscale.  |
+| remapPointMax     | Integer          | Remap the maximum data point to a different point on the colorscale. |
 
 <br />
 
@@ -748,10 +740,9 @@ The colorscale may be used in one of the following ways:
 
         "colorScale":  {
             "colors":["#0d0887", "#46039f", "#7201a8", "#9c179e", "#bd3786", "#d8576b", "#ed7953", "#fb9f3a", "#fdca26", "#f0f921"],
-            "prefixZeroAlpha": false,
             "scaleType": "linear",
-            "cutPointMin": 3000,
-            "cutPointMax": 3513
+            "cutPointMin": 0,
+            "cutPointMax": 1
         },
 
  - Defining the color array without defining an object
@@ -769,98 +760,28 @@ The colorscale may be used in one of the following ways:
 
 <br>
 
-### 🌋 Shaders
-Currently the component only supports two types of shaders:
-* _soft-hillshading_
-* _hillshading_
-
-Shaders only works for two layer types - _image_- and _tile_-layers. You can specify that you want shading with the following way inside your layer data:
-```javascript
-{
-    ...
-    "type": 'image',
-    "shader": {
-        "type": SHADER_TYPE|null
-        // Other shader spesific configuration goes here
-    },
-    ...
-}
-```
-
-<br>
-
-#### Base props
-| Name            | Type    | Description| Default |
-|-----------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| type            | String  | The type of shader that should be used. It can either be null, hillshading or soft-hillshading.                                                                                                  | null    |
-| setBlackToAlpha | Boolean | If true, all colors with RGB(0,0,0) will have the alpha be set to 0.0, making all the black in the image transparent. This is useful if your images have a black background you want to remove.  | false   |
-
-<br>
 
 #### 🏔 Hillshading
 Hillshading is a shader that generates elevation and sense of relief to images. It can be enabled the following way:
 ```javascript
 {
     "shader": {
-        "type": "hillshading",
-        "shadows": true|false, // For enabling shadows
-    }
-}
-```
-This kind of hillshading is expensive for huge images, especially with shadows. Shadows are the most expensive computation of the hillshading, so if it is not needed, make sure it is not enabled. However, the usages of the shadows can be optimized a bit, as the shadows are generated in _N_ iterations, where _N_ is automatically adjusted based on image size. With small images like 256x256, _N_ is set to 128, which shows really great shadows, but if you do the same for a 1000x1000 image your browser might not handle it at all, and is therefore automatically set to _N_ = 8 for the biggest images. The result are not as great as before, but it is decent. On the other hand, it is possible force _N_ to be something else, which can be set with the _shadowIterations_-field:
-```javascript
-{
-    "shader": {
-        "type": "hillshading",
-        "shadowIterations": 128 // <--- Expensive for huge images
+        "applyHillshading" : true,
     }
 }
 ```
 
-Here is a brief visualization of the hillshader with different kind of shadow-configuration.
-![ShadowComparison](https://user-images.githubusercontent.com/31648998/87668347-394d8b00-c76c-11ea-94d0-b221a168930c.png)
 
-When using shadows with TileLayer one can notice that the generated shadows are not continuous between the tiles, because the TileLayer draws all the tiles indepedently. However, a solution is to draw all the tiles all at once, which can be done by changing the _draw-strategy_ for the TileLayer the following way:
-```python
-{
-    "type": "tile",
-    ...
-    "drawStrategy": "full",
-}
-```
+#### Hillshading options
 
-<br>
-
-##### Hillshading options
 | Name             | Type          | Description                                                                                                                                                                                                                                 | Default   |
 |------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
-| pixelScale       | Number        | A indication on what is the scale of the pixels. A higher number will decrease the intensitiy of the shadows                                                                                                                                | 8000      |
-| elevationScale   | Number        | ElevationScale is a variable for scaling the generated elevation of the image. The greater the scale, the higher the "_mountains_". If you have _shadows_ enabled, but see no shadows, maybe your elevation is too low.                     | 1.0       |
-| shadows          | Boolean       | If shadows should be applied to the provided image or not. Note that shadows is quite heavy computational, especially for big images. Try to decrease the _shadowsIterations_ field if you have troubles rendering with shadows.            | false     |
-| shadowIterations | Number        | The number of iterations the shadows should be applied on. The higher number of iterations the greater the result, but also more heavy the generation gets. Your browser might not support too high iteration-number, especially on Chrome. | null      |
+| elevationScale       | Number        | Multiplier applied to the elevation value when computing the hillshading | 1.0      |
+| sunDirection          | Vector       | Direction the light is coming from.           | [1,1,1]     |
+| ambientLightIntensity | Number        | Brightness added to all pixels. | 0.5      |
+| diffuseLightIntensity | Number        | Brightness of surfaces hit by light.| 0.5      |
 
-<br>
 
-#### Soft hillshading
-If the normal hillshading-shader is too heavy computational, there is also a soft hillshader which is less computational, but provide less elevation-details compared to the other hillshader. Can be enabled with the following configuration:
-```javascript
-{
-    ...
-    "shader": {
-        "type": "soft-hillshading",
-        "elevationScale": 0.03, // Optional
-    },
-    ...
-}
-```
-
-<br>
-
-##### Soft hillshading options
-| Name           | Type          | Description                                                                                                       | Default   |
-|----------------|---------------|-------------------------------------------------------------------------------------------------------------------|-----------|
-| elevationScale | Number        | A variable for scaling the generated elevation of the image. The greater the scale, the higher the "_mountains_". | 0.03      |
-| lightDirection | Array<Number> | A vector of length 3 indicating the direction from the surface to the sun.                                        | [1, 1, 1] |
 
 <br>
 
