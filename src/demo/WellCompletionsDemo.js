@@ -5,7 +5,7 @@ const data = require("./example-data/well-completions.json");
 
 class WellCompletionsDemo extends Component {
     render() {
-        return <WellCompletions id="someid" data={data} />;
+        return <WellCompletions id="well_completions" data={data} />;
     }
 }
 
