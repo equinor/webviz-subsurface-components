@@ -4,9 +4,7 @@
  *
  * Copyright (C) 2020 - Equinor ASA. */
 
-import {
-    drawWithTerrainRGB,
-} from "./commands";
+import { drawWithTerrainRGB } from "./commands";
 
 // Utils
 import Utils from "../utils";
