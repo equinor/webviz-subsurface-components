@@ -1,3 +1,9 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (C) 2020 - Equinor ASA. */
+
 import { useEffect, useContext, useRef } from "react";
 import PropTypes from "prop-types";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -185,10 +191,10 @@ const MousePosition = props => {
 
         const x = Math.round(event.latlng.lng);
         const y = Math.round(event.latlng.lat);
-        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally
-        const z = mapZValue(red);
+        const [r, g, b, a] = ctx.getImageData(screenX, screenY, 1, 1).data; // TODO: store this locally
+        const z = mapZValue(r, g, b);
 
-        setLatLng(x, y, z, red > 0);
+        setLatLng(x, y, z, a > 0);
     };
 
     const mapXCoordinateToCanvas = (x, clientRect, canvas) => {
@@ -222,8 +228,8 @@ const MousePosition = props => {
 
         const x = Math.round(event.latlng.lng);
         const y = Math.round(event.latlng.lat);
-        const red = ctx.getImageData(screenX, screenY, 1, 1).data[0]; // TODO: store this locally
-        const z = mapZValue(red);
+        const [r, g, b] = ctx.getImageData(screenX, screenY, 1, 1).data; // TODO: store this locally
+        const z = mapZValue(r, g, b);
 
         // Used to disable map.on("click") events when pressed on the controls
         const controlsList = document.getElementsByClassName(
@@ -294,11 +300,13 @@ const MousePosition = props => {
         props.map.addEventListener("mouseup", onCanvasMouseClick);
     };
 
-    const mapZValue = redColorvalue => {
+    const mapZValue = (r, g, b) => {
         const { minvalue, maxvalue } = stateRef.current || {};
-        return roundOff(
-            minvalue + ((maxvalue - minvalue) / (255 - 0)) * (redColorvalue - 0)
-        );
+
+        const elevation = r * 256.0 * 256.0 + g * 256.0 + b;
+        const scaleFactor =
+            (maxvalue - minvalue) / (256.0 * 256.0 * 256.0 - 1.0);
+        return roundOff(elevation * scaleFactor + minvalue);
     };
 
     const roundOff = n => {
