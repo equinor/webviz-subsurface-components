@@ -9,14 +9,9 @@ export interface Zone {
 }
 export interface Well {
     name: string;
-    completions: Record<string, Completions>;
+    completions: number[];
     type: string;
     region: string;
-}
-
-export interface Completions {
-    t: number[];
-    f: number[];
 }
 
 export interface UISettings {

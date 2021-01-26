@@ -1,6 +1,5 @@
 import { Slider } from "@equinor/eds-core-react";
 import { createStyles, makeStyles } from "@material-ui/core";
-import { debounce } from "lodash";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimeIndexRange } from "../redux/reducer";
@@ -30,9 +29,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
         [times]
     );
     const onChange = useCallback(
-        debounce((_, value) => dispatch(updateTimeIndexRange(value)), 20, {
-            trailing: true,
-        }),
+        (_, value) => dispatch(updateTimeIndexRange(value)),
         [dispatch]
     );
 
@@ -42,9 +39,9 @@ const TimeRangeSelector: React.FC = React.memo(() => {
     return (
         <div className={classes.root}>
             <Slider
-                value={timeIndexRange[0]}
+                value={timeIndexRange}
                 onChange={onChange}
-                ariaLabelledby="even-simpler-slider"
+                ariaLabelledby="range-slider-label"
                 min={0}
                 max={times.length - 1}
                 step={1}
