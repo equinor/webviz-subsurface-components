@@ -8,7 +8,7 @@ export interface ComponentProps {
     id: string;
     data: any;
 }
-const WellCompletions: React.FC<ComponentProps> = React.memo(props => {
+const WellCompletion: React.FC<ComponentProps> = React.memo(props => {
     return (
         <ReduxProvider store={REDUX_STORE}>
             <DataLoader props={props}>
@@ -18,9 +18,5 @@ const WellCompletions: React.FC<ComponentProps> = React.memo(props => {
     );
 });
 
-WellCompletions.displayName = "WellCompletions";
-WellCompletions.propTypes = {
-    id: PropTypes.string.isRequired,
-    data: PropTypes.object.isRequired,
-};
-export default WellCompletions;
+WellCompletion.displayName = "WellCompletion";
+export default WellCompletion;
