@@ -62,11 +62,9 @@ export class D3WellCompletions {
     clear = () => {
         //Do nothing
     };
-
     private renderWells() {
         //Clear existing
         this.wellsG.selectAll("*").remove();
-
         const wellWidth = this.layout.xExtent / Math.max(this.wells.length, 1);
         const wellHeight = this.layout.yExtent;
         const well = this.wellsG
@@ -114,6 +112,7 @@ export class D3WellCompletions {
         const bar = this.stratigraphyG
             .selectAll("g")
             .data(this.stratigraphy)
+
             .enter()
             .append("g")
             .attr(
