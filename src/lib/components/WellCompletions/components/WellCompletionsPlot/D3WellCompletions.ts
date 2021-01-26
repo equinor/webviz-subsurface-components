@@ -1,5 +1,6 @@
-import { Data } from "../../redux/types";
-import { getLayout, getSvg, Padding, PlotLayout } from "./util";
+import { Zone } from "../../redux/types";
+import { WellPlotData } from "./dataUtil";
+import { getLayout, getSvg, Padding, PlotLayout } from "./plotUtil";
 
 export class D3WellCompletions {
     private id: string;
@@ -14,7 +15,8 @@ export class D3WellCompletions {
     private completionsG: d3.Selection<SVGGElement, any, any, any>;
 
     //data
-    private data: Data;
+    private stratigraphy: Zone[] = [];
+    private wells: WellPlotData[] = [];
 
     constructor(id: string, div: HTMLDivElement) {
         this.id = id;
@@ -31,8 +33,17 @@ export class D3WellCompletions {
         this.completionsG = this.svg.append("g");
     }
 
-    setData = (data: Data) => {
-        this.data = data;
+    setStratigraphyData = (stratigraphy: Zone[]) => {
+        this.stratigraphy = stratigraphy;
+        this.renderStratigraphy();
+        this.renderWells();
+        this.renderCompletions();
+    };
+
+    setWellPlotData = (wellPlotData: WellPlotData[]) => {
+        this.wells = wellPlotData;
+        this.renderWells();
+        this.renderCompletions();
     };
 
     resize = () => {
@@ -43,29 +54,24 @@ export class D3WellCompletions {
         this.svg
             .attr("width", this.layout.width)
             .attr("height", this.layout.height);
+        this.renderStratigraphy();
+        this.renderWells();
+        this.renderCompletions();
     };
 
     clear = () => {
         //Do nothing
     };
 
-    draw = () => {
-        if (!this.data) return;
-        this.renderStratigraphy();
-        this.renderWells();
-        this.renderCompletions();
-    };
-
     private renderWells() {
         //Clear existing
         this.wellsG.selectAll("*").remove();
 
-        const wellWidth =
-            this.layout.xExtent / Math.max(this.data.wells.length, 1);
+        const wellWidth = this.layout.xExtent / Math.max(this.wells.length, 1);
         const wellHeight = this.layout.yExtent;
         const well = this.wellsG
             .selectAll("g")
-            .data(this.data.wells)
+            .data(this.wells)
             .enter()
             .append("g")
             .attr(
@@ -103,11 +109,11 @@ export class D3WellCompletions {
 
         const w = this.layout.xExtent;
         const h = this.layout.yExtent;
-        const barHeight = h / Math.max(this.data.stratigraphy.length, 1);
+        const barHeight = h / Math.max(this.stratigraphy.length, 1);
 
         const bar = this.stratigraphyG
             .selectAll("g")
-            .data(this.data.stratigraphy)
+            .data(this.stratigraphy)
             .enter()
             .append("g")
             .attr(
@@ -144,13 +150,13 @@ export class D3WellCompletions {
 
         const w = this.layout.xExtent;
         const h = this.layout.yExtent;
-        const wellWidth = w / Math.max(this.data.wells.length, 1);
-        const barHeight = h / Math.max(this.data.stratigraphy.length, 1);
+        const wellWidth = w / Math.max(this.wells.length, 1);
+        const barHeight = h / Math.max(this.stratigraphy.length, 1);
         const barWidth = w / 50;
 
         this.completionsG
             .selectAll("g")
-            .data(this.data.wells)
+            .data(this.wells)
             .enter()
             .append("g")
             .attr(
@@ -160,9 +166,7 @@ export class D3WellCompletions {
                         (i + 0.5) * wellWidth}, ${0})`
             )
             .selectAll("g")
-            .data(function(d) {
-                return d.completions;
-            })
+            .data(d => d.completions)
             .enter()
             .append("g")
             .attr(
