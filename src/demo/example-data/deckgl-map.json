@@ -1,6 +1,8 @@
 [
     {
-        "dataImage": "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/terrain.png"
+        "dataImage": "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/terrain.png",
+        "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/viridis.png"
+
     },
     {
         "dataImage": "https://i.imgur.com/Dx8eseE.png",

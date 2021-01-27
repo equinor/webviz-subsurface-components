@@ -23,8 +23,9 @@ const DeckGLMapDemo = () => {
             <DeckGLMap
                 viewState={INITIAL_VIEW_STATE}
                 dataImage={example.dataImage}
-                colormap={example.colormap}
-            />
+                colormap={example.colormap}>
+            </DeckGLMap>
+            <img src={example.colormap} />
         </div>
     );
 };
