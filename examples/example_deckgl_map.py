@@ -72,21 +72,25 @@ if __name__ == "__main__":
     map_data = (map_data - min_value) * scale_factor
 
     map_data = array2d_to_png(map_data)
+    colormap = "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
 
     deckgl_map_1 = webviz_subsurface_components.DeckGLMap(
-        viewState= {
+        viewState = {
             'target': [0, 0, 0],
             'zoom': 3,
         },
-        dataImage= map_data,
-        colormap= "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
+        dataImage = map_data,
+        colormap = colormap
     )
 
     app = dash.Dash(__name__)
 
     app.layout = html.Div(
-        style={"height": "100vh"},
-        children=deckgl_map_1,
+        style = {"height": "95vh"},
+        children = [
+            deckgl_map_1,
+            html.Img(src=colormap)
+        ]
     )
 
     app.run_server(debug=True)
