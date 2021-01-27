@@ -1,8 +1,9 @@
 [
     {
-        "elevationData": "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/terrain.png"
+        "dataImage": "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/terrain.png"
     },
     {
-        "elevationData": "https://i.imgur.com/sTD3huW.png"
+        "dataImage": "https://i.imgur.com/Dx8eseE.png",
+        "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
     }
 ]
