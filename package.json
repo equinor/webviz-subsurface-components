@@ -25,7 +25,7 @@
     "license": "LGPL",
     "dependencies": {
         "@material-ui/core": "^4.3.3",
-        "@types/react": "^16.9.35",
+        "@types/react": "^16.14.2",
         "@types/react-dom": "^16.9.8",
         "d3": "^5.11.0",
         "leaflet": "^1.6.0",
