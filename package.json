@@ -24,7 +24,7 @@
     "author": "R&T Equinor <akia@equinor.com>",
     "license": "LGPL",
     "dependencies": {
-        "@material-ui/core": "^4.3.3",
+        "@material-ui/core": "^4.11.2",
         "@types/react": "^16.9.35",
         "@types/react-dom": "^16.9.8",
         "d3": "^5.11.0",
