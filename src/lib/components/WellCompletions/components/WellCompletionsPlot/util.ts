@@ -18,11 +18,10 @@ export interface Padding {
 }
 
 export const getLayout = (
-    div: HTMLDivElement,
+    width: number,
+    height: number,
     padding: Padding = { bottom: 0, top: 0, left: 0, right: 0 }
 ): PlotLayout => {
-    const width = div.getBoundingClientRect().width;
-    const height = div.getBoundingClientRect().height;
     const xRange: [number, number] = [padding.left, width - padding.right];
     const yRange: [number, number] = [height - padding.bottom, padding.top];
     const xExtent = Math.abs(xRange[0] - xRange[1]);
@@ -62,8 +61,6 @@ export const getSvg = (div: HTMLDivElement, id = "default") => {
         .call(updateOrCreate, "svg", "svg-context-" + id)
         .select("svg.svg-context-" + id)
         .style("position", "relative")
-        .style("width", "100%")
-        .style("height", "100%")
         .attr("width", boundingRect.width)
         .attr("height", boundingRect.height)
         .attr("id", "svg-context-" + id);

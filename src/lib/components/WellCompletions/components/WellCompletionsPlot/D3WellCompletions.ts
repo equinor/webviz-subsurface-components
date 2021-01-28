@@ -21,7 +21,11 @@ export class D3WellCompletions {
         this.div = div;
 
         // layout
-        this.layout = getLayout(this.div, this.padding);
+        this.layout = getLayout(
+            div.getBoundingClientRect().width,
+            div.getBoundingClientRect().height,
+            this.padding
+        );
 
         // svg
         this.svg = getSvg(div);
@@ -35,9 +39,9 @@ export class D3WellCompletions {
         this.data = data;
     };
 
-    resize = () => {
+    resize = (width, height) => {
         // update layout
-        this.layout = getLayout(this.div, this.padding);
+        this.layout = getLayout(width, height, this.padding);
 
         // update svg attributes
         this.svg

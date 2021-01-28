@@ -1,8 +1,7 @@
 import { createStyles, makeStyles } from "@material-ui/core";
-import { throttle } from "lodash";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import ReactResizeDetector from "react-resize-detector";
+import { useResizeDetector } from "react-resize-detector";
 import { WellCompletionsState } from "../../redux/store";
 import { D3WellCompletions } from "./D3WellCompletions";
 
@@ -20,28 +19,16 @@ const useStyles = makeStyles(() =>
 );
 const WellCompletionsPlot: React.FC = () => {
     const classes = useStyles();
+    // A reference to the div storing the plots
+    const d3wellcompletions = useRef<D3WellCompletions>();
+    const { width, height, ref } = useResizeDetector<HTMLDivElement>({
+        refreshMode: "debounce",
+        refreshRate: 100,
+        refreshOptions: { trailing: true },
+    });
     const id = useSelector((state: WellCompletionsState) => state.id);
     const data = useSelector(
         (state: WellCompletionsState) => state.dataModel.data
-    );
-
-    // A reference to the div storing the plots
-    const divRef = useRef<HTMLDivElement>();
-    const d3wellcompletions = useRef<D3WellCompletions>();
-
-    const onResize = useMemo(
-        () =>
-            throttle(
-                () => {
-                    if (d3wellcompletions.current) {
-                        d3wellcompletions.current.resize();
-                        d3wellcompletions.current.draw();
-                    }
-                },
-                100,
-                { trailing: true }
-            ),
-        []
     );
 
     // Effects
@@ -49,7 +36,7 @@ const WellCompletionsPlot: React.FC = () => {
         if (!d3wellcompletions.current) {
             d3wellcompletions.current = new D3WellCompletions(
                 id,
-                divRef.current as HTMLDivElement
+                ref.current as HTMLDivElement
             );
         }
     }, [id]);
@@ -60,21 +47,23 @@ const WellCompletionsPlot: React.FC = () => {
             d3wellcompletions.current.draw();
         }
     }, [data]);
+
+    useEffect(() => {
+        if (
+            d3wellcompletions.current &&
+            width !== undefined &&
+            height !== undefined
+        ) {
+            d3wellcompletions.current.resize(width, height);
+            d3wellcompletions.current.draw();
+        }
+    }, [width, height]);
     // on unmount
     useEffect(() => {
         return () => d3wellcompletions.current?.clear();
     }, []);
 
-    return (
-        <ReactResizeDetector handleHeight handleWidth onResize={onResize}>
-            <div className={classes.root}>
-                <div
-                    className={classes.main}
-                    ref={divRef as React.MutableRefObject<HTMLDivElement>}
-                />
-            </div>
-        </ReactResizeDetector>
-    );
+    return <div className={classes.root} ref={ref} />;
 };
 
 export default WellCompletionsPlot;

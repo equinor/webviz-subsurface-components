@@ -1,7 +1,7 @@
 import React, { Fragment, PropsWithChildren, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updateData, updateId, updateTimeIndexRange } from "../redux/reducer";
-import { ComponentProps } from "../WellCompletions";
+import { ComponentProps } from "../WellCompletion";
 
 interface Props {
     props: ComponentProps;
