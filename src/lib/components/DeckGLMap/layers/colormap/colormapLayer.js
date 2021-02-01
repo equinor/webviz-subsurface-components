@@ -6,7 +6,7 @@ import { picking, project32, gouraudLighting } from "@deck.gl/core";
 import { Texture2D } from "@luma.gl/core";
 import GL from "@luma.gl/constants";
 
-import { decoder, colormap } from "../webgl";
+import { decoder, colormap } from "../../webgl";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
