@@ -1,1 +1,1 @@
-export {default as ColormapLayer} from "./colormap/colormapLayer"
+export { default as ColormapLayer } from "./colormap/colormapLayer";
