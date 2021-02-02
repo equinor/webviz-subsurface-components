@@ -17,7 +17,7 @@ function DeckGLMap(props) {
 
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
-            <DeckGL id="serialized-deck" {...jsonProps} />
+            {jsonProps && <DeckGL id="serialized-deck" {...jsonProps} />}
         </div>
     );
 }

@@ -1,11 +1,11 @@
 import React from "react";
 
 import AceEditor from "react-ace";
-
 import "ace-builds/src-min-noconflict/mode-json";
 import "ace-builds/src-min-noconflict/theme-monokai";
 import "ace-builds/webpack-resolver";
 
+import PropTypes from "prop-types";
 import DeckGLMap from "../lib/components/DeckGLMap";
 
 import exampleData from "./example-data/deckgl-map.json";
@@ -23,24 +23,25 @@ class ErrorBoundary extends React.Component {
         this.props.onReset();
     }
 
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps) {
         if (!prevProps.reset && this.props.reset && this.state.hasError) {
-            this.setState({ hasError: false })
+            this.setState({ hasError: false });
         }
     }
 
     render() {
         if (this.state.hasError) {
             return (
-                <div style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "100%",
-                    width: "100%",
-                    border: "solid 3px red",
-                }}>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "100%",
+                        width: "100%",
+                        border: "solid 3px red",
+                    }}
+                >
                     <h3>Invalid map description</h3>
                 </div>
             );
@@ -48,7 +49,11 @@ class ErrorBoundary extends React.Component {
         return this.props.children;
     }
 }
-
+ErrorBoundary.propTypes = {
+    reset: PropTypes.bool,
+    onReset: PropTypes.func,
+    children: PropTypes.node.isRequired,
+};
 
 function _get_colmaps(layers) {
     return layers
@@ -110,7 +115,12 @@ const DeckGLMapDemo = () => {
                 />
             </div>
             <div style={{ flex: 2 }}>
-                <ErrorBoundary reset={errorReset} onReset={() => { setErrorReset(false) }}>
+                <ErrorBoundary
+                    reset={errorReset}
+                    onReset={() => {
+                        setErrorReset(false);
+                    }}
+                >
                     <DeckGLMap jsonData={jsonData} />
                 </ErrorBoundary>
                 <div>

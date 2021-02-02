@@ -75,12 +75,48 @@ if __name__ == "__main__":
     colormap = "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
 
     deckgl_map_1 = webviz_subsurface_components.DeckGLMap(
-        viewState = {
-            'target': [0, 0, 0],
-            'zoom': 3,
-        },
-        dataImage = map_data,
-        colormap = colormap
+        jsonData = {
+            "initialViewState": {
+                "target": [0, 0, 0],
+                "zoom": 3
+            },
+            "layers": [
+                {
+                    "@@type": "ColormapLayer",
+                    "id": "colormap-layer",
+                    "bounds": [-50, 50, 50, -50],
+                    "image": map_data,
+                    "colormap": colormap
+                }
+            ],
+            "views": [
+                {
+                    "@@type": "OrthographicView",
+                    "id": "main",
+                    "controller": True,
+                    "x": "0%",
+                    "y": "0%",
+                    "width": "100%",
+                    "height": "100%"
+                },
+                {
+                    "@@type": "OrthographicView",
+                    "id": "minimap",
+                    "controller": False,
+                    "x": "80%",
+                    "y": "75%",
+                    "width": "20%",
+                    "height": "25%",
+                    "clear": {
+                        "color": [0.9, 0.9, 0.9, 1]
+                    },
+                    "viewState": {
+                        "id": "main",
+                        "zoom": 1
+                    }
+                }
+            ]
+        }
     )
 
     app = dash.Dash(__name__)
