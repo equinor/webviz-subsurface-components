@@ -4,10 +4,51 @@ import AceEditor from "react-ace";
 
 import "ace-builds/src-min-noconflict/mode-json";
 import "ace-builds/src-min-noconflict/theme-monokai";
+import "ace-builds/webpack-resolver";
 
 import DeckGLMap from "../lib/components/DeckGLMap";
 
 import exampleData from "./example-data/deckgl-map.json";
+
+// Component used to catch DeckGL errors an display a message.
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.log(error, errorInfo);
+        this.setState({ hasError: true });
+        this.props.onReset();
+    }
+
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (!prevProps.reset && this.props.reset && this.state.hasError) {
+            this.setState({ hasError: false })
+        }
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                    width: "100%",
+                    border: "solid 3px red",
+                }}>
+                    <h3>Invalid map description</h3>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
+
 
 function _get_colmaps(layers) {
     return layers
@@ -21,6 +62,8 @@ const DeckGLMapDemo = () => {
     const [jsonData, setJsonData] = React.useState(null);
     const [colormaps, setColormaps] = React.useState([]);
 
+    const [errorReset, setErrorReset] = React.useState(false);
+
     React.useEffect(() => {
         const example = exampleData[1];
 
@@ -33,16 +76,20 @@ const DeckGLMapDemo = () => {
     }, []);
 
     const onEditorChanged = txt => {
-        setText(txt);
-        // Parse JSON, while capturing and ignoring exceptions
-        try {
-            const json = txt && JSON.parse(txt);
-            setJsonData(json.jsonData);
+        if (txt != text) {
+            setText(txt);
+            // Parse JSON, while capturing and ignoring exceptions
+            try {
+                const json = txt && JSON.parse(txt);
+                setJsonData(json.jsonData);
 
-            const colmaps = _get_colmaps(json.jsonData["layers"]);
-            setColormaps(colmaps);
-        } catch (error) {
-            // ignore error, user is editing and not yet correct JSON
+                const colmaps = _get_colmaps(json.jsonData["layers"]);
+                setColormaps(colmaps);
+
+                setErrorReset(true);
+            } catch (error) {
+                // ignore error, user is editing and not yet correct JSON
+            }
         }
     };
 
@@ -60,11 +107,12 @@ const DeckGLMapDemo = () => {
                     name="AceEditorDiv"
                     editorProps={{ $blockScrolling: true }}
                     value={text}
-                    setOptions={{ useWorker: false }}
                 />
             </div>
             <div style={{ flex: 2 }}>
-                <DeckGLMap jsonData={jsonData} />
+                <ErrorBoundary reset={errorReset} onReset={() => { setErrorReset(false) }}>
+                    <DeckGLMap jsonData={jsonData} />
+                </ErrorBoundary>
                 <div>
                     {colormaps.map((colormap, index) => (
                         <img

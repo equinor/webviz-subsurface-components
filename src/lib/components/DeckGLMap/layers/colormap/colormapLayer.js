@@ -20,10 +20,6 @@ const defaultProps = {
 };
 
 export default class ColormapLayer extends BitmapLayer {
-    constructor(props) {
-        super(props);
-    }
-
     draw({ uniforms }) {
         const { gl } = this.context;
         super.draw({
@@ -38,19 +34,17 @@ export default class ColormapLayer extends BitmapLayer {
     }
 
     getShaders() {
-        // use object.assign to make sure we don't overwrite existing fields like `vs`, `modules`...
-        return Object.assign({}, super.getShaders(), {
+        return {
+            ...super.getShaders(),
             inject: {
-                "fs:#decl": `
-            uniform sampler2D u_colormap;
-          `,
+                "fs:#decl": `uniform sampler2D u_colormap;`,
                 "fs:DECKGL_FILTER_COLOR": `
-            float val = decoder_rgb2float(color.rgb, vec3(1.0, 1.0, 1.0), 0.0, 1.0 / (256.0*256.0*256.0 - 1.0));
-            color = vec4(lin_colormap(u_colormap, val).rgb, color.a);
-          `,
+                    float val = decoder_rgb2float(color.rgb, vec3(1.0, 1.0, 1.0), 0.0, 1.0 / (256.0*256.0*256.0 - 1.0));
+                    color = vec4(lin_colormap(u_colormap, val).rgb, color.a);
+                `,
             },
             modules: [picking, project32, gouraudLighting, decoder, colormap],
-        });
+        };
     }
 }
 
