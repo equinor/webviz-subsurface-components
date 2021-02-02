@@ -8,6 +8,8 @@ import "ace-builds/webpack-resolver";
 import PropTypes from "prop-types";
 import DeckGLMap from "../lib/components/DeckGLMap";
 
+import ResizePanel from "react-resize-panel";
+
 import exampleData from "./example-data/deckgl-map.json";
 
 // Component used to catch DeckGL errors an display a message.
@@ -102,18 +104,20 @@ const DeckGLMapDemo = () => {
     // https://eds-storybook-react.azurewebsites.net/?path=/docs/components-sidesheet--default
     return (
         <div style={{ height: "95%", display: "flex" }}>
-            <div style={{ flex: 1 }}>
-                <AceEditor
-                    width="100%"
-                    height="100%"
-                    mode="json"
-                    theme="monokai"
-                    onChange={onEditorChanged}
-                    name="AceEditorDiv"
-                    editorProps={{ $blockScrolling: true }}
-                    value={text}
-                />
-            </div>
+            <ResizePanel direction="e" style={{ width: '30%' }}>
+                <div style={{ flex: 1 }}>
+                    <AceEditor
+                        width="100%"
+                        height="100%"
+                        mode="json"
+                        theme="monokai"
+                        onChange={onEditorChanged}
+                        name="AceEditorDiv"
+                        editorProps={{ $blockScrolling: true }}
+                        value={text}
+                    />
+                </div>
+            </ResizePanel>
             <div style={{ flex: 2 }}>
                 <ErrorBoundary
                     reset={errorReset}

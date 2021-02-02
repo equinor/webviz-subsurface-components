@@ -64,6 +64,7 @@
         "react-ace": "^9.3.0",
         "react-docgen": "^2.20.1",
         "react-dom": "^16.9.0",
+        "react-resize-panel": "^0.3.5",
         "source-map-loader": "^0.2.4",
         "typescript": "^3.8.3",
         "url-loader": "^2.1.0",
