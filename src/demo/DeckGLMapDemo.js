@@ -9,18 +9,27 @@ import DeckGLMap from "../lib/components/DeckGLMap";
 
 import exampleData from "./example-data/deckgl-map.json";
 
+function _get_colmaps(layers) {
+    return layers
+        .filter(l => l["@@type"] == "ColormapLayer")
+        .map(v => v["colormap"]);
+}
+
 const DeckGLMapDemo = () => {
     const [text, setText] = React.useState("");
 
     const [jsonData, setJsonData] = React.useState(null);
-    const [colormap, setColormap] = React.useState("");
+    const [colormaps, setColormaps] = React.useState([]);
 
     React.useEffect(() => {
         const example = exampleData[1];
 
-        setJsonData(example.jsonData);
-        setColormap(example.colormap);
         setText(JSON.stringify(example, null, 2));
+
+        setJsonData(example.jsonData);
+
+        const colmaps = _get_colmaps(example.jsonData["layers"]);
+        setColormaps(colmaps);
     }, []);
 
     const onEditorChanged = txt => {
@@ -29,7 +38,9 @@ const DeckGLMapDemo = () => {
         try {
             const json = txt && JSON.parse(txt);
             setJsonData(json.jsonData);
-            setColormap(json.colormap);
+
+            const colmaps = _get_colmaps(json.jsonData["layers"]);
+            setColormaps(colmaps);
         } catch (error) {
             // ignore error, user is editing and not yet correct JSON
         }
@@ -54,7 +65,15 @@ const DeckGLMapDemo = () => {
             </div>
             <div style={{ flex: 2 }}>
                 <DeckGLMap jsonData={jsonData} />
-                <img src={colormap} />
+                <div>
+                    {colormaps.map((colormap, index) => (
+                        <img
+                            key={index}
+                            src={colormap}
+                            style={{ padding: "2px" }}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );
