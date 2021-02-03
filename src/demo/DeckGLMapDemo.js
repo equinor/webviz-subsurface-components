@@ -104,7 +104,7 @@ const DeckGLMapDemo = () => {
     // https://eds-storybook-react.azurewebsites.net/?path=/docs/components-sidesheet--default
     return (
         <div style={{ height: "95%", display: "flex" }}>
-            <ResizePanel direction="e" style={{ width: '30%' }}>
+            <ResizePanel direction="e" style={{ width: "30%" }}>
                 <div style={{ flex: 1 }}>
                     <AceEditor
                         width="100%"
