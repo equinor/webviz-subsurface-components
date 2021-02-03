@@ -10,6 +10,7 @@ import Morris from "./components/Morris";
 import LayeredMap from "./components/LayeredMap";
 import LeafletMap from "./components/LeafletMap";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
+import WellCompletions from "./components/WellCompletions";
 
 export {
     HistoryMatch,
@@ -18,4 +19,5 @@ export {
     LayeredMap,
     PriorPosteriorDistribution,
     LeafletMap,
+    WellCompletions,
 };

@@ -1,22 +1,20 @@
-import React, { Component } from "react";
-import D3WellCompletions from "./utils/well_completions";
+/**
+ * This file is created in order to let dash-generate-components extract metadata.
+ * At the moment, the library does not support generating components from typescript directly
+ * https://github.com/plotly/dash/issues/719
+ */
 
-class WellCompletions extends Component {
-    componentDidMount() {
-        this.d3wellcompletions = new D3WellCompletions(
-            this.props.id,
-            this.props.data
-        );
-        this.d3wellcompletions.renderPlot();
+import PropTypes from "prop-types";
+import React from "react";
+import WellCompletionComponent from "./components/WellCompletionComponent";
 
-        window.addEventListener("resize", () =>
-            this.d3wellcompletions.renderPlot()
-        );
-    }
+const WellCompletions = props => {
+    return <WellCompletionComponent id={props.id} data={props.data} />;
+};
 
-    render() {
-        return <div id={this.props.id}></div>
-    }
-}
+WellCompletions.propTypes = {
+    id: PropTypes.string.isRequired,
+    data: PropTypes.object,
+};
 
 export default WellCompletions;
