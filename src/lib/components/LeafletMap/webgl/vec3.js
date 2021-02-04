@@ -1,3 +1,9 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (C) 2020 - Equinor ASA. */
+
 /**
  * !NB - This file implements only the necessary functions of gl-matrix's Vec3
  * instead of installing the entire dependency. If the demand of gl-matrix functionality

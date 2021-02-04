@@ -1,9 +1,10 @@
-import {
-    drawRawImage,
-    drawWithColormap,
-    drawWithHillShading,
-    drawWithAdvancedHillShading,
-} from "./commands";
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (C) 2020 - Equinor ASA. */
+
+import { drawWithTerrainRGB } from "./commands";
 
 // Utils
 import Utils from "../utils";
@@ -23,87 +24,18 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
     // Select which draw command to draw
     const shader = config.shader || {};
     const colorScale = config.colorScale || {};
+    if (!shader.type || shader.type == "terrainRGB") {
+        const minmaxValues = {
+            minValue: config.minvalue,
+            maxValue: config.maxvalue,
+        };
 
-    const cutOffPoints = calcCutOffPoints(
-        config.minvalue,
-        config.maxvalue,
-        (config.colorScale || {}).cutPointMin,
-        (config.colorScale || {}).cutPointMax
-    );
-
-    if (loadedColorMap) {
-        switch (shader.type) {
-            // Old hillshader
-            case "soft-hillshading": {
-                drawWithHillShading(gl, canvas, loadedImage, loadedColorMap, {
-                    ...colorScale,
-                    ...shader,
-                });
-                break;
-            }
-
-            case "hillshading": {
-                drawWithAdvancedHillShading(
-                    gl,
-                    canvas,
-                    loadedImage,
-                    loadedColorMap,
-                    {
-                        ...colorScale,
-                        ...shader,
-                        ...cutOffPoints,
-                    }
-                );
-                break;
-            }
-
-            default: {
-                // Draw the image with colormap
-                drawWithColormap(gl, canvas, loadedImage, loadedColorMap, {
-                    ...colorScale,
-                    ...shader,
-                    ...cutOffPoints,
-                });
-            }
-        }
-    } else {
-        // Draw the image raw - without colormap
-        drawRawImage(gl, canvas, loadedImage, {
+        drawWithTerrainRGB(gl, canvas, loadedImage, loadedColorMap, {
+            ...minmaxValues,
             ...colorScale,
             ...shader,
-            ...cutOffPoints,
         });
+    } else {
+        console.warn("Unrecognized shader: ", shader.type);
     }
-};
-
-/**
- * Calculates cutOffPoints based on given a min/max values and min/max-cutoff-points between 0 and 255.
- * @example
- * calcCutOffPoints(0, 1000, 500, 1000) // { 127, 255 }
- */
-const calcCutOffPoints = (min, max, cutMin, cutMax) => {
-    // If min and max is not provided, there will be no cutOff
-    if (!min || !max) {
-        return {
-            cutPointMin: 0,
-            cutPointMax: 256,
-        };
-    }
-
-    if (cutMax > max) {
-        cutMax = max;
-    }
-    if (cutMin < min) {
-        cutMin = min;
-    }
-
-    const maxColorValue = Math.round(
-        255 - (Math.abs(cutMax - max) / (max - min)) * 255
-    );
-    const minColorValue = Math.round(((cutMin - min) / (max - min)) * 255);
-
-    return {
-        cutPointMin: minColorValue,
-        cutPointMax: maxColorValue,
-    };
 };

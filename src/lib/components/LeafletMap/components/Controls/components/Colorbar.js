@@ -1,3 +1,9 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (C) 2020 - Equinor ASA. */
+
 import React, { useState, useEffect, useContext } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
@@ -104,10 +110,10 @@ const ColorBar = props => {
                 )}
             </div>
             <div>
-                {minMaxValue[0]} {unit}
+                {minMaxValue[0].toFixed(2)} {unit}
             </div>
             <div className="leaflet-colorbar-right-label">
-                {minMaxValue[1]} {unit}
+                {minMaxValue[1].toFixed(2)} {unit}
             </div>
         </div>,
         control.panelDiv

@@ -1,3 +1,9 @@
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Copyright (C) 2020 - Equinor ASA.
+
 # 🌍 EqGL - WebGL abstraction framework
 EqGL is an abstract framework for webgl, making it easier to write WebGL-code, resulting in less and more readable code. This framework is highly inspiried by [ReGL](https://github.com/regl-project/regl), but is simplified and less feature rich. EqGL is supposed to be a good alternative to ReGL, were one just wants to avoid nasty WebGL code and big dependencies.
 
@@ -154,5 +160,5 @@ eqGL.framebuffer({
 ```
 ### Further work
 * Support more WebGL features
-    * Add support for renderbuffers. 
-    * What do [ReGL](https://github.com/regl-project/regl) have that we do not? 🤔 
+    * Add support for renderbuffers.
+    * What do [ReGL](https://github.com/regl-project/regl) have that we do not? 🤔
