@@ -5,17 +5,18 @@ import {
     FirstPersonView,
     OrbitView,
     OrthographicView,
+    COORDINATE_SYSTEM,
 } from "@deck.gl/core";
-import * as Layers from "@deck.gl/layers";
+
 import * as AggregationLayers from "@deck.gl/aggregation-layers";
 import * as GeoLayers from "@deck.gl/geo-layers";
+import * as Layers from "@deck.gl/layers";
 import * as MeshLayers from "@deck.gl/mesh-layers";
-import * as CustomLayers from "./layers";
-
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import GL from "@luma.gl/constants";
 
 import { registerLoaders } from "@loaders.gl/core";
+import GL from "@luma.gl/constants";
+
+import * as CustomLayers from "./layers";
 
 // Note: deck already registers JSONLoader...
 registerLoaders([]);

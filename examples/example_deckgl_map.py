@@ -75,6 +75,7 @@ if __name__ == "__main__":
     colormap = "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
 
     deckgl_map_1 = webviz_subsurface_components.DeckGLMap(
+        id = "DeckGL-Map",
         jsonData = {
             "initialViewState": {
                 "target": [0, 0, 0],

@@ -20,7 +20,10 @@ class ErrorBoundary extends React.Component {
     }
 
     componentDidCatch(error, errorInfo) {
-        console.log(error, errorInfo);
+        // Logging it just as a warning, since it's expected to happen when
+        // actively editing the JSON file.
+        console.warn(error, errorInfo);
+
         this.setState({ hasError: true });
         this.props.onReset();
     }
@@ -82,7 +85,7 @@ const DeckGLMapDemo = () => {
         setColormaps(colmaps);
     }, []);
 
-    const onEditorChanged = txt => {
+    const onEditorChanged = React.useCallback(txt => {
         if (txt != text) {
             setText(txt);
             // Parse JSON, while capturing and ignoring exceptions
@@ -98,7 +101,7 @@ const DeckGLMapDemo = () => {
                 // ignore error, user is editing and not yet correct JSON
             }
         }
-    };
+    });
 
     // TODO: Fold code panel in a slider:
     // https://eds-storybook-react.azurewebsites.net/?path=/docs/components-sidesheet--default
@@ -125,7 +128,7 @@ const DeckGLMapDemo = () => {
                         setErrorReset(false);
                     }}
                 >
-                    <DeckGLMap jsonData={jsonData} />
+                    <DeckGLMap id="DeckGL-Map" jsonData={jsonData} />
                 </ErrorBoundary>
                 <div>
                     {colormaps.map((colormap, index) => (
