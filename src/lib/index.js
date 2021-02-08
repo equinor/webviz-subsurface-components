@@ -11,6 +11,7 @@ import LayeredMap from "./components/LayeredMap";
 import LeafletMap from "./components/LeafletMap";
 import DeckGLMap from "./components/DeckGLMap";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
+import WellCompletions from "./components/WellCompletions";
 
 export {
     HistoryMatch,
@@ -20,4 +21,5 @@ export {
     PriorPosteriorDistribution,
     LeafletMap,
     DeckGLMap,
+    WellCompletions,
 };
