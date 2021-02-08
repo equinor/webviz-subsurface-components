@@ -1,0 +1,88 @@
+[
+    {
+        "jsonData": {
+            "description": "A minimal deck.gl example rendering a circle with text",
+            "initialViewState": {
+              "longitude": -122.45,
+              "latitude": 37.8,
+              "zoom": 12
+            },
+            "layers": [
+              {
+                "@@type": "ScatterplotLayer",
+                "data": [
+                  {
+                    "position": [
+                      -122.45,
+                      37.8
+                    ]
+                  }
+                ],
+                "getFillColor": [
+                  255,
+                  0,
+                  0,
+                  255
+                ],
+                "getRadius": 1000
+              },
+              {
+                "@@type": "TextLayer",
+                "data": [
+                  {
+                    "position": [
+                      -122.45,
+                      37.8
+                    ],
+                    "text": "Hello World"
+                  }
+                ]
+              }
+            ]
+          }
+    },
+    {
+        "jsonData": {
+            "initialViewState": {
+                "target": [0, 0, 0],
+                "zoom": 3
+            },
+            "layers": [
+                {
+                    "@@type": "ColormapLayer",
+                    "id": "colormap-layer",
+                    "bounds": [-50, 50, 50, -50],
+                    "image": "https://i.imgur.com/Dx8eseE.png",
+                    "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
+                }
+            ],
+            "views": [
+                {
+                    "@@type": "OrthographicView",
+                    "id": "main",
+                    "controller": true,
+                    "x": "0%",
+                    "y": "0%",
+                    "width": "100%",
+                    "height": "100%"
+                },
+                {
+                    "@@type": "OrthographicView",
+                    "id": "minimap",
+                    "controller": false,
+                    "x": "80%",
+                    "y": "75%",
+                    "width": "20%",
+                    "height": "25%",
+                    "clear": {
+                        "color": [0.9, 0.9, 0.9, 1]
+                    },
+                    "viewState": {
+                        "id": "main",
+                        "zoom": 1
+                    }
+                }
+            ]
+        }
+    }
+]
