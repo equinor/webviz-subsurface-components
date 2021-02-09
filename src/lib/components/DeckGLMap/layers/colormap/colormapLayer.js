@@ -6,7 +6,7 @@ import { picking, project32, gouraudLighting } from "@deck.gl/core";
 import { Texture2D } from "@luma.gl/core";
 import GL from "@luma.gl/constants";
 
-import { decoder, colormap } from "../../webgl";
+import { decoder, colormap } from "../shader_modules";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -39,7 +39,7 @@ export default class ColormapLayer extends BitmapLayer {
             inject: {
                 "fs:#decl": `uniform sampler2D u_colormap;`,
                 "fs:DECKGL_FILTER_COLOR": `
-                    float val = decoder_rgb2float(color.rgb, vec3(1.0, 1.0, 1.0), 0.0, 1.0 / (256.0*256.0*256.0 - 1.0));
+                    float val = decoder_rgb2float_256x3(color.rgb);
                     color = vec4(lin_colormap(u_colormap, val).rgb, color.a);
                 `,
             },
