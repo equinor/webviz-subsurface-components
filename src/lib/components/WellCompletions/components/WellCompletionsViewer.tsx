@@ -1,11 +1,12 @@
 import { createStyles, makeStyles } from "@material-ui/core";
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
+import { usePlotData } from "../hooks/usePlotData";
 import { WellCompletionsState } from "../redux/store";
+import WellCompletionsPlot from "./Plot/WellCompletionsPlot";
 import HideZeroCompletionsSwitch from "./Settings/HideZeroCompletionsSwitch";
 import RangeDisplayModeSelector from "./Settings/RangeDisplayModeSelector";
 import TimeRangeSelector from "./Settings/TimeRangeSelector";
-import WellCompletionsPlot from "./Plot/WellCompletionsPlot";
 import WellFilter from "./Settings/WellFilter";
 import ZoneSelector from "./Settings/ZoneSelector";
 
@@ -17,14 +18,11 @@ const useStyles = makeStyles(() =>
             flex: 1,
             flexDirection: "column",
             height: "90%",
-            minWidth: "500px",
-            minHeight: "300px",
         },
         actions: {
             position: "relative",
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-between",
             margin: "2rem",
         },
     })
@@ -35,10 +33,22 @@ const WellCompletionsViewer: React.FC = () => {
     const data = useSelector(
         (state: WellCompletionsState) => state.dataModel.data
     );
+    const plotData = usePlotData();
+
+    const [minWidth, minHeight] = useMemo(
+        () => [plotData.wells.length * 20, plotData.stratigraphy.length * 20],
+        [plotData]
+    );
     //If no data is available
     if (!data) return <div />;
     return (
-        <div className={classes.root}>
+        <div
+            className={classes.root}
+            style={{
+                minWidth: `${minWidth}px`,
+                minHeight: `${minHeight}px`,
+            }}
+        >
             <div className={classes.actions}>
                 <TimeRangeSelector />
                 <RangeDisplayModeSelector />
@@ -46,7 +56,7 @@ const WellCompletionsViewer: React.FC = () => {
                 <ZoneSelector />
                 <WellFilter />
             </div>
-            <WellCompletionsPlot />
+            <WellCompletionsPlot plotData={plotData} />
         </div>
     );
 };

@@ -1,12 +1,8 @@
 import { createStyles, makeStyles } from "@material-ui/core";
-import { isEqual } from "lodash";
-import React, { useEffect, useMemo, useRef } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useRef } from "react";
 import { useResizeDetector } from "react-resize-detector";
-import { WellCompletionsState } from "../../redux/store";
-import { getRegexPredicate } from "../../utils/regex";
+import { PlotData } from "../../hooks/dataUtil";
 import { D3WellCompletions } from "./D3WellCompletions";
-import { dataInTimeIndexRange } from "./dataUtil";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -17,7 +13,11 @@ const useStyles = makeStyles(() =>
         },
     })
 );
-const WellCompletionsPlot: React.FC = () => {
+interface Props {
+    plotData: PlotData;
+}
+/* eslint-disable react/prop-types */
+const WellCompletionsPlot: React.FC<Props> = React.memo(({ plotData }) => {
     const classes = useStyles();
     // A reference to the div storing the plots
     const d3wellcompletions = useRef<D3WellCompletions>();
@@ -26,60 +26,6 @@ const WellCompletionsPlot: React.FC = () => {
         refreshRate: 100,
         refreshOptions: { trailing: true },
     });
-    //Redux states
-    const data = useSelector(
-        (state: WellCompletionsState) => state.dataModel.data!
-    );
-    const timeIndexRange = useSelector(
-        (state: WellCompletionsState) => state.ui.timeIndexRange,
-        isEqual
-    ) as [number, number];
-    const rangeDisplayMode = useSelector(
-        (state: WellCompletionsState) => state.ui.rangeDisplayMode
-    );
-    const hideZeroCompletions = useSelector(
-        (state: WellCompletionsState) => state.ui.hideZeroCompletions
-    );
-    const filteredZones = useSelector(
-        (state: WellCompletionsState) => state.ui.filteredZones
-    );
-    const wellSearchText = useSelector(
-        (state: WellCompletionsState) => state.ui.wellSearchText
-    );
-    //Memo
-    const filteredStratigraphy = useMemo(
-        () =>
-            data.stratigraphy.filter(
-                zone => !filteredZones || filteredZones.includes(zone.name)
-            ),
-        [data.stratigraphy, filteredZones]
-    );
-    const wellNameRegex = useMemo(() => getRegexPredicate(wellSearchText), [
-        wellSearchText,
-    ]);
-    const filteredWells = useMemo(
-        () => data.wells.filter(well => wellNameRegex(well.name)),
-        [data.wells, wellNameRegex]
-    );
-
-    const plotData = useMemo(
-        () =>
-            dataInTimeIndexRange(
-                filteredStratigraphy,
-                filteredWells,
-                timeIndexRange,
-                rangeDisplayMode,
-                hideZeroCompletions
-            ),
-        [
-            filteredStratigraphy,
-            filteredWells,
-            timeIndexRange,
-            rangeDisplayMode,
-            hideZeroCompletions,
-        ]
-    );
-
     // On mount
     useEffect(() => {
         if (!d3wellcompletions.current) {
@@ -111,6 +57,6 @@ const WellCompletionsPlot: React.FC = () => {
     }, []);
 
     return <div className={classes.root} ref={ref} />;
-};
+});
 
 export default WellCompletionsPlot;

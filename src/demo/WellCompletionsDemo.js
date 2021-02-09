@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import WellCompletions from "../lib/components/WellCompletions";
 
-const data = require("./example-data/well-completions.json");
+const data = require("./example-data/well-completions-99wells-28zones-900ts.json");
 
 class WellCompletionsDemo extends Component {
     render() {

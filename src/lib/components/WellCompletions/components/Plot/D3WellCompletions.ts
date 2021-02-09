@@ -1,6 +1,6 @@
 import * as d3 from "d3";
+import { PlotData, WellPlotData } from "../../hooks/dataUtil";
 import { Zone } from "../../redux/types";
-import { PlotData, WellPlotData } from "./dataUtil";
 import { getLayout, getSvg, Padding, PlotLayout } from "./plotUtil";
 
 export class D3WellCompletions {
@@ -140,6 +140,7 @@ export class D3WellCompletions {
     }
 
     private renderCompletions(): void {
+        const start = new Date().getTime();
         //Clear existing
         this.completionsG.selectAll("*").remove();
 
@@ -147,7 +148,8 @@ export class D3WellCompletions {
         const h = this.layout.yExtent;
         const wellWidth = w / Math.max(this.wells.length, 1);
         const barHeight = h / Math.max(this.stratigraphy.length, 1);
-        const barWidth = w / 50;
+        const barWidth = w / (2 * Math.max(this.wells.length, 1));
+        console.log("setup " + (new Date().getTime() - start));
         this.completionsG
             .selectAll("g")
             .data(this.wells)
@@ -162,16 +164,16 @@ export class D3WellCompletions {
             .selectAll("g")
             .data(d => d.completions)
             .enter()
-            .append("g")
+            .append("rect")
             .attr(
                 "transform",
                 (d, i) =>
                     `translate(${-d * barWidth * 0.5}, ${i * barHeight +
                         this.padding.top})`
             )
-            .append("rect")
             .attr("width", d => d * barWidth)
             .attr("height", barHeight)
             .attr("fill", "#111");
+        console.log(new Date().getTime() - start);
     }
 }

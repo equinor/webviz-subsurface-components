@@ -1,4 +1,4 @@
-import { RangeMode, RangeModes, Well, Zone } from "../../redux/types";
+import { RangeMode, RangeModes, Well, Zone } from "../redux/types";
 /**
  * Util method to prepare stratigraphy and well data from the given time step range and other settings for plotting
  * @param stratigraphy
@@ -48,7 +48,6 @@ export const dataInTimeIndexRange = (
                 completions: wellCompletions,
             });
     });
-
     return {
         stratigraphy,
         wells: wellPlotData,
