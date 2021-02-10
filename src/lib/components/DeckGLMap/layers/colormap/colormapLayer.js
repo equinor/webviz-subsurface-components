@@ -1,12 +1,12 @@
 // DeckGL typescript declarations are not great, so for now it's just js.
 
 import { BitmapLayer } from "@deck.gl/layers";
-import { picking, project32, gouraudLighting } from "@deck.gl/core";
 
-import { Texture2D } from "@luma.gl/core";
 import GL from "@luma.gl/constants";
+import { Texture2D } from "@luma.gl/core";
 
-import { decoder, colormap } from "../shader_modules";
+import { decoder } from "../shader_modules";
+import fsColormap from "./colormap.fs.glsl";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -25,7 +25,7 @@ export default class ColormapLayer extends BitmapLayer {
         super.draw({
             uniforms: {
                 ...uniforms,
-                u_colormap: new Texture2D(gl, {
+                colormap: new Texture2D(gl, {
                     data: this.props.colormap,
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
@@ -34,17 +34,10 @@ export default class ColormapLayer extends BitmapLayer {
     }
 
     getShaders() {
-        return {
-            ...super.getShaders(),
-            inject: {
-                "fs:#decl": `uniform sampler2D u_colormap;`,
-                "fs:DECKGL_FILTER_COLOR": `
-                    float val = decoder_rgb2float_256x3(color.rgb);
-                    color = vec4(lin_colormap(u_colormap, val).rgb, color.a);
-                `,
-            },
-            modules: [picking, project32, gouraudLighting, decoder, colormap],
-        };
+        let parentShaders = super.getShaders();
+        parentShaders.fs = fsColormap;
+        parentShaders.modules.push(decoder);
+        return parentShaders;
     }
 }
 

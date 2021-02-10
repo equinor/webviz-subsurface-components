@@ -1,4 +1,4 @@
-#define SHADER_NAME hillshading-shader
+#define SHADER_NAME hillshading2d-shader
 
 #ifdef GL_ES
 precision highp float;
