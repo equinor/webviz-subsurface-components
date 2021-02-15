@@ -19,8 +19,9 @@ export const dataInTimeIndexRange = (
     //Get first step for now
     wells.forEach(well => {
         const wellCompletions: number[] = [];
+        const zoneIndices: number[] = [];
         let hasData = false;
-        stratigraphy.forEach(zone => {
+        stratigraphy.forEach((zone, zoneIndex) => {
             const values = Array(range[1] - range[0] + 1).fill(0);
             if (well.completions[zone.name]) {
                 //Find values in the time range
@@ -40,12 +41,20 @@ export const dataInTimeIndexRange = (
             const dFunction = RangeModes[rangeDisplayMode];
             const valueInRangeMode = dFunction(values);
             if (valueInRangeMode !== 0) hasData = true;
-            wellCompletions.push(valueInRangeMode);
+            //If value changed
+            if (
+                wellCompletions.length === 0 ||
+                wellCompletions[wellCompletions.length - 1] !== valueInRangeMode
+            ) {
+                wellCompletions.push(valueInRangeMode);
+                zoneIndices.push(zoneIndex);
+            }
         });
         if (!hideZeroCompletions || hasData)
             wellPlotData.push({
                 name: well.name,
                 completions: wellCompletions,
+                zoneIndices,
             });
     });
     return {
@@ -61,4 +70,5 @@ export interface PlotData {
 export interface WellPlotData {
     name: string;
     completions: number[];
+    zoneIndices: number[];
 }

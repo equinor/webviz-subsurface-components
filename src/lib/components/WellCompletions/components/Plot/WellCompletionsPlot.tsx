@@ -1,8 +1,11 @@
 import { createStyles, makeStyles } from "@material-ui/core";
-import React, { useEffect, useRef } from "react";
+import React, { useMemo } from "react";
 import { useResizeDetector } from "react-resize-detector";
 import { PlotData } from "../../hooks/dataUtil";
-import { D3WellCompletions } from "./D3WellCompletions";
+import CompletionsPlot from "./CompletionsPlot";
+import { getLayout, Padding } from "./plotUtil";
+import StratigraphyPlot from "./StratigraphyPlot";
+import WellsPlot from "./WellsPlot";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -16,47 +19,53 @@ const useStyles = makeStyles(() =>
 interface Props {
     plotData: PlotData;
 }
+
+const padding: Padding = { left: 50, right: 50, top: 50, bottom: 50 };
 /* eslint-disable react/prop-types */
 const WellCompletionsPlot: React.FC<Props> = React.memo(({ plotData }) => {
     const classes = useStyles();
-    // A reference to the div storing the plots
-    const d3wellcompletions = useRef<D3WellCompletions>();
     const { width, height, ref } = useResizeDetector<HTMLDivElement>({
         refreshMode: "debounce",
-        refreshRate: 100,
+        refreshRate: 50,
         refreshOptions: { trailing: true },
     });
-    // On mount
-    useEffect(() => {
-        if (!d3wellcompletions.current) {
-            d3wellcompletions.current = new D3WellCompletions(
-                ref.current as HTMLDivElement
-            );
-        }
-    }, []);
+    const layout = useMemo(
+        () =>
+            width !== undefined && height !== undefined
+                ? getLayout(width, height, padding)
+                : undefined,
+        [width, height]
+    );
 
-    //Data changed
-    useEffect(() => {
-        if (d3wellcompletions.current) {
-            d3wellcompletions.current.setPlotData(plotData);
-        }
-    }, [plotData]);
-    //Resize
-    useEffect(() => {
-        if (
-            d3wellcompletions.current &&
-            width !== undefined &&
-            height !== undefined
-        ) {
-            d3wellcompletions.current.resize(width, height);
-        }
-    }, [width, height]);
-    // On unmount
-    useEffect(() => {
-        return () => d3wellcompletions.current?.clear();
-    }, []);
-
-    return <div className={classes.root} ref={ref} />;
+    return (
+        <div className={classes.root} ref={ref}>
+            {layout && (
+                <svg
+                    id={"svg-context"}
+                    width={width}
+                    height={height}
+                    style={{ position: "relative" }}
+                >
+                    <StratigraphyPlot
+                        data={plotData.stratigraphy}
+                        layout={layout}
+                        padding={padding}
+                    />
+                    <WellsPlot
+                        data={plotData.wells}
+                        layout={layout}
+                        padding={padding}
+                    />
+                    <CompletionsPlot
+                        data={plotData}
+                        layout={layout}
+                        padding={padding}
+                    />
+                </svg>
+            )}
+        </div>
+    );
 });
 
+WellCompletionsPlot.displayName = "WellCompletionsPlot";
 export default WellCompletionsPlot;

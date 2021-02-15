@@ -1,22 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Data, RangeMode, UISettings } from "./types";
+import { RangeMode, UISettings } from "./types";
 
 export const idSlice = createSlice({
     name: "id",
     initialState: "",
     reducers: {
-        updateId: (state, action: PayloadAction<string>) => action.payload,
-    },
-});
-export const dataModelSlice = createSlice({
-    name: "dataModel",
-    initialState: {
-        data: undefined as Data | undefined,
-    },
-    reducers: {
-        updateData: (state, action: PayloadAction<Data>) => {
-            state.data = action.payload;
-        },
+        updateId: (_, action: PayloadAction<string>) => action.payload,
     },
 });
 export const uiSlice = createSlice({
@@ -55,7 +44,6 @@ export const uiSlice = createSlice({
 });
 
 export const { updateId } = idSlice.actions;
-export const { updateData } = dataModelSlice.actions;
 export const {
     updateTimeIndexRange,
     updateRangeDisplayMode,

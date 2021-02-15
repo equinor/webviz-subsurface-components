@@ -1,9 +1,10 @@
 import { MultiSelect } from "@equinor/eds-core-react";
 import { createStyles, makeStyles } from "@material-ui/core";
-import React, { useCallback } from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateFilteredZones } from "../../redux/reducer";
 import { WellCompletionsState } from "../../redux/store";
+import { DataContext } from "../../WellCompletions";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -14,13 +15,15 @@ const useStyles = makeStyles(() =>
 );
 const ZoneSelector: React.FC = React.memo(() => {
     const classes = useStyles();
+    const data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
-    const stratigraphy = useSelector((st: WellCompletionsState) =>
-        st.dataModel.data?.stratigraphy.map(zone => zone.name)
-    );
     const filteredZones = useSelector(
         (st: WellCompletionsState) => st.ui.filteredZones
+    );
+    const stratigraphy = useMemo(
+        () => data.stratigraphy.map(zone => zone.name),
+        [data]
     );
     // handlers
     const handleSelectionChange = useCallback(
@@ -31,7 +34,7 @@ const ZoneSelector: React.FC = React.memo(() => {
         <MultiSelect
             className={classes.root}
             label="Select Zones"
-            initialSelectedItems={filteredZones}
+            selectedOptions={filteredZones}
             items={stratigraphy || []}
             handleSelectedItemsChange={handleSelectionChange}
         />

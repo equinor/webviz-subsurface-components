@@ -1,8 +1,7 @@
 import { createStyles, makeStyles } from "@material-ui/core";
-import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
+import React, { useContext, useMemo } from "react";
 import { usePlotData } from "../hooks/usePlotData";
-import { WellCompletionsState } from "../redux/store";
+import { DataContext } from "../WellCompletions";
 import WellCompletionsPlot from "./Plot/WellCompletionsPlot";
 import HideZeroCompletionsSwitch from "./Settings/HideZeroCompletionsSwitch";
 import RangeDisplayModeSelector from "./Settings/RangeDisplayModeSelector";
@@ -30,9 +29,7 @@ const useStyles = makeStyles(() =>
 
 const WellCompletionsViewer: React.FC = () => {
     const classes = useStyles();
-    const data = useSelector(
-        (state: WellCompletionsState) => state.dataModel.data
-    );
+    const data = useContext(DataContext);
     const plotData = usePlotData();
 
     const [minWidth, minHeight] = useMemo(

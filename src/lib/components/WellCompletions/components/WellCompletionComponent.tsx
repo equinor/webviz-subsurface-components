@@ -3,14 +3,14 @@ import { Provider as ReduxProvider } from "react-redux";
 import { REDUX_STORE } from "../redux/store";
 import DataLoader from "./DataLoader";
 import WellCompletionsViewer from "./WellCompletionsViewer";
-export interface ComponentProps {
+interface Props {
     id: string;
-    data: any;
 }
-const WellCompletionComponent: React.FC<ComponentProps> = React.memo(props => {
+
+const WellCompletionComponent: React.FC<Props> = React.memo(({ id }: Props) => {
     return (
         <ReduxProvider store={REDUX_STORE}>
-            <DataLoader props={props}>
+            <DataLoader id={id}>
                 <WellCompletionsViewer />
             </DataLoader>
         </ReduxProvider>

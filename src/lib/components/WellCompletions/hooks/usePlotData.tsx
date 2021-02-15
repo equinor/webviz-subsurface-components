@@ -1,14 +1,13 @@
 import { isEqual } from "lodash";
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { WellCompletionsState } from "../redux/store";
 import { getRegexPredicate } from "../utils/regex";
+import { DataContext } from "../WellCompletions";
 import { dataInTimeIndexRange } from "./dataUtil";
 export const usePlotData = () => {
     //Redux states
-    const data = useSelector(
-        (state: WellCompletionsState) => state.dataModel.data
-    );
+    const data = useContext(DataContext);
     const timeIndexRange = useSelector(
         (state: WellCompletionsState) => state.ui.timeIndexRange,
         isEqual
