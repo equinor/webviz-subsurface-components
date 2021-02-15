@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { PlotData } from "../../hooks/dataUtil";
+import { useTooltip } from "../Tooltip/TooltipProvider";
 import { Padding, PlotLayout } from "./plotUtil";
 
 interface Props {
@@ -7,9 +8,11 @@ interface Props {
     layout: PlotLayout;
     padding: Padding;
 }
+
 /* eslint-disable react/prop-types */
 const CompletionsPlot: React.FC<Props> = React.memo(
     ({ data, layout, padding }) => {
+        const { setContent } = useTooltip();
         const wellWidth = useMemo(
             () => layout.xExtent / Math.max(data.wells.length, 1),
             [layout.xExtent, data.wells.length]
@@ -33,9 +36,16 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                     j === well.zoneIndices.length - 1
                                         ? data.stratigraphy.length
                                         : well.zoneIndices[j + 1];
+                                const rangeText =
+                                    data.stratigraphy[start].name +
+                                    (start < end - 1
+                                        ? ` - ${
+                                              data.stratigraphy[end - 1].name
+                                          }`
+                                        : "");
                                 return (
                                     <rect
-                                        key={`well-${well.name}-completions-${j}`}
+                                        key={`well-${well.name}-completions-${start}-${end}`}
                                         transform={`translate(${-completion *
                                             wellWidth *
                                             0.25}, ${start * barHeight +
@@ -43,6 +53,27 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                         width={(completion * wellWidth) / 2}
                                         height={barHeight * (end - start)}
                                         fill={"#111"}
+                                        onMouseOver={() =>
+                                            setContent(() => (
+                                                <table>
+                                                    <tr>
+                                                        <td>Well name</td>
+                                                        <td>{well.name}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Stratigraphy</td>
+                                                        <td>{rangeText}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Completion</td>
+                                                        <td>{completion}</td>
+                                                    </tr>
+                                                </table>
+                                            ))
+                                        }
+                                        onMouseOut={() =>
+                                            setContent(() => null)
+                                        }
                                     />
                                 );
                             })}

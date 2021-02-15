@@ -2,6 +2,7 @@ import { createStyles, makeStyles } from "@material-ui/core";
 import React, { useMemo } from "react";
 import { useResizeDetector } from "react-resize-detector";
 import { PlotData } from "../../hooks/dataUtil";
+import { TooltipProvider } from "../Tooltip/TooltipProvider";
 import CompletionsPlot from "./CompletionsPlot";
 import { getLayout, Padding } from "./plotUtil";
 import StratigraphyPlot from "./StratigraphyPlot";
@@ -38,32 +39,34 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(({ plotData }) => {
     );
 
     return (
-        <div className={classes.root} ref={ref}>
-            {layout && (
-                <svg
-                    id={"svg-context"}
-                    width={width}
-                    height={height}
-                    style={{ position: "relative" }}
-                >
-                    <StratigraphyPlot
-                        data={plotData.stratigraphy}
-                        layout={layout}
-                        padding={padding}
-                    />
-                    <WellsPlot
-                        data={plotData.wells}
-                        layout={layout}
-                        padding={padding}
-                    />
-                    <CompletionsPlot
-                        data={plotData}
-                        layout={layout}
-                        padding={padding}
-                    />
-                </svg>
-            )}
-        </div>
+        <TooltipProvider>
+            <div className={classes.root} ref={ref}>
+                {layout && (
+                    <svg
+                        id={"svg-context"}
+                        width={width}
+                        height={height}
+                        style={{ position: "relative" }}
+                    >
+                        <StratigraphyPlot
+                            data={plotData.stratigraphy}
+                            layout={layout}
+                            padding={padding}
+                        />
+                        <WellsPlot
+                            data={plotData.wells}
+                            layout={layout}
+                            padding={padding}
+                        />
+                        <CompletionsPlot
+                            data={plotData}
+                            layout={layout}
+                            padding={padding}
+                        />
+                    </svg>
+                )}
+            </div>
+        </TooltipProvider>
     );
 });
 
