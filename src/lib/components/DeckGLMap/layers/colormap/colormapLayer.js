@@ -17,15 +17,24 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 
 const defaultProps = {
     colormap: { type: "object", value: null, async: true },
+    valueDecoder: {
+        type: "object",
+        value: {
+            rgbScaler: [1, 1, 1],
+            // Scale [0, 256*256*256-1] to [0, 1]
+            floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
+            offset: 0,
+        },
+    },
 };
 
 export default class ColormapLayer extends BitmapLayer {
-    draw({ uniforms }) {
-        const { gl } = this.context;
+    draw({ moduleParameters, uniforms, context }) {
+        super.setModuleParameters(moduleParameters);
         super.draw({
             uniforms: {
                 ...uniforms,
-                colormap: new Texture2D(gl, {
+                colormap: new Texture2D(context.gl, {
                     data: this.props.colormap,
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),

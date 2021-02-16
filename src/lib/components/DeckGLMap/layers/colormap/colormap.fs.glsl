@@ -14,7 +14,7 @@ uniform float opacity;
 void main(void) {
   vec4 bitmapColor = texture2D(bitmapTexture, vTexCoord);
 
-  float val = decoder_rgb2float_256x3(bitmapColor.rgb);
+  float val = decode_rgb2float(bitmapColor.rgb);
   vec4 color = texture2D(colormap, vec2(val, 0.5));
 
   gl_FragColor = vec4(color.rgb, color.a * bitmapColor.a * opacity);
