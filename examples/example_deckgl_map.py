@@ -64,11 +64,12 @@ if __name__ == "__main__":
 
     min_value = np.nanmin(map_data)
     max_value = np.nanmax(map_data)
+    value_range = max_value - min_value
 
     # Shift the values to start from 0 and scale them to cover
     # the whole RGB range for increased precision.
     # The client will need to reverse this operation.
-    scale_factor = (256*256*256 - 1) / (max_value - min_value)
+    scale_factor = (256*256*256 - 1) / value_range
     map_data = (map_data - min_value) * scale_factor
 
     map_data = array2d_to_png(map_data)
@@ -88,6 +89,14 @@ if __name__ == "__main__":
                     "bounds": [-50, 50, 50, -50],
                     "image": map_data,
                     "colormap": colormap
+                },
+                {
+                    "@@type": "Hillshading2DLayer",
+                    "id": "hillshading-layer",
+                    "bounds": [-50, 50, 50, -50],
+                    "opacity": 1.0,
+                    "valueRange": value_range,
+                    "image": map_data
                 }
             ],
             "views": [
