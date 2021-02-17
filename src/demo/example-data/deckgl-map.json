@@ -62,6 +62,11 @@
                     "valueRange": 731.0,
                     "opacity": 1.0,
                     "image": "https://i.imgur.com/Dx8eseE.png"
+                },
+                {
+                    "@@type": "WellsLayer",
+                    "id": "wells-layer",
+                    "data": "src/demo/example-data/emerald_wells.json"
                 }
             ],
             "views": [

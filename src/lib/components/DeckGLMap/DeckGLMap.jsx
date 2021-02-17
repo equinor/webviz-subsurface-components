@@ -19,7 +19,15 @@ function DeckGLMap(props) {
 
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
-            {jsonProps && <DeckGL id={props.id} {...jsonProps} />}
+            {jsonProps && (
+                <DeckGL
+                    id={props.id}
+                    {...jsonProps}
+                    getTooltip={({ object }) =>
+                        object && object.properties && object.properties.name
+                    }
+                />
+            )}
         </div>
     );
 }
