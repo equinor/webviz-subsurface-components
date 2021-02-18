@@ -17,19 +17,19 @@ uniform float diffuseLightIntensity;
 uniform float opacity;
 
 vec3 normal(float val) {
-    vec2 dr = 1.0 / bitmapResolution;
-    float p0 = valueRange * val;
-    float px = valueRange * decode_rgb2float(texture2D(bitmapTexture, vTexCoord + vec2(1.0, 0.0) / bitmapResolution).rgb);
-    float py = valueRange * decode_rgb2float(texture2D(bitmapTexture, vTexCoord + vec2(0.0, 1.0) / bitmapResolution).rgb);
-    vec3 dx = vec3(1.0, 0.0, px - p0);
-    vec3 dy = vec3(0.0, 1.0, py - p0);
+  vec2 dr = 1.0 / bitmapResolution;
+  float p0 = valueRange * val;
+  float px = valueRange * decode_rgb2float(texture2D(bitmapTexture, vTexCoord + vec2(1.0, 0.0) / bitmapResolution).rgb);
+  float py = valueRange * decode_rgb2float(texture2D(bitmapTexture, vTexCoord + vec2(0.0, 1.0) / bitmapResolution).rgb);
+  vec3 dx = vec3(1.0, 0.0, px - p0);
+  vec3 dy = vec3(0.0, 1.0, py - p0);
 
-    return normalize(cross(dx, dy));
+  return normalize(cross(dx, dy));
 }
 
 float shadow(vec3 normal) {
-    float diffuse = diffuseLightIntensity * dot(normal, normalize(lightDirection));
-    return clamp(ambientLightIntensity + diffuse, 0.0, 1.0);
+  float diffuse = diffuseLightIntensity * dot(normal, normalize(lightDirection));
+  return clamp(ambientLightIntensity + diffuse, 0.0, 1.0);
 }
 
 void main(void) {
