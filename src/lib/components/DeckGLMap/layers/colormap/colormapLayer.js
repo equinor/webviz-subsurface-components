@@ -1,12 +1,12 @@
 // DeckGL typescript declarations are not great, so for now it's just js.
 
 import { BitmapLayer } from "@deck.gl/layers";
-import { picking, project32, gouraudLighting } from "@deck.gl/core";
 
-import { Texture2D } from "@luma.gl/core";
 import GL from "@luma.gl/constants";
+import { Texture2D } from "@luma.gl/core";
 
-import { decoder, colormap } from "../../webgl";
+import { decoder } from "../shader_modules";
+import fsColormap from "./colormap.fs.glsl";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -17,15 +17,31 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 
 const defaultProps = {
     colormap: { type: "object", value: null, async: true },
+    valueDecoder: {
+        type: "object",
+        value: {
+            rgbScaler: [1, 1, 1],
+            // Scale [0, 256*256*256-1] to [0, 1]
+            floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
+            offset: 0,
+        },
+    },
 };
 
 export default class ColormapLayer extends BitmapLayer {
-    draw({ uniforms }) {
-        const { gl } = this.context;
+    draw({ moduleParameters, uniforms, context }) {
+        const mergedDecoder = {
+            ...defaultProps.valueDecoder.value,
+            ...moduleParameters.valueDecoder,
+        };
+        super.setModuleParameters({
+            ...moduleParameters,
+            valueDecoder: mergedDecoder,
+        });
         super.draw({
             uniforms: {
                 ...uniforms,
-                u_colormap: new Texture2D(gl, {
+                colormap: new Texture2D(context.gl, {
                     data: this.props.colormap,
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
@@ -34,17 +50,10 @@ export default class ColormapLayer extends BitmapLayer {
     }
 
     getShaders() {
-        return {
-            ...super.getShaders(),
-            inject: {
-                "fs:#decl": `uniform sampler2D u_colormap;`,
-                "fs:DECKGL_FILTER_COLOR": `
-                    float val = decoder_rgb2float(color.rgb, vec3(1.0, 1.0, 1.0), 0.0, 1.0 / (256.0*256.0*256.0 - 1.0));
-                    color = vec4(lin_colormap(u_colormap, val).rgb, color.a);
-                `,
-            },
-            modules: [picking, project32, gouraudLighting, decoder, colormap],
-        };
+        let parentShaders = super.getShaders();
+        parentShaders.fs = fsColormap;
+        parentShaders.modules.push(decoder);
+        return parentShaders;
     }
 }
 

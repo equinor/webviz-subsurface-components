@@ -54,6 +54,14 @@
                     "bounds": [-50, 50, 50, -50],
                     "image": "https://i.imgur.com/Dx8eseE.png",
                     "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
+                },
+                {
+                    "@@type": "Hillshading2DLayer",
+                    "id": "hillshading-layer",
+                    "bounds": [-50, 50, 50, -50],
+                    "valueRange": 731.0,
+                    "opacity": 1.0,
+                    "image": "https://i.imgur.com/Dx8eseE.png"
                 }
             ],
             "views": [
@@ -75,7 +83,8 @@
                     "width": "20%",
                     "height": "25%",
                     "clear": {
-                        "color": [0.9, 0.9, 0.9, 1]
+                        "color": [0.9, 0.9, 0.9, 1],
+                        "depth": true
                     },
                     "viewState": {
                         "id": "main",
