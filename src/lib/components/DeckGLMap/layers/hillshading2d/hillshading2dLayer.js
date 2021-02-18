@@ -25,7 +25,16 @@ const defaultProps = {
 export default class Hillshading2DLayer extends BitmapLayer {
     draw({ moduleParameters, uniforms }) {
         if (this.state.bitmapTexture) {
-            super.setModuleParameters(moduleParameters);
+            // The prop objects are not merged with the defaultProps by default.
+            // See https://github.com/facebook/react/issues/2568
+            const mergedDecoder = {
+                ...defaultProps.valueDecoder.value,
+                ...moduleParameters.valueDecoder,
+            };
+            super.setModuleParameters({
+                ...moduleParameters,
+                valueDecoder: mergedDecoder,
+            });
             super.draw({
                 uniforms: {
                     ...uniforms,

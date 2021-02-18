@@ -30,7 +30,14 @@ const defaultProps = {
 
 export default class ColormapLayer extends BitmapLayer {
     draw({ moduleParameters, uniforms, context }) {
-        super.setModuleParameters(moduleParameters);
+        const mergedDecoder = {
+            ...defaultProps.valueDecoder.value,
+            ...moduleParameters.valueDecoder,
+        };
+        super.setModuleParameters({
+            ...moduleParameters,
+            valueDecoder: mergedDecoder,
+        });
         super.draw({
             uniforms: {
                 ...uniforms,
