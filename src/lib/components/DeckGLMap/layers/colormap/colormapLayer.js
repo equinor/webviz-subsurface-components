@@ -24,6 +24,7 @@ const defaultProps = {
             // Scale [0, 256*256*256-1] to [0, 1]
             floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
             offset: 0,
+            step: 0,
         },
     },
 };
