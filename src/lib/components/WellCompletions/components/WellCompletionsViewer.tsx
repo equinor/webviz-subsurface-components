@@ -1,4 +1,3 @@
-import { TopBar } from "@equinor/eds-core-react";
 import { createStyles, makeStyles } from "@material-ui/core";
 import React, { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -6,12 +5,8 @@ import { usePlotData } from "../hooks/usePlotData";
 import { WellCompletionsState } from "../redux/store";
 import { DataContext } from "../WellCompletions";
 import WellCompletionsPlot from "./Plot/WellCompletionsPlot";
-import HideZeroCompletionsSwitch from "./Settings/HideZeroCompletionsSwitch";
-import RangeDisplayModeSelector from "./Settings/RangeDisplayModeSelector";
-import TimeRangeSelector from "./Settings/TimeRangeSelector";
-import WellFilter from "./Settings/WellFilter";
+import SettingsBar from "./Settings/SettingsBar";
 import WellPagination from "./Settings/WellPagination";
-import ZoneSelector from "./Settings/ZoneSelector";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -21,14 +16,6 @@ const useStyles = makeStyles(() =>
             flex: 1,
             flexDirection: "column",
             height: "90%",
-        },
-        topBar: {
-            minHeight: "90px",
-        },
-        actions: {
-            position: "relative",
-            display: "flex",
-            flexDirection: "row",
         },
     })
 );
@@ -70,17 +57,7 @@ const WellCompletionsViewer: React.FC = () => {
                 minHeight: `${minHeight}px`,
             }}
         >
-            <TopBar className={classes.topBar}>
-                <TopBar.Header className={classes.actions}>
-                    <TimeRangeSelector />
-                    <RangeDisplayModeSelector />
-                </TopBar.Header>
-                <TopBar.Actions className={classes.actions}>
-                    <HideZeroCompletionsSwitch />
-                    <ZoneSelector />
-                    <WellFilter />
-                </TopBar.Actions>
-            </TopBar>
+            <SettingsBar />
             <WellPagination />
             <WellCompletionsPlot plotData={dataInCurrentPage} />
         </div>

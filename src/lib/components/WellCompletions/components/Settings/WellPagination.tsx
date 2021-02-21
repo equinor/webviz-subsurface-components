@@ -1,13 +1,12 @@
-import { NativeSelect, Typography } from "@equinor/eds-core-react";
+import { Typography } from "@equinor/eds-core-react";
 import { createStyles, makeStyles } from "@material-ui/core";
 import { Pagination } from "@material-ui/lab";
 import { clamp } from "lodash";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { usePlotData } from "../../hooks/usePlotData";
-import { updateCurrentPage, updateWellsPerPage } from "../../redux/reducer";
+import { updateCurrentPage } from "../../redux/reducer";
 import { WellCompletionsState } from "../../redux/store";
-const wellsPerPageOptions = [25, 50];
 const useStyles = makeStyles(() =>
     createStyles({
         root: {
@@ -58,10 +57,6 @@ const WellPagination: React.FC = React.memo(() => {
         [currentClampedPage, wellsPerPage, wellsCount]
     );
     // handlers
-    const onWellsPerPageChange = useCallback(
-        event => dispatch(updateWellsPerPage(event.target.value)),
-        [dispatch]
-    );
     const onCurrentPageChange = useCallback(
         (...arg) => dispatch(updateCurrentPage(arg[1])),
         [dispatch]
@@ -77,19 +72,6 @@ const WellPagination: React.FC = React.memo(() => {
                 <Typography
                     style={{ alignSelf: "center", minWidth: "125px" }}
                 >{`${startItem} - ${endItem} of ${wellsCount} items`}</Typography>
-                <NativeSelect
-                    label={""}
-                    id="wells-per-page-select"
-                    style={{ marginLeft: "20px", maxWidth: "210px" }}
-                    onChange={onWellsPerPageChange}
-                >
-                    {wellsPerPageOptions.map(value => (
-                        <option
-                            key={`option-${value}`}
-                            value={value}
-                        >{`Show ${value} wells per page`}</option>
-                    ))}
-                </NativeSelect>
             </div>
             <Pagination
                 className={classes.right}

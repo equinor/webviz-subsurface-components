@@ -1,14 +1,14 @@
 import { Search } from "@equinor/eds-core-react";
-import { createStyles, makeStyles } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import { throttle } from "lodash";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { updateWellSearchText } from "../../redux/reducer";
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            margin: "15px",
+            padding: theme.spacing(1),
             maxWidth: "210px",
         },
     })
