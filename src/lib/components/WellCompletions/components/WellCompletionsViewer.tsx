@@ -1,12 +1,16 @@
+import { TopBar } from "@equinor/eds-core-react";
 import { createStyles, makeStyles } from "@material-ui/core";
 import React, { useContext, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { usePlotData } from "../hooks/usePlotData";
+import { WellCompletionsState } from "../redux/store";
 import { DataContext } from "../WellCompletions";
 import WellCompletionsPlot from "./Plot/WellCompletionsPlot";
 import HideZeroCompletionsSwitch from "./Settings/HideZeroCompletionsSwitch";
 import RangeDisplayModeSelector from "./Settings/RangeDisplayModeSelector";
 import TimeRangeSelector from "./Settings/TimeRangeSelector";
 import WellFilter from "./Settings/WellFilter";
+import WellPagination from "./Settings/WellPagination";
 import ZoneSelector from "./Settings/ZoneSelector";
 
 const useStyles = makeStyles(() =>
@@ -18,11 +22,13 @@ const useStyles = makeStyles(() =>
             flexDirection: "column",
             height: "90%",
         },
+        topBar: {
+            minHeight: "90px",
+        },
         actions: {
             position: "relative",
             display: "flex",
             flexDirection: "row",
-            margin: "2rem",
         },
     })
 );
@@ -32,9 +38,27 @@ const WellCompletionsViewer: React.FC = () => {
     const data = useContext(DataContext);
     const plotData = usePlotData();
 
+    const wellsPerPage = useSelector(
+        (state: WellCompletionsState) => state.ui.wellsPerPage
+    );
+    const currentPage = useSelector(
+        (state: WellCompletionsState) => state.ui.currentPage
+    );
+    const dataInCurrentPage = useMemo(() => {
+        return {
+            ...plotData,
+            wells: plotData.wells.slice(
+                (currentPage - 1) * wellsPerPage,
+                currentPage * wellsPerPage - 1
+            ),
+        };
+    }, [plotData, currentPage, wellsPerPage]);
     const [minWidth, minHeight] = useMemo(
-        () => [plotData.wells.length * 20, plotData.stratigraphy.length * 20],
-        [plotData]
+        () => [
+            dataInCurrentPage.wells.length * 20,
+            dataInCurrentPage.stratigraphy.length * 20,
+        ],
+        [dataInCurrentPage]
     );
     //If no data is available
     if (!data) return <div />;
@@ -46,14 +70,19 @@ const WellCompletionsViewer: React.FC = () => {
                 minHeight: `${minHeight}px`,
             }}
         >
-            <div className={classes.actions}>
-                <TimeRangeSelector />
-                <RangeDisplayModeSelector />
-                <HideZeroCompletionsSwitch />
-                <ZoneSelector />
-                <WellFilter />
-            </div>
-            <WellCompletionsPlot plotData={plotData} />
+            <TopBar className={classes.topBar}>
+                <TopBar.Header className={classes.actions}>
+                    <TimeRangeSelector />
+                    <RangeDisplayModeSelector />
+                </TopBar.Header>
+                <TopBar.Actions className={classes.actions}>
+                    <HideZeroCompletionsSwitch />
+                    <ZoneSelector />
+                    <WellFilter />
+                </TopBar.Actions>
+            </TopBar>
+            <WellPagination />
+            <WellCompletionsPlot plotData={dataInCurrentPage} />
         </div>
     );
 };

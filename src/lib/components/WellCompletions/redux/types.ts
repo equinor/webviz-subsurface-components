@@ -29,7 +29,8 @@ export type RangeMode = keyof typeof RangeModes;
 
 export interface UISettings {
     timeIndexRange: [number, number];
-    animating: boolean;
+    wellsPerPage: number;
+    currentPage: number;
     rangeDisplayMode: RangeMode;
     filteredZones: string[];
     wellSearchText: string;

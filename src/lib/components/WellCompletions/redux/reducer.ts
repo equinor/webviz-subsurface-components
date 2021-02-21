@@ -12,7 +12,8 @@ export const uiSlice = createSlice({
     name: "ui",
     initialState: {
         timeIndexRange: [0, 0],
-        animating: false,
+        wellsPerPage: 25,
+        currentPage: 1,
         rangeDisplayMode: "First Step",
         wellSearchText: "",
         filteredZones: [],
@@ -25,8 +26,11 @@ export const uiSlice = createSlice({
         ) => {
             state.timeIndexRange = action.payload;
         },
-        updateAnimating: (state, action: PayloadAction<boolean>) => {
-            state.animating = action.payload;
+        updateWellsPerPage: (state, action: PayloadAction<number>) => {
+            state.wellsPerPage = action.payload;
+        },
+        updateCurrentPage: (state, action: PayloadAction<number>) => {
+            state.currentPage = action.payload;
         },
         updateRangeDisplayMode: (state, action: PayloadAction<RangeMode>) => {
             state.rangeDisplayMode = action.payload;
@@ -47,7 +51,8 @@ export const { updateId } = idSlice.actions;
 export const {
     updateTimeIndexRange,
     updateRangeDisplayMode,
-    updateAnimating,
+    updateWellsPerPage,
+    updateCurrentPage,
     updateWellSearchText,
     updateFilteredZones,
     updateHideZeroCompletions,

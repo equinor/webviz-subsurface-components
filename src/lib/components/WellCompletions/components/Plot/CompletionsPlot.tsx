@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { PlotData } from "../../hooks/dataUtil";
 import { useTooltip } from "../Tooltip/TooltipProvider";
 import { Padding, PlotLayout } from "./plotUtil";
@@ -21,6 +21,38 @@ const CompletionsPlot: React.FC<Props> = React.memo(
             () => layout.yExtent / Math.max(data.stratigraphy.length, 1),
             [layout.yExtent, data.stratigraphy.length]
         );
+
+        const onMouseMove = useCallback(
+            (e, well, completion) => {
+                const zoneName =
+                    data.stratigraphy[
+                        Math.floor(
+                            (e.nativeEvent.offsetY - padding.top) / barHeight
+                        )
+                    ].name;
+                setContent(() => (
+                    <table>
+                        <tr>
+                            <td>Well name</td>
+                            <td>{well.name}</td>
+                        </tr>
+                        <tr>
+                            <td>Stratigraphy</td>
+                            <td>{zoneName}</td>
+                        </tr>
+                        <tr>
+                            <td>Completion</td>
+                            <td>{completion}</td>
+                        </tr>
+                    </table>
+                ));
+            },
+            [setContent, data.stratigraphy]
+        );
+
+        const onMouseOut = useCallback(() => setContent(() => null), [
+            setContent,
+        ]);
         return (
             <g>
                 {data.wells.map((well, i) => {
@@ -36,13 +68,6 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                     j === well.zoneIndices.length - 1
                                         ? data.stratigraphy.length
                                         : well.zoneIndices[j + 1];
-                                const rangeText =
-                                    data.stratigraphy[start].name +
-                                    (start < end - 1
-                                        ? ` - ${
-                                              data.stratigraphy[end - 1].name
-                                          }`
-                                        : "");
                                 return (
                                     <rect
                                         key={`well-${well.name}-completions-${start}-${end}`}
@@ -53,27 +78,10 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                         width={(completion * wellWidth) / 2}
                                         height={barHeight * (end - start)}
                                         fill={"#111"}
-                                        onMouseOver={() =>
-                                            setContent(() => (
-                                                <table>
-                                                    <tr>
-                                                        <td>Well name</td>
-                                                        <td>{well.name}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Stratigraphy</td>
-                                                        <td>{rangeText}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Completion</td>
-                                                        <td>{completion}</td>
-                                                    </tr>
-                                                </table>
-                                            ))
+                                        onMouseMove={e =>
+                                            onMouseMove(e, well, completion)
                                         }
-                                        onMouseOut={() =>
-                                            setContent(() => null)
-                                        }
+                                        onMouseOut={onMouseOut}
                                     />
                                 );
                             })}

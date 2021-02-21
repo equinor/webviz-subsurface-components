@@ -5,6 +5,10 @@ import { WellCompletionsState } from "../redux/store";
 import { getRegexPredicate } from "../utils/regex";
 import { DataContext } from "../WellCompletions";
 import { dataInTimeIndexRange } from "./dataUtil";
+
+export const useFilteredWells = () => {
+    const data = useContext(DataContext);
+};
 export const usePlotData = () => {
     //Redux states
     const data = useContext(DataContext);
@@ -25,6 +29,13 @@ export const usePlotData = () => {
         (state: WellCompletionsState) => state.ui.wellSearchText
     );
     //Memo
+    const wellNameRegex = useMemo(() => getRegexPredicate(wellSearchText), [
+        wellSearchText,
+    ]);
+    const filteredWells = useMemo(
+        () => (data ? data.wells.filter(well => wellNameRegex(well.name)) : []),
+        [data, wellNameRegex]
+    );
     const filteredStratigraphy = useMemo(
         () =>
             data
@@ -35,14 +46,6 @@ export const usePlotData = () => {
                 : [],
         [data, filteredZones]
     );
-    const wellNameRegex = useMemo(() => getRegexPredicate(wellSearchText), [
-        wellSearchText,
-    ]);
-    const filteredWells = useMemo(
-        () => (data ? data.wells.filter(well => wellNameRegex(well.name)) : []),
-        [data, wellNameRegex]
-    );
-
     return useMemo(
         () =>
             dataInTimeIndexRange(

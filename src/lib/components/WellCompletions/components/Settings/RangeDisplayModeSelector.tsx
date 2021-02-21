@@ -9,6 +9,7 @@ import { RangeModes } from "../../redux/types";
 const useStyles = makeStyles(() =>
     createStyles({
         root: {
+            minWidth: "120px",
             maxWidth: "120px",
         },
     })

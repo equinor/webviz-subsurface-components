@@ -1,0 +1,107 @@
+import { NativeSelect, Typography } from "@equinor/eds-core-react";
+import { createStyles, makeStyles } from "@material-ui/core";
+import { Pagination } from "@material-ui/lab";
+import { clamp } from "lodash";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { usePlotData } from "../../hooks/usePlotData";
+import { updateCurrentPage, updateWellsPerPage } from "../../redux/reducer";
+import { WellCompletionsState } from "../../redux/store";
+const wellsPerPageOptions = [25, 50];
+const useStyles = makeStyles(() =>
+    createStyles({
+        root: {
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+        },
+        left: {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-start",
+            padding: "5px",
+        },
+        right: {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-end",
+        },
+    })
+);
+const WellPagination: React.FC = React.memo(() => {
+    const classes = useStyles();
+    // Redux
+    const dispatch = useDispatch();
+    const plotData = usePlotData();
+    const currentPage = useSelector(
+        (st: WellCompletionsState) => st.ui.currentPage
+    );
+    const wellsPerPage = useSelector(
+        (st: WellCompletionsState) => st.ui.wellsPerPage
+    );
+    const wellsCount = useMemo(() => plotData.wells.length, [plotData]);
+    const pageCount = useMemo(
+        () => Math.ceil(plotData.wells.length / wellsPerPage),
+        [plotData, wellsPerPage]
+    );
+    const currentClampedPage = useMemo(() => clamp(currentPage, 1, pageCount), [
+        currentPage,
+        pageCount,
+    ]);
+    const startItem = useMemo(
+        () => (currentClampedPage - 1) * wellsPerPage + 1,
+        [currentClampedPage, wellsPerPage]
+    );
+
+    const endItem = useMemo(
+        () => Math.min(wellsCount, currentClampedPage * wellsPerPage),
+        [currentClampedPage, wellsPerPage, wellsCount]
+    );
+    // handlers
+    const onWellsPerPageChange = useCallback(
+        event => dispatch(updateWellsPerPage(event.target.value)),
+        [dispatch]
+    );
+    const onCurrentPageChange = useCallback(
+        (...arg) => dispatch(updateCurrentPage(arg[1])),
+        [dispatch]
+    );
+    //effects
+    useEffect(() => {
+        dispatch(updateCurrentPage(currentClampedPage));
+    }, [currentClampedPage]);
+
+    return (
+        <div className={classes.root}>
+            <div className={classes.left}>
+                <Typography
+                    style={{ alignSelf: "center", minWidth: "125px" }}
+                >{`${startItem} - ${endItem} of ${wellsCount} items`}</Typography>
+                <NativeSelect
+                    label={""}
+                    id="wells-per-page-select"
+                    style={{ marginLeft: "20px", maxWidth: "210px" }}
+                    onChange={onWellsPerPageChange}
+                >
+                    {wellsPerPageOptions.map(value => (
+                        <option
+                            key={`option-${value}`}
+                            value={value}
+                        >{`Show ${value} wells per page`}</option>
+                    ))}
+                </NativeSelect>
+            </div>
+            <Pagination
+                className={classes.right}
+                defaultPage={1}
+                page={currentClampedPage}
+                count={pageCount}
+                size="medium"
+                onChange={onCurrentPageChange}
+            />
+        </div>
+    );
+});
+
+WellPagination.displayName = "WellPagination";
+export default WellPagination;

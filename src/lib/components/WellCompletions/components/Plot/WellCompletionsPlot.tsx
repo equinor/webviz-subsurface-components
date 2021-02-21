@@ -1,4 +1,4 @@
-import { createStyles, makeStyles } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import React, { useMemo } from "react";
 import { useResizeDetector } from "react-resize-detector";
 import { PlotData } from "../../hooks/dataUtil";
@@ -8,12 +8,13 @@ import { getLayout, Padding } from "./plotUtil";
 import StratigraphyPlot from "./StratigraphyPlot";
 import WellsPlot from "./WellsPlot";
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             display: "flex",
             flex: 1,
             height: "80%",
+            padding: theme.spacing(1),
         },
     })
 );
@@ -70,5 +71,4 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(({ plotData }) => {
     );
 });
 
-WellCompletionsPlot.displayName = "WellCompletionsPlot";
 export default WellCompletionsPlot;
