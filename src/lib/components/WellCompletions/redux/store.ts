@@ -1,9 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { idSlice, uiSlice } from "./reducer";
+import { attributeSlice, idSlice, uiSlice } from "./reducer";
 
 export const REDUX_STORE = configureStore({
     reducer: {
         id: idSlice.reducer,
+        attributes: attributeSlice.reducer,
         ui: uiSlice.reducer,
     },
 });

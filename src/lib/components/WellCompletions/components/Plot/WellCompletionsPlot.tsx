@@ -2,7 +2,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import React, { useMemo } from "react";
 import { useResizeDetector } from "react-resize-detector";
 import { PlotData } from "../../hooks/dataUtil";
-import { TooltipProvider } from "../Tooltip/TooltipProvider";
+import { TooltipProvider } from "../Utils/TooltipProvider";
 import CompletionsPlot from "./CompletionsPlot";
 import { getLayout, Padding } from "./plotUtil";
 import StratigraphyPlot from "./StratigraphyPlot";
@@ -22,7 +22,7 @@ interface Props {
     plotData: PlotData;
 }
 
-const padding: Padding = { left: 50, right: 50, top: 50, bottom: 50 };
+const padding: Padding = { left: 50, right: 50, top: 70, bottom: 50 };
 /* eslint-disable react/prop-types */
 const WellCompletionsPlot: React.FC<Props> = React.memo(({ plotData }) => {
     const classes = useStyles();

@@ -2,6 +2,7 @@ import { TopBar } from "@equinor/eds-core-react";
 import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
 import FilterMenu from "./FilterMenu";
+import SortMenu from "./SortMenu";
 import TimeRangeSelector from "./TimeRangeSelector";
 import ViewMenu from "./ViewMenu";
 
@@ -27,6 +28,7 @@ const SettingsBar: React.FC = React.memo(() => {
             <TopBar.Actions className={classes.actions}>
                 <ViewMenu />
                 <FilterMenu />
+                <SortMenu />
             </TopBar.Actions>
         </TopBar>
     );

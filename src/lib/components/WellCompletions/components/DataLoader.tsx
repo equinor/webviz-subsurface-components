@@ -2,14 +2,18 @@ import React, {
     Fragment,
     PropsWithChildren,
     useContext,
-    useEffect,
+    // eslint-disable-next-line prettier/prettier
+    useEffect
 } from "react";
 import { useDispatch } from "react-redux";
 import {
+    updateAttributeKeys,
     updateFilteredZones,
     updateId,
-    updateTimeIndexRange,
+    // eslint-disable-next-line prettier/prettier
+    updateTimeIndexRange
 } from "../redux/reducer";
+import { SORT_BY_NAME } from "../redux/types";
 import { DataContext } from "../WellCompletions";
 
 interface Props {
@@ -26,6 +30,13 @@ const DataLoader: React.FC<Props> = ({
 
     useEffect(() => {
         dispatch(updateId(id));
+        //Setup attributes
+        const attributeKeys = new Set<string>();
+        attributeKeys.add(SORT_BY_NAME);
+        data.wells.forEach(well =>
+            Object.keys(well.attributes).forEach(key => attributeKeys.add(key))
+        );
+        dispatch(updateAttributeKeys(Array.from(attributeKeys)));
         //Setup initial ui settings
         dispatch(
             updateTimeIndexRange(

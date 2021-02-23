@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { PlotData } from "../../hooks/dataUtil";
-import { useTooltip } from "../Tooltip/TooltipProvider";
+import { useTooltip } from "../Utils/TooltipProvider";
 import { Padding, PlotLayout } from "./plotUtil";
 
 interface Props {
@@ -32,18 +32,20 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                     ].name;
                 setContent(() => (
                     <table>
-                        <tr>
-                            <td>Well name</td>
-                            <td>{well.name}</td>
-                        </tr>
-                        <tr>
-                            <td>Stratigraphy</td>
-                            <td>{zoneName}</td>
-                        </tr>
-                        <tr>
-                            <td>Completion</td>
-                            <td>{completion}</td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td>Well name</td>
+                                <td>{well.name}</td>
+                            </tr>
+                            <tr>
+                                <td>Stratigraphy</td>
+                                <td>{zoneName}</td>
+                            </tr>
+                            <tr>
+                                <td>Completion</td>
+                                <td>{completion}</td>
+                            </tr>
+                        </tbody>
                     </table>
                 ));
             },

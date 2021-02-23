@@ -10,8 +10,7 @@ export interface Zone {
 export interface Well {
     name: string;
     completions: Record<string, Completions>;
-    type: string;
-    region: string;
+    attributes: Record<string, any>;
 }
 
 export interface Completions {
@@ -27,6 +26,11 @@ export const RangeModes = {
 };
 export type RangeMode = keyof typeof RangeModes;
 
+export type SortDirection = "Ascending" | "Descending";
+export const SORT_BY_NAME = "well name";
+export interface Attributes {
+    attributeKeys: string[];
+}
 export interface UISettings {
     timeIndexRange: [number, number];
     wellsPerPage: number;
@@ -35,4 +39,5 @@ export interface UISettings {
     filteredZones: string[];
     wellSearchText: string;
     hideZeroCompletions: boolean;
+    sortBy: Record<string, SortDirection>;
 }

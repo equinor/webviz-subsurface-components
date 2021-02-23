@@ -55,6 +55,7 @@ export const dataInTimeIndexRange = (
                 name: well.name,
                 completions: wellCompletions,
                 zoneIndices,
+                attributes: well.attributes,
             });
     });
     return {
@@ -69,6 +70,7 @@ export interface PlotData {
 }
 export interface WellPlotData {
     name: string;
+    attributes: Record<string, any>;
     completions: number[];
     zoneIndices: number[];
 }

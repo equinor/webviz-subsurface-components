@@ -1,11 +1,22 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RangeMode, UISettings } from "./types";
+import { Attributes, RangeMode, SortDirection, UISettings } from "./types";
 
 export const idSlice = createSlice({
     name: "id",
     initialState: "",
     reducers: {
         updateId: (_, action: PayloadAction<string>) => action.payload,
+    },
+});
+export const attributeSlice = createSlice({
+    name: "id",
+    initialState: {
+        attributeKeys: [],
+    } as Attributes,
+    reducers: {
+        updateAttributeKeys: (state, action: PayloadAction<string[]>) => {
+            state.attributeKeys = action.payload;
+        },
     },
 });
 export const uiSlice = createSlice({
@@ -18,6 +29,7 @@ export const uiSlice = createSlice({
         wellSearchText: "",
         filteredZones: [],
         hideZeroCompletions: false,
+        sortBy: {},
     } as UISettings,
     reducers: {
         updateTimeIndexRange: (
@@ -44,10 +56,36 @@ export const uiSlice = createSlice({
         updateHideZeroCompletions: (state, action: PayloadAction<boolean>) => {
             state.hideZeroCompletions = action.payload;
         },
+        updateSortKey: (
+            state,
+            action: PayloadAction<{
+                sortKey: string;
+                sortDirection: SortDirection;
+            }>
+        ) => {
+            const newSortBy = {
+                ...state.sortBy,
+                [action.payload.sortKey]: action.payload.sortDirection,
+            };
+            state.sortBy = newSortBy;
+        },
+        deleteSortKey: (state, action: PayloadAction<string>) => {
+            const newSortBy = Object.keys(state.sortBy).reduce(
+                (acc, current) => {
+                    if (current !== action.payload) {
+                        acc[current] = state.sortBy[current];
+                    }
+                    return acc;
+                },
+                {}
+            );
+            state.sortBy = newSortBy;
+        },
     },
 });
 
 export const { updateId } = idSlice.actions;
+export const { updateAttributeKeys } = attributeSlice.actions;
 export const {
     updateTimeIndexRange,
     updateRangeDisplayMode,
@@ -56,4 +94,6 @@ export const {
     updateWellSearchText,
     updateFilteredZones,
     updateHideZeroCompletions,
+    updateSortKey,
+    deleteSortKey,
 } = uiSlice.actions;
