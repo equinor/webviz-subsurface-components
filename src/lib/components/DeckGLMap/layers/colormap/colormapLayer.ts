@@ -1,6 +1,6 @@
 // DeckGL typescript declarations are not great, so for now it's just js.
 
-import { BitmapLayer } from "@deck.gl/layers";
+import { BitmapLayer, BitmapLayerProps } from "@deck.gl/layers";
 
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
@@ -14,6 +14,18 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
+
+export interface ValueDecoder {
+    rgbScaler: [number, number, number];
+    floatScaler: number;
+    offset: number;
+    step: number;
+}
+
+export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
+    colormap: unknown;
+    valueDecoder: ValueDecoder;
+}
 
 const defaultProps = {
     colormap: { type: "object", value: null, async: true },
@@ -29,9 +41,14 @@ const defaultProps = {
     },
 };
 
-export default class ColormapLayer extends BitmapLayer {
-    draw({ moduleParameters, uniforms, context }) {
-        const mergedDecoder = {
+export default class ColormapLayer extends BitmapLayer<
+    unknown,
+    ColormapLayerProps<unknown>
+> {
+    // Signature from the base class, eslint doesn't like the any type.
+    // eslint-disable-next-line
+    draw({ moduleParameters, uniforms, context }: any): void {
+        const mergedDecoder: ValueDecoder = {
             ...defaultProps.valueDecoder.value,
             ...moduleParameters.valueDecoder,
         };
@@ -50,8 +67,10 @@ export default class ColormapLayer extends BitmapLayer {
         });
     }
 
-    getShaders() {
-        let parentShaders = super.getShaders();
+    // Signature from the base class, eslint doesn't like the any type.
+    // eslint-disable-next-line
+    getShaders(): any {
+        const parentShaders = super.getShaders();
         parentShaders.fs = fsColormap;
         parentShaders.modules.push(decoder);
         return parentShaders;
