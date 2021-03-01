@@ -1,6 +1,6 @@
 interface ValueDecoder {
     rgbScaler: [number, number, number];
     floatScaler: number;
-    offsets: number;
+    offset: number;
     step: number;
 }
