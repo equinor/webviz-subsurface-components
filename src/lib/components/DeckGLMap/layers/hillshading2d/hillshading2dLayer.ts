@@ -1,6 +1,6 @@
 // DeckGL typescript declarations are not great, so for now it's just js.
 
-import { BitmapLayer } from "@deck.gl/layers";
+import { BitmapLayer, BitmapLayerProps } from "@deck.gl/layers";
 
 import { decoder } from "../shader_modules";
 import fsHillshading from "./hillshading2d.fs.glsl";
@@ -23,12 +23,26 @@ const defaultProps = {
     },
 };
 
-export default class Hillshading2DLayer extends BitmapLayer {
-    draw({ moduleParameters, uniforms }) {
+export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
+    valueRange: number;
+    lightDirection: [number, number, number];
+    ambientLightIntensity: number;
+    diffuseLightIntensity: number;
+    opacity: number;
+    valueDecoder: ValueDecoder;
+}
+
+export default class Hillshading2DLayer extends BitmapLayer<
+    unknown,
+    Hillshading2DProps<unknown>
+> {
+    // Signature from the base class, eslint doesn't like the any type.
+    // eslint-disable-next-line
+    draw({ moduleParameters, uniforms }: any): void {
         if (this.state.bitmapTexture) {
             // The prop objects are not merged with the defaultProps by default.
             // See https://github.com/facebook/react/issues/2568
-            const mergedDecoder = {
+            const mergedDecoder: ValueDecoder = {
                 ...defaultProps.valueDecoder.value,
                 ...moduleParameters.valueDecoder,
             };
@@ -53,8 +67,10 @@ export default class Hillshading2DLayer extends BitmapLayer {
         }
     }
 
-    getShaders() {
-        let parentShaders = super.getShaders();
+    // Signature from the base class, eslint doesn't like the any type.
+    // eslint-disable-next-line
+    getShaders(): any {
+        const parentShaders = super.getShaders();
         parentShaders.fs = fsHillshading;
         parentShaders.modules.push(decoder);
         return parentShaders;

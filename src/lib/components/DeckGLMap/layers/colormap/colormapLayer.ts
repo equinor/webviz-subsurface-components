@@ -15,13 +15,6 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
-export interface ValueDecoder {
-    rgbScaler: [number, number, number];
-    floatScaler: number;
-    offset: number;
-    step: number;
-}
-
 export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
     colormap: unknown;
     valueDecoder: ValueDecoder;
