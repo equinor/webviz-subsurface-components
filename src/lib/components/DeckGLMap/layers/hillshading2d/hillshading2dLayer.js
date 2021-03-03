@@ -25,7 +25,7 @@ const defaultProps = {
 
 export default class Hillshading2DLayer extends BitmapLayer {
     draw({ moduleParameters, uniforms }) {
-        if (this.state.bitmapTexture) {
+        if (this.props.image) {
             // The prop objects are not merged with the defaultProps by default.
             // See https://github.com/facebook/react/issues/2568
             const mergedDecoder = {
@@ -40,8 +40,8 @@ export default class Hillshading2DLayer extends BitmapLayer {
                 uniforms: {
                     ...uniforms,
                     bitmapResolution: [
-                        this.state.bitmapTexture.width,
-                        this.state.bitmapTexture.height,
+                        this.props.image.width,
+                        this.props.image.height,
                     ],
                     valueRange: this.props.valueRange,
                     lightDirection: this.props.lightDirection,
