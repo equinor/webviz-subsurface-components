@@ -38,7 +38,7 @@
         "@types/react-redux": "^7.1.15",
         "@types/react-resize-detector": "^5.0.0",
         "d3": "^5.11.0",
-        "deck.gl": "^8.3.12",
+        "deck.gl": "^8.4.9",
         "leaflet": "^1.6.0",
         "leaflet-draw": "^1.0.4",
         "ramda": "^0.27.1",
