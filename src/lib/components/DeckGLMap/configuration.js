@@ -12,6 +12,7 @@ import * as AggregationLayers from "@deck.gl/aggregation-layers";
 import * as GeoLayers from "@deck.gl/geo-layers";
 import * as Layers from "@deck.gl/layers";
 import * as MeshLayers from "@deck.gl/mesh-layers";
+import { EditableGeoJsonLayer} from 'nebula.gl';
 
 import { registerLoaders } from "@loaders.gl/core";
 import GL from "@luma.gl/constants";
@@ -31,7 +32,7 @@ export default {
         AggregationLayers,
         GeoLayers,
         MeshLayers,
-        CustomLayers,
+        CustomLayers, 
         // Any non-standard views or layers
         {}
     ),
