@@ -1,13 +1,8 @@
-import { EditableGeoJsonLayer } from 'nebula.gl';
+import { EditableGeoJsonLayer } from "nebula.gl";
 
+const defaultProps = {};
 
-const defaultProps = {
-};
-
-
-export default class  DrawingLayer extends EditableGeoJsonLayer {
-
-}
+export default class DrawingLayer extends EditableGeoJsonLayer {}
 
 DrawingLayer.layerName = "DrawingLayer";
 DrawingLayer.defaultProps = defaultProps;

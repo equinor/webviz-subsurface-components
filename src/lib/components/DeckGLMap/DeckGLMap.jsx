@@ -3,28 +3,24 @@ import * as React from "react";
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 import PropTypes from "prop-types";
-import { EditableGeoJsonLayer, DrawPolygonMode, DrawLineStringMode } from 'nebula.gl';
-import { DrawingLayer } from './layers';
-import Checkbox from '@material-ui/core/Checkbox';
+import { EditableGeoJsonLayer, DrawLineStringMode } from "nebula.gl";
+import { DrawingLayer } from "./layers";
 import { Toolbox } from "@nebula.gl/editor";
-
 
 import JSON_CONVERTER_CONFIGURATION from "./configuration";
 import { COORDINATE_SYSTEM } from "deck.gl";
 
 const EMPTY_GEOJSON = {
     type: "FeatureCollection",
-    features: []
- }
+    features: [],
+};
 
-function layerFilter({layer, viewport}) {
-  // Do not draw the DrawingLayer in the minimap view.
-  return !(viewport.id === 'minimap' && layer.id === 'drawing-layer');
+function layerFilter({ layer, viewport }) {
+    // Do not draw the DrawingLayer in the minimap view.
+    return !(viewport.id === "minimap" && layer.id === "drawing-layer");
 }
 
-
 function DeckGLMap(props) {
-
     //== Drawing layer hooks ==
     const [features, setFeatures] = React.useState(EMPTY_GEOJSON);
     const [mode, setMode] = React.useState(() => DrawLineStringMode);
@@ -40,37 +36,49 @@ function DeckGLMap(props) {
         setJsonProps(jsonConverter.convert(props.jsonData));
     }, [props.jsonData]);
 
-
-    let jsonProps_copy = {...jsonProps};
+    let jsonProps_copy = { ...jsonProps };
 
     let UseDrawingLayerCtrls = false;
     if (jsonProps_copy?.layers) {
-        const drawingLayer_from_json = jsonProps_copy.layers.find(e => e instanceof DrawingLayer);
+        const drawingLayer_from_json = jsonProps_copy.layers.find(
+            e => e instanceof DrawingLayer
+        );
         if (drawingLayer_from_json) {
             UseDrawingLayerCtrls = true;
             // Drawing layer is present.
             // Remove it and add new (can not set proerties on the original?)
-            jsonProps_copy.layers = jsonProps_copy.layers.filter(e => !(e instanceof DrawingLayer));
+            jsonProps_copy.layers = jsonProps_copy.layers.filter(
+                e => !(e instanceof DrawingLayer)
+            );
 
             const drawingLayer = new EditableGeoJsonLayer({
-                id: 'drawing-layer',
+                id: "drawing-layer",
                 data: features,
                 mode,
                 selectedFeatureIndexes,
-                onEdit: ({ updatedData }) => { setFeatures(updatedData); }
+                coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+                onEdit: ({ updatedData }) => {
+                    setFeatures(updatedData);
+                },
             });
 
             jsonProps_copy.layers.push(drawingLayer);
         }
     }
 
-
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
-            {jsonProps_copy && <DeckGL id={props.id} layerFilter={layerFilter} {...jsonProps_copy} controller={{ doubleClickZoom: false }} />}
-            
-            { UseDrawingLayerCtrls ?
-                <Toolbox 
+            {jsonProps_copy && (
+                <DeckGL
+                    id={props.id}
+                    layerFilter={layerFilter}
+                    {...jsonProps_copy}
+                    controller={{ doubleClickZoom: false }}
+                />
+            )}
+
+            {UseDrawingLayerCtrls ? (
+                <Toolbox
                     mode={mode}
                     onSetMode={setMode}
                     modeConfig={modeConfig}
@@ -78,13 +86,11 @@ function DeckGLMap(props) {
                     geoJson={features}
                     onSetGeoJson={setFeatures}
                     onImport={setFeatures}
-                /> : null
-            };
-
+                />
+            ) : null}
         </div>
     );
 }
-
 
 DeckGLMap.propTypes = {
     /**

@@ -85,7 +85,6 @@ const DeckGLMapDemo = () => {
         setColormaps(colmaps);
     }, []);
 
-
     const onEditorChanged = React.useCallback(txt => {
         if (txt != text) {
             setText(txt);
