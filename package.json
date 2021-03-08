@@ -18,7 +18,7 @@
         "build:js-demo": "webpack --mode production --entry ./src/demo/index.js",
         "build:py_and_r": "dash-generate-components ./src/lib/components webviz_subsurface_components -p package-info.json --r-prefix '' --ignore .*.js$",
         "build": "npm run build:js && npm run build:js-dev && npm run build:py_and_r",
-        "typecheck": "tsc",
+        "typecheck": "tsc --noEmit",
         "format": "eslint --fix *.js *json 'src/**/*.+(ts|tsx|js|jsx|json|css)'",
         "linting": "eslint *.js *.json 'src/**/*.+(ts|tsx|js|jsx|json|css)'",
         "validate": "npm run typecheck && npm run linting"
@@ -37,7 +37,7 @@
         "@types/react-redux": "^7.1.15",
         "@types/react-resize-detector": "^5.0.0",
         "d3": "^5.11.0",
-        "deck.gl": "^8.3.12",
+        "deck.gl": "^8.4.9",
         "leaflet": "^1.6.0",
         "leaflet-draw": "^1.0.4",
         "nebula.gl": "^0.22.3",
