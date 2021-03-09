@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
-import { WellPlotData } from "../../hooks/dataUtil";
-import { SORT_BY_COMPLETION_DATE } from "../../hooks/sort";
-import { useTooltip } from "../Utils/TooltipProvider";
+import { WellPlotData } from "../../utils/dataUtil";
+import { SORT_BY_COMPLETION_DATE } from "../../utils/sort";
+import { useTooltip } from "../Common/TooltipProvider";
 import { Padding, PlotLayout } from "./plotUtil";
 
 interface Props {

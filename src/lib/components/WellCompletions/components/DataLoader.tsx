@@ -1,38 +1,26 @@
-/* eslint-disable prettier/prettier */
-import React, {
-    Fragment,
-    PropsWithChildren,
-    useContext,
-    useEffect
-} from "react";
-import { useDispatch } from "react-redux";
+import React, { PropsWithChildren, useMemo } from "react";
+import { Provider as ReduxProvider } from "react-redux";
+import { createReduxStore } from "../redux/store";
+import { UISettings } from "../redux/types";
+import { preprocessData } from "../utils/dataUtil";
 import {
     SORT_BY_COMPLETION_DATE,
     SORT_BY_NAME,
-    SORT_BY_STRATIGRAPHY_DEPTH
-} from "../hooks/sort";
-import {
-    updateAttributeKeys,
-    updateFilteredZones,
-    updateId,
-    updateTimeIndexRange
-} from "../redux/reducer";
+    SORT_BY_STRATIGRAPHY_DEPTH,
+} from "../utils/sort";
 import { DataContext } from "../WellCompletions";
 
 interface Props {
     id: string;
+    data: any;
 }
 
-const DataLoader: React.FC<Props> = ({
+const DataProvider: React.FC<Props> = ({
     children,
     id,
+    data,
 }: PropsWithChildren<Props>) => {
-    // Redux
-    const dispatch = useDispatch();
-    const data = useContext(DataContext);
-
-    useEffect(() => {
-        dispatch(updateId(id));
+    const preloadedState = useMemo(() => {
         //Setup attributes
         const attributeKeys = new Set<string>([
             SORT_BY_NAME,
@@ -42,19 +30,35 @@ const DataLoader: React.FC<Props> = ({
         data.wells.forEach(well =>
             Object.keys(well.attributes).forEach(key => attributeKeys.add(key))
         );
-        dispatch(updateAttributeKeys(Array.from(attributeKeys)));
-        //Setup initial ui settings
-        dispatch(
-            updateTimeIndexRange(
-                data.timeSteps.length > 0
-                    ? [0, data.timeSteps.length - 1]
-                    : [0, 0]
-            )
-        );
-        dispatch(updateFilteredZones(data.stratigraphy.map(zone => zone.name)));
-    }, [data]);
+        const timeIndexRange =
+            data.timeSteps.length > 0 ? [0, data.timeSteps.length - 1] : [0, 0];
+        return {
+            id: id,
+            ui: {
+                timeIndexRange: timeIndexRange,
+                wellsPerPage: 25,
+                currentPage: 1,
+                rangeDisplayMode: "First Step",
+                wellSearchText: "",
+                filteredZones: data.stratigraphy.map(zone => zone.name),
+                hideZeroCompletions: false,
+                sortBy: {},
+            } as UISettings,
+            attributes: { attributeKeys: Array.from(attributeKeys) },
+        };
+    }, [id, data]);
 
-    return <Fragment>{children}</Fragment>;
+    const store = useMemo(() => createReduxStore(preloadedState), [
+        preloadedState,
+    ]);
+
+    const preprocessedData = useMemo(() => preprocessData(data), [data]);
+
+    return (
+        <DataContext.Provider value={preprocessedData}>
+            <ReduxProvider store={store}>{children}</ReduxProvider>
+        </DataContext.Provider>
+    );
 };
 
-export default DataLoader;
+export default DataProvider;

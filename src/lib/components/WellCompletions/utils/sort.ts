@@ -38,8 +38,8 @@ export const createSortFunction = (sortBy: Record<string, SortDirection>) => {
             const bAttribute = keyFunction(b);
             if (aAttribute === bAttribute) continue;
             if (
-                sortBy[sort] !== "Ascending" ||
-                aAttribute < bAttribute ||
+                (sortBy[sort] === "Ascending" && aAttribute < bAttribute) ||
+                (sortBy[sort] !== "Ascending" && aAttribute > bAttribute) ||
                 bAttribute === undefined
             )
                 return -1;

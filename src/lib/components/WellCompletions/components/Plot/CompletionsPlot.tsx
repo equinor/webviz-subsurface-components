@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
-import { PlotData } from "../../hooks/dataUtil";
-import { useTooltip } from "../Utils/TooltipProvider";
+import { PlotData } from "../../utils/dataUtil";
+import { useTooltip } from "../Common/TooltipProvider";
 import { Padding, PlotLayout } from "./plotUtil";
 
 interface Props {

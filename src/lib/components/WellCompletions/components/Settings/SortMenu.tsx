@@ -11,7 +11,7 @@ import {
     Theme
 } from "@material-ui/core";
 import React, { useCallback } from "react";
-import { useDialog } from "../Utils/useDialog";
+import { useDialog } from "../Common/useDialog";
 import SortTable from "./SortTable";
 
 // Use library approach

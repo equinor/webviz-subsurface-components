@@ -1,8 +1,8 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import React, { useMemo } from "react";
 import { useResizeDetector } from "react-resize-detector";
-import { PlotData } from "../../hooks/dataUtil";
-import { TooltipProvider } from "../Utils/TooltipProvider";
+import { PlotData } from "../../utils/dataUtil";
+import { TooltipProvider } from "../Common/TooltipProvider";
 import CompletionsPlot from "./CompletionsPlot";
 import { getLayout, Padding } from "./plotUtil";
 import StratigraphyPlot from "./StratigraphyPlot";

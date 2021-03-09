@@ -1,4 +1,28 @@
 import { RangeMode, RangeModes, Well, Zone } from "../redux/types";
+export const preprocessData = (data: any) => {
+    return {
+        ...data,
+        wells: data.wells.map(well => {
+            let earliestCompDateIndex = Number.POSITIVE_INFINITY;
+            data.stratigraphy.forEach(zone => {
+                if (zone.name in well.completions) {
+                    //store earliest completion date
+                    const completion = well.completions[zone.name];
+                    const earliestDate = completion.t.find(
+                        (_, index) => completion.f[index] > 0
+                    );
+                    if (earliestDate !== undefined)
+                        earliestCompDateIndex = Math.min(
+                            earliestCompDateIndex,
+                            earliestDate
+                        );
+                }
+            });
+            return { ...well, earliestCompDateIndex };
+        }),
+    };
+};
+
 /**
  * Util method to prepare stratigraphy and well data from the given time step range and other settings for plotting
  * @param stratigraphy
@@ -20,26 +44,20 @@ export const dataInTimeIndexRange = (
     wells.forEach(well => {
         const wellCompletions: number[] = [];
         const zoneIndices: number[] = [];
-        let earliestCompDateIndex = Number.POSITIVE_INFINITY;
         let hasData = false;
         stratigraphy.forEach((zone, zoneIndex) => {
             const values = Array(range[1] - range[0] + 1).fill(0);
-            if (well.completions[zone.name]) {
+            if (zone.name in well.completions) {
+                const completion = well.completions[zone.name];
                 //Find values in the time range
                 let index = 0;
                 let currentValue = 0;
                 for (let rangeI = 0; rangeI < values.length; rangeI++) {
                     const timeStep = rangeI + range[0];
-                    while (timeStep >= well.completions[zone.name].t[index]) {
-                        currentValue = well.completions[zone.name].f[index];
+                    while (timeStep >= completion.t[index]) {
+                        currentValue = completion.f[index];
                         index++;
                     }
-                    if (currentValue > 0)
-                        //update earliest completion time within the time range
-                        earliestCompDateIndex = Math.min(
-                            earliestCompDateIndex,
-                            timeStep
-                        );
                     values[rangeI] = currentValue;
                 }
             }
@@ -57,11 +75,9 @@ export const dataInTimeIndexRange = (
         });
         if (!hideZeroCompletions || hasData)
             wellPlotData.push({
-                name: well.name,
-                earliestCompDateIndex,
+                ...well,
                 completions: wellCompletions,
                 zoneIndices,
-                attributes: well.attributes,
             });
     });
     return {

@@ -3,10 +3,10 @@ import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { WellCompletionsState } from "../redux/store";
 import { Well } from "../redux/types";
+import { dataInTimeIndexRange, PlotData } from "../utils/dataUtil";
 import { getRegexPredicate } from "../utils/regex";
+import { createSortFunction } from "../utils/sort";
 import { DataContext } from "../WellCompletions";
-import { dataInTimeIndexRange, PlotData } from "./dataUtil";
-import { createSortFunction } from "./sort";
 
 export const usePlotData = () => {
     //Redux states

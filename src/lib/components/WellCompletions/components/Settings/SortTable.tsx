@@ -4,7 +4,7 @@ import {
     Icon,
     NativeSelect,
     Table,
-    Typography
+    Typography,
 } from "@equinor/eds-core-react";
 import { add_box, delete_to_trash } from "@equinor/eds-icons";
 import {
@@ -12,7 +12,7 @@ import {
     createStyles,
     makeStyles,
     Theme,
-    Tooltip
+    Tooltip,
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -97,41 +97,43 @@ const SortTable: React.FC = React.memo(() => {
                         <Table.Cell></Table.Cell>
                     </Table.Row>
                 </Table.Head>
-                {Object.keys(sortBy).map(sortKey => (
-                    <Table.Row key={`sort-by-${sortKey}`}>
-                        <Table.Cell>{sortKey}</Table.Cell>
-                        <Table.Cell>
-                            <Button
-                                aria-controls="simple-menu"
-                                aria-haspopup="true"
-                                variant="ghost"
-                                onClick={e =>
-                                    onUpdateSortKey(
-                                        sortKey,
-                                        sortBy[sortKey] === "Ascending"
-                                            ? "Descending"
-                                            : "Ascending"
-                                    )
-                                }
-                            >
-                                {sortBy[sortKey]}
-                            </Button>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <Button
-                                aria-controls="simple-menu"
-                                aria-haspopup="true"
-                                variant="ghost_icon"
-                                onClick={e => onDeleteSortKey(sortKey)}
-                            >
-                                <Icon
-                                    color="currentColor"
-                                    name="delete_to_trash"
-                                />
-                            </Button>
-                        </Table.Cell>
-                    </Table.Row>
-                ))}
+                <Table.Body>
+                    {Object.keys(sortBy).map(sortKey => (
+                        <Table.Row key={`sort-by-${sortKey}`}>
+                            <Table.Cell>{sortKey}</Table.Cell>
+                            <Table.Cell>
+                                <Button
+                                    aria-controls="simple-menu"
+                                    aria-haspopup="true"
+                                    variant="ghost"
+                                    onClick={e =>
+                                        onUpdateSortKey(
+                                            sortKey,
+                                            sortBy[sortKey] === "Ascending"
+                                                ? "Descending"
+                                                : "Ascending"
+                                        )
+                                    }
+                                >
+                                    {sortBy[sortKey]}
+                                </Button>
+                            </Table.Cell>
+                            <Table.Cell>
+                                <Button
+                                    aria-controls="simple-menu"
+                                    aria-haspopup="true"
+                                    variant="ghost_icon"
+                                    onClick={e => onDeleteSortKey(sortKey)}
+                                >
+                                    <Icon
+                                        color="currentColor"
+                                        name="delete_to_trash"
+                                    />
+                                </Button>
+                            </Table.Cell>
+                        </Table.Row>
+                    ))}
+                </Table.Body>
             </Table>
             <div className={classes.add}>
                 <NativeSelect

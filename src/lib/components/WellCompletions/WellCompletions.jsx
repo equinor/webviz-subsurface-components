@@ -10,11 +10,7 @@ import WellCompletionComponent from "./components/WellCompletionComponent";
 
 export const DataContext = React.createContext();
 const WellCompletions = props => {
-    return (
-        <DataContext.Provider value={props.data}>
-            <WellCompletionComponent id={props.id} />
-        </DataContext.Provider>
-    );
+    return <WellCompletionComponent id={props.id} data={props.data} />;
 };
 
 WellCompletions.propTypes = {
