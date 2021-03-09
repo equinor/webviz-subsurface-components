@@ -44,18 +44,20 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
     const [modeConfig, setModeConfig] = React.useState({});
     const [selectedFeatureIndexes] = React.useState([]);
 
-    let jsonProps_copy = { ...jsonProps };
+    const jsonPropsCopy = { ...jsonProps };
 
     let UseDrawingLayerCtrls = false;
-    if (jsonProps_copy?.layers) {
-        const drawingLayer_from_json = jsonProps_copy.layers.find(
+    if (jsonPropsCopy?.layers) {
+        const drawingLayerFromJson = jsonPropsCopy.layers.find(
             e => e instanceof DrawingLayer
         );
-        if (drawingLayer_from_json) {
+        if (drawingLayerFromJson) {
             UseDrawingLayerCtrls = true;
             // Drawing layer is present.
             // Remove it and add new (can not set proerties on the original?)
-            jsonProps_copy.layers = jsonProps_copy.layers.filter( e => !(e instanceof DrawingLayer));
+            jsonPropsCopy.layers = jsonPropsCopy.layers.filter(
+                e => !(e instanceof DrawingLayer)
+            );
 
             const drawingLayer = new EditableGeoJsonLayer({
                 id: "drawing-layer",
@@ -68,17 +70,17 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                 },
             });
 
-            jsonProps_copy.layers.push(drawingLayer);
+            jsonPropsCopy.layers.push(drawingLayer);
         }
     }
 
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
-            {jsonProps_copy && (
+            {jsonPropsCopy && (
                 <DeckGL
                     id={props.id}
                     layerFilter={layerFilter}
-                    {...jsonProps_copy}
+                    {...jsonPropsCopy}
                     controller={{ doubleClickZoom: false }}
                 />
             )}
