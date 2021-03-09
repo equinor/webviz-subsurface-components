@@ -2,30 +2,12 @@ import { isEqual } from "lodash";
 import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { WellCompletionsState } from "../redux/store";
-import { SortDirection, SORT_BY_NAME, Well } from "../redux/types";
+import { Well } from "../redux/types";
 import { getRegexPredicate } from "../utils/regex";
 import { DataContext } from "../WellCompletions";
-import { dataInTimeIndexRange } from "./dataUtil";
+import { dataInTimeIndexRange, PlotData } from "./dataUtil";
+import { createSortFunction } from "./sort";
 
-const createSortFunction = (sortBy: Record<string, SortDirection>) => {
-    return (a: Well, b: Well) => {
-        for (const sort in sortBy) {
-            const aAttribute =
-                sort === SORT_BY_NAME ? a.name : a.attributes[sort];
-            const bAttribute =
-                sort === SORT_BY_NAME ? b.name : b.attributes[sort];
-            if (aAttribute === bAttribute) continue;
-            if (
-                (sortBy[sort] === "Ascending" && aAttribute < bAttribute) ||
-                (sortBy[sort] === "Descending" && aAttribute > bAttribute) ||
-                bAttribute === undefined
-            )
-                return -1;
-            else return 1;
-        }
-        return 0;
-    };
-};
 export const usePlotData = () => {
     //Redux states
     const data = useContext(DataContext);
@@ -52,15 +34,14 @@ export const usePlotData = () => {
     const wellNameRegex = useMemo(() => getRegexPredicate(wellSearchText), [
         wellSearchText,
     ]);
-    const sortFunction = useMemo(() => createSortFunction(sortBy), [sortBy]);
-    const sortedAndFilteredWells = useMemo(
+    const filteredWells = useMemo(
         () =>
             data
-                ? Array.from(data.wells as Well[])
-                      .sort(sortFunction)
-                      .filter(well => wellNameRegex(well.name))
+                ? Array.from(data.wells as Well[]).filter(well =>
+                      wellNameRegex(well.name)
+                  )
                 : [],
-        [data, wellNameRegex, sortFunction]
+        [data, wellNameRegex]
     );
     const filteredStratigraphy = useMemo(
         () =>
@@ -72,21 +53,29 @@ export const usePlotData = () => {
                 : [],
         [data, filteredZones]
     );
-    return useMemo(
+
+    const plotDataInTimeRange = useMemo(
         () =>
             dataInTimeIndexRange(
                 filteredStratigraphy,
-                sortedAndFilteredWells,
+                filteredWells,
                 timeIndexRange,
                 rangeDisplayMode,
                 hideZeroCompletions
             ),
         [
             filteredStratigraphy,
-            sortedAndFilteredWells,
+            filteredWells,
             timeIndexRange,
             rangeDisplayMode,
             hideZeroCompletions,
         ]
     );
+    const sortFunction = useMemo(() => createSortFunction(sortBy), [sortBy]);
+    return useMemo(() => {
+        return {
+            stratigraphy: plotDataInTimeRange.stratigraphy,
+            wells: Array.from(plotDataInTimeRange.wells).sort(sortFunction),
+        } as PlotData;
+    }, [plotDataInTimeRange, sortFunction]);
 };

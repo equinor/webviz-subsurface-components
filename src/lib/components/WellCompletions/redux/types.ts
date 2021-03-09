@@ -27,7 +27,10 @@ export const RangeModes = {
 export type RangeMode = keyof typeof RangeModes;
 
 export type SortDirection = "Ascending" | "Descending";
+//Deault sort methods
 export const SORT_BY_NAME = "well name";
+export const SORT_BY_FORMATION_DEPTH = "stratigraphy depth";
+export const SORT_BY_COMPLETION_DATA = "completion date";
 export interface Attributes {
     attributeKeys: string[];
 }

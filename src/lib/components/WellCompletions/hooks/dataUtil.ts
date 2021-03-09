@@ -20,6 +20,7 @@ export const dataInTimeIndexRange = (
     wells.forEach(well => {
         const wellCompletions: number[] = [];
         const zoneIndices: number[] = [];
+        let earliestCompDateIndex = Number.POSITIVE_INFINITY;
         let hasData = false;
         stratigraphy.forEach((zone, zoneIndex) => {
             const values = Array(range[1] - range[0] + 1).fill(0);
@@ -28,13 +29,17 @@ export const dataInTimeIndexRange = (
                 let index = 0;
                 let currentValue = 0;
                 for (let rangeI = 0; rangeI < values.length; rangeI++) {
-                    while (
-                        rangeI + range[0] >=
-                        well.completions[zone.name].t[index]
-                    ) {
+                    const timeStep = rangeI + range[0];
+                    while (timeStep >= well.completions[zone.name].t[index]) {
                         currentValue = well.completions[zone.name].f[index];
                         index++;
                     }
+                    if (currentValue > 0)
+                        //update earliest completion time within the time range
+                        earliestCompDateIndex = Math.min(
+                            earliestCompDateIndex,
+                            timeStep
+                        );
                     values[rangeI] = currentValue;
                 }
             }
@@ -53,6 +58,7 @@ export const dataInTimeIndexRange = (
         if (!hideZeroCompletions || hasData)
             wellPlotData.push({
                 name: well.name,
+                earliestCompDateIndex,
                 completions: wellCompletions,
                 zoneIndices,
                 attributes: well.attributes,
@@ -70,6 +76,7 @@ export interface PlotData {
 }
 export interface WellPlotData {
     name: string;
+    earliestCompDateIndex: number;
     attributes: Record<string, any>;
     completions: number[];
     zoneIndices: number[];
