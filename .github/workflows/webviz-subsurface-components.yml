@@ -31,8 +31,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: 📦 Install build dependencies
+        # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
+        # TODO: remove `npm run setup_deckgl_types` when the deckgl types package doesn't need a postscript anymore.
         run: |
           npm ci --ignore-scripts
+          npm run setup_deckgl_types
           npm run postinstall
           pip install .[dependencies]
           pip install dash[dev]
