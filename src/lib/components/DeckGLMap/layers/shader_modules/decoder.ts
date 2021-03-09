@@ -1,13 +1,22 @@
 import fs from "./decoder.fs.glsl";
 
-const DEFAULT_DECODER = {
+const DEFAULT_DECODER: ValueDecoder = {
     rgbScaler: [1, 1, 1],
     floatScaler: 1,
     offset: 0,
     step: 0,
 };
 
-function getUniforms(opts) {
+interface DecoderUniforms {
+    "decoder.rgbScaler": typeof DEFAULT_DECODER.rgbScaler;
+    "decoder.floatScaler": typeof DEFAULT_DECODER.floatScaler;
+    "decoder.offset": typeof DEFAULT_DECODER.offset;
+    "decoder.step": typeof DEFAULT_DECODER.step;
+}
+
+// Disable complaint about `any`
+// eslint-disable-next-line
+function getUniforms(opts: any): DecoderUniforms | {} {
     if (opts && opts.valueDecoder) {
         const {
             rgbScaler = DEFAULT_DECODER.rgbScaler,
