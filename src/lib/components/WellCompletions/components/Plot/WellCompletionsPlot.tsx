@@ -19,56 +19,60 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 interface Props {
+    timeSteps: string[];
     plotData: PlotData;
 }
 
 const padding: Padding = { left: 50, right: 50, top: 70, bottom: 50 };
 /* eslint-disable react/prop-types */
-const WellCompletionsPlot: React.FC<Props> = React.memo(({ plotData }) => {
-    const classes = useStyles();
-    const { width, height, ref } = useResizeDetector<HTMLDivElement>({
-        refreshMode: "debounce",
-        refreshRate: 50,
-        refreshOptions: { trailing: true },
-    });
-    const layout = useMemo(
-        () =>
-            width !== undefined && height !== undefined
-                ? getLayout(width, height, padding)
-                : undefined,
-        [width, height]
-    );
+const WellCompletionsPlot: React.FC<Props> = React.memo(
+    ({ timeSteps, plotData }) => {
+        const classes = useStyles();
+        const { width, height, ref } = useResizeDetector<HTMLDivElement>({
+            refreshMode: "debounce",
+            refreshRate: 50,
+            refreshOptions: { trailing: true },
+        });
+        const layout = useMemo(
+            () =>
+                width !== undefined && height !== undefined
+                    ? getLayout(width, height, padding)
+                    : undefined,
+            [width, height]
+        );
 
-    return (
-        <TooltipProvider>
-            <div className={classes.root} ref={ref}>
-                {layout && (
-                    <svg
-                        id={"svg-context"}
-                        width={width}
-                        height={height}
-                        style={{ position: "relative" }}
-                    >
-                        <StratigraphyPlot
-                            data={plotData.stratigraphy}
-                            layout={layout}
-                            padding={padding}
-                        />
-                        <WellsPlot
-                            data={plotData.wells}
-                            layout={layout}
-                            padding={padding}
-                        />
-                        <CompletionsPlot
-                            data={plotData}
-                            layout={layout}
-                            padding={padding}
-                        />
-                    </svg>
-                )}
-            </div>
-        </TooltipProvider>
-    );
-});
+        return (
+            <TooltipProvider>
+                <div className={classes.root} ref={ref}>
+                    {layout && (
+                        <svg
+                            id={"svg-context"}
+                            width={width}
+                            height={height}
+                            style={{ position: "relative" }}
+                        >
+                            <StratigraphyPlot
+                                data={plotData.stratigraphy}
+                                layout={layout}
+                                padding={padding}
+                            />
+                            <WellsPlot
+                                timeSteps={timeSteps}
+                                data={plotData.wells}
+                                layout={layout}
+                                padding={padding}
+                            />
+                            <CompletionsPlot
+                                data={plotData}
+                                layout={layout}
+                                padding={padding}
+                            />
+                        </svg>
+                    )}
+                </div>
+            </TooltipProvider>
+        );
+    }
+);
 
 export default WellCompletionsPlot;

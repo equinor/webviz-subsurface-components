@@ -59,7 +59,10 @@ const WellCompletionsViewer: React.FC = () => {
         >
             <SettingsBar />
             <WellPagination />
-            <WellCompletionsPlot plotData={dataInCurrentPage} />
+            <WellCompletionsPlot
+                timeSteps={data.timeSteps}
+                plotData={dataInCurrentPage}
+            />
         </div>
     );
 };

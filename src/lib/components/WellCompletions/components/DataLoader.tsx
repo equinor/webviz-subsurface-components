@@ -1,19 +1,22 @@
+/* eslint-disable prettier/prettier */
 import React, {
     Fragment,
     PropsWithChildren,
     useContext,
-    // eslint-disable-next-line prettier/prettier
     useEffect
 } from "react";
 import { useDispatch } from "react-redux";
 import {
+    SORT_BY_COMPLETION_DATE,
+    SORT_BY_NAME,
+    SORT_BY_STRATIGRAPHY_DEPTH
+} from "../hooks/sort";
+import {
     updateAttributeKeys,
     updateFilteredZones,
     updateId,
-    // eslint-disable-next-line prettier/prettier
     updateTimeIndexRange
 } from "../redux/reducer";
-import { SORT_BY_NAME } from "../redux/types";
 import { DataContext } from "../WellCompletions";
 
 interface Props {
@@ -31,8 +34,11 @@ const DataLoader: React.FC<Props> = ({
     useEffect(() => {
         dispatch(updateId(id));
         //Setup attributes
-        const attributeKeys = new Set<string>();
-        attributeKeys.add(SORT_BY_NAME);
+        const attributeKeys = new Set<string>([
+            SORT_BY_NAME,
+            SORT_BY_STRATIGRAPHY_DEPTH,
+            SORT_BY_COMPLETION_DATE,
+        ]);
         data.wells.forEach(well =>
             Object.keys(well.attributes).forEach(key => attributeKeys.add(key))
         );
