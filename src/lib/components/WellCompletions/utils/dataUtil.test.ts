@@ -1,3 +1,4 @@
+import { Well } from "../redux/types";
 import { dataInTimeIndexRange } from "./dataUtil";
 
 describe("Data Util", () => {
@@ -122,7 +123,7 @@ describe("Data Util", () => {
             },
             earliestCompDateIndex: 1,
             attributes: { type: "Producer", region: "Region 2" },
-        },
+        } as Well,
     ];
     it("test dataInTimeIndexRange", () => {
         //Display single time step
