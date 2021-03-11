@@ -4,28 +4,28 @@ import { GeoJsonLayer } from "@deck.gl/layers";
 export default class WellsLayer extends CompositeLayer {
 
     renderLayers() {
-        const shadow = new GeoJsonLayer({
-            id: "well-shadow",
+        var properties = {
+            id: 'wells-shadow',
             data: this.props.data,
+            opacity: this.props.opacity,
             pickable: true,
-            pointRadiusMinPixels: 9,
-            pointRadiusMaxPixels: 15,
-            lineWidthMinPixels: 5,
-            lineWidthMaxPixels: 6,
-        });
+            pointRadiusUnits: 'pixels',
+            lineWidthUnits: 'pixels',
+            pointRadiusScale: this.props.pointRadiusScale,
+            lineWidthScale: this.props.lineWidthScale,
+        };
 
-        const colored = new GeoJsonLayer({
-            data: this.props.data,
-            pickable: true,
-            pointRadiusMinPixels: 7,
-            pointRadiusMaxPixels: 13,
-            lineWidthMinPixels: 3,
-            lineWidthMaxPixels: 4,
-            getFillColor: d => d.properties.color,
-            getLineColor: d => d.properties.color,
-        });
+        const shadow = new GeoJsonLayer(properties);
 
-        return [shadow, colored];
+        properties.id = 'wells-color';
+        properties.getFillColor = d => d.properties.color;
+        properties.getLineColor = properties.getFillColor;
+        properties.pointRadiusScale = properties.pointRadiusScale - 1;
+        properties.lineWidthScale = properties.lineWidthScale - 1;
+
+        const colors = new GeoJsonLayer(properties);
+
+        return [shadow, colors];
     }
 }
 
