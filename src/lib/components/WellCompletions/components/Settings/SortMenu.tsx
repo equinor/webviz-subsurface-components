@@ -28,17 +28,6 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 const SortMenu: React.FC = React.memo(() => {
     const classes = useStyles();
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-    // handlers
-    const handleClick = useCallback(
-        (event: React.MouseEvent<HTMLButtonElement>) =>
-            setAnchorEl(event.currentTarget),
-        []
-    );
-
-    const handleClose = useCallback(() => setAnchorEl(null), []);
-
     // Dialogs
     const {
         launchDialog: launchSortDialog,
@@ -57,14 +46,6 @@ const SortMenu: React.FC = React.memo(() => {
                     <Icon color="currentColor" name="sort" />
                 </Button>
             </Tooltip>
-            <Menu
-                id="simple-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                classes={{ paper: classes.paper }}
-            ></Menu>
             {renderSortDialog()}
         </div>
     );
