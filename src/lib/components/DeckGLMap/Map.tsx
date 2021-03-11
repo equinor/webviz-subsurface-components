@@ -23,7 +23,7 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
 
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
-            {jsonProps &&
+            {jsonProps && (
                 <DeckGL
                     id={props.id}
                     {...jsonProps}
@@ -31,7 +31,7 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                         object && object.properties && object.properties.name
                     }
                 />
-            }
+            )}
         </div>
     );
 };
