@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import withReduxEnhancer from "addon-redux/enhancer";
 import { attributeSlice, idSlice, uiSlice } from "./reducer";
+import withReduxEnhancer from "addon-redux/enhancer";
 
 export const rootReducer = combineReducers({
     id: idSlice.reducer,

@@ -1,5 +1,5 @@
 import React from "react";
-import { withReduxDecorator } from "../../test/storybookReduxAddon";
+import { withReduxDecorator } from "../../storyUtil/reduxAddon";
 import HideZeroCompletionsSwitch from "./HideZeroCompletionsSwitch";
 
 export default {
