@@ -1,6 +1,11 @@
 import React from "react";
+<<<<<<< HEAD
 import { exampleDataDecorator } from "../../test/storybookDataDecorator";
 import { withReduxDecorator } from "../../test/storybookReduxAddon";
+=======
+import { exampleDataDecorator } from "../../storyUtil/inputDataDecorator";
+import { withReduxDecorator } from "../../storyUtil/reduxAddon";
+>>>>>>> Add storybooks for well completions component
 import TimeRangeSelector from "./TimeRangeSelector";
 
 export default {
