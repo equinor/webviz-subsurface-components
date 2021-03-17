@@ -1,5 +1,9 @@
 import React from "react";
+<<<<<<< HEAD
 import { exampleData } from "./test/storybookDataDecorator";
+=======
+import { exampleData } from "./storyUtil/inputDataDecorator";
+>>>>>>> Add storybooks for well completions component
 import WellCompletions from "./WellCompletions";
 
 export default {
