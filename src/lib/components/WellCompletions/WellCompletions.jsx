@@ -8,6 +8,9 @@ import Ajv from "ajv";
 import PropTypes from "prop-types";
 import React, { useMemo } from "react";
 import WellCompletionComponent from "./components/WellCompletionComponent";
+import { inputSchema } from "./utils/schema";
+
+const ajv = new Ajv();
 
 const inputSchema = require("../../../../inputSchema/wellCompletions.json");
 const ajv = new Ajv();
