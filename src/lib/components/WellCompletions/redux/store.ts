@@ -1,13 +1,6 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import withReduxEnhancer from "addon-redux/enhancer";
-import { attributeSlice, idSlice, uiSlice } from "./reducer";
-import withReduxEnhancer from "addon-redux/enhancer";
-
-export const rootReducer = combineReducers({
-    id: idSlice.reducer,
-    attributes: attributeSlice.reducer,
-    ui: uiSlice.reducer,
-});
+import { rootReducer } from "./reducer";
 
 export type WellCompletionsState = ReturnType<typeof rootReducer>;
 export const createReduxStore = (
