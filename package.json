@@ -24,7 +24,9 @@
     "validate": "npm run typecheck && npm run linting",
     "setup_deckgl_types": "cd ./node_modules/@danmarshall/deckgl-typings/ && indefinitely-typed --folder deck.gl__aggregation-layers --folder deck.gl__core --folder deck.gl__extensions --folder deck.gl__geo-layers --folder deck.gl__google-maps --folder deck.gl__json --folder deck.gl__layers --folder deck.gl__mapbox --folder deck.gl__mesh-layers --folder deck.gl__react --folder deck.gl --folder luma.gl__constants --folder luma.gl__core --folder luma.gl__gltools --folder luma.gl__webgl-state-tracker --folder luma.gl__webgl --folder math.gl__core --folder math.gl",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "test": "jest",
+    "test:watch": "npm test -- --watch"
   },
   "author": "R&T Equinor <akia@equinor.com>",
   "license": "LGPL",
@@ -64,6 +66,8 @@
     "@storybook/addon-essentials": "^6.1.21",
     "@storybook/addon-links": "^6.1.21",
     "@storybook/react": "^6.1.21",
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^11.2.5",
     "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^2.32.0",
     "@typescript-eslint/parser": "^2.32.0",
@@ -91,6 +95,8 @@
     "react-docgen": "^2.20.1",
     "react-dom": "^16.9.0",
     "react-resize-panel": "^0.3.5",
+    "react-test-renderer": "^17.0.1",
+    "redux-mock-store": "^1.5.4",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.8.3",
     "url-loader": "^2.1.0",

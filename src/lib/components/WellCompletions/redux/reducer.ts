@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Attributes, RangeMode, SortDirection, UISettings } from "./types";
 
 export const idSlice = createSlice({
@@ -9,7 +9,7 @@ export const idSlice = createSlice({
     },
 });
 export const attributeSlice = createSlice({
-    name: "id",
+    name: "attribute",
     initialState: {
         attributeKeys: [],
     } as Attributes,
@@ -84,16 +84,8 @@ export const uiSlice = createSlice({
     },
 });
 
-export const { updateId } = idSlice.actions;
-export const { updateAttributeKeys } = attributeSlice.actions;
-export const {
-    updateTimeIndexRange,
-    updateRangeDisplayMode,
-    updateWellsPerPage,
-    updateCurrentPage,
-    updateWellSearchText,
-    updateFilteredZones,
-    updateHideZeroCompletions,
-    updateSortKey,
-    deleteSortKey,
-} = uiSlice.actions;
+export const rootReducer = combineReducers({
+    id: idSlice.reducer,
+    attributes: attributeSlice.reducer,
+    ui: uiSlice.reducer,
+});

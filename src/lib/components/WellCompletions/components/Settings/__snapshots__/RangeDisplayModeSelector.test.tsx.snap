@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test range display mode selector snapshot test 1`] = `
+<div
+  className="sc-dkmKpi ffBaIM makeStyles-root-1"
+>
+  <label
+    className="sc-kstrdz kQbbrf"
+    htmlFor="range-display-mode-selector"
+  >
+    <span
+      className="sc-hBEYos hwwwul"
+    >
+      Range Display Mode
+    </span>
+  </label>
+  <select
+    className="sc-cvJHqN gNVDDY"
+    disabled={false}
+    id="range-display-mode-selector"
+    multiple={false}
+    onChange={[Function]}
+    value="First Step"
+  >
+    <option>
+      First Step
+    </option>
+    <option>
+      Last Step
+    </option>
+    <option>
+      Max
+    </option>
+    <option>
+      Average
+    </option>
+  </select>
+</div>
+`;

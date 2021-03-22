@@ -1,6 +1,6 @@
 import React from "react";
-import { exampleDataDecorator } from "../../storyUtil/inputDataDecorator";
-import { withReduxDecorator } from "../../storyUtil/reduxAddon";
+import { exampleDataDecorator } from "../../test/storybookDataDecorator";
+import { withReduxDecorator } from "../../test/storybookReduxAddon";
 import WellFilter from "./WellFilter";
 
 export default {

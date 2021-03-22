@@ -1,5 +1,5 @@
 import React from "react";
-import { exampleData } from "./storyUtil/inputDataDecorator";
+import { exampleData } from "./test/storybookDataDecorator";
 import WellCompletions from "./WellCompletions";
 
 export default {
