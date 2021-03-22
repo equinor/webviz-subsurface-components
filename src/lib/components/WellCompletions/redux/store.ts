@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { configureStore } from "@reduxjs/toolkit";
 import withReduxEnhancer from "addon-redux/enhancer";
 import { rootReducer } from "./reducer";
@@ -13,6 +14,11 @@ export const rootReducer = combineReducers({
     ui: uiSlice.reducer,
 });
 >>>>>>> Add storybooks for well completions component
+=======
+import { configureStore } from "@reduxjs/toolkit";
+import withReduxEnhancer from "addon-redux/enhancer";
+import { rootReducer } from "./reducer";
+>>>>>>> added redux tests and setup react component test examples
 
 export type WellCompletionsState = ReturnType<typeof rootReducer>;
 export const createReduxStore = (
