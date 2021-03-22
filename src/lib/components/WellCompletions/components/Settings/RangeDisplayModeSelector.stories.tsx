@@ -1,5 +1,5 @@
 import React from "react";
-import { withReduxDecorator } from "../../storyUtil/reduxAddon";
+import { withReduxDecorator } from "../../test/storybookReduxAddon";
 import RangeDisplayModeSelector from "./RangeDisplayModeSelector";
 
 export default {

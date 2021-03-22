@@ -1,15 +1,10 @@
-import addons from "@storybook/addons";
-import withRedux from "addon-redux/withRedux";
-import { Provider } from "react-redux";
-import { createReduxStore } from "../redux/store";
 import { UISettings } from "../redux/types";
 import {
     SORT_BY_COMPLETION_DATE,
     SORT_BY_NAME,
     SORT_BY_STRATIGRAPHY_DEPTH,
 } from "../utils/sort";
-
-const state = {
+export const testState = {
     id: "test",
     ui: {
         timeIndexRange: [0, 9],
@@ -32,14 +27,3 @@ const state = {
         ],
     },
 };
-// A super-simple mock of a redux store
-const testStore = createReduxStore(state);
-
-const withReduxSettings = {
-    Provider,
-    store: testStore,
-    state,
-    actions: [],
-};
-
-export const withReduxDecorator = withRedux(addons)(withReduxSettings);
