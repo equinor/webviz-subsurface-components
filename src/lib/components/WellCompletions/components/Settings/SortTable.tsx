@@ -16,7 +16,7 @@ import {
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteSortKey, updateSortKey } from "../../redux/reducer";
+import { deleteSortKey, updateSortKey } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 import { SortDirection } from "../../redux/types";
 

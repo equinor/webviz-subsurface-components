@@ -2,7 +2,7 @@ import { NativeSelect } from "@equinor/eds-core-react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { updateWellsPerPage } from "../../redux/reducer";
+import { updateWellsPerPage } from "../../redux/actions";
 
 const wellsPerPageOptions = [25, 50];
 const useStyles = makeStyles((theme: Theme) =>
