@@ -8,9 +8,12 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "jsx": "react", // use typescript to transpile jsx to js
-        "target": "es5", // specify ECMAScript target version
+        "target": "es6", // specify ECMAScript target version
         "allowJs": true, // allow a partial TypeScript and JavaScript codebase
         "skipLibCheck": true // don't do typechecking on the node modules
     },
-    "include": ["./src/"]
+    "include": [
+        "./src/",
+        "src/custom.d.ts"
+    ]
 }

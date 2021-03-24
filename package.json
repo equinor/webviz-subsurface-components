@@ -43,6 +43,7 @@
         "@types/react-redux": "^7.1.15",
         "@types/react-resize-detector": "^5.0.0",
         "ajv": "^7.2.1",
+        "core-components": "file:../../../core-components-0.0.1.tgz",
         "d3": "^5.11.0",
         "deck.gl": "^8.4.9",
         "deep-equal": "^2.0.5",
