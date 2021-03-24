@@ -27,9 +27,12 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                 <DeckGL
                     id={props.id}
                     {...jsonProps}
-                    getTooltip={({ object }: any) =>
-                        object && object.properties && object.properties.name
-                    }
+                    getTooltip={(pickInfo: any): string | undefined => {
+                        return (
+                            pickInfo?.object?.properties?.name ||
+                            pickInfo?.propertyValue?.toString()
+                        );
+                    }}
                 />
             )}
         </div>
