@@ -1,6 +1,6 @@
 [
     {
-        "jsonData": {
+        "deckglSpec": {
             "description": "A minimal deck.gl example rendering a circle with text",
             "initialViewState": {
               "longitude": -122.45,
@@ -42,7 +42,7 @@
           }
     },
     {
-        "jsonData": {
+        "deckglSpec": {
             "initialViewState": {
                 "target": [434962.5, 6478095.5, 0],
                 "zoom": -3

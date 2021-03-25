@@ -8,20 +8,20 @@ import JSON_CONVERTER_CONFIGURATION from "./configuration";
 
 export interface MapProps {
     id: string;
-    jsonData: object;
+    deckglSpec: object;
     showCoords: boolean;
 }
 
 const Map: React.FC<MapProps> = (props: MapProps) => {
-    const [jsonProps, setJsonProps] = React.useState(null);
+    const [deckglSpec, setDeckglSpec] = React.useState(null);
     React.useEffect(() => {
         const configuration = new JSONConfiguration(
             JSON_CONVERTER_CONFIGURATION
         );
         const jsonConverter = new JSONConverter({ configuration });
 
-        setJsonProps(jsonConverter.convert(props.jsonData));
-    }, [props.jsonData]);
+        setDeckglSpec(jsonConverter.convert(props.deckglSpec));
+    }, [props.deckglSpec]);
 
     const [coordsInfo, setCoordsInfo] = React.useState<CoordsInfo | null>(null);
     const extractCoords = React.useCallback(pickInfo => {
@@ -47,10 +47,10 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
 
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
-            {jsonProps && (
+            {deckglSpec && (
                 <DeckGL
                     id={props.id}
-                    {...jsonProps}
+                    {...deckglSpec}
                     getCursor={({ isDragging }): string =>
                         isDragging ? "grabbing" : "default"
                     }
