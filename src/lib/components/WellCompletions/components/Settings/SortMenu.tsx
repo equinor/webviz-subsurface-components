@@ -1,52 +1,63 @@
 /* eslint-disable react/display-name */
-import { Icon, Tooltip } from "@equinor/eds-core-react";
+import { Button, Dialog, Icon, Scrim, Tooltip } from "@equinor/eds-core-react";
 import { sort } from "@equinor/eds-icons";
-import {
-    Button,
-    createStyles,
-    makeStyles,
-    Menu,
-
-    // eslint-disable-next-line prettier/prettier
-    Theme
-} from "@material-ui/core";
-import React, { useCallback } from "react";
-import { useDialog } from "../Common/useDialog";
+import { createStyles, makeStyles } from "@material-ui/core";
+import React, { useState } from "react";
 import SortTable from "./SortTable";
 
 // Use library approach
 Icon.add({ sort }); // (this needs only be done once)
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
     createStyles({
-        paper: {
-            paddingLeft: theme.spacing(1),
-            paddingRight: theme.spacing(1),
-            alignSelf: "center",
-            width: "250px",
+        dialog: {
+            minWidth: "400px",
         },
+        action: { margin: "5px" },
     })
 );
 const SortMenu: React.FC = React.memo(() => {
     const classes = useStyles();
     // Dialogs
-    const {
-        launchDialog: launchSortDialog,
-        renderDialog: renderSortDialog,
-    } = useDialog({
-        dialogComponent: () => <SortTable />,
-    });
+
+    const [visibleScrim, setVisibleScrim] = useState(false);
+    const handleClose = () => {
+        setVisibleScrim(!visibleScrim);
+    };
     return (
         <div>
             <Tooltip title="Sort">
                 <Button
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    onClick={launchSortDialog}
+                    variant="ghost_icon"
+                    onClick={() => setVisibleScrim(true)}
                 >
                     <Icon color="currentColor" name="sort" />
                 </Button>
             </Tooltip>
-            {renderSortDialog()}
+            {visibleScrim && (
+                <Scrim onClose={handleClose}>
+                    <Dialog className={classes.dialog}>
+                        <Dialog.Title>Well sorting levels</Dialog.Title>
+                        <Dialog.CustomContent>
+                            <SortTable />
+                        </Dialog.CustomContent>
+                        <Dialog.Actions>
+                            <Button
+                                className={classes.action}
+                                variant="ghost"
+                                onClick={() => setVisibleScrim(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                className={classes.action}
+                                onClick={() => setVisibleScrim(false)}
+                            >
+                                OK
+                            </Button>
+                        </Dialog.Actions>
+                    </Dialog>
+                </Scrim>
+            )}
         </div>
     );
 });

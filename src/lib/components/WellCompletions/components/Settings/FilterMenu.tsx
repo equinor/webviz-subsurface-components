@@ -1,12 +1,10 @@
-import { Icon, Tooltip } from "@equinor/eds-core-react";
+import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { filter_alt } from "@equinor/eds-icons";
 import {
-    Button,
     createStyles,
     makeStyles,
     Menu,
-
     // eslint-disable-next-line prettier/prettier
     Theme
 } from "@material-ui/core";
@@ -44,11 +42,7 @@ const FilterMenu: React.FC = React.memo(() => {
     return (
         <div>
             <Tooltip title="Filter">
-                <Button
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    onClick={handleClick}
-                >
+                <Button variant="ghost_icon" onClick={handleClick}>
                     <Icon color="currentColor" name="filter_alt" />
                 </Button>
             </Tooltip>

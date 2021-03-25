@@ -9,7 +9,7 @@ export const idSlice = createSlice({
     },
 });
 export const attributeSlice = createSlice({
-    name: "id",
+    name: "attribute",
     initialState: {
         attributeKeys: [],
     } as Attributes,

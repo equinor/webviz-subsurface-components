@@ -31,18 +31,24 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                         )
                     ].name;
                 setContent(() => (
-                    <table>
+                    <table style={{ color: "#fff" }}>
                         <tbody>
                             <tr>
-                                <td>Well name</td>
+                                <td>
+                                    <b>Well name</b>
+                                </td>
                                 <td>{well.name}</td>
                             </tr>
                             <tr>
-                                <td>Stratigraphy</td>
+                                <td>
+                                    <b>Stratigraphy</b>
+                                </td>
                                 <td>{zoneName}</td>
                             </tr>
                             <tr>
-                                <td>Completion</td>
+                                <td>
+                                    <b>Completion</b>
+                                </td>
                                 <td>{completion}</td>
                             </tr>
                         </tbody>

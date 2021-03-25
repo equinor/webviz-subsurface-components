@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { WellCompletionsState } from "../redux/store";
 import { Well } from "../redux/types";
 import { dataInTimeIndexRange, PlotData } from "../utils/dataUtil";
-import { getRegexPredicate } from "../utils/regex";
+import { getRegexPredicate } from "../utils/stringUtil";
 import { createSortFunction } from "../utils/sort";
 import { DataContext } from "../WellCompletions";
 

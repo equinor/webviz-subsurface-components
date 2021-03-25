@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { WellPlotData } from "../../utils/dataUtil";
 import { SORT_BY_COMPLETION_DATE } from "../../utils/sort";
+import { capitalizeFirstLetter } from "../../utils/stringUtil";
 import { useTooltip } from "../Common/TooltipProvider";
 import { Padding, PlotLayout } from "./plotUtil";
 
@@ -21,12 +22,16 @@ const WellsPlot: React.FC<Props> = React.memo(
         const onMouseOver = useCallback(
             well => {
                 setContent(() => (
-                    <table>
+                    <table style={{ color: "#fff" }}>
                         <tbody>
                             {/* earliest completion date */}
                             <tr key={`well-tooltip-${well.name}-earliest-comp`}>
                                 <td>
-                                    <b>{SORT_BY_COMPLETION_DATE}</b>
+                                    <b>
+                                        {capitalizeFirstLetter(
+                                            SORT_BY_COMPLETION_DATE
+                                        )}
+                                    </b>
                                 </td>
                                 <td>{timeSteps[well.earliestCompDateIndex]}</td>
                             </tr>
@@ -35,7 +40,9 @@ const WellsPlot: React.FC<Props> = React.memo(
                                     key={`well-tooltip-${well.name}-${attribute}`}
                                 >
                                     <td>
-                                        <b>{attribute}</b>
+                                        <b>
+                                            {capitalizeFirstLetter(attribute)}
+                                        </b>
                                     </td>
                                     <td>{well.attributes[attribute]}</td>
                                 </tr>

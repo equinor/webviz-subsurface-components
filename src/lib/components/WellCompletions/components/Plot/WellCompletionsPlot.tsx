@@ -43,7 +43,12 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
 
         return (
             <TooltipProvider>
-                <div className={classes.root} ref={ref}>
+                <div
+                    className={classes.root}
+                    ref={ref}
+                    data-tip
+                    data-for="plot-tooltip"
+                >
                     {layout && (
                         <svg
                             id={"svg-context"}

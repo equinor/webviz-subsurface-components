@@ -1,22 +1,5 @@
-import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import React, { PropsWithChildren } from "react";
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            position: "fixed",
-            zIndex: 999,
-            padding: theme.spacing(0.5),
-            backgroundColor: theme.palette.background.paper,
-            borderColor: theme.palette.divider,
-            borderRadius: theme.shape.borderRadius,
-            borderWidth: "thin",
-            borderStyle: "solid",
-            pointerEvents: "none",
-            overflow: "hidden",
-        },
-    })
-);
+import ReactTooltip from "react-tooltip";
 
 const TooltipContext = React.createContext<{
     setContent: React.Dispatch<React.SetStateAction<React.FC<{}> | null>>;
@@ -35,11 +18,7 @@ const TooltipContext = React.createContext<{
 const TooltipProvider: React.FC<PropsWithChildren<{}>> = ({
     children,
 }: PropsWithChildren<{}>) => {
-    // Style
-    const classes = useStyles();
-
     // State
-    const [coords, setCoords] = React.useState([0, 0]);
     const [Content, setContent] = React.useState<React.FC | null>(null);
 
     const value = React.useMemo(
@@ -49,38 +28,10 @@ const TooltipProvider: React.FC<PropsWithChildren<{}>> = ({
         [setContent]
     );
 
-    // Callbacks
-    const handleMouseMove = React.useCallback((e: MouseEvent) => {
-        setCoords([e.clientX, e.clientY]);
-    }, []);
-
-    const addEventListeners = React.useCallback(() => {
-        document.addEventListener("mousemove", handleMouseMove);
-    }, [handleMouseMove]);
-
-    const removeEventListeners = React.useCallback(() => {
-        document.removeEventListener("mousemove", handleMouseMove);
-    }, [handleMouseMove]);
-
-    // Effects
-    React.useEffect(() => {
-        addEventListeners();
-        return removeEventListeners;
-    }, [addEventListeners, removeEventListeners]);
-
     return (
         <TooltipContext.Provider value={value}>
             {children}
-            <div
-                className={classes.root}
-                style={{
-                    left: coords[0] + 20, // 20px x offset from the mouse cursor
-                    top: coords[1],
-                    display: Content ? undefined : "none",
-                }}
-            >
-                {Content}
-            </div>
+            <ReactTooltip id="plot-tooltip" getContent={() => Content} />
         </TooltipContext.Provider>
     );
 };

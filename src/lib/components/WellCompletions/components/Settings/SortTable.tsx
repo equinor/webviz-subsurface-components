@@ -18,6 +18,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSortKey, updateSortKey } from "../../redux/reducer";
 import { WellCompletionsState } from "../../redux/store";
+import { SortDirection } from "../../redux/types";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -36,7 +37,6 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         select: {
             maxWidth: "150px",
-            paddingX: theme.spacing(1),
         },
     })
 );
@@ -46,6 +46,9 @@ Icon.add({ delete_to_trash }); // (this needs only be done once)
 const SortTable: React.FC = React.memo(() => {
     const classes = useStyles();
     const [sortKeyToAdd, setSortKeyToAdd] = useState<string>();
+    const [sortDirectionToAdd, setSortDirectionToAdd] = useState<SortDirection>(
+        "Ascending"
+    );
     // Redux
     const dispatch = useDispatch();
     const sortBy = useSelector((st: WellCompletionsState) => st.ui.sortBy);
@@ -66,7 +69,14 @@ const SortTable: React.FC = React.memo(() => {
     // handlers
     const onSortKeyToAddChange = useCallback(
         event => setSortKeyToAdd(event.target.value),
-        []
+        [setSortKeyToAdd]
+    );
+    const onSortDirectionToAddChange = useCallback(
+        () =>
+            setSortDirectionToAdd(
+                sortDirectionToAdd === "Ascending" ? "Descending" : "Ascending"
+            ),
+        [setSortDirectionToAdd, sortDirectionToAdd]
     );
 
     const onUpdateSortKey = useCallback(
@@ -87,9 +97,6 @@ const SortTable: React.FC = React.memo(() => {
             className={classes.root}
         >
             <Table>
-                <Table.Caption captionSide="top">
-                    <Typography variant="h4">Well sorting levels</Typography>
-                </Table.Caption>
                 <Table.Head>
                     <Table.Row>
                         <Table.Cell>Sort by</Table.Cell>
@@ -133,33 +140,51 @@ const SortTable: React.FC = React.memo(() => {
                             </Table.Cell>
                         </Table.Row>
                     ))}
+                    {/* Placeholder row */}
+                    <Table.Row key={`sort-by-placeholder`}>
+                        <Table.Cell>
+                            <NativeSelect
+                                className={classes.select}
+                                id="range-display-mode-selector"
+                                label=""
+                                value={sortKeyToAdd}
+                                onChange={onSortKeyToAddChange}
+                            >
+                                {availableToAdd.map(key => (
+                                    <option key={key}>{key}</option>
+                                ))}
+                            </NativeSelect>
+                        </Table.Cell>
+                        <Table.Cell>
+                            <Button
+                                aria-controls="simple-menu"
+                                aria-haspopup="true"
+                                variant="ghost"
+                                onClick={onSortDirectionToAddChange}
+                            >
+                                {sortDirectionToAdd}
+                            </Button>
+                        </Table.Cell>
+                        <Table.Cell>
+                            <Tooltip title="Add sorting level">
+                                <Button
+                                    aria-controls="simple-menu"
+                                    aria-haspopup="true"
+                                    variant="ghost_icon"
+                                    onClick={() =>
+                                        onUpdateSortKey(
+                                            sortKeyToAdd,
+                                            sortDirectionToAdd
+                                        )
+                                    }
+                                >
+                                    <Icon color="currentColor" name="add_box" />
+                                </Button>
+                            </Tooltip>
+                        </Table.Cell>
+                    </Table.Row>
                 </Table.Body>
             </Table>
-            <div className={classes.add}>
-                <NativeSelect
-                    className={classes.select}
-                    id="range-display-mode-selector"
-                    label=""
-                    value={sortKeyToAdd}
-                    onChange={onSortKeyToAddChange}
-                >
-                    {availableToAdd.map(key => (
-                        <option key={key}>{key}</option>
-                    ))}
-                </NativeSelect>
-                <Tooltip title="Add sorting level">
-                    <Button
-                        aria-controls="simple-menu"
-                        aria-haspopup="true"
-                        variant="ghost_icon"
-                        onClick={e =>
-                            onUpdateSortKey(sortKeyToAdd, "Ascending")
-                        }
-                    >
-                        <Icon color="currentColor" name="add_box" />
-                    </Button>
-                </Tooltip>
-            </div>
         </Box>
     );
 });

@@ -1,9 +1,8 @@
-import { Icon, Tooltip } from "@equinor/eds-core-react";
+import { Icon, Tooltip, Button } from "@equinor/eds-core-react";
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { view_column } from "@equinor/eds-icons";
 import {
     Box,
-    Button,
     createStyles,
     makeStyles,
     Menu,
@@ -14,7 +13,6 @@ import React from "react";
 import RangeDisplayModeSelector from "./RangeDisplayModeSelector";
 import WellsPerPageSelector from "./WellsPerPageSelector";
 
-// Use library approach
 // eslint-disable-next-line @typescript-eslint/camelcase
 Icon.add({ view_column }); // (this needs only be done once)
 const useStyles = makeStyles((theme: Theme) =>
@@ -43,11 +41,7 @@ const ViewMenu: React.FC = React.memo(() => {
     return (
         <div>
             <Tooltip title="View">
-                <Button
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    onClick={handleClick}
-                >
+                <Button variant="ghost_icon" onClick={handleClick}>
                     <Icon color="currentColor" name="view_column" />
                 </Button>
             </Tooltip>
