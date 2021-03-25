@@ -71,6 +71,7 @@ const DeckGLMapDemo = () => {
 
     const [jsonData, setJsonData] = React.useState(null);
     const [colormaps, setColormaps] = React.useState([]);
+    const [showCoords, setShowCoords] = React.useState(true);
 
     const [errorReset, setErrorReset] = React.useState(false);
 
@@ -80,6 +81,11 @@ const DeckGLMapDemo = () => {
         setText(JSON.stringify(example, null, 2));
 
         setJsonData(example.jsonData);
+        setShowCoords(
+            typeof example.showCoords === "undefined"
+                ? true
+                : example.showCoords
+        );
 
         const colmaps = _get_colmaps(example.jsonData["layers"]);
         setColormaps(colmaps);
@@ -92,6 +98,11 @@ const DeckGLMapDemo = () => {
             try {
                 const json = txt && JSON.parse(txt);
                 setJsonData(json.jsonData);
+                setShowCoords(
+                    typeof json.showCoords === "undefined"
+                        ? true
+                        : json.showCoords
+                );
 
                 const colmaps = _get_colmaps(json.jsonData["layers"]);
                 setColormaps(colmaps);
@@ -128,7 +139,11 @@ const DeckGLMapDemo = () => {
                         setErrorReset(false);
                     }}
                 >
-                    <DeckGLMap id="DeckGL-Map" jsonData={jsonData} />
+                    <DeckGLMap
+                        id="DeckGL-Map"
+                        jsonData={jsonData}
+                        showCoords={showCoords}
+                    />
                 </ErrorBoundary>
                 <div>
                     {colormaps.map((colormap, index) => (
