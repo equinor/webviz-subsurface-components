@@ -72,11 +72,12 @@ const DeckGLMapDemo = () => {
     const [text, setText] = React.useState("");
     const [parsedJson, setParsedJson] = React.useState(null);
 
-    const colormaps = React.useMemo(() =>
-        parsedJson?.deckglSpec?.layers
-            ? _get_colmaps(parsedJson.deckglSpec.layers)
-            : [],
-            [parsedJson]
+    const colormaps = React.useMemo(
+        () =>
+            parsedJson?.deckglSpec?.layers
+                ? _get_colmaps(parsedJson.deckglSpec.layers)
+                : [],
+        [parsedJson]
     );
 
     React.useEffect(() => {
