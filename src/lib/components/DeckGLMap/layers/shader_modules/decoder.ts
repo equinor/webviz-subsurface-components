@@ -1,3 +1,4 @@
+import { ValueDecoder } from "../utils/propertyMapTools";
 import fs from "./decoder.fs.glsl";
 
 const DEFAULT_DECODER: ValueDecoder = {

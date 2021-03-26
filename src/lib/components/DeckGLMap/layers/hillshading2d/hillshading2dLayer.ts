@@ -3,10 +3,17 @@
 import { BitmapLayer, BitmapLayerProps } from "@deck.gl/layers";
 
 import { decoder } from "../shader_modules";
+import {
+    decodeRGB,
+    BitmapPickInfo,
+    PropertyMapPickInfo,
+    ValueDecoder,
+} from "../utils/propertyMapTools";
+
 import fsHillshading from "./hillshading2d.fs.glsl";
 
 const defaultProps = {
-    valueRange: { type: "number" },
+    valueRange: { type: "array" },
     lightDirection: { type: "array", value: [1, 1, 1] },
     ambientLightIntensity: { type: "number", value: 0.5 },
     diffuseLightIntensity: { type: "number", value: 0.5 },
@@ -24,7 +31,7 @@ const defaultProps = {
 };
 
 export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
-    valueRange: number;
+    valueRange: [number, number];
     lightDirection: [number, number, number];
     ambientLightIntensity: number;
     diffuseLightIntensity: number;
@@ -50,6 +57,7 @@ export default class Hillshading2DLayer extends BitmapLayer<
                 ...moduleParameters,
                 valueDecoder: mergedDecoder,
             });
+            const [minVal, maxVal] = this.props.valueRange;
             super.draw({
                 uniforms: {
                     ...uniforms,
@@ -57,7 +65,7 @@ export default class Hillshading2DLayer extends BitmapLayer<
                         this.props.image.width,
                         this.props.image.height,
                     ],
-                    valueRange: this.props.valueRange,
+                    valueRangeSize: maxVal - minVal,
                     lightDirection: this.props.lightDirection,
                     ambientLightIntensity: this.props.ambientLightIntensity,
                     diffuseLightIntensity: this.props.diffuseLightIntensity,
@@ -74,6 +82,24 @@ export default class Hillshading2DLayer extends BitmapLayer<
         parentShaders.fs = fsHillshading;
         parentShaders.modules.push(decoder);
         return parentShaders;
+    }
+
+    getPickingInfo({ info }: { info: BitmapPickInfo }): PropertyMapPickInfo {
+        if (this.state.pickingDisabled || !info.color) {
+            return info;
+        }
+
+        const mergedDecoder = {
+            ...defaultProps.valueDecoder.value,
+            ...this.props.valueDecoder,
+        };
+        const val = decodeRGB(info.color, mergedDecoder, this.props.valueRange);
+
+        return {
+            ...info,
+            index: 0, // Picking color doesn't represent object index in this layer
+            propertyValue: val,
+        };
     }
 }
 

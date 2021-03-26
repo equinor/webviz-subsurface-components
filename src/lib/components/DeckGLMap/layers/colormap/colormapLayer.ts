@@ -6,6 +6,13 @@ import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
 
 import { decoder } from "../shader_modules";
+import {
+    decodeRGB,
+    BitmapPickInfo,
+    PropertyMapPickInfo,
+    ValueDecoder,
+} from "../utils/propertyMapTools";
+
 import fsColormap from "./colormap.fs.glsl";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
@@ -17,11 +24,13 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 
 export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
     colormap: unknown;
+    valueRange: [number, number];
     valueDecoder: ValueDecoder;
 }
 
 const defaultProps = {
     colormap: { type: "object", value: null, async: true },
+    valueRange: { type: "array" },
     valueDecoder: {
         type: "object",
         value: {
@@ -67,6 +76,24 @@ export default class ColormapLayer extends BitmapLayer<
         parentShaders.fs = fsColormap;
         parentShaders.modules.push(decoder);
         return parentShaders;
+    }
+
+    getPickingInfo({ info }: { info: BitmapPickInfo }): PropertyMapPickInfo {
+        if (this.state.pickingDisabled || !info.color) {
+            return info;
+        }
+
+        const mergedDecoder = {
+            ...defaultProps.valueDecoder.value,
+            ...this.props.valueDecoder,
+        };
+        const val = decodeRGB(info.color, mergedDecoder, this.props.valueRange);
+
+        return {
+            ...info,
+            index: 0, // Picking color doesn't represent object index in this layer
+            propertyValue: val,
+        };
     }
 }
 

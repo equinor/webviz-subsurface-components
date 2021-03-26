@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import Map from "./Map";
 
 function DeckGLMap(props) {
-    return <Map id={props.id} jsonData={props.jsonData} />;
+    return <Map {...props} />;
 }
 
 DeckGLMap.propTypes = {
@@ -16,10 +16,19 @@ DeckGLMap.propTypes = {
     id: PropTypes.string.isRequired,
 
     /**
-     * JSON description of the map to be displayed. More detailes about
+     * JSON specification of the map to be displayed. More detailes about
      * the format can be found here: https://deck.gl/docs/api-reference/json/conversion-reference
      */
-    jsonData: PropTypes.object,
+    deckglSpec: PropTypes.object,
+
+    /**
+     * Show or hide the coordinates component. True by default.
+     */
+    showCoords: PropTypes.bool,
+};
+
+DeckGLMap.defaultProps = {
+    showCoords: true,
 };
 
 export default DeckGLMap;

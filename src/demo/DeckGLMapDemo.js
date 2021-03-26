@@ -67,22 +67,24 @@ function _get_colmaps(layers) {
 }
 
 const DeckGLMapDemo = () => {
-    const [text, setText] = React.useState("");
-
-    const [jsonData, setJsonData] = React.useState(null);
-    const [colormaps, setColormaps] = React.useState([]);
-
     const [errorReset, setErrorReset] = React.useState(false);
+
+    const [text, setText] = React.useState("");
+    const [parsedJson, setParsedJson] = React.useState(null);
+
+    const colormaps = React.useMemo(
+        () =>
+            parsedJson?.deckglSpec?.layers
+                ? _get_colmaps(parsedJson.deckglSpec.layers)
+                : [],
+        [parsedJson]
+    );
 
     React.useEffect(() => {
         const example = exampleData[1];
 
         setText(JSON.stringify(example, null, 2));
-
-        setJsonData(example.jsonData);
-
-        const colmaps = _get_colmaps(example.jsonData["layers"]);
-        setColormaps(colmaps);
+        setParsedJson(example);
     }, []);
 
     const onEditorChanged = React.useCallback(txt => {
@@ -91,10 +93,7 @@ const DeckGLMapDemo = () => {
             // Parse JSON, while capturing and ignoring exceptions
             try {
                 const json = txt && JSON.parse(txt);
-                setJsonData(json.jsonData);
-
-                const colmaps = _get_colmaps(json.jsonData["layers"]);
-                setColormaps(colmaps);
+                setParsedJson(json);
 
                 setErrorReset(true);
             } catch (error) {
@@ -128,7 +127,7 @@ const DeckGLMapDemo = () => {
                         setErrorReset(false);
                     }}
                 >
-                    <DeckGLMap id="DeckGL-Map" jsonData={jsonData} />
+                    <DeckGLMap id="DeckGL-Map" {...parsedJson} />
                 </ErrorBoundary>
                 <div>
                     {colormaps.map((colormap, index) => (
