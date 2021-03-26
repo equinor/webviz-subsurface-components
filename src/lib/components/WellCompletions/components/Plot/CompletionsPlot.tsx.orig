@@ -104,66 +104,76 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                 const totalWidth =
                                     completion.open + completion.shut;
                                 return (
+<<<<<<< HEAD
+                                    <rect
+                                        key={`well-${well.name}-completions-${start}-${end}`}
+                                        transform={`translate(${
+                                            -completion * wellWidth * 0.25
+                                        }, ${start * barHeight + padding.top})`}
+                                        width={(completion * wellWidth) / 2}
+                                        height={barHeight * (end - start)}
+                                        fill={"#111"}
+                                        onMouseMove={(e) =>
+                                            onMouseMove(e, well, completion)
+                                        }
+                                        onMouseOut={onMouseOut}
+                                    />
+=======
                                     <>
                                         <rect
                                             key={`well-${well.name}-completions-${start}-${end}`}
-                                            transform={`translate(${
-                                                -totalWidth * wellWidth * 0.25
-                                            }, ${
-                                                start * barHeight + padding.top
-                                            })`}
+                                            transform={`translate(${-totalWidth *
+                                                wellWidth *
+                                                0.25}, ${start * barHeight +
+                                                padding.top})`}
                                             width={
                                                 (completion.shut * wellWidth) /
                                                 4
                                             }
                                             height={barHeight * (end - start)}
                                             fill={"#f00"}
-                                            onMouseMove={(e) =>
+                                            onMouseMove={e =>
                                                 onMouseMove(e, well, completion)
                                             }
                                             onMouseOut={onMouseOut}
                                         />
                                         <rect
                                             key={`well-${well.name}-completions-open-${start}-${end}`}
-                                            transform={`translate(${
-                                                -completion.open *
+                                            transform={`translate(${-completion.open *
                                                 wellWidth *
-                                                0.25
-                                            }, ${
-                                                start * barHeight + padding.top
-                                            })`}
+                                                0.25}, ${start * barHeight +
+                                                padding.top})`}
                                             width={
                                                 (completion.open * wellWidth) /
                                                 2
                                             }
                                             height={barHeight * (end - start)}
                                             fill={"#111"}
-                                            onMouseMove={(e) =>
+                                            onMouseMove={e =>
                                                 onMouseMove(e, well, completion)
                                             }
                                             onMouseOut={onMouseOut}
                                         />
                                         <rect
                                             key={`well-${well.name}-completions-${start}-${end}`}
-                                            transform={`translate(${
-                                                (totalWidth - completion.shut) *
+                                            transform={`translate(${(totalWidth -
+                                                completion.shut) *
                                                 wellWidth *
-                                                0.25
-                                            }, ${
-                                                start * barHeight + padding.top
-                                            })`}
+                                                0.25}, ${start * barHeight +
+                                                padding.top})`}
                                             width={
                                                 (completion.shut * wellWidth) /
                                                 4
                                             }
                                             height={barHeight * (end - start)}
                                             fill={"#f00"}
-                                            onMouseMove={(e) =>
+                                            onMouseMove={e =>
                                                 onMouseMove(e, well, completion)
                                             }
                                             onMouseOut={onMouseOut}
                                         />
                                     </>
+>>>>>>> Add kh support
                                 );
                             })}
                         </g>
