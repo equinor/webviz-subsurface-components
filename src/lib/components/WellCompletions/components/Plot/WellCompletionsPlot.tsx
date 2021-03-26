@@ -1,116 +1,83 @@
-import { createStyles, makeStyles } from "@material-ui/core";
-import { isEqual } from "lodash";
-import React, { useEffect, useMemo, useRef } from "react";
-import { useSelector } from "react-redux";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import React, { useMemo } from "react";
 import { useResizeDetector } from "react-resize-detector";
-import { WellCompletionsState } from "../../redux/store";
-import { getRegexPredicate } from "../../utils/regex";
-import { D3WellCompletions } from "./D3WellCompletions";
-import { dataInTimeIndexRange } from "./dataUtil";
+import { PlotData } from "../../utils/dataUtil";
+import { TooltipProvider } from "../Common/TooltipProvider";
+import CompletionsPlot from "./CompletionsPlot";
+import { getLayout, Padding } from "./plotUtil";
+import StratigraphyPlot from "./StratigraphyPlot";
+import WellsPlot from "./WellsPlot";
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             display: "flex",
             flex: 1,
             height: "80%",
+            padding: theme.spacing(1),
         },
     })
 );
-const WellCompletionsPlot: React.FC = () => {
-    const classes = useStyles();
-    // A reference to the div storing the plots
-    const d3wellcompletions = useRef<D3WellCompletions>();
-    const { width, height, ref } = useResizeDetector<HTMLDivElement>({
-        refreshMode: "debounce",
-        refreshRate: 100,
-        refreshOptions: { trailing: true },
-    });
-    //Redux states
-    const data = useSelector(
-        (state: WellCompletionsState) => state.dataModel.data!
-    );
-    const timeIndexRange = useSelector(
-        (state: WellCompletionsState) => state.ui.timeIndexRange,
-        isEqual
-    ) as [number, number];
-    const rangeDisplayMode = useSelector(
-        (state: WellCompletionsState) => state.ui.rangeDisplayMode
-    );
-    const hideZeroCompletions = useSelector(
-        (state: WellCompletionsState) => state.ui.hideZeroCompletions
-    );
-    const filteredZones = useSelector(
-        (state: WellCompletionsState) => state.ui.filteredZones
-    );
-    const wellSearchText = useSelector(
-        (state: WellCompletionsState) => state.ui.wellSearchText
-    );
-    //Memo
-    const filteredStratigraphy = useMemo(
-        () =>
-            data.stratigraphy.filter(
-                zone => !filteredZones || filteredZones.includes(zone.name)
-            ),
-        [data.stratigraphy, filteredZones]
-    );
-    const wellNameRegex = useMemo(() => getRegexPredicate(wellSearchText), [
-        wellSearchText,
-    ]);
-    const filteredWells = useMemo(
-        () => data.wells.filter(well => wellNameRegex(well.name)),
-        [data.wells, wellNameRegex]
-    );
+interface Props {
+    timeSteps: string[];
+    plotData: PlotData;
+}
 
-    const plotData = useMemo(
-        () =>
-            dataInTimeIndexRange(
-                filteredStratigraphy,
-                filteredWells,
-                timeIndexRange,
-                rangeDisplayMode,
-                hideZeroCompletions
-            ),
-        [
-            filteredStratigraphy,
-            filteredWells,
-            timeIndexRange,
-            rangeDisplayMode,
-            hideZeroCompletions,
-        ]
-    );
+const padding: Padding = { left: 50, right: 50, top: 70, bottom: 50 };
+/* eslint-disable react/prop-types */
+const WellCompletionsPlot: React.FC<Props> = React.memo(
+    ({ timeSteps, plotData }) => {
+        const classes = useStyles();
+        const { width, height, ref } = useResizeDetector<HTMLDivElement>({
+            refreshMode: "debounce",
+            refreshRate: 50,
+            refreshOptions: { trailing: true },
+        });
+        const layout = useMemo(
+            () =>
+                width !== undefined && height !== undefined
+                    ? getLayout(width, height, padding)
+                    : undefined,
+            [width, height]
+        );
 
-    // On mount
-    useEffect(() => {
-        if (!d3wellcompletions.current) {
-            d3wellcompletions.current = new D3WellCompletions(
-                ref.current as HTMLDivElement
-            );
-        }
-    }, []);
-
-    //Data changed
-    useEffect(() => {
-        if (d3wellcompletions.current) {
-            d3wellcompletions.current.setPlotData(plotData);
-        }
-    }, [plotData]);
-    //Resize
-    useEffect(() => {
-        if (
-            d3wellcompletions.current &&
-            width !== undefined &&
-            height !== undefined
-        ) {
-            d3wellcompletions.current.resize(width, height);
-        }
-    }, [width, height]);
-    // On unmount
-    useEffect(() => {
-        return () => d3wellcompletions.current?.clear();
-    }, []);
-
-    return <div className={classes.root} ref={ref} />;
-};
+        return (
+            <TooltipProvider>
+                <div
+                    className={classes.root}
+                    ref={ref}
+                    data-tip
+                    data-for="plot-tooltip"
+                >
+                    {layout && (
+                        <svg
+                            id={"svg-context"}
+                            width={width}
+                            height={height}
+                            style={{ position: "relative" }}
+                        >
+                            <StratigraphyPlot
+                                data={plotData.stratigraphy}
+                                layout={layout}
+                                padding={padding}
+                            />
+                            <WellsPlot
+                                timeSteps={timeSteps}
+                                data={plotData.wells}
+                                layout={layout}
+                                padding={padding}
+                            />
+                            <CompletionsPlot
+                                data={plotData}
+                                layout={layout}
+                                padding={padding}
+                            />
+                        </svg>
+                    )}
+                </div>
+            </TooltipProvider>
+        );
+    }
+);
 
 export default WellCompletionsPlot;

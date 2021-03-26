@@ -1,6 +1,7 @@
+import { Well } from "../redux/types";
 import { dataInTimeIndexRange } from "./dataUtil";
 
-describe("Feature Toggles", () => {
+describe("Data Util", () => {
     const testStratigraphy = [
         {
             name: "zone1",
@@ -120,9 +121,9 @@ describe("Feature Toggles", () => {
                     f: [1.0],
                 },
             },
-            type: "Producer",
-            region: "Region1",
-        },
+            earliestCompDateIndex: 1,
+            attributes: { type: "Producer", region: "Region 2" },
+        } as Well,
     ];
     it("test dataInTimeIndexRange", () => {
         //Display single time step
@@ -139,7 +140,13 @@ describe("Feature Toggles", () => {
             wells: [
                 {
                     name: "RWI_3",
-                    completions: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    completions: [0],
+                    zoneIndices: [0],
+                    earliestCompDateIndex: 1,
+                    attributes: {
+                        region: "Region 2",
+                        type: "Producer",
+                    },
                 },
             ],
         });
@@ -170,22 +177,13 @@ describe("Feature Toggles", () => {
             wells: [
                 {
                     name: "RWI_3",
-                    completions: [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0.125,
-                        0.125,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                    ],
+                    completions: [0, 0.125, 0],
+                    zoneIndices: [0, 5, 7],
+                    earliestCompDateIndex: 1,
+                    attributes: {
+                        region: "Region 2",
+                        type: "Producer",
+                    },
                 },
             ],
         });
@@ -203,22 +201,13 @@ describe("Feature Toggles", () => {
             wells: [
                 {
                     name: "RWI_3",
-                    completions: [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0.125,
-                        0.125,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                    ],
+                    completions: [0, 0.125, 0],
+                    zoneIndices: [0, 5, 7],
+                    earliestCompDateIndex: 1,
+                    attributes: {
+                        region: "Region 2",
+                        type: "Producer",
+                    },
                 },
             ],
         });
@@ -237,7 +226,13 @@ describe("Feature Toggles", () => {
             wells: [
                 {
                     name: "RWI_3",
-                    completions: [1, 1, 1],
+                    completions: [1],
+                    zoneIndices: [0],
+                    earliestCompDateIndex: 1,
+                    attributes: {
+                        region: "Region 2",
+                        type: "Producer",
+                    },
                 },
             ],
         });

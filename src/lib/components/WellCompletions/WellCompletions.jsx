@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import WellCompletionComponent from "./components/WellCompletionComponent";
 
+export const DataContext = React.createContext();
 const WellCompletions = props => {
     return <WellCompletionComponent id={props.id} data={props.data} />;
 };
