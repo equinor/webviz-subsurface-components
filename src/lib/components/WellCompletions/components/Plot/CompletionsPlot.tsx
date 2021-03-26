@@ -55,7 +55,7 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                     </table>
                 ));
             },
-            [setContent, data.stratigraphy]
+            [setContent, data.stratigraphy, barHeight]
         );
 
         const onMouseOut = useCallback(() => setContent(() => null), [
