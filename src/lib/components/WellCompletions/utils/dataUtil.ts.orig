@@ -1,6 +1,11 @@
-import _ from "lodash";
+<<<<<<< HEAD
 import { Data, RangeMode, RangeModes, Well, Zone } from "../redux/types";
-export const preprocessData = (data: Data): Data => {
+export const preprocessData = (data: any): Data => {
+=======
+import { RangeMode, RangeModes, Well, Zone } from "../redux/types";
+import _ from "lodash";
+export const preprocessData = (data: any) => {
+>>>>>>> Add kh support
     return {
         ...data,
         wells: data.wells.map((well) => {
@@ -42,8 +47,14 @@ export const dataInTimeIndexRange = (
 ): PlotData => {
     const wellPlotData: WellPlotData[] = [];
     //Get first step for now
+<<<<<<< HEAD
     wells.forEach((well) => {
+        const wellCompletions: number[] = [];
+        const zoneIndices: number[] = [];
+=======
+    wells.forEach(well => {
         const completionsPlotData: CompletionPlotData[] = [];
+>>>>>>> Add kh support
         let hasData = false;
         stratigraphy.forEach((zone, zoneIndex) => {
             const length = range[1] - range[0] + 1;
@@ -118,7 +129,12 @@ export interface PlotData {
 export interface WellPlotData {
     name: string;
     earliestCompDateIndex: number;
+<<<<<<< HEAD
     attributes: Record<string, string | number | undefined>;
+    completions: number[];
+    zoneIndices: number[];
+=======
+    attributes: Record<string, any>;
     completions: CompletionPlotData[];
 }
 
@@ -129,4 +145,5 @@ export interface CompletionPlotData {
     khMean: number;
     khMin: number;
     khMax: number;
+>>>>>>> Add kh support
 }
