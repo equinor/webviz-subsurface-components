@@ -12,9 +12,6 @@ import WellCompletionComponent from "./components/WellCompletionComponent";
 const inputSchema = require("../../../../inputSchema/wellCompletions.json");
 const ajv = new Ajv();
 
-const inputSchema = require("../../../../inputSchema/wellCompletions.json");
-const ajv = new Ajv();
-
 export const DataContext = React.createContext();
 const WellCompletions = props => {
     const valid = useMemo(() => {
