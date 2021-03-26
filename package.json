@@ -8,7 +8,7 @@
   "bugs": {
     "url": "https://github.com/equinor/webviz-subsurface-components/issues"
   },
-  "homepage": "https://github.com/equinor/webviz-subsurface-components", 
+  "homepage": "https://github.com/equinor/webviz-subsurface-components",
   "main": "build/index.js",
   "scripts": {
     "start": "webpack-dev-server --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
