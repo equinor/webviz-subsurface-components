@@ -1,6 +1,6 @@
 [
     {
-        "jsonData": {
+        "deckglSpec": {
             "description": "A minimal deck.gl example rendering a circle with text",
             "initialViewState": {
               "longitude": -122.45,
@@ -42,7 +42,7 @@
           }
     },
     {
-        "jsonData": {
+        "deckglSpec": {
             "initialViewState": {
                 "target": [434962.5, 6478095.5, 0],
                 "zoom": -3
@@ -53,13 +53,15 @@
                     "id": "colormap-layer",
                     "bounds": [432205, 6475078, 437720, 6481113],
                     "image": "https://i.imgur.com/Dx8eseE.png",
-                    "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
+                    "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
+                    "valueRange": [2782, 3513],
+                    "pickable": true
                 },
                 {
                     "@@type": "Hillshading2DLayer",
                     "id": "hillshading-layer",
                     "bounds": [432205, 6475078, 437720, 6481113],
-                    "valueRange": 731.0,
+                    "valueRange": [2782, 3513],
                     "opacity": 1.0,
                     "image": "https://i.imgur.com/Dx8eseE.png"
                 },
