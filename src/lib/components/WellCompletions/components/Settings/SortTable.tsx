@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import {
-    Button,
-    Icon,
-    NativeSelect,
-    Table,
-    Typography,
-} from "@equinor/eds-core-react";
+import { Button, Icon, NativeSelect, Table } from "@equinor/eds-core-react";
 import { add_box, delete_to_trash } from "@equinor/eds-icons";
 import {
     Box,
