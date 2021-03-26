@@ -16,7 +16,11 @@ export interface Well {
 
 export interface Completions {
     t: number[];
-    f: number[];
+    open: number[];
+    shut: number[];
+    khMean: number[];
+    khMin: number[];
+    khMax: number[];
 }
 
 export const RangeModes = {
