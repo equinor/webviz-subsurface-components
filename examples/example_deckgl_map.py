@@ -64,12 +64,11 @@ if __name__ == "__main__":
 
     min_value = np.nanmin(map_data)
     max_value = np.nanmax(map_data)
-    value_range = max_value - min_value
 
     # Shift the values to start from 0 and scale them to cover
     # the whole RGB range for increased precision.
     # The client will need to reverse this operation.
-    scale_factor = (256*256*256 - 1) / value_range
+    scale_factor = (256*256*256 - 1) / (max_value - min_value)
     map_data = (map_data - min_value) * scale_factor
 
     map_data = array2d_to_png(map_data)
@@ -82,7 +81,7 @@ if __name__ == "__main__":
 
     deckgl_map_1 = webviz_subsurface_components.DeckGLMap(
         id = "DeckGL-Map",
-        jsonData = {
+        deckglSpec = {
             "initialViewState": {
                 "target": [bounds[0] + width/2, bounds[1] + height/2, 0],
                 "zoom": -3
@@ -93,14 +92,16 @@ if __name__ == "__main__":
                     "id": "colormap-layer",
                     "bounds": bounds,
                     "image": map_data,
-                    "colormap": colormap
+                    "colormap": colormap,
+                    "valueRange": [min_value, max_value],
+                    "pickable": True
                 },
                 {
                     "@@type": "Hillshading2DLayer",
                     "id": "hillshading-layer",
                     "bounds": bounds,
                     "opacity": 1.0,
-                    "valueRange": value_range,
+                    "valueRange": [min_value, max_value],
                     "image": map_data
                 }
             ],
