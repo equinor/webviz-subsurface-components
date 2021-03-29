@@ -21,7 +21,7 @@ class LayeredMapDemo extends Component {
                         sync_ids={["layered-map-demo2"]}
                         layers={data.layers}
                         overlay_layers={data.overlay_layers}
-                        setProps={e => console.log(e)}
+                        setProps={(e) => console.log(e)}
                         draw_toolbar_marker={true}
                         draw_toolbar_polygon={true}
                         draw_toolbar_polyline={true}
@@ -35,7 +35,7 @@ class LayeredMapDemo extends Component {
                         sync_ids={["layered-map-demo1"]}
                         layers={data.layers}
                         overlay_layers={data.overlay_layers}
-                        setProps={e => console.log(e)}
+                        setProps={(e) => console.log(e)}
                         draw_toolbar_marker={true}
                         draw_toolbar_polygon={true}
                         draw_toolbar_polyline={true}

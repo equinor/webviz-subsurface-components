@@ -91,7 +91,7 @@ export default function sensitivitySliderPlot(
         },
 
         initData() {
-            this._bisectDate = d3.bisector(d => d.time).left;
+            this._bisectDate = d3.bisector((d) => d.time).left;
 
             return this.initGraphData().initSliderData();
         },
@@ -128,7 +128,7 @@ export default function sensitivitySliderPlot(
                         case 1:
                             d.values = {
                                 linear: this._parameters[i].main,
-                                log: this._parameters[i].main.map(value =>
+                                log: this._parameters[i].main.map((value) =>
                                     Math.log(value)
                                 ),
                             };
@@ -141,7 +141,7 @@ export default function sensitivitySliderPlot(
                                 linear: this._parameters[i].interactions,
                                 log: this._parameters[
                                     i
-                                ].interactions.map(value => Math.log(value)),
+                                ].interactions.map((value) => Math.log(value)),
                             };
                             d.clazz =
                                 "sensitivity-slider-plot__slider-bar-container " +
@@ -165,12 +165,12 @@ export default function sensitivitySliderPlot(
 
         updateGraphScales() {
             this._graphX
-                .domain(d3.extent(this._output, d => d.time))
+                .domain(d3.extent(this._output, (d) => d.time))
                 .range([0, this._graphWidth]);
             this._graphY
                 .domain([
-                    d3.min(this._output, d => d.min),
-                    d3.max(this._output, d => d.max),
+                    d3.min(this._output, (d) => d.min),
+                    d3.max(this._output, (d) => d.max),
                 ])
                 .range([this._graphHeight, 0]);
             return this;
@@ -204,15 +204,15 @@ export default function sensitivitySliderPlot(
         initGraphGenerators() {
             this._area = d3
                 .area()
-                .x(d => this._graphX(d.time))
-                .y0(d => this._graphY(d.min))
-                .y1(d => this._graphY(d.max))
+                .x((d) => this._graphX(d.time))
+                .y0((d) => this._graphY(d.min))
+                .y1((d) => this._graphY(d.max))
                 .curve(d3.curveLinear);
 
             this._line = d3
                 .line()
-                .x(d => this._graphX(d.time))
-                .y(d => this._graphY(d.mean))
+                .x((d) => this._graphX(d.time))
+                .y((d) => this._graphY(d.mean))
                 .curve(d3.curveLinear);
 
             return this;
@@ -264,14 +264,16 @@ export default function sensitivitySliderPlot(
                 main: {
                     linear: d3.extent(allMainValues),
                     log: d3.extent(
-                        allMainValues.filter(value => value !== 0).map(Math.log)
+                        allMainValues
+                            .filter((value) => value !== 0)
+                            .map(Math.log)
                     ),
                 },
                 interaction: {
                     linear: d3.extent(allInteractionValues),
                     log: d3.extent(
                         allInteractionValues
-                            .filter(value => value !== 0)
+                            .filter((value) => value !== 0)
                             .map(Math.log)
                     ),
                 },
@@ -306,7 +308,7 @@ export default function sensitivitySliderPlot(
                 this
             );
             this._sliderCellYPos = ["header"]
-                .concat(this._parameters.map(param => param.name))
+                .concat(this._parameters.map((param) => param.name))
                 .map((d, i) => i * this._sliderCellHeight);
             return this;
         },
@@ -381,7 +383,7 @@ export default function sensitivitySliderPlot(
 
             const select = formContainer
                 .append("select")
-                .on("change", function() {
+                .on("change", function () {
                     self.updateSliderScale(type, this.value);
                     self.updateSliderBars();
                 });
@@ -391,10 +393,7 @@ export default function sensitivitySliderPlot(
                 .attr("selected", "selected")
                 .html("Linear");
 
-            select
-                .append("option")
-                .attr("value", "log")
-                .html("Log");
+            select.append("option").attr("value", "log").html("Log");
 
             return this;
         },
@@ -416,7 +415,7 @@ export default function sensitivitySliderPlot(
                 .append("g")
                 .attr(
                     "class",
-                    d =>
+                    (d) =>
                         `sensitivity-slider-plot__slider-cell${
                             d.clazz ? ` ${d.clazz}` : ""
                         }`
@@ -425,17 +424,17 @@ export default function sensitivitySliderPlot(
                 .merge(g)
                 .attr(
                     "transform",
-                    d =>
+                    (d) =>
                         `translate(${self._sliderCellXPos[d.j]}, ${
                             self._sliderCellYPos[d.i]
                         })`
                 )
-                .attr("width", d => self._sliderCellWidths[d.j]);
+                .attr("width", (d) => self._sliderCellWidths[d.j]);
 
             const colHeaderLabel = this._sliderSVG
                 .selectAll(".sensitivity-slider-plot__slider-col-header")
                 .selectAll("text")
-                .data(d => [d]);
+                .data((d) => [d]);
             colHeaderLabel
                 .enter()
                 .append("text")
@@ -444,14 +443,14 @@ export default function sensitivitySliderPlot(
                     true
                 )
                 .attr("y", self._sliderCellHeight / 2)
-                .text(d => d.key)
+                .text((d) => d.key)
                 .merge(colHeaderLabel)
-                .attr("x", d => self._sliderCellWidths[d.j] / 2);
+                .attr("x", (d) => self._sliderCellWidths[d.j] / 2);
 
             const rowHeaderLabel = this._sliderSVG
                 .selectAll(".sensitivity-slider-plot__slider-row-header")
                 .selectAll("text")
-                .data(d => [d]);
+                .data((d) => [d]);
             rowHeaderLabel
                 .enter()
                 .append("text")
@@ -460,9 +459,9 @@ export default function sensitivitySliderPlot(
                     true
                 )
                 .attr("y", self._sliderCellHeight / 2)
-                .text(d => d.key)
+                .text((d) => d.key)
                 .merge(rowHeaderLabel)
-                .attr("x", d => self._sliderCellWidths[d.j]);
+                .attr("x", (d) => self._sliderCellWidths[d.j]);
 
             return this;
         },
@@ -476,22 +475,22 @@ export default function sensitivitySliderPlot(
                 .selectAll("g")
                 .attr(
                     "transform",
-                    d =>
+                    (d) =>
                         `translate(${self._sliderCellXPos[d.j]}, ${
                             self._sliderCellYPos[d.i]
                         })`
                 )
-                .attr("width", d => self._sliderCellWidths[d.j]);
+                .attr("width", (d) => self._sliderCellWidths[d.j]);
 
             this._sliderSVG
                 .selectAll(".sensitivity-slider-plot__slider-col-header")
                 .selectAll("text")
-                .attr("x", d => self._sliderCellWidths[d.j] / 2);
+                .attr("x", (d) => self._sliderCellWidths[d.j] / 2);
 
             this._sliderSVG
                 .selectAll(".sensitivity-slider-plot__slider-row-header")
                 .selectAll("text")
-                .attr("x", d => self._sliderCellWidths[d.j]);
+                .attr("x", (d) => self._sliderCellWidths[d.j]);
 
             return this;
         },
@@ -516,7 +515,7 @@ export default function sensitivitySliderPlot(
                         .selectAll(
                             ".sensitivity-slider-plot__slider-bar-background"
                         )
-                        .data(d => [d]);
+                        .data((d) => [d]);
                     rect.enter()
                         .append("rect")
                         .classed(
@@ -527,7 +526,7 @@ export default function sensitivitySliderPlot(
                         .attr("y", self._sliderCellPadding.top)
                         .attr("x", self._sliderCellPadding.left)
                         .merge(rect)
-                        .attr("width", d => self._sliderWidths[d.j]);
+                        .attr("width", (d) => self._sliderWidths[d.j]);
                 }
 
                 function drawMainBar(d) {
@@ -541,7 +540,7 @@ export default function sensitivitySliderPlot(
 
                     const rect = cell
                         .selectAll(".sensitivity-slider-plot__slider-bar-main")
-                        .data(d => [d]);
+                        .data((d) => [d]);
                     rect.enter()
                         .append("rect")
                         .classed(
@@ -554,7 +553,7 @@ export default function sensitivitySliderPlot(
                         .merge(rect)
                         .transition()
                         .duration(self._transitionDuration)
-                        .attr("width", d => {
+                        .attr("width", (d) => {
                             const val =
                                 d.values[scaleType][
                                     self._currentGraphDatumIndex
@@ -581,7 +580,7 @@ export default function sensitivitySliderPlot(
                         .selectAll(
                             ".sensitivity-slider-plot__slider-bar-interaction"
                         )
-                        .data(d => [d]);
+                        .data((d) => [d]);
                     rect.enter()
                         .append("rect")
                         .classed(
@@ -594,7 +593,7 @@ export default function sensitivitySliderPlot(
                         .merge(rect)
                         .transition()
                         .duration(self._transitionDuration)
-                        .attr("width", d => {
+                        .attr("width", (d) => {
                             const val =
                                 d.values[scaleType][
                                     self._currentGraphDatumIndex
@@ -619,7 +618,7 @@ export default function sensitivitySliderPlot(
 
                     const text = cell
                         .selectAll(".sensitivity-slider-plot__slide-bar-label")
-                        .data(d => [d]);
+                        .data((d) => [d]);
                     text.enter()
                         .append("text")
                         .classed(
@@ -630,7 +629,7 @@ export default function sensitivitySliderPlot(
                         .merge(text)
                         .transition()
                         .duration(self._transitionDuration)
-                        .text(d => {
+                        .text((d) => {
                             const val =
                                 d.values[scaleType][
                                     self._currentGraphDatumIndex

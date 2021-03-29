@@ -31,7 +31,9 @@ const DataLoader: React.FC<Props> = ({
             )
         );
         dispatch(
-            updateFilteredZones(props.data.stratigraphy.map(zone => zone.name))
+            updateFilteredZones(
+                props.data.stratigraphy.map((zone) => zone.name)
+            )
         );
     }, [props]);
 

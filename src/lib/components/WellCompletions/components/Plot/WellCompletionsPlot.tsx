@@ -21,7 +21,7 @@ const WellCompletionsPlot: React.FC = () => {
     const classes = useStyles();
     // A reference to the div storing the plots
     const d3wellcompletions = useRef<D3WellCompletions>();
-    const { width, height, ref } = useResizeDetector<HTMLDivElement>({
+    const { width, height, ref } = useResizeDetector({
         refreshMode: "debounce",
         refreshRate: 100,
         refreshOptions: { trailing: true },
@@ -50,7 +50,7 @@ const WellCompletionsPlot: React.FC = () => {
     const filteredStratigraphy = useMemo(
         () =>
             data.stratigraphy.filter(
-                zone => !filteredZones || filteredZones.includes(zone.name)
+                (zone) => !filteredZones || filteredZones.includes(zone.name)
             ),
         [data.stratigraphy, filteredZones]
     );
@@ -58,7 +58,7 @@ const WellCompletionsPlot: React.FC = () => {
         wellSearchText,
     ]);
     const filteredWells = useMemo(
-        () => data.wells.filter(well => wellNameRegex(well.name)),
+        () => data.wells.filter((well) => wellNameRegex(well.name)),
         [data.wells, wellNameRegex]
     );
 
@@ -84,7 +84,7 @@ const WellCompletionsPlot: React.FC = () => {
     useEffect(() => {
         if (!d3wellcompletions.current) {
             d3wellcompletions.current = new D3WellCompletions(
-                ref.current as HTMLDivElement
+                (ref.current as unknown) as HTMLDivElement
             );
         }
     }, []);

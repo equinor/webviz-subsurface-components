@@ -17,14 +17,14 @@ const ZoneSelector: React.FC = React.memo(() => {
     // Redux
     const dispatch = useDispatch();
     const stratigraphy = useSelector((st: WellCompletionsState) =>
-        st.dataModel.data?.stratigraphy.map(zone => zone.name)
+        st.dataModel.data?.stratigraphy.map((zone) => zone.name)
     );
     const filteredZones = useSelector(
         (st: WellCompletionsState) => st.ui.filteredZones
     );
     // handlers
     const handleSelectionChange = useCallback(
-        event => dispatch(updateFilteredZones(event.selectedItems)),
+        (event) => dispatch(updateFilteredZones(event.selectedItems)),
         [dispatch]
     );
     return (

@@ -124,7 +124,7 @@ export default class DistanceScale {
             .attr("stroke", "#bbbbbb")
             .attr("fill", (d, i) => colors[i])
             .attr("fill-opacity", "0.6")
-            .attr("x", d => `${d}px`)
+            .attr("x", (d) => `${d}px`)
             .attr("width", `${width}px`);
 
         this.element.selectAll("text").remove();

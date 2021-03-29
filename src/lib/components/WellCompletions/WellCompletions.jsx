@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import WellCompletionComponent from "./components/WellCompletionComponent";
 
-const WellCompletions = props => {
+const WellCompletions = (props) => {
     return <WellCompletionComponent id={props.id} data={props.data} />;
 };
 

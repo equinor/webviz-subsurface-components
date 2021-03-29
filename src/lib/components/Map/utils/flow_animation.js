@@ -44,7 +44,7 @@ export default class FlowAnimation {
 
         this._colors = d3
             .range(85, 255, 10)
-            .map(j => `rgba(${j}, ${j}, ${j}, 1.0)`);
+            .map((j) => `rgba(${j}, ${j}, ${j}, 1.0)`);
         const incr = (maxflow - minflow) / this._colors.length;
         this._colorScale = d3
             .scaleThreshold()
@@ -178,7 +178,7 @@ export default class FlowAnimation {
      */
     _fillDrawBuckets() {
         this._drawBuckets = new Map();
-        this._particles.forEach(d => {
+        this._particles.forEach((d) => {
             const pos = d.position;
             const prevPos = d.previousPosition;
             const dist = distance(prevPos, pos);

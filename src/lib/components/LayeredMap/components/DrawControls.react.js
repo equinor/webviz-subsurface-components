@@ -25,7 +25,7 @@ L.Icon.Default.mergeOptions({
  *    https://stackoverflow.com/questions/18014907/leaflet-draw-retrieve-layer-type-on-drawedited-event
  **/
 
-const getShapeType = layer => {
+const getShapeType = (layer) => {
     if (layer instanceof L.Rectangle) {
         return "rectangle";
     }
@@ -46,16 +46,16 @@ const getShapeType = layer => {
 
 class DrawControls extends Component {
     _onEdited(e) {
-        e.layers.eachLayer(layer => {
+        e.layers.eachLayer((layer) => {
             const layertype = getShapeType(layer);
             if (layertype === "polyline") {
-                const coords = layer._latlngs.map(p => {
+                const coords = layer._latlngs.map((p) => {
                     return [p.lat, p.lng];
                 });
                 this.props.lineCoords(coords);
             }
             if (layertype === "polygon") {
-                const coords = layer._latlngs[0].map(p => {
+                const coords = layer._latlngs[0].map((p) => {
                     return [p.lat, p.lng];
                 });
                 this.props.polygonCoords(coords);
@@ -87,14 +87,14 @@ class DrawControls extends Component {
             this.removeLayers("marker");
         }
         if (type === "polyline") {
-            const coords = layer._latlngs.map(p => {
+            const coords = layer._latlngs.map((p) => {
                 return [p.lat, p.lng];
             });
             this.props.lineCoords(coords);
             this.removeLayers("polyline");
         }
         if (type === "polygon") {
-            const coords = layer._latlngs[0].map(p => {
+            const coords = layer._latlngs[0].map((p) => {
                 return [p.lat, p.lng];
             });
             this.props.polygonCoords(coords);

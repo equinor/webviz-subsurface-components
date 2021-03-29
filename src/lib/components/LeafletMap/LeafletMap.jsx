@@ -20,7 +20,7 @@ import Context from "./context";
 // Utils
 import { onSizeChange } from "./utils/element";
 
-const stringToCRS = crsString => {
+const stringToCRS = (crsString) => {
     switch (crsString) {
         case "earth": {
             return L.CRS.EPSG3857;
@@ -94,9 +94,9 @@ class LeafletMap extends Component {
         this.onSizeChange && this.onSizeChange();
     }
 
-    setEvents = map => {
-        map.on("zoomanim", e => {
-            this.props.syncedMaps.forEach(id => {
+    setEvents = (map) => {
+        map.on("zoomanim", (e) => {
+            this.props.syncedMaps.forEach((id) => {
                 if (!LeafletMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
@@ -112,10 +112,10 @@ class LeafletMap extends Component {
             });
         });
 
-        map.on("move", e => {
+        map.on("move", (e) => {
             // Only react if move event is from a real user interaction
             // (originalEvent is undefined if viewport is programatically changed).
-            this.props.syncedMaps.forEach(id => {
+            this.props.syncedMaps.forEach((id) => {
                 if (!LeafletMap.mapReferences[id] || id === this.state.id) {
                     return;
                 }
@@ -133,7 +133,7 @@ class LeafletMap extends Component {
         return this.state.map;
     };
 
-    setPropsExist = value => {
+    setPropsExist = (value) => {
         if (!this.props.setProps) {
             console.log(value);
         } else {
@@ -141,18 +141,18 @@ class LeafletMap extends Component {
         }
     };
 
-    drawLayerAdd = newLayers => {
-        this.setState(prevState => ({
+    drawLayerAdd = (newLayers) => {
+        this.setState((prevState) => ({
             drawLayerData: [...prevState.drawLayerData, ...newLayers],
         }));
     };
 
-    drawLayerDelete = layerTypes => {
+    drawLayerDelete = (layerTypes) => {
         if (layerTypes === "all") {
             this.setState({ drawLayerData: [] });
             return;
         }
-        const layers = this.state.drawLayerData.filter(drawing => {
+        const layers = this.state.drawLayerData.filter((drawing) => {
             return !layerTypes.includes(drawing.type);
         });
         if (layers !== this.state.layers) {
@@ -160,7 +160,7 @@ class LeafletMap extends Component {
         }
     };
 
-    syncedDrawLayerAdd = newLayers => {
+    syncedDrawLayerAdd = (newLayers) => {
         for (const layer of newLayers) {
             layer["creatorId"] = this.state.id;
             LeafletMap.syncedDrawLayer.data.push(layer);
@@ -171,7 +171,7 @@ class LeafletMap extends Component {
     syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
         const syncedMaps = [...this.props.syncedMaps, this.state.id];
         LeafletMap.syncedDrawLayer.data = LeafletMap.syncedDrawLayer.data.filter(
-            drawing => {
+            (drawing) => {
                 return (
                     !syncedMaps.includes(drawing.creatorId) ||
                     !layerTypes.includes(drawing.type)
@@ -200,7 +200,7 @@ class LeafletMap extends Component {
     /**
      * @param {HTMLCanvasElement} onScreenCanvas
      */
-    setFocucedImageLayer = layer => {
+    setFocucedImageLayer = (layer) => {
         this.setState({
             focusedImageLayer: layer,
         });
@@ -210,7 +210,7 @@ class LeafletMap extends Component {
      * @param {String} mode
      * can be "editing" or null
      */
-    setMode = newMode => {
+    setMode = (newMode) => {
         this.setState({
             mode: newMode,
         });
@@ -219,7 +219,7 @@ class LeafletMap extends Component {
     render() {
         return (
             <div style={{ height: "100%", width: "100%" }}>
-                <div ref={el => (this.mapEl = el)} style={{ height: "100%" }}>
+                <div ref={(el) => (this.mapEl = el)} style={{ height: "100%" }}>
                     <Context.Provider
                         value={{
                             drawLayer: this.state.drawLayer,

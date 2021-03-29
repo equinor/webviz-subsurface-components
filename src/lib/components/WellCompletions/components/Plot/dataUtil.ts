@@ -17,10 +17,10 @@ export const dataInTimeIndexRange = (
 ): PlotData => {
     const wellPlotData: WellPlotData[] = [];
     //Get first step for now
-    wells.forEach(well => {
+    wells.forEach((well) => {
         const wellCompletions: number[] = [];
         let hasData = false;
-        stratigraphy.forEach(zone => {
+        stratigraphy.forEach((zone) => {
             const values = Array(range[1] - range[0] + 1).fill(0);
             if (well.completions[zone.name]) {
                 //Find values in the time range

@@ -158,7 +158,7 @@ class DrawCmdBuilder {
             framebuffer: this._framebuffer,
         };
 
-        return props => drawCmd(this._context, this.cmd, props);
+        return (props) => drawCmd(this._context, this.cmd, props);
     }
 }
 
