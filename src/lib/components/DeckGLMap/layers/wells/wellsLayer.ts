@@ -1,9 +1,20 @@
 import { CompositeLayer } from "@deck.gl/core";
+import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { GeoJsonLayer } from "@deck.gl/layers";
 
-export default class WellsLayer extends CompositeLayer {
+export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
+    pointRadiusScale: number;
+    lineWidthScale: number;
+    outline: boolean;
+}
+
+function getOutlineColor() {
+    return [0, 0, 0, 255];
+}
+
+export default class WellsLayer extends CompositeLayer<unknown, WellsLayerProps<unknown>> {
     renderLayers() {
-        let properties = {
+        let properties: any = {
             id: "outline",
             data: this.props.data,
             pickable: true,
@@ -29,3 +40,4 @@ export default class WellsLayer extends CompositeLayer {
 }
 
 WellsLayer.layerName = "WellsLayer";
+
