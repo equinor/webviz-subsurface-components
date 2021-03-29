@@ -14,7 +14,7 @@ import Context from "../../../context";
 
 // Constants
 
-const MousePosition = props => {
+const MousePosition = (props) => {
     const { focusedImageLayer, mode } = useContext(Context);
 
     // As useState-values are not available in eventListeners,
@@ -78,7 +78,7 @@ const MousePosition = props => {
         };
     };
 
-    const updateMode = mode => {
+    const updateMode = (mode) => {
         stateRef.current.mode = mode;
     };
 
@@ -92,13 +92,13 @@ const MousePosition = props => {
                 position: props.position,
             },
 
-            onAdd: function() {
+            onAdd: function () {
                 const latlng = L.DomUtil.create("div", "mouseposition");
                 this._latlng = latlng;
                 return latlng;
             },
 
-            updateHTML: function(x, y, z, zNotZero, unit) {
+            updateHTML: function (x, y, z, zNotZero, unit) {
                 // TODO: add default measurement unit, make it passable with props
                 const newUnit = unit === undefined ? "m" : unit;
                 const z_string = zNotZero ? " z: " + z + newUnit : "";
@@ -146,7 +146,7 @@ const MousePosition = props => {
         /**
          * @type {Image}
          */
-        const image = await new Promise(res => {
+        const image = await new Promise((res) => {
             const image = new Image();
             image.onload = () => {
                 res(image);
@@ -170,7 +170,7 @@ const MousePosition = props => {
         );
     };
 
-    const onCanvasMouseMove = event => {
+    const onCanvasMouseMove = (event) => {
         const { canvas, ctx, onScreenCanvas } = stateRef.current || {};
         if (!canvas) {
             return;
@@ -204,7 +204,7 @@ const MousePosition = props => {
         return ((y - clientRect.top) / clientRect.height) * canvas.height;
     };
 
-    const onCanvasMouseClick = event => {
+    const onCanvasMouseClick = (event) => {
         const { canvas, ctx, onScreenCanvas, props } = stateRef.current || {};
         if (!canvas) {
             return;
@@ -309,7 +309,7 @@ const MousePosition = props => {
         return roundOff(elevation * scaleFactor + minvalue);
     };
 
-    const roundOff = n => {
+    const roundOff = (n) => {
         // Returns two significant figures (non-zero) for numbers with an absolute value less
         // than 1, and two decimal places for numbers with an absolute value greater
         // than 1.

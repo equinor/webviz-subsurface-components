@@ -66,9 +66,9 @@ export default class Legend {
             .attr("x", 9)
             .attr("y", (d, i) => 9 + i * 22)
             .merge(colourBoxSelection)
-            .attr("fill", d => d.box.colour)
-            .attr("stroke", d => d.box.stroke)
-            .attr("fill-opacity", d => d.box.fillOpacity);
+            .attr("fill", (d) => d.box.colour)
+            .attr("stroke", (d) => d.box.stroke)
+            .attr("fill-opacity", (d) => d.box.fillOpacity);
     }
 
     _renderLegendLabels() {
@@ -87,7 +87,7 @@ export default class Legend {
             .attr("y", (d, i) => (i + 1) * 22)
             .attr("font-size", 20)
             .merge(legendTextSelection)
-            .text(d => d.label)
+            .text((d) => d.label)
             .exit()
             .remove();
     }

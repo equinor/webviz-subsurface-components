@@ -75,12 +75,12 @@ export class Cell {
             [1, 0],
             [1, 1],
         ];
-        corners.forEach(corner => {
+        corners.forEach((corner) => {
             const position = new Vector(corner[0], corner[1]);
             const speed = this.normalVelocity(position).magnitude;
             normalCornerSpeeds.push(speed);
         });
-        return Math.max(...normalCornerSpeeds.map(x => x || 0));
+        return Math.max(...normalCornerSpeeds.map((x) => x || 0));
     }
 
     /**

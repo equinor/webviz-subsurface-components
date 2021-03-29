@@ -12,7 +12,7 @@ const HideZeroCompletionsSwitch: React.FC = React.memo(() => {
     );
     // handlers
     const handleSwitchChange = useCallback(
-        event => dispatch(updateHideZeroCompletions(event.target.checked)),
+        (event) => dispatch(updateHideZeroCompletions(event.target.checked)),
         [dispatch]
     );
     return (

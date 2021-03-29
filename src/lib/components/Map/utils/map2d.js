@@ -31,8 +31,8 @@ export default class Map2D extends Component {
         this.valUnit = valUnit;
         this.layerNames = layerNames;
         this.layers = layers;
-        this.coords = layers.map(cells => cells.map(cell => cell.points));
-        this.values = layers.map(cells => cells.map(cell => cell.value));
+        this.coords = layers.map((cells) => cells.map((cell) => cell.points));
+        this.values = layers.map((cells) => cells.map((cell) => cell.value));
         this.height = height;
         const node = d3.select(elementSelector).node();
         if (width) {
@@ -53,11 +53,11 @@ export default class Map2D extends Component {
 
     _calcMinMax(layers) {
         const cells = d3.merge(layers);
-        const points = d3.merge(cells.map(cell => cell.points));
+        const points = d3.merge(cells.map((cell) => cell.points));
 
-        [this.xMin, this.xMax] = d3.extent(points, point => point[0]);
-        [this.yMin, this.yMax] = d3.extent(points, point => point[1]);
-        [this.valMax, this.valMin] = d3.extent(cells, cell => cell.value);
+        [this.xMin, this.xMax] = d3.extent(points, (point) => point[0]);
+        [this.yMin, this.yMax] = d3.extent(points, (point) => point[1]);
+        [this.valMax, this.valMin] = d3.extent(cells, (cell) => cell.value);
     }
 
     _calculateDimensions() {
@@ -183,7 +183,7 @@ export default class Map2D extends Component {
 
         this.map.render();
 
-        this.map.on("mousemove", info => {
+        this.map.on("mousemove", (info) => {
             this.infoBox.setX(`x = ${this._calculateXCoord(info.x)}`);
             this.infoBox.setY(`y = ${this._calculateYCoord(info.y)}`);
             this.infoBox.setValue(`${info.value} ${this.valUnit}`);
@@ -237,7 +237,7 @@ export default class Map2D extends Component {
         this.compass.render();
 
         this.compass.initDragEvents();
-        this.compass.on("dragged", angle => {
+        this.compass.on("dragged", (angle) => {
             this.mapTransform.angle = angle;
             this.map.setTransform(this.mapTransform);
             this.emit("rotate", this.mapTransform);
@@ -265,7 +265,7 @@ export default class Map2D extends Component {
 
             this.layerSlider.render();
 
-            this.layerSlider.on("change", value => {
+            this.layerSlider.on("change", (value) => {
                 this.map.setLayer(value);
             });
         }

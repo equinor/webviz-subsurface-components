@@ -131,7 +131,7 @@ export const buildColormapWithCfg = (colors, config = {}) => {
  *
  * @param {String|Object|Array<String>} colorScale
  */
-export const buildColormap = colorScale => {
+export const buildColormap = (colorScale) => {
     if (typeof colorScale === "string") {
         // The given colorScale is already a base64 image
         return colorScale;
@@ -178,7 +178,7 @@ export const buildColormapFromHexColors = (hexColors, config = {}) => {
  * @example
  * const [r, g, b, a] = hexToRGB("#ffeeaaff")
  */
-export const hexToRGB = hex => {
+export const hexToRGB = (hex) => {
     const hasAlpha = hex.length === 9;
     const start = hasAlpha ? 24 : 16;
     const bigint = parseInt(hex.slice(1), 16);

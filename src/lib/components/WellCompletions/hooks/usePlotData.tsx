@@ -37,7 +37,7 @@ export const usePlotData = () => {
     const filteredWells = useMemo(
         () =>
             data
-                ? Array.from(data.wells as Well[]).filter(well =>
+                ? Array.from(data.wells as Well[]).filter((well) =>
                       wellNameRegex(well.name)
                   )
                 : [],
@@ -47,7 +47,7 @@ export const usePlotData = () => {
         () =>
             data
                 ? data.stratigraphy.filter(
-                      zone =>
+                      (zone) =>
                           !filteredZones || filteredZones.includes(zone.name)
                   )
                 : [],

@@ -9,22 +9,22 @@ const createSortKeyFunction = (
 ): ((well: WellPlotData) => any) => {
     switch (sortMethod) {
         case SORT_BY_NAME:
-            return well => well.name;
+            return (well) => well.name;
         case SORT_BY_STRATIGRAPHY_DEPTH:
-            return well =>
+            return (well) =>
                 well.zoneIndices.find(
                     (_, index) => well.completions[index] > 0
                 );
         case SORT_BY_COMPLETION_DATE:
-            return well => well.earliestCompDateIndex;
+            return (well) => well.earliestCompDateIndex;
         default:
-            return well => well.attributes[sortMethod];
+            return (well) => well.attributes[sortMethod];
     }
 };
 export const createSortFunction = (sortBy: Record<string, SortDirection>) => {
     const keyFunctions = new Map(
         Object.keys(sortBy).map(
-            sort =>
+            (sort) =>
                 [sort, createSortKeyFunction(sort)] as [
                     string,
                     (well: WellPlotData) => any

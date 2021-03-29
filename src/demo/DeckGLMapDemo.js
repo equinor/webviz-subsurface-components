@@ -62,8 +62,8 @@ ErrorBoundary.propTypes = {
 
 function _get_colmaps(layers) {
     return layers
-        .filter(l => l["@@type"] == "ColormapLayer")
-        .map(v => v["colormap"]);
+        .filter((l) => l["@@type"] == "ColormapLayer")
+        .map((v) => v["colormap"]);
 }
 
 const DeckGLMapDemo = () => {
@@ -87,7 +87,7 @@ const DeckGLMapDemo = () => {
         setParsedJson(example);
     }, []);
 
-    const onEditorChanged = React.useCallback(txt => {
+    const onEditorChanged = React.useCallback((txt) => {
         if (txt != text) {
             setText(txt);
             // Parse JSON, while capturing and ignoring exceptions

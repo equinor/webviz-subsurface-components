@@ -44,15 +44,15 @@ export default class FlowMap extends Map2D {
         this.layers.forEach((_, i) => {
             const cells = self._createCells(i);
             const maxNormalSpeeds = [];
-            cells.forEach(cell => {
+            cells.forEach((cell) => {
                 maxNormalSpeeds.push(cell.maxNormalSpeed);
             });
             maxNormalSpeedPerLayer.push(Math.max(...maxNormalSpeeds));
         });
 
         const scale = 1.0 / Math.max(...maxNormalSpeedPerLayer);
-        this.layers.forEach(layer_cells => {
-            layer_cells.forEach(cell => {
+        this.layers.forEach((layer_cells) => {
+            layer_cells.forEach((cell) => {
                 cell["NORMFLOWI-"] = scale * cell["FLOWI-"];
                 cell["NORMFLOWJ-"] = scale * cell["FLOWJ-"];
                 cell["NORMFLOWI+"] = scale * cell["FLOWI+"];
@@ -64,7 +64,7 @@ export default class FlowMap extends Map2D {
     _createCells(i) {
         const cells = [];
         const self = this;
-        this.layers[i].forEach(cell => {
+        this.layers[i].forEach((cell) => {
             cells.push(
                 new Cell(
                     cell.points.map(([x, y]) => [x - self.xMin, self.yMax - y]),
@@ -91,7 +91,7 @@ export default class FlowMap extends Map2D {
         super.init();
 
         const self = this;
-        this.on("zoom", t => {
+        this.on("zoom", (t) => {
             self._flowAnimation.clear();
             self._flowAnimation.setTransform(
                 t.x,
@@ -102,7 +102,7 @@ export default class FlowMap extends Map2D {
                 [(t.k * this.map.mapWidth) / 2, (t.k * this.map.mapHeight) / 2]
             );
         });
-        this.on("rotate", t => {
+        this.on("rotate", (t) => {
             self._flowAnimation.clear();
             self._flowAnimation.setTransform(
                 t.x,
@@ -114,7 +114,7 @@ export default class FlowMap extends Map2D {
             );
         });
         if (this.layerSlider) {
-            this.layerSlider.on("change", value => {
+            this.layerSlider.on("change", (value) => {
                 self._setLayer(value);
                 self._flowAnimation.clear();
                 self._flowAnimation.particleGenerator = self._particleGenerator;

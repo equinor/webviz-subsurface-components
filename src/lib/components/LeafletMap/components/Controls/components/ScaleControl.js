@@ -10,7 +10,7 @@ import Context from "../../../context";
 
 import L from "leaflet";
 
-const ScaleControl = props => {
+const ScaleControl = (props) => {
     const { focusedImageLayer = {} } = useContext(Context);
 
     // State
@@ -40,7 +40,7 @@ const ScaleControl = props => {
         addControl(props.map);
     };
 
-    const addControl = map => {
+    const addControl = (map) => {
         if (!focusedImageLayer) {
             return;
         }

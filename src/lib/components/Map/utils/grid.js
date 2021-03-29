@@ -18,7 +18,7 @@ export default class Grid {
      */
     constructor(cells) {
         this._data = [];
-        cells.forEach(c => {
+        cells.forEach((c) => {
             if (!this._data[c.i]) {
                 this._data[c.i] = [];
             }

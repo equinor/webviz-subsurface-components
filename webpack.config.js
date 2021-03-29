@@ -7,7 +7,7 @@
 const path = require("path");
 const TerserJSPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const packagejson = require("./package.json");
 const dashLibraryName = packagejson.name.replace(/-/g, "_");
@@ -35,7 +35,7 @@ module.exports = (env, argv) => {
     const filename_css = demo ? "output.css" : `${dashLibraryName}.css`;
 
     const devtool =
-        argv.devtool || (mode === "development" ? "eval-source-map" : "none");
+        argv.devtool || (mode === "development" ? "eval-source-map" : false);
 
     const externals = demo
         ? undefined
@@ -58,10 +58,7 @@ module.exports = (env, argv) => {
             libraryTarget: "window",
         },
         optimization: {
-            minimizer: [
-                new TerserJSPlugin({}),
-                new OptimizeCSSAssetsPlugin({}),
-            ],
+            minimizer: [new TerserJSPlugin({}), new CssMinimizerPlugin({})],
         },
         externals,
         plugins: [
