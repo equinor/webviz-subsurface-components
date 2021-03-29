@@ -1,10 +1,11 @@
 import { Slider } from "@equinor/eds-core-react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
-import { debounce } from "lodash";
-import React, { useCallback } from "react";
+import { debounce, isEqual } from "lodash";
+import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimeIndexRange } from "../../redux/reducer";
 import { WellCompletionsState } from "../../redux/store";
+import { DataContext } from "../../WellCompletions";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -16,14 +17,14 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 const TimeRangeSelector: React.FC = React.memo(() => {
     const classes = useStyles();
+    const data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
-    const times = useSelector(
-        (state: WellCompletionsState) => state.dataModel.data!.timeSteps
-    );
     const timeIndexRange = useSelector(
-        (state: WellCompletionsState) => state.ui.timeIndexRange
+        (state: WellCompletionsState) => state.ui.timeIndexRange,
+        isEqual
     );
+    const times = useMemo(() => data.timeSteps, [data]);
     // handlers
     const outputFunction = useCallback(
         (step: number) => (times ? times[step] : ""),
