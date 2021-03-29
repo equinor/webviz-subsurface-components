@@ -1,15 +1,17 @@
 import { NativeSelect } from "@equinor/eds-core-react";
-import { createStyles, makeStyles } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRangeDisplayMode } from "../../redux/reducer";
 import { WellCompletionsState } from "../../redux/store";
 import { RangeModes } from "../../redux/types";
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
+            minWidth: "120px",
             maxWidth: "120px",
+            padding: theme.spacing(1),
         },
     })
 );

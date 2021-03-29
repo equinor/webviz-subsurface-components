@@ -8,8 +8,8 @@ import { updateWellSearchText } from "../../redux/reducer";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            marginRight: "2rem",
-            marginTop: theme.spacing(1),
+            padding: theme.spacing(1),
+            maxWidth: "210px",
         },
     })
 );

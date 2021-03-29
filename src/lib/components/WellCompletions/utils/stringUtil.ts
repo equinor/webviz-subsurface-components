@@ -11,7 +11,9 @@ const ESCAPE_CHAR = "+";
  */
 const SPECIAL_ESCAPE = "\\.)]";
 
-export const getRegexPredicate = (pattern: string) => {
+export const getRegexPredicate = (
+    pattern: string
+): ((item: string) => boolean) => {
     const processed: string[] = [];
     for (let index = 0; index < pattern.length; index++) {
         const character = pattern.charAt(index);
@@ -39,8 +41,15 @@ export const getRegexPredicate = (pattern: string) => {
 
     const rgx: RegExp | undefined = new RegExp(processedPattern);
 
-    return (item: string) => {
+    return (item: string): boolean => {
         if (pattern.length === 0) return true;
         return rgx ? rgx.test(item.toLowerCase()) : false;
     };
+};
+/**
+ * capitalize the first letter in the given name
+ * @param name
+ */
+export const capitalizeFirstLetter = (name: string): string => {
+    return name.length === 0 ? name : name[0].toUpperCase() + name.slice(1);
 };

@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { Zone } from "../../redux/types";
-import { PlotData, WellPlotData } from "./dataUtil";
+import { PlotData, WellPlotData } from "../../utils/dataUtil";
 import { getLayout, getSvg, Padding, PlotLayout } from "./plotUtil";
 
 export class D3WellCompletions {

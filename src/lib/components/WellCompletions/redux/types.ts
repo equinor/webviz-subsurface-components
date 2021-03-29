@@ -9,9 +9,9 @@ export interface Zone {
 }
 export interface Well {
     name: string;
+    earliestCompDateIndex: number;
     completions: Record<string, Completions>;
-    type: string;
-    region: string;
+    attributes: Record<string, any>;
 }
 
 export interface Completions {
@@ -27,11 +27,17 @@ export const RangeModes = {
 };
 export type RangeMode = keyof typeof RangeModes;
 
+export type SortDirection = "Ascending" | "Descending";
+export interface Attributes {
+    attributeKeys: string[];
+}
 export interface UISettings {
     timeIndexRange: [number, number];
-    animating: boolean;
+    wellsPerPage: number;
+    currentPage: number;
     rangeDisplayMode: RangeMode;
     filteredZones: string[];
     wellSearchText: string;
     hideZeroCompletions: boolean;
+    sortBy: Record<string, SortDirection>;
 }

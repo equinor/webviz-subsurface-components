@@ -1,13 +1,12 @@
 import { createStyles, makeStyles } from "@material-ui/core";
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { usePlotData } from "../hooks/usePlotData";
 import { WellCompletionsState } from "../redux/store";
-import HideZeroCompletionsSwitch from "./Settings/HideZeroCompletionsSwitch";
-import RangeDisplayModeSelector from "./Settings/RangeDisplayModeSelector";
-import TimeRangeSelector from "./Settings/TimeRangeSelector";
+import { DataContext } from "../WellCompletions";
 import WellCompletionsPlot from "./Plot/WellCompletionsPlot";
-import WellFilter from "./Settings/WellFilter";
-import ZoneSelector from "./Settings/ZoneSelector";
+import SettingsBar from "./Settings/SettingsBar";
+import WellPagination from "./Settings/WellPagination";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -17,36 +16,53 @@ const useStyles = makeStyles(() =>
             flex: 1,
             flexDirection: "column",
             height: "90%",
-            minWidth: "500px",
-            minHeight: "300px",
-        },
-        actions: {
-            position: "relative",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            margin: "2rem",
         },
     })
 );
 
 const WellCompletionsViewer: React.FC = () => {
     const classes = useStyles();
-    const data = useSelector(
-        (state: WellCompletionsState) => state.dataModel.data
+    const data = useContext(DataContext);
+    const plotData = usePlotData();
+
+    const wellsPerPage = useSelector(
+        (state: WellCompletionsState) => state.ui.wellsPerPage
+    );
+    const currentPage = useSelector(
+        (state: WellCompletionsState) => state.ui.currentPage
+    );
+    const dataInCurrentPage = useMemo(() => {
+        return {
+            ...plotData,
+            wells: plotData.wells.slice(
+                (currentPage - 1) * wellsPerPage,
+                currentPage * wellsPerPage - 1
+            ),
+        };
+    }, [plotData, currentPage, wellsPerPage]);
+    const [minWidth, minHeight] = useMemo(
+        () => [
+            dataInCurrentPage.wells.length * 20,
+            dataInCurrentPage.stratigraphy.length * 20,
+        ],
+        [dataInCurrentPage]
     );
     //If no data is available
     if (!data) return <div />;
     return (
-        <div className={classes.root}>
-            <div className={classes.actions}>
-                <TimeRangeSelector />
-                <RangeDisplayModeSelector />
-                <HideZeroCompletionsSwitch />
-                <ZoneSelector />
-                <WellFilter />
-            </div>
-            <WellCompletionsPlot />
+        <div
+            className={classes.root}
+            style={{
+                minWidth: `${minWidth}px`,
+                minHeight: `${minHeight}px`,
+            }}
+        >
+            <SettingsBar />
+            <WellPagination />
+            <WellCompletionsPlot
+                timeSteps={data.timeSteps}
+                plotData={dataInCurrentPage}
+            />
         </div>
     );
 };

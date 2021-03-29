@@ -1,21 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Data, RangeMode, UISettings } from "./types";
+import { Attributes, RangeMode, SortDirection, UISettings } from "./types";
 
 export const idSlice = createSlice({
     name: "id",
     initialState: "",
     reducers: {
-        updateId: (state, action: PayloadAction<string>) => action.payload,
+        updateId: (_, action: PayloadAction<string>) => action.payload,
     },
 });
-export const dataModelSlice = createSlice({
-    name: "dataModel",
+export const attributeSlice = createSlice({
+    name: "attribute",
     initialState: {
-        data: undefined as Data | undefined,
-    },
+        attributeKeys: [],
+    } as Attributes,
     reducers: {
-        updateData: (state, action: PayloadAction<Data>) => {
-            state.data = action.payload;
+        updateAttributeKeys: (state, action: PayloadAction<string[]>) => {
+            state.attributeKeys = action.payload;
         },
     },
 });
@@ -23,11 +23,13 @@ export const uiSlice = createSlice({
     name: "ui",
     initialState: {
         timeIndexRange: [0, 0],
-        animating: false,
+        wellsPerPage: 25,
+        currentPage: 1,
         rangeDisplayMode: "First Step",
         wellSearchText: "",
         filteredZones: [],
         hideZeroCompletions: false,
+        sortBy: {},
     } as UISettings,
     reducers: {
         updateTimeIndexRange: (
@@ -36,8 +38,11 @@ export const uiSlice = createSlice({
         ) => {
             state.timeIndexRange = action.payload;
         },
-        updateAnimating: (state, action: PayloadAction<boolean>) => {
-            state.animating = action.payload;
+        updateWellsPerPage: (state, action: PayloadAction<number>) => {
+            state.wellsPerPage = action.payload;
+        },
+        updateCurrentPage: (state, action: PayloadAction<number>) => {
+            state.currentPage = action.payload;
         },
         updateRangeDisplayMode: (state, action: PayloadAction<RangeMode>) => {
             state.rangeDisplayMode = action.payload;
@@ -51,16 +56,44 @@ export const uiSlice = createSlice({
         updateHideZeroCompletions: (state, action: PayloadAction<boolean>) => {
             state.hideZeroCompletions = action.payload;
         },
+        updateSortKey: (
+            state,
+            action: PayloadAction<{
+                sortKey: string;
+                sortDirection: SortDirection;
+            }>
+        ) => {
+            const newSortBy = {
+                ...state.sortBy,
+                [action.payload.sortKey]: action.payload.sortDirection,
+            };
+            state.sortBy = newSortBy;
+        },
+        deleteSortKey: (state, action: PayloadAction<string>) => {
+            const newSortBy = Object.keys(state.sortBy).reduce(
+                (acc, current) => {
+                    if (current !== action.payload) {
+                        acc[current] = state.sortBy[current];
+                    }
+                    return acc;
+                },
+                {}
+            );
+            state.sortBy = newSortBy;
+        },
     },
 });
 
 export const { updateId } = idSlice.actions;
-export const { updateData } = dataModelSlice.actions;
+export const { updateAttributeKeys } = attributeSlice.actions;
 export const {
     updateTimeIndexRange,
     updateRangeDisplayMode,
-    updateAnimating,
+    updateWellsPerPage,
+    updateCurrentPage,
     updateWellSearchText,
     updateFilteredZones,
     updateHideZeroCompletions,
+    updateSortKey,
+    deleteSortKey,
 } = uiSlice.actions;
