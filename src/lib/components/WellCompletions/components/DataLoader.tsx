@@ -27,8 +27,10 @@ const DataProvider: React.FC<Props> = ({
             SORT_BY_STRATIGRAPHY_DEPTH,
             SORT_BY_COMPLETION_DATE,
         ]);
-        data.wells.forEach(well =>
-            Object.keys(well.attributes).forEach(key => attributeKeys.add(key))
+        data.wells.forEach((well) =>
+            Object.keys(well.attributes).forEach((key) =>
+                attributeKeys.add(key)
+            )
         );
         const timeIndexRange =
             data.timeSteps.length > 0 ? [0, data.timeSteps.length - 1] : [0, 0];
@@ -40,7 +42,7 @@ const DataProvider: React.FC<Props> = ({
                 currentPage: 1,
                 rangeDisplayMode: "First Step",
                 wellSearchText: "",
-                filteredZones: data.stratigraphy.map(zone => zone.name),
+                filteredZones: data.stratigraphy.map((zone) => zone.name),
                 hideZeroCompletions: false,
                 sortBy: {},
             } as UISettings,

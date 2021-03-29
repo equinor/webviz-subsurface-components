@@ -20,7 +20,7 @@ const WellsPerPageSelector: React.FC = React.memo(() => {
     const dispatch = useDispatch();
     // handlers
     const onWellsPerPageChange = useCallback(
-        event => dispatch(updateWellsPerPage(event.target.value)),
+        (event) => dispatch(updateWellsPerPage(event.target.value)),
         [dispatch]
     );
     return (
@@ -30,7 +30,7 @@ const WellsPerPageSelector: React.FC = React.memo(() => {
             className={classes.root}
             onChange={onWellsPerPageChange}
         >
-            {wellsPerPageOptions.map(value => (
+            {wellsPerPageOptions.map((value) => (
                 <option key={`option-${value}`} value={value}>
                     {value}
                 </option>
