@@ -12,9 +12,12 @@ function getOutlineColor() {
     return [0, 0, 0, 255];
 }
 
-export default class WellsLayer extends CompositeLayer<unknown, WellsLayerProps<unknown>> {
+export default class WellsLayer extends CompositeLayer<
+    unknown,
+    WellsLayerProps<unknown>
+> {
     renderLayers() {
-        let properties: any = {
+        const properties: any = {
             id: "outline",
             data: this.props.data,
             pickable: true,
@@ -40,4 +43,3 @@ export default class WellsLayer extends CompositeLayer<unknown, WellsLayerProps<
 }
 
 WellsLayer.layerName = "WellsLayer";
-
