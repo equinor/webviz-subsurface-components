@@ -64,7 +64,7 @@ jobs:
         run: |
           npm run validate
           black --check webviz_subsurface_components/ tests/ setup.py examples/
-          pylint webviz_subsurface_components/ tests/ setup.py examples/*.py
+          pylint webviz_subsurface_components/ tests/ setup.py examples/*.py --ignore well-completions-csv2json.py
           bandit -r -c ./bandit.yml webviz_subsurface_components tests setup.py /examples/
 
       - name: 🤖 Run tests

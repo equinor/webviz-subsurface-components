@@ -1,6 +1,6 @@
 [MASTER]
 
-ignore-patterns = ^[A-Z], _imports_, well-completions-csv2json.py  # Dash auto-generated files - ignore them
+ignore-patterns = ^[A-Z], _imports_  # Dash auto-generated files - ignore them
 
 [MESSAGES CONTROL]
 
