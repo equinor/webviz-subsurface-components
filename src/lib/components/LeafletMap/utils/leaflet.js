@@ -6,7 +6,7 @@
 
 import L from "leaflet";
 
-export const getShapeType = layer => {
+export const getShapeType = (layer) => {
     if (layer instanceof L.Rectangle) {
         return "rectangle";
     }
@@ -42,7 +42,7 @@ const addTooltip = (item, shapeObject) => {
 
 // Layer utils
 export const makePolyline = (item, swapXY, setProps) => {
-    const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
+    const pos = swapXY ? item.positions.map((xy) => yx(xy)) : item.positions;
     const shape = addTooltip(
         item,
         L.polyline(pos, {
@@ -57,7 +57,7 @@ export const makePolyline = (item, swapXY, setProps) => {
 };
 
 export const makePolygon = (item, swapXY, setProps) => {
-    const pos = swapXY ? item.positions.map(xy => yx(xy)) : item.positions;
+    const pos = swapXY ? item.positions.map((xy) => yx(xy)) : item.positions;
     const shape = addTooltip(
         item,
         L.polygon(pos, {
@@ -108,8 +108,8 @@ export const makeCircleMarker = (item, swapXY) => {
     );
 };
 
-export const addImage = imageData => {
-    const bounds = (imageData.bounds || []).map(xy => yx(xy));
+export const addImage = (imageData) => {
+    const bounds = (imageData.bounds || []).map((xy) => yx(xy));
     const newImageLayer = L.imageWebGLOverlay(imageData.url, bounds, {
         ...imageData,
         minvalue: imageData.minvalue,
@@ -121,7 +121,7 @@ export const addImage = imageData => {
     return newImageLayer;
 };
 
-export const addTile = tileData => {
+export const addTile = (tileData) => {
     const newTileLayer = L.tileWebGLLayer(tileData.url, {
         ...tileData,
         minvalue: tileData.minvalue,

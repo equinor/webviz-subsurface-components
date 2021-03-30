@@ -9,7 +9,8 @@ import PropTypes from "prop-types";
 import MorrisMethod from "./utils/morris";
 import "./morris.css";
 
-const parseData = data => (typeof data === "string" ? JSON.parse(data) : data);
+const parseData = (data) =>
+    typeof data === "string" ? JSON.parse(data) : data;
 
 class Morris extends Component {
     constructor(props) {
@@ -21,7 +22,7 @@ class Morris extends Component {
         const { output, parameters, parameter, height } = this.props;
         if (output && parameters && parameter) {
             const parsedOutput = parseData(output);
-            parsedOutput.time = parsedOutput.forEach(d => {
+            parsedOutput.time = parsedOutput.forEach((d) => {
                 d.time = new Date(d.time);
             });
             const parsedParameters = parseData(parameters);
@@ -41,7 +42,7 @@ class Morris extends Component {
         const { output, parameters, parameter, height } = this.props;
         if (output && parameters && parameter) {
             const parsedOutput = parseData(output);
-            parsedOutput.time = parsedOutput.forEach(d => {
+            parsedOutput.time = parsedOutput.forEach((d) => {
                 d.time = new Date(d.time);
             });
             const parsedParameters = parseData(parameters);

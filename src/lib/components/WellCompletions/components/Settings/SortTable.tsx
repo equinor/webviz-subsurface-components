@@ -6,7 +6,7 @@ import {
     createStyles,
     makeStyles,
     Theme,
-    Tooltip,
+    Tooltip
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,7 +50,7 @@ const SortTable: React.FC = React.memo(() => {
         (st: WellCompletionsState) => st.attributes.attributeKeys
     );
     const availableToAdd = useMemo(
-        () => attributeKeys.filter(key => !(key in sortBy)),
+        () => attributeKeys.filter((key) => !(key in sortBy)),
         [attributeKeys, sortBy]
     );
     useEffect(() => {
@@ -62,7 +62,7 @@ const SortTable: React.FC = React.memo(() => {
     }, [availableToAdd, sortKeyToAdd]);
     // handlers
     const onSortKeyToAddChange = useCallback(
-        event => setSortKeyToAdd(event.target.value),
+        (event) => setSortKeyToAdd(event.target.value),
         [setSortKeyToAdd]
     );
     const onSortDirectionToAddChange = useCallback(
@@ -79,7 +79,7 @@ const SortTable: React.FC = React.memo(() => {
         [dispatch]
     );
     const onDeleteSortKey = useCallback(
-        sortKey => dispatch(deleteSortKey(sortKey)),
+        (sortKey) => dispatch(deleteSortKey(sortKey)),
         [dispatch]
     );
 
@@ -99,7 +99,7 @@ const SortTable: React.FC = React.memo(() => {
                     </Table.Row>
                 </Table.Head>
                 <Table.Body>
-                    {Object.keys(sortBy).map(sortKey => (
+                    {Object.keys(sortBy).map((sortKey) => (
                         <Table.Row key={`sort-by-${sortKey}`}>
                             <Table.Cell>{sortKey}</Table.Cell>
                             <Table.Cell>
@@ -107,7 +107,7 @@ const SortTable: React.FC = React.memo(() => {
                                     aria-controls="simple-menu"
                                     aria-haspopup="true"
                                     variant="ghost"
-                                    onClick={e =>
+                                    onClick={(e) =>
                                         onUpdateSortKey(
                                             sortKey,
                                             sortBy[sortKey] === "Ascending"
@@ -124,7 +124,7 @@ const SortTable: React.FC = React.memo(() => {
                                     aria-controls="simple-menu"
                                     aria-haspopup="true"
                                     variant="ghost_icon"
-                                    onClick={e => onDeleteSortKey(sortKey)}
+                                    onClick={(e) => onDeleteSortKey(sortKey)}
                                 >
                                     <Icon
                                         color="currentColor"
@@ -144,7 +144,7 @@ const SortTable: React.FC = React.memo(() => {
                                 value={sortKeyToAdd}
                                 onChange={onSortKeyToAddChange}
                             >
-                                {availableToAdd.map(key => (
+                                {availableToAdd.map((key) => (
                                     <option key={key}>{key}</option>
                                 ))}
                             </NativeSelect>

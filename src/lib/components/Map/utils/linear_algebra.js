@@ -88,7 +88,7 @@ export class Vector {
      * Magnitude of the vector (L2 norm)
      */
     get magnitude() {
-        return Math.sqrt(this._data.map(x => x ** 2).reduce((a, b) => a + b));
+        return Math.sqrt(this._data.map((x) => x ** 2).reduce((a, b) => a + b));
     }
 
     /**
@@ -114,7 +114,7 @@ export class Vector {
      *     with the given scalar.
      */
     scalarMultiply(scalar) {
-        return this.transform(e => e * scalar);
+        return this.transform((e) => e * scalar);
     }
 
     /**
@@ -183,7 +183,7 @@ export class Matrix {
             this._length = length;
             this._rowLength = rowLength;
         } else if (data.length > 0) {
-            this._data = data.map(d => Float64Array.from(d));
+            this._data = data.map((d) => Float64Array.from(d));
             this._length = data.length;
             this._rowLength = this._data[0].length;
         } else {
@@ -254,7 +254,7 @@ export class Matrix {
      * @returns {Vector} The ith column.
      */
     column(i) {
-        return new Vector(this._data.map(d => d[i]));
+        return new Vector(this._data.map((d) => d[i]));
     }
 
     /**
@@ -354,7 +354,7 @@ export class Matrix {
      */
     scalarMultiply(scalar) {
         return new Matrix(
-            this._data.map(d => d.map(e => scalar * e)),
+            this._data.map((d) => d.map((e) => scalar * e)),
             true,
             this._length,
             this._rowLength
@@ -406,5 +406,5 @@ export function linearIndependent(vectors) {
 }
 
 export function affineIndependent([v1, ...rest]) {
-    return linearIndependent(rest.filter(Boolean).map(v2 => v2.minus(v1)));
+    return linearIndependent(rest.filter(Boolean).map((v2) => v2.minus(v1)));
 }

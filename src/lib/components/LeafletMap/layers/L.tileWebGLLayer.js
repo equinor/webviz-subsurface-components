@@ -61,7 +61,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
         drawStrategy: null,
     },
 
-    initialize: function(url, options) {
+    initialize: function (url, options) {
         this._url = url;
         this._canvas = null;
         (this._glContext = null),
@@ -93,7 +93,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
      * @param {String} url - The TileService URL
      * @param {Boolean} noRedraw - A boolean indicates if one would like to redraw everything.
      */
-    setUrl: function(url, noRedraw) {
+    setUrl: function (url, noRedraw) {
         if (this._url === url && noRedraw === undefined) {
             noRedraw = true;
         }
@@ -106,7 +106,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
         return this;
     },
 
-    onAdd: function(map) {
+    onAdd: function (map) {
         const canvas = (this._canvas = DomUtil.create("canvas"));
 
         this._glContext = canvas.getContext("webgl", {
@@ -122,14 +122,14 @@ L.TileWebGLLayer = L.GridLayer.extend({
         }
     },
 
-    onRemove: function(map) {
+    onRemove: function (map) {
         map.off("moveend", () => this._triggerFullDraw());
         map.off("zoomend", () => this._triggerFullDraw());
 
         L.GridLayer.prototype.onRemove.call(this, map);
     },
 
-    createTile: function(coords, done) {
+    createTile: function (coords, done) {
         // Create image-tag and assign on load- and error-listeners
         const tile = DomUtil.create("canvas");
         DomEvent.on(
@@ -162,7 +162,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
         return tile;
     },
 
-    getTileUrl: function(coords) {
+    getTileUrl: function (coords) {
         var urlData = {
             s: this._getSubdomain(coords),
             x: coords.x,
@@ -174,7 +174,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
         return Util.template(this._url, Util.extend(urlData, this.options));
     },
 
-    updateOptions: function(options) {
+    updateOptions: function (options) {
         Util.setOptions(this, {
             ...this.options,
             ...options,
@@ -191,7 +191,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
 
     // ----------- PRIVATE FUNCTIONS ------------------
 
-    _draw: async function(tile, coords, done) {
+    _draw: async function (tile, coords, done) {
         const drawOptions = this._getDrawOptions();
 
         drawFunc(
@@ -211,18 +211,18 @@ L.TileWebGLLayer = L.GridLayer.extend({
         });
     },
 
-    _redrawAllTiles: function() {
+    _redrawAllTiles: function () {
         for (let { el, coords } of Object.values(this._tiles || {})) {
             this._draw(el, coords, null);
         }
     },
 
-    _drawAllTiles: async function() {
+    _drawAllTiles: async function () {
         const drawOptions = this._getDrawOptions();
 
         const tiles = Object.values(this._tiles || {})
-            .filter(tile => tile.current)
-            .map(tile => ({ ...tile, image: this.getTileUrl(tile.coords) }));
+            .filter((tile) => tile.current)
+            .map((tile) => ({ ...tile, image: this.getTileUrl(tile.coords) }));
 
         // Merge the tiles into a single image
         const { url, size, minX, minY } = await tilesToImage(
@@ -258,7 +258,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
         });
     },
 
-    _getZoomForUrl: function() {
+    _getZoomForUrl: function () {
         let zoom = this._tileZoom;
         let maxZoom = this.options.maxZoom;
         let zoomReverse = this.options.zoomReverse;
@@ -271,18 +271,18 @@ L.TileWebGLLayer = L.GridLayer.extend({
         return zoom + zoomOffset;
     },
 
-    _onTileRemove: function(e) {
+    _onTileRemove: function (e) {
         e.tile.onload = null;
     },
 
-    _getSubdomain: function(tilePoint) {
+    _getSubdomain: function (tilePoint) {
         var index =
             Math.abs(tilePoint.x + tilePoint.y) %
             this.options.subdomains.length;
         return this.options.subdomains[index];
     },
 
-    _removeTile: function(key) {
+    _removeTile: function (key) {
         var tile = this._tiles[key];
         if (!tile) {
             return;
@@ -298,7 +298,7 @@ L.TileWebGLLayer = L.GridLayer.extend({
         return GridLayer.prototype._removeTile.call(this, key);
     },
 
-    _tileOnLoad: function(done, tile) {
+    _tileOnLoad: function (done, tile) {
         // For https://github.com/Leaflet/Leaflet/issues/3332
         if (Browser.ielt9) {
             setTimeout(Util.bind(done, this, null, tile), 0);
@@ -307,11 +307,11 @@ L.TileWebGLLayer = L.GridLayer.extend({
         }
     },
 
-    _tileOnError: function(done, tile, e) {
+    _tileOnError: function (done, tile, e) {
         done(e, tile);
     },
 
-    _initColormap: function() {
+    _initColormap: function () {
         const colorScale = this.options.colorScale;
         if (!colorScale) {
             this._colormapUrl = null;
@@ -320,14 +320,14 @@ L.TileWebGLLayer = L.GridLayer.extend({
         }
     },
 
-    _getDrawOptions: function() {
+    _getDrawOptions: function () {
         return {
             ...this.options,
             crossOrigin: "",
         };
     },
 
-    _triggerFullDraw: function() {
+    _triggerFullDraw: function () {
         if (this._fullDrawTimeout) {
             clearTimeout(this._fullDrawTimeout);
         }

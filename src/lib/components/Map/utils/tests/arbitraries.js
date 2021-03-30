@@ -31,19 +31,15 @@ export const arbitraryCell = arbitrarySizedArray(jsc.number, 14).smap(
             fx1,
             fy1
         ),
-    c =>
-        c.corners
-            .values()
-            .concat([c.i, c.j])
-            .concat(c.flux.values())
+    (c) => c.corners.values().concat([c.i, c.j]).concat(c.flux.values())
 );
 
 export const arbitraryPoint = arbitrarySizedArray(jsc.number(0, 1), 2).smap(
-    l => new Vector(l),
-    v => Array.from(v)
+    (l) => new Vector(l),
+    (v) => Array.from(v)
 );
 
-export const arbitraryNonEmptyCell = jsc.suchthat(arbitraryCell, c => {
+export const arbitraryNonEmptyCell = jsc.suchthat(arbitraryCell, (c) => {
     const [c1, c2, c3, c4] = c.corners;
     const cornerCombos = [
         [c1, c2, c3],
@@ -79,14 +75,14 @@ function arbitraryMatrixArray(maxn, maxm) {
 }
 
 export const arbitraryVector = jsc.array(jsc.number).smap(
-    l => new Vector(l),
-    v => Array.from(v)
+    (l) => new Vector(l),
+    (v) => Array.from(v)
 );
 
 export function arbitraryMatrix(maxm, maxn) {
     return arbitraryMatrixArray(maxm, maxn).smap(
-        l => new Matrix(l),
-        m => Array.from(m).map(d => Array.from(d))
+        (l) => new Matrix(l),
+        (m) => Array.from(m).map((d) => Array.from(d))
     );
 }
 
@@ -94,7 +90,7 @@ export function arbitrarySquareMatrix(maxm, maxn) {
     return jsc.suchthat(
         arbitraryMatrix(maxm, maxn),
         jsc.bool,
-        l => l.length === l.rowLength
+        (l) => l.length === l.rowLength
     );
 }
 
@@ -116,18 +112,18 @@ function distinctIndecies(cells) {
 }
 
 export const arbitraryGrid = jsc.array(arbitraryNonEmptyCell).smap(
-    l => new Grid(distinctIndecies(l)),
-    g => g.getCells()
+    (l) => new Grid(distinctIndecies(l)),
+    (g) => g.getCells()
 );
 
 export const arbitraryField = arbitraryGrid.smap(
-    g => new Field(g),
-    f => f.grid
+    (g) => new Field(g),
+    (f) => f.grid
 );
 
 export const arbitraryParticle = jsc
     .tuple([arbitraryPoint, arbitraryField])
     .smap(
         ([p, f]) => new Particle(p, f.grid.getCell(0, 0), f),
-        p => [p.normalPosition, p.field]
+        (p) => [p.normalPosition, p.field]
     );

@@ -19,8 +19,9 @@ const StratigraphyPlot: React.FC<Props> = React.memo(
                 {data.map((zone, i) => {
                     return (
                         <g
-                            transform={`translate(0,${padding.top +
-                                i * barHeight})`}
+                            transform={`translate(0,${
+                                padding.top + i * barHeight
+                            })`}
                             key={`zone-${zone.name}`}
                         >
                             <rect

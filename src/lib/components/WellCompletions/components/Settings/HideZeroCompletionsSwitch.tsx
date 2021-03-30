@@ -12,14 +12,13 @@ const HideZeroCompletionsSwitch: React.FC = React.memo(() => {
     );
     // handlers
     const handleSwitchChange = useCallback(
-        event => dispatch(updateHideZeroCompletions(event.target.checked)),
+        (event) => dispatch(updateHideZeroCompletions(event.target.checked)),
         [dispatch]
     );
     return (
         <Switch
             label="Filter by completions"
             size="small"
-            enterKeyHint="Only show wells completed in at least one of the selected layers"
             onChange={handleSwitchChange}
             checked={hideZeroCompletions}
         />

@@ -61,8 +61,9 @@ export default class Map extends Component {
         return (
             `translate(${this.mapTransform.x},${this.mapTransform.y})` +
             ` scale(${this.mapTransform.k})` +
-            ` rotate(${this.mapTransform.angle}, ${this.mapWidth / 2},${this
-                .mapHeight / 2})`
+            ` rotate(${this.mapTransform.angle}, ${this.mapWidth / 2},${
+                this.mapHeight / 2
+            })`
         );
     }
 
@@ -89,13 +90,13 @@ export default class Map extends Component {
             .enter()
             .append("polygon")
             .merge(this.map)
-            .attr("points", d =>
+            .attr("points", (d) =>
                 d
                     .map(([x, y]) => [x - self.xMin, self.yMax - y].join(","))
                     .join(" ")
             )
             .attr("fill", (d, i) => self.color(i))
-            .on("mousemove", function(d, i) {
+            .on("mousemove", function (d, i) {
                 self.emit("mousemove", {
                     x: d3.mouse(this)[0],
                     y: d3.mouse(this)[1],

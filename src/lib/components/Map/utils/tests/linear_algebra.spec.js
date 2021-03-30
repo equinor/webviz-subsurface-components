@@ -17,13 +17,17 @@ describe("Vector", () => {
     jsc.property(
         "construction is inverse with Array.from",
         jsc.array(jsc.number),
-        list => equal(Array.from(new Vector(list)), list)
+        (list) => equal(Array.from(new Vector(list)), list)
     );
 
-    jsc.property("value is consistent with input", jsc.array(jsc.nat), arr => {
-        const vector = new Vector(arr);
-        return arr.every((e, i) => vector.value(i) === e);
-    });
+    jsc.property(
+        "value is consistent with input",
+        jsc.array(jsc.nat),
+        (arr) => {
+            const vector = new Vector(arr);
+            return arr.every((e, i) => vector.value(i) === e);
+        }
+    );
 
     jsc.property(
         "magnitude is calculated correctly",
@@ -59,7 +63,7 @@ describe("Vector", () => {
         (vector, n) =>
             equal(
                 Array.from(vector.scalarMultiply(n)),
-                Array.from(vector).map(e => e * n)
+                Array.from(vector).map((e) => e * n)
             )
     );
 
@@ -99,20 +103,20 @@ describe("Vector", () => {
 });
 
 function matrixToArray(matrix) {
-    return Array.from(matrix).map(d => Array.from(d));
+    return Array.from(matrix).map((d) => Array.from(d));
 }
 
 describe("Matrix", () => {
     jsc.property(
         "construction is inverse with mapping Array.from",
         arbitraryMatrix(),
-        mat => {
+        (mat) => {
             const list = matrixToArray(mat);
             return equal(matrixToArray(new Matrix(list)), list);
         }
     );
 
-    jsc.property("Matrix gets size from input", arbitraryMatrix(), mat => {
+    jsc.property("Matrix gets size from input", arbitraryMatrix(), (mat) => {
         const list = matrixToArray(mat);
         const matrix = new Matrix(list);
         if (list.length > 0) {
@@ -127,7 +131,7 @@ describe("Matrix", () => {
     jsc.property(
         "Transpose has row and column size inverted",
         arbitraryMatrix(),
-        matrix => {
+        (matrix) => {
             const trans = matrix.transpose();
 
             if (matrix.length > 0 && matrix.rowLength > 0) {
@@ -143,7 +147,7 @@ describe("Matrix", () => {
     jsc.property(
         "Transpose inverts row and column",
         arbitraryMatrix(),
-        matrix => {
+        (matrix) => {
             const trans = matrix.transpose();
 
             let ok = true;
@@ -162,12 +166,12 @@ describe("Matrix", () => {
     jsc.property(
         "Determinant is invariant over transpose",
         arbitrarySquareMatrix(2, 2),
-        matrix => matrix.determinant() === matrix.transpose().determinant()
+        (matrix) => matrix.determinant() === matrix.transpose().determinant()
     );
     jsc.property(
         "Multiplying with identity matrix is identity",
         arbitrarySquareMatrix(),
-        matrix => {
+        (matrix) => {
             const identity = Matrix.identity(matrix.length);
             return equal(matrix.multiply(identity), matrix);
         }

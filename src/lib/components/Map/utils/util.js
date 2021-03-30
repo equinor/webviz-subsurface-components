@@ -28,7 +28,7 @@ export default class SVGTransform {
 
         const transformations = transformString.match(this.TRANSFORM_REGEX);
 
-        transformations.forEach(transform => {
+        transformations.forEach((transform) => {
             const methodAndValues = transform.match(/[\w.-]+/g);
             const method = methodAndValues.shift();
 
@@ -39,7 +39,7 @@ export default class SVGTransform {
     }
 
     addTransform(type, params) {
-        this.transform[type] = params.map(item => `${item}`);
+        this.transform[type] = params.map((item) => `${item}`);
     }
 
     /**
@@ -61,4 +61,4 @@ export default class SVGTransform {
     }
 }
 
-export const range = num => [...Array(num)].map((_, i) => i);
+export const range = (num) => [...Array(num)].map((_, i) => i);

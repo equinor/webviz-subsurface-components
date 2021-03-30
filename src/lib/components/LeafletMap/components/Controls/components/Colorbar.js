@@ -15,7 +15,7 @@ import L from "leaflet";
 // Utils
 import { buildColormap } from "../../../utils/colorScale";
 
-const ColorBar = props => {
+const ColorBar = (props) => {
     const { focusedImageLayer = {} } = useContext(Context);
 
     // State
@@ -81,7 +81,7 @@ const ColorBar = props => {
             options: {
                 position: props.position || "bottomright",
             },
-            onAdd: function() {
+            onAdd: function () {
                 this.panelDiv = L.DomUtil.create(
                     "div",
                     "leaflet-custom-control"

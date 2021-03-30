@@ -66,8 +66,9 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                 {data.wells.map((well, i) => {
                     return (
                         <g
-                            transform={`translate(${padding.left +
-                                (i + 0.5) * wellWidth}, ${0})`}
+                            transform={`translate(${
+                                padding.left + (i + 0.5) * wellWidth
+                            }, ${0})`}
                             key={`well-${well.name}-completions`}
                         >
                             {well.completions.map((completion, j) => {
@@ -79,14 +80,13 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                 return (
                                     <rect
                                         key={`well-${well.name}-completions-${start}-${end}`}
-                                        transform={`translate(${-completion *
-                                            wellWidth *
-                                            0.25}, ${start * barHeight +
-                                            padding.top})`}
+                                        transform={`translate(${
+                                            -completion * wellWidth * 0.25
+                                        }, ${start * barHeight + padding.top})`}
                                         width={(completion * wellWidth) / 2}
                                         height={barHeight * (end - start)}
                                         fill={"#111"}
-                                        onMouseMove={e =>
+                                        onMouseMove={(e) =>
                                             onMouseMove(e, well, completion)
                                         }
                                         onMouseOut={onMouseOut}
