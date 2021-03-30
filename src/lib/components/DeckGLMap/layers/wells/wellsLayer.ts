@@ -1,6 +1,7 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
-import { GeoJsonLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, GeoJsonLayerProps } from "@deck.gl/layers";
+import { RGBAColor } from "@deck.gl/core/utils/color";
 
 export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     pointRadiusScale: number;
@@ -8,16 +9,25 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     outline: boolean;
 }
 
-function getOutlineColor() {
-    return [0, 0, 0, 255];
+interface WellDataType {
+    type: string;
+    geometry: Record<string, unknown>;
+    properties: {
+        name: string;
+        color: RGBAColor;
+    };
+}
+
+function _getFillColor(d): RGBAColor {
+    return d.properties.color;
 }
 
 export default class WellsLayer extends CompositeLayer<
     unknown,
     WellsLayerProps<unknown>
 > {
-    renderLayers() {
-        const properties: any = {
+    renderLayers(): GeoJsonLayer<unknown>[] {
+        const properties: GeoJsonLayerProps<unknown> = {
             id: "outline",
             data: this.props.data,
             pickable: true,
@@ -30,10 +40,10 @@ export default class WellsLayer extends CompositeLayer<
         const outline = new GeoJsonLayer(this.getSubLayerProps(properties));
 
         properties.id = "colors";
-        properties.getFillColor = d => d.properties.color;
+        properties.getFillColor = _getFillColor;
         properties.getLineColor = properties.getFillColor;
-        properties.pointRadiusScale = properties.pointRadiusScale - 1;
-        properties.lineWidthScale = properties.lineWidthScale - 1;
+        properties.pointRadiusScale = (properties.pointRadiusScale || 8) - 1;
+        properties.lineWidthScale = (properties.lineWidthScale || 5) - 1;
 
         const colors = new GeoJsonLayer(this.getSubLayerProps(properties));
 
