@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2020 - Equinor ASA. */
 
-import jsc from "./jsverify";
+import jsc from "jsverify";
 import {
     arbitraryCell,
     arbitraryNonEmptyCell,

@@ -3,7 +3,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import { throttle } from "lodash";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { updateWellSearchText } from "../../redux/reducer";
+import { updateWellSearchText } from "../../redux/actions";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

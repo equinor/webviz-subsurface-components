@@ -5,6 +5,7 @@ import {
     createStyles,
     makeStyles,
     Menu,
+    Box,
     // eslint-disable-next-line prettier/prettier
     Theme
 } from "@material-ui/core";
@@ -47,16 +48,18 @@ const FilterMenu: React.FC = React.memo(() => {
                 </Button>
             </Tooltip>
             <Menu
-                id="simple-menu"
+                id="filter-menu"
                 anchorEl={anchorEl}
                 keepMounted
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
                 classes={{ paper: classes.paper }}
             >
-                <HideZeroCompletionsSwitch />
-                <ZoneSelector />
-                <WellFilter />
+                <Box marginY={1}>
+                    <HideZeroCompletionsSwitch />
+                    <ZoneSelector />
+                    <WellFilter />
+                </Box>
             </Menu>
         </div>
     );

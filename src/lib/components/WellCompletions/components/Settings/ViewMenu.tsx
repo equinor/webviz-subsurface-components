@@ -46,7 +46,7 @@ const ViewMenu: React.FC = React.memo(() => {
                 </Button>
             </Tooltip>
             <Menu
-                id="simple-menu"
+                id="view-menu"
                 anchorEl={anchorEl}
                 keepMounted
                 open={Boolean(anchorEl)}
