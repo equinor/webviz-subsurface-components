@@ -9,9 +9,9 @@ import PropTypes from "prop-types";
 import FlowMap from "./utils/flow_map";
 import Map2D from "./utils/map2d";
 
-const getIndexies = layers => {
+const getIndexies = (layers) => {
     const index = {};
-    layers.forEach(kLayer => {
+    layers.forEach((kLayer) => {
         kLayer.forEach(({ k, i, j, ...layer }) => {
             if (!index[k]) {
                 index[k] = {};
@@ -30,7 +30,7 @@ const getIndexies = layers => {
 };
 
 const addNegativeFlow = ({ layers, indexies }) =>
-    layers.map(kLayer =>
+    layers.map((kLayer) =>
         kLayer.map(({ i, j, k, ...layer }) => {
             let FLOWInegative = 0;
             let FLOWJnegative = 0;
@@ -71,7 +71,7 @@ export function makeFlowLayers(data) {
     const flow_scale = data.linearscales.flow[0];
     const flow_min = data.linearscales.flow[1];
 
-    data.values.forEach(values => {
+    data.values.forEach((values) => {
         const kValue = values[2];
         if (!layers[kValue]) {
             layers[kValue] = [];
@@ -108,7 +108,7 @@ export function makeFlowLayers(data) {
     return addNegativeFlow({ layers, indexies });
 }
 
-export const make2DLayers = data => {
+export const make2DLayers = (data) => {
     const layers = [];
 
     const coord_scale = data.linearscales.coord[0];
@@ -118,7 +118,7 @@ export const make2DLayers = data => {
     const val_scale = data.linearscales.value[0];
     const val_min = data.linearscales.value[1];
 
-    data.values.forEach(values => {
+    data.values.forEach((values) => {
         const kValue = values[2];
         if (!layers[kValue]) {
             layers[kValue] = [];
@@ -180,9 +180,10 @@ const init2DMap = ({ elementSelector, data, height, layerNames }) => {
     map.init();
 };
 
-const parseData = data => (typeof data === "string" ? JSON.parse(data) : data);
+const parseData = (data) =>
+    typeof data === "string" ? JSON.parse(data) : data;
 
-const shouldRenderFlowMap = data => "flow" in data.linearscales;
+const shouldRenderFlowMap = (data) => "flow" in data.linearscales;
 
 class Map extends Component {
     constructor(props) {
@@ -229,7 +230,7 @@ class Map extends Component {
                 <div id={this.elementId}>
                     <canvas
                         id={this.canvasId}
-                        ref={ref => {
+                        ref={(ref) => {
                             this.canvas = ref;
                         }}
                         style={{

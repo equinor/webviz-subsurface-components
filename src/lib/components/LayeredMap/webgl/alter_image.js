@@ -98,15 +98,15 @@ function alter_image(
         gl.uniform1i(gl.getUniformLocation(program, uniformName), textureIndex);
     };
 
-    const load_image = src =>
-        new Promise(resolve => {
+    const load_image = (src) =>
+        new Promise((resolve) => {
             const img = new Image();
             img.src = src;
             img.onload = () => resolve(img);
         });
 
     Promise.all([load_image(map_base64), load_image(colormap_base64)]).then(
-        function([map_image, colormap_image]) {
+        function ([map_image, colormap_image]) {
             const gl = canvas.getContext("webgl", {
                 premultipliedAlpha: false,
             });

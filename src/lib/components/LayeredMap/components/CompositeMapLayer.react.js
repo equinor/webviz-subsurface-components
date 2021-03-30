@@ -27,7 +27,7 @@ class CompositeMapLayer extends Component {
 
     renderItem(item, index) {
         if (item.type === "polyline") {
-            const positions = item.positions.map(xy => yx(xy));
+            const positions = item.positions.map((xy) => yx(xy));
             return (
                 <Polyline
                     onClick={() => this.props.lineCoords(positions)}
@@ -40,7 +40,7 @@ class CompositeMapLayer extends Component {
             );
         }
         if (item.type === "polygon") {
-            const positions = item.positions.map(xy => yx(xy));
+            const positions = item.positions.map((xy) => yx(xy));
             return (
                 <Polygon
                     onClick={() => this.props.polygonCoords(positions)}
@@ -70,7 +70,7 @@ class CompositeMapLayer extends Component {
                     <ImageOverlayWebGL
                         url={item.url}
                         colormap={item.colormap}
-                        bounds={item.bounds.map(xy => yx(xy))}
+                        bounds={item.bounds.map((xy) => yx(xy))}
                         hillShading={
                             this.props.hillShading && item.allowHillshading
                         }

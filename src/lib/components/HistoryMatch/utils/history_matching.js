@@ -38,9 +38,7 @@ export default class HistoryMatching {
         // height of plot area
         this.plotHeight = 20 * (this.data.iterations[0].labels.length + 1);
 
-        d3.select(this.container)
-            .selectAll("*")
-            .remove();
+        d3.select(this.container).selectAll("*").remove();
 
         this.svg = d3
             .select(this.container)
@@ -80,7 +78,7 @@ export default class HistoryMatching {
 
         this.iterationPicker = new Slider({
             parentElement: this.sliderContainer,
-            data: this.data.iterations.map(iteration => iteration.name),
+            data: this.data.iterations.map((iteration) => iteration.name),
             length: this.plotWidth,
             width: 80,
             position: {
@@ -90,7 +88,7 @@ export default class HistoryMatching {
             numberOfVisibleTicks: this.data.iterations.length,
         });
 
-        this.iterationPicker.on("change", index => {
+        this.iterationPicker.on("change", (index) => {
             this._setIteration(index);
         });
 

@@ -50,7 +50,7 @@ class Switch extends React.Component {
         this.setState({ switchCtrl: null });
     };
 
-    handleChange = event => {
+    handleChange = (event) => {
         if (this.props.setProps) {
             const curProps = Object.assign({}, this.props);
             delete curProps.map;

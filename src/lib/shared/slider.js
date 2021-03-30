@@ -105,11 +105,11 @@ export default class Slider extends Component {
             .attr("class", "slider")
             .attr(`${this.axis}1`, this.scale.range()[0])
             .attr(`${this.axis}2`, this.scale.range()[1])
-            .select(function() {
+            .select(function () {
                 return this.parentNode.appendChild(this.cloneNode(true));
             })
             .attr("class", "slider-inset")
-            .select(function() {
+            .select(function () {
                 return this.parentNode.appendChild(this.cloneNode(true));
             })
             .attr("class", "slider-overlay")
@@ -170,10 +170,10 @@ export default class Slider extends Component {
             .data(this.scale.ticks(this.numberOfVisibleTicks))
             .enter()
             .append("text")
-            .attr(this.axis, d => this.scale(d))
+            .attr(this.axis, (d) => this.scale(d))
             .attr("text-anchor", tickProp["text-anchor"])
             .attr("dominant-baseline", tickProp["dominant-baseline"])
-            .text(d => this.data[d]);
+            .text((d) => this.data[d]);
     }
 
     renderCurrentTick() {

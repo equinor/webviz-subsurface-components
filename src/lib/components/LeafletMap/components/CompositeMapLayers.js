@@ -85,7 +85,7 @@ class CompositeMapLayers extends Component {
                 this.createMultipleLayers();
             } else {
                 const layers = (this.props.layers || []).filter(
-                    layer => layer.id
+                    (layer) => layer.id
                 );
                 for (const propLayerData of layers) {
                     switch (propLayerData.action) {
@@ -125,7 +125,7 @@ class CompositeMapLayers extends Component {
 
     componentWillUnmount() {
         const map = this.props.map;
-        map.eachLayer(function(layer) {
+        map.eachLayer(function (layer) {
             map.removeLayer(layer);
         });
     }
@@ -133,13 +133,13 @@ class CompositeMapLayers extends Component {
     removeAllLayers = () => {
         const map = this.props.map;
         this.context.drawLayerDelete("all");
-        Object.values(this.layers).forEach(layer => {
+        Object.values(this.layers).forEach((layer) => {
             this.layerControl.removeLayer(layer);
         });
 
         // TODO: check if the last invisible layer is duplicated if we don't remove it
         // For some reason there exists at least one layer which is not in state
-        map.eachLayer(layer => {
+        map.eachLayer((layer) => {
             layer.remove();
         });
         this.layers = {};
@@ -189,7 +189,7 @@ class CompositeMapLayers extends Component {
     }
 
     updateUponBaseMapChange = () => {
-        this.props.map.on("baselayerchange", e => {
+        this.props.map.on("baselayerchange", (e) => {
             const layer = Object.values(e.layer._layers)[0];
             this.setFocusedImageLayer(layer);
 
@@ -198,7 +198,7 @@ class CompositeMapLayers extends Component {
         });
     };
 
-    removeLayerFromState = id => {
+    removeLayerFromState = (id) => {
         delete this.layers[id];
 
         if (this.baseLayersById[id]) {
@@ -208,7 +208,7 @@ class CompositeMapLayers extends Component {
 
     createMultipleLayers() {
         const layers = (this.props.layers || []).filter(
-            layer => layer.action !== "delete"
+            (layer) => layer.action !== "delete"
         );
         for (const layer of layers) {
             this.createLayerGroup(layer);
@@ -216,7 +216,7 @@ class CompositeMapLayers extends Component {
         this.addDrawLayerToMap();
     }
 
-    createLayerGroup = layer => {
+    createLayerGroup = (layer) => {
         if (this.layers[layer.id]) {
             return;
         }
@@ -258,7 +258,7 @@ class CompositeMapLayers extends Component {
             // TODO: improve bounds optimization?
             if (layer.data && layer.data.length > 0 && !activeLayer) {
                 const bounds = layer.data[0].bounds
-                    ? layer.data[0].bounds.map(xy => yx(xy))
+                    ? layer.data[0].bounds.map((xy) => yx(xy))
                     : DEFAULT_BOUNDS;
                 this.props.map.fitBounds(bounds);
             }
@@ -274,7 +274,7 @@ class CompositeMapLayers extends Component {
         this.layerControl.addOverlay(this.context.drawLayer, "Drawings");
     };
 
-    setFocusedImageLayer = layer => {
+    setFocusedImageLayer = (layer) => {
         const updateFunc = this.context.setFocusedImageLayer;
         if (updateFunc) {
             updateFunc(layer);
@@ -317,15 +317,17 @@ class CompositeMapLayers extends Component {
             }
         }
 
-        Object.values(itemsToDraw).forEach(item => {
+        Object.values(itemsToDraw).forEach((item) => {
             this.addItemToLayer(item, this.context.drawLayer, false);
         });
     };
 
     getActiveBaseLayer() {
         const baseLayerIds = Object.keys(this.baseLayersById || {});
-        const layers = baseLayerIds.map(id => this.layers[id]).filter(l => l);
-        return layers.find(layer => this.props.map.hasLayer(layer));
+        const layers = baseLayerIds
+            .map((id) => this.layers[id])
+            .filter((l) => l);
+        return layers.find((layer) => this.props.map.hasLayer(layer));
     }
 
     render() {

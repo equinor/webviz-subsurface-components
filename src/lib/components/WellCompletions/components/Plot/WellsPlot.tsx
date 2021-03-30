@@ -20,7 +20,7 @@ const WellsPlot: React.FC<Props> = React.memo(
             [layout.xExtent, data.length]
         );
         const onMouseOver = useCallback(
-            well => {
+            (well) => {
                 setContent(() => (
                     <table style={{ color: "#fff" }}>
                         <tbody>
@@ -35,7 +35,7 @@ const WellsPlot: React.FC<Props> = React.memo(
                                 </td>
                                 <td>{timeSteps[well.earliestCompDateIndex]}</td>
                             </tr>
-                            {Object.keys(well.attributes).map(attribute => (
+                            {Object.keys(well.attributes).map((attribute) => (
                                 <tr
                                     key={`well-tooltip-${well.name}-${attribute}`}
                                 >
@@ -62,15 +62,17 @@ const WellsPlot: React.FC<Props> = React.memo(
                 {data.map((well, i) => {
                     return (
                         <g
-                            transform={`translate(${padding.left +
-                                (i + 0.5) * wellWidth},0)`}
+                            transform={`translate(${
+                                padding.left + (i + 0.5) * wellWidth
+                            },0)`}
                             key={`well-${well.name}`}
                         >
                             <text
                                 style={{ fontSize: "9px" }}
                                 textAnchor="start"
-                                transform={`translate(0,${padding.top -
-                                    10}) rotate(-60)`}
+                                transform={`translate(0,${
+                                    padding.top - 10
+                                }) rotate(-60)`}
                                 x={0}
                                 y={0}
                                 dy={".35em"}

@@ -38,7 +38,7 @@ class ImageOverlayWebGL extends Component {
 
         return (
             <CanvasOverlay
-                drawMethod={canvas =>
+                drawMethod={(canvas) =>
                     alter_image(
                         canvas,
                         this.props.url,

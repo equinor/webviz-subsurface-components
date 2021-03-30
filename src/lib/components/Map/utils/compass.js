@@ -130,7 +130,7 @@ export default class Compass extends Component {
             .data(compassCoords)
             .enter()
             .append("polygon")
-            .attr("points", d => d)
+            .attr("points", (d) => d)
             .attr("fill", "#DA8FAF")
             .attr("opacity", "0.5")
             .style("pointer-events", "visiblePainted");

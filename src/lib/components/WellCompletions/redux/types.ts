@@ -20,10 +20,10 @@ export interface Completions {
 }
 
 export const RangeModes = {
-    "First Step": arr => arr[0],
-    "Last Step": arr => arr[arr.length - 1],
-    Max: arr => Math.max(...arr),
-    Average: arr => arr.reduce((a, b) => a + b) / arr.length,
+    "First Step": (arr) => arr[0],
+    "Last Step": (arr) => arr[arr.length - 1],
+    Max: (arr) => Math.max(...arr),
+    Average: (arr) => arr.reduce((a, b) => a + b) / arr.length,
 };
 export type RangeMode = keyof typeof RangeModes;
 

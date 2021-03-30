@@ -56,10 +56,10 @@ class LayeredMap extends Component {
                 [1, 1],
             ];
         }
-        this.props.layers.map(layer => {
-            layer.data.map(item => {
+        this.props.layers.map((layer) => {
+            layer.data.map((item) => {
                 if (["polyline", "polygon"].includes(item.type)) {
-                    item.positions.map(xy => {
+                    item.positions.map((xy) => {
                         x_arr.push(xy[0]);
                         y_arr.push(xy[1]);
                     });
@@ -113,10 +113,10 @@ class LayeredMap extends Component {
     }
 
     setEvents() {
-        this.mapRef.current.leafletElement.on("zoomanim", ev => {
+        this.mapRef.current.leafletElement.on("zoomanim", (ev) => {
             this.props.sync_ids
-                .filter(id => id !== this.props.id)
-                .map(id => {
+                .filter((id) => id !== this.props.id)
+                .map((id) => {
                     if (
                         _layeredmap_references[
                             id
@@ -132,13 +132,13 @@ class LayeredMap extends Component {
                 });
         });
 
-        this.mapRef.current.leafletElement.on("onlayeredmapclick", ev => {
+        this.mapRef.current.leafletElement.on("onlayeredmapclick", (ev) => {
             this.setState({ z: ev.z, z_timestamp: Date.now() });
         });
 
-        this.mapRef.current.leafletElement.on("click", ev => {
+        this.mapRef.current.leafletElement.on("click", (ev) => {
             this.updateCircleMarkerPosition(ev.latlng.lng, ev.latlng.lat);
-            this.props.sync_ids.map(id => {
+            this.props.sync_ids.map((id) => {
                 _layeredmap_references[id].updateCircleMarkerPosition(
                     ev.latlng.lng,
                     ev.latlng.lat
@@ -146,10 +146,10 @@ class LayeredMap extends Component {
             });
         });
 
-        this.mapRef.current.leafletElement.on("move", ev => {
+        this.mapRef.current.leafletElement.on("move", (ev) => {
             this.props.sync_ids
-                .filter(id => id !== this.props.id)
-                .map(id => {
+                .filter((id) => id !== this.props.id)
+                .map((id) => {
                     // Only react if move event is from a real user interaction
                     // (originalEvent is undefined if viewport is programatically changed).
                     if (typeof ev.originalEvent !== "undefined") {
@@ -194,8 +194,8 @@ class LayeredMap extends Component {
             draw_toolbar_marker || draw_toolbar_polygon || draw_toolbar_polyline
                 ? true
                 : false;
-        const showHillshadingSwitch = this.props.layers.some(layer =>
-            layer.data.some(item => item.allowHillshading)
+        const showHillshadingSwitch = this.props.layers.some((layer) =>
+            layer.data.some((item) => item.allowHillshading)
         );
 
         const showLayersControl = this.props.layers.length > 1;
@@ -215,8 +215,8 @@ class LayeredMap extends Component {
                 key={key}
                 hillShading={this.state.hillShading}
                 lightDirection={this.props.lightDirection}
-                lineCoords={coords => setProps({ polyline_points: coords })}
-                polygonCoords={coords => setProps({ polygon_points: coords })}
+                lineCoords={(coords) => setProps({ polyline_points: coords })}
+                polygonCoords={(coords) => setProps({ polygon_points: coords })}
             />
         );
 
@@ -243,8 +243,8 @@ class LayeredMap extends Component {
                 />
                 <OptionalLayerControl showLayersControl={showLayersControl}>
                     {this.props.layers
-                        .filter(layer => layer.base_layer)
-                        .map(layer =>
+                        .filter((layer) => layer.base_layer)
+                        .map((layer) =>
                             showLayersControl ? (
                                 <BaseLayer
                                     checked={layer.checked}
@@ -258,8 +258,8 @@ class LayeredMap extends Component {
                             )
                         )}
                     {this.props.layers
-                        .filter(layer => !layer.base_layer)
-                        .map(layer =>
+                        .filter((layer) => !layer.base_layer)
+                        .map((layer) =>
                             showLayersControl ? (
                                 <Overlay
                                     checked={layer.checked}
@@ -279,13 +279,13 @@ class LayeredMap extends Component {
                             drawMarker={draw_toolbar_marker}
                             drawPolygon={draw_toolbar_polygon}
                             drawPolyline={draw_toolbar_polyline}
-                            lineCoords={coords =>
+                            lineCoords={(coords) =>
                                 setProps({ polyline_points: coords })
                             }
-                            markerCoords={coords =>
+                            markerCoords={(coords) =>
                                 setProps({ marker_point: coords })
                             }
-                            polygonCoords={coords =>
+                            polygonCoords={(coords) =>
                                 setProps({ polygon_points: coords })
                             }
                         />

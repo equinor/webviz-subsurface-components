@@ -28,7 +28,7 @@ const padding: Padding = { left: 50, right: 50, top: 70, bottom: 50 };
 const WellCompletionsPlot: React.FC<Props> = React.memo(
     ({ timeSteps, plotData }) => {
         const classes = useStyles();
-        const { width, height, ref } = useResizeDetector<HTMLDivElement>({
+        const { width, height, ref } = useResizeDetector({
             refreshMode: "debounce",
             refreshRate: 50,
             refreshOptions: { trailing: true },

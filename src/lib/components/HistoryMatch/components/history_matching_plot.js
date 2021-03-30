@@ -98,7 +98,7 @@ export default class HistoryMatchingPlot extends Component {
             .attr("font-size", 30)
             .attr("text-anchor", "middle")
             .merge(this.container.selectAll("text#title"))
-            .text(d => `Misfit overview for ${d}`);
+            .text((d) => `Misfit overview for ${d}`);
     }
 
     renderPlot() {
@@ -131,7 +131,7 @@ export default class HistoryMatchingPlot extends Component {
         const xAxis = d3
             .axisTop()
             .scale(this.xScale)
-            .tickFormat(d => {
+            .tickFormat((d) => {
                 if (d === 0) {
                     return "0";
                 }
@@ -224,18 +224,15 @@ export default class HistoryMatchingPlot extends Component {
             .attr("text-anchor", "end")
             .attr("font-size", this.LABEL_FONT_SIZE)
             .merge(labelSelection)
-            .text(d => d);
+            .text((d) => d);
 
-        labelSelection
-            .transition()
-            .duration(400)
-            .attr("fill-opacity", 0.0);
+        labelSelection.transition().duration(400).attr("fill-opacity", 0.0);
 
         labelSelection
             .transition()
             .delay(400)
             .duration(1)
-            .text(d => d);
+            .text((d) => d);
 
         labelSelection
             .transition()
@@ -334,15 +331,11 @@ export default class HistoryMatchingPlot extends Component {
 
         this.tooltip.style("display", "block");
 
-        d3.select(node)
-            .transition()
-            .attr("stroke-width", 5);
+        d3.select(node).transition().attr("stroke-width", 5);
     }
 
     hideTooltip(node) {
-        d3.select(node)
-            .transition()
-            .attr("stroke-width", 1);
+        d3.select(node).transition().attr("stroke-width", 1);
 
         this.tooltip.style("display", "none");
     }
@@ -414,8 +407,9 @@ export default class HistoryMatchingPlot extends Component {
                 if (i < numberOfParameters - 1) {
                     line += `V${transformedData[i + 1].yVal}`;
                 } else {
-                    line += `V${transformedData[i].yVal +
-                        this.yScale.bandwidth()}`;
+                    line += `V${
+                        transformedData[i].yVal + this.yScale.bandwidth()
+                    }`;
                 }
             } else {
                 line += `V${transformedData[i].yVal}`;

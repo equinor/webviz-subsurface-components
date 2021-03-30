@@ -2,7 +2,7 @@ import React, { PropsWithChildren } from "react";
 import ReactTooltip from "react-tooltip";
 
 const TooltipContext = React.createContext<{
-    setContent: React.Dispatch<React.SetStateAction<React.FC<{}> | null>>;
+    setContent: React.Dispatch<React.SetStateAction<React.FC | null>>;
 }>({
     setContent: () => null,
 });
@@ -15,9 +15,9 @@ const TooltipContext = React.createContext<{
  * that will be displayed in the tooltip. Hiding the tooltip is
  * done with setContent(null)
  */
-const TooltipProvider: React.FC<PropsWithChildren<{}>> = ({
+const TooltipProvider: React.FC<PropsWithChildren<unknown>> = ({
     children,
-}: PropsWithChildren<{}>) => {
+}: PropsWithChildren<unknown>) => {
     // State
     const [Content, setContent] = React.useState<React.FC | null>(null);
 

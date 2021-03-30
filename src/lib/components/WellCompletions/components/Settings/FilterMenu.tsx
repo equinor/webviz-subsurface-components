@@ -1,5 +1,4 @@
 import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
-// eslint-disable-next-line @typescript-eslint/camelcase
 import { filter_alt } from "@equinor/eds-icons";
 import {
     createStyles,
@@ -14,7 +13,6 @@ import WellFilter from "./WellFilter";
 import ZoneSelector from "./ZoneSelector";
 
 // Use library approach
-// eslint-disable-next-line @typescript-eslint/camelcase
 Icon.add({ filter_alt }); // (this needs only be done once)
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

@@ -8,7 +8,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import HistoryMatching from "./utils/history_matching";
 
-const parseData = data => (typeof data === "string" ? JSON.parse(data) : data);
+const parseData = (data) =>
+    typeof data === "string" ? JSON.parse(data) : data;
 
 class HistoryMatch extends Component {
     constructor(props) {
