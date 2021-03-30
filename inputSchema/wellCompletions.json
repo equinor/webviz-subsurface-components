@@ -1,6 +1,7 @@
 {
     "type": "object",
     "properties": {
+        "version": { "type": "string", "minLength": 1 },
         "stratigraphy": {
             "type": "array",
             "items": {
