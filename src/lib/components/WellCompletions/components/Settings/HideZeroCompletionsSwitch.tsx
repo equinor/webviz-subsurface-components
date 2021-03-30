@@ -19,7 +19,6 @@ const HideZeroCompletionsSwitch: React.FC = React.memo(() => {
         <Switch
             label="Filter by completions"
             size="small"
-            enterKeyHint="Only show wells completed in at least one of the selected layers"
             onChange={handleSwitchChange}
             checked={hideZeroCompletions}
         />
