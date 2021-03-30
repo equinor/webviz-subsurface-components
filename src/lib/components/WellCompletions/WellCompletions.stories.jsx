@@ -14,7 +14,7 @@ export default {
     },
 };
 
-const Template = data => <WellCompletions data={data.data} id={"test"} />;
+const Template = (data) => <WellCompletions data={data.data} id={"test"} />;
 export const WellCompletion = Template.bind({});
 
 WellCompletion.args = {
