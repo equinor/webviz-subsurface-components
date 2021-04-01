@@ -20,6 +20,8 @@ def generate_synthetic_data(num_groups, num_iter, num_realizations):
     come from  an assisted history matching run.
     """
 
+    # pylint: disable=too-many-locals
+
     obs_group_names = [f"Obs. group {i}" for i in range(num_groups)]
     number_dp = np.random.randint(low=10, high=100, size=num_groups)
 
@@ -85,29 +87,31 @@ def _get_sorted_edges(number_observation_groups):
 
     sorted_values = np.flip(sorted_values, 0)
 
-    P10 = np.percentile(sorted_values, 90, axis=1)
-    P90 = np.percentile(sorted_values, 10, axis=1)
+    p10 = np.percentile(sorted_values, 90, axis=1)
+    p90 = np.percentile(sorted_values, 10, axis=1)
 
     # Dictionary with two arrays (P10, P90). Each array of length equal
     # to number of observation groups i.e. number of items along y axis.
     # These values are to be used for drawing the stair stepped
     # sorted P10-P90 area:
 
-    coordinates = {"low": list(P10), "high": list(P90)}
+    coordinates = {"low": list(p10), "high": list(p90)}
 
     return coordinates
 
 
 class HistoryMatch:
+    # pylint: disable=too-few-public-methods
     def __init__(self, data):
-        super(HistoryMatch, self).__init__()
+        super().__init__()
 
-        self.data = self._prepareData(data)
+        self.data = HistoryMatch._prepare_data(data)
 
     def get_data(self):
         return self.data
 
-    def _prepareData(self, data):
+    @staticmethod
+    def _prepare_data(data):
         data = data.copy().reset_index()
 
         ensemble_labels = data.ensemble_name.unique().tolist()
@@ -121,9 +125,11 @@ class HistoryMatch:
             df = data[data.ensemble_name == ensemble]
             iterations.append(df.groupby("obs_group_name").mean())
 
-        sorted_iterations = self._sortIterations(iterations)
+        sorted_iterations = HistoryMatch._sort_iterations(iterations)
 
-        iterations_dict = self._iterations_to_dict(sorted_iterations, ensemble_labels)
+        iterations_dict = HistoryMatch._iterations_to_dict(
+            sorted_iterations, ensemble_labels
+        )
 
         confidence_sorted = _get_sorted_edges(num_obs_groups)
         confidence_unsorted = _get_unsorted_edges()
@@ -135,7 +141,8 @@ class HistoryMatch:
 
         return data
 
-    def _sortIterations(self, iterations):
+    @staticmethod
+    def _sort_iterations(iterations):
         sorted_data = []
 
         for df in iterations:
@@ -149,7 +156,8 @@ class HistoryMatch:
 
         return sorted_data
 
-    def _iterations_to_dict(self, iterations, labels):
+    @staticmethod
+    def _iterations_to_dict(iterations, labels):
         retval = []
 
         for iteration, label in zip(iterations, labels):
@@ -165,14 +173,16 @@ class HistoryMatch:
         return retval
 
 
-data = generate_synthetic_data(num_groups=50, num_iter=4, num_realizations=100)
+synthetic_data = generate_synthetic_data(
+    num_groups=50, num_iter=4, num_realizations=100
+)
 
 app = dash.Dash(__name__)
 
 app.layout = html.Div(
     children=[
         webviz_subsurface_components.HistoryMatch(
-            id="parameters", data=HistoryMatch(data).get_data()
+            id="parameters", data=HistoryMatch(synthetic_data).get_data()
         )
     ]
 )

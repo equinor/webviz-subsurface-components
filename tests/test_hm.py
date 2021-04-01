@@ -6,9 +6,10 @@
 
 import json
 import dash
-from dash.dependencies import Input, Output
-import webviz_subsurface_components
 import dash_html_components as html
+
+import webviz_subsurface_components
+
 
 # Basic test for the component rendering.
 def test_render_hm(dash_duo):
@@ -19,7 +20,9 @@ def test_render_hm(dash_duo):
     app = dash.Dash(__name__)
 
     app.layout = html.Div(
-        [webviz_subsurface_components.HistoryMatch(id="parameters", data=hm_data),]
+        [
+            webviz_subsurface_components.HistoryMatch(id="parameters", data=hm_data),
+        ]
     )
 
     dash_duo.start_server(app)
