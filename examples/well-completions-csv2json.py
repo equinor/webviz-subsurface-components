@@ -164,9 +164,9 @@ def extract_wells(df, layers, zone_names, time_steps, realisations):
 
 
 def random_color_str():
-    r = random.randint(8, 15)
-    g = random.randint(8, 15)
-    b = random.randint(8, 15)
+    r = random.randint(8, 15)  # nosec - bandit B311
+    g = random.randint(8, 15)  # nosec - bandit B311
+    b = random.randint(8, 15)  # nosec - bandit B311
     s = hex((r << 8) + (g << 4) + b)
     return "#" + s[-3:]
 
