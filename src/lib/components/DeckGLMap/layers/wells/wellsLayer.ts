@@ -18,10 +18,6 @@ interface WellDataType {
     };
 }
 
-function _getFillColor(d): RGBAColor {
-    return d.properties.color;
-}
-
 export default class WellsLayer extends CompositeLayer<
     WellDataType,
     WellsLayerProps<WellDataType>
@@ -40,7 +36,7 @@ export default class WellsLayer extends CompositeLayer<
         const outline = new GeoJsonLayer<WellDataType>(this.getSubLayerProps(properties));
 
         properties.id = "colors";
-        properties.getFillColor = _getFillColor;
+        properties.getFillColor = (d: WellDataType): RGBAColor => d.properties.color;
         properties.getLineColor = properties.getFillColor;
         properties.pointRadiusScale = (properties.pointRadiusScale || 8) - 1;
         properties.lineWidthScale = (properties.lineWidthScale || 5) - 1;
