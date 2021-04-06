@@ -5,15 +5,17 @@
 # Copyright (C) 2020 - Equinor ASA.
 
 import json
-import webviz_subsurface_components
+
 import dash
 import dash_html_components as html
 
-with open('../src/demo/example-data/well-completions.json', "r") as json_file:
+import webviz_subsurface_components
+
+with open("../src/demo/example-data/well-completions.json", "r") as json_file:
     data = json.load(json_file)
-    
+
 app = dash.Dash(__name__)
-    
+
 app.layout = html.Div(
     style={"height": "600px"},
     children=[

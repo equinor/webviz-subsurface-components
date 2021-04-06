@@ -21,7 +21,7 @@ INSTALL_REQUIRES = ["dash>=1.6"]
 
 TESTS_REQUIRE = [
     "bandit",
-    "black",
+    "black>=20.8b1",
     "matplotlib>=3.0",
     "numpy>=1.14",
     "pandas>=0.25",
