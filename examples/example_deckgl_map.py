@@ -5,16 +5,17 @@
 # Copyright (C) 2020 - Equinor ASA.
 
 import io
-import numpy as np
 import base64
-from PIL import Image
 
 import dash
-import dash_core_components as dcc
 import dash_html_components as html
+import numpy as np
+from PIL import Image
+
 import webviz_subsurface_components
 
-def array2d_to_png(Z):
+
+def array2d_to_png(z_array):
     """The DeckGL map dash component takes in pictures as base64 data
     (or as a link to an existing hosted image). I.e. for containers wanting
     to create pictures on-the-fly from numpy arrays, they have to be converted
@@ -28,21 +29,21 @@ def array2d_to_png(Z):
     shifted to start from 0.
     """
 
-    shape = Z.shape
-    Z = np.repeat(Z, 4) # This will flatten the array
+    shape = z_array.shape
+    z_array = np.repeat(z_array, 4)  # This will flatten the array
 
-    Z[0::4][np.isnan(Z[0::4])] = 0  # Red
-    Z[1::4][np.isnan(Z[1::4])] = 0  # Green
-    Z[2::4][np.isnan(Z[2::4])] = 0  # Blue
+    z_array[0::4][np.isnan(z_array[0::4])] = 0  # Red
+    z_array[1::4][np.isnan(z_array[1::4])] = 0  # Green
+    z_array[2::4][np.isnan(z_array[2::4])] = 0  # Blue
 
-    Z[0::4] = np.floor((Z[0::4] / (256*256)) % 256) # Red
-    Z[1::4] = np.floor((Z[1::4] / 256) % 256)       # Green
-    Z[2::4] = np.floor(Z[2::4] % 256)               # Blue
-    Z[3::4] = np.where(np.isnan(Z[3::4]), 0, 255)   # Alpha
+    z_array[0::4] = np.floor((z_array[0::4] / (256 * 256)) % 256)  # Red
+    z_array[1::4] = np.floor((z_array[1::4] / 256) % 256)  # Green
+    z_array[2::4] = np.floor(z_array[2::4] % 256)  # Blue
+    z_array[3::4] = np.where(np.isnan(z_array[3::4]), 0, 255)  # Alpha
 
     # Back to 2d shape + 1 dimension for the rgba values.
-    Z = Z.reshape((shape[0], shape[1], 4))
-    image = Image.fromarray(np.uint8(Z), "RGBA")
+    z_array = z_array.reshape((shape[0], shape[1], 4))
+    image = Image.fromarray(np.uint8(z_array), "RGBA")
 
     byte_io = io.BytesIO()
     image.save(byte_io, format="png")
@@ -52,6 +53,7 @@ def array2d_to_png(Z):
 
     base64_data = base64.b64encode(byte_io.read()).decode("ascii")
     return f"data:image/png;base64,{base64_data}"
+
 
 if __name__ == "__main__":
 
@@ -64,28 +66,26 @@ if __name__ == "__main__":
 
     min_value = np.nanmin(map_data)
     max_value = np.nanmax(map_data)
-    value_range = max_value - min_value
 
     # Shift the values to start from 0 and scale them to cover
     # the whole RGB range for increased precision.
     # The client will need to reverse this operation.
-    scale_factor = (256*256*256 - 1) / value_range
+    scale_factor = (256 * 256 * 256 - 1) / (max_value - min_value)
     map_data = (map_data - min_value) * scale_factor
 
     map_data = array2d_to_png(map_data)
-    colormap = "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
-
+    COLORMAP = "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
 
     bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
     width = bounds[2] - bounds[0]  # right - left
     height = bounds[3] - bounds[1]  # top - bottom
 
     deckgl_map_1 = webviz_subsurface_components.DeckGLMap(
-        id = "DeckGL-Map",
-        jsonData = {
+        id="DeckGL-Map",
+        deckglSpec={
             "initialViewState": {
-                "target": [bounds[0] + width/2, bounds[1] + height/2, 0],
-                "zoom": -3
+                "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+                "zoom": -3,
             },
             "layers": [
                 {
@@ -93,16 +93,18 @@ if __name__ == "__main__":
                     "id": "colormap-layer",
                     "bounds": bounds,
                     "image": map_data,
-                    "colormap": colormap
+                    "colormap": COLORMAP,
+                    "valueRange": [min_value, max_value],
+                    "pickable": True,
                 },
                 {
                     "@@type": "Hillshading2DLayer",
                     "id": "hillshading-layer",
                     "bounds": bounds,
                     "opacity": 1.0,
-                    "valueRange": value_range,
-                    "image": map_data
-                }
+                    "valueRange": [min_value, max_value],
+                    "image": map_data,
+                },
             ],
             "views": [
                 {
@@ -113,7 +115,7 @@ if __name__ == "__main__":
                     "y": "0%",
                     "width": "100%",
                     "height": "100%",
-                    "flipY": False
+                    "flipY": False,
                 },
                 {
                     "@@type": "OrthographicView",
@@ -124,27 +126,17 @@ if __name__ == "__main__":
                     "width": "20%",
                     "height": "25%",
                     "flipY": False,
-                    "clear": {
-                        "color": [0.9, 0.9, 0.9, 1],
-                        "depth": True
-                    },
-                    "viewState": {
-                        "id": "main",
-                        "zoom": -5
-                    }
-                }
-            ]
-        }
+                    "clear": {"color": [0.9, 0.9, 0.9, 1], "depth": True},
+                    "viewState": {"id": "main", "zoom": -5},
+                },
+            ],
+        },
     )
 
     app = dash.Dash(__name__)
 
     app.layout = html.Div(
-        style = {"height": "95vh"},
-        children = [
-            deckgl_map_1,
-            html.Img(src=colormap)
-        ]
+        style={"height": "95vh"}, children=[deckgl_map_1, html.Img(src=COLORMAP)]
     )
 
     app.run_server(debug=True)
