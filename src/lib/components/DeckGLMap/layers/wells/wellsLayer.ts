@@ -23,11 +23,11 @@ function _getFillColor(d): RGBAColor {
 }
 
 export default class WellsLayer extends CompositeLayer<
-    unknown,
-    WellsLayerProps<unknown>
+    WellDataType,
+    WellsLayerProps<WellDataType>
 > {
-    renderLayers(): GeoJsonLayer<unknown>[] {
-        const properties: GeoJsonLayerProps<unknown> = {
+    renderLayers(): GeoJsonLayer<WellDataType>[] {
+        const properties: GeoJsonLayerProps<WellDataType> = {
             id: "outline",
             data: this.props.data,
             pickable: true,
@@ -37,7 +37,7 @@ export default class WellsLayer extends CompositeLayer<
             lineWidthScale: this.props.lineWidthScale,
         };
 
-        const outline = new GeoJsonLayer(this.getSubLayerProps(properties));
+        const outline = new GeoJsonLayer<WellDataType>(this.getSubLayerProps(properties));
 
         properties.id = "colors";
         properties.getFillColor = _getFillColor;
@@ -45,7 +45,7 @@ export default class WellsLayer extends CompositeLayer<
         properties.pointRadiusScale = (properties.pointRadiusScale || 8) - 1;
         properties.lineWidthScale = (properties.lineWidthScale || 5) - 1;
 
-        const colors = new GeoJsonLayer(this.getSubLayerProps(properties));
+        const colors = new GeoJsonLayer<WellDataType>(this.getSubLayerProps(properties));
 
         if (this.props.outline) return [outline, colors];
         else return [colors];
