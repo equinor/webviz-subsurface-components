@@ -50,12 +50,12 @@ const ZoneSelector: React.FC = React.memo(() => {
         (st: WellCompletionsState) => st.ui.filteredZones
     );
     const stratigraphy = useMemo(
-        () => data.stratigraphy.map(zone => zone.name),
+        () => data.stratigraphy.map((zone) => zone.name),
         [data]
     );
     // handlers
     const handleSelectionChange = useCallback(
-        event => dispatch(updateFilteredZones(event.target.value)),
+        (event) => dispatch(updateFilteredZones(event.target.value)),
         [dispatch]
     );
     return (
@@ -68,11 +68,11 @@ const ZoneSelector: React.FC = React.memo(() => {
                 value={filteredZones}
                 onChange={handleSelectionChange}
                 input={<Input />}
-                renderValue={selected => (selected as string[]).join(", ")}
+                renderValue={(selected) => (selected as string[]).join(", ")}
                 MenuProps={MenuProps}
                 style={{ width: "230px" }}
             >
-                {stratigraphy.map(name => (
+                {stratigraphy.map((name) => (
                     <MenuItem key={name} value={name}>
                         <Checkbox checked={filteredZones.indexOf(name) > -1} />
                         <ListItemText primary={name} />

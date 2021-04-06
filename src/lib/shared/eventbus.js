@@ -61,7 +61,7 @@ export default class EventBus {
             return;
         }
 
-        events.forEach(e => e(data));
+        events.forEach((e) => e(data));
     }
 
     /**
@@ -86,7 +86,7 @@ export default class EventBus {
         }
 
         this.events[eventName] = this.events[eventName].filter(
-            eventHandler => eventHandler !== handler
+            (eventHandler) => eventHandler !== handler
         );
     }
 }

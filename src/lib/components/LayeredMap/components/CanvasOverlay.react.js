@@ -49,9 +49,9 @@ class CanvasOverlay extends MapLayer {
         this.el = L.DomUtil.create("canvas", "leaflet-zoom-animated");
 
         const LeafletCanvasLayer = L.Layer.extend({
-            onAdd: leafletMap =>
+            onAdd: (leafletMap) =>
                 leafletMap.getPanes().overlayPane.appendChild(this.el),
-            addTo: leafletMap => {
+            addTo: (leafletMap) => {
                 leafletMap.addLayer(this);
                 return this;
             },
@@ -70,7 +70,7 @@ class CanvasOverlay extends MapLayer {
         this.props.drawMethod(this.el);
         this._reset();
 
-        this.el.onclick = e => {
+        this.el.onclick = (e) => {
             if (this.props.original_data.loaded) {
                 const client_rect = this.el.getBoundingClientRect();
                 const x = Math.floor(

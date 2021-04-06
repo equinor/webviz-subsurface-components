@@ -151,10 +151,10 @@ const extractValue = (variable, props) => {
         return props[variable.name];
     } else if (
         Array.isArray(variable) &&
-        variable.some(v => v instanceof Variable)
+        variable.some((v) => v instanceof Variable)
     ) {
         // The uniformf-method gives an array
-        const v = variable.find(v => v instanceof Variable);
+        const v = variable.find((v) => v instanceof Variable);
         return props[v.name];
     }
     return variable;

@@ -2,9 +2,9 @@ import { RangeMode, RangeModes, Well, Zone } from "../redux/types";
 export const preprocessData = (data: any) => {
     return {
         ...data,
-        wells: data.wells.map(well => {
+        wells: data.wells.map((well) => {
             let earliestCompDateIndex = Number.POSITIVE_INFINITY;
-            data.stratigraphy.forEach(zone => {
+            data.stratigraphy.forEach((zone) => {
                 if (zone.name in well.completions) {
                     //store earliest completion date
                     const completion = well.completions[zone.name];
@@ -41,7 +41,7 @@ export const dataInTimeIndexRange = (
 ): PlotData => {
     const wellPlotData: WellPlotData[] = [];
     //Get first step for now
-    wells.forEach(well => {
+    wells.forEach((well) => {
         const wellCompletions: number[] = [];
         const zoneIndices: number[] = [];
         let hasData = false;

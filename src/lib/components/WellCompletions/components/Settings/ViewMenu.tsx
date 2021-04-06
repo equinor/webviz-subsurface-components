@@ -1,5 +1,4 @@
 import { Icon, Tooltip, Button } from "@equinor/eds-core-react";
-// eslint-disable-next-line @typescript-eslint/camelcase
 import { view_column } from "@equinor/eds-icons";
 import {
     Box,
@@ -13,7 +12,6 @@ import React from "react";
 import RangeDisplayModeSelector from "./RangeDisplayModeSelector";
 import WellsPerPageSelector from "./WellsPerPageSelector";
 
-// eslint-disable-next-line @typescript-eslint/camelcase
 Icon.add({ view_column }); // (this needs only be done once)
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

@@ -25,7 +25,7 @@ const RangeDisplayModeSelector: React.FC = React.memo(() => {
     );
     // handlers
     const handleSelectedItemChange = useCallback(
-        event => dispatch(updateRangeDisplayMode(event.target.value)),
+        (event) => dispatch(updateRangeDisplayMode(event.target.value)),
         [dispatch]
     );
     return (
@@ -36,7 +36,7 @@ const RangeDisplayModeSelector: React.FC = React.memo(() => {
             value={rangeDisplayMode}
             onChange={handleSelectedItemChange}
         >
-            {Object.keys(RangeModes).map(mode => (
+            {Object.keys(RangeModes).map((mode) => (
                 <option key={mode}>{mode}</option>
             ))}
         </NativeSelect>

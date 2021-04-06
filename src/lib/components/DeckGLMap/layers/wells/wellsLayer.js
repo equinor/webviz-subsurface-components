@@ -16,7 +16,7 @@ export default class WellsLayer extends CompositeLayer {
         const outline = new GeoJsonLayer(this.getSubLayerProps(properties));
 
         properties.id = "colors";
-        properties.getFillColor = d => d.properties.color;
+        properties.getFillColor = (d) => d.properties.color;
         properties.getLineColor = properties.getFillColor;
         properties.pointRadiusScale = properties.pointRadiusScale - 1;
         properties.lineWidthScale = properties.lineWidthScale - 1;

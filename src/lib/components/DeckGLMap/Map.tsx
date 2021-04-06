@@ -8,7 +8,7 @@ import JSON_CONVERTER_CONFIGURATION from "./configuration";
 
 export interface MapProps {
     id: string;
-    deckglSpec: object;
+    deckglSpec: Record<string, unknown>;
     showCoords: boolean;
 }
 
@@ -24,7 +24,7 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
     }, [props.deckglSpec]);
 
     const [coordsInfo, setCoordsInfo] = React.useState<CoordsInfo | null>(null);
-    const extractCoords = React.useCallback(pickInfo => {
+    const extractCoords = React.useCallback((pickInfo) => {
         const xy = pickInfo.coordinate;
         if (!xy) {
             setCoordsInfo(null);

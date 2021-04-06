@@ -4,8 +4,8 @@
  *
  * Copyright (C) 2020 - Equinor ASA. */
 
-export const loadShader = shaderPath =>
-    fetch(shaderPath).then(res => res.text());
+export const loadShader = (shaderPath) =>
+    fetch(shaderPath).then((res) => res.text());
 
 export const createShader = (gl, shaderType, shaderSource) => {
     /**
@@ -100,8 +100,9 @@ export const bindTexture = (gl, textureIndex, uniformName, image) => {
 export const didShaderCompile = (gl, shader, name) => {
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         console.error(
-            `ERROR: Was not able to compile the ${name} shader. Vertex: ${name ===
-                gl.VERTEX_SHADER} - Frag: ${name === gl.FRAGMENT_SHADER}`,
+            `ERROR: Was not able to compile the ${name} shader. Vertex: ${
+                name === gl.VERTEX_SHADER
+            } - Frag: ${name === gl.FRAGMENT_SHADER}`,
             gl.getShaderInfoLog(shader)
         );
         return false;

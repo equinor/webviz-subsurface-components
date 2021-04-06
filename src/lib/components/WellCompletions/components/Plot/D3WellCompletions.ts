@@ -83,7 +83,7 @@ export class D3WellCompletions {
         b.append("rect")
             .attr("width", w)
             .attr("height", barHeight + 1)
-            .attr("fill", function(d) {
+            .attr("fill", function (d) {
                 return d.color;
             });
 
@@ -94,7 +94,7 @@ export class D3WellCompletions {
             .attr("y", barHeight / 2)
             .attr("dy", ".35em")
             .attr("font-family", "sans-serif")
-            .text(function(d) {
+            .text(function (d) {
                 return d.name;
             });
     }
@@ -129,7 +129,7 @@ export class D3WellCompletions {
             .attr("y", 0)
             .attr("dy", ".35em")
             .attr("font-family", "sans-serif")
-            .text(d => d.name);
+            .text((d) => d.name);
         const traj = well
             .append("g")
             .attr("transform", "translate(0," + (this.padding.top - 4) + ")");
@@ -156,21 +156,23 @@ export class D3WellCompletions {
             .attr(
                 "transform",
                 (_, i) =>
-                    `translate(${this.padding.left +
-                        (i + 0.5) * wellWidth}, ${0})`
+                    `translate(${
+                        this.padding.left + (i + 0.5) * wellWidth
+                    }, ${0})`
             )
             .selectAll("g")
-            .data(d => d.completions)
+            .data((d) => d.completions)
             .enter()
             .append("g")
             .attr(
                 "transform",
                 (d, i) =>
-                    `translate(${-d * barWidth * 0.5}, ${i * barHeight +
-                        this.padding.top})`
+                    `translate(${-d * barWidth * 0.5}, ${
+                        i * barHeight + this.padding.top
+                    })`
             )
             .append("rect")
-            .attr("width", d => d * barWidth)
+            .attr("width", (d) => d * barWidth)
             .attr("height", barHeight)
             .attr("fill", "#111");
     }

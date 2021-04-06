@@ -5,16 +5,17 @@
 # Copyright (C) 2020 - Equinor ASA.
 
 import io
-import numpy as np
 import base64
-from PIL import Image
 
 import dash
-import dash_core_components as dcc
 import dash_html_components as html
+import numpy as np
+from PIL import Image
+
 import webviz_subsurface_components
 
-def array2d_to_png(Z):
+
+def array2d_to_png(z_array):
     """The leaflet map dash component takes in pictures as base64 data
     (or as a link to an existing hosted image). I.e. for containers wanting
     to create pictures on-the-fly from numpy arrays, they have to be converted
@@ -28,21 +29,21 @@ def array2d_to_png(Z):
     shifted to start from 0.
     """
 
-    shape = Z.shape
-    Z = np.repeat(Z, 4) # This will flatten the array
+    shape = z_array.shape
+    z_array = np.repeat(z_array, 4)  # This will flatten the array
 
-    Z[0::4][np.isnan(Z[0::4])] = 0  # Red
-    Z[1::4][np.isnan(Z[1::4])] = 0  # Green
-    Z[2::4][np.isnan(Z[2::4])] = 0  # Blue
+    z_array[0::4][np.isnan(z_array[0::4])] = 0  # Red
+    z_array[1::4][np.isnan(z_array[1::4])] = 0  # Green
+    z_array[2::4][np.isnan(z_array[2::4])] = 0  # Blue
 
-    Z[0::4] = np.floor((Z[0::4] / (256*256)) % 256) # Red
-    Z[1::4] = np.floor((Z[1::4] / 256) % 256)       # Green
-    Z[2::4] = np.floor(Z[2::4] % 256)               # Blue
-    Z[3::4] = np.where(np.isnan(Z[3::4]), 0, 255)   # Alpha
+    z_array[0::4] = np.floor((z_array[0::4] / (256 * 256)) % 256)  # Red
+    z_array[1::4] = np.floor((z_array[1::4] / 256) % 256)  # Green
+    z_array[2::4] = np.floor(z_array[2::4] % 256)  # Blue
+    z_array[3::4] = np.where(np.isnan(z_array[3::4]), 0, 255)  # Alpha
 
     # Back to 2d shape + 1 dimension for the rgba values.
-    Z = Z.reshape((shape[0], shape[1], 4))
-    image = Image.fromarray(np.uint8(Z), "RGBA")
+    z_array = z_array.reshape((shape[0], shape[1], 4))
+    image = Image.fromarray(np.uint8(z_array), "RGBA")
 
     byte_io = io.BytesIO()
     image.save(byte_io, format="png")
@@ -52,6 +53,7 @@ def array2d_to_png(Z):
 
     base64_data = base64.b64encode(byte_io.read()).decode("ascii")
     return f"data:image/png;base64,{base64_data}"
+
 
 DEFAULT_COLORSCALE_COLORS = [
     "#0d0887",
@@ -81,7 +83,7 @@ if __name__ == "__main__":
     # Shift the values to start from 0 and scale them to cover
     # the whole RGB range for increased precision.
     # The client will need to reverse this operation.
-    scale_factor = (256*256*256 - 1) / (max_value - min_value)
+    scale_factor = (256 * 256 * 256 - 1) / (max_value - min_value)
     map_data = (map_data - min_value) * scale_factor
 
     map_data = array2d_to_png(map_data)
@@ -101,15 +103,12 @@ if __name__ == "__main__":
                         "url": map_data,
                         "colorScale": {
                             "colors": DEFAULT_COLORSCALE_COLORS,
-                            "prefixZeroAlpha": False,
+                            "prefixz_arrayeroAlpha": False,
                             "scaleType": "linear",
-
                             "cutPointMin": 0,
                             "cutPointMax": 1,
-
                             "remapPointMin": 0,
                             "remapPointMax": 1,
-
                         },
                         "minvalue": min_value,
                         "maxvalue": max_value,
@@ -118,11 +117,8 @@ if __name__ == "__main__":
                             "type": "terrainRGB",
                             "applyColorScale": True,
                             "applyHillshading": True,
-
                             "ambientLightIntensity": 0.5,
-                            "diffuseLightIntensity": 0.5
-
-
+                            "diffuseLightIntensity": 0.5,
                         },
                     },
                 ],
@@ -134,7 +130,7 @@ if __name__ == "__main__":
             "coordinatePosition": "bottomright",
         },
         updateMode="",
-        minZoom=-5,
+        minz_arrayoom=-5,
     )
 
     app = dash.Dash(__name__)

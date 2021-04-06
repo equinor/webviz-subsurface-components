@@ -19,7 +19,7 @@ const LeafletMapDemo = () => {
         layers[0].data[0].shader.applyHillshading
     );
 
-    const onChange = changes => {
+    const onChange = (changes) => {
         const newLayers = Object.assign([], layers);
         if (changes.switch) {
             setSwitchValue(changes.switch.value);

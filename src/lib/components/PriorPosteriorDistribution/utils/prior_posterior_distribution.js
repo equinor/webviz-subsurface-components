@@ -49,11 +49,11 @@ class D3PriorPosterior {
          */
 
         this.global_min = Math.min(
-            ...this.data.values.map(values => Math.min(...values))
+            ...this.data.values.map((values) => Math.min(...values))
         );
 
         this.global_max = Math.max(
-            ...this.data.values.map(values => Math.max(...values))
+            ...this.data.values.map((values) => Math.max(...values))
         );
 
         this.x_scale = d3
@@ -93,14 +93,14 @@ class D3PriorPosterior {
             .domain(this.x_scale.domain())
             .thresholds(this.x_scale.ticks(this.number_bins));
 
-        this.bins = this.data.values.map(values => histogram(values));
+        this.bins = this.data.values.map((values) => histogram(values));
 
         const number_data_points = this.data.values.map(
-            values => values.length
+            (values) => values.length
         );
         this.bins.map((bins, iteration_index) =>
             bins.map(
-                bin =>
+                (bin) =>
                     (bin.percent =
                         (bin.length * 100) /
                         number_data_points[iteration_index])
@@ -108,7 +108,9 @@ class D3PriorPosterior {
         );
 
         const max_percent = Math.max(
-            ...this.bins.map(bins => Math.max(...bins.map(bin => bin.percent)))
+            ...this.bins.map((bins) =>
+                Math.max(...bins.map((bin) => bin.percent))
+            )
         );
 
         this.y_scale = d3
@@ -196,14 +198,14 @@ class D3PriorPosterior {
             .enter()
             .append("rect")
             .classed("prior_posterior_rect", true)
-            .attr("x", d => this.x_scale(d.x0))
-            .attr("y", d => this.y_scale(d.percent))
-            .attr("width", d => this.x_scale(d.x1) - this.x_scale(d.x0))
+            .attr("x", (d) => this.x_scale(d.x0))
+            .attr("y", (d) => this.y_scale(d.percent))
+            .attr("width", (d) => this.x_scale(d.x1) - this.x_scale(d.x0))
             .attr(
                 "height",
-                d => this.height_histogram - this.y_scale(d.percent)
+                (d) => this.height_histogram - this.y_scale(d.percent)
             )
-            .style("fill", d => this.color_scale(0.5 * (d.x1 + d.x0)))
+            .style("fill", (d) => this.color_scale(0.5 * (d.x1 + d.x0)))
             .on("mouseover", (_, i) => {
                 this.tooltip
                     .style("opacity", 1)
@@ -213,7 +215,7 @@ class D3PriorPosterior {
                         ) + " %"
                     );
             })
-            .on("mousemove", d => {
+            .on("mousemove", (d) => {
                 this.updateTooltipLocation(d.x1);
             })
             .on("mouseout", () => this.tooltip.style("opacity", 0));
@@ -248,7 +250,7 @@ class D3PriorPosterior {
             })
         );
 
-        const data = Object.entries(temp_nodes).map(entry => {
+        const data = Object.entries(temp_nodes).map((entry) => {
             return {
                 id: entry[0],
                 values: entry[1],
@@ -259,9 +261,9 @@ class D3PriorPosterior {
 
         const tick = () => {
             d3.selectAll(".prior_posterior_circle")
-                .attr("cx", d => d.x)
-                .attr("cy", d => d.y)
-                .attr("fill", d =>
+                .attr("cx", (d) => d.x)
+                .attr("cy", (d) => d.y)
+                .attr("fill", (d) =>
                     this.color_scale(d.values[this.iteration_index])
                 );
         };
@@ -276,7 +278,7 @@ class D3PriorPosterior {
             .enter()
             .append("circle")
             .classed("prior_posterior_circle", true)
-            .on("mouseover", d => {
+            .on("mouseover", (d) => {
                 this.tooltip
                     .style("opacity", 1)
                     .html(
@@ -285,16 +287,16 @@ class D3PriorPosterior {
                             d.values[this.iteration_index].toPrecision(5)
                     );
             })
-            .on("mousemove", d =>
+            .on("mousemove", (d) =>
                 this.updateTooltipLocation(d.values[this.iteration_index])
             )
             .on("mouseout", () => this.tooltip.style("opacity", 0));
 
         this.pile_chart_circles
-            .attr("r", d =>
+            .attr("r", (d) =>
                 this.iteration_index in d.values ? this.radius_circles : 0
             )
-            .attr("visibility", d =>
+            .attr("visibility", (d) =>
                 this.iteration_index in d.values ? "visible" : "hidden"
             );
 
@@ -302,7 +304,7 @@ class D3PriorPosterior {
             .forceSimulation(data)
             .force(
                 "x",
-                d3.forceX(d =>
+                d3.forceX((d) =>
                     this.iteration_index in d.values
                         ? this.x_scale(d.values[this.iteration_index])
                         : 0
@@ -329,11 +331,11 @@ class D3PriorPosterior {
                 y: 120,
             },
             hideCurrentTick: true,
-            selectedIndex: bins.findIndex(x => x === this.number_bins),
+            selectedIndex: bins.findIndex((x) => x === this.number_bins),
             numberOfVisibleTicks: bins.length,
         });
 
-        this.numberBinsPicker.on("change", index => {
+        this.numberBinsPicker.on("change", (index) => {
             this._setNumberBins(bins[index]);
         });
 
@@ -359,7 +361,7 @@ class D3PriorPosterior {
             numberOfVisibleTicks: this.data.iterations.length,
         });
 
-        this.iterationPicker.on("change", index => {
+        this.iterationPicker.on("change", (index) => {
             this._setIteration(index);
         });
 
@@ -372,17 +374,17 @@ class D3PriorPosterior {
         this.updateHistogram();
 
         this.pile_chart_circles
-            .attr("r", d =>
+            .attr("r", (d) =>
                 this.iteration_index in d.values ? this.radius_circles : 0
             )
-            .attr("visibility", d =>
+            .attr("visibility", (d) =>
                 this.iteration_index in d.values ? "visible" : "hidden"
             );
 
         this.simulation
             .force(
                 "x",
-                d3.forceX(d =>
+                d3.forceX((d) =>
                     this.iteration_index in d.values
                         ? this.x_scale(d.values[this.iteration_index])
                         : 0
