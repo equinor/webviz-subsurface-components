@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React from "react";
 import { Provider } from "react-redux";
 import { createReduxStore } from "../redux/store";
 import { testState } from "./testReduxState";
@@ -8,6 +8,10 @@ export const testStore = createReduxStore(testState);
 testStore.dispatch = jest.fn();
 
 // eslint-disable-next-line react/prop-types
-export const Wrapper = ({ children }: { children: FC }): JSX.Element => {
+export const Wrapper = ({
+    children,
+}: {
+    children: JSX.Element;
+}): JSX.Element => {
     return <Provider store={testStore}>{children}</Provider>;
 };
