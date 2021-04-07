@@ -45,16 +45,19 @@ export const getLayout = (
 };
 
 export const updateOrCreate = (
-    selection: d3.Selection<any, any, any, any>,
+    selection: d3.Selection<d3.BaseType, unknown, d3.BaseType, unknown>,
     element: string,
     elementClass: string
-): d3.Selection<d3.BaseType, any, any, any> => {
+): d3.Selection<d3.BaseType, unknown, d3.BaseType, unknown> => {
     if (selection.select(element + "." + elementClass).empty())
         return selection.append(element).attr("class", elementClass);
     return selection.select(element + "." + elementClass);
 };
 
-export const getSvg = (div: HTMLDivElement, id = "default") => {
+export const getSvg = (
+    div: HTMLDivElement,
+    id = "default"
+): d3.Selection<d3.BaseType, unknown, null, undefined> => {
     const boundingRect = div.getBoundingClientRect();
     return d3
         .select(div)

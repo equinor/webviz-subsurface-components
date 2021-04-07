@@ -45,7 +45,7 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
             <TooltipProvider>
                 <div
                     className={classes.root}
-                    ref={ref as any}
+                    ref={ref as React.LegacyRef<HTMLDivElement>}
                     data-tip
                     data-for="plot-tooltip"
                 >

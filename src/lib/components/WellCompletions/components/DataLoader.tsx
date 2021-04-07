@@ -6,6 +6,7 @@ import { preprocessData } from "../utils/dataUtil";
 import {
     SORT_BY_COMPLETION_DATE,
     SORT_BY_NAME,
+    // eslint-disable-next-line prettier/prettier
     SORT_BY_STRATIGRAPHY_DEPTH
 } from "../utils/sort";
 import { DataContext } from "../WellCompletions";
