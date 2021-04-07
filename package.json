@@ -11,7 +11,7 @@
     "homepage": "https://github.com/equinor/webviz-subsurface-components",
     "main": "build/index.js",
     "scripts": {
-        "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
+        "start": "webpack-dev-server --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
         "postinstall": "cp ./package.json webviz_subsurface_components/package.json",
         "build:js": "webpack --mode production",
         "build:js-dev": "webpack --mode development",
@@ -104,12 +104,12 @@
         "react-resize-panel": "^0.3.5",
         "react-test-renderer": "^17.0.1",
         "redux-mock-store": "^1.5.4",
-        "source-map-loader": "^2.0.1",
+        "source-map-loader": "^0.2.4",
         "typescript": "^4.2.3",
         "url-loader": "^4.1.1",
         "webpack": "^4.41.2",
-        "webpack-cli": "^4.5.0",
-        "webpack-dev-server": "^3.11.2"
+        "webpack-cli": "^3.3.7",
+        "webpack-dev-server": "^3.11.0"
     },
     "engines": {
         "node": ">=14.16.0",
