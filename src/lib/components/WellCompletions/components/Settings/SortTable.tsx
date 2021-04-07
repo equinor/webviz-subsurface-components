@@ -106,7 +106,7 @@ const SortTable: React.FC = React.memo(() => {
                                     aria-controls="simple-menu"
                                     aria-haspopup="true"
                                     variant="ghost"
-                                    onClick={(e) =>
+                                    onClick={() =>
                                         onUpdateSortKey(
                                             sortKey,
                                             sortBy[sortKey] === "Ascending"
@@ -123,7 +123,7 @@ const SortTable: React.FC = React.memo(() => {
                                     aria-controls="simple-menu"
                                     aria-haspopup="true"
                                     variant="ghost_icon"
-                                    onClick={(e) => onDeleteSortKey(sortKey)}
+                                    onClick={() => onDeleteSortKey(sortKey)}
                                 >
                                     <Icon
                                         color="currentColor"

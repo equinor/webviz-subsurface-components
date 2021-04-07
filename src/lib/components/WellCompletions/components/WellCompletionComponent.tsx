@@ -1,6 +1,7 @@
 import Ajv from "ajv";
 import React, { useMemo } from "react";
 import semver from "semver";
+import { Data } from "../redux/types";
 import ErrorPlaceholder from "./Common/ErrorPlaceholder";
 import DataProvider from "./DataLoader";
 import WellCompletionsViewer from "./WellCompletionsViewer";
@@ -8,9 +9,10 @@ import WellCompletionsViewer from "./WellCompletionsViewer";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const inputSchema = require("../../../../../inputSchema/wellCompletions.json");
 const ajv = new Ajv();
+const minVersion = "1.0.0";
 interface Props {
     id: string;
-    data: any;
+    data: Data;
 }
 
 const WellCompletionComponent: React.FC<Props> = React.memo(
@@ -25,7 +27,9 @@ const WellCompletionComponent: React.FC<Props> = React.memo(
             [data.version]
         );
         const isVersionValid = useMemo(
-            () => isVersionDefined && semver.satisfies(data.version, ">=1.0.0"),
+            () =>
+                isVersionDefined &&
+                semver.satisfies(data.version, `>=${minVersion}`),
             [data, isVersionDefined]
         );
         if (!isVersionValid)

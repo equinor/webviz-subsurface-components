@@ -4,11 +4,11 @@ import { useSelector } from "react-redux";
 import { WellCompletionsState } from "../redux/store";
 import { Well } from "../redux/types";
 import { dataInTimeIndexRange, PlotData } from "../utils/dataUtil";
-import { getRegexPredicate } from "../utils/stringUtil";
 import { createSortFunction } from "../utils/sort";
+import { getRegexPredicate } from "../utils/stringUtil";
 import { DataContext } from "../WellCompletions";
 
-export const usePlotData = () => {
+export const usePlotData = (): PlotData => {
     //Redux states
     const data = useContext(DataContext);
     const timeIndexRange = useSelector(

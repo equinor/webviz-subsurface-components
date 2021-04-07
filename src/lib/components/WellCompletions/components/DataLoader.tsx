@@ -1,18 +1,18 @@
 import React, { PropsWithChildren, useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
-import { UISettings } from "../redux/types";
+import { Data, UISettings } from "../redux/types";
 import { preprocessData } from "../utils/dataUtil";
 import {
     SORT_BY_COMPLETION_DATE,
     SORT_BY_NAME,
-    SORT_BY_STRATIGRAPHY_DEPTH,
+    SORT_BY_STRATIGRAPHY_DEPTH
 } from "../utils/sort";
 import { DataContext } from "../WellCompletions";
 
 interface Props {
     id: string;
-    data: any;
+    data: Data;
 }
 
 const DataProvider: React.FC<Props> = ({

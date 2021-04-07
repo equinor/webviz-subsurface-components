@@ -1,4 +1,5 @@
 export interface Data {
+    version: string;
     stratigraphy: Zone[];
     wells: Well[];
     timeSteps: string[];
@@ -11,7 +12,7 @@ export interface Well {
     name: string;
     earliestCompDateIndex: number;
     completions: Record<string, Completions>;
-    attributes: Record<string, any>;
+    attributes: Record<string, string | number | undefined>;
 }
 
 export interface Completions {
@@ -20,10 +21,11 @@ export interface Completions {
 }
 
 export const RangeModes = {
-    "First Step": (arr) => arr[0],
-    "Last Step": (arr) => arr[arr.length - 1],
-    Max: (arr) => Math.max(...arr),
-    Average: (arr) => arr.reduce((a, b) => a + b) / arr.length,
+    "First Step": (arr: number[]): number => arr[0],
+    "Last Step": (arr: number[]): number => arr[arr.length - 1],
+    Max: (arr: number[]): number => Math.max(...arr),
+    Average: (arr: number[]): number =>
+        arr.reduce((a, b) => a + b) / arr.length,
 };
 export type RangeMode = keyof typeof RangeModes;
 

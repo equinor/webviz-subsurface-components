@@ -1,23 +1,7 @@
-import configureStore from "redux-mock-store"; //ES6 modules
 import { testState } from "../test/testReduxState";
-import {
-    deleteSortKey,
-    updateAttributeKeys,
-    updateCurrentPage,
-    updateFilteredZones,
-    updateHideZeroCompletions,
-    updateId,
-    updateRangeDisplayMode,
-    updateSortKey,
-    updateTimeIndexRange,
-    updateWellSearchText,
-    updateWellsPerPage,
-} from "./actions";
 import { rootReducer } from "./reducer";
 import { SortDirection } from "./types";
 
-const middlewares = [];
-const mockStore = configureStore(middlewares);
 describe("test actions", () => {
     it("test updateId", () => {
         expect(

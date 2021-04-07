@@ -1,5 +1,5 @@
-import { RangeMode, RangeModes, Well, Zone } from "../redux/types";
-export const preprocessData = (data: any) => {
+import { Data, RangeMode, RangeModes, Well, Zone } from "../redux/types";
+export const preprocessData = (data: any): Data => {
     return {
         ...data,
         wells: data.wells.map((well) => {
@@ -93,7 +93,7 @@ export interface PlotData {
 export interface WellPlotData {
     name: string;
     earliestCompDateIndex: number;
-    attributes: Record<string, any>;
+    attributes: Record<string, string | number | undefined>;
     completions: number[];
     zoneIndices: number[];
 }

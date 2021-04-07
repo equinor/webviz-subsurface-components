@@ -39,7 +39,9 @@ const TooltipProvider: React.FC<PropsWithChildren<unknown>> = ({
 /**
  *  A hook for displaying tooltips
  */
-const useTooltip = () => {
+const useTooltip = (): {
+    setContent: React.Dispatch<React.SetStateAction<React.FC | null>>;
+} => {
     return React.useContext(TooltipContext);
 };
 
