@@ -1,6 +1,7 @@
 import { CompositeLayer } from "@deck.gl/core";
-import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { GeoJsonLayer, GeoJsonLayerProps } from "@deck.gl/layers";
+
+import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 
 export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
@@ -9,7 +10,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     outline: boolean;
 }
 
-interface WellDataType {
+export interface WellDataType {
     type: string;
     geometry: Record<string, unknown>;
     properties: {
