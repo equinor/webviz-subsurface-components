@@ -1,0 +1,64 @@
+{
+    "type": "object",
+    "properties": {
+        "version": { "type": "string", "minLength": 1 },
+        "stratigraphy": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "color": {
+                        "type": "string",
+                        "pattern": "^#[0-9a-fA-F]{3}$"
+                    }
+                },
+                "required": ["name", "color"]
+            }
+        },
+        "timeSteps": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+        },
+        "wells": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "completions": {
+                        "type": "object",
+                        "patternProperties": {
+                            ".+": {
+                                "type": "object",
+                                "properties": {
+                                    "t": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "f": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    }
+                                },
+                                "required": ["t", "f"]
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "attributes": {
+                        "type": "object"
+                    }
+                },
+                "required": ["name", "completions", "attributes"]
+            }
+        }
+    },
+    "required": ["stratigraphy", "timeSteps", "wells"]
+}

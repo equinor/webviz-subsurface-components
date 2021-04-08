@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test hide zero completions switch snapshot test 1`] = `
+<label
+  className="sc-dUrnRO eauNHr"
+>
+  <input
+    checked={false}
+    className="sc-fXoxut sc-Fyfyc gyilmq bWImoY"
+    onChange={[Function]}
+    type="checkbox"
+  />
+  <span
+    className="sc-dWdcrH sc-bQdQlF fYDgBx fYcyWn"
+  >
+    <span
+      className="sc-eFubAy eAScPd"
+    />
+    <span
+      className="sc-fmlJLJ iDQfFa"
+    />
+  </span>
+  <span
+    className="sc-httYMd bQQtEf"
+  >
+    Filter by completions
+  </span>
+</label>
+`;

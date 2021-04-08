@@ -1,10 +1,4 @@
-import {
-    Button,
-    Icon,
-    NativeSelect,
-    Table,
-    Typography,
-} from "@equinor/eds-core-react";
+import { Button, Icon, NativeSelect, Table } from "@equinor/eds-core-react";
 import { add_box, delete_to_trash } from "@equinor/eds-icons";
 import {
     Box,
@@ -15,7 +9,7 @@ import {
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteSortKey, updateSortKey } from "../../redux/reducer";
+import { deleteSortKey, updateSortKey } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 import { SortDirection } from "../../redux/types";
 
@@ -112,7 +106,7 @@ const SortTable: React.FC = React.memo(() => {
                                     aria-controls="simple-menu"
                                     aria-haspopup="true"
                                     variant="ghost"
-                                    onClick={(e) =>
+                                    onClick={() =>
                                         onUpdateSortKey(
                                             sortKey,
                                             sortBy[sortKey] === "Ascending"
@@ -129,7 +123,7 @@ const SortTable: React.FC = React.memo(() => {
                                     aria-controls="simple-menu"
                                     aria-haspopup="true"
                                     variant="ghost_icon"
-                                    onClick={(e) => onDeleteSortKey(sortKey)}
+                                    onClick={() => onDeleteSortKey(sortKey)}
                                 >
                                     <Icon
                                         color="currentColor"

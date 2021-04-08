@@ -8,10 +8,20 @@ export class D3WellCompletions {
     private padding: Padding = { left: 50, right: 50, top: 50, bottom: 50 };
     private layout: PlotLayout;
     // svg
-    private svg: d3.Selection<d3.BaseType, any, any, any>;
-    private stratigraphyG: d3.Selection<SVGGElement, any, any, any>;
-    private wellsG: d3.Selection<SVGGElement, any, any, any>;
-    private completionsG: d3.Selection<SVGGElement, any, any, any>;
+    private svg: d3.Selection<d3.BaseType, unknown, d3.BaseType, unknown>;
+    private stratigraphyG: d3.Selection<
+        SVGGElement,
+        unknown,
+        d3.BaseType,
+        unknown
+    >;
+    private wellsG: d3.Selection<SVGGElement, unknown, d3.BaseType, unknown>;
+    private completionsG: d3.Selection<
+        SVGGElement,
+        unknown,
+        d3.BaseType,
+        unknown
+    >;
 
     //data
     private stratigraphy: Zone[] = [];
@@ -41,7 +51,7 @@ export class D3WellCompletions {
         this.renderCompletions();
     };
 
-    resize = (width, height): void => {
+    resize = (width: number, height: number): void => {
         // update layout
         this.layout = getLayout(width, height, this.padding);
 
@@ -54,7 +64,7 @@ export class D3WellCompletions {
         this.renderCompletions();
     };
 
-    clear = () => {
+    clear = (): void => {
         //Do nothing
     };
 

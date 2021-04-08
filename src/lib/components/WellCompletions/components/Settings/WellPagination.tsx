@@ -5,7 +5,7 @@ import { clamp } from "lodash";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { usePlotData } from "../../hooks/usePlotData";
-import { updateCurrentPage } from "../../redux/reducer";
+import { updateCurrentPage } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 const useStyles = makeStyles(() =>
     createStyles({

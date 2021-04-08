@@ -1,7 +1,7 @@
 import { Switch } from "@equinor/eds-core-react";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateHideZeroCompletions } from "../../redux/reducer";
+import { updateHideZeroCompletions } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 
 const HideZeroCompletionsSwitch: React.FC = React.memo(() => {
