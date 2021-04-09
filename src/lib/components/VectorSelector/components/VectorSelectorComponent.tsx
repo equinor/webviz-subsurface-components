@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import SmartNodeSelectorComponent from "core-components/dist/components/SmartNodeSelector/components/SmartNodeSelectorComponent";
-import TreeData from "core-components/dist/components/SmartNodeSelector/utils/TreeData";
-import { TreeDataNode } from "core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
+import SmartNodeSelectorComponent from "@webviz/core-components/dist/components/SmartNodeSelector/components/SmartNodeSelectorComponent"
+import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
+import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 import VectorSelection from "../utils/VectorSelection";
 import VectorData from "../utils/VectorData";
 import aquifer from "./images/aquifer.svg";

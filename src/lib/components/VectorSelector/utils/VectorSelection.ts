@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import TreeNodeSelection from 'core-components/dist/components/SmartNodeSelector/utils/TreeNodeSelection';
-import TreeData from 'core-components/dist/components/SmartNodeSelector/utils/TreeData';
+import TreeNodeSelection from '@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeNodeSelection';
+import TreeData from '@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData';
 
 export default class VectorSelection extends TreeNodeSelection {
     private myTreeData: TreeData;
