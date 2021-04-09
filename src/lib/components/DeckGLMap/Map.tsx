@@ -5,6 +5,10 @@ import DeckGL from "@deck.gl/react";
 
 import Coords, { CoordsInfo } from "./components/Coords";
 import JSON_CONVERTER_CONFIGURATION from "./configuration";
+import { PickInfo } from "deck.gl";
+
+import { WellDataType } from "./layers/wells/wellsLayer";
+import { PropertyMapPickInfo } from "./layers/utils/propertyMapTools";
 
 export interface MapProps {
     id: string;
@@ -24,7 +28,7 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
     }, [props.deckglSpec]);
 
     const [coordsInfo, setCoordsInfo] = React.useState<CoordsInfo | null>(null);
-    const extractCoords = React.useCallback((pickInfo) => {
+    const extractCoords = React.useCallback((pickInfo: PickInfo<unknown>) => {
         const xy = pickInfo.coordinate;
         if (!xy) {
             setCoordsInfo(null);
@@ -37,10 +41,9 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
 
         // TODO: modify this to support multiple property layers, once this issue is fixed:
         // https://github.com/visgl/deck.gl/issues/5576
-        const zValue = pickInfo?.propertyValue;
-        const zLayerId = pickInfo?.layer?.id;
+        const zValue = (pickInfo as PropertyMapPickInfo).propertyValue;
         if (zValue) {
-            coords.z = [{ value: zValue, layerId: zLayerId }];
+            coords.z = [{ value: zValue, layerId: pickInfo.layer.id }];
         }
         setCoordsInfo(coords);
     }, []);
@@ -54,10 +57,10 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                     getCursor={({ isDragging }): string =>
                         isDragging ? "grabbing" : "default"
                     }
-                    getTooltip={(pickInfo: any): string | undefined => {
-                        return pickInfo?.object?.properties?.name;
+                    getTooltip={(info: PickInfo<unknown>): string | null => {
+                        return (info.object as WellDataType)?.properties.name;
                     }}
-                    onHover={(pickInfo: any): void => {
+                    onHover={(pickInfo: PickInfo<unknown>): void => {
                         extractCoords(pickInfo);
                     }}
                 >
