@@ -37,7 +37,7 @@
         "@types/react-dom": "^16.9.10",
         "@types/react-redux": "^7.1.15",
         "@types/react-resize-detector": "^5.0.0",
-        "core-components": "file:../../../core-components-0.0.1.tgz",
+        "@webviz/core-components": "^0.3.1",
         "d3": "^5.11.0",
         "deck.gl": "^8.4.9",
         "leaflet": "^1.6.0",
