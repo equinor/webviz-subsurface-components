@@ -1,5 +1,5 @@
 import { Data, RangeMode, RangeModes, Well, Zone } from "../redux/types";
-export const preprocessData = (data: any): Data => {
+export const preprocessData = (data: Data): Data => {
     return {
         ...data,
         wells: data.wells.map((well) => {

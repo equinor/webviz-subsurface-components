@@ -2,14 +2,14 @@
 
 exports[`test range display mode selector snapshot test 1`] = `
 <div
-  className="sc-iWFSnp hjdvhV makeStyles-root-1"
+  className="sc-iWVLQz eCHTEl makeStyles-root-1"
 >
   <label
-    className="sc-fFubgz hrDuXp"
+    className="sc-fFehDp jthYlw"
     htmlFor="range-display-mode-selector"
   >
     <span
-      className="sc-bkzZxe fEPEPX"
+      className="sc-bkkfTU bgnqzc"
     >
       Range Display Mode
     </span>
