@@ -30,6 +30,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Use Node.js 15.12
+        uses: actions/setup-node@v1
+        with:
+          node-version: "15.12"
+
       - name: 📦 Install build dependencies
         # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
         # TODO: remove `npm run setup_deckgl_types` when the deckgl types package doesn't need a postscript anymore.
