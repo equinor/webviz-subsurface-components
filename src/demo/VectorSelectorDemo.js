@@ -1,0 +1,49 @@
+import React, { Component } from "react";
+import VectorSelector from "../lib/components/VectorSelector";
+
+class WellCompletionsDemo extends Component {
+    constructor(props) {
+        super(props);
+
+        this.setProps = this.setProps.bind(this);
+    }
+
+    setProps(newProps) {
+        this.setState(newProps);
+    }
+
+    render() {
+        return (
+            <VectorSelector
+                id="vector_selector"
+                delimiter=":"
+                numMetaNodes={1}
+                label="Select a vector"
+                data={[
+                    {
+                        id: "0",
+                        name: "iter-0",
+                        color: "#0095FF",
+                        description: "Iteration 0",
+                        children: [
+                            {
+                                id: "0-0",
+                                name: "WGOR",
+                                description: "Gas-Oil Ratio",
+                                children: [
+                                    {
+                                        id: "0-0-0",
+                                        name: "OP_1",
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ]}
+                setProps={this.setProps}
+            />
+        );
+    }
+}
+
+export default WellCompletionsDemo;
