@@ -61,19 +61,19 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                 <td>
                                     <b>Kh Mean</b>
                                 </td>
-                                <td>{completion.khMean}</td>
+                                <td>{completion.khMean.toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td>
                                     <b>Kh Min</b>
                                 </td>
-                                <td>{completion.khMin}</td>
+                                <td>{completion.khMin.toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td>
                                     <b>Kh Max</b>
                                 </td>
-                                <td>{completion.khMax}</td>
+                                <td>{completion.khMax.toFixed(2)}</td>
                             </tr>
                         </tbody>
                     </table>

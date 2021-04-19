@@ -42,12 +42,28 @@
                                         "type": "array",
                                         "items": { "type": "number" }
                                     },
-                                    "f": {
+                                    "open": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "shut": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "khMean": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "khMin": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "khMax": {
                                         "type": "array",
                                         "items": { "type": "number" }
                                     }
                                 },
-                                "required": ["t", "f"]
+                                "required": ["t", "open", "shut", "khMean", "khMin", "khMax"]
                             }
                         },
                         "additionalProperties": false

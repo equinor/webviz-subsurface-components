@@ -2,26 +2,26 @@
 
 exports[`test hide zero completions switch snapshot test 1`] = `
 <label
-  className="sc-dUbuoE byrORV"
+  className="sc-dUrnRO eauNHr"
 >
   <input
     checked={false}
-    className="sc-fXEqXD sc-FNZbm fgxrku frkXXs"
+    className="sc-fXoxut sc-Fyfyc gyilmq bWImoY"
     onChange={[Function]}
     type="checkbox"
   />
   <span
-    className="sc-dVNiOx sc-bQtJOP MToBH eWpThv"
+    className="sc-dWdcrH sc-bQdQlF fYDgBx fYcyWn"
   >
     <span
-      className="sc-eFehXo dQSnKG"
+      className="sc-eFubAy eAScPd"
     />
     <span
-      className="sc-fmBDoT boDmd"
+      className="sc-fmlJLJ iDQfFa"
     />
   </span>
   <span
-    className="sc-htJSpn dxxpaC"
+    className="sc-httYMd bQQtEf"
   >
     Filter by completions
   </span>
