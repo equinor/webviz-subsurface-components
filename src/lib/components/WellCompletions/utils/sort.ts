@@ -12,9 +12,9 @@ const createSortKeyFunction = (
             return (well) => well.name;
         case SORT_BY_STRATIGRAPHY_DEPTH:
             return (well) =>
-                well.zoneIndices.find(
-                    (_, index) => well.completions[index] > 0
-                );
+                well.completions.find(
+                    (_, index) => well.completions[index]!.open > 0
+                )?.zoneIndex;
         case SORT_BY_COMPLETION_DATE:
             return (well) => well.earliestCompDateIndex;
         default:
