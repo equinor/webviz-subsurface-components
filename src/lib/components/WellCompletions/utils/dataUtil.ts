@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { Data, RangeMode, RangeModes, Well, Zone } from "../redux/types";
 export const preprocessData = (data: Data): Data => {
     return {
@@ -91,7 +90,7 @@ export const dataInTimeIndexRange = (
             //If value changed
             if (
                 completionsPlotData.length === 0 ||
-                !_.isEqual(
+                !isCompletionValuesEqual(
                     completionsPlotData[completionsPlotData.length - 1],
                     newCompletion
                 )
@@ -110,6 +109,16 @@ export const dataInTimeIndexRange = (
         wells: wellPlotData,
     };
 };
+
+const isCompletionValuesEqual = (
+    completion1: CompletionPlotData,
+    completion2: CompletionPlotData
+) =>
+    completion1.open === completion2.open &&
+    completion1.shut === completion2.shut &&
+    completion1.khMean === completion2.khMean &&
+    completion1.khMin === completion2.khMin &&
+    completion1.khMax === completion2.khMax;
 
 export interface PlotData {
     stratigraphy: Zone[];
