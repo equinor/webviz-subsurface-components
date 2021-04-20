@@ -12,6 +12,7 @@ import {
     updateSortKey,
     updateTimeIndexRange,
     updateWellSearchText,
+    // eslint-disable-next-line prettier/prettier
     updateWellsPerPage
 } from "./actions";
 import { SortDirection } from "./types";

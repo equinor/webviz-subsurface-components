@@ -5,6 +5,7 @@ import {
     createStyles,
     makeStyles,
     Theme,
+    // eslint-disable-next-line prettier/prettier
     Tooltip
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -15,6 +16,7 @@ import { SortDirection } from "../../redux/types";
 import {
     SORT_BY_COMPLETION_DATE,
     SORT_BY_NAME,
+    // eslint-disable-next-line prettier/prettier
     SORT_BY_STRATIGRAPHY_DEPTH
 } from "../../utils/sort";
 

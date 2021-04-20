@@ -5,6 +5,7 @@ import {
     RangeModes,
     Well,
     WellInfo,
+    // eslint-disable-next-line prettier/prettier
     Zone
 } from "../redux/types";
 

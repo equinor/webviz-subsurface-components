@@ -6,6 +6,7 @@ import { Well } from "../redux/types";
 import {
     computeDataToPlot,
     createAttributePredicate,
+    // eslint-disable-next-line prettier/prettier
     PlotData
 } from "../utils/dataUtil";
 import { createSortFunction } from "../utils/sort";
