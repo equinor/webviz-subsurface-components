@@ -2,7 +2,7 @@ import { UISettings } from "../redux/types";
 import {
     SORT_BY_COMPLETION_DATE,
     SORT_BY_NAME,
-    SORT_BY_STRATIGRAPHY_DEPTH,
+    SORT_BY_STRATIGRAPHY_DEPTH
 } from "../utils/sort";
 export const testState = {
     id: "test",
@@ -15,6 +15,7 @@ export const testState = {
         filteredZones: [],
         hideZeroCompletions: false,
         sortBy: {},
+        filterByAttributes: [],
     } as UISettings,
     attributes: {
         attributeKeys: [

@@ -13,6 +13,9 @@ const WellAttributesSelector: React.FC = React.memo(() => {
     const attributeKeys = useSelector(
         (st: WellCompletionsState) => st.attributes.attributeKeys
     );
+    const filterByAttributes = useSelector(
+        (st: WellCompletionsState) => st.ui.filterByAttributes
+    );
     const wells = useMemo(() => data.wells, [data]);
     const attributesTree = useMemo(
         () => extractAttributesTree(wells, attributeKeys),
@@ -30,8 +33,7 @@ const WellAttributesSelector: React.FC = React.memo(() => {
             key="attributes-selector"
             numMetaNodes={0}
             delimiter=":"
-            selectedNodes={[]}
-            selectedTags={[]}
+            selectedNodes={filterByAttributes}
             setProps={handleSelectionChange}
             label="Filter by Attributes"
             data={attributesTree}
