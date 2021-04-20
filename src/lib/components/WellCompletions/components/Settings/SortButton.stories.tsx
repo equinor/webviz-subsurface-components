@@ -5,7 +5,7 @@ import SortButton from "./SortButton";
 
 export default {
     component: SortButton,
-    title: "WellCompletions/Components/Settings/Sort",
+    title: "WellCompletions/Components/Settings/Sort by Attributes",
 };
 
 const Template = () => <SortButton />;

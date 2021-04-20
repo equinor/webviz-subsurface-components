@@ -3,59 +3,59 @@
     "stratigraphy": [
       {
         "name": "zone1",
-        "color": "#f98"
+        "color": "#f98f98"
       },
       {
         "name": "zone2",
-        "color": "#989"
+        "color": "#989989"
       },
       {
         "name": "zone3",
-        "color": "#9db"
+        "color": "#9db9db"
       },
       {
         "name": "zone4",
-        "color": "#888"
+        "color": "#888888"
       },
       {
         "name": "zone5",
-        "color": "#dff"
+        "color": "#dffdff"
       },
       {
         "name": "zone6",
-        "color": "#a9a"
+        "color": "#a9aa9a"
       },
       {
         "name": "zone7",
-        "color": "#98f"
+        "color": "#98f98f"
       },
       {
         "name": "zone8",
-        "color": "#b9f"
+        "color": "#b9fb9f"
       },
       {
         "name": "zone9",
-        "color": "#998"
+        "color": "#998998"
       },
       {
         "name": "zone10",
-        "color": "#c9c"
+        "color": "#c9cc9c"
       },
       {
         "name": "zone11",
-        "color": "#fdc"
+        "color": "#fdcfdc"
       },
       {
         "name": "zone12",
-        "color": "#bbf"
+        "color": "#bbfbbf"
       },
       {
         "name": "zone13",
-        "color": "#898"
+        "color": "#898898"
       },
       {
         "name": "zone14",
-        "color": "#daf"
+        "color": "#dafdaf"
       }
     ],
     "timeSteps": [

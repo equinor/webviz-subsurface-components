@@ -50,19 +50,21 @@ const WellCompletionsViewer: React.FC = () => {
     //If no data is available
     if (!data) return <div />;
     return (
-        <div
-            className={classes.root}
-            style={{
-                minWidth: `${minWidth}px`,
-                minHeight: `${minHeight}px`,
-            }}
-        >
+        <div className={classes.root}>
             <SettingsBar />
             <WellPagination />
-            <WellCompletionsPlot
-                timeSteps={data.timeSteps}
-                plotData={dataInCurrentPage}
-            />
+            <div
+                className={classes.root}
+                style={{
+                    minWidth: `${minWidth}px`,
+                    minHeight: `${minHeight}px`,
+                }}
+            >
+                <WellCompletionsPlot
+                    timeSteps={data.timeSteps}
+                    plotData={dataInCurrentPage}
+                />
+            </div>
         </div>
     );
 };
