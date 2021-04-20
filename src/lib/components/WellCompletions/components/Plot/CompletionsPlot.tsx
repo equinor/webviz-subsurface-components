@@ -33,48 +33,22 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                 setContent(() => (
                     <table style={{ color: "#fff" }}>
                         <tbody>
-                            <tr>
-                                <td>
-                                    <b>Well name</b>
-                                </td>
-                                <td>{well.name}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <b>Stratigraphy</b>
-                                </td>
-                                <td>{zoneName}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <b>Open</b>
-                                </td>
-                                <td>{completion.open}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <b>Shut</b>
-                                </td>
-                                <td>{completion.shut}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <b>Kh Mean</b>
-                                </td>
-                                <td>{completion.khMean.toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <b>Kh Min</b>
-                                </td>
-                                <td>{completion.khMin.toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <b>Kh Max</b>
-                                </td>
-                                <td>{completion.khMax.toFixed(2)}</td>
-                            </tr>
+                            {[
+                                ["Well name", well.name],
+                                ["Stratigraphy", zoneName],
+                                ["Open", completion.open],
+                                ["Shut", completion.shut],
+                                ["Kh Mean", completion.khMean.toFixed(2)],
+                                ["Kh Min", completion.khMin.toFixed(2)],
+                                ["Kh Max", completion.khMax.toFixed(2)],
+                            ].map(([key, value]) => (
+                                <tr key={`tooltip-${key}-${value}`}>
+                                    <td>
+                                        <b>{key}</b>
+                                    </td>
+                                    <td>{value}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 ));
@@ -104,9 +78,11 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                 const totalWidth =
                                     completion.open + completion.shut;
                                 return (
-                                    <>
+                                    <g
+                                        key={`well-${well.name}-completions-${j}`}
+                                    >
                                         <rect
-                                            key={`well-${well.name}-completions-${start}-${end}`}
+                                            key={`well-${well.name}-completions-${j}-shut-left`}
                                             transform={`translate(${
                                                 -totalWidth * wellWidth * 0.25
                                             }, ${
@@ -124,7 +100,7 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                             onMouseOut={onMouseOut}
                                         />
                                         <rect
-                                            key={`well-${well.name}-completions-open-${start}-${end}`}
+                                            key={`well-${well.name}-completions-${j}-open`}
                                             transform={`translate(${
                                                 -completion.open *
                                                 wellWidth *
@@ -144,7 +120,7 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                             onMouseOut={onMouseOut}
                                         />
                                         <rect
-                                            key={`well-${well.name}-completions-${start}-${end}`}
+                                            key={`well-${well.name}-completions-${j}-shut-right`}
                                             transform={`translate(${
                                                 (totalWidth - completion.shut) *
                                                 wellWidth *
@@ -163,7 +139,7 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                             }
                                             onMouseOut={onMouseOut}
                                         />
-                                    </>
+                                    </g>
                                 );
                             })}
                         </g>

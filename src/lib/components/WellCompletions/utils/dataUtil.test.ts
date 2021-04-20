@@ -1,5 +1,5 @@
 import { Well } from "../redux/types";
-import { dataInTimeIndexRange } from "./dataUtil";
+import { computeDataToPlot } from "./dataUtil";
 
 describe("Data Util", () => {
     const testStratigraphy = [
@@ -181,10 +181,10 @@ describe("Data Util", () => {
             attributes: { type: "Producer", region: "Region 2" },
         } as Well,
     ];
-    it("test dataInTimeIndexRange", () => {
+    it("test computeDataToPlot", () => {
         //Display single time step
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 testStratigraphy,
                 testWells,
                 [0, 0],
@@ -216,7 +216,7 @@ describe("Data Util", () => {
         });
         //Well with zero completions is filtered out
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 testStratigraphy,
                 testWells,
                 [0, 0],
@@ -229,7 +229,7 @@ describe("Data Util", () => {
         });
         //Display range first step
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 testStratigraphy,
                 testWells,
                 [2, 6],
@@ -277,7 +277,7 @@ describe("Data Util", () => {
         });
         //Display range average
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 testStratigraphy,
                 testWells,
                 [2, 6],
@@ -326,7 +326,7 @@ describe("Data Util", () => {
         //with filtered stratigraphy
         const filteredStratigraphy = testStratigraphy.slice(2, 5);
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 filteredStratigraphy,
                 testWells,
                 [2, 6],

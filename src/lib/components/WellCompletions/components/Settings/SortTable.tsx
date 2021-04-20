@@ -5,13 +5,18 @@ import {
     createStyles,
     makeStyles,
     Theme,
-    Tooltip,
+    Tooltip
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSortKey, updateSortKey } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 import { SortDirection } from "../../redux/types";
+import {
+    SORT_BY_COMPLETION_DATE,
+    SORT_BY_NAME,
+    SORT_BY_STRATIGRAPHY_DEPTH
+} from "../../utils/sort";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -48,9 +53,19 @@ const SortTable: React.FC = React.memo(() => {
     const attributeKeys = useSelector(
         (st: WellCompletionsState) => st.attributes.attributeKeys
     );
+    const sortKeys = useMemo(() => {
+        const keys = new Set<string>([
+            SORT_BY_NAME,
+            SORT_BY_STRATIGRAPHY_DEPTH,
+            SORT_BY_COMPLETION_DATE,
+        ]);
+        attributeKeys.forEach((key) => keys.add(key));
+        return keys;
+    }, [attributeKeys]);
+
     const availableToAdd = useMemo(
-        () => attributeKeys.filter((key) => !(key in sortBy)),
-        [attributeKeys, sortBy]
+        () => Array.from(sortKeys).filter((key) => !(key in sortBy)),
+        [sortKeys, sortBy]
     );
     useEffect(() => {
         if (

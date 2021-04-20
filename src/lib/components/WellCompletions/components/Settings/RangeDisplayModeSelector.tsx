@@ -9,8 +9,8 @@ import { RangeModes } from "../../redux/types";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            minWidth: "120px",
-            maxWidth: "120px",
+            minWidth: "170px",
+            maxWidth: "170px",
             padding: theme.spacing(1),
         },
     })

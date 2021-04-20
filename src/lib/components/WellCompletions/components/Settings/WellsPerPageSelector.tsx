@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             padding: theme.spacing(1),
-            maxWidth: "120px",
+            maxWidth: "170px",
         },
     })
 );

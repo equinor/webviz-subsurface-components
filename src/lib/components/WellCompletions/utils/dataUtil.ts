@@ -1,4 +1,18 @@
-import { Data, RangeMode, RangeModes, Well, Zone } from "../redux/types";
+import {
+    AttributeType,
+    Data,
+    RangeMode,
+    RangeModes,
+    Well,
+    WellInfo,
+    Zone
+} from "../redux/types";
+
+/**
+ * Preprocess the input data by finding the earliest completion date
+ * @param data
+ * @returns
+ */
 export const preprocessData = (data: Data): Data => {
     return {
         ...data,
@@ -23,6 +37,54 @@ export const preprocessData = (data: Data): Data => {
     };
 };
 
+export interface AttributeNode {
+    name: string;
+    children: { name: AttributeType; key: string }[];
+}
+
+/**
+ * Extract well attributes into a tree structure for the use of node selector
+ * @param wells
+ * @param attributeKeys
+ * @returns
+ */
+export const extractAttributesTree = (
+    wells: WellInfo[],
+    attributeKeys: string[]
+): AttributeNode[] => {
+    //Store unique attribute values in sets
+    const attributes = new Map<string, Set<AttributeType>>(
+        attributeKeys.map((key) => [key, new Set<AttributeType>()])
+    );
+
+    wells.forEach((well) =>
+        attributes.forEach((values, key) => values.add(well.attributes[key]))
+    );
+
+    return Array.from(attributes.entries()).map(([key, values]) => ({
+        name: key,
+        children: Array.from(values).map((value) => ({
+            name: value,
+            key: `${key}-${value}`,
+        })),
+    }));
+};
+
+export const createAttributePredicate = (
+    filterByAttributes: string[]
+): ((well: Well) => boolean) => {
+    if (filterByAttributes.length === 0) return () => true;
+    const filters = filterByAttributes.map((attributeNode) => {
+        const [key, value] = attributeNode.split(":");
+        return (well: Well) => {
+            return well.attributes[key] === value;
+        };
+    });
+    return (well: Well) => {
+        return filters.every((filter) => filter(well));
+    };
+};
+
 /**
  * Util method to prepare stratigraphy and well data from the given time step range and other settings for plotting
  * @param stratigraphy
@@ -30,9 +92,10 @@ export const preprocessData = (data: Data): Data => {
  * @param range
  * @param rangeDisplayMode
  * @param hideZeroCompletions
+ * @param filterByAttributes
  * @returns
  */
-export const dataInTimeIndexRange = (
+export const computeDataToPlot = (
     stratigraphy: Zone[],
     wells: Well[],
     range: [number, number],
@@ -124,10 +187,7 @@ export interface PlotData {
     stratigraphy: Zone[];
     wells: WellPlotData[];
 }
-export interface WellPlotData {
-    name: string;
-    earliestCompDateIndex: number;
-    attributes: Record<string, string | number | undefined>;
+export interface WellPlotData extends WellInfo {
     completions: CompletionPlotData[];
 }
 

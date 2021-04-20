@@ -1,12 +1,12 @@
-import { SortDirection } from "../redux/types";
+import { AttributeType, SortDirection } from "../redux/types";
 import { WellPlotData } from "./dataUtil";
 //Deault sort methods
 export const SORT_BY_NAME = "well name";
 export const SORT_BY_STRATIGRAPHY_DEPTH = "stratigraphy depth";
 export const SORT_BY_COMPLETION_DATE = "earliest comp date";
-const createSortKeyFunction = (
+export const createAttributeKeyFunction = (
     sortMethod: string
-): ((well: WellPlotData) => string | number | undefined) => {
+): ((well: WellPlotData) => AttributeType) => {
     switch (sortMethod) {
         case SORT_BY_NAME:
             return (well) => well.name;
@@ -27,9 +27,9 @@ export const createSortFunction = (
     const keyFunctions = new Map(
         Object.keys(sortBy).map(
             (sort) =>
-                [sort, createSortKeyFunction(sort)] as [
+                [sort, createAttributeKeyFunction(sort)] as [
                     string,
-                    (well: WellPlotData) => string | number
+                    (well: WellPlotData) => AttributeType
                 ]
         )
     );
