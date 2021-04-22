@@ -13,6 +13,7 @@ export const createAttributeKeyFunction = (
         case SORT_BY_STRATIGRAPHY_DEPTH:
             return (well) =>
                 well.completions.find(
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     (_, index) => well.completions[index]!.open > 0
                 )?.zoneIndex;
         case SORT_BY_COMPLETION_DATE:

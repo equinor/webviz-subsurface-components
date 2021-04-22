@@ -17,12 +17,12 @@ interface Props {
 const WellsPlot: React.FC<Props> = React.memo(
     ({ timeSteps, data, layout, padding }) => {
         const { setContent } = useTooltip();
+        const attributeKeys = useSelector(
+            (st: WellCompletionsState) => st.attributes.attributeKeys
+        );
         const wellWidth = useMemo(
             () => layout.xExtent / Math.max(data.length, 1),
             [layout.xExtent, data.length]
-        );
-        const attributeKeys = useSelector(
-            (st: WellCompletionsState) => st.attributes.attributeKeys
         );
         const onMouseOver = useCallback(
             (well) => {

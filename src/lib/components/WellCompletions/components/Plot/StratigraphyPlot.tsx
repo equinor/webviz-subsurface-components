@@ -9,7 +9,7 @@ interface Props {
 }
 
 const shortenName = (str: string) =>
-    str.length > 10 ? "..." + str.substring(str.length - 7, str.length) : str;
+    str.length >= 13 ? "..." + str.substring(str.length - 10, str.length) : str;
 /* eslint-disable react/prop-types */
 const StratigraphyPlot: React.FC<Props> = React.memo(
     ({ data, layout, padding }) => {

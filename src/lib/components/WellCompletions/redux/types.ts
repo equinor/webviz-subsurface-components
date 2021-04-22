@@ -41,7 +41,7 @@ export interface Attributes {
     attributeKeys: string[];
 }
 
-export type AttributeType = string | number | undefined;
+export type AttributeType = string | number | boolean | undefined;
 export interface UISettings {
     // Display
     timeIndexRange: [number, number];

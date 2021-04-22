@@ -78,7 +78,17 @@ export const createAttributePredicate = (
     const filters = filterByAttributes.map((attributeNode) => {
         const [key, value] = attributeNode.split(":");
         return (well: Well) => {
-            return well.attributes[key] === value;
+            if (well.attributes[key] === undefined)
+                return value === "undefined";
+            const attributeType = typeof well.attributes[key];
+            switch (attributeType) {
+                case "string":
+                    return well.attributes[key] === value;
+                case "number":
+                    return well.attributes[key] === +value;
+                case "boolean":
+                    return well.attributes[key] === (value == "true");
+            }
         };
     });
     return (well: Well) => {
