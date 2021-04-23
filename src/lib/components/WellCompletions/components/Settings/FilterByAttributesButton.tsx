@@ -1,9 +1,9 @@
 /* eslint-disable react/display-name */
-import { Button, Dialog, Icon, Scrim, Tooltip } from "@equinor/eds-core-react";
+import { Button, Dialog, Icon, Menu, Scrim } from "@equinor/eds-core-react";
 import { sort } from "@equinor/eds-icons";
 import { createStyles, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
-import SortTable from "./SortTable";
+import WellAttributesSelector from "./WellAttributesSelector";
 
 // Use library approach
 Icon.add({ sort }); // (this needs only be done once)
@@ -15,7 +15,8 @@ const useStyles = makeStyles(() =>
         action: { margin: "5px" },
     })
 );
-const SortMenu: React.FC = React.memo(() => {
+
+const FilterByAttributesButton: React.FC = React.memo(() => {
     const classes = useStyles();
     // Dialogs
 
@@ -24,21 +25,15 @@ const SortMenu: React.FC = React.memo(() => {
         setVisibleScrim(!visibleScrim);
     };
     return (
-        <div>
-            <Tooltip title="Sort">
-                <Button
-                    variant="ghost_icon"
-                    onClick={() => setVisibleScrim(true)}
-                >
-                    <Icon color="currentColor" name="sort" />
-                </Button>
-            </Tooltip>
+        <>
+            <Menu.MenuItem onClick={() => setVisibleScrim(true)}>
+                Filter by Attributes
+            </Menu.MenuItem>
             {visibleScrim && (
                 <Scrim onClose={handleClose}>
                     <Dialog className={classes.dialog}>
-                        <Dialog.Title>Well sorting levels</Dialog.Title>
                         <Dialog.CustomContent>
-                            <SortTable />
+                            <WellAttributesSelector />
                         </Dialog.CustomContent>
                         <Dialog.Actions>
                             <Button
@@ -58,9 +53,9 @@ const SortMenu: React.FC = React.memo(() => {
                     </Dialog>
                 </Scrim>
             )}
-        </div>
+        </>
     );
 });
 
-SortMenu.displayName = "SortMenu";
-export default SortMenu;
+FilterByAttributesButton.displayName = "FilterByAttributesButton";
+export default FilterByAttributesButton;

@@ -8,16 +8,23 @@ export interface Zone {
     name: string;
     color: string;
 }
-export interface Well {
+
+export interface WellInfo {
     name: string;
     earliestCompDateIndex: number;
+    attributes: Record<string, AttributeType>;
+}
+export interface Well extends WellInfo {
     completions: Record<string, Completions>;
-    attributes: Record<string, string | number | undefined>;
 }
 
 export interface Completions {
     t: number[];
-    f: number[];
+    open: number[];
+    shut: number[];
+    khMean: number[];
+    khMin: number[];
+    khMax: number[];
 }
 
 export const RangeModes = {
@@ -33,13 +40,18 @@ export type SortDirection = "Ascending" | "Descending";
 export interface Attributes {
     attributeKeys: string[];
 }
+
+export type AttributeType = string | number | boolean | undefined;
 export interface UISettings {
+    // Display
     timeIndexRange: [number, number];
     wellsPerPage: number;
     currentPage: number;
     rangeDisplayMode: RangeMode;
+    sortBy: Record<string, SortDirection>;
+    // Filter
     filteredZones: string[];
     wellSearchText: string;
     hideZeroCompletions: boolean;
-    sortBy: Record<string, SortDirection>;
+    filterByAttributes: string[];
 }

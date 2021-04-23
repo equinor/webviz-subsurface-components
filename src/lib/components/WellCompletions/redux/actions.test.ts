@@ -4,6 +4,7 @@ import {
     deleteSortKey,
     updateAttributeKeys,
     updateCurrentPage,
+    updateFilterByAttributes,
     updateFilteredZones,
     updateHideZeroCompletions,
     updateId,
@@ -11,7 +12,8 @@ import {
     updateSortKey,
     updateTimeIndexRange,
     updateWellSearchText,
-    updateWellsPerPage,
+    // eslint-disable-next-line prettier/prettier
+    updateWellsPerPage
 } from "./actions";
 import { SortDirection } from "./types";
 
@@ -100,6 +102,18 @@ describe("test actions", () => {
             {
                 payload: true,
                 type: "ui/updateHideZeroCompletions",
+            },
+        ]);
+    });
+    it("test updateFilterByAttributes", () => {
+        const store = mockStore(testState);
+        store.dispatch(updateFilterByAttributes([]));
+
+        const actions = store.getActions();
+        expect(actions).toEqual([
+            {
+                payload: [],
+                type: "ui/updateFilterByAttributes",
             },
         ]);
     });

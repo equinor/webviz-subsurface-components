@@ -26,10 +26,11 @@ export const uiSlice = createSlice({
         wellsPerPage: 25,
         currentPage: 1,
         rangeDisplayMode: "First Step",
+        sortBy: {},
         wellSearchText: "",
         filteredZones: [],
         hideZeroCompletions: false,
-        sortBy: {},
+        filterByAttributes: [],
     } as UISettings,
     reducers: {
         updateTimeIndexRange: (
@@ -55,6 +56,9 @@ export const uiSlice = createSlice({
         },
         updateHideZeroCompletions: (state, action: PayloadAction<boolean>) => {
             state.hideZeroCompletions = action.payload;
+        },
+        updateFilterByAttributes: (state, action: PayloadAction<string[]>) => {
+            state.filterByAttributes = action.payload;
         },
         updateSortKey: (
             state,
