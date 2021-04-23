@@ -198,7 +198,9 @@ if __name__ == "__main__":
     def update_maps(left_deckgl_spec, right_deckgl_spec):
         ctx = dash.callback_context
         trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-        value = left_deckgl_spec if trigger_id == "DeckGL-Map-Left" else right_deckgl_spec
+        value = (
+            left_deckgl_spec if trigger_id == "DeckGL-Map-Left" else right_deckgl_spec
+        )
         return value, value
 
     app.run_server(debug=True)
