@@ -14,6 +14,7 @@ export interface MapProps {
     id: string;
     deckglSpec: Record<string, unknown>;
     showCoords: boolean;
+    setProps: (props: Record<string, unknown>) => void;
 }
 
 const Map: React.FC<MapProps> = (props: MapProps) => {
@@ -24,8 +25,44 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
         );
         const jsonConverter = new JSONConverter({ configuration });
 
-        setDeckglSpec(jsonConverter.convert(props.deckglSpec));
-    }, [props.deckglSpec]);
+        const setLayerProps = (layerId, newLayerProps) => {
+            if (!props.deckglSpec) {
+                return;
+            }
+
+            // Deep clone the spec
+            const currSpec = JSON.parse(JSON.stringify(props.deckglSpec));
+
+            const layerIndex = currSpec.layers.findIndex(({ id }) => {
+                return id == layerId;
+            });
+            if (layerIndex < 0) {
+                console.log("Layer %s not found", layerId);
+                return;
+            }
+
+            const layerProps = currSpec.layers[layerIndex];
+            currSpec.layers[layerIndex] = {
+                ...layerProps,
+                ...newLayerProps,
+            };
+            props.setProps({ deckglSpec: currSpec });
+        };
+
+        // Inject `setLayerProps` in all the layers
+        const specClone = Object.assign({}, props.deckglSpec);
+        if (specClone && specClone.layers) {
+            specClone.layers = (specClone.layers as Array<unknown>).map(
+                (layer) => {
+                    return Object.assign(layer, {
+                        setLayerProps: setLayerProps,
+                    });
+                }
+            );
+        }
+        const deckglSpec = jsonConverter.convert(specClone);
+        setDeckglSpec(deckglSpec);
+    }, [props]);
 
     const [coordsInfo, setCoordsInfo] = React.useState<CoordsInfo | null>(null);
     const extractCoords = React.useCallback((pickInfo: PickInfo<unknown>) => {

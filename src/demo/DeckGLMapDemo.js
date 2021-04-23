@@ -100,6 +100,11 @@ const DeckGLMapDemo = () => {
         }
     });
 
+    const setMapProps = React.useCallback((updatedProps) => {
+        setParsedJson(updatedProps);
+        setText(JSON.stringify(updatedProps, null, 2));
+    });
+
     // TODO: Fold code panel in a slider:
     // https://eds-storybook-react.azurewebsites.net/?path=/docs/components-sidesheet--default
     return (
@@ -125,7 +130,11 @@ const DeckGLMapDemo = () => {
                         setErrorReset(false);
                     }}
                 >
-                    <DeckGLMap id="DeckGL-Map" {...parsedJson} />
+                    <DeckGLMap
+                        id="DeckGL-Map"
+                        {...parsedJson}
+                        setProps={setMapProps}
+                    />
                 </ErrorBoundary>
                 <div>
                     {colormaps.map((colormap, index) => (
