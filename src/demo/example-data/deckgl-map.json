@@ -1,48 +1,6 @@
 [
   {
     "deckglSpec": {
-      "description": "A minimal deck.gl example rendering a circle with text",
-      "initialViewState": {
-        "longitude": -122.45,
-        "latitude": 37.8,
-        "zoom": 12
-      },
-      "layers": [
-        {
-          "@@type": "ScatterplotLayer",
-          "data": [
-            {
-              "position": [
-                -122.45,
-                37.8
-              ]
-            }
-          ],
-          "getFillColor": [
-            255,
-            0,
-            0,
-            255
-          ],
-          "getRadius": 1000
-        },
-        {
-          "@@type": "TextLayer",
-          "data": [
-            {
-              "position": [
-                -122.45,
-                37.8
-              ],
-              "text": "Hello World"
-            }
-          ]
-        }
-      ]
-    }
-  },
-  {
-    "deckglSpec": {
       "initialViewState": {
         "target": [
           434962.5,
@@ -84,6 +42,15 @@
           ],
           "opacity": 1.0,
           "image": "https://i.imgur.com/Dx8eseE.png"
+        },
+        {
+          "@@type": "WellsLayer",
+          "id": "wells-layer",
+          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/volve_wells.json",
+          "opacity": 1.0,
+          "lineWidthScale": 5,
+          "pointRadiusScale": 8,
+          "outline": true
         },
         {
           "@@type": "DrawingLayer",

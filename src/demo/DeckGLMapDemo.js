@@ -79,7 +79,7 @@ const DeckGLMapDemo = () => {
     );
 
     React.useEffect(() => {
-        const example = exampleData[1];
+        const example = exampleData[0];
 
         setText(JSON.stringify(example, null, 2));
         setParsedJson(example);
