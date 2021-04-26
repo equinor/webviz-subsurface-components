@@ -47,16 +47,17 @@ export default class Hillshading2DLayer extends BitmapLayer<
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms }: any): void {
         if (this.props.image) {
-            // The prop objects are not merged with the defaultProps by default.
-            // See https://github.com/facebook/react/issues/2568
-            const mergedDecoder: ValueDecoder = {
-                ...defaultProps.valueDecoder.value,
-                ...moduleParameters.valueDecoder,
-            };
-            super.setModuleParameters({
+            const mergedModuleParams = {
                 ...moduleParameters,
-                valueDecoder: mergedDecoder,
-            });
+                valueDecoder: {
+                    // The prop objects are not merged with the defaultProps by default.
+                    // See https://github.com/facebook/react/issues/2568
+                    ...defaultProps.valueDecoder.value,
+                    ...moduleParameters.valueDecoder,
+                },
+            };
+            super.setModuleParameters(mergedModuleParams);
+
             const [minVal, maxVal] = this.props.valueRange;
             super.draw({
                 uniforms: {
@@ -71,6 +72,7 @@ export default class Hillshading2DLayer extends BitmapLayer<
                     diffuseLightIntensity: this.props.diffuseLightIntensity,
                     opacity: this.props.opacity,
                 },
+                moduleParameters: mergedModuleParams,
             });
         }
     }
