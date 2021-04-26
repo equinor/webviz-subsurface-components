@@ -1,16 +1,16 @@
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react";
+import "jest-styled-components";
 import React from "react";
-import renderer from "react-test-renderer";
-import { testStore, Wrapper } from "../../test/testReduxWrapper";
+import { testStore, Wrapper } from "../../test/TestWrapper";
 import RangeDisplayModeSelector from "./RangeDisplayModeSelector";
 
 describe("test range display mode selector", () => {
     it("snapshot test", () => {
-        const tree = renderer
-            .create(Wrapper({ children: <RangeDisplayModeSelector /> }))
-            .toJSON();
-        expect(tree).toMatchSnapshot();
+        const { container } = render(
+            Wrapper({ children: <RangeDisplayModeSelector /> })
+        );
+        expect(container.firstChild).toMatchSnapshot();
     });
 
     it("click to dispatch redux action", async () => {
