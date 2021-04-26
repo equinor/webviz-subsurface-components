@@ -1,4 +1,5 @@
 export interface Data {
+    version: string;
     stratigraphy: Zone[];
     wells: Well[];
     timeSteps: string[];
@@ -7,23 +8,31 @@ export interface Zone {
     name: string;
     color: string;
 }
-export interface Well {
+
+export interface WellInfo {
     name: string;
     earliestCompDateIndex: number;
+    attributes: Record<string, AttributeType>;
+}
+export interface Well extends WellInfo {
     completions: Record<string, Completions>;
-    attributes: Record<string, any>;
 }
 
 export interface Completions {
     t: number[];
-    f: number[];
+    open: number[];
+    shut: number[];
+    khMean: number[];
+    khMin: number[];
+    khMax: number[];
 }
 
 export const RangeModes = {
-    "First Step": (arr) => arr[0],
-    "Last Step": (arr) => arr[arr.length - 1],
-    Max: (arr) => Math.max(...arr),
-    Average: (arr) => arr.reduce((a, b) => a + b) / arr.length,
+    "First Step": (arr: number[]): number => arr[0],
+    "Last Step": (arr: number[]): number => arr[arr.length - 1],
+    Max: (arr: number[]): number => Math.max(...arr),
+    Average: (arr: number[]): number =>
+        arr.reduce((a, b) => a + b) / arr.length,
 };
 export type RangeMode = keyof typeof RangeModes;
 
@@ -31,13 +40,18 @@ export type SortDirection = "Ascending" | "Descending";
 export interface Attributes {
     attributeKeys: string[];
 }
+
+export type AttributeType = string | number | boolean | undefined;
 export interface UISettings {
+    // Display
     timeIndexRange: [number, number];
     wellsPerPage: number;
     currentPage: number;
     rangeDisplayMode: RangeMode;
+    sortBy: Record<string, SortDirection>;
+    // Filter
     filteredZones: string[];
     wellSearchText: string;
     hideZeroCompletions: boolean;
-    sortBy: Record<string, SortDirection>;
+    filterByAttributes: string[];
 }

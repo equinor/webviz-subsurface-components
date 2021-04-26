@@ -1,4 +1,4 @@
-import { Icon, Tooltip, Button } from "@equinor/eds-core-react";
+import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
 import { view_column } from "@equinor/eds-icons";
 import {
     Box,
@@ -10,6 +10,7 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import RangeDisplayModeSelector from "./RangeDisplayModeSelector";
+import SortButton from "./SortButton";
 import WellsPerPageSelector from "./WellsPerPageSelector";
 
 Icon.add({ view_column }); // (this needs only be done once)
@@ -19,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
             paddingLeft: theme.spacing(1),
             paddingRight: theme.spacing(1),
             alignSelf: "center",
-            width: "150px",
+            width: "200px",
         },
     })
 );
@@ -44,7 +45,7 @@ const ViewMenu: React.FC = React.memo(() => {
                 </Button>
             </Tooltip>
             <Menu
-                id="simple-menu"
+                id="view-menu"
                 anchorEl={anchorEl}
                 keepMounted
                 open={Boolean(anchorEl)}
@@ -52,6 +53,7 @@ const ViewMenu: React.FC = React.memo(() => {
                 classes={{ paper: classes.paper }}
             >
                 <Box marginY={1}>
+                    <SortButton />
                     <RangeDisplayModeSelector />
                     <WellsPerPageSelector />
                 </Box>

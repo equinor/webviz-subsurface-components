@@ -1,6 +1,7 @@
 import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
 import { filter_alt } from "@equinor/eds-icons";
 import {
+    Box,
     createStyles,
     makeStyles,
     Menu,
@@ -8,6 +9,7 @@ import {
     Theme
 } from "@material-ui/core";
 import React, { useCallback } from "react";
+import FilterByAttributesButton from "./FilterByAttributesButton";
 import HideZeroCompletionsSwitch from "./HideZeroCompletionsSwitch";
 import WellFilter from "./WellFilter";
 import ZoneSelector from "./ZoneSelector";
@@ -45,16 +47,19 @@ const FilterMenu: React.FC = React.memo(() => {
                 </Button>
             </Tooltip>
             <Menu
-                id="simple-menu"
+                id="filter-menu"
                 anchorEl={anchorEl}
                 keepMounted
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
                 classes={{ paper: classes.paper }}
             >
-                <HideZeroCompletionsSwitch />
-                <ZoneSelector />
-                <WellFilter />
+                <Box marginY={1}>
+                    <HideZeroCompletionsSwitch />
+                    <ZoneSelector />
+                    <WellFilter />
+                    <FilterByAttributesButton />
+                </Box>
             </Menu>
         </div>
     );

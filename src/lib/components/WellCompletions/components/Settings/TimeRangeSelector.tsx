@@ -3,7 +3,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import { debounce, isEqual } from "lodash";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateTimeIndexRange } from "../../redux/reducer";
+import { updateTimeIndexRange } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 import { DataContext } from "../../WellCompletions";
 

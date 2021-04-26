@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Attributes, RangeMode, SortDirection, UISettings } from "./types";
 
 export const idSlice = createSlice({
@@ -26,10 +26,11 @@ export const uiSlice = createSlice({
         wellsPerPage: 25,
         currentPage: 1,
         rangeDisplayMode: "First Step",
+        sortBy: {},
         wellSearchText: "",
         filteredZones: [],
         hideZeroCompletions: false,
-        sortBy: {},
+        filterByAttributes: [],
     } as UISettings,
     reducers: {
         updateTimeIndexRange: (
@@ -55,6 +56,9 @@ export const uiSlice = createSlice({
         },
         updateHideZeroCompletions: (state, action: PayloadAction<boolean>) => {
             state.hideZeroCompletions = action.payload;
+        },
+        updateFilterByAttributes: (state, action: PayloadAction<string[]>) => {
+            state.filterByAttributes = action.payload;
         },
         updateSortKey: (
             state,
@@ -84,16 +88,8 @@ export const uiSlice = createSlice({
     },
 });
 
-export const { updateId } = idSlice.actions;
-export const { updateAttributeKeys } = attributeSlice.actions;
-export const {
-    updateTimeIndexRange,
-    updateRangeDisplayMode,
-    updateWellsPerPage,
-    updateCurrentPage,
-    updateWellSearchText,
-    updateFilteredZones,
-    updateHideZeroCompletions,
-    updateSortKey,
-    deleteSortKey,
-} = uiSlice.actions;
+export const rootReducer = combineReducers({
+    id: idSlice.reducer,
+    attributes: attributeSlice.reducer,
+    ui: uiSlice.reducer,
+});

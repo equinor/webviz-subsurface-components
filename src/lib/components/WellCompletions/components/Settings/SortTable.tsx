@@ -1,23 +1,24 @@
-import {
-    Button,
-    Icon,
-    NativeSelect,
-    Table,
-    Typography,
-} from "@equinor/eds-core-react";
+import { Button, Icon, NativeSelect, Table } from "@equinor/eds-core-react";
 import { add_box, delete_to_trash } from "@equinor/eds-icons";
 import {
     Box,
     createStyles,
     makeStyles,
     Theme,
-    Tooltip,
+    // eslint-disable-next-line prettier/prettier
+    Tooltip
 } from "@material-ui/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteSortKey, updateSortKey } from "../../redux/reducer";
+import { deleteSortKey, updateSortKey } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 import { SortDirection } from "../../redux/types";
+import {
+    SORT_BY_COMPLETION_DATE,
+    SORT_BY_NAME,
+    // eslint-disable-next-line prettier/prettier
+    SORT_BY_STRATIGRAPHY_DEPTH
+} from "../../utils/sort";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -54,9 +55,19 @@ const SortTable: React.FC = React.memo(() => {
     const attributeKeys = useSelector(
         (st: WellCompletionsState) => st.attributes.attributeKeys
     );
+    const sortKeys = useMemo(() => {
+        const keys = new Set<string>([
+            SORT_BY_NAME,
+            SORT_BY_STRATIGRAPHY_DEPTH,
+            SORT_BY_COMPLETION_DATE,
+        ]);
+        attributeKeys.forEach((key) => keys.add(key));
+        return keys;
+    }, [attributeKeys]);
+
     const availableToAdd = useMemo(
-        () => attributeKeys.filter((key) => !(key in sortBy)),
-        [attributeKeys, sortBy]
+        () => Array.from(sortKeys).filter((key) => !(key in sortBy)),
+        [sortKeys, sortBy]
     );
     useEffect(() => {
         if (
@@ -112,7 +123,7 @@ const SortTable: React.FC = React.memo(() => {
                                     aria-controls="simple-menu"
                                     aria-haspopup="true"
                                     variant="ghost"
-                                    onClick={(e) =>
+                                    onClick={() =>
                                         onUpdateSortKey(
                                             sortKey,
                                             sortBy[sortKey] === "Ascending"
@@ -129,7 +140,7 @@ const SortTable: React.FC = React.memo(() => {
                                     aria-controls="simple-menu"
                                     aria-haspopup="true"
                                     variant="ghost_icon"
-                                    onClick={(e) => onDeleteSortKey(sortKey)}
+                                    onClick={() => onDeleteSortKey(sortKey)}
                                 >
                                     <Icon
                                         color="currentColor"

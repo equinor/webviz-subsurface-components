@@ -1,18 +1,13 @@
 import React, { PropsWithChildren, useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
-import { UISettings } from "../redux/types";
+import { Data, UISettings } from "../redux/types";
 import { preprocessData } from "../utils/dataUtil";
-import {
-    SORT_BY_COMPLETION_DATE,
-    SORT_BY_NAME,
-    SORT_BY_STRATIGRAPHY_DEPTH,
-} from "../utils/sort";
 import { DataContext } from "../WellCompletions";
 
 interface Props {
     id: string;
-    data: any;
+    data: Data;
 }
 
 const DataProvider: React.FC<Props> = ({
@@ -22,11 +17,7 @@ const DataProvider: React.FC<Props> = ({
 }: PropsWithChildren<Props>) => {
     const preloadedState = useMemo(() => {
         //Setup attributes
-        const attributeKeys = new Set<string>([
-            SORT_BY_NAME,
-            SORT_BY_STRATIGRAPHY_DEPTH,
-            SORT_BY_COMPLETION_DATE,
-        ]);
+        const attributeKeys = new Set<string>();
         data.wells.forEach((well) =>
             Object.keys(well.attributes).forEach((key) =>
                 attributeKeys.add(key)
@@ -37,7 +28,7 @@ const DataProvider: React.FC<Props> = ({
         return {
             id: id,
             ui: {
-                timeIndexRange: timeIndexRange,
+                timeIndexRange: timeIndexRange as [number, number],
                 wellsPerPage: 25,
                 currentPage: 1,
                 rangeDisplayMode: "First Step",
@@ -45,6 +36,7 @@ const DataProvider: React.FC<Props> = ({
                 filteredZones: data.stratigraphy.map((zone) => zone.name),
                 hideZeroCompletions: false,
                 sortBy: {},
+                filterByAttributes: [],
             } as UISettings,
             attributes: { attributeKeys: Array.from(attributeKeys) },
         };
