@@ -1,4 +1,6 @@
 import React, { useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { WellCompletionsState } from "../../redux/store";
 import { WellPlotData } from "../../utils/dataUtil";
 import { SORT_BY_COMPLETION_DATE } from "../../utils/sort";
 import { capitalizeFirstLetter } from "../../utils/stringUtil";
@@ -15,6 +17,9 @@ interface Props {
 const WellsPlot: React.FC<Props> = React.memo(
     ({ timeSteps, data, layout, padding }) => {
         const { setContent } = useTooltip();
+        const attributeKeys = useSelector(
+            (st: WellCompletionsState) => st.attributes.attributeKeys
+        );
         const wellWidth = useMemo(
             () => layout.xExtent / Math.max(data.length, 1),
             [layout.xExtent, data.length]
@@ -35,7 +40,7 @@ const WellsPlot: React.FC<Props> = React.memo(
                                 </td>
                                 <td>{timeSteps[well.earliestCompDateIndex]}</td>
                             </tr>
-                            {Object.keys(well.attributes).map((attribute) => (
+                            {attributeKeys.map((attribute) => (
                                 <tr
                                     key={`well-tooltip-${well.name}-${attribute}`}
                                 >
@@ -44,7 +49,10 @@ const WellsPlot: React.FC<Props> = React.memo(
                                             {capitalizeFirstLetter(attribute)}
                                         </b>
                                     </td>
-                                    <td>{well.attributes[attribute]}</td>
+                                    <td>
+                                        {well.attributes[attribute] ||
+                                            "Undefined"}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

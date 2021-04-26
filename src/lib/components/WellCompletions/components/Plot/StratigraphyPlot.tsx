@@ -7,6 +7,9 @@ interface Props {
     layout: PlotLayout;
     padding: Padding;
 }
+
+const shortenName = (str: string) =>
+    str.length >= 13 ? "..." + str.substring(str.length - 10, str.length) : str;
 /* eslint-disable react/prop-types */
 const StratigraphyPlot: React.FC<Props> = React.memo(
     ({ data, layout, padding }) => {
@@ -30,6 +33,7 @@ const StratigraphyPlot: React.FC<Props> = React.memo(
                                 height={barHeight + 1}
                                 fill={zone.color}
                             />
+                            <title>{zone.name}</title>
                             <text
                                 style={{ fontSize: "11px" }}
                                 textAnchor="end"
@@ -38,7 +42,7 @@ const StratigraphyPlot: React.FC<Props> = React.memo(
                                 dy={".35em"}
                                 fontFamily={"sans-serif"}
                             >
-                                {zone.name}
+                                {shortenName(zone.name)}
                             </text>
                         </g>
                     );

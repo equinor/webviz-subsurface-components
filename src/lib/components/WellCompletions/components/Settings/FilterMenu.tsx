@@ -1,14 +1,15 @@
 import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
 import { filter_alt } from "@equinor/eds-icons";
 import {
+    Box,
     createStyles,
     makeStyles,
     Menu,
-    Box,
     // eslint-disable-next-line prettier/prettier
     Theme
 } from "@material-ui/core";
 import React, { useCallback } from "react";
+import FilterByAttributesButton from "./FilterByAttributesButton";
 import HideZeroCompletionsSwitch from "./HideZeroCompletionsSwitch";
 import WellFilter from "./WellFilter";
 import ZoneSelector from "./ZoneSelector";
@@ -57,6 +58,7 @@ const FilterMenu: React.FC = React.memo(() => {
                     <HideZeroCompletionsSwitch />
                     <ZoneSelector />
                     <WellFilter />
+                    <FilterByAttributesButton />
                 </Box>
             </Menu>
         </div>

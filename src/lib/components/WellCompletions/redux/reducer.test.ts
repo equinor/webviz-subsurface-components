@@ -101,6 +101,17 @@ describe("test actions", () => {
             ui: { ...testState.ui, hideZeroCompletions: true },
         });
     });
+    it("test updateFilterByAttributes", () => {
+        expect(
+            rootReducer(testState, {
+                payload: [],
+                type: "ui/updateFilterByAttributes",
+            })
+        ).toEqual({
+            ...testState,
+            ui: { ...testState.ui, filterByAttributes: [] },
+        });
+    });
 
     it("test updateSortKey", () => {
         const newSort = {

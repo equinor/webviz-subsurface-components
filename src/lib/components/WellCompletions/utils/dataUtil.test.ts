@@ -1,5 +1,5 @@
 import { Well } from "../redux/types";
-import { dataInTimeIndexRange } from "./dataUtil";
+import { computeDataToPlot } from "./dataUtil";
 
 describe("Data Util", () => {
     const testStratigraphy = [
@@ -66,69 +66,125 @@ describe("Data Util", () => {
             completions: {
                 zone1: {
                     t: [5],
-                    f: [1.0],
+                    open: [0.5],
+                    shut: [0.5],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone2: {
                     t: [5],
-                    f: [1.0],
+                    open: [0.5],
+                    shut: [0.5],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone3: {
                     t: [5],
-                    f: [1.0],
+                    open: [0.5],
+                    shut: [0.5],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone4: {
                     t: [5],
-                    f: [1.0],
+                    open: [0.5],
+                    shut: [0.5],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone5: {
                     t: [5],
-                    f: [1.0],
+                    open: [0.5],
+                    shut: [0.5],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone6: {
                     t: [1, 2, 5],
-                    f: [1.0, 0.125, 0],
+                    open: [1.0, 0.125, 0],
+                    shut: [0.0, 0.875, 1],
+                    khMin: [100, 200, 300],
+                    khMax: [200, 200, 400],
+                    khMean: [150, 200, 350],
                 },
                 zone7: {
                     t: [1, 2, 5],
-                    f: [1.0, 0.125, 0],
+                    open: [1.0, 0.125, 0],
+                    shut: [0.0, 0.875, 1],
+                    khMin: [100, 200, 300],
+                    khMax: [200, 200, 400],
+                    khMean: [150, 200, 350],
                 },
                 zone8: {
                     t: [5],
-                    f: [1.0],
+                    open: [1.0],
+                    shut: [0.0],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone9: {
                     t: [3],
-                    f: [1.0],
+                    open: [1.0],
+                    shut: [0.0],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone10: {
                     t: [5],
-                    f: [1.0],
+                    open: [1.0],
+                    shut: [0.0],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone11: {
                     t: [5],
-                    f: [1.0],
+                    open: [1.0],
+                    shut: [0.0],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone12: {
                     t: [5],
-                    f: [1.0],
+                    open: [1.0],
+                    shut: [0.0],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone13: {
                     t: [5],
-                    f: [1.0],
+                    open: [1.0],
+                    shut: [0.0],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
                 zone14: {
                     t: [5],
-                    f: [1.0],
+                    open: [1.0],
+                    shut: [0.0],
+                    khMin: [100],
+                    khMax: [200],
+                    khMean: [150],
                 },
             },
             earliestCompDateIndex: 1,
             attributes: { type: "Producer", region: "Region 2" },
         } as Well,
     ];
-    it("test dataInTimeIndexRange", () => {
+    it("test computeDataToPlot", () => {
         //Display single time step
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 testStratigraphy,
                 testWells,
                 [0, 0],
@@ -140,8 +196,16 @@ describe("Data Util", () => {
             wells: [
                 {
                     name: "RWI_3",
-                    completions: [0],
-                    zoneIndices: [0],
+                    completions: [
+                        {
+                            khMax: 0,
+                            khMean: 0,
+                            khMin: 0,
+                            open: 0,
+                            shut: 0,
+                            zoneIndex: 0,
+                        },
+                    ],
                     earliestCompDateIndex: 1,
                     attributes: {
                         region: "Region 2",
@@ -152,7 +216,7 @@ describe("Data Util", () => {
         });
         //Well with zero completions is filtered out
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 testStratigraphy,
                 testWells,
                 [0, 0],
@@ -165,7 +229,7 @@ describe("Data Util", () => {
         });
         //Display range first step
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 testStratigraphy,
                 testWells,
                 [2, 6],
@@ -177,8 +241,32 @@ describe("Data Util", () => {
             wells: [
                 {
                     name: "RWI_3",
-                    completions: [0, 0.125, 0],
-                    zoneIndices: [0, 5, 7],
+                    completions: [
+                        {
+                            khMax: 0,
+                            khMean: 0,
+                            khMin: 0,
+                            open: 0,
+                            shut: 0,
+                            zoneIndex: 0,
+                        },
+                        {
+                            khMax: 200,
+                            khMean: 200,
+                            khMin: 200,
+                            open: 0.125,
+                            shut: 0.875,
+                            zoneIndex: 5,
+                        },
+                        {
+                            khMax: 0,
+                            khMean: 0,
+                            khMin: 0,
+                            open: 0,
+                            shut: 0,
+                            zoneIndex: 7,
+                        },
+                    ],
                     earliestCompDateIndex: 1,
                     attributes: {
                         region: "Region 2",
@@ -189,7 +277,7 @@ describe("Data Util", () => {
         });
         //Display range average
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 testStratigraphy,
                 testWells,
                 [2, 6],
@@ -201,8 +289,32 @@ describe("Data Util", () => {
             wells: [
                 {
                     name: "RWI_3",
-                    completions: [0, 0.125, 0],
-                    zoneIndices: [0, 5, 7],
+                    completions: [
+                        {
+                            khMax: 0,
+                            khMean: 0,
+                            khMin: 0,
+                            open: 0,
+                            shut: 0,
+                            zoneIndex: 0,
+                        },
+                        {
+                            khMax: 200,
+                            khMean: 200,
+                            khMin: 200,
+                            open: 0.125,
+                            shut: 0.875,
+                            zoneIndex: 5,
+                        },
+                        {
+                            khMax: 0,
+                            khMean: 0,
+                            khMin: 0,
+                            open: 0,
+                            shut: 0,
+                            zoneIndex: 7,
+                        },
+                    ],
                     earliestCompDateIndex: 1,
                     attributes: {
                         region: "Region 2",
@@ -214,7 +326,7 @@ describe("Data Util", () => {
         //with filtered stratigraphy
         const filteredStratigraphy = testStratigraphy.slice(2, 5);
         expect(
-            dataInTimeIndexRange(
+            computeDataToPlot(
                 filteredStratigraphy,
                 testWells,
                 [2, 6],
@@ -226,8 +338,16 @@ describe("Data Util", () => {
             wells: [
                 {
                     name: "RWI_3",
-                    completions: [1],
-                    zoneIndices: [0],
+                    completions: [
+                        {
+                            khMax: 200,
+                            khMean: 150,
+                            khMin: 100,
+                            open: 0.5,
+                            shut: 0.5,
+                            zoneIndex: 0,
+                        },
+                    ],
                     earliestCompDateIndex: 1,
                     attributes: {
                         region: "Region 2",

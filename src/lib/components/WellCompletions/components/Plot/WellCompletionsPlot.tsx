@@ -23,7 +23,7 @@ interface Props {
     plotData: PlotData;
 }
 
-const padding: Padding = { left: 50, right: 50, top: 70, bottom: 50 };
+const padding: Padding = { left: 80, right: 50, top: 70, bottom: 50 };
 /* eslint-disable react/prop-types */
 const WellCompletionsPlot: React.FC<Props> = React.memo(
     ({ timeSteps, plotData }) => {

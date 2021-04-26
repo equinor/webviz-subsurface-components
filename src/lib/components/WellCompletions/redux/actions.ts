@@ -12,4 +12,5 @@ export const {
     updateHideZeroCompletions,
     updateSortKey,
     deleteSortKey,
+    updateFilterByAttributes,
 } = uiSlice.actions;
