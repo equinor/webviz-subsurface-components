@@ -50,14 +50,17 @@ export default class ColormapLayer extends BitmapLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms, context }: any): void {
-        const mergedDecoder: ValueDecoder = {
-            ...defaultProps.valueDecoder.value,
-            ...moduleParameters.valueDecoder,
-        };
-        super.setModuleParameters({
+        const mergedModuleParams = {
             ...moduleParameters,
-            valueDecoder: mergedDecoder,
-        });
+            valueDecoder: {
+                // The prop objects are not merged with the defaultProps by default.
+                // See https://github.com/facebook/react/issues/2568
+                ...defaultProps.valueDecoder.value,
+                ...moduleParameters.valueDecoder,
+            },
+        };
+        super.setModuleParameters(mergedModuleParams);
+
         super.draw({
             uniforms: {
                 ...uniforms,
@@ -66,6 +69,7 @@ export default class ColormapLayer extends BitmapLayer<
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
             },
+            moduleParameters: mergedModuleParams,
         });
     }
 
