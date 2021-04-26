@@ -13,7 +13,6 @@ import {
 import { createSortFunction } from "../utils/sort";
 import { getRegexPredicate } from "../utils/stringUtil";
 
-
 export const usePlotData = (): PlotData => {
     //Redux states
     const data = useContext(DataContext);
