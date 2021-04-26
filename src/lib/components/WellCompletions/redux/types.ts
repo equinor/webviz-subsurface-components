@@ -1,8 +1,16 @@
 export interface Data {
     version: string;
+    units: Units;
     stratigraphy: Zone[];
     wells: Well[];
     timeSteps: string[];
+}
+
+export interface Units {
+    kh: {
+        unit: string;
+        decimalPlaces: number;
+    };
 }
 export interface Zone {
     name: string;

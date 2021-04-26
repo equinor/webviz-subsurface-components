@@ -3,12 +3,24 @@ import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
 import { Data, UISettings } from "../redux/types";
 import { preprocessData } from "../utils/dataUtil";
-import { DataContext } from "../WellCompletions";
 
 interface Props {
     id: string;
     data: Data;
 }
+const defaultData = {
+    version: "",
+    unit: {
+        kh: {
+            unit: "",
+            decimalPlaces: 2,
+        },
+    },
+    stratigraphy: [],
+    wells: [],
+    timeSteps: [],
+};
+export const DataContext = React.createContext<Data>(defaultData);
 
 const DataProvider: React.FC<Props> = ({
     children,

@@ -1,6 +1,7 @@
 import { isEqual } from "lodash";
 import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { DataContext } from "../components/DataLoader";
 import { WellCompletionsState } from "../redux/store";
 import { Well } from "../redux/types";
 import {
@@ -11,7 +12,7 @@ import {
 } from "../utils/dataUtil";
 import { createSortFunction } from "../utils/sort";
 import { getRegexPredicate } from "../utils/stringUtil";
-import { DataContext } from "../WellCompletions";
+
 
 export const usePlotData = (): PlotData => {
     //Redux states
