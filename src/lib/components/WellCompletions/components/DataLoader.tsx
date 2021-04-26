@@ -10,7 +10,7 @@ interface Props {
 }
 const defaultData = {
     version: "",
-    unit: {
+    units: {
         kh: {
             unit: "",
             decimalPlaces: 2,
