@@ -42,6 +42,11 @@
           }
     },
     {
+        "coords": {
+          "visible": true,
+          "multiPicking": true,
+          "pickDepth": 10
+        },
         "deckglSpec": {
             "initialViewState": {
                 "target": [434962.5, 6478095.5, 0],
@@ -63,7 +68,8 @@
                     "bounds": [432205, 6475078, 437720, 6481113],
                     "valueRange": [2782, 3513],
                     "opacity": 1.0,
-                    "image": "https://i.imgur.com/Dx8eseE.png"
+                    "image": "https://i.imgur.com/Dx8eseE.png",
+                    "pickable": true
                 },
                 {
                     "@@type": "WellsLayer",
