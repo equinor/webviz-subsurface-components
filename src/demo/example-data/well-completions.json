@@ -1,5 +1,11 @@
 {
     "version": "1.0.0",
+    "units": {
+      "kh":{
+          "unit":"mDm",
+          "decimalPlaces":2
+      }
+    },
     "stratigraphy": [
       {
         "name": "zone1",

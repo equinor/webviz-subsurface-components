@@ -1,31 +1,37 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useContext, useMemo } from "react";
 import { CompletionPlotData, PlotData } from "../../utils/dataUtil";
 import { useTooltip } from "../Common/TooltipProvider";
+import { DataContext } from "../DataLoader";
 import { Padding, PlotLayout } from "./plotUtil";
 
 interface Props {
-    data: PlotData;
+    plotData: PlotData;
     layout: PlotLayout;
     padding: Padding;
 }
 
 /* eslint-disable react/prop-types */
 const CompletionsPlot: React.FC<Props> = React.memo(
-    ({ data, layout, padding }) => {
+    ({ plotData, layout, padding }) => {
+        const data = useContext(DataContext);
         const { setContent } = useTooltip();
+        const decimalPlaces = useMemo(() => data.units.kh.decimalPlaces, [
+            data,
+        ]);
+        const khUnit = useMemo(() => data.units.kh.unit, [data]);
         const wellWidth = useMemo(
-            () => layout.xExtent / Math.max(data.wells.length, 1),
-            [layout.xExtent, data.wells.length]
+            () => layout.xExtent / Math.max(plotData.wells.length, 1),
+            [layout.xExtent, plotData.wells.length]
         );
         const barHeight = useMemo(
-            () => layout.yExtent / Math.max(data.stratigraphy.length, 1),
-            [layout.yExtent, data.stratigraphy.length]
+            () => layout.yExtent / Math.max(plotData.stratigraphy.length, 1),
+            [layout.yExtent, plotData.stratigraphy.length]
         );
 
         const onMouseMove = useCallback(
             (e, well, completion: CompletionPlotData) => {
                 const zoneName =
-                    data.stratigraphy[
+                    plotData.stratigraphy[
                         Math.floor(
                             (e.nativeEvent.offsetY - padding.top) / barHeight
                         )
@@ -38,9 +44,24 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                 ["Stratigraphy", zoneName],
                                 ["Open", completion.open],
                                 ["Shut", completion.shut],
-                                ["Kh Mean", completion.khMean.toFixed(2)],
-                                ["Kh Min", completion.khMin.toFixed(2)],
-                                ["Kh Max", completion.khMax.toFixed(2)],
+                                [
+                                    "Kh Mean",
+                                    `${completion.khMean.toFixed(
+                                        decimalPlaces
+                                    )}${khUnit}`,
+                                ],
+                                [
+                                    "Kh Min",
+                                    `${completion.khMin.toFixed(
+                                        decimalPlaces
+                                    )}${khUnit}`,
+                                ],
+                                [
+                                    "Kh Max",
+                                    `${completion.khMax.toFixed(
+                                        decimalPlaces
+                                    )}${khUnit}`,
+                                ],
                             ].map(([key, value]) => (
                                 <tr key={`tooltip-${key}-${value}`}>
                                     <td>
@@ -53,7 +74,7 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                     </table>
                 ));
             },
-            [setContent, data.stratigraphy, barHeight]
+            [setContent, plotData.stratigraphy, barHeight]
         );
 
         const onMouseOut = useCallback(() => setContent(() => null), [
@@ -61,7 +82,7 @@ const CompletionsPlot: React.FC<Props> = React.memo(
         ]);
         return (
             <g>
-                {data.wells.map((well, i) => {
+                {plotData.wells.map((well, i) => {
                     return (
                         <g
                             transform={`translate(${
@@ -73,7 +94,7 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                 const start = completion.zoneIndex;
                                 const end =
                                     j === well.completions.length - 1
-                                        ? data.stratigraphy.length
+                                        ? plotData.stratigraphy.length
                                         : well.completions[j + 1].zoneIndex;
                                 const totalWidth =
                                     completion.open + completion.shut;

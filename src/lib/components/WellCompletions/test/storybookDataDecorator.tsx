@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { DataContext } from "../WellCompletions";
+import { DataContext } from "../components/DataLoader";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 export const exampleData = require("../../../../demo/example-data/well-completions-kh.json");
 

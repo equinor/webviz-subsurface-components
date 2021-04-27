@@ -5,7 +5,7 @@ import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimeIndexRange } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
-import { DataContext } from "../../WellCompletions";
+import { DataContext } from "../DataLoader";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
