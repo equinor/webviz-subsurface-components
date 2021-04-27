@@ -25,6 +25,11 @@ DeckGLMap.propTypes = {
      * Show or hide the coordinates component. True by default.
      */
     showCoords: PropTypes.bool,
+
+    /**
+     * For reacting to prop changes
+     */
+    setProps: PropTypes.func,
 };
 
 DeckGLMap.defaultProps = {

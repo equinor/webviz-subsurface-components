@@ -1,17 +1,18 @@
 // This configuration object determines which deck.gl classes are accessible in the serialized json
 
 import {
-    MapView,
+    COORDINATE_SYSTEM,
     FirstPersonView,
+    MapView,
     OrbitView,
     OrthographicView,
-    COORDINATE_SYSTEM,
 } from "@deck.gl/core";
 
 import * as AggregationLayers from "@deck.gl/aggregation-layers";
 import * as GeoLayers from "@deck.gl/geo-layers";
 import * as Layers from "@deck.gl/layers";
 import * as MeshLayers from "@deck.gl/mesh-layers";
+import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 
 import { registerLoaders } from "@loaders.gl/core";
 import GL from "@luma.gl/constants";
@@ -25,7 +26,7 @@ export default {
     // Classes that should be instantiatable by JSON converter
     classes: Object.assign(
         // Support `@deck.gl/core` Views
-        { MapView, FirstPersonView, OrbitView, OrthographicView },
+        { FirstPersonView, MapView, OrbitView, OrthographicView },
         // a map of all layers that should be exposes as JSONLayers
         Layers,
         AggregationLayers,
@@ -33,7 +34,7 @@ export default {
         MeshLayers,
         CustomLayers,
         // Any non-standard views or layers
-        {}
+        { EditableGeoJsonLayer }
     ),
 
     // Functions that should be executed by JSON converter

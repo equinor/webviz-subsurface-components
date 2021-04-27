@@ -79,7 +79,7 @@ const DeckGLMapDemo = () => {
     );
 
     React.useEffect(() => {
-        const example = exampleData[1];
+        const example = exampleData[0];
 
         setText(JSON.stringify(example, null, 2));
         setParsedJson(example);
@@ -98,6 +98,11 @@ const DeckGLMapDemo = () => {
                 // ignore error, user is editing and not yet correct JSON
             }
         }
+    });
+
+    const setMapProps = React.useCallback((updatedProps) => {
+        setParsedJson(updatedProps);
+        setText(JSON.stringify(updatedProps, null, 2));
     });
 
     // TODO: Fold code panel in a slider:
@@ -125,7 +130,11 @@ const DeckGLMapDemo = () => {
                         setErrorReset(false);
                     }}
                 >
-                    <DeckGLMap id="DeckGL-Map" {...parsedJson} />
+                    <DeckGLMap
+                        id="DeckGL-Map"
+                        {...parsedJson}
+                        setProps={setMapProps}
+                    />
                 </ErrorBoundary>
                 <div>
                     {colormaps.map((colormap, index) => (

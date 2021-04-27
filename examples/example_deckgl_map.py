@@ -80,8 +80,8 @@ if __name__ == "__main__":
     width = bounds[2] - bounds[0]  # right - left
     height = bounds[3] - bounds[1]  # top - bottom
 
-    deckgl_map_1 = webviz_subsurface_components.DeckGLMap(
-        id="DeckGL-Map",
+    deckgl_map_left = webviz_subsurface_components.DeckGLMap(
+        id="DeckGL-Map-Left",
         deckglSpec={
             "initialViewState": {
                 "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
@@ -105,6 +105,12 @@ if __name__ == "__main__":
                     "valueRange": [min_value, max_value],
                     "image": map_data,
                 },
+                {
+                    "@@type": "DrawingLayer",
+                    "id": "drawing-layer",
+                    "mode": "drawLineString",
+                    "data": {"type": "FeatureCollection", "features": []},
+                },
             ],
             "views": [
                 {
@@ -116,19 +122,54 @@ if __name__ == "__main__":
                     "width": "100%",
                     "height": "100%",
                     "flipY": False,
+                }
+            ],
+        },
+    )
+
+    deckgl_map_right = webviz_subsurface_components.DeckGLMap(
+        id="DeckGL-Map-Right",
+        deckglSpec={
+            "initialViewState": {
+                "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+                "zoom": -3,
+            },
+            "layers": [
+                {
+                    "@@type": "ColormapLayer",
+                    "id": "colormap-layer",
+                    "bounds": bounds,
+                    "image": map_data,
+                    "colormap": COLORMAP,
+                    "valueRange": [min_value, max_value],
+                    "pickable": True,
                 },
                 {
-                    "@@type": "OrthographicView",
-                    "id": "minimap",
-                    "controller": False,
-                    "x": "80%",
-                    "y": "75%",
-                    "width": "20%",
-                    "height": "25%",
-                    "flipY": False,
-                    "clear": {"color": [0.9, 0.9, 0.9, 1], "depth": True},
-                    "viewState": {"id": "main", "zoom": -5},
+                    "@@type": "Hillshading2DLayer",
+                    "id": "hillshading-layer",
+                    "bounds": bounds,
+                    "opacity": 1.0,
+                    "valueRange": [min_value, max_value],
+                    "image": map_data,
                 },
+                {
+                    "@@type": "DrawingLayer",
+                    "id": "drawing-layer",
+                    "mode": "drawLineString",
+                    "data": {"type": "FeatureCollection", "features": []},
+                },
+            ],
+            "views": [
+                {
+                    "@@type": "OrthographicView",
+                    "id": "main",
+                    "controller": True,
+                    "x": "0%",
+                    "y": "0%",
+                    "width": "100%",
+                    "height": "100%",
+                    "flipY": False,
+                }
             ],
         },
     )
@@ -136,7 +177,30 @@ if __name__ == "__main__":
     app = dash.Dash(__name__)
 
     app.layout = html.Div(
-        style={"height": "95vh"}, children=[deckgl_map_1, html.Img(src=COLORMAP)]
+        children=[
+            html.Div(
+                style={"float": "left", "width": "50%", "height": "95vh"},
+                children=[deckgl_map_left],
+            ),
+            html.Div(
+                style={"float": "right", "width": "50%", "height": "95vh"},
+                children=[deckgl_map_right],
+            ),
+        ]
     )
+
+    @app.callback(
+        dash.dependencies.Output("DeckGL-Map-Left", "deckglSpec"),
+        dash.dependencies.Output("DeckGL-Map-Right", "deckglSpec"),
+        dash.dependencies.Input("DeckGL-Map-Left", "deckglSpec"),
+        dash.dependencies.Input("DeckGL-Map-Right", "deckglSpec"),
+    )
+    def update_maps(left_deckgl_spec, right_deckgl_spec):
+        ctx = dash.callback_context
+        trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        value = (
+            left_deckgl_spec if trigger_id == "DeckGL-Map-Left" else right_deckgl_spec
+        )
+        return value, value
 
     app.run_server(debug=True)
