@@ -46,7 +46,8 @@
             3513
           ],
           "opacity": 1.0,
-          "image": "https://i.imgur.com/Dx8eseE.png"
+          "image": "https://i.imgur.com/Dx8eseE.png",
+          "pickable": true
         },
         {
           "@@type": "WellsLayer",
