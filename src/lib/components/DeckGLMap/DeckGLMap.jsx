@@ -29,6 +29,11 @@ DeckGLMap.propTypes = {
         multiPicking: PropTypes.bool,
         pickDepth: PropTypes.number,
     }),
+
+    /**
+     * For reacting to prop changes
+     */
+    setProps: PropTypes.func,
 };
 
 DeckGLMap.defaultProps = {
