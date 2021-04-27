@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateFilterByAttributes } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 import { extractAttributesTree } from "../../utils/dataUtil";
-import { DataContext } from "../../WellCompletions";
+import { DataContext } from "../DataLoader";
 
 const WellAttributesSelector: React.FC = React.memo(() => {
     const data = useContext(DataContext);
