@@ -2,6 +2,20 @@
     "type": "object",
     "properties": {
         "version": { "type": "string", "minLength": 1 },
+        "units": {
+            "type": "object",
+            "properties": {
+                "kh": {
+                    "type": "object",
+                    "properties": {
+                        "unit": {
+                            "type": "string"
+                        },
+                        "decimalPlaces": { "type": "number" }
+                    }
+                }
+            }
+        },
         "stratigraphy": {
             "type": "array",
             "items": {
@@ -63,7 +77,14 @@
                                         "items": { "type": "number" }
                                     }
                                 },
-                                "required": ["t", "open", "shut", "khMean", "khMin", "khMax"]
+                                "required": [
+                                    "t",
+                                    "open",
+                                    "shut",
+                                    "khMean",
+                                    "khMin",
+                                    "khMax"
+                                ]
                             }
                         },
                         "additionalProperties": false

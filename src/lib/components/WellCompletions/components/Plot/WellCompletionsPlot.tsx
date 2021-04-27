@@ -68,7 +68,7 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
                                 padding={padding}
                             />
                             <CompletionsPlot
-                                data={plotData}
+                                plotData={plotData}
                                 layout={layout}
                                 padding={padding}
                             />
