@@ -13,7 +13,7 @@ import { PropertyMapPickInfo } from "./layers/utils/propertyMapTools";
 export interface MapProps {
     id: string;
     deckglSpec: Record<string, unknown>;
-    resources: Record<string, string>;
+    resources: Record<string, unknown>;
     showCoords: boolean;
     setProps: (props: Record<string, unknown>) => void;
 }
