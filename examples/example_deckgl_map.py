@@ -82,6 +82,9 @@ if __name__ == "__main__":
 
     deckgl_map_left = webviz_subsurface_components.DeckGLMap(
         id="DeckGL-Map-Left",
+        resources={
+            "propertyMap": map_data,
+        },
         deckglSpec={
             "initialViewState": {
                 "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
@@ -92,7 +95,7 @@ if __name__ == "__main__":
                     "@@type": "ColormapLayer",
                     "id": "colormap-layer",
                     "bounds": bounds,
-                    "image": map_data,
+                    "image": "@@#resources.propertyMap",
                     "colormap": COLORMAP,
                     "valueRange": [min_value, max_value],
                     "pickable": True,
@@ -103,7 +106,7 @@ if __name__ == "__main__":
                     "bounds": bounds,
                     "opacity": 1.0,
                     "valueRange": [min_value, max_value],
-                    "image": map_data,
+                    "image": "@@#resources.propertyMap",
                 },
                 {
                     "@@type": "DrawingLayer",
@@ -139,7 +142,7 @@ if __name__ == "__main__":
                     "@@type": "ColormapLayer",
                     "id": "colormap-layer",
                     "bounds": bounds,
-                    "image": map_data,
+                    "image": "@@#resources.propertyMap",
                     "colormap": COLORMAP,
                     "valueRange": [min_value, max_value],
                     "pickable": True,
@@ -150,7 +153,7 @@ if __name__ == "__main__":
                     "bounds": bounds,
                     "opacity": 1.0,
                     "valueRange": [min_value, max_value],
-                    "image": map_data,
+                    "image": "@@#resources.propertyMap",
                 },
                 {
                     "@@type": "DrawingLayer",

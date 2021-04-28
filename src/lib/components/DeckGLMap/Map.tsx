@@ -4,7 +4,7 @@ import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 
 import Coords, { CoordsInfo } from "./components/Coords";
-import JSON_CONVERTER_CONFIGURATION from "./configuration";
+import JSON_CONVERTER_CONFIG from "./configuration";
 import { PickInfo } from "deck.gl";
 
 import { WellDataType } from "./layers/wells/wellsLayer";
@@ -13,6 +13,7 @@ import { PropertyMapPickInfo } from "./layers/utils/propertyMapTools";
 export interface MapProps {
     id: string;
     deckglSpec: Record<string, unknown>;
+    resources: Record<string, string>;
     showCoords: boolean;
     setProps: (props: Record<string, unknown>) => void;
 }
@@ -20,9 +21,10 @@ export interface MapProps {
 const Map: React.FC<MapProps> = (props: MapProps) => {
     const [deckglSpec, setDeckglSpec] = React.useState(null);
     React.useEffect(() => {
-        const configuration = new JSONConfiguration(
-            JSON_CONVERTER_CONFIGURATION
-        );
+        if (props.resources) {
+            JSON_CONVERTER_CONFIG.enumerations["resources"] = props.resources;
+        }
+        const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
         const jsonConverter = new JSONConverter({ configuration });
 
         const setLayerProps = (layerId, newLayerProps) => {
