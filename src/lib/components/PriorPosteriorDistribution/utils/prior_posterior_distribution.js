@@ -56,9 +56,14 @@ class D3PriorPosterior {
             ...this.data.values.map((values) => Math.max(...values))
         );
 
+        this.xscale_addition = (this.global_max - this.global_min) * 0.05;
+
         this.x_scale = d3
             .scaleLinear()
-            .domain([this.global_min, this.global_max])
+            .domain([
+                this.global_min - this.xscale_addition,
+                this.global_max + this.xscale_addition,
+            ])
             .range([0, this.width_plot]);
 
         this.color_scale = d3
