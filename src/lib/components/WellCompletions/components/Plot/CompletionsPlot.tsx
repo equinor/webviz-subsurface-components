@@ -18,7 +18,10 @@ const CompletionsPlot: React.FC<Props> = React.memo(
         const decimalPlaces = useMemo(() => data.units.kh.decimalPlaces, [
             data,
         ]);
-        const khUnit = useMemo(() => data.units.kh.unit, [data]);
+        const khUnit = useMemo(
+            () => (data.units.kh.unit.length > 0 ? data.units.kh.unit : ""),
+            [data]
+        );
         const wellWidth = useMemo(
             () => layout.xExtent / Math.max(plotData.wells.length, 1),
             [layout.xExtent, plotData.wells.length]

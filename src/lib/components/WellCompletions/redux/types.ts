@@ -36,8 +36,7 @@ export interface Completions {
 }
 
 export const RangeModes = {
-    "First Step": (arr: number[]): number => arr[0],
-    "Last Step": (arr: number[]): number => arr[arr.length - 1],
+    Off: (arr: number[]): number => arr[arr.length - 1],
     Max: (arr: number[]): number => Math.max(...arr),
     Average: (arr: number[]): number =>
         arr.reduce((a, b) => a + b) / arr.length,
