@@ -3,22 +3,27 @@ import React from "react";
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 
-import Coords, { CoordsInfo } from "./components/Coords";
+import Coords from "./components/Coords";
 import JSON_CONVERTER_CONFIG from "./configuration";
 import { PickInfo } from "deck.gl";
 
 import { WellDataType } from "./layers/wells/wellsLayer";
-import { PropertyMapPickInfo } from "./layers/utils/propertyMapTools";
 
 export interface MapProps {
     id: string;
     deckglSpec: Record<string, unknown>;
     resources: Record<string, unknown>;
-    showCoords: boolean;
+    coords: {
+        visible: boolean;
+        multiPicking: boolean;
+        pickDepth: number;
+    };
     setProps: (props: Record<string, unknown>) => void;
 }
 
 const Map: React.FC<MapProps> = (props: MapProps) => {
+    const deckRef = React.useRef<DeckGL>(null);
+
     const [deckglSpec, setDeckglSpec] = React.useState(null);
     React.useEffect(() => {
         if (props.resources) {
@@ -66,26 +71,24 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
         setDeckglSpec(deckglSpec);
     }, [props]);
 
-    const [coordsInfo, setCoordsInfo] = React.useState<CoordsInfo | null>(null);
-    const extractCoords = React.useCallback((pickInfo: PickInfo<unknown>) => {
-        const xy = pickInfo.coordinate;
-        if (!xy) {
-            setCoordsInfo(null);
-            return;
-        }
-        const coords: CoordsInfo = {
-            x: xy[0],
-            y: xy[1],
-        };
+    const [hoverInfo, setHoverInfo] = React.useState<PickInfo<unknown>[]>([]);
 
-        // TODO: modify this to support multiple property layers, once this issue is fixed:
-        // https://github.com/visgl/deck.gl/issues/5576
-        const zValue = (pickInfo as PropertyMapPickInfo).propertyValue;
-        if (zValue) {
-            coords.z = [{ value: zValue, layerId: pickInfo.layer.id }];
-        }
-        setCoordsInfo(coords);
-    }, []);
+    const onHover = React.useCallback(
+        (pickInfo: PickInfo<unknown>, event) => {
+            if (props.coords.multiPicking) {
+                const infos = deckRef.current?.pickMultipleObjects({
+                    x: event.offsetCenter.x,
+                    y: event.offsetCenter.y,
+                    radius: 1,
+                    depth: props.coords.pickDepth,
+                });
+                setHoverInfo(infos);
+            } else {
+                setHoverInfo([pickInfo]);
+            }
+        },
+        [props.coords]
+    );
 
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
@@ -99,11 +102,10 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                     getTooltip={(info: PickInfo<unknown>): string | null => {
                         return (info.object as WellDataType)?.properties.name;
                     }}
-                    onHover={(pickInfo: PickInfo<unknown>): void => {
-                        extractCoords(pickInfo);
-                    }}
+                    ref={deckRef}
+                    onHover={onHover}
                 >
-                    {props.showCoords && <Coords coordsInfo={coordsInfo} />}
+                    {props.coords.visible && <Coords pickInfos={hoverInfo} />}
                 </DeckGL>
             )}
         </div>
