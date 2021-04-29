@@ -35,15 +35,13 @@ const DataProvider: React.FC<Props> = ({
                 attributeKeys.add(key)
             )
         );
-        const timeIndexRange =
-            data.timeSteps.length > 0 ? [0, data.timeSteps.length - 1] : [0, 0];
         return {
             id: id,
             ui: {
-                timeIndexRange: timeIndexRange as [number, number],
+                timeIndexRange: [0, 0] as [number, number],
                 wellsPerPage: 25,
                 currentPage: 1,
-                rangeDisplayMode: "First Step",
+                rangeDisplayMode: "Off",
                 wellSearchText: "",
                 filteredZones: data.stratigraphy.map((zone) => zone.name),
                 hideZeroCompletions: false,

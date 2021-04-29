@@ -20,10 +20,14 @@ const TimeRangeSelector: React.FC = React.memo(() => {
     const data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
+    const rangeDisplayMode = useSelector(
+        (state: WellCompletionsState) => state.ui.rangeDisplayMode,
+        isEqual
+    );
     const timeIndexRange = useSelector(
         (state: WellCompletionsState) => state.ui.timeIndexRange,
         isEqual
-    );
+    ) as [number, number];
     const times = useMemo(() => data.timeSteps, [data]);
     // handlers
     const outputFunction = useCallback(
@@ -34,10 +38,11 @@ const TimeRangeSelector: React.FC = React.memo(() => {
         debounce(
             (_, value) =>
                 dispatch(
-                    updateTimeIndexRange([
-                        Math.min(...value),
-                        Math.max(...value),
-                    ])
+                    updateTimeIndexRange(
+                        rangeDisplayMode === "Off"
+                            ? [0, Math.min(...value)]
+                            : [Math.min(...value), Math.max(...value)]
+                    )
                 ),
             20,
             {
@@ -53,15 +58,28 @@ const TimeRangeSelector: React.FC = React.memo(() => {
     return (
         <div className={classes.root}>
             <span>Time Steps</span>
-            <Slider
-                value={timeIndexRange}
-                onChange={onChange}
-                ariaLabelledby="range-slider-label"
-                min={0}
-                max={times.length - 1}
-                step={1}
-                outputFunction={outputFunction}
-            />
+            {rangeDisplayMode === "Off" && (
+                <Slider
+                    value={Math.max(...timeIndexRange)}
+                    onChange={onChange}
+                    ariaLabelledby="time-step-slider-label"
+                    min={0}
+                    max={times.length - 1}
+                    step={1}
+                    outputFunction={outputFunction}
+                />
+            )}
+            {rangeDisplayMode !== "Off" && (
+                <Slider
+                    value={timeIndexRange}
+                    onChange={onChange}
+                    ariaLabelledby="time-step-slider-range-label"
+                    min={0}
+                    max={times.length - 1}
+                    step={1}
+                    outputFunction={outputFunction}
+                />
+            )}
         </div>
     );
 });
