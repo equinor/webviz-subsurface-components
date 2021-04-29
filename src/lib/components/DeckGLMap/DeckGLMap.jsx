@@ -22,6 +22,14 @@ DeckGLMap.propTypes = {
     deckglSpec: PropTypes.object,
 
     /**
+     * Resource dictionary made available in the DeckGL specification as an enum.
+     * The values can be accessed like this: `"@@#resources.resourceId"`, where
+     * `resourceId` is the key in the `resources` dict. For more information,
+     * see the DeckGL documentation on enums in the json spec: https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
+     */
+    resources: PropTypes.object,
+
+    /**
      * Show or hide the coordinates component. True by default.
      */
     showCoords: PropTypes.bool,
