@@ -114,7 +114,6 @@ export const computeDataToPlot = (
     hideZeroCompletions: boolean
 ): PlotData => {
     const wellPlotData: WellPlotData[] = [];
-    //Get first step for now
     wells.forEach((well) => {
         const completionsPlotData: CompletionPlotData[] = [];
         let hasData = false;

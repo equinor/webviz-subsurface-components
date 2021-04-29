@@ -11,7 +11,7 @@ export const testState = {
         timeIndexRange: [0, 9],
         wellsPerPage: 25,
         currentPage: 1,
-        rangeDisplayMode: "First Step",
+        rangeDisplayMode: "Off",
         wellSearchText: "",
         filteredZones: [],
         hideZeroCompletions: false,

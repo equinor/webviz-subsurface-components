@@ -184,13 +184,7 @@ describe("Data Util", () => {
     it("test computeDataToPlot", () => {
         //Display single time step
         expect(
-            computeDataToPlot(
-                testStratigraphy,
-                testWells,
-                [0, 0],
-                "First Step",
-                false
-            )
+            computeDataToPlot(testStratigraphy, testWells, [0, 0], "Off", false)
         ).toEqual({
             stratigraphy: testStratigraphy,
             wells: [
@@ -216,26 +210,14 @@ describe("Data Util", () => {
         });
         //Well with zero completions is filtered out
         expect(
-            computeDataToPlot(
-                testStratigraphy,
-                testWells,
-                [0, 0],
-                "First Step",
-                true
-            )
+            computeDataToPlot(testStratigraphy, testWells, [0, 0], "Off", true)
         ).toEqual({
             stratigraphy: testStratigraphy,
             wells: [],
         });
-        //Display range first step
+        //Display max in range
         expect(
-            computeDataToPlot(
-                testStratigraphy,
-                testWells,
-                [2, 6],
-                "First Step",
-                false
-            )
+            computeDataToPlot(testStratigraphy, testWells, [2, 6], "Max", false)
         ).toEqual({
             stratigraphy: testStratigraphy,
             wells: [
@@ -243,26 +225,26 @@ describe("Data Util", () => {
                     name: "RWI_3",
                     completions: [
                         {
-                            khMax: 0,
-                            khMean: 0,
-                            khMin: 0,
-                            open: 0,
-                            shut: 0,
+                            khMax: 200,
+                            khMean: 150,
+                            khMin: 100,
+                            open: 0.5,
+                            shut: 0.5,
                             zoneIndex: 0,
                         },
                         {
-                            khMax: 200,
-                            khMean: 200,
-                            khMin: 200,
+                            khMax: 400,
+                            khMean: 350,
+                            khMin: 300,
                             open: 0.125,
-                            shut: 0.875,
+                            shut: 1,
                             zoneIndex: 5,
                         },
                         {
-                            khMax: 0,
-                            khMean: 0,
-                            khMin: 0,
-                            open: 0,
+                            khMax: 200,
+                            khMean: 150,
+                            khMin: 100,
+                            open: 1,
                             shut: 0,
                             zoneIndex: 7,
                         },
@@ -281,7 +263,7 @@ describe("Data Util", () => {
                 testStratigraphy,
                 testWells,
                 [2, 6],
-                "First Step",
+                "Average",
                 false
             )
         ).toEqual({
@@ -291,28 +273,44 @@ describe("Data Util", () => {
                     name: "RWI_3",
                     completions: [
                         {
-                            khMax: 0,
-                            khMean: 0,
-                            khMin: 0,
-                            open: 0,
-                            shut: 0,
+                            khMax: 80,
+                            khMean: 60,
+                            khMin: 40,
+                            open: 0.2,
+                            shut: 0.2,
                             zoneIndex: 0,
                         },
                         {
-                            khMax: 200,
-                            khMean: 200,
-                            khMin: 200,
-                            open: 0.125,
-                            shut: 0.875,
+                            khMax: 280,
+                            khMean: 260,
+                            khMin: 240,
+                            open: 0.075,
+                            shut: 0.925,
                             zoneIndex: 5,
                         },
                         {
-                            khMax: 0,
-                            khMean: 0,
-                            khMin: 0,
-                            open: 0,
+                            khMax: 80,
+                            khMean: 60,
+                            khMin: 40,
+                            open: 0.4,
                             shut: 0,
                             zoneIndex: 7,
+                        },
+                        {
+                            khMax: 160,
+                            khMean: 120,
+                            khMin: 80,
+                            open: 0.8,
+                            shut: 0,
+                            zoneIndex: 8,
+                        },
+                        {
+                            khMax: 80,
+                            khMean: 60,
+                            khMin: 40,
+                            open: 0.4,
+                            shut: 0,
+                            zoneIndex: 9,
                         },
                     ],
                     earliestCompDateIndex: 1,

@@ -105,10 +105,7 @@ exports[`test range display mode selector snapshot test 1`] = `
     id="range-display-mode-selector"
   >
     <option>
-      First Step
-    </option>
-    <option>
-      Last Step
+      Off
     </option>
     <option>
       Max

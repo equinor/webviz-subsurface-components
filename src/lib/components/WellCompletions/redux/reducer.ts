@@ -25,7 +25,7 @@ export const uiSlice = createSlice({
         timeIndexRange: [0, 0],
         wellsPerPage: 25,
         currentPage: 1,
-        rangeDisplayMode: "First Step",
+        rangeDisplayMode: "Off",
         sortBy: {},
         wellSearchText: "",
         filteredZones: [],
