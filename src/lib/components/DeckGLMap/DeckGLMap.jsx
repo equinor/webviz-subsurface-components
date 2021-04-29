@@ -30,9 +30,13 @@ DeckGLMap.propTypes = {
     resources: PropTypes.object,
 
     /**
-     * Show or hide the coordinates component. True by default.
+     * Parameters for the coordinates component
      */
-    showCoords: PropTypes.bool,
+    coords: PropTypes.shape({
+        visible: PropTypes.bool,
+        multiPicking: PropTypes.bool,
+        pickDepth: PropTypes.number,
+    }),
 
     /**
      * For reacting to prop changes
@@ -41,7 +45,11 @@ DeckGLMap.propTypes = {
 };
 
 DeckGLMap.defaultProps = {
-    showCoords: true,
+    coords: {
+        visible: true,
+        multiPicking: true,
+        pickDepth: 10,
+    },
 };
 
 export default DeckGLMap;
