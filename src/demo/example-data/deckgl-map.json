@@ -5,6 +5,9 @@
       "multiPicking": true,
       "pickDepth": 10
     },
+    "resources": {
+      "propertyMap": "https://i.imgur.com/Dx8eseE.png"
+    },
     "deckglSpec": {
       "initialViewState": {
         "target": [
@@ -24,7 +27,7 @@
             437720,
             6481113
           ],
-          "image": "https://i.imgur.com/Dx8eseE.png",
+          "image": "@@#resources.propertyMap",
           "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
           "valueRange": [
             2782,
@@ -46,7 +49,7 @@
             3513
           ],
           "opacity": 1.0,
-          "image": "https://i.imgur.com/Dx8eseE.png",
+          "image": "@@#resources.propertyMap",
           "pickable": true
         },
         {
