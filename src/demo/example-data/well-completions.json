@@ -676,7 +676,7 @@
         },
         "attributes": {
           "type": "Injector",
-          "region": "",
+          "region": "Region 1",
           "user defined category": "my group 2"
         }
       },
@@ -1339,7 +1339,7 @@
         },
         "attributes": {
           "type": "Producer",
-          "region": "",
+          "region": "Region 2",
           "user defined category": "my group 2"
         }
       },
@@ -2328,7 +2328,7 @@
         },
         "attributes": {
           "type": "Producer",
-          "region": "",
+          "region": "Region 2",
           "user defined category": "my group 2"
         }
       },
