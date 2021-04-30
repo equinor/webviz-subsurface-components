@@ -168,8 +168,8 @@ if __name__ == "__main__":
                     "opacity": 1.0,
                     "lineWidthScale": 5,
                     "pointRadiusScale": 8,
-                    "outline": True
-                }
+                    "outline": True,
+                },
             ],
             "views": [
                 {
