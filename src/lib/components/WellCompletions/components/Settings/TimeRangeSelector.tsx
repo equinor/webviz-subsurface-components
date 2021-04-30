@@ -21,8 +21,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
     // Redux
     const dispatch = useDispatch();
     const rangeDisplayMode = useSelector(
-        (state: WellCompletionsState) => state.ui.rangeDisplayMode,
-        isEqual
+        (state: WellCompletionsState) => state.ui.rangeDisplayMode
     );
     const timeIndexRange = useSelector(
         (state: WellCompletionsState) => state.ui.timeIndexRange,
@@ -49,7 +48,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                 trailing: true,
             }
         ),
-        [dispatch]
+        [dispatch, rangeDisplayMode]
     );
 
     //If data not loaded yet
