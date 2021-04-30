@@ -8,6 +8,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
+    selectedFeature: string;
 }
 
 export interface WellDataType {
