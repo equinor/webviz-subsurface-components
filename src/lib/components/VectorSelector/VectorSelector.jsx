@@ -13,8 +13,7 @@ const VectorSelector = props => {
             label={props.label}
             showSuggestions={props.showSuggestions}
             setProps={props.setProps}
-            selectedNodes={props.selectedNodes}
-            selectedIds={props.selectedIds}
+            selectedTags={props.selectedTags}
             placeholder={props.placeholder}
             numSecondsUntilSuggestionsAreShown={
                 props.numSecondsUntilSuggestionsAreShown
@@ -29,9 +28,7 @@ VectorSelector.defaultProps = {
     delimiter: ":",
     numMetaNodes: 0,
     showSuggestions: true,
-    selectedNodes: [],
     selectedTags: [],
-    selectedIds: [],
     placeholder: "Add new tag...",
     numSecondsUntilSuggestionsAreShown: 1.5,
     persisted_props: ["selectedNodes", "selectedTags", "selectedIds"],
@@ -68,7 +65,7 @@ VectorSelector.propTypes = {
     /**
      * A label that will be printed when this component is rendered.
      */
-    label: PropTypes.string.isRequired,
+    label: PropTypes.string,
 
     /**
      * Stating of suggestions should be shown or not.
@@ -82,19 +79,9 @@ VectorSelector.propTypes = {
     setProps: PropTypes.func,
 
     /**
-     * Selected nodes - readonly.
-     */
-    selectedNodes: PropTypes.arrayOf(PropTypes.string),
-
-    /**
      * Selected tags.
      */
     selectedTags: PropTypes.arrayOf(PropTypes.string),
-
-    /**
-     * Selected ids.
-     */
-    selectedIds: PropTypes.arrayOf(PropTypes.string),
 
     /**
      * Placeholder text for input field.

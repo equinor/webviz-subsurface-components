@@ -24,19 +24,23 @@ import well from "./images/well.svg";
 import well_completion from "./images/well-completion.svg";
 import React from "react";
 
+type ParentProps = {
+    selectedTags: string[],
+    selectedNodes: string[],
+    selectedIds: string[]
+};
+
 type VectorSelectorPropType = {
     id: string,
     maxNumSelectedNodes: number,
     delimiter: string,
     numMetaNodes: number,
     data: TreeDataNode[],
-    label: string,
+    label?: string,
     showSuggestions: boolean,
-    setProps: (props: any) => void,
-    selectedNodes: string[],
-    selectedTags: string[],
-    selectedIds: string[],
-    placeholder: string,
+    setProps: (props: ParentProps) => void,
+    selectedTags?: string[],
+    placeholder?: string,
     numSecondsUntilSuggestionsAreShown: number,
     persistence: boolean | string | number,
     persisted_props: ("selectedNodes" | "selectedTags" | "selectedIds")[],
@@ -53,18 +57,29 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
     constructor(props: VectorSelectorPropType) {
         super(props);
         this.props = props;
-        this.treeData = new TreeData({
-            treeData: this.modifyTreeData(
-                props.data,
-                props.numMetaNodes
-            ),
-            delimiter: props.delimiter,
-        });
+
+        let hasError = false;
+        let error = "";
+        try {
+            this.treeData = new TreeData({
+                treeData: this.modifyTreeData(
+                    props.data,
+                    props.numMetaNodes
+                ),
+                delimiter: props.delimiter,
+            });
+        }
+        catch(e) {
+            hasError = true;
+            error = e;
+        }
+
 
         let nodeSelections: VectorSelection[] = [];
         if (props.selectedTags !== undefined) {
             for (const tag of props.selectedTags) {
                 const nodePath = tag.split(this.props.delimiter);
+                nodePath.splice(props.numMetaNodes, 0, "*")
                 nodeSelections.push(this.createNewNodeSelection(nodePath));
             }
         }
@@ -79,6 +94,8 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             nodeSelections,
             currentTagIndex: 0,
             suggestionsVisible: false,
+            hasError: hasError,
+            error: error
         };
     }
 

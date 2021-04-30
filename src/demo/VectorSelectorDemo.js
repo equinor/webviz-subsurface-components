@@ -17,6 +17,7 @@ class WellCompletionsDemo extends Component {
             <VectorSelector
                 id="vector_selector"
                 delimiter=":"
+                selectedTags={["iter-0:WGOR:OP_1"]}
                 numMetaNodes={1}
                 label="Select a vector"
                 data={[
