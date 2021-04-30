@@ -184,7 +184,13 @@ describe("Data Util", () => {
     it("test computeDataToPlot", () => {
         //Display single time step
         expect(
-            computeDataToPlot(testStratigraphy, testWells, [0, 0], "None", false)
+            computeDataToPlot(
+                testStratigraphy,
+                testWells,
+                [0, 0],
+                "None",
+                false
+            )
         ).toEqual({
             stratigraphy: testStratigraphy,
             wells: [

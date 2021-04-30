@@ -3,6 +3,7 @@ import {
     Attributes,
     SortDirection,
     TimeAggregation,
+    // eslint-disable-next-line prettier/prettier
     UISettings
 } from "./types";
 
