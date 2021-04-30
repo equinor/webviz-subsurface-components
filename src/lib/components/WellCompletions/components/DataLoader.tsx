@@ -41,7 +41,7 @@ const DataProvider: React.FC<Props> = ({
                 timeIndexRange: [0, 0] as [number, number],
                 wellsPerPage: 25,
                 currentPage: 1,
-                rangeDisplayMode: "Off",
+                timeAggregation: "None",
                 wellSearchText: "",
                 filteredZones: data.stratigraphy.map((zone) => zone.name),
                 hideZeroCompletions: false,

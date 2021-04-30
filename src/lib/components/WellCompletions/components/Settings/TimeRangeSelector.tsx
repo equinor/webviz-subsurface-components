@@ -20,8 +20,8 @@ const TimeRangeSelector: React.FC = React.memo(() => {
     const data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
-    const rangeDisplayMode = useSelector(
-        (state: WellCompletionsState) => state.ui.rangeDisplayMode
+    const timeAggregation = useSelector(
+        (state: WellCompletionsState) => state.ui.timeAggregation
     );
     const timeIndexRange = useSelector(
         (state: WellCompletionsState) => state.ui.timeIndexRange,
@@ -38,7 +38,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
             (_, value) =>
                 dispatch(
                     updateTimeIndexRange(
-                        rangeDisplayMode === "Off"
+                        timeAggregation === "None"
                             ? [0, Math.min(...value)]
                             : [Math.min(...value), Math.max(...value)]
                     )
@@ -48,7 +48,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                 trailing: true,
             }
         ),
-        [dispatch, rangeDisplayMode]
+        [dispatch, timeAggregation]
     );
 
     //If data not loaded yet
@@ -57,7 +57,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
     return (
         <div className={classes.root}>
             <span>Time Steps</span>
-            {rangeDisplayMode === "Off" && (
+            {timeAggregation === "None" && (
                 <Slider
                     value={Math.max(...timeIndexRange)}
                     onChange={onChange}
@@ -68,7 +68,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                     outputFunction={outputFunction}
                 />
             )}
-            {rangeDisplayMode !== "Off" && (
+            {timeAggregation !== "None" && (
                 <Slider
                     value={timeIndexRange}
                     onChange={onChange}

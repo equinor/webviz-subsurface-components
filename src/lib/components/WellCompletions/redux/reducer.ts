@@ -1,5 +1,10 @@
 import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Attributes, RangeMode, SortDirection, UISettings } from "./types";
+import {
+    Attributes,
+    SortDirection,
+    TimeAggregation,
+    UISettings
+} from "./types";
 
 export const idSlice = createSlice({
     name: "id",
@@ -25,7 +30,7 @@ export const uiSlice = createSlice({
         timeIndexRange: [0, 0],
         wellsPerPage: 25,
         currentPage: 1,
-        rangeDisplayMode: "Off",
+        timeAggregation: "None",
         sortBy: {},
         wellSearchText: "",
         filteredZones: [],
@@ -45,8 +50,11 @@ export const uiSlice = createSlice({
         updateCurrentPage: (state, action: PayloadAction<number>) => {
             state.currentPage = action.payload;
         },
-        updateRangeDisplayMode: (state, action: PayloadAction<RangeMode>) => {
-            state.rangeDisplayMode = action.payload;
+        updateTimeAggregation: (
+            state,
+            action: PayloadAction<TimeAggregation>
+        ) => {
+            state.timeAggregation = action.payload;
         },
         updateWellSearchText: (state, action: PayloadAction<string>) => {
             state.wellSearchText = action.payload;

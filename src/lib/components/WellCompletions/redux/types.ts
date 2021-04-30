@@ -35,13 +35,13 @@ export interface Completions {
     khMax: number[];
 }
 
-export const RangeModes = {
-    Off: (arr: number[]): number => arr[arr.length - 1],
+export const TimeAggregations = {
+    None: (arr: number[]): number => arr[arr.length - 1],
     Max: (arr: number[]): number => Math.max(...arr),
     Average: (arr: number[]): number =>
         arr.reduce((a, b) => a + b) / arr.length,
 };
-export type RangeMode = keyof typeof RangeModes;
+export type TimeAggregation = keyof typeof TimeAggregations;
 
 export type SortDirection = "Ascending" | "Descending";
 export interface Attributes {
@@ -54,7 +54,7 @@ export interface UISettings {
     timeIndexRange: [number, number];
     wellsPerPage: number;
     currentPage: number;
-    rangeDisplayMode: RangeMode;
+    timeAggregation: TimeAggregation;
     sortBy: Record<string, SortDirection>;
     // Filter
     filteredZones: string[];

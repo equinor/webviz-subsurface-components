@@ -1,12 +1,12 @@
 import React from "react";
 import { withReduxDecorator } from "../../test/storybookReduxAddon";
-import RangeDisplayModeSelector from "./RangeDisplayModeSelector";
+import TimeAggregationSelector from "./TimeAggregationSelector";
 
 export default {
-    component: RangeDisplayModeSelector,
-    title: "WellCompletions/Components/Settings/Range Display Mode",
+    component: TimeAggregationSelector,
+    title: "WellCompletions/Components/Settings/Time Aggregation Selector",
 };
 
-const Template = () => <RangeDisplayModeSelector />;
+const Template = () => <TimeAggregationSelector />;
 export const Selector = Template.bind({});
 Selector.decorators = [withReduxDecorator];

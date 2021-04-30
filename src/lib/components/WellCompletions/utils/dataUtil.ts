@@ -1,8 +1,8 @@
 import {
     AttributeType,
     Data,
-    RangeMode,
-    RangeModes,
+    TimeAggregation,
+    TimeAggregations,
     Well,
     WellInfo,
     // eslint-disable-next-line prettier/prettier
@@ -101,7 +101,7 @@ export const createAttributePredicate = (
  * @param stratigraphy
  * @param wells
  * @param range
- * @param rangeDisplayMode
+ * @param timeAggregation
  * @param hideZeroCompletions
  * @param filterByAttributes
  * @returns
@@ -110,7 +110,7 @@ export const computeDataToPlot = (
     stratigraphy: Zone[],
     wells: Well[],
     range: [number, number],
-    rangeDisplayMode: RangeMode,
+    timeAggregation: TimeAggregation,
     hideZeroCompletions: boolean
 ): PlotData => {
     const wellPlotData: WellPlotData[] = [];
@@ -150,7 +150,7 @@ export const computeDataToPlot = (
                     khMaxValues[rangeI] = currentkhMaxValue;
                 }
             }
-            const dFunction = RangeModes[rangeDisplayMode];
+            const dFunction = TimeAggregations[timeAggregation];
             const newCompletion = {
                 zoneIndex,
                 open: dFunction(openValues),

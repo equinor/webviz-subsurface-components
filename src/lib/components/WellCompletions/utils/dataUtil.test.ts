@@ -184,7 +184,7 @@ describe("Data Util", () => {
     it("test computeDataToPlot", () => {
         //Display single time step
         expect(
-            computeDataToPlot(testStratigraphy, testWells, [0, 0], "Off", false)
+            computeDataToPlot(testStratigraphy, testWells, [0, 0], "None", false)
         ).toEqual({
             stratigraphy: testStratigraphy,
             wells: [
@@ -210,7 +210,7 @@ describe("Data Util", () => {
         });
         //Well with zero completions is filtered out
         expect(
-            computeDataToPlot(testStratigraphy, testWells, [0, 0], "Off", true)
+            computeDataToPlot(testStratigraphy, testWells, [0, 0], "None", true)
         ).toEqual({
             stratigraphy: testStratigraphy,
             wells: [],
