@@ -76,6 +76,11 @@ if __name__ == "__main__":
     map_data = array2d_to_png(map_data)
     COLORMAP = "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
 
+    WELLS = (
+        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src"
+        "/demo/example-data/volve_wells.json"
+    )
+
     bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
     width = bounds[2] - bounds[0]  # right - left
     height = bounds[3] - bounds[1]  # top - bottom
@@ -164,7 +169,7 @@ if __name__ == "__main__":
                 {
                     "@@type": "WellsLayer",
                     "id": "wells-layer",
-                    "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/volve_wells.json",
+                    "data": WELLS,
                     "opacity": 1.0,
                     "lineWidthScale": 5,
                     "pointRadiusScale": 8,
