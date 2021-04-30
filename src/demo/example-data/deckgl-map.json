@@ -86,6 +86,15 @@
           "image": "https://i.imgur.com/Dx8eseE.png"
         },
         {
+          "@@type": "WellsLayer",
+          "id": "wells-layer",
+          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/volve_wells.json",
+          "opacity": 1.0,
+          "lineWidthScale": 10,
+          "pointRadiusScale": 8,
+          "outline": true
+        },
+        {
           "@@type": "DrawingLayer",
           "id": "drawing-layer",
           "mode": "drawLineString",

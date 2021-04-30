@@ -158,6 +158,15 @@ if __name__ == "__main__":
                     "mode": "drawLineString",
                     "data": {"type": "FeatureCollection", "features": []},
                 },
+                {
+                    "@@type": "WellsLayer",
+                    "id": "wells-layer",
+                    "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/volve_wells.json",
+                    "opacity": 1.0,
+                    "lineWidthScale": 5,
+                    "pointRadiusScale": 8,
+                    "outline": True
+                }
             ],
             "views": [
                 {

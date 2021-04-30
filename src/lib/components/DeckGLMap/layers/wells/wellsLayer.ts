@@ -19,6 +19,16 @@ export interface WellDataType {
     };
 }
 
+function handleClick(event) {
+    this.setLayerProps("wells-layer", {selectedFeature: event.object});
+    return true;
+}
+
+const defaultProps = {
+    onClick: handleClick,
+    autoHighlight: true,
+};
+
 export default class WellsLayer extends CompositeLayer<
     WellDataType,
     WellsLayerProps<WellDataType>
@@ -49,9 +59,16 @@ export default class WellsLayer extends CompositeLayer<
             this.getSubLayerProps(properties)
         );
 
-        if (this.props.outline) return [outline, colors];
-        else return [colors];
+        // Highlight the selected well.
+        properties.data = this.props.selectedFeature;
+        properties.pointRadiusScale = properties.pointRadiusScale + 2;
+        properties.lineWidthScale = properties.lineWidthScale + 2;
+        const highlight = new GeoJsonLayer<WellDataType>(properties);
+
+        if (this.props.outline) return [outline, colors, highlight];
+        else return [colors, highlight];
     }
 }
 
 WellsLayer.layerName = "WellsLayer";
+WellsLayer.defaultProps = defaultProps;
