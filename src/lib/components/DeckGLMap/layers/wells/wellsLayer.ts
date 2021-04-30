@@ -20,7 +20,7 @@ export interface WellDataType {
 }
 
 function handleClick(event) {
-    this.setLayerProps("wells-layer", {selectedFeature: event.object});
+    this.setLayerProps("wells-layer", { selectedFeature: event.object });
     return true;
 }
 
