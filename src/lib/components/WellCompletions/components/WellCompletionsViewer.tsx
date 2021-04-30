@@ -3,7 +3,7 @@ import React, { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { usePlotData } from "../hooks/usePlotData";
 import { WellCompletionsState } from "../redux/store";
-import { DataContext } from "../WellCompletions";
+import { DataContext } from "./DataLoader";
 import WellCompletionsPlot from "./Plot/WellCompletionsPlot";
 import SettingsBar from "./Settings/SettingsBar";
 import WellPagination from "./Settings/WellPagination";

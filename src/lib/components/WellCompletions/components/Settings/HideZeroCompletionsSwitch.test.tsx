@@ -1,16 +1,15 @@
-import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react";
+import "jest-styled-components";
 import React from "react";
-import renderer from "react-test-renderer";
-import { testStore, Wrapper } from "../../test/testReduxWrapper";
+import { testStore, Wrapper } from "../../test/TestWrapper";
 import HideZeroCompletionsSwitch from "./HideZeroCompletionsSwitch";
 
 describe("test hide zero completions switch", () => {
     it("snapshot test", () => {
-        const tree = renderer
-            .create(Wrapper({ children: <HideZeroCompletionsSwitch /> }))
-            .toJSON();
-        expect(tree).toMatchSnapshot();
+        const { container } = render(
+            Wrapper({ children: <HideZeroCompletionsSwitch /> })
+        );
+        expect(container.firstChild).toMatchSnapshot();
     });
     it("click to dispatch redux action", async () => {
         render(<HideZeroCompletionsSwitch />, {

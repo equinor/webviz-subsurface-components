@@ -22,9 +22,21 @@ DeckGLMap.propTypes = {
     deckglSpec: PropTypes.object,
 
     /**
-     * Show or hide the coordinates component. True by default.
+     * Resource dictionary made available in the DeckGL specification as an enum.
+     * The values can be accessed like this: `"@@#resources.resourceId"`, where
+     * `resourceId` is the key in the `resources` dict. For more information,
+     * see the DeckGL documentation on enums in the json spec: https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
      */
-    showCoords: PropTypes.bool,
+    resources: PropTypes.object,
+
+    /**
+     * Parameters for the coordinates component
+     */
+    coords: PropTypes.shape({
+        visible: PropTypes.bool,
+        multiPicking: PropTypes.bool,
+        pickDepth: PropTypes.number,
+    }),
 
     /**
      * For reacting to prop changes
@@ -33,7 +45,11 @@ DeckGLMap.propTypes = {
 };
 
 DeckGLMap.defaultProps = {
-    showCoords: true,
+    coords: {
+        visible: true,
+        multiPicking: true,
+        pickDepth: 10,
+    },
 };
 
 export default DeckGLMap;
