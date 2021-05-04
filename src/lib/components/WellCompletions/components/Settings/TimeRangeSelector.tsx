@@ -6,7 +6,7 @@ import {
     // eslint-disable-next-line prettier/prettier
     withStyles
 } from "@material-ui/core";
-import { debounce, isEqual } from "lodash";
+import { isEqual } from "lodash";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimeIndexRange } from "../../redux/actions";
@@ -48,20 +48,14 @@ const TimeRangeSelector: React.FC = React.memo(() => {
     // handlers
     const outputFunction = useCallback((step: number) => times[step], [times]);
     const onChange = useCallback(
-        debounce(
-            (_, value) =>
-                dispatch(
-                    updateTimeIndexRange(
-                        timeAggregation === "None"
-                            ? [0, value]
-                            : [Math.min(...value), Math.max(...value)]
-                    )
-                ),
-            20,
-            {
-                trailing: true,
-            }
-        ),
+        (_, value) =>
+            dispatch(
+                updateTimeIndexRange(
+                    timeAggregation === "None"
+                        ? [0, value]
+                        : [Math.min(...value), Math.max(...value)]
+                )
+            ),
         [dispatch, timeAggregation]
     );
     return (
