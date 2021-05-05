@@ -9,8 +9,8 @@ import {
     Theme
 } from "@material-ui/core";
 import React from "react";
-import RangeDisplayModeSelector from "./RangeDisplayModeSelector";
 import SortButton from "./SortButton";
+import TimeAggregationSelector from "./TimeAggregationSelector";
 import WellsPerPageSelector from "./WellsPerPageSelector";
 
 Icon.add({ view_column }); // (this needs only be done once)
@@ -54,7 +54,7 @@ const ViewMenu: React.FC = React.memo(() => {
             >
                 <Box marginY={1}>
                     <SortButton />
-                    <RangeDisplayModeSelector />
+                    <TimeAggregationSelector />
                     <WellsPerPageSelector />
                 </Box>
             </Menu>

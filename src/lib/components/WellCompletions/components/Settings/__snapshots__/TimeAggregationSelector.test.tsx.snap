@@ -92,23 +92,20 @@ exports[`test range display mode selector snapshot test 1`] = `
 >
   <label
     class="c1"
-    for="range-display-mode-selector"
+    for="time-aggregation-selector"
   >
     <span
       class="c2"
     >
-      Range Display Mode
+      Time Aggregation
     </span>
   </label>
   <select
     class="c3"
-    id="range-display-mode-selector"
+    id="time-aggregation-selector"
   >
     <option>
-      First Step
-    </option>
-    <option>
-      Last Step
+      None
     </option>
     <option>
       Max

@@ -35,15 +35,15 @@ describe("test actions", () => {
             ui: { ...testState.ui, timeIndexRange: [1, 3] },
         });
     });
-    it("test updateRangeDisplayMode", () => {
+    it("test updateTimeAggregation", () => {
         expect(
             rootReducer(testState, {
                 payload: "Average",
-                type: "ui/updateRangeDisplayMode",
+                type: "ui/updateTimeAggregation",
             })
         ).toEqual({
             ...testState,
-            ui: { ...testState.ui, rangeDisplayMode: "Average" },
+            ui: { ...testState.ui, timeAggregation: "Average" },
         });
     });
 
