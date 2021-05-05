@@ -20,8 +20,8 @@ export const usePlotData = (): PlotData => {
         (state: WellCompletionsState) => state.ui.timeIndexRange,
         isEqual
     ) as [number, number];
-    const rangeDisplayMode = useSelector(
-        (state: WellCompletionsState) => state.ui.rangeDisplayMode
+    const timeAggregation = useSelector(
+        (state: WellCompletionsState) => state.ui.timeAggregation
     );
     const hideZeroCompletions = useSelector(
         (state: WellCompletionsState) => state.ui.hideZeroCompletions
@@ -75,14 +75,14 @@ export const usePlotData = (): PlotData => {
                 filteredStratigraphy,
                 filteredWells,
                 timeIndexRange,
-                rangeDisplayMode,
+                timeAggregation,
                 hideZeroCompletions
             ),
         [
             filteredStratigraphy,
             filteredWells,
             timeIndexRange,
-            rangeDisplayMode,
+            timeAggregation,
             hideZeroCompletions,
         ]
     );

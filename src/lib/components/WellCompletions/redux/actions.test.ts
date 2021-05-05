@@ -8,8 +8,8 @@ import {
     updateFilteredZones,
     updateHideZeroCompletions,
     updateId,
-    updateRangeDisplayMode,
     updateSortKey,
+    updateTimeAggregation,
     updateTimeIndexRange,
     updateWellSearchText,
     // eslint-disable-next-line prettier/prettier
@@ -47,13 +47,13 @@ describe("test actions", () => {
             { payload: [1, 3], type: "ui/updateTimeIndexRange" },
         ]);
     });
-    it("test updateRangeDisplayMode", () => {
+    it("test updateTimeAggregation", () => {
         const store = mockStore(testState);
-        store.dispatch(updateRangeDisplayMode("Average"));
+        store.dispatch(updateTimeAggregation("Average"));
 
         const actions = store.getActions();
         expect(actions).toEqual([
-            { payload: "Average", type: "ui/updateRangeDisplayMode" },
+            { payload: "Average", type: "ui/updateTimeAggregation" },
         ]);
     });
 
