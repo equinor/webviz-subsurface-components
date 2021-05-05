@@ -33,7 +33,7 @@ const WellAttributesSelector: React.FC = React.memo(() => {
             key="attributes-selector"
             numMetaNodes={0}
             delimiter=":"
-            selectedNodes={filterByAttributes}
+            selectedTags={filterByAttributes}
             setProps={handleSelectionChange}
             label="Filter by Attributes"
             data={attributesTree}
