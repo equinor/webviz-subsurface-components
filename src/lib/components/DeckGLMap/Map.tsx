@@ -7,7 +7,7 @@ import Coords from "./components/Coords";
 import JSON_CONVERTER_CONFIG from "./configuration";
 import { PickInfo } from "deck.gl";
 
-import { WellDataType } from "./layers/wells/wellsLayer";
+import { Feature } from "geojson";
 
 export interface MapProps {
     id: string;
@@ -100,7 +100,7 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                         isDragging ? "grabbing" : "default"
                     }
                     getTooltip={(info: PickInfo<unknown>): string | null => {
-                        return (info.object as WellDataType)?.properties.name;
+                        return (info.object as Feature)?.properties?.name;
                     }}
                     ref={deckRef}
                     onHover={onHover}
