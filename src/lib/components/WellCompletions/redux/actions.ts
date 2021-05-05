@@ -4,7 +4,7 @@ export const { updateId } = idSlice.actions;
 export const { updateAttributeKeys } = attributeSlice.actions;
 export const {
     updateTimeIndexRange,
-    updateRangeDisplayMode,
+    updateTimeAggregation,
     updateWellsPerPage,
     updateCurrentPage,
     updateWellSearchText,
