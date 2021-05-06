@@ -1,5 +1,5 @@
 import { CompositeLayer } from "@deck.gl/core";
-import { GeoJsonLayer, GeoJsonLayerProps } from "@deck.gl/layers";
+import { GeoJsonLayer } from "@deck.gl/layers";
 
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { RGBAColor } from "@deck.gl/core/utils/color";
@@ -28,37 +28,49 @@ export default class WellsLayer extends CompositeLayer<
     WellsLayerProps<Feature>
 > {
     renderLayers(): GeoJsonLayer<Feature>[] {
-        const properties: GeoJsonLayerProps<Feature> = {
-            id: "outline",
-            data: this.props.data,
-            pickable: true,
-            pointRadiusUnits: "pixels",
-            lineWidthUnits: "pixels",
-            pointRadiusScale: this.props.pointRadiusScale,
-            lineWidthScale: this.props.lineWidthScale,
-        };
-
         const outline = new GeoJsonLayer<Feature>(
-            this.getSubLayerProps(properties)
+            this.getSubLayerProps({
+                id: "outline",
+                data: this.props.data,
+                pickable: false,
+                stroked: false,
+                pointRadiusUnits: "pixels",
+                lineWidthUnits: "pixels",
+                pointRadiusScale: this.props.pointRadiusScale,
+                lineWidthScale: this.props.lineWidthScale,
+            })
         );
 
-        properties.id = "colors";
-        properties.getFillColor = (d: Feature): RGBAColor =>
-            d?.properties?.color;
-        properties.getLineColor = properties.getFillColor;
-        properties.pointRadiusScale = (properties.pointRadiusScale || 8) - 1;
-        properties.lineWidthScale = (properties.lineWidthScale || 5) - 1;
-
+        const getColor = (d: Feature): RGBAColor => d?.properties?.color;
         const colors = new GeoJsonLayer<Feature>(
-            this.getSubLayerProps(properties)
+            this.getSubLayerProps({
+                id: "colors",
+                data: this.props.data,
+                pickable: true,
+                stroked: false,
+                pointRadiusUnits: "pixels",
+                lineWidthUnits: "pixels",
+                pointRadiusScale: this.props.pointRadiusScale - 1,
+                lineWidthScale: this.props.lineWidthScale - 1,
+                getFillColor: getColor,
+                getLineColor: getColor,
+            })
         );
 
         // Highlight the selected well.
-        properties.data = this.props.selectedFeature;
-        properties.pointRadiusScale = properties.pointRadiusScale + 2;
-        properties.lineWidthScale = properties.lineWidthScale + 2;
         const highlight = new GeoJsonLayer<Feature>(
-            this.getSubLayerProps(properties)
+            this.getSubLayerProps({
+                id: "highlight",
+                data: this.props.selectedFeature,
+                pickable: false,
+                stroked: false,
+                pointRadiusUnits: "pixels",
+                lineWidthUnits: "pixels",
+                pointRadiusScale: this.props.pointRadiusScale + 2,
+                lineWidthScale: this.props.lineWidthScale + 2,
+                getFillColor: getColor,
+                getLineColor: getColor,
+            })
         );
 
         if (this.props.outline) return [outline, colors, highlight];
