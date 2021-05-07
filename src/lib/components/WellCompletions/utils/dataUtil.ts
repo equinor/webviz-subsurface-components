@@ -59,7 +59,11 @@ export const extractAttributesTree = (
     );
 
     wells.forEach((well) =>
-        attributes.forEach((values, key) => values.add(well.attributes[key]))
+        attributes.forEach((values, key) =>
+            values.add(
+                key in well.attributes ? well.attributes[key] : "undefined"
+            )
+        )
     );
 
     return Array.from(attributes.entries()).map(([key, values]) => ({
