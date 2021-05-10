@@ -1,5 +1,6 @@
 [
   {
+    "id": "DeckGL-Map",
     "coords": {
       "visible": true,
       "multiPicking": true,

@@ -26,10 +26,14 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
 
     const [deckglSpec, setDeckglSpec] = React.useState(null);
     React.useEffect(() => {
-        if (props.resources) {
-            JSON_CONVERTER_CONFIG.enumerations["resources"] = props.resources;
-        }
         const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
+        if (props.resources) {
+            configuration.merge({
+                enumerations: {
+                    resources: props.resources,
+                },
+            });
+        }
         const jsonConverter = new JSONConverter({ configuration });
 
         const setLayerProps = (layerId, newLayerProps) => {
@@ -53,7 +57,7 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                 ...layerProps,
                 ...newLayerProps,
             };
-            props.setProps({ deckglSpec: currSpec });
+            props.setProps({ ...props, deckglSpec: currSpec });
         };
 
         // Inject `setLayerProps` in all the layers
