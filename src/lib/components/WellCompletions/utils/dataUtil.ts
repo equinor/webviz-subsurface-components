@@ -78,22 +78,29 @@ export const extractAttributesTree = (
 export const createAttributePredicate = (
     filterByAttributes: string[]
 ): ((well: Well) => boolean) => {
-    if (filterByAttributes.length === 0) return () => true;
-    const filters = filterByAttributes.map((attributeNode) => {
+    // Use an OR logic for the attribute values under a given attribute key
+    const allowValues = new Map<string, Set<string>>();
+    filterByAttributes.forEach((attributeNode) => {
         const [key, value] = attributeNode.split(":");
-        return (well: Well) => {
-            if (well.attributes[key] === undefined)
-                return value === "undefined";
-            const attributeType = typeof well.attributes[key];
-            switch (attributeType) {
-                case "string":
-                    return well.attributes[key] === value;
-                case "number":
-                    return well.attributes[key] === +value;
-                case "boolean":
-                    return well.attributes[key] === (value == "true");
-            }
-        };
+        if (!allowValues.has(key)) allowValues.set(key, new Set());
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        allowValues.get(key)!.add(value);
+    });
+    const filters = Array.from(allowValues.entries()).map(([key, values]) => {
+        return (well: Well) =>
+            Array.from(values).some((value) => {
+                const attributeType = typeof well.attributes[key];
+                switch (attributeType) {
+                    case "undefined":
+                        return value === "undefined";
+                    case "string":
+                        return well.attributes[key] === value;
+                    case "number":
+                        return well.attributes[key] === +value;
+                    case "boolean":
+                        return well.attributes[key] === (value == "true");
+                }
+            });
     });
     return (well: Well) => {
         return filters.every((filter) => filter(well));
