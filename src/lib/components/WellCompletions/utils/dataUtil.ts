@@ -68,17 +68,18 @@ export const extractAttributesTree = (
 
     return Array.from(attributes.entries()).map(([key, values]) => ({
         name: key,
-        children: Array.from(values).map((value) => ({
-            name: value,
-            key: `${key}-${value}`,
-        })),
+        children: Array.from(values)
+            .sort()
+            .map((value) => ({
+                name: value,
+                key: `${key}-${value}`,
+            })),
     }));
 };
 
-export const createAttributePredicate = (
+export const computeAllowedAttributeValues = (
     filterByAttributes: string[]
-): ((well: Well) => boolean) => {
-    // Use an OR logic for the attribute values under a given attribute key
+): Map<string, Set<string>> => {
     const allowValues = new Map<string, Set<string>>();
     filterByAttributes.forEach((attributeNode) => {
         const [key, value] = attributeNode.split(":");
@@ -86,7 +87,15 @@ export const createAttributePredicate = (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         allowValues.get(key)!.add(value);
     });
-    const filters = Array.from(allowValues.entries()).map(([key, values]) => {
+    return allowValues;
+};
+
+export const createAttributePredicate = (
+    filterByAttributes: string[]
+): ((well: Well) => boolean) => {
+    const allowedValues = computeAllowedAttributeValues(filterByAttributes);
+    // Use an OR logic for the attribute values under a given attribute key
+    const filters = Array.from(allowedValues.entries()).map(([key, values]) => {
         return (well: Well) =>
             Array.from(values).some((value) => {
                 const attributeType = typeof well.attributes[key];
