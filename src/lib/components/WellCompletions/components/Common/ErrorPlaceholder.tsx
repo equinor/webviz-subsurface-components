@@ -1,4 +1,5 @@
-import { createStyles, makeStyles, Typography } from "@material-ui/core";
+import { Typography } from "@equinor/eds-core-react";
+import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
 
 const useStyles = makeStyles(() =>
