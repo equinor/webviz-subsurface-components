@@ -1,12 +1,29 @@
+import { Typography } from "@equinor/eds-core-react";
+import { createStyles, makeStyles } from "@material-ui/core";
 import { SmartNodeSelector } from "@webviz/core-components";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateFilterByAttributes } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
-import { extractAttributesTree } from "../../utils/dataUtil";
+import {
+    computeAllowedAttributeValues,
+    // eslint-disable-next-line prettier/prettier
+    extractAttributesTree
+} from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
 
+const useStyles = makeStyles(() =>
+    createStyles({
+        root: {
+            display: "flex",
+            flex: 1,
+            flexDirection: "column",
+        },
+    })
+);
 const WellAttributesSelector: React.FC = React.memo(() => {
+    // Style
+    const classes = useStyles();
     const data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
@@ -21,6 +38,22 @@ const WellAttributesSelector: React.FC = React.memo(() => {
         () => extractAttributesTree(wells, attributeKeys),
         [wells]
     );
+    const hintText = useMemo(() => {
+        const allowedValues = computeAllowedAttributeValues(filterByAttributes);
+        return (
+            "Well selection criteria: " +
+            Array.from(allowedValues.entries())
+                .map(
+                    ([key, values]) =>
+                        `"${key}" ${
+                            values.size === 1
+                                ? ` is "${Array.from(values)[0]}"`
+                                : ` is in [${Array.from(values)}]`
+                        }`
+                )
+                .join(" and ")
+        );
+    }, [filterByAttributes]);
     // handlers
     const handleSelectionChange = useCallback(
         (selection) =>
@@ -28,16 +61,19 @@ const WellAttributesSelector: React.FC = React.memo(() => {
         [dispatch]
     );
     return (
-        <SmartNodeSelector
-            id="AttributesSelector"
-            key="attributes-selector"
-            numMetaNodes={0}
-            delimiter=":"
-            selectedTags={filterByAttributes}
-            setProps={handleSelectionChange}
-            label="Filter by Attributes"
-            data={attributesTree}
-        />
+        <div className={classes.root}>
+            <SmartNodeSelector
+                id="AttributesSelector"
+                key="attributes-selector"
+                numMetaNodes={0}
+                delimiter=":"
+                selectedTags={filterByAttributes}
+                setProps={handleSelectionChange}
+                label="Filter by Attributes"
+                data={attributesTree}
+            />
+            <Typography>{hintText}</Typography>
+        </div>
     );
 });
 
