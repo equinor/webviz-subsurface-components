@@ -43,7 +43,7 @@ const WellCompletionsViewer: React.FC = () => {
     const [minWidth, minHeight] = useMemo(
         () => [
             dataInCurrentPage.wells.length * 20,
-            dataInCurrentPage.stratigraphy.length * 20,
+            dataInCurrentPage.subzones.length * 20,
         ],
         [dataInCurrentPage]
     );

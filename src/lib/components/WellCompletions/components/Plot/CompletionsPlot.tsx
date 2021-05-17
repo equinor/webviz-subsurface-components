@@ -28,14 +28,14 @@ const CompletionsPlot: React.FC<Props> = React.memo(
             [layout.xExtent, plotData.wells.length]
         );
         const barHeight = useMemo(
-            () => layout.yExtent / Math.max(plotData.stratigraphy.length, 1),
-            [layout.yExtent, plotData.stratigraphy.length]
+            () => layout.yExtent / Math.max(plotData.subzones.length, 1),
+            [layout.yExtent, plotData.subzones.length]
         );
 
         const onMouseMove = useCallback(
             (e, well, completion: CompletionPlotData) => {
                 const zoneName =
-                    plotData.stratigraphy[
+                    plotData.subzones[
                         Math.floor(
                             (e.nativeEvent.offsetY - padding.top) / barHeight
                         )
@@ -78,7 +78,7 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                     </table>
                 ));
             },
-            [setContent, plotData.stratigraphy, barHeight]
+            [setContent, plotData.subzones, barHeight]
         );
 
         const onMouseOut = useCallback(() => setContent(() => null), [
@@ -98,7 +98,7 @@ const CompletionsPlot: React.FC<Props> = React.memo(
                                 const start = completion.zoneIndex;
                                 const end =
                                     j === well.completions.length - 1
-                                        ? plotData.stratigraphy.length
+                                        ? plotData.subzones.length
                                         : well.completions[j + 1].zoneIndex;
                                 const totalWidth =
                                     completion.open + completion.shut;

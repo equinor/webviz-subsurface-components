@@ -1,8 +1,8 @@
 import React, { PropsWithChildren, useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
-import { Data, UISettings } from "../redux/types";
-import { preprocessData } from "../utils/dataUtil";
+import { Data, UISettings, Zone } from "../redux/types";
+import { findSubzones, preprocessData } from "../utils/dataUtil";
 
 interface Props {
     id: string;
@@ -27,6 +27,11 @@ const DataProvider: React.FC<Props> = ({
     id,
     data,
 }: PropsWithChildren<Props>) => {
+    const allSubzones = useMemo(() => {
+        const subzones: Zone[] = [];
+        data.stratigraphy.forEach((zone) => findSubzones(zone, subzones));
+        return subzones.map((zone) => zone.name);
+    }, [data.stratigraphy]);
     const preloadedState = useMemo(() => {
         //Setup attributes
         const attributeKeys = new Set<string>();
@@ -43,20 +48,23 @@ const DataProvider: React.FC<Props> = ({
                 currentPage: 1,
                 timeAggregation: "None",
                 wellSearchText: "",
-                filteredZones: data.stratigraphy.map((zone) => zone.name),
+                filteredZones: allSubzones,
                 hideZeroCompletions: false,
                 sortBy: {},
                 filterByAttributes: [],
             } as UISettings,
             attributes: { attributeKeys: Array.from(attributeKeys) },
         };
-    }, [id, data]);
+    }, [id, data.wells, allSubzones]);
 
     const store = useMemo(() => createReduxStore(preloadedState), [
         preloadedState,
     ]);
 
-    const preprocessedData = useMemo(() => preprocessData(data), [data]);
+    const preprocessedData = useMemo(() => preprocessData(allSubzones, data), [
+        allSubzones,
+        data,
+    ]);
 
     return (
         <DataContext.Provider value={preprocessedData}>
