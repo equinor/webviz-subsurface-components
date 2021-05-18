@@ -47,6 +47,7 @@ const DataProvider: React.FC<Props> = ({
                 wellsPerPage: 25,
                 currentPage: 1,
                 timeAggregation: "None",
+                isDrawerOpen: false,
                 wellSearchText: "",
                 filteredZones: allSubzones,
                 hideZeroCompletions: false,

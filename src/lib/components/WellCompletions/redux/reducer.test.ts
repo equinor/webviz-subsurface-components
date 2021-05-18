@@ -112,6 +112,17 @@ describe("test actions", () => {
             ui: { ...testState.ui, filterByAttributes: [] },
         });
     });
+    it("test updateIsDrawerOpen", () => {
+        expect(
+            rootReducer(testState, {
+                payload: true,
+                type: "ui/updateIsDrawerOpen",
+            })
+        ).toEqual({
+            ...testState,
+            ui: { ...testState.ui, updateIsDrawerOpen: true },
+        });
+    });
 
     it("test updateSortKey", () => {
         const newSort = {

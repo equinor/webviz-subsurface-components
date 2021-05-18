@@ -57,6 +57,7 @@ export interface UISettings {
     currentPage: number;
     timeAggregation: TimeAggregation;
     sortBy: Record<string, SortDirection>;
+    isDrawerOpen: boolean;
     // Filter
     filteredZones: string[];
     wellSearchText: string;
