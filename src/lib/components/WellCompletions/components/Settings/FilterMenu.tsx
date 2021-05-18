@@ -1,8 +1,9 @@
 import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
 import { filter_alt } from "@equinor/eds-icons";
 import React, { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateIsDrawerOpen } from "../../redux/actions";
+import { WellCompletionsState } from "../../redux/store";
 
 // Use library approach
 Icon.add({ filter_alt }); // (this needs only be done once)
@@ -10,9 +11,13 @@ Icon.add({ filter_alt }); // (this needs only be done once)
 const FilterMenu: React.FC = React.memo(() => {
     const dispatch = useDispatch();
 
-    const openDrawer = useCallback(() => dispatch(updateIsDrawerOpen(true)), [
-        dispatch,
-    ]);
+    const isDrawerOpen = useSelector(
+        (state: WellCompletionsState) => state.ui.isDrawerOpen
+    );
+    const openDrawer = useCallback(
+        () => dispatch(updateIsDrawerOpen(!isDrawerOpen)),
+        [dispatch, isDrawerOpen]
+    );
     return (
         <div>
             <Tooltip title="Filter">

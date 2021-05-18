@@ -2,18 +2,13 @@ import {
     createStyles,
     Divider,
     Drawer,
-    IconButton,
     makeStyles,
-    Theme,
-    // eslint-disable-next-line prettier/prettier
-    useTheme
+    Theme
 } from "@material-ui/core";
-import { ChevronLeft, ChevronRight } from "@material-ui/icons";
 import clsx from "clsx";
-import React, { useCallback, useContext, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useContext, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { usePlotData } from "../hooks/usePlotData";
-import { updateIsDrawerOpen } from "../redux/actions";
 import { WellCompletionsState } from "../redux/store";
 import { DataContext } from "./DataLoader";
 import WellCompletionsPlot from "./Plot/WellCompletionsPlot";
@@ -41,6 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
             flexDirection: "row",
         },
         drawer: {
+            zIndex: 0,
             width: drawerWidth,
             flexShrink: 0,
         },
@@ -79,8 +75,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const WellCompletionsViewer: React.FC = () => {
     const classes = useStyles();
-    const theme = useTheme();
-    const dispatch = useDispatch();
 
     const data = useContext(DataContext);
     const plotData = usePlotData();
@@ -111,9 +105,6 @@ const WellCompletionsViewer: React.FC = () => {
         [dataInCurrentPage]
     );
 
-    const closeDrawer = useCallback(() => dispatch(updateIsDrawerOpen(false)), [
-        dispatch,
-    ]);
     //If no data is available
     if (!data) return <div />;
     return (
@@ -149,15 +140,6 @@ const WellCompletionsViewer: React.FC = () => {
                     anchor="right"
                     open={isDrawerOpen}
                 >
-                    <div className={classes.drawerHeader}>
-                        <IconButton onClick={closeDrawer}>
-                            {theme.direction === "rtl" ? (
-                                <ChevronLeft />
-                            ) : (
-                                <ChevronRight />
-                            )}
-                        </IconButton>
-                    </div>
                     <Divider />
                     <ZoneSelector />
                     <WellFilter />
