@@ -205,7 +205,7 @@ export const computeDataToPlot = (
             });
     });
     return {
-        subzones,
+        stratigraphy: subzones,
         wells: wellPlotData,
     };
 };
@@ -221,7 +221,7 @@ const isCompletionValuesEqual = (
     completion1.khMax === completion2.khMax;
 
 export interface PlotData {
-    subzones: Zone[];
+    stratigraphy: Zone[];
     wells: WellPlotData[];
 }
 export interface WellPlotData extends WellInfo {

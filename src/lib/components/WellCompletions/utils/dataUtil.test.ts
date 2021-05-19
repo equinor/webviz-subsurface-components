@@ -1,8 +1,8 @@
-import { Well } from "../redux/types";
+import { Well, Zone } from "../redux/types";
 import { computeDataToPlot } from "./dataUtil";
 
 describe("Data Util", () => {
-    const testStratigraphy = [
+    const testStratigraphy: Zone[] = [
         {
             name: "zone1",
             color: "#c9f",

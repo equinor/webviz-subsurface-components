@@ -15,7 +15,7 @@ export interface Units {
 export interface Zone {
     name: string;
     color: string;
-    subzones: Zone[];
+    subzones?: Zone[];
 }
 
 export interface WellInfo {

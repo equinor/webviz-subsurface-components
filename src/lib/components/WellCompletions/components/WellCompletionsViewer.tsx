@@ -3,6 +3,7 @@ import {
     Divider,
     Drawer,
     makeStyles,
+    // eslint-disable-next-line prettier/prettier
     Theme
 } from "@material-ui/core";
 import clsx from "clsx";
@@ -100,7 +101,7 @@ const WellCompletionsViewer: React.FC = () => {
     const [minWidth, minHeight] = useMemo(
         () => [
             dataInCurrentPage.wells.length * 20,
-            dataInCurrentPage.subzones.length * 20,
+            dataInCurrentPage.stratigraphy.length * 20,
         ],
         [dataInCurrentPage]
     );

@@ -87,7 +87,7 @@ export const usePlotData = (): PlotData => {
     const sortFunction = useMemo(() => createSortFunction(sortBy), [sortBy]);
     return useMemo(() => {
         return {
-            subzones: dataToPlot.subzones,
+            stratigraphy: dataToPlot.stratigraphy,
             wells: Array.from(dataToPlot.wells).sort(sortFunction),
         } as PlotData;
     }, [dataToPlot, sortFunction]);

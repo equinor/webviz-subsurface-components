@@ -120,7 +120,7 @@ describe("test actions", () => {
             })
         ).toEqual({
             ...testState,
-            ui: { ...testState.ui, updateIsDrawerOpen: true },
+            ui: { ...testState.ui, isDrawerOpen: true },
         });
     });
 

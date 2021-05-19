@@ -57,7 +57,7 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
                             style={{ position: "relative" }}
                         >
                             <StratigraphyPlot
-                                data={plotData.subzones}
+                                data={plotData.stratigraphy}
                                 layout={layout}
                                 padding={padding}
                             />

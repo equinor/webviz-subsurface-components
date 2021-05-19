@@ -2,44 +2,32 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import React, { useCallback, useContext, useMemo } from "react";
 import DropdownTreeSelect, { TreeNodeProps } from "react-dropdown-tree-select";
 import "react-dropdown-tree-select/dist/styles.css";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateFilteredZones } from "../../redux/actions";
-import { WellCompletionsState } from "../../redux/store";
 import { Zone } from "../../redux/types";
 import { findSubzones } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
 
-const extractStratigraphyTree = (
-    stratigraphy: Zone[],
-    filteredZones: string[]
-): TreeNodeProps => {
-    const filteredZonesSet = new Set(filteredZones);
+const extractStratigraphyTree = (stratigraphy: Zone[]): TreeNodeProps => {
     const root: TreeNodeProps = {
         label: "All",
         value: "All",
-        expanded: true,
-        isDefaultValue: false,
         children: [],
+        isDefaultValue: true,
     };
-    const constructTree = (
-        zone: Zone,
-        parentNode: TreeNodeProps,
-        filteredZones
-    ) => {
+    const constructTree = (zone: Zone, parentNode: TreeNodeProps) => {
         const newChild: TreeNodeProps = {
             label: zone.name,
             value: zone.name,
             children: [],
-            expanded: true,
-            isDefaultValue: filteredZonesSet.has(zone.name),
         };
         parentNode.children?.push(newChild);
         if (zone.subzones !== undefined)
             zone.subzones.forEach((subzone) =>
-                constructTree(subzone, newChild, filteredZones)
+                constructTree(subzone, newChild)
             );
     };
-    stratigraphy.forEach((zone) => constructTree(zone, root, filteredZones));
+    stratigraphy.forEach((zone) => constructTree(zone, root));
     return root;
 };
 
@@ -78,37 +66,20 @@ const ZoneSelector: React.FC = React.memo(() => {
     const data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
-    const filteredZones = useSelector(
-        (st: WellCompletionsState) => st.ui.filteredZones
-    );
-    const allSubzoneCount = useMemo(() => {
-        const result: Zone[] = [];
-        data.stratigraphy.forEach((zone) => findSubzones(zone, result));
-        return result.length;
-    }, [data.stratigraphy]);
 
     const stratigraphyTree = useMemo(
-        () => extractStratigraphyTree(data.stratigraphy, filteredZones),
-        [data.stratigraphy, filteredZones]
+        () => extractStratigraphyTree(data.stratigraphy),
+        [data.stratigraphy]
     );
     // handlers
     const handleSelectionChange = useCallback(
-        (_, selectedNodes) => {
-            //Deselect all
-            if (
-                selectedNodes.length === 1 &&
-                selectedNodes[0].label === "All" &&
-                filteredZones.length === allSubzoneCount
-            )
-                dispatch(updateFilteredZones([]));
-            else
-                dispatch(
-                    updateFilteredZones(
-                        findSelectedZones(data.stratigraphy, selectedNodes)
-                    )
-                );
-        },
-        [dispatch, data.stratigraphy, filteredZones]
+        (_, selectedNodes) =>
+            dispatch(
+                updateFilteredZones(
+                    findSelectedZones(data.stratigraphy, selectedNodes)
+                )
+            ),
+        [dispatch, data.stratigraphy]
     );
     return (
         <DropdownTreeSelect
