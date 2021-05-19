@@ -13,7 +13,7 @@ const extractStratigraphyTree = (stratigraphy: Zone[]): TreeNodeProps => {
         label: "All",
         value: "All",
         children: [],
-        isDefaultValue: true,
+        checked: true,
     };
     const constructTree = (zone: Zone, parentNode: TreeNodeProps) => {
         const newChild: TreeNodeProps = {
