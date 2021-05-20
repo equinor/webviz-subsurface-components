@@ -48,6 +48,7 @@
         "d3": "^5.11.0",
         "deck.gl": "^8.4.13",
         "deep-equal": "^2.0.5",
+        "fast-json-patch": "^3.0.0-1",
         "jsonschema": "^1.4.0",
         "leaflet": "^1.6.0",
         "leaflet-draw": "^1.0.4",

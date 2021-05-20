@@ -13,6 +13,8 @@ import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 
+import { patchLayerProps } from "../utils/layerTools";
+
 // Mapping of mode name to mode class
 const MODE_MAP = {
     view: ViewMode,
@@ -34,7 +36,6 @@ const defaultProps = {
 
 export interface DrawingLayerProps<D> extends CompositeLayerProps<D> {
     mode?: string;
-    setLayerProps: (layerId: string, props: Record<string, unknown>) => void;
 }
 
 export default class DrawingLayer extends CompositeLayer<
@@ -65,7 +66,8 @@ export default class DrawingLayer extends CompositeLayer<
                     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
                     onEdit: ({ updatedData, editType }) => {
                         if (editType === "addFeature" && this.props.id) {
-                            this.props.setLayerProps(this.props.id, {
+                            patchLayerProps(this, {
+                                ...this.props,
                                 data: updatedData,
                             });
                         }

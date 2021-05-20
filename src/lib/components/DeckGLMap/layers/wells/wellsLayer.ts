@@ -6,6 +6,9 @@ import { RGBAColor } from "@deck.gl/core/utils/color";
 
 import { Feature } from "geojson";
 
+// TODO : organize imports (see all files)
+import { patchLayerProps } from "../utils/layerTools";
+
 export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
@@ -13,13 +16,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     selectedFeature: Feature;
 }
 
-function handleClick(event) {
-    this.setLayerProps("wells-layer", { selectedFeature: event.object });
-    return true;
-}
-
 const defaultProps = {
-    onClick: handleClick,
     autoHighlight: true,
 };
 
@@ -27,6 +24,15 @@ export default class WellsLayer extends CompositeLayer<
     Feature,
     WellsLayerProps<Feature>
 > {
+    // TODO: types EVERYWHERE!
+    onClick(info: any): any {
+        patchLayerProps(this, {
+            ...this.props,
+            selectedFeature: info.object,
+        });
+        return true;
+    }
+
     renderLayers(): GeoJsonLayer<Feature>[] {
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps({

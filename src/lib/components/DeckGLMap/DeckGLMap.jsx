@@ -3,8 +3,46 @@ import PropTypes from "prop-types";
 
 import Map from "./Map";
 
-function DeckGLMap(props) {
-    return <Map {...props} />;
+import { applyPatch } from "fast-json-patch";
+
+function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
+    const [deckglSpec, setDeckglSpec] = React.useState({});
+
+    React.useEffect(() => {
+        if (!deckglSpecPatch) {
+            return;
+        }
+
+        // TODO: clean this crap
+        const patch = deckglSpecPatch.map((patch) => {
+            patch.path = patch.path.replaceAll(/\[([\w-]+)\]/g, (_, p1) => {
+                return deckglSpec.layers.findIndex(({ id }) => {
+                    return id == p1;
+                });
+            });
+            return patch;
+        });
+
+        const newSpec = applyPatch(deckglSpec, patch, true, false).newDocument;
+
+        // TODO error check
+
+        setDeckglSpec(newSpec);
+    }, [deckglSpecPatch]);
+
+    return (
+        <Map
+            id={id}
+            resources={resources}
+            deckglSpec={deckglSpec}
+            patchSpec={(patch) => {
+                setProps({
+                    deckglSpecPatch: patch,
+                });
+            }}
+            coords={coords}
+        />
+    );
 }
 
 DeckGLMap.propTypes = {
@@ -16,18 +54,19 @@ DeckGLMap.propTypes = {
     id: PropTypes.string.isRequired,
 
     /**
-     * JSON specification of the map to be displayed. More detailes about
-     * the format can be found here: https://deck.gl/docs/api-reference/json/conversion-reference
-     */
-    deckglSpec: PropTypes.object,
-
-    /**
      * Resource dictionary made available in the DeckGL specification as an enum.
      * The values can be accessed like this: `"@@#resources.resourceId"`, where
      * `resourceId` is the key in the `resources` dict. For more information,
      * see the DeckGL documentation on enums in the json spec: https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
      */
     resources: PropTypes.object,
+
+    /**
+     * TODO: Fix this doc
+     * JSON specification of the map to be displayed. More detailes about
+     * the format can be found here: https://deck.gl/docs/api-reference/json/conversion-reference
+     */
+    deckglSpecPatch: PropTypes.arrayOf(PropTypes.object),
 
     /**
      * Parameters for the coordinates component

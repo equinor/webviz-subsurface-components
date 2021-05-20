@@ -101,8 +101,12 @@ const DeckGLMapDemo = () => {
     });
 
     const setMapProps = React.useCallback((updatedProps) => {
-        setParsedJson(updatedProps);
-        setText(JSON.stringify(updatedProps, null, 2));
+        const updatedJson = {
+            ...parsedJson,
+            ...updatedProps,
+        };
+        setParsedJson(updatedJson);
+        setText(JSON.stringify(updatedJson, null, 2));
     });
 
     // TODO: Fold code panel in a slider:
