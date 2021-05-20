@@ -76,10 +76,7 @@ const Map: React.FC<MapProps> = ({
                     return (info.object as Feature)?.properties?.name;
                 }}
                 ref={deckRef}
-                {
-                    // TODO: find a better way to send the callback
-                }
-                patchSpec={patchSpec}
+                patchSpec={patchSpec} // TODO: find a better way to send the callback
                 onHover={onHover}
             >
                 {

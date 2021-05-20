@@ -3,7 +3,33 @@ import PropTypes from "prop-types";
 
 import Map from "./Map";
 
-import { applyPatch } from "fast-json-patch";
+import { applyPatch, getValueByPointer } from "fast-json-patch";
+
+function _idsToIndices(doc, path) {
+    // The path looks something like this: `/layers/[layer-id]/property`,
+    // where `[layer-id]` is the id of an object in the `layers` array.
+    // This function will replace all object ids with their indices in the array,
+    // resulting in a path that would look like this: `/layers/2/property`,
+    // which is a valid json pointer that can be used by json patch.
+
+    const replaced = path.replace(
+        /([\w-/]*)\/\[([\w-]+)\]/,
+        (_, parent, matchedId) => {
+            const parentArray = getValueByPointer(doc, parent);
+            const index = parentArray.findIndex(({ id }) => {
+                return matchedId == id;
+            });
+            if (index < 0) throw `Id [${matchedId}] not found!`;
+            return `${parent}/${index}`;
+        }
+    );
+
+    // Replace all ids in the path.
+    if (path != replaced) {
+        return _idsToIndices(doc, replaced);
+    }
+    return path;
+}
 
 function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
     const [deckglSpec, setDeckglSpec] = React.useState({});
@@ -13,19 +39,18 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
             return;
         }
 
-        // TODO: clean this crap
-        const patch = deckglSpecPatch.map((patch) => {
-            patch.path = patch.path.replaceAll(/\[([\w-]+)\]/g, (_, p1) => {
-                return deckglSpec.layers.findIndex(({ id }) => {
-                    return id == p1;
-                });
+        let newSpec = deckglSpec;
+        try {
+            const patch = deckglSpecPatch.map((patch) => {
+                return {
+                    ...patch,
+                    path: _idsToIndices(deckglSpec, patch.path),
+                };
             });
-            return patch;
-        });
-
-        const newSpec = applyPatch(deckglSpec, patch, true, false).newDocument;
-
-        // TODO error check
+            newSpec = applyPatch(deckglSpec, patch, true, false).newDocument;
+        } catch (error) {
+            console.error("Unable to apply patch: " + error);
+        }
 
         setDeckglSpec(newSpec);
     }, [deckglSpecPatch]);
@@ -62,9 +87,8 @@ DeckGLMap.propTypes = {
     resources: PropTypes.object,
 
     /**
-     * TODO: Fix this doc
-     * JSON specification of the map to be displayed. More detailes about
-     * the format can be found here: https://deck.gl/docs/api-reference/json/conversion-reference
+     * A JSON patch (http://jsonpatch.com/) applied to the DeckGL specification state. The initial state is an empty object.
+     * More detailes about the specification format can be found here: https://deck.gl/docs/api-reference/json/conversion-reference
      */
     deckglSpecPatch: PropTypes.arrayOf(PropTypes.object),
 
