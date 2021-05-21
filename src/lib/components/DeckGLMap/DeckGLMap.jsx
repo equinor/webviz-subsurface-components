@@ -1,6 +1,7 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 
+import Coords from "./components/Coords";
 import Map from "./Map";
 
 import { applyPatch, getValueByPointer } from "fast-json-patch";
@@ -31,6 +32,14 @@ function _idsToIndices(doc, path) {
     return path;
 }
 
+DeckGLMap.defaultProps = {
+    coords: {
+        visible: true,
+        multiPicking: true,
+        pickDepth: 10,
+    },
+};
+
 function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
     const [deckglSpec, setDeckglSpec] = React.useState({});
 
@@ -55,18 +64,40 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
         setDeckglSpec(newSpec);
     }, [deckglSpecPatch]);
 
-    return (
-        <Map
-            id={id}
-            resources={resources}
-            deckglSpec={deckglSpec}
-            patchSpec={(patch) => {
-                setProps({
-                    deckglSpecPatch: patch,
+    const [hoverInfo, setHoverInfo] = React.useState([]);
+    const onHover = React.useCallback(
+        (pickInfo, event) => {
+            if (coords.multiPicking && pickInfo.layer) {
+                const infos = pickInfo.layer.context.deck.pickMultipleObjects({
+                    x: event.offsetCenter.x,
+                    y: event.offsetCenter.y,
+                    radius: 1,
+                    depth: coords.pickDepth,
                 });
-            }}
-            coords={coords}
-        />
+                setHoverInfo(infos);
+            } else {
+                setHoverInfo([pickInfo]);
+            }
+        },
+        [coords]
+    );
+
+    return (
+        <div style={{ height: "100%", width: "100%", position: "relative" }}>
+            <Map
+                id={id}
+                resources={resources}
+                deckglSpec={deckglSpec}
+                patchSpec={(patch) => {
+                    setProps({
+                        deckglSpecPatch: patch,
+                    });
+                }}
+                onHover={onHover}
+            >
+                <Coords pickInfos={hoverInfo} />
+            </Map>
+        </div>
     );
 }
 
@@ -105,14 +136,6 @@ DeckGLMap.propTypes = {
      * For reacting to prop changes
      */
     setProps: PropTypes.func,
-};
-
-DeckGLMap.defaultProps = {
-    coords: {
-        visible: true,
-        multiPicking: true,
-        pickDepth: 10,
-    },
 };
 
 export default DeckGLMap;
