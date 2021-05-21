@@ -122,6 +122,7 @@ const WellCompletionsViewer: React.FC = () => {
                         style={{
                             minWidth: `${minWidth}px`,
                             minHeight: `${minHeight}px`,
+                            height: "100%",
                         }}
                     >
                         <WellCompletionsPlot
