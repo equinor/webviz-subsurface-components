@@ -36,7 +36,7 @@ const WellCompletionsViewer: React.FC = () => {
             ...plotData,
             wells: plotData.wells.slice(
                 (currentPage - 1) * wellsPerPage,
-                currentPage * wellsPerPage - 1
+                currentPage * wellsPerPage
             ),
         };
     }, [plotData, currentPage, wellsPerPage]);
