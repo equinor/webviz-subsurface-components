@@ -1,0 +1,200 @@
+.slider,
+.slider-inset,
+.slider-overlay {
+    stroke-linecap: round;
+}
+
+.slider {
+    stroke-width: 8px;
+}
+
+.slider-inset {
+    stroke: #b20276;
+    stroke-width: 8px;
+}
+
+.slider-overlay {
+    pointer-events: stroke;
+    cursor: pointer;
+}
+
+.handle {
+    fill: #fff;
+    stroke: #b20276;
+    stroke-opacity: 0.5;
+    stroke-width: 1.25px;
+}
+
+
+
+
+
+#sensitivity-slider-plot {
+    position: relative;
+}
+
+.sensitivity-slider-plot__graph-area {
+    fill: steelblue;
+    fill-opacity: 0.4
+}
+
+.sensitivity-slider-plot__graph-line {
+    stroke: steelblue;
+    stroke-width: 1;
+    fill: none
+}
+
+.sensitivity-slider-plot__graph-overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.sensitivity-slider-plot__graph-container {
+    background-color: white;
+    z-index: 1;
+}
+
+.sensitivity-slider-plot__slider-container {
+    background-color: white;
+    padding: 0;
+}
+
+.sensitivity-slider-plot__graph-focus-circle {
+    fill: none;
+    stroke: black;
+    r: 4.5
+}
+
+.sensitivity-slider-plot__graph-focus-line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5px;
+    stroke-dasharray: 3 3;
+}
+
+.sensitivity-slider-plot__graph-focus-text {
+    /*x: 9px;*/
+    /*dy: -0.35em;*/
+    font-size: 12px;
+}
+
+.sensitivity-slider-plot__slider-cell {
+    fill: none;
+}
+
+.sensitivity-slider-plot__slider-col-header {
+    /*fill: none;*/
+}
+
+.sensitivity-slider-plot__slider-row-header {
+    /*fill: none;*/
+}
+
+.sensitivity-slider-plot__slider-col-header-label {
+    text-anchor: middle;
+    alignment-baseline: hanging;
+    font-size: 30px;
+    fill: black;
+}
+
+.sensitivity-slider-plot__slider-row-header-label {
+    text-anchor: end;
+    alignment-baseline: central;
+    font-size: 10px;
+    fill: black;
+}
+
+.sensitivity-slider-plot__slide-bar-label {
+    text-anchor: end;
+    alignment-baseline: central;
+    font-size: 12px;
+    fill: black;
+}
+
+.sensitivity-slider-plot__slider-bar-background {
+    fill: grey;
+    stroke: black;
+    stroke-width: 0.5px;
+    rx: 4;
+    ry: 4;
+}
+
+.sensitivity-slider-plot__slider-bar-main {
+    fill: rgb(210, 15, 140);
+    stroke: black;
+    stroke-width: 0.5px;
+    rx: 4;
+    ry: 4;
+}
+
+.sensitivity-slider-plot__slider-bar-interaction {
+    fill: rgb(250, 150, 0);
+    stroke: black;
+    stroke-width: 0.5px;
+    rx: 4;
+    ry: 4;
+}
+
+.affix {
+    top: 0;
+}
+
+.sensitivity-slider-plot__description.mfp-wrap {
+    z-index: initial;
+}
+
+
+
+.link {
+    fill: none;
+    stroke: #0d1b9e;
+    opacity: 1;
+}
+
+.grouptree_link {
+    opacity: 0.3;
+
+}
+
+.grouptree_link__oilrate {
+    stroke: #60be6c;
+}
+
+.grouptree_link__waterrate {
+    stroke: #0d1b9e;
+}
+
+.grouptree_link__gasrate {
+    stroke: #c5221c;
+}
+
+.grouptree__node {
+    fill: #fff;
+    stroke: #60be6c;
+    stroke-width: 1px;
+    cursor: default;
+}
+
+.grouptree__nodelabel {
+    font-size: 10px;
+    font-family: sans-serif;
+}
+
+.grouptree__pressurelabel {
+    font-size: 9px;
+    font-family: "Statoil Sans Light", Lucida, Arial, Helvetica, sans-serif;
+}
+
+.grouptree__pressureunit{
+    font-size: 6px;
+
+}
+
+.grouptree__grupnet_text{
+    font-size: 12px;
+}
+
+.grouptree__node--withchildren {
+    stroke-width: 2.5px;
+    cursor: pointer;
+}
