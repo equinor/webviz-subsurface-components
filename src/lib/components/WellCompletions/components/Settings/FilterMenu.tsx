@@ -20,8 +20,11 @@ const FilterMenu: React.FC = React.memo(() => {
     );
     return (
         <div>
-            <Tooltip title="Filter">
-                <Button variant="ghost_icon" onClick={openDrawer}>
+            <Tooltip title={isDrawerOpen ? "Close filter menu" : "Filter"}>
+                <Button
+                    variant={isDrawerOpen ? "outlined" : "ghost_icon"}
+                    onClick={openDrawer}
+                >
                     <Icon color="currentColor" name="filter_alt" />
                 </Button>
             </Tooltip>
