@@ -4,12 +4,13 @@
  *
  * Copyright (C) 2020 - Equinor ASA. */
 
+import DeckGLMap from "./components/DeckGLMap";
+import DynamicTree from "./components/DynamicTree";
 import HistoryMatch from "./components/HistoryMatch";
-import Map from "./components/Map";
-import Morris from "./components/Morris";
 import LayeredMap from "./components/LayeredMap";
 import LeafletMap from "./components/LeafletMap";
-import DeckGLMap from "./components/DeckGLMap";
+import Map from "./components/Map";
+import Morris from "./components/Morris";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
 import WellCompletions from "./components/WellCompletions";
 
@@ -22,4 +23,6 @@ export {
     LeafletMap,
     DeckGLMap,
     WellCompletions,
+    DynamicTree,
 };
+
