@@ -1,5 +1,5 @@
 import { Typography } from "@equinor/eds-core-react";
-import { createStyles, makeStyles } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import { SmartNodeSelector } from "@webviz/core-components";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,9 +12,11 @@ import {
 } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
+            padding: theme.spacing(1),
+            maxWidth: "250px",
             display: "flex",
             flex: 1,
             flexDirection: "column",

@@ -15,6 +15,7 @@ export interface Units {
 export interface Zone {
     name: string;
     color: string;
+    subzones?: Zone[];
 }
 
 export interface WellInfo {
@@ -56,6 +57,7 @@ export interface UISettings {
     currentPage: number;
     timeAggregation: TimeAggregation;
     sortBy: Record<string, SortDirection>;
+    isDrawerOpen: boolean;
     // Filter
     filteredZones: string[];
     wellSearchText: string;

@@ -1,85 +1,97 @@
-import {
-    Checkbox,
-    createStyles,
-    FormControl,
-    Input,
-    InputLabel,
-    ListItemText,
-    makeStyles,
-    MenuItem,
-    Select,
-    // eslint-disable-next-line prettier/prettier
-    Theme
-} from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import React, { useCallback, useContext, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import DropdownTreeSelect, { TreeNodeProps } from "react-dropdown-tree-select";
+import "react-dropdown-tree-select/dist/styles.css";
+import { useDispatch } from "react-redux";
 import { updateFilteredZones } from "../../redux/actions";
-import { WellCompletionsState } from "../../redux/store";
+import { Zone } from "../../redux/types";
+import { findSubzones } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
+
+const extractStratigraphyTree = (stratigraphy: Zone[]): TreeNodeProps => {
+    const root: TreeNodeProps = {
+        label: "All",
+        value: "All",
+        children: [],
+        checked: true,
+        expanded: true,
+    };
+    const constructTree = (zone: Zone, parentNode: TreeNodeProps) => {
+        const newChild: TreeNodeProps = {
+            label: zone.name,
+            value: zone.name,
+            children: [],
+        };
+        parentNode.children?.push(newChild);
+        if (zone.subzones !== undefined)
+            zone.subzones.forEach((subzone) =>
+                constructTree(subzone, newChild)
+            );
+    };
+    stratigraphy.forEach((zone) => constructTree(zone, root));
+    return root;
+};
+
+//DFS
+export const findSelectedZones = (
+    stratigraphy: Zone[],
+    selectedNodes: TreeNodeProps[]
+): string[] => {
+    const selectedNodeNames = new Set(selectedNodes.map((node) => node.label));
+    const result: Zone[] = [];
+    const searchZone = (zone, selectedNodeNames, result) => {
+        if (selectedNodeNames.has("All") || selectedNodeNames.has(zone.name))
+            findSubzones(zone, result);
+        else if (zone.subzones)
+            zone.subzones.forEach((subzone) =>
+                searchZone(subzone, selectedNodeNames, result)
+            );
+    };
+    stratigraphy.forEach((subzone) =>
+        searchZone(subzone, selectedNodeNames, result)
+    );
+    return result.map((zone) => zone.name);
+};
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             padding: theme.spacing(1),
-            width: "150px",
-        },
-        formControl: {
-            margin: theme.spacing(1),
-            minWidth: 120,
-            maxWidth: 250,
+            maxWidth: "250px",
         },
     })
 );
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-    PaperProps: {
-        style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-        },
-    },
-};
 
 const ZoneSelector: React.FC = React.memo(() => {
     const classes = useStyles();
     const data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
-    const filteredZones = useSelector(
-        (st: WellCompletionsState) => st.ui.filteredZones
-    );
-    const stratigraphy = useMemo(
-        () => data.stratigraphy.map((zone) => zone.name),
-        [data]
+
+    const stratigraphyTree = useMemo(
+        () => extractStratigraphyTree(data.stratigraphy),
+        [data.stratigraphy]
     );
     // handlers
     const handleSelectionChange = useCallback(
-        (event) => dispatch(updateFilteredZones(event.target.value)),
-        [dispatch]
+        (_, selectedNodes) =>
+            dispatch(
+                updateFilteredZones(
+                    findSelectedZones(data.stratigraphy, selectedNodes)
+                )
+            ),
+        [dispatch, data.stratigraphy]
     );
     return (
-        <FormControl className={classes.formControl}>
-            <InputLabel id="mutiple-zone-label">Select Zones</InputLabel>
-            <Select
-                labelId="mutiple-zone-label"
-                id="demo-mutiple-zone"
-                multiple
-                value={filteredZones}
-                onChange={handleSelectionChange}
-                input={<Input />}
-                renderValue={(selected) => (selected as string[]).join(", ")}
-                MenuProps={MenuProps}
-                style={{ width: "230px" }}
-            >
-                {stratigraphy.map((name) => (
-                    <MenuItem key={name} value={name}>
-                        <Checkbox checked={filteredZones.indexOf(name) > -1} />
-                        <ListItemText primary={name} />
-                    </MenuItem>
-                ))}
-            </Select>
-        </FormControl>
+        <DropdownTreeSelect
+            texts={{ placeholder: "Select Zone(s)..." }}
+            inlineSearchInput={true}
+            showPartiallySelected={true}
+            data={stratigraphyTree}
+            onChange={handleSelectionChange}
+            className={classes.root}
+            keepTreeOnSearch={true}
+        />
     );
 });
 

@@ -1,30 +1,89 @@
-import { createStyles, makeStyles } from "@material-ui/core";
+import {
+    createStyles,
+    Divider,
+    Drawer,
+    makeStyles,
+    // eslint-disable-next-line prettier/prettier
+    Theme
+} from "@material-ui/core";
+import clsx from "clsx";
 import React, { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { usePlotData } from "../hooks/usePlotData";
 import { WellCompletionsState } from "../redux/store";
 import { DataContext } from "./DataLoader";
 import WellCompletionsPlot from "./Plot/WellCompletionsPlot";
+import HideZeroCompletionsSwitch from "./Settings/HideZeroCompletionsSwitch";
 import SettingsBar from "./Settings/SettingsBar";
+import WellAttributesSelector from "./Settings/WellAttributesSelector";
+import WellFilter from "./Settings/WellFilter";
 import WellPagination from "./Settings/WellPagination";
+import ZoneSelector from "./Settings/ZoneSelector";
 
-const useStyles = makeStyles(() =>
+const drawerWidth = 270;
+const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             position: "relative",
             display: "flex",
             flex: 1,
             flexDirection: "column",
+            width: "100%",
             height: "90%",
+        },
+        main: {
+            position: "relative",
+            display: "flex",
+            flex: 1,
+            flexDirection: "row",
+        },
+        drawer: {
+            zIndex: 0,
+            width: drawerWidth,
+            flexShrink: 0,
+        },
+        drawerShift: {
+            width: 0,
+            flexShrink: 0,
+            display: "none",
+        },
+        drawerPaper: {
+            position: "relative",
+        },
+        drawerHeader: {
+            display: "flex",
+            alignItems: "center",
+            padding: theme.spacing(0, 1),
+            // necessary for content to be below app bar
+            ...theme.mixins.toolbar,
+            justifyContent: "flex-start",
+        },
+        content: {
+            width: "100%",
+            transition: theme.transitions.create("margin", {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+        },
+        contentShift: {
+            width: `calc(100% - ${drawerWidth}px)`,
+            transition: theme.transitions.create("margin", {
+                easing: theme.transitions.easing.easeOut,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
         },
     })
 );
 
 const WellCompletionsViewer: React.FC = () => {
     const classes = useStyles();
+
     const data = useContext(DataContext);
     const plotData = usePlotData();
 
+    const isDrawerOpen = useSelector(
+        (state: WellCompletionsState) => state.ui.isDrawerOpen
+    );
     const wellsPerPage = useSelector(
         (state: WellCompletionsState) => state.ui.wellsPerPage
     );
@@ -47,23 +106,49 @@ const WellCompletionsViewer: React.FC = () => {
         ],
         [dataInCurrentPage]
     );
+
     //If no data is available
     if (!data) return <div />;
     return (
         <div className={classes.root}>
             <SettingsBar />
-            <WellPagination />
-            <div
-                className={classes.root}
-                style={{
-                    minWidth: `${minWidth}px`,
-                    minHeight: `${minHeight}px`,
-                }}
-            >
-                <WellCompletionsPlot
-                    timeSteps={data.timeSteps}
-                    plotData={dataInCurrentPage}
-                />
+            <div className={classes.main}>
+                <div
+                    className={clsx(classes.content, {
+                        [classes.contentShift]: isDrawerOpen,
+                    })}
+                >
+                    <WellPagination />
+                    <div
+                        style={{
+                            minWidth: `${minWidth}px`,
+                            minHeight: `${minHeight}px`,
+                            height: "100%",
+                        }}
+                    >
+                        <WellCompletionsPlot
+                            timeSteps={data.timeSteps}
+                            plotData={dataInCurrentPage}
+                        />
+                    </div>
+                </div>
+                <Drawer
+                    className={clsx(classes.drawer, {
+                        [classes.drawerShift]: !isDrawerOpen,
+                    })}
+                    classes={{
+                        paper: classes.drawerPaper,
+                    }}
+                    variant="persistent"
+                    anchor="right"
+                    open={isDrawerOpen}
+                >
+                    <Divider />
+                    <ZoneSelector />
+                    <WellFilter />
+                    <HideZeroCompletionsSwitch />
+                    <WellAttributesSelector />
+                </Drawer>
             </div>
         </div>
     );
