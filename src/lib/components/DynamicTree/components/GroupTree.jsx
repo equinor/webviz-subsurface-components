@@ -60,106 +60,91 @@ export function initDynamicTree(
 ) {
     if (Object.keys(data).length > 0) {
         const groupTree = new GroupTree(gtDomId, data, "oilrate");
-
-        function SetupControls(
-            groupTree,
-            sliderDomId,
-            iterationDomId,
-            flowDomId
-        ) {
-            const iteration_names = groupTree.data.iteration_names;
-            let currentTimestep =
-                groupTree.data.iterations[iteration_names[0]].timesteps[0];
-            let currentIteration =
-                groupTree.data.iterations[iteration_names[0]];
-
-            function setCurrentIteration(en) {
-                currentIteration = groupTree.data.iterations[en];
-                sliderControl.setData(
-                    currentIteration.timesteps
-                        .sort()
-                        .map((d) => new Date(d).toLocaleDateString())
-                );
-                groupTree.update(currentIteration.trees[currentTimestep]);
-            }
-
-            function setCurrentTimestep(ts) {
-                currentTimestep = currentIteration.timesteps[ts];
-                groupTree.update(currentIteration.trees[currentTimestep]);
-            }
-
-            function setCurrentFlowrate(fr) {
-                groupTree.flowrate = fr;
-            }
-
-            function populateRatioBtns(
-                names,
-                domId,
-                input_name,
-                selectedCallback
-            ) {
-                const lables = d3
-                    .select(domId)
-                    .selectAll("label")
-                    .data(names)
-                    .enter()
-                    .append("label")
-                    .attr("class", "radio-inline");
-
-                lables
-                    .append("input")
-                    .attr("type", "radio")
-                    .attr("value", (d) => d)
-                    .attr("name", input_name)
-                    .on("click", (d) => selectedCallback(d));
-
-                lables.append("text").text((d) => d);
-
-                d3.select(domId)
-                    .select("label")
-                    .select("input")
-                    .attr("checked", true);
-            }
-
-            populateRatioBtns(
-                groupTree.data.iteration_names,
-                iterationDomId,
-                "iteration",
-                setCurrentIteration
-            );
-
-            populateRatioBtns(
-                ["oilrate", "waterrate", "gasrate"],
-                flowDomId,
-                "flow",
-                setCurrentFlowrate
-            );
-
-            let sliderControl = new Slider({
-                parentElement: d3
-                    .select(sliderDomId)
-                    .append("svg")
-                    .attr("height", 80)
-                    .attr("width", 1000),
-                orientation: "HORIZONTAL",
-                length: 900,
-                width: 80,
-                position: {
-                    x: 40,
-                    y: 40,
-                },
-                data: currentIteration.timesteps
-                    .sort()
-                    .map((d) => new Date(d).toLocaleDateString()),
-            });
-            sliderControl.on("change", setCurrentTimestep);
-            sliderControl.render();
-
-            groupTree.update(currentIteration.trees[currentTimestep]);
-        }
-
         SetupControls(groupTree, sliderDomId, iterationDomId, flowDomId);
     } else {
         throw new Error("Empty dataset");
     }
+}
+
+function SetupControls(groupTree, sliderDomId, iterationDomId, flowDomId) {
+    const iteration_names = groupTree.data.iteration_names;
+    let currentTimestep =
+        groupTree.data.iterations[iteration_names[0]].timesteps[0];
+    let currentIteration = groupTree.data.iterations[iteration_names[0]];
+
+    function setCurrentIteration(en) {
+        currentIteration = groupTree.data.iterations[en];
+        sliderControl.setData(
+            currentIteration.timesteps
+                .sort()
+                .map((d) => new Date(d).toLocaleDateString())
+        );
+        groupTree.update(currentIteration.trees[currentTimestep]);
+    }
+
+    function setCurrentTimestep(ts) {
+        currentTimestep = currentIteration.timesteps[ts];
+        groupTree.update(currentIteration.trees[currentTimestep]);
+    }
+
+    function setCurrentFlowrate(fr) {
+        groupTree.flowrate = fr;
+    }
+
+    function populateRatioBtns(names, domId, input_name, selectedCallback) {
+        const lables = d3
+            .select(domId)
+            .selectAll("label")
+            .data(names)
+            .enter()
+            .append("label")
+            .attr("class", "radio-inline");
+
+        lables
+            .append("input")
+            .attr("type", "radio")
+            .attr("value", (d) => d)
+            .attr("name", input_name)
+            .on("click", (d) => selectedCallback(d));
+
+        lables.append("text").text((d) => d);
+
+        d3.select(domId).select("label").select("input").attr("checked", true);
+    }
+
+    populateRatioBtns(
+        groupTree.data.iteration_names,
+        iterationDomId,
+        "iteration",
+        setCurrentIteration
+    );
+
+    populateRatioBtns(
+        ["oilrate", "waterrate", "gasrate"],
+        flowDomId,
+        "flow",
+        setCurrentFlowrate
+    );
+
+    let sliderControl = new Slider({
+        parentElement: d3
+            .select(sliderDomId)
+            .append("svg")
+            .attr("height", 80)
+            .attr("width", 1000),
+        orientation: "HORIZONTAL",
+        length: 900,
+        width: 80,
+        position: {
+            x: 40,
+            y: 40,
+        },
+        data: currentIteration.timesteps
+            .sort()
+            .map((d) => new Date(d).toLocaleDateString()),
+    });
+    sliderControl.on("change", setCurrentTimestep);
+    sliderControl.render();
+
+    groupTree.update(currentIteration.trees[currentTimestep]);
 }
