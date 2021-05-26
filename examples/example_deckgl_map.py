@@ -90,105 +90,122 @@ if __name__ == "__main__":
         resources={
             "propertyMap": map_data,
         },
-        deckglSpec={
-            "initialViewState": {
-                "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
-                "zoom": -3,
+        deckglSpecPatch=[
+            {
+                "op": "replace",
+                "path": "",
+                "value": {
+                    "initialViewState": {
+                        "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+                        "zoom": -3,
+                    },
+                    "layers": [
+                        {
+                            "@@type": "ColormapLayer",
+                            "id": "colormap-layer",
+                            "bounds": bounds,
+                            "image": "@@#resources.propertyMap",
+                            "colormap": COLORMAP,
+                            "valueRange": [min_value, max_value],
+                            "pickable": True,
+                        },
+                        {
+                            "@@type": "Hillshading2DLayer",
+                            "id": "hillshading-layer",
+                            "bounds": bounds,
+                            "opacity": 1.0,
+                            "valueRange": [min_value, max_value],
+                            "image": "@@#resources.propertyMap",
+                            "pickable": True,
+                        },
+                        {
+                            "@@type": "DrawingLayer",
+                            "id": "drawing-layer",
+                            "mode": "drawLineString",
+                            "data": {"type": "FeatureCollection", "features": []},
+                        },
+                    ],
+                    "views": [
+                        {
+                            "@@type": "OrthographicView",
+                            "id": "main",
+                            "controller": True,
+                            "x": "0%",
+                            "y": "0%",
+                            "width": "100%",
+                            "height": "100%",
+                            "flipY": False,
+                        }
+                    ],
+                },
             },
-            "layers": [
-                {
-                    "@@type": "ColormapLayer",
-                    "id": "colormap-layer",
-                    "bounds": bounds,
-                    "image": "@@#resources.propertyMap",
-                    "colormap": COLORMAP,
-                    "valueRange": [min_value, max_value],
-                    "pickable": True,
-                },
-                {
-                    "@@type": "Hillshading2DLayer",
-                    "id": "hillshading-layer",
-                    "bounds": bounds,
-                    "opacity": 1.0,
-                    "valueRange": [min_value, max_value],
-                    "image": "@@#resources.propertyMap",
-                },
-                {
-                    "@@type": "DrawingLayer",
-                    "id": "drawing-layer",
-                    "mode": "drawLineString",
-                    "data": {"type": "FeatureCollection", "features": []},
-                },
-            ],
-            "views": [
-                {
-                    "@@type": "OrthographicView",
-                    "id": "main",
-                    "controller": True,
-                    "x": "0%",
-                    "y": "0%",
-                    "width": "100%",
-                    "height": "100%",
-                    "flipY": False,
-                }
-            ],
-        },
+        ],
     )
 
     deckgl_map_right = webviz_subsurface_components.DeckGLMap(
         id="DeckGL-Map-Right",
-        deckglSpec={
-            "initialViewState": {
-                "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
-                "zoom": -3,
-            },
-            "layers": [
-                {
-                    "@@type": "ColormapLayer",
-                    "id": "colormap-layer",
-                    "bounds": bounds,
-                    "image": "@@#resources.propertyMap",
-                    "colormap": COLORMAP,
-                    "valueRange": [min_value, max_value],
-                    "pickable": True,
-                },
-                {
-                    "@@type": "Hillshading2DLayer",
-                    "id": "hillshading-layer",
-                    "bounds": bounds,
-                    "opacity": 1.0,
-                    "valueRange": [min_value, max_value],
-                    "image": "@@#resources.propertyMap",
-                },
-                {
-                    "@@type": "DrawingLayer",
-                    "id": "drawing-layer",
-                    "mode": "drawLineString",
-                    "data": {"type": "FeatureCollection", "features": []},
-                },
-                {
-                    "@@type": "WellsLayer",
-                    "id": "wells-layer",
-                    "data": WELLS,
-                    "opacity": 1.0,
-                    "lineWidthScale": 5,
-                    "pointRadiusScale": 8,
-                    "outline": True,
-                },
-            ],
-            "views": [
-                {
-                    "@@type": "OrthographicView",
-                    "id": "main",
-                    "controller": True,
-                    "x": "0%",
-                    "y": "0%",
-                    "width": "100%",
-                    "height": "100%",
-                    "flipY": False,
-                }
-            ],
+        resources={
+            "propertyMap": map_data,
         },
+        deckglSpecPatch=[
+            {
+                "op": "replace",
+                "path": "",
+                "value": {
+                    "initialViewState": {
+                        "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+                        "zoom": -3,
+                    },
+                    "layers": [
+                        {
+                            "@@type": "ColormapLayer",
+                            "id": "colormap-layer",
+                            "bounds": bounds,
+                            "image": "@@#resources.propertyMap",
+                            "colormap": COLORMAP,
+                            "valueRange": [min_value, max_value],
+                            "pickable": True,
+                        },
+                        {
+                            "@@type": "Hillshading2DLayer",
+                            "id": "hillshading-layer",
+                            "bounds": bounds,
+                            "opacity": 1.0,
+                            "valueRange": [min_value, max_value],
+                            "image": "@@#resources.propertyMap",
+                            "pickable": True,
+                        },
+                        {
+                            "@@type": "DrawingLayer",
+                            "id": "drawing-layer",
+                            "mode": "view",
+                            "data": {"type": "FeatureCollection", "features": []},
+                        },
+                        {
+                            "@@type": "WellsLayer",
+                            "id": "wells-layer",
+                            "data": WELLS,
+                            "opacity": 1.0,
+                            "lineWidthScale": 5,
+                            "pointRadiusScale": 8,
+                            "outline": True,
+                        },
+                    ],
+                    "views": [
+                        {
+                            "@@type": "OrthographicView",
+                            "id": "main",
+                            "controller": True,
+                            "x": "0%",
+                            "y": "0%",
+                            "width": "100%",
+                            "height": "100%",
+                            "flipY": False,
+                        }
+                    ],
+                },
+            },
+        ],
     )
 
     app = dash.Dash(__name__)
@@ -199,6 +216,10 @@ if __name__ == "__main__":
                 style={"float": "left", "width": "50%", "height": "95vh"},
                 children=[deckgl_map_left],
             ),
+            html.Button(
+                id="toggle-drawing",
+                children="Toggle drawing mode",
+            ),
             html.Div(
                 style={"float": "right", "width": "50%", "height": "95vh"},
                 children=[deckgl_map_right],
@@ -207,17 +228,24 @@ if __name__ == "__main__":
     )
 
     @app.callback(
-        dash.dependencies.Output("DeckGL-Map-Left", "deckglSpec"),
-        dash.dependencies.Output("DeckGL-Map-Right", "deckglSpec"),
-        dash.dependencies.Input("DeckGL-Map-Left", "deckglSpec"),
-        dash.dependencies.Input("DeckGL-Map-Right", "deckglSpec"),
+        dash.dependencies.Output("DeckGL-Map-Left", "deckglSpecPatch"),
+        dash.dependencies.Input("toggle-drawing", "n_clicks"),
     )
-    def update_maps(left_deckgl_spec, right_deckgl_spec):
-        ctx = dash.callback_context
-        trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-        value = (
-            left_deckgl_spec if trigger_id == "DeckGL-Map-Left" else right_deckgl_spec
+    def toggle_drawing(n_clicks):
+        mode = "view" if n_clicks is None or n_clicks % 2 == 0 else "drawLineString"
+        return [
+            {"op": "replace", "path": "/layers/[drawing-layer]/mode", "value": mode}
+        ]
+
+    @app.callback(
+        dash.dependencies.Output("DeckGL-Map-Right", "deckglSpecPatch"),
+        dash.dependencies.Input("DeckGL-Map-Left", "deckglSpecPatch"),
+    )
+    def sync_drawing(in_patch):
+        drawing_layer_patches = filter(
+            lambda patch: patch["path"].startswith("/layers/[drawing-layer]/data"),
+            in_patch,
         )
-        return value, value
+        return list(drawing_layer_patches)
 
     app.run_server(debug=True)
