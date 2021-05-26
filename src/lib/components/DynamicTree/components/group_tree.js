@@ -1,4 +1,4 @@
-import * as d3 from 'd3'
+import * as d3 from "d3";
 /* eslint camelcase: "off" */
 /* eslint array-callback-return: "off" */
 /* eslint no-return-assign: "off" */
@@ -20,55 +20,62 @@ export default class GroupTree {
      * @param defaultFlowrate
      */
     constructor(dom_element_id, tree_data, defaultFlowrate) {
-        this._currentFlowrate = defaultFlowrate
-        this._transitionTime = 1000
+        this._currentFlowrate = defaultFlowrate;
+        this._transitionTime = 1000;
 
-
-        const tree_values = {}
+        const tree_values = {};
 
         Object.values(tree_data.iterations).map((iteration) => {
             Object.values(iteration.trees).map((tree) => {
-                d3.hierarchy(tree, d => d.children).each(t => Object.keys(t.data).forEach(key => {
-                    if (!tree_values[key]) {
-                        tree_values[key] = []
-                    }
-                    tree_values[key].push(t.data[key])
-                }))
-            })
-        })
-        this._path_scale = new Map()
+                d3.hierarchy(tree, (d) => d.children).each((t) =>
+                    Object.keys(t.data).forEach((key) => {
+                        if (!tree_values[key]) {
+                            tree_values[key] = [];
+                        }
+                        tree_values[key].push(t.data[key]);
+                    })
+                );
+            });
+        });
+        this._path_scale = new Map();
         Object.keys(tree_values).forEach((key) => {
-            this._path_scale[key] = d3.scaleLinear()
+            this._path_scale[key] = d3
+                .scaleLinear()
                 .domain(d3.extent(tree_values[key]))
-                .range([2, 100])
-        })
+                .range([2, 100]);
+        });
 
-
-        this._width = d3.select(dom_element_id).node().getBoundingClientRect().width
+        this._width = d3
+            .select(dom_element_id)
+            .node()
+            .getBoundingClientRect().width;
 
         const margin = {
-            top: 10, right: 90, bottom: 30, left: 90,
-        }
+            top: 10,
+            right: 90,
+            bottom: 30,
+            left: 90,
+        };
 
+        const height = 700 - margin.top - margin.bottom;
+        this._width = +this._width - margin.left - margin.right;
 
-        const height = 700 - margin.top - margin.bottom
-        this._width = +this._width - margin.left - margin.right
+        this._svg = d3
+            .select(dom_element_id)
+            .append("svg")
+            .attr("width", this._width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        this._svg = d3.select(dom_element_id).append('svg')
-            .attr('width', this._width + margin.right + margin.left)
-            .attr('height', height + margin.top + margin.bottom)
-            .append('g')
-            .attr('transform', `translate(${margin.left},${margin.top})`)
+        this._textpaths = this._svg.append("g");
 
-        this._textpaths = this._svg.append('g')
+        this._renderTree = d3.tree().size([height, this._width]);
 
-        this._renderTree = d3.tree().size([height, this._width])
+        this._data = GroupTree.initHierarchies(tree_data, height);
 
-        this._data = GroupTree.initHierarchies(tree_data, height)
-
-        this._currentTree = {}
+        this._currentTree = {};
     }
-
 
     /**
      * Initialize all trees in the group tree datastructure, once for the entire visualization.
@@ -76,28 +83,28 @@ export default class GroupTree {
      */
     static initHierarchies(trees, height) {
         // generate the node-id used to match in the enter, update and exit selections
-        const getId = (d) => ((d.parent === null) ? d.data.name : `${d.parent.id}_${d.data.name}`)
+        const getId = (d) =>
+            d.parent === null ? d.data.name : `${d.parent.id}_${d.data.name}`;
 
         Object.keys(trees.iterations).map((key) => {
             Object.keys(trees.iterations[key].trees).map((tKey) => {
-                let t = trees.iterations[key].trees[tKey]
-                t = d3.hierarchy(t, (dd) => dd.children)
-                t.descendants().map((n) => n.id = getId(n))
-                t.x0 = height / 2
-                t.y0 = 0
-                trees.iterations[key].trees[tKey] = t
-            })
-        })
-        return trees
+                let t = trees.iterations[key].trees[tKey];
+                t = d3.hierarchy(t, (dd) => dd.children);
+                t.descendants().map((n) => (n.id = getId(n)));
+                t.x0 = height / 2;
+                t.y0 = 0;
+                trees.iterations[key].trees[tKey] = t;
+            });
+        });
+        return trees;
     }
 
     /**
      * @returns {*} -The initialized hierarchical group tree data structure
      */
     get data() {
-        return this._data
+        return this._data;
     }
-
 
     /**
      * Set the flowrate and update display of all edges accordingly.
@@ -105,24 +112,31 @@ export default class GroupTree {
      * @param flowrate - key identifying the flowrate of the incoming edge
      */
     set flowrate(flowrate) {
-        this._currentFlowrate = flowrate
-        this._svg.selectAll('path.link')
+        this._currentFlowrate = flowrate;
+        this._svg
+            .selectAll("path.link")
             .transition()
             .duration(this._transitionTime)
-            .attr('class', (d) => `link grouptree_link grouptree_link__${flowrate}`)
-            .style('stroke-width', (d) => this.getEdgeStrokeWidth(flowrate, d.data[flowrate]))
-            .style('stroke-dasharray', (d) => (d.data[flowrate] > 0 ? 'none' : '5,5'))
+            .attr(
+                "class",
+                (d) => `link grouptree_link grouptree_link__${flowrate}`
+            )
+            .style("stroke-width", (d) =>
+                this.getEdgeStrokeWidth(flowrate, d.data[flowrate])
+            )
+            .style("stroke-dasharray", (d) =>
+                d.data[flowrate] > 0 ? "none" : "5,5"
+            );
     }
 
     get flowrate() {
-        return this._currentFlowrate
+        return this._currentFlowrate;
     }
 
     getEdgeStrokeWidth(key, val) {
-        const normalized = this._path_scale[key](val)
-        return (`${normalized}px`)
+        const normalized = this._path_scale[key](val);
+        return `${normalized}px`;
     }
-
 
     /**
      * Sets the state of the current tree, and updates the tree visualization accordingly.
@@ -132,7 +146,7 @@ export default class GroupTree {
      * @param root
      */
     update(root) {
-        const self = this
+        const self = this;
 
         /**
          * Assigns y coordinates to all tree nodes in the rendered tree.
@@ -142,34 +156,34 @@ export default class GroupTree {
          */
         function growNewTree(t, width) {
             t.descendants().forEach((d) => {
-                d.y = d.depth * width / (t.height + 1)
-            })
+                d.y = (d.depth * width) / (t.height + 1);
+            });
 
-            return t
+            return t;
         }
 
         function doPostUpdateOperations(tree) {
-            setEndPositions(tree.descendants())
-            setNodeVisibility(tree.descendants(), true)
-            return tree
+            setEndPositions(tree.descendants());
+            setNodeVisibility(tree.descendants(), true);
+            return tree;
         }
 
         function findClosestVisibleParent(d) {
-            let c = d
+            let c = d;
             while (c.parent && !c.isvisible) {
-                c = c.parent
+                c = c.parent;
             }
-            return c
+            return c;
         }
 
         function getClosestVisibleParentStartCoordinates(d) {
-            const p = findClosestVisibleParent(d)
-            return { x: p.x0, y: p.y0 }
+            const p = findClosestVisibleParent(d);
+            return { x: p.x0, y: p.y0 };
         }
 
         function getClosestVisibleParentEndCoordinates(d) {
-            const p = findClosestVisibleParent(d)
-            return { x: p.x, y: p.y }
+            const p = findClosestVisibleParent(d);
+            return { x: p.x, y: p.y };
         }
 
         /**
@@ -178,13 +192,13 @@ export default class GroupTree {
          */
         function toggleBranch(node) {
             if (node.children) {
-                node._children = node.children
-                node.children = null
+                node._children = node.children;
+                node.children = null;
             } else {
-                node.children = node._children
-                node._children = null
+                node.children = node._children;
+                node._children = null;
             }
-            self.update(self._currentTree)
+            self.update(self._currentTree);
         }
 
         /**
@@ -194,8 +208,8 @@ export default class GroupTree {
          */
         function setNodeVisibility(nodes, visibility) {
             nodes.forEach((d) => {
-                d.isvisible = visibility
-            })
+                d.isvisible = visibility;
+            });
         }
 
         /**
@@ -204,9 +218,9 @@ export default class GroupTree {
          */
         function setEndPositions(nodes) {
             nodes.forEach((d) => {
-                d.x0 = d.x
-                d.y0 = d.y
-            })
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
         }
 
         /**
@@ -222,18 +236,18 @@ export default class GroupTree {
                 oldRoot.descendants().forEach((oldNode) => {
                     newRoot.descendants().forEach((newNode) => {
                         if (oldNode.id === newNode.id) {
-                            newNode.x0 = oldNode.x0
-                            newNode.y0 = oldNode.y0
+                            newNode.x0 = oldNode.x0;
+                            newNode.y0 = oldNode.y0;
 
-                            oldNode.x = newNode.x
-                            oldNode.y = newNode.y
+                            oldNode.x = newNode.x;
+                            oldNode.y = newNode.y;
 
-                            newNode.isvisible = oldNode.isvisible
+                            newNode.isvisible = oldNode.isvisible;
                         }
-                    })
-                })
+                    });
+                });
             }
-            return newRoot
+            return newRoot;
         }
 
         /**
@@ -244,82 +258,105 @@ export default class GroupTree {
          * @param nodes - list of nodes in a tree
          */
         function updateNodes(nodes) {
-            const node = self._svg.selectAll('g.node')
-                .data(nodes, (d) => d.id)
+            const node = self._svg.selectAll("g.node").data(nodes, (d) => d.id);
 
-            const nodeEnter = node.enter()
-                .append('g')
-                .attr('class', 'node')
-                .attr('id', (d) => d.id)
-                .attr('transform', (d) => {
-                    const c = getClosestVisibleParentStartCoordinates(d)
-                    return `translate(${c.y},${c.x})`
+            const nodeEnter = node
+                .enter()
+                .append("g")
+                .attr("class", "node")
+                .attr("id", (d) => d.id)
+                .attr("transform", (d) => {
+                    const c = getClosestVisibleParentStartCoordinates(d);
+                    return `translate(${c.y},${c.x})`;
                 })
-                .on('click', toggleBranch)
+                .on("click", toggleBranch);
 
-            nodeEnter.append('circle')
-                .attr('id', (d) => d.id)
-                .attr('r', 6)
+            nodeEnter
+                .append("circle")
+                .attr("id", (d) => d.id)
+                .attr("r", 6)
                 .transition()
                 .duration(self._transitionTime)
-                .attr('x', (d) => d.x)
-                .attr('y', (d) => d.y)
+                .attr("x", (d) => d.x)
+                .attr("y", (d) => d.y);
 
-            nodeEnter.append('text')
-                .attr('class', 'grouptree__nodelabel')
-                .attr('dy', '.35em')
-                .style('fill-opacity', 1)
-                .attr('x', (d) => (d.children || d._children ? -21 : 21))
-                .attr('text-anchor', (d) => (d.children || d._children ? 'end' : 'start'))
-                .text((d) => d.data.name)
+            nodeEnter
+                .append("text")
+                .attr("class", "grouptree__nodelabel")
+                .attr("dy", ".35em")
+                .style("fill-opacity", 1)
+                .attr("x", (d) => (d.children || d._children ? -21 : 21))
+                .attr("text-anchor", (d) =>
+                    d.children || d._children ? "end" : "start"
+                )
+                .text((d) => d.data.name);
 
-            nodeEnter.append('text')
-                .attr('class', 'grouptree__pressurelabel')
-                .attr('x', 0)
-                .attr('dy', '-.05em')
-                .attr('text-anchor', 'middle')
-                .text((d) => d.data.pressure.toFixed(0))
+            nodeEnter
+                .append("text")
+                .attr("class", "grouptree__pressurelabel")
+                .attr("x", 0)
+                .attr("dy", "-.05em")
+                .attr("text-anchor", "middle")
+                .text((d) => d.data.pressure.toFixed(0));
 
-            nodeEnter.append('text')
-                .attr('class', 'grouptree__pressureunit')
-                .attr('x', 0)
-                .attr('dy', '.04em')
-                .attr('dominant-baseline', 'text-before-edge')
-                .attr('text-anchor', 'middle')
-                .text('bar')
+            nodeEnter
+                .append("text")
+                .attr("class", "grouptree__pressureunit")
+                .attr("x", 0)
+                .attr("dy", ".04em")
+                .attr("dominant-baseline", "text-before-edge")
+                .attr("text-anchor", "middle")
+                .text("bar");
 
-            const nodeUpdate = nodeEnter.merge(node)
+            const nodeUpdate = nodeEnter.merge(node);
 
-            nodeUpdate.select('text.grouptree__pressurelabel')
-                .text((d) => d.data.pressure.toFixed(0))
+            nodeUpdate
+                .select("text.grouptree__pressurelabel")
+                .text((d) => d.data.pressure.toFixed(0));
 
-            nodeUpdate.transition()
-                .duration(self._transitionTime)
-                .attr('transform', (d) => `translate(${d.y},${d.x})`)
-
-            nodeUpdate.select('circle')
-                .attr('class',
-                    (d) => `${'grouptree__node' + ' '}${
-                        d.children || d._children ? 'grouptree__node--withchildren' : 'grouptree__node'}`)
-                .transition().duration(self._transitionTime)
-                .attr('r', 15)
-
-            const nodeExit = node.exit()
-                .attr('opacity', 1)
+            nodeUpdate
                 .transition()
                 .duration(self._transitionTime)
-                .attr('opacity', 1e-6)
-                .attr('transform', (d) => {
-                    d.isvisible = false
-                    const c = getClosestVisibleParentEndCoordinates(d)
-                    return `translate(${c.y},${c.x})`
-                })
-                .remove()
+                .attr("transform", (d) => `translate(${d.y},${d.x})`);
 
-            nodeExit.select('text').style('fill-opacity', 1e-6)
-            nodeExit.select('.grouptree__nodelabel').style('fill-opacity', 1e-6)
-            nodeExit.select('.grouptree__pressurelabel').style('fill-opacity', 1e-6)
-            nodeExit.select('.grouptree__pressureunit').style('fill-opacity', 1e-6)
+            nodeUpdate
+                .select("circle")
+                .attr(
+                    "class",
+                    (d) =>
+                        `${"grouptree__node" + " "}${
+                            d.children || d._children
+                                ? "grouptree__node--withchildren"
+                                : "grouptree__node"
+                        }`
+                )
+                .transition()
+                .duration(self._transitionTime)
+                .attr("r", 15);
+
+            const nodeExit = node
+                .exit()
+                .attr("opacity", 1)
+                .transition()
+                .duration(self._transitionTime)
+                .attr("opacity", 1e-6)
+                .attr("transform", (d) => {
+                    d.isvisible = false;
+                    const c = getClosestVisibleParentEndCoordinates(d);
+                    return `translate(${c.y},${c.x})`;
+                })
+                .remove();
+
+            nodeExit.select("text").style("fill-opacity", 1e-6);
+            nodeExit
+                .select(".grouptree__nodelabel")
+                .style("fill-opacity", 1e-6);
+            nodeExit
+                .select(".grouptree__pressurelabel")
+                .style("fill-opacity", 1e-6);
+            nodeExit
+                .select(".grouptree__pressureunit")
+                .style("fill-opacity", 1e-6);
         }
 
         /**
@@ -329,35 +366,45 @@ export default class GroupTree {
          * @param flowrate - key identifying the flowrate of the incoming edge
          */
         function updateEdges(edges, flowrate) {
-            const link = self._svg.selectAll('path.link')
-                .data(edges, (d) => d.id)
+            const link = self._svg
+                .selectAll("path.link")
+                .data(edges, (d) => d.id);
 
-            const linkEnter = link.enter().insert('path', 'g')
-                .attr('id', (d) => `path ${d.id}`)
-                .attr('d', (d) => {
-                    const c = getClosestVisibleParentStartCoordinates(d)
-                    return diagonal(c, c)
-                })
+            const linkEnter = link
+                .enter()
+                .insert("path", "g")
+                .attr("id", (d) => `path ${d.id}`)
+                .attr("d", (d) => {
+                    const c = getClosestVisibleParentStartCoordinates(d);
+                    return diagonal(c, c);
+                });
 
-            const linkUpdate = linkEnter.merge(link)
+            const linkUpdate = linkEnter.merge(link);
 
-            linkUpdate.transition()
+            linkUpdate
+                .transition()
                 .duration(self._transitionTime)
-                .attr('class', (d) => `link grouptree_link grouptree_link__${flowrate}`)
-                .attr('d', (d) => diagonal(d, d.parent))
-                .style('stroke-width', (d) => self.getEdgeStrokeWidth(flowrate, d.data[flowrate]))
-                .style('stroke-dasharray', (d) => (d.data[flowrate] > 0 ? 'none' : '5,5'))
-
+                .attr(
+                    "class",
+                    (d) => `link grouptree_link grouptree_link__${flowrate}`
+                )
+                .attr("d", (d) => diagonal(d, d.parent))
+                .style("stroke-width", (d) =>
+                    self.getEdgeStrokeWidth(flowrate, d.data[flowrate])
+                )
+                .style("stroke-dasharray", (d) =>
+                    d.data[flowrate] > 0 ? "none" : "5,5"
+                );
 
             link.exit()
                 .transition()
                 .duration(self._transitionTime)
-                .attr('d', (d) => {
-                    d.isvisible = false
-                    const c = getClosestVisibleParentEndCoordinates(d)
-                    return diagonal(c, c)
+                .attr("d", (d) => {
+                    d.isvisible = false;
+                    const c = getClosestVisibleParentEndCoordinates(d);
+                    return diagonal(c, c);
                 })
-                .remove()
+                .remove();
 
             /**
              * Create the curve definition for the edge between node s and node d.
@@ -368,10 +415,9 @@ export default class GroupTree {
                 return `M ${d.y} ${d.x}
                  C ${(d.y + s.y) / 2} ${d.x},
                    ${(d.y + s.y) / 2} ${s.x},
-                   ${s.y} ${s.x}`
+                   ${s.y} ${s.x}`;
             }
         }
-
 
         /**
          * Add new and update existing texts/textpaths on edges.
@@ -379,36 +425,42 @@ export default class GroupTree {
          * @param edges - list of nodes in a tree
          */
         function updateEdgeTexts(edges) {
-            const textpath = self._textpaths.selectAll('.grupnet_text')
-                .data(edges, (d) => d.id)
+            const textpath = self._textpaths
+                .selectAll(".grupnet_text")
+                .data(edges, (d) => d.id);
 
-            const enter = textpath.enter()
-                .insert('text')
-                .attr('dominant-baseline', 'central')
-                .attr('text-anchor', 'middle')
-                .append('textPath')
-                .attr('class', 'grupnet_text')
-                .attr('startOffset', '50%')
-                .attr('xlink:href', (d) => `#path ${d.id}`)
+            const enter = textpath
+                .enter()
+                .insert("text")
+                .attr("dominant-baseline", "central")
+                .attr("text-anchor", "middle")
+                .append("textPath")
+                .attr("class", "grupnet_text")
+                .attr("startOffset", "50%")
+                .attr("xlink:href", (d) => `#path ${d.id}`);
 
-            enter.merge(textpath)
-                .attr('fill-opacity', 1e-6)
+            enter
+                .merge(textpath)
+                .attr("fill-opacity", 1e-6)
                 .transition()
                 .duration(self._transitionTime)
-                .attr('fill-opacity', 1)
-                .text((d) => d.data.grupnet)
+                .attr("fill-opacity", 1)
+                .text((d) => d.data.grupnet);
 
-            textpath.exit().remove()
+            textpath.exit().remove();
         }
 
-        const newTree = cloneExistingNodeStates(growNewTree(this._renderTree(root), this._width), this._currentTree)
+        const newTree = cloneExistingNodeStates(
+            growNewTree(this._renderTree(root), this._width),
+            this._currentTree
+        );
 
         // execute visualization operations on enter, update and exit selections
-        updateNodes(newTree.descendants())
-        updateEdges(newTree.descendants().slice(1), this.flowrate)
-        updateEdgeTexts(newTree.descendants().slice(1))
+        updateNodes(newTree.descendants());
+        updateEdges(newTree.descendants().slice(1), this.flowrate);
+        updateEdgeTexts(newTree.descendants().slice(1));
 
         // save the state of the now current tree, before next update
-        this._currentTree = doPostUpdateOperations(newTree)
+        this._currentTree = doPostUpdateOperations(newTree);
     }
 }
