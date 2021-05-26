@@ -1,66 +1,33 @@
 import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
 import { filter_alt } from "@equinor/eds-icons";
-import {
-    Box,
-    createStyles,
-    makeStyles,
-    Menu,
-    // eslint-disable-next-line prettier/prettier
-    Theme
-} from "@material-ui/core";
 import React, { useCallback } from "react";
-import FilterByAttributesButton from "./FilterByAttributesButton";
-import HideZeroCompletionsSwitch from "./HideZeroCompletionsSwitch";
-import WellFilter from "./WellFilter";
-import ZoneSelector from "./ZoneSelector";
+import { useDispatch, useSelector } from "react-redux";
+import { updateIsDrawerOpen } from "../../redux/actions";
+import { WellCompletionsState } from "../../redux/store";
 
 // Use library approach
 Icon.add({ filter_alt }); // (this needs only be done once)
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        paper: {
-            paddingLeft: theme.spacing(1),
-            paddingRight: theme.spacing(1),
-            alignSelf: "center",
-            width: "250px",
-        },
-    })
-);
+
 const FilterMenu: React.FC = React.memo(() => {
-    const classes = useStyles();
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const dispatch = useDispatch();
 
-    // handlers
-    const handleClick = useCallback(
-        (event: React.MouseEvent<HTMLButtonElement>) =>
-            setAnchorEl(event.currentTarget),
-        []
+    const isDrawerOpen = useSelector(
+        (state: WellCompletionsState) => state.ui.isDrawerOpen
     );
-
-    const handleClose = useCallback(() => setAnchorEl(null), []);
-
+    const openDrawer = useCallback(
+        () => dispatch(updateIsDrawerOpen(!isDrawerOpen)),
+        [dispatch, isDrawerOpen]
+    );
     return (
         <div>
-            <Tooltip title="Filter">
-                <Button variant="ghost_icon" onClick={handleClick}>
+            <Tooltip title={isDrawerOpen ? "Close filter menu" : "Filter"}>
+                <Button
+                    variant={isDrawerOpen ? "outlined" : "ghost_icon"}
+                    onClick={openDrawer}
+                >
                     <Icon color="currentColor" name="filter_alt" />
                 </Button>
             </Tooltip>
-            <Menu
-                id="filter-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                classes={{ paper: classes.paper }}
-            >
-                <Box marginY={1}>
-                    <HideZeroCompletionsSwitch />
-                    <ZoneSelector />
-                    <WellFilter />
-                    <FilterByAttributesButton />
-                </Box>
-            </Menu>
         </div>
     );
 });

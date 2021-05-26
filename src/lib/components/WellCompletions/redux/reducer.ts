@@ -33,6 +33,7 @@ export const uiSlice = createSlice({
         currentPage: 1,
         timeAggregation: "None",
         sortBy: {},
+        isDrawerOpen: false,
         wellSearchText: "",
         filteredZones: [],
         hideZeroCompletions: false,
@@ -56,6 +57,9 @@ export const uiSlice = createSlice({
             action: PayloadAction<TimeAggregation>
         ) => {
             state.timeAggregation = action.payload;
+        },
+        updateIsDrawerOpen: (state, action: PayloadAction<boolean>) => {
+            state.isDrawerOpen = action.payload;
         },
         updateWellSearchText: (state, action: PayloadAction<string>) => {
             state.wellSearchText = action.payload;

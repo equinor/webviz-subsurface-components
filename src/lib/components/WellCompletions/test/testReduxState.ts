@@ -12,6 +12,7 @@ export const testState = {
         wellsPerPage: 25,
         currentPage: 1,
         timeAggregation: "None",
+        isDrawerOpen: false,
         wellSearchText: "",
         filteredZones: [],
         hideZeroCompletions: false,

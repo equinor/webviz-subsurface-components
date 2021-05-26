@@ -14,15 +14,15 @@ import {
  * @param data
  * @returns
  */
-export const preprocessData = (data: Data): Data => {
+export const preprocessData = (subzones: string[], data: Data): Data => {
     return {
         ...data,
         wells: data.wells.map((well) => {
             let earliestCompDateIndex = Number.POSITIVE_INFINITY;
-            data.stratigraphy.forEach((zone) => {
-                if (zone.name in well.completions) {
+            subzones.forEach((zone) => {
+                if (zone in well.completions) {
                     //store earliest completion date
-                    const completion = well.completions[zone.name];
+                    const completion = well.completions[zone];
                     const earliestDate = completion.t.find(
                         (_, index) => completion.open[index] > 0
                     );
@@ -116,9 +116,16 @@ export const createAttributePredicate = (
     };
 };
 
+//DFS
+export const findSubzones = (zone: Zone, result: Zone[]): void => {
+    if (zone === undefined) return;
+    if (zone.subzones === undefined || zone.subzones.length === 0)
+        result.push(zone);
+    else zone.subzones.forEach((zone) => findSubzones(zone, result));
+};
 /**
  * Util method to prepare stratigraphy and well data from the given time step range and other settings for plotting
- * @param stratigraphy
+ * @param subzones
  * @param wells
  * @param range
  * @param timeAggregation
@@ -127,7 +134,7 @@ export const createAttributePredicate = (
  * @returns
  */
 export const computeDataToPlot = (
-    stratigraphy: Zone[],
+    subzones: Zone[],
     wells: Well[],
     range: [number, number],
     timeAggregation: TimeAggregation,
@@ -137,7 +144,7 @@ export const computeDataToPlot = (
     wells.forEach((well) => {
         const completionsPlotData: CompletionPlotData[] = [];
         let hasData = false;
-        stratigraphy.forEach((zone, zoneIndex) => {
+        subzones.forEach((zone, zoneIndex) => {
             const length = range[1] - range[0] + 1;
             const openValues = Array(length).fill(0);
             const shutValues = Array(length).fill(0);
@@ -198,7 +205,7 @@ export const computeDataToPlot = (
             });
     });
     return {
-        stratigraphy,
+        stratigraphy: subzones,
         wells: wellPlotData,
     };
 };

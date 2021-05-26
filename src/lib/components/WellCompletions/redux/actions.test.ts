@@ -8,6 +8,7 @@ import {
     updateFilteredZones,
     updateHideZeroCompletions,
     updateId,
+    updateIsDrawerOpen,
     updateSortKey,
     updateTimeAggregation,
     updateTimeIndexRange,
@@ -114,6 +115,18 @@ describe("test actions", () => {
             {
                 payload: [],
                 type: "ui/updateFilterByAttributes",
+            },
+        ]);
+    });
+    it("test updateIsDrawerOpen", () => {
+        const store = mockStore(testState);
+        store.dispatch(updateIsDrawerOpen(true));
+
+        const actions = store.getActions();
+        expect(actions).toEqual([
+            {
+                payload: true,
+                type: "ui/updateIsDrawerOpen",
             },
         ]);
     });
