@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import SmartNodeSelectorComponent from "@webviz/core-components/dist/components/SmartNodeSelector/components/SmartNodeSelectorComponent"
+import SmartNodeSelectorComponent from "@webviz/core-components/dist/components/SmartNodeSelector/components/SmartNodeSelectorComponent";
 import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 import VectorSelection from "../utils/VectorSelection";
@@ -25,26 +25,26 @@ import well_completion from "./images/well-completion.svg";
 import React from "react";
 
 type ParentProps = {
-    selectedTags: string[],
-    selectedNodes: string[],
-    selectedIds: string[]
+    selectedTags: string[];
+    selectedNodes: string[];
+    selectedIds: string[];
 };
 
 type VectorSelectorPropType = {
-    id: string,
-    maxNumSelectedNodes: number,
-    delimiter: string,
-    numMetaNodes: number,
-    data: TreeDataNode[],
-    label?: string,
-    showSuggestions: boolean,
-    setProps: (props: ParentProps) => void,
-    selectedTags?: string[],
-    placeholder?: string,
-    numSecondsUntilSuggestionsAreShown: number,
-    persistence: boolean | string | number,
-    persisted_props: ("selectedTags")[],
-    persistence_type: "local" | "session" | "memory"
+    id: string;
+    maxNumSelectedNodes: number;
+    delimiter: string;
+    numMetaNodes: number;
+    data: TreeDataNode[];
+    label?: string;
+    showSuggestions: boolean;
+    setProps: (props: ParentProps) => void;
+    selectedTags?: string[];
+    placeholder?: string;
+    numSecondsUntilSuggestionsAreShown: number;
+    persistence: boolean | string | number;
+    persisted_props: "selectedTags"[];
+    persistence_type: "local" | "session" | "memory";
 };
 
 /**
@@ -62,24 +62,19 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
         let error = "";
         try {
             this.treeData = new TreeData({
-                treeData: this.modifyTreeData(
-                    props.data,
-                    props.numMetaNodes
-                ),
+                treeData: this.modifyTreeData(props.data, props.numMetaNodes),
                 delimiter: props.delimiter,
             });
-        }
-        catch(e) {
+        } catch (e) {
             hasError = true;
             error = e;
         }
 
-
-        let nodeSelections: VectorSelection[] = [];
+        const nodeSelections: VectorSelection[] = [];
         if (props.selectedTags !== undefined) {
             for (const tag of props.selectedTags) {
                 const nodePath = tag.split(this.props.delimiter);
-                nodePath.splice(props.numMetaNodes, 0, "*")
+                nodePath.splice(props.numMetaNodes, 0, "*");
                 nodeSelections.push(this.createNewNodeSelection(nodePath));
             }
         }
@@ -95,20 +90,22 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             currentTagIndex: 0,
             suggestionsVisible: false,
             hasError: hasError,
-            error: error
+            error: error,
         };
     }
 
     componentDidUpdate(prevProps: VectorSelectorPropType): void {
-        const selectedTags = this.state.nodeSelections.filter(
-            nodeSelection => nodeSelection.isValid()
-        ).map(
-            nodeSelection => nodeSelection.getCompleteNodePathAsString()
-        );
+        const selectedTags = this.state.nodeSelections
+            .filter((nodeSelection) => nodeSelection.isValid())
+            .map((nodeSelection) =>
+                nodeSelection.getCompleteNodePathAsString()
+            );
         if (
-            this.props.selectedTags
-            && JSON.stringify(this.props.selectedTags) !== JSON.stringify(selectedTags)
-            && JSON.stringify(prevProps.selectedTags) !== JSON.stringify(this.props.selectedTags)
+            this.props.selectedTags &&
+            JSON.stringify(this.props.selectedTags) !==
+                JSON.stringify(selectedTags) &&
+            JSON.stringify(prevProps.selectedTags) !==
+                JSON.stringify(this.props.selectedTags)
         ) {
             const nodeSelections: VectorSelection[] = [];
             if (this.props.selectedTags !== undefined) {
@@ -118,7 +115,10 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                     nodeSelections.push(this.createNewNodeSelection(nodePath));
                 }
             }
-            if (nodeSelections.length < this.props.maxNumSelectedNodes || this.props.maxNumSelectedNodes === -1) {
+            if (
+                nodeSelections.length < this.props.maxNumSelectedNodes ||
+                this.props.maxNumSelectedNodes === -1
+            ) {
                 nodeSelections.push(this.createNewNodeSelection());
             }
             this.numValidSelections = this.countValidSelections();
@@ -137,7 +137,10 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
         });
     }
 
-    modifyTreeData(treeData: TreeDataNode[], numMetaNodes: number): TreeDataNode[] {
+    modifyTreeData(
+        treeData: TreeDataNode[],
+        numMetaNodes: number
+    ): TreeDataNode[] {
         const typeIcons = {
             aquifer: aquifer,
             block: block,
@@ -152,7 +155,10 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             well: well,
             "well-completion": well_completion,
         };
-        const populateData = (data: TreeDataNode[] | undefined, level: number) => {
+        const populateData = (
+            data: TreeDataNode[] | undefined,
+            level: number
+        ) => {
             const newData: TreeDataNode[] = [];
             if (level == numMetaNodes && data) {
                 const types = {};
@@ -168,9 +174,9 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                 }
                 for (const type in types) {
                     newData.push({
-                        "name": type.charAt(0).toUpperCase() + type.slice(1),
-                        "icon": typeIcons[type],
-                        "children": types[type],
+                        name: type.charAt(0).toUpperCase() + type.slice(1),
+                        icon: typeIcons[type],
+                        children: types[type],
                     });
                 }
             } else if (data) {
