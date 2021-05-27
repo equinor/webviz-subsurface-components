@@ -21,7 +21,7 @@ export default class GroupTree {
      */
     constructor(dom_element_id, tree_data, defaultFlowrate) {
         this._currentFlowrate = defaultFlowrate;
-        this._transitionTime = 1000;
+        this._transitionTime = 200;
 
         const tree_values = {};
 
@@ -45,10 +45,8 @@ export default class GroupTree {
                 .range([2, 100]);
         });
 
-        this._width = d3
-            .select(dom_element_id)
-            .node()
-            .getBoundingClientRect().width;
+        const select = d3.select(dom_element_id);
+        this._width = select.node().getBoundingClientRect().width;
 
         const margin = {
             top: 10,

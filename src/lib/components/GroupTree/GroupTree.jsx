@@ -6,15 +6,15 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import GroupTree from "./components/GroupTree";
+import GroupTreeComponent from "./components/GroupTreeComponent";
 
-const DynamicTree = (props) => {
-    return <GroupTree id={props.id} />;
+const GroupTree = (props) => {
+    return <GroupTreeComponent id={props.id} data={props.data} />;
 };
 
-DynamicTree.propTypes = {
+GroupTree.propTypes = {
     id: PropTypes.string.isRequired,
     data: PropTypes.object,
 };
 
-export default DynamicTree;
+export default GroupTree;
