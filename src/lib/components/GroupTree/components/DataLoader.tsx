@@ -15,13 +15,11 @@ const DataProvider: React.FC<Props> = ({
     data,
 }: PropsWithChildren<Props>) => {
     const preloadedState = useMemo(() => {
-        const iterations = Array.from(Object.keys(data.iterations));
+        const iterations = Object.keys(data.iterations);
         const firstIteration = iterations.length > 0 ? iterations[0] : "";
         const dateTimes =
             firstIteration in data.iterations
-                ? Array.from(
-                      Object.keys(data.iterations[firstIteration]!.trees)
-                  )
+                ? Object.keys(data.iterations[firstIteration]!.trees)
                 : [];
         const firstDateTime = dateTimes.length === 0 ? "" : dateTimes[0];
         return {
