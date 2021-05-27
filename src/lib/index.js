@@ -5,7 +5,7 @@
  * Copyright (C) 2020 - Equinor ASA. */
 
 import DeckGLMap from "./components/DeckGLMap";
-import DynamicTree from "./components/DynamicTree";
+import GroupTree from "./components/GroupTree";
 import HistoryMatch from "./components/HistoryMatch";
 import LayeredMap from "./components/LayeredMap";
 import LeafletMap from "./components/LeafletMap";
@@ -23,6 +23,5 @@ export {
     LeafletMap,
     DeckGLMap,
     WellCompletions,
-    DynamicTree,
+    GroupTree,
 };
-

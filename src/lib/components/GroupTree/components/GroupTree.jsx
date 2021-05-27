@@ -1,7 +1,6 @@
 import * as d3 from "d3";
 import Slider from "../../../shared/slider";
-import "./dynamic_tree.css";
-import GroupTree from "./group_tree";
+import GroupTree from "./Plot/group_tree";
 
 /**
  * Creates a new instance of the group tree visualization with the necessary control components.

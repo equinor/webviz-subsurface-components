@@ -7,7 +7,7 @@
 /* eslint no-magic-numbers: 0 */
 import React, { Component } from "react";
 import DeckGLMapDemo from "./DeckGLMapDemo";
-import DynamicTreeDemo from "./DynamicTreeDemo";
+import GroupTreeDemo from "./GroupTreeDemo";
 // Components
 import HistoryMatchDemo from "./HistoryMatchDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
@@ -32,8 +32,8 @@ class App extends Component {
             case "DeckGLMapDemo": {
                 return <DeckGLMapDemo />;
             }
-            case "DynamicTree": {
-                return <DynamicTreeDemo />;
+            case "GroupTree": {
+                return <GroupTreeDemo />;
             }
             case "LeafletMap": {
                 return <LeafletMapDemo />;
@@ -70,7 +70,7 @@ class App extends Component {
                     onChange={this.onChange.bind(this)}
                 >
                     <option value="DeckGLMapDemo">DeckGLMapDemo</option>
-                    <option value="DynamicTree">DynamicTree</option>
+                    <option value="GroupTree">GroupTree</option>
                     <option value="LeafletMap">LeafletMap</option>
                     <option value="HistoryMatch">HistoryMatch</option>
                     <option value="Morris">Morris</option>
