@@ -25,7 +25,7 @@ export default class VectorSelection extends TreeNodeSelection {
 
     setNodeName(data: string, index?: number): void {
         let increment = false;
-        let newData = data;
+        const newData = data;
         if (index !== undefined) {
             if (index == super.getNumMetaNodes() - 1 && data.length == 1) {
                 data = "*";

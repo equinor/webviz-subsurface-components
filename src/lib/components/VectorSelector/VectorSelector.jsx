@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import VectorSelectorComponent from "./components/VectorSelectorComponent";
 
-const VectorSelector = props => {
+const VectorSelector = (props) => {
     return (
         <VectorSelectorComponent
             id={props.id}
