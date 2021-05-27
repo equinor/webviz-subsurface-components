@@ -43,7 +43,7 @@ const DateTimeSlider: React.FC = React.memo(() => {
         (state: GroupTreeState) => state.ui.currentDateTime
     );
     const times = useMemo(
-        () => Array.from(Object.keys(data.iterations[currentIteration].trees)),
+        () => Object.keys(data.iterations[currentIteration].trees),
         [data, currentIteration]
     );
     const currentDateTimeIndex = useMemo(() => times.indexOf(currentDateTime), [
@@ -62,7 +62,7 @@ const DateTimeSlider: React.FC = React.memo(() => {
             <EdsSlider
                 track={false}
                 aria-labelledby="date-time-slider-label"
-                value={currentDateTimeIndex >= 0 ? currentDateTimeIndex : 0}
+                value={currentDateTimeIndex}
                 valueLabelDisplay="on"
                 onChange={onChange}
                 min={0}

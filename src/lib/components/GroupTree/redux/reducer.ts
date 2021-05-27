@@ -16,8 +16,11 @@ export const uiSlice = createSlice({
         currentFlowRate: "oilrate",
     } as UISettings,
     reducers: {
-        updateCurrentIteration: (state, action: PayloadAction<string>) => {
-            state.currentIteration = action.payload;
+        updateCurrentIteration: (
+            state,
+            action: PayloadAction<[string, string]>
+        ) => {
+            [state.currentIteration, state.currentDateTime] = action.payload;
         },
         updateCurrentDateTime: (state, action: PayloadAction<string>) => {
             state.currentDateTime = action.payload;
