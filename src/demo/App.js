@@ -16,6 +16,7 @@ import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import LeafletMapDemo from "./LeafletMapDemo";
 import DeckGLMapDemo from "./DeckGLMapDemo";
 import WellCompletionsDemo from "./WellCompletionsDemo";
+import VectorSelectorDemo from "./VectorSelectorDemo";
 
 class App extends Component {
     constructor(props) {
@@ -53,6 +54,9 @@ class App extends Component {
             case "WellCompletions": {
                 return <WellCompletionsDemo />;
             }
+            case "VectorSelector": {
+                return <VectorSelectorDemo />;
+            }
             default: {
                 return null;
             }
@@ -76,6 +80,7 @@ class App extends Component {
                         PriorPosteriorDistribution
                     </option>
                     <option value="WellCompletions">WellCompletions</option>
+                    <option value="VectorSelector">VectorSelector</option>
                 </select>
                 {this.renderDemo()}
             </div>
