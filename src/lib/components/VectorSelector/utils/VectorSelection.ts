@@ -73,6 +73,26 @@ export default class VectorSelection extends TreeNodeSelection {
         super.setFocussedLevel(index, true);
     }
 
+    containsOrIsContainedBy(other: VectorSelection): boolean {
+        if (this.containsWildcardIncludingType() && !other.containsWildcardIncludingType()) {
+            return this.exactlyMatchedNodePaths().includes(other.getCompleteNodePathAsString());
+        }
+        else if (!this.containsWildcardIncludingType() && other.containsWildcardIncludingType()) {
+            return other.exactlyMatchedNodePaths().includes(this.getCompleteNodePathAsString());
+        }
+        else if (this.containsWildcardIncludingType() && other.containsWildcardIncludingType()) {
+            const otherMatchedTags = other.exactlyMatchedNodePaths();
+            return this.exactlyMatchedNodePaths().some((el) => otherMatchedTags.includes(el));
+        }
+        else {
+            return this.equals(other);
+        }
+    }
+
+    containsWildcardIncludingType(): boolean {
+        return super.containsWildcard();
+    }
+
     containsWildcard(): boolean {
         let level = 0;
         for (const el of this.getNodePath()) {

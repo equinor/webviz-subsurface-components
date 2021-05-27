@@ -43,7 +43,7 @@ type VectorSelectorPropType = {
     placeholder?: string,
     numSecondsUntilSuggestionsAreShown: number,
     persistence: boolean | string | number,
-    persisted_props: ("selectedNodes" | "selectedTags" | "selectedIds")[],
+    persisted_props: ("selectedTags")[],
     persistence_type: "local" | "session" | "memory"
 };
 
@@ -97,6 +97,33 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             hasError: hasError,
             error: error
         };
+    }
+
+    componentDidUpdate(prevProps: VectorSelectorPropType): void {
+        const selectedTags = this.state.nodeSelections.filter(
+            nodeSelection => nodeSelection.isValid()
+        ).map(
+            nodeSelection => nodeSelection.getCompleteNodePathAsString()
+        );
+        if (
+            this.props.selectedTags
+            && JSON.stringify(this.props.selectedTags) !== JSON.stringify(selectedTags)
+            && JSON.stringify(prevProps.selectedTags) !== JSON.stringify(this.props.selectedTags)
+        ) {
+            const nodeSelections: VectorSelection[] = [];
+            if (this.props.selectedTags !== undefined) {
+                for (const tag of this.props.selectedTags) {
+                    const nodePath = tag.split(this.props.delimiter);
+                    nodePath.splice(this.props.numMetaNodes, 0, "*");
+                    nodeSelections.push(this.createNewNodeSelection(nodePath));
+                }
+            }
+            if (nodeSelections.length < this.props.maxNumSelectedNodes || this.props.maxNumSelectedNodes === -1) {
+                nodeSelections.push(this.createNewNodeSelection());
+            }
+            this.numValidSelections = this.countValidSelections();
+            this.updateState({ nodeSelections: nodeSelections });
+        }
     }
 
     createNewNodeSelection(nodePath: string[] = [""]): VectorSelection {
