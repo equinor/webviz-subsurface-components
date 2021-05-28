@@ -11,6 +11,7 @@ import LayeredMap from "./components/LayeredMap";
 import LeafletMap from "./components/LeafletMap";
 import DeckGLMap from "./components/DeckGLMap";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
+import VectorSelector from "./components/VectorSelector";
 import WellCompletions from "./components/WellCompletions";
 
 export {
@@ -21,5 +22,6 @@ export {
     PriorPosteriorDistribution,
     LeafletMap,
     DeckGLMap,
+    VectorSelector,
     WellCompletions,
 };
