@@ -12,6 +12,7 @@
     "main": "build/index.js",
     "scripts": {
         "start": "webpack-dev-server --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
+        "postinstall": "cp ./package.json webviz_subsurface_components/package.json",
         "build:js": "webpack --mode production",
         "build:js-dev": "webpack --mode development",
         "build:js-demo": "webpack --mode production --entry ./src/demo/index.js",
