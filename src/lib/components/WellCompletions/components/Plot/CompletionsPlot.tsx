@@ -15,9 +15,10 @@ const CompletionsPlot: React.FC<Props> = React.memo(
     ({ plotData, layout, padding }) => {
         const data = useContext(DataContext);
         const { setContent } = useTooltip();
-        const decimalPlaces = useMemo(() => data.units.kh.decimalPlaces, [
-            data,
-        ]);
+        const decimalPlaces = useMemo(
+            () => data.units.kh.decimalPlaces,
+            [data]
+        );
         const khUnit = useMemo(
             () =>
                 data.units.kh.unit.length > 0 ? ` ${data.units.kh.unit}` : "",
@@ -81,9 +82,10 @@ const CompletionsPlot: React.FC<Props> = React.memo(
             [setContent, plotData.stratigraphy, barHeight]
         );
 
-        const onMouseOut = useCallback(() => setContent(() => null), [
-            setContent,
-        ]);
+        const onMouseOut = useCallback(
+            () => setContent(() => null),
+            [setContent]
+        );
         return (
             <g>
                 {plotData.wells.map((well, i) => {

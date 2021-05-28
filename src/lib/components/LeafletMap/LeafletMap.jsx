@@ -170,14 +170,13 @@ class LeafletMap extends Component {
 
     syncedDrawLayerDelete = (layerTypes, shouldRedraw) => {
         const syncedMaps = [...this.props.syncedMaps, this.state.id];
-        LeafletMap.syncedDrawLayer.data = LeafletMap.syncedDrawLayer.data.filter(
-            (drawing) => {
+        LeafletMap.syncedDrawLayer.data =
+            LeafletMap.syncedDrawLayer.data.filter((drawing) => {
                 return (
                     !syncedMaps.includes(drawing.creatorId) ||
                     !layerTypes.includes(drawing.type)
                 );
-            }
-        );
+            });
         if (shouldRedraw) {
             this.redrawAllSyncedMaps();
         }
