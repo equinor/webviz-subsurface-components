@@ -62,6 +62,11 @@
           "outline": true
         },
         {
+          "@@type": "PieChartLayer",
+          "id": "pie-layer",
+          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/piechart.json"
+        },
+        {
           "@@type": "DrawingLayer",
           "id": "drawing-layer",
           "mode": "drawLineString",
