@@ -120,14 +120,10 @@ export default class FlowMap extends Map2D {
                 self._flowAnimation.particleGenerator = self._particleGenerator;
             });
         }
-        this._flowAnimation.setTransform(
+        this._flowAnimation.setTransform(0, 0, this.kInit, this.kInit, 0, [
             0,
             0,
-            this.kInit,
-            this.kInit,
-            0,
-            [0, 0]
-        );
+        ]);
         this._flowAnimation.start();
     }
 

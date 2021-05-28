@@ -40,10 +40,9 @@ export const usePlotData = (): PlotData => {
         (state: WellCompletionsState) => state.ui.sortBy
     );
     //Memo
-    const wellNameRegex = useMemo(
-        () => getRegexPredicate(wellSearchText),
-        [wellSearchText]
-    );
+    const wellNameRegex = useMemo(() => getRegexPredicate(wellSearchText), [
+        wellSearchText,
+    ]);
     const wellAttributePredicate = useMemo(
         () => createAttributePredicate(filterByAttributes),
         [filterByAttributes]

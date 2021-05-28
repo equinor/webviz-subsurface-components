@@ -46,8 +46,9 @@ Icon.add({ delete_to_trash }); // (this needs only be done once)
 const SortTable: React.FC = React.memo(() => {
     const classes = useStyles();
     const [sortKeyToAdd, setSortKeyToAdd] = useState<string>();
-    const [sortDirectionToAdd, setSortDirectionToAdd] =
-        useState<SortDirection>("Ascending");
+    const [sortDirectionToAdd, setSortDirectionToAdd] = useState<SortDirection>(
+        "Ascending"
+    );
     // Redux
     const dispatch = useDispatch();
     const sortBy = useSelector((st: WellCompletionsState) => st.ui.sortBy);

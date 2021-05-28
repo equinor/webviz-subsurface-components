@@ -43,10 +43,10 @@ const WellPagination: React.FC = React.memo(() => {
         () => Math.ceil(plotData.wells.length / wellsPerPage),
         [plotData, wellsPerPage]
     );
-    const currentClampedPage = useMemo(
-        () => clamp(currentPage, 1, pageCount),
-        [currentPage, pageCount]
-    );
+    const currentClampedPage = useMemo(() => clamp(currentPage, 1, pageCount), [
+        currentPage,
+        pageCount,
+    ]);
     const startItem = useMemo(
         () => (currentClampedPage - 1) * wellsPerPage + 1,
         [currentClampedPage, wellsPerPage]

@@ -62,10 +62,9 @@ const WellsPlot: React.FC<Props> = React.memo(
             [setContent]
         );
 
-        const onMouseOut = useCallback(
-            () => setContent(() => null),
-            [setContent]
-        );
+        const onMouseOut = useCallback(() => setContent(() => null), [
+            setContent,
+        ]);
         return (
             <g>
                 {data.map((well, i) => {

@@ -139,9 +139,9 @@ export default function sensitivitySliderPlot(
                         case 2:
                             d.values = {
                                 linear: this._parameters[i].interactions,
-                                log: this._parameters[i].interactions.map(
-                                    (value) => Math.log(value)
-                                ),
+                                log: this._parameters[
+                                    i
+                                ].interactions.map((value) => Math.log(value)),
                             };
                             d.clazz =
                                 "sensitivity-slider-plot__slider-bar-container " +

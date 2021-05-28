@@ -58,15 +58,14 @@ const DataProvider: React.FC<Props> = ({
         };
     }, [id, data.wells, allSubzones]);
 
-    const store = useMemo(
-        () => createReduxStore(preloadedState),
-        [preloadedState]
-    );
+    const store = useMemo(() => createReduxStore(preloadedState), [
+        preloadedState,
+    ]);
 
-    const preprocessedData = useMemo(
-        () => preprocessData(allSubzones, data),
-        [allSubzones, data]
-    );
+    const preprocessedData = useMemo(() => preprocessData(allSubzones, data), [
+        allSubzones,
+        data,
+    ]);
 
     return (
         <DataContext.Provider value={preprocessedData}>
