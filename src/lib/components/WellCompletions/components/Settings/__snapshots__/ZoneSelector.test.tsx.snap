@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test Zone Selector snapshot test 1`] = `
+<div
+  class="MuiFormControl-root makeStyles-formControl-2"
+>
+  <label
+    class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated"
+    data-shrink="false"
+    id="mutiple-zone-label"
+  >
+    Select Zones
+  </label>
+  <div
+    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"
+    style="width: 230px;"
+  >
+    <div
+      aria-haspopup="listbox"
+      aria-labelledby="mutiple-zone-label demo-mutiple-zone"
+      class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiInputBase-input MuiInput-input"
+      id="demo-mutiple-zone"
+      role="button"
+      tabindex="0"
+    >
+      <span>
+        ​
+      </span>
+    </div>
+    <input
+      aria-hidden="true"
+      class="MuiSelect-nativeInput"
+      tabindex="-1"
+      value=""
+    />
+    <svg
+      aria-hidden="true"
+      class="MuiSvgIcon-root MuiSelect-icon"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M7 10l5 5 5-5z"
+      />
+    </svg>
+  </div>
+</div>
+`;

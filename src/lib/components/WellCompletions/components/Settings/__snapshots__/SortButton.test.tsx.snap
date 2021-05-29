@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test view menu snapshot test 1`] = `
+<li
+  class="sc-jtXFOG eXGKHH"
+  role="menuitem"
+  tabindex="0"
+>
+  <div
+    class="sc-eldixR hGzJYK"
+  >
+    Sort/Group by Attributes
+  </div>
+</li>
+`;

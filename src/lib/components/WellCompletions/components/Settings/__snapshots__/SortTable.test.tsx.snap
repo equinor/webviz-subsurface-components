@@ -1,0 +1,140 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test sorting the table snapshot test 1`] = `
+<div
+  class="MuiBox-root MuiBox-root-4 makeStyles-root-1"
+>
+  <table
+    class="sc-eCImvq cAwzou"
+  >
+    <thead
+      class="sc-pVTma czHsjy"
+    >
+      <tr
+        class="sc-jrQzUz gRNlyM"
+      >
+        <th
+          class="sc-iCfLBT FYYOR"
+        >
+          <div
+            class="sc-furvIG haXEwx"
+          >
+            Sort by
+          </div>
+        </th>
+        <th
+          class="sc-iCfLBT FYYOR"
+        >
+          <div
+            class="sc-furvIG haXEwx"
+          >
+            Direction
+          </div>
+        </th>
+        <th
+          class="sc-iCfLBT FYYOR"
+        >
+          <div
+            class="sc-furvIG haXEwx"
+          />
+        </th>
+      </tr>
+    </thead>
+    <tbody
+      class="sc-jRQAMF"
+    >
+      <tr
+        class="sc-jrQzUz gRNlyM"
+      >
+        <td
+          class="sc-gKckTs cqxaQV"
+        >
+          <div
+            class="sc-iWVLQz eCHTEl makeStyles-select-3"
+          >
+            <select
+              class="sc-fyrnIy hsTrOV"
+              id="range-display-mode-selector"
+            >
+              <option>
+                well name
+              </option>
+              <option>
+                stratigraphy depth
+              </option>
+              <option>
+                earliest comp date
+              </option>
+              <option>
+                type
+              </option>
+              <option>
+                region
+              </option>
+              <option>
+                user defined category
+              </option>
+            </select>
+          </div>
+        </td>
+        <td
+          class="sc-gKckTs cqxaQV"
+        >
+          <button
+            aria-controls="simple-menu"
+            aria-haspopup="true"
+            class="sc-dkPtyc hVhMQi"
+            tabindex="0"
+            type="button"
+          >
+            <span
+              class="sc-gsDJrp hVwA"
+            >
+              <span
+                class="sc-bdvvaa cBHEoO"
+              >
+                Ascending
+              </span>
+            </span>
+          </button>
+        </td>
+        <td
+          class="sc-gKckTs cqxaQV"
+        >
+          <button
+            aria-controls="simple-menu"
+            aria-haspopup="true"
+            class="sc-dkPtyc jOZxVe"
+            tabindex="0"
+            title="Add sorting level"
+            type="button"
+          >
+            <span
+              class="sc-gsDJrp hVwA"
+            >
+              <svg
+                aria-hidden="true"
+                class="sc-kfPtPH eNNZeU"
+                fill="currentColor"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  class="sc-fKVsgm"
+                  clip-rule="evenodd"
+                  d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-6-2h-2v-4H7v-2h4V7h2v4h4v2h-4v4z"
+                  data-testid="eds-icon-path"
+                  fill-rule="evenodd"
+                  height="24"
+                />
+              </svg>
+            </span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;

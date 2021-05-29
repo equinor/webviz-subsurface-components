@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test view menu snapshot test 1`] = `
+<div>
+  <div
+    class="sc-ZOsLE kgNgxl"
+  >
+    <div>
+      <button
+        class="sc-dkPtyc jOZxVe"
+        tabindex="0"
+        type="button"
+      >
+        <span
+          class="sc-gsDJrp hVwA"
+        >
+          <svg
+            aria-hidden="true"
+            class="sc-kfPtPH eNNZeU"
+            fill="currentColor"
+            height="24px"
+            viewBox="0 0 24 24"
+            width="24px"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              class="sc-fKVsgm"
+              clip-rule="evenodd"
+              d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
+              data-testid="eds-icon-path"
+              fill-rule="evenodd"
+              height="24"
+            />
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+`;

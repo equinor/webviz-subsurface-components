@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test number of Wells per page snapshot test 1`] = `
+<div
+  class="sc-iWVLQz eCHTEl makeStyles-root-1"
+>
+  <label
+    class="sc-fFehDp jthYlw"
+    for="wells-per-page-select"
+  >
+    <span
+      class="sc-bkkfTU bgnqzc"
+    >
+      Wells per page
+    </span>
+  </label>
+  <select
+    class="sc-fyrnIy hsTrOV"
+    id="wells-per-page-select"
+  >
+    <option
+      value="10"
+    >
+      10
+    </option>
+    <option
+      value="25"
+    >
+      25
+    </option>
+    <option
+      value="50"
+    >
+      50
+    </option>
+  </select>
+</div>
+`;
