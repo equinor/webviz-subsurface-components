@@ -3,10 +3,11 @@ import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { DataContext } from "../components/DataLoader";
 import { WellCompletionsState } from "../redux/store";
-import { Well } from "../redux/types";
+import { Well, Zone } from "../redux/types";
 import {
     computeDataToPlot,
     createAttributePredicate,
+    findSubzones,
     // eslint-disable-next-line prettier/prettier
     PlotData
 } from "../utils/dataUtil";
@@ -57,29 +58,25 @@ export const usePlotData = (): PlotData => {
                 : [],
         [data, wellNameRegex, wellAttributePredicate]
     );
-    const filteredStratigraphy = useMemo(
-        () =>
-            data
-                ? data.stratigraphy.filter(
-                      (zone) =>
-                          !filteredZones || filteredZones.includes(zone.name)
-                  )
-                : [],
-        [data, filteredZones]
-    );
+    const filteredSubzones = useMemo(() => {
+        const allSubzones: Zone[] = [];
+        const filteredZoneSet = new Set(filteredZones);
+        data.stratigraphy.forEach((zone) => findSubzones(zone, allSubzones));
+        return allSubzones.filter((zone) => filteredZoneSet.has(zone.name));
+    }, [data, filteredZones]);
 
     // Compute data to plot by applying time range and other settings
     const dataToPlot = useMemo(
         () =>
             computeDataToPlot(
-                filteredStratigraphy,
+                filteredSubzones,
                 filteredWells,
                 timeIndexRange,
                 timeAggregation,
                 hideZeroCompletions
             ),
         [
-            filteredStratigraphy,
+            filteredSubzones,
             filteredWells,
             timeIndexRange,
             timeAggregation,
