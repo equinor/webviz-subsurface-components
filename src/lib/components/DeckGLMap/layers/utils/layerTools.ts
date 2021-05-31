@@ -1,7 +1,10 @@
+import Layer, { LayerProps } from "@deck.gl/core/lib/layer";
 import * as jsonpatch from "fast-json-patch";
 
-// TODO: templated function, T = layer, U = layer.props
-export function patchLayerProps(layer, newProps): void {
+export function patchLayerProps<
+    L extends Layer<unknown, P>,
+    P extends LayerProps<unknown>
+>(layer: L, newProps: P): void {
     const layerPath = "/layers/[" + layer.id + "]";
     const patch = jsonpatch.compare(layer.props, newProps);
 
@@ -10,5 +13,11 @@ export function patchLayerProps(layer, newProps): void {
         op.path = layerPath + op.path;
     });
 
-    layer.context.deck.props.patchSpec(patch);
+    // userData is undocumented and it doesn't appear in the
+    // deckProps type, but it is used by the layersManager
+    // and forwarded though the context to all the layers.
+    //
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: TS2339
+    layer.context.userData.patchSpec(patch);
 }

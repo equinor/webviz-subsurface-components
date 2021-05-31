@@ -1,12 +1,11 @@
 import { CompositeLayer } from "@deck.gl/core";
-import { GeoJsonLayer } from "@deck.gl/layers";
-
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { RGBAColor } from "@deck.gl/core/utils/color";
+import { GeoJsonLayer } from "@deck.gl/layers";
+import { PickInfo } from "deck.gl";
 
 import { Feature } from "geojson";
 
-// TODO : organize imports (see all files)
 import { patchLayerProps } from "../utils/layerTools";
 
 export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
@@ -24,8 +23,7 @@ export default class WellsLayer extends CompositeLayer<
     Feature,
     WellsLayerProps<Feature>
 > {
-    // TODO: types EVERYWHERE!
-    onClick(info: any): any {
+    onClick(info: PickInfo<Feature>): boolean {
         patchLayerProps(this, {
             ...this.props,
             selectedFeature: info.object,

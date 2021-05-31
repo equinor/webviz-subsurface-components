@@ -66,7 +66,10 @@ export default class DrawingLayer extends CompositeLayer<
                     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
                     onEdit: ({ updatedData, editType }) => {
                         if (editType === "addFeature" && this.props.id) {
-                            patchLayerProps(this, {
+                            patchLayerProps<
+                                DrawingLayer,
+                                DrawingLayerProps<FeatureCollection>
+                            >(this, {
                                 ...this.props,
                                 data: updatedData,
                             });
