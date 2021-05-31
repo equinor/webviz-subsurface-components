@@ -13,10 +13,12 @@ export default class PieChartLayer extends SolidPolygonLayer<
     unknown,
     PieChartLayerProps<unknown>
 > {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     shouldUpdateState({ changeFlags }) {
         return changeFlags.viewportChanged;
     }
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     updateState({ props, oldProps, context, changeFlags }) {
         super.updateState({ props, oldProps, context, changeFlags });
 
@@ -66,7 +68,7 @@ function makePies(data, zoom) {
         return;
     }
 
-    const polygons: any[] = [];
+    const polygons: unknown[] = [];
     for (const pie of data.pies) {
         const pie_polygons = makePie(pie, zoom);
         for (const polygon of pie_polygons) {
@@ -93,7 +95,7 @@ function makePie(pie, zoom) {
         sum += prop.frac;
     }
 
-    const pie_polygons: any[] = [];
+    const pie_polygons: unknown[] = [];
     let start_a = -90.0;
     for (let i = 0; i < pie_props.length; i++) {
         const frac = pie_props[i].frac / sum;
