@@ -87,10 +87,11 @@ class CanvasOverlay extends MapLayer {
 
                 const NUMBER_DISCRETIZATION_LEVELS = 255;
 
-                const z = this.props.original_data.ImageData.data[
-                    (y * this.props.original_data.ImageData.width + x) *
-                        NUMBER_COLOR_CHANNELS
-                ];
+                const z =
+                    this.props.original_data.ImageData.data[
+                        (y * this.props.original_data.ImageData.width + x) *
+                            NUMBER_COLOR_CHANNELS
+                    ];
 
                 const z_string =
                     z > 0
