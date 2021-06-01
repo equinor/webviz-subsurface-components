@@ -17,7 +17,7 @@ with open(os.path.join("webviz_subsurface_components", "package.json")) as f:
 
 package_name = package["name"].replace(" ", "_").replace("-", "_")
 
-INSTALL_REQUIRES = ["dash>=1.6"]
+INSTALL_REQUIRES = ["dash>=1.6", "py_expression_eval>=0.3.13"]
 
 TESTS_REQUIRE = [
     "bandit",

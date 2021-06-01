@@ -1,0 +1,40 @@
+.VectorCalculator {
+    display: block;
+    padding: 5px;
+}
+
+.VectorCalculator__ExpressionInputComponent {
+    padding: 16px;
+}
+
+.VectorCalculator .ExpressionTableComponent {
+    padding: 16px;
+    min-width: 360px;
+}
+
+.VectorCalculator .ExpressionsTableHeader {
+    font-weight: bold;
+}
+
+.VectorCalculator .ExpressionTable {
+    max-height: 450px;
+    min-width: 250px;
+}
+
+.VectorCalculator .VariablesTableNameCell {
+    display: inline-block;
+    position: relative;
+    width: 99%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.VectorCalculator .VariablesTableExpressionCell {
+    display: inline-block;
+    position: relative;
+    width: 99%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
