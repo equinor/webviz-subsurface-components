@@ -8,7 +8,7 @@ import {
     TableCell,
 } from "@material-ui/core";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
-import cloneDeep from "lodash.clonedeep";
+import cloneDeep from "lodash/cloneDeep";
 
 import { VariableVectorMapType } from "../utils/VectorCalculatorTypes";
 import VectorSelector from "../../VectorSelector";
