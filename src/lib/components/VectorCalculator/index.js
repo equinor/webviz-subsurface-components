@@ -1,1 +1,1 @@
-export {VectorCalculator} from "./VectorCalculator";
+export { VectorCalculator } from "./VectorCalculator";

@@ -1,16 +1,30 @@
-import React, { useCallback } from 'react';
-import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
-import { Tooltip } from '@equinor/eds-core-react';
+import React, { useCallback } from "react";
+import {
+    Checkbox,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from "@material-ui/core";
+import { Tooltip } from "@equinor/eds-core-react";
 
-import { ExpressionType, VariableVectorMapType } from '../utils/VectorCalculatorTypes';
-import '../VectorCalculator.css';
+import {
+    ExpressionType,
+    VariableVectorMapType,
+} from "../utils/VectorCalculatorTypes";
+import "../VectorCalculator.css";
 
 interface EnhancedTableProps {
     numSelected: number;
     onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
     rowCount: number;
 }
-const EnhancedTableHead: React.FC<EnhancedTableProps> = (props: EnhancedTableProps) => {
+const EnhancedTableHead: React.FC<EnhancedTableProps> = (
+    props: EnhancedTableProps
+) => {
     const { onSelectAllClick, numSelected, rowCount } = props;
 
     return (
@@ -18,29 +32,54 @@ const EnhancedTableHead: React.FC<EnhancedTableProps> = (props: EnhancedTablePro
             <TableRow>
                 <TableCell padding="checkbox">
                     <Checkbox
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
+                        indeterminate={
+                            numSelected > 0 && numSelected < rowCount
+                        }
                         checked={numSelected > 0 && numSelected <= rowCount}
                         onChange={onSelectAllClick}
-                        inputProps={{ 'aria-label': 'select all expressions' }}
+                        inputProps={{ "aria-label": "select all expressions" }}
                     />
                 </TableCell>
-                <TableCell className="ExpressionsTableHeader" align="left" width="600">{"Name"}</TableCell>
-                <TableCell className="ExpressionsTableHeader" align="left" width="300">{"Expression"}</TableCell>
+                <TableCell
+                    className="ExpressionsTableHeader"
+                    align="left"
+                    width="600"
+                >
+                    {"Name"}
+                </TableCell>
+                <TableCell
+                    className="ExpressionsTableHeader"
+                    align="left"
+                    width="300"
+                >
+                    {"Expression"}
+                </TableCell>
             </TableRow>
         </TableHead>
     );
-}
+};
 
 interface ExpressionsTableProps {
-    expressions: ExpressionType[],
-    onExpressionsSelect: (expressions: ExpressionType[]) => void,
-    onActiveExpressionSelect: (expression: ExpressionType) => void,
+    expressions: ExpressionType[];
+    onExpressionsSelect: (expressions: ExpressionType[]) => void;
+    onActiveExpressionSelect: (expression: ExpressionType) => void;
 }
-export const ExpressionsTable: React.FC<ExpressionsTableProps> = (props: ExpressionsTableProps) => {
+export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
+    props: ExpressionsTableProps
+) => {
     const { expressions } = props;
-    const [selectedExpressions, setSelectedExpressions] = React.useState<ExpressionType[]>([]);
-    const [activeExpression, setActiveExpression] = React.useState<ExpressionType>(
-        { name: "", expression: "", id: "", variableVectorMap: [] });
+    const [selectedExpressions, setSelectedExpressions] = React.useState<
+        ExpressionType[]
+    >([]);
+    const [
+        activeExpression,
+        setActiveExpression,
+    ] = React.useState<ExpressionType>({
+        name: "",
+        expression: "",
+        id: "",
+        variableVectorMap: [],
+    });
 
     React.useEffect(() => {
         updateSelectedExpressions();
@@ -50,7 +89,9 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (props: Express
     const updateSelectedExpressions = useCallback((): void => {
         const newSelectedExpressions = expressions.filter((expr) => {
             for (const elm of selectedExpressions) {
-                if (elm.id === expr.id) { return true; }
+                if (elm.id === expr.id) {
+                    return true;
+                }
             }
             return false;
         });
@@ -59,9 +100,16 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (props: Express
     }, [expressions, selectedExpressions]);
 
     const updateActiveExpression = useCallback((): void => {
-        let newActiveExpression = expressions.find((elm) => elm.id === activeExpression.id);
+        let newActiveExpression = expressions.find(
+            (elm) => elm.id === activeExpression.id
+        );
         if (newActiveExpression === undefined) {
-            newActiveExpression = { name: "", expression: "", id: "", variableVectorMap: [] };
+            newActiveExpression = {
+                name: "",
+                expression: "",
+                id: "",
+                variableVectorMap: [],
+            };
         }
         setActiveExpression(newActiveExpression);
     }, [expressions, activeExpression]);
@@ -79,22 +127,25 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (props: Express
         } else if (index > 0) {
             newSelected = newSelected.concat(
                 selectedExpressions.slice(0, index),
-                selectedExpressions.slice(index + 1),
+                selectedExpressions.slice(index + 1)
             );
         }
 
         setSelectedExpressions(newSelected);
         props.onExpressionsSelect(newSelected);
-    }
+    };
 
     const handleRowClick = (expression: ExpressionType): void => {
         setActiveExpression(expression);
         props.onActiveExpressionSelect(expression);
-    }
+    };
 
-    const isExpressionSelected = useCallback((expression: ExpressionType): boolean => {
-        return selectedExpressions.indexOf(expression) !== -1;
-    }, [selectedExpressions]);
+    const isExpressionSelected = useCallback(
+        (expression: ExpressionType): boolean => {
+            return selectedExpressions.indexOf(expression) !== -1;
+        },
+        [selectedExpressions]
+    );
 
     const handleSelectAllClick = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.checked) {
@@ -105,15 +156,18 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (props: Express
         }
         setSelectedExpressions([]);
         props.onExpressionsSelect([]);
-    }
+    };
 
-    const getExpressionFromMap = (expression: string, variableVectorMap: VariableVectorMapType[]): string => {
+    const getExpressionFromMap = (
+        expression: string,
+        variableVectorMap: VariableVectorMapType[]
+    ): string => {
         let output = expression;
         for (const elm of variableVectorMap) {
             output = output.replace(elm.variableName, elm.vectorName[0]);
         }
         return output;
-    }
+    };
 
     return (
         <TableContainer className={"ExpressionTable"} component={Paper}>
@@ -127,7 +181,10 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (props: Express
                     {expressions.map((row) => {
                         const isSelected = isExpressionSelected(row);
                         const isActive = activeExpression === row;
-                        const expressionFromMap = getExpressionFromMap(row.expression, row.variableVectorMap);
+                        const expressionFromMap = getExpressionFromMap(
+                            row.expression,
+                            row.variableVectorMap
+                        );
 
                         return (
                             <TableRow
@@ -138,10 +195,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (props: Express
                                 selected={isActive}
                                 aria-checked={isActive}
                             >
-                                <TableCell
-                                    padding="checkbox"
-                                    width="2%"
-                                >
+                                <TableCell padding="checkbox" width="2%">
                                     <Checkbox
                                         checked={isSelected}
                                         onClick={() => handleCheckBoxClick(row)}
@@ -166,7 +220,11 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (props: Express
                                         width="60%"
                                         onClick={() => handleRowClick(row)}
                                     >
-                                        <div className={"VariablesTableExpressionCell"}>
+                                        <div
+                                            className={
+                                                "VariablesTableExpressionCell"
+                                            }
+                                        >
                                             {expressionFromMap}
                                         </div>
                                     </TableCell>
