@@ -17,11 +17,12 @@ import LeafletMapDemo from "./LeafletMapDemo";
 import DeckGLMapDemo from "./DeckGLMapDemo";
 import WellCompletionsDemo from "./WellCompletionsDemo";
 import VectorSelectorDemo from "./VectorSelectorDemo";
+import VectorCalculatorDemo from "./VectorCalculatorDemo";
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "DeckGLMapDemo" };
+        this.state = { value: "VectorCalculator" };
     }
 
     onChange(e) {
@@ -30,6 +31,9 @@ class App extends Component {
 
     renderDemo() {
         switch (this.state.value) {
+            case "VectorCalculator": {
+                return <VectorCalculatorDemo />;
+            }
             case "DeckGLMapDemo": {
                 return <DeckGLMapDemo />;
             }
@@ -70,6 +74,7 @@ class App extends Component {
                     value={this.state.value}
                     onChange={this.onChange.bind(this)}
                 >
+                    <option value="VectorCalculator">VectorCalculator</option>
                     <option value="DeckGLMapDemo">DeckGLMapDemo</option>
                     <option value="LeafletMap">LeafletMap</option>
                     <option value="HistoryMatch">HistoryMatch</option>
