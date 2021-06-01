@@ -13,6 +13,7 @@ import DeckGLMap from "./components/DeckGLMap";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
 import VectorSelector from "./components/VectorSelector";
 import WellCompletions from "./components/WellCompletions";
+import {VectorCalculator} from "./components/VectorCalculator";
 
 export {
     HistoryMatch,
@@ -24,4 +25,5 @@ export {
     DeckGLMap,
     VectorSelector,
     WellCompletions,
+    VectorCalculator
 };
