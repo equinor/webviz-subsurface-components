@@ -99,9 +99,8 @@ class CompositeMapLayers extends Component {
 
                         case "delete":
                             if (this.layers[propLayerData.id]) {
-                                const stateLayer = this.layers[
-                                    propLayerData.id
-                                ];
+                                const stateLayer =
+                                    this.layers[propLayerData.id];
                                 stateLayer.remove();
                                 this.layerControl.removeLayer(stateLayer);
                                 this.removeLayerFromState(propLayerData.id);
