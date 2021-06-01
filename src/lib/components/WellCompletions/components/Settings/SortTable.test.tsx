@@ -12,7 +12,7 @@ describe("test sorting the table", () => {
     });
 
     it("test to check ascending sort", async () => {
-        const { container } = render(<SortTable />, {
+        render(<SortTable />, {
             wrapper: Wrapper,
         });
 

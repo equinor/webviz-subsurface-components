@@ -16,7 +16,7 @@ describe("test Zone Selector", () => {
         // const { container } = render(<ZoneSelector />, {
         //     wrapper: Wrapper,
         // });
-        // userEvent.click(screen.getByRole("button", { name: "Select Zones ​" }));
+        // userEvent.click(screen.getByRole("button", { name: "Select Zones" }));
         // await screen.getByRole("listbox");
         //incomplete test
         /*

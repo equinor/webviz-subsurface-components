@@ -16,7 +16,7 @@ describe("test time range selector", () => {
     });
 
     it("click to dispatch redux action", async () => {
-        const { container } = render(<TimeRangeSelector />, {
+        render(<TimeRangeSelector />, {
             wrapper: Wrapper,
         });
         userEvent.type(screen.getByRole("slider"), "{arrowright}");
