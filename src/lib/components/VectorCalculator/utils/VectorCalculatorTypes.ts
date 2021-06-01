@@ -1,9 +1,3 @@
-interface HashTable {
-    [key: string]: string[];
-}
-
-//export type VariableVectorMapType = { [key: string]: string[]; }
-
 export type VariableVectorMapType = {
     variableName: string;
     vectorName: string[];
