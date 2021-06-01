@@ -160,7 +160,6 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (props: Express
                                     key={row.expression}
                                     placement="top"
                                     title={expressionFromMap}
-                                    enterDelay={1000}
                                 >
                                     <TableCell
                                         align="left"
