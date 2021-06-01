@@ -1,16 +1,10 @@
 import React from "react";
 import Grid from "@material-ui/core/Grid";
-import { validate as isUuid } from "uuid";
 
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
 import { ExpressionInputComponent } from "./ExpressionInputComponent";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
-import {
-    parseExpression,
-    parseExpressionName,
-} from "../utils/VectorCalculatorRegex";
-import { isVariableVectorMapValid } from "../utils/VectorCalculatorHelperFunctions";
 
 interface ParentProps {
     expressions: ExpressionType[];
@@ -30,19 +24,15 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     const [expressions, setExpressions] = React.useState<ExpressionType[]>(
         props.expressions
     );
-    const [
-        activeExpression,
-        setActiveExpression,
-    ] = React.useState<ExpressionType>({
-        name: "",
-        expression: "",
-        id: "",
-        variableVectorMap: [],
-    });
-    const [
-        disabledInputComponent,
-        setDisabledInputComponent,
-    ] = React.useState<boolean>(true);
+    const [activeExpression, setActiveExpression] =
+        React.useState<ExpressionType>({
+            name: "",
+            expression: "",
+            id: "",
+            variableVectorMap: [],
+        });
+    const [disabledInputComponent, setDisabledInputComponent] =
+        React.useState<boolean>(true);
 
     React.useEffect(() => {
         // Intention: Validation of expressions handled back-end
