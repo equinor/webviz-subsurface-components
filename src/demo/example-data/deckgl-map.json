@@ -67,6 +67,11 @@
               "outline": true
             },
             {
+              "@@type": "PieChartLayer",
+              "id": "pie-layer",
+              "data": "piechart.json"
+            },
+            {
               "@@type": "DrawingLayer",
               "id": "drawing-layer",
               "mode": "drawLineString",
