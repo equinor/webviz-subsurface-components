@@ -1,7 +1,6 @@
+from typing import List, Dict, Union
 from functools import wraps
 import sys
-
-from typing import List, Dict, Union
 
 if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
     from typing import TypedDict
