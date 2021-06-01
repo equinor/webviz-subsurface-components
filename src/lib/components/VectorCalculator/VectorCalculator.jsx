@@ -22,7 +22,7 @@ export const VectorCalculator = (props) => {
 
 VectorCalculator.defaultProps = {
     // Set all non isRequired props
-    isDashControlled: false
+    isDashControlled: false,
 };
 
 VectorCalculator.propTypes = {
@@ -42,16 +42,23 @@ VectorCalculator.propTypes = {
     vectors: PropTypes.array.isRequired,
 
     /**
-     * Pre-defined vector calculation expressions 
+     * Pre-defined vector calculation expressions
      * Each expression consist of an expression name, mathematical expression with single characther variables
      * and map of characther variables and the corresponding vector name.
      */
-    expressions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        expression: PropTypes.string.isRequired,
-        id: PropTypes.string.isRequired,
-        variableVectorMap: PropTypes.arrayOf(PropTypes.shape({ variableName: string.isRequired, vectorName: string.isRequired }))
-    })).isRequired,
+    expressions: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            expression: PropTypes.string.isRequired,
+            id: PropTypes.string.isRequired,
+            variableVectorMap: PropTypes.arrayOf(
+                PropTypes.shape({
+                    variableName: string.isRequired,
+                    vectorName: string.isRequired,
+                })
+            ),
+        })
+    ).isRequired,
 
     /**
      * State for expression validation in dash plugin
