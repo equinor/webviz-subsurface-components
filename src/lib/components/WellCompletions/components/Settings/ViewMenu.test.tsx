@@ -1,16 +1,13 @@
-
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react";
+import "jest-styled-components";
 import React from "react";
-import { testStore, Wrapper } from "../../test/TestWrapper";
+import { Wrapper } from "../../test/TestWrapper";
 import ViewMenu from "./ViewMenu";
-
 
 describe("test view menu", () => {
     it("snapshot test", () => {
-        const { container } = render(
-            Wrapper({ children: <ViewMenu /> })
-        );
+        const { container } = render(Wrapper({ children: <ViewMenu /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
 
@@ -18,7 +15,7 @@ describe("test view menu", () => {
         render(<ViewMenu />, {
             wrapper: Wrapper,
         });
-        fireEvent.click(screen.getByRole('button', {name: ""}));
-        expect(screen.getAllByRole('menu', {name: ''})).toHaveLength(1)
+        fireEvent.click(screen.getByRole("button", { name: "" }));
+        expect(screen.getAllByRole("menu", { name: "" })).toHaveLength(1);
     });
 });

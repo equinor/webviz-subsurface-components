@@ -2,47 +2,55 @@
 
 exports[`test Zone Selector snapshot test 1`] = `
 <div
-  class="MuiFormControl-root makeStyles-formControl-2"
+  class="makeStyles-root-1 react-dropdown-tree-select"
+  id="rdts1"
 >
-  <label
-    class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated"
-    data-shrink="false"
-    id="mutiple-zone-label"
-  >
-    Select Zones
-  </label>
   <div
-    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"
-    style="width: 230px;"
+    class="dropdown"
   >
-    <div
-      aria-haspopup="listbox"
-      aria-labelledby="mutiple-zone-label demo-mutiple-zone"
-      class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiInputBase-input MuiInput-input"
-      id="demo-mutiple-zone"
+    <a
+      aria-expanded="false"
+      aria-haspopup="tree"
+      aria-labelledby="rdts1-0_tag"
+      class="dropdown-trigger arrow bottom"
+      id="rdts1_trigger"
       role="button"
       tabindex="0"
     >
-      <span>
-        ​
-      </span>
-    </div>
-    <input
-      aria-hidden="true"
-      class="MuiSelect-nativeInput"
-      tabindex="-1"
-      value=""
-    />
-    <svg
-      aria-hidden="true"
-      class="MuiSvgIcon-root MuiSelect-icon"
-      focusable="false"
-      viewBox="0 0 24 24"
-    >
-      <path
-        d="M7 10l5 5 5-5z"
-      />
-    </svg>
+      <ul
+        class="tag-list"
+      >
+        <li
+          class="tag-item"
+        >
+          <span
+            aria-label="All"
+            class="tag"
+            id="rdts1-0_tag"
+          >
+            All
+            <button
+              aria-label="Remove"
+              aria-labelledby="rdts1-0_button rdts1-0_tag"
+              class="tag-remove"
+              id="rdts1-0_button"
+              type="button"
+            >
+              x
+            </button>
+          </span>
+        </li>
+        <li
+          class="tag-item"
+        >
+          <span
+            class="placeholder"
+          >
+            Select Zone(s)...
+          </span>
+        </li>
+      </ul>
+    </a>
   </div>
 </div>
 `;

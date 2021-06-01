@@ -1,15 +1,13 @@
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react";
+import "jest-styled-components";
 import React from "react";
-import { testStore, Wrapper } from "../../test/TestWrapper";
+import { Wrapper } from "../../test/TestWrapper";
 import SortButton from "./SortButton";
-
 
 describe("Test view menu", () => {
     it("snapshot test", () => {
-        const { container } = render(
-            Wrapper({ children: <SortButton /> })
-        );
+        const { container } = render(Wrapper({ children: <SortButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
 
@@ -17,7 +15,9 @@ describe("Test view menu", () => {
         render(<SortButton />, {
             wrapper: Wrapper,
         });
-        fireEvent.click(screen.getByRole('menuitem', {name :'Sort/Group by Attributes'}))
-        await screen.findByText('Well sorting levels')
+        fireEvent.click(
+            screen.getByRole("menuitem", { name: "Sort/Group by Attributes" })
+        );
+        await screen.findByText("Well sorting levels");
     });
 });

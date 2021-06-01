@@ -1,9 +1,9 @@
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react";
+import "jest-styled-components";
 import React from "react";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import WellsPerPageSelector from "./WellsPerPageSelector";
-
 
 describe("test number of Wells per page", () => {
     it("snapshot test", () => {

@@ -1,0 +1,330 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test settings bar snapshot test 1`] = `
+.c5 {
+  height: 100%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c5 > img:first-child,
+.c5 > svg:first-child {
+  margin-right: 8px;
+}
+
+.c5 > img:last-child,
+.c5 > svg:last-child {
+  margin-left: 8px;
+}
+
+.c5 > img:only-child,
+.c5 > svg:only-child {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.c5 > span:first-child {
+  margin-left: 32px;
+}
+
+.c5 > span:last-child {
+  margin-right: 32px;
+}
+
+.c5 > span:only-child {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.c4 {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  height: 40px;
+  width: 40px;
+  padding-left: 0;
+  padding-right: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  margin: 0;
+  color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  font-family: Equinor;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.143em;
+  text-align: center;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.c4 svg {
+  justify-self: center;
+}
+
+.c4::after {
+  position: absolute;
+  top: -6px;
+  left: -4px;
+  width: 48px;
+  height: 48px;
+  content: '';
+}
+
+.c4:hover {
+  background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+  border: 1px solid transparent;
+  border-radius: 50%;
+}
+
+.c4:focus {
+  outline: none;
+}
+
+.c4[data-focus-visible-added]:focus {
+  outline: 1px dashed rgba(0,112,121,1);
+  outline-offset: 4px;
+}
+
+.c4::-moz-focus-inner {
+  border: 0;
+}
+
+.c4:disabled {
+  cursor: not-allowed;
+  background: transparent;
+  border: 1px solid transparent;
+  margin: 0;
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  font-family: Equinor;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.143em;
+  text-align: center;
+}
+
+.c4:disabled:hover {
+  background: transparent;
+}
+
+.c4::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  min-height: auto;
+  content: '';
+}
+
+.c0 {
+  height: 64px;
+  top: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  background: var(--eds_ui_background__default,rgba(255,255,255,1));
+  box-sizing: border-box;
+  z-index: 250;
+  display: grid;
+  grid-column-gap: 40px;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: 'left center right';
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-bottom: 2px solid var(--eds_ui_background__light,rgba(247,247,247,1));
+  padding-left: 40px;
+  padding-top: 8px;
+  padding-right: 40px;
+  padding-bottom: 8px;
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.000em;
+  -webkit-letter-spacing: 0.013em;
+  -moz-letter-spacing: 0.013em;
+  -ms-letter-spacing: 0.013em;
+  letter-spacing: 0.013em;
+  text-align: left;
+}
+
+.c2 {
+  grid-area: right;
+  text-align: right;
+}
+
+.c1 {
+  grid-area: left;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 24px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.000em;
+  -webkit-letter-spacing: 0.013em;
+  -moz-letter-spacing: 0.013em;
+  -ms-letter-spacing: 0.013em;
+  letter-spacing: 0.013em;
+  text-align: left;
+}
+
+.c3 {
+  position: relative;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+<header
+  class="c0 makeStyles-topBar-1"
+>
+  <div
+    class="c1 makeStyles-actions-2"
+  >
+    <div
+      class="makeStyles-root-3"
+    >
+      <span>
+        Time Steps
+      </span>
+      <span
+        class="MuiSlider-root WithStyles(ForwardRef(Slider))-root-4 MuiSlider-colorPrimary MuiSlider-trackFalse"
+      >
+        <span
+          class="MuiSlider-rail"
+        />
+        <span
+          class="MuiSlider-track"
+          style="left: 0%; width: 100%;"
+        />
+        <input
+          type="hidden"
+          value="-1"
+        />
+        <span
+          aria-labelledby="time-step-slider-label"
+          aria-orientation="horizontal"
+          aria-valuemax="-1"
+          aria-valuemin="0"
+          aria-valuenow="-1"
+          class="MuiSlider-thumb MuiSlider-thumbColorPrimary PrivateValueLabel-open-7 PrivateValueLabel-thumb-6"
+          data-index="0"
+          role="slider"
+          style="left: 100%;"
+          tabindex="0"
+        >
+          <span
+            class="PrivateValueLabel-offset-8 MuiSlider-valueLabel WithStyles(ForwardRef(Slider))-valueLabel-5"
+          >
+            <span
+              class="PrivateValueLabel-circle-9"
+            >
+              <span
+                class="PrivateValueLabel-label-10"
+              />
+            </span>
+          </span>
+        </span>
+      </span>
+    </div>
+  </div>
+  <div
+    class="c2 makeStyles-actions-2"
+  >
+    <div>
+      <div
+        class="c3"
+      >
+        <div>
+          <button
+            class="c4"
+            tabindex="0"
+            type="button"
+          >
+            <span
+              class="c5"
+            >
+              <svg
+                aria-hidden="true"
+                class=""
+                fill="currentColor"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  class=""
+                  clip-rule="evenodd"
+                  d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
+                  data-testid="eds-icon-path"
+                  fill-rule="evenodd"
+                  height="24"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div
+        class="c3"
+      >
+        <div>
+          <button
+            class="c4"
+            tabindex="0"
+            type="button"
+          >
+            <span
+              class="c5"
+            >
+              <svg
+                aria-hidden="true"
+                class=""
+                fill="currentColor"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  class=""
+                  clip-rule="evenodd"
+                  d="M7 6h10l-5.01 6.3L7 6zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0018.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
+                  data-testid="eds-icon-path"
+                  fill-rule="evenodd"
+                  height="24"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+`;

@@ -1,6 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test pagination snapshot test 1`] = `
+.c0 {
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.250em;
+  text-align: left;
+}
+
 <div
   class="makeStyles-root-1"
 >
@@ -8,7 +18,7 @@ exports[`test pagination snapshot test 1`] = `
     class="makeStyles-left-2"
   >
     <p
-      class="sc-hKwCoD gsCtPr"
+      class="c0"
       style="align-self: center; min-width: 125px;"
     >
       1 - 0 of 0 items
