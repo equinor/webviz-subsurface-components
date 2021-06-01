@@ -21,13 +21,10 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     const { currentName, initialName, existingExpressions, disabled } = props;
     const [name, setName] = React.useState(initialName);
 
-    const [textFieldVariantState, setTextFieldVariantState] = React.useState<
-        "success" | "error" | "warning" | "default"
-    >("success");
-    const [
-        textFieldHelperTextState,
-        setTextFieldHelperTextState,
-    ] = React.useState<string>("");
+    const [textFieldVariantState, setTextFieldVariantState] =
+        React.useState<"success" | "error" | "warning" | "default">("success");
+    const [textFieldHelperTextState, setTextFieldHelperTextState] =
+        React.useState<string>("");
     const [textFieldIconState, setTextFieldIconState] = React.useState<
         ReactNode | undefined
     >(<Icon key="thumbs" name="thumbs_up" />);
