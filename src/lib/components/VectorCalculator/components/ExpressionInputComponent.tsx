@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { Button, Icon } from "@equinor/eds-core-react";
 import { Grid, Paper } from "@material-ui/core";
 import { clear, save, sync } from "@equinor/eds-icons";
-import cloneDeep from "lodash.clonedeep";
+import cloneDeep from "lodash/cloneDeep";
 
 import {
     ExpressionType,
@@ -38,29 +38,23 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     const [isValidExpression, setIsValidExpression] = React.useState(
         parseExpression(activeExpression.expression)
     );
-    const [
-        isValidVariableVectorMap,
-        setIsValidVariableVectorMap,
-    ] = React.useState(
-        isVariableVectorMapValid(
-            activeExpression.variableVectorMap,
-            ":",
-            props.vectors
-        )
-    );
-    const [
-        editableExpression,
-        setEditableExpression,
-    ] = React.useState<ExpressionType>({
-        name: "",
-        expression: "",
-        id: "",
-        variableVectorMap: [],
-    });
-    const [
-        cachedVariableVectorMap,
-        setCachedVariableVectorMap,
-    ] = React.useState<VariableVectorMapType[]>([]);
+    const [isValidVariableVectorMap, setIsValidVariableVectorMap] =
+        React.useState(
+            isVariableVectorMapValid(
+                activeExpression.variableVectorMap,
+                ":",
+                props.vectors
+            )
+        );
+    const [editableExpression, setEditableExpression] =
+        React.useState<ExpressionType>({
+            name: "",
+            expression: "",
+            id: "",
+            variableVectorMap: [],
+        });
+    const [cachedVariableVectorMap, setCachedVariableVectorMap] =
+        React.useState<VariableVectorMapType[]>([]);
 
     Icon.add({ clear });
     Icon.add({ save });
@@ -124,9 +118,8 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     const onVariableVectorMapChange = (
         newVariableVectorMap: VariableVectorMapType[]
     ): void => {
-        const newCachedMap = getUpdatedCachedVariableVectorMap(
-            newVariableVectorMap
-        );
+        const newCachedMap =
+            getUpdatedCachedVariableVectorMap(newVariableVectorMap);
         setCachedVariableVectorMap(newCachedMap);
 
         setIsValidVariableVectorMap(
@@ -142,11 +135,11 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         (newMap: VariableVectorMapType[]): VariableVectorMapType[] => {
             const newCachedVariableVectorMap: VariableVectorMapType[] = [];
             for (const elm of newMap) {
-                const cachedElm:
-                    | VariableVectorMapType
-                    | undefined = cachedVariableVectorMap.find(
-                    (cachedElm) => cachedElm.variableName === elm.variableName
-                );
+                const cachedElm: VariableVectorMapType | undefined =
+                    cachedVariableVectorMap.find(
+                        (cachedElm) =>
+                            cachedElm.variableName === elm.variableName
+                    );
                 if (cachedElm === undefined) {
                     newCachedVariableVectorMap.push(elm);
                 } else {
@@ -168,16 +161,14 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 return cloneDeep(editableExpression.variableVectorMap);
             }
 
-            const variables: string[] = retrieveVariablesFromExpression(
-                expression
-            );
+            const variables: string[] =
+                retrieveVariablesFromExpression(expression);
             const map: VariableVectorMapType[] = [];
             for (const variable of variables) {
-                const existingMap:
-                    | VariableVectorMapType
-                    | undefined = cachedVariableVectorMap.find(
-                    (elm) => elm.variableName === variable
-                );
+                const existingMap: VariableVectorMapType | undefined =
+                    cachedVariableVectorMap.find(
+                        (elm) => elm.variableName === variable
+                    );
                 if (existingMap === undefined) {
                     map.push({ variableName: variable, vectorName: [] });
                 } else {
