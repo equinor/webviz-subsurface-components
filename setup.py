@@ -20,7 +20,7 @@ package_name = package["name"].replace(" ", "_").replace("-", "_")
 INSTALL_REQUIRES = [
     "dash>=1.6",
     "py_expression_eval>=0.3.13",
-    "numpy>=1.14",
+    "numpy>=1.20.3",
     "pandas>=0.25",
 ]
 
