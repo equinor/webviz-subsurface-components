@@ -34,12 +34,13 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
         vectorSelectorProps: VectorSelectorParentProps,
         index: number
     ): void => {
-        if (vectorSelectorProps.selectedTags.length !== 1) {
-            return;
-        }
         const newVariableVectorMap = cloneDeep(props.variableVectorMap);
-        newVariableVectorMap[index].vectorName[0] =
-            vectorSelectorProps.selectedTags[0];
+        if (vectorSelectorProps.selectedTags.length < 1) {
+            newVariableVectorMap[index].vectorName = [];
+        } else {
+            newVariableVectorMap[index].vectorName[0] =
+                vectorSelectorProps.selectedTags[0];
+        }
         props.onMapChange(newVariableVectorMap);
     };
 
