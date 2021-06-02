@@ -208,15 +208,15 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                         {row.name}
                                     </div>
                                 </TableCell>
-                                <Tooltip
-                                    key={row.expression}
-                                    placement="top"
-                                    title={expressionFromMap}
+                                <TableCell
+                                    align="left"
+                                    width="60%"
+                                    onClick={() => handleRowClick(row)}
                                 >
-                                    <TableCell
-                                        align="left"
-                                        width="60%"
-                                        onClick={() => handleRowClick(row)}
+                                    <Tooltip
+                                        key={row.expression}
+                                        placement="top"
+                                        title={expressionFromMap}
                                     >
                                         <div
                                             className={
@@ -225,8 +225,8 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                         >
                                             {expressionFromMap}
                                         </div>
-                                    </TableCell>
-                                </Tooltip>
+                                    </Tooltip>
+                                </TableCell>
                             </TableRow>
                         );
                     })}
