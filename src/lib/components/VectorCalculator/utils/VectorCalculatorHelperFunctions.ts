@@ -20,7 +20,7 @@ export const getAvailableName = (
     expressions: ExpressionType[]
 ): string => {
     let availableName = nameSuggestion;
-    let n: number = 1;
+    let n = 1;
     while (isExpressionNameExisting(availableName, expressions)) {
         availableName = `${nameSuggestion}_${n}`;
         ++n;
