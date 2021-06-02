@@ -580,7 +580,7 @@ class VectorCalculatorDemo extends Component {
                         id: uuidv4(),
                         variableVectorMap: [
                             { variableName: "x", vectorName: ["WOPT:OP_1"] },
-                            { variableName: "y", vectorName: ["COPT:OP_3"] },
+                            { variableName: "y", vectorName: ["WWPR:OP_3"] },
                         ],
                     },
                     {
@@ -588,9 +588,9 @@ class VectorCalculatorDemo extends Component {
                         expression: "x-2*y/z",
                         id: uuidv4(),
                         variableVectorMap: [
-                            { variableName: "x", vectorName: ["WEPR:OP_2"] },
+                            { variableName: "x", vectorName: ["WWPR:OP_2"] },
                             { variableName: "y", vectorName: ["FGIR"] },
-                            { variableName: "z", vectorName: ["COPT:OP_2"] },
+                            { variableName: "z", vectorName: ["WBHP:OP_2"] },
                         ],
                     },
                 ]}
