@@ -14,17 +14,19 @@ import { RGBAColor } from "@deck.gl/core/utils/color";
 //     "properties": [{"color": [255, 0, 0], "label":"oil"}, {"color": [0, 0, 255], "label":"water"}, {"color": [0, 255, 0], "label":"gas"}, {"color": [0, 255, 255], "label":"sand"}]
 // }
 
-interface PieData {
-    pies: [
-        {
-            x: number;
-            y: number;
-            R: number;
-            fractions: [{ value: number; idx: number }];
-        }
-    ];
+type PieProperties = [{ color: RGBAColor; label: string }];
 
-    properties: [{ color: RGBAColor; label: string }];
+type PieData = {
+    x: number;
+    y: number;
+    R: number;
+    fractions: [{ value: number; idx: number }];
+};
+
+// These are the data PieChartLayer expects.
+interface PiesData {
+    pies: PieData[];
+    properties: PieProperties;
 }
 
 // These are the data SolidPolygonLayer expects.
@@ -36,38 +38,24 @@ interface PolygonData {
     };
 }
 
-// These are the data PieChartLayer expects.
-interface PieData {
-    pies: [
-        {
-            x: number;
-            y: number;
-            R: number;
-            fractions: [{ value: number; idx: number }];
-        }
-    ];
+export type PieChartLayerProps<D> = CompositeLayerProps<D>;
 
-    properties: [{ color: RGBAColor; label: string }];
-}
-export interface PieChartLayerProps<D> extends CompositeLayerProps<D> {
-   //data: PieData;
-}
 const defaultProps = {};
 export default class PieChartLayer extends CompositeLayer<
-    PieData,
-    PieChartLayerProps<PieData>
+    PiesData,
+    PieChartLayerProps<PiesData>
 > {
-    renderLayers(): SolidPolygonLayer<unknown>[] {
-        const properties: PieChartLayerProps<unknown> = {
-            id: "pie-layer",
-            data: makePies(this.props.data as PieData),
-            pickable: true,
-            getFillColor: (d: {
-                properties: { color: RGBAColor; label: string };
-            }) => d?.properties?.color ?? [0, 0, 0],
-        };
-
-        const layer = new SolidPolygonLayer(this.getSubLayerProps(properties));
+    renderLayers(): SolidPolygonLayer<PolygonData>[] {
+        const layer = new SolidPolygonLayer<PolygonData>(
+            this.getSubLayerProps({
+                id: "pie-layer",
+                data: makePies(this.props.data as PiesData),
+                pickable: true,
+                getFillColor: (d: {
+                    properties: { color: RGBAColor; label: string };
+                }) => d?.properties?.color ?? [0, 0, 0],
+            })
+        );
         return [layer];
     }
 }
@@ -77,16 +65,16 @@ PieChartLayer.defaultProps = defaultProps;
 
 //================= Local help functions. ==================
 
-function makePies(data: PieData): PolygonData[] {
-    const polygons: PolygonData[] = [];
+function makePies(data: PiesData): PolygonData[] {
+    let polygons: PolygonData[] = [];
     for (const pie of data.pies) {
-        polygons.concat(makePie(pie, data.properties));
+        polygons = polygons.concat(makePie(pie, data.properties));
     }
     return polygons;
 }
 
 // return array of one pie's polygon's
-function makePie(pie, properties): PolygonData[] {
+function makePie(pie: PieData, properties: PieProperties): PolygonData[] {
     const dA = 10; // delta angle
 
     const x = pie.x;
@@ -129,7 +117,6 @@ function makePie(pie, properties): PolygonData[] {
                 name: label + ": " + (frac * 100).toFixed(1) + "%",
             },
         });
-
         start_a = end_a;
     }
     return pie_polygons;
