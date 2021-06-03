@@ -77,6 +77,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
             expression: "",
             id: "",
             variableVectorMap: [],
+            isValid: false,
         });
 
     React.useEffect(() => {
@@ -107,6 +108,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                 expression: "",
                 id: "",
                 variableVectorMap: [],
+                isValid: false,
             };
         }
         setActiveExpression(newActiveExpression);
