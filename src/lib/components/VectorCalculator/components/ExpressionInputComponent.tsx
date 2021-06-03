@@ -26,6 +26,7 @@ interface ExpressionInputComponent {
     activeExpression: ExpressionType;
     expressions: ExpressionType[];
     vectors: TreeDataNode[];
+    externalValidation: boolean;
     disabled?: boolean;
     onExpressionChange: (expression: ExpressionType) => void;
 }
@@ -52,6 +53,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             expression: "",
             id: "",
             variableVectorMap: [],
+            isValid: false,
         });
     const [cachedVariableVectorMap, setCachedVariableVectorMap] =
         React.useState<VariableVectorMapType[]>([]);

@@ -83,6 +83,7 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                 expression: "",
                 id: uuidv4(),
                 variableVectorMap: [],
+                isValid: false,
             };
             addNewExpressions([newExpression]);
 
