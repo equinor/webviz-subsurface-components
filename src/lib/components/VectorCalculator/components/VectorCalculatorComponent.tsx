@@ -21,6 +21,7 @@ interface VectorCalculatorProps {
 export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     props: VectorCalculatorProps
 ) => {
+    const { isDashControlled } = props;
     const [expressions, setExpressions] = React.useState<ExpressionType[]>(
         props.expressions
     );
@@ -30,6 +31,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
             expression: "",
             id: "",
             variableVectorMap: [],
+            isValid: false,
         });
     const [disabledInputComponent, setDisabledInputComponent] =
         React.useState<boolean>(true);
@@ -52,6 +54,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
                 expression: "",
                 id: "",
                 variableVectorMap: [],
+                isValid: false,
             });
         } else {
             setActiveExpression(expression);
@@ -92,6 +95,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
                     activeExpression={activeExpression}
                     expressions={expressions}
                     vectors={props.vectors}
+                    externalValidation={isDashControlled}
                     disabled={disabledInputComponent}
                     onExpressionChange={handleActiveExpressionEdit}
                 />

@@ -8,4 +8,5 @@ export type ExpressionType = {
     expression: string;
     id: string;
     variableVectorMap: VariableVectorMapType[];
+    isValid: boolean;
 };
