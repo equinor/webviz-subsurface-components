@@ -4,16 +4,6 @@ import { SolidPolygonLayer, SolidPolygonLayerProps } from "@deck.gl/layers";
 import { Position } from "@deck.gl/core/utils/positions";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 
-// INPUT format (PieData):
-// {
-//     "pies": [ {"x": 433600, "y": 6477600, "R": 20, "fractions": [{"value":21, "idx":0}, {"value":13, "idx":1}, {"value":8, "idx":2}]},
-//               {"x": 434556, "y": 6478951, "R": 40, "fractions": [{"value":12, "idx":0}, {"value":18, "idx":1}, {"value":7, "idx":2}]},
-//               {"x": 437086, "y": 6477198, "R": 30, "fractions": [{"value":16, "idx":0}, {"value":20, "idx":1}, {"value":6, "idx":2}]}
-//             ],
-
-//     "properties": [{"color": [255, 0, 0], "label":"oil"}, {"color": [0, 0, 255], "label":"water"}, {"color": [0, 255, 0], "label":"gas"}, {"color": [0, 255, 255], "label":"sand"}]
-// }
-
 type PieProperties = [{ color: RGBAColor; label: string }];
 
 type PieData = {
