@@ -1,8 +1,8 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
-import { SolidPolygonLayer, SolidPolygonLayerProps } from "@deck.gl/layers";
-import { Position } from "@deck.gl/core/utils/positions";
 import { RGBAColor } from "@deck.gl/core/utils/color";
+import { Position } from "@deck.gl/core/utils/positions";
+import { SolidPolygonLayer } from "@deck.gl/layers";
 
 type PieProperties = [{ color: RGBAColor; label: string }];
 
@@ -30,7 +30,9 @@ interface PolygonData {
 
 export type PieChartLayerProps<D> = CompositeLayerProps<D>;
 
-const defaultProps = {};
+const defaultProps = {
+    pickable: true,
+};
 export default class PieChartLayer extends CompositeLayer<
     PiesData,
     PieChartLayerProps<PiesData>
@@ -38,12 +40,8 @@ export default class PieChartLayer extends CompositeLayer<
     renderLayers(): SolidPolygonLayer<PolygonData>[] {
         const layer = new SolidPolygonLayer<PolygonData>(
             this.getSubLayerProps({
-                id: "pie-layer",
                 data: makePies(this.props.data as PiesData),
-                pickable: true,
-                getFillColor: (d: {
-                    properties: { color: RGBAColor; label: string };
-                }) => d?.properties?.color ?? [0, 0, 0],
+                getFillColor: (d: PolygonData) => d.properties.color,
             })
         );
         return [layer];
