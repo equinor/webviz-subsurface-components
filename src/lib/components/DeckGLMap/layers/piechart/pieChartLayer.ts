@@ -38,9 +38,16 @@ export default class PieChartLayer extends CompositeLayer<
     PieChartLayerProps<PiesData>
 > {
     renderLayers(): SolidPolygonLayer<PolygonData>[] {
+        const pieData = this.props.data as PiesData;
+        if (!pieData?.pies) {
+            // this.props.data is a sum type, and since TS doesn't have
+            // pattern matching, we must check it this way.
+            return [];
+        }
+
         const layer = new SolidPolygonLayer<PolygonData>(
             this.getSubLayerProps({
-                data: makePies(this.props.data as PiesData),
+                data: makePies(pieData),
                 getFillColor: (d: PolygonData) => d.properties.color,
             })
         );
