@@ -26,9 +26,9 @@ const FilterByAttributesButton: React.FC = React.memo(() => {
     };
     return (
         <>
-            <Menu.MenuItem onClick={() => setVisibleScrim(true)}>
+            <Menu.Item onClick={() => setVisibleScrim(true)}>
                 Filter by Attributes
-            </Menu.MenuItem>
+            </Menu.Item>
             {visibleScrim && (
                 <Scrim onClose={handleClose}>
                     <Dialog className={classes.dialog}>
