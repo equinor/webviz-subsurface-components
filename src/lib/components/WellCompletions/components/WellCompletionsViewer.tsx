@@ -9,6 +9,7 @@ import {
 import clsx from "clsx";
 import React, { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
+import ReactResizeDetector from "react-resize-detector";
 import { usePlotData } from "../hooks/usePlotData";
 import { WellCompletionsState } from "../redux/store";
 import { DataContext } from "./DataLoader";
@@ -36,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
             display: "flex",
             flex: 1,
             flexDirection: "row",
+            height: "100%",
         },
         drawer: {
             zIndex: 0,
@@ -111,45 +113,56 @@ const WellCompletionsViewer: React.FC = () => {
     if (!data) return <div />;
     return (
         <div className={classes.root}>
-            <SettingsBar />
-            <div className={classes.main}>
-                <div
-                    className={clsx(classes.content, {
-                        [classes.contentShift]: isDrawerOpen,
-                    })}
-                >
-                    <WellPagination />
-                    <div
-                        style={{
-                            minWidth: `${minWidth}px`,
-                            minHeight: `${minHeight}px`,
-                            height: "100%",
-                        }}
-                    >
-                        <WellCompletionsPlot
-                            timeSteps={data.timeSteps}
-                            plotData={dataInCurrentPage}
-                        />
-                    </div>
-                </div>
-                <Drawer
-                    className={clsx(classes.drawer, {
-                        [classes.drawerShift]: !isDrawerOpen,
-                    })}
-                    classes={{
-                        paper: classes.drawerPaper,
-                    }}
-                    variant="persistent"
-                    anchor="right"
-                    open={isDrawerOpen}
-                >
-                    <Divider />
-                    <ZoneSelector />
-                    <WellFilter />
-                    <HideZeroCompletionsSwitch />
-                    <WellAttributesSelector />
-                </Drawer>
-            </div>
+            <ReactResizeDetector handleWidth handleHeight>
+                {({ width }) => (
+                    <>
+                        <SettingsBar />
+                        <div
+                            className={classes.main}
+                            style={{
+                                width: `${width}px`,
+                            }}
+                        >
+                            <div
+                                className={clsx(classes.content, {
+                                    [classes.contentShift]: isDrawerOpen,
+                                })}
+                            >
+                                <WellPagination />
+                                <div
+                                    style={{
+                                        minWidth: `${minWidth}px`,
+                                        minHeight: `${minHeight}px`,
+                                        height: "100%",
+                                    }}
+                                >
+                                    <WellCompletionsPlot
+                                        timeSteps={data.timeSteps}
+                                        plotData={dataInCurrentPage}
+                                    />
+                                </div>
+                            </div>
+                            <Drawer
+                                className={clsx(classes.drawer, {
+                                    [classes.drawerShift]: !isDrawerOpen,
+                                })}
+                                classes={{
+                                    paper: classes.drawerPaper,
+                                }}
+                                variant="persistent"
+                                anchor="right"
+                                open={isDrawerOpen}
+                            >
+                                <Divider />
+                                <ZoneSelector />
+                                <WellFilter />
+                                <HideZeroCompletionsSwitch />
+                                <WellAttributesSelector />
+                            </Drawer>
+                        </div>
+                    </>
+                )}
+            </ReactResizeDetector>
         </div>
     );
 };
