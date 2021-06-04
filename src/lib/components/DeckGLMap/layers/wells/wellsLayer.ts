@@ -14,6 +14,10 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedFeature: Feature;
+    logData: object;
+    logName: string;
+    logRadius: number;
+    logCurves: boolean;
 }
 
 export interface LogCurveDataType {
@@ -23,56 +27,43 @@ export interface LogCurveDataType {
     curves: {
         name: string;
         description: string;
-    };
+    }[];
     data: [number[]];
 }
 
-let COLOR_MAP = [ 
-    [28, 255, 12, 200],
-    [196, 255, 7, 200],
-    [148, 129, 255, 200],
-    [118, 90, 254, 200],
-    [78, 254, 17, 200],
-    [19, 242, 255, 200],
-    [26, 70, 255, 200],
-    [255, 171, 156, 200],
-    [138, 83, 255, 200]
+let COLOR_MAP: RGBAColor[] = [ 
+    [0, 0, 0, 255],
+    [0, 255, 0, 255],
+    [0, 0, 255, 255],
+    [255, 255, 0, 255],
+    [255, 0, 255, 255],
+    [0, 255, 255, 255],
+    [125, 125, 255, 255],
+    [125, 255, 125, 255],
+    [255, 125, 125, 255]
 ]
 
-/*
-function transpose(mat) {
-    for (var i = 0; i < mat.length; i++) {
-        for (var j = 0; j < i; j++) {
-            const tmp = mat[i][j];
-            mat[i][j] = mat[j][i];
-            mat[j][i] = tmp;
-        }
-    }
+function getLogIDByName(d: LogCurveDataType, log_name: string) {
+    return d.curves.findIndex(item => item.name.toLowerCase() === log_name.toLowerCase())
 }
 
-function getLogPath(d: WellDataType, lc_idx: number) {
-    if (d.properties != undefined) {
-        let found = LOG_DATA.find(item => item.header.well == d.properties.name)
-        if (found != undefined) {
-            //transpose(found.data)
-            return found.data[lc_idx];
-        }    
-    }
-    return [];
-}
-*/
 
-function getLogColor(d: LogCurveDataType, lc_idx: number) {
-    //console.log(d.curves[lc_idx].name)
-    if (d.curves[lc_idx] == undefined ||
-        d.curves[lc_idx].description == "continuous") {
+function getLogColor(d: LogCurveDataType, log_name: string): RGBAColor[] {
+    const log_id = getLogIDByName(d, log_name)
+    if (d.curves[log_id] == undefined ||
+        d.curves[log_id].description == "continuous") {
         return []
     }
-    let color: number[][] = [];
-    d.data[lc_idx].forEach(value => {               
-        color.push(COLOR_MAP[value]);
+    let color: RGBAColor[] = [];
+    d.data[log_id].forEach(value => {
+        color.push(COLOR_MAP[value%10]);
     }); 
     return color;
+}
+
+function getLogWidth(d: LogCurveDataType, log_name: string): number[] {
+    const log_id = getLogIDByName(d, log_name)
+    return d.data[log_id]
 }
 
 const defaultProps = {
@@ -137,35 +128,32 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-
-        // PathLayer properties
-        const lc_layer = new PathLayer<Feature>(
+        const lc_layer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
                 id: "log_curve",
                 data: this.props.logData,
                 pickable: false,
                 widthScale: 10,
                 widthMinPixels: 1,
-                miterLimit: 1000,
+                miterLimit: 100,
                 getPath: (d: LogCurveDataType): number[] => d.data[0],
-                getColor: (d:LogCurveDataType): RGBAColor => 
-                            getLogColor(d, this.props.logIndex),
+                getColor: (d:LogCurveDataType): RGBAColor[] => 
+                            getLogColor(d, this.props.logName),
                 getWidth: (d:LogCurveDataType): number | number[] => 
-                            (this.props.logRadius || d.data[this.props.logIndex]),
+                            (this.props.logRadius || getLogWidth(d, this.props.logName)),
                 updateTriggers: {
-                    getColor: [this.props.logIndex],
-                    getWidth: [this.props.logIndex, this.props.logRadius]
+                    getColor: [this.props.logName],
+                    getWidth: [this.props.logName, this.props.logRadius]
                 }
             }) 
         );
 
-        //PathLayer ends
         let layers = [colors]
         if (this.props.outline) {
             layers.splice(0, 0, outline)
         }
         if (this.props.logCurves) {
-            layers.splice(1,0,lc_layer)
+            layers.splice(1, 0, lc_layer)
         }
         return layers;
     }
