@@ -1,8 +1,8 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
-import { SolidPolygonLayer } from "@deck.gl/layers";
-import { Position } from "@deck.gl/core/utils/positions";
 import { RGBAColor } from "@deck.gl/core/utils/color";
+import { Position } from "@deck.gl/core/utils/positions";
+import { SolidPolygonLayer } from "@deck.gl/layers";
 
 type PieProperties = [{ color: RGBAColor; label: string }];
 
@@ -30,20 +30,25 @@ interface PolygonData {
 
 export type PieChartLayerProps<D> = CompositeLayerProps<D>;
 
-const defaultProps = {};
+const defaultProps = {
+    pickable: true,
+};
 export default class PieChartLayer extends CompositeLayer<
     PiesData,
     PieChartLayerProps<PiesData>
 > {
     renderLayers(): SolidPolygonLayer<PolygonData>[] {
+        const pieData = this.props.data as PiesData;
+        if (!pieData?.pies) {
+            // this.props.data is a sum type, and since TS doesn't have
+            // pattern matching, we must check it this way.
+            return [];
+        }
+
         const layer = new SolidPolygonLayer<PolygonData>(
             this.getSubLayerProps({
-                id: "pie-layer",
-                data: makePies(this.props.data as PiesData),
-                pickable: true,
-                getFillColor: (d: {
-                    properties: { color: RGBAColor; label: string };
-                }) => d?.properties?.color ?? [0, 0, 0],
+                data: makePies(pieData),
+                getFillColor: (d: PolygonData) => d.properties.color,
             })
         );
         return [layer];
