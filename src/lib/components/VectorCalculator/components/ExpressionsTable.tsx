@@ -219,6 +219,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                         key={row.expression}
                                         placement="top"
                                         title={expressionFromMap}
+                                        enterDelay={1000}
                                     >
                                         <div
                                             className={

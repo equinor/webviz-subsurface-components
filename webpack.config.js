@@ -3,6 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
  * Copyright (C) 2020 - Equinor ASA. */
+const webpack = require("webpack");
 
 const path = require("path");
 const TerserJSPlugin = require("terser-webpack-plugin");
@@ -64,6 +65,11 @@ module.exports = (env, argv) => {
         plugins: [
             new MiniCssExtractPlugin({
                 filename: filename_css,
+            }),
+            // fix "process is not defined" error:
+            // https://stackoverflow.com/questions/41359504/webpack-bundle-js-uncaught-referenceerror-process-is-not-defined
+            new webpack.ProvidePlugin({
+                process: "process/browser",
             }),
         ],
         module: {
