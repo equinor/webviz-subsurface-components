@@ -20,7 +20,7 @@ import webviz_subsurface_components
 
 
 class MapSpec:
-    def __init__(self, initialSpec={}):
+    def __init__(self, initialSpec=None):
         self._spec = initialSpec
 
     # Warning: modifying the spec directly might result in missing patches,
@@ -52,32 +52,38 @@ class MapSpec:
         return jsonpatch.make_patch(self._spec, comp_with).patch
 
     def apply_patch(self, patch):
-        jsonpatch.apply_patch(self._spec, self.normalize_patch(patch))
+        jsonpatch.apply_patch(self._spec, self.normalize_patch(patch), True)
 
     # Replace ids with indices in the patch paths
-    def normalize_patch(self, patch, inplace=False):
+    def normalize_patch(self, in_patch, inplace=False):
         def replace_path_id(matched):
             parent = matched.group(1)
-            id = matched.group(2)
+            obj_id = matched.group(2)
             parent_array = jsonpointer.resolve_pointer(self._spec, parent)
             matched_id = -1
             for (i, elem) in enumerate(parent_array):
-                if elem["id"] == id:
+                if elem["id"] == obj_id:
                     matched_id = i
                     break
             if matched_id < 0:
-                raise f"Id {id} not found"
+                raise f"Id {obj_id} not found"
             return f"{parent}/{matched_id}"
 
-        out_patch = patch if inplace else copy.deepcopy(patch)
-        for p in out_patch:
-            p["path"] = re.sub(r"([\w\/-]*)\/\[([\w-]+)\]", replace_path_id, p["path"])
+        out_patch = in_patch if inplace else copy.deepcopy(in_patch)
+        for patch in out_patch:
+            patch["path"] = re.sub(
+                r"([\w\/-]*)\/\[([\w-]+)\]", replace_path_id, patch["path"]
+            )
 
         return out_patch
 
 
 class LeftMapSpec(MapSpec):
-    def __init__(self, bounds, width, height, colormap, min_val, max_val):
+    def __init__(self, min_val, max_val):
+        bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
+        width = bounds[2] - bounds[0]  # right - left
+        height = bounds[3] - bounds[1]  # top - bottom
+
         super().__init__(
             {
                 "initialViewState": {
@@ -90,7 +96,7 @@ class LeftMapSpec(MapSpec):
                         "id": "colormap-layer",
                         "bounds": bounds,
                         "image": "@@#resources.propertyMap",
-                        "colormap": colormap,
+                        "colormap": "@@#resources.colormap",
                         "valueRange": [min_val, max_val],
                         "pickable": True,
                     },
@@ -128,11 +134,15 @@ class LeftMapSpec(MapSpec):
     def update_drawing_mode(self, mode):
         spec = self.get_spec_clone()
         spec["layers"][2]["mode"] = mode
-        self.update(spec)
+        return self.update(spec)
 
 
 class RightMapSpec(MapSpec):
-    def __init__(self, bounds, width, height, colormap, min_val, max_val, wells):
+    def __init__(self, min_val, max_val):
+        bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
+        width = bounds[2] - bounds[0]  # right - left
+        height = bounds[3] - bounds[1]  # top - bottom
+
         super().__init__(
             {
                 "initialViewState": {
@@ -145,7 +155,7 @@ class RightMapSpec(MapSpec):
                         "id": "colormap-layer",
                         "bounds": bounds,
                         "image": "@@#resources.propertyMap",
-                        "colormap": colormap,
+                        "colormap": "@@#resources.colormap",
                         "valueRange": [min_val, max_val],
                         "pickable": True,
                     },
@@ -167,7 +177,7 @@ class RightMapSpec(MapSpec):
                     {
                         "@@type": "WellsLayer",
                         "id": "wells-layer",
-                        "data": wells,
+                        "data": "@@#resources.wells",
                         "opacity": 1.0,
                         "lineWidthScale": 5,
                         "pointRadiusScale": 8,
@@ -243,7 +253,6 @@ def array2d_to_png(z_array):
 
 
 if __name__ == "__main__":
-
     # The data below is a modified version of one of the surfaces
     # taken from the Volve data set provided by Equinor and the former
     # Volve Licence partners under CC BY-NC-SA 4.0 license, and only
@@ -261,32 +270,29 @@ if __name__ == "__main__":
     map_data = (map_data - min_value) * scale_factor
 
     map_data = array2d_to_png(map_data)
-    COLORMAP = "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
+    COLOR_MAP = "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
     WELLS = (
-        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src"
-        "/demo/example-data/volve_wells.json"
+        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/"
+        "master/src/demo/example-data/volve_wells.json"
     )
-
-    bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
-    width = bounds[2] - bounds[0]  # right - left
-    height = bounds[3] - bounds[1]  # top - bottom
-
-    left_map_spec = LeftMapSpec(bounds, width, height, COLORMAP, min_value, max_value)
+    left_map_spec = LeftMapSpec(min_value, max_value)
     left_map = webviz_subsurface_components.DeckGLMap(
         id="DeckGL-Map-Left",
         resources={
             "propertyMap": map_data,
+            "colormap": COLOR_MAP,
+            "wells": WELLS,
         },
         deckglSpecPatch=left_map_spec.create_patch(),
     )
 
-    right_map_spec = RightMapSpec(
-        bounds, width, height, COLORMAP, min_value, max_value, WELLS
-    )
+    right_map_spec = RightMapSpec(min_value, max_value)
     right_map = webviz_subsurface_components.DeckGLMap(
         id="DeckGL-Map-Right",
         resources={
             "propertyMap": map_data,
+            "colormap": COLOR_MAP,
+            "wells": WELLS,
         },
         deckglSpecPatch=right_map_spec.create_patch(),
     )
@@ -316,7 +322,8 @@ if __name__ == "__main__":
     )
     def toggle_drawing(n_clicks):
         mode = "view" if n_clicks is None or n_clicks % 2 == 0 else "drawLineString"
-        return left_map_spec.update_drawing_mode(mode)
+        patch = left_map_spec.update_drawing_mode(mode)
+        return patch
 
     @app.callback(
         dash.dependencies.Output("DeckGL-Map-Right", "deckglSpecPatch"),
