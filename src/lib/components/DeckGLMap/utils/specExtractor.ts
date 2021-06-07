@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEmpty } from "lodash";
 import { DrawMode } from "../redux/types";
 

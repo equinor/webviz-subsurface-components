@@ -8,7 +8,7 @@ export const patchMiddleware = (
 ) => {
     return (store: Middleware<Dispatch, MapState>) =>
         (next: Dispatch) =>
-        (action: AnyAction) => {
+        (action: AnyAction): AnyAction => {
             const stateBef = store.getState();
             const result = next(action);
 
@@ -24,6 +24,7 @@ export const patchMiddleware = (
                     op.path = op.path.substring(5);
                     const layerInfo = /\/layers\/(\d+)(\/\w+)/gm.exec(op.path);
                     if (layerInfo) {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const layerId = (stateAft.spec.layers as any[])[
                             layerInfo[1]
                         ].id;
