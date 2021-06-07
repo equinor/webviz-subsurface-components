@@ -31,6 +31,10 @@ const Map: React.FC<MapProps> = ({
     const [specObj, setSpecObj] = React.useState(null);
 
     React.useEffect(() => {
+        if (!props.deckglSpec) {
+            return;
+        }
+
         const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
         if (resources) {
             configuration.merge({
@@ -40,9 +44,8 @@ const Map: React.FC<MapProps> = ({
             });
         }
         const jsonConverter = new JSONConverter({ configuration });
-        const specObj = jsonConverter.convert(deckglSpec);
-        setSpecObj(specObj);
-    }, [deckglSpec]);
+        setSpecObj(jsonConverter.convert(props.deckglSpec));
+    }, [props.deckglSpec, props.resources]);
 
     React.useEffect(() => {
         if (deckRef.current) {
