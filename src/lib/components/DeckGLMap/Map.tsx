@@ -1,13 +1,13 @@
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 import { PickInfo } from "deck.gl";
-
 import { Operation } from "fast-json-patch";
 import { Feature } from "geojson";
-
 import React from "react";
-
+import { useDispatch } from "react-redux";
+import LayersButton from "./components/settings/LayersButton";
 import JSON_CONVERTER_CONFIG from "./configuration";
+import { setSpec } from "./redux/actions";
 
 export interface MapProps {
     id: string;
@@ -20,6 +20,7 @@ export interface MapProps {
 
 const Map: React.FC<MapProps> = (props: MapProps) => {
     const deckRef = React.useRef<DeckGL>(null);
+    const dispatch = useDispatch();
 
     const [specObj, setSpecObj] = React.useState(null);
 
@@ -33,7 +34,10 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
             });
         }
         const jsonConverter = new JSONConverter({ configuration });
-        setSpecObj(jsonConverter.convert(props.deckglSpec));
+        const specObj = jsonConverter.convert(props.deckglSpec);
+        setSpecObj(specObj);
+        //update redux
+        dispatch(setSpec(specObj ? props.deckglSpec : {}));
     }, [props.deckglSpec]);
 
     React.useEffect(() => {
@@ -54,20 +58,23 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
 
     return (
         specObj && (
-            <DeckGL
-                id={props.id}
-                {...specObj}
-                getCursor={({ isDragging }): string =>
-                    isDragging ? "grabbing" : "default"
-                }
-                getTooltip={(info: PickInfo<unknown>): string | null => {
-                    return (info.object as Feature)?.properties?.name;
-                }}
-                ref={deckRef}
-                onHover={props.onHover}
-            >
-                {props.children}
-            </DeckGL>
+            <>
+                <DeckGL
+                    id={props.id}
+                    {...specObj}
+                    getCursor={({ isDragging }): string =>
+                        isDragging ? "grabbing" : "default"
+                    }
+                    getTooltip={(info: PickInfo<unknown>): string | null => {
+                        return (info.object as Feature)?.properties?.name;
+                    }}
+                    ref={deckRef}
+                    onHover={props.onHover}
+                >
+                    {props.children}
+                </DeckGL>
+                <LayersButton />
+            </>
         )
     );
 };

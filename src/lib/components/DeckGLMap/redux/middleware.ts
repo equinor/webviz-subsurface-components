@@ -1,0 +1,38 @@
+import * as jsonpatch from "fast-json-patch";
+import { isEqual } from "lodash";
+import { AnyAction, Dispatch, MiddlewareAPI as Middleware } from "redux";
+import { MapState } from "./store";
+
+export const patchMiddleware = (
+    patchSpec: (patch: jsonpatch.Operation[]) => void
+) => {
+    return (store: Middleware<Dispatch, MapState>) =>
+        (next: Dispatch) =>
+        (action: AnyAction) => {
+            const stateBef = store.getState();
+            const result = next(action);
+
+            const stateAft = store.getState();
+
+            if (
+                action.type !== "spec/setSpec" &&
+                !isEqual(stateBef, stateAft)
+            ) {
+                const patch = jsonpatch.compare(stateBef, stateAft);
+                patch.forEach((op) => {
+                    //remove /spec prefix
+                    op.path = op.path.substring(5);
+                    const layerInfo = /\/layers\/(\d+)(\/\w+)/gm.exec(op.path);
+                    if (layerInfo) {
+                        const layerId = (stateAft.spec.layers as any[])[
+                            layerInfo[1]
+                        ].id;
+                        op.path = "/layers/[" + layerId + "]" + layerInfo[2];
+                    }
+                });
+                patchSpec(patch);
+            }
+
+            return result;
+        };
+};

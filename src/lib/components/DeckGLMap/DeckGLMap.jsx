@@ -1,10 +1,10 @@
-import * as React from "react";
+import { applyPatch, getValueByPointer } from "fast-json-patch";
 import PropTypes from "prop-types";
-
+import * as React from "react";
+import { Provider as ReduxProvider } from "react-redux";
 import Coords from "./components/Coords";
 import Map from "./Map";
-
-import { applyPatch, getValueByPointer } from "fast-json-patch";
+import { createStore } from "./redux/store";
 
 function _idsToIndices(doc, path) {
     // The path looks something like this: `/layers/[layer-id]/property`,
@@ -42,7 +42,6 @@ DeckGLMap.defaultProps = {
 
 function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
     const [deckglSpec, setDeckglSpec] = React.useState({});
-
     React.useEffect(() => {
         if (!deckglSpecPatch) {
             return;
@@ -81,22 +80,29 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
         },
         [coords]
     );
+    const patchSpec = React.useCallback(
+        (patch) =>
+            setProps({
+                deckglSpecPatch: patch,
+            }),
+        [setProps]
+    );
+
+    const store = React.useMemo(() => createStore(patchSpec), [patchSpec]);
 
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
-            <Map
-                id={id}
-                resources={resources}
-                deckglSpec={deckglSpec}
-                patchSpec={(patch) => {
-                    setProps({
-                        deckglSpecPatch: patch,
-                    });
-                }}
-                onHover={onHover}
-            >
-                <Coords pickInfos={hoverInfo} />
-            </Map>
+            <ReduxProvider store={store}>
+                <Map
+                    id={id}
+                    resources={resources}
+                    deckglSpec={deckglSpec}
+                    patchSpec={patchSpec}
+                    onHover={onHover}
+                >
+                    <Coords pickInfos={hoverInfo} />
+                </Map>
+            </ReduxProvider>
         </div>
     );
 }
