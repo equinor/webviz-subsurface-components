@@ -129,7 +129,8 @@ export default class VectorSelection extends TreeNodeSelection {
 
     exactlyMatchedNodePaths(): Array<string> {
         const selections = this.myTreeData.findNodes(
-            super.getNodePath()
+            super.getNodePath(),
+            true
         ).nodePaths;
         const nodePaths: string[] = [];
         for (const selection of selections) {

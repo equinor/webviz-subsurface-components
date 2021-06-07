@@ -42,7 +42,7 @@
         "@types/react-dom": "^17.0.3",
         "@types/react-redux": "^7.1.15",
         "@types/react-resize-detector": "^5.0.0",
-        "@webviz/core-components": "^0.4.1",
+        "@webviz/core-components": "^0.5.0",
         "ajv": "^7.2.1",
         "clsx": "^1.1.1",
         "d3": "^5.11.0",
