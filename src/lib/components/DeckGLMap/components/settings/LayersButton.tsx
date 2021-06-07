@@ -1,60 +1,35 @@
 import { Checkbox, Icon, Menu, Tooltip } from "@equinor/eds-core-react";
-import { layers } from "@equinor/eds-icons";
-import {
-    createStyles,
-    Fab,
-    makeStyles,
-    Theme,
-    // eslint-disable-next-line prettier/prettier
-    useTheme
-} from "@material-ui/core";
-import { isEmpty } from "lodash";
+import { createStyles, Fab, makeStyles } from "@material-ui/core";
 import React, { ChangeEvent, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateVisibleLayers } from "../../redux/actions";
 import { MapState } from "../../redux/store";
+import { getLayerVisibility } from "../../utils/specExtractor";
 
-Icon.add({ layers }); // (this needs only be done once)
-
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
     createStyles({
-        fab: {
-            position: "absolute",
-            bottom: theme.spacing(2),
-            right: theme.spacing(2),
+        root: {
+            flexDirection: "column",
+            display: "flex",
         },
     })
 );
 const LayersButton: React.FC = React.memo(() => {
     const classes = useStyles();
-    const theme = useTheme();
     // Redux
     const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const spec = useSelector((st: MapState) => st.spec);
 
-    const layers = useMemo(
-        () =>
-            !isEmpty(spec)
-                ? (spec.layers as any).reduce(
-                      (acc, current) => ({
-                          ...acc,
-                          [current.id]:
-                              current.visible === undefined || current.visible,
-                      }),
-                      {}
-                  )
-                : {},
-        [spec]
-    );
+    const layers = useMemo(() => getLayerVisibility(spec), [spec]);
 
     // handlers
-    const handleOpen = useCallback(
+    const handleClick = useCallback(
         (event: React.MouseEvent<HTMLButtonElement>) => {
-            setAnchorEl(event.currentTarget);
+            setAnchorEl(anchorEl ? null : event.currentTarget);
         },
-        []
+        [anchorEl]
     );
 
     const handleClose = useCallback(() => {
@@ -68,11 +43,7 @@ const LayersButton: React.FC = React.memo(() => {
 
     return (
         <>
-            <Fab
-                onClick={handleOpen}
-                className={classes.fab}
-                id="layers-selector-button"
-            >
+            <Fab id="layers-selector-button" onClick={handleClick}>
                 <Tooltip title="Layers">
                     <Icon color="currentColor" name="layers" />
                 </Tooltip>
@@ -82,26 +53,19 @@ const LayersButton: React.FC = React.memo(() => {
                 aria-labelledby="layers-selector-button"
                 id="layers-selector"
                 onClose={handleClose}
-                placement="bottom-end"
+                placement="left"
                 open={Boolean(anchorEl)}
+                className={classes.root}
             >
                 {Object.keys(layers).map((layer) => (
-                    <Menu.Item
-                        key={`layer-checkbox-menu-${layer}`}
-                        style={{
-                            padding: 0,
-                            paddingRight: theme.spacing(1),
+                    <Checkbox
+                        key={`layer-checkbox-${layer}`}
+                        label={layer}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            updateChecked(layer, e.target.checked);
                         }}
-                    >
-                        <Checkbox
-                            key={`layer-checkbox-${layer}`}
-                            label={layer}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                updateChecked(layer, e.target.checked);
-                            }}
-                            checked={layers[layer]}
-                        />
-                    </Menu.Item>
+                        checked={layers[layer]}
+                    />
                 ))}
             </Menu>
         </>

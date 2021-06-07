@@ -5,7 +5,7 @@ import { Operation } from "fast-json-patch";
 import { Feature } from "geojson";
 import React from "react";
 import { useDispatch } from "react-redux";
-import LayersButton from "./components/settings/LayersButton";
+import Settings from "./components/settings/Settings";
 import JSON_CONVERTER_CONFIG from "./configuration";
 import { setSpec } from "./redux/actions";
 
@@ -73,7 +73,7 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                 >
                     {props.children}
                 </DeckGL>
-                <LayersButton />
+                <Settings />
             </>
         )
     );

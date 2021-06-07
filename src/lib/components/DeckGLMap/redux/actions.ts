@@ -1,4 +1,4 @@
-import { drawingSlice, specSlice } from "./reducer";
+import { specSlice } from "./reducer";
 
-export const { setSpec, updateVisibleLayers } = specSlice.actions;
-export const { updateDrawingMode } = drawingSlice.actions;
+export const { setSpec, updateVisibleLayers, updateDrawingMode } =
+    specSlice.actions;

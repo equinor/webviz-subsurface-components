@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DrawingSettings, DrawMode } from "./types";
+import { DrawMode } from "./types";
 
 export const specSlice = createSlice({
     name: "spec",
@@ -16,21 +17,18 @@ export const specSlice = createSlice({
             );
             layer.visible = action.payload[1];
         },
-    },
-});
-
-export const drawingSlice = createSlice({
-    name: "drawing",
-    initialState: {
-        mode: "view",
-    } as DrawingSettings,
-    reducers: {
-        updateDrawingMode: (state, action: PayloadAction<DrawMode>) => {
-            state.mode = action.payload;
+        updateDrawingMode: (
+            state,
+            action: PayloadAction<[string, DrawMode]>
+        ) => {
+            const layer = (state.layers as any[]).find(
+                (layer) => layer.id === action.payload[0]
+            );
+            if (layer["@@type"] === "DrawingLayer")
+                layer.mode = action.payload[1];
         },
     },
 });
 export const rootReducer = combineReducers({
     spec: specSlice.reducer,
-    drawing: drawingSlice.reducer,
 });
