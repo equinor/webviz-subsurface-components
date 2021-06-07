@@ -13,10 +13,12 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedFeature: Feature;
+    selectionEnabled: boolean;
 }
 
 const defaultProps = {
     autoHighlight: true,
+    selectionEnabled: true,
 };
 
 export default class WellsLayer extends CompositeLayer<
@@ -24,6 +26,10 @@ export default class WellsLayer extends CompositeLayer<
     WellsLayerProps<Feature>
 > {
     onClick(info: PickInfo<Feature>): boolean {
+        if (!this.props.selectionEnabled) {
+            return false;
+        }
+
         patchLayerProps(this, {
             ...this.props,
             selectedFeature: info.object,
