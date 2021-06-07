@@ -33,6 +33,41 @@ function _idsToIndices(doc, path) {
     return path;
 }
 
+function useStateWithPatches(initialState) {
+    const [state, setState] = React.useState(initialState);
+
+    const getPatch = (newState) => {
+        if (typeof newState === "function") {
+            const currState = cloneDeep(state);
+            return jsonpatch.compare(state, newState(currState));
+        }
+        return jsonpatch.compare(state, newState);
+    };
+
+    const setPatch = (patch) => {
+        let newSpec = state;
+        try {
+            const normalizedPatch = patch.map((patch) => {
+                return {
+                    ...patch,
+                    path: _idsToIndices(state, patch.path),
+                };
+            });
+            newSpec = jsonpatch.applyPatch(
+                state,
+                normalizedPatch,
+                true,
+                false
+            ).newDocument;
+        } catch (error) {
+            console.error("Unable to apply patch: " + error);
+        }
+        setState(newSpec);
+    };
+
+    return [state, getPatch, setPatch];
+}
+
 DeckGLMap.defaultProps = {
     coords: {
         visible: true,
@@ -42,32 +77,14 @@ DeckGLMap.defaultProps = {
 };
 
 function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
-    const [deckglSpec, setDeckglSpec] = React.useState(null);
+    const [deckglSpec, getDeckglSpecPatch, setDeckglSpecPatch] =
+        useStateWithPatches(null);
 
     React.useEffect(() => {
         if (!deckglSpecPatch) {
             return;
         }
-
-        let newSpec = deckglSpec;
-        try {
-            const patch = deckglSpecPatch.map((patch) => {
-                return {
-                    ...patch,
-                    path: _idsToIndices(deckglSpec, patch.path),
-                };
-            });
-            newSpec = jsonpatch.applyPatch(
-                deckglSpec,
-                patch,
-                true,
-                false
-            ).newDocument;
-        } catch (error) {
-            console.error("Unable to apply patch: " + error);
-        }
-
-        setDeckglSpec(newSpec);
+        setDeckglSpecPatch(deckglSpecPatch);
     }, [deckglSpecPatch]);
 
     React.useEffect(() => {
@@ -77,14 +94,15 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
             return layer["@@type"] == "DrawingLayer" && layer["mode"] != "view";
         });
 
-        const newSpec = cloneDeep(deckglSpec);
-        newSpec.layers.forEach((layer) => {
-            if (layer["@@type"] == "WellsLayer") {
-                layer.selectionEnabled = !drawingEnabled;
-            }
+        const patch = getDeckglSpecPatch((newSpec) => {
+            newSpec.layers.forEach((layer) => {
+                if (layer["@@type"] == "WellsLayer") {
+                    layer.selectionEnabled = !drawingEnabled;
+                }
+            });
+            return newSpec;
         });
 
-        const patch = jsonpatch.compare(deckglSpec, newSpec);
         if (patch.length !== 0) {
             setProps({
                 deckglSpecPatch: patch,
