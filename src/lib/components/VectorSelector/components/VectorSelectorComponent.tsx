@@ -133,7 +133,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             selected: false,
             delimiter: this.props.delimiter,
             numMetaNodes: this.props.numMetaNodes + 1,
-            treeData: this.treeData,
+            treeData: this.treeData as TreeData,
         });
     }
 
