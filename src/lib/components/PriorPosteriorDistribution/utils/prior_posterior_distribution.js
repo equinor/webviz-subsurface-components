@@ -56,14 +56,9 @@ class D3PriorPosterior {
             ...this.data.values.map((values) => Math.max(...values))
         );
 
-        this.xscale_addition = (this.global_max - this.global_min) * 0.05;
-
         this.x_scale = d3
             .scaleLinear()
-            .domain([
-                this.global_min - this.xscale_addition,
-                this.global_max + this.xscale_addition,
-            ])
+            .domain([this.global_min, this.global_max])
             .range([0, this.width_plot]);
 
         this.color_scale = d3
@@ -96,7 +91,13 @@ class D3PriorPosterior {
         const histogram = d3
             .histogram()
             .domain(this.x_scale.domain())
-            .thresholds(this.x_scale.ticks(this.number_bins));
+            .thresholds(
+                d3.range(
+                    this.global_min,
+                    this.global_max,
+                    (this.global_max - this.global_min) / this.number_bins
+                )
+            );
 
         this.bins = this.data.values.map((values) => histogram(values));
 
