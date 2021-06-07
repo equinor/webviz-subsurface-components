@@ -71,132 +71,132 @@ class MapSpec:
 
         out_patch = patch if inplace else copy.deepcopy(patch)
         for p in out_patch:
-            p['path'] = re.sub(r"([\w\/-]*)\/\[([\w-]+)\]",
-                               replace_path_id, p['path'])
+            p["path"] = re.sub(r"([\w\/-]*)\/\[([\w-]+)\]", replace_path_id, p["path"])
 
         return out_patch
 
 
 class LeftMapSpec(MapSpec):
     def __init__(self, bounds, width, height, colormap, min_val, max_val):
-        super().__init__({
-            "initialViewState": {
-                "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
-                "zoom": -3,
-            },
-            "layers": [
-                {
-                    "@@type": "ColormapLayer",
-                    "id": "colormap-layer",
-                    "bounds": bounds,
-                    "image": "@@#resources.propertyMap",
-                    "colormap": colormap,
-                    "valueRange": [min_val, max_val],
-                    "pickable": True,
+        super().__init__(
+            {
+                "initialViewState": {
+                    "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+                    "zoom": -3,
                 },
-                {
-                    "@@type": "Hillshading2DLayer",
-                    "id": "hillshading-layer",
-                    "bounds": bounds,
-                    "opacity": 1.0,
-                    "valueRange": [min_val, max_val],
-                    "image": "@@#resources.propertyMap",
-                    "pickable": True,
-                },
-                {
-                    "@@type": "DrawingLayer",
-                    "id": "drawing-layer",
-                    "mode": "drawLineString",
-                    "data": {"type": "FeatureCollection", "features": []},
-                },
-            ],
-            "views": [
-                {
-                    "@@type": "OrthographicView",
-                    "id": "main",
-                    "controller": {
-                        "doubleClickZoom": False
+                "layers": [
+                    {
+                        "@@type": "ColormapLayer",
+                        "id": "colormap-layer",
+                        "bounds": bounds,
+                        "image": "@@#resources.propertyMap",
+                        "colormap": colormap,
+                        "valueRange": [min_val, max_val],
+                        "pickable": True,
                     },
-                    "x": "0%",
-                    "y": "0%",
-                    "width": "100%",
-                    "height": "100%",
-                    "flipY": False,
-                }
-            ],
-        })
+                    {
+                        "@@type": "Hillshading2DLayer",
+                        "id": "hillshading-layer",
+                        "bounds": bounds,
+                        "opacity": 1.0,
+                        "valueRange": [min_val, max_val],
+                        "image": "@@#resources.propertyMap",
+                        "pickable": True,
+                    },
+                    {
+                        "@@type": "DrawingLayer",
+                        "id": "drawing-layer",
+                        "mode": "drawLineString",
+                        "data": {"type": "FeatureCollection", "features": []},
+                    },
+                ],
+                "views": [
+                    {
+                        "@@type": "OrthographicView",
+                        "id": "main",
+                        "controller": {"doubleClickZoom": False},
+                        "x": "0%",
+                        "y": "0%",
+                        "width": "100%",
+                        "height": "100%",
+                        "flipY": False,
+                    }
+                ],
+            }
+        )
 
     def update_drawing_mode(self, mode):
         spec = self.get_spec_clone()
-        spec['layers'][2]['mode'] = mode
+        spec["layers"][2]["mode"] = mode
         self.update(spec)
 
 
 class RightMapSpec(MapSpec):
     def __init__(self, bounds, width, height, colormap, min_val, max_val, wells):
-        super().__init__({
-            "initialViewState": {
-                "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
-                "zoom": -3,
-            },
-            "layers": [
-                {
-                    "@@type": "ColormapLayer",
-                    "id": "colormap-layer",
-                    "bounds": bounds,
-                    "image": "@@#resources.propertyMap",
-                    "colormap": colormap,
-                    "valueRange": [min_val, max_val],
-                    "pickable": True,
+        super().__init__(
+            {
+                "initialViewState": {
+                    "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+                    "zoom": -3,
                 },
-                {
-                    "@@type": "Hillshading2DLayer",
-                    "id": "hillshading-layer",
-                    "bounds": bounds,
-                    "opacity": 1.0,
-                    "valueRange": [min_val, max_val],
-                    "image": "@@#resources.propertyMap",
-                    "pickable": True,
-                },
-                {
-                    "@@type": "DrawingLayer",
-                    "id": "drawing-layer",
-                    "mode": "view",
-                    "data": {"type": "FeatureCollection", "features": []},
-                },
-                {
-                    "@@type": "WellsLayer",
-                    "id": "wells-layer",
-                    "data": wells,
-                    "opacity": 1.0,
-                    "lineWidthScale": 5,
-                    "pointRadiusScale": 8,
-                    "outline": True,
-                },
-            ],
-            "views": [
-                {
-                    "@@type": "OrthographicView",
-                    "id": "main",
-                    "controller": {
-                        "doubleClickZoom": False
+                "layers": [
+                    {
+                        "@@type": "ColormapLayer",
+                        "id": "colormap-layer",
+                        "bounds": bounds,
+                        "image": "@@#resources.propertyMap",
+                        "colormap": colormap,
+                        "valueRange": [min_val, max_val],
+                        "pickable": True,
                     },
-                    "x": "0%",
-                    "y": "0%",
-                    "width": "100%",
-                    "height": "100%",
-                    "flipY": False,
-                }
-            ],
-        })
+                    {
+                        "@@type": "Hillshading2DLayer",
+                        "id": "hillshading-layer",
+                        "bounds": bounds,
+                        "opacity": 1.0,
+                        "valueRange": [min_val, max_val],
+                        "image": "@@#resources.propertyMap",
+                        "pickable": True,
+                    },
+                    {
+                        "@@type": "DrawingLayer",
+                        "id": "drawing-layer",
+                        "mode": "view",
+                        "data": {"type": "FeatureCollection", "features": []},
+                    },
+                    {
+                        "@@type": "WellsLayer",
+                        "id": "wells-layer",
+                        "data": wells,
+                        "opacity": 1.0,
+                        "lineWidthScale": 5,
+                        "pointRadiusScale": 8,
+                        "outline": True,
+                    },
+                ],
+                "views": [
+                    {
+                        "@@type": "OrthographicView",
+                        "id": "main",
+                        "controller": {"doubleClickZoom": False},
+                        "x": "0%",
+                        "y": "0%",
+                        "width": "100%",
+                        "height": "100%",
+                        "flipY": False,
+                    }
+                ],
+            }
+        )
 
     def sync_drawing(self, in_patch):
-        drawing_layer_patches = list(filter(
-            lambda patch: patch["path"].startswith(
-                "/layers/[drawing-layer]/data") or patch["path"].startswith(
-                "/layers/2/data"),
-            in_patch,
-        ))
+        drawing_layer_patches = list(
+            filter(
+                lambda patch: patch["path"].startswith("/layers/[drawing-layer]/data")
+                or patch["path"].startswith("/layers/2/data"),
+                in_patch,
+            )
+        )
         self.apply_patch(drawing_layer_patches)
 
         return drawing_layer_patches
@@ -271,8 +271,7 @@ if __name__ == "__main__":
     width = bounds[2] - bounds[0]  # right - left
     height = bounds[3] - bounds[1]  # top - bottom
 
-    left_map_spec = LeftMapSpec(
-        bounds, width, height, COLORMAP, min_value, max_value)
+    left_map_spec = LeftMapSpec(bounds, width, height, COLORMAP, min_value, max_value)
     left_map = webviz_subsurface_components.DeckGLMap(
         id="DeckGL-Map-Left",
         resources={
@@ -282,7 +281,8 @@ if __name__ == "__main__":
     )
 
     right_map_spec = RightMapSpec(
-        bounds, width, height, COLORMAP, min_value, max_value, WELLS)
+        bounds, width, height, COLORMAP, min_value, max_value, WELLS
+    )
     right_map = webviz_subsurface_components.DeckGLMap(
         id="DeckGL-Map-Right",
         resources={
