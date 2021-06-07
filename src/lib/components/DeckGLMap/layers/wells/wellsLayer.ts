@@ -27,6 +27,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedFeature: Feature;
+    selectionEnabled: boolean;
     logData: string;
     logName: string;
     logRadius: number;
@@ -84,6 +85,7 @@ function getLogWidth(d: LogCurveDataType, log_name: string): number[] | null {
 
 const defaultProps = {
     autoHighlight: true,
+    selectionEnabled: true,
 };
 
 function squared_distance(a, b): number {
@@ -102,6 +104,10 @@ export default class WellsLayer extends CompositeLayer<
     WellsLayerProps<Feature>
 > {
     onClick(info: WellsPickInfo): boolean {
+        if (!this.props.selectionEnabled) {
+            return false;
+        }
+
         patchLayerProps(this, {
             ...this.props,
             selectedFeature: info.object,
