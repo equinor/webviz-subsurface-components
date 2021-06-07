@@ -4,10 +4,10 @@ import { PickInfo } from "deck.gl";
 import { Operation } from "fast-json-patch";
 import { Feature } from "geojson";
 import React from "react";
-import { useDispatch } from "react-redux";
+import { Provider as ReduxProvider } from "react-redux";
 import Settings from "./components/settings/Settings";
 import JSON_CONVERTER_CONFIG from "./configuration";
-import { setSpec } from "./redux/actions";
+import { createStore } from "./redux/store";
 
 export interface MapProps {
     id: string;
@@ -18,27 +18,31 @@ export interface MapProps {
     children?: React.ReactNode;
 }
 
-const Map: React.FC<MapProps> = (props: MapProps) => {
+const Map: React.FC<MapProps> = ({
+    id,
+    resources,
+    deckglSpec,
+    onHover,
+    patchSpec,
+    children,
+}: MapProps) => {
     const deckRef = React.useRef<DeckGL>(null);
-    const dispatch = useDispatch();
 
     const [specObj, setSpecObj] = React.useState(null);
 
     React.useEffect(() => {
         const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
-        if (props.resources) {
+        if (resources) {
             configuration.merge({
                 enumerations: {
-                    resources: props.resources,
+                    resources,
                 },
             });
         }
         const jsonConverter = new JSONConverter({ configuration });
-        const specObj = jsonConverter.convert(props.deckglSpec);
+        const specObj = jsonConverter.convert(deckglSpec);
         setSpecObj(specObj);
-        //update redux
-        dispatch(setSpec(specObj ? props.deckglSpec : {}));
-    }, [props.deckglSpec]);
+    }, [deckglSpec]);
 
     React.useEffect(() => {
         if (deckRef.current) {
@@ -50,17 +54,21 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore: TS2345
                 userData: {
-                    patchSpec: props.patchSpec,
+                    patchSpec: patchSpec,
                 },
             });
         }
-    }, [props.patchSpec]);
+    }, [patchSpec]);
 
+    const store = React.useMemo(
+        () => createStore(deckglSpec, patchSpec),
+        [deckglSpec, patchSpec]
+    );
     return (
         specObj && (
-            <>
+            <ReduxProvider store={store}>
                 <DeckGL
-                    id={props.id}
+                    id={id}
                     {...specObj}
                     getCursor={({ isDragging }): string =>
                         isDragging ? "grabbing" : "default"
@@ -69,12 +77,12 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                         return (info.object as Feature)?.properties?.name;
                     }}
                     ref={deckRef}
-                    onHover={props.onHover}
+                    onHover={onHover}
                 >
-                    {props.children}
+                    {children}
                 </DeckGL>
                 <Settings />
-            </>
+            </ReduxProvider>
         )
     );
 };
