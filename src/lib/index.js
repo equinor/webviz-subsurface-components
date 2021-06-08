@@ -12,6 +12,7 @@ import LeafletMap from "./components/LeafletMap";
 import Map from "./components/Map";
 import Morris from "./components/Morris";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
+import VectorSelector from "./components/VectorSelector";
 import WellCompletions from "./components/WellCompletions";
 
 export {
@@ -22,6 +23,7 @@ export {
     PriorPosteriorDistribution,
     LeafletMap,
     DeckGLMap,
+    VectorSelector,
     WellCompletions,
     GroupTree,
 };

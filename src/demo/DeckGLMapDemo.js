@@ -101,8 +101,12 @@ const DeckGLMapDemo = () => {
     });
 
     const setMapProps = React.useCallback((updatedProps) => {
-        setParsedJson(updatedProps);
-        setText(JSON.stringify(updatedProps, null, 2));
+        const updatedJson = {
+            ...parsedJson,
+            ...updatedProps,
+        };
+        setParsedJson(updatedJson);
+        setText(JSON.stringify(updatedJson, null, 2));
     });
 
     // TODO: Fold code panel in a slider:
@@ -123,29 +127,27 @@ const DeckGLMapDemo = () => {
                     />
                 </div>
             </div>
-            <div style={{ flex: 2 }}>
-                <ErrorBoundary
-                    reset={errorReset}
-                    onReset={() => {
-                        setErrorReset(false);
-                    }}
-                >
-                    <DeckGLMap
-                        id="DeckGL-Map"
-                        {...parsedJson}
-                        setProps={setMapProps}
-                    />
-                </ErrorBoundary>
-                <div>
-                    {colormaps.map((colormap, index) => (
-                        <img
-                            key={index}
-                            src={colormap}
-                            style={{ padding: "2px" }}
-                        />
-                    ))}
+            {parsedJson && (
+                <div style={{ flex: 2 }}>
+                    <ErrorBoundary
+                        reset={errorReset}
+                        onReset={() => {
+                            setErrorReset(false);
+                        }}
+                    >
+                        <DeckGLMap {...parsedJson} setProps={setMapProps} />
+                    </ErrorBoundary>
+                    <div>
+                        {colormaps.map((colormap, index) => (
+                            <img
+                                key={index}
+                                src={colormap}
+                                style={{ padding: "2px" }}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

@@ -1,32 +1,42 @@
 import { CompositeLayer } from "@deck.gl/core";
-import { GeoJsonLayer } from "@deck.gl/layers";
-
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { RGBAColor } from "@deck.gl/core/utils/color";
+import { GeoJsonLayer } from "@deck.gl/layers";
+import { PickInfo } from "deck.gl";
 
 import { Feature } from "geojson";
+
+import { patchLayerProps } from "../utils/layerTools";
 
 export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
     selectedFeature: Feature;
-}
-
-function handleClick(event) {
-    this.setLayerProps("wells-layer", { selectedFeature: event.object });
-    return true;
+    selectionEnabled: boolean;
 }
 
 const defaultProps = {
-    onClick: handleClick,
     autoHighlight: true,
+    selectionEnabled: true,
 };
 
 export default class WellsLayer extends CompositeLayer<
     Feature,
     WellsLayerProps<Feature>
 > {
+    onClick(info: PickInfo<Feature>): boolean {
+        if (!this.props.selectionEnabled) {
+            return false;
+        }
+
+        patchLayerProps(this, {
+            ...this.props,
+            selectedFeature: info.object,
+        });
+        return true;
+    }
+
     renderLayers(): GeoJsonLayer<Feature>[] {
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps({

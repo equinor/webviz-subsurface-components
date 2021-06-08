@@ -13,6 +13,8 @@ import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 
+import { patchLayerProps } from "../utils/layerTools";
+
 // Mapping of mode name to mode class
 const MODE_MAP = {
     view: ViewMode,
@@ -21,11 +23,9 @@ const MODE_MAP = {
     drawPolygon: DrawPolygonMode,
 };
 
-const DEFAULT_EDIT_MODE = DrawLineStringMode;
-
 const defaultProps = {
     pickable: true,
-    mode: DEFAULT_EDIT_MODE,
+    mode: "drawLineString",
     data: {
         type: "FeatureCollection",
         features: [],
@@ -33,8 +33,7 @@ const defaultProps = {
 };
 
 export interface DrawingLayerProps<D> extends CompositeLayerProps<D> {
-    mode?: string;
-    setLayerProps: (layerId: string, props: Record<string, unknown>) => void;
+    mode: string;
 }
 
 export default class DrawingLayer extends CompositeLayer<
@@ -50,22 +49,21 @@ export default class DrawingLayer extends CompositeLayer<
     }
 
     renderLayers(): [EditableGeoJsonLayer] {
-        const mode =
-            typeof this.props.mode === "string"
-                ? MODE_MAP[this.props.mode]
-                : this.props.mode;
-
         return [
             new EditableGeoJsonLayer(
                 this.getSubLayerProps({
                     id: "editable",
                     data: this.props.data,
-                    mode: mode,
+                    mode: MODE_MAP[this.props.mode],
                     selectedFeatureIndexes: this.state.selectedFeatureIndexes,
                     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
                     onEdit: ({ updatedData, editType }) => {
                         if (editType === "addFeature" && this.props.id) {
-                            this.props.setLayerProps(this.props.id, {
+                            patchLayerProps<
+                                DrawingLayer,
+                                DrawingLayerProps<FeatureCollection>
+                            >(this, {
+                                ...this.props,
                                 data: updatedData,
                             });
                         }
