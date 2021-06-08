@@ -17,7 +17,7 @@ interface ParentProps {
 interface VectorCalculatorProps {
     id: string;
     vectors: TreeDataNode[];
-    expressions: ExpressionType[];
+    expressions: ExpressionType[]; // Rename to predefinedExpressions?
     isDashControlled: boolean;
     externalParseData?: ExternalParseData;
     setProps: (props: ParentProps) => void;

@@ -3,6 +3,7 @@ import { Icon, TextField, Progress } from "@equinor/eds-core-react";
 import { error_filled, thumbs_up } from "@equinor/eds-icons";
 
 import "../VectorCalculator.css";
+import { ExpressionType } from "../utils/VectorCalculatorTypes";
 
 export enum ExpressionStatus {
     Valid = 1,

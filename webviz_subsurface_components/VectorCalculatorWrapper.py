@@ -30,6 +30,11 @@ class ExpressionInfo(TypedDict):
     isValid: bool
     isDeletable: bool
 
+class ExternalParseData(TypedDict):
+    expression: str
+    id: str
+    variables: List[str]
+    isValid: bool
 
 class ExternalParseData(TypedDict):
     expression: str
@@ -194,6 +199,23 @@ class VectorCalculatorWrapper(VectorCalculator):
 
     @staticmethod
     def validate_expression(expression: ExpressionInfo) -> bool:
+        try:
+            parsed_expr = VectorCalculatorWrapper.parser.parse(expression["expression"])
+            variables: List[str] = parsed_expr.variables()
+
+            # Ensure only single character variables
+            if any([len(elm) > 1 for elm in variables]):
+                raise Exception
+
+            parsed_data: ExternalParseData = {"expression": expression["expression"], "id": expression["id"], "variables":variables,"isValid":True}
+            return parsed_data
+        except:
+            empty_variables: List[str] = []
+            non_parsed_data: ExternalParseData = {"expression": expression["expression"], "id": expression["id"], "variables":empty_variables,"isValid":False}
+            return non_parsed_data
+
+    @staticmethod
+    def is_valid_expression(expression: ExpressionInfo) -> bool:
         try:
             VectorCalculatorWrapper.parser.parse(expression["expression"])
         except:
