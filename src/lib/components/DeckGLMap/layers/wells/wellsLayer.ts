@@ -1,24 +1,16 @@
 import { CompositeLayer } from "@deck.gl/core";
 
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
-import { RGBAColor } from "@deck.gl/core/utils/color";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
+import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PickInfo } from "deck.gl";
 
 import { Feature } from "geojson";
 
 import { patchLayerProps } from "../utils/layerTools";
 
-export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
-    pointRadiusScale: number;
-    lineWidthScale: number;
-    outline: boolean;
-    selectedFeature: Feature;
-    logData: object;
-    logName: string;
-    logRadius: number;
-    logCurves: boolean;
-}
+import { interpolateRgbBasis } from "d3-interpolate";
+import { color } from "d3-color";
 
 export interface LogCurveDataType {
     header: {
@@ -28,10 +20,21 @@ export interface LogCurveDataType {
         name: string;
         description: string;
     }[];
-    data: [number[]];
+    data: number[][];
 }
 
-let COLOR_MAP: RGBAColor[] = [ 
+export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
+    pointRadiusScale: number;
+    lineWidthScale: number;
+    outline: boolean;
+    selectedFeature: Feature;
+    logData: string;
+    logName: string;
+    logRadius: number;
+    logCurves: boolean;
+}
+
+let COLOR_MAP: RGBAColor[] = [
     [0, 0, 0, 255],
     [0, 255, 0, 255],
     [0, 0, 255, 255],
@@ -47,18 +50,31 @@ function getLogIDByName(d: LogCurveDataType, log_name: string) {
     return d.curves.findIndex(item => item.name.toLowerCase() === log_name.toLowerCase())
 }
 
-
+const color_interp = interpolateRgbBasis(["red", "yellow", "green", "blue"]);
 function getLogColor(d: LogCurveDataType, log_name: string): RGBAColor[] {
     const log_id = getLogIDByName(d, log_name)
-    if (d.curves[log_id] == undefined ||
-        d.curves[log_id].description == "continuous") {
-        return []
+    if (d.curves[log_id] == undefined) {
+        return [];
     }
-    let color: RGBAColor[] = [];
-    d.data[log_id].forEach(value => {
-        color.push(COLOR_MAP[value%10]);
-    }); 
-    return color;
+
+    let log_color: RGBAColor[] = [];
+    if (d.curves[log_id].description == "continuous") {
+        const min = Math.min(...d.data[log_id])
+        const max = Math.max(...d.data[log_id])
+        const max_delta = max-min;
+        d.data[log_id].forEach(value => {
+            var rgb = color(color_interp((value-min)/max_delta))?.rgb();
+            if (rgb != undefined) {
+                log_color.push([rgb.r, rgb.g, rgb.b])
+            }
+        });
+    }
+    else {
+        d.data[log_id].forEach(value => {
+            log_color.push(COLOR_MAP[value%10]);
+        });
+    }
+    return log_color;
 }
 
 function getLogWidth(d: LogCurveDataType, log_name: string): number[] {
@@ -137,15 +153,15 @@ export default class WellsLayer extends CompositeLayer<
                 widthMinPixels: 1,
                 miterLimit: 100,
                 getPath: (d: LogCurveDataType): number[] => d.data[0],
-                getColor: (d:LogCurveDataType): RGBAColor[] => 
+                getColor: (d:LogCurveDataType): RGBAColor[] =>
                             getLogColor(d, this.props.logName),
-                getWidth: (d:LogCurveDataType): number | number[] => 
+                getWidth: (d:LogCurveDataType): number | number[] =>
                             (this.props.logRadius || getLogWidth(d, this.props.logName)),
                 updateTriggers: {
                     getColor: [this.props.logName],
                     getWidth: [this.props.logName, this.props.logRadius]
                 }
-            }) 
+            })
         );
 
         let layers = [colors]

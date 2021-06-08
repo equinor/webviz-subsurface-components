@@ -64,7 +64,7 @@
               "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/logcurve/src/demo/example-data/volve_logs.json",
               "opacity": 1.0,
               "lineWidthScale": 5,
-              "logRadius": 4,
+              "logRadius": 6,
               "logName": "zonelog",
               "pointRadiusScale": 8,
               "outline": true,
