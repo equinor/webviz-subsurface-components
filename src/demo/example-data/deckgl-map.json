@@ -65,10 +65,14 @@
               "opacity": 1.0,
               "lineWidthScale": 5,
 <<<<<<< HEAD
+<<<<<<< HEAD
               "logRadius": 6,
 =======
               "logRadius": 4,
 >>>>>>> 1. Used resample log data
+=======
+              "logRadius": 6,
+>>>>>>> Added color to continuous log
               "logName": "zonelog",
               "pointRadiusScale": 8,
               "outline": true,
