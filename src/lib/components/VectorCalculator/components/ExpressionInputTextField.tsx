@@ -1,20 +1,20 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useCallback } from "react";
 import { TextField, Icon } from "@equinor/eds-core-react";
 import { error_filled, thumbs_up } from "@equinor/eds-icons";
 
-import { parseExpression } from "../utils/VectorCalculatorRegex";
 import "../VectorCalculator.css";
+import { ExpressionType } from "../utils/VectorCalculatorTypes";
 
 interface ExpressionInputTextFieldProps {
     expression: string;
+    isValid: boolean;
     disabled?: boolean;
     onExpressionChange: (expression: string) => void;
-    onValidChanged: (isValid: boolean) => void;
 }
 
 export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
     (props: ExpressionInputTextFieldProps) => {
-        const { expression, disabled } = props;
+        const { expression, isValid, disabled } = props;
 
         const [textFieldVariantState, setTextFieldVariantState] =
             React.useState<"success" | "error" | "warning" | "default">(
@@ -26,26 +26,24 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
         Icon.add({ error_filled });
         Icon.add({ thumbs_up });
 
-        const textFieldVariant = (isValid: boolean): "error" | "success" => {
+        const textFieldVariant = useCallback((): "error" | "success" => {
             if (!isValid) {
                 return "error";
             }
             return "success";
-        };
+        }, [isValid]);
 
-        const textFieldIcon = (isValid: boolean): ReactNode | undefined => {
+        const textFieldIcon = useCallback((): ReactNode | undefined => {
             if (!isValid) {
                 return <Icon key="error" name="error_filled" />;
             }
             return <Icon key="thumbs" name="thumbs_up" />;
-        };
+        }, [isValid]);
 
         React.useEffect(() => {
-            const isValid = parseExpression(expression);
-            setTextFieldVariantState(textFieldVariant(isValid));
-            setTextFieldIconState(textFieldIcon(isValid));
-            props.onValidChanged(isValid);
-        }, [expression]);
+            setTextFieldVariantState(textFieldVariant());
+            setTextFieldIconState(textFieldIcon());
+        }, [isValid]);
 
         const handleInputChange = (
             e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>

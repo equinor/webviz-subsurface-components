@@ -15,6 +15,20 @@ export const isExpressionNameExisting = (
     return expressions.some((expression) => expression.name === name);
 };
 
+export const getDetailedExpression = (expression: ExpressionType): string => {
+    if (!expression.isValid) {
+        return "";
+    }
+    let detailedExpr = expression.expression;
+    for (const elm of expression.variableVectorMap) {
+        detailedExpr = detailedExpr.replace(
+            elm.variableName,
+            elm.vectorName[0]
+        );
+    }
+    return detailedExpr;
+};
+
 export const getAvailableName = (
     nameSuggestion: string,
     expressions: ExpressionType[]

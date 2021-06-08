@@ -564,6 +564,7 @@ class VectorCalculatorDemo extends Component {
                             { variableName: "x", vectorName: ["WOPT:OP_1"] },
                             { variableName: "y", vectorName: ["FGIR"] },
                         ],
+                        isValid: true,
                     },
                     {
                         name: "Test2",
@@ -573,6 +574,7 @@ class VectorCalculatorDemo extends Component {
                             { variableName: "x", vectorName: ["WOPT:OP_3"] },
                             { variableName: "y", vectorName: ["FGIR"] },
                         ],
+                        isValid: true,
                     },
                     {
                         name: "Test3",
@@ -582,6 +584,7 @@ class VectorCalculatorDemo extends Component {
                             { variableName: "x", vectorName: ["WOPT:OP_1"] },
                             { variableName: "y", vectorName: ["WWPR:OP_3"] },
                         ],
+                        isValid: true,
                     },
                     {
                         name: "Test4",
@@ -592,8 +595,10 @@ class VectorCalculatorDemo extends Component {
                             { variableName: "y", vectorName: ["FGIR"] },
                             { variableName: "z", vectorName: ["WBHP:OP_2"] },
                         ],
+                        isValid: true,
                     },
                 ]}
+                isDashControlled={false}
                 setProps={this.setProps}
             />
         );

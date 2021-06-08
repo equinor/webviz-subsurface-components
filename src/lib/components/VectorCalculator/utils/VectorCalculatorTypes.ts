@@ -8,5 +8,13 @@ export type ExpressionType = {
     expression: string;
     id: string;
     variableVectorMap: VariableVectorMapType[];
-    isValid: boolean;
+    isValid: boolean; ///! Is name, expression and map valid
+};
+
+export type ExternalParseData = {
+    // TODO: Add message string for parsing failure?
+    expression: string;
+    id: string;
+    variables: string[];
+    isValid: boolean; // Is expression successfully parsed
 };
