@@ -1,20 +1,25 @@
 import React from "react";
 import Grid from "@material-ui/core/Grid";
 
-import { ExpressionType } from "../utils/VectorCalculatorTypes";
+import {
+    ExpressionType,
+    ExternalParseData,
+} from "../utils/VectorCalculatorTypes";
 import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
 import { ExpressionInputComponent } from "./ExpressionInputComponent";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 
 interface ParentProps {
-    expressions: ExpressionType[];
+    expressions?: ExpressionType[]; // TODO: Have "expression?:"" or "expression:" ?
+    externalParseExpression?: ExpressionType;
 }
 
 interface VectorCalculatorProps {
     id: string;
     vectors: TreeDataNode[];
-    expressions: ExpressionType[];
+    expressions: ExpressionType[]; // Rename to predefinedExpressions?
     isDashControlled: boolean;
+    externalParseData?: ExternalParseData;
     setProps: (props: ParentProps) => void;
 }
 
@@ -37,9 +42,13 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
         React.useState<boolean>(true);
 
     React.useEffect(() => {
-        // Intention: Validation of expressions handled back-end
-        if (expressions !== props.expressions) {
-            props.setProps({ expressions: expressions });
+        // Only send valid expressions
+        const outputExpressions = expressions.filter(
+            (expression) => expression.isValid
+        );
+
+        if (outputExpressions !== props.expressions) {
+            props.setProps({ expressions: outputExpressions });
         }
     }, [expressions]);
 
@@ -81,6 +90,12 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
         setExpressions(newExpressions);
     };
 
+    const handleExternalExpressionParsing = (
+        expression: ExpressionType
+    ): void => {
+        props.setProps({ externalParseExpression: expression });
+    };
+
     return (
         <Grid container spacing={3}>
             <Grid item xs={4}>
@@ -95,9 +110,13 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
                     activeExpression={activeExpression}
                     expressions={expressions}
                     vectors={props.vectors}
-                    externalValidation={isDashControlled}
+                    externalParsing={isDashControlled}
+                    externalParseData={props.externalParseData}
                     disabled={disabledInputComponent}
                     onExpressionChange={handleActiveExpressionEdit}
+                    onExternalExpressionParsing={
+                        handleExternalExpressionParsing
+                    }
                 />
             </Grid>
         </Grid>
