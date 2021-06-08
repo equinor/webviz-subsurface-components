@@ -1,11 +1,9 @@
-import * as React from "react";
+import * as jsonpatch from "fast-json-patch";
+import { cloneDeep } from "lodash";
 import PropTypes from "prop-types";
-
+import * as React from "react";
 import Coords from "./components/Coords";
 import Map from "./Map";
-
-import { cloneDeep } from "lodash";
-import * as jsonpatch from "fast-json-patch";
 
 function _idsToIndices(doc, path) {
     // The path looks something like this: `/layers/[layer-id]/property`,
@@ -43,7 +41,6 @@ DeckGLMap.defaultProps = {
 
 function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
     const [deckglSpec, setDeckglSpec] = React.useState(null);
-
     React.useEffect(() => {
         if (!deckglSpecPatch) {
             return;
@@ -109,6 +106,13 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
         },
         [coords]
     );
+    const patchSpec = React.useCallback(
+        (patch) =>
+            setProps({
+                deckglSpecPatch: patch,
+            }),
+        [setProps]
+    );
 
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
@@ -116,11 +120,7 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
                 id={id}
                 resources={resources}
                 deckglSpec={deckglSpec}
-                patchSpec={(patch) => {
-                    setProps({
-                        deckglSpecPatch: patch,
-                    });
-                }}
+                patchSpec={patchSpec}
                 onHover={onHover}
             >
                 <Coords pickInfos={hoverInfo} />
