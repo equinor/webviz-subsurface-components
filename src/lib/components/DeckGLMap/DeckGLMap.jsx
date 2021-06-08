@@ -40,7 +40,7 @@ DeckGLMap.defaultProps = {
 };
 
 function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
-    const [deckglSpec, setDeckglSpec] = React.useState({});
+    const [deckglSpec, setDeckglSpec] = React.useState(null);
     React.useEffect(() => {
         if (!deckglSpecPatch) {
             return;

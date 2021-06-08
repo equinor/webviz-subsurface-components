@@ -1,5 +1,6 @@
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
+import { AnyAction, EnhancedStore } from "@reduxjs/toolkit";
 import { PickInfo } from "deck.gl";
 import { Operation } from "fast-json-patch";
 import { Feature } from "geojson";
@@ -7,6 +8,7 @@ import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import Settings from "./components/settings/Settings";
 import JSON_CONVERTER_CONFIG from "./configuration";
+import { setSpec } from "./redux/actions";
 import { createStore } from "./redux/store";
 
 export interface MapProps {
@@ -27,6 +29,10 @@ const Map: React.FC<MapProps> = ({
     children,
 }: MapProps) => {
     const deckRef = React.useRef<DeckGL>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
+        createStore(deckglSpec, patchSpec)
+    );
 
     const [specObj, setSpecObj] = React.useState(null);
 
@@ -63,13 +69,13 @@ const Map: React.FC<MapProps> = ({
         }
     }, [patchSpec]);
 
-    const store = React.useMemo(
-        () => createStore(deckglSpec, patchSpec),
-        [deckglSpec, patchSpec]
-    );
+    React.useEffect(() => {
+        store.current.dispatch(setSpec(specObj ? deckglSpec : {}));
+    }, [deckglSpec, specObj]);
+
     return (
         specObj && (
-            <ReduxProvider store={store}>
+            <ReduxProvider store={store.current}>
                 <DeckGL
                     id={id}
                     {...specObj}
