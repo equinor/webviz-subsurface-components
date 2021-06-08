@@ -48,11 +48,14 @@ export default class DrawingLayer extends CompositeLayer<
         });
     }
 
-    renderLayers(): [EditableGeoJsonLayer] {
+    renderLayers(): [EditableGeoJsonLayer?] {
+        if (this.props.visible == false) {
+            return [];
+        }
+
         return [
             new EditableGeoJsonLayer(
                 this.getSubLayerProps({
-                    id: "editable",
                     data: this.props.data,
                     mode: MODE_MAP[this.props.mode],
                     selectedFeatureIndexes: this.state.selectedFeatureIndexes,
