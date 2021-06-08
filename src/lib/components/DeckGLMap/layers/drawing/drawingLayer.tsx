@@ -68,6 +68,7 @@ export default class DrawingLayer extends CompositeLayer<
                             >(this, {
                                 ...this.props,
                                 data: updatedData,
+                                mode: "view",
                             });
                         }
                     },
