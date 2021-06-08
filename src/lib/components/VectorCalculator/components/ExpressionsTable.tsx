@@ -11,10 +11,8 @@ import {
 } from "@material-ui/core";
 import { Tooltip } from "@equinor/eds-core-react";
 
-import {
-    ExpressionType,
-    VariableVectorMapType,
-} from "../utils/VectorCalculatorTypes";
+import { getDetailedExpression } from "../utils/VectorCalculatorHelperFunctions";
+import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import "../VectorCalculator.css";
 
 interface EnhancedTableProps {
@@ -160,17 +158,6 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
         props.onExpressionsSelect([]);
     };
 
-    const getExpressionFromMap = (
-        expression: string,
-        variableVectorMap: VariableVectorMapType[]
-    ): string => {
-        let output = expression;
-        for (const elm of variableVectorMap) {
-            output = output.replace(elm.variableName, elm.vectorName[0]);
-        }
-        return output;
-    };
-
     return (
         <TableContainer className={"ExpressionTable"} component={Paper}>
             <Table>
@@ -183,10 +170,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                     {expressions.map((row) => {
                         const isSelected = isExpressionSelected(row);
                         const isActive = activeExpression === row;
-                        const expressionFromMap = getExpressionFromMap(
-                            row.expression,
-                            row.variableVectorMap
-                        );
+                        const expressionFromMap = getDetailedExpression(row);
 
                         return (
                             <TableRow

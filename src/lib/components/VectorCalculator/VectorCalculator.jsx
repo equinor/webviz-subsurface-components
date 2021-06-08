@@ -13,6 +13,8 @@ export const VectorCalculator = (props) => {
                     id={props.id}
                     vectors={props.vectors}
                     expressions={props.expressions}
+                    isDashControlled={props.isDashControlled}
+                    externalParseData={props.externalParseData}
                     setProps={props.setProps}
                 />
             </div>
@@ -32,9 +34,9 @@ VectorCalculator.propTypes = {
     id: PropTypes.string.isRequired,
 
     /**
-     * Existing vectors
+     * Existing vectors for vector selector
      */
-    // vectors: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    vectors: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 
     /**
      * A JSON object holding all existing vectors
@@ -56,14 +58,25 @@ VectorCalculator.propTypes = {
                     variableName: string.isRequired,
                     vectorName: string.isRequired,
                 })
-            ),
+            ).isRequired,
+            isValid: PropTypes.bool.isRequired,
         })
     ).isRequired,
 
     /**
-     * State for expression validation in dash plugin
+     * State for expression parsing in dash plugin
      */
     isDashControlled: PropTypes.bool,
+
+    /**
+     * Data for external parsing
+     */
+    externalParseData: PropTypes.shape({
+        expression: PropTypes.string.isRequired,
+        id: PropTypes.string.isRequired,
+        variables: PropTypes.arrayOf(string.isRequired).isRequired,
+        isValid: PropTypes.bool.isRequired,
+    }),
 
     /**
      * Dash-assigned callback that should be called to report property changes
