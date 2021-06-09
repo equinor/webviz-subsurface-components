@@ -38,3 +38,18 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.VectorCalculator .VariablesTableContainer {
+    overflow: visible;
+    position: relative;
+}
+
+.VectorCalculator .DisableOverlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ccc;
+    opacity: 0.1;
+    z-index: 20;
+    cursor: not-allowed;
+}
