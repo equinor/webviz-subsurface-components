@@ -203,11 +203,13 @@ class VectorCalculatorWrapper(VectorCalculator):
             parsed_expr = VectorCalculatorWrapper.parser.parse(expression["expression"])
             variables: List[str] = parsed_expr.variables()
 
+            parsed_data: ExternalParseData = {"expression": expression["expression"], "id": expression["id"], "variables":variables,"isValid":True}
+
             # Ensure only single character variables
             if any([len(elm) > 1 for elm in variables]):
-                raise Exception
-
-            parsed_data: ExternalParseData = {"expression": expression["expression"], "id": expression["id"], "variables":variables,"isValid":True}
+                parsed_data["variables"] = []
+                parsed_data["isValid"] = False
+                
             return parsed_data
         except:
             empty_variables: List[str] = []
