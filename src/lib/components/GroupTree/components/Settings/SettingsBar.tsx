@@ -2,6 +2,7 @@ import { TopBar } from "@equinor/eds-core-react";
 import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
 import DateTimeSlider from "./DateTimeSlider";
+import FlowRateSelector from "./FlowRateSelector";
 import IterationSelector from "./IterationSelector";
 
 const useStyles = makeStyles(() =>
@@ -22,6 +23,7 @@ const SettingsBar: React.FC = React.memo(() => {
         <TopBar className={classes.topBar}>
             <TopBar.Header className={classes.actions}>
                 <IterationSelector />
+                <FlowRateSelector />
             </TopBar.Header>
             <TopBar.Actions className={classes.actions}>
                 <DateTimeSlider />

@@ -46,10 +46,10 @@ const DateTimeSlider: React.FC = React.memo(() => {
         () => Object.keys(data.iterations[currentIteration].trees),
         [data, currentIteration]
     );
-    const currentDateTimeIndex = useMemo(() => times.indexOf(currentDateTime), [
-        times,
-        currentDateTime,
-    ]);
+    const currentDateTimeIndex = useMemo(
+        () => times.indexOf(currentDateTime),
+        [times, currentDateTime]
+    );
     // handlers
     const outputFunction = useCallback((step: number) => times[step], [times]);
     const onChange = useCallback(

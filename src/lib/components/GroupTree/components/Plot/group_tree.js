@@ -117,7 +117,7 @@ export default class GroupTree {
             .duration(this._transitionTime)
             .attr(
                 "class",
-                (d) => `link grouptree_link grouptree_link__${flowrate}`
+                () => `link grouptree_link grouptree_link__${flowrate}`
             )
             .style("stroke-width", (d) =>
                 this.getEdgeStrokeWidth(flowrate, d.data[flowrate])
@@ -384,7 +384,7 @@ export default class GroupTree {
                 .duration(self._transitionTime)
                 .attr(
                     "class",
-                    (d) => `link grouptree_link grouptree_link__${flowrate}`
+                    () => `link grouptree_link grouptree_link__${flowrate}`
                 )
                 .attr("d", (d) => diagonal(d, d.parent))
                 .style("stroke-width", (d) =>

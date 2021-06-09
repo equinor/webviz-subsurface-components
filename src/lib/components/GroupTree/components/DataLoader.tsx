@@ -19,7 +19,8 @@ const DataProvider: React.FC<Props> = ({
         const firstIteration = iterations.length > 0 ? iterations[0] : "";
         const dateTimes =
             firstIteration in data.iterations
-                ? Object.keys(data.iterations[firstIteration]!.trees)
+                ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  Object.keys(data.iterations[firstIteration]!.trees)
                 : [];
         const firstDateTime = dateTimes.length === 0 ? "" : dateTimes[0];
         return {
@@ -32,9 +33,10 @@ const DataProvider: React.FC<Props> = ({
         };
     }, [id, data]);
 
-    const store = useMemo(() => createReduxStore(preloadedState), [
-        preloadedState,
-    ]);
+    const store = useMemo(
+        () => createReduxStore(preloadedState),
+        [preloadedState]
+    );
 
     return (
         <DataContext.Provider value={data}>

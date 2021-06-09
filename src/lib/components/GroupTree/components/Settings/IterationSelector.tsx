@@ -27,9 +27,10 @@ const IterationSelector: React.FC = React.memo(() => {
     const currentDateTime = useSelector(
         (st: GroupTreeState) => st.ui.currentDateTime
     );
-    const iterations = useMemo(() => Array.from(Object.keys(data.iterations)), [
-        data,
-    ]);
+    const iterations = useMemo(
+        () => Array.from(Object.keys(data.iterations)),
+        [data]
+    );
     // handlers
     const handleSelectedItemChange = useCallback(
         (event) => {

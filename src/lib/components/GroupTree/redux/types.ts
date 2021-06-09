@@ -12,8 +12,12 @@ export interface Node {
     gasrate: number;
     grupnet: number;
 }
-
-export type FlowRate = "oilrate" | "waterrate" | "gasrate";
+export const FlowRates = {
+    oilrate: "Oil Rate",
+    waterrate: "Water Rate",
+    gasrate: "Gas Rate",
+};
+export type FlowRate = keyof typeof FlowRates;
 
 export interface UISettings {
     currentDateTime: string;
