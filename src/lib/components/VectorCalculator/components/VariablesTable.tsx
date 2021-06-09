@@ -12,10 +12,12 @@ import cloneDeep from "lodash/cloneDeep";
 
 import { VariableVectorMapType } from "../utils/VectorCalculatorTypes";
 import VectorSelector from "../../VectorSelector";
+import "../VectorCalculator.css";
 
 interface VariablesTableProps {
     variableVectorMap: VariableVectorMapType[];
     vectorData: TreeDataNode[];
+    disabled?: boolean;
     onMapChange: (variableVectorMap: VariableVectorMapType[]) => void;
 }
 
@@ -29,6 +31,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
     props: VariablesTableProps
 ) => {
     const { vectorData } = props;
+    const disabled = props.disabled || false;
 
     const updatedProps = (
         vectorSelectorProps: VectorSelectorParentProps,
@@ -45,7 +48,8 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
     };
 
     return (
-        <TableContainer component={Paper} style={{ overflow: "visible" }}>
+        <TableContainer component={Paper} className="VariablesTableContainer">
+            {disabled && <div className="DisableOverlay" />}
             <Table>
                 <TableBody>
                     {props.variableVectorMap.map((row, index) => {

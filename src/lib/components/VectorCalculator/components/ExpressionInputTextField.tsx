@@ -1,20 +1,25 @@
 import React, { ReactNode, useCallback } from "react";
-import { TextField, Icon } from "@equinor/eds-core-react";
+import { Icon, TextField, Progress } from "@equinor/eds-core-react";
 import { error_filled, thumbs_up } from "@equinor/eds-icons";
 
 import "../VectorCalculator.css";
-import { ExpressionType } from "../utils/VectorCalculatorTypes";
+
+export enum ExpressionStatus {
+    Valid = 1,
+    Invalid = 2,
+    Evaluating = 3,
+}
 
 interface ExpressionInputTextFieldProps {
     expression: string;
-    isValid: boolean;
+    status: ExpressionStatus;
     disabled?: boolean;
     onExpressionChange: (expression: string) => void;
 }
 
 export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
     (props: ExpressionInputTextFieldProps) => {
-        const { expression, isValid, disabled } = props;
+        const { expression, status, disabled } = props;
 
         const [textFieldVariantState, setTextFieldVariantState] =
             React.useState<"success" | "error" | "warning" | "default">(
@@ -26,24 +31,36 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
         Icon.add({ error_filled });
         Icon.add({ thumbs_up });
 
-        const textFieldVariant = useCallback((): "error" | "success" => {
-            if (!isValid) {
+        const textFieldVariant = useCallback(():
+            | "error"
+            | "success"
+            | "default" => {
+            if (status === ExpressionStatus.Valid) {
+                return "success";
+            }
+            if (status === ExpressionStatus.Invalid) {
                 return "error";
             }
-            return "success";
-        }, [isValid]);
+            return "default";
+        }, [status]);
 
         const textFieldIcon = useCallback((): ReactNode | undefined => {
-            if (!isValid) {
+            if (status === ExpressionStatus.Evaluating) {
+                return <Progress.Circular />;
+            }
+            if (status === ExpressionStatus.Valid) {
+                return <Icon key="thumbs" name="thumbs_up" />;
+            }
+            if (status === ExpressionStatus.Invalid) {
                 return <Icon key="error" name="error_filled" />;
             }
-            return <Icon key="thumbs" name="thumbs_up" />;
-        }, [isValid]);
+            return undefined;
+        }, [status]);
 
         React.useEffect(() => {
             setTextFieldVariantState(textFieldVariant());
             setTextFieldIconState(textFieldIcon());
-        }, [isValid]);
+        }, [status]);
 
         const handleInputChange = (
             e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
@@ -62,6 +79,6 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
                 disabled={disabled}
                 variant={textFieldVariantState}
                 inputIcon={textFieldIconState}
-            />
+            ></TextField>
         );
     };
