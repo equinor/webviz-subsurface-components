@@ -31,6 +31,7 @@ class ExternalParseData(TypedDict):
     id: str
     variables: List[str]
     isValid: bool
+    message: str
 
 
 class VectorCalculatorParser(Parser):
@@ -63,17 +64,28 @@ class VectorCalculatorWrapper(VectorCalculator):
             parsed_expr = VectorCalculatorWrapper.parser.parse(expression["expression"])
             variables: List[str] = parsed_expr.variables()
 
-            parsed_data: ExternalParseData = {"expression": expression["expression"], "id": expression["id"], "variables":variables,"isValid":True}
+            parsed_data: ExternalParseData = {
+                "expression": expression["expression"],
+                 "id": expression["id"], 
+                 "variables":variables,
+                 "isValid":True, 
+                 "message": ""}
 
             # Ensure only single character variables
             if any([len(elm) > 1 for elm in variables]):
                 parsed_data["variables"] = []
                 parsed_data["isValid"] = False
+                parsed_data["message"] = "External parsing failed"
                 
             return parsed_data
         except:
             empty_variables: List[str] = []
-            non_parsed_data: ExternalParseData = {"expression": expression["expression"], "id": expression["id"], "variables":empty_variables,"isValid":False}
+            non_parsed_data: ExternalParseData = {
+                "expression": expression["expression"], 
+                "id": expression["id"],
+                 "variables":empty_variables,
+                 "isValid":False,
+                 "message": "External parsing failed"}
             return non_parsed_data
 
     @staticmethod
