@@ -17,7 +17,7 @@ interface ParentProps {
 interface VectorCalculatorProps {
     id: string;
     vectors: TreeDataNode[];
-    expressions: ExpressionType[]; // Rename to predefinedExpressions?
+    expressions: ExpressionType[];
     isDashControlled: boolean;
     externalParseData?: ExternalParseData;
     setProps: (props: ParentProps) => void;
@@ -112,6 +112,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
             <Grid item xs={12} md={6}>
                 <ExpressionsTableComponent
                     expressions={expressions}
+                    predefinedExpressions={props.expressions}
                     onActiveExpressionChange={handleActiveExpressionChange}
                     onExpressionsChange={handleExpressionsChange}
                 />

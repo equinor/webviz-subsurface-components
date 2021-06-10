@@ -13,13 +13,14 @@ import "../VectorCalculator.css";
 
 interface ExpressionsTableComponentProps {
     expressions: ExpressionType[];
+    predefinedExpressions: ExpressionType[];
     onActiveExpressionChange: (expression: ExpressionType | undefined) => void;
     onExpressionsChange: (expressions: ExpressionType[]) => void;
 }
 
 export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps> =
     (props: ExpressionsTableComponentProps) => {
-        const { expressions } = props;
+        const { expressions, predefinedExpressions } = props;
         const [activeExpression, setActiveExpression] =
             React.useState<ExpressionType | undefined>(undefined);
         const [selectedExpressions, setSelectedExpressions] = React.useState<
@@ -66,6 +67,12 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
         ): void => {
             setSelectedExpressions(expressions);
         };
+
+                // Disable deletion when one or more expression is not deletable
+                setDisableDelete(expressions.some((expr) => !expr.isDeletable));
+            },
+            [predefinedExpressions]
+        );
 
         const handleActiveExpressionSelect = (
             expression: ExpressionType
