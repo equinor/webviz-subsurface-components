@@ -69,16 +69,15 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     const [selectedExpressions, setSelectedExpressions] = React.useState<
         ExpressionType[]
     >([]);
-    const [
-        activeExpression,
-        setActiveExpression,
-    ] = React.useState<ExpressionType>({
-        name: "",
-        expression: "",
-        id: "",
-        variableVectorMap: [],
-        isValid: false,
-    });
+    const [activeExpression, setActiveExpression] =
+        React.useState<ExpressionType>({
+            name: "",
+            expression: "",
+            id: "",
+            variableVectorMap: [],
+            isValid: false,
+            isDeletable: true,
+        });
 
     React.useEffect(() => {
         updateSelectedExpressions();
@@ -109,6 +108,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                 id: "",
                 variableVectorMap: [],
                 isValid: false,
+                isDeletable: true,
             };
         }
         setActiveExpression(newActiveExpression);
