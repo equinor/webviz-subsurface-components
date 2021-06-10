@@ -21,8 +21,8 @@ import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeS
 import { isVariableVectorMapValid } from "../utils/VectorCalculatorHelperFunctions";
 import {
     parseExpression,
-    retrieveVariablesFromValidExpression,
     parseExpressionName,
+    retrieveVariablesFromValidExpression,
 } from "../utils/VectorCalculatorRegex";
 import "../VectorCalculator.css";
 
@@ -41,8 +41,9 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     props: ExpressionInputComponent
 ) => {
     const { activeExpression, expressions, externalParsing, disabled } = props;
-    const [isValid, setIsValid] = React.useState<boolean>(true); // TODO: Set correct init value
-    const [isValidName, setIsValidName] = React.useState<boolean>(true);
+    const [isValidName, setIsValidName] = React.useState<boolean>(
+        parseExpressionName(activeExpression.name)
+    );
     const [expressionStatus, setExpressionStatus] =
         React.useState<ExpressionStatus>(ExpressionStatus.Valid); // TODO: Set correct initial value (external parsing?)
     const [isValidVariableVectorMap, setIsValidVariableVectorMap] =
@@ -53,6 +54,11 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 props.vectors
             )
         );
+    const [isValid, setIsValid] = React.useState<boolean>(
+        isValidName &&
+            expressionStatus == ExpressionStatus.Valid &&
+            isValidVariableVectorMap
+    );
     const [editableExpression, setEditableExpression] =
         React.useState<ExpressionType>(activeExpression);
     const [cachedVariableVectorMap, setCachedVariableVectorMap] =
@@ -220,10 +226,12 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
 
     const getUpdatedCachedVariableVectorMap = useCallback(
         (newMap: VariableVectorMapType[]): VariableVectorMapType[] => {
-            const newCachedVariableVectorMap: VariableVectorMapType[] = [];
+            const newCachedVariableVectorMap = cloneDeep(
+                cachedVariableVectorMap
+            );
             for (const elm of newMap) {
                 const cachedElm: VariableVectorMapType | undefined =
-                    cachedVariableVectorMap.find(
+                    newCachedVariableVectorMap.find(
                         (cachedElm) =>
                             cachedElm.variableName === elm.variableName
                     );
