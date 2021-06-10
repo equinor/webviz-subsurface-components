@@ -3,7 +3,7 @@ import { Button, Dialog, Icon, Menu, Scrim } from "@equinor/eds-core-react";
 import { sort } from "@equinor/eds-icons";
 import { createStyles, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
-import SortTable from "./SortTable";
+import WellAttributesSelector from "./WellAttributesSelector";
 
 // Use library approach
 Icon.add({ sort }); // (this needs only be done once)
@@ -16,7 +16,7 @@ const useStyles = makeStyles(() =>
     })
 );
 
-const SortButton: React.FC = React.memo(() => {
+const FilterByAttributesButton: React.FC = React.memo(() => {
     const classes = useStyles();
     // Dialogs
 
@@ -27,14 +27,13 @@ const SortButton: React.FC = React.memo(() => {
     return (
         <>
             <Menu.Item onClick={() => setVisibleScrim(true)}>
-                Sort/Group by Attributes
+                Filter by Attributes
             </Menu.Item>
             {visibleScrim && (
                 <Scrim onClose={handleClose}>
                     <Dialog className={classes.dialog}>
-                        <Dialog.Title>Well sorting levels</Dialog.Title>
                         <Dialog.CustomContent>
-                            <SortTable />
+                            <WellAttributesSelector />
                         </Dialog.CustomContent>
                         <Dialog.Actions>
                             <Button
@@ -58,5 +57,5 @@ const SortButton: React.FC = React.memo(() => {
     );
 });
 
-SortButton.displayName = "SortButton";
-export default SortButton;
+FilterByAttributesButton.displayName = "FilterByAttributesButton";
+export default FilterByAttributesButton;
