@@ -67,6 +67,11 @@
               "outline": true
             },
             {
+              "@@type": "PieChartLayer",
+              "id": "pie-layer",
+              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/piechart.json"
+            },
+            {
               "@@type": "DrawingLayer",
               "id": "drawing-layer",
               "mode": "drawLineString",
@@ -80,7 +85,9 @@
             {
               "@@type": "OrthographicView",
               "id": "main",
-              "controller": true,
+              "controller": {
+                "doubleClickZoom": false
+              },
               "x": "0%",
               "y": "0%",
               "width": "100%",
