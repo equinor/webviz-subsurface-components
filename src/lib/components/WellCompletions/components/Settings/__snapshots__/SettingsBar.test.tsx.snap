@@ -1,48 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test settings bar snapshot test 1`] = `
-.c5 {
-  height: 100%;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+.c4 {
+  display: grid;
+  grid-gap: 8px;
+  grid-auto-flow: column;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  height: 100%;
 }
 
-.c5 > img:first-child,
-.c5 > svg:first-child {
-  margin-right: 8px;
-}
-
-.c5 > img:last-child,
-.c5 > svg:last-child {
-  margin-left: 8px;
-}
-
-.c5 > img:only-child,
-.c5 > svg:only-child {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.c5 > span:first-child {
-  margin-left: 32px;
-}
-
-.c5 > span:last-child {
-  margin-right: 32px;
-}
-
-.c5 > span:only-child {
-  margin-right: 0;
-  margin-left: 0;
-}
-
-.c4 {
+.c3 {
   margin: 0;
   padding: 0;
   background: transparent;
@@ -66,11 +36,11 @@ exports[`test settings bar snapshot test 1`] = `
   display: inline-block;
 }
 
-.c4 svg {
+.c3 svg {
   justify-self: center;
 }
 
-.c4::after {
+.c3::after {
   position: absolute;
   top: -6px;
   left: -4px;
@@ -79,26 +49,26 @@ exports[`test settings bar snapshot test 1`] = `
   content: '';
 }
 
-.c4:hover {
+.c3:hover {
   background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
   border: 1px solid transparent;
   border-radius: 50%;
 }
 
-.c4:focus {
+.c3:focus {
   outline: none;
 }
 
-.c4[data-focus-visible-added]:focus {
+.c3[data-focus-visible-added]:focus {
   outline: 1px dashed rgba(0,112,121,1);
-  outline-offset: 4px;
+  outline-offset: 2px;
 }
 
-.c4::-moz-focus-inner {
+.c3::-moz-focus-inner {
   border: 0;
 }
 
-.c4:disabled {
+.c3:disabled {
   cursor: not-allowed;
   background: transparent;
   border: 1px solid transparent;
@@ -111,11 +81,11 @@ exports[`test settings bar snapshot test 1`] = `
   text-align: center;
 }
 
-.c4:disabled:hover {
+.c3:disabled:hover {
   background: transparent;
 }
 
-.c4::before {
+.c3::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -140,7 +110,7 @@ exports[`test settings bar snapshot test 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  border-bottom: 2px solid var(--eds_ui_background__light,rgba(247,247,247,1));
+  border-bottom: 2px var(--eds_ui_background__light,rgba(247,247,247,1));
   padding-left: 40px;
   padding-top: 8px;
   padding-right: 40px;
@@ -172,29 +142,6 @@ exports[`test settings bar snapshot test 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin: 0;
-  color: rgba(61,61,61,1);
-  font-family: Equinor;
-  font-size: 1.000rem;
-  font-weight: 400;
-  line-height: 1.000em;
-  -webkit-letter-spacing: 0.013em;
-  -moz-letter-spacing: 0.013em;
-  -ms-letter-spacing: 0.013em;
-  letter-spacing: 0.013em;
-  text-align: left;
-}
-
-.c3 {
-  position: relative;
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
 }
 
 <header
@@ -254,77 +201,65 @@ exports[`test settings bar snapshot test 1`] = `
     class="c2 makeStyles-actions-2"
   >
     <div>
-      <div
+      <button
         class="c3"
+        tabindex="0"
+        type="button"
       >
-        <div>
-          <button
-            class="c4"
-            tabindex="0"
-            type="button"
+        <span
+          class="c4"
+        >
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="currentColor"
+            height="24px"
+            viewBox="0 0 24 24"
+            width="24px"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <span
-              class="c5"
-            >
-              <svg
-                aria-hidden="true"
-                class=""
-                fill="currentColor"
-                height="24px"
-                viewBox="0 0 24 24"
-                width="24px"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  class=""
-                  clip-rule="evenodd"
-                  d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
-                  data-testid="eds-icon-path"
-                  fill-rule="evenodd"
-                  height="24"
-                />
-              </svg>
-            </span>
-          </button>
-        </div>
-      </div>
+            <path
+              class=""
+              clip-rule="evenodd"
+              d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
+              data-testid="eds-icon-path"
+              fill-rule="evenodd"
+              height="24"
+            />
+          </svg>
+        </span>
+      </button>
     </div>
     <div>
-      <div
+      <button
         class="c3"
+        data-testid="filter_button"
+        tabindex="0"
+        type="button"
       >
-        <div>
-          <button
-            class="c4"
-            data-testid="filter_button"
-            tabindex="0"
-            type="button"
+        <span
+          class="c4"
+        >
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="currentColor"
+            height="24px"
+            viewBox="0 0 24 24"
+            width="24px"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <span
-              class="c5"
-            >
-              <svg
-                aria-hidden="true"
-                class=""
-                fill="currentColor"
-                height="24px"
-                viewBox="0 0 24 24"
-                width="24px"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  class=""
-                  clip-rule="evenodd"
-                  d="M7 6h10l-5.01 6.3L7 6zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0018.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
-                  data-testid="eds-icon-path"
-                  fill-rule="evenodd"
-                  height="24"
-                />
-              </svg>
-            </span>
-          </button>
-        </div>
-      </div>
+            <path
+              class=""
+              clip-rule="evenodd"
+              d="M7 6h10l-5.01 6.3L7 6zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0018.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
+              data-testid="eds-icon-path"
+              fill-rule="evenodd"
+              height="24"
+            />
+          </svg>
+        </span>
+      </button>
     </div>
   </div>
 </header>

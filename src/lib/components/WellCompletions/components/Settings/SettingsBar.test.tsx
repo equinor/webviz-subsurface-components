@@ -5,7 +5,6 @@ import React from "react";
 import { Wrapper } from "../../test/TestWrapper";
 import SettingsBar from "./SettingsBar";
 
-
 describe("test settings bar", () => {
     it("snapshot test", () => {
         const { container } = render(Wrapper({ children: <SettingsBar /> }));

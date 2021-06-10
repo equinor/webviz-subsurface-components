@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/extend-expect";
-import { fireEvent, getByTestId, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import { testStore, Wrapper } from "../../test/TestWrapper";
@@ -13,7 +13,7 @@ describe("Test Filter Menu", () => {
     it("click to open filter menu and dispatch redux action", async () => {
         render(<FilterMenu />, {
             wrapper: Wrapper,
-        })
+        });
         fireEvent.click(screen.getByTestId("filter_button"));
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({

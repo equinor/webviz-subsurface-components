@@ -1,48 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test view menu snapshot test 1`] = `
-.c2 {
-  height: 100%;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+.c1 {
+  display: grid;
+  grid-gap: 8px;
+  grid-auto-flow: column;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  height: 100%;
 }
 
-.c2 > img:first-child,
-.c2 > svg:first-child {
-  margin-right: 8px;
-}
-
-.c2 > img:last-child,
-.c2 > svg:last-child {
-  margin-left: 8px;
-}
-
-.c2 > img:only-child,
-.c2 > svg:only-child {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.c2 > span:first-child {
-  margin-left: 32px;
-}
-
-.c2 > span:last-child {
-  margin-right: 32px;
-}
-
-.c2 > span:only-child {
-  margin-right: 0;
-  margin-left: 0;
-}
-
-.c1 {
+.c0 {
   margin: 0;
   padding: 0;
   background: transparent;
@@ -66,11 +36,11 @@ exports[`test view menu snapshot test 1`] = `
   display: inline-block;
 }
 
-.c1 svg {
+.c0 svg {
   justify-self: center;
 }
 
-.c1::after {
+.c0::after {
   position: absolute;
   top: -6px;
   left: -4px;
@@ -79,26 +49,26 @@ exports[`test view menu snapshot test 1`] = `
   content: '';
 }
 
-.c1:hover {
+.c0:hover {
   background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
   border: 1px solid transparent;
   border-radius: 50%;
 }
 
-.c1:focus {
+.c0:focus {
   outline: none;
 }
 
-.c1[data-focus-visible-added]:focus {
+.c0[data-focus-visible-added]:focus {
   outline: 1px dashed rgba(0,112,121,1);
-  outline-offset: 4px;
+  outline-offset: 2px;
 }
 
-.c1::-moz-focus-inner {
+.c0::-moz-focus-inner {
   border: 0;
 }
 
-.c1:disabled {
+.c0:disabled {
   cursor: not-allowed;
   background: transparent;
   border: 1px solid transparent;
@@ -111,11 +81,11 @@ exports[`test view menu snapshot test 1`] = `
   text-align: center;
 }
 
-.c1:disabled:hover {
+.c0:disabled:hover {
   background: transparent;
 }
 
-.c1::before {
+.c0::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -124,52 +94,34 @@ exports[`test view menu snapshot test 1`] = `
   content: '';
 }
 
-.c0 {
-  position: relative;
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
 <div>
-  <div
+  <button
     class="c0"
+    tabindex="0"
+    type="button"
   >
-    <div>
-      <button
-        class="c1"
-        tabindex="0"
-        type="button"
+    <span
+      class="c1"
+    >
+      <svg
+        aria-hidden="true"
+        class=""
+        fill="currentColor"
+        height="24px"
+        viewBox="0 0 24 24"
+        width="24px"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <span
-          class="c2"
-        >
-          <svg
-            aria-hidden="true"
-            class=""
-            fill="currentColor"
-            height="24px"
-            viewBox="0 0 24 24"
-            width="24px"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              class=""
-              clip-rule="evenodd"
-              d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
-              data-testid="eds-icon-path"
-              fill-rule="evenodd"
-              height="24"
-            />
-          </svg>
-        </span>
-      </button>
-    </div>
-  </div>
+        <path
+          class=""
+          clip-rule="evenodd"
+          d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
+          data-testid="eds-icon-path"
+          fill-rule="evenodd"
+          height="24"
+        />
+      </svg>
+    </span>
+  </button>
 </div>
 `;

@@ -1,52 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test sorting the table snapshot test 1`] = `
-.c10 {
-  text-align: center;
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
 .c9 {
-  height: 100%;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+  display: grid;
+  grid-gap: 8px;
+  grid-auto-flow: column;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-}
-
-.c9 > img:first-child,
-.c9 > svg:first-child {
-  margin-right: 8px;
-}
-
-.c9 > img:last-child,
-.c9 > svg:last-child {
-  margin-left: 8px;
-}
-
-.c9 > img:only-child,
-.c9 > svg:only-child {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.c9 > span:first-child {
-  margin-left: 32px;
-}
-
-.c9 > span:last-child {
-  margin-right: 32px;
-}
-
-.c9 > span:only-child {
-  margin-right: 0;
-  margin-left: 0;
+  height: 100%;
 }
 
 .c8 {
@@ -98,7 +61,7 @@ exports[`test sorting the table snapshot test 1`] = `
 
 .c8[data-focus-visible-added]:focus {
   outline: 1px dashed rgba(0,112,121,1);
-  outline-offset: 4px;
+  outline-offset: 2px;
 }
 
 .c8::-moz-focus-inner {
@@ -131,7 +94,7 @@ exports[`test sorting the table snapshot test 1`] = `
   content: '';
 }
 
-.c11 {
+.c10 {
   margin: 0;
   padding: 0;
   background: transparent;
@@ -155,11 +118,11 @@ exports[`test sorting the table snapshot test 1`] = `
   display: inline-block;
 }
 
-.c11 svg {
+.c10 svg {
   justify-self: center;
 }
 
-.c11::after {
+.c10::after {
   position: absolute;
   top: -6px;
   left: -4px;
@@ -168,26 +131,26 @@ exports[`test sorting the table snapshot test 1`] = `
   content: '';
 }
 
-.c11:hover {
+.c10:hover {
   background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
   border: 1px solid transparent;
   border-radius: 50%;
 }
 
-.c11:focus {
+.c10:focus {
   outline: none;
 }
 
-.c11[data-focus-visible-added]:focus {
+.c10[data-focus-visible-added]:focus {
   outline: 1px dashed rgba(0,112,121,1);
-  outline-offset: 4px;
+  outline-offset: 2px;
 }
 
-.c11::-moz-focus-inner {
+.c10::-moz-focus-inner {
   border: 0;
 }
 
-.c11:disabled {
+.c10:disabled {
   cursor: not-allowed;
   background: transparent;
   border: 1px solid transparent;
@@ -200,11 +163,11 @@ exports[`test sorting the table snapshot test 1`] = `
   text-align: center;
 }
 
-.c11:disabled:hover {
+.c10:disabled:hover {
   background: transparent;
 }
 
-.c11::before {
+.c10::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -272,13 +235,13 @@ exports[`test sorting the table snapshot test 1`] = `
 .c7 {
   border: none;
   border-radius: 0;
-  box-shadow: inset 0 -1px 0 0 #6f6f6f;
+  box-shadow: inset 0 -1px 0 0 var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
   padding-left: 8px;
   padding-top: 6px;
   padding-right: 8px;
   padding-bottom: 6px;
   margin: 0;
-  color: #6f6f6f;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
   font-family: Equinor;
   font-size: 1.000rem;
   font-weight: 400;
@@ -294,7 +257,7 @@ exports[`test sorting the table snapshot test 1`] = `
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, #f7f7f7 0%, #f7f7f7 100% );
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
   background-repeat: no-repeat,repeat;
   background-position: right 8px top 50%;
   width: 100%;
@@ -302,14 +265,14 @@ exports[`test sorting the table snapshot test 1`] = `
 
 .c7:active,
 .c7:focus {
-  outline-offset: 0;
   box-shadow: none;
-  outline: 2px solid #007079;
+  outline: 2px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  outline-offset: 0px;
 }
 
 .c7:disabled {
-  color: #bebebe;
-  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, #f7f7f7 0%, #f7f7f7 100% );
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
   cursor: not-allowed;
   box-shadow: none;
   outline: none;
@@ -418,11 +381,7 @@ exports[`test sorting the table snapshot test 1`] = `
             <span
               class="c9"
             >
-              <span
-                class="c10"
-              >
-                Ascending
-              </span>
+              Ascending
             </span>
           </button>
         </td>
@@ -432,7 +391,7 @@ exports[`test sorting the table snapshot test 1`] = `
           <button
             aria-controls="simple-menu"
             aria-haspopup="true"
-            class="c11"
+            class="c10"
             tabindex="0"
             title="Add sorting level"
             type="button"
