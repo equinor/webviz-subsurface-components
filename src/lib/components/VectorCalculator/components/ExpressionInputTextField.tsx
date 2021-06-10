@@ -13,13 +13,14 @@ export enum ExpressionStatus {
 interface ExpressionInputTextFieldProps {
     expression: string;
     status: ExpressionStatus;
+    helperText: string;
     disabled?: boolean;
     onExpressionChange: (expression: string) => void;
 }
 
 export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
     (props: ExpressionInputTextFieldProps) => {
-        const { expression, status, disabled } = props;
+        const { expression, status, helperText, disabled } = props;
 
         const [textFieldVariantState, setTextFieldVariantState] =
             React.useState<"success" | "error" | "warning" | "default">(
@@ -79,6 +80,7 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
                 disabled={disabled}
                 variant={textFieldVariantState}
                 inputIcon={textFieldIconState}
+                helperText={helperText}
             ></TextField>
         );
     };
