@@ -21,7 +21,7 @@ import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeS
 import { isVariableVectorMapValid } from "../utils/VectorCalculatorHelperFunctions";
 import {
     parseExpression,
-    parseExpressionName,
+    parseName,
     retrieveVariablesFromValidExpression,
 } from "../utils/VectorCalculatorRegex";
 import "../VectorCalculator.css";
@@ -42,7 +42,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
 ) => {
     const { activeExpression, expressions, externalParsing, disabled } = props;
     const [isValidName, setIsValidName] = React.useState<boolean>(
-        parseExpressionName(activeExpression.name)
+        parseName(activeExpression.name)
     );
     const [expressionStatus, setExpressionStatus] =
         React.useState<ExpressionStatus>(ExpressionStatus.Valid); // TODO: Set correct initial value (external parsing?)
@@ -123,7 +123,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         setEditableExpression(activeExpressionClone);
         setCachedVariableVectorMap(variableVectorMapClone);
 
-        setIsValidName(parseExpressionName(activeExpressionClone.name));
+        setIsValidName(parseName(activeExpressionClone.name));
         setIsValidVariableVectorMap(
             isVariableVectorMapValid(
                 activeExpressionClone.variableVectorMap,
