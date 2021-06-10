@@ -13,9 +13,9 @@ export type ExpressionType = {
 };
 
 export type ExternalParseData = {
-    // TODO: Add message string for parsing failure?
     expression: string;
     id: string;
     variables: string[];
     isValid: boolean; // Is expression successfully parsed
+    message: string;
 };

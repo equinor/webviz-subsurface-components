@@ -63,6 +63,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         React.useState<ExpressionType>(activeExpression);
     const [cachedVariableVectorMap, setCachedVariableVectorMap] =
         React.useState<VariableVectorMapType[]>([]);
+    const [parsingMessage, setParsingMessage] = React.useState<string>("");
 
     Icon.add({ clear });
     Icon.add({ save });
@@ -91,6 +92,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
 
         const newEditabledExpression = cloneDeep(editableExpression);
 
+        setParsingMessage(props.externalParseData.message);
         setExpressionStatus(
             props.externalParseData.isValid
                 ? ExpressionStatus.Valid
@@ -186,6 +188,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         if (externalParsing) {
             setEditableExpression(updatedExpression);
             setExpressionStatus(ExpressionStatus.Evaluating);
+            setParsingMessage("");
             props.onExternalExpressionParsing(updatedExpression);
         } else {
             // TODO: Now the function returns editableExpression map from expression string character
@@ -314,6 +317,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 <ExpressionInputTextField
                     expression={editableExpression.expression}
                     status={expressionStatus}
+                    helperText={parsingMessage}
                     disabled={disabled}
                     onExpressionChange={onExpressionChange}
                 />
