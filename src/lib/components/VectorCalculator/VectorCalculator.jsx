@@ -44,9 +44,9 @@ VectorCalculator.propTypes = {
     vectors: PropTypes.array.isRequired,
 
     /**
-     * Pre-defined vector calculation expressions
-     * Each expression consist of an expression name, mathematical expression with single characther variables
-     * and map of characther variables and the corresponding vector name.
+     * Pre-defined vector calculator expressions.
+     * Each expression consist of an expression name, mathematical expression string with variables
+     * and a map of characther variables and the corresponding vector name.
      */
     expressions: PropTypes.arrayOf(
         PropTypes.shape({
@@ -60,6 +60,7 @@ VectorCalculator.propTypes = {
                 })
             ).isRequired,
             isValid: PropTypes.bool.isRequired,
+            isDeletable: PropTypes.bool.isRequired,
         })
     ).isRequired,
 

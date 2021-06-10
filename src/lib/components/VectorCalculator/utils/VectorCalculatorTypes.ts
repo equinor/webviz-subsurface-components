@@ -9,6 +9,7 @@ export type ExpressionType = {
     id: string;
     variableVectorMap: VariableVectorMapType[];
     isValid: boolean; ///! Is name, expression and map valid
+    isDeletable: boolean;
 };
 
 export type ExternalParseData = {

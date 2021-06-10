@@ -12,28 +12,35 @@ import { cloneDeep } from "lodash";
 
 interface ExpressionsTableComponentProps {
     expressions: ExpressionType[];
+    predefinedExpressions: ExpressionType[];
     onActiveExpressionChange: (expression: ExpressionType | undefined) => void;
     onExpressionsChange: (expressions: ExpressionType[]) => void;
 }
 
 export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps> =
     (props: ExpressionsTableComponentProps) => {
-        const { expressions } = props;
+        const { expressions, predefinedExpressions } = props;
         const [activeExpression, setActiveExpression] =
             React.useState<ExpressionType | undefined>(undefined);
         const [selectedExpressions, setSelectedExpressions] = React.useState<
             ExpressionType[]
         >([]);
+        const [disableDelete, setDisableDelete] =
+            React.useState<boolean>(false);
 
         Icon.add({ add });
         Icon.add({ copy });
         Icon.add({ delete_forever });
 
-        const handleExpressionsSelect = (
-            expressions: ExpressionType[]
-        ): void => {
-            setSelectedExpressions(expressions);
-        };
+        const handleExpressionsSelect = useCallback(
+            (expressions: ExpressionType[]): void => {
+                setSelectedExpressions(expressions);
+
+                // Disable deletion when one or more expression is not deletable
+                setDisableDelete(expressions.some((expr) => !expr.isDeletable));
+            },
+            [predefinedExpressions]
+        );
 
         const handleActiveExpressionSelect = (
             expression: ExpressionType
@@ -52,6 +59,7 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                 const cloneExpr = cloneDeep(elm);
                 cloneExpr.name = getAvailableName(elm.name, expressions);
                 cloneExpr.id = uuidv4();
+                cloneExpr.isDeletable = true;
                 newExpressions.push(cloneExpr);
             }
             addNewExpressions(newExpressions);
@@ -74,9 +82,8 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
         };
 
         const handleNewClick = (): void => {
-            // TODO:
-            // - Set new expression as active expression?
-            // If so: must modify selectedExpressions state in ExpressionsTable -> new prop gives unwanted logic?
+            // TODO: Set new expression as active expression?
+            // - If so: must modify selectedExpressions state in ExpressionsTable -> new prop gives unwanted logic?
             const newName = getAvailableName("New Expression", expressions);
             const newExpression: ExpressionType = {
                 name: newName,
@@ -84,11 +91,9 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                 id: uuidv4(),
                 variableVectorMap: [],
                 isValid: false,
+                isDeletable: true,
             };
             addNewExpressions([newExpression]);
-
-            // setActiveExpression(newExpression);
-            // props.onExpressionSelect(newExpression);
         };
 
         const addNewExpressions = useCallback(
@@ -123,7 +128,11 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                         </Button>
                     </Grid>
                     <Grid item>
-                        <Button onClick={handleDeleteClick} color="danger">
+                        <Button
+                            onClick={handleDeleteClick}
+                            color="danger"
+                            disabled={disableDelete}
+                        >
                             <Icon key="delete" name="delete_forever" />
                             Delete
                         </Button>

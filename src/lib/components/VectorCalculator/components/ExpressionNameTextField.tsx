@@ -4,7 +4,7 @@ import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
 
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import { isExpressionNameExisting } from "../utils/VectorCalculatorHelperFunctions";
-import { parseExpressionName } from "../utils/VectorCalculatorRegex";
+import { parseName } from "../utils/VectorCalculatorRegex";
 
 interface ExpressionNameTextFieldProps {
     initialName: string;
@@ -45,7 +45,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             if (name === "") {
                 return "default";
             }
-            if (!parseExpressionName(name)) {
+            if (!parseName(name)) {
                 return "error";
             }
             if (name == initialName) {
@@ -56,7 +56,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             }
             return "success";
         },
-        [parseExpressionName, isExisting, initialName]
+        [parseName, isExisting, initialName]
     );
 
     const getTextFieldHelperText = useCallback(
@@ -64,7 +64,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             if (name === "") {
                 return "";
             }
-            if (!parseExpressionName(name)) {
+            if (!parseName(name)) {
                 return 'Name can only contain characthers: a-z, numbers 0-9, " _ " and " : "';
             }
             if (isExisting(name) && name !== initialName) {
@@ -72,12 +72,12 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             }
             return "";
         },
-        [parseExpressionName, isExisting, initialName]
+        [parseName, isExisting, initialName]
     );
 
     const getTextFieldIcon = useCallback(
         (name: string): ReactNode | undefined => {
-            if (!parseExpressionName(name)) {
+            if (!parseName(name)) {
                 return <Icon key="error" name="error_filled" />;
             }
             if (isExisting(name) && name !== initialName) {
@@ -85,7 +85,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             }
             return <Icon key="thumbs" name="thumbs_up" />;
         },
-        [parseExpressionName, isExisting, initialName]
+        [parseName, isExisting, initialName]
     );
 
     React.useEffect(() => {
@@ -107,7 +107,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
     ): void => {
         const newName: string = e.target.value;
-        const isValid = parseName(newName);
+        const isValid = validateName(newName);
 
         setName(newName);
         setTextFieldVariantState(getTextFieldVariant(newName));
@@ -118,9 +118,9 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         props.onValidChange(isValid);
     };
 
-    const parseName = useCallback(
+    const validateName = useCallback(
         (name: string): boolean => {
-            if (!parseExpressionName(name)) {
+            if (!parseName(name)) {
                 return false;
             }
             if (name === initialName) {
@@ -131,7 +131,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             }
             return true;
         },
-        [parseExpressionName, isExisting, initialName]
+        [parseName, isExisting, initialName]
     );
 
     return (

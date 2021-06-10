@@ -17,7 +17,7 @@ interface ParentProps {
 interface VectorCalculatorProps {
     id: string;
     vectors: TreeDataNode[];
-    expressions: ExpressionType[]; // Rename to predefinedExpressions?
+    expressions: ExpressionType[];
     isDashControlled: boolean;
     externalParseData?: ExternalParseData;
     setProps: (props: ParentProps) => void;
@@ -37,9 +37,14 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
             id: "",
             variableVectorMap: [],
             isValid: false,
+            isDeletable: true,
         });
     const [disabledInputComponent, setDisabledInputComponent] =
         React.useState<boolean>(true);
+
+    React.useEffect(() => {
+        setExpressions(props.expressions);
+    }, [props.expressions]);
 
     React.useEffect(() => {
         // Only send valid expressions
@@ -64,6 +69,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
                 id: "",
                 variableVectorMap: [],
                 isValid: false,
+                isDeletable: true,
             });
         } else {
             setActiveExpression(expression);
@@ -101,6 +107,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
             <Grid item xs={4}>
                 <ExpressionsTableComponent
                     expressions={expressions}
+                    predefinedExpressions={props.expressions}
                     onActiveExpressionChange={handleActiveExpressionChange}
                     onExpressionsChange={handleExpressionsChange}
                 />
