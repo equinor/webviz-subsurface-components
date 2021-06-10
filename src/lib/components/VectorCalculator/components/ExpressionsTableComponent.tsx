@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Button, Icon } from "@equinor/eds-core-react";
+import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
 import { Grid, Paper } from "@material-ui/core";
 import { add, copy, delete_forever } from "@equinor/eds-icons";
 import { v4 as uuidv4 } from "uuid";
@@ -32,15 +32,20 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
         Icon.add({ copy });
         Icon.add({ delete_forever });
 
-        const handleExpressionsSelect = useCallback(
-            (expressions: ExpressionType[]): void => {
-                setSelectedExpressions(expressions);
+        React.useEffect(() => {
+            // Disable delete when all expressions are non-deletable
+            setDisableDelete(
+                selectedExpressions.length <= 0
+                    ? false
+                    : selectedExpressions.every((expr) => !expr.isDeletable)
+            );
+        }, [selectedExpressions]);
 
-                // Disable deletion when one or more expression is not deletable
-                setDisableDelete(expressions.some((expr) => !expr.isDeletable));
-            },
-            [predefinedExpressions]
-        );
+        const handleExpressionsSelect = (
+            expressions: ExpressionType[]
+        ): void => {
+            setSelectedExpressions(expressions);
+        };
 
         const handleActiveExpressionSelect = (
             expression: ExpressionType
@@ -66,11 +71,20 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
         };
 
         const handleDeleteClick = (): void => {
+            const nonDeletableExpressions = selectedExpressions.filter(
+                (elm) => {
+                    return !elm.isDeletable;
+                }
+            );
+            setSelectedExpressions(nonDeletableExpressions);
+
+            const deletableExpressions = selectedExpressions.filter((elm) => {
+                return elm.isDeletable;
+            });
             const newExpressionsList = expressions.filter((elm) => {
-                return selectedExpressions.indexOf(elm) === -1;
+                return deletableExpressions.indexOf(elm) === -1;
             });
             props.onExpressionsChange(newExpressionsList);
-            setSelectedExpressions([]);
 
             if (
                 activeExpression !== undefined &&
