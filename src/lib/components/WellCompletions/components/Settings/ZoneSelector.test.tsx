@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom/extend-expect";
-import { render } from "@testing-library/react";
+import { render, fireEvent, screen , within, wait} from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
-import { Wrapper } from "../../test/TestWrapper";
+import { Wrapper, testStore } from "../../test/TestWrapper";
 import ZoneSelector from "./ZoneSelector";
 
 describe("test Zone Selector", () => {
@@ -11,38 +11,29 @@ describe("test Zone Selector", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
 
-    it("click to dispatch redux action", async () => {
-        //TODO update test for the new zone selector
-        // const { container } = render(<ZoneSelector />, {
-        //     wrapper: Wrapper,
-        // });
-        // userEvent.click(screen.getByRole("button", { name: "Select Zones" }));
-        // await screen.getByRole("listbox");
-        //incomplete test
-        /*
-        const list = screen.getByRole('listbox')
+    it("click to dispatch redux action remove all zones", async () => {
+        
+        const { container } = render(<ZoneSelector />, {
+             wrapper: Wrapper,
+        });
 
-        const { getByRole } = within(list)
-        const items = getByRole("option", {name: 'zone1' , hidden: true})
-
-        userEvent.click(screen.getByText('zone1'))
-        */
-        /*
-        const list = screen.getByRole("listbox", {
-            name: /Select Zones/i,})
-            
-        userEvent.selectOptions(list, ['zone1', 'zone2'])
-        const { getAllByRole } = within(list)
-        const items = getAllByRole('listbo')
-        userEvent.click(items[0])
-        */
-        /*
+        fireEvent.click(screen.getByRole('button', {  name: /remove all/i}))
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
-            payload: ["zone1", "zone2"],
+            payload: [],
             type: "ui/updateFilteredZones",
-        
         });
-        */
+    });
+
+    it("click to dispatch redux action to remove one zone", async () => {       
+        const { container } = render(<ZoneSelector />, {
+                 wrapper: Wrapper,
+        });
+
+        const zone_list = screen.getByText(/select zone\(s\)\.\.\./i)
+        fireEvent.click(screen.getByText(/select zone\(s\)\.\.\./i))
+        expect(screen.getByPlaceholderText("Search...")).toBeInTheDocument()
+ 
     });
 });
+

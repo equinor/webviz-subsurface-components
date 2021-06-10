@@ -1,16 +1,24 @@
 import "@testing-library/jest-dom/extend-expect";
-import { render } from "@testing-library/react";
+import { fireEvent, getByTestId, render, screen } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
-import { Wrapper } from "../../test/TestWrapper";
+import { testStore, Wrapper } from "../../test/TestWrapper";
 import FilterMenu from "./FilterMenu";
 
-describe("basic snapshot test Filter Menu", () => {
+describe("Test Filter Menu", () => {
     it("snapshot test", () => {
         const { container } = render(Wrapper({ children: <FilterMenu /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
-    it("click to open filter menu", () => {
-        //TODO update tests
+    it("click to open filter menu and dispatch redux action", async () => {
+        render(<FilterMenu />, {
+            wrapper: Wrapper,
+        })
+        fireEvent.click(screen.getByTestId("filter_button"));
+        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
+        expect(testStore.dispatch).toBeCalledWith({
+            payload: true,
+            type: "ui/updateIsDrawerOpen",
+        });
     });
 });

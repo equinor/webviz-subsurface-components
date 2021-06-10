@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`basic snapshot test Filter Menu snapshot test 1`] = `
+exports[`Test Filter Menu snapshot test 1`] = `
 .c2 {
   height: 100%;
   display: -webkit-box;
@@ -143,6 +143,7 @@ exports[`basic snapshot test Filter Menu snapshot test 1`] = `
     <div>
       <button
         class="c1"
+        data-testid="filter_button"
         tabindex="0"
         type="button"
       >

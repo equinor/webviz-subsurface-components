@@ -296,6 +296,7 @@ exports[`test settings bar snapshot test 1`] = `
         <div>
           <button
             class="c4"
+            data-testid="filter_button"
             tabindex="0"
             type="button"
           >
