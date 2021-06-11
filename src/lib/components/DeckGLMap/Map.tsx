@@ -8,6 +8,7 @@ import { Feature } from "geojson";
 import React from "react";
 
 import JSON_CONVERTER_CONFIG from "./configuration";
+import { WellsPickInfo } from "./layers/wells/wellsLayer";
 
 export interface MapProps {
     id: string;
@@ -60,8 +61,15 @@ const Map: React.FC<MapProps> = (props: MapProps) => {
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
                 }
-                getTooltip={(info: PickInfo<unknown>): string | null => {
-                    return (info.object as Feature)?.properties?.name;
+                getTooltip={(
+                    info: PickInfo<unknown> | WellsPickInfo
+                ): string | null | undefined => {
+                    const well_info = info as WellsPickInfo;
+                    if (well_info) {
+                        return well_info.logName;
+                    } else {
+                        return (info.object as Feature)?.properties?.name;
+                    }
                 }}
                 ref={deckRef}
                 onHover={props.onHover}

@@ -1,6 +1,6 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
-import { SolidPolygonLayer, SolidPolygonLayerProps } from "@deck.gl/layers";
+import { SolidPolygonLayer } from "@deck.gl/layers";
 import { Position } from "@deck.gl/core/utils/positions";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 
