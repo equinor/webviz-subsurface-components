@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test view menu snapshot test 1`] = `
+.c0 {
+  width: auto;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  color: var(--eds_text__static_icons__default,rgba(61,61,61,1));
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.000em;
+  -webkit-letter-spacing: 0.013em;
+  -moz-letter-spacing: 0.013em;
+  -ms-letter-spacing: 0.013em;
+  letter-spacing: 0.013em;
+  text-align: left;
+  padding-left: 24px;
+  padding-top: 16px;
+  padding-right: 24px;
+  padding-bottom: 16px;
+}
+
+.c0:hover {
+  z-index: 1;
+  cursor: pointer;
+  background: var(--eds_ui_background__light,rgba(247,247,247,1));
+}
+
+.c0:focus {
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 2px;
+}
+
+.c1 {
+  width: auto;
+  display: grid;
+  grid-gap: 16px;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content auto max-content;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+<li
+  class="c0"
+  role="menuitem"
+  tabindex="0"
+>
+  <div
+    class="c1"
+  >
+    Sort/Group by Attributes
+  </div>
+</li>
+`;
