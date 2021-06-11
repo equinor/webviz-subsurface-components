@@ -6,56 +6,14 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableHead,
-    TableRow,
 } from "@material-ui/core";
 import { Tooltip } from "@equinor/eds-core-react";
 
 import { getDetailedExpression } from "../utils/VectorCalculatorHelperFunctions";
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
+import { BlinkingTableRow } from "../utils/BlinkingTableRow";
+import { EnhancedTableHead } from "../utils/EnhancedTableHead";
 import "../VectorCalculator.css";
-
-interface EnhancedTableProps {
-    numSelected: number;
-    onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    rowCount: number;
-}
-const EnhancedTableHead: React.FC<EnhancedTableProps> = (
-    props: EnhancedTableProps
-) => {
-    const { onSelectAllClick, numSelected, rowCount } = props;
-
-    return (
-        <TableHead>
-            <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        indeterminate={
-                            numSelected > 0 && numSelected < rowCount
-                        }
-                        checked={numSelected > 0 && numSelected <= rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{ "aria-label": "select all expressions" }}
-                    />
-                </TableCell>
-                <TableCell
-                    className="ExpressionsTableHeader"
-                    align="left"
-                    width="600"
-                >
-                    {"Name"}
-                </TableCell>
-                <TableCell
-                    className="ExpressionsTableHeader"
-                    align="left"
-                    width="300"
-                >
-                    {"Expression"}
-                </TableCell>
-            </TableRow>
-        </TableHead>
-    );
-};
 
 interface ExpressionsTableProps {
     expressions: ExpressionType[];
@@ -173,8 +131,9 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                         const expressionFromMap = getDetailedExpression(row);
 
                         return (
-                            <TableRow
-                                hover
+                            <BlinkingTableRow
+                                blinking={false} // TODO: Add blinking functionality
+                                hover={true}
                                 role="checkbox"
                                 tabIndex={-1}
                                 key={row.id}
@@ -192,7 +151,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                     onClick={() => handleRowClick(row)}
                                     width="38%"
                                 >
-                                    <div className={"VariablesTableNameCell"}>
+                                    <div className={"ExpressionsTableNameCell"}>
                                         {row.name}
                                     </div>
                                 </TableCell>
@@ -209,14 +168,14 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                     >
                                         <div
                                             className={
-                                                "VariablesTableExpressionCell"
+                                                "ExpressionsTableExpressionCell"
                                             }
                                         >
                                             {expressionFromMap}
                                         </div>
                                     </Tooltip>
                                 </TableCell>
-                            </TableRow>
+                            </BlinkingTableRow>
                         );
                     })}
                 </TableBody>

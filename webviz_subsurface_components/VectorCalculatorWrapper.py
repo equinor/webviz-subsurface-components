@@ -76,6 +76,10 @@ class VectorCalculatorWrapper(VectorCalculator):
                  "message": ""}
 
             # Whitelisit rules
+            # TODO: 
+            # - symbols
+            # - variable characters a-zA-Z
+            # - functions: log, ...?
             # Ensure only single character variables
             if any([len(elm) > 1 for elm in variables]):
                 parsed_data["variables"] = []
@@ -83,14 +87,16 @@ class VectorCalculatorWrapper(VectorCalculator):
                 parsed_data["message"] = "Only single character variables a-zA-Z allowed"
                 
             return parsed_data
-        except:
+        except Exception as e:
             empty_variables: List[str] = []
             non_parsed_data: ExternalParseData = {
                 "expression": expression["expression"], 
                 "id": expression["id"],
                  "variables":empty_variables,
                  "isValid":False,
-                 "message": "External parsing failed"}
+                 "message": str(e)}
+            if len(expression["expression"]) <= 0:
+                non_parsed_data["message"] = ""
             return non_parsed_data
 
     @staticmethod
