@@ -191,7 +191,8 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const layers: any[] = [colors, highlight];
+        const layers: (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] =
+            [colors, highlight];
         if (this.props.outline) {
             layers.splice(0, 0, outline);
         }
@@ -199,7 +200,7 @@ export default class WellsLayer extends CompositeLayer<
             layers.splice(1, 0, log_layer);
         }
         return layers;
-   }
+    }
 
     getPickingInfo({ info }) {
         if (info.object == null || info.object.data == undefined) return info;

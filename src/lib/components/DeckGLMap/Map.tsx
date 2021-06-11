@@ -83,8 +83,9 @@ const Map: React.FC<MapProps> = ({
                     getCursor={({ isDragging }): string =>
                         isDragging ? "grabbing" : "default"
                     }
-                    getTooltip={(info: PickInfo<unknown>|WellsPickInfo)
-                        : string | null | undefined => {
+                    getTooltip={(
+                        info: PickInfo<unknown> | WellsPickInfo
+                    ): string | null | undefined => {
                         const well_info = info as WellsPickInfo;
                         if (well_info) {
                             return well_info.logName;
