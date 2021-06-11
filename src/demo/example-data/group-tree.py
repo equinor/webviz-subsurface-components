@@ -22,7 +22,12 @@ def grow_tree(root, depth, max_width):
     depth -= 1
     if depth > 0 and random.randint(0, 10) > 1:
         for c in range(0, random.randint(1, max_width)):
-            root["children"].append(grow_tree(create_node(depth, c), depth, max_width))
+            child = grow_tree(create_node(depth, c), depth, max_width)
+            root["children"].append(child)
+            #add up children rates
+            root["oilrate"]+=child["oilrate"]
+            root["waterrate"]+=child["waterrate"]
+            root["gasrate"]+=child["gasrate"]
 
     return root
 
@@ -46,5 +51,5 @@ iterations = {
 
 data = {"iterations": iterations}
 # more human friendly output:
-with open("dynamic-tree.json", "w") as outfile:
+with open("group-tree.json", "w") as outfile:
     json.dump(data, outfile, indent=2)
