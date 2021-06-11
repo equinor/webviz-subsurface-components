@@ -44,6 +44,10 @@ class VectorCalculatorParser(Parser):
 
     def __init__(self):
         super(VectorCalculatorParser, self).__init__()
+        self.ops2["+"] = np.add
+        self.ops2["-"] = np.subtract
+        self.ops2["*"] = np.multiply
+        self.ops2["/"] = np.divide
         self.ops2["^"] = np.power
         self.functions["log"] = np.log
 
@@ -71,11 +75,12 @@ class VectorCalculatorWrapper(VectorCalculator):
                  "isValid":True, 
                  "message": ""}
 
+            # Whitelisit rules
             # Ensure only single character variables
             if any([len(elm) > 1 for elm in variables]):
                 parsed_data["variables"] = []
                 parsed_data["isValid"] = False
-                parsed_data["message"] = "External parsing failed"
+                parsed_data["message"] = "Only single character variables a-zA-Z allowed"
                 
             return parsed_data
         except:
