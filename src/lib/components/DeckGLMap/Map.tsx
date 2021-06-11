@@ -8,9 +8,9 @@ import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import Settings from "./components/settings/Settings";
 import JSON_CONVERTER_CONFIG from "./configuration";
-import { WellsPickInfo } from "./layers/wells/wellsLayer";
 import { setSpec } from "./redux/actions";
 import { createStore } from "./redux/store";
+import { WellsPickInfo } from "./layers/wells/wellsLayer";
 
 export interface MapProps {
     id: string;
