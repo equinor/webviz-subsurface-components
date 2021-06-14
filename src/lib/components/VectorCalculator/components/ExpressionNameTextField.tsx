@@ -29,9 +29,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         ReactNode | undefined
     >(<Icon key="thumbs" name="thumbs_up" />);
 
-    Icon.add({ error_filled });
-    Icon.add({ warning_filled });
-    Icon.add({ thumbs_up });
+    Icon.add({ error_filled, thumbs_up, warning_filled });
 
     const isExisting = useCallback(
         (name: string): boolean => {

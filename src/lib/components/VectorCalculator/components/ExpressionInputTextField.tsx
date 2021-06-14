@@ -29,8 +29,7 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
         const [textFieldIconState, setTextFieldIconState] =
             React.useState<ReactNode | undefined>(undefined);
 
-        Icon.add({ error_filled });
-        Icon.add({ thumbs_up });
+        Icon.add({ error_filled, thumbs_up });
 
         const textFieldVariant = useCallback(():
             | "error"

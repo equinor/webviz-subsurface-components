@@ -17,6 +17,7 @@ import "../VectorCalculator.css";
 
 interface ExpressionsTableProps {
     expressions: ExpressionType[];
+    blinkingExpressions: ExpressionType[];
     onExpressionsSelect: (expressions: ExpressionType[]) => void;
     onActiveExpressionSelect: (expression: ExpressionType) => void;
 }
@@ -129,10 +130,13 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                         const isSelected = isExpressionSelected(row);
                         const isActive = activeExpression === row;
                         const expressionFromMap = getDetailedExpression(row);
+                        const isBlinking = props.blinkingExpressions.some(
+                            (elm) => elm.id == row.id
+                        );
 
                         return (
                             <BlinkingTableRow
-                                blinking={false} // TODO: Add blinking functionality
+                                blinking={isBlinking}
                                 hover={true}
                                 role="checkbox"
                                 tabIndex={-1}
