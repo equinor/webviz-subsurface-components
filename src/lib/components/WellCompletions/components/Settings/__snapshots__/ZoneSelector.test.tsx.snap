@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test Zone Selector snapshot test 1`] = `
+<div
+  class="makeStyles-root-1 react-dropdown-tree-select"
+  id="rdts1"
+>
+  <div
+    class="dropdown"
+  >
+    <a
+      aria-expanded="false"
+      aria-haspopup="tree"
+      aria-labelledby="rdts1-0_tag"
+      class="dropdown-trigger arrow bottom"
+      id="rdts1_trigger"
+      role="button"
+      tabindex="0"
+    >
+      <ul
+        class="tag-list"
+      >
+        <li
+          class="tag-item"
+        >
+          <span
+            aria-label="All"
+            class="tag"
+            id="rdts1-0_tag"
+          >
+            All
+            <button
+              aria-label="Remove"
+              aria-labelledby="rdts1-0_button rdts1-0_tag"
+              class="tag-remove"
+              id="rdts1-0_button"
+              type="button"
+            >
+              x
+            </button>
+          </span>
+        </li>
+        <li
+          class="tag-item"
+        >
+          <span
+            class="placeholder"
+          >
+            Select Zone(s)...
+          </span>
+        </li>
+      </ul>
+    </a>
+  </div>
+</div>
+`;

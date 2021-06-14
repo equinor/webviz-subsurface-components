@@ -22,9 +22,8 @@ const LayerSettingsButton: React.FC<Props> = React.memo(
         const classes = useStyles();
         const spec = useSelector((st: MapState) => st.spec);
         const layerVisibility = useMemo(() => getLayerVisibility(spec), [spec]);
-        const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(
-            null
-        );
+        const [anchorEl, setAnchorEl] =
+            React.useState<null | HTMLElement>(null);
 
         // handlers
         const handleClick = useCallback(

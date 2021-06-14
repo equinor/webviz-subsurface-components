@@ -1,0 +1,152 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test well attributes selector snapshot test 1`] = `
+.c0 {
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.250em;
+  text-align: left;
+}
+
+<div
+  class="makeStyles-root-1"
+>
+  <div
+    id="AttributesSelector"
+  >
+    <label>
+      Filter by Attributes
+    </label>
+    <div
+      class="SmartNodeSelector"
+    >
+      <ul
+        class="SmartNodeSelector__Tags"
+      >
+        <li
+          class="SmartNodeSelector__Tag "
+          title="Enter a new name"
+        >
+          <div
+            class="SmartNodeSelector__InnerTag"
+          >
+            <div
+              class="SmartNodeSelector__InputContainer"
+            >
+              <input
+                placeholder="Add new tag..."
+                spellcheck="false"
+                style="width: 100px;"
+                type="text"
+                value=""
+              />
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div
+        class="SmartNodeSelector__ClearAll"
+      >
+        <button
+          disabled=""
+          title="Clear all"
+          type="button"
+        />
+      </div>
+      <div
+        class="Suggestions"
+        style="max-height: 568px; display: none;"
+      >
+        <div
+          class="Suggestions__Spacer"
+          style="height: 0px;"
+        />
+        <div
+          class="Suggestions__Suggestion Suggestions__Suggestion--Selected"
+          data-index="0"
+          data-use="well name"
+          style="background-image: none; height: 34px;"
+        >
+          <span
+            class="Suggestions__Match"
+          />
+          well name
+          
+        </div>
+        <div
+          class="Suggestions__Suggestion"
+          data-index="1"
+          data-use="stratigraphy depth"
+          style="background-image: none; height: 34px;"
+        >
+          <span
+            class="Suggestions__Match"
+          />
+          stratigraphy depth
+          
+        </div>
+        <div
+          class="Suggestions__Suggestion"
+          data-index="2"
+          data-use="earliest comp date"
+          style="background-image: none; height: 34px;"
+        >
+          <span
+            class="Suggestions__Match"
+          />
+          earliest comp date
+          
+        </div>
+        <div
+          class="Suggestions__Suggestion"
+          data-index="3"
+          data-use="type"
+          style="background-image: none; height: 34px;"
+        >
+          <span
+            class="Suggestions__Match"
+          />
+          type
+          
+        </div>
+        <div
+          class="Suggestions__Suggestion"
+          data-index="4"
+          data-use="region"
+          style="background-image: none; height: 34px;"
+        >
+          <span
+            class="Suggestions__Match"
+          />
+          region
+          
+        </div>
+        <div
+          class="Suggestions__Suggestion"
+          data-index="5"
+          data-use="user defined category"
+          style="background-image: none; height: 34px;"
+        >
+          <span
+            class="Suggestions__Match"
+          />
+          user defined category
+          
+        </div>
+        <div
+          class="Suggestions__Spacer"
+          style="height: 0px;"
+        />
+      </div>
+    </div>
+  </div>
+  <p
+    class="c0"
+  >
+    Well selection criteria: 
+  </p>
+</div>
+`;
