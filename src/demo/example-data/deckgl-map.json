@@ -67,6 +67,12 @@
               "outline": true
             },
             {
+              "@@type": "FaultLinesLayer",
+              "id": "fault-lines-layer",
+              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/fault_lines.geojson",
+              "lineWidthMinPixels": 2
+            },
+            {
               "@@type": "PieChartLayer",
               "id": "pie-layer",
               "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/piechart.json"
