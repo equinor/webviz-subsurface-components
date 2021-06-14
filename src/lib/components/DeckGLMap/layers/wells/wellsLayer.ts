@@ -3,6 +3,7 @@ import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { GeoJsonLayer } from "@deck.gl/layers";
 import { PickInfo } from "deck.gl";
+import { subtract, distance } from 'mathjs'
 
 import { Feature } from "geojson";
 
@@ -20,6 +21,12 @@ const defaultProps = {
     autoHighlight: true,
     selectionEnabled: true,
 };
+
+function squared_distance(a, b) {
+    const dx = a[0] - b[0];
+    const dy = a[1] - b[1];
+    return dx * dx + dy * dy;
+}
 
 export default class WellsLayer extends CompositeLayer<
     Feature,
@@ -85,6 +92,46 @@ export default class WellsLayer extends CompositeLayer<
 
         if (this.props.outline) return [outline, colors, highlight];
         else return [colors, highlight];
+    }
+
+    getPickingInfo({ info }) {
+        if (info.object == null)
+            return info;
+
+        const measured_depths = info.object.properties.md[0];
+        const trajectory = info.object.geometry.geometries[1].coordinates;
+
+        const d2 = trajectory.map((element, index) => squared_distance(element, info.coordinate));
+
+        let index = Array.from(d2.entries());
+        index = index.sort((a, b) => a[1] - b[1]);
+
+        const index0 = index[0][0];
+        const index1 = index[1][0];
+
+        const md0 = measured_depths[index0];
+        const md1 = measured_depths[index1];
+
+        const survey0 = trajectory[index0];
+        const survey1 = trajectory[index1];
+
+        const v0 = subtract(info.coordinate, survey0);
+        const v1 = subtract(survey1, survey0);
+
+        const dv = distance(survey0, survey1);
+
+        const dot = v0[0] * v1[0] + v0[1] * v1[1];
+        const scalar_projection = dot / dv;
+
+        const c0 = scalar_projection / dv;
+        const c1 = dv - c0;
+
+        const md = (md0 * c1 + md1 * c0) / dv;
+        
+        return {
+            ...info,
+            propertyValue: md,
+        };
     }
 }
 
