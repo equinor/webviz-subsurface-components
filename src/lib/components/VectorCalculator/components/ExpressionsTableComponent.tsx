@@ -1,6 +1,7 @@
-import React, { useCallback } from "react";
-import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
+import React, { useCallback, useRef } from "react";
+import { Button, Icon } from "@equinor/eds-core-react";
 import { Grid, Paper } from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 import { add, copy, delete_forever } from "@equinor/eds-icons";
 import { v4 as uuidv4 } from "uuid";
 
@@ -27,10 +28,19 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
         >([]);
         const [disableDelete, setDisableDelete] =
             React.useState<boolean>(false);
+        const deleteTimer =
+            React.useRef<ReturnType<typeof setTimeout> | null>(null);
+        const [blinkingTableExpressions, setBlinkingTableExpressions] =
+            React.useState<ExpressionType[]>([]);
 
-        Icon.add({ add });
-        Icon.add({ copy });
-        Icon.add({ delete_forever });
+        Icon.add({ add, copy, delete_forever });
+
+        React.useEffect(() => {
+            // Unmount timer
+            return () => {
+                deleteTimer.current && clearTimeout(deleteTimer.current);
+            };
+        }, []);
 
         React.useEffect(() => {
             // Disable delete when all expressions are non-deletable
@@ -77,6 +87,13 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                 }
             );
             setSelectedExpressions(nonDeletableExpressions);
+
+            // Handle blinking in table
+            setBlinkingTableExpressions(nonDeletableExpressions);
+            deleteTimer.current = setTimeout(
+                () => setBlinkingTableExpressions([]),
+                3000
+            );
 
             const deletableExpressions = selectedExpressions.filter((elm) => {
                 return elm.isDeletable;
@@ -127,11 +144,21 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                     <Grid item>
                         <ExpressionsTable
                             expressions={expressions}
+                            blinkingExpressions={blinkingTableExpressions}
                             onExpressionsSelect={handleExpressionsSelect}
                             onActiveExpressionSelect={
                                 handleActiveExpressionSelect
                             }
                         />
+                    </Grid>
+                    <Grid item>
+                        {blinkingTableExpressions.length !== 0 && (
+                            <Alert variant="filled" severity="error">
+                                {blinkingTableExpressions.length > 1
+                                    ? "Expressions not deletable!"
+                                    : "Expression not deletable!"}
+                            </Alert>
+                        )}
                     </Grid>
                 </Grid>
                 <Grid container item spacing={2} alignItems="flex-end">
