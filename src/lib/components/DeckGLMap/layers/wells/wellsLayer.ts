@@ -10,18 +10,6 @@ import { Feature } from "geojson";
 
 import { patchLayerProps } from "../utils/layerTools";
 
-export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
-    pointRadiusScale: number;
-    lineWidthScale: number;
-    outline: boolean;
-    selectedFeature: Feature;
-    selectionEnabled: boolean;
-    logData: string;
-    logName: string;
-    logRadius: number;
-    logCurves: boolean;
-}
-
 export interface LogCurveDataType {
     header: {
         name: string;
@@ -38,14 +26,15 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedFeature: Feature;
-    logData: string;
+    selectionEnabled: boolean;
+    logData: string | LogCurveDataType;
     logName: string;
     logRadius: number;
     logCurves: boolean;
 }
 
 const COLOR_MAP: RGBAColor[] = [
-    [0, 0, 0, 255],
+    [0, 0, 0, 0],
     [0, 255, 0, 255],
     [0, 0, 255, 255],
     [255, 255, 0, 255],
@@ -207,7 +196,7 @@ export default class WellsLayer extends CompositeLayer<
 
         const trajectory = info.object.data[0];
 
-        let min_d = 99999;
+        let min_d = Number.MAX_VALUE;
         let vertex_index = 0;
         for (let i = 0; i < trajectory.length; i++) {
             const d = squared_distance(trajectory[i], info.coordinate);

@@ -86,9 +86,8 @@ const Map: React.FC<MapProps> = ({
                     getTooltip={(
                         info: PickInfo<unknown> | WellsPickInfo
                     ): string | null | undefined => {
-                        const well_info = info as WellsPickInfo;
-                        if (well_info) {
-                            return well_info.logName;
+                        if ((info as WellsPickInfo)?.logName) {
+                            return (info as WellsPickInfo)?.logName;
                         } else {
                             return (info.object as Feature)?.properties?.name;
                         }
