@@ -19,11 +19,8 @@ import { VariablesTable } from "./VariablesTable";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 
 import { isVariableVectorMapValid } from "../utils/VectorCalculatorHelperFunctions";
-import {
-    parseExpression,
-    parseName,
-    retrieveVariablesFromValidExpression,
-} from "../utils/VectorCalculatorRegex";
+import { parseName } from "../utils/VectorCalculatorRegex";
+import { ExpressionParserWrapper } from "../utils/ExpressionParserWrapper";
 import "../VectorCalculator.css";
 
 interface ExpressionInputComponent {
@@ -64,10 +61,9 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     const [cachedVariableVectorMap, setCachedVariableVectorMap] =
         React.useState<VariableVectorMapType[]>([]);
     const [parsingMessage, setParsingMessage] = React.useState<string>("");
+    const expressionParser = new ExpressionParserWrapper();
 
-    Icon.add({ clear });
-    Icon.add({ save });
-    Icon.add({ sync });
+    Icon.add({ clear, save, sync });
 
     React.useEffect(() => {
         setIsValid(
@@ -138,7 +134,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             props.onExternalExpressionParsing(activeExpressionClone);
         } else {
             setExpressionStatus(
-                parseExpression(activeExpressionClone.expression)
+                expressionParser.validate(activeExpressionClone.expression)
                     ? ExpressionStatus.Valid
                     : ExpressionStatus.Invalid
             );
@@ -164,10 +160,11 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             props.onExternalExpressionParsing(activeExpression);
         } else {
             setExpressionStatus(
-                parseExpression(activeExpression.expression)
+                expressionParser.validate(activeExpression.expression)
                     ? ExpressionStatus.Valid
                     : ExpressionStatus.Invalid
             );
+            setParsingMessage("");
         }
     };
 
@@ -191,9 +188,6 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             setParsingMessage("");
             props.onExternalExpressionParsing(updatedExpression);
         } else {
-            // TODO: Now the function returns editableExpression map from expression string character
-            // Replace with same logic as for external parsing: Provide list of variables in expression
-            // E.g.: Currently log(x+y) gives issue as log is a func
             const newMap =
                 getVariableVectorMapFromExpression(updatedExpression);
             updatedExpression.variableVectorMap = newMap;
@@ -202,9 +196,12 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 isVariableVectorMapValid(newMap, ":", props.vectors)
             );
             setExpressionStatus(
-                parseExpression(updatedExpression.expression)
+                expressionParser.validate(updatedExpression.expression)
                     ? ExpressionStatus.Valid
                     : ExpressionStatus.Invalid
+            );
+            setParsingMessage(
+                expressionParser.parseMessage(updatedExpression.expression)
             );
             setEditableExpression(updatedExpression);
         }
@@ -255,23 +252,17 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             if (expression.expression.length === 0) {
                 return [];
             }
-            if (!parseExpression(expression.expression)) {
+            if (!expressionParser.validate(expression.expression)) {
                 return cloneDeep(editableExpression.variableVectorMap);
             }
 
-            // Replace with parse lib which handles funcitons and provides list of variables
-            // E.g.: Currently log(x+y) gives issue as log is a func
-            const variables: string[] = retrieveVariablesFromValidExpression(
+            const variables: string[] = expressionParser.variables(
                 expression.expression
             );
+
             return getVariableVectorMapFromVariables(variables);
         },
-        [
-            parseExpression,
-            retrieveVariablesFromValidExpression,
-            editableExpression,
-            cachedVariableVectorMap,
-        ]
+        [expressionParser, editableExpression, cachedVariableVectorMap]
     );
 
     const getVariableVectorMapFromVariables = useCallback(
