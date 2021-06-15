@@ -93,7 +93,7 @@ function squared_distance(a, b): number {
     return dx * dx + dy * dy;
 }
 
-export interface WellsPickInfo extends PickInfo<Feature | LogCurveDataType> {
+export interface WellsPickInfo extends PickInfo<unknown> {
     logName?: string;
     propertyValue?: number;
 }
