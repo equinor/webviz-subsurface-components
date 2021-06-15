@@ -66,6 +66,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     const [cachedVariableVectorMap, setCachedVariableVectorMap] =
         React.useState<VariableVectorMapType[]>([]);
     const [parsingMessage, setParsingMessage] = React.useState<string>("");
+    const expressionParser = new ExpressionParserWrapper();
 
     Icon.add({ clear, save, sync });
 
