@@ -22,6 +22,7 @@ const FilterMenu: React.FC = React.memo(() => {
         <div>
             <Tooltip title={isDrawerOpen ? "Close filter menu" : "Filter"}>
                 <Button
+                    data-testid="filter_button"
                     variant={isDrawerOpen ? "outlined" : "ghost_icon"}
                     onClick={openDrawer}
                 >
