@@ -93,13 +93,13 @@ function squared_distance(a, b): number {
     return dx * dx + dy * dy;
 }
 
-export interface WellsPickInfo extends PickInfo<unknown> {
+export interface WellsPickInfo extends PickInfo<Feature | LogCurveDataType> {
     logName?: string;
     propertyValue?: number;
 }
 
 export default class WellsLayer extends CompositeLayer<
-    Feature,
+    Feature | LogCurveDataType,
     WellsLayerProps<Feature>
 > {
     onClick(info: WellsPickInfo): boolean {
@@ -191,10 +191,11 @@ export default class WellsLayer extends CompositeLayer<
         return layers;
     }
 
-    getPickingInfo({ info }) {
-        if (info.object == null || info.object.data == undefined) return info;
+    getPickingInfo({ info }: { info: PickInfo<any> }): WellsPickInfo {
+        if (!info.object || !(info.object as LogCurveDataType)?.data)
+            return info;
 
-        const trajectory = info.object.data[0];
+        const trajectory = (info.object as LogCurveDataType)?.data[0];
 
         let min_d = Number.MAX_VALUE;
         let vertex_index = 0;
@@ -206,11 +207,16 @@ export default class WellsLayer extends CompositeLayer<
             min_d = d;
         }
 
-        const log_id = getLogIDByName(info.object, this.props.logName);
+        const log_id = getLogIDByName(
+            info.object as LogCurveDataType,
+            this.props.logName
+        );
         if (!log_id) return info;
 
-        const value = info?.object?.data[log_id][vertex_index];
-        const log_name = info?.object?.curves[log_id].name;
+        const value = (info.object as LogCurveDataType)?.data[log_id][
+            vertex_index
+        ];
+        const log_name = (info.object as LogCurveDataType)?.curves[log_id].name;
         return {
             ...info,
             propertyValue: value,
