@@ -99,7 +99,7 @@ export interface WellsPickInfo extends PickInfo<Feature | LogCurveDataType> {
 }
 
 export default class WellsLayer extends CompositeLayer<
-    Feature | LogCurveDataType,
+    unknown,
     WellsLayerProps<Feature>
 > {
     onClick(info: WellsPickInfo): boolean {
@@ -191,7 +191,11 @@ export default class WellsLayer extends CompositeLayer<
         return layers;
     }
 
-    getPickingInfo({ info }: { info: PickInfo<any> }): WellsPickInfo {
+    getPickingInfo({
+        info,
+    }: {
+        info: PickInfo<unknown>;
+    }): WellsPickInfo | PickInfo<unknown> {
         if (!info.object || !(info.object as LogCurveDataType)?.data)
             return info;
 
