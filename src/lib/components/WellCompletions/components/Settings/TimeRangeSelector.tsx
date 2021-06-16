@@ -16,13 +16,16 @@ import { DataContext } from "../DataLoader";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            width: "200px",
-            marginRight: theme.spacing(4),
-        },
-        dropdowns: {
             display: "flex",
             flexDirection: "row",
+        },
+        slider: {
+            width: "200px",
+            marginLeft: theme.spacing(4),
             marginRight: theme.spacing(4),
+        },
+        selector: {
+            maxWidth: "130px",
         },
     })
 );
@@ -58,40 +61,11 @@ const TimeRangeSelector: React.FC = React.memo(() => {
         [dispatch]
     );
     //If number of time step is small
-    return times.length <= 15 ? (
+    return (
         <div className={classes.root}>
-            <span>Time Steps</span>
-            <EdsSlider
-                track={timeAggregation === "None" ? false : "normal"}
-                aria-labelledby="time-step-slider-label"
-                value={
-                    timeAggregation === "None"
-                        ? Math.max(...timeIndexRange)
-                        : timeIndexRange.slice()
-                }
-                valueLabelDisplay="on"
-                onChange={(_, value) =>
-                    onChange(
-                        timeAggregation === "None"
-                            ? [0, value]
-                            : [
-                                  Math.min(...(value as number[])),
-                                  Math.max(...(value as number[])),
-                              ]
-                    )
-                }
-                min={0}
-                max={times.length - 1}
-                step={1}
-                marks={true}
-                valueLabelFormat={outputFunction}
-            />
-        </div>
-    ) : (
-        <div className={classes.dropdowns}>
             {timeAggregation !== "None" && (
                 <NativeSelect
-                    className={classes.root}
+                    className={classes.selector}
                     id="time-start-selector"
                     label="Start"
                     value={Math.min(...timeIndexRange)}
@@ -115,13 +89,44 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                     ))}
                 </NativeSelect>
             )}
+            <div className={classes.slider}>
+                <span>Time Steps</span>
+                <EdsSlider
+                    track={timeAggregation === "None" ? false : "normal"}
+                    aria-labelledby="time-step-slider-label"
+                    value={
+                        timeAggregation === "None"
+                            ? Math.max(...timeIndexRange)
+                            : timeIndexRange.slice()
+                    }
+                    valueLabelDisplay="on"
+                    onChange={(_, value) =>
+                        onChange(
+                            timeAggregation === "None"
+                                ? [0, value]
+                                : [
+                                      Math.min(...(value as number[])),
+                                      Math.max(...(value as number[])),
+                                  ]
+                        )
+                    }
+                    min={0}
+                    max={times.length - 1}
+                    step={1}
+                    marks={true}
+                    valueLabelFormat={outputFunction}
+                />
+            </div>
             <NativeSelect
-                className={classes.root}
+                className={classes.selector}
                 id="time-end-selector"
                 label={timeAggregation === "None" ? "Select Time" : "End"}
                 value={Math.max(...timeIndexRange)}
                 onChange={(event) =>
-                    onChange([timeIndexRange[0], parseInt(event.target.value)])
+                    onChange([
+                        timeAggregation === "None" ? 0 : timeIndexRange[0],
+                        parseInt(event.target.value),
+                    ])
                 }
             >
                 {(timeAggregation === "None"
