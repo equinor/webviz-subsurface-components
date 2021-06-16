@@ -16,6 +16,7 @@ export const LayerIcons = {
     Hillshading2DLayer: undefined,
     WellsLayer: undefined,
     PieChartLayer: undefined,
+    FaultPolygonsLayer: undefined,
     DrawingLayer: "brush",
 };
 

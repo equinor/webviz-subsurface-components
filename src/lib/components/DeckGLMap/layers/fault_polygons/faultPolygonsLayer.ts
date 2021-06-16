@@ -13,16 +13,17 @@ const getColor = (d: Feature): RGBAColor => {
 
 const defaultProps = {
     pickable: true,
+    filled: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     getLineColor: (d) => d.properties.color,
     getFillColor: getColor,
 };
 
-export type FaultLinesLayerProps<D> = GeoJsonLayerProps<D>;
-export default class FaultLinesLayer extends GeoJsonLayer<
+export type FaultPolygonsLayerProps<D> = GeoJsonLayerProps<D>;
+export default class FaultPolygonsLayer extends GeoJsonLayer<
     unknown,
     GeoJsonLayerProps<unknown>
 > {}
 
-FaultLinesLayer.layerName = "FaultLinesLayer";
-FaultLinesLayer.defaultProps = defaultProps;
+FaultPolygonsLayer.layerName = "FaultPolygonsLayer";
+FaultPolygonsLayer.defaultProps = defaultProps;

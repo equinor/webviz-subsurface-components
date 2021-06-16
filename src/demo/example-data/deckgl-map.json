@@ -67,9 +67,9 @@
               "outline": true
             },
             {
-              "@@type": "FaultLinesLayer",
-              "id": "fault-lines-layer",
-              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/fault_lines.geojson",
+              "@@type": "FaultPolygonsLayer",
+              "id": "fault-polygons-layer",
+              "data": https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/fault_polygons.geojson",
               "lineWidthMinPixels": 2
             },
             {
