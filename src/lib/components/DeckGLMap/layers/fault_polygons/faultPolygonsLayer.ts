@@ -15,7 +15,7 @@ const defaultProps = {
     pickable: true,
     filled: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    getLineColor: (d: Feature) => d.properties.color,
+    getLineColor: (d: Feature) => d?.properties?.color ?? [0, 0, 0, 255],
     getFillColor: getColor,
 };
 
