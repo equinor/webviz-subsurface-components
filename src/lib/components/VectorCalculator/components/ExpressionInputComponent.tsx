@@ -20,8 +20,13 @@ import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeS
 
 import { isVariableVectorMapValid } from "../utils/VectorCalculatorHelperFunctions";
 import { parseName } from "../utils/VectorCalculatorRegex";
-import { ExpressionParserWrapper } from "../utils/ExpressionParserWrapper";
 import "../VectorCalculator.css";
+
+import {
+    expressionVariables,
+    parseMessage,
+    validateExpression,
+} from "../utils/ExpressionParser";
 
 interface ExpressionInputComponent {
     activeExpression: ExpressionType;
@@ -61,7 +66,6 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     const [cachedVariableVectorMap, setCachedVariableVectorMap] =
         React.useState<VariableVectorMapType[]>([]);
     const [parsingMessage, setParsingMessage] = React.useState<string>("");
-    const expressionParser = new ExpressionParserWrapper();
 
     Icon.add({ clear, save, sync });
 
@@ -134,7 +138,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             props.onExternalExpressionParsing(activeExpressionClone);
         } else {
             setExpressionStatus(
-                expressionParser.validate(activeExpressionClone.expression)
+                validateExpression(activeExpressionClone.expression)
                     ? ExpressionStatus.Valid
                     : ExpressionStatus.Invalid
             );
@@ -160,7 +164,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             props.onExternalExpressionParsing(activeExpression);
         } else {
             setExpressionStatus(
-                expressionParser.validate(activeExpression.expression)
+                validateExpression(activeExpression.expression)
                     ? ExpressionStatus.Valid
                     : ExpressionStatus.Invalid
             );
@@ -196,13 +200,11 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 isVariableVectorMapValid(newMap, ":", props.vectors)
             );
             setExpressionStatus(
-                expressionParser.validate(updatedExpression.expression)
+                validateExpression(updatedExpression.expression)
                     ? ExpressionStatus.Valid
                     : ExpressionStatus.Invalid
             );
-            setParsingMessage(
-                expressionParser.parseMessage(updatedExpression.expression)
-            );
+            setParsingMessage(parseMessage(updatedExpression.expression));
             setEditableExpression(updatedExpression);
         }
     };
@@ -252,17 +254,18 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             if (expression.expression.length === 0) {
                 return [];
             }
-            if (!expressionParser.validate(expression.expression)) {
+
+            if (!validateExpression(expression.expression)) {
                 return cloneDeep(editableExpression.variableVectorMap);
             }
 
-            const variables: string[] = expressionParser.variables(
+            const variables: string[] = expressionVariables(
                 expression.expression
             );
 
             return getVariableVectorMapFromVariables(variables);
         },
-        [expressionParser, editableExpression, cachedVariableVectorMap]
+        [editableExpression, cachedVariableVectorMap]
     );
 
     const getVariableVectorMapFromVariables = useCallback(
