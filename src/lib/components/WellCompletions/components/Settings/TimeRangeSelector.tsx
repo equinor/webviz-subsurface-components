@@ -1,3 +1,4 @@
+import { NativeSelect } from "@equinor/eds-core-react";
 import {
     createStyles,
     makeStyles,
@@ -16,6 +17,11 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             width: "200px",
+            marginRight: theme.spacing(4),
+        },
+        dropdowns: {
+            display: "flex",
+            flexDirection: "row",
             marginRight: theme.spacing(4),
         },
     })
@@ -48,17 +54,11 @@ const TimeRangeSelector: React.FC = React.memo(() => {
     // handlers
     const outputFunction = useCallback((step: number) => times[step], [times]);
     const onChange = useCallback(
-        (_, value) =>
-            dispatch(
-                updateTimeIndexRange(
-                    timeAggregation === "None"
-                        ? [0, value]
-                        : [Math.min(...value), Math.max(...value)]
-                )
-            ),
-        [dispatch, timeAggregation]
+        (range) => dispatch(updateTimeIndexRange(range)),
+        [dispatch]
     );
-    return (
+    //If number of time step is small
+    return times.length <= 15 ? (
         <div className={classes.root}>
             <span>Time Steps</span>
             <EdsSlider
@@ -70,13 +70,79 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                         : timeIndexRange.slice()
                 }
                 valueLabelDisplay="on"
-                onChange={onChange}
+                onChange={(_, value) =>
+                    onChange(
+                        timeAggregation === "None"
+                            ? [0, value]
+                            : [
+                                  Math.min(...(value as number[])),
+                                  Math.max(...(value as number[])),
+                              ]
+                    )
+                }
                 min={0}
                 max={times.length - 1}
                 step={1}
                 marks={true}
                 valueLabelFormat={outputFunction}
             />
+        </div>
+    ) : (
+        <div className={classes.dropdowns}>
+            {timeAggregation !== "None" && (
+                <NativeSelect
+                    className={classes.root}
+                    id="time-start-selector"
+                    label="Start"
+                    value={Math.min(...timeIndexRange)}
+                    onChange={(event) =>
+                        onChange([
+                            parseInt(event.target.value),
+                            Math.max(
+                                parseInt(event.target.value),
+                                timeIndexRange[1]
+                            ),
+                        ])
+                    }
+                >
+                    {times.map((time, index) => (
+                        <option
+                            key={`time-dropdown-start-${time}`}
+                            value={index}
+                        >
+                            {time}
+                        </option>
+                    ))}
+                </NativeSelect>
+            )}
+            <NativeSelect
+                className={classes.root}
+                id="time-end-selector"
+                label={timeAggregation === "None" ? "Select Time" : "End"}
+                value={Math.max(...timeIndexRange)}
+                onChange={(event) =>
+                    onChange([timeIndexRange[0], parseInt(event.target.value)])
+                }
+            >
+                {(timeAggregation === "None"
+                    ? times
+                    : times.filter(
+                          (_, index) => index >= Math.min(...timeIndexRange)
+                      )
+                ).map((time, index) => (
+                    <option
+                        key={`time-dropdown-end-${time}`}
+                        value={
+                            index +
+                            (timeAggregation === "None"
+                                ? 0
+                                : Math.min(...timeIndexRange))
+                        }
+                    >
+                        {time}
+                    </option>
+                ))}
+            </NativeSelect>
         </div>
     );
 });
