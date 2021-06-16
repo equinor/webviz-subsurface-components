@@ -24,7 +24,7 @@ import "../VectorCalculator.css";
 
 import {
     expressionVariables,
-    parseMessage,
+    expressionParseMessage,
     validateExpression,
 } from "../utils/ExpressionParser";
 
@@ -204,7 +204,9 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                     ? ExpressionStatus.Valid
                     : ExpressionStatus.Invalid
             );
-            setParsingMessage(parseMessage(updatedExpression.expression));
+            setParsingMessage(
+                expressionParseMessage(updatedExpression.expression)
+            );
             setEditableExpression(updatedExpression);
         }
     };
