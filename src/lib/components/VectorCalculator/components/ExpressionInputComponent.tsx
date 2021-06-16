@@ -30,7 +30,7 @@ import "../VectorCalculator.css";
 
 import {
     expressionVariables,
-    parseMessage,
+    expressionParseMessage,
     validateExpression,
 } from "../utils/ExpressionParser";
 
