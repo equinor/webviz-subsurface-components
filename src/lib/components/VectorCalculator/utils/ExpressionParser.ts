@@ -4,8 +4,8 @@ const { parse } = create({
     parseDependencies,
 });
 
-const operatorWhitelist = ["+", "-", "*", "/", "^"];
-const functionWhitelist = ["log", "sqrt"];
+const operatorWhitelist: string[] = ["+", "-", "*", "/", "^"];
+const functionWhitelist: string[] = ["log", "sqrt"];
 
 type ParseData = {
     variables: string[];
