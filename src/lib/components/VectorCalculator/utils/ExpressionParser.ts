@@ -98,7 +98,7 @@ export const validateExpression = (expression: string): boolean => {
     }
 };
 
-export const parseMessage = (expression: string): string => {
+export const expressionParseMessage = (expression: string): string => {
     try {
         parseExpression(expression);
         return "";
