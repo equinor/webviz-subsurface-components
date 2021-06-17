@@ -1,6 +1,7 @@
 from typing import List, Dict, Union
 from functools import wraps
 import sys
+import re
 
 if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
     from typing import TypedDict
@@ -37,19 +38,34 @@ class ExternalParseData(TypedDict):
 class VectorCalculatorParser(Parser):
     """Creates expression parser configured to handle vector variables
 
-    Overrides operators to handle vectors by replacing math lib functions with numpy functions
+    Overrides operators and functions to provide whitelist for parsing. Note that the overrides also replace
+    math lib functions with numpy functions.
 
     I.e.: Configured expression parser for vector calculator
     """
 
     def __init__(self):
         super(VectorCalculatorParser, self).__init__()
-        self.ops2["+"] = np.add
-        self.ops2["-"] = np.subtract
-        self.ops2["*"] = np.multiply
-        self.ops2["/"] = np.divide
-        self.ops2["^"] = np.power
-        self.functions["log"] = np.log
+
+        self.characterBlacklist = ["\"", "'"]
+
+        # Override internal operators and functions (whitelisting)
+        self.ops1 = {
+            "sqrt": np.sqrt,
+            "abs": np.abs,
+            "-": np.negative,
+        }
+
+        self.ops2 = {
+            "+": np.add,
+            "-": np.subtract,
+            "*": np.multiply,
+            "/": np.divide,
+            "^": np.power,
+        }
+        self.functions = {
+            "log": np.log
+        }
 
 
 class VectorCalculatorWrapper(VectorCalculator):
@@ -63,44 +79,51 @@ class VectorCalculatorWrapper(VectorCalculator):
 
     @staticmethod
     def parse_expression(expression: ExpressionInfo) -> ExternalParseData:
-        # Initial implementation, move functionality into wrapper when functioning
-        try:
-            parsed_expr = VectorCalculatorWrapper.parser.parse(expression["expression"])
-            variables: List[str] = parsed_expr.variables()
-
-            parsed_data: ExternalParseData = {
-                "expression": expression["expression"],
-                 "id": expression["id"], 
-                 "variables":variables,
-                 "isValid":True, 
-                 "message": ""}
-
-            # Whitelisit rules
-            # TODO: 
-            # - symbols
-            # - variable characters a-zA-Z
-            # - functions: log, ...?
-            # Ensure only single character variables
-            if any([len(elm) > 1 for elm in variables]):
-                parsed_data["variables"] = []
-                parsed_data["isValid"] = False
-                parsed_data["message"] = "Only single character variables a-zA-Z allowed"
+        # Set numpy error state to raise exception in local scope
+        with np.errstate(all='raise'):
+            try:
+                # Blacklisted characters
+                blacklisted_chars = [elm for elm in VectorCalculatorWrapper.parser.characterBlacklist if expression["expression"].__contains__(elm)]
+                if len(blacklisted_chars)>0:
+                    message = "Invalid characters:" if len(blacklisted_chars) > 1 else "Invalid character:"
+                    raise Exception(message+f" {blacklisted_chars}")
                 
-            return parsed_data
-        except Exception as e:
-            empty_variables: List[str] = []
-            non_parsed_data: ExternalParseData = {
-                "expression": expression["expression"], 
-                "id": expression["id"],
-                 "variables":empty_variables,
-                 "isValid":False,
-                 "message": str(e)}
-            if len(expression["expression"]) <= 0:
-                non_parsed_data["message"] = ""
-            return non_parsed_data
+                parsed_expr = VectorCalculatorWrapper.parser.parse(expression["expression"])
+                variables: List[str] = parsed_expr.variables()
+
+                # Whitelisit rules
+                mul_char_vars = [elm for elm in variables if len(elm)>1]
+                if len(mul_char_vars) > 0:
+                    raise Exception(f"Not allowed with multi character variables: {mul_char_vars}")
+
+                invalid_var_chars = [elm for elm in variables if not re.search("[a-zA-Z]{1}", elm)]
+                if len(invalid_var_chars)>0:
+                    message = "Invalid variable characters:" if len(invalid_var_chars) > 1 else "Invalid variable character:"
+                    raise Exception(message+f" {invalid_var_chars}")
+
+                # Evaluate to ensure valid expression (not captured by parse() method)
+                # - Parser allow assignment of function to variable, e.g. parse("f(x)").evaluate({"f":np.sqrt, "x":2})
+                # - Assign value to variables and evaluate to ensure valid expression 
+                evaluation_values = np.ones(len(variables))
+                evaluation_dict = dict(zip(variables, evaluation_values))
+                parsed_expr.evaluate(evaluation_dict)            
+                    
+                return {
+                    "expression": expression["expression"],
+                    "id": expression["id"], 
+                    "variables":variables,
+                    "isValid":True, 
+                    "message": ""}
+            except Exception as e:
+                return {
+                    "expression": expression["expression"], 
+                    "id": expression["id"],
+                    "variables":[],
+                    "isValid":False,
+                    "message": "" if len(expression["expression"]) <= 0 else str(e)}
 
     @staticmethod
-    def is_valid_expression(expression: ExpressionInfo) -> bool:
+    def validate_expression(expression: ExpressionInfo) -> bool:
         try:
             VectorCalculatorWrapper.parser.parse(expression["expression"])
         except:
