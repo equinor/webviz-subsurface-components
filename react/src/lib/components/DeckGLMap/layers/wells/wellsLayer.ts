@@ -9,6 +9,7 @@ import { color } from "d3-color";
 
 import { Feature } from "geojson";
 
+import { PropertyDataType } from "../../components/InfoCard";
 import { patchLayerProps } from "../utils/layerTools";
 
 export interface LogCurveDataType {
@@ -20,6 +21,14 @@ export interface LogCurveDataType {
         description: string;
     }[];
     data: number[][];
+    metadata_discrete: Record<
+        string,
+        {
+            attributes: unknown;
+            objects: Record<string, number[]>;
+        }
+    >;
+    // metadata_continuous?: string[];
 }
 
 export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
@@ -34,18 +43,6 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
 }
-
-const COLOR_MAP: RGBAColor[] = [
-    [0, 0, 0, 0],
-    [0, 255, 0, 255],
-    [0, 0, 255, 255],
-    [255, 255, 0, 255],
-    [255, 0, 255, 255],
-    [0, 255, 255, 255],
-    [125, 125, 255, 255],
-    [125, 255, 125, 255],
-    [255, 125, 125, 255],
-];
 
 function isLogRunSelected(d: LogCurveDataType, logrun_name: string): boolean {
     return d.header.name.toLowerCase() === logrun_name.toLowerCase();
@@ -64,13 +61,13 @@ function getLogIDByName(
     d: LogCurveDataType,
     logrun_name: string,
     log_name: string
-): number | null {
+): number {
     if (isLogRunSelected(d, logrun_name)) {
         return d?.curves?.findIndex(
             (item) => item.name.toLowerCase() === log_name.toLowerCase()
         );
     }
-    return null;
+    return -1;
 }
 
 const color_interp = interpolateRgbBasis(["red", "yellow", "green", "blue"]);
@@ -80,7 +77,7 @@ function getLogColor(
     log_name: string
 ): RGBAColor[] {
     const log_id = getLogIDByName(d, logrun_name, log_name);
-    if (!log_id || d?.curves[log_id] == undefined) {
+    if (!d?.curves?.[log_id]) {
         return [];
     }
 
@@ -96,8 +93,12 @@ function getLogColor(
             }
         });
     } else {
-        d.data[log_id].forEach((value) => {
-            log_color.push(COLOR_MAP[value % 10]);
+        const log_attributes = d.metadata_discrete[log_name]?.objects;
+        d.data[log_id].forEach((log_value) => {
+            const dl_attrs = Object.entries(log_attributes).find(
+                ([, value]) => value[1] == log_value
+            )?.[1];
+            log_color.push(dl_attrs?.[0]);
         });
     }
     return log_color;
@@ -107,9 +108,9 @@ function getLogWidth(
     d: LogCurveDataType,
     logrun_name: string,
     log_name: string
-): number[] | null {
+): number[] {
     const log_id = getLogIDByName(d, logrun_name, log_name);
-    return log_id ? d?.data[log_id] : null;
+    return d?.data?.[log_id];
 }
 
 const defaultProps = {
@@ -165,9 +166,56 @@ function getMd(pickInfo): number | null {
     return (md0 * c1 + md1 * c0) / dv;
 }
 
+function getMdProperty(info): PropertyDataType | null {
+    const md = getMd(info);
+    if (md != null) {
+        return { name: "MD", value: md };
+    }
+    return null;
+}
+
+function getDiscLogSegmentIndex(info): number {
+    const trajectory = (info.object as LogCurveDataType)?.data[0];
+
+    let min_d = Number.MAX_VALUE;
+    let segment_index = 0;
+    for (let i = 0; i < trajectory?.length; i++) {
+        const d = squared_distance(trajectory[i], info.coordinate);
+        if (d > min_d) continue;
+
+        segment_index = i;
+        min_d = d;
+    }
+    return segment_index;
+}
+
+function getLogProperty(
+    info,
+    logrun_name: string,
+    log_name: string
+): PropertyDataType | null {
+    const info_object = info.object as LogCurveDataType;
+    if (!info_object?.data) return null;
+
+    const log_id = getLogIDByName(info_object, logrun_name, log_name);
+    const log = info_object.curves?.[log_id].name;
+
+    const data_objects = info_object.metadata_discrete[log]?.objects;
+
+    const segment_index = getDiscLogSegmentIndex(info);
+    let log_value: number | string = info_object.data[log_id][segment_index];
+    const dl_segment = Object.entries(data_objects).find(
+        ([, value]) => value[1] == log_value
+    );
+
+    log_value = dl_segment ? dl_segment[0] + " (" + log_value + ")" : log_value;
+    if (log_value) return { name: log, value: log_value };
+    else return null;
+}
+
 export interface WellsPickInfo extends PickInfo<unknown> {
     logName?: string;
-    propertyValue?: number;
+    properties?: PropertyDataType[];
 }
 
 export default class WellsLayer extends CompositeLayer<
@@ -235,7 +283,8 @@ export default class WellsLayer extends CompositeLayer<
         const log_layer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
                 id: "log_curve",
-                data: this.props.logData,
+                //data: this.props.logData,
+                data: require("D:\\BigLoopAnalytics\\data files\\154cm_discrete_label.json"),
                 pickable: true,
                 widthScale: 10,
                 widthMinPixels: 1,
@@ -244,7 +293,7 @@ export default class WellsLayer extends CompositeLayer<
                     getLogPath(d, this.props.logrunName),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
                     getLogColor(d, this.props.logrunName, this.props.logName),
-                getWidth: (d: LogCurveDataType): number | number[] | null =>
+                getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
                     getLogWidth(d, this.props.logrunName, this.props.logName),
                 updateTriggers: {
@@ -272,45 +321,21 @@ export default class WellsLayer extends CompositeLayer<
     }): WellsPickInfo | PickInfo<unknown> {
         if (!info.object) return info;
 
-        // Return MD if a trajectory has been picked.
-        const measured_depth = getMd(info);
-        if (measured_depth != null) {
-            return {
-                ...info,
-                propertyValue: measured_depth,
-            };
-        }
-
-        if (!info.object || !(info.object as LogCurveDataType)?.data)
-            return info;
-
-        const trajectory = (info.object as LogCurveDataType)?.data[0];
-
-        let min_d = Number.MAX_VALUE;
-        let vertex_index = 0;
-        for (let i = 0; i < trajectory.length; i++) {
-            const d = squared_distance(trajectory[i], info.coordinate);
-            if (d > min_d) continue;
-
-            vertex_index = i;
-            min_d = d;
-        }
-
-        const log_id = getLogIDByName(
-            info.object as LogCurveDataType,
+        const md_property = getMdProperty(info);
+        const log_property = getLogProperty(
+            info,
             this.props.logrunName,
             this.props.logName
         );
-        if (!log_id) return info;
 
-        const value = (info.object as LogCurveDataType)?.data[log_id][
-            vertex_index
-        ];
-        const log_name = (info.object as LogCurveDataType)?.curves[log_id].name;
+        const properties: PropertyDataType[] = [];
+        if (md_property != null) properties.push(md_property);
+        if (log_property != null) properties.push(log_property);
+
         return {
             ...info,
-            propertyValue: value,
-            logName: log_name,
+            properties: properties,
+            logName: log_property?.name,
         };
     }
 }

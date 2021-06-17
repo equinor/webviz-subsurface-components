@@ -2,7 +2,7 @@ import * as jsonpatch from "fast-json-patch";
 import { cloneDeep } from "lodash";
 import PropTypes from "prop-types";
 import * as React from "react";
-import Coords from "./components/Coords";
+import InfoCard from "./components/InfoCard";
 import Map from "./Map";
 
 function _idsToIndices(doc, path) {
@@ -142,7 +142,7 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
                 patchSpec={patchSpec}
                 onHover={onHover}
             >
-                <Coords pickInfos={hoverInfo} />
+                <InfoCard pickInfos={hoverInfo} />
             </Map>
         </div>
     );
