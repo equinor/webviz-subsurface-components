@@ -14,13 +14,19 @@ type ParseData = {
 };
 
 const parseExpression = (expression: string): ParseData => {
+    if (expression.length <= 0) {
+        throw new Error("");
+    }
+
     if (expression.match(/\s+/)) {
         throw new Error("Whitespace not supported!");
     }
 
     if (!parse) {
-        throw new Error("Invalid parser state");
+        throw new Error("Undefined parse function!");
     }
+
+    // Retreive node tree
     var node = parse(expression);
 
     var operatorNodes: string[] = [];
@@ -103,7 +109,7 @@ export const expressionParseMessage = (expression: string): string => {
         parseExpression(expression);
         return "";
     } catch (e) {
-        return String(e);
+        return String(e.message);
     }
 };
 
