@@ -1,26 +1,25 @@
-import React, { useCallback, useRef } from "react";
+import React from "react";
 import { Button, Icon } from "@equinor/eds-core-react";
 import { Grid, Paper } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import { add, copy, delete_forever } from "@equinor/eds-icons";
 import { v4 as uuidv4 } from "uuid";
+import { cloneDeep } from "lodash";
 
 import { ExpressionsTable } from "./ExpressionsTable";
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import { getAvailableName } from "../utils/VectorCalculatorHelperFunctions";
 import "../VectorCalculator.css";
-import { cloneDeep } from "lodash";
 
 interface ExpressionsTableComponentProps {
     expressions: ExpressionType[];
-    predefinedExpressions: ExpressionType[];
     onActiveExpressionChange: (expression: ExpressionType | undefined) => void;
     onExpressionsChange: (expressions: ExpressionType[]) => void;
 }
 
 export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps> =
     (props: ExpressionsTableComponentProps) => {
-        const { expressions, predefinedExpressions } = props;
+        const { expressions } = props;
         const [activeExpression, setActiveExpression] =
             React.useState<ExpressionType | undefined>(undefined);
         const [selectedExpressions, setSelectedExpressions] = React.useState<
@@ -51,6 +50,17 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
             );
         }, [selectedExpressions]);
 
+        const addNewExpressions = React.useCallback(
+            (newExpressions: ExpressionType[]): void => {
+                const newExpressionsList = cloneDeep(expressions);
+                for (const elm of newExpressions) {
+                    newExpressionsList.push(elm);
+                }
+                props.onExpressionsChange(newExpressionsList);
+            },
+            [expressions]
+        );
+
         const handleExpressionsSelect = (
             expressions: ExpressionType[]
         ): void => {
@@ -64,7 +74,7 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
             props.onActiveExpressionChange(expression);
         };
 
-        const handleCloneClick = (): void => {
+        const handleCloneClick = React.useCallback((): void => {
             if (selectedExpressions.length <= 0) {
                 return;
             }
@@ -78,9 +88,9 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                 newExpressions.push(cloneExpr);
             }
             addNewExpressions(newExpressions);
-        };
+        }, [selectedExpressions, addNewExpressions, getAvailableName]);
 
-        const handleDeleteClick = (): void => {
+        const handleDeleteClick = React.useCallback((): void => {
             const nonDeletableExpressions = selectedExpressions.filter(
                 (elm) => {
                     return !elm.isDeletable;
@@ -110,11 +120,19 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                 setActiveExpression(undefined);
                 props.onActiveExpressionChange(undefined);
             }
-        };
+        }, [
+            activeExpression,
+            deleteTimer,
+            expressions,
+            selectedExpressions,
+            setActiveExpression,
+            setBlinkingTableExpressions,
+            setSelectedExpressions,
+            props.onActiveExpressionChange,
+            props.onExpressionsChange,
+        ]);
 
-        const handleNewClick = (): void => {
-            // TODO: Set new expression as active expression?
-            // - If so: must modify selectedExpressions state in ExpressionsTable -> new prop gives unwanted logic?
+        const handleNewClick = React.useCallback((): void => {
             const newName = getAvailableName("New Expression", expressions);
             const newExpression: ExpressionType = {
                 name: newName,
@@ -125,18 +143,7 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                 isDeletable: true,
             };
             addNewExpressions([newExpression]);
-        };
-
-        const addNewExpressions = useCallback(
-            (newExpressions: ExpressionType[]): void => {
-                const newExpressionsList = cloneDeep(expressions);
-                for (const elm of newExpressions) {
-                    newExpressionsList.push(elm);
-                }
-                props.onExpressionsChange(newExpressionsList);
-            },
-            [expressions]
-        );
+        }, [expressions, addNewExpressions, getAvailableName]);
 
         return (
             <Paper className="ExpressionTableComponent">

@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback } from "react";
+import React from "react";
 import { Icon, TextField, Progress } from "@equinor/eds-core-react";
 import { error_filled, thumbs_up } from "@equinor/eds-icons";
 
@@ -27,11 +27,11 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
                 "default"
             );
         const [textFieldIconState, setTextFieldIconState] =
-            React.useState<ReactNode | undefined>(undefined);
+            React.useState<React.ReactNode | undefined>(undefined);
 
         Icon.add({ error_filled, thumbs_up });
 
-        const textFieldVariant = useCallback(():
+        const textFieldVariant = React.useCallback(():
             | "error"
             | "success"
             | "default" => {
@@ -44,7 +44,9 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
             return "default";
         }, [status]);
 
-        const textFieldIcon = useCallback((): ReactNode | undefined => {
+        const textFieldIcon = React.useCallback(():
+            | React.ReactNode
+            | undefined => {
             if (status === ExpressionStatus.Evaluating) {
                 return <Progress.Circular />;
             }

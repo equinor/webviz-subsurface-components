@@ -1,10 +1,12 @@
-import React, { ReactNode, useCallback } from "react";
+import React from "react";
 import { TextField, Icon } from "@equinor/eds-core-react";
 import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
 
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
-import { isExpressionNameExisting } from "../utils/VectorCalculatorHelperFunctions";
-import { parseName } from "../utils/VectorCalculatorRegex";
+import {
+    isNameExisting,
+    parseName,
+} from "../utils/VectorCalculatorHelperFunctions";
 
 interface ExpressionNameTextFieldProps {
     initialName: string;
@@ -26,19 +28,19 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     const [textFieldHelperTextState, setTextFieldHelperTextState] =
         React.useState<string>("");
     const [textFieldIconState, setTextFieldIconState] = React.useState<
-        ReactNode | undefined
+        React.ReactNode | undefined
     >(<Icon key="thumbs" name="thumbs_up" />);
 
     Icon.add({ error_filled, thumbs_up, warning_filled });
 
-    const isExisting = useCallback(
+    const isExisting = React.useCallback(
         (name: string): boolean => {
-            return isExpressionNameExisting(name, existingExpressions);
+            return isNameExisting(name, existingExpressions);
         },
-        [isExpressionNameExisting, existingExpressions]
+        [isNameExisting, existingExpressions]
     );
 
-    const getTextFieldVariant = useCallback(
+    const getTextFieldVariant = React.useCallback(
         (name: string): "success" | "error" | "warning" | "default" => {
             if (name === "") {
                 return "default";
@@ -57,7 +59,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         [parseName, isExisting, initialName]
     );
 
-    const getTextFieldHelperText = useCallback(
+    const getTextFieldHelperText = React.useCallback(
         (name: string): string => {
             if (name === "") {
                 return "";
@@ -73,8 +75,8 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         [parseName, isExisting, initialName]
     );
 
-    const getTextFieldIcon = useCallback(
-        (name: string): ReactNode | undefined => {
+    const getTextFieldIcon = React.useCallback(
+        (name: string): React.ReactNode | undefined => {
             if (!parseName(name)) {
                 return <Icon key="error" name="error_filled" />;
             }
@@ -101,22 +103,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         getTextFieldIcon,
     ]);
 
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
-    ): void => {
-        const newName: string = e.target.value;
-        const isValid = validateName(newName);
-
-        setName(newName);
-        setTextFieldVariantState(getTextFieldVariant(newName));
-        setTextFieldHelperTextState(getTextFieldHelperText(newName));
-        setTextFieldIconState(getTextFieldIcon(newName));
-
-        props.onNameChange(newName);
-        props.onValidChange(isValid);
-    };
-
-    const validateName = useCallback(
+    const validateName = React.useCallback(
         (name: string): boolean => {
             if (!parseName(name)) {
                 return false;
@@ -130,6 +117,35 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             return true;
         },
         [parseName, isExisting, initialName]
+    );
+
+    const handleInputChange = React.useCallback(
+        (
+            e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
+        ): void => {
+            const newName: string = e.target.value;
+            const isValid = validateName(newName);
+
+            setName(newName);
+            setTextFieldVariantState(getTextFieldVariant(newName));
+            setTextFieldHelperTextState(getTextFieldHelperText(newName));
+            setTextFieldIconState(getTextFieldIcon(newName));
+
+            props.onNameChange(newName);
+            props.onValidChange(isValid);
+        },
+        [
+            validateName,
+            setName,
+            setTextFieldVariantState,
+            setTextFieldHelperTextState,
+            setTextFieldIconState,
+            getTextFieldVariant,
+            getTextFieldHelperText,
+            getTextFieldIcon,
+            props.onNameChange,
+            props.onValidChange,
+        ]
     );
 
     return (
