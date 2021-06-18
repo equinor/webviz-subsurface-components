@@ -8,7 +8,14 @@ import {
 } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
 
-export const isExpressionNameExisting = (
+export const parseName = (name: string): boolean => {
+    const regex = new RegExp(
+        /^(?=.{1,50}$)[A-Za-z]{1}([:_]?[A-Za-z0-9]+){0,}$/
+    );
+    return regex.test(name);
+};
+
+export const isNameExisting = (
     name: string,
     expressions: ExpressionType[]
 ): boolean => {
@@ -35,7 +42,7 @@ export const getAvailableName = (
 ): string => {
     let availableName = nameSuggestion;
     let n = 1;
-    while (isExpressionNameExisting(availableName, expressions)) {
+    while (isNameExisting(availableName, expressions)) {
         availableName = `${nameSuggestion}_${n}`;
         ++n;
     }
@@ -47,6 +54,9 @@ export const isVariableVectorMapValid = (
     delimiter: string,
     vectorData: TreeDataNode[]
 ): boolean => {
+    if (variableVectorMap.length <= 0) {
+        return false;
+    }
     const vectorNames: (string | undefined)[] = variableVectorMap.map(
         (pair) => {
             return pair.vectorName.length <= 0 ? undefined : pair.vectorName[0];

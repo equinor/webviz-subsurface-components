@@ -10,7 +10,7 @@ import { ExpressionInputComponent } from "./ExpressionInputComponent";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 
 interface ParentProps {
-    expressions?: ExpressionType[]; // TODO: Have "expression?:"" or "expression:" ?
+    expressions?: ExpressionType[];
     externalParseExpression?: ExpressionType;
 }
 
@@ -55,59 +55,63 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
         if (outputExpressions !== props.expressions) {
             props.setProps({ expressions: outputExpressions });
         }
-    }, [expressions]);
+    }, [expressions, props.setProps]);
 
-    const handleActiveExpressionChange = (
-        expression: ExpressionType | undefined
-    ) => {
-        setDisabledInputComponent(expression === undefined);
+    const handleActiveExpressionChange = React.useCallback(
+        (expression: ExpressionType | undefined) => {
+            setDisabledInputComponent(expression === undefined);
 
-        if (expression === undefined) {
-            setActiveExpression({
-                name: "",
-                expression: "",
-                id: "",
-                variableVectorMap: [],
-                isValid: false,
-                isDeletable: true,
-            });
-        } else {
-            setActiveExpression(expression);
-        }
-    };
+            if (expression === undefined) {
+                setActiveExpression({
+                    name: "",
+                    expression: "",
+                    id: "",
+                    variableVectorMap: [],
+                    isValid: false,
+                    isDeletable: true,
+                });
+            } else {
+                setActiveExpression(expression);
+            }
+        },
+        [setActiveExpression, setDisabledInputComponent]
+    );
 
     const handleExpressionsChange = (expressions: ExpressionType[]) => {
         setExpressions(expressions);
     };
 
-    const handleActiveExpressionEdit = (expression: ExpressionType): void => {
-        if (activeExpression === undefined) {
-            return;
-        }
-
-        const newExpressions = expressions.map((elm) => {
-            if (elm.id === activeExpression.id) {
-                const editedExpression = expression;
-                setActiveExpression(editedExpression);
-                return editedExpression;
+    const handleActiveExpressionEdit = React.useCallback(
+        (expression: ExpressionType): void => {
+            if (activeExpression === undefined) {
+                return;
             }
-            return elm;
-        });
-        setExpressions(newExpressions);
-    };
 
-    const handleExternalExpressionParsing = (
-        expression: ExpressionType
-    ): void => {
-        props.setProps({ externalParseExpression: expression });
-    };
+            const newExpressions = expressions.map((elm) => {
+                if (elm.id === activeExpression.id) {
+                    const editedExpression = expression;
+                    setActiveExpression(editedExpression);
+                    return editedExpression;
+                }
+                return elm;
+            });
+            setExpressions(newExpressions);
+        },
+        [activeExpression, expressions, setActiveExpression, setExpressions]
+    );
+
+    const handleExternalExpressionParsing = React.useCallback(
+        (expression: ExpressionType): void => {
+            props.setProps({ externalParseExpression: expression });
+        },
+        [props.setProps]
+    );
 
     return (
         <Grid container spacing={3}>
             <Grid item xs={4}>
                 <ExpressionsTableComponent
                     expressions={expressions}
-                    predefinedExpressions={props.expressions}
                     onActiveExpressionChange={handleActiveExpressionChange}
                     onExpressionsChange={handleExpressionsChange}
                 />

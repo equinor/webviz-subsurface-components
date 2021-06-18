@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import {
     Checkbox,
     Paper,
@@ -43,7 +43,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
         updateActiveExpression();
     }, [expressions]);
 
-    const updateSelectedExpressions = useCallback((): void => {
+    const updateSelectedExpressions = React.useCallback((): void => {
         const newSelectedExpressions = expressions.filter((expr) => {
             for (const elm of selectedExpressions) {
                 if (elm.id === expr.id) {
@@ -53,10 +53,13 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
             return false;
         });
 
-        setSelectedExpressions(newSelectedExpressions);
-    }, [expressions, selectedExpressions]);
+        if (newSelectedExpressions !== selectedExpressions) {
+            setSelectedExpressions(newSelectedExpressions);
+            props.onExpressionsSelect(newSelectedExpressions);
+        }
+    }, [expressions, selectedExpressions, setSelectedExpressions]);
 
-    const updateActiveExpression = useCallback((): void => {
+    const updateActiveExpression = React.useCallback((): void => {
         let newActiveExpression = expressions.find(
             (elm) => elm.id === activeExpression.id
         );
@@ -71,51 +74,59 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
             };
         }
         setActiveExpression(newActiveExpression);
-    }, [expressions, activeExpression]);
+    }, [expressions, activeExpression, setActiveExpression]);
 
-    const handleCheckBoxClick = (expression: ExpressionType): void => {
-        const index = selectedExpressions.indexOf(expression);
+    const handleCheckBoxClick = React.useCallback(
+        (expression: ExpressionType): void => {
+            const index = selectedExpressions.indexOf(expression);
 
-        let newSelected: ExpressionType[] = [];
-        if (index === -1) {
-            newSelected = newSelected.concat(selectedExpressions, expression);
-        } else if (index === 0) {
-            newSelected = newSelected.concat(selectedExpressions.slice(1));
-        } else if (index === selectedExpressions.length - 1) {
-            newSelected = newSelected.concat(selectedExpressions.slice(0, -1));
-        } else if (index > 0) {
-            newSelected = newSelected.concat(
-                selectedExpressions.slice(0, index),
-                selectedExpressions.slice(index + 1)
-            );
-        }
+            let newSelected: ExpressionType[] = [];
+            if (index === -1) {
+                newSelected = newSelected.concat(
+                    selectedExpressions,
+                    expression
+                );
+            } else if (index === 0) {
+                newSelected = newSelected.concat(selectedExpressions.slice(1));
+            } else if (index === selectedExpressions.length - 1) {
+                newSelected = newSelected.concat(
+                    selectedExpressions.slice(0, -1)
+                );
+            } else if (index > 0) {
+                newSelected = newSelected.concat(
+                    selectedExpressions.slice(0, index),
+                    selectedExpressions.slice(index + 1)
+                );
+            }
 
-        setSelectedExpressions(newSelected);
-        props.onExpressionsSelect(newSelected);
-    };
+            setSelectedExpressions(newSelected);
+            props.onExpressionsSelect(newSelected);
+        },
+        [selectedExpressions, setSelectedExpressions, props.onExpressionsSelect]
+    );
 
     const handleRowClick = (expression: ExpressionType): void => {
         setActiveExpression(expression);
         props.onActiveExpressionSelect(expression);
     };
 
-    const isExpressionSelected = useCallback(
-        (expression: ExpressionType): boolean => {
-            return selectedExpressions.indexOf(expression) !== -1;
-        },
-        [selectedExpressions]
-    );
-
-    const handleSelectAllClick = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.checked) {
-            const newSelectedExpressions = [...expressions];
-            setSelectedExpressions(newSelectedExpressions);
-            props.onExpressionsSelect(newSelectedExpressions);
-            return;
-        }
-        setSelectedExpressions([]);
-        props.onExpressionsSelect([]);
+    const isExpressionSelected = (expression: ExpressionType): boolean => {
+        return selectedExpressions.indexOf(expression) !== -1;
     };
+
+    const handleSelectAllClick = React.useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (e.target.checked) {
+                const newSelectedExpressions = [...expressions];
+                setSelectedExpressions(newSelectedExpressions);
+                props.onExpressionsSelect(newSelectedExpressions);
+                return;
+            }
+            setSelectedExpressions([]);
+            props.onExpressionsSelect([]);
+        },
+        [expressions, setSelectedExpressions, props.onExpressionsSelect]
+    );
 
     return (
         <TableContainer className={"ExpressionTable"} component={Paper}>

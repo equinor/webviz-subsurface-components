@@ -33,19 +33,22 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
     const { vectorData } = props;
     const disabled = props.disabled || false;
 
-    const updatedProps = (
-        vectorSelectorProps: VectorSelectorParentProps,
-        index: number
-    ): void => {
-        const newVariableVectorMap = cloneDeep(props.variableVectorMap);
-        if (vectorSelectorProps.selectedTags.length < 1) {
-            newVariableVectorMap[index].vectorName = [];
-        } else {
-            newVariableVectorMap[index].vectorName[0] =
-                vectorSelectorProps.selectedTags[0];
-        }
-        props.onMapChange(newVariableVectorMap);
-    };
+    const updatedProps = React.useCallback(
+        (
+            vectorSelectorProps: VectorSelectorParentProps,
+            index: number
+        ): void => {
+            const newVariableVectorMap = cloneDeep(props.variableVectorMap);
+            if (vectorSelectorProps.selectedTags.length < 1) {
+                newVariableVectorMap[index].vectorName = [];
+            } else {
+                newVariableVectorMap[index].vectorName[0] =
+                    vectorSelectorProps.selectedTags[0];
+            }
+            props.onMapChange(newVariableVectorMap);
+        },
+        [props.variableVectorMap, props.onMapChange]
+    );
 
     return (
         <TableContainer component={Paper} className="VariablesTableContainer">
