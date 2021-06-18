@@ -13,14 +13,13 @@ import "../VectorCalculator.css";
 
 interface ExpressionsTableComponentProps {
     expressions: ExpressionType[];
-    predefinedExpressions: ExpressionType[];
     onActiveExpressionChange: (expression: ExpressionType | undefined) => void;
     onExpressionsChange: (expressions: ExpressionType[]) => void;
 }
 
 export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps> =
     (props: ExpressionsTableComponentProps) => {
-        const { expressions, predefinedExpressions } = props;
+        const { expressions } = props;
         const [activeExpression, setActiveExpression] =
             React.useState<ExpressionType | undefined>(undefined);
         const [selectedExpressions, setSelectedExpressions] = React.useState<

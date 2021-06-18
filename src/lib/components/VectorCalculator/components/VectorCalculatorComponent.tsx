@@ -112,7 +112,6 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
             <Grid item xs={12} md={6}>
                 <ExpressionsTableComponent
                     expressions={expressions}
-                    predefinedExpressions={props.expressions}
                     onActiveExpressionChange={handleActiveExpressionChange}
                     onExpressionsChange={handleExpressionsChange}
                 />
