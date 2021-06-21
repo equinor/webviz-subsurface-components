@@ -28,6 +28,44 @@ function squared_distance(a, b) {
     return dx * dx + dy * dy;
 }
 
+function getMd(pickInfo) {
+    const measured_depths = pickInfo.object.properties.md[0];
+    const trajectory = pickInfo.object.geometry.geometries[1].coordinates;
+
+    // Get squared distance from survey point to picked point.
+    const d2 = trajectory.map((element, index) => squared_distance(element, pickInfo.coordinate));
+
+    // Enumerate squared distances.
+    let index = Array.from(d2.entries());
+
+    // Sort by squared distance.
+    index = index.sort((a, b) => a[1] - b[1]);
+
+    // Get the nearest indexes.
+    const index0 = index[0][0];
+    const index1 = index[1][0];
+
+    // Get the nearest MD values.
+    const md0 = measured_depths[index0];
+    const md1 = measured_depths[index1];
+
+    // Get the nearest survey points.
+    const survey0 = trajectory[index0];
+    const survey1 = trajectory[index1];
+
+    const dv = distance(survey0, survey1);
+
+    // Calculate the scalar projection onto segment.
+    const v0 = subtract(info.coordinate, survey0);
+    const v1 = subtract(survey1, survey0);
+    const scalar_projection = dot(v0, v1) / dv;
+
+    // Interpolate MD value.
+    const c0 = scalar_projection / dv;
+    const c1 = dv - c0;
+    return (md0 * c1 + md1 * c0) / dv;
+}
+
 export default class WellsLayer extends CompositeLayer<
     Feature,
     WellsLayerProps<Feature>
@@ -98,44 +136,9 @@ export default class WellsLayer extends CompositeLayer<
         if (info.object == null)
             return info;
 
-        const measured_depths = info.object.properties.md[0];
-        const trajectory = info.object.geometry.geometries[1].coordinates;
-
-        const d2 = trajectory.map((element, index) => squared_distance(element, info.coordinate));
-
-        // Enumerate squared distances.
-        let index = Array.from(d2.entries());
-
-        // Sort by squared distance.
-        index = index.sort((a, b) => a[1] - b[1]);
-
-        // Get the nearest indexes.
-        const index0 = index[0][0];
-        const index1 = index[1][0];
-
-        // Get the nearest MD values.
-        const md0 = measured_depths[index0];
-        const md1 = measured_depths[index1];
-
-        // Get the nearest survey points.
-        const survey0 = trajectory[index0];
-        const survey1 = trajectory[index1];
-
-        const dv = distance(survey0, survey1);
-
-        // Calculate the scalar projection onto segment.
-        const v0 = subtract(info.coordinate, survey0);
-        const v1 = subtract(survey1, survey0);
-        const scalar_projection = dot(v0, v1) / dv;
-
-        // Interpolate MD value.
-        const c0 = scalar_projection / dv;
-        const c1 = dv - c0;
-        const md = (md0 * c1 + md1 * c0) / dv;
-        
         return {
             ...info,
-            propertyValue: md,
+            propertyValue: getMd(info),
         };
     }
 }
