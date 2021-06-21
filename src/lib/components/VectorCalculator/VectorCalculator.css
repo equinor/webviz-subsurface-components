@@ -26,10 +26,14 @@
     width: 65%;
 }
 
-.VectorCalculator .ExpressionTable {
+.VectorCalculator .ExpressionsTable {
     position: relative;
     max-height: 450px;
     max-width: 100%;
+}
+
+.VectorCalculator .ExpressionsTable table {
+    table-layout: fixed;
 }
 
 .VectorCalculator .ExpressionsTableNameCell {
