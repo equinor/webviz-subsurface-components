@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { WellCompletionsState } from "../../redux/store";
-import { WellPlotData } from "../../utils/dataUtil";
+import { PlotData } from "../../utils/dataUtil";
 import { SORT_BY_COMPLETION_DATE } from "../../utils/sort";
 import { capitalizeFirstLetter } from "../../utils/stringUtil";
 import { useTooltip } from "../Common/TooltipProvider";
@@ -9,20 +9,24 @@ import { Padding, PlotLayout } from "./plotUtil";
 
 interface Props {
     timeSteps: string[];
-    data: WellPlotData[];
+    plotData: PlotData;
     layout: PlotLayout;
     padding: Padding;
 }
 /* eslint-disable react/prop-types */
 const WellsPlot: React.FC<Props> = React.memo(
-    ({ timeSteps, data, layout, padding }) => {
+    ({ timeSteps, plotData, layout, padding }) => {
         const { setContent } = useTooltip();
         const attributeKeys = useSelector(
             (st: WellCompletionsState) => st.attributes.attributeKeys
         );
         const wellWidth = useMemo(
-            () => layout.xExtent / Math.max(data.length, 1),
-            [layout.xExtent, data.length]
+            () => layout.xExtent / Math.max(plotData.wells.length, 1),
+            [layout.xExtent, plotData.wells.length]
+        );
+        const barHeight = useMemo(
+            () => layout.yExtent / Math.max(plotData.stratigraphy.length, 1),
+            [layout.yExtent, plotData.stratigraphy.length]
         );
         const onMouseOver = useCallback(
             (well) => {
@@ -68,7 +72,13 @@ const WellsPlot: React.FC<Props> = React.memo(
         );
         return (
             <g>
-                {data.map((well, i) => {
+                {plotData.wells.map((well, i) => {
+                    const lastCompletion = Array.from(well.completions)
+                        .reverse()
+                        .find((comp) => comp.open + comp.shut > 0);
+                    const height = lastCompletion
+                        ? (lastCompletion.zoneIndex + 1) * barHeight
+                        : layout.yExtent;
                     return (
                         <g
                             transform={`translate(${
@@ -94,7 +104,7 @@ const WellsPlot: React.FC<Props> = React.memo(
                             <rect
                                 transform={`translate(0,${padding.top - 4})`}
                                 width={0.5}
-                                height={layout.yExtent + 4}
+                                height={height + 4}
                                 fill={"#111"}
                             />
                         </g>
