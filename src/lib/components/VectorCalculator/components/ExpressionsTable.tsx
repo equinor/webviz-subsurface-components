@@ -129,7 +129,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     );
 
     return (
-        <TableContainer className={"ExpressionTable"} component={Paper}>
+        <TableContainer className={"ExpressionsTable"} component={Paper}>
             <Table stickyHeader aria-label="sticky table">
                 <EnhancedTableHead
                     numSelected={selectedExpressions.length}
