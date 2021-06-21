@@ -26,16 +26,14 @@ export const EnhancedTableHead: React.FC<EnhancedTableProps> = (
                     />
                 </TableCell>
                 <TableCell
-                    className="ExpressionsTableHeader"
+                    className="ExpressionsTableHeader ExpressionsTableHeaderNameCell"
                     align="left"
-                    width="35%"
                 >
                     {"Name"}
                 </TableCell>
                 <TableCell
-                    className="ExpressionsTableHeader"
+                    className="ExpressionsTableHeader ExpressionsTableHeaderExpressionCell"
                     align="left"
-                    width="65%"
                 >
                     {"Expression"}
                 </TableCell>
