@@ -109,14 +109,14 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
 
     return (
         <Grid container spacing={3}>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={6}>
                 <ExpressionsTableComponent
                     expressions={expressions}
                     onActiveExpressionChange={handleActiveExpressionChange}
                     onExpressionsChange={handleExpressionsChange}
                 />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
                 <ExpressionInputComponent
                     activeExpression={activeExpression}
                     expressions={expressions}

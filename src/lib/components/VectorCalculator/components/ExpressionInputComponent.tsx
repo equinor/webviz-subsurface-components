@@ -350,7 +350,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     return (
         <Grid
             container
-            className="VectorCalculator__ExpressionInputComponent"
+            className="ExpressionInputComponent"
             component={Paper}
             item
             xs={12}

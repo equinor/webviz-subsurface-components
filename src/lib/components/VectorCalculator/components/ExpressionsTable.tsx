@@ -155,7 +155,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                 selected={isActive}
                                 aria-checked={isActive}
                             >
-                                <TableCell padding="checkbox" width="2%">
+                                <TableCell padding="checkbox">
                                     <Checkbox
                                         checked={isSelected}
                                         onClick={() => handleCheckBoxClick(row)}
@@ -164,7 +164,6 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                 <TableCell
                                     align="left"
                                     onClick={() => handleRowClick(row)}
-                                    width="38%"
                                 >
                                     <div className={"ExpressionsTableNameCell"}>
                                         {row.name}
@@ -172,7 +171,6 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                 </TableCell>
                                 <TableCell
                                     align="left"
-                                    width="60%"
                                     onClick={() => handleRowClick(row)}
                                 >
                                     <Tooltip
