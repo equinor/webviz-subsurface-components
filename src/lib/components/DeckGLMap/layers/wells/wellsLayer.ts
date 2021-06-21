@@ -2,11 +2,8 @@ import { CompositeLayer } from "@deck.gl/core";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
-<<<<<<< HEAD
-import { GeoJsonLayer } from "@deck.gl/layers";
 import { PickInfo } from "deck.gl";
-import { subtract, distance, dot } from 'mathjs'
-//import { PickInfo } from "@deck.gl/core/lib/deck";
+import { subtract, distance, dot, BigNumber, MathArray, Matrix, MathType } from 'mathjs'
 import { interpolateRgbBasis } from "d3-interpolate";
 import { color } from "d3-color";
 
@@ -97,7 +94,10 @@ function squared_distance(a, b): number {
     return dx * dx + dy * dy;
 }
 
-function getMd(pickInfo) {
+function getMd(pickInfo): number | null {
+    if (!pickInfo.object.properties || !pickInfo.object.geometry)
+        return null;
+
     const measured_depths = pickInfo.object.properties.md[0];
     const trajectory = pickInfo.object.geometry.geometries[1].coordinates;
 
@@ -105,10 +105,10 @@ function getMd(pickInfo) {
     const d2 = trajectory.map((element, index) => squared_distance(element, pickInfo.coordinate));
 
     // Enumerate squared distances.
-    let index = Array.from(d2.entries());
+    let index: number[] = Array.from(d2.entries());
 
     // Sort by squared distance.
-    index = index.sort((a, b) => a[1] - b[1]);
+    index = index.sort((a: number, b: number) => a[1] - b[1]);
 
     // Get the nearest indexes.
     const index0 = index[0][0];
@@ -122,12 +122,12 @@ function getMd(pickInfo) {
     const survey0 = trajectory[index0];
     const survey1 = trajectory[index1];
 
-    const dv = distance(survey0, survey1);
+    const dv = distance(survey0, survey1) as number;
 
     // Calculate the scalar projection onto segment.
-    const v0 = subtract(info.coordinate, survey0);
+    const v0 = subtract(pickInfo.coordinate, survey0);
     const v1 = subtract(survey1, survey0);
-    const scalar_projection = dot(v0, v1) / dv;
+    const scalar_projection: number = dot(v0 as number[], v1 as number[]) / dv;
 
     // Interpolate MD value.
     const c0 = scalar_projection / dv;
@@ -238,8 +238,22 @@ export default class WellsLayer extends CompositeLayer<
     }: {
         info: PickInfo<unknown>;
     }): WellsPickInfo | PickInfo<unknown> {
+        if (!info.object)
+            return info;
+
+        // Return MD if a trajectory has been picked.
+        const measured_depth = getMd(info);
+        if (measured_depth != null) {
+            return {
+                ...info,
+                propertyValue: measured_depth,
+            };
+        }
+
         if (!info.object || !(info.object as LogCurveDataType)?.data)
             return info;
+
+        console.log(typeof(info.object));
 
         const trajectory = (info.object as LogCurveDataType)?.data[0];
 
@@ -269,18 +283,6 @@ export default class WellsLayer extends CompositeLayer<
             logName: log_name,
         };
     }
-
-        /*
-    getPickingInfo({ info }) {
-        if (info.object == null)
-            return info;
-
-        return {
-            ...info,
-            propertyValue: getMd(info),
-        };
-    }
-    */
 }
 
 WellsLayer.layerName = "WellsLayer";
