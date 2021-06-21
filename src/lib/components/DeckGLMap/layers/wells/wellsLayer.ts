@@ -3,7 +3,11 @@ import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PickInfo } from "deck.gl";
-import { subtract, distance, dot, BigNumber, MathArray, Matrix, MathType } from 'mathjs'
+import {
+    subtract,
+    distance,
+    dot,
+} from "mathjs";
 import { interpolateRgbBasis } from "d3-interpolate";
 import { color } from "d3-color";
 
@@ -95,14 +99,15 @@ function squared_distance(a, b): number {
 }
 
 function getMd(pickInfo): number | null {
-    if (!pickInfo.object.properties || !pickInfo.object.geometry)
-        return null;
+    if (!pickInfo.object.properties || !pickInfo.object.geometry) return null;
 
     const measured_depths = pickInfo.object.properties.md[0];
     const trajectory = pickInfo.object.geometry.geometries[1].coordinates;
 
     // Get squared distance from survey point to picked point.
-    const d2 = trajectory.map((element, index) => squared_distance(element, pickInfo.coordinate));
+    const d2 = trajectory.map((element, index) =>
+        squared_distance(element, pickInfo.coordinate)
+    );
 
     // Enumerate squared distances.
     let index: number[] = Array.from(d2.entries());
@@ -238,8 +243,7 @@ export default class WellsLayer extends CompositeLayer<
     }: {
         info: PickInfo<unknown>;
     }): WellsPickInfo | PickInfo<unknown> {
-        if (!info.object)
-            return info;
+        if (!info.object) return info;
 
         // Return MD if a trajectory has been picked.
         const measured_depth = getMd(info);
@@ -252,8 +256,6 @@ export default class WellsLayer extends CompositeLayer<
 
         if (!info.object || !(info.object as LogCurveDataType)?.data)
             return info;
-
-        console.log(typeof(info.object));
 
         const trajectory = (info.object as LogCurveDataType)?.data[0];
 
