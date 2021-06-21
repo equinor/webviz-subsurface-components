@@ -6,6 +6,7 @@ import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import {
     isNameExisting,
     parseName,
+    nameParseMessage,
 } from "../utils/VectorCalculatorHelperFunctions";
 
 interface ExpressionNameTextFieldProps {
@@ -65,7 +66,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 return "";
             }
             if (!parseName(name)) {
-                return 'Name can only contain characthers: a-z, numbers 0-9, " _ " and " : "';
+                return nameParseMessage(name);
             }
             if (isExisting(name) && name !== initialName) {
                 return "Name is already existing";

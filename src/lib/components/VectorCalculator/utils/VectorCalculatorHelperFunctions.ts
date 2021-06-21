@@ -15,6 +15,45 @@ export const parseName = (name: string): boolean => {
     return regex.test(name);
 };
 
+export const nameParseMessage = (name: string): string => {
+    if (parseName(name)) {
+        return "";
+    }
+
+    if (name.length < 0) {
+        return "Minimum 1 character!";
+    }
+    if (name.length > 50) {
+        return "Maximum 50 characters!";
+    }
+    if (name.match(/\s+/)) {
+        return "Whitespace not allowed!";
+    }
+    if (!name[0].match(/[A-Za-z]/)) {
+        return "First character must be: a-z or A-Z";
+    }
+    if (name[name.length - 1].match(/[:]/)) {
+        return 'Cannot end with " : "';
+    }
+    if (name[name.length - 1].match(/[_]/)) {
+        return 'Cannot end with " _ "';
+    }
+    if (name.match(/[:]{2,}/)) {
+        return 'Only one " : " in a row';
+    }
+    if (name.match(/[_]{2,}/)) {
+        return 'Only one " _ " in a row';
+    }
+    if (name.match(/[:][^a-zA-Z0-9]{1}/)) {
+        return '" : " Must be followed by: a-z, A-Z or 0-9';
+    }
+    if (name.match(/[_][^a-zA-Z0-9]{1}/)) {
+        return '" _ " Must be followed by: a-z, A-Z or 0-9';
+    }
+
+    return 'Valid characters: a-z, A-Z, 0-9, " _ " and " : "';
+};
+
 export const isNameExisting = (
     name: string,
     expressions: ExpressionType[]
