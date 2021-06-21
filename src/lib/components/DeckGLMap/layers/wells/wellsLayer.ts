@@ -3,11 +3,7 @@ import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PickInfo } from "deck.gl";
-import {
-    subtract,
-    distance,
-    dot,
-} from "mathjs";
+import { subtract, distance, dot } from "mathjs";
 import { interpolateRgbBasis } from "d3-interpolate";
 import { color } from "d3-color";
 
@@ -105,7 +101,7 @@ function getMd(pickInfo): number | null {
     const trajectory = pickInfo.object.geometry.geometries[1].coordinates;
 
     // Get squared distance from survey point to picked point.
-    const d2 = trajectory.map((element, index) =>
+    const d2 = trajectory.map((element) =>
         squared_distance(element, pickInfo.coordinate)
     );
 
