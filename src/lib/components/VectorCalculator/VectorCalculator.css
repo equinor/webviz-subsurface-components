@@ -1,14 +1,16 @@
 .VectorCalculator {
     display: block;
     padding: 5px;
+    flex-grow: 1;
 }
 
-.VectorCalculator__ExpressionInputComponent {
-    padding: 16px;
+.VectorCalculator .ExpressionInputComponent {
+    padding: 20px;
+    min-width: 400px;
 }
 
 .VectorCalculator .ExpressionTableComponent {
-    padding: 16px;
+    padding: 20px;
     min-width: 360px;
 }
 
@@ -16,12 +18,21 @@
     font-weight: bold;
 }
 
-.VectorCalculator .ExpressionTable {
-    max-height: 450px;
-    min-width: 250px;
+.VectorCalculator .ExpressionsTableHeaderNameCell {
+    width: 35%;
 }
 
-.VectorCalculator .EspressionsTableNameCell {
+.VectorCalculator .ExpressionsTableHeaderExpressionCell {
+    width: 65%;
+}
+
+.VectorCalculator .ExpressionTable {
+    position: relative;
+    max-height: 450px;
+    max-width: 100%;
+}
+
+.VectorCalculator .ExpressionsTableNameCell {
     display: inline-block;
     position: relative;
     width: 99%;
