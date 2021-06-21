@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "./dist/", // path to output directory
+        "declaration": true,
         "sourceMap": true, // allow sourcemap support
         "strictNullChecks": true, // enable strict null checks as a best practice
         "module": "es6", // specify module code generation
@@ -12,5 +13,5 @@
         "allowJs": true, // allow a partial TypeScript and JavaScript codebase
         "skipLibCheck": true // don't do typechecking on the node modules
     },
-    "include": ["./src/", "src/custom.d.ts"]
+    "include": ["./src/lib", "./src/custom.d.ts"]
 }

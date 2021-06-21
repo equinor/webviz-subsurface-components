@@ -10,6 +10,7 @@
     },
     "homepage": "https://github.com/equinor/webviz-subsurface-components",
     "main": "build/index.js",
+    "types": "index.d.ts",
     "scripts": {
         "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
         "copy-package-json": "copyfiles ./package.json ../webviz_subsurface_components/",
@@ -26,7 +27,9 @@
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook",
         "test": "jest --coverage",
-        "test:watch": "npm test -- --watch"
+        "test:watch": "npm test -- --watch",
+        "build:npm": "rimraf dist && tsc --declaration && npm run copy-files",
+        "copy-files": "copyfiles package.json dist && copyfiles --up 1 ../README.md dist && copyfiles --up 2 src/lib/**/*.css src/lib/**/*.glsl src/lib/**/*.svg src/lib/inputSchema/*.json dist/"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
