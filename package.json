@@ -53,6 +53,7 @@
         "leaflet": "^1.6.0",
         "leaflet-draw": "^1.0.4",
         "lodash": "^4.17.21",
+        "mathjs": "^9.4.2",
         "nebula.gl": "^0.22.3",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
