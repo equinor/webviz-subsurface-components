@@ -72,6 +72,12 @@
               "logCurves": true
             },
             {
+              "@@type": "FaultPolygonsLayer",
+              "id": "fault-polygons-layer",
+              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/logcurve/src/demo/example-data/fault_polygons.geojson",
+              "lineWidthMinPixels": 2
+            },
+            {
               "@@type": "PieChartLayer",
               "id": "pie-layer",
               "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/piechart.json"
