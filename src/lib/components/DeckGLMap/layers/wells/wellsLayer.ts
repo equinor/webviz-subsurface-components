@@ -30,6 +30,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     selectionEnabled: boolean;
     logData: string | LogCurveDataType;
     logName: string;
+    logrunName: string;
     logRadius: number;
     logCurves: boolean;
 }
@@ -45,6 +46,15 @@ const COLOR_MAP: RGBAColor[] = [
     [125, 255, 125, 255],
     [255, 125, 125, 255],
 ];
+
+function getLogPath(d: LogCurveDataType, logrun_name: string): number[] {
+    if (d?.header?.name?.toLowerCase() === logrun_name?.toLowerCase()) {
+        if (d?.data) {
+            return d.data[0];
+        }
+    }
+    return [];
+}
 
 function getLogIDByName(d: LogCurveDataType, log_name: string): number | null {
     return d?.curves?.findIndex(
@@ -211,7 +221,8 @@ export default class WellsLayer extends CompositeLayer<
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
-                getPath: (d: LogCurveDataType): number[] => d.data[0],
+                getPath: (d: LogCurveDataType): number[] =>
+                    getLogPath(d, this.props.logrunName),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
                     getLogColor(d, this.props.logName),
                 getWidth: (d: LogCurveDataType): number | number[] | null =>
