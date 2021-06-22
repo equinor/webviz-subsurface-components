@@ -63,7 +63,7 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
                             />
                             <WellsPlot
                                 timeSteps={timeSteps}
-                                data={plotData.wells}
+                                plotData={plotData}
                                 layout={layout}
                                 padding={padding}
                             />
