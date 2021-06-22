@@ -31,16 +31,39 @@ describe("test Zone Selector", () => {
         });
 
         userEvent.click(screen.getByRole("button", { name: /remove all/i }));
-        const zoneFilter = screen.getByText(/select zone\(s\)\.\.\./i)
-        userEvent.click(zoneFilter)
-        const dropdown = screen.getByPlaceholderText('Search...')
-        await waitFor(() => expect(dropdown).toBeVisible())
-        userEvent.type(dropdown, '{down}')
-        userEvent.type(dropdown, '{enter}')
+        const zoneFilter = screen.getByText(/select zone\(s\)\.\.\./i);
+        userEvent.click(zoneFilter);
+        const dropdown = screen.getByPlaceholderText("Search...");
+        await waitFor(() => expect(dropdown).toBeVisible());
+        userEvent.type(dropdown, "{down}");
+        userEvent.type(dropdown, "{enter}");
 
         expect(testStore.dispatch).toHaveBeenCalledTimes(3);
-        expect(testStore.dispatch).toBeCalledWith({
-            payload: ['zone1'],
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(1, {
+            payload: [],
+            type: "ui/updateFilteredZones",
+        });
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(2, {
+            payload: [],
+            type: "ui/updateFilteredZones",
+        });
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(3, {
+            payload: [
+                "zone1.1",
+                "zone1.2",
+                "zone1.3",
+                "zone2.1",
+                "zone2.2",
+                "zone2.3",
+                "zone3.1",
+                "zone3.2",
+                "zone3.3",
+                "zone4.1",
+                "zone4.2",
+                "zone4.3",
+                "zone4.4",
+                "zone4.5",
+            ],
             type: "ui/updateFilteredZones",
         });
     });

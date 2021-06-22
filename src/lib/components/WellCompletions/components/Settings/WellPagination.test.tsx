@@ -28,10 +28,8 @@ describe("test pagination", () => {
         render(<WellPagination />, {
             wrapper: Wrapper,
         });
-        fireEvent.click(
-            screen.getByText(/1/i)
-        );
-        expect(testStore.dispatch).toHaveBeenCalledTimes(3);
+        fireEvent.click(screen.getByText("1"));
+        expect(testStore.dispatch).toHaveBeenCalledTimes(4);
         expect(testStore.dispatch).toBeCalledWith({
             payload: 1,
             type: "ui/updateCurrentPage",

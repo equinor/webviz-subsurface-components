@@ -1,10 +1,13 @@
 import "@testing-library/jest-dom/extend-expect";
-import { fireEvent, render, screen, waitFor} from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import WellAttributesSelector from "./WellAttributesSelector";
+
+//Manually add the scrollTo because it is not implemented in jsdom
+//Without it, the SmartNodeSelector reports TypeError: suggestionsRef.current.scrollTo is not a function
+Element.prototype.scrollTo = jest.fn();
 
 describe("test well attributes selector", () => {
     it("snapshot test", () => {
@@ -18,13 +21,14 @@ describe("test well attributes selector", () => {
         render(<WellAttributesSelector />, {
             wrapper: Wrapper,
         });
-        
-        const attributeFilter = screen.getByRole('textbox')
-        userEvent.type(attributeFilter, 'type:Injector{enter}')
-        await waitFor(() => expect(screen.getByText(/well selection criteria: "type" is "injector"/i)).toBeVisible())
-        expect(testStore.dispatch).toHaveBeenCalledTimes(1)
+
+        const attributeFilter = screen.getByRole("textbox");
+        fireEvent.change(attributeFilter, {
+            target: { value: "type:Injector" },
+        });
+        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
-            payload: ['type:injector'],
+            payload: ["type:Injector"],
             type: "ui/updateFilterByAttributes",
         });
     });

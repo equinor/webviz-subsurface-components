@@ -29,8 +29,11 @@ describe("Test view menu", () => {
             screen.getByRole("menuitem", { name: "Sort/Group by Attributes" })
         );
         await screen.findByText("Well sorting levels");
-        fireEvent.click(screen.getByRole('button', {name: "OK" }))
+        fireEvent.click(screen.getByRole("button", { name: "OK" }));
         await waitFor(() => {
-            expect(screen.queryByText('Well sorting levels')).not.toBeInTheDocument()})
+            expect(
+                screen.queryByText("Well sorting levels")
+            ).not.toBeInTheDocument();
+        });
     });
 });

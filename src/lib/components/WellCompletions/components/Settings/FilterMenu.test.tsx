@@ -5,7 +5,6 @@ import React from "react";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import FilterMenu from "./FilterMenu";
 
-
 describe("Test Filter Menu", () => {
     it("snapshot test", () => {
         const { container } = render(Wrapper({ children: <FilterMenu /> }));
@@ -26,10 +25,7 @@ describe("Test Filter Menu", () => {
         render(<FilterMenu />, {
             wrapper: Wrapper,
         });
-        fireEvent.mouseOver(screen.getByTestId("filter_button"));    
-        expect(
-          await screen.findByText("Filter")
-        ).toBeInTheDocument();
-      });
+        fireEvent.mouseOver(screen.getByTestId("filter_button"));
+        expect(await screen.findByText("Filter")).toBeInTheDocument();
+    });
 });
-
