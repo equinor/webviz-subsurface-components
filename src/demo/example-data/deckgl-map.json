@@ -65,6 +65,7 @@
               "opacity": 1.0,
               "lineWidthScale": 5,
               "logRadius": 6,
+              "logrunName": "BLOCKING",
               "logName": "zonelog",
               "pointRadiusScale": 8,
               "outline": true,
