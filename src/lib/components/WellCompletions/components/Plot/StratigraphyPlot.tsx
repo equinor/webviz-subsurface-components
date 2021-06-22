@@ -30,7 +30,7 @@ const StratigraphyPlot: React.FC<Props> = React.memo(
                             <rect
                                 transform={`translate(${padding.left}, 0)`}
                                 width={layout.xExtent}
-                                height={barHeight + 1}
+                                height={barHeight}
                                 fill={zone.color}
                             />
                             <title>{zone.name}</title>
