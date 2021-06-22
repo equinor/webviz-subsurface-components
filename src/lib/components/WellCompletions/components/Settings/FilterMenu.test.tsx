@@ -5,6 +5,7 @@ import React from "react";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import FilterMenu from "./FilterMenu";
 
+
 describe("Test Filter Menu", () => {
     it("snapshot test", () => {
         const { container } = render(Wrapper({ children: <FilterMenu /> }));
@@ -21,4 +22,14 @@ describe("Test Filter Menu", () => {
             type: "ui/updateIsDrawerOpen",
         });
     });
+    it("Test tooltip title when menu not open", async () => {
+        render(<FilterMenu />, {
+            wrapper: Wrapper,
+        });
+        fireEvent.mouseOver(screen.getByTestId("filter_button"));    
+        expect(
+          await screen.findByText("Filter")
+        ).toBeInTheDocument();
+      });
 });
+

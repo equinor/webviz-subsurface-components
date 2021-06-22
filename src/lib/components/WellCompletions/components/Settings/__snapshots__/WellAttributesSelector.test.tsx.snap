@@ -39,7 +39,7 @@ exports[`test well attributes selector snapshot test 1`] = `
               <input
                 placeholder="Add new tag..."
                 spellcheck="false"
-                style="width: 100px;"
+                style="width: 50px;"
                 type="text"
                 value=""
               />

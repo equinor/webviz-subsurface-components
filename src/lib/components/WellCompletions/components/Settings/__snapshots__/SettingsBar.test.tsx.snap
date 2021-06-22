@@ -1,18 +1,48 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test settings bar snapshot test 1`] = `
-.c8 {
-  display: grid;
-  grid-gap: 8px;
-  grid-auto-flow: column;
+.c9 {
+  height: 100%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  height: 100%;
 }
 
-.c7 {
+.c9 > img:first-child,
+.c9 > svg:first-child {
+  margin-right: 8px;
+}
+
+.c9 > img:last-child,
+.c9 > svg:last-child {
+  margin-left: 8px;
+}
+
+.c9 > img:only-child,
+.c9 > svg:only-child {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.c9 > span:first-child {
+  margin-left: 32px;
+}
+
+.c9 > span:last-child {
+  margin-right: 32px;
+}
+
+.c9 > span:only-child {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.c8 {
   margin: 0;
   padding: 0;
   background: transparent;
@@ -36,11 +66,11 @@ exports[`test settings bar snapshot test 1`] = `
   display: inline-block;
 }
 
-.c7 svg {
+.c8 svg {
   justify-self: center;
 }
 
-.c7::after {
+.c8::after {
   position: absolute;
   top: -6px;
   left: -4px;
@@ -49,26 +79,26 @@ exports[`test settings bar snapshot test 1`] = `
   content: '';
 }
 
-.c7:hover {
+.c8:hover {
   background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
   border: 1px solid transparent;
   border-radius: 50%;
 }
 
-.c7:focus {
+.c8:focus {
   outline: none;
 }
 
-.c7[data-focus-visible-added]:focus {
+.c8[data-focus-visible-added]:focus {
   outline: 1px dashed rgba(0,112,121,1);
-  outline-offset: 2px;
+  outline-offset: 4px;
 }
 
-.c7::-moz-focus-inner {
+.c8::-moz-focus-inner {
   border: 0;
 }
 
-.c7:disabled {
+.c8:disabled {
   cursor: not-allowed;
   background: transparent;
   border: 1px solid transparent;
@@ -81,11 +111,11 @@ exports[`test settings bar snapshot test 1`] = `
   text-align: center;
 }
 
-.c7:disabled:hover {
+.c8:disabled:hover {
   background: transparent;
 }
 
-.c7::before {
+.c8::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -105,7 +135,7 @@ exports[`test settings bar snapshot test 1`] = `
   justify-content: space-between;
   position: relative;
   margin: 0;
-  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  color: rgba(0,0,0,1);
   font-family: Equinor;
   font-size: 0.750rem;
   font-weight: 500;
@@ -113,7 +143,7 @@ exports[`test settings bar snapshot test 1`] = `
   text-align: left;
   margin-left: 8px;
   margin-right: 8px;
-  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  color: #6f6f6f;
 }
 
 .c4 {
@@ -136,7 +166,7 @@ exports[`test settings bar snapshot test 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  border-bottom: 2px var(--eds_ui_background__light,rgba(247,247,247,1));
+  border-bottom: 2px solid var(--eds_ui_background__light,rgba(247,247,247,1));
   padding-left: 40px;
   padding-top: 8px;
   padding-right: 40px;
@@ -168,18 +198,41 @@ exports[`test settings bar snapshot test 1`] = `
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.000em;
+  -webkit-letter-spacing: 0.013em;
+  -moz-letter-spacing: 0.013em;
+  -ms-letter-spacing: 0.013em;
+  letter-spacing: 0.013em;
+  text-align: left;
+}
+
+.c7 {
+  position: relative;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 .c5 {
   border: none;
   border-radius: 0;
-  box-shadow: inset 0 -1px 0 0 var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  box-shadow: inset 0 -1px 0 0 #6f6f6f;
   padding-left: 8px;
   padding-top: 6px;
   padding-right: 8px;
   padding-bottom: 6px;
   margin: 0;
-  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  color: #6f6f6f;
   font-family: Equinor;
   font-size: 1.000rem;
   font-weight: 400;
@@ -195,7 +248,7 @@ exports[`test settings bar snapshot test 1`] = `
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, #f7f7f7 0%, #f7f7f7 100% );
   background-repeat: no-repeat,repeat;
   background-position: right 8px top 50%;
   width: 100%;
@@ -203,14 +256,14 @@ exports[`test settings bar snapshot test 1`] = `
 
 .c5:active,
 .c5:focus {
+  outline-offset: 0;
   box-shadow: none;
-  outline: 2px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
-  outline-offset: 0px;
+  outline: 2px solid #007079;
 }
 
 .c5:disabled {
-  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
-  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  color: #bebebe;
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, #f7f7f7 0%, #f7f7f7 100% );
   cursor: not-allowed;
   box-shadow: none;
   outline: none;
@@ -309,65 +362,77 @@ exports[`test settings bar snapshot test 1`] = `
     class="c6 makeStyles-actions-2"
   >
     <div>
-      <button
+      <div
         class="c7"
-        tabindex="0"
-        type="button"
       >
-        <span
-          class="c8"
-        >
-          <svg
-            aria-hidden="true"
-            class=""
-            fill="currentColor"
-            height="24px"
-            viewBox="0 0 24 24"
-            width="24px"
-            xmlns="http://www.w3.org/2000/svg"
+        <div>
+          <button
+            class="c8"
+            tabindex="0"
+            type="button"
           >
-            <path
-              class=""
-              clip-rule="evenodd"
-              d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
-              data-testid="eds-icon-path"
-              fill-rule="evenodd"
-              height="24"
-            />
-          </svg>
-        </span>
-      </button>
+            <span
+              class="c9"
+            >
+              <svg
+                aria-hidden="true"
+                class=""
+                fill="currentColor"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  class=""
+                  clip-rule="evenodd"
+                  d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
+                  data-testid="eds-icon-path"
+                  fill-rule="evenodd"
+                  height="24"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
     <div>
-      <button
+      <div
         class="c7"
-        data-testid="filter_button"
-        tabindex="0"
-        type="button"
       >
-        <span
-          class="c8"
-        >
-          <svg
-            aria-hidden="true"
-            class=""
-            fill="currentColor"
-            height="24px"
-            viewBox="0 0 24 24"
-            width="24px"
-            xmlns="http://www.w3.org/2000/svg"
+        <div>
+          <button
+            class="c8"
+            data-testid="filter_button"
+            tabindex="0"
+            type="button"
           >
-            <path
-              class=""
-              clip-rule="evenodd"
-              d="M7 6h10l-5.01 6.3L7 6zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0018.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
-              data-testid="eds-icon-path"
-              fill-rule="evenodd"
-              height="24"
-            />
-          </svg>
-        </span>
-      </button>
+            <span
+              class="c9"
+            >
+              <svg
+                aria-hidden="true"
+                class=""
+                fill="currentColor"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  class=""
+                  clip-rule="evenodd"
+                  d="M7 6h10l-5.01 6.3L7 6zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0018.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
+                  data-testid="eds-icon-path"
+                  fill-rule="evenodd"
+                  height="24"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </header>
