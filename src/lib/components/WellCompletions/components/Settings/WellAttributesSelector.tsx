@@ -73,6 +73,7 @@ const WellAttributesSelector: React.FC = React.memo(() => {
                 setProps={handleSelectionChange}
                 label="Filter by Attributes"
                 data={attributesTree}
+                numSecondsUntilSuggestionsAreShown={0.5}
             />
             <Typography>{hintText}</Typography>
         </div>
