@@ -42,6 +42,7 @@ type VectorSelectorPropType = {
     selectedTags?: string[];
     placeholder?: string;
     numSecondsUntilSuggestionsAreShown: number;
+    lineBreakAfterTag?: boolean;
     persistence: boolean | string | number;
     persisted_props: "selectedTags"[];
     persistence_type: "local" | "session" | "memory";

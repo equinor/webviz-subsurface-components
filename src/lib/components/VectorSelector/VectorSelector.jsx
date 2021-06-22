@@ -18,6 +18,7 @@ const VectorSelector = (props) => {
             numSecondsUntilSuggestionsAreShown={
                 props.numSecondsUntilSuggestionsAreShown
             }
+            lineBreakAfterTag={props.lineBreakAfterTag}
             persistence={props.persistence}
         />
     );
@@ -30,7 +31,8 @@ VectorSelector.defaultProps = {
     showSuggestions: true,
     selectedTags: [],
     placeholder: "Add new tag...",
-    numSecondsUntilSuggestionsAreShown: 1.5,
+    numSecondsUntilSuggestionsAreShown: 0.5,
+    lineBreakAfterTag: false,
     persisted_props: ["selectedNodes", "selectedTags", "selectedIds"],
     persistence_type: "local",
 };
@@ -92,6 +94,11 @@ VectorSelector.propTypes = {
      * Number of seconds until suggestions are shown.
      */
     numSecondsUntilSuggestionsAreShown: PropTypes.number,
+
+    /**
+     * If set to true, tags will be separated by a line break.
+     */
+    lineBreakAfterTag: PropTypes.bool,
 
     /**
      * Used to allow user interactions in this component to be persisted when
