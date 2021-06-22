@@ -78,7 +78,7 @@ const WellsPlot: React.FC<Props> = React.memo(
                         .find((comp) => comp.open + comp.shut > 0);
                     const height = lastCompletion
                         ? (lastCompletion.zoneIndex + 1) * barHeight
-                        : layout.yExtent;
+                        : 0;
                     return (
                         <g
                             transform={`translate(${
