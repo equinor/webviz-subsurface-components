@@ -6,7 +6,9 @@ import "../VectorCalculator.css";
 interface BlinkingTableRowProps extends TableRowProps {
     blinking: boolean;
 }
-export const BlinkingTableRow: React.FC<BlinkingTableRowProps> = (props) => {
+export const BlinkingTableRow: React.FC<BlinkingTableRowProps> = (
+    props: BlinkingTableRowProps
+) => {
     const { blinking, children, ...other } = props;
 
     return (

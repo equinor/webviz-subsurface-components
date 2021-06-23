@@ -39,11 +39,6 @@ VectorCalculator.propTypes = {
     vectors: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 
     /**
-     * A JSON object holding all existing vectors
-     */
-    vectors: PropTypes.array.isRequired,
-
-    /**
      * Pre-defined vector calculator expressions.
      * Each expression consist of an expression name, mathematical expression string with variables
      * and a map of characther variables and the corresponding vector name.
