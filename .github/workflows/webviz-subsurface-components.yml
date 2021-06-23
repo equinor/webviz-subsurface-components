@@ -43,6 +43,12 @@ jobs:
           pip install .[dependencies]
           pip install dash[dev]
 
+      - name: ⏭️ Use latest prerelease wcc when prereleasing wsc
+        if: github.event.release.prerelease
+        run: |
+          npm install --ignore-scripts @webviz/core-components@next
+          npm run postinstall
+
       - name: 🏗️ Build JavaScript part
         run: |
           npm run build
@@ -71,6 +77,7 @@ jobs:
           bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
 
       - name: 🤖 Run tests
+        if: github.event_name != 'release'  # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
         run: |
           npm run test
           pytest ./tests --headless
