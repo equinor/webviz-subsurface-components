@@ -9,4 +9,5 @@ export default {
 
 const Template = () => <TimeAggregationSelector />;
 export const Selector = Template.bind({});
+//Wrap with redux store
 Selector.decorators = [withReduxDecorator];

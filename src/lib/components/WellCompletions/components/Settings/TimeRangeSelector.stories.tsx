@@ -10,4 +10,5 @@ export default {
 
 const Template = () => <TimeRangeSelector />;
 export const Selector = Template.bind({});
+//Wrap with example intpu data and redux store
 Selector.decorators = [exampleDataDecorator, withReduxDecorator];

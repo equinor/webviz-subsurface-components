@@ -5,9 +5,10 @@ import SortButton from "./SortButton";
 
 export default {
     component: SortButton,
-    title: "WellCompletions/Components/Settings/Sort by Attributes",
+    title: "WellCompletions/Components/Buttons/Sort by Attributes",
 };
 
 const Template = () => <SortButton />;
 export const Button = Template.bind({});
+//Wrap with example intpu data and redux store
 Button.decorators = [exampleDataDecorator, withReduxDecorator];

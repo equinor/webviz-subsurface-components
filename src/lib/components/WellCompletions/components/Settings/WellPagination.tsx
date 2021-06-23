@@ -27,6 +27,9 @@ const useStyles = makeStyles(() =>
         },
     })
 );
+/**
+ * Divide wells into pages
+ */
 const WellPagination: React.FC = React.memo(() => {
     const classes = useStyles();
     // Redux
@@ -38,6 +41,7 @@ const WellPagination: React.FC = React.memo(() => {
     const wellsPerPage = useSelector(
         (st: WellCompletionsState) => st.ui.wellsPerPage
     );
+    // Memo
     const wellsCount = useMemo(() => plotData.wells.length, [plotData]);
     const pageCount = useMemo(
         () => Math.ceil(plotData.wells.length / wellsPerPage),
@@ -56,19 +60,22 @@ const WellPagination: React.FC = React.memo(() => {
         () => Math.min(wellsCount, currentClampedPage * wellsPerPage),
         [currentClampedPage, wellsPerPage, wellsCount]
     );
-    // handlers
+    // Handlers
     const onCurrentPageChange = useCallback(
         (...arg) => dispatch(updateCurrentPage(arg[1])),
         [dispatch]
     );
-    //effects
+
+    // Effects
     useEffect(() => {
         dispatch(updateCurrentPage(currentClampedPage));
     }, [currentClampedPage]);
 
+    // Render
     return (
         <div className={classes.root}>
             <div className={classes.left}>
+                {/* Indicates what the current page is displaying*/}
                 <Typography
                     style={{ alignSelf: "center", minWidth: "125px" }}
                 >{`${startItem} - ${endItem} of ${wellsCount} items`}</Typography>
