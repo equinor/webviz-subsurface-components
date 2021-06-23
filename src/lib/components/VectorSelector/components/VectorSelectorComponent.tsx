@@ -42,6 +42,7 @@ type VectorSelectorPropType = {
     selectedTags?: string[];
     placeholder?: string;
     numSecondsUntilSuggestionsAreShown: number;
+    lineBreakAfterTag?: boolean;
     persistence: boolean | string | number;
     persisted_props: "selectedTags"[];
     persistence_type: "local" | "session" | "memory";
@@ -133,7 +134,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             selected: false,
             delimiter: this.props.delimiter,
             numMetaNodes: this.props.numMetaNodes + 1,
-            treeData: this.treeData,
+            treeData: this.treeData as TreeData,
         });
     }
 

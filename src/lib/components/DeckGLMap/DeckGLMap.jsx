@@ -1,10 +1,9 @@
-import * as React from "react";
+import * as jsonpatch from "fast-json-patch";
+import { cloneDeep } from "lodash";
 import PropTypes from "prop-types";
-
+import * as React from "react";
 import Coords from "./components/Coords";
 import Map from "./Map";
-
-import { applyPatch, getValueByPointer } from "fast-json-patch";
 
 function _idsToIndices(doc, path) {
     // The path looks something like this: `/layers/[layer-id]/property`,
@@ -16,7 +15,7 @@ function _idsToIndices(doc, path) {
     const replaced = path.replace(
         /([\w-/]*)\/\[([\w-]+)\]/,
         (_, parent, matchedId) => {
-            const parentArray = getValueByPointer(doc, parent);
+            const parentArray = jsonpatch.getValueByPointer(doc, parent);
             const index = parentArray.findIndex(({ id }) => {
                 return matchedId == id;
             });
@@ -41,8 +40,7 @@ DeckGLMap.defaultProps = {
 };
 
 function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
-    const [deckglSpec, setDeckglSpec] = React.useState({});
-
+    const [deckglSpec, setDeckglSpec] = React.useState(null);
     React.useEffect(() => {
         if (!deckglSpecPatch) {
             return;
@@ -56,13 +54,40 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
                     path: _idsToIndices(deckglSpec, patch.path),
                 };
             });
-            newSpec = applyPatch(deckglSpec, patch, true, false).newDocument;
+            newSpec = jsonpatch.applyPatch(
+                deckglSpec,
+                patch,
+                true,
+                false
+            ).newDocument;
         } catch (error) {
             console.error("Unable to apply patch: " + error);
         }
 
         setDeckglSpec(newSpec);
     }, [deckglSpecPatch]);
+
+    React.useEffect(() => {
+        if (!deckglSpec) return;
+
+        const drawingEnabled = deckglSpec.layers.some((layer) => {
+            return layer["@@type"] == "DrawingLayer" && layer["mode"] != "view";
+        });
+
+        const newSpec = cloneDeep(deckglSpec);
+        newSpec.layers.forEach((layer) => {
+            if (layer["@@type"] == "WellsLayer") {
+                layer.selectionEnabled = !drawingEnabled;
+            }
+        });
+
+        const patch = jsonpatch.compare(deckglSpec, newSpec);
+        if (patch.length !== 0) {
+            setProps({
+                deckglSpecPatch: patch,
+            });
+        }
+    }, [deckglSpec]);
 
     const [hoverInfo, setHoverInfo] = React.useState([]);
     const onHover = React.useCallback(
@@ -81,6 +106,13 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
         },
         [coords]
     );
+    const patchSpec = React.useCallback(
+        (patch) =>
+            setProps({
+                deckglSpecPatch: patch,
+            }),
+        [setProps]
+    );
 
     return (
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
@@ -88,11 +120,7 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
                 id={id}
                 resources={resources}
                 deckglSpec={deckglSpec}
-                patchSpec={(patch) => {
-                    setProps({
-                        deckglSpecPatch: patch,
-                    });
-                }}
+                patchSpec={patchSpec}
                 onHover={onHover}
             >
                 <Coords pickInfos={hoverInfo} />

@@ -6,15 +6,15 @@
 
 /* eslint no-magic-numbers: 0 */
 import React, { Component } from "react";
-
+import DeckGLMapDemo from "./DeckGLMapDemo";
+import GroupTreeDemo from "./GroupTreeDemo";
 // Components
 import HistoryMatchDemo from "./HistoryMatchDemo";
-import MorrisDemo from "./MorrisDemo";
-import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
-import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import LeafletMapDemo from "./LeafletMapDemo";
-import DeckGLMapDemo from "./DeckGLMapDemo";
+import MorrisDemo from "./MorrisDemo";
+import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
+import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import WellCompletionsDemo from "./WellCompletionsDemo";
 import VectorSelectorDemo from "./VectorSelectorDemo";
 import VectorCalculatorDemo from "./VectorCalculatorDemo";
@@ -36,6 +36,9 @@ class App extends Component {
             }
             case "DeckGLMapDemo": {
                 return <DeckGLMapDemo />;
+            }
+            case "GroupTree": {
+                return <GroupTreeDemo />;
             }
             case "LeafletMap": {
                 return <LeafletMapDemo />;
@@ -76,6 +79,7 @@ class App extends Component {
                 >
                     <option value="VectorCalculator">VectorCalculator</option>
                     <option value="DeckGLMapDemo">DeckGLMapDemo</option>
+                    <option value="GroupTree">GroupTree</option>
                     <option value="LeafletMap">LeafletMap</option>
                     <option value="HistoryMatch">HistoryMatch</option>
                     <option value="Morris">Morris</option>
