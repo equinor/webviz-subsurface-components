@@ -27,11 +27,11 @@ const parseExpression = (expression: string): ParseData => {
     }
 
     // Retreive node tree
-    var node = parse(expression);
+    const node = parse(expression);
 
-    var operatorNodes: string[] = [];
-    var symbolNodes: string[] = [];
-    var functionNodes: string[] = [];
+    const operatorNodes: string[] = [];
+    const symbolNodes: string[] = [];
+    const functionNodes: string[] = [];
 
     // Traverse and handle valid node types
     node.traverse((node) => {
