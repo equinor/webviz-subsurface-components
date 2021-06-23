@@ -21,4 +21,11 @@ describe("Test Filter Menu", () => {
             type: "ui/updateIsDrawerOpen",
         });
     });
+    it("Test tooltip title when menu not open", async () => {
+        render(<FilterMenu />, {
+            wrapper: Wrapper,
+        });
+        fireEvent.mouseOver(screen.getByTestId("filter_button"));
+        expect(await screen.findByText("Filter")).toBeInTheDocument();
+    });
 });
