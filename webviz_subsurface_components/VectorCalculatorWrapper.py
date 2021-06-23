@@ -30,6 +30,7 @@ class ExpressionInfo(TypedDict):
     isValid: bool
     isDeletable: bool
 
+
 class ExternalParseData(TypedDict):
     expression: str
     id: str
@@ -197,43 +198,6 @@ class VectorCalculatorWrapper(VectorCalculator):
                     "isValid": False,
                     "message": "" if len(expression["expression"]) <= 0 else str(e),
                 }
-
-    @staticmethod
-    def validate_expression(expression: ExpressionInfo) -> bool:
-        try:
-            parsed_expr = VectorCalculatorWrapper.parser.parse(expression["expression"])
-            variables: List[str] = parsed_expr.variables()
-
-                # Whitelisit rules
-                mul_char_vars = [elm for elm in variables if len(elm)>1]
-                if len(mul_char_vars) > 0:
-                    raise Exception(f"Not allowed with multi character variables: {mul_char_vars}")
-
-                invalid_var_chars = [elm for elm in variables if not re.search("[a-zA-Z]{1}", elm)]
-                if len(invalid_var_chars)>0:
-                    message = "Invalid variable characters:" if len(invalid_var_chars) > 1 else "Invalid variable character:"
-                    raise Exception(message+f" {invalid_var_chars}")
-
-                # Evaluate to ensure valid expression (not captured by parse() method)
-                # - Parser allow assignment of function to variable, e.g. parse("f(x)").evaluate({"f":np.sqrt, "x":2})
-                # - Assign value to variables and evaluate to ensure valid expression 
-                evaluation_values = np.ones(len(variables))
-                evaluation_dict = dict(zip(variables, evaluation_values))
-                parsed_expr.evaluate(evaluation_dict)            
-                    
-                return {
-                    "expression": expression["expression"],
-                    "id": expression["id"], 
-                    "variables":variables,
-                    "isValid":True, 
-                    "message": ""}
-            except Exception as e:
-                return {
-                    "expression": expression["expression"], 
-                    "id": expression["id"],
-                    "variables":[],
-                    "isValid":False,
-                    "message": "" if len(expression["expression"]) <= 0 else str(e)}
 
     @staticmethod
     def validate_expression(expression: ExpressionInfo) -> bool:
