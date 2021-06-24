@@ -9,4 +9,5 @@ export default {
 
 const Template = () => <SortTable />;
 export const Table = Template.bind({});
+//Wrap with redux store
 Table.decorators = [withReduxDecorator];

@@ -3,16 +3,16 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import { Wrapper } from "../../test/TestWrapper";
-import ViewMenu from "./ViewMenu";
+import ViewButton from "./ViewButton";
 
 describe("test view menu", () => {
     it("snapshot test", () => {
-        const { container } = render(Wrapper({ children: <ViewMenu /> }));
+        const { container } = render(Wrapper({ children: <ViewButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
 
     it("click to display menu", async () => {
-        render(<ViewMenu />, {
+        render(<ViewButton />, {
             wrapper: Wrapper,
         });
         fireEvent.click(screen.getByRole("button", { name: "" }));

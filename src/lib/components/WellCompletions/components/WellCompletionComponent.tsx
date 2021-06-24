@@ -14,7 +14,9 @@ interface Props {
     id: string;
     data: Data;
 }
-
+/**
+ * Well completions component
+ */
 const WellCompletionComponent: React.FC<Props> = React.memo(
     ({ id, data }: Props) => {
         const validate = useMemo(() => ajv.compile(inputSchema), []);
