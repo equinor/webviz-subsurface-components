@@ -3,15 +3,15 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import { testStore, Wrapper } from "../../test/TestWrapper";
-import FilterMenu from "./FilterMenu";
+import FilterButton from "./FilterButton";
 
 describe("Test Filter Menu", () => {
     it("snapshot test", () => {
-        const { container } = render(Wrapper({ children: <FilterMenu /> }));
+        const { container } = render(Wrapper({ children: <FilterButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
     it("click to open filter menu and dispatch redux action", async () => {
-        render(<FilterMenu />, {
+        render(<FilterButton />, {
             wrapper: Wrapper,
         });
         fireEvent.click(screen.getByTestId("filter_button"));
@@ -22,7 +22,7 @@ describe("Test Filter Menu", () => {
         });
     });
     it("Test tooltip title when menu not open", async () => {
-        render(<FilterMenu />, {
+        render(<FilterButton />, {
             wrapper: Wrapper,
         });
         fireEvent.mouseOver(screen.getByTestId("filter_button"));

@@ -1,4 +1,5 @@
 import { createStyles, makeStyles } from "@material-ui/core";
+import { cloneDeep } from "lodash";
 import React, { useContext, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { GroupTreeState } from "../redux/store";
@@ -36,7 +37,11 @@ const GroupTreeViewer: React.FC = () => {
         (state: GroupTreeState) => state.ui.currentFlowRate
     );
     useEffect(() => {
-        renderer.current = new GroupTree("#grouptree_tree", data, "oilrate");
+        renderer.current = new GroupTree(
+            "#grouptree_tree",
+            cloneDeep(data),
+            "oilrate"
+        );
     }, [data]);
 
     useEffect(() => {

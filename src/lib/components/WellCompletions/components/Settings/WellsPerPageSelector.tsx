@@ -14,7 +14,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     })
 );
-
+/**
+ * A drop down for selecting how many wells to display per page
+ */
 const WellsPerPageSelector: React.FC = React.memo(() => {
     const classes = useStyles();
     // Redux
@@ -22,11 +24,12 @@ const WellsPerPageSelector: React.FC = React.memo(() => {
     const wellsPerPage = useSelector(
         (st: WellCompletionsState) => st.ui.wellsPerPage
     );
-    // handlers
+    // Handlers
     const onWellsPerPageChange = useCallback(
         (event) => dispatch(updateWellsPerPage(event.target.value)),
         [dispatch]
     );
+    // Render
     return (
         <NativeSelect
             label={"Wells per page"}

@@ -24,19 +24,22 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     })
 );
-const ViewMenu: React.FC = React.memo(() => {
+/**
+ * A menu button that shows a list of viewing options
+ */
+const ViewButton: React.FC = React.memo(() => {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-    // handlers
+    // Handlers
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
-
     const handleClose = () => {
         setAnchorEl(null);
     };
 
+    // Render
     return (
         <div>
             <Tooltip title="View">
@@ -62,5 +65,5 @@ const ViewMenu: React.FC = React.memo(() => {
     );
 });
 
-ViewMenu.displayName = "ViewMenu";
-export default ViewMenu;
+ViewButton.displayName = "ViewMenu";
+export default ViewButton;

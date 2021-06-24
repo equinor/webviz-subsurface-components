@@ -41,9 +41,14 @@ const EdsSlider = withStyles({
         },
     },
 })(Slider);
+/**
+ * A React component for selecting time step(s) to display in the plot
+ */
 const TimeRangeSelector: React.FC = React.memo(() => {
     const classes = useStyles();
+    // Direct access to the input data
     const data = useContext(DataContext);
+
     // Redux
     const dispatch = useDispatch();
     const timeAggregation = useSelector(
@@ -53,16 +58,25 @@ const TimeRangeSelector: React.FC = React.memo(() => {
         (state: WellCompletionsState) => state.ui.timeIndexRange,
         isEqual
     ) as [number, number];
+
+    // Memo
+    // Arry of date time strings
     const times = useMemo(() => data.timeSteps, [data]);
-    // handlers
+
+    // Handlers
+    // Get date time string by index
     const outputFunction = useCallback((step: number) => times[step], [times]);
+    // Update time range in redux. When the time aggregation is off,
+    // only the upper bound of the range will be used in computing the plot data
     const onChange = useCallback(
         (range) => dispatch(updateTimeIndexRange(range)),
         [dispatch]
     );
-    //If number of time step is small
+
+    // Render
     return (
         <div className={classes.root}>
+            {/* This only appears when time aggregation is on */}
             {timeAggregation !== "None" && (
                 <NativeSelect
                     className={classes.selector}
@@ -79,6 +93,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                         ])
                     }
                 >
+                    {/* Show the full list of date times */}
                     {times.map((time, index) => (
                         <option
                             key={`time-dropdown-start-${time}`}
@@ -89,6 +104,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                     ))}
                 </NativeSelect>
             )}
+            {/* Slider that is easy to use when the number of time steps is not too large */}
             <div className={classes.slider}>
                 <span>Time Steps</span>
                 <EdsSlider
@@ -102,9 +118,12 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                     valueLabelDisplay="on"
                     onChange={(_, value) =>
                         onChange(
+                            //If time aggregation is off, we only need to know the end date
                             timeAggregation === "None"
                                 ? [0, value]
-                                : [
+                                : // This is due to a feature (or a bug) in EdsSlider that the first
+                                  //value in the range is not necessarily the lower bound
+                                  [
                                       Math.min(...(value as number[])),
                                       Math.max(...(value as number[])),
                                   ]
@@ -129,6 +148,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                     ])
                 }
             >
+                {/* If time aggregation is on, we only show the time steps that >= the start date */}
                 {(timeAggregation === "None"
                     ? times
                     : times.filter(

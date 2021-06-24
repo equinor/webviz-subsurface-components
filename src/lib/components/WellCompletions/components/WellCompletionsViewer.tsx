@@ -80,9 +80,12 @@ const useStyles = makeStyles((theme: Theme) =>
 const WellCompletionsViewer: React.FC = () => {
     const classes = useStyles();
 
+    // Use input data directly
     const data = useContext(DataContext);
+    // Create plot data with the selected time step(s)
     const plotData = usePlotData();
 
+    // Redux
     const isDrawerOpen = useSelector(
         (state: WellCompletionsState) => state.ui.isDrawerOpen
     );
@@ -92,6 +95,7 @@ const WellCompletionsViewer: React.FC = () => {
     const currentPage = useSelector(
         (state: WellCompletionsState) => state.ui.currentPage
     );
+    // Memo
     const dataInCurrentPage = useMemo(() => {
         return {
             ...plotData,
@@ -111,8 +115,10 @@ const WellCompletionsViewer: React.FC = () => {
 
     //If no data is available
     if (!data) return <div />;
+    // Render
     return (
         <div className={classes.root}>
+            {/* We detect the resize of the element and resize the plot accordingly */}
             <ReactResizeDetector handleWidth handleHeight>
                 {({ width }) => (
                     <>
@@ -142,6 +148,7 @@ const WellCompletionsViewer: React.FC = () => {
                                     />
                                 </div>
                             </div>
+                            {/* Drawer on the right-hand side (hidden by default) that shows the filter options */}
                             <Drawer
                                 className={clsx(classes.drawer, {
                                     [classes.drawerShift]: !isDrawerOpen,
