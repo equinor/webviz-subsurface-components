@@ -12,11 +12,12 @@ const useStyles = makeStyles(() =>
         action: { margin: "5px" },
     })
 );
-
+/**
+ * A menu button that shows a dialog for sorting wells by attributes
+ */
 const SortButton: React.FC = React.memo(() => {
     const classes = useStyles();
     // Dialogs
-
     const [visibleScrim, setVisibleScrim] = useState(false);
     const handleClose = () => {
         setVisibleScrim(!visibleScrim);

@@ -24,4 +24,15 @@ describe("test pagination", () => {
             type: "ui/updateCurrentPage",
         });
     });
+    it("click to dispatch redux action", async () => {
+        render(<WellPagination />, {
+            wrapper: Wrapper,
+        });
+        fireEvent.click(screen.getByText("1"));
+        expect(testStore.dispatch).toHaveBeenCalledTimes(4);
+        expect(testStore.dispatch).toBeCalledWith({
+            payload: 1,
+            type: "ui/updateCurrentPage",
+        });
+    });
 });

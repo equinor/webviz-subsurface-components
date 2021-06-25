@@ -96,6 +96,51 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
     }
 
     componentDidUpdate(prevProps: VectorSelectorPropType): void {
+        if (
+            (this.props.data &&
+                JSON.stringify(this.props.data) !==
+                    JSON.stringify(prevProps.data)) ||
+            (this.props.delimiter &&
+                this.props.delimiter !== prevProps.delimiter) ||
+            (this.props.numMetaNodes &&
+                this.props.numMetaNodes !== prevProps.numMetaNodes)
+        ) {
+            let hasError = false;
+            let error = "";
+            try {
+                this.treeData = new TreeData({
+                    treeData: this.modifyTreeData(
+                        this.props.data,
+                        this.props.numMetaNodes
+                    ),
+                    delimiter: this.props.delimiter,
+                });
+            } catch (e) {
+                this.treeData = null;
+                hasError = true;
+                error = e;
+            }
+            const nodeSelections: VectorSelection[] = [];
+            for (const node of this.state.nodeSelections) {
+                nodeSelections.push(
+                    this.createNewNodeSelection(node.getNodePath())
+                );
+            }
+
+            this.setState(
+                {
+                    nodeSelections: nodeSelections,
+                    currentTagIndex: this.state.currentTagIndex,
+                    suggestionsVisible: this.state.suggestionsVisible,
+                    hasError: hasError,
+                    error: error,
+                },
+                () => {
+                    this.updateSelectedTagsAndNodes();
+                }
+            );
+        }
+
         const selectedTags = this.state.nodeSelections
             .filter((nodeSelection) => nodeSelection.isValid())
             .map((nodeSelection) =>

@@ -15,7 +15,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     })
 );
-
+/**
+ * A dropdown for selecting the time aggregation mode
+ */
 const TimeAggregationSelector: React.FC = React.memo(() => {
     const classes = useStyles();
     // Redux
@@ -23,11 +25,12 @@ const TimeAggregationSelector: React.FC = React.memo(() => {
     const timeAggregation = useSelector(
         (st: WellCompletionsState) => st.ui.timeAggregation
     );
-    // handlers
+    // Handlers
     const handleSelectedItemChange = useCallback(
         (event) => dispatch(updateTimeAggregation(event.target.value)),
         [dispatch]
     );
+    //Render
     return (
         <NativeSelect
             className={classes.root}

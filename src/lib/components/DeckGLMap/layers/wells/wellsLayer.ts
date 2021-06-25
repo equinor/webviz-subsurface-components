@@ -47,8 +47,12 @@ const COLOR_MAP: RGBAColor[] = [
     [255, 125, 125, 255],
 ];
 
+function isLogRunSelected(d: LogCurveDataType, logrun_name: string): boolean {
+    return d.header.name.toLowerCase() === logrun_name.toLowerCase();
+}
+
 function getLogPath(d: LogCurveDataType, logrun_name: string): number[] {
-    if (d?.header?.name?.toLowerCase() === logrun_name?.toLowerCase()) {
+    if (isLogRunSelected(d, logrun_name)) {
         if (d?.data) {
             return d.data[0];
         }
@@ -56,15 +60,26 @@ function getLogPath(d: LogCurveDataType, logrun_name: string): number[] {
     return [];
 }
 
-function getLogIDByName(d: LogCurveDataType, log_name: string): number | null {
-    return d?.curves?.findIndex(
-        (item) => item.name.toLowerCase() === log_name.toLowerCase()
-    );
+function getLogIDByName(
+    d: LogCurveDataType,
+    logrun_name: string,
+    log_name: string
+): number | null {
+    if (isLogRunSelected(d, logrun_name)) {
+        return d?.curves?.findIndex(
+            (item) => item.name.toLowerCase() === log_name.toLowerCase()
+        );
+    }
+    return null;
 }
 
 const color_interp = interpolateRgbBasis(["red", "yellow", "green", "blue"]);
-function getLogColor(d: LogCurveDataType, log_name: string): RGBAColor[] {
-    const log_id = getLogIDByName(d, log_name);
+function getLogColor(
+    d: LogCurveDataType,
+    logrun_name: string,
+    log_name: string
+): RGBAColor[] {
+    const log_id = getLogIDByName(d, logrun_name, log_name);
     if (!log_id || d?.curves[log_id] == undefined) {
         return [];
     }
@@ -88,8 +103,12 @@ function getLogColor(d: LogCurveDataType, log_name: string): RGBAColor[] {
     return log_color;
 }
 
-function getLogWidth(d: LogCurveDataType, log_name: string): number[] | null {
-    const log_id = getLogIDByName(d, log_name);
+function getLogWidth(
+    d: LogCurveDataType,
+    logrun_name: string,
+    log_name: string
+): number[] | null {
+    const log_id = getLogIDByName(d, logrun_name, log_name);
     return log_id ? d?.data[log_id] : null;
 }
 
@@ -224,9 +243,10 @@ export default class WellsLayer extends CompositeLayer<
                 getPath: (d: LogCurveDataType): number[] =>
                     getLogPath(d, this.props.logrunName),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
-                    getLogColor(d, this.props.logName),
+                    getLogColor(d, this.props.logrunName, this.props.logName),
                 getWidth: (d: LogCurveDataType): number | number[] | null =>
-                    this.props.logRadius || getLogWidth(d, this.props.logName),
+                    this.props.logRadius ||
+                    getLogWidth(d, this.props.logrunName, this.props.logName),
                 updateTriggers: {
                     getColor: [this.props.logName],
                     getWidth: [this.props.logName, this.props.logRadius],
@@ -278,6 +298,7 @@ export default class WellsLayer extends CompositeLayer<
 
         const log_id = getLogIDByName(
             info.object as LogCurveDataType,
+            this.props.logrunName,
             this.props.logName
         );
         if (!log_id) return info;

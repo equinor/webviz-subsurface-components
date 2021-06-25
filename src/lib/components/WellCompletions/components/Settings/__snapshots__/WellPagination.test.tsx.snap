@@ -21,7 +21,7 @@ exports[`test pagination snapshot test 1`] = `
       class="c0"
       style="align-self: center; min-width: 125px;"
     >
-      1 - 0 of 0 items
+      1 - 11 of 11 items
     </p>
   </div>
   <nav
@@ -49,6 +49,20 @@ exports[`test pagination snapshot test 1`] = `
               d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"
             />
           </svg>
+        </button>
+      </li>
+      <li>
+        <button
+          aria-current="true"
+          aria-label="page 1"
+          class="MuiButtonBase-root MuiPaginationItem-root MuiPaginationItem-page Mui-selected"
+          tabindex="0"
+          type="button"
+        >
+          1
+          <span
+            class="MuiTouchRipple-root"
+          />
         </button>
       </li>
       <li>

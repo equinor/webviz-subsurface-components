@@ -21,8 +21,12 @@ describe("test time range selector", () => {
         });
         userEvent.type(screen.getByRole("slider"), "{arrowright}");
         expect(testStore.dispatch).toHaveBeenCalledTimes(2);
-        expect(testStore.dispatch).toBeCalledWith({
-            payload: [0, -1],
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(1, {
+            payload: [0, NaN],
+            type: "ui/updateTimeIndexRange",
+        });
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(2, {
+            payload: [0, 9],
             type: "ui/updateTimeIndexRange",
         });
     });

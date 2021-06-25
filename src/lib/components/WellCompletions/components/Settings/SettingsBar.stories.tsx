@@ -10,4 +10,6 @@ export default {
 
 const Template = () => <SettingsBar />;
 export const TopBar = Template.bind({});
+//Wrap with redux store
+//Settings bar also need to use the input data therefore wrapping with exampleDataDecorator
 TopBar.decorators = [exampleDataDecorator, withReduxDecorator];

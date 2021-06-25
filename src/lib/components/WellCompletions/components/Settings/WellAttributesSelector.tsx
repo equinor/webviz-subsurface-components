@@ -23,12 +23,17 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     })
 );
+/**
+ * A react component to allow the users to select wells by attribute values
+ */
 const WellAttributesSelector: React.FC = React.memo(() => {
     // Style
     const classes = useStyles();
+    // Direct access to the input data
     const data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
+    // All the attribute keys available
     const attributeKeys = useSelector(
         (st: WellCompletionsState) => st.attributes.attributeKeys
     );
@@ -36,10 +41,12 @@ const WellAttributesSelector: React.FC = React.memo(() => {
         (st: WellCompletionsState) => st.ui.filterByAttributes
     );
     const wells = useMemo(() => data.wells, [data]);
+    //Create the tree that the SmartNodeSelector can accept as input.
     const attributesTree = useMemo(
         () => extractAttributesTree(wells, attributeKeys),
         [wells]
     );
+    //Create the hint text for the user to better understand how the filter applies.
     const hintText = useMemo(() => {
         const allowedValues = computeAllowedAttributeValues(filterByAttributes);
         return (
@@ -47,21 +54,24 @@ const WellAttributesSelector: React.FC = React.memo(() => {
             Array.from(allowedValues.entries())
                 .map(
                     ([key, values]) =>
+                        //Within the same attribute, we use OR relation
                         `"${key}" ${
                             values.size === 1
                                 ? ` is "${Array.from(values)[0]}"`
                                 : ` is in [${Array.from(values)}]`
                         }`
                 )
+                //In between different attribute key, we use AND relation
                 .join(" and ")
         );
     }, [filterByAttributes]);
-    // handlers
+    // Handlers
     const handleSelectionChange = useCallback(
         (selection) =>
             dispatch(updateFilterByAttributes(selection.selectedNodes)),
         [dispatch]
     );
+    // Render
     return (
         <div className={classes.root}>
             <SmartNodeSelector
