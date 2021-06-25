@@ -26,7 +26,6 @@ export {
     DeckGLMap,
     VectorSelector,
     WellCompletions,
-    VectorCalculator
+    VectorCalculator,
     GroupTree,
-    VectorCalculator
 };
