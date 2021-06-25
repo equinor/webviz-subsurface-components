@@ -18,11 +18,12 @@ export const preprocessData = (subzones: string[], data: Data): Data => {
     return {
         ...data,
         wells: data.wells.map((well) => {
+            //The earliest completion date for the given well
             let earliestCompDateIndex = Number.POSITIVE_INFINITY;
             subzones.forEach((zone) => {
                 if (zone in well.completions) {
-                    //store earliest completion date
                     const completion = well.completions[zone];
+                    //Find the earliest date for the given completion
                     const earliestDate = completion.t.find(
                         (_, index) => completion.open[index] > 0
                     );
@@ -33,11 +34,11 @@ export const preprocessData = (subzones: string[], data: Data): Data => {
                         );
                 }
             });
+            //store the earliest completion date
             return { ...well, earliestCompDateIndex };
         }),
     };
 };
-
 export interface AttributeNode {
     name: string;
     children: { name: AttributeType; key: string }[];
@@ -59,13 +60,14 @@ export const extractAttributesTree = (
     );
 
     wells.forEach((well) =>
-        attributes.forEach((values, key) =>
-            values.add(
+        attributes.forEach((valuesSet, key) =>
+            //If the well doesnt have the given attribute key, it means the attribute is undefined for this well
+            valuesSet.add(
                 key in well.attributes ? well.attributes[key] : "undefined"
             )
         )
     );
-
+    //Return an array of nodes
     return Array.from(attributes.entries()).map(([key, values]) => ({
         name: key,
         children: Array.from(values)
@@ -76,7 +78,11 @@ export const extractAttributesTree = (
             })),
     }));
 };
-
+/**
+ * Compute the selected nodes from the node selector into a map of attribute keys with their allowed values
+ * @param filterByAttributes an array of selected node, e.g ["name:Ann","age:37"]
+ * @returns
+ */
 export const computeAllowedAttributeValues = (
     filterByAttributes: string[]
 ): Map<string, Set<string>> => {
@@ -89,7 +95,11 @@ export const computeAllowedAttributeValues = (
     });
     return allowValues;
 };
-
+/**
+ * Create a attribute predicate for well selection
+ * @param filterByAttributes an array of selected node, e.g ["name:Ann","age:37"]
+ * @returns
+ */
 export const createAttributePredicate = (
     filterByAttributes: string[]
 ): ((well: Well) => boolean) => {
@@ -111,12 +121,18 @@ export const createAttributePredicate = (
                 }
             });
     });
+    //Use an AND logic between different attribute keys
     return (well: Well) => {
         return filters.every((filter) => filter(well));
     };
 };
 
-//DFS
+/**
+ * DFS to find all leaf nodes
+ * @param zone
+ * @param result
+ * @returns
+ */
 export const findSubzones = (zone: Zone, result: Zone[]): void => {
     if (zone === undefined) return;
     if (zone.subzones === undefined || zone.subzones.length === 0)
@@ -130,7 +146,6 @@ export const findSubzones = (zone: Zone, result: Zone[]): void => {
  * @param range
  * @param timeAggregation
  * @param hideZeroCompletions
- * @param filterByAttributes
  * @returns
  */
 export const computeDataToPlot = (

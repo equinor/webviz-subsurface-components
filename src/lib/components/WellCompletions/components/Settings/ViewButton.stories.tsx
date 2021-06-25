@@ -1,13 +1,14 @@
 import React from "react";
 import { exampleDataDecorator } from "../../test/storybookDataDecorator";
 import { withReduxDecorator } from "../../test/storybookReduxAddon";
-import ViewMenu from "./ViewMenu";
+import ViewButton from "./ViewButton";
 
 export default {
-    component: ViewMenu,
-    title: "WellCompletions/Components/Menus/View",
+    component: ViewButton,
+    title: "WellCompletions/Components/Buttons/View",
 };
 
-const Template = () => <ViewMenu />;
+const Template = () => <ViewButton />;
 export const Menu = Template.bind({});
+//Wrap with example intpu data and redux store
 Menu.decorators = [exampleDataDecorator, withReduxDecorator];

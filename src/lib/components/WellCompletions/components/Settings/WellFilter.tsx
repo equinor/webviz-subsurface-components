@@ -13,12 +13,16 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     })
 );
+/**
+ * A search textfield to search wells by their names
+ */
 const WellFilter: React.FC = React.memo(() => {
     const classes = useStyles();
     // Redux
     const dispatch = useDispatch();
-    // handlers
+    // Handlers
     const onChange = useCallback(
+        // Reduce the update frequency to 0.2 second
         throttle(
             (event: React.ChangeEvent<HTMLInputElement>) =>
                 dispatch(updateWellSearchText(event.target.value)),

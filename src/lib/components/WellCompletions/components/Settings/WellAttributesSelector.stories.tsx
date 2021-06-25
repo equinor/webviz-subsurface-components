@@ -10,4 +10,5 @@ export default {
 
 const Template = () => <WellAttributesSelector />;
 export const Filter = Template.bind({});
+//Wrap with example intpu data and redux store
 Filter.decorators = [exampleDataDecorator, withReduxDecorator];

@@ -8,4 +8,5 @@ export default {
 
 const Template = () => <HideZeroCompletionsSwitch />;
 export const Switch = Template.bind({});
+//Wrap with redux store
 Switch.decorators = [withReduxDecorator];

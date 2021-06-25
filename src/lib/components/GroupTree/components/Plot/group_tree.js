@@ -1,3 +1,7 @@
+/** This code is copied directly from
+ * https://github.com/anders-kiaer/webviz-subsurface-components/blob/dynamic_tree/src/lib/components/DynamicTree/group_tree.js
+ *  This needs to be refactored to develop further
+ */
 import * as d3 from "d3";
 /* eslint camelcase: "off" */
 /* eslint array-callback-return: "off" */

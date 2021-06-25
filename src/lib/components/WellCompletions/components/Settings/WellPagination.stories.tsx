@@ -5,9 +5,10 @@ import WellPagination from "./WellPagination";
 
 export default {
     component: WellPagination,
-    title: "WellCompletions/Components/Settings/WellPagination",
+    title: "WellCompletions/Components/Settings/Well Pagination",
 };
 
 const Template = () => <WellPagination />;
 export const Bar = Template.bind({});
+//Wrap with example intpu data and redux store
 Bar.decorators = [exampleDataDecorator, withReduxDecorator];
