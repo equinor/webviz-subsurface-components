@@ -64,10 +64,13 @@ class ConfigExpressionData(TypedDict):
 
     Simplified data type to pre-define expressions for user.
 
-    variableVectorMap: Dict[str,str] with {key, value} = {variableName, vectorName}
+    The ConfigExpressionData instance name is the name of the expression - i.e.
+    when using a dictionary of ConfigExpressionData the expression name is the dict key
+
+    expression: str, mathematical expression
+    variableVectorMap: Dict[str,str], Dictionary with {key, value} = {variableName, vectorName}
     """
 
-    name: str
     expression: str
     variableVectorMap: Dict[str, str]
 
@@ -128,18 +131,18 @@ class VectorCalculatorWrapper(VectorCalculator):
 
     @staticmethod
     def expressions_from_config(
-        expressions: List[ConfigExpressionData],
+        expressions: Dict[str, ConfigExpressionData],
     ) -> List[ExpressionInfo]:
         output: List[ExpressionInfo] = []
 
         for expression in expressions:
             output.append(
                 {
-                    "name": expression["name"],
-                    "expression": expression["expression"],
+                    "name": expression,
+                    "expression": expressions[expression]["expression"],
                     "id": f"{uuid4()}",
                     "variableVectorMap": VectorCalculatorWrapper.variable_vector_map_from_dict(
-                        expression["variableVectorMap"]
+                        expressions[expression]["variableVectorMap"]
                     ),
                     "isValid": True,
                     "isDeletable": False,
