@@ -59,15 +59,13 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
         super(props);
         this.props = props;
 
-        let hasError = false;
-        let error = "";
+        let error: string | undefined;
         try {
             this.treeData = new TreeData({
                 treeData: this.modifyTreeData(props.data, props.numMetaNodes),
                 delimiter: props.delimiter,
             });
         } catch (e) {
-            hasError = true;
             error = e;
         }
 
@@ -90,8 +88,8 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             nodeSelections,
             currentTagIndex: 0,
             suggestionsVisible: false,
-            hasError: hasError,
-            error: error,
+            hasError: error !== undefined,
+            error: error || "",
         };
     }
 
@@ -105,8 +103,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             (this.props.numMetaNodes &&
                 this.props.numMetaNodes !== prevProps.numMetaNodes)
         ) {
-            let hasError = false;
-            let error = "";
+            let error: string | undefined;
             try {
                 this.treeData = new TreeData({
                     treeData: this.modifyTreeData(
@@ -117,7 +114,6 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                 });
             } catch (e) {
                 this.treeData = null;
-                hasError = true;
                 error = e;
             }
             const nodeSelections: VectorSelection[] = [];
@@ -132,8 +128,8 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                     nodeSelections: nodeSelections,
                     currentTagIndex: this.state.currentTagIndex,
                     suggestionsVisible: this.state.suggestionsVisible,
-                    hasError: hasError,
-                    error: error,
+                    hasError: error !== undefined,
+                    error: error || "",
                 },
                 () => {
                     this.updateSelectedTagsAndNodes();
@@ -206,7 +202,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             level: number
         ) => {
             const newData: TreeDataNode[] = [];
-            if (level == numMetaNodes && data) {
+            if (level === numMetaNodes && data) {
                 const types = {};
                 for (let i = 0; i < data.length; i++) {
                     let type = "others";
