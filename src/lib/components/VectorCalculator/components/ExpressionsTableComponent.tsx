@@ -67,12 +67,6 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
             setSelectedExpressions(expressions);
         };
 
-                // Disable deletion when one or more expression is not deletable
-                setDisableDelete(expressions.some((expr) => !expr.isDeletable));
-            },
-            [predefinedExpressions]
-        );
-
         const handleActiveExpressionSelect = (
             expression: ExpressionType
         ): void => {

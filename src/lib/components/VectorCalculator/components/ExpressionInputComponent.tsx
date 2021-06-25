@@ -28,22 +28,6 @@ import {
 } from "../utils/ExpressionParser";
 import "../VectorCalculator.css";
 
-import {
-    ExpressionType,
-    ExternalParseData,
-    VariableVectorMapType,
-} from "../utils/VectorCalculatorTypes";
-import {
-    isVariableVectorMapValid,
-    parseName,
-} from "../utils/VectorCalculatorHelperFunctions";
-import {
-    expressionVariables,
-    expressionParseMessage,
-    validateExpression,
-} from "../utils/ExpressionParser";
-import "../VectorCalculator.css";
-
 interface ExpressionInputComponent {
     activeExpression: ExpressionType;
     expressions: ExpressionType[];
