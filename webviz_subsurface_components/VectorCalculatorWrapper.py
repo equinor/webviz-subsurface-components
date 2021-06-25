@@ -59,6 +59,19 @@ class ConfigExpressionData(TypedDict):
     variableVectorMap: Dict[str, str]
 
 
+class ConfigExpressionData(TypedDict):
+    """Type definition for configuration of pre-defined calculated expressions
+
+    Simplified data type to pre-define expressions for user.
+
+    variableVectorMap: Dict[str,str] with {key, value} = {variableName, vectorName}
+    """
+
+    name: str
+    expression: str
+    variableVectorMap: Dict[str, str]
+
+
 class VectorCalculatorParser(Parser):
     """Creates expression parser configured to handle vector variables
 
