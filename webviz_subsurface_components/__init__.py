@@ -18,6 +18,14 @@ import dash as _dash
 from ._imports_ import *
 from ._imports_ import __all__
 
+from .VectorCalculatorWrapper import VectorCalculatorWrapper as VectorCalculator
+from .VectorCalculatorWrapper import (
+    VectorCalculatorParser,
+    ExpressionInfo,
+    VariableVectorMapInfo,
+)
+
+
 try:
     __version__ = get_distribution(__name__).version
 except DistributionNotFound:

@@ -23,14 +23,17 @@ package_name = (
     .replace("@", "")
 )
 
-INSTALL_REQUIRES = ["dash>=1.6"]
+INSTALL_REQUIRES = [
+    "dash>=1.6",
+    "py_expression_eval>=0.3.13",
+    "numpy>=1.14",
+    "pandas>=0.25",
+]
 
 TESTS_REQUIRE = [
     "bandit",
     "black>=20.8b1",
     "matplotlib>=3.0",
-    "numpy>=1.14",
-    "pandas>=0.25",
     "Pillow>=6.0",
     "pylint>=2.4",
     "scipy>=1.2",
