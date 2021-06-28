@@ -3,9 +3,6 @@
 webviz_subsurface_components/**/*
 !webviz_subsurface_components/__init__.py
 
-output.css
-output.js
-
 DESCRIPTION
 NAMESPACE
 R/
@@ -14,8 +11,8 @@ inst/
 .Rbuildignore
 
 # Storybook stuff
-storybook-static/
-!storybook-static/favicon.ico
+react/storybook-static/**/*
+!react/storybook-static/favicon.ico
 
 # Created by .ignore support plugin (hsz.mobi)
 ### VisualStudioCode template
