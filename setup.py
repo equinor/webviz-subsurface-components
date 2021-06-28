@@ -29,6 +29,8 @@ TESTS_REQUIRE = [
     "pylint>=2.4",
     "scipy>=1.2",
     "selenium>=3.141",
+    "jsonpatch>=1.32",
+    "jsonpointer>=2.1",
 ]
 
 # 'dash[testing]' to be added in TEST_REQUIRE when
