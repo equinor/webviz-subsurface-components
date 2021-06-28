@@ -22,6 +22,7 @@ from .VectorCalculatorWrapper import VectorCalculatorWrapper as VectorCalculator
 from .VectorCalculatorWrapper import (
     VectorCalculatorParser,
     ExpressionInfo,
+    ExternalParseData,
     VariableVectorMapInfo,
 )
 
