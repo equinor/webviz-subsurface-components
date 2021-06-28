@@ -14,11 +14,13 @@ import MorrisDemo from "./MorrisDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import VectorSelectorDemo from "./VectorSelectorDemo";
+import WellLogViewerDemo from "./WellLogViewerDemo";
+import VectorCalculatorDemo from "./VectorCalculatorDemo";
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "LeafletMap" };
+        this.state = { value: "VectorCalculator" };
     }
 
     onChange(e) {
@@ -27,6 +29,15 @@ class App extends Component {
 
     renderDemo() {
         switch (this.state.value) {
+            case "VectorCalculator": {
+                return <VectorCalculatorDemo />;
+            }
+            case "DeckGLMapDemo": {
+                return <DeckGLMapDemo />;
+            }
+            case "GroupTree": {
+                return <GroupTreeDemo />;
+            }
             case "LeafletMap": {
                 return <LeafletMapDemo />;
             }
@@ -61,6 +72,9 @@ class App extends Component {
                     value={this.state.value}
                     onChange={this.onChange.bind(this)}
                 >
+                    <option value="VectorCalculator">VectorCalculator</option>
+                    <option value="DeckGLMapDemo">DeckGLMapDemo</option>
+                    <option value="GroupTree">GroupTree</option>
                     <option value="LeafletMap">LeafletMap</option>
                     <option value="HistoryMatch">HistoryMatch</option>
                     <option value="Morris">Morris</option>

@@ -1,0 +1,87 @@
+import React from "react";
+import { Icon, TextField, Progress } from "@equinor/eds-core-react";
+import { error_filled, thumbs_up } from "@equinor/eds-icons";
+
+import "../VectorCalculator.css";
+
+export enum ExpressionStatus {
+    Valid = 1,
+    Invalid = 2,
+    Evaluating = 3,
+}
+
+interface ExpressionInputTextFieldProps {
+    expression: string;
+    status: ExpressionStatus;
+    helperText: string;
+    disabled?: boolean;
+    onExpressionChange: (expression: string) => void;
+}
+
+export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
+    (props: ExpressionInputTextFieldProps) => {
+        const { expression, status, helperText, disabled } = props;
+
+        const [textFieldVariantState, setTextFieldVariantState] =
+            React.useState<"success" | "error" | "warning" | "default">(
+                "default"
+            );
+        const [textFieldIconState, setTextFieldIconState] =
+            React.useState<React.ReactNode | undefined>(undefined);
+
+        Icon.add({ error_filled, thumbs_up });
+
+        const textFieldVariant = React.useCallback(():
+            | "error"
+            | "success"
+            | "default" => {
+            if (status === ExpressionStatus.Valid) {
+                return "success";
+            }
+            if (status === ExpressionStatus.Invalid) {
+                return "error";
+            }
+            return "default";
+        }, [status]);
+
+        const textFieldIcon = React.useCallback(():
+            | React.ReactNode
+            | undefined => {
+            if (status === ExpressionStatus.Evaluating) {
+                return <Progress.Circular />;
+            }
+            if (status === ExpressionStatus.Valid) {
+                return <Icon key="thumbs" name="thumbs_up" />;
+            }
+            if (status === ExpressionStatus.Invalid) {
+                return <Icon key="error" name="error_filled" />;
+            }
+            return undefined;
+        }, [status]);
+
+        React.useEffect(() => {
+            setTextFieldVariantState(textFieldVariant());
+            setTextFieldIconState(textFieldIcon());
+        }, [status]);
+
+        const handleInputChange = (
+            e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
+        ): void => {
+            const newExpression: string = e.target.value;
+            props.onExpressionChange(newExpression);
+        };
+
+        return (
+            <TextField
+                id="expression_input_field"
+                label="Expression"
+                placeholder="New expression"
+                onChange={handleInputChange}
+                value={expression}
+                disabled={disabled}
+                variant={textFieldVariantState}
+                inputIcon={textFieldIconState}
+                helperText={helperText}
+            ></TextField>
+        );
+    };
