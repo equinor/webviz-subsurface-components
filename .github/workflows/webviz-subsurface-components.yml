@@ -82,6 +82,9 @@ jobs:
           npm run test
           pytest ./tests --headless
 
+      - name: Upload coverage to Codecov
+          uses: codecov/codecov-action@v1
+
       - name: 🚢 Build and deploy Python package
         if: github.event_name == 'release' && matrix.python-version == '3.6'
         env:
