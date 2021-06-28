@@ -5,10 +5,8 @@ webviz_subsurface_components/**/*
 
 DESCRIPTION
 NAMESPACE
-R/
 man/
 inst/
-.Rbuildignore
 
 # Storybook stuff
 react/storybook-static/**/*
