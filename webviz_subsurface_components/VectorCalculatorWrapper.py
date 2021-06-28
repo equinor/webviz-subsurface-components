@@ -3,8 +3,6 @@ from functools import wraps
 import sys
 import re
 
-from uuid import uuid4
-
 if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
     from typing import TypedDict
 else:
@@ -37,22 +35,6 @@ class ExternalParseData(TypedDict):
     variables: List[str]
     isValid: bool
     message: str
-
-
-class ConfigExpressionData(TypedDict):
-    """Type definition for configuration of pre-defined calculated expressions
-
-    Simplified data type to pre-define expressions for user.
-
-    The ConfigExpressionData instance name is the name of the expression - i.e.
-    when using a dictionary of ConfigExpressionData the expression name is the dict key
-
-    expression: str, mathematical expression
-    variableVectorMap: Dict[str,str], Dictionary with {key, value} = {variableName, vectorName}
-    """
-
-    expression: str
-    variableVectorMap: Dict[str, str]
 
 
 class VectorCalculatorParser(Parser):
@@ -94,41 +76,6 @@ class VectorCalculatorWrapper(VectorCalculator):
         super(VectorCalculatorWrapper, self).__init__(
             *args, **kwargs, isDashControlled=True
         )
-
-    @staticmethod
-    def variable_vector_map_from_dict(
-        variable_vector_dict: Dict[str, str]
-    ) -> List[VariableVectorMapInfo]:
-        variable_vector_map: List[VariableVectorMapInfo] = []
-        for variable in variable_vector_dict:
-            variable_vector_map.append(
-                {
-                    "variableName": variable,
-                    "vectorName": [variable_vector_dict[variable]],
-                }
-            )
-        return variable_vector_map
-
-    @staticmethod
-    def expressions_from_config(
-        expressions: Dict[str, ConfigExpressionData],
-    ) -> List[ExpressionInfo]:
-        output: List[ExpressionInfo] = []
-
-        for expression in expressions:
-            output.append(
-                {
-                    "name": expression,
-                    "expression": expressions[expression]["expression"],
-                    "id": f"{uuid4()}",
-                    "variableVectorMap": VectorCalculatorWrapper.variable_vector_map_from_dict(
-                        expressions[expression]["variableVectorMap"]
-                    ),
-                    "isValid": True,
-                    "isDeletable": False,
-                }
-            )
-        return output
 
     @staticmethod
     def parse_expression(expression: ExpressionInfo) -> ExternalParseData:
