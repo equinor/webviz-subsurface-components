@@ -8,6 +8,7 @@ import { Zone } from "../../redux/types";
 import { findSubzones } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
 
+//Construct a stratigraphy tree as the input of react-dropdown-tree
 const extractStratigraphyTree = (stratigraphy: Zone[]): TreeNodeProps => {
     const root: TreeNodeProps = {
         label: "All",
@@ -32,7 +33,7 @@ const extractStratigraphyTree = (stratigraphy: Zone[]): TreeNodeProps => {
     return root;
 };
 
-//DFS
+//Find an array of the selected subzones names from the given selectedNodes
 export const findSelectedZones = (
     stratigraphy: Zone[],
     selectedNodes: TreeNodeProps[]
@@ -61,18 +62,21 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     })
 );
-
+/**
+ * A react component for selecting zones to display in the completions plot
+ */
 const ZoneSelector: React.FC = React.memo(() => {
     const classes = useStyles();
+    // Use input data directly
     const data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
-
+    // Memo
     const stratigraphyTree = useMemo(
         () => extractStratigraphyTree(data.stratigraphy),
         [data.stratigraphy]
     );
-    // handlers
+    // Handlers
     const handleSelectionChange = useCallback(
         (_, selectedNodes) =>
             dispatch(
@@ -82,6 +86,7 @@ const ZoneSelector: React.FC = React.memo(() => {
             ),
         [dispatch, data.stratigraphy]
     );
+    // Render
     return (
         <DropdownTreeSelect
             texts={{ placeholder: "Select Zone(s)..." }}

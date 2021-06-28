@@ -1,9 +1,9 @@
 import { TopBar } from "@equinor/eds-core-react";
 import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
-import FilterMenu from "./FilterMenu";
+import FilterButton from "./FilterButton";
 import TimeRangeSelector from "./TimeRangeSelector";
-import ViewMenu from "./ViewMenu";
+import ViewButton from "./ViewButton";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -17,6 +17,9 @@ const useStyles = makeStyles(() =>
         },
     })
 );
+/**
+ * A settings bar that offers time selection and other viewing/filtering functions
+ */
 const SettingsBar: React.FC = React.memo(() => {
     const classes = useStyles();
     return (
@@ -25,8 +28,8 @@ const SettingsBar: React.FC = React.memo(() => {
                 <TimeRangeSelector />
             </TopBar.Header>
             <TopBar.Actions className={classes.actions}>
-                <ViewMenu />
-                <FilterMenu />
+                <ViewButton />
+                <FilterButton />
             </TopBar.Actions>
         </TopBar>
     );

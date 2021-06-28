@@ -1,0 +1,261 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test time range selector snapshot test 1`] = `
+.c1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  position: relative;
+  margin: 0;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  font-family: Equinor;
+  font-size: 0.750rem;
+  font-weight: 500;
+  line-height: 1.333em;
+  text-align: left;
+  margin-left: 8px;
+  margin-right: 8px;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c2 {
+  margin: 0;
+}
+
+.c3 {
+  border: none;
+  border-radius: 0;
+  box-shadow: inset 0 -1px 0 0 var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  padding-left: 8px;
+  padding-top: 6px;
+  padding-right: 8px;
+  padding-bottom: 6px;
+  margin: 0;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.500em;
+  -webkit-letter-spacing: 0.025em;
+  -moz-letter-spacing: 0.025em;
+  -ms-letter-spacing: 0.025em;
+  letter-spacing: 0.025em;
+  text-align: left;
+  padding-right: calc(8px *2 + 24px);
+  display: block;
+  margin: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  background-repeat: no-repeat,repeat;
+  background-position: right 8px top 50%;
+  width: 100%;
+}
+
+.c3:active,
+.c3:focus {
+  box-shadow: none;
+  outline: 2px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  outline-offset: 0px;
+}
+
+.c3:disabled {
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  cursor: not-allowed;
+  box-shadow: none;
+  outline: none;
+}
+
+.c3:disabled .arrow-icon {
+  fill: red;
+}
+
+.c3:disabled:focus,
+.c3:disabled:active {
+  outline: none;
+}
+
+.c0 {
+  min-width: 100px;
+  width: 100%;
+}
+
+<div
+  class="makeStyles-root-1"
+>
+  <div
+    class="makeStyles-slider-2"
+  >
+    <span>
+      Time Steps
+    </span>
+    <span
+      class="MuiSlider-root WithStyles(ForwardRef(Slider))-root-4 MuiSlider-colorPrimary MuiSlider-trackFalse"
+    >
+      <span
+        class="MuiSlider-rail"
+      />
+      <span
+        class="MuiSlider-track"
+        style="left: 0%; width: 100%;"
+      />
+      <input
+        type="hidden"
+        value="9"
+      />
+      <span
+        class="MuiSlider-mark"
+        data-index="0"
+        style="left: 0%;"
+      />
+      <span
+        class="MuiSlider-mark"
+        data-index="1"
+        style="left: 11.11111111111111%;"
+      />
+      <span
+        class="MuiSlider-mark"
+        data-index="2"
+        style="left: 22.22222222222222%;"
+      />
+      <span
+        class="MuiSlider-mark"
+        data-index="3"
+        style="left: 33.333333333333336%;"
+      />
+      <span
+        class="MuiSlider-mark"
+        data-index="4"
+        style="left: 44.44444444444444%;"
+      />
+      <span
+        class="MuiSlider-mark"
+        data-index="5"
+        style="left: 55.55555555555556%;"
+      />
+      <span
+        class="MuiSlider-mark"
+        data-index="6"
+        style="left: 66.66666666666667%;"
+      />
+      <span
+        class="MuiSlider-mark"
+        data-index="7"
+        style="left: 77.77777777777777%;"
+      />
+      <span
+        class="MuiSlider-mark"
+        data-index="8"
+        style="left: 88.88888888888889%;"
+      />
+      <span
+        class="MuiSlider-mark MuiSlider-markActive"
+        data-index="9"
+        style="left: 100%;"
+      />
+      <span
+        aria-labelledby="time-step-slider-label"
+        aria-orientation="horizontal"
+        aria-valuemax="9"
+        aria-valuemin="0"
+        aria-valuenow="9"
+        class="MuiSlider-thumb MuiSlider-thumbColorPrimary PrivateValueLabel-open-7 PrivateValueLabel-thumb-6"
+        data-index="0"
+        role="slider"
+        style="left: 100%;"
+        tabindex="0"
+      >
+        <span
+          class="PrivateValueLabel-offset-8 MuiSlider-valueLabel WithStyles(ForwardRef(Slider))-valueLabel-5"
+        >
+          <span
+            class="PrivateValueLabel-circle-9"
+          >
+            <span
+              class="PrivateValueLabel-label-10"
+            >
+              2002-10-01
+            </span>
+          </span>
+        </span>
+      </span>
+    </span>
+  </div>
+  <div
+    class="c0 makeStyles-selector-3"
+  >
+    <label
+      class="c1"
+      for="time-end-selector"
+    >
+      <span
+        class="c2"
+      >
+        Select Time
+      </span>
+    </label>
+    <select
+      class="c3"
+      id="time-end-selector"
+    >
+      <option
+        value="0"
+      >
+        2000-02-01
+      </option>
+      <option
+        value="1"
+      >
+        2000-06-01
+      </option>
+      <option
+        value="2"
+      >
+        2000-07-01
+      </option>
+      <option
+        value="3"
+      >
+        2000-10-01
+      </option>
+      <option
+        value="4"
+      >
+        2001-01-01
+      </option>
+      <option
+        value="5"
+      >
+        2001-03-01
+      </option>
+      <option
+        value="6"
+      >
+        2001-04-01
+      </option>
+      <option
+        value="7"
+      >
+        2001-10-01
+      </option>
+      <option
+        value="8"
+      >
+        2002-07-01
+      </option>
+      <option
+        value="9"
+      >
+        2002-10-01
+      </option>
+    </select>
+  </div>
+</div>
+`;

@@ -42,6 +42,7 @@ type VectorSelectorPropType = {
     selectedTags?: string[];
     placeholder?: string;
     numSecondsUntilSuggestionsAreShown: number;
+    lineBreakAfterTag?: boolean;
     persistence: boolean | string | number;
     persisted_props: "selectedTags"[];
     persistence_type: "local" | "session" | "memory";
@@ -58,15 +59,13 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
         super(props);
         this.props = props;
 
-        let hasError = false;
-        let error = "";
+        let error: string | undefined;
         try {
             this.treeData = new TreeData({
                 treeData: this.modifyTreeData(props.data, props.numMetaNodes),
                 delimiter: props.delimiter,
             });
         } catch (e) {
-            hasError = true;
             error = e;
         }
 
@@ -89,12 +88,55 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             nodeSelections,
             currentTagIndex: 0,
             suggestionsVisible: false,
-            hasError: hasError,
-            error: error,
+            hasError: error !== undefined,
+            error: error || "",
         };
     }
 
     componentDidUpdate(prevProps: VectorSelectorPropType): void {
+        if (
+            (this.props.data &&
+                JSON.stringify(this.props.data) !==
+                    JSON.stringify(prevProps.data)) ||
+            (this.props.delimiter &&
+                this.props.delimiter !== prevProps.delimiter) ||
+            (this.props.numMetaNodes &&
+                this.props.numMetaNodes !== prevProps.numMetaNodes)
+        ) {
+            let error: string | undefined;
+            try {
+                this.treeData = new TreeData({
+                    treeData: this.modifyTreeData(
+                        this.props.data,
+                        this.props.numMetaNodes
+                    ),
+                    delimiter: this.props.delimiter,
+                });
+            } catch (e) {
+                this.treeData = null;
+                error = e;
+            }
+            const nodeSelections: VectorSelection[] = [];
+            for (const node of this.state.nodeSelections) {
+                nodeSelections.push(
+                    this.createNewNodeSelection(node.getNodePath())
+                );
+            }
+
+            this.setState(
+                {
+                    nodeSelections: nodeSelections,
+                    currentTagIndex: this.state.currentTagIndex,
+                    suggestionsVisible: this.state.suggestionsVisible,
+                    hasError: error !== undefined,
+                    error: error || "",
+                },
+                () => {
+                    this.updateSelectedTagsAndNodes();
+                }
+            );
+        }
+
         const selectedTags = this.state.nodeSelections
             .filter((nodeSelection) => nodeSelection.isValid())
             .map((nodeSelection) =>
@@ -133,7 +175,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             selected: false,
             delimiter: this.props.delimiter,
             numMetaNodes: this.props.numMetaNodes + 1,
-            treeData: this.treeData,
+            treeData: this.treeData as TreeData,
         });
     }
 
@@ -160,7 +202,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             level: number
         ) => {
             const newData: TreeDataNode[] = [];
-            if (level == numMetaNodes && data) {
+            if (level === numMetaNodes && data) {
                 const types = {};
                 for (let i = 0; i < data.length; i++) {
                     let type = "others";

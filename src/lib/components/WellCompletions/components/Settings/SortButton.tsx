@@ -9,17 +9,15 @@ import SortTable from "./SortTable";
 Icon.add({ sort }); // (this needs only be done once)
 const useStyles = makeStyles(() =>
     createStyles({
-        dialog: {
-            minWidth: "400px",
-        },
         action: { margin: "5px" },
     })
 );
-
+/**
+ * A menu button that shows a dialog for sorting wells by attributes
+ */
 const SortButton: React.FC = React.memo(() => {
     const classes = useStyles();
     // Dialogs
-
     const [visibleScrim, setVisibleScrim] = useState(false);
     const handleClose = () => {
         setVisibleScrim(!visibleScrim);
@@ -31,19 +29,12 @@ const SortButton: React.FC = React.memo(() => {
             </Menu.Item>
             {visibleScrim && (
                 <Scrim onClose={handleClose}>
-                    <Dialog className={classes.dialog}>
+                    <Dialog style={{ minWidth: "400px" }}>
                         <Dialog.Title>Well sorting levels</Dialog.Title>
                         <Dialog.CustomContent>
                             <SortTable />
                         </Dialog.CustomContent>
                         <Dialog.Actions>
-                            <Button
-                                className={classes.action}
-                                variant="ghost"
-                                onClick={() => setVisibleScrim(false)}
-                            >
-                                Cancel
-                            </Button>
                             <Button
                                 className={classes.action}
                                 onClick={() => setVisibleScrim(false)}

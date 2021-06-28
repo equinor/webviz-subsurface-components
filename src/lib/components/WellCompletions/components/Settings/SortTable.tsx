@@ -42,18 +42,29 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 Icon.add({ add_box }); // (this needs only be done once)
 Icon.add({ delete_to_trash }); // (this needs only be done once)
-
+/**
+ * A table that allows adding or removing sorting layers.
+ * There is also an option per row to sort by ascending or descending order
+ */
 const SortTable: React.FC = React.memo(() => {
     const classes = useStyles();
+    // Local states
+    // Sort key in the placeholder row
     const [sortKeyToAdd, setSortKeyToAdd] = useState<string>();
+    // Sort direction in the placeholder row
     const [sortDirectionToAdd, setSortDirectionToAdd] =
         useState<SortDirection>("Ascending");
+
     // Redux
     const dispatch = useDispatch();
+    // The attributes that we are currently sorting by
     const sortBy = useSelector((st: WellCompletionsState) => st.ui.sortBy);
+    // All the attribute keys
     const attributeKeys = useSelector(
         (st: WellCompletionsState) => st.attributes.attributeKeys
     );
+    // Memo
+    // Apart from the user defined attribute, we can also sort by well name, stratigraphy depth etc
     const sortKeys = useMemo(() => {
         const keys = new Set<string>([
             SORT_BY_NAME,
@@ -63,11 +74,14 @@ const SortTable: React.FC = React.memo(() => {
         attributeKeys.forEach((key) => keys.add(key));
         return keys;
     }, [attributeKeys]);
-
+    // The attribute keys that are not yet added to the current sorting set
     const availableToAdd = useMemo(
         () => Array.from(sortKeys).filter((key) => !(key in sortBy)),
         [sortKeys, sortBy]
     );
+
+    // Effects
+    // Update the sort key in the placeholder row to be the first item in the available attribute key set
     useEffect(() => {
         if (
             availableToAdd.length > 0 &&
@@ -75,11 +89,14 @@ const SortTable: React.FC = React.memo(() => {
         )
             setSortKeyToAdd(availableToAdd[0]);
     }, [availableToAdd, sortKeyToAdd]);
-    // handlers
+
+    // Handlers
+    // Update the sort key in the placeholder row
     const onSortKeyToAddChange = useCallback(
         (event) => setSortKeyToAdd(event.target.value),
         [setSortKeyToAdd]
     );
+    // Update the sort direction in the placeholder row
     const onSortDirectionToAddChange = useCallback(
         () =>
             setSortDirectionToAdd(
@@ -88,16 +105,19 @@ const SortTable: React.FC = React.memo(() => {
         [setSortDirectionToAdd, sortDirectionToAdd]
     );
 
+    // Add or update sort key and direction
     const onUpdateSortKey = useCallback(
         (sortKey, sortDirection) =>
             dispatch(updateSortKey({ sortKey, sortDirection })),
         [dispatch]
     );
+    // Remove sort key and direction
     const onDeleteSortKey = useCallback(
         (sortKey) => dispatch(deleteSortKey(sortKey)),
         [dispatch]
     );
 
+    // Render
     return (
         <Box
             marginTop={1}

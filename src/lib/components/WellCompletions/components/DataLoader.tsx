@@ -21,7 +21,9 @@ const defaultData = {
     timeSteps: [],
 };
 export const DataContext = React.createContext<Data>(defaultData);
-
+/**
+ * A data loading layer to ready the input data and redux store
+ */
 const DataProvider: React.FC<Props> = ({
     children,
     id,
@@ -32,6 +34,7 @@ const DataProvider: React.FC<Props> = ({
         data.stratigraphy.forEach((zone) => findSubzones(zone, subzones));
         return subzones.map((zone) => zone.name);
     }, [data.stratigraphy]);
+
     const preloadedState = useMemo(() => {
         //Setup attributes
         const attributeKeys = new Set<string>();

@@ -1,0 +1,91 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test pagination snapshot test 1`] = `
+.c0 {
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.250em;
+  text-align: left;
+}
+
+<div
+  class="makeStyles-root-1"
+>
+  <div
+    class="makeStyles-left-2"
+  >
+    <p
+      class="c0"
+      style="align-self: center; min-width: 125px;"
+    >
+      1 - 11 of 11 items
+    </p>
+  </div>
+  <nav
+    aria-label="pagination navigation"
+    class="MuiPagination-root makeStyles-right-3"
+  >
+    <ul
+      class="MuiPagination-ul"
+    >
+      <li>
+        <button
+          aria-label="Go to previous page"
+          class="MuiButtonBase-root MuiPaginationItem-root MuiPaginationItem-page Mui-disabled Mui-disabled"
+          disabled=""
+          tabindex="-1"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiPaginationItem-icon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"
+            />
+          </svg>
+        </button>
+      </li>
+      <li>
+        <button
+          aria-current="true"
+          aria-label="page 1"
+          class="MuiButtonBase-root MuiPaginationItem-root MuiPaginationItem-page Mui-selected"
+          tabindex="0"
+          type="button"
+        >
+          1
+          <span
+            class="MuiTouchRipple-root"
+          />
+        </button>
+      </li>
+      <li>
+        <button
+          aria-label="Go to next page"
+          class="MuiButtonBase-root MuiPaginationItem-root MuiPaginationItem-page Mui-disabled Mui-disabled"
+          disabled=""
+          tabindex="-1"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiPaginationItem-icon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+            />
+          </svg>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>
+`;
