@@ -19,27 +19,25 @@ export const nameOccupiedByVectors = (
     name: string,
     vectors: TreeDataNode[]
 ): boolean => {
-    if (vectors.length <= 0) {
-        return false;
-    }
     const nodes: string[] = name.split(":");
     let children: TreeDataNode[] = vectors;
 
     for (const node of nodes) {
-        // Node cannot be appended to an end node of vector tree
-        if (children.length <= 0) {
-            return true;
-        }
-
-        const foundChild: TreeDataNode | undefined = children.find(
+        const childNode: TreeDataNode | undefined = children.find(
             (child) => child.name === node
         );
-        if (!foundChild) {
+        // Node is available child node
+        if (!childNode) {
             return false;
         }
 
-        children = foundChild.children ? foundChild.children : [];
+        // Name occupied if child is last node of vector name path
+        if (!childNode.children || childNode.children.length <= 0) {
+            return true;
+        }
+        children = childNode.children;
     }
+    // Did not find available child node
     return true;
 };
 

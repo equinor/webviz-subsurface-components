@@ -76,7 +76,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 return nameParseMessage(name);
             }
             if (nameOccupiedByVectors(name, vectors)) {
-                return "Name occupied existing vector!";
+                return "Name occupied by existing vector!";
             }
             if (nameInExpressions(name, existingExpressions)) {
                 return "Name of existing expression!";
