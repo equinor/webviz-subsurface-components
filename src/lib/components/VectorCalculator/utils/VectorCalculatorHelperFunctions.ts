@@ -15,33 +15,36 @@ export const parseName = (name: string): boolean => {
     return regex.test(name);
 };
 
-export const nameInVectors = (
+export const nameOccupiedByVectors = (
     name: string,
     vectors: TreeDataNode[]
 ): boolean => {
+    if (vectors.length <= 0) {
+        return false;
+    }
     const nodes: string[] = name.split(":");
-    let children: TreeDataNode[] | undefined = vectors;
+    let children: TreeDataNode[] = vectors;
 
     for (const node of nodes) {
-        if (!children) {
-            return false;
+        // Node cannot be appended to an end node of vector tree
+        if (children.length <= 0) {
+            return true;
         }
 
         const foundChild: TreeDataNode | undefined = children.find(
             (child) => child.name === node
         );
-
         if (!foundChild) {
             return false;
         }
 
-        children = foundChild.children;
+        children = foundChild.children ? foundChild.children : [];
     }
     return true;
 };
 
 export const validName = (name: string, vectors: TreeDataNode[]): boolean => {
-    return parseName(name) && !nameInVectors(name, vectors);
+    return parseName(name) && !nameOccupiedByVectors(name, vectors);
 };
 
 export const nameParseMessage = (name: string): string => {
