@@ -11,7 +11,9 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const packagejson = require("./package.json");
-const dashLibraryName = packagejson.name.replace(/[-\/]/g, "_").replace(/@/g, "");
+const dashLibraryName = packagejson.name
+    .replace(/[-/]/g, "_")
+    .replace(/@/g, "");
 
 module.exports = (env, argv) => {
     let mode;
@@ -53,7 +55,9 @@ module.exports = (env, argv) => {
             extensions: [".ts", ".tsx", ".js", ".jsx"],
         },
         output: {
-            path: demo ? __dirname : path.resolve(__dirname, "..", dashLibraryName),
+            path: demo
+                ? __dirname
+                : path.resolve(__dirname, "..", dashLibraryName),
             filename: filename_js,
             library: dashLibraryName,
             libraryTarget: "window",
@@ -64,7 +68,9 @@ module.exports = (env, argv) => {
         externals,
         plugins: [
             new MiniCssExtractPlugin({
-                filename: demo ? filename_css : path.join("..", dashLibraryName,filename_css),
+                filename: demo
+                    ? filename_css
+                    : path.join("..", dashLibraryName, filename_css),
             }),
             // fix "process is not defined" error:
             // https://stackoverflow.com/questions/41359504/webpack-bundle-js-uncaught-referenceerror-process-is-not-defined
