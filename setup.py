@@ -15,7 +15,13 @@ with open("README.md", "r") as fh:
 with open(os.path.join("webviz_subsurface_components", "package.json")) as f:
     package = json.load(f)
 
-package_name = package["name"].replace(" ", "_").replace("-", "_")
+package_name = (
+    package["name"]
+    .replace(" ", "_")
+    .replace("-", "_")
+    .replace("/", "_")
+    .replace("@", "")
+)
 
 INSTALL_REQUIRES = ["dash>=1.6"]
 

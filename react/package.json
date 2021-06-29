@@ -1,5 +1,5 @@
 {
-    "name": "webviz_subsurface_components",
+    "name": "@webviz/subsurface-components",
     "description": "Custom Dash components for use in Webviz",
     "repository": {
         "type": "git",
@@ -12,12 +12,12 @@
     "main": "build/index.js",
     "scripts": {
         "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
-        "postinstall": "cp ./package.json webviz_subsurface_components/package.json && npm run setup_deckgl_types",
+        "postinstall": "cp ./package.json ../webviz_subsurface_components/package.json && npm run setup_deckgl_types",
         "build:js": "webpack --mode production",
         "build:js-dev": "webpack --mode development",
         "build:js-demo": "webpack --mode production --entry ./src/demo/index.js",
-        "build:py_and_r": "dash-generate-components ./src/lib/components webviz_subsurface_components -p package-info.json --r-prefix '' --ignore \"(.js|.stories.jsx)$\"",
-        "build": "npm run build:js && npm run build:js-dev && npm run build:py_and_r",
+        "build:py": "dash-generate-components ./src/lib/components ../webviz_subsurface_components -p package-info.json --ignore \"(.js|.stories.jsx)$\"",
+        "build": "npm run build:js && npm run build:js-dev && npm run build:py",
         "typecheck": "tsc --noEmit",
         "format": "eslint --fix *.js *json \"src/**/*.+(ts|tsx|js|jsx|json|css)\"",
         "lint": "eslint *.js *.json \"src/**/*.+(ts|tsx|js|jsx|json|css)\"",
@@ -29,7 +29,7 @@
         "test:watch": "npm test -- --watch"
     },
     "author": "R&T Equinor <akia@equinor.com>",
-    "license": "LGPL",
+    "license": "MPL",
     "dependencies": {
         "@danmarshall/deckgl-typings": "^4.9.0",
         "@equinor/eds-core-react": "^0.12.1",
