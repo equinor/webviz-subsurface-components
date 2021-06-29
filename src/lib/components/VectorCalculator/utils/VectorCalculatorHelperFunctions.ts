@@ -15,6 +15,35 @@ export const parseName = (name: string): boolean => {
     return regex.test(name);
 };
 
+export const nameInVectors = (
+    name: string,
+    vectors: TreeDataNode[]
+): boolean => {
+    const nodes: string[] = name.split(":");
+    let children: TreeDataNode[] | undefined = vectors;
+
+    for (const node of nodes) {
+        if (!children) {
+            return false;
+        }
+
+        const foundChild: TreeDataNode | undefined = children.find(
+            (child) => child.name === node
+        );
+
+        if (!foundChild) {
+            return false;
+        }
+
+        children = foundChild.children;
+    }
+    return true;
+};
+
+export const validName = (name: string, vectors: TreeDataNode[]): boolean => {
+    return parseName(name) && !nameInVectors(name, vectors);
+};
+
 export const nameParseMessage = (name: string): string => {
     if (parseName(name)) {
         return "";
@@ -54,7 +83,7 @@ export const nameParseMessage = (name: string): string => {
     return 'Valid characters: a-z, A-Z, 0-9, " _ " and " : "';
 };
 
-export const isNameExisting = (
+export const nameInExpressions = (
     name: string,
     expressions: ExpressionType[]
 ): boolean => {
@@ -81,7 +110,7 @@ export const getAvailableName = (
 ): string => {
     let availableName = nameSuggestion;
     let n = 1;
-    while (isNameExisting(availableName, expressions)) {
+    while (nameInExpressions(availableName, expressions)) {
         availableName = `${nameSuggestion}_${n}`;
         ++n;
     }

@@ -2,9 +2,11 @@ import React from "react";
 import { TextField, Icon } from "@equinor/eds-core-react";
 import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
 
+import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import {
-    isNameExisting,
+    nameInVectors,
+    nameInExpressions,
     parseName,
     nameParseMessage,
 } from "../utils/VectorCalculatorHelperFunctions";
@@ -13,6 +15,7 @@ interface ExpressionNameTextFieldProps {
     initialName: string;
     currentName: string;
     existingExpressions: ExpressionType[];
+    vectors: TreeDataNode[];
     disabled?: boolean;
     onNameChange: (name: string) => void;
     onValidChange: (isValid: boolean) => void;
@@ -21,7 +24,8 @@ interface ExpressionNameTextFieldProps {
 export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     props: ExpressionNameTextFieldProps
 ) => {
-    const { currentName, initialName, existingExpressions, disabled } = props;
+    const { currentName, initialName, existingExpressions, vectors, disabled } =
+        props;
     const [name, setName] = React.useState(initialName);
 
     const [textFieldVariantState, setTextFieldVariantState] =
@@ -34,13 +38,6 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
 
     Icon.add({ error_filled, thumbs_up, warning_filled });
 
-    const isExisting = React.useCallback(
-        (name: string): boolean => {
-            return isNameExisting(name, existingExpressions);
-        },
-        [isNameExisting, existingExpressions]
-    );
-
     const getTextFieldVariant = React.useCallback(
         (name: string): "success" | "error" | "warning" | "default" => {
             if (name === "") {
@@ -52,28 +49,48 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             if (name == initialName) {
                 return "success";
             }
-            if (isExisting(name)) {
+            if (
+                nameInVectors(name, vectors) ||
+                nameInExpressions(name, existingExpressions)
+            ) {
                 return "warning";
             }
             return "success";
         },
-        [parseName, isExisting, initialName]
+        [
+            parseName,
+            nameInVectors,
+            nameInExpressions,
+            existingExpressions,
+            initialName,
+            vectors,
+        ]
     );
 
     const getTextFieldHelperText = React.useCallback(
         (name: string): string => {
-            if (name === "") {
+            if (name === "" || name === initialName) {
                 return "";
             }
             if (!parseName(name)) {
                 return nameParseMessage(name);
             }
-            if (isExisting(name) && name !== initialName) {
-                return "Name is already existing";
+            if (nameInVectors(name, vectors)) {
+                return "Name of existing vector!";
+            }
+            if (nameInExpressions(name, existingExpressions)) {
+                return "Name of existing expression!";
             }
             return "";
         },
-        [parseName, isExisting, initialName]
+        [
+            parseName,
+            nameInVectors,
+            nameInExpressions,
+            existingExpressions,
+            initialName,
+            vectors,
+        ]
     );
 
     const getTextFieldIcon = React.useCallback(
@@ -81,12 +98,25 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             if (!parseName(name)) {
                 return <Icon key="error" name="error_filled" />;
             }
-            if (isExisting(name) && name !== initialName) {
+            if (name === initialName) {
+                return <Icon key="thumbs" name="thumbs_up" />;
+            }
+            if (
+                nameInVectors(name, vectors) ||
+                nameInExpressions(name, existingExpressions)
+            ) {
                 return <Icon key="warning" name="warning_filled" />;
             }
             return <Icon key="thumbs" name="thumbs_up" />;
         },
-        [parseName, isExisting, initialName]
+        [
+            parseName,
+            nameInVectors,
+            nameInExpressions,
+            existingExpressions,
+            initialName,
+            vectors,
+        ]
     );
 
     React.useEffect(() => {
@@ -109,15 +139,25 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             if (!parseName(name)) {
                 return false;
             }
+            if (nameInVectors(name, vectors)) {
+                return false;
+            }
             if (name === initialName) {
                 return true;
             }
-            if (isExisting(name)) {
+            if (nameInExpressions(name, existingExpressions)) {
                 return false;
             }
             return true;
         },
-        [parseName, isExisting, initialName]
+        [
+            parseName,
+            nameInExpressions,
+            nameInVectors,
+            existingExpressions,
+            initialName,
+            vectors,
+        ]
     );
 
     const handleInputChange = React.useCallback(
