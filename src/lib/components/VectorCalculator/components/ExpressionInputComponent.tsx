@@ -19,7 +19,7 @@ import {
 } from "../utils/VectorCalculatorTypes";
 import {
     isVariableVectorMapValid,
-    parseName,
+    validName,
 } from "../utils/VectorCalculatorHelperFunctions";
 import {
     expressionVariables,
@@ -44,7 +44,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
 ) => {
     const { activeExpression, expressions, externalParsing, disabled } = props;
     const [isValidName, setIsValidName] = React.useState<boolean>(
-        parseName(activeExpression.name)
+        validName(activeExpression.name, props.vectors)
     );
     const [expressionStatus, setExpressionStatus] =
         React.useState<ExpressionStatus>(ExpressionStatus.Invalid);
@@ -196,7 +196,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         setEditableExpression(activeExpressionClone);
         setCachedVariableVectorMap(variableVectorMapClone);
 
-        setIsValidName(parseName(activeExpressionClone.name));
+        setIsValidName(validName(activeExpressionClone.name, props.vectors));
         setIsValidVariableVectorMap(
             isVariableVectorMapValid(
                 activeExpressionClone.variableVectorMap,
@@ -223,7 +223,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         props.vectors,
         props.onExternalExpressionParsing,
         expressionParseMessage,
-        parseName,
+        validName,
         validateExpression,
         isVariableVectorMapValid,
     ]);
@@ -362,6 +362,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                     initialName={activeExpression.name}
                     currentName={editableExpression.name}
                     existingExpressions={expressions}
+                    vectors={props.vectors}
                     disabled={disabled}
                     onNameChange={handleNameChange}
                     onValidChange={handleValidNameChange}
