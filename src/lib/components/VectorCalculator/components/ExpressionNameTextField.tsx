@@ -5,7 +5,7 @@ import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import {
-    nameInVectors,
+    nameOccupiedByVectors,
     nameInExpressions,
     parseName,
     nameParseMessage,
@@ -50,7 +50,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 return "success";
             }
             if (
-                nameInVectors(name, vectors) ||
+                nameOccupiedByVectors(name, vectors) ||
                 nameInExpressions(name, existingExpressions)
             ) {
                 return "warning";
@@ -59,7 +59,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         },
         [
             parseName,
-            nameInVectors,
+            nameOccupiedByVectors,
             nameInExpressions,
             existingExpressions,
             initialName,
@@ -75,8 +75,8 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             if (!parseName(name)) {
                 return nameParseMessage(name);
             }
-            if (nameInVectors(name, vectors)) {
-                return "Name of existing vector!";
+            if (nameOccupiedByVectors(name, vectors)) {
+                return "Name occupied existing vector!";
             }
             if (nameInExpressions(name, existingExpressions)) {
                 return "Name of existing expression!";
@@ -85,7 +85,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         },
         [
             parseName,
-            nameInVectors,
+            nameOccupiedByVectors,
             nameInExpressions,
             existingExpressions,
             initialName,
@@ -102,7 +102,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 return <Icon key="thumbs" name="thumbs_up" />;
             }
             if (
-                nameInVectors(name, vectors) ||
+                nameOccupiedByVectors(name, vectors) ||
                 nameInExpressions(name, existingExpressions)
             ) {
                 return <Icon key="warning" name="warning_filled" />;
@@ -111,7 +111,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         },
         [
             parseName,
-            nameInVectors,
+            nameOccupiedByVectors,
             nameInExpressions,
             existingExpressions,
             initialName,
@@ -139,7 +139,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             if (!parseName(name)) {
                 return false;
             }
-            if (nameInVectors(name, vectors)) {
+            if (nameOccupiedByVectors(name, vectors)) {
                 return false;
             }
             if (name === initialName) {
@@ -153,7 +153,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         [
             parseName,
             nameInExpressions,
-            nameInVectors,
+            nameOccupiedByVectors,
             existingExpressions,
             initialName,
             vectors,
