@@ -7,7 +7,7 @@
       "pickDepth": 10
     },
     "resources": {
-      "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/propertyMap.png"
+      "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png"
     },
     "deckglSpecPatch": [
       {
@@ -60,8 +60,8 @@
             {
               "@@type": "WellsLayer",
               "id": "wells-layer",
-              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/volve_wells.json",
-              "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/volve_logs.json",
+              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+              "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
               "opacity": 1.0,
               "lineWidthScale": 5,
               "logRadius": 6,
@@ -74,13 +74,13 @@
             {
               "@@type": "FaultPolygonsLayer",
               "id": "fault-polygons-layer",
-              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/fault_polygons.geojson",
+              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson",
               "lineWidthMinPixels": 2
             },
             {
               "@@type": "PieChartLayer",
               "id": "pie-layer",
-              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/src/demo/example-data/piechart.json"
+              "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
             },
             {
               "@@type": "DrawingLayer",
