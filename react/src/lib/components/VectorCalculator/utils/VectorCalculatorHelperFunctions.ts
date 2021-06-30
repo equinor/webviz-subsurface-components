@@ -1,7 +1,4 @@
-import {
-    ExpressionType,
-    VariableVectorMapType,
-} from "../utils/VectorCalculatorTypes";
+import { ExpressionType, VariableVectorMapType } from "./VectorCalculatorTypes";
 import {
     TreeDataNode,
     TreeDataNodeMetaData,
