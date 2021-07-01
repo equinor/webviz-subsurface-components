@@ -85,6 +85,15 @@ module.exports = (env, argv) => {
                     exclude: /node_modules/,
                     loader: "babel-loader",
                 },
+{
+  test: /\.scss$/,
+  use: [
+     'vue-style-loader',
+     'css-loader',
+     'sass-loader'
+  ]
+},
+
                 {
                     test: /\.css$/,
                     use: [
@@ -121,3 +130,4 @@ module.exports = (env, argv) => {
         devtool,
     };
 };
+
