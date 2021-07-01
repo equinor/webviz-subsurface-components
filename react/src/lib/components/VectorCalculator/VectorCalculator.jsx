@@ -36,7 +36,7 @@ VectorCalculator.propTypes = {
     /**
      * Existing vectors for vector selector
      */
-    vectors: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    vectors: PropTypes.array.isRequired,
 
     /**
      * Pre-defined vector calculator expressions.
