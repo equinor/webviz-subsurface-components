@@ -54,6 +54,10 @@
     text-overflow: ellipsis;
 }
 
+.VectorCalculator .TextFieldWrapper {
+    height: 58px;
+}
+
 .VectorCalculator .VariablesTableContainer {
     overflow: visible;
     position: relative;

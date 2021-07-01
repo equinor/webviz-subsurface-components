@@ -72,16 +72,18 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
         };
 
         return (
-            <TextField
-                id="expression_input_field"
-                label="Expression"
-                placeholder="New expression"
-                onChange={handleInputChange}
-                value={expression}
-                disabled={disabled}
-                variant={textFieldVariantState}
-                inputIcon={textFieldIconState}
-                helperText={helperText}
-            ></TextField>
+            <div className="TextFieldWrapper">
+                <TextField
+                    id="expression_input_field"
+                    label="Expression"
+                    placeholder="New expression"
+                    onChange={handleInputChange}
+                    value={expression}
+                    disabled={disabled}
+                    variant={textFieldVariantState}
+                    inputIcon={textFieldIconState}
+                    helperText={helperText}
+                ></TextField>
+            </div>
         );
     };
