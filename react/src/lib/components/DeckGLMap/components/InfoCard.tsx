@@ -12,10 +12,13 @@ import { Button, Icon } from "@equinor/eds-core-react";
 import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
 
 import { PickInfo } from "deck.gl";
-import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import { PropertyMapPickInfo } from "../layers/utils/propertyMapTools";
 
 Icon.add({ arrow_drop_up, arrow_drop_down });
+
+export interface LayerPickInfo extends PickInfo<unknown> {
+    properties?: PropertyDataType[];
+}
 
 export interface PropertyDataType {
     name: string;
@@ -152,7 +155,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         });
 
         props.pickInfos.forEach((info) => {
-            const layer_props = (info as WellsPickInfo)?.properties;
+            const layer_props = (info as LayerPickInfo)?.properties;
             const data = infoCardData.find(
                 (item) => item.layerName === info.layer?.id
             );

@@ -1,7 +1,7 @@
-import { PickInfo } from "@deck.gl/core/lib/deck";
 import { RGBColor } from "@deck.gl/core/utils/color";
+import { LayerPickInfo } from "../../components/InfoCard";
 
-export interface BitmapPickInfo extends PickInfo<unknown> {
+export interface BitmapPickInfo extends LayerPickInfo {
     color?: RGBColor;
 }
 
