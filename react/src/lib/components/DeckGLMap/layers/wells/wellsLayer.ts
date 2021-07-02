@@ -118,7 +118,8 @@ export default class WellsLayer extends CompositeLayer<
         const log_layer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
                 id: "log_curve",
-                data: this.props.logData,
+                //data: this.props.logData,
+                data: require("D:\\BigLoopAnalytics\\data files\\volve_logs.json"),
                 pickable: true,
                 widthScale: 10,
                 widthMinPixels: 1,

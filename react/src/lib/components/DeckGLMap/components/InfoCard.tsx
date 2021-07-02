@@ -34,7 +34,7 @@ export interface InfoCardProps {
     pickInfos: PickInfo<unknown>[];
 }
 
-const useRowStyles = makeStyles({
+const useStyles = makeStyles({
     table: {
         "& > *": {
             backgroundColor: "#ffffffcc",
@@ -61,7 +61,7 @@ const useRowStyles = makeStyles({
 function Row(props: { layer_data: InfoCardDataType }) {
     const { layer_data } = props;
     const [open, setOpen] = React.useState(true);
-    const classes = useRowStyles();
+    const classes = useStyles();
 
     return (
         <React.Fragment>
@@ -179,7 +179,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         setInfoCardData(infoCardData);
     }, [props.pickInfos]);
 
-    const classes = useRowStyles();
+    const classes = useStyles();
     return (
         infoCardData && (
             <TableContainer component={Paper}>
