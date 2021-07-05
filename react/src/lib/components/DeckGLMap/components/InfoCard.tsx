@@ -11,26 +11,18 @@ import Paper from "@material-ui/core/Paper";
 import { Button, Icon } from "@equinor/eds-core-react";
 import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
 
-import { PickInfo } from "deck.gl";
+import { PickInfo } from "@deck.gl/core/lib/deck";
+import { LayerPickInfo, PropertyDataType } from "../layers/utils/layerTools";
 import { PropertyMapPickInfo } from "../layers/utils/propertyMapTools";
 
 Icon.add({ arrow_drop_up, arrow_drop_down });
 
-export interface LayerPickInfo extends PickInfo<unknown> {
-    properties?: PropertyDataType[];
-}
-
-export interface PropertyDataType {
-    name: string;
-    value: string | number;
-}
-
-export interface InfoCardDataType {
+interface InfoCardDataType {
     layerName: string;
     properties: PropertyDataType[];
 }
 
-export interface InfoCardProps {
+interface InfoCardProps {
     pickInfos: PickInfo<unknown>[];
 }
 
@@ -155,17 +147,17 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         });
 
         props.pickInfos.forEach((info) => {
-            const layer_props = (info as LayerPickInfo)?.properties;
+            const layer_props = (info as LayerPickInfo)?.property;
             const data = infoCardData.find(
                 (item) => item.layerName === info.layer?.id
             );
-            if (layer_props && layer_props.length) {
+            if (layer_props) {
                 if (data) {
-                    data.properties = data.properties.concat(layer_props);
+                    data.properties.push(layer_props);
                 } else {
                     infoCardData.push({
                         layerName: info.layer?.id || "unknown-layer",
-                        properties: layer_props,
+                        properties: [layer_props],
                     });
                 }
             }

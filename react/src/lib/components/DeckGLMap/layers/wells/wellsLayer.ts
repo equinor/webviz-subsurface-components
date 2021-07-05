@@ -9,7 +9,7 @@ import { color } from "d3-color";
 
 import { Feature } from "geojson";
 
-import { LayerPickInfo, PropertyDataType } from "../../components/InfoCard";
+import { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
 
 export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
@@ -162,14 +162,14 @@ export default class WellsLayer extends CompositeLayer<
             this.props.logName
         );
 
-        const properties: PropertyDataType[] = [];
-        if (md_property != null) properties.push(md_property);
-        if (log_property != null) properties.push(log_property);
+        let layer_property: PropertyDataType | null = null;
+        if (md_property) layer_property = md_property;
+        if (log_property) layer_property = log_property;
 
         return {
             ...info,
-            properties: properties,
-            logName: log_property?.name,
+            property: layer_property,
+            logName: layer_property?.name,
         };
     }
 }
