@@ -142,7 +142,7 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
                 patchSpec={patchSpec}
                 onHover={onHover}
             >
-                <InfoCard pickInfos={hoverInfo} />
+                {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
             </Map>
         </div>
     );
