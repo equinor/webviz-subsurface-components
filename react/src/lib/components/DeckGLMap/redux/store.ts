@@ -12,14 +12,14 @@ import { rootReducer } from "./reducer";
 export type MapState = ReturnType<typeof rootReducer>;
 export const createStore: (
     initialState: Record<string, unknown>,
-    patchSpec: (patch: Operation[]) => void
+    setSpecPatch: (patch: Operation[]) => void
 ) => EnhancedStore = (
     initialState: Record<string, unknown>,
-    patchSpec: (patch: Operation[]) => void
+    setSpecPatch: (patch: Operation[]) => void
 ) =>
     configureStore({
         reducer: rootReducer,
         enhancers: [withReduxEnhancer],
         preloadedState: { spec: initialState },
-        middleware: [patchMiddleware(patchSpec), ...getDefaultMiddleware()],
+        middleware: [patchMiddleware(setSpecPatch), ...getDefaultMiddleware()],
     });

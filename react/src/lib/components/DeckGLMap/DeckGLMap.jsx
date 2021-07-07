@@ -129,27 +129,32 @@ function DeckGLMap({
         },
         [coords]
     );
-    const setPatchSpec = React.useCallback(
-        (patch) =>
+    const setSpecPatch = React.useCallback(
+        (patch) => {
             setProps({
                 deckglSpecBase: patchedSpec,
                 deckglSpecPatch: patch,
-            }),
-        [setProps]
+            });
+        },
+        [setProps, patchedSpec]
     );
 
     return (
-        <div style={{ height: "100%", width: "100%", position: "relative" }}>
-            <Map
-                id={id}
-                resources={resources}
-                deckglSpec={patchedSpec}
-                patchSpec={setPatchSpec}
-                onHover={onHover}
+        patchedSpec && (
+            <div
+                style={{ height: "100%", width: "100%", position: "relative" }}
             >
-                <Coords pickInfos={hoverInfo} />
-            </Map>
-        </div>
+                <Map
+                    id={id}
+                    resources={resources}
+                    deckglSpec={patchedSpec}
+                    setSpecPatch={setSpecPatch}
+                    onHover={onHover}
+                >
+                    <Coords pickInfos={hoverInfo} />
+                </Map>
+            </div>
+        )
     );
 }
 

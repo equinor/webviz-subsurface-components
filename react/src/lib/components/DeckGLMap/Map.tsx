@@ -17,7 +17,7 @@ export interface MapProps {
     resources: Record<string, unknown>;
     deckglSpec: Record<string, unknown>;
     onHover: <D>(info: PickInfo<D>, e: MouseEvent) => void;
-    patchSpec: (patch: Operation[]) => void;
+    setSpecPatch: (patch: Operation[]) => void;
     children?: React.ReactNode;
 }
 
@@ -26,14 +26,18 @@ const Map: React.FC<MapProps> = ({
     resources,
     deckglSpec,
     onHover,
-    patchSpec,
+    setSpecPatch,
     children,
 }: MapProps) => {
     const deckRef = React.useRef<DeckGL>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
-        createStore(deckglSpec, patchSpec)
+        createStore(deckglSpec, setSpecPatch)
     );
+
+    React.useEffect(() => {
+        store.current = createStore(deckglSpec, setSpecPatch);
+    }, [setSpecPatch]);
 
     const [specObj, setSpecObj] = React.useState(null);
 
@@ -64,11 +68,11 @@ const Map: React.FC<MapProps> = ({
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore: TS2345
                 userData: {
-                    patchSpec: patchSpec,
+                    setSpecPatch: setSpecPatch,
                 },
             });
         }
-    }, [patchSpec]);
+    }, [setSpecPatch]);
 
     React.useEffect(() => {
         store.current.dispatch(setSpec(specObj ? deckglSpec : {}));

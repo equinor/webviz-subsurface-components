@@ -4,7 +4,7 @@ import { AnyAction, Dispatch, MiddlewareAPI as Middleware } from "redux";
 import { MapState } from "./store";
 
 export const patchMiddleware = (
-    patchSpec: (patch: jsonpatch.Operation[]) => void
+    setSpecPatch: (patch: jsonpatch.Operation[]) => void
 ) => {
     return (store: Middleware<Dispatch, MapState>) =>
         (next: Dispatch) =>
@@ -31,7 +31,7 @@ export const patchMiddleware = (
                         op.path = "/layers/[" + layerId + "]" + layerInfo[2];
                     }
                 });
-                patchSpec(patch);
+                setSpecPatch(patch);
             }
 
             return result;
