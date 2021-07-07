@@ -1,5 +1,15 @@
 import Layer, { LayerProps } from "@deck.gl/core/lib/layer";
 import * as jsonpatch from "fast-json-patch";
+import { PickInfo } from "@deck.gl/core/lib/deck";
+
+export interface PropertyDataType {
+    name: string;
+    value: string | number;
+}
+
+export interface LayerPickInfo extends PickInfo<unknown> {
+    property: PropertyDataType | null;
+}
 
 export function patchLayerProps<
     L extends Layer<unknown, P>,
