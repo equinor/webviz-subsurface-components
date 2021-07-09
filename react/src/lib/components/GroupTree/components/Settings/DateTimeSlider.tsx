@@ -10,7 +10,7 @@ import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentDateTime } from "../../redux/actions";
 import { GroupTreeState } from "../../redux/store";
-import { Data } from "../../redux/types";
+import { Data, DatedTree } from "../../redux/types";
 import { DataContext } from "../DataLoader";
 
 
@@ -45,7 +45,7 @@ const DateTimeSlider: React.FC = React.memo(() => {
     );
     const times = useMemo(
         // list of all dates
-        () => { const times: [string] = data.reduce((total, currentValue) => total.concat(currentValue.dates), []);
+        () => { const times: string[] = data.reduce((total: [string], currentValue: DatedTree) => total.concat(currentValue.dates), []);
                 return times;
         },
         [data]

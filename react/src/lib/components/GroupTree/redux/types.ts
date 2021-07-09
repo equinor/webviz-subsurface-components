@@ -2,10 +2,7 @@ export type DatedTree = {
     dates: [string];
     tree: Node;
 };
-export interface Data {
-    [index: number]: DatedTree;
-}
-
+export type Data = DatedTree[];
 export interface Node {
     name: string;
     pressure: number[];
