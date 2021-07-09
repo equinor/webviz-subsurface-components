@@ -6,5 +6,5 @@ export const testState = {
         currentIteration: "Iter_0",
         currentDateTime: "01/01/2000",
         currentFlowRate: "oilrate",
-    } as UISettings
+    } as UISettings,
 };

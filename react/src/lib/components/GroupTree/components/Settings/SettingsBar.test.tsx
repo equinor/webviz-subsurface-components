@@ -1,9 +1,8 @@
 import "@testing-library/jest-dom/extend-expect";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
-import { testStore, Wrapper } from "../../test/TestWrapper";
+import { Wrapper } from "../../test/TestWrapper";
 import SettingsBar from "./SettingsBar";
 
 describe("Test Settins Bar component", () => {

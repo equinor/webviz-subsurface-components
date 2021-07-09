@@ -8,14 +8,19 @@ import IterationSelector from "./IterationSelector";
 
 describe("Test Iteration selector component", () => {
     it("snapshot test", () => {
-        const { container } = render(Wrapper({ children: <IterationSelector /> }));
+        const { container } = render(
+            Wrapper({ children: <IterationSelector /> })
+            );
         expect(container.firstChild).toMatchSnapshot();
     });
     it("select 'Iter_1' option to dispatch redux action", async () => {
         render(<IterationSelector />, {
             wrapper: Wrapper,
         });
-        userEvent.selectOptions(screen.getByRole('combobox', {  name: /current iteration/i}), "Iter_1");
+        userEvent.selectOptions(
+            screen.getByRole("combobox", { name: /current iteration/i }),
+             "Iter_1"
+             );
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toHaveBeenCalledWith({
             payload: ["Iter_1", "01/01/2000"],
