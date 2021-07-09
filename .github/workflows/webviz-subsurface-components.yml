@@ -40,6 +40,7 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefix ./react
           npm run postinstall --prefix ./react
+          npm run copy-package-json --prefix ./react
           pip install .[dependencies]
           pip install dash[dev]
 
