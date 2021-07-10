@@ -13,7 +13,6 @@ import { GroupTreeState } from "../../redux/store";
 import { Data, DatedTree } from "../../redux/types";
 import { DataContext } from "../DataLoader";
 
-
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -43,10 +42,17 @@ const DateTimeSlider: React.FC = React.memo(() => {
     const currentDateTime = useSelector(
         (state: GroupTreeState) => state.ui.currentDateTime
     );
+
     const times = useMemo(
         // list of all dates
-        () => { const times: string[] = data.reduce((total: [string], currentValue: DatedTree) => total.concat(currentValue.dates), []);
-                return times;
+        () => {
+            const times: string[] = data.reduce(
+                (total: string[], currentValue: DatedTree) => {
+                    return total.concat(currentValue.dates);
+                },
+                []
+            );
+            return times;
         },
         [data]
     );
