@@ -151,7 +151,7 @@ function DeckGLMap({
                     setSpecPatch={setSpecPatch}
                     onHover={onHover}
                 >
-                    <InfoCard pickInfos={hoverInfo} />
+                    {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
                 </Map>
             </div>
         )
