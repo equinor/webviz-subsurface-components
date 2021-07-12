@@ -2,6 +2,8 @@ import json
 import random
 from datetime import datetime
 
+# note this file must be updated to new latest input format used by GroupTree.
+
 
 def create_node(depth, child_no):
     is_inactive = random.randint(0, 10)
