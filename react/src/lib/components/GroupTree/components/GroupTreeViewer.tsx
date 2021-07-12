@@ -27,9 +27,6 @@ const GroupTreeViewer: React.FC = () => {
 
     const renderer = useRef<GroupTree>();
 
-    const currentIteration = useSelector(
-        (state: GroupTreeState) => state.ui.currentIteration
-    );
     const currentDateTime = useSelector(
         (state: GroupTreeState) => state.ui.currentDateTime
     );
@@ -40,20 +37,22 @@ const GroupTreeViewer: React.FC = () => {
         renderer.current = new GroupTree(
             "#grouptree_tree",
             cloneDeep(data),
-            "oilrate"
+            "oilrate",
+            currentDateTime
         );
     }, [data]);
 
     useEffect(() => {
         if (!renderer.current) return;
-        const currentDateTimes =
-            renderer.current.data.iterations[currentIteration];
-        renderer.current.update(currentDateTimes.trees[currentDateTime]);
-    }, [currentIteration, currentDateTime]);
+
+        renderer.current.update(currentDateTime);
+    }, [currentDateTime]);
+
     useEffect(() => {
         if (!renderer.current) return;
         renderer.current.flowrate = currentFlowRate;
     }, [currentFlowRate]);
+
     return (
         <div className={classes.root}>
             <SettingsBar />
