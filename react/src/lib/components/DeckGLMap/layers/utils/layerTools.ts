@@ -29,5 +29,5 @@ export function patchLayerProps<
     //
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore: TS2339
-    layer.context.userData.patchSpec(patch);
+    layer.context.userData.setSpecPatch(patch);
 }
