@@ -12,7 +12,6 @@
     "main": "build/index.js",
     "scripts": {
         "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
-        "postinstall": "npm run setup_deckgl_types",
         "copy-package-json": "copyfiles ./package.json ../webviz_subsurface_components/",
         "build:js": "webpack --mode production",
         "build:js-dev": "webpack --mode development",
@@ -43,7 +42,7 @@
         "@types/react-dom": "^17.0.3",
         "@types/react-redux": "^7.1.15",
         "@types/react-resize-detector": "^5.0.0",
-        "@webviz/core-components": "^0.5.0",
+        "@webviz/core-components": "^0.5.1",
         "ajv": "^7.2.1",
         "clsx": "^1.1.1",
         "d3": "^5.11.0",

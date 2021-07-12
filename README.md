@@ -42,9 +42,9 @@ then:
     ```
     npm ci --ignore-scripts --prefix ./react
     ```
-2. Run the project's own `postinstall` script (and optionally Dash component pre-script)
+2. Run some potentially optional postinstall scripts
     ```
-    npm run postinstall --prefix ./react
+    npm run setup_deckgl_types --prefix ./react  # only needed if ignored scripts during install
     npm run copy-package-json --prefix ./react  # only needed if building Dash components
     ```
 3. Install python packages required to build components.
