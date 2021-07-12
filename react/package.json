@@ -12,7 +12,8 @@
     "main": "build/index.js",
     "scripts": {
         "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
-        "postinstall": "copyfiles ./package.json ../webviz_subsurface_components/ && npm run setup_deckgl_types",
+        "postinstall": "npm run setup_deckgl_types",
+        "copy-package-json": "copyfiles ./package.json ../webviz_subsurface_components/",
         "build:js": "webpack --mode production",
         "build:js-dev": "webpack --mode development",
         "build:js-demo": "webpack --mode production --entry ./src/demo/index.js",
@@ -28,7 +29,7 @@
         "test": "jest --coverage",
         "test:watch": "npm test -- --watch"
     },
-    "author": "R&T Equinor <akia@equinor.com>",
+    "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
     "dependencies": {
         "@danmarshall/deckgl-typings": "^4.9.0",
