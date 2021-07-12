@@ -62,7 +62,16 @@ class App extends Component {
                 return <VectorSelectorDemo />;
             }
             case "WellLogView": {
-                return <WellLogViewDemo />;
+                return <WellLogViewDemo example="0"/>;
+            }
+            case "WellLogView2": {
+                return <WellLogViewDemo example="1" />;
+            }
+            case "WellLogView3": {
+                return <WellLogViewDemo example="2" />;
+            }
+            case "WellLogView4": {
+                return <WellLogViewDemo example="3"/>;
             }
             default: {
                 return null;
@@ -90,6 +99,9 @@ class App extends Component {
                     <option value="WellCompletions">WellCompletions</option>
                     <option value="VectorSelector">VectorSelector</option>
                     <option value="WellLogView">WellLogView</option>
+                    <option value="WellLogView2">WellLogView2</option>
+                    <option value="WellLogView3">WellLogView3</option>
+                    <option value="WellLogView4">WellLogView4</option>
                 </select>
                 {this.renderDemo()}
             </div>
