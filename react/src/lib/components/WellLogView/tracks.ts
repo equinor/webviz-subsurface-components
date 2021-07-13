@@ -1,10 +1,10 @@
 import {
-    Track, 
+    Track,
     ScaleTrack,
     DualScaleTrack,
-  GraphTrack,
-  graphLegendConfig,
-  LegendHelper,
+    GraphTrack,
+    graphLegendConfig,
+    LegendHelper,
     scaleLegendConfig,
     ScaleInterpolator
 } from '@equinor/videx-wellog';
@@ -58,11 +58,11 @@ const colors = ['red', 'blue', 'orange', 'green', 'red', 'magenta', 'gray', 'bro
 * `DotPlot` - discrete points graph
 * `DifferentialPlot` - differential graph, for correlation of two data series.
 */
-const plotTypes = ['line', 'line', 'line', 'linestep', 'dot', 'area', 'dot', 'linestep'/*, 'differential'*/]
+const plotTypes = ['line', 'line', 'line', 'linestep', 'linestep', 'dot', 'area', 'dot', 'linestep'/*, 'differential'*/]
 
-function checkMinMaxValue(minmax: [number?, number?], value: number) {
+function checkMinMaxValue(minmax: [number, number], value: number) {
     if (value !== null) {
-        if (minmax[0] === undefined)
+        if (minmax[0] === Number.POSITIVE_INFINITY) 
             minmax[0] = minmax[1] = value;
         else if (minmax[0] > value)
             minmax[0] = value;
@@ -70,28 +70,25 @@ function checkMinMaxValue(minmax: [number?, number?], value: number) {
             minmax[1] = value;
     }
 }
-function checkMinMax(minmax: [number?, number?], minmaxSrc: [number?, number?]) {
-    if (minmaxSrc[0] !== undefined) {
-        if (minmax[0] === undefined) {
-            minmax[0] = minmaxSrc[0];
-            minmax[1] = minmaxSrc[1];
-        }
-        else if (minmax[0] > minmaxSrc[0]) 
-            minmax[0] = minmaxSrc[0];
-        else if (minmax[1] < minmaxSrc[1])
-            minmax[1] = minmaxSrc[1];
+function checkMinMax(minmax: [number, number], minmaxSrc: [number, number]) {
+    if (minmax[0] === Number.POSITIVE_INFINITY) {
+        minmax[0] = minmaxSrc[0];
+        minmax[1] = minmaxSrc[1];
     }
+    else if (minmax[0] > minmaxSrc[0])
+        minmax[0] = minmaxSrc[0];
+    else if (minmax[1] < minmaxSrc[1])
+        minmax[1] = minmaxSrc[1];
 }
-
 class PlotData {
-    minmax: [number?, number?];
-    minmaxPrimaryAxis: [number?, number?];
-    data: [];
+    minmax: [number, number];
+    minmaxPrimaryAxis: [number, number];
+    data: [number, number][];
 
     constructor() {
-        this.minmax = [undefined, undefined];
-        this.minmaxPrimaryAxis = [undefined, undefined];
-        this.data = [];
+        this.minmax = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
+        this.minmaxPrimaryAxis = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
+        this.data = []
     }
 };
 
@@ -153,11 +150,11 @@ function makeTrackHeader(bMultiple, curve) {
         curve.name;
 }
 
-export default (datas, axes: { primary: string, secondary: string } = {primary: "md", secondary:"tvd"}) => {
+export default (datas, axes: { primary: string, secondary: string } = { primary: "md", secondary: "tvd" }) => {
     let tracks: Track[] = [];
-    let minmaxPrimaryAxis: [number?, number?] = [undefined, undefined];
-    let minmaxSecondaryAxis: [number?, number?] = [undefined, undefined];
-    let interpolator: ScaleInterpolator;
+    let minmaxPrimaryAxis: [number, number] = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
+    let minmaxSecondaryAxis: [number, number] = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
+    let interpolator: ScaleInterpolator | undefined = undefined;
     if (datas) {
         if (0) { // Debug print of available curves
             let msg = "";
@@ -187,11 +184,11 @@ export default (datas, axes: { primary: string, secondary: string } = {primary: 
         let iSecondaryAxis = indexOfCurveByNames(data, names[axes.secondary])
         //alert("iPrimaryAxis=" + iPrimaryAxis + "; iSecondaryAxis=" + iSecondaryAxis)
 
-        let iTrack = 0;
+        let nTrack = 0;
         if (iPrimaryAxis >= 0) {
             const curvePrimaryAxis = data.curves[iPrimaryAxis];
             if (iSecondaryAxis >= 0) {
-                const scaleTrack1 = new DualScaleTrack(iTrack++, {
+                const scaleTrack1 = new DualScaleTrack(nTrack++, {
                     mode: 0,
                     maxWidth: 50,
                     width: 2,
@@ -232,7 +229,7 @@ export default (datas, axes: { primary: string, secondary: string } = {primary: 
                 
 
                 const curveSecondaryAxis = data.curves[iSecondaryAxis];
-                const scaleTrack2 = new DualScaleTrack(iTrack++, {
+                const scaleTrack2 = new DualScaleTrack(nTrack++, {
                     mode: 1,
                     maxWidth: 50,
                     width: 2,
@@ -246,12 +243,10 @@ export default (datas, axes: { primary: string, secondary: string } = {primary: 
                 
                 const forward = (v) => { // SecondaryAxis => PrimaryAxis
                     let ret = secondary2primary(v);
-                    //alert(v + ", " + ret);
                     return ret;
                 }
                 const reverse = (v) => { // PrimaryAxis => SecondaryAxis
                     let ret = primary2secondary(v);
-                    //alert(v + ", " + ret);
                     return ret;
                 }
                 interpolator = {
@@ -262,7 +257,7 @@ export default (datas, axes: { primary: string, secondary: string } = {primary: 
                 };
             }
             else {
-                let track = new ScaleTrack(iTrack++, {
+                let track = new ScaleTrack(nTrack++, {
                     maxWidth: 50,
                     width: 2,
                     label: titlePrimaryAxis,
@@ -287,7 +282,7 @@ export default (datas, axes: { primary: string, secondary: string } = {primary: 
             if (curve.valueType === "string") 
                 continue; //??
 
-            if (iTrack > 11 && iCurve !== iSecondaryAxis && iCurve !== iPrimaryAxis)
+            if (nTrack > 11 && iCurve !== iSecondaryAxis && iCurve !== iPrimaryAxis)
                 continue
 
             let plot = preparePlotData(data.data, iCurve, iPrimaryAxis)
@@ -298,7 +293,7 @@ export default (datas, axes: { primary: string, secondary: string } = {primary: 
 
             let plotDatas = [plot.data];
             let plots = [{
-                //id: 'dots',
+                id: iCurve, // set some id
                 type: plotType,
                 options: {
                     scale:'linear',
@@ -308,14 +303,14 @@ export default (datas, axes: { primary: string, secondary: string } = {primary: 
                     fillOpacity: 0.3, // for 'area'!  
                     dataAccessor: d => d[0],
                     legendInfo: () => ({
-                        label: (curve.name ? curve.name : '???')/* + '\r\n[' + plotType + ']'*/,
-                        unit: curve.unit ? curve.unit : '',
+                        label: (curve.name ? curve.name : '???'),
+                        unit: (curve.unit ? curve.unit : '') + '\r\n[' + plotType + ']',
                     }),
                 },
             }];
 
            
-            let bMultiple = iTrack==2
+            let bMultiple = nTrack==2 // for DEMO
             if (bMultiple) {
                 iCurve++
                 const curve2 = data.curves[iCurve];
@@ -337,7 +332,7 @@ export default (datas, axes: { primary: string, secondary: string } = {primary: 
 
                 plotDatas.push(plot2.data);
                 plots.push({
-                    //id: 'dots',
+                    id: iCurve, // set some id
                     type: plotType2,
                     options: {
                         scale: 'linear',
@@ -347,15 +342,15 @@ export default (datas, axes: { primary: string, secondary: string } = {primary: 
                         fillOpacity: 0.3, // for 'area'!  
                         dataAccessor: d => d[1],
                         legendInfo: () => ({
-                            label: (curve2.name ? curve2.name : '???')/* + '\r\n[' + plotType2 + ']'*/,
-                            unit: curve2.unit ? curve2.unit : '',
+                            label: (curve2.name ? curve2.name : '???'),
+                            unit: (curve2.unit ? curve2.unit : '') + '\r\n[' + plotType2 + ']',
                         }),
                     },
                 });
             }
             
 
-            let track = new GraphTrack(iTrack++, {
+            let track = new GraphTrack(nTrack++, {
                 label: makeTrackHeader(bMultiple, curve),
                 abbr: curve.name,
                 legendConfig: graphLegendConfig,

@@ -115,12 +115,22 @@ function addPinnedValueOverlay(instance) {
     .style('top', `${offset}px`);
 }
 
+interface Props {
+    data: any
+};
 
-class WellLogView extends Component {
+class WellLogView extends Component<Props> {
+    container?: HTMLElement;
     logController?: LogViewer;
-    constructor() {
-        super()
+
+    constructor(props) {
+        super(props)
+        //alert("props=" + props)
+
+        this.container = undefined
         this.logController = undefined
+
+        //this.setTracks()
     }
 
     componentDidMount() {
@@ -147,31 +157,32 @@ class WellLogView extends Component {
             interpolator,
         } = createTracks(this.props.data, axes);
 
-        if (this.logController) { // remove old LogViewer
-            this.logController.onUnmount(); // 
-            this.container.innerHTML = ""; // delete all old LogViewer elements
-
-            this.logController = null;
-        }
-
         let scaleHandler = new InterpolatedScaleHandler(interpolator);
 
-        // create new LogViewer
-        this.logController = new LogViewer({
-            showLegend: true,
-            horizontal: false,
-            domain: minmaxPrimaryAxis,
-            scaleHandler: scaleHandler
-        });
+        if (this.logController) { // remove old LogViewer
+            this.logController.onUnmount(); // 
+            this.logController = undefined;
+        }
+        if (this.container) {
+            this.container.innerHTML = ""; // delete all old LogViewer elements
 
-        this.logController.init(this.container);
+            // create new LogViewer
+            this.logController = new LogViewer({
+                showLegend: true,
+                horizontal: false,
+                domain: minmaxPrimaryAxis,
+                scaleHandler: scaleHandler
+            });
 
-        addReadoutOverlay(this.logController);
-        addRubberbandOverlay(this.logController);
-        addPinnedValueOverlay(this.logController);
+            this.logController.init(this.container);
 
-        //this.setTracks();
-        this.logController.setTracks(tracks);
+            addReadoutOverlay(this.logController);
+            addRubberbandOverlay(this.logController);
+            addPinnedValueOverlay(this.logController);
+
+            //this.setTracks();
+            this.logController.setTracks(tracks);
+        }
     }
 
     setTracks() {
@@ -201,7 +212,7 @@ class WellLogView extends Component {
             <div>
                 <table height='100%' width='100%'>
                     <tr>
-                        <td className='wellog' ref={el => { this.container = el; }} />
+                        <td className='wellog' ref={el => { this.container = el as HTMLElement; }} />
                         {/*
                         <td valign='top'>
                             <fieldset>
@@ -211,9 +222,12 @@ class WellLogView extends Component {
                             </fieldset>
                             <fieldset>
                                 <legend>Readout</legend>
-                                <table width='100'>
+                                <table width='100' id='well-log-readout'>
                                     <tr><td>MD</td><td>mtr</td><td>2345.6</td></tr>
                                     <tr><td>TVD</td><td>mtr</td><td>1234.5</td></tr>
+                                    <tr><td>HKLA</td><td>ohm.m</td><td>110.5</td></tr>
+                                    <tr><td>HKLX</td><td></td><td>80.15</td></tr>
+                                    <tr><td>...</td></tr>
                                 </table>
                             </fieldset>
                         </td>
