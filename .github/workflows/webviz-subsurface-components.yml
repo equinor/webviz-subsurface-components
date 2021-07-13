@@ -39,15 +39,18 @@ jobs:
         # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
         run: |
           npm ci --ignore-scripts --prefix ./react
-          npm run postinstall --prefix ./react
+          npm run setup_deckgl_types --prefix ./react
+          npm run copy-package-json --prefix ./react
           pip install .[dependencies]
           pip install dash[dev]
 
-      - name: ⏭️ Use latest prerelease wcc when prereleasing wsc
+      - name: ⏭️ Modifications when prerelease
         if: github.event.release.prerelease
+        working-directory: ./react
         run: |
+          echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
           npm install --ignore-scripts @webviz/core-components@next
-          npm run postinstall
+          npm run setup_deckgl_types
 
       - name: 🏗️ Build JavaScript part
         run: |
@@ -81,6 +84,22 @@ jobs:
         run: |
           npm run test --prefix ./react
           pytest ./tests --headless
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+
+      - name: 🔼 Build and publish Node.js package
+        if: github.event_name == 'release' && matrix.python-version == '3.6'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ./react
+        run: |
+          cp ../README.md .
+          npm version --no-git-tag-version ${GITHUB_REF//refs\/tags\//}
+          npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
+          npm config set always-auth true
+          # Use 'latest' tag if $NPM_PUBLISH_TAG is not set:
+          npm publish --access public --tag ${NPM_PUBLISH_TAG:-latest}
 
       - name: 🚢 Build and deploy Python package
         if: github.event_name == 'release' && matrix.python-version == '3.6'

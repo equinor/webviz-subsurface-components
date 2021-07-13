@@ -1,5 +1,15 @@
 import Layer, { LayerProps } from "@deck.gl/core/lib/layer";
 import * as jsonpatch from "fast-json-patch";
+import { PickInfo } from "@deck.gl/core/lib/deck";
+
+export interface PropertyDataType {
+    name: string;
+    value: string | number;
+}
+
+export interface LayerPickInfo extends PickInfo<unknown> {
+    property: PropertyDataType | null;
+}
 
 export function patchLayerProps<
     L extends Layer<unknown, P>,
@@ -19,5 +29,5 @@ export function patchLayerProps<
     //
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore: TS2339
-    layer.context.userData.patchSpec(patch);
+    layer.context.userData.setSpecPatch(patch);
 }

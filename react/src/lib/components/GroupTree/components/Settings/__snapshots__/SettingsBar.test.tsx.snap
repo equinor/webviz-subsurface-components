@@ -1,0 +1,384 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Settins Bar component snapshot test 1`] = `
+.c3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  position: relative;
+  margin: 0;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  font-family: Equinor;
+  font-size: 0.750rem;
+  font-weight: 500;
+  line-height: 1.333em;
+  text-align: left;
+  margin-left: 8px;
+  margin-right: 8px;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c4 {
+  margin: 0;
+}
+
+.c0 {
+  height: 64px;
+  top: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  background: var(--eds_ui_background__default,rgba(255,255,255,1));
+  box-sizing: border-box;
+  z-index: 250;
+  display: grid;
+  grid-column-gap: 40px;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: 'left center right';
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-bottom: 2px var(--eds_ui_background__light,rgba(247,247,247,1));
+  padding-left: 40px;
+  padding-top: 8px;
+  padding-right: 40px;
+  padding-bottom: 8px;
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.000em;
+  -webkit-letter-spacing: 0.013em;
+  -moz-letter-spacing: 0.013em;
+  -ms-letter-spacing: 0.013em;
+  letter-spacing: 0.013em;
+  text-align: left;
+}
+
+.c6 {
+  grid-area: right;
+  text-align: right;
+}
+
+.c1 {
+  grid-area: left;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 24px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c5 {
+  border: none;
+  border-radius: 0;
+  box-shadow: inset 0 -1px 0 0 var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  padding-left: 8px;
+  padding-top: 6px;
+  padding-right: 8px;
+  padding-bottom: 6px;
+  margin: 0;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.500em;
+  -webkit-letter-spacing: 0.025em;
+  -moz-letter-spacing: 0.025em;
+  -ms-letter-spacing: 0.025em;
+  letter-spacing: 0.025em;
+  text-align: left;
+  padding-right: calc(8px *2 + 24px);
+  display: block;
+  margin: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  background-repeat: no-repeat,repeat;
+  background-position: right 8px top 50%;
+  width: 100%;
+}
+
+.c5:active,
+.c5:focus {
+  box-shadow: none;
+  outline: 2px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  outline-offset: 0px;
+}
+
+.c5:disabled {
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  cursor: not-allowed;
+  box-shadow: none;
+  outline: none;
+}
+
+.c5:disabled .arrow-icon {
+  fill: red;
+}
+
+.c5:disabled:focus,
+.c5:disabled:active {
+  outline: none;
+}
+
+.c2 {
+  min-width: 100px;
+  width: 100%;
+}
+
+<header
+  class="c0 makeStyles-topBar-1"
+>
+  <div
+    class="c1 makeStyles-actions-2"
+  >
+    <div
+      class="c2 makeStyles-root-3"
+    >
+      <label
+        class="c3"
+        for="flow-rate-selector"
+      >
+        <span
+          class="c4"
+        >
+          Flow Rate
+        </span>
+      </label>
+      <select
+        class="c5"
+        id="flow-rate-selector"
+      >
+        <option
+          value="oilrate"
+        >
+          Oil Rate
+        </option>
+        <option
+          value="waterrate"
+        >
+          Water Rate
+        </option>
+        <option
+          value="gasrate"
+        >
+          Gas Rate
+        </option>
+      </select>
+    </div>
+  </div>
+  <div
+    class="c6 makeStyles-actions-2"
+  >
+    <div
+      class="makeStyles-root-4"
+    >
+      <span>
+        Time Steps
+      </span>
+      <span
+        class="MuiSlider-root WithStyles(ForwardRef(Slider))-root-5 MuiSlider-colorPrimary MuiSlider-trackFalse"
+      >
+        <span
+          class="MuiSlider-rail"
+        />
+        <span
+          class="MuiSlider-track"
+          style="left: 0%; width: 0%;"
+        />
+        <input
+          type="hidden"
+          value="0"
+        />
+        <span
+          class="MuiSlider-mark MuiSlider-markActive"
+          data-index="0"
+          style="left: 0%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="1"
+          style="left: 3.4482758620689653%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="2"
+          style="left: 6.896551724137931%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="3"
+          style="left: 10.344827586206897%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="4"
+          style="left: 13.793103448275861%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="5"
+          style="left: 17.24137931034483%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="6"
+          style="left: 20.689655172413794%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="7"
+          style="left: 24.137931034482758%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="8"
+          style="left: 27.586206896551722%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="9"
+          style="left: 31.03448275862069%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="10"
+          style="left: 34.48275862068966%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="11"
+          style="left: 37.93103448275862%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="12"
+          style="left: 41.37931034482759%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="13"
+          style="left: 44.827586206896555%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="14"
+          style="left: 48.275862068965516%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="15"
+          style="left: 51.724137931034484%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="16"
+          style="left: 55.172413793103445%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="17"
+          style="left: 58.62068965517241%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="18"
+          style="left: 62.06896551724138%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="19"
+          style="left: 65.51724137931035%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="20"
+          style="left: 68.96551724137932%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="21"
+          style="left: 72.41379310344827%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="22"
+          style="left: 75.86206896551724%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="23"
+          style="left: 79.3103448275862%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="24"
+          style="left: 82.75862068965517%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="25"
+          style="left: 86.20689655172414%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="26"
+          style="left: 89.65517241379311%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="27"
+          style="left: 93.10344827586206%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="28"
+          style="left: 96.55172413793103%;"
+        />
+        <span
+          class="MuiSlider-mark"
+          data-index="29"
+          style="left: 100%;"
+        />
+        <span
+          aria-labelledby="date-time-slider-label"
+          aria-orientation="horizontal"
+          aria-valuemax="29"
+          aria-valuemin="0"
+          aria-valuenow="0"
+          class="MuiSlider-thumb MuiSlider-thumbColorPrimary PrivateValueLabel-open-8 PrivateValueLabel-thumb-7"
+          data-index="0"
+          role="slider"
+          style="left: 0%;"
+          tabindex="0"
+        >
+          <span
+            class="PrivateValueLabel-offset-9 MuiSlider-valueLabel WithStyles(ForwardRef(Slider))-valueLabel-6"
+          >
+            <span
+              class="PrivateValueLabel-circle-10"
+            >
+              <span
+                class="PrivateValueLabel-label-11"
+              >
+                2018-01-01
+              </span>
+            </span>
+          </span>
+        </span>
+      </span>
+    </div>
+  </div>
+</header>
+`;

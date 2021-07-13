@@ -2,7 +2,7 @@ import * as jsonpatch from "fast-json-patch";
 import { cloneDeep } from "lodash";
 import PropTypes from "prop-types";
 import * as React from "react";
-import Coords from "./components/Coords";
+import InfoCard from "./components/InfoCard";
 import Map from "./Map";
 
 function _idsToIndices(doc, path) {
@@ -31,40 +31,34 @@ function _idsToIndices(doc, path) {
     return path;
 }
 
-function useStateWithPatches(initialState) {
-    const [state, setState] = React.useState(initialState);
+const _getPatch = (base, modified) => {
+    if (typeof modified === "function") {
+        const baseClone = cloneDeep(base);
+        return jsonpatch.compare(base, modified(baseClone));
+    }
+    return jsonpatch.compare(base, modified);
+};
 
-    const getPatch = (newState) => {
-        if (typeof newState === "function") {
-            const currState = cloneDeep(state);
-            return jsonpatch.compare(state, newState(currState));
-        }
-        return jsonpatch.compare(state, newState);
-    };
-
-    const setPatch = (patch) => {
-        let newSpec = state;
-        try {
-            const normalizedPatch = patch.map((patch) => {
-                return {
-                    ...patch,
-                    path: _idsToIndices(state, patch.path),
-                };
-            });
-            newSpec = jsonpatch.applyPatch(
-                state,
-                normalizedPatch,
-                true,
-                false
-            ).newDocument;
-        } catch (error) {
-            console.error("Unable to apply patch: " + error);
-        }
-        setState(newSpec);
-    };
-
-    return [state, getPatch, setPatch];
-}
+const _setPatch = (base, patch) => {
+    let result = base;
+    try {
+        const normalizedPatch = patch.map((patch) => {
+            return {
+                ...patch,
+                path: _idsToIndices(base, patch.path),
+            };
+        });
+        result = jsonpatch.applyPatch(
+            base,
+            normalizedPatch,
+            true,
+            false
+        ).newDocument;
+    } catch (error) {
+        console.error("Unable to apply patch: " + error);
+    }
+    return result;
+};
 
 DeckGLMap.defaultProps = {
     coords: {
@@ -74,25 +68,34 @@ DeckGLMap.defaultProps = {
     },
 };
 
-function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
-    const [deckglSpec, getDeckglSpecPatch, setDeckglSpecPatch] =
-        useStateWithPatches(null);
+function DeckGLMap({
+    id,
+    resources,
+    deckglSpecBase,
+    deckglSpecPatch,
+    coords,
+    setProps,
+}) {
+    let [patchedSpec, setPatchedSpec] = React.useState(null);
 
     React.useEffect(() => {
-        if (!deckglSpecPatch) {
-            return;
-        }
-        setDeckglSpecPatch(deckglSpecPatch);
-    }, [deckglSpecPatch]);
+        if (!deckglSpecBase) return;
+
+        setPatchedSpec(
+            deckglSpecPatch
+                ? _setPatch(deckglSpecBase, deckglSpecPatch)
+                : deckglSpecBase
+        );
+    }, [deckglSpecBase, deckglSpecPatch]);
 
     React.useEffect(() => {
-        if (!deckglSpec) return;
+        if (!patchedSpec) return;
 
-        const drawingEnabled = deckglSpec.layers.some((layer) => {
+        const drawingEnabled = patchedSpec.layers.some((layer) => {
             return layer["@@type"] == "DrawingLayer" && layer["mode"] != "view";
         });
 
-        const patch = getDeckglSpecPatch((newSpec) => {
+        const patch = _getPatch(patchedSpec, (newSpec) => {
             newSpec.layers.forEach((layer) => {
                 if (layer["@@type"] == "WellsLayer") {
                     layer.selectionEnabled = !drawingEnabled;
@@ -103,10 +106,11 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
 
         if (patch.length !== 0) {
             setProps({
+                deckglSpecBase: patchedSpec,
                 deckglSpecPatch: patch,
             });
         }
-    }, [deckglSpec]);
+    }, [patchedSpec]);
 
     const [hoverInfo, setHoverInfo] = React.useState([]);
     const onHover = React.useCallback(
@@ -125,26 +129,32 @@ function DeckGLMap({ id, resources, deckglSpecPatch, coords, setProps }) {
         },
         [coords]
     );
-    const patchSpec = React.useCallback(
-        (patch) =>
+    const setSpecPatch = React.useCallback(
+        (patch) => {
             setProps({
+                deckglSpecBase: patchedSpec,
                 deckglSpecPatch: patch,
-            }),
-        [setProps]
+            });
+        },
+        [setProps, patchedSpec]
     );
 
     return (
-        <div style={{ height: "100%", width: "100%", position: "relative" }}>
-            <Map
-                id={id}
-                resources={resources}
-                deckglSpec={deckglSpec}
-                patchSpec={patchSpec}
-                onHover={onHover}
+        patchedSpec && (
+            <div
+                style={{ height: "100%", width: "100%", position: "relative" }}
             >
-                <Coords pickInfos={hoverInfo} />
-            </Map>
-        </div>
+                <Map
+                    id={id}
+                    resources={resources}
+                    deckglSpec={patchedSpec}
+                    setSpecPatch={setSpecPatch}
+                    onHover={onHover}
+                >
+                    {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
+                </Map>
+            </div>
+        )
     );
 }
 
@@ -160,13 +170,25 @@ DeckGLMap.propTypes = {
      * Resource dictionary made available in the DeckGL specification as an enum.
      * The values can be accessed like this: `"@@#resources.resourceId"`, where
      * `resourceId` is the key in the `resources` dict. For more information,
-     * see the DeckGL documentation on enums in the json spec: https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
+     * see the DeckGL documentation on enums in the json spec:
+     * https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
      */
     resources: PropTypes.object,
 
     /**
-     * A JSON patch (http://jsonpatch.com/) applied to the DeckGL specification state. The initial state is an empty object.
-     * More detailes about the specification format can be found here: https://deck.gl/docs/api-reference/json/conversion-reference
+     * JSON object describing the map structure to which deckglSpecPatch will be
+     * applied in order to form the final map specification.
+     * More detailes about the specification format can be found here:
+     * https://deck.gl/docs/api-reference/json/conversion-reference
+     */
+    deckglSpecBase: PropTypes.object,
+
+    /**
+     * A JSON patch (http://jsonpatch.com/) applied to deckglSpecBase.
+     * This split (base + patch) allows doing partial updates to the map
+     * while keeping the map state in the Dash store, as well as
+     * making it easier for the Dash component user to figure out what changed
+     * in the map spec when recieving a callback on the python side.
      */
     deckglSpecPatch: PropTypes.arrayOf(PropTypes.object),
 
