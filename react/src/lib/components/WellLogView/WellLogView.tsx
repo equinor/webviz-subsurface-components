@@ -1,14 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
     LogViewer, InterpolatedScaleHandler,
-    UIHelper,
 }  from '@equinor/videx-wellog';
 
-import './styles.scss';
+import "./styles.scss";
 
-import { select } from 'd3';
+import { select } from "d3";
 
-import createTracks from './tracks';
+import createTracks from "./tracks";
 
 function addRubberbandOverlay(instance) {
   const rubberBandSize = 9;

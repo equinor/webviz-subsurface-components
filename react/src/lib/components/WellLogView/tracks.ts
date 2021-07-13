@@ -110,7 +110,7 @@ function createInterpolator(from: Float32Array, to: Float32Array) {
     const n = from.length
     for (let i = 0; i < n; i++) {
         let d = from[i] - from[i - 1];
-        mul[i] = d? (to[i] - to[i - 1]) / d: 1.0/*???*/;
+        mul[i] = d? (to[i] - to[i - 1]) / d: 1.0;
     }
 
     return (x: number) => {
@@ -146,7 +146,7 @@ function makeTrackHeader(bMultiple, curve) {
         curve.name;
 }
 
-export default (datas, axes: { primary: string, secondary: string } = { primary: "md", secondary: "tvd" }) => {
+export default (datas: any, axes: { primary: string, secondary: string } = { primary: "md", secondary: "tvd" }) => {
     let tracks: Track[] = [];
     let minmaxPrimaryAxis: [number, number] = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
     let minmaxSecondaryAxis: [number, number] = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
@@ -278,13 +278,13 @@ export default (datas, axes: { primary: string, secondary: string } = { primary:
             if (curve.valueType === "string") 
                 continue; //??
 
-            if (nTrack > 11 && iCurve !== iSecondaryAxis && iCurve !== iPrimaryAxis)
+            if (nTrack > 12 && iCurve !== iSecondaryAxis && iCurve !== iPrimaryAxis)
                 continue
 
-            let plot = preparePlotData(data.data, iCurve, iPrimaryAxis)
+            const plot = preparePlotData(data.data, iCurve, iPrimaryAxis)
             checkMinMax(minmaxPrimaryAxis, plot.minmaxPrimaryAxis)
-            let plotColor = colors[iPlot % colors.length];
-            let plotType = plotTypes[iPlot % plotTypes.length];
+            const plotColor = colors[iPlot % colors.length];
+            const plotType = plotTypes[iPlot % plotTypes.length];
             iPlot++;
 
             let plotDatas = [plot.data];
@@ -292,14 +292,14 @@ export default (datas, axes: { primary: string, secondary: string } = { primary:
                 id: iCurve, // set some id
                 type: plotType,
                 options: {
-                    scale:'linear',
+                    scale: 'linear',
                     domain: plot.minmax, //??
                     color: plotColor,
                     // for 'area'!  fill: 'red',
                     fillOpacity: 0.3, // for 'area'!  
                     dataAccessor: d => d[0],
                     legendInfo: () => ({
-                        label: (curve.name ? curve.name : '???'),
+                        label: curve.name ? curve.name : '???',
                         unit: (curve.unit ? curve.unit : '') + '\r\n[' + plotType + ']',
                     }),
                 },
@@ -310,9 +310,9 @@ export default (datas, axes: { primary: string, secondary: string } = { primary:
             if (bMultiple) {
                 iCurve++
                 const curve2 = data.curves[iCurve];
-                let plot2 = preparePlotData(data.data, iCurve, iPrimaryAxis)
+                const plot2 = preparePlotData(data.data, iCurve, iPrimaryAxis)
                 checkMinMax(minmaxPrimaryAxis, plot2.minmaxPrimaryAxis)
-                let plotColor2 = colors[iPlot % colors.length];
+                const plotColor2 = colors[iPlot % colors.length];
                 //let plotType2 = 'differential';/*plotTypes[iPlot % plotTypes.length];*/
                 /**
                  * Data format used by differential plot
@@ -321,7 +321,7 @@ export default (datas, axes: { primary: string, secondary: string } = { primary:
                  */
 
 
-                let plotType2 = plotTypes[iPlot % plotTypes.length];
+                const plotType2 = plotTypes[iPlot % plotTypes.length];
                 iPlot++;
 
                 //alert(plot2.data)
@@ -338,7 +338,7 @@ export default (datas, axes: { primary: string, secondary: string } = { primary:
                         fillOpacity: 0.3, // for 'area'!  
                         dataAccessor: d => d[1],
                         legendInfo: () => ({
-                            label: (curve2.name ? curve2.name : '???'),
+                            label: curve2.name ? curve2.name : '???',
                             unit: (curve2.unit ? curve2.unit : '') + '\r\n[' + plotType2 + ']',
                         }),
                     },
