@@ -10,7 +10,9 @@ import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentDateTime } from "../../redux/actions";
 import { GroupTreeState } from "../../redux/store";
+import { Data, DatedTree } from "../../redux/types";
 import { DataContext } from "../DataLoader";
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -33,23 +35,33 @@ const EdsSlider = withStyles({
 })(Slider);
 const DateTimeSlider: React.FC = React.memo(() => {
     const classes = useStyles();
-    const data = useContext(DataContext);
+    const data: Data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
-    const currentIteration = useSelector(
-        (state: GroupTreeState) => state.ui.currentIteration
-    );
+
     const currentDateTime = useSelector(
         (state: GroupTreeState) => state.ui.currentDateTime
     );
+
     const times = useMemo(
-        () => Object.keys(data.iterations[currentIteration].trees),
-        [data, currentIteration]
+        // list of all dates
+        () => {
+            const times: string[] = data.reduce(
+                (total: string[], currentValue: DatedTree) => {
+                    return total.concat(currentValue.dates);
+                },
+                []
+            );
+            return times;
+        },
+        [data]
     );
+
     const currentDateTimeIndex = useMemo(
         () => times.indexOf(currentDateTime),
         [times, currentDateTime]
     );
+
     // handlers
     const outputFunction = useCallback((step: number) => times[step], [times]);
     const onChange = useCallback(

@@ -14,7 +14,7 @@ const GroupTree = (props) => {
 
 GroupTree.propTypes = {
     id: PropTypes.string.isRequired,
-    data: PropTypes.object,
+    data: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default GroupTree;

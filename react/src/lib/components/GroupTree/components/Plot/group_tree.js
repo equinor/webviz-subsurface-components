@@ -1,6 +1,8 @@
 /** This code is copied directly from
  * https://github.com/anders-kiaer/webviz-subsurface-components/blob/dynamic_tree/src/lib/components/DynamicTree/group_tree.js
  *  This needs to be refactored to develop further
+ *
+ * 9 july 2021: refactored to use new format.
  */
 import * as d3 from "d3";
 /* eslint camelcase: "off" */
@@ -23,29 +25,29 @@ export default class GroupTree {
      * @param {group-tree-data} tree_data
      * @param defaultFlowrate
      */
-    constructor(dom_element_id, tree_data, defaultFlowrate) {
+    constructor(dom_element_id, tree_data, defaultFlowrate, currentDateTime) {
         this._currentFlowrate = defaultFlowrate;
+        this._currentDateTime = currentDateTime;
         this._transitionTime = 200;
 
         const tree_values = {};
-
-        Object.values(tree_data.iterations).map((iteration) => {
-            Object.values(iteration.trees).map((tree) => {
-                d3.hierarchy(tree, (d) => d.children).each((t) =>
-                    Object.keys(t.data).forEach((key) => {
-                        if (!tree_values[key]) {
-                            tree_values[key] = [];
-                        }
-                        tree_values[key].push(t.data[key]);
-                    })
-                );
-            });
+        tree_data.map((datedTree) => {
+            let tree = datedTree.tree;
+            d3.hierarchy(tree, (d) => d.children).each((t) =>
+                Object.keys(t.data).forEach((key) => {
+                    if (!tree_values[key]) {
+                        tree_values[key] = [];
+                    }
+                    tree_values[key].push(t.data[key]);
+                })
+            );
         });
+
         this._path_scale = new Map();
         Object.keys(tree_values).forEach((key) => {
             this._path_scale[key] = d3
                 .scaleLinear()
-                .domain(d3.extent(tree_values[key]))
+                .domain(d3.extent(tree_values[key].flat()))
                 .range([2, 100]);
         });
 
@@ -77,28 +79,29 @@ export default class GroupTree {
         this._data = GroupTree.initHierarchies(tree_data, height);
 
         this._currentTree = {};
+
+        this._updateCalled = false;
     }
 
     /**
      * Initialize all trees in the group tree datastructure, once for the entire visualization.
      *
      */
-    static initHierarchies(trees, height) {
+    static initHierarchies(tree_data, height) {
         // generate the node-id used to match in the enter, update and exit selections
         const getId = (d) =>
             d.parent === null ? d.data.name : `${d.parent.id}_${d.data.name}`;
 
-        Object.keys(trees.iterations).map((key) => {
-            Object.keys(trees.iterations[key].trees).map((tKey) => {
-                let t = trees.iterations[key].trees[tKey];
-                t = d3.hierarchy(t, (dd) => dd.children);
-                t.descendants().map((n) => (n.id = getId(n)));
-                t.x0 = height / 2;
-                t.y0 = 0;
-                trees.iterations[key].trees[tKey] = t;
-            });
+        tree_data.map((datedTree) => {
+            let tree = datedTree.tree;
+            tree = d3.hierarchy(tree, (dd) => dd.children);
+            tree.descendants().map((n) => (n.id = getId(n)));
+            tree.x0 = height / 2;
+            tree.y0 = 0;
+            datedTree.tree = tree;
         });
-        return trees;
+
+        return tree_data;
     }
 
     /**
@@ -114,6 +117,13 @@ export default class GroupTree {
      * @param flowrate - key identifying the flowrate of the incoming edge
      */
     set flowrate(flowrate) {
+        const current_tree_index = this._data.findIndex((e) => {
+            return e.dates.includes(this._currentDateTime);
+        });
+        const date_index = this._data[current_tree_index].dates.indexOf(
+            this._currentDateTime
+        );
+
         this._currentFlowrate = flowrate;
         this._svg
             .selectAll("path.link")
@@ -124,10 +134,10 @@ export default class GroupTree {
                 () => `link grouptree_link grouptree_link__${flowrate}`
             )
             .style("stroke-width", (d) =>
-                this.getEdgeStrokeWidth(flowrate, d.data[flowrate])
+                this.getEdgeStrokeWidth(flowrate, d.data[flowrate][date_index])
             )
             .style("stroke-dasharray", (d) =>
-                d.data[flowrate] > 0 ? "none" : "5,5"
+                d.data[flowrate][date_index] > 0 ? "none" : "5,5"
             );
     }
 
@@ -147,8 +157,30 @@ export default class GroupTree {
      *
      * @param root
      */
-    update(root) {
+    update(newDateTime) {
         const self = this;
+
+        const current_tree_index = self._data.findIndex((e) => {
+            return e.dates.includes(self._currentDateTime);
+        });
+
+        const new_tree_index = self._data.findIndex((e) => {
+            return e.dates.includes(newDateTime);
+        });
+
+        self._currentDateTime = newDateTime;
+
+        // No need to update if the tree is the same for this new timestep.
+        if (current_tree_index == new_tree_index && self._updateCalled) {
+            self._updateCalled = true;
+            self.flowrate = self._currentFlowrate;
+            return;
+        }
+
+        const root = self._data[new_tree_index];
+
+        self._updateCalled = true;
+        const date_index = root.dates.indexOf(self._currentDateTime); // used to look up pressure and oil/water/gas rates.
 
         /**
          * Assigns y coordinates to all tree nodes in the rendered tree.
@@ -200,7 +232,9 @@ export default class GroupTree {
                 node.children = node._children;
                 node._children = null;
             }
-            self.update(self._currentTree);
+
+            self._updateCalled = false; // force update
+            self.update(self._currentDateTime);
         }
 
         /**
@@ -299,7 +333,7 @@ export default class GroupTree {
                 .attr("x", 0)
                 .attr("dy", "-.05em")
                 .attr("text-anchor", "middle")
-                .text((d) => d.data.pressure.toFixed(0));
+                .text((d) => d.data.pressure[date_index].toFixed(0));
 
             nodeEnter
                 .append("text")
@@ -314,7 +348,7 @@ export default class GroupTree {
 
             nodeUpdate
                 .select("text.grouptree__pressurelabel")
-                .text((d) => d.data.pressure.toFixed(0));
+                .text((d) => d.data.pressure[date_index].toFixed(0));
 
             nodeUpdate
                 .transition()
@@ -392,11 +426,14 @@ export default class GroupTree {
                 )
                 .attr("d", (d) => diagonal(d, d.parent))
                 .style("stroke-width", (d) =>
-                    self.getEdgeStrokeWidth(flowrate, d.data[flowrate])
+                    self.getEdgeStrokeWidth(
+                        flowrate,
+                        d.data[flowrate][date_index]
+                    )
                 )
-                .style("stroke-dasharray", (d) =>
-                    d.data[flowrate] > 0 ? "none" : "5,5"
-                );
+                .style("stroke-dasharray", (d) => {
+                    return d.data[flowrate][date_index] > 0 ? "none" : "5,5";
+                });
 
             link.exit()
                 .transition()
@@ -453,7 +490,7 @@ export default class GroupTree {
         }
 
         const newTree = cloneExistingNodeStates(
-            growNewTree(this._renderTree(root), this._width),
+            growNewTree(this._renderTree(root.tree), this._width),
             this._currentTree
         );
 
