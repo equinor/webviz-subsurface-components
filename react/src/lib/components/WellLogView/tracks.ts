@@ -4,14 +4,10 @@ import {
     DualScaleTrack,
     GraphTrack,
     graphLegendConfig,
-    LegendHelper,
     scaleLegendConfig,
     ScaleInterpolator
 } from '@equinor/videx-wellog';
 
-
-
-//import { scaleLinear } from 'd3';
 
 function indexOfCurveByName(data, name: string): number {
     let i: number = 0;

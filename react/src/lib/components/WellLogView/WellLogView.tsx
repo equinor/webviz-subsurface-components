@@ -210,7 +210,7 @@ class WellLogView extends Component<Props> {
     render() {
         return (
             <div>
-                <table height='100%' width='100%'>
+                <table style={{ height: '100%', width: '100%' }}>
                     <tr>
                         <td className='wellog' ref={el => { this.container = el as HTMLElement; }} />
                         {/*
