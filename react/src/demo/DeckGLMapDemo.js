@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React from "react";
 
 import AceEditor from "react-ace";
@@ -58,6 +59,30 @@ ErrorBoundary.propTypes = {
     children: PropTypes.node.isRequired,
 };
 
+// button component to show/hide code panle side bar
+const CodePanelButton = () => {
+    const [isShown, setIsShown] = React.useState(true);
+    function togglePanel() {
+        const codePanelBar = document.getElementById("code-panel");
+        if (isShown) {
+            codePanelBar.setAttribute("hidden", true);
+            setIsShown(false);
+        }
+        else {
+            codePanelBar.removeAttribute("hidden");
+            setIsShown(true);
+        }
+    }
+
+    return (
+        <button 
+        style={{marginLeft: "5px", cursor: "pointer"}} 
+        onClick={()=>togglePanel()}>
+            {`${isShown? "Hide " : "Show "} Code Panel`}
+        </button>
+    )
+}
+
 function _get_colmaps(layers) {
     return layers
         .filter((l) => l["@@type"] == "ColormapLayer")
@@ -112,43 +137,46 @@ const DeckGLMapDemo = () => {
     // TODO: Fold code panel in a slider:
     // https://eds-storybook-react.azurewebsites.net/?path=/docs/components-sidesheet--default
     return (
-        <div style={{ height: "95%", display: "flex" }}>
-            <div style={{ width: "30%" }}>
-                <div style={{ flex: 1 }}>
-                    <AceEditor
-                        width="100%"
-                        height="100%"
-                        mode="json"
-                        theme="monokai"
-                        onChange={onEditorChanged}
-                        name="AceEditorDiv"
-                        editorProps={{ $blockScrolling: true }}
-                        value={text}
-                    />
-                </div>
-            </div>
-            {parsedJson && (
-                <div style={{ flex: 2 }}>
-                    <ErrorBoundary
-                        reset={errorReset}
-                        onReset={() => {
-                            setErrorReset(false);
-                        }}
-                    >
-                        <DeckGLMap {...parsedJson} setProps={setMapProps} />
-                    </ErrorBoundary>
-                    <div>
-                        {colormaps.map((colormap, index) => (
-                            <img
-                                key={index}
-                                src={colormap}
-                                style={{ padding: "2px" }}
-                            />
-                        ))}
+        <React.Fragment>
+            <CodePanelButton />
+            <div style={{ height: "95%", display: "flex" }}>            
+                <div id="code-panel" style={{ width: "30%" }}>                
+                    <div style={{ flex: 1 }}>
+                        <AceEditor
+                            width="100%"
+                            height="100%"
+                            mode="json"
+                            theme="monokai"
+                            onChange={onEditorChanged}
+                            name="AceEditorDiv"
+                            editorProps={{ $blockScrolling: true }}
+                            value={text}
+                        />
                     </div>
                 </div>
-            )}
-        </div>
+                {parsedJson && (
+                    <div style={{ flex: 2 }}>
+                        <ErrorBoundary
+                            reset={errorReset}
+                            onReset={() => {
+                                setErrorReset(false);
+                            }}
+                        >
+                            <DeckGLMap {...parsedJson} setProps={setMapProps} />
+                        </ErrorBoundary>
+                        <div>
+                            {colormaps.map((colormap, index) => (
+                                <img
+                                    key={index}
+                                    src={colormap}
+                                    style={{ padding: "2px" }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </React.Fragment>
     );
 };
 
