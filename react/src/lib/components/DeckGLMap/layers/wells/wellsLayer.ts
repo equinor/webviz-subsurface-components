@@ -6,6 +6,7 @@ import { PickInfo } from "deck.gl";
 import { subtract, distance, dot } from "mathjs";
 import { interpolateRgbBasis } from "d3-interpolate";
 import { color } from "d3-color";
+import { Position2D } from "@deck.gl/core/utils/positions";
 
 import { Feature } from "geojson";
 
@@ -70,10 +71,12 @@ export default class WellsLayer extends CompositeLayer<
     }
 
     renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
+        const data = splineRefine(this.props.data);
+
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps({
                 id: "outline",
-                data: this.props.data,
+                data,
                 pickable: false,
                 stroked: false,
                 pointRadiusUnits: "pixels",
@@ -87,7 +90,7 @@ export default class WellsLayer extends CompositeLayer<
         const colors = new GeoJsonLayer<Feature>(
             this.getSubLayerProps({
                 id: "colors",
-                data: this.props.data,
+                data,
                 pickable: true,
                 stroked: false,
                 pointRadiusUnits: "pixels",
@@ -145,6 +148,7 @@ export default class WellsLayer extends CompositeLayer<
         if (this.props.logCurves) {
             layers.splice(1, 0, log_layer);
         }
+
         return layers;
     }
 
@@ -347,4 +351,110 @@ function getLogProperty(
 
     if (log_value) return { name: prop_name, value: log_value };
     else return null;
+}
+
+function CatmullRom(
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: number,
+    t: number
+): number {
+    const t2 = t * t;
+    const t3 = t * t * t;
+    return  0.5 *(2*p1 + (-p0 + p2) * t + (2*p0 - 5*p1 + 4*p2 - p3) * t2 + (-p0 + 3*p1- 3*p2 + p3) * t3); // eslint-disable-line
+}
+
+// Resample well path's and md's to higher resolution for smoother curves.
+// Uses interploating spline through existing data.
+function splineRefine(data) {
+    const ts = [0.2, 0.4, 0.6, 0.8];
+
+    for (let well_no = 0; well_no < data.length; well_no++) {
+        const mds = data[well_no]["properties"]["md"];
+        const coords =
+            data[well_no]["geometry"]["geometries"][1]["coordinates"];
+
+        const n = coords.length;
+        if (n < 2) {
+            continue;
+        }
+
+        // Point before first.
+        const x0 = 0.25 * (coords[0][0] - coords[1][0]) + coords[0][0];
+        const y0 = 0.25 * (coords[0][1] - coords[1][1]) + coords[0][1];
+        const P_first: Position2D = [x0, y0];
+
+        // Point after last.
+        const xn =
+            0.25 * (coords[n - 1][0] - coords[n - 2][0]) + coords[n - 1][0];
+        const yn =
+            0.25 * (coords[n - 1][1] - coords[n - 2][1]) + coords[n - 1][1];
+        const P_n: Position2D = [xn, yn];
+
+        const md_first = 0.25 * (mds[0][0] - mds[0][1]) + mds[0][0];
+        const md_n = 0.25 * (mds[0][n - 1] - mds[0][n - 2]) + mds[0][n - 1];
+
+        const newCoordinates: [Position2D?] = [];
+        const newMds: number[][] = [];
+        newMds.push([]);
+
+        for (let i = 0; i < n - 2; i += 1) {
+            let P0: Position2D, P1: Position2D, P2: Position2D, P3: Position2D;
+            let md0: number, md1: number, md2: number, md3: number;
+
+            if (i === 0) {
+                P0 = P_first;
+                P1 = coords[i + 0];
+                P2 = coords[i + 1];
+                P3 = coords[i + 2];
+
+                md0 = md_first;
+                md1 = mds[0][i + 0];
+                md2 = mds[0][i + 1];
+                md3 = mds[0][i + 2];
+            } else if (i === n - 3) {
+                P0 = coords[i + 0];
+                P1 = coords[i + 1];
+                P2 = coords[i + 2];
+                P3 = P_n;
+
+                md0 = mds[0][i + 0];
+                md1 = mds[0][i + 1];
+                md2 = mds[0][i + 2];
+                md3 = md_n;
+            } else {
+                P0 = coords[i + 0];
+                P1 = coords[i + 1];
+                P2 = coords[i + 2];
+                P3 = coords[i + 3];
+
+                md0 = mds[0][i + 0];
+                md1 = mds[0][i + 1];
+                md2 = mds[0][i + 2];
+                md3 = mds[0][i + 3];
+            }
+
+            newCoordinates.push(P1);
+            newMds[0].push(md1);
+
+            for (let t_i = 0; t_i < ts.length; t_i += 1) {
+                const t = ts[t_i];
+
+                const x = CatmullRom(P0[0], P1[0], P2[0], P3[0], t);
+                const y = CatmullRom(P0[1], P1[1], P2[1], P3[1], t);
+                const md = CatmullRom(md0, md1, md2, md3, t);
+
+                newCoordinates.push([x, y]);
+                newMds[0].push(md);
+            }
+        }
+
+        newCoordinates.push(coords[n - 1]);
+        newMds[0].push(mds[n - 1]);
+
+        data[well_no]['geometry']['geometries'][1]['coordinates'] = newCoordinates; // eslint-disable-line
+        data[well_no]["properties"]["md"] = newMds;
+    }
+    return data;
 }
