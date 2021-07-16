@@ -7,7 +7,8 @@ interface Props {
     id: string;
     data: Data;
 }
-export const DataContext = React.createContext<Data>({ iterations: {} });
+
+export const DataContext = React.createContext<Data>([]);
 
 const DataProvider: React.FC<Props> = ({
     children,
@@ -15,18 +16,11 @@ const DataProvider: React.FC<Props> = ({
     data,
 }: PropsWithChildren<Props>) => {
     const preloadedState = useMemo(() => {
-        const iterations = Object.keys(data.iterations);
-        const firstIteration = iterations.length > 0 ? iterations[0] : "";
-        const dateTimes =
-            firstIteration in data.iterations
-                ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  Object.keys(data.iterations[firstIteration]!.trees)
-                : [];
-        const firstDateTime = dateTimes.length === 0 ? "" : dateTimes[0];
+        const firstDateTime = data.length > 0 ? data[0].dates[0] : "";
+
         return {
             id: id,
             ui: {
-                currentIteration: firstIteration,
                 currentDateTime: firstDateTime,
                 currentFlowRate: "oilrate",
             } as UISettings,
