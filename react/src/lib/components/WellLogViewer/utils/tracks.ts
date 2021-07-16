@@ -103,10 +103,10 @@ class PlotData {
     }
 }
 
-function preparePlotData(datas, iCurve, iPrimaryAxis): PlotData {
+function preparePlotData(data, iCurve, iPrimaryAxis): PlotData {
     const plot = new PlotData();
     let i = 0;
-    for (const row of datas) {
+    for (const row of data) {
         const value: number = row[iCurve];
         checkMinMaxValue(plot.minmax, value);
         const primary: number = iPrimaryAxis >= 0 ? row[iPrimaryAxis] : i++;
@@ -140,7 +140,7 @@ function makeTrackHeader(bMultiple, curve) {
 }
 
 export default (
-    datas: [],
+    welllog: /*Record<string, unknown>*/[],
     axes: { primary: string; secondary: string } = {
         primary: "md",
         secondary: "tvd",
@@ -159,9 +159,9 @@ export default (
     let primaries = new Float32Array(0); // 32 bits should be enough
     let secondaries = new Float32Array(0);
 
-    if (datas) {
-        const data = datas[0].data;
-        let curves = datas[0].curves;
+    if (welllog) {
+        const data = (welllog as any[])[0].data;
+        let curves = (welllog as any[])[0].curves;
 
         let titlePrimaryAxis = titles[axes.primary];
         let iPrimaryAxis = indexOfCurveByNames(curves, names[axes.primary]);

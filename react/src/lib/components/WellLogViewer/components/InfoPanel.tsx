@@ -16,7 +16,7 @@ interface Props {
 function createSeparator() {
     return (
         <tr>
-            <td colSpan="3">
+            <td colSpan={3}>
                 {" "}
                 <hr />
             </td>

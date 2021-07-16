@@ -64,8 +64,7 @@ class WellLogViewerDemo extends Component {
                 </div>
                 <div style={{ height: "92%" }}>
                     <WellLogViewer
-                        id="well_log_view"
-                        data={this.getData(this.state.example)}
+                        welllog={this.getData(this.state.example)}
                     />
                 </div>
             </div>
