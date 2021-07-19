@@ -185,6 +185,14 @@ WellsLayer.defaultProps = defaultProps;
 
 //================= Local help functions. ==================
 
+function transpose(a) {
+    return Object.keys(a[0]).map(function (c) {
+        return a.map(function (r) {
+            return r[c];
+        });
+    });
+}
+
 function getLogValues(
     d: LogCurveDataType,
     logrun_name: string,
@@ -193,7 +201,7 @@ function getLogValues(
     if (!isSelectedLogRun(d, logrun_name)) return [];
 
     const log_id = getLogIndex(d, log_name);
-    return log_id >= 0 ? d.data[log_id] : [];
+    return log_id >= 0 ? transpose(d.data)[log_id] : [];
 }
 
 function getLogInfo(
@@ -236,7 +244,7 @@ function getWellMds(well_object: Feature): number[] {
     return well_object.properties?.md[0];
 }
 
-function get_neighboring_md_indices(mds: number[], md: number): number[] {
+function getNeighboringMdIndices(mds: number[], md: number): number[] {
     const idx = mds.findIndex((x) => x >= md);
     return idx === 0 ? [idx, idx + 1] : [idx - 1, idx];
 }
@@ -256,7 +264,7 @@ function getLogPath(
     const log_xy: Position[] = [];
     const log_mds = getLogValues(d, logrun_name, "MD");
     log_mds.forEach((md) => {
-        const [l_idx, h_idx] = get_neighboring_md_indices(well_mds, md);
+        const [l_idx, h_idx] = getNeighboringMdIndices(well_mds, md);
         const md_normalized =
             (md - well_mds[l_idx]) / (well_mds[h_idx] - well_mds[l_idx]);
         const xy = interpolateNumberArray(
