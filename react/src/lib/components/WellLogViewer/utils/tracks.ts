@@ -163,7 +163,7 @@ class TrackInfo {
 }
 
 export default (
-    welllog: /*Record<string, unknown>*/ [],
+    welllog: Record<string, any>[],
     axes: { primary: string; secondary: string } = {
         primary: "md",
         secondary: "tvd",
@@ -171,7 +171,7 @@ export default (
 ): TrackInfo => {
     const info = new TrackInfo();
 
-    if (welllog) {
+    if (welllog && welllog[0]) {
         const data = welllog[0].data;
         const curves = welllog[0].curves;
 
