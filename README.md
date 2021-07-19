@@ -7,6 +7,7 @@
 [![Python 3.6 | 3.7 | 3.8 | 3.9](https://img.shields.io/badge/python-3.6%20|%203.7%20|%203.8%20|%203.9-blue.svg)](https://www.python.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black%20%28Python%29-000000.svg)](https://github.com/psf/black)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier%20%28JavaScript%29-ff69b4.svg)](https://github.com/prettier/prettier)
+[![codecov](https://codecov.io/gh/equinor/webviz-subsurface-components/branch/master/graph/badge.svg?token=TKBZPHQLU4)](https://codecov.io/gh/equinor/webviz-subsurface-components)
 
 # Webviz subsurface components
 
@@ -42,9 +43,9 @@ then:
     ```
     npm ci --ignore-scripts --prefix ./react
     ```
-2. Run the project's own `postinstall` script (and optionally Dash component pre-script)
+2. Run some potentially optional postinstall scripts
     ```
-    npm run postinstall --prefix ./react
+    npm run setup_deckgl_types --prefix ./react  # only needed if ignored scripts during install
     npm run copy-package-json --prefix ./react  # only needed if building Dash components
     ```
 3. Install python packages required to build components.
