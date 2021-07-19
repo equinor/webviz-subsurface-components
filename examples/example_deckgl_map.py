@@ -11,6 +11,7 @@ import re
 
 import dash
 import dash_html_components as html
+import dash_core_components as dcc
 import jsonpatch
 import jsonpointer
 import numpy as np
@@ -20,11 +21,11 @@ import webviz_subsurface_components
 
 
 class MapSpec:
-    def __init__(self, initialSpec=None):
+    def __init__(self, initialSpec=None, initialPatch=None):
         self._spec = initialSpec
+        if initialPatch:
+            self.apply_patch(initialPatch)
 
-    # Warning: modifying the spec directly might result in missing patches,
-    # and getting out of sync with the frontend state.
     def get_spec(self):
         return self._spec
 
@@ -76,140 +77,6 @@ class MapSpec:
             )
 
         return out_patch
-
-
-class LeftMapSpec(MapSpec):
-    def __init__(self, min_val, max_val):
-        bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
-        width = bounds[2] - bounds[0]  # right - left
-        height = bounds[3] - bounds[1]  # top - bottom
-
-        super().__init__(
-            {
-                "initialViewState": {
-                    "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
-                    "zoom": -3,
-                },
-                "layers": [
-                    {
-                        "@@type": "ColormapLayer",
-                        "id": "colormap-layer",
-                        "bounds": bounds,
-                        "image": "@@#resources.propertyMap",
-                        "colormap": "@@#resources.colormap",
-                        "valueRange": [min_val, max_val],
-                        "pickable": True,
-                    },
-                    {
-                        "@@type": "Hillshading2DLayer",
-                        "id": "hillshading-layer",
-                        "bounds": bounds,
-                        "opacity": 1.0,
-                        "valueRange": [min_val, max_val],
-                        "image": "@@#resources.propertyMap",
-                        "pickable": True,
-                    },
-                    {
-                        "@@type": "DrawingLayer",
-                        "id": "drawing-layer",
-                        "mode": "drawLineString",
-                        "data": {"type": "FeatureCollection", "features": []},
-                    },
-                ],
-                "views": [
-                    {
-                        "@@type": "OrthographicView",
-                        "id": "main",
-                        "controller": {"doubleClickZoom": False},
-                        "x": "0%",
-                        "y": "0%",
-                        "width": "100%",
-                        "height": "100%",
-                        "flipY": False,
-                    }
-                ],
-            }
-        )
-
-    def update_drawing_mode(self, mode):
-        spec = self.get_spec_clone()
-        spec["layers"][2]["mode"] = mode
-        return self.update(spec)
-
-
-class RightMapSpec(MapSpec):
-    def __init__(self, min_val, max_val):
-        bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
-        width = bounds[2] - bounds[0]  # right - left
-        height = bounds[3] - bounds[1]  # top - bottom
-
-        super().__init__(
-            {
-                "initialViewState": {
-                    "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
-                    "zoom": -3,
-                },
-                "layers": [
-                    {
-                        "@@type": "ColormapLayer",
-                        "id": "colormap-layer",
-                        "bounds": bounds,
-                        "image": "@@#resources.propertyMap",
-                        "colormap": "@@#resources.colormap",
-                        "valueRange": [min_val, max_val],
-                        "pickable": True,
-                    },
-                    {
-                        "@@type": "Hillshading2DLayer",
-                        "id": "hillshading-layer",
-                        "bounds": bounds,
-                        "opacity": 1.0,
-                        "valueRange": [min_val, max_val],
-                        "image": "@@#resources.propertyMap",
-                        "pickable": True,
-                    },
-                    {
-                        "@@type": "DrawingLayer",
-                        "id": "drawing-layer",
-                        "mode": "view",
-                        "data": {"type": "FeatureCollection", "features": []},
-                    },
-                    {
-                        "@@type": "WellsLayer",
-                        "id": "wells-layer",
-                        "data": "@@#resources.wells",
-                        "opacity": 1.0,
-                        "lineWidthScale": 5,
-                        "pointRadiusScale": 8,
-                        "outline": True,
-                    },
-                ],
-                "views": [
-                    {
-                        "@@type": "OrthographicView",
-                        "id": "main",
-                        "controller": {"doubleClickZoom": False},
-                        "x": "0%",
-                        "y": "0%",
-                        "width": "100%",
-                        "height": "100%",
-                        "flipY": False,
-                    }
-                ],
-            }
-        )
-
-    def sync_drawing(self, in_patch):
-        drawing_layer_patches = list(
-            filter(
-                lambda patch: patch["path"].startswith("/layers/[drawing-layer]/data")
-                or patch["path"].startswith("/layers/2/data"),
-                in_patch,
-            )
-        )
-        self.apply_patch(drawing_layer_patches)
-
-        return drawing_layer_patches
 
 
 def array2d_to_png(z_array):
@@ -273,28 +140,110 @@ if __name__ == "__main__":
     COLOR_MAP = "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png"
     WELLS = (
         "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/"
-        "master/src/demo/example-data/volve_wells.json"
-    )
-    left_map_spec = LeftMapSpec(min_value, max_value)
-    left_map = webviz_subsurface_components.DeckGLMap(
-        id="DeckGL-Map-Left",
-        resources={
-            "propertyMap": map_data,
-            "colormap": COLOR_MAP,
-            "wells": WELLS,
-        },
-        deckglSpecPatch=left_map_spec.create_patch(),
+        "master/react/src/demo/example-data/volve_wells.json"
     )
 
-    right_map_spec = RightMapSpec(min_value, max_value)
-    right_map = webviz_subsurface_components.DeckGLMap(
-        id="DeckGL-Map-Right",
+    bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
+    width = bounds[2] - bounds[0]  # right - left
+    height = bounds[3] - bounds[1]  # top - bottom
+
+    map_obj = webviz_subsurface_components.DeckGLMap(
+        id="deckgl-map",
         resources={
             "propertyMap": map_data,
-            "colormap": COLOR_MAP,
             "wells": WELLS,
         },
-        deckglSpecPatch=right_map_spec.create_patch(),
+        deckglSpecBase={
+            "initialViewState": {
+                "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+                "zoom": -3,
+            },
+            "layers": [
+                {
+                    "@@type": "ColormapLayer",
+                    "id": "colormap-layer",
+                    "bounds": bounds,
+                    "image": "@@#resources.propertyMap",
+                    "colormap": COLOR_MAP,
+                    "valueRange": [min_value, max_value],
+                    "pickable": True,
+                },
+                {
+                    "@@type": "Hillshading2DLayer",
+                    "id": "hillshading-layer",
+                    "bounds": bounds,
+                    "opacity": 1.0,
+                    "valueRange": [min_value, max_value],
+                    "image": "@@#resources.propertyMap",
+                    "pickable": True,
+                },
+                {
+                    "@@type": "DrawingLayer",
+                    "id": "drawing-layer",
+                    "data": {"type": "FeatureCollection", "features": []},
+                },
+                {
+                    "@@type": "WellsLayer",
+                    "id": "wells-layer",
+                    "data": "@@#resources.wells",
+                    "opacity": 1.0,
+                    "lineWidthScale": 5,
+                    "pointRadiusScale": 8,
+                    "outline": True,
+                },
+            ],
+            "views": [
+                {
+                    "@@type": "OrthographicView",
+                    "id": "main",
+                    "controller": {"doubleClickZoom": False},
+                    "x": "0%",
+                    "y": "0%",
+                    "width": "100%",
+                    "height": "100%",
+                    "flipY": False,
+                }
+            ],
+        },
+    )
+
+    colormap_dropdown = dcc.Dropdown(
+        id="colormap-select",
+        options=[
+            {
+                "label": "Black & White",
+                "value": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/"
+                "colormaps/binary_r.png",
+            },
+            {
+                "label": "Plasma",
+                "value": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/"
+                "colormaps/plasma.png",
+            },
+            {
+                "label": "Seismic",
+                "value": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/"
+                "colormaps/seismic.png",
+            },
+            {
+                "label": "Spectral",
+                "value": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/"
+                "colormaps/spectral.png",
+            },
+            {
+                "label": "Terrain",
+                "value": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/"
+                "colormaps/terrain.png",
+            },
+            {
+                "label": "Viridis",
+                "value": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/"
+                "colormaps/viridis.png",
+            },
+        ],
+        value="https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/"
+        "colormaps/plasma.png",
+        clearable=False,
     )
 
     app = dash.Dash(__name__)
@@ -302,40 +251,53 @@ if __name__ == "__main__":
     app.layout = html.Div(
         children=[
             html.Div(
-                style={"float": "left", "width": "50%", "height": "95vh"},
-                children=[left_map],
-            ),
-            html.Button(
-                id="toggle-drawing",
-                children="Toggle drawing mode",
+                style={"float": "left", "width": "256px"},
+                children=[
+                    colormap_dropdown,
+                    html.Img(
+                        id="colormap-img",
+                    ),
+                ],
             ),
             html.Div(
-                style={"float": "right", "width": "50%", "height": "95vh"},
-                children=[right_map],
+                style={"float": "left", "width": "95%", "height": "90vh"},
+                children=[map_obj],
             ),
         ]
     )
 
     @app.callback(
-        dash.dependencies.Output("DeckGL-Map-Left", "deckglSpecPatch"),
-        dash.dependencies.Input("toggle-drawing", "n_clicks"),
+        dash.dependencies.Output("colormap-img", "src"),
+        [dash.dependencies.Input("colormap-select", "value")],
     )
-    def toggle_drawing(n_clicks):
-        mode = "view" if n_clicks is None or n_clicks % 2 == 0 else "drawLineString"
-        patch = left_map_spec.update_drawing_mode(mode)
-        return patch
+    def update_img(value):
+        return value
 
     @app.callback(
-        dash.dependencies.Output("DeckGL-Map-Right", "deckglSpecPatch"),
-        dash.dependencies.Input("DeckGL-Map-Left", "deckglSpecPatch"),
+        dash.dependencies.Output("deckgl-map", "deckglSpecBase"),
+        dash.dependencies.Output("deckgl-map", "deckglSpecPatch"),
+        dash.dependencies.Input("colormap-select", "value"),
+        dash.dependencies.State("deckgl-map", "deckglSpecBase"),
+        dash.dependencies.State("deckgl-map", "deckglSpecPatch"),
     )
-    def sync_drawing(in_patch):
-        if not in_patch:
+    def sync_drawing(colormap, spec_base, spec_patch):
+        if not colormap:
             return None
-        # Update internal state of the left map
-        left_map_spec.apply_patch(in_patch)
 
-        # Update the right map
-        return right_map_spec.sync_drawing(in_patch)
+        map_spec = MapSpec(spec_base, spec_patch)
+
+        def apply_colormap(spec):
+            # Update the colormap layer then return the full spec.
+            # The MapSpec class will create a patch from it.
+            spec["layers"][0]["colormap"] = colormap
+            return spec
+
+        # Send the updated base spec (the input base+patch) and the colormap patch.
+        # This can be done in a number of ways:
+        # - Apply input patch and local modifications to the input base and send just deckglSpecBase
+        # - Apply input patch to the input base and send it as deckglSpecBase.
+        #   Send local modifications as deckglSpecBase. (Current solution)
+        # - Send just the input patch and local modifications as deckglSpecBase
+        return map_spec.get_spec(), map_spec.create_patch(apply_colormap)
 
     app.run_server(debug=True)
