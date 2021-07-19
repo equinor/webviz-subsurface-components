@@ -29,7 +29,6 @@ const Map: React.FC<MapProps> = ({
     setSpecPatch,
     children,
 }: MapProps) => {
-    const deckRef = React.useRef<DeckGL>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
         createStore(deckglSpec, setSpecPatch)
@@ -58,21 +57,24 @@ const Map: React.FC<MapProps> = ({
         setSpecObj(jsonConverter.convert(deckglSpec));
     }, [deckglSpec, resources]);
 
-    React.useEffect(() => {
-        if (deckRef.current) {
-            deckRef.current.deck.setProps({
-                // userData is undocumented and it doesn't appear in the
-                // deckProps type, but it is used by the layersManager
-                // and forwarded though the context to all the layers.
-                //
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore: TS2345
-                userData: {
-                    setSpecPatch: setSpecPatch,
-                },
-            });
-        }
-    }, [setSpecPatch]);
+    const refCb = React.useCallback(
+        (deckRef) => {
+            if (deckRef) {
+                deckRef.deck.setProps({
+                    // userData is undocumented and it doesn't appear in the
+                    // deckProps type, but it is used by the layersManager
+                    // and forwarded though the context to all the layers.
+                    //
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore: TS2345
+                    userData: {
+                        setSpecPatch: setSpecPatch,
+                    },
+                });
+            }
+        },
+        [setSpecPatch]
+    );
 
     React.useEffect(() => {
         store.current.dispatch(setSpec(specObj ? deckglSpec : {}));
@@ -96,7 +98,7 @@ const Map: React.FC<MapProps> = ({
                             return (info.object as Feature)?.properties?.name;
                         }
                     }}
-                    ref={deckRef}
+                    ref={refCb}
                     onHover={onHover}
                 >
                     {children}
