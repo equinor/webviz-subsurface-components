@@ -139,29 +139,41 @@ function makeTrackHeader(bMultiple, curve) {
         : curve.name;
 }
 
+class TrackInfo {
+    tracks: Track[];
+    minmaxPrimaryAxis: [number, number];
+    minmaxSecondaryAxis: [number, number];
+    primaries: Float32Array; // 32 bits should be enough
+    secondaries: Float32Array;
+
+    constructor() {
+        this.tracks = [];
+        this.minmaxPrimaryAxis = [
+            Number.POSITIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+        ];
+        this.minmaxSecondaryAxis = [
+            Number.POSITIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+        ];
+
+        this.primaries = new Float32Array(0);
+        this.secondaries = new Float32Array(0);
+    }
+}
+
 export default (
-    welllog: /*Record<string, unknown>*/[],
+    welllog: /*Record<string, unknown>*/ [],
     axes: { primary: string; secondary: string } = {
         primary: "md",
         secondary: "tvd",
     }
-) => {
-    const tracks: Track[] = [];
-    const minmaxPrimaryAxis: [number, number] = [
-        Number.POSITIVE_INFINITY,
-        Number.NEGATIVE_INFINITY,
-    ];
-    const minmaxSecondaryAxis: [number, number] = [
-        Number.POSITIVE_INFINITY,
-        Number.NEGATIVE_INFINITY,
-    ];
-
-    let primaries = new Float32Array(0); // 32 bits should be enough
-    let secondaries = new Float32Array(0);
+): TrackInfo => {
+    const info = new TrackInfo();
 
     if (welllog) {
-        const data = (welllog as any[])[0].data;
-        let curves = (welllog as any[])[0].curves;
+        const data = welllog[0].data;
+        const curves = welllog[0].curves;
 
         let titlePrimaryAxis = titles[axes.primary];
         let iPrimaryAxis = indexOfCurveByNames(curves, names[axes.primary]);
@@ -171,7 +183,10 @@ export default (
             iPrimaryAxis = indexOfCurveByNames(curves, names["time"]);
         }
         const titleSecondaryAxis = titles[axes.secondary];
-        const iSecondaryAxis = indexOfCurveByNames(curves, names[axes.secondary]);
+        const iSecondaryAxis = indexOfCurveByNames(
+            curves,
+            names[axes.secondary]
+        );
         //alert("iPrimaryAxis=" + iPrimaryAxis + "; iSecondaryAxis=" + iSecondaryAxis)
 
         let nTrack = 0;
@@ -191,7 +206,7 @@ export default (
                         : "mtr",
                     legendConfig: scaleLegendConfig,
                 });
-                tracks.push(scaleTrack1);
+                info.tracks.push(scaleTrack1);
 
                 const curveSecondaryAxis = curves[iSecondaryAxis];
                 const scaleTrack2 = new DualScaleTrack(nTrack++, {
@@ -207,12 +222,10 @@ export default (
                         : "mtr",
                     legendConfig: scaleLegendConfig,
                 });
-                tracks.push(scaleTrack2);
+                info.tracks.push(scaleTrack2);
 
-
-
-                primaries = new Float32Array(data.length); // 32 bits should be enough
-                secondaries = new Float32Array(data.length);
+                info.primaries = new Float32Array(data.length); // 32 bits should be enough
+                info.secondaries = new Float32Array(data.length);
                 {
                     let count = 0;
                     for (const row of data) {
@@ -220,21 +233,21 @@ export default (
                         //    row[iSecondaryAxis] += 150 * Math.sin((row[iSecondaryAxis] - data[0][iSecondaryAxis])*0.01)
 
                         const secondary: number = row[iSecondaryAxis];
-                        checkMinMaxValue(minmaxSecondaryAxis, secondary);
+                        checkMinMaxValue(info.minmaxSecondaryAxis, secondary);
 
                         if (secondary !== null) {
                             const primary: number = row[iPrimaryAxis];
                             if (primary !== null) {
-                                secondaries[count] = secondary;
-                                primaries[count] = primary;
+                                info.secondaries[count] = secondary;
+                                info.primaries[count] = primary;
                                 count++;
                             }
                         }
                     }
-                    if (count < primaries.length) {
+                    if (count < info.primaries.length) {
                         // resize arrays to actual size used
-                        primaries = primaries.subarray(0, count);
-                        secondaries = secondaries.subarray(0, count);
+                        info.primaries = info.primaries.subarray(0, count);
+                        info.secondaries = info.secondaries.subarray(0, count);
                     }
                 }
             } else {
@@ -250,7 +263,7 @@ export default (
                         : "mtr",
                     legendConfig: scaleLegendConfig, //??
                 });
-                tracks.push(track);
+                info.tracks.push(track);
             }
         }
         let iPlot = 0;
@@ -275,7 +288,7 @@ export default (
                 continue;
 
             const plot = preparePlotData(data, iCurve, iPrimaryAxis);
-            checkMinMax(minmaxPrimaryAxis, plot.minmaxPrimaryAxis);
+            checkMinMax(info.minmaxPrimaryAxis, plot.minmaxPrimaryAxis);
             const plotColor = colors[iPlot % colors.length];
             const plotType = plotTypes[iPlot % plotTypes.length];
             iPlot++;
@@ -305,7 +318,7 @@ export default (
                 iCurve++;
                 const curve2 = curves[iCurve];
                 const plot2 = preparePlotData(data, iCurve, iPrimaryAxis);
-                checkMinMax(minmaxPrimaryAxis, plot2.minmaxPrimaryAxis);
+                checkMinMax(info.minmaxPrimaryAxis, plot2.minmaxPrimaryAxis);
                 const plotColor2 = colors[iPlot % colors.length];
                 // plotType2 == 'differential'0
                 /**
@@ -347,13 +360,8 @@ export default (
                 data: plotDatas,
                 plots: plots,
             });
-            tracks.push(track);
+            info.tracks.push(track);
         }
     }
-    return {
-        tracks,
-        minmaxPrimaryAxis,
-        primaries, 
-        secondaries, 
-    };
+    return info;
 };

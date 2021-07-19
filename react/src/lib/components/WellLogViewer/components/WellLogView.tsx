@@ -1,7 +1,9 @@
 import React, { Component, ReactNode } from "react";
 import { LogViewer } from "@equinor/videx-wellog";
-import { InterpolatedScaleHandler, ScaleInterpolator } from "@equinor/videx-wellog";
-
+import {
+    InterpolatedScaleHandler,
+    ScaleInterpolator,
+} from "@equinor/videx-wellog";
 
 import "./styles.scss";
 
@@ -129,23 +131,20 @@ function createInterpolator(from: Float32Array, to: Float32Array) {
     return (x: number, expand: boolean) => {
         for (let i = 0; i < n; i++) {
             if (x < from[i]) {
-                if (!i) return expand ? to[0] : Number.NaN;//(null as unknown as number);
+                if (!i) return expand ? to[0] : Number.NaN; //(null as unknown as number);
                 return (x - from[i]) * mul[i] + to[i];
             }
         }
-        return expand ? to[n ? n - 1 : 0] : Number.NaN;//(null as unknown as number);
+        return expand ? to[n ? n - 1 : 0] : Number.NaN; //(null as unknown as number);
     };
 }
 
-function createScaleHandler(primaries: Float32Array, secondaries: Float32Array) {
-    const primary2secondary = createInterpolator(
-        primaries,
-        secondaries
-    );
-    const secondary2primary = createInterpolator(
-        secondaries,
-        primaries
-    );
+function createScaleHandler(
+    primaries: Float32Array,
+    secondaries: Float32Array
+) {
+    const primary2secondary = createInterpolator(primaries, secondaries);
+    const secondary2primary = createInterpolator(secondaries, primaries);
 
     const forward = (v) => {
         // SecondaryAxis => PrimaryAxis
@@ -155,20 +154,19 @@ function createScaleHandler(primaries: Float32Array, secondaries: Float32Array) 
         // PrimaryAxis => SecondaryAxis
         return primary2secondary(v, false);
     };
-    let interpolator: ScaleInterpolator = {
+    const interpolator: ScaleInterpolator = {
         forward,
         reverse,
         forwardInterpolatedDomain: (domain) =>
-            domain.map((v) => /*forward(v)*/secondary2primary(v, true)),
+            domain.map((v) => /*forward(v)*/ secondary2primary(v, true)),
         reverseInterpolatedDomain: (domain) =>
-            domain.map((v) => /*reverse(v)*/primary2secondary(v, true)),
+            domain.map((v) => /*reverse(v)*/ primary2secondary(v, true)),
     };
     return new InterpolatedScaleHandler(interpolator);
 }
 
 function formatValue(v1: number) {
-    if (!Number.isFinite(v1))
-        return "";
+    if (!Number.isFinite(v1)) return "";
     let v = v1.toPrecision(4);
     if (v.indexOf(".") >= 0) {
         // cut trailing zeroes
@@ -218,8 +216,11 @@ function getValue(x: number, data, plot) {
     return v;
 }
 
-
-function setTracksToController(logController: LogViewer, primary: string, welllog:[]) {
+function setTracksToController(
+    logController: LogViewer,
+    primary: string,
+    welllog: []
+) {
     const axes = {
         primary: primary,
         secondary: primary == "md" ? "tvd" : "md",
@@ -244,7 +245,7 @@ interface Info {
     type: string; // line, linestep, area, ?dot?
 }
 interface Props {
-    welllog: []; 
+    welllog: [];
     primary: string;
     setInfo: (infos: Info[]) => void;
 }
@@ -274,7 +275,7 @@ class WellLogView extends Component<Props, State> {
         this.setTracks();
     }
 
-    componentDidUpdate(prevProps: Props, prevState: State): void {
+    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
         // Typical usage (don't forget to compare props):
         if (this.props.welllog !== prevProps.welllog) {
             this.setTracks();
@@ -307,7 +308,11 @@ class WellLogView extends Component<Props, State> {
     }
     setTracks(): void {
         if (this.logController)
-            setTracksToController(this.logController, this.props.primary, this.props.welllog)
+            setTracksToController(
+                this.logController,
+                this.props.primary,
+                this.props.welllog
+            );
         this.setInfo(); // Clear old track information
     }
     setInfo(x: number = Number.NaN, x2: number = Number.NaN): void {
@@ -350,7 +355,7 @@ class WellLogView extends Component<Props, State> {
                     color: iPlot == 0 ? "black" : "grey",
                     value: formatValue(_x),
                     type: "", //plot.type,
-                }); 
+                });
                 iPlot++;
             }
         }

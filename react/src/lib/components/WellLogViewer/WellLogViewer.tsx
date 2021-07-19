@@ -1,12 +1,8 @@
 import React, { Component, ReactNode } from "react";
-import { LogViewer } from "@equinor/videx-wellog";
-import { InterpolatedScaleHandler, ScaleInterpolator } from "@equinor/videx-wellog";
 
 import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import ScaleSelector from "./components/ScaleSelector";
-
-
 
 interface Props {
     welllog: [];
@@ -38,13 +34,12 @@ class WellLogViewer extends Component<Props, State> {
     onChangePrimaryScale(value: string): void {
         this.setState({ primary: value });
     }
-    setInfo(infos):void {
+    setInfo(infos: Info[]): void {
         this.setState({
             primary: this.state.primary,
             infos: infos,
         });
     }
-
 
     render(): ReactNode {
         return (
