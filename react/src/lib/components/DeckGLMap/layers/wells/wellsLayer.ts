@@ -409,13 +409,10 @@ function splineRefine(data, refine: boolean) {
     const ts = refine ? [0.2, 0.4, 0.6, 0.8] : [];
 
     if (data["features"] === undefined) {
-        console.log("NO DATA")
         return;
     }
 
     const no_wells = data["features"].length;
-    console.log("no_wells", no_wells)
-
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const mds = data["features"][well_no]["properties"]["md"];
 
@@ -438,8 +435,8 @@ function splineRefine(data, refine: boolean) {
         const zn = coords[n - 1][2] - coords[n - 2][2] + coords[n - 1][2];
         const P_n: Position3D = [xn, yn, zn];
 
-        const md_first = 0.25 * (mds[0][0] - mds[0][1]) + mds[0][0];
-        const md_n = 0.25 * (mds[0][n - 1] - mds[0][n - 2]) + mds[0][n - 1];
+        //const md_first = 0.25 * (mds[0][0] - mds[0][1]) + mds[0][0];
+        //const md_n = 0.25 * (mds[0][n - 1] - mds[0][n - 2]) + mds[0][n - 1];
 
         const newCoordinates: [Position3D?] = [];
         const newMds: number[][] = [];
@@ -447,7 +444,10 @@ function splineRefine(data, refine: boolean) {
 
         for (let i = 0; i < n - 2; i += 1) {
             let P0: Position3D, P1: Position3D, P2: Position3D, P3: Position3D;
-            let md0: number, md1: number, md2: number, md3: number;
+            //let md0: number;
+            let md1: number;
+            //let md2: number;
+            //let md3: number;
 
             if (i === 0) {
                 P0 = P_first;
@@ -455,30 +455,30 @@ function splineRefine(data, refine: boolean) {
                 P2 = coords[i + 1];
                 P3 = coords[i + 2];
 
-                md0 = md_first;
+                //md0 = md_first;
                 md1 = mds[0][i + 0];
-                md2 = mds[0][i + 1];
-                md3 = mds[0][i + 2];
+                //md2 = mds[0][i + 1];
+                //md3 = mds[0][i + 2];
             } else if (i === n - 3) {
                 P0 = coords[i + 0];
                 P1 = coords[i + 1];
                 P2 = coords[i + 2];
                 P3 = P_n;
 
-                md0 = mds[0][i + 0];
+                //md0 = mds[0][i + 0];
                 md1 = mds[0][i + 1];
-                md2 = mds[0][i + 2];
-                md3 = md_n;
+                //md2 = mds[0][i + 2];
+                //md3 = md_n;
             } else {
                 P0 = coords[i + 0];
                 P1 = coords[i + 1];
                 P2 = coords[i + 2];
                 P3 = coords[i + 3];
 
-                md0 = mds[0][i + 0];
+                //md0 = mds[0][i + 0];
                 md1 = mds[0][i + 1];
-                md2 = mds[0][i + 2];
-                md3 = mds[0][i + 3];
+                //md2 = mds[0][i + 2];
+                //md3 = mds[0][i + 3];
             }
 
             newCoordinates.push(P1);
