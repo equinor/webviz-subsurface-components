@@ -24,14 +24,14 @@ class AxisSelector extends Component<Props> {
     }
 
     render(): ReactNode {
-        const time = this.props.value === "time"
+        const time = this.props.value === "time";
         return (
             <div>
                 <fieldset>
                     <legend>{this.props.header}</legend>
                     {time ? this.createItem("TIME", "time") : ""}
-                    {!time? this.createItem("MD", "md"): ""}
-                    {!time?this.createItem("TVD", "tvd"): ""}
+                    {!time ? this.createItem("MD", "md") : ""}
+                    {!time ? this.createItem("TVD", "tvd") : ""}
                 </fieldset>
             </div>
         );

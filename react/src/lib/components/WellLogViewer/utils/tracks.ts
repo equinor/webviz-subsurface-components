@@ -91,15 +91,14 @@ function checkMinMax(minmax: [number, number], minmaxSrc: [number, number]) {
 function roundMinMax(minmax: [number, number]): [number, number] {
     //const kmax = 8; const kmin = 5;
     const kmin = 8;
-    const kmax = 14;
+    const kmax = 12;
 
     if (!isFinite(minmax[0]) || !isFinite(minmax[1]))
         return [minmax[0], minmax[1]];
 
     let d = minmax[1] - minmax[0];
     if (d < 0) return [minmax[0], minmax[1]];
-    if (!d)
-        d = 1;
+    if (!d) d = 1;
 
     const l0 = Math.floor(Math.log10(d));
     let p = Math.pow(10, l0 + 1);
@@ -112,7 +111,7 @@ function roundMinMax(minmax: [number, number]): [number, number] {
     let k1 = 0,
         k2 = 0;
     let k = k2 - k1;
-    for (; l > -20/*-30*/; l--) {
+    for (; l > -20 /*-30*/; l--) {
         p = p * 0.1;
         while (q >= 0.5) {
             d = p * q;
@@ -160,7 +159,8 @@ function roundMinMax(minmax: [number, number]): [number, number] {
         k1 = k;
     }
     console.log(minmax[0], minmax[1], k1 * d + c, k2 * d + c);
-    let a = k1 * d + c, b = k2 * d + c;
+    const a = k1 * d + c,
+        b = k2 * d + c;
     return [parseFloat(a.toPrecision(5)), parseFloat(b.toPrecision(5))];
 }
 
@@ -236,6 +236,25 @@ class TrackInfo {
         this.primaries = new Float32Array(0);
         this.secondaries = new Float32Array(0);
     }
+}
+
+export function getAvailableAxes(welllog: Record<string, any>[]): string[] {
+    if (welllog && welllog[0]) {
+        const curves = welllog[0].curves;
+
+        const iMD = indexOfCurveByNames(curves, namesMD);
+        const iTVD = indexOfCurveByNames(curves, namesMD);
+        const iTIME = indexOfCurveByNames(curves, namesMD);
+
+        const result: string[] = [];
+        if (iMD >= 0) result.push("md");
+        if (iTVD >= 0) result.push("tvd");
+        if (iTIME >= 0) result.push("time");
+
+        return result;
+    }
+
+    return ["md", "tvd"];
 }
 
 export default (

@@ -4,6 +4,8 @@ import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
+import getAvailableAxes from "./utils/tracks";
+
 interface Props {
     welllog: [];
 }
@@ -28,32 +30,31 @@ class WellLogViewer extends Component<Props, State> {
 
         this.state = {
             primaryAxis: "md",
-            scales: [], 
+            scales: [],
             infos: [],
         };
     }
 
     onChangePrimaryAxis(value: string): void {
-        this.setState(
-            {
-                primaryAxis: value,
-                infos: this.state.infos,
-                scales: this.state.scales
-            }
-        );
+        this.setState({
+            primaryAxis: value,
+            infos: this.state.infos,
+            scales: this.state.scales,
+        });
     }
     setInfo(infos: Info[]): void {
         this.setState({
             primaryAxis: this.state.primaryAxis,
             infos: infos,
-            scales: this.state.scales
+            scales: this.state.scales,
         });
     }
-    setAvailableAxes(scales: string[]): void { // "md", "tvd", "time"
+    setAvailableAxes(scales: string[]): void {
+        // "md", "tvd", "time"
         this.setState({
             primaryAxis: scales[0],
             infos: this.state.infos,
-            scales: scales
+            scales: scales,
         });
     }
 
