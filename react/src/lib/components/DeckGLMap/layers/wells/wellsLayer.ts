@@ -193,6 +193,14 @@ function transpose(a) {
     });
 }
 
+function getLogMd(d: LogCurveDataType, logrun_name: string): number[] {
+    if (!isSelectedLogRun(d, logrun_name)) return [];
+
+    const names_md = ["DEPTH", "DEPT", "MD", "TDEP"]; // aliases for MD
+    const log_id = getLogIndexByNames(d, names_md);
+    return log_id >= 0 ? transpose(d.data)[log_id] : [];
+}
+
 function getLogValues(
     d: LogCurveDataType,
     logrun_name: string,
@@ -200,7 +208,7 @@ function getLogValues(
 ): number[] {
     if (!isSelectedLogRun(d, logrun_name)) return [];
 
-    const log_id = getLogIndex(d, log_name);
+    const log_id = getLogIndexByName(d, log_name);
     return log_id >= 0 ? transpose(d.data)[log_id] : [];
 }
 
@@ -211,7 +219,7 @@ function getLogInfo(
 ): { name: string; description: string } | undefined {
     if (!isSelectedLogRun(d, logrun_name)) return undefined;
 
-    const log_id = getLogIndex(d, log_name);
+    const log_id = getLogIndexByName(d, log_name);
     return d.curves[log_id];
 }
 
@@ -262,7 +270,7 @@ function getLogPath(
     if (well_xy.length == 0 || well_mds.length == 0) return [];
 
     const log_xy: Position[] = [];
-    const log_mds = getLogValues(d, logrun_name, "MD");
+    const log_mds = getLogMd(d, logrun_name);
     log_mds.forEach((md) => {
         const [l_idx, h_idx] = getNeighboringMdIndices(well_mds, md);
         const md_normalized =
@@ -276,10 +284,20 @@ function getLogPath(
     return log_xy;
 }
 
-function getLogIndex(d: LogCurveDataType, log_name: string): number {
+function getLogIndexByName(d: LogCurveDataType, log_name: string): number {
     return d.curves.findIndex(
         (item) => item.name.toLowerCase() === log_name.toLowerCase()
     );
+}
+
+function getLogIndexByNames(d: LogCurveDataType, names: string[]): number {
+    for (const name of names) {
+        const index = d.curves.findIndex(
+            (item) => item.name.toLowerCase() === name.toLowerCase()
+        );
+        if (index >= 0) return index;
+    }
+    return -1;
 }
 
 const color_interp = interpolateRgbBasis(["red", "yellow", "green", "blue"]);
