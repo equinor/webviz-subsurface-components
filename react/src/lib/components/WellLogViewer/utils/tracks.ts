@@ -241,7 +241,9 @@ class TrackInfo {
     }
 }
 
-export function getAvailableAxes(welllog: Record<string, any>[]): string[] {
+type WellLog = Record<string, any>[]; // JSON object from a file
+
+export function getAvailableAxes(welllog: WellLog): string[] {
     if (welllog && welllog[0]) {
         const curves = welllog[0].curves;
 
@@ -261,7 +263,7 @@ export function getAvailableAxes(welllog: Record<string, any>[]): string[] {
 }
 
 export default (
-    welllog: Record<string, any>[],
+    welllog: WellLog,
     axes: { primaryAxis: string; secondaryAxis: string } = {
         primaryAxis: "md",
         secondaryAxis: "tvd",

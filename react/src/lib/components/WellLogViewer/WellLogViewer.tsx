@@ -42,13 +42,13 @@ class WellLogViewer extends Component<Props, State> {
         };
     }
 
-    componentDidUpdate(prevProps /*, prevState*/): boolean {
+    componentDidUpdate(prevProps: Props): boolean {
         if (this.props.welllog !== prevProps.welllog) {
             const axes = getAvailableAxes(this.props.welllog);
             this.setState({
                 primaryAxis: axes[0],
                 axes: axes,
-                infos: this.state.infos,
+                // will be changed by callback! infos: [],
             });
         }
         return true;
@@ -56,15 +56,12 @@ class WellLogViewer extends Component<Props, State> {
     onChangePrimaryAxis(value: string): void {
         this.setState({
             primaryAxis: value,
-            infos: this.state.infos,
-            axes: this.state.axes,
+            // will be changed by callback! infos: [],
         });
     }
     setInfo(infos: Info[]): void {
         this.setState({
-            primaryAxis: this.state.primaryAxis,
             infos: infos,
-            axes: this.state.axes,
         });
     }
 
