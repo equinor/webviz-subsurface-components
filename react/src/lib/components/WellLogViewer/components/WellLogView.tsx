@@ -218,12 +218,12 @@ function getValue(x: number, data, plot) {
 
 function setTracksToController(
     logController: LogViewer,
-    primary: string,
-    welllog: []
+    primaryAxis: string,
+    welllog: [] // JSON Log Format
 ) {
     const axes = {
-        primary: primary,
-        secondary: primary == "md" ? "tvd" : "md",
+        primaryAxis: primaryAxis,
+        secondaryAxis: primaryAxis == "md" ? "tvd" : "md",
     };
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
@@ -246,7 +246,8 @@ interface Info {
 }
 interface Props {
     welllog: [];
-    primary: string;
+    primaryAxis: string;
+    //setAvailableAxes : (scales: string[]) => void;
     setInfo: (infos: Info[]) => void;
 }
 
@@ -279,7 +280,7 @@ class WellLogView extends Component<Props, State> {
         // Typical usage (don't forget to compare props):
         if (this.props.welllog !== prevProps.welllog) {
             this.setTracks();
-        } else if (this.props.primary !== prevProps.primary) {
+        } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
             this.setTracks();
         }
     }
@@ -310,7 +311,7 @@ class WellLogView extends Component<Props, State> {
         if (this.logController)
             setTracksToController(
                 this.logController,
-                this.props.primary,
+                this.props.primaryAxis,
                 this.props.welllog
             );
         this.setInfo(); // Clear old track information
@@ -370,7 +371,7 @@ class WellLogView extends Component<Props, State> {
     render(): ReactNode {
         return (
             <div
-                className="wellog"
+                className="welllogview"
                 ref={(el) => {
                     this.container = el as HTMLElement;
                 }}

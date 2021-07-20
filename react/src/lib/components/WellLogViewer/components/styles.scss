@@ -4,20 +4,8 @@
 @import '@equinor/videx-wellog/dist/styles/scale-styles.scss';
 
 
-html {
+.welllogview { // log-controller
   height: 100%;
-  body {
-    height: 96%;
-    #root {
-      height: 100%;
-      .log-controller {
-        height: 100%;
-      }
-    }
-  }
-}
-
-.wellog {
   .track {
     .track-title {
       background-color: #ccc;

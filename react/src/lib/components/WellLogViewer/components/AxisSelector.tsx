@@ -6,7 +6,7 @@ interface Props {
     onChange: (value: string) => void;
 }
 
-class ScaleSelector extends Component<Props> {
+class AxisSelector extends Component<Props> {
     createItem(label: string, value: string): ReactNode {
         return (
             <div>
@@ -24,16 +24,18 @@ class ScaleSelector extends Component<Props> {
     }
 
     render(): ReactNode {
+        const time = this.props.value === "time"
         return (
             <div>
                 <fieldset>
                     <legend>{this.props.header}</legend>
-                    {this.createItem("MD", "md")}
-                    {this.createItem("TVD", "tvd")}
+                    {time ? this.createItem("TIME", "time") : ""}
+                    {!time? this.createItem("MD", "md"): ""}
+                    {!time?this.createItem("TVD", "tvd"): ""}
                 </fieldset>
             </div>
         );
     }
 }
 
-export default ScaleSelector;
+export default AxisSelector;

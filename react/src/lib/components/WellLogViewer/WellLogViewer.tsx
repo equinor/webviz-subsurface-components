@@ -2,7 +2,7 @@ import React, { Component, ReactNode } from "react";
 
 import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
-import ScaleSelector from "./components/ScaleSelector";
+import AxisSelector from "./components/AxisSelector";
 
 interface Props {
     welllog: [];
@@ -16,7 +16,8 @@ interface Info {
     type: string; // line, linestep, area, ?dot?
 }
 interface State {
-    primary: string;
+    scales: string[]; // scales available in welllog
+    primaryAxis: string;
     infos: Info[];
 }
 
@@ -26,18 +27,33 @@ class WellLogViewer extends Component<Props, State> {
         //alert("props=" + props)
 
         this.state = {
-            primary: "md",
+            primaryAxis: "md",
+            scales: [], 
             infos: [],
         };
     }
 
-    onChangePrimaryScale(value: string): void {
-        this.setState({ primary: value });
+    onChangePrimaryAxis(value: string): void {
+        this.setState(
+            {
+                primaryAxis: value,
+                infos: this.state.infos,
+                scales: this.state.scales
+            }
+        );
     }
     setInfo(infos: Info[]): void {
         this.setState({
-            primary: this.state.primary,
+            primaryAxis: this.state.primaryAxis,
             infos: infos,
+            scales: this.state.scales
+        });
+    }
+    setAvailableAxes(scales: string[]): void { // "md", "tvd", "time"
+        this.setState({
+            primaryAxis: scales[0],
+            infos: this.state.infos,
+            scales: scales
         });
     }
 
@@ -49,15 +65,15 @@ class WellLogViewer extends Component<Props, State> {
                         <td>
                             <WellLogView
                                 welllog={this.props.welllog}
-                                primary={this.state.primary}
+                                primaryAxis={this.state.primaryAxis}
                                 setInfo={this.setInfo.bind(this)}
                             />
                         </td>
                         <td valign="top" style={{ width: "250px" }}>
-                            <ScaleSelector
+                            <AxisSelector
                                 header="Primary scale"
-                                value={this.state.primary}
-                                onChange={this.onChangePrimaryScale.bind(this)}
+                                value={this.state.primaryAxis}
+                                onChange={this.onChangePrimaryAxis.bind(this)}
                             />
                             <InfoPanel
                                 header="Readout"
