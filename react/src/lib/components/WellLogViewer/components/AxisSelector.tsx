@@ -1,7 +1,9 @@
 import React, { Component, ReactNode } from "react";
 
 interface Props {
-    header: string;
+    header: string; // language dependent string
+    axes: string[];
+    axisLabels: Record<string, string>; // language dependent strings
     value: string;
     onChange: (value: string) => void;
 }
@@ -24,14 +26,17 @@ class AxisSelector extends Component<Props> {
     }
 
     render(): ReactNode {
-        const time = this.props.value === "time";
+        if (!this.props.axes || this.props.axes.length <1) return <></>; // nothing to render
         return (
             <div>
                 <fieldset>
                     <legend>{this.props.header}</legend>
-                    {time ? this.createItem("TIME", "time") : ""}
-                    {!time ? this.createItem("MD", "md") : ""}
-                    {!time ? this.createItem("TVD", "tvd") : ""}
+                    {this.props.axes.map((axis) => {
+                        return this.createItem(
+                            this.props.axisLabels[axis],
+                            axis
+                        );
+                    })}
                 </fieldset>
             </div>
         );

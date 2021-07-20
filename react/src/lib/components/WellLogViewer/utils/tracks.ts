@@ -89,11 +89,15 @@ function checkMinMax(minmax: [number, number], minmaxSrc: [number, number]) {
 }
 
 function roundMinMax(minmax: [number, number]): [number, number] {
-    //const kmax = 8; const kmin = 5;
-    const kmin = 8;
-    const kmax = 12;
+    //const kmax = 7; const kmin = 5;
+    const kmin = 6;
+    const kmax = 9;
 
     if (!isFinite(minmax[0]) || !isFinite(minmax[1]))
+        return [minmax[0], minmax[1]];
+
+    if (!minmax[0] && !minmax[1])
+        // some special case of absolutly round values (zeroes)
         return [minmax[0], minmax[1]];
 
     let d = minmax[1] - minmax[0];
@@ -158,7 +162,6 @@ function roundMinMax(minmax: [number, number]): [number, number] {
         }
         k1 = k;
     }
-    console.log(minmax[0], minmax[1], k1 * d + c, k2 * d + c);
     const a = k1 * d + c,
         b = k2 * d + c;
     return [parseFloat(a.toPrecision(5)), parseFloat(b.toPrecision(5))];
@@ -243,8 +246,8 @@ export function getAvailableAxes(welllog: Record<string, any>[]): string[] {
         const curves = welllog[0].curves;
 
         const iMD = indexOfCurveByNames(curves, namesMD);
-        const iTVD = indexOfCurveByNames(curves, namesMD);
-        const iTIME = indexOfCurveByNames(curves, namesMD);
+        const iTVD = indexOfCurveByNames(curves, namesTVD);
+        const iTIME = indexOfCurveByNames(curves, namesTIME);
 
         const result: string[] = [];
         if (iMD >= 0) result.push("md");

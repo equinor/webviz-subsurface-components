@@ -4,7 +4,13 @@ import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
-import getAvailableAxes from "./utils/tracks";
+import { getAvailableAxes } from "./utils/tracks";
+
+const labels: Record<string, string> = {
+    md: "MD",
+    tvd: "TVD",
+    time: "TIME",
+};
 
 interface Props {
     welllog: [];
@@ -18,7 +24,7 @@ interface Info {
     type: string; // line, linestep, area, ?dot?
 }
 interface State {
-    scales: string[]; // scales available in welllog
+    axes: string[]; // axes available in welllog
     primaryAxis: string;
     infos: Info[];
 }
@@ -28,33 +34,37 @@ class WellLogViewer extends Component<Props, State> {
         super(props);
         //alert("props=" + props)
 
+        const axes = getAvailableAxes(this.props.welllog);
         this.state = {
-            primaryAxis: "md",
-            scales: [],
+            primaryAxis: axes[0], //"md"
+            axes: axes, //["md", "tvd"]
             infos: [],
         };
     }
 
+    componentDidUpdate(prevProps /*, prevState*/): boolean {
+        if (this.props.welllog !== prevProps.welllog) {
+            const axes = getAvailableAxes(this.props.welllog);
+            this.setState({
+                primaryAxis: axes[0],
+                axes: axes,
+                infos: this.state.infos,
+            });
+        }
+        return true;
+    }
     onChangePrimaryAxis(value: string): void {
         this.setState({
             primaryAxis: value,
             infos: this.state.infos,
-            scales: this.state.scales,
+            axes: this.state.axes,
         });
     }
     setInfo(infos: Info[]): void {
         this.setState({
             primaryAxis: this.state.primaryAxis,
             infos: infos,
-            scales: this.state.scales,
-        });
-    }
-    setAvailableAxes(scales: string[]): void {
-        // "md", "tvd", "time"
-        this.setState({
-            primaryAxis: scales[0],
-            infos: this.state.infos,
-            scales: scales,
+            axes: this.state.axes,
         });
     }
 
@@ -73,6 +83,8 @@ class WellLogViewer extends Component<Props, State> {
                         <td valign="top" style={{ width: "250px" }}>
                             <AxisSelector
                                 header="Primary scale"
+                                axes={this.state.axes}
+                                axisLabels={labels}
                                 value={this.state.primaryAxis}
                                 onChange={this.onChangePrimaryAxis.bind(this)}
                             />
