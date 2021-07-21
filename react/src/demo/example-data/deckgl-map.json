@@ -65,7 +65,8 @@
           "logName": "zonelog",
           "pointRadiusScale": 8,
           "outline": true,
-          "logCurves": true
+          "logCurves": true,
+          "refined": true
         },
         {
           "@@type": "FaultPolygonsLayer",
