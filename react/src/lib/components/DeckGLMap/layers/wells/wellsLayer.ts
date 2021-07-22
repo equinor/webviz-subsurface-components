@@ -6,13 +6,17 @@ import { PickInfo } from "deck.gl";
 import { subtract, distance, dot } from "mathjs";
 import { interpolateRgbBasis } from "d3-interpolate";
 import { color } from "d3-color";
-import { Feature, GeometryCollection, LineString, Position } from "geojson";
-import { Feature, GeoJSON } from "geojson";
+import {
+    GeoJSON,
+    Feature,
+    GeometryCollection,
+    LineString,
+    Position,
+} from "geojson";
 import { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
-import { Position2D, Position3D } from "@deck.gl/core/utils/positions";
 
 export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     pointRadiusScale: number;
