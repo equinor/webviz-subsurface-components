@@ -70,7 +70,6 @@ export default class WellsLayer extends CompositeLayer<
     }
 
     renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
-
         // Input 3D wellpaths will be projected to z = 0 plane (setting z values to zero).
         // Also if "refined" is specified it will interpolate survey points and refine path using
         // spline interpolation.
