@@ -62,7 +62,7 @@
           "lineWidthScale": 5,
           "logRadius": 6,
           "logrunName": "BLOCKING",
-          "logName": "ZONELOG",
+          "logName": "zonelog",
           "pointRadiusScale": 8,
           "outline": true,
           "logCurves": true
