@@ -6,9 +6,8 @@ import { PickInfo } from "deck.gl";
 import { subtract, distance, dot } from "mathjs";
 import { interpolateRgbBasis } from "d3-interpolate";
 import { color } from "d3-color";
-
 import { Feature, GeometryCollection, LineString, Position } from "geojson";
-
+import { Feature, GeoJSON } from "geojson";
 import { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
@@ -79,7 +78,7 @@ export default class WellsLayer extends CompositeLayer<
         // spline interpolation.
         const refined = this.props.refined;
         //const now = Date.now();
-        const data = splineRefine(this.props.data, refined);
+        const data = splineRefine(this.props.data as GeoJSON, refined);
         //console.log("time elapsed:", Date.now() - now);
 
         const outline = new GeoJsonLayer<Feature>(

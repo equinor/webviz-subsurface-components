@@ -1,5 +1,6 @@
 import { Position3D, Position2D } from "@deck.gl/core/utils/positions";
 import { cloneDeep } from "lodash";
+import { GeoJSON } from "geojson";
 
 /**
  * Given four points P0, P1, P2, P4 and a argument t in the interval [0,1].
@@ -109,7 +110,7 @@ export function CatmullRom(
  *          If refine is set to true it will interpolate and refine path using spline unterploation.
  *          The spline interpolation is done in 3D.
  */
-export function splineRefine(data_in, refine: boolean) {
+export function splineRefine(data_in: GeoJSON, refine: boolean): GeoJSON {
     const ts = refine ? [0.2, 0.4, 0.6, 0.8] : [];
 
     const data = cloneDeep(data_in);
@@ -120,7 +121,10 @@ export function splineRefine(data_in, refine: boolean) {
 
     const no_wells = data["features"].length;
     for (let well_no = 0; well_no < no_wells; well_no++) {
-        const mds = data["features"][well_no]["properties"]["md"];
+        const mds = data["features"][well_no].properties?.md;
+        if (mds === undefined) {
+            continue;
+        }
 
         const coords = data["features"][well_no]["geometry"]["geometries"][1]["coordinates"]; // eslint-disable-line
 
