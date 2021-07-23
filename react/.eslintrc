@@ -7,7 +7,8 @@
   "extends":  [
     "plugin:react/recommended",
     "eslint:recommended",
-    "plugin:prettier/recommended"],
+    "plugin:prettier/recommended"
+  ],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],

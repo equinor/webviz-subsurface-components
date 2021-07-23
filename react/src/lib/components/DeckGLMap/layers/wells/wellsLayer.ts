@@ -98,7 +98,7 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const getColor = (d: Feature): RGBAColor => d?.properties?.color;
+        const getColor = (d: Feature): RGBAColor => d?.properties?.["color"];
         const colors = new GeoJsonLayer<Feature>(
             this.getSubLayerProps({
                 id: "colors",
@@ -252,7 +252,8 @@ function getWellObjectByName(
     name: string
 ): Feature | undefined {
     return wells_data?.find(
-        (item) => item.properties?.name.toLowerCase() === name?.toLowerCase()
+        (item) =>
+            item.properties?.["name"].toLowerCase() === name?.toLowerCase()
     );
 }
 
@@ -265,7 +266,7 @@ function getWellCoordinates(well_object: Feature): Position[] {
 }
 
 function getWellMds(well_object: Feature): number[] {
-    return well_object.properties?.md[0];
+    return well_object.properties?.["md"][0];
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
@@ -435,7 +436,8 @@ function getMd(pickInfo): number | null {
 function getMdProperty(info: PickInfo<unknown>): PropertyDataType | null {
     const md = getMd(info);
     if (md != null) {
-        const prop_name = "MD " + (info.object as Feature)?.properties?.name;
+        const prop_name =
+            "MD " + (info.object as Feature)?.properties?.["name"];
         return { name: prop_name, value: md };
     }
     return null;

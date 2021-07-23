@@ -25,7 +25,7 @@ export const patchMiddleware = (
                     const layerInfo = /\/layers\/(\d+)(\/\w+)/gm.exec(op.path);
                     if (layerInfo) {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const layerId = (stateAft.spec.layers as any[])[
+                        const layerId = (stateAft.spec["layers"] as any[])[
                             layerInfo[1]
                         ].id;
                         op.path = "/layers/[" + layerId + "]" + layerInfo[2];
