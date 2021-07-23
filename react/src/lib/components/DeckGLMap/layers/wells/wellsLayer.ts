@@ -134,13 +134,14 @@ export default class WellsLayer extends CompositeLayer<
             this.getSubLayerProps({
                 id: "log_curve",
                 data: this.props.logData,
+                positionFormat: "XY",
                 pickable: true,
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath(
-                        this.props.data as Feature[],
+                        data?.["features"] as Feature[],
                         d,
                         this.props.logrunName
                     ),
@@ -177,7 +178,7 @@ export default class WellsLayer extends CompositeLayer<
 
         const md_property = getMdProperty(info);
         const log_property = getLogProperty(
-            this.props.data as Feature[],
+            this.props.data?.["features"] as Feature[],
             info,
             this.props.logrunName,
             this.props.logName
@@ -280,23 +281,23 @@ function getLogPath(
     const well_object = getWellObjectByName(wells_data, d.header.well);
     if (well_object == undefined) return [];
 
-    const well_xy = getWellCoordinates(well_object);
+    const well_xyz = getWellCoordinates(well_object);
     const well_mds = getWellMds(well_object);
-    if (well_xy.length == 0 || well_mds.length == 0) return [];
+    if (well_xyz.length == 0 || well_mds.length == 0) return [];
 
-    const log_xy: Position[] = [];
+    const log_xyz: Position[] = [];
     const log_mds = getLogMd(d, logrun_name);
     log_mds.forEach((md) => {
         const [l_idx, h_idx] = getNeighboringMdIndices(well_mds, md);
         const md_normalized =
             (md - well_mds[l_idx]) / (well_mds[h_idx] - well_mds[l_idx]);
-        const xy = interpolateNumberArray(
-            well_xy[l_idx],
-            well_xy[h_idx]
+        const xyz = interpolateNumberArray(
+            well_xyz[l_idx],
+            well_xyz[h_idx]
         )(md_normalized);
-        log_xy.push(xy);
+        log_xyz.push(xyz);
     });
-    return log_xy;
+    return log_xyz;
 }
 
 function getLogIndexByName(d: LogCurveDataType, log_name: string): number {
