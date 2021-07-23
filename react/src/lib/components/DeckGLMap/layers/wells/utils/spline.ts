@@ -209,7 +209,7 @@ export function splineRefine(data_in: GeoJSON, refine: boolean): GeoJSON {
         }
 
         newCoordinates.push(coords[n - 1]);
-        newMds[0].push(mds[n - 1]);
+        newMds[0].push(mds[0][n - 1]);
 
         // Convert well path to 2D.
         const coords2D: Position2D[] = newCoordinates.map((e: Position3D) => {
