@@ -24,7 +24,7 @@ exports[`test well attributes selector snapshot test 1`] = `
       class="SmartNodeSelector"
     >
       <ul
-        class="SmartNodeSelector__Tags--nolinebreak"
+        class="SmartNodeSelector__Tags"
       >
         <li
           class="SmartNodeSelector__Tag "
