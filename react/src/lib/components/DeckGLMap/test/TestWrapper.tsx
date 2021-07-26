@@ -1,11 +1,10 @@
-import { string } from "mathjs";
 import React from "react";
 import { Provider } from "react-redux";
 import { createStore } from "../redux/store";
-import { testState, testSpecPatch } from "./testReduxState";
+import { Operation } from "fast-json-patch";
 
 
-export const testStore = createStore({}, {});
+export const testStore = createStore({}, (patch: Operation[]) => void);
 testStore.dispatch = jest.fn();
 export const Wrapper = ({
     children,
