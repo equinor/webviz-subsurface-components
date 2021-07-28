@@ -1,3 +1,4 @@
 *.css
 registerServiceWorker.js
 output.js
+src/demo/example-data/
