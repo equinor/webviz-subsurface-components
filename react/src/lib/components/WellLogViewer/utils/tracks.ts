@@ -179,7 +179,7 @@ function fillPlotOptions(templatePlot, styles, iPlot: number) {
     return options;
 }
 
-function _dataAccessor(d: any[]) {
+function _dataAccessor(d: number[][]): number[] {
     const iPlot = this as number;
     return d[iPlot];
 }
