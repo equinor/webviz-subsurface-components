@@ -4,16 +4,27 @@ import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
-import { getAvailableAxes } from "./utils/tracks";
+import { getAvailableAxes, WellLog } from "./utils/tracks";
 
-const labels: Record<string, string> = {
+
+const axisTitles: Record<string, string> = { // language dependent
     md: "MD",
     tvd: "TVD",
     time: "TIME",
 };
 
+// mnemos could be case insentitive ("Depth")
+const axisMnemos: Record<string, string[]> = {
+    md: ["DEPTH", "DEPT", "MD", "TDEP" /*"Tool Depth"*/], // depth based logging data,
+    tvd: ["TVD", "TVDSS", "DVER" /*"TRUE Vertical depth"*/],
+    time: ["TIME"], //  time based logging data
+};
+
+
+
 interface Props {
-    welllog: [];
+    welllog: WellLog;
+    template: Record<string, any>;
 }
 
 interface Info {
@@ -32,9 +43,13 @@ interface State {
 class WellLogViewer extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
-        //alert("props=" + props)
 
-        const axes = getAvailableAxes(this.props.welllog);
+        const axes = getAvailableAxes(this.props.welllog, axisMnemos);
+        let primaryAxis = axes[0];
+        if (this.props.template && this.props.template.scale.primary) {
+            if (axes.indexOf(this.props.template.scale.primary)>=0) 
+                primaryAxis = this.props.template.scale.primary
+        }
         this.state = {
             primaryAxis: axes[0], //"md"
             axes: axes, //["md", "tvd"]
@@ -43,10 +58,20 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props): boolean {
-        if (this.props.welllog !== prevProps.welllog) {
-            const axes = getAvailableAxes(this.props.welllog);
+        if (this.props.welllog !== prevProps.welllog || this.props.template !== prevProps.template) {
+            const axes = getAvailableAxes(this.props.welllog, axisMnemos);
+            let primaryAxis = axes[0];
+            if (this.props.template && this.props.template.scale.primary) {
+                if (axes.indexOf(this.props.template.scale.primary) < 0) {
+                    if (this.props.welllog === prevProps.welllog)
+                        return false; // nothing to update
+                }
+                else {
+                    primaryAxis = this.props.template.scale.primary
+                }
+            }
             this.setState({
-                primaryAxis: axes[0],
+                primaryAxis: primaryAxis,
                 axes: axes,
                 // will be changed by callback! infos: [],
             });
@@ -73,15 +98,18 @@ class WellLogViewer extends Component<Props, State> {
                         <td>
                             <WellLogView
                                 welllog={this.props.welllog}
+                                template={this.props.template}
                                 primaryAxis={this.state.primaryAxis}
                                 setInfo={this.setInfo.bind(this)}
+                                axisTitles={axisTitles}
+                                axisMnemos={axisMnemos}
                             />
                         </td>
                         <td valign="top" style={{ width: "250px" }}>
                             <AxisSelector
                                 header="Primary scale"
                                 axes={this.state.axes}
-                                axisLabels={labels}
+                                axisLabels={axisTitles}
                                 value={this.state.primaryAxis}
                                 onChange={this.onChangePrimaryAxis.bind(this)}
                             />

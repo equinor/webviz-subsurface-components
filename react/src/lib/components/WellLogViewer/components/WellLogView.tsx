@@ -10,6 +10,7 @@ import "./styles.scss";
 import { select } from "d3";
 
 import createTracks from "../utils/tracks";
+import { AxesInfo, WellLog}  from "../utils/tracks";
 
 function addRubberbandOverlay(instance) {
     const rubberBandSize = 9;
@@ -216,22 +217,21 @@ function getValue(x: number, data, plot) {
     return v;
 }
 
+
 function setTracksToController(
     logController: LogViewer,
-    primaryAxis: string,
-    welllog: [] // JSON Log Format
+    axes: AxesInfo,
+    welllog: WellLog, // JSON Log Format
+    template: Record<string, any>// JSON
 ) {
-    const axes = {
-        primaryAxis: primaryAxis,
-        secondaryAxis: primaryAxis == "md" ? "tvd" : "md",
-    };
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
-        axes
+        axes,
+        template.tracks, 
+        template.styles
     );
     logController.reset();
     const scaleHandler = createScaleHandler(primaries, secondaries);
-    //scaleHandler.baseDomain(minmaxPrimaryAxis);
     logController.scaleHandler = scaleHandler;
     logController.domain = minmaxPrimaryAxis;
     logController.setTracks(tracks);
@@ -245,10 +245,13 @@ interface Info {
     type: string; // line, linestep, area, ?dot?
 }
 interface Props {
-    welllog: [];
+    welllog: WellLog;
+    template: Record<string, any>;
     primaryAxis: string;
     //setAvailableAxes : (scales: string[]) => void;
     setInfo: (infos: Info[]) => void;
+    axisTitles: Record<string, string>;
+    axisMnemos: Record<string, string[]>;
 }
 
 interface State {
@@ -280,6 +283,8 @@ class WellLogView extends Component<Props, State> {
         // Typical usage (don't forget to compare props):
         if (this.props.welllog !== prevProps.welllog) {
             this.setTracks();
+        } else if (this.props.template !== prevProps.template) {
+            this.setTracks();
         } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
             this.setTracks();
         }
@@ -308,12 +313,20 @@ class WellLogView extends Component<Props, State> {
         this.setInfo();
     }
     setTracks(): void {
-        if (this.logController)
+        if (this.logController) {
+            const axes: AxesInfo = {
+                primaryAxis: this.props.primaryAxis,
+                secondaryAxis: this.props.primaryAxis == "md" ? "tvd" : "md",
+                titles: this.props.axisTitles,
+                mnemos: this.props.axisMnemos
+            };
             setTracksToController(
                 this.logController,
-                this.props.primaryAxis,
-                this.props.welllog
+                axes,
+                this.props.welllog,
+                this.props.template
             );
+        }
         this.setInfo(); // Clear old track information
     }
     setInfo(x: number = Number.NaN, x2: number = Number.NaN): void {
