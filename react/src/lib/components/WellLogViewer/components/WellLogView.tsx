@@ -10,7 +10,9 @@ import "./styles.scss";
 import { select } from "d3";
 
 import createTracks from "../utils/tracks";
-import { AxesInfo, WellLog}  from "../utils/tracks";
+import { AxesInfo, WellLog } from "../utils/tracks";
+
+export type Template = Record<string, any>; // JSON
 
 function addRubberbandOverlay(instance) {
     const rubberBandSize = 9;
@@ -217,17 +219,16 @@ function getValue(x: number, data, plot) {
     return v;
 }
 
-
 function setTracksToController(
     logController: LogViewer,
     axes: AxesInfo,
     welllog: WellLog, // JSON Log Format
-    template: Record<string, any>// JSON
+    template: Template // JSON
 ) {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
         axes,
-        template.tracks, 
+        template.tracks,
         template.styles
     );
     logController.reset();
@@ -246,7 +247,7 @@ interface Info {
 }
 interface Props {
     welllog: WellLog;
-    template: Record<string, any>;
+    template: Template;
     primaryAxis: string;
     //setAvailableAxes : (scales: string[]) => void;
     setInfo: (infos: Info[]) => void;
@@ -318,7 +319,7 @@ class WellLogView extends Component<Props, State> {
                 primaryAxis: this.props.primaryAxis,
                 secondaryAxis: this.props.primaryAxis == "md" ? "tvd" : "md",
                 titles: this.props.axisTitles,
-                mnemos: this.props.axisMnemos
+                mnemos: this.props.axisMnemos,
             };
             setTracksToController(
                 this.logController,

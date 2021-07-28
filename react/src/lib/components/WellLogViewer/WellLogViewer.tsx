@@ -4,10 +4,11 @@ import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
+import { Template } from "./components/WellLogView";
 import { getAvailableAxes, WellLog } from "./utils/tracks";
 
-
-const axisTitles: Record<string, string> = { // language dependent
+const axisTitles: Record<string, string> = {
+    // language dependent
     md: "MD",
     tvd: "TVD",
     time: "TIME",
@@ -20,11 +21,9 @@ const axisMnemos: Record<string, string[]> = {
     time: ["TIME"], //  time based logging data
 };
 
-
-
 interface Props {
     welllog: WellLog;
-    template: Record<string, any>;
+    template: Template;
 }
 
 interface Info {
@@ -47,27 +46,28 @@ class WellLogViewer extends Component<Props, State> {
         const axes = getAvailableAxes(this.props.welllog, axisMnemos);
         let primaryAxis = axes[0];
         if (this.props.template && this.props.template.scale.primary) {
-            if (axes.indexOf(this.props.template.scale.primary)>=0) 
-                primaryAxis = this.props.template.scale.primary
+            if (axes.indexOf(this.props.template.scale.primary) >= 0)
+                primaryAxis = this.props.template.scale.primary;
         }
         this.state = {
-            primaryAxis: axes[0], //"md"
+            primaryAxis: primaryAxis, //"md"
             axes: axes, //["md", "tvd"]
             infos: [],
         };
     }
 
     componentDidUpdate(prevProps: Props): boolean {
-        if (this.props.welllog !== prevProps.welllog || this.props.template !== prevProps.template) {
+        if (
+            this.props.welllog !== prevProps.welllog ||
+            this.props.template !== prevProps.template
+        ) {
             const axes = getAvailableAxes(this.props.welllog, axisMnemos);
             let primaryAxis = axes[0];
             if (this.props.template && this.props.template.scale.primary) {
                 if (axes.indexOf(this.props.template.scale.primary) < 0) {
-                    if (this.props.welllog === prevProps.welllog)
-                        return false; // nothing to update
-                }
-                else {
-                    primaryAxis = this.props.template.scale.primary
+                    if (this.props.welllog === prevProps.welllog) return false; // nothing to update
+                } else {
+                    primaryAxis = this.props.template.scale.primary;
                 }
             }
             this.setState({

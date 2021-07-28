@@ -6,9 +6,9 @@ import {
 } from "@equinor/videx-wellog";
 import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
 
-import { checkMinMaxValue, checkMinMax, roundMinMax } from"./minmax"
+import { checkMinMaxValue, checkMinMax, roundMinMax } from "./minmax";
 
-function indexOfElementByName(array: {"name":string}[], name: string): number {
+function indexOfElementByName(array: { name: string }[], name: string): number {
     if (name) {
         let i = 0;
         for (const element of array) {
@@ -21,7 +21,10 @@ function indexOfElementByName(array: {"name":string}[], name: string): number {
     return -1;
 }
 
-function indexOfElementByNames(array: { "name": string }[], names: string[]): number {
+function indexOfElementByNames(
+    array: { name: string }[],
+    names: string[]
+): number {
     if (names) {
         let i = 0;
         for (const element of array) {
@@ -60,8 +63,6 @@ const plotTypes = [
     "dot",
     "linestep" /*, 'differential'*/,
 ];
-
-
 
 class PlotData {
     minmax: [number, number];
@@ -106,11 +107,11 @@ function shortDescription(description) {
 }
 
 function makeTrackHeader(templateTrack) {
-    if (templateTrack.title)
-        return templateTrack.title;
+    if (templateTrack.title) return templateTrack.title;
 
     const plots = templateTrack.plots;
-    if (plots && plots[0]) { // get the first curve name
+    if (plots && plots[0]) {
+        // get the first curve name
         const curve = plots[0];
         return curve.description
             ? shortDescription(curve.description)
@@ -145,14 +146,17 @@ class TracksInfo {
 
 export type WellLog = Record<string, any>[]; // JSON object from a file
 
-export function getAvailableAxes(welllog: WellLog, axisMnemos: Record<string,string[]>): string[] {
+export function getAvailableAxes(
+    welllog: WellLog,
+    axisMnemos: Record<string, string[]>
+): string[] {
     const result: string[] = [];
     if (welllog && welllog[0]) {
         const curves = welllog[0].curves;
 
-        for (let key in axisMnemos) {
+        for (const key in axisMnemos) {
             const i = indexOfElementByNames(curves, axisMnemos[key]);
-            if(i>=0) result.push(key);
+            if (i >= 0) result.push(key);
         }
     }
 
@@ -165,28 +169,37 @@ function isValidPlotType(plotType) {
 
 function fillPlotOptions(templatePlot, styles, iPlot: number) {
     const iStyle = indexOfElementByName(styles, templatePlot.style);
-    let options = iStyle >= 0 ? { ...templatePlot, ...styles[iStyle] } : { ...templatePlot };
+    const options =
+        iStyle >= 0
+            ? { ...templatePlot, ...styles[iStyle] }
+            : { ...templatePlot };
     if (!isValidPlotType(options.type))
         options.type = plotTypes[iPlot % plotTypes.length];
     if (!options.color) options.color = colors[iPlot % colors.length];
     return options;
 }
 
-function _dataAccessor(d: any) {
-    let iPlot = this as number;
+function _dataAccessor(d: any[]) {
+    const iPlot = this as number;
     return d[iPlot];
 }
 
-function newDualScaleTrack(id: number, mode: number, title:string, abbr:string, units: string ) {
+function newDualScaleTrack(
+    id: number,
+    mode: number,
+    title: string,
+    abbr: string,
+    units: string
+) {
     return new DualScaleTrack(id, {
         mode: mode,
         maxWidth: 50,
         width: 2,
         label: title,
-        abbr: abbr ? abbr: title,
-        units: units ? units: "",
+        abbr: abbr ? abbr : title,
+        units: units ? units : "",
         legendConfig: scaleLegendConfig,
-    })
+    });
 }
 
 function newScaleTrack(id: number, title: string, abbr: string, units: string) {
@@ -197,22 +210,21 @@ function newScaleTrack(id: number, title: string, abbr: string, units: string) {
         abbr: abbr ? abbr : title,
         units: units ? units : "",
         legendConfig: scaleLegendConfig,
-    })
+    });
 }
-
 
 export interface AxesInfo {
     primaryAxis: string;
     secondaryAxis: string;
-    titles: Record <string, string> // language dependent strings
-    mnemos: Record<string, string[]>
+    titles: Record<string, string>; // language dependent strings
+    mnemos: Record<string, string[]>;
 }
 
 export default (
     welllog: WellLog,
     axes: AxesInfo,
-    tracks: Record<string, any>[],
-    styles: Record<string, any>[]
+    tracks: Record<string, any>[], // Part of JSON
+    styles: Record<string, any>[] // Part of JSON
 ): TracksInfo => {
     const info = new TracksInfo();
 
@@ -220,21 +232,39 @@ export default (
         const data = welllog[0].data;
         const curves = welllog[0].curves;
 
-        const iPrimaryAxis = indexOfElementByNames(curves, axes.mnemos[axes.primaryAxis]);
+        const iPrimaryAxis = indexOfElementByNames(
+            curves,
+            axes.mnemos[axes.primaryAxis]
+        );
         if (iPrimaryAxis >= 0) {
             const titlePrimaryAxis = axes.titles[axes.primaryAxis];
             const curvePrimaryAxis = curves[iPrimaryAxis];
-            const iSecondaryAxis = indexOfElementByNames(curves, axes.mnemos[axes.secondaryAxis]);
+            const iSecondaryAxis = indexOfElementByNames(
+                curves,
+                axes.mnemos[axes.secondaryAxis]
+            );
 
             if (iSecondaryAxis >= 0) {
                 info.tracks.push(
-                    newDualScaleTrack(info.tracks.length, 0, titlePrimaryAxis, curvePrimaryAxis.name, curvePrimaryAxis.unit)
+                    newDualScaleTrack(
+                        info.tracks.length,
+                        0,
+                        titlePrimaryAxis,
+                        curvePrimaryAxis.name,
+                        curvePrimaryAxis.unit
+                    )
                 );
 
                 const titleSecondaryAxis = axes.titles[axes.secondaryAxis];
                 const curveSecondaryAxis = curves[iSecondaryAxis];
                 info.tracks.push(
-                    newDualScaleTrack(info.tracks.length, 1, titleSecondaryAxis, curveSecondaryAxis.name, curveSecondaryAxis.unit)
+                    newDualScaleTrack(
+                        info.tracks.length,
+                        1,
+                        titleSecondaryAxis,
+                        curveSecondaryAxis.name,
+                        curveSecondaryAxis.unit
+                    )
                 );
 
                 info.primaries = new Float32Array(data.length); // 32 bits should be enough
@@ -265,18 +295,22 @@ export default (
                 }
             } else {
                 info.tracks.push(
-                    newScaleTrack(info.tracks.length, titlePrimaryAxis, curvePrimaryAxis.name, curvePrimaryAxis.unit)
+                    newScaleTrack(
+                        info.tracks.length,
+                        titlePrimaryAxis,
+                        curvePrimaryAxis.name,
+                        curvePrimaryAxis.unit
+                    )
                 );
             }
         }
         let iPlot = 0;
-        for (let templateTrack of tracks) {
-            const plotDatas: any[] = [];
+        for (const templateTrack of tracks) {
+            const plotDatas: any[][] = [];
             const plots: any[] = [];
-            for (let templatePlot of templateTrack.plots) {
-                let iCurve = indexOfElementByName(curves, templatePlot.name);
-                if (iCurve < 0)
-                    continue;
+            for (const templatePlot of templateTrack.plots) {
+                const iCurve = indexOfElementByName(curves, templatePlot.name);
+                if (iCurve < 0) continue;
                 const curve = curves[iCurve];
 
                 if (curve.dimensions !== 1) continue;
@@ -287,35 +321,33 @@ export default (
                 const plot = preparePlotData(data, iCurve, iPrimaryAxis);
                 checkMinMax(info.minmaxPrimaryAxis, plot.minmaxPrimaryAxis);
                 plotDatas.push(plot.data);
-                plots.push(
-                    {
-                        id: iCurve, // set some id
-                        type: options.type,
-                        options: {
-                            scale: "linear",
-                            domain: roundMinMax(plot.minmax),
-                            color: options.color,
-                            // for 'area'!  fill: 'red',
-                            fillOpacity: 0.3, // for 'area'!
-                            dataAccessor: _dataAccessor.bind(plots.length),
-                            legendInfo: () => ({
-                                label: curve.name,
-                                unit: curve.unit ? curve.unit : "",
-                            }),
-                        },
+                plots.push({
+                    id: iCurve, // set some id
+                    type: options.type,
+                    options: {
+                        scale: "linear",
+                        domain: roundMinMax(plot.minmax),
+                        color: options.color,
+                        // for 'area'!  fill: 'red',
+                        fillOpacity: 0.3, // for 'area'!
+                        dataAccessor: _dataAccessor.bind(plots.length),
+                        legendInfo: () => ({
+                            label: curve.name,
+                            unit: curve.unit ? curve.unit : "",
+                        }),
                     },
-                );
+                });
                 iPlot++;
             }
             if (plots.length || templateTrack.required)
-              info.tracks.push(
-                new GraphTrack(info.tracks.length, {
-                    label: makeTrackHeader(templateTrack),
-                    legendConfig: graphLegendConfig,
-                    data: plotDatas,
-                    plots: plots,
-                }
-                ));
+                info.tracks.push(
+                    new GraphTrack(info.tracks.length, {
+                        label: makeTrackHeader(templateTrack),
+                        legendConfig: graphLegendConfig,
+                        data: plotDatas,
+                        plots: plots,
+                    })
+                );
         }
     }
     return info;

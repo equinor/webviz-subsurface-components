@@ -18,9 +18,10 @@ class AxisSelector extends Component<Props> {
                     checked={this.props.value === value}
                     onChange={(ev) => {
                         this.props.onChange(ev.target.value);
-                    }} 
+                    }}
                     key={value}
-                />{/* set key prop just for react pleasure */}
+                />
+                {/* set key prop just for react pleasure */}
                 {label}
             </div>
         );

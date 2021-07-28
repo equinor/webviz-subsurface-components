@@ -1,4 +1,7 @@
-export function checkMinMaxValue(minmax: [number, number], value: number) {
+export function checkMinMaxValue(
+    minmax: [number, number],
+    value: number
+): void {
     if (value !== null) {
         if (minmax[0] === Number.POSITIVE_INFINITY)
             minmax[0] = minmax[1] = value;
@@ -7,14 +10,16 @@ export function checkMinMaxValue(minmax: [number, number], value: number) {
     }
 }
 
-export function checkMinMax(minmax: [number, number], minmaxSrc: [number, number]) {
+export function checkMinMax(
+    minmax: [number, number],
+    minmaxSrc: [number, number]
+): void {
     if (minmax[0] === Number.POSITIVE_INFINITY) {
         minmax[0] = minmaxSrc[0];
         minmax[1] = minmaxSrc[1];
     } else if (minmax[0] > minmaxSrc[0]) minmax[0] = minmaxSrc[0];
     else if (minmax[1] < minmaxSrc[1]) minmax[1] = minmaxSrc[1];
 }
-
 
 export function roundMinMax(minmax: [number, number]): [number, number] {
     //const kmax = 7; const kmin = 5;
