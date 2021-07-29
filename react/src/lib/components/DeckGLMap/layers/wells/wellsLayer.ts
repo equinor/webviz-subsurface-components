@@ -15,7 +15,7 @@ import {
 } from "geojson";
 import { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
-import { splineRefine } from "./utils/spline";
+import { splineRefine, convertTo2D } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 
@@ -30,7 +30,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     logrunName: string;
     logRadius: number;
     logCurves: boolean;
-    refined: boolean;
+    refine: boolean;
 }
 
 const defaultProps = {
@@ -78,13 +78,13 @@ export default class WellsLayer extends CompositeLayer<
     }
 
     renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
-        // Input 3D wellpaths will be projected to z = 0 plane (setting z values to zero).
-        // Also if "refined" is specified it will interpolate survey points and refine path using
-        // spline interpolation.
-        const refined = this.props.refined;
-        //const now = Date.now();
-        const data = splineRefine(this.props.data as GeoJSON, refined);
-        //console.log("time elapsed:", Date.now() - now);
+
+        const refine = this.props.refine;
+        let data = refine
+            ? splineRefine(this.props.data as GeoJSON) // smooth well paths.
+            : this.props.data;
+
+        data = convertTo2D(data as GeoJSON);
 
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps({

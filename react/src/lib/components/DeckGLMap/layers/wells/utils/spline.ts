@@ -104,13 +104,11 @@ export function CatmullRom(
 }
 
 /**
- * Input: A 3D well path.
- * Returns: A new modified well path.
- *          z values will be set to zero (projecting well path to z = 0 plane).
- *          If refine is set to true it will interpolate and refine path using spline unterploation.
- *          The spline interpolation is done in 3D.
+ * Will interpolate and refine wellpaths using spline interploation resulting
+ * in smoother curves with more points.
+ * Assumes 3D data.
  */
-export function splineRefine(data_in: GeoJSON, refine: boolean): GeoJSON {
+export function splineRefine(data_in: GeoJSON): GeoJSON {
     const data = cloneDeep(data_in);
 
     if (data["features"] === undefined) {
@@ -127,7 +125,7 @@ export function splineRefine(data_in: GeoJSON, refine: boolean): GeoJSON {
         const coords = data["features"][well_no]["geometry"]["geometries"][1]["coordinates"]; // eslint-disable-line
 
         const n = coords.length;
-        const ts = refine && n > 3 ? [0.2, 0.4, 0.6, 0.8] : [];
+        const ts = n > 3 ? [0.2, 0.4, 0.6, 0.8] : [];
 
         // Point before first.
         const x0 = coords[0][0] - coords[1][0] + coords[0][0];
@@ -204,14 +202,35 @@ export function splineRefine(data_in: GeoJSON, refine: boolean): GeoJSON {
         newCoordinates.push(coords[n - 1]);
         newMds[0].push(mds[0][n - 1]);
 
-        // Convert well path to 2D.
-        const coords2D: Position2D[] = newCoordinates.map((e: Position3D) => {
+        data["features"][well_no]["geometry"]["geometries"][1]["coordinates"] =
+            newCoordinates;
+        data["features"][well_no]["properties"]["md"] = newMds;
+    }
+
+    return data;
+}
+
+/**
+ * Converts 3D well paths to 2D.
+ */
+export function convertTo2D(data_in: GeoJSON): GeoJSON {
+    const data = cloneDeep(data_in);
+
+    if (data["features"] === undefined) {
+        return data;
+    }
+
+    const no_wells = data["features"].length;
+    for (let well_no = 0; well_no < no_wells; well_no++) {
+        const coords = data["features"][well_no]["geometry"]["geometries"][1]["coordinates"]; // eslint-disable-line
+
+        // Convert to 2D.
+        const coords2D: Position2D[] = coords.map((e: Position3D) => {
             return [e[0], e[1]] as Position2D;
         });
 
         data["features"][well_no]["geometry"]["geometries"][1]["coordinates"] =
             coords2D;
-        data["features"][well_no]["properties"]["md"] = newMds;
     }
 
     return data;
