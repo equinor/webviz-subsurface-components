@@ -12,9 +12,7 @@ describe("test view menu", () => {
     });
 
     it("click to display menu", async () => {
-        render(<ViewButton />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <ViewButton /> }));
         fireEvent.click(screen.getByRole("button", { name: "" }));
         expect(screen.getAllByRole("menu", { name: "" })).toHaveLength(1);
     });

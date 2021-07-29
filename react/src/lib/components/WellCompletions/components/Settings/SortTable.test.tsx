@@ -12,9 +12,7 @@ describe("test sorting the table", () => {
     });
 
     it("dispatch redux action - add sorting level", async () => {
-        render(<SortTable />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <SortTable /> }));
         fireEvent.click(screen.getByRole("button", { name: "Ascending" }));
         await screen.findByText("Descending");
         fireEvent.click(

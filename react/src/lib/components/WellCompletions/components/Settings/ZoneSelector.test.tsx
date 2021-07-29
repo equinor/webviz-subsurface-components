@@ -13,9 +13,7 @@ describe("test Zone Selector", () => {
     });
 
     it("click to dispatch redux action remove all zones", async () => {
-        render(<ZoneSelector />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <ZoneSelector /> }));
 
         fireEvent.click(screen.getByRole("button", { name: /remove all/i }));
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
@@ -26,9 +24,7 @@ describe("test Zone Selector", () => {
     });
 
     it("select 'zone1' check box to dispatch redux action and show only zone1", async () => {
-        render(<ZoneSelector />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <ZoneSelector /> }));
 
         userEvent.click(screen.getByRole("button", { name: /remove all/i }));
         const zoneFilter = screen.getByText(/select zone\(s\)\.\.\./i);

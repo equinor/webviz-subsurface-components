@@ -11,9 +11,7 @@ describe("test search wells ", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     it("enter input to dispatch redux action", async () => {
-        render(<WellFilter />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <WellFilter /> }));
         fireEvent.change(screen.getByPlaceholderText("Search well names"), {
             target: { value: "OP_1" },
         });

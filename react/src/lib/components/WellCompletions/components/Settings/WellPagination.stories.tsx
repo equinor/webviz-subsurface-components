@@ -1,6 +1,6 @@
 import React from "react";
-import { exampleDataDecorator } from "../../test/storybookDataDecorator";
-import { withReduxDecorator } from "../../test/storybookReduxAddon";
+// import { exampleDataDecorator } from "../../test/storybookDataDecorator";
+// import { withReduxDecorator } from "../../test/storybookReduxAddon";
 import WellPagination from "./WellPagination";
 
 export default {
@@ -10,5 +10,6 @@ export default {
 
 const Template = () => <WellPagination />;
 export const Bar = Template.bind({});
+// TODO: Is this needed? It doesn't typecheck.
 //Wrap with example intpu data and redux store
-Bar.decorators = [exampleDataDecorator, withReduxDecorator];
+// Bar.decorators = [exampleDataDecorator, withReduxDecorator];

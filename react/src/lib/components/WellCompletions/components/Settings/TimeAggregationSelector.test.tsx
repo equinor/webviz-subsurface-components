@@ -14,9 +14,7 @@ describe("test range display mode selector", () => {
     });
 
     it("click to dispatch redux action", async () => {
-        render(<TimeAggregationSelector />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <TimeAggregationSelector /> }));
         fireEvent.change(screen.getByRole("combobox"), {
             target: { value: "Average" },
         });

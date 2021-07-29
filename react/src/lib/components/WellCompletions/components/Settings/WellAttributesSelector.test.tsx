@@ -18,9 +18,7 @@ describe("test well attributes selector", () => {
     });
 
     it("click to dispatch redux action", async () => {
-        render(<WellAttributesSelector />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <WellAttributesSelector /> }));
 
         const attributeFilter = screen.getByRole("textbox");
         fireEvent.change(attributeFilter, {
