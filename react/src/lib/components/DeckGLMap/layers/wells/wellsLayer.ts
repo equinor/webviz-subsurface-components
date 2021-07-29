@@ -78,7 +78,6 @@ export default class WellsLayer extends CompositeLayer<
     }
 
     renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
-
         const refine = this.props.refine;
         let data = refine
             ? splineRefine(this.props.data as GeoJSON) // smooth well paths.
