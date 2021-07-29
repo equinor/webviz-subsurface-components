@@ -17,6 +17,7 @@ import { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
+import { Position2D } from "@deck.gl/core/utils/positions";
 
 export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     pointRadiusScale: number;
@@ -365,26 +366,47 @@ function squared_distance(a, b): number {
     return dx * dx + dy * dy;
 }
 
+// Return distance between line segment vw and point p
+function distToSegmentSquared(
+    v: Position2D,
+    w: Position2D,
+    p: Position2D
+): number {
+    const l2 = squared_distance(v, w);
+    if (l2 == 0) return squared_distance(p, v);
+    let t =
+        ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return squared_distance(p, [
+        v[0] + t * (w[0] - v[0]),
+        v[1] + t * (w[1] - v[1]),
+    ]);
+}
+
 function getMd(pickInfo): number | null {
     if (!pickInfo.object.properties || !pickInfo.object.geometry) return null;
 
     const measured_depths = pickInfo.object.properties.md[0];
     const trajectory = pickInfo.object.geometry.geometries[1].coordinates;
 
-    // Get squared distance from survey point to picked point.
-    const d2 = trajectory.map((element) =>
-        squared_distance(element, pickInfo.coordinate)
-    );
+    // Identify closest well path leg to pickInfo.coordinate.
+    let min_d = Number.MAX_VALUE;
+    let segment_index = 0;
+    for (let i = 0; i < trajectory?.length - 1; i++) {
+        const d = distToSegmentSquared(
+            trajectory[i],
+            trajectory[i + 1],
+            pickInfo.coordinate
+        );
 
-    // Enumerate squared distances.
-    let index: number[] = Array.from(d2.entries());
+        if (d > min_d) continue;
 
-    // Sort by squared distance.
-    index = index.sort((a: number, b: number) => a[1] - b[1]);
+        segment_index = i;
+        min_d = d;
+    }
 
-    // Get the nearest indexes.
-    const index0 = index[0][0];
-    const index1 = index[1][0];
+    const index0 = segment_index;
+    const index1 = index0 + 1;
 
     // Get the nearest MD values.
     const md0 = measured_depths[index0];
@@ -395,16 +417,20 @@ function getMd(pickInfo): number | null {
     const survey1 = trajectory[index1];
 
     const dv = distance(survey0, survey1) as number;
+    if (dv === 0) {
+        return -1;
+    }
 
     // Calculate the scalar projection onto segment.
     const v0 = subtract(pickInfo.coordinate, survey0);
     const v1 = subtract(survey1, survey0);
-    const scalar_projection: number = dot(v0 as number[], v1 as number[]) / dv;
+
+    // scalar_projection in interval [0,1]
+    const scalar_projection: number =
+        dot(v0 as number[], v1 as number[]) / (dv * dv);
 
     // Interpolate MD value.
-    const c0 = scalar_projection / dv;
-    const c1 = dv - c0;
-    return (md0 * c1 + md1 * c0) / dv;
+    return md0 * (1.0 - scalar_projection) + md1 * scalar_projection;
 }
 
 function getMdProperty(info: PickInfo<unknown>): PropertyDataType | null {
