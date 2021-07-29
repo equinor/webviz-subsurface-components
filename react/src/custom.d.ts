@@ -4,3 +4,5 @@ declare module "*.svg" {
     const src: string;
     export default src;
 }
+declare module "addon-redux/withRedux";
+declare module "addon-redux/enhancer";
