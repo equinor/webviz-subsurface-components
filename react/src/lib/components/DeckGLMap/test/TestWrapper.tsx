@@ -4,12 +4,17 @@ import { createStore } from "../redux/store";
 import { Operation } from "fast-json-patch";
 
 
-export const testStore = createStore({}, (patch: Operation[]) => void);
+const exampleData = require("../../../../demo/example-data/deckgl-map.json");
+export const testStore = createStore({}, (patch: Operation[]) =>{
+    patch;
+});
 testStore.dispatch = jest.fn();
 export const Wrapper = ({
     children,
 }: {
     children: JSX.Element;
 }): JSX.Element => {
-    return <Provider store={testStore}>{children}</Provider>;
+    return (
+            <Provider store={testStore}>{children}</Provider>
+    );
 };
