@@ -1,15 +1,9 @@
-import React from "react";
-// import { exampleDataDecorator } from "../../test/storybookDataDecorator";
-// import { withReduxDecorator } from "../../test/storybookReduxAddon";
+import { exampleDataDecorator } from "../../test/storybookDataDecorator";
+import { withReduxDecorator } from "../../test/storybookReduxAddon";
 import WellPagination from "./WellPagination";
 
 export default {
     component: WellPagination,
     title: "WellCompletions/Components/Settings/Well Pagination",
+    decorators: [exampleDataDecorator, withReduxDecorator],
 };
-
-const Template = () => <WellPagination />;
-export const Bar = Template.bind({});
-// TODO: Is this needed? It doesn't typecheck.
-//Wrap with example intpu data and redux store
-// Bar.decorators = [exampleDataDecorator, withReduxDecorator];

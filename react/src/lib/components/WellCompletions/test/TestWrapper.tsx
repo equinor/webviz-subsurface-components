@@ -10,6 +10,7 @@ export const testStore = createReduxStore(testState);
 // eslint-disable-next-line no-undef
 testStore.dispatch = jest.fn();
 
+// eslint-disable-next-line react/prop-types
 export const Wrapper = ({
     children,
 }: {

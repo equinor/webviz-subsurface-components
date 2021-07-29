@@ -14,9 +14,7 @@ describe("Test flow rate selector component", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     it("select 'water rate' option to dispatch redux action", async () => {
-        render(<FlowRateSelector />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <FlowRateSelector /> }));
         userEvent.selectOptions(
             screen.getByRole("combobox", { name: /flow rate/i }),
             "Water Rate"
