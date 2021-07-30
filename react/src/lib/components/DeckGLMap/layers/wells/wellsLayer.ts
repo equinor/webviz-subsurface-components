@@ -251,7 +251,7 @@ function getWellObjectByName(
     wells_data: Feature[],
     name: string
 ): Feature | undefined {
-    return wells_data.find(
+    return wells_data?.find(
         (item) => item.properties?.name.toLowerCase() === name?.toLowerCase()
     );
 }

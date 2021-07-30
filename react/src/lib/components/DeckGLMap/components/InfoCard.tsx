@@ -148,12 +148,19 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
 
         props.pickInfos.forEach((info) => {
             const layer_props = (info as LayerPickInfo)?.property;
-            const data = infoCardData.find(
+            const parent = infoCardData.find(
                 (item) => item.layerName === info.layer?.id
             );
             if (layer_props) {
-                if (data) {
-                    data.properties.push(layer_props);
+                if (parent) {
+                    const property = parent.properties.find(
+                        (item) => item.name === layer_props.name
+                    );
+                    if (property) {
+                        property.value = layer_props.value;
+                    } else {
+                        parent.properties.push(layer_props);
+                    }
                 } else {
                     infoCardData.push({
                         layerName: info.layer?.id || "unknown-layer",
