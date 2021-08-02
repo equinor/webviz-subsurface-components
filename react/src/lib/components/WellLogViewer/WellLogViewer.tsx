@@ -96,11 +96,11 @@ class WellLogViewer extends Component<Props, State> {
             infos: infos,
         });
     }
-    setController(controller: WellLogController) {
+    setController(controller: WellLogController): void {
         this.controller = controller;
         this._enableScroll();
     }
-    setScrollPos(pos: number) {
+    setScrollPos(pos: number): void {
         this._enableScroll();
     }
 
@@ -111,31 +111,25 @@ class WellLogViewer extends Component<Props, State> {
         });
     }
 
-    onScrollUp() {
-        if (this.controller)
-            this.controller.scrollUp();
+    onScrollUp(): void {
+        if (this.controller) this.controller.scrollUp();
     }
-    onScrollDown() {
-        if (this.controller)
-            this.controller.scrollDown();
+    onScrollDown(): void {
+        if (this.controller) this.controller.scrollDown();
     }
 
-    _enableScroll() {
-        const pos = this.controller? this.controller.getScrollPos(): 0;
-        const n = this.controller? this.controller.getScrollMax(): 0;
-        let down = document.getElementById("buttonDown") as HTMLButtonElement;
-        let up = document.getElementById("buttonUp") as HTMLButtonElement;
+    _enableScroll(): void {
+        const pos = this.controller ? this.controller.getScrollPos() : 0;
+        const n = this.controller ? this.controller.getScrollMax() : 0;
+        const down = document.getElementById("buttonDown") as HTMLButtonElement;
+        const up = document.getElementById("buttonUp") as HTMLButtonElement;
         if (down) {
-            if (pos + 1 < n)
-                down.removeAttribute("disabled");
-            else
-                down.setAttribute("disabled", "true");
+            if (pos + 1 < n) down.removeAttribute("disabled");
+            else down.setAttribute("disabled", "true");
         }
         if (up) {
-            if (pos > 0)
-                up.removeAttribute("disabled");
-            else
-                up.setAttribute("disabled", "true");
+            if (pos > 0) up.removeAttribute("disabled");
+            else up.setAttribute("disabled", "true");
         }
     }
 
@@ -155,7 +149,8 @@ class WellLogViewer extends Component<Props, State> {
                                 setInfo={this.setInfo.bind(this)}
                                 setController={this.setController.bind(this)}
                                 setScrollPos={this.setScrollPos.bind(this)}
-                            /> {/*scroll={this.state.scroll}*/}
+                            />{" "}
+                            {/*scroll={this.state.scroll}*/}
                         </td>
                         <td valign="top" style={{ width: "250px" }}>
                             <AxisSelector
@@ -170,9 +165,21 @@ class WellLogViewer extends Component<Props, State> {
                                 infos={this.state.infos}
                             />
                             <div>
-                                <br/>
-                                <button id="buttonUp" type="button" onClick={this.onScrollUp.bind(this)}>{"\u25C4"}</button> 
-                                <button id="buttonDown" type="button" onClick={this.onScrollDown.bind(this)}>{"\u25BA"}</button> 
+                                <br />
+                                <button
+                                    id="buttonUp"
+                                    type="button"
+                                    onClick={this.onScrollUp.bind(this)}
+                                >
+                                    {"\u25C4"}
+                                </button>
+                                <button
+                                    id="buttonDown"
+                                    type="button"
+                                    onClick={this.onScrollDown.bind(this)}
+                                >
+                                    {"\u25BA"}
+                                </button>
                             </div>
                         </td>
                     </tr>

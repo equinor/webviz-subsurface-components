@@ -240,10 +240,10 @@ function setTracksToController(
 }
 
 function repaintController(logController: LogViewer) {
-    let p = document.getElementsByClassName("welllogview");
+    const p = document.getElementsByClassName("welllogview");
     if (p && p[0]) {
-        let logElement = p[0] as HTMLElement
-        let oldWidth = logElement.style.width;
+        const logElement = p[0] as HTMLElement;
+        const oldWidth = logElement.style.width;
         logElement.style.width = "0";
         logController.adjustToSize(true); // force resize all elements
         logElement.style.width = oldWidth;
@@ -266,7 +266,6 @@ interface Info {
     value: string;
     type: string; // line, linestep, area, ?dot?
 }
-
 
 interface Props {
     welllog: WellLog;
@@ -303,10 +302,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         this.state = {
             infos: [],
-            scrollPos: props.scrollPos ? props.scrollPos: 0,
+            scrollPos: props.scrollPos ? props.scrollPos : 0,
         };
 
-        if (this.props.setController) // set callback to component caller
+        if (this.props.setController)
+            // set callback to component caller
             this.props.setController(this);
     }
 
@@ -323,11 +323,17 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.setTracks();
         } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
             this.setTracks();
-        } else if (this.props.axisTitles !== prevProps.axisTitles || this.props.axisMnemos !== prevProps.axisMnemos) {
+        } else if (
+            this.props.axisTitles !== prevProps.axisTitles ||
+            this.props.axisMnemos !== prevProps.axisMnemos
+        ) {
             this.setTracks();
         } else if (this.props.scrollPos !== prevProps.scrollPos) {
-            this.scrollTo(this.props.scrollPos ? this.props.scrollPos: 0);
-        } else if (this.state.scrollPos !== prevState.scrollPos || this.props.maxTrackNum !== prevProps.maxTrackNum) {
+            this.scrollTo(this.props.scrollPos ? this.props.scrollPos : 0);
+        } else if (
+            this.state.scrollPos !== prevState.scrollPos ||
+            this.props.maxTrackNum !== prevProps.maxTrackNum
+        ) {
             this.setScroll();
             this.setInfo();
         }
@@ -364,7 +370,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.logController) {
             const axes: AxesInfo = {
                 primaryAxis: this.props.primaryAxis,
-                secondaryAxis: this.props.template && this.props.template.scale && this.props.template.scale.allowSecondary? (this.props.primaryAxis == "md" ? "tvd" : "md") : "",
+                secondaryAxis:
+                    this.props.template &&
+                    this.props.template.scale &&
+                    this.props.template.scale.allowSecondary
+                        ? this.props.primaryAxis == "md"
+                            ? "tvd"
+                            : "md"
+                        : "",
                 titles: this.props.axisTitles,
                 mnemos: this.props.axisMnemos,
             };
@@ -379,16 +392,19 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(); // Clear old track information
     }
     setScroll(): void {
-        let iFrom = this._newPos(this.state.scrollPos);
+        const iFrom = this._newPos(this.state.scrollPos);
         const iTo = iFrom + this._maxmaxTrackNum();
         let iTrack = 0;
         if (this.logController) {
             for (const track of this.logController.tracks) {
-                if (isScaleTrack(track)) { continue; } // skip scales
-                if (track.elm) { // class track-container
-                    let elm = track.elm.parentElement // class track
+                if (isScaleTrack(track)) {
+                    continue;
+                } // skip scales
+                if (track.elm) {
+                    // class track-container
+                    const elm = track.elm.parentElement; // class track
                     if (elm) {
-                        let visible = iFrom <= iTrack && iTrack < iTo;
+                        const visible = iFrom <= iTrack && iTrack < iTo;
                         elm.style.visibility = visible ? "visible" : "collapse";
                     }
                 }
@@ -401,7 +417,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
     setInfo(x: number = Number.NaN, x2: number = Number.NaN): void {
         if (!this.logController) return;
-        let iFrom = this._newPos(this.state.scrollPos);
+        const iFrom = this._newPos(this.state.scrollPos);
         const iTo = iFrom + this._maxmaxTrackNum();
         let iTrack = 0;
 
@@ -409,10 +425,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         let iPlot = 0;
         let bSeparator = false;
         for (const track of this.logController.tracks) {
-            if (isScaleTrack(track)) { continue; } // skip scales
-            let visible = iFrom <= iTrack && iTrack < iTo;
+            if (isScaleTrack(track)) {
+                continue;
+            } // skip scales
+            const visible = iFrom <= iTrack && iTrack < iTo;
             if (visible) {
-
                 const plots = track.options["plots"];
                 const datas = track.data;
 
@@ -462,10 +479,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(x, x2);
     }
 
-    _posMax(): number { // for scrollbar 
-        if (!this.logController)
-            return 0;
-        let nScaleTracks = getScaleTrackNum(this.logController.tracks)
+    _posMax(): number {
+        // for scrollbar
+        if (!this.logController) return 0;
+        const nScaleTracks = getScaleTrackNum(this.logController.tracks);
         const nGraphTracks = this.logController.tracks.length - nScaleTracks;
         let posMax = nGraphTracks - this._maxmaxTrackNum();
         if (posMax < 0) posMax = 0;
@@ -473,32 +490,27 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
     _newPos(pos: number): number {
         let newPos = pos;
-        let newPosMax = this._posMax();
-        if (newPos > newPosMax)
-            newPos = newPosMax;
-        if (newPos < 0)
-            newPos = 0;
+        const newPosMax = this._posMax();
+        if (newPos > newPosMax) newPos = newPosMax;
+        if (newPos < 0) newPos = 0;
         return newPos;
     }
     _maxmaxTrackNum(): number {
-        return this.props.maxTrackNum ? this.props.maxTrackNum : 20/*some default value*/;
+        return this.props.maxTrackNum
+            ? this.props.maxTrackNum
+            : 20 /*some default value*/;
     }
 
-
-    scrollUp(): boolean
-    {
-        return this.scrollTo(this.state.scrollPos -1);
+    scrollUp(): boolean {
+        return this.scrollTo(this.state.scrollPos - 1);
     }
-    scrollDown(): boolean
-    {
+    scrollDown(): boolean {
         return this.scrollTo(this.state.scrollPos + 1);
     }
-    scrollTo(pos: number): boolean
-    {
-        let newPos = this._newPos(pos);
-        if (this.state.scrollPos == newPos) 
-            return false;
-        this.setState({ scrollPos: newPos })
+    scrollTo(pos: number): boolean {
+        const newPos = this._newPos(pos);
+        if (this.state.scrollPos == newPos) return false;
+        this.setState({ scrollPos: newPos });
         return true;
     }
     getScrollPos(): number {
@@ -507,8 +519,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     getScrollMax(): number {
         return this._posMax();
     }
-
-
 
     render(): ReactNode {
         return (

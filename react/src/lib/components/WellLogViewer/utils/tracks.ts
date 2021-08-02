@@ -218,14 +218,13 @@ export function isScaleTrack(track: Track): boolean {
     //if ((track as DualScaleTrack).xscale) return true;
     return false;
 }
-export function getScaleTrackNum(tracks: Track[]) {
+export function getScaleTrackNum(tracks: Track[]): number {
     let n = 0;
     for (const track of tracks) {
         if (isScaleTrack(track)) n++;
     }
     return n;
 }
-
 
 export interface AxesInfo {
     primaryAxis: string;
