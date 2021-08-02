@@ -1,0 +1,128 @@
+{
+  "name": "Template 2",
+  "scale": {
+    "primary": "tvd"
+  },
+  "tracks": [
+    {
+      "plots": [
+        {
+          "name": "BDIA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "ROPA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "BVW"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "COAL_FLAG"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "KLOGH"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "PHIF"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "DD_PRESS"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "DD_VOLUME"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "TEMP",
+          "type": "linestep"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "DD_PRESS_MOD_1000"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "DD_PRESS_MOD_100"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "RACESLM"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "RPAESLM"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "RACELM"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "RPCELM"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "RAAELM"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "RPAELM"
+        }
+      ]
+    }
+  ]
+}
