@@ -85,6 +85,83 @@
           "name": "SW"
         }
       ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MFOA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MFIA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MDOA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MDIA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MTOA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MTIA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "ECDT"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "BDTI"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "BDDI"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "BRVC"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "TCTI"
+        }
+      ]
     }
   ],
   "styles": [

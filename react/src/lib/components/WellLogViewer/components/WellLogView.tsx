@@ -10,6 +10,7 @@ import "./styles.scss";
 import { select } from "d3";
 
 import createTracks from "../utils/tracks";
+import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
 import { AxesInfo, WellLog } from "../utils/tracks";
 
 export type Template = Record<string, any>; // JSON
@@ -238,6 +239,26 @@ function setTracksToController(
     logController.setTracks(tracks);
 }
 
+function repaintController(logController: LogViewer) {
+    let p = document.getElementsByClassName("welllogview");
+    if (p && p[0]) {
+        let logElement = p[0] as HTMLElement
+        let oldWidth = logElement.style.width;
+        logElement.style.width = "0";
+        logController.adjustToSize(true); // force resize all elements
+        logElement.style.width = oldWidth;
+    }
+    logController.adjustToSize(true); // force resize all elements
+}
+
+export interface WellLogController {
+    scrollUp(): boolean;
+    scrollDown(): boolean;
+    scrollTo(pos: number): boolean;
+    getScrollPos(): number;
+    getScrollMax(): number;
+}
+
 interface Info {
     name?: string;
     units?: string;
@@ -245,6 +266,8 @@ interface Info {
     value: string;
     type: string; // line, linestep, area, ?dot?
 }
+
+
 interface Props {
     welllog: WellLog;
     template: Template;
@@ -253,13 +276,21 @@ interface Props {
     setInfo: (infos: Info[]) => void;
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
+
+    setController?: (controller: WellLogController) => void;
+    setScrollPos?: (pos: number) => void;
+
+    scrollPos?: number;
+    maxTrackNum?: number;
 }
 
 interface State {
     infos: Info[];
+
+    scrollPos: number;
 }
 
-class WellLogView extends Component<Props, State> {
+class WellLogView extends Component<Props, State> implements WellLogController {
     container?: HTMLElement;
     logController?: LogViewer;
 
@@ -272,7 +303,11 @@ class WellLogView extends Component<Props, State> {
 
         this.state = {
             infos: [],
+            scrollPos: props.scrollPos ? props.scrollPos: 0,
         };
+
+        if (this.props.setController) // set callback to component caller
+            this.props.setController(this);
     }
 
     componentDidMount(): void {
@@ -280,7 +315,7 @@ class WellLogView extends Component<Props, State> {
         this.setTracks();
     }
 
-    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
+    componentDidUpdate(prevProps: Props, prevState: State): void {
         // Typical usage (don't forget to compare props):
         if (this.props.welllog !== prevProps.welllog) {
             this.setTracks();
@@ -288,7 +323,19 @@ class WellLogView extends Component<Props, State> {
             this.setTracks();
         } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
             this.setTracks();
+        } else if (this.props.axisTitles !== prevProps.axisTitles || this.props.axisMnemos !== prevProps.axisMnemos) {
+            this.setTracks();
+        } else if (this.props.scrollPos !== prevProps.scrollPos) {
+            this.scrollTo(this.props.scrollPos ? this.props.scrollPos: 0);
+        } else if (this.state.scrollPos !== prevState.scrollPos || this.props.maxTrackNum !== prevProps.maxTrackNum) {
+            this.setScroll();
+            this.setInfo();
         }
+        /*??
+        if (this.props.setController !== prevProps.setController) {
+            if (this.props.setController) // set callback to component caller
+                this.props.setController(this);
+        }*/
     }
 
     createLogViewer(): void {
@@ -317,7 +364,7 @@ class WellLogView extends Component<Props, State> {
         if (this.logController) {
             const axes: AxesInfo = {
                 primaryAxis: this.props.primaryAxis,
-                secondaryAxis: this.props.primaryAxis == "md" ? "tvd" : "md",
+                secondaryAxis: this.props.template && this.props.template.scale && this.props.template.scale.allowSecondary? (this.props.primaryAxis == "md" ? "tvd" : "md") : "",
                 titles: this.props.axisTitles,
                 mnemos: this.props.axisMnemos,
             };
@@ -328,51 +375,84 @@ class WellLogView extends Component<Props, State> {
                 this.props.template
             );
         }
+        this.setScroll();
         this.setInfo(); // Clear old track information
+    }
+    setScroll(): void {
+        let iFrom = this._newPos(this.state.scrollPos);
+        const iTo = iFrom + this._maxmaxTrackNum();
+        let iTrack = 0;
+        if (this.logController) {
+            for (const track of this.logController.tracks) {
+                if (isScaleTrack(track)) { continue; } // skip scales
+                if (track.elm) { // class track-container
+                    let elm = track.elm.parentElement // class track
+                    if (elm) {
+                        let visible = iFrom <= iTrack && iTrack < iTo;
+                        elm.style.visibility = visible ? "visible" : "collapse";
+                    }
+                }
+                iTrack++;
+            }
+            repaintController(this.logController); //repaint log-controller
+        }
+
+        if (this.props.setScrollPos) this.props.setScrollPos(iFrom);
     }
     setInfo(x: number = Number.NaN, x2: number = Number.NaN): void {
         if (!this.logController) return;
+        let iFrom = this._newPos(this.state.scrollPos);
+        const iTo = iFrom + this._maxmaxTrackNum();
+        let iTrack = 0;
+
         const infos: Info[] = [];
         let iPlot = 0;
         let bSeparator = false;
         for (const track of this.logController.tracks) {
-            const plots = track.options["plots"];
-            const datas = track.data;
-            if (plots) {
-                if (!bSeparator) {
-                    bSeparator = true;
-                    infos.push({
-                        color: "",
-                        value: "",
-                        type: "separator",
-                    });
-                }
+            if (isScaleTrack(track)) { continue; } // skip scales
+            let visible = iFrom <= iTrack && iTrack < iTo;
+            if (visible) {
 
-                const nPlots = plots.length;
-                for (let p = 0; p < nPlots; p++) {
-                    const plot = plots[p];
-                    const v = getValue(x, datas[p], plot);
-                    const legend = plot.options.legendInfo();
+                const plots = track.options["plots"];
+                const datas = track.data;
+
+                if (plots) {
+                    if (!bSeparator) {
+                        bSeparator = true;
+                        infos.push({
+                            color: "",
+                            value: "",
+                            type: "separator",
+                        });
+                    }
+
+                    const nPlots = plots.length;
+                    for (let p = 0; p < nPlots; p++) {
+                        const plot = plots[p];
+                        const v = getValue(x, datas[p], plot);
+                        const legend = plot.options.legendInfo();
+                        infos.push({
+                            name: legend.label,
+                            units: legend.unit,
+                            color: plot.options.color,
+                            value: v,
+                            type: plot.type,
+                        });
+                        iPlot++;
+                    }
+                } else {
+                    const _x = iPlot == 0 ? x : x2;
                     infos.push({
-                        name: legend.label,
-                        units: legend.unit,
-                        color: plot.options.color,
-                        value: v,
-                        type: plot.type,
+                        name: track.options.abbr,
+                        units: track.options["units"], // ScaleTrackOptions.units
+                        color: iPlot == 0 ? "black" : "grey",
+                        value: formatValue(_x),
+                        type: "", //plot.type,
                     });
                     iPlot++;
                 }
-            } else {
-                const _x = iPlot == 0 ? x : x2;
-                infos.push({
-                    name: track.options.abbr,
-                    units: track.options["units"], // ScaleTrackOptions.units
-                    color: iPlot == 0 ? "black" : "grey",
-                    value: formatValue(_x),
-                    type: "", //plot.type,
-                });
-                iPlot++;
             }
+            iTrack++;
         }
 
         this.props.setInfo(infos);
@@ -381,6 +461,54 @@ class WellLogView extends Component<Props, State> {
     onMouseMove(x: number, x2: number): void {
         this.setInfo(x, x2);
     }
+
+    _posMax(): number { // for scrollbar 
+        if (!this.logController)
+            return 0;
+        let nScaleTracks = getScaleTrackNum(this.logController.tracks)
+        const nGraphTracks = this.logController.tracks.length - nScaleTracks;
+        let posMax = nGraphTracks - this._maxmaxTrackNum();
+        if (posMax < 0) posMax = 0;
+        return posMax;
+    }
+    _newPos(pos: number): number {
+        let newPos = pos;
+        let newPosMax = this._posMax();
+        if (newPos > newPosMax)
+            newPos = newPosMax;
+        if (newPos < 0)
+            newPos = 0;
+        return newPos;
+    }
+    _maxmaxTrackNum(): number {
+        return this.props.maxTrackNum ? this.props.maxTrackNum : 20/*some default value*/;
+    }
+
+
+    scrollUp(): boolean
+    {
+        return this.scrollTo(this.state.scrollPos -1);
+    }
+    scrollDown(): boolean
+    {
+        return this.scrollTo(this.state.scrollPos + 1);
+    }
+    scrollTo(pos: number): boolean
+    {
+        let newPos = this._newPos(pos);
+        if (this.state.scrollPos == newPos) 
+            return false;
+        this.setState({ scrollPos: newPos })
+        return true;
+    }
+    getScrollPos(): number {
+        return this.state.scrollPos;
+    }
+    getScrollMax(): number {
+        return this._posMax();
+    }
+
+
 
     render(): ReactNode {
         return (

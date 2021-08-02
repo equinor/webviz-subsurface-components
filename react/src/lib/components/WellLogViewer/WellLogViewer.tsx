@@ -4,7 +4,7 @@ import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
-import { Template } from "./components/WellLogView";
+import { Template, WellLogController } from "./components/WellLogView";
 import { getAvailableAxes, WellLog } from "./utils/tracks";
 
 const axisTitles: Record<string, string> = {
@@ -37,9 +37,13 @@ interface State {
     axes: string[]; // axes available in welllog
     primaryAxis: string;
     infos: Info[];
+
+    scroll: number;
 }
 
 class WellLogViewer extends Component<Props, State> {
+    controller?: WellLogController;
+
     constructor(props: Props) {
         super(props);
 
@@ -53,7 +57,15 @@ class WellLogViewer extends Component<Props, State> {
             primaryAxis: primaryAxis, //"md"
             axes: axes, //["md", "tvd"]
             infos: [],
+
+            scroll: 0,
         };
+
+        this.controller = undefined;
+    }
+
+    componentDidMount(): void {
+        this._enableScroll();
     }
 
     componentDidUpdate(prevProps: Props): boolean {
@@ -78,16 +90,53 @@ class WellLogViewer extends Component<Props, State> {
         }
         return true;
     }
+
+    setInfo(infos: Info[]): void {
+        this.setState({
+            infos: infos,
+        });
+    }
+    setController(controller: WellLogController) {
+        this.controller = controller;
+        this._enableScroll();
+    }
+    setScrollPos(pos: number) {
+        this._enableScroll();
+    }
+
     onChangePrimaryAxis(value: string): void {
         this.setState({
             primaryAxis: value,
             // will be changed by callback! infos: [],
         });
     }
-    setInfo(infos: Info[]): void {
-        this.setState({
-            infos: infos,
-        });
+
+    onScrollUp() {
+        if (this.controller)
+            this.controller.scrollUp();
+    }
+    onScrollDown() {
+        if (this.controller)
+            this.controller.scrollDown();
+    }
+
+    _enableScroll() {
+        const pos = this.controller? this.controller.getScrollPos(): 0;
+        const n = this.controller? this.controller.getScrollMax(): 0;
+        let down = document.getElementById("buttonDown") as HTMLButtonElement;
+        let up = document.getElementById("buttonUp") as HTMLButtonElement;
+        if (down) {
+            if (pos + 1 < n)
+                down.removeAttribute("disabled");
+            else
+                down.setAttribute("disabled", "true");
+        }
+        if (up) {
+            if (pos > 0)
+                up.removeAttribute("disabled");
+            else
+                up.setAttribute("disabled", "true");
+        }
     }
 
     render(): ReactNode {
@@ -100,10 +149,13 @@ class WellLogViewer extends Component<Props, State> {
                                 welllog={this.props.welllog}
                                 template={this.props.template}
                                 primaryAxis={this.state.primaryAxis}
-                                setInfo={this.setInfo.bind(this)}
                                 axisTitles={axisTitles}
                                 axisMnemos={axisMnemos}
-                            />
+                                maxTrackNum={7}
+                                setInfo={this.setInfo.bind(this)}
+                                setController={this.setController.bind(this)}
+                                setScrollPos={this.setScrollPos.bind(this)}
+                            /> {/*scroll={this.state.scroll}*/}
                         </td>
                         <td valign="top" style={{ width: "250px" }}>
                             <AxisSelector
@@ -117,6 +169,11 @@ class WellLogViewer extends Component<Props, State> {
                                 header="Readout"
                                 infos={this.state.infos}
                             />
+                            <div>
+                                <br/>
+                                <button id="buttonUp" type="button" onClick={this.onScrollUp.bind(this)}>{"\u25C4"}</button> 
+                                <button id="buttonDown" type="button" onClick={this.onScrollDown.bind(this)}>{"\u25BA"}</button> 
+                            </div>
                         </td>
                     </tr>
                 </table>
