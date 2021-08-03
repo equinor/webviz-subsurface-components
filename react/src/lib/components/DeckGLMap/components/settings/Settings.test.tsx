@@ -7,15 +7,12 @@ import Settings from "./Settings";
 
 describe("test settings component", () => {
     it("snapshot test", () => {
-        const { container } = render(
-            Wrapper({ children: <Settings /> })
-        );
+        const { container } = render(Wrapper({ children: <Settings /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
     it("test hide layers settings button", () => {
         render(<Settings />, {
             wrapper: Wrapper,
         });
-        
-    })
+    });
 });

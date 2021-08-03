@@ -3,18 +3,94 @@ import { Provider } from "react-redux";
 import { createStore } from "../redux/store";
 import { Operation } from "fast-json-patch";
 
-
 const exampleData = require("../../../../demo/example-data/deckgl-map.json");
-export const testStore = createStore({}, (patch: Operation[]) =>{
-    patch;
-});
+export const testStore = createStore(
+    {
+        initialViewState: {
+            target: [434962.5, 6478095.5, 0],
+            zoom: -3,
+        },
+        layers: [
+            {
+                "@@type": "ColormapLayer",
+                id: "colormap-layer",
+                bounds: [432205, 6475078, 437720, 6481113],
+                image: "@@#resources.propertyMap",
+                colormap:
+                    "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
+                valueRange: [2782, 3513],
+                pickable: true,
+            },
+            {
+                "@@type": "Hillshading2DLayer",
+                id: "hillshading-layer",
+                bounds: [432205, 6475078, 437720, 6481113],
+                valueRange: [2782, 3513],
+                opacity: 1,
+                image: "@@#resources.propertyMap",
+                pickable: true,
+            },
+            {
+                "@@type": "WellsLayer",
+                id: "wells-layer",
+                data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+                logData:
+                    "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+                opacity: 1,
+                lineWidthScale: 5,
+                logRadius: 6,
+                logrunName: "BLOCKING",
+                logName: "ZONELOG",
+                pointRadiusScale: 8,
+                outline: true,
+                logCurves: true,
+                refine: true,
+            },
+            {
+                "@@type": "FaultPolygonsLayer",
+                id: "fault-polygons-layer",
+                data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson",
+                lineWidthMinPixels: 2,
+            },
+            {
+                "@@type": "PieChartLayer",
+                id: "pie-layer",
+                data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json",
+            },
+            {
+                "@@type": "DrawingLayer",
+                id: "drawing-layer",
+                mode: "drawLineString",
+                data: {
+                    type: "FeatureCollection",
+                    features: [],
+                },
+            },
+        ],
+        views: [
+            {
+                "@@type": "OrthographicView",
+                id: "main",
+                controller: {
+                    doubleClickZoom: false,
+                },
+                x: "0%",
+                y: "0%",
+                width: "100%",
+                height: "100%",
+                flipY: false,
+            },
+        ],
+    },
+    (patch: Operation[]) => {
+        patch;
+    }
+);
 testStore.dispatch = jest.fn();
 export const Wrapper = ({
     children,
 }: {
     children: JSX.Element;
 }): JSX.Element => {
-    return (
-            <Provider store={testStore}>{children}</Provider>
-    );
+    return <Provider store={testStore}>{children}</Provider>;
 };

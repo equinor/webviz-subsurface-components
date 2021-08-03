@@ -8,9 +8,7 @@ import { Icon } from "@equinor/eds-core-react";
 
 describe("test 'layers' button", () => {
     xit("snapshot test", () => {
-        const { container } = render(
-            Wrapper({ children: <LayersButton /> })
-        );
+        const { container } = render(Wrapper({ children: <LayersButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
     xit("click to dispatch redux action", async () => {
@@ -20,14 +18,15 @@ describe("test 'layers' button", () => {
         userEvent.hover(screen.getByLabelText("layers-selector-button"));
         expect(await screen.findByText("Layers")).toBeInTheDocument();
 
-        userEvent.click(screen.getByRole('button'))
-        expect(screen.getByRole('menu')).toBeInTheDocument()
-        userEvent.click(screen.getByRole('checkbox', {  name: /colormap\-layer/i}))
+        userEvent.click(screen.getByRole("button"));
+        expect(screen.getByRole("menu")).toBeInTheDocument();
+        userEvent.click(
+            screen.getByRole("checkbox", { name: /colormap\-layer/i })
+        );
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["colormap-layer", false],
             type: "spec/updateVisibleLayers",
         });
-
     });
 });

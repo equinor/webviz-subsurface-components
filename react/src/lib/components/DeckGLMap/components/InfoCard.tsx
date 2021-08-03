@@ -118,8 +118,9 @@ function Row(props: { layer_data: InfoCardDataType }) {
 }
 
 const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
-    const [infoCardData, setInfoCardData] =
-        React.useState<InfoCardDataType[] | null>(null);
+    const [infoCardData, setInfoCardData] = React.useState<
+        InfoCardDataType[] | null
+    >(null);
 
     React.useEffect(() => {
         if (props.pickInfos.length === 0) {

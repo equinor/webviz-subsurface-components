@@ -8,17 +8,32 @@ import LayerSettingsButton from "./LayerSettingsButton";
 describe("test layers settings button", () => {
     it("snapshot test", () => {
         const { container } = render(
-            Wrapper({ children: <LayerSettingsButton layerId = "colormap-layer" layerType="ColormapLayer" /> })
+            Wrapper({
+                children: (
+                    <LayerSettingsButton
+                        layerId="colormap-layer"
+                        layerType="ColormapLayer"
+                    />
+                ),
+            })
         );
         expect(container.firstChild).toMatchSnapshot();
     });
     xit("click to dispatch redux action", async () => {
-        render(<LayerSettingsButton layerId = "colormap-layer" layerType="ColormapLayer" />, {
-            wrapper: Wrapper,
-        });
-        userEvent.click(screen.getByRole('button'))
-        expect(screen.getByText(/draw mode/i)).toBeVisible()
-        expect(screen.getByRole('combobox', {  name: /draw mode/i})).toHaveDisplayValue('drawLineString')
+        render(
+            <LayerSettingsButton
+                layerId="colormap-layer"
+                layerType="ColormapLayer"
+            />,
+            {
+                wrapper: Wrapper,
+            }
+        );
+        userEvent.click(screen.getByRole("button"));
+        expect(screen.getByText(/draw mode/i)).toBeVisible();
+        expect(
+            screen.getByRole("combobox", { name: /draw mode/i })
+        ).toHaveDisplayValue("drawLineString");
         userEvent.selectOptions(
             screen.getByRole("combobox", { name: /draw mode/i }),
             "view"

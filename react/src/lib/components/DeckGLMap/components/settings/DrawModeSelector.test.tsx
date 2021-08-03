@@ -8,7 +8,7 @@ import DrawModeSelector from "./DrawModeSelector";
 describe("Test draw-mode menu", () => {
     it("snapshot test", () => {
         const { container } = render(
-            Wrapper({ children: <DrawModeSelector layerId="colormap-layer"/> })
+            Wrapper({ children: <DrawModeSelector layerId="colormap-layer" /> })
         );
         expect(container.firstChild).toMatchSnapshot();
     });
@@ -16,8 +16,10 @@ describe("Test draw-mode menu", () => {
         render(<DrawModeSelector layerId="colormap-layer" />, {
             wrapper: Wrapper,
         });
-        expect(screen.getByLabelText(/draw mode/i)).toBeVisible()
-        expect(screen.getByRole('combobox', {  name: /draw mode/i})).toHaveDisplayValue('drawLineString')
+        expect(screen.getByLabelText(/draw mode/i)).toBeVisible();
+        expect(
+            screen.getByRole("combobox", { name: /draw mode/i })
+        ).toHaveDisplayValue("drawLineString");
         userEvent.selectOptions(
             screen.getByRole("combobox", { name: /draw mode/i }),
             "view"
