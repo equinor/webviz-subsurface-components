@@ -1,10 +1,9 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import userEvent from "@testing-library/user-event";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import LayersButton from "./LayersButton";
-import { Icon } from "@equinor/eds-core-react";
 
 describe("test 'layers' button", () => {
     xit("snapshot test", () => {
@@ -21,7 +20,7 @@ describe("test 'layers' button", () => {
         userEvent.click(screen.getByRole("button"));
         expect(screen.getByRole("menu")).toBeInTheDocument();
         userEvent.click(
-            screen.getByRole("checkbox", { name: /colormap\-layer/i })
+            screen.getByRole("checkbox", { name: /colormap-layer/i })
         );
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
