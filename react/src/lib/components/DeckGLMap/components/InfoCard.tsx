@@ -172,7 +172,14 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
 
             const zValue = (info as PropertyMapPickInfo).propertyValue;
             if (zValue) {
-                xy_properties.push({ name: info.layer.id, value: zValue });
+                const property = xy_properties.find(
+                    (item) => item.name === info.layer.id
+                );
+                if (property) {
+                    property.value = zValue;
+                } else {
+                    xy_properties.push({ name: info.layer.id, value: zValue });
+                }
             }
         });
 
