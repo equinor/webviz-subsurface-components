@@ -132,7 +132,6 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
             topObject.coordinate === undefined ||
             topObject.coordinate.length < 2
         ) {
-            setInfoCardData(null);
             return;
         }
 
