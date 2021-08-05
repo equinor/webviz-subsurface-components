@@ -11,13 +11,16 @@ import JSON_CONVERTER_CONFIG from "./configuration";
 import { setSpec } from "./redux/actions";
 import { createStore } from "./redux/store";
 import { WellsPickInfo } from "./layers/wells/wellsLayer";
+import InfoCard from "./components/InfoCard";
 
 export interface MapProps {
     id: string;
     resources: Record<string, unknown>;
     deckglSpec: Record<string, unknown>;
-    onHover: <D>(info: PickInfo<D>, e: MouseEvent) => void;
     setSpecPatch: (patch: Operation[]) => void;
+    onHover: <D>(info: PickInfo<D>, e: MouseEvent) => void;
+    hoverInfo: PickInfo<unknown>[];
+    showInfoCard: boolean;
     children?: React.ReactNode;
 }
 
@@ -25,8 +28,10 @@ const Map: React.FC<MapProps> = ({
     id,
     resources,
     deckglSpec,
-    onHover,
     setSpecPatch,
+    onHover,
+    hoverInfo,
+    showInfoCard,
     children,
 }: MapProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,6 +108,7 @@ const Map: React.FC<MapProps> = ({
                 >
                     {children}
                 </DeckGL>
+                {showInfoCard ? <InfoCard pickInfos={hoverInfo} /> : null}
                 <Settings />
             </ReduxProvider>
         )
