@@ -2,7 +2,6 @@ import * as jsonpatch from "fast-json-patch";
 import { cloneDeep } from "lodash";
 import PropTypes from "prop-types";
 import * as React from "react";
-import InfoCard from "./components/InfoCard";
 import Map from "./Map";
 
 function _idsToIndices(doc, path) {
