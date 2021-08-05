@@ -2,16 +2,15 @@ import { CompositeLayer } from "@deck.gl/core";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
-import { PickInfo } from "deck.gl";
 import { subtract, distance, dot } from "mathjs";
 import { interpolateRgbBasis } from "d3-interpolate";
 import { color } from "d3-color";
 import {
-    GeoJSON,
     Feature,
     GeometryCollection,
     LineString,
     Position,
+    FeatureCollection,
 } from "geojson";
 import { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
@@ -62,31 +61,35 @@ export interface WellsPickInfo extends LayerPickInfo {
 }
 
 export default class WellsLayer extends CompositeLayer<
-    unknown,
-    WellsLayerProps<Feature>
+    FeatureCollection,
+    WellsLayerProps<FeatureCollection>
 > {
     onClick(info: WellsPickInfo): boolean {
         if (!this.props.selectionEnabled) {
             return false;
         }
 
-        patchLayerProps(this, {
+        patchLayerProps<FeatureCollection>(this, {
             ...this.props,
             selectedFeature: info.object,
-        });
+        } as WellsLayerProps<FeatureCollection>);
         return true;
     }
 
     renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
+        if (!(this.props.data as FeatureCollection).features) {
+            return [];
+        }
+
         const refine = this.props.refine;
         let data = refine
-            ? splineRefine(this.props.data as GeoJSON) // smooth well paths.
-            : this.props.data;
+            ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
+            : (this.props.data as FeatureCollection);
 
-        data = convertTo2D(data as GeoJSON);
+        data = convertTo2D(data);
 
         const outline = new GeoJsonLayer<Feature>(
-            this.getSubLayerProps({
+            this.getSubLayerProps<Feature>({
                 id: "outline",
                 data,
                 pickable: false,
@@ -100,7 +103,7 @@ export default class WellsLayer extends CompositeLayer<
 
         const getColor = (d: Feature): RGBAColor => d?.properties?.["color"];
         const colors = new GeoJsonLayer<Feature>(
-            this.getSubLayerProps({
+            this.getSubLayerProps<Feature>({
                 id: "colors",
                 data,
                 pickable: true,
@@ -116,7 +119,7 @@ export default class WellsLayer extends CompositeLayer<
 
         // Highlight the selected well.
         const highlight = new GeoJsonLayer<Feature>(
-            this.getSubLayerProps({
+            this.getSubLayerProps<Feature>({
                 id: "highlight",
                 data: this.props.selectedFeature,
                 pickable: false,
@@ -131,7 +134,7 @@ export default class WellsLayer extends CompositeLayer<
         );
 
         const log_layer = new PathLayer<LogCurveDataType>(
-            this.getSubLayerProps({
+            this.getSubLayerProps<LogCurveDataType>({
                 id: "log_curve",
                 data: this.props.logData,
                 positionFormat: "XY",
@@ -140,11 +143,7 @@ export default class WellsLayer extends CompositeLayer<
                 widthMinPixels: 1,
                 miterLimit: 100,
                 getPath: (d: LogCurveDataType): Position[] =>
-                    getLogPath(
-                        data?.["features"] as Feature[],
-                        d,
-                        this.props.logrunName
-                    ),
+                    getLogPath(data.features, d, this.props.logrunName),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
                     getLogColor(d, this.props.logrunName, this.props.logName),
                 getWidth: (d: LogCurveDataType): number | number[] =>
@@ -169,17 +168,17 @@ export default class WellsLayer extends CompositeLayer<
         return layers;
     }
 
-    getPickingInfo({
-        info,
-    }: {
-        info: PickInfo<unknown>;
-    }): WellsPickInfo | PickInfo<unknown> {
+    // For now, use `any` for the picking types because this function should
+    // recieve PickInfo<FeatureCollection>, but it recieves PickInfo<Feature>.
+    //eslint-disable-next-line
+    getPickingInfo({ info }: { info: any }): any {
         if (!info.object) return info;
 
-        const md_property = getMdProperty(info);
+        const md_property = getMdProperty(info.coordinate, info.object);
         const log_property = getLogProperty(
-            this.props.data?.["features"] as Feature[],
-            info,
+            info.coordinate,
+            (this.props.data as FeatureCollection).features,
+            info.object,
             this.props.logrunName,
             this.props.logName
         );
@@ -201,12 +200,12 @@ WellsLayer.defaultProps = defaultProps;
 
 //================= Local help functions. ==================
 
-function transpose(a) {
-    return Object.keys(a[0]).map(function (c) {
-        return a.map(function (r) {
-            return r[c];
-        });
-    });
+function getColumn<D>(data: D[][], col: number): D[] {
+    const column = [];
+    for (let i = 0; i < data.length; i++) {
+        column.push(data[i][col]);
+    }
+    return column;
 }
 
 function getLogMd(d: LogCurveDataType, logrun_name: string): number[] {
@@ -214,7 +213,7 @@ function getLogMd(d: LogCurveDataType, logrun_name: string): number[] {
 
     const names_md = ["DEPTH", "DEPT", "MD", "TDEP"]; // aliases for MD
     const log_id = getLogIndexByNames(d, names_md);
-    return log_id >= 0 ? transpose(d.data)[log_id] : [];
+    return log_id >= 0 ? getColumn(d.data, log_id) : [];
 }
 
 function getLogValues(
@@ -225,7 +224,7 @@ function getLogValues(
     if (!isSelectedLogRun(d, logrun_name)) return [];
 
     const log_id = getLogIndexByName(d, log_name);
-    return log_id >= 0 ? transpose(d.data)[log_id] : [];
+    return log_id >= 0 ? getColumn(d.data, log_id) : [];
 }
 
 function getLogInfo(
@@ -360,18 +359,14 @@ function getLogWidth(
     return getLogValues(d, logrun_name, log_name);
 }
 
-function squared_distance(a, b): number {
+function squared_distance(a: Position, b: Position): number {
     const dx = a[0] - b[0];
     const dy = a[1] - b[1];
     return dx * dx + dy * dy;
 }
 
 // Return distance between line segment vw and point p
-function distToSegmentSquared(
-    v: Position2D,
-    w: Position2D,
-    p: Position2D
-): number {
+function distToSegmentSquared(v: Position, w: Position, p: Position): number {
     const l2 = squared_distance(v, w);
     if (l2 == 0) return squared_distance(p, v);
     let t =
@@ -383,21 +378,19 @@ function distToSegmentSquared(
     ]);
 }
 
-function getMd(pickInfo): number | null {
-    if (!pickInfo.object.properties || !pickInfo.object.geometry) return null;
+function getMd(coord: Position2D, feature: Feature): number | null {
+    if (!feature.properties || !feature.geometry) return null;
 
-    const measured_depths = pickInfo.object.properties.md[0];
-    const trajectory = pickInfo.object.geometry.geometries[1].coordinates;
+    const measured_depths = feature.properties["md"][0];
 
-    // Identify closest well path leg to pickInfo.coordinate.
+    const gc = feature.geometry as GeometryCollection;
+    const trajectory = (gc.geometries[1] as LineString).coordinates;
+
+    // Identify closest well path leg to coord.
     let min_d = Number.MAX_VALUE;
     let segment_index = 0;
     for (let i = 0; i < trajectory?.length - 1; i++) {
-        const d = distToSegmentSquared(
-            trajectory[i],
-            trajectory[i + 1],
-            pickInfo.coordinate
-        );
+        const d = distToSegmentSquared(trajectory[i], trajectory[i + 1], coord);
 
         if (d > min_d) continue;
 
@@ -422,7 +415,7 @@ function getMd(pickInfo): number | null {
     }
 
     // Calculate the scalar projection onto segment.
-    const v0 = subtract(pickInfo.coordinate, survey0);
+    const v0 = subtract(coord, survey0);
     const v1 = subtract(survey1, survey0);
 
     // scalar_projection in interval [0,1]
@@ -433,11 +426,13 @@ function getMd(pickInfo): number | null {
     return md0 * (1.0 - scalar_projection) + md1 * scalar_projection;
 }
 
-function getMdProperty(info: PickInfo<unknown>): PropertyDataType | null {
-    const md = getMd(info);
+function getMdProperty(
+    coord: Position2D,
+    feature: Feature
+): PropertyDataType | null {
+    const md = getMd(coord, feature);
     if (md != null) {
-        const prop_name =
-            "MD " + (info.object as Feature)?.properties?.["name"];
+        const prop_name = "MD " + feature.properties?.["name"];
         return { name: prop_name, value: md };
     }
     return null;
@@ -445,20 +440,17 @@ function getMdProperty(info: PickInfo<unknown>): PropertyDataType | null {
 
 // Returns segment index of discrete logs
 function getLogSegmentIndex(
+    coord: Position2D,
     wells_data: Feature[],
-    info: PickInfo<unknown>,
+    log_data: LogCurveDataType,
     logrun_name: string
 ): number {
-    const trajectory = getLogPath(
-        wells_data,
-        info.object as LogCurveDataType,
-        logrun_name
-    );
+    const trajectory = getLogPath(wells_data, log_data, logrun_name);
 
     let min_d = Number.MAX_VALUE;
     let segment_index = 0;
     for (let i = 0; i < trajectory?.length; i++) {
-        const d = squared_distance(trajectory[i], info.coordinate);
+        const d = squared_distance(trajectory[i], coord);
         if (d > min_d) continue;
 
         segment_index = i;
@@ -468,31 +460,36 @@ function getLogSegmentIndex(
 }
 
 function getLogProperty(
+    coord: Position2D,
     wells_data: Feature[],
-    info: PickInfo<unknown>,
+    log_data: LogCurveDataType,
     logrun_name: string,
     log_name: string
 ): PropertyDataType | null {
-    const info_object = info.object as LogCurveDataType;
-    if (!info_object?.data) return null;
+    if (!log_data.data) return null;
 
-    const segment_index = getLogSegmentIndex(wells_data, info, logrun_name);
+    const segment_index = getLogSegmentIndex(
+        coord,
+        wells_data,
+        log_data,
+        logrun_name
+    );
     let log_value: number | string = getLogValues(
-        info_object,
+        log_data,
         logrun_name,
         log_name
     )[segment_index];
 
     let dl_attrs: [string, [RGBAColor, number]] | undefined = undefined;
-    const dl_metadata = getDiscreteLogMetadata(info_object, log_name)?.objects;
+    const dl_metadata = getDiscreteLogMetadata(log_data, log_name)?.objects;
     if (dl_metadata) {
         dl_attrs = Object.entries(dl_metadata).find(
             ([, value]) => value[1] == log_value
         );
     }
 
-    const log = getLogInfo(info_object, logrun_name, log_name)?.name;
-    const prop_name = log + " " + info_object.header.well;
+    const log = getLogInfo(log_data, logrun_name, log_name)?.name;
+    const prop_name = log + " " + log_data.header.well;
     log_value = dl_attrs ? dl_attrs[0] + " (" + log_value + ")" : log_value;
 
     if (log_value) return { name: prop_name, value: log_value };
