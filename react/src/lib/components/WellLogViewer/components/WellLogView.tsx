@@ -5,31 +5,154 @@ import {
     ScaleInterpolator,
 } from "@equinor/videx-wellog";
 
+import {
+    Track,
+    GraphTrack /*, ScaleTrack, DualScaleTrack*/,
+} from "@equinor/videx-wellog";
+
+import { ScaleTrackOptions } from "../../../../../node_modules/@equinor/videx-wellog/dist/tracks/scale/interfaces";
+import { GraphTrackOptions } from "../../../../../node_modules/@equinor/videx-wellog/dist/tracks/graph/interfaces";
+import {
+    OverlayClickEvent,
+    OverlayMouseMoveEvent,
+    OverlayMouseExitEvent,
+    OverlayRescaleEvent,
+} from "../../../../../node_modules/@equinor/videx-wellog/dist/ui/interfaces";
+
 import "./styles.scss";
 
 import { select } from "d3";
 
+import { WellLog } from "./WellLogTypes";
+import { Template } from "./WellLogTemplateTypes";
+
 import createTracks from "../utils/tracks";
 import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
-import { AxesInfo, WellLog } from "../utils/tracks";
+import { AxesInfo } from "../utils/tracks";
+import { ExtPlotOptions } from "../utils/tracks";
 
-export type Template = Record<string, any>; // JSON
+import ReactDOM from "react-dom";
 
-function addRubberbandOverlay(instance) {
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+
+interface Props1 {
+    anchorEl: HTMLElement;
+    track: Track;
+    welllog: WellLog;
+}
+interface State1 {
+    anchorEl: HTMLElement | null;
+}
+
+class SimpleMenu extends Component<Props1, State1> {
+    constructor(props: Props1) {
+        super(props);
+        this.state = { anchorEl: this.props.anchorEl };
+    }
+    componentDidUpdate(prevProps: Props1) {
+        if (this.props.anchorEl !== prevProps.anchorEl) {
+            this.setState({ anchorEl: this.props.anchorEl });
+        }
+
+        /*if (
+            this.props.welllog !== prevProps.welllog ||
+            this.props.track !== prevProps.track
+        ) {
+        }*/
+    }
+
+    handleCloseMenu(ev: MouseEvent) {
+        ev;
+        this.setState({ anchorEl: null });
+    }
+    handleClickItem(ev: MouseEvent) {
+        ev;
+        this.setState({ anchorEl: null });
+    }
+
+    createMenuItem(item: string): ReactNode {
+        //onClick = { this.handleClickItem.bind(this) }
+        return <MenuItem>{item}</MenuItem>;
+    }
+    menuItems(): ReactNode[] {
+        const nodes: ReactNode[] = [];
+        const track = this.props.track;
+        const plots = (track as GraphTrack).plots;
+        const abbr = track.options.abbr;
+
+        const welllog = this.props.welllog;
+        if (welllog && welllog[0]) {
+            const curves = welllog[0].curves;
+            let iCurve = 0;
+            for (const curve of curves) {
+                let bUsed = false;
+                if (plots) {
+                    // GraphTrack
+                    for (const plot of plots)
+                        if (plot.id == iCurve) {
+                            bUsed = true;
+                            break;
+                        }
+                } else if (abbr === curve.name) {
+                    bUsed = true;
+                }
+                if (!bUsed) nodes.push(this.createMenuItem(curve.name));
+                iCurve++;
+            }
+        }
+
+        return nodes;
+    }
+
+    render(): ReactNode {
+        return (
+            <div>
+                <Menu
+                    id="simple-menu"
+                    anchorEl={this.state.anchorEl}
+                    keepMounted
+                    open={Boolean(this.state.anchorEl)}
+                    onClose={this.handleCloseMenu.bind(this)}
+                >
+                    {this.menuItems()}
+                </Menu>
+            </div>
+        );
+    }
+}
+function localMenu(parent: HTMLElement, track: Track, welllog: WellLog) {
+    if (track) return; // not ready
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "100px";
+    el.style.height = "500px";
+    parent.appendChild(el);
+    ReactDOM.render(
+        <SimpleMenu anchorEl={el} track={track} welllog={welllog} />,
+        el
+    );
+}
+
+function addRubberbandOverlay(instance: LogViewer) {
     const rubberBandSize = 9;
     const offset = (rubberBandSize - 1) / 2;
     const rbelm = instance.overlay.create("rubber-band", {
-        onMouseMove: (event) => {
-            const { y } = event;
-            event.target.style.top = `${y - (offset + 0.5)}px`;
-            event.target.style.visibility = "visible";
+        onMouseMove: (event: OverlayMouseMoveEvent) => {
+            if (event.target) {
+                event.target.style.top = `${event.y - (offset + 0.5)}px`;
+                event.target.style.visibility = "visible";
+            }
         },
-        onMouseExit: (event) => {
-            event.target.style.visibility = "hidden";
-            if (instance.options.rubberbandExit) {
-                instance.options.rubberbandExit({
-                    source: instance,
-                });
+        onMouseExit: (event: OverlayMouseExitEvent) => {
+            if (event.target) {
+                event.target.style.visibility = "hidden";
+                /* not exists ?
+                if (instance.options.rubberbandExit) {
+                    instance.options.rubberbandExit({
+                        source: instance,
+                    });
+                }
+                */
             }
         },
     });
@@ -47,34 +170,45 @@ function addRubberbandOverlay(instance) {
         .style("top", `${offset}px`);
 }
 
-function addReadoutOverlay(instance, parent: WellLogView) {
+function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
+    parent;
     //instance.overlay.register(key: string, callbacks: OverlayCallbacks): void;
     const elm = instance.overlay.create("depth", {
-        onClick: (event) => {
-            const { target, caller, y } = event;
+        onClick: (event: OverlayClickEvent): void => {
+            const { caller, y } = event;
             const x = caller.scale.invert(y);
-            target.textContent = Number.isFinite(x)
-                ? `Pinned MD: ${x.toFixed(1)}`
-                : "-";
-            target.style.visibility = "visible";
+            if (event.target) {
+                event.target.textContent = Number.isFinite(x)
+                    ? `Pinned MD: ${x.toFixed(1)}`
+                    : "-";
+                event.target.style.visibility = "visible";
+            }
         },
-        onMouseMove: (event) => {
-            const { target, caller, y } = event;
+        onMouseMove: (event: OverlayMouseMoveEvent): void => {
+            const { caller, y } = event;
             const x = caller.scale.invert(y);
-            target.textContent = Number.isFinite(x)
-                ? `MD: ${x.toFixed(1)}`
-                : "-";
-            target.style.visibility = "visible";
+            if (event.target) {
+                event.target.textContent = Number.isFinite(x)
+                    ? `MD: ${x.toFixed(1)}`
+                    : "-";
+                event.target.style.visibility = "visible";
+            }
 
-            const x2 = caller.scaleHandler.interpolator.reverse(x);
+            const x2 = (
+                caller.scaleHandler as InterpolatedScaleHandler
+            ).interpolator.reverse(x);
             parent.onMouseMove(x, x2);
         },
-        onMouseExit: (event) => {
-            event.target.style.visibility = "hidden";
+        onMouseExit: (event: OverlayMouseExitEvent): void => {
+            if (event.target) event.target.style.visibility = "hidden";
         },
-        onRescale: (event) => {
-            event.target.style.visibility = "visible";
-            event.target.textContent = `Zoom: x${event.transform.k.toFixed(1)}`;
+        onRescale: (event: OverlayRescaleEvent): void => {
+            if (event.target && event.transform) {
+                event.target.style.visibility = "visible";
+                event.target.textContent = `Zoom: x${event.transform.k.toFixed(
+                    1
+                )}`;
+            }
         },
     });
     elm.style.visibility = "hidden";
@@ -89,17 +223,19 @@ function addReadoutOverlay(instance, parent: WellLogView) {
     elm.style.bottom = "5px";
 }
 
-function addPinnedValueOverlay(instance) {
+function addPinnedValueOverlay(instance: LogViewer) {
     const rubberBandSize = 9;
     const offset = (rubberBandSize - 1) / 2;
     const rbelm = instance.overlay.create("pinned", {
-        onClick: (event) => {
+        onClick: (event: OverlayClickEvent): void => {
             const { y } = event;
-            event.target.style.top = `${y - (offset + 0.5)}px`;
-            event.target.style.visibility = "visible";
+            if (event.target) {
+                event.target.style.top = `${y - (offset + 0.5)}px`;
+                event.target.style.visibility = "visible";
+            }
         },
-        onMouseExit: (event) => {
-            event.target.style.visibility = "hidden";
+        onMouseExit: (event: OverlayMouseExitEvent): void => {
+            if (event.target) event.target.style.visibility = "hidden";
         },
     });
 
@@ -150,11 +286,11 @@ function createScaleHandler(
     const primary2secondary = createInterpolator(primaries, secondaries);
     const secondary2primary = createInterpolator(secondaries, primaries);
 
-    const forward = (v) => {
+    const forward = (v: number): number => {
         // SecondaryAxis => PrimaryAxis
         return secondary2primary(v, false);
     };
-    const reverse = (v) => {
+    const reverse = (v: number): number => {
         // PrimaryAxis => SecondaryAxis
         return primary2secondary(v, false);
     };
@@ -184,7 +320,7 @@ function formatValue(v1: number) {
     return v;
 }
 
-function getValue(x: number, data, plot) {
+function getValue(x: number, data: [], type: string) {
     let v = "";
     if (Number.isFinite(x)) {
         const n = data.length;
@@ -198,12 +334,12 @@ function getValue(x: number, data, plot) {
                 else {
                     const rowPrev = data[i - 1];
                     if (rowPrev[0] == null || rowPrev[1] == null) break;
-                    if (plot.type === "linestep") {
+                    if (type === "linestep") {
                         v1 = row[1]; //!! not rPrev[1] !!
                     } else {
                         const d = row[0] - rowPrev[0];
                         const f = x - rowPrev[0];
-                        if (plot.type === "dot") {
+                        if (type === "dot") {
                             v1 = f < d * 0.5 ? rowPrev[1] : row[1];
                         } else {
                             // "line", "area"
@@ -239,16 +375,10 @@ function setTracksToController(
     logController.setTracks(tracks);
 }
 
-function repaintController(logController: LogViewer) {
-    const p = document.getElementsByClassName("welllogview");
-    if (p && p[0]) {
-        const logElement = p[0] as HTMLElement;
-        const oldWidth = logElement.style.width;
-        logElement.style.width = "0";
-        logController.adjustToSize(true); // force resize all elements
-        logElement.style.width = oldWidth;
-    }
-    logController.adjustToSize(true); // force resize all elements
+interface TrackEvent {
+    track: Track;
+    element: HTMLElement;
+    ev: MouseEvent;
 }
 
 export interface WellLogController {
@@ -387,6 +517,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.props.welllog,
                 this.props.template
             );
+            this.addTrackContextMenus();
         }
         this.setScroll();
         this.setInfo(); // Clear old track information
@@ -410,7 +541,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 }
                 iTrack++;
             }
-            repaintController(this.logController); //repaint log-controller
+            this.logController.updateTracks();
         }
 
         if (this.props.setScrollPos) this.props.setScrollPos(iFrom);
@@ -425,15 +556,15 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         let iPlot = 0;
         let bSeparator = false;
         for (const track of this.logController.tracks) {
-            if (isScaleTrack(track)) {
-                continue;
-            } // skip scales
-            const visible = iFrom <= iTrack && iTrack < iTo;
+            const bScaleTrack = isScaleTrack(track);
+            const visible = (iFrom <= iTrack && iTrack < iTo) || bScaleTrack;
             if (visible) {
-                const plots = track.options["plots"];
+                const plotConfigs = (track.options as GraphTrackOptions)[
+                    "plots"
+                ];
                 const datas = track.data;
 
-                if (plots) {
+                if (plotConfigs) {
                     if (!bSeparator) {
                         bSeparator = true;
                         infos.push({
@@ -443,17 +574,21 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                         });
                     }
 
-                    const nPlots = plots.length;
+                    const nPlots = plotConfigs.length;
                     for (let p = 0; p < nPlots; p++) {
-                        const plot = plots[p];
-                        const v = getValue(x, datas[p], plot);
-                        const legend = plot.options.legendInfo();
+                        const plotConfig = plotConfigs[p];
+                        const v = getValue(x, datas[p], plotConfig.type);
+                        const legend = (
+                            plotConfig.options as ExtPlotOptions
+                        ).legendInfo();
                         infos.push({
                             name: legend.label,
                             units: legend.unit,
-                            color: plot.options.color,
+                            color: plotConfig.options.color
+                                ? plotConfig.options.color
+                                : "",
                             value: v,
-                            type: plot.type,
+                            type: plotConfig.type,
                         });
                         iPlot++;
                     }
@@ -461,7 +596,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                     const _x = iPlot == 0 ? x : x2;
                     infos.push({
                         name: track.options.abbr,
-                        units: track.options["units"], // ScaleTrackOptions.units
+                        units: (track.options as ScaleTrackOptions)["units"],
                         color: iPlot == 0 ? "black" : "grey",
                         value: formatValue(_x),
                         type: "", //plot.type,
@@ -469,7 +604,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                     iPlot++;
                 }
             }
-            iTrack++;
+            if (!bScaleTrack) iTrack++;
         }
 
         this.props.setInfo(infos);
@@ -477,6 +612,75 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     onMouseMove(x: number, x2: number): void {
         this.setInfo(x, x2);
+    }
+
+    _addTrackContextMenu(
+        className: string,
+        func: (ev: TrackEvent) => void
+    ): void {
+        //track-title
+        if (!this.logController || !this.logController.container) return;
+        const elements = this.logController.container
+            .node()
+            .getElementsByClassName(className);
+        let iTrack = 0;
+        for (const element of elements) {
+            const track = this.logController.tracks[iTrack];
+            element.addEventListener("contextmenu", (ev: MouseEvent) => {
+                func({ track: track, element: element, ev: ev });
+                ev.preventDefault();
+            });
+            iTrack++;
+        }
+    }
+
+    addTrackContextMenus(): void {
+        this._addTrackContextMenu(
+            "track-title",
+            this.onTrackTitleContextMenu.bind(this)
+        );
+        this._addTrackContextMenu(
+            "track-legend",
+            this.onTrackLegendContextMenu.bind(this)
+        );
+        this._addTrackContextMenu(
+            "track-container",
+            this.onTrackContainerContextMenu.bind(this)
+        );
+    }
+    onTrackTitleContextMenu(ev: TrackEvent): void {
+        const track = ev.track;
+        let msg = "";
+
+        const plots = (track as GraphTrack).plots;
+        const abbr = track.options.abbr;
+
+        const welllog = this.props.welllog;
+        if (welllog && welllog[0]) {
+            const curves = welllog[0].curves;
+            let iCurve = 0;
+            for (const curve of curves) {
+                msg += "\r\n" + curve.name;
+                if (plots) {
+                    // GraphTrack
+                    for (const plot of plots)
+                        if (plot.id == iCurve) {
+                            msg += "   *";
+                        }
+                } else if (abbr === curve.name) {
+                    msg += "   *";
+                }
+                iCurve++;
+            }
+        }
+
+        alert("Available tracks:" + msg);
+    }
+    onTrackLegendContextMenu(ev: TrackEvent): void {
+        localMenu(ev.element, ev.track, this.props.welllog);
+    }
+    onTrackContainerContextMenu(ev: TrackEvent): void {
+        ev;
     }
 
     _posMax(): number {

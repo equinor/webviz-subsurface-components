@@ -4,8 +4,11 @@ import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
-import { Template, WellLogController } from "./components/WellLogView";
-import { getAvailableAxes, WellLog } from "./utils/tracks";
+import { WellLog } from "./components/WellLogTypes";
+import { Template } from "./components/WellLogTemplateTypes";
+import { WellLogController } from "./components/WellLogView";
+
+import { getAvailableAxes } from "./utils/tracks";
 
 const axisTitles: Record<string, string> = {
     // language dependent
@@ -68,7 +71,7 @@ class WellLogViewer extends Component<Props, State> {
         this._enableScroll();
     }
 
-    componentDidUpdate(prevProps: Props): boolean {
+    componentDidUpdate(prevProps: Props): void {
         if (
             this.props.welllog !== prevProps.welllog ||
             this.props.template !== prevProps.template
@@ -77,7 +80,8 @@ class WellLogViewer extends Component<Props, State> {
             let primaryAxis = axes[0];
             if (this.props.template && this.props.template.scale.primary) {
                 if (axes.indexOf(this.props.template.scale.primary) < 0) {
-                    if (this.props.welllog === prevProps.welllog) return false; // nothing to update
+                    if (this.props.welllog === prevProps.welllog)
+                        return /* false*/; // nothing to update
                 } else {
                     primaryAxis = this.props.template.scale.primary;
                 }
@@ -88,7 +92,6 @@ class WellLogViewer extends Component<Props, State> {
                 // will be changed by callback! infos: [],
             });
         }
-        return true;
     }
 
     setInfo(infos: Info[]): void {
@@ -100,7 +103,9 @@ class WellLogViewer extends Component<Props, State> {
         this.controller = controller;
         this._enableScroll();
     }
+
     setScrollPos(pos: number): void {
+        console.log(pos);
         this._enableScroll();
     }
 
