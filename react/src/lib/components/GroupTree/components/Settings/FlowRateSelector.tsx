@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentFlowRate } from "../../redux/actions";
 import { GroupTreeState } from "../../redux/store";
-import { FlowRates } from "../../redux/types";
+import { FlowRate, FlowRates } from "../../redux/types";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -38,7 +38,7 @@ const FlowRateSelector: React.FC = React.memo(() => {
         >
             {Object.keys(FlowRates).map((rate) => (
                 <option key={`option-${rate}`} value={rate}>
-                    {FlowRates[rate]}
+                    {FlowRates[rate as FlowRate]}
                 </option>
             ))}
         </NativeSelect>

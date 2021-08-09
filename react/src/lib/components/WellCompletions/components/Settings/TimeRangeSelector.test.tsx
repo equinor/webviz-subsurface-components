@@ -16,9 +16,7 @@ describe("test time range selector", () => {
     });
 
     it("click to dispatch redux action", async () => {
-        render(<TimeRangeSelector />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <TimeRangeSelector /> }));
         userEvent.type(screen.getByRole("slider"), "{arrowright}");
         expect(testStore.dispatch).toHaveBeenCalledTimes(2);
         expect(testStore.dispatch).toHaveBeenNthCalledWith(1, {

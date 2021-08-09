@@ -1,6 +1,6 @@
-import { Position3D, Position2D } from "@deck.gl/core/utils/positions";
+import { Position2D, Position3D } from "@deck.gl/core/utils/positions";
+import { FeatureCollection, GeometryCollection, LineString } from "geojson";
 import { cloneDeep } from "lodash";
-import { GeoJSON } from "geojson";
 
 /**
  * Given four points P0, P1, P2, P4 and a argument t in the interval [0,1].
@@ -108,21 +108,24 @@ export function CatmullRom(
  * in smoother curves with more points.
  * Assumes 3D data.
  */
-export function splineRefine(data_in: GeoJSON): GeoJSON {
+export function splineRefine(data_in: FeatureCollection): FeatureCollection {
     const data = cloneDeep(data_in);
 
-    if (data["features"] === undefined) {
-        return data;
-    }
-
-    const no_wells = data["features"].length;
+    const no_wells = data.features.length;
     for (let well_no = 0; well_no < no_wells; well_no++) {
-        const mds = data["features"][well_no].properties?.md;
+        const mds = data.features[well_no].properties?.["md"];
         if (mds === undefined) {
             continue;
         }
+        const geometryCollection = data.features[well_no]
+            .geometry as GeometryCollection;
+        const lineString = geometryCollection?.geometries[1] as LineString;
 
-        const coords = data["features"][well_no]["geometry"]["geometries"][1]["coordinates"]; // eslint-disable-line
+        if (lineString.coordinates?.length === undefined) {
+            continue;
+        }
+
+        const coords = lineString.coordinates as Position3D[];
 
         const n = coords.length;
         const ts = n > 3 ? [0.2, 0.4, 0.6, 0.8] : [];
@@ -143,7 +146,7 @@ export function splineRefine(data_in: GeoJSON): GeoJSON {
 
         const md_n = mds[0][n - 1] - mds[0][n - 2] + mds[0][n - 1];
 
-        const newCoordinates: [Position3D?] = [];
+        const newCoordinates: Position3D[] = [];
         const newMds: number[][] = [];
         newMds.push([]);
 
@@ -202,9 +205,14 @@ export function splineRefine(data_in: GeoJSON): GeoJSON {
         newCoordinates.push(coords[n - 1]);
         newMds[0].push(mds[0][n - 1]);
 
-        data["features"][well_no]["geometry"]["geometries"][1]["coordinates"] =
-            newCoordinates;
-        data["features"][well_no]["properties"]["md"] = newMds;
+        (
+            (data.features[well_no].geometry as GeometryCollection)
+                .geometries[1] as LineString
+        ).coordinates = newCoordinates;
+
+        if (data.features[well_no].properties) {
+            data.features[well_no].properties!["md"] = newMds; // eslint-disable-line
+        }
     }
 
     return data;
@@ -213,24 +221,30 @@ export function splineRefine(data_in: GeoJSON): GeoJSON {
 /**
  * Converts 3D well paths to 2D.
  */
-export function convertTo2D(data_in: GeoJSON): GeoJSON {
+export function convertTo2D(data_in: FeatureCollection): FeatureCollection {
     const data = cloneDeep(data_in);
 
-    if (data["features"] === undefined) {
-        return data;
-    }
-
-    const no_wells = data["features"].length;
+    const no_wells = data.features.length;
     for (let well_no = 0; well_no < no_wells; well_no++) {
-        const coords = data["features"][well_no]["geometry"]["geometries"][1]["coordinates"]; // eslint-disable-line
+        const geometryCollection = data.features[well_no]
+            .geometry as GeometryCollection;
+        const lineString = geometryCollection?.geometries[1] as LineString;
+
+        if (lineString.coordinates?.length === undefined) {
+            continue;
+        }
+
+        const coords = lineString.coordinates as Position3D[];
 
         // Convert to 2D.
         const coords2D: Position2D[] = coords.map((e: Position3D) => {
             return [e[0], e[1]] as Position2D;
         });
 
-        data["features"][well_no]["geometry"]["geometries"][1]["coordinates"] =
-            coords2D;
+        (
+            (data.features[well_no].geometry as GeometryCollection)
+                .geometries[1] as LineString
+        ).coordinates = coords2D;
     }
 
     return data;

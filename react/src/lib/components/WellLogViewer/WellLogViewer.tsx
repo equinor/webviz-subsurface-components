@@ -49,9 +49,9 @@ class WellLogViewer extends Component<Props, State> {
 
         const axes = getAvailableAxes(this.props.welllog, axisMnemos);
         let primaryAxis = axes[0];
-        if (this.props.template && this.props.template.scale.primary) {
-            if (axes.indexOf(this.props.template.scale.primary) >= 0)
-                primaryAxis = this.props.template.scale.primary;
+        if (this.props.template && this.props.template["scale"].primary) {
+            if (axes.indexOf(this.props.template["scale"].primary) >= 0)
+                primaryAxis = this.props.template["scale"].primary;
         }
         this.state = {
             primaryAxis: primaryAxis, //"md"
@@ -75,11 +75,11 @@ class WellLogViewer extends Component<Props, State> {
         ) {
             const axes = getAvailableAxes(this.props.welllog, axisMnemos);
             let primaryAxis = axes[0];
-            if (this.props.template && this.props.template.scale.primary) {
-                if (axes.indexOf(this.props.template.scale.primary) < 0) {
+            if (this.props.template && this.props.template["scale"].primary) {
+                if (axes.indexOf(this.props.template["scale"].primary) < 0) {
                     if (this.props.welllog === prevProps.welllog) return false; // nothing to update
                 } else {
-                    primaryAxis = this.props.template.scale.primary;
+                    primaryAxis = this.props.template["scale"].primary;
                 }
             }
             this.setState({
@@ -100,7 +100,7 @@ class WellLogViewer extends Component<Props, State> {
         this.controller = controller;
         this._enableScroll();
     }
-    setScrollPos(pos: number): void {
+    setScrollPos(_: number): void {
         this._enableScroll();
     }
 

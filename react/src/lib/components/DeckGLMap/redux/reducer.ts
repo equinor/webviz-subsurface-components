@@ -12,7 +12,7 @@ export const specSlice = createSlice({
             state,
             action: PayloadAction<[string, boolean]>
         ) => {
-            const layer = (state.layers as any[]).find(
+            const layer = (state["layers"] as any[]).find(
                 (layer) => layer.id === action.payload[0]
             );
             layer.visible = action.payload[1];
@@ -21,7 +21,7 @@ export const specSlice = createSlice({
             state,
             action: PayloadAction<[string, DrawMode]>
         ) => {
-            const layer = (state.layers as any[]).find(
+            const layer = (state["layers"] as any[]).find(
                 (layer) => layer.id === action.payload[0]
             );
             if (layer["@@type"] === "DrawingLayer")

@@ -79,7 +79,7 @@ class PlotData {
     }
 }
 
-function preparePlotData(data, iCurve, iPrimaryAxis): PlotData {
+function preparePlotData(data: any, iCurve: any, iPrimaryAxis: any): PlotData {
     const plot = new PlotData();
     let i = 0;
     for (const row of data) {
@@ -93,7 +93,7 @@ function preparePlotData(data, iCurve, iPrimaryAxis): PlotData {
     return plot;
 }
 
-function shortDescription(description) {
+function shortDescription(description: any) {
     // sometimes description contains the track number
     //"0  Depth",
     //"1  BVW:CPI:rC:0001:v1",
@@ -106,7 +106,7 @@ function shortDescription(description) {
     return description;
 }
 
-function makeTrackHeader(templateTrack) {
+function makeTrackHeader(templateTrack: any) {
     if (templateTrack.title) return templateTrack.title;
 
     const plots = templateTrack.plots;
@@ -152,7 +152,7 @@ export function getAvailableAxes(
 ): string[] {
     const result: string[] = [];
     if (welllog && welllog[0]) {
-        const curves = welllog[0].curves;
+        const curves = welllog[0]["curves"];
 
         for (const key in axisMnemos) {
             const i = indexOfElementByNames(curves, axisMnemos[key]);
@@ -163,11 +163,11 @@ export function getAvailableAxes(
     return result;
 }
 
-function isValidPlotType(plotType) {
+function isValidPlotType(plotType: any) {
     return ["line", "linestep", "dot", "area"].indexOf(plotType) >= 0;
 }
 
-function fillPlotOptions(templatePlot, styles, iPlot: number) {
+function fillPlotOptions(templatePlot: any, styles: any, iPlot: number) {
     const iStyle = indexOfElementByName(styles, templatePlot.style);
     const options =
         iStyle >= 0
@@ -177,11 +177,6 @@ function fillPlotOptions(templatePlot, styles, iPlot: number) {
         options.type = plotTypes[iPlot % plotTypes.length];
     if (!options.color) options.color = colors[iPlot % colors.length];
     return options;
-}
-
-function _dataAccessor(d: number[][]): number[] {
-    const iPlot = this as number;
-    return d[iPlot];
 }
 
 function newDualScaleTrack(
@@ -242,8 +237,8 @@ export default (
     const info = new TracksInfo();
 
     if (welllog && welllog[0]) {
-        const data = welllog[0].data;
-        const curves = welllog[0].curves;
+        const data = welllog[0]["data"];
+        const curves = welllog[0]["curves"];
 
         const iPrimaryAxis = indexOfElementByNames(
             curves,
@@ -321,7 +316,7 @@ export default (
         for (const templateTrack of tracks) {
             const plotDatas: any[][] = [];
             const plots: any[] = [];
-            for (const templatePlot of templateTrack.plots) {
+            for (const templatePlot of templateTrack["plots"]) {
                 const iCurve = indexOfElementByName(curves, templatePlot.name);
                 if (iCurve < 0) continue;
                 const curve = curves[iCurve];
@@ -343,7 +338,8 @@ export default (
                         color: options.color,
                         // for 'area'!  fill: 'red',
                         fillOpacity: 0.3, // for 'area'!
-                        dataAccessor: _dataAccessor.bind(plots.length),
+                        dataAccessor: (d: number[][]): number[] =>
+                            d[plots.length],
                         legendInfo: () => ({
                             label: curve.name,
                             unit: curve.unit ? curve.unit : "",
@@ -352,7 +348,7 @@ export default (
                 });
                 iPlot++;
             }
-            if (plots.length || templateTrack.required)
+            if (plots.length || templateTrack["required"])
                 info.tracks.push(
                     new GraphTrack(info.tracks.length, {
                         label: makeTrackHeader(templateTrack),
