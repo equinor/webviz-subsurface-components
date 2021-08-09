@@ -1,5 +1,5 @@
 import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
-import withReduxEnhancer from "addon-redux/enhancer";
+import { enhancer } from "addon-redux";
 import { rootReducer } from "./reducer";
 
 export type WellCompletionsState = ReturnType<typeof rootReducer>;
@@ -9,5 +9,5 @@ export const createReduxStore = (
     configureStore({
         reducer: rootReducer,
         preloadedState,
-        enhancers: [withReduxEnhancer],
+        enhancers: [enhancer],
     });
