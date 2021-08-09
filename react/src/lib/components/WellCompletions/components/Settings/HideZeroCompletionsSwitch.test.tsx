@@ -12,9 +12,7 @@ describe("test hide zero completions switch", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     it("click to dispatch redux action", async () => {
-        render(<HideZeroCompletionsSwitch />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <HideZeroCompletionsSwitch /> }));
         fireEvent.click(screen.getByRole("checkbox"));
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({

@@ -4,7 +4,7 @@ import { RGBAColor } from "@deck.gl/core/utils/color";
 import { Feature } from "geojson";
 
 const getColor = (d: Feature): RGBAColor => {
-    const c: RGBAColor = d?.properties?.color;
+    const c: RGBAColor = d?.properties?.["color"];
     const r = c[0] ?? 0;
     const g = c[1] ?? 0;
     const b = c[2] ?? 0;
@@ -15,7 +15,7 @@ const defaultProps = {
     pickable: true,
     filled: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    getLineColor: (d: Feature) => d?.properties?.color ?? [0, 0, 0, 255],
+    getLineColor: (d: Feature) => d?.properties?.["color"] ?? [0, 0, 0, 255],
     getFillColor: getColor,
 };
 

@@ -88,7 +88,7 @@ export default class DrawingLayer extends CompositeLayer<
         if (this.props.mode === "view" || this.props.mode === "modify") {
             const featureIndex = this.state.data.features.indexOf(info.object);
             if (featureIndex >= 0) {
-                patchLayerProps(this, {
+                patchLayerProps<FeatureCollection>(this, {
                     ...this.props,
                     selectedFeatureIndexes: [info.index],
                 } as DrawingLayerProps<FeatureCollection>);
@@ -102,7 +102,7 @@ export default class DrawingLayer extends CompositeLayer<
     _onEdit(editAction: EditAction<FeatureCollection>): void {
         switch (editAction.editType) {
             case "addFeature":
-                patchLayerProps(this, {
+                patchLayerProps<FeatureCollection>(this, {
                     ...this.props,
                     data: editAction.updatedData,
                     selectedFeatureIndexes:
@@ -110,7 +110,7 @@ export default class DrawingLayer extends CompositeLayer<
                 } as DrawingLayerProps<FeatureCollection>);
                 break;
             case "removeFeature":
-                patchLayerProps(this, {
+                patchLayerProps<FeatureCollection>(this, {
                     ...this.props,
                     data: editAction.updatedData,
                     selectedFeatureIndexes: [],
@@ -118,7 +118,7 @@ export default class DrawingLayer extends CompositeLayer<
                 break;
             case "removePosition":
             case "finishMovePosition":
-                patchLayerProps(this, {
+                patchLayerProps<FeatureCollection>(this, {
                     ...this.props,
                     data: editAction.updatedData,
                 } as DrawingLayerProps<FeatureCollection>);
@@ -150,17 +150,18 @@ export default class DrawingLayer extends CompositeLayer<
             new EditableGeoJsonLayer(
                 this.getSubLayerProps({
                     data: this.state.data,
-                    mode: MODE_MAP[this.props.mode],
+                    mode: MODE_MAP[this.props.mode as keyof typeof MODE_MAP],
                     modeConfig: {
                         viewport: this.context.viewport,
                     },
                     selectedFeatureIndexes: this.props.selectedFeatureIndexes,
                     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-                    onEdit: (editAction) => this._onEdit(editAction),
+                    onEdit: (editAction: EditAction<FeatureCollection>) =>
+                        this._onEdit(editAction),
                     _subLayerProps: {
                         geojson: {
                             autoHighlight: true,
-                            getLineColor: (feature) =>
+                            getLineColor: (feature: Feature) =>
                                 this._getLineColor(feature),
                         },
                     },

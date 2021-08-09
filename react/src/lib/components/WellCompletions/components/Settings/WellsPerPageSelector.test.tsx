@@ -14,9 +14,7 @@ describe("test number of Wells per page", () => {
     });
 
     it("click to dispatch redux action", async () => {
-        render(<WellsPerPageSelector />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <WellsPerPageSelector /> }));
         fireEvent.change(screen.getByLabelText("Wells per page"), {
             target: { value: "50" },
         });

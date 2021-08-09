@@ -15,16 +15,16 @@ import { AxesInfo, WellLog } from "../utils/tracks";
 
 export type Template = Record<string, any>; // JSON
 
-function addRubberbandOverlay(instance) {
+function addRubberbandOverlay(instance: any) {
     const rubberBandSize = 9;
     const offset = (rubberBandSize - 1) / 2;
     const rbelm = instance.overlay.create("rubber-band", {
-        onMouseMove: (event) => {
+        onMouseMove: (event: any) => {
             const { y } = event;
             event.target.style.top = `${y - (offset + 0.5)}px`;
             event.target.style.visibility = "visible";
         },
-        onMouseExit: (event) => {
+        onMouseExit: (event: any) => {
             event.target.style.visibility = "hidden";
             if (instance.options.rubberbandExit) {
                 instance.options.rubberbandExit({
@@ -47,10 +47,10 @@ function addRubberbandOverlay(instance) {
         .style("top", `${offset}px`);
 }
 
-function addReadoutOverlay(instance, parent: WellLogView) {
+function addReadoutOverlay(instance: any, parent: WellLogView) {
     //instance.overlay.register(key: string, callbacks: OverlayCallbacks): void;
     const elm = instance.overlay.create("depth", {
-        onClick: (event) => {
+        onClick: (event: any) => {
             const { target, caller, y } = event;
             const x = caller.scale.invert(y);
             target.textContent = Number.isFinite(x)
@@ -58,7 +58,7 @@ function addReadoutOverlay(instance, parent: WellLogView) {
                 : "-";
             target.style.visibility = "visible";
         },
-        onMouseMove: (event) => {
+        onMouseMove: (event: any) => {
             const { target, caller, y } = event;
             const x = caller.scale.invert(y);
             target.textContent = Number.isFinite(x)
@@ -69,10 +69,10 @@ function addReadoutOverlay(instance, parent: WellLogView) {
             const x2 = caller.scaleHandler.interpolator.reverse(x);
             parent.onMouseMove(x, x2);
         },
-        onMouseExit: (event) => {
+        onMouseExit: (event: any) => {
             event.target.style.visibility = "hidden";
         },
-        onRescale: (event) => {
+        onRescale: (event: any) => {
             event.target.style.visibility = "visible";
             event.target.textContent = `Zoom: x${event.transform.k.toFixed(1)}`;
         },
@@ -89,16 +89,16 @@ function addReadoutOverlay(instance, parent: WellLogView) {
     elm.style.bottom = "5px";
 }
 
-function addPinnedValueOverlay(instance) {
+function addPinnedValueOverlay(instance: any) {
     const rubberBandSize = 9;
     const offset = (rubberBandSize - 1) / 2;
     const rbelm = instance.overlay.create("pinned", {
-        onClick: (event) => {
+        onClick: (event: any) => {
             const { y } = event;
             event.target.style.top = `${y - (offset + 0.5)}px`;
             event.target.style.visibility = "visible";
         },
-        onMouseExit: (event) => {
+        onMouseExit: (event: any) => {
             event.target.style.visibility = "hidden";
         },
     });
@@ -150,11 +150,11 @@ function createScaleHandler(
     const primary2secondary = createInterpolator(primaries, secondaries);
     const secondary2primary = createInterpolator(secondaries, primaries);
 
-    const forward = (v) => {
+    const forward = (v: any) => {
         // SecondaryAxis => PrimaryAxis
         return secondary2primary(v, false);
     };
-    const reverse = (v) => {
+    const reverse = (v: any) => {
         // PrimaryAxis => SecondaryAxis
         return primary2secondary(v, false);
     };
@@ -184,7 +184,7 @@ function formatValue(v1: number) {
     return v;
 }
 
-function getValue(x: number, data, plot) {
+function getValue(x: number, data: any, plot: any) {
     let v = "";
     if (Number.isFinite(x)) {
         const n = data.length;
@@ -229,8 +229,8 @@ function setTracksToController(
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
         axes,
-        template.tracks,
-        template.styles
+        template["tracks"],
+        template["styles"]
     );
     logController.reset();
     const scaleHandler = createScaleHandler(primaries, secondaries);
@@ -372,8 +372,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 primaryAxis: this.props.primaryAxis,
                 secondaryAxis:
                     this.props.template &&
-                    this.props.template.scale &&
-                    this.props.template.scale.allowSecondary
+                    this.props.template["scale"] &&
+                    this.props.template["scale"].allowSecondary
                         ? this.props.primaryAxis == "md"
                             ? "tvd"
                             : "md"
@@ -430,7 +430,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             } // skip scales
             const visible = iFrom <= iTrack && iTrack < iTo;
             if (visible) {
-                const plots = track.options["plots"];
+                const plots = (track.options as any)["plots"];
                 const datas = track.data;
 
                 if (plots) {
@@ -461,7 +461,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                     const _x = iPlot == 0 ? x : x2;
                     infos.push({
                         name: track.options.abbr,
-                        units: track.options["units"], // ScaleTrackOptions.units
+                        units: (track.options as any)["units"], // ScaleTrackOptions.units
                         color: iPlot == 0 ? "black" : "grey",
                         value: formatValue(_x),
                         type: "", //plot.type,
