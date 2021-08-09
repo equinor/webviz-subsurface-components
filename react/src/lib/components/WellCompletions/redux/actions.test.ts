@@ -18,8 +18,7 @@ import {
 } from "./actions";
 import { SortDirection } from "./types";
 
-const middlewares = [];
-const mockStore = configureStore(middlewares);
+const mockStore = configureStore([]);
 describe("test actions", () => {
     it("test updateId", () => {
         const store = mockStore(testState);

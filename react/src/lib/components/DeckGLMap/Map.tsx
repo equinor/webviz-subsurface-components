@@ -100,7 +100,8 @@ const Map: React.FC<MapProps> = ({
                         if ((info as WellsPickInfo)?.logName) {
                             return (info as WellsPickInfo)?.logName;
                         } else {
-                            return (info.object as Feature)?.properties?.name;
+                            const feat = info.object as Feature;
+                            return feat?.properties?.["name"];
                         }
                     }}
                     ref={refCb}

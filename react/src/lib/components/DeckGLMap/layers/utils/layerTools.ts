@@ -12,8 +12,9 @@ export interface LayerPickInfo extends PickInfo<unknown> {
 }
 
 export function patchLayerProps<
-    L extends Layer<unknown, P>,
-    P extends LayerProps<unknown>
+    D,
+    P extends LayerProps<D> = LayerProps<D>,
+    L extends Layer<D, P> = Layer<D, P>
 >(layer: L, newProps: P): void {
     const layerPath = "/layers/[" + layer.id + "]";
     const patch = jsonpatch.compare(layer.props, newProps);

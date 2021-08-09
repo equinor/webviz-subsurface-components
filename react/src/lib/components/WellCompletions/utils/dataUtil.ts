@@ -118,6 +118,8 @@ export const createAttributePredicate = (
                         return well.attributes[key] === +value;
                     case "boolean":
                         return well.attributes[key] === (value == "true");
+                    default:
+                        return false;
                 }
             });
     });

@@ -40,7 +40,11 @@ export const findSelectedZones = (
 ): string[] => {
     const selectedNodeNames = new Set(selectedNodes.map((node) => node.label));
     const result: Zone[] = [];
-    const searchZone = (zone, selectedNodeNames, result) => {
+    const searchZone = (
+        zone: Zone,
+        selectedNodeNames: Set<string>,
+        result: Zone[]
+    ) => {
         if (selectedNodeNames.has("All") || selectedNodeNames.has(zone.name))
             findSubzones(zone, result);
         else if (zone.subzones)
