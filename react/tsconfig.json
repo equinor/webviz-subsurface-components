@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "./dist/", // path to output directory
+        "declaration": true,
         "sourceMap": true, // allow sourcemap support
         "strict": true, // enable all of the strict mode family of options
         "noImplicitReturns": true,
@@ -18,5 +19,5 @@
         "allowJs": true, // allow a partial TypeScript and JavaScript codebase
         "skipLibCheck": true // don't do typechecking on the node modules
     },
-    "include": ["./src/", "src/custom.d.ts"]
+    "include": ["./src/lib", "./src/custom.d.ts"]
 }
