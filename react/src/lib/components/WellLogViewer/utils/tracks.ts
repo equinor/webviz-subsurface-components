@@ -1,14 +1,47 @@
+/* eslint-disable */
+
 import {
     Track,
     ScaleTrack,
     DualScaleTrack,
     GraphTrack,
 } from "@equinor/videx-wellog";
+
+
+
+//import { Plot } from "@equinor/videx-wellog";
+
+//import { PlotOptions } from "../../../../../node_modules/@equinor/videx-wellog/plots/interfaces"
+import { AreaPlotOptions } from "../../../../../node_modules/@equinor/videx-wellog/dist/plots/interfaces"
+
+export interface ExtPlotOptions extends AreaPlotOptions {
+    legendInfo: () => {
+        label: string,
+        unit: string
+    };
+}
+
+import { PlotConfig } from "../../../../../node_modules/@equinor/videx-wellog/dist/tracks/graph/interfaces"
+
+
+//import { GraphTrackOptions } from "@equinor/videx-wellog";
+
 import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
+
+import {
+    TemplatePlotProps,
+    TemplateTrack,
+    TemplatePlot,
+    TemplateStyle,
+} from "../components/WellLogTemplateTypes";
+import {
+    WellLog,
+    WellLogDataRow
+} from "../components/WellLogTypes";
 
 import { checkMinMaxValue, checkMinMax, roundMinMax } from "./minmax";
 
-function indexOfElementByName(array: { name: string }[], name: string): number {
+function indexOfElementByName(array: Named[], name: string): number {
     if (name) {
         let i = 0;
         for (const element of array) {
@@ -21,10 +54,7 @@ function indexOfElementByName(array: { name: string }[], name: string): number {
     return -1;
 }
 
-function indexOfElementByNames(
-    array: { name: string }[],
-    names: string[]
-): number {
+function indexOfElementByNames(array: Named[], names: string[]): number {
     if (names) {
         let i = 0;
         for (const element of array) {
@@ -79,7 +109,11 @@ class PlotData {
     }
 }
 
-function preparePlotData(data: any, iCurve: any, iPrimaryAxis: any): PlotData {
+function preparePlotData(
+    data: WellLogDataRow[],
+    iCurve: number,
+    iPrimaryAxis: number
+): PlotData {
     const plot = new PlotData();
     let i = 0;
     for (const row of data) {
@@ -93,7 +127,7 @@ function preparePlotData(data: any, iCurve: any, iPrimaryAxis: any): PlotData {
     return plot;
 }
 
-function shortDescription(description: any) {
+function shortDescription(description: string): string {
     // sometimes description contains the track number
     //"0  Depth",
     //"1  BVW:CPI:rC:0001:v1",
@@ -106,13 +140,18 @@ function shortDescription(description: any) {
     return description;
 }
 
-function makeTrackHeader(templateTrack: any) {
+function makeTrackHeader(welllog: WellLog, templateTrack: TemplateTrack) : string {
     if (templateTrack.title) return templateTrack.title;
 
-    const plots = templateTrack.plots;
-    if (plots && plots[0]) {
+    const templatePlots = templateTrack.plots;
+    if (templatePlots && templatePlots[0]) {
+        const curves = welllog[0].curves;
         // get the first curve name
-        const curve = plots[0];
+        const templatePlot = templatePlots[0];
+        const iCurve = indexOfElementByName(curves, templatePlot.name);
+        if (iCurve < 0) // something went wrong
+            return templatePlot.name;
+        const curve = curves[iCurve];
         return curve.description
             ? shortDescription(curve.description)
             : curve.name;
@@ -144,7 +183,10 @@ class TracksInfo {
     }
 }
 
-export type WellLog = Record<string, any>[]; // JSON object from a file
+type Named = {
+    name: string;
+};
+
 
 export function getAvailableAxes(
     welllog: WellLog,
@@ -152,7 +194,7 @@ export function getAvailableAxes(
 ): string[] {
     const result: string[] = [];
     if (welllog && welllog[0]) {
-        const curves = welllog[0]["curves"];
+        const curves = welllog[0].curves;
 
         for (const key in axisMnemos) {
             const i = indexOfElementByNames(curves, axisMnemos[key]);
@@ -163,15 +205,19 @@ export function getAvailableAxes(
     return result;
 }
 
-function isValidPlotType(plotType: any) {
+function isValidPlotType(plotType: string) {
     return ["line", "linestep", "dot", "area"].indexOf(plotType) >= 0;
 }
 
-function fillPlotOptions(templatePlot: any, styles: any, iPlot: number) {
-    const iStyle = indexOfElementByName(styles, templatePlot.style);
+function fillPlotOptions(
+    templatePlot: TemplatePlot,
+    templateStyles: TemplateStyle[],
+    iPlot: number
+): TemplatePlotProps {
+    const iStyle = indexOfElementByName(templateStyles, templatePlot.style);
     const options =
         iStyle >= 0
-            ? { ...templatePlot, ...styles[iStyle] }
+            ? { ...templateStyles[iStyle], ...templatePlot }
             : { ...templatePlot };
     if (!isValidPlotType(options.type))
         options.type = plotTypes[iPlot % plotTypes.length];
@@ -179,13 +225,31 @@ function fillPlotOptions(templatePlot: any, styles: any, iPlot: number) {
     return options;
 }
 
+class __dataAccessor {
+    iPlot: number;
+
+    constructor(iPlot: number) {
+        this.iPlot = iPlot
+    }
+
+    dataAccessor(d: number[][]): number[] {
+        return d[this.iPlot];
+    }
+}
+function makeDataAccessor(iPlot: number) {
+    let _dataAccessor = new __dataAccessor(iPlot)
+    return _dataAccessor.dataAccessor.bind(_dataAccessor)
+}
+
+
+
 function newDualScaleTrack(
     id: number,
     mode: number,
     title: string,
     abbr: string,
     units: string
-) {
+): DualScaleTrack {
     return new DualScaleTrack(id, {
         mode: mode,
         maxWidth: 50,
@@ -197,7 +261,7 @@ function newDualScaleTrack(
     });
 }
 
-function newScaleTrack(id: number, title: string, abbr: string, units: string) {
+function newScaleTrack(id: number, title: string, abbr: string, units: string) : ScaleTrack {
     return new ScaleTrack(id, {
         maxWidth: 50,
         width: 2,
@@ -231,14 +295,14 @@ export interface AxesInfo {
 export default (
     welllog: WellLog,
     axes: AxesInfo,
-    tracks: Record<string, any>[], // Part of JSON
-    styles: Record<string, any>[] // Part of JSON
+    templateTracks: TemplateTrack[], // Part of JSON
+    templateStyles: TemplateStyle[] // Part of JSON
 ): TracksInfo => {
     const info = new TracksInfo();
 
     if (welllog && welllog[0]) {
-        const data = welllog[0]["data"];
-        const curves = welllog[0]["curves"];
+        const data = welllog[0].data;
+        const curves = welllog[0].curves;
 
         const iPrimaryAxis = indexOfElementByNames(
             curves,
@@ -313,10 +377,10 @@ export default (
             }
         }
         let iPlot = 0;
-        for (const templateTrack of tracks) {
-            const plotDatas: any[][] = [];
-            const plots: any[] = [];
-            for (const templatePlot of templateTrack["plots"]) {
+        for (const templateTrack of templateTracks) {
+            const plotDatas: [number, number][][] = [];
+            const plots: PlotConfig[] = [];
+            for (const templatePlot of templateTrack.plots) {
                 const iCurve = indexOfElementByName(curves, templatePlot.name);
                 if (iCurve < 0) continue;
                 const curve = curves[iCurve];
@@ -324,34 +388,39 @@ export default (
                 if (curve.dimensions !== 1) continue;
                 if (curve.valueType === "string") continue; //??
 
-                const options = fillPlotOptions(templatePlot, styles, iPlot);
+                const options = fillPlotOptions(
+                    templatePlot,
+                    templateStyles,
+                    iPlot
+                );
 
-                const plot = preparePlotData(data, iCurve, iPrimaryAxis);
-                checkMinMax(info.minmaxPrimaryAxis, plot.minmaxPrimaryAxis);
-                plotDatas.push(plot.data);
+                const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+                checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
+                plotDatas.push(plotData.data);
+                let plotOptions: ExtPlotOptions = {
+                    scale: "linear",
+                    domain: roundMinMax(plotData.minmax),
+                    color: options.color,
+                    // for 'area'!  fill: 'red',
+                    fillOpacity: 0.3, // for 'area'!
+                    dataAccessor: makeDataAccessor(plots.length),
+                    legendInfo: () => ({
+                        label: curve.name,
+                        unit: curve.unit ? curve.unit : "",
+                    }),
+                }
                 plots.push({
                     id: iCurve, // set some id
                     type: options.type,
-                    options: {
-                        scale: "linear",
-                        domain: roundMinMax(plot.minmax),
-                        color: options.color,
-                        // for 'area'!  fill: 'red',
-                        fillOpacity: 0.3, // for 'area'!
-                        dataAccessor: (d: number[][]): number[] =>
-                            d[plots.length],
-                        legendInfo: () => ({
-                            label: curve.name,
-                            unit: curve.unit ? curve.unit : "",
-                        }),
-                    },
+                    options: plotOptions
                 });
+
                 iPlot++;
             }
-            if (plots.length || templateTrack["required"])
+            if (plots.length || templateTrack.required)
                 info.tracks.push(
                     new GraphTrack(info.tracks.length, {
-                        label: makeTrackHeader(templateTrack),
+                        label: makeTrackHeader(welllog, templateTrack),
                         legendConfig: graphLegendConfig,
                         data: plotDatas,
                         plots: plots,
