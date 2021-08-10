@@ -46,7 +46,7 @@ export default class PieChartLayer extends CompositeLayer<
         }
 
         const layer = new SolidPolygonLayer<PolygonData>(
-            this.getSubLayerProps({
+            this.getSubLayerProps<PolygonData, SolidPolygonLayer<PolygonData>>({
                 data: makePies(pieData),
                 getFillColor: (d: PolygonData) => d.properties.color,
             })

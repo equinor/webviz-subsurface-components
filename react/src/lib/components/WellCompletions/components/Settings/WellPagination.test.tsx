@@ -12,9 +12,7 @@ describe("test pagination", () => {
     });
 
     it("click to dispatch redux action", async () => {
-        render(<WellPagination />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <WellPagination /> }));
         fireEvent.click(
             screen.getByRole("button", { name: "Go to next page" })
         );
@@ -25,9 +23,7 @@ describe("test pagination", () => {
         });
     });
     it("click to dispatch redux action", async () => {
-        render(<WellPagination />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <WellPagination /> }));
         fireEvent.click(screen.getByText("1"));
         expect(testStore.dispatch).toHaveBeenCalledTimes(4);
         expect(testStore.dispatch).toBeCalledWith({

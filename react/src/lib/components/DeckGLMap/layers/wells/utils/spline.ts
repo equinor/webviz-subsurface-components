@@ -1,6 +1,6 @@
-import { Position3D, Position2D } from "@deck.gl/core/utils/positions";
+import { Position2D, Position3D } from "@deck.gl/core/utils/positions";
+import { FeatureCollection, GeometryCollection, LineString } from "geojson";
 import { cloneDeep } from "lodash";
-import { GeoJSON } from "geojson";
 
 /**
  * Given four points P0, P1, P2, P4 and a argument t in the interval [0,1].
@@ -104,34 +104,31 @@ export function CatmullRom(
 }
 
 /**
- * Input: A 3D well path.
- * Returns: A new modified well path.
- *          z values will be set to zero (projecting well path to z = 0 plane).
- *          If refine is set to true it will interpolate and refine path using spline unterploation.
- *          The spline interpolation is done in 3D.
+ * Will interpolate and refine wellpaths using spline interploation resulting
+ * in smoother curves with more points.
+ * Assumes 3D data.
  */
-export function splineRefine(data_in: GeoJSON, refine: boolean): GeoJSON {
-    const ts = refine ? [0.2, 0.4, 0.6, 0.8] : [];
-
+export function splineRefine(data_in: FeatureCollection): FeatureCollection {
     const data = cloneDeep(data_in);
 
-    if (data["features"] === undefined) {
-        return data;
-    }
-
-    const no_wells = data["features"].length;
+    const no_wells = data.features.length;
     for (let well_no = 0; well_no < no_wells; well_no++) {
-        const mds = data["features"][well_no].properties?.md;
+        const mds = data.features[well_no].properties?.["md"];
         if (mds === undefined) {
             continue;
         }
+        const geometryCollection = data.features[well_no]
+            .geometry as GeometryCollection;
+        const lineString = geometryCollection?.geometries[1] as LineString;
 
-        const coords = data["features"][well_no]["geometry"]["geometries"][1]["coordinates"]; // eslint-disable-line
-
-        const n = coords.length;
-        if (n < 3) {
+        if (lineString.coordinates?.length === undefined) {
             continue;
         }
+
+        const coords = lineString.coordinates as Position3D[];
+
+        const n = coords.length;
+        const ts = n > 3 ? [0.2, 0.4, 0.6, 0.8] : [];
 
         // Point before first.
         const x0 = coords[0][0] - coords[1][0] + coords[0][0];
@@ -149,16 +146,13 @@ export function splineRefine(data_in: GeoJSON, refine: boolean): GeoJSON {
 
         const md_n = mds[0][n - 1] - mds[0][n - 2] + mds[0][n - 1];
 
-        const newCoordinates: [Position3D?] = [];
+        const newCoordinates: Position3D[] = [];
         const newMds: number[][] = [];
         newMds.push([]);
 
-        for (let i = 0; i < n - 2; i += 1) {
+        for (let i = 0; i < n - 1; i += 1) {
             let P0: Position3D, P1: Position3D, P2: Position3D, P3: Position3D;
-            let md0: number;
-            let md1: number;
-            let md2: number;
-            let md3: number;
+            let md0: number, md1: number, md2: number, md3: number;
 
             if (i === 0) {
                 P0 = P_first;
@@ -170,26 +164,26 @@ export function splineRefine(data_in: GeoJSON, refine: boolean): GeoJSON {
                 md1 = mds[0][i + 0];
                 md2 = mds[0][i + 1];
                 md3 = mds[0][i + 2];
-            } else if (i === n - 3) {
-                P0 = coords[i + 0];
-                P1 = coords[i + 1];
-                P2 = coords[i + 2];
+            } else if (i === n - 2) {
+                P0 = coords[n - 3];
+                P1 = coords[n - 2];
+                P2 = coords[n - 1];
                 P3 = P_n;
 
-                md0 = mds[0][i + 0];
-                md1 = mds[0][i + 1];
-                md2 = mds[0][i + 2];
+                md0 = mds[0][n - 3];
+                md1 = mds[0][n - 2];
+                md2 = mds[0][n - 1];
                 md3 = md_n;
             } else {
-                P0 = coords[i + 0];
-                P1 = coords[i + 1];
-                P2 = coords[i + 2];
-                P3 = coords[i + 3];
+                P0 = coords[i - 1];
+                P1 = coords[i - 0];
+                P2 = coords[i + 1];
+                P3 = coords[i + 2];
 
-                md0 = mds[0][i + 0];
-                md1 = mds[0][i + 1];
-                md2 = mds[0][i + 2];
-                md3 = mds[0][i + 3];
+                md0 = mds[0][i - 1];
+                md1 = mds[0][i - 0];
+                md2 = mds[0][i + 1];
+                md3 = mds[0][i + 2];
             }
 
             newCoordinates.push(P1);
@@ -209,16 +203,48 @@ export function splineRefine(data_in: GeoJSON, refine: boolean): GeoJSON {
         }
 
         newCoordinates.push(coords[n - 1]);
-        newMds[0].push(mds[n - 1]);
+        newMds[0].push(mds[0][n - 1]);
 
-        // Convert well path to 2D.
-        const coords2D: Position2D[] = newCoordinates.map((e: Position3D) => {
+        (
+            (data.features[well_no].geometry as GeometryCollection)
+                .geometries[1] as LineString
+        ).coordinates = newCoordinates;
+
+        if (data.features[well_no].properties) {
+            data.features[well_no].properties!["md"] = newMds; // eslint-disable-line
+        }
+    }
+
+    return data;
+}
+
+/**
+ * Converts 3D well paths to 2D.
+ */
+export function convertTo2D(data_in: FeatureCollection): FeatureCollection {
+    const data = cloneDeep(data_in);
+
+    const no_wells = data.features.length;
+    for (let well_no = 0; well_no < no_wells; well_no++) {
+        const geometryCollection = data.features[well_no]
+            .geometry as GeometryCollection;
+        const lineString = geometryCollection?.geometries[1] as LineString;
+
+        if (lineString.coordinates?.length === undefined) {
+            continue;
+        }
+
+        const coords = lineString.coordinates as Position3D[];
+
+        // Convert to 2D.
+        const coords2D: Position2D[] = coords.map((e: Position3D) => {
             return [e[0], e[1]] as Position2D;
         });
 
-        data["features"][well_no]["geometry"]["geometries"][1]["coordinates"] =
-            coords2D;
-        data["features"][well_no]["properties"]["md"] = newMds;
+        (
+            (data.features[well_no].geometry as GeometryCollection)
+                .geometries[1] as LineString
+        ).coordinates = coords2D;
     }
 
     return data;

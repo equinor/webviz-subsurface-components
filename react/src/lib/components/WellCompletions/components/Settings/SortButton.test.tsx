@@ -12,9 +12,7 @@ describe("Test view menu", () => {
     });
 
     it("click to display pop-over menu", async () => {
-        render(<SortButton />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <SortButton /> }));
         fireEvent.click(
             screen.getByRole("menuitem", { name: "Sort/Group by Attributes" })
         );
@@ -22,9 +20,7 @@ describe("Test view menu", () => {
     });
 
     it("click OK to sort", async () => {
-        render(<SortButton />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <SortButton /> }));
         fireEvent.click(
             screen.getByRole("menuitem", { name: "Sort/Group by Attributes" })
         );

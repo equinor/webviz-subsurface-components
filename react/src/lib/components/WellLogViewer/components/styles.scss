@@ -1,0 +1,17 @@
+// These are important to properly display the examples
+@import '@equinor/videx-wellog/dist/styles/log-styles.scss';
+//@import '@equinor/videx-wellog/dist/styles/loader-styles.scss';
+@import '@equinor/videx-wellog/dist/styles/scale-styles.scss';
+
+
+.welllogview { // log-controller
+  height: 100%;
+  .track {
+    .track-title {
+      background-color: #ccc;
+      font-weight: normal;
+      color: black;
+      font-family: inherit;
+    }
+  }
+}

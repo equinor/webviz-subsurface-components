@@ -17,6 +17,7 @@ import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import WellCompletionsDemo from "./WellCompletionsDemo";
 import VectorSelectorDemo from "./VectorSelectorDemo";
+import WellLogViewerDemo from "./WellLogViewerDemo";
 
 class App extends Component {
     constructor(props) {
@@ -60,6 +61,9 @@ class App extends Component {
             case "VectorSelector": {
                 return <VectorSelectorDemo />;
             }
+            case "WellLogViewer": {
+                return <WellLogViewerDemo />;
+            }
             default: {
                 return null;
             }
@@ -85,6 +89,7 @@ class App extends Component {
                     </option>
                     <option value="WellCompletions">WellCompletions</option>
                     <option value="VectorSelector">VectorSelector</option>
+                    <option value="WellLogViewer">WellLogViewer</option>
                 </select>
                 {this.renderDemo()}
             </div>

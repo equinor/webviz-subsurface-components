@@ -1,0 +1,173 @@
+{
+  "name": "Template 1",
+  "scale": {
+    "primary": "md",
+    "allowSecondary": true
+  },
+  "tracks": [
+    {
+      "title": "Multiple",
+      "plots": [
+        {
+          "name": "BDIA"
+        },
+        {
+          "name": "ROPA"
+        },
+        {
+          "name": "HKLA",
+          "style": "HKL"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "HKLX",
+          "style": "HKL"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "WOBA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "DD_VOLUME"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "TEMP",
+          "type": "linestep"
+        }
+      ]
+    },
+    {
+      "required": true,
+      "plots": [
+        {
+          "name": "TQA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "BITSIZE"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "GRSIM"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "RACESHM"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "SW"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MFOA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MFIA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MDOA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MDIA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MTOA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MTIA"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "ECDT"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "BDTI"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "BDDI"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "BRVC"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "TCTI"
+        }
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "name": "HKL",
+      "type": "area"
+    }
+  ]
+}

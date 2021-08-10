@@ -132,7 +132,6 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
             topObject.coordinate === undefined ||
             topObject.coordinate.length < 2
         ) {
-            setInfoCardData(null);
             return;
         }
 
@@ -148,12 +147,19 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
 
         props.pickInfos.forEach((info) => {
             const layer_props = (info as LayerPickInfo)?.property;
-            const data = infoCardData.find(
+            const parent = infoCardData.find(
                 (item) => item.layerName === info.layer?.id
             );
             if (layer_props) {
-                if (data) {
-                    data.properties.push(layer_props);
+                if (parent) {
+                    const property = parent.properties.find(
+                        (item) => item.name === layer_props.name
+                    );
+                    if (property) {
+                        property.value = layer_props.value;
+                    } else {
+                        parent.properties.push(layer_props);
+                    }
                 } else {
                     infoCardData.push({
                         layerName: info.layer?.id || "unknown-layer",
@@ -164,7 +170,14 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
 
             const zValue = (info as PropertyMapPickInfo).propertyValue;
             if (zValue) {
-                xy_properties.push({ name: info.layer.id, value: zValue });
+                const property = xy_properties.find(
+                    (item) => item.name === info.layer.id
+                );
+                if (property) {
+                    property.value = zValue;
+                } else {
+                    xy_properties.push({ name: info.layer.id, value: zValue });
+                }
             }
         });
 

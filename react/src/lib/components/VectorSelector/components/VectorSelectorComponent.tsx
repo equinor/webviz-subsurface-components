@@ -183,7 +183,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
         treeData: TreeDataNode[],
         numMetaNodes: number
     ): TreeDataNode[] {
-        const typeIcons = {
+        const typeIcons: Record<string, string> = {
             aquifer: aquifer,
             block: block,
             field: field,
@@ -203,11 +203,12 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
         ) => {
             const newData: TreeDataNode[] = [];
             if (level === numMetaNodes && data) {
-                const types = {};
+                const types: Record<string, Array<TreeDataNode>> = {};
                 for (let i = 0; i < data.length; i++) {
                     let type = "others";
                     if (data[i].name in VectorData) {
-                        type = VectorData[data[i].name].type;
+                        const asKey = data[i].name as keyof typeof VectorData;
+                        type = VectorData[asKey].type;
                     }
                     if (!(type in types)) {
                         types[type] = [];

@@ -4,7 +4,7 @@ import {
     // eslint-disable-next-line prettier/prettier
     getDefaultMiddleware
 } from "@reduxjs/toolkit";
-import withReduxEnhancer from "addon-redux/enhancer";
+import { enhancer } from "addon-redux";
 import { Operation } from "fast-json-patch";
 import { patchMiddleware } from "./middleware";
 import { rootReducer } from "./reducer";
@@ -19,7 +19,7 @@ export const createStore: (
 ) =>
     configureStore({
         reducer: rootReducer,
-        enhancers: [withReduxEnhancer],
+        enhancers: [enhancer],
         preloadedState: { spec: initialState },
         middleware: [patchMiddleware(setSpecPatch), ...getDefaultMiddleware()],
     });
