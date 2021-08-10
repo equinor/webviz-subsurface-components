@@ -11,9 +11,7 @@ describe("test 'layers' button", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     xit("click to dispatch redux action", async () => {
-        render(<LayersButton />, {
-            wrapper: Wrapper,
-        });
+        render(<LayersButton />);
         userEvent.hover(screen.getByLabelText("layers-selector-button"));
         expect(await screen.findByText("Layers")).toBeInTheDocument();
 

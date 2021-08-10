@@ -24,10 +24,7 @@ describe("test layers settings button", () => {
             <LayerSettingsButton
                 layerId="colormap-layer"
                 layerType="ColormapLayer"
-            />,
-            {
-                wrapper: Wrapper,
-            }
+            />
         );
         userEvent.click(screen.getByRole("button"));
         expect(screen.getByText(/draw mode/i)).toBeVisible();

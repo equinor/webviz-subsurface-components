@@ -10,8 +10,6 @@ describe("test settings component", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     it("test hide layers settings button", () => {
-        render(<Settings />, {
-            wrapper: Wrapper,
-        });
+        render(Wrapper({ children: <Settings /> }));
     });
 });

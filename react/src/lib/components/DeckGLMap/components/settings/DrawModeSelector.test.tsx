@@ -13,9 +13,7 @@ describe("Test draw-mode menu", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     xit("select option to dispatch redux action", async () => {
-        render(<DrawModeSelector layerId="colormap-layer" />, {
-            wrapper: Wrapper,
-        });
+        render(<DrawModeSelector layerId="colormap-layer" />);
         expect(screen.getByLabelText(/draw mode/i)).toBeVisible();
         expect(
             screen.getByRole("combobox", { name: /draw mode/i })
