@@ -17,7 +17,7 @@ import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 import { registerLoaders } from "@loaders.gl/core";
 import GL from "@luma.gl/constants";
 
-import * as CustomLayers from "./layers";
+import * as CustomLayers from "../layers";
 
 // Note: deck already registers JSONLoader...
 registerLoaders([]);

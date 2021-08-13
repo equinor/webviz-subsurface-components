@@ -1,5 +1,6 @@
 # Dash built code
 
+react/webviz_subsurface_components/**/*
 webviz_subsurface_components/**/*
 !webviz_subsurface_components/__init__.py
 

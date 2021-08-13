@@ -6,12 +6,12 @@ import { Operation } from "fast-json-patch";
 import { Feature } from "geojson";
 import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
-import Settings from "./components/settings/Settings";
-import JSON_CONVERTER_CONFIG from "./configuration";
-import { setSpec } from "./redux/actions";
-import { createStore } from "./redux/store";
-import { WellsPickInfo } from "./layers/wells/wellsLayer";
-import InfoCard from "./components/InfoCard";
+import Settings from "./settings/Settings";
+import JSON_CONVERTER_CONFIG from "../utils/configuration";
+import { setSpec } from "../redux/actions";
+import { createStore } from "../redux/store";
+import { WellsPickInfo } from "../layers/wells/wellsLayer";
+import InfoCard from "./InfoCard";
 
 export interface MapProps {
     id: string;
