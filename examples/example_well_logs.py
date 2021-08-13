@@ -20,7 +20,6 @@ with open("./react/src/demo/example-data/welllog_template_1.json", "r") as json_
 app = dash.Dash(__name__)
 
 app.layout = html.Div(
-    style={"height": "600px"},
     children=[
         webviz_subsurface_components.WellLogViewer(
             id="well_completions", welllog=logs, template=template
