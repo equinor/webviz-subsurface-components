@@ -108,6 +108,7 @@ class WellLogViewerDemo extends Component {
                     </div>
                     <div style={{ width: "80%", flex: 1 }}>
                         <WellLogViewer
+                            id="WellLogViewer"
                             welllog={this.getData(this.state.example)}
                             template={JSON.parse(this.state.text)}
                         />

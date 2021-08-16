@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
-import Context from "../../../context";
+import Context from "../../../utils/context";
 
 import L from "leaflet";
 
