@@ -9,8 +9,11 @@
         "url": "https://github.com/equinor/webviz-subsurface-components/issues"
     },
     "homepage": "https://github.com/equinor/webviz-subsurface-components",
-    "main": "build/index.js",
-    "types": "index.d.ts",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist/**/*"
+    ],
     "scripts": {
         "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
         "copy-package-json": "copyfiles ./package.json ../webviz_subsurface_components/",
@@ -32,7 +35,11 @@
         "test": "jest --coverage",
         "test:watch": "npm test -- --watch",
         "build:npm": "rimraf dist && tsc --declaration && npm run copy-files",
-        "copy-files": "copyfiles package.json dist && copyfiles --up 1 ../README.md dist && copyfiles --up 2 src/lib/**/*.css src/lib/**/*.glsl src/lib/**/*.svg src/lib/inputSchema/*.json dist/"
+        "copy-files": "copyfiles package.json dist && copyfiles --up 1 ../README.md dist && copyfiles --up 2 src/lib/**/*.css src/lib/**/*.glsl src/lib/**/*.svg src/lib/inputSchema/*.json dist/",
+        "prepare": "npm run build:npm",
+        "postpack": "npm run tidy-up",
+        "prepublishOnly": "npm test && npm run lint",
+        "preversion": "npm run lint"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
