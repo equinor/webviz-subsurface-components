@@ -142,6 +142,10 @@ if __name__ == "__main__":
         "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/"
         "master/react/src/demo/example-data/volve_wells.json"
     )
+    LOGS = (
+        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/"
+        "master/react/src/demo/example-data/volve_logs.json"
+    )
 
     bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
     width = bounds[2] - bounds[0]  # right - left
@@ -151,7 +155,6 @@ if __name__ == "__main__":
         id="deckgl-map",
         resources={
             "propertyMap": map_data,
-            "wells": WELLS,
         },
         deckglSpecBase={
             "initialViewState": {
@@ -185,11 +188,17 @@ if __name__ == "__main__":
                 {
                     "@@type": "WellsLayer",
                     "id": "wells-layer",
-                    "data": "@@#resources.wells",
+                    "data": WELLS,
+                    "logData": LOGS,
                     "opacity": 1.0,
                     "lineWidthScale": 5,
                     "pointRadiusScale": 8,
                     "outline": True,
+                    "logRadius": 6,
+                    "logrunName": "BLOCKING",
+                    "logName": "ZONELOG",
+                    "logCurves": True,
+                    "refine": True,
                 },
             ],
             "views": [

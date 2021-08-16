@@ -1,5 +1,6 @@
 import React, { Component, ReactNode } from "react";
 
+import PropTypes from "prop-types";
 import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
@@ -45,6 +46,8 @@ interface State {
 }
 
 class WellLogViewer extends Component<Props, State> {
+    public static propTypes: Record<string, unknown>;
+
     controller?: WellLogController;
 
     constructor(props: Props) {
@@ -142,56 +145,77 @@ class WellLogViewer extends Component<Props, State> {
         return (
             <div>
                 <table style={{ height: "100%", width: "100%" }}>
-                    <tr>
-                        <td>
-                            <WellLogView
-                                welllog={this.props.welllog}
-                                template={this.props.template}
-                                primaryAxis={this.state.primaryAxis}
-                                axisTitles={axisTitles}
-                                axisMnemos={axisMnemos}
-                                maxTrackNum={7}
-                                setInfo={this.setInfo.bind(this)}
-                                setController={this.setController.bind(this)}
-                                setScrollPos={this.setScrollPos.bind(this)}
-                            />{" "}
-                            {/*scroll={this.state.scroll}*/}
-                        </td>
-                        <td valign="top" style={{ width: "250px" }}>
-                            <AxisSelector
-                                header="Primary scale"
-                                axes={this.state.axes}
-                                axisLabels={axisTitles}
-                                value={this.state.primaryAxis}
-                                onChange={this.onChangePrimaryAxis.bind(this)}
-                            />
-                            <InfoPanel
-                                header="Readout"
-                                infos={this.state.infos}
-                            />
-                            <div>
-                                <br />
-                                <button
-                                    id="buttonUp"
-                                    type="button"
-                                    onClick={this.onScrollUp.bind(this)}
-                                >
-                                    {"\u25C4"}
-                                </button>
-                                <button
-                                    id="buttonDown"
-                                    type="button"
-                                    onClick={this.onScrollDown.bind(this)}
-                                >
-                                    {"\u25BA"}
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <WellLogView
+                                    welllog={this.props.welllog}
+                                    template={this.props.template}
+                                    primaryAxis={this.state.primaryAxis}
+                                    axisTitles={axisTitles}
+                                    axisMnemos={axisMnemos}
+                                    maxTrackNum={7}
+                                    setInfo={this.setInfo.bind(this)}
+                                    setController={this.setController.bind(
+                                        this
+                                    )}
+                                    setScrollPos={this.setScrollPos.bind(this)}
+                                />{" "}
+                                {/*scroll={this.state.scroll}*/}
+                            </td>
+                            <td valign="top" style={{ width: "250px" }}>
+                                <AxisSelector
+                                    header="Primary scale"
+                                    axes={this.state.axes}
+                                    axisLabels={axisTitles}
+                                    value={this.state.primaryAxis}
+                                    onChange={this.onChangePrimaryAxis.bind(
+                                        this
+                                    )}
+                                />
+                                <InfoPanel
+                                    header="Readout"
+                                    infos={this.state.infos}
+                                />
+                                <div>
+                                    <br />
+                                    <button
+                                        id="buttonUp"
+                                        type="button"
+                                        onClick={this.onScrollUp.bind(this)}
+                                    >
+                                        {"\u25C4"}
+                                    </button>
+                                    <button
+                                        id="buttonDown"
+                                        type="button"
+                                        onClick={this.onScrollDown.bind(this)}
+                                    >
+                                        {"\u25BA"}
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         );
     }
 }
+
+WellLogViewer.propTypes = {
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    id: PropTypes.string.isRequired,
+
+    // TODO: Add doc
+    welllog: PropTypes.array,
+
+    // TODO: Add doc
+    template: PropTypes.object,
+};
 
 export default WellLogViewer;

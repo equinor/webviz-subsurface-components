@@ -14,6 +14,7 @@ import Morris from "./components/Morris";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
 import VectorSelector from "./components/VectorSelector";
 import WellCompletions from "./components/WellCompletions";
+import WellLogViewer from "./components/WellLogViewer";
 
 export {
     HistoryMatch,
@@ -26,4 +27,5 @@ export {
     VectorSelector,
     WellCompletions,
     GroupTree,
+    WellLogViewer,
 };
