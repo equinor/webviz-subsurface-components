@@ -10,7 +10,7 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
 // Context
-import Context from "../../../context";
+import Context from "../../../utils/context";
 
 // Constants
 

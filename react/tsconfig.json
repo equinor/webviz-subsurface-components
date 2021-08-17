@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "baseUrl": "src",
         "outDir": "./dist/", // path to output directory
         "declaration": true,
         "sourceMap": true, // allow sourcemap support

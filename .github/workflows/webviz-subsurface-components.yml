@@ -39,7 +39,7 @@ jobs:
         # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
         run: |
           npm ci --ignore-scripts --prefix ./react
-          npm run setup_deckgl_types --prefix ./react
+          npm run setup-deckgl-types --prefix ./react
           npm run copy-package-json --prefix ./react
           pip install .[dependencies]
           pip install dash[dev]
@@ -50,7 +50,7 @@ jobs:
         run: |
           echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
           npm install --ignore-scripts @webviz/core-components@next
-          npm run setup_deckgl_types
+          npm run setup-deckgl-types
 
       - name: 🏗️ Build JavaScript part
         run: |

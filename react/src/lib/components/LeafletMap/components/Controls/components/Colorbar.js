@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
-import Context from "../../../context";
+import Context from "../../../utils/context";
 
 // Leaflet
 import L from "leaflet";

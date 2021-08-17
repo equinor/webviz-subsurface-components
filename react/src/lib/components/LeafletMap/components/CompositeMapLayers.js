@@ -6,7 +6,7 @@
 
 import { Component } from "react";
 import PropTypes from "prop-types";
-import Context from "../context";
+import Context from "../utils/context";
 
 // Leaflet
 import L from "leaflet";
