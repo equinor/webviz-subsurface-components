@@ -4,7 +4,6 @@ import { createStore } from "../redux/store";
 import { Operation } from "fast-json-patch";
 import { testState } from "../../DeckGLMap/test/testReduxState";
 
-//const exampleData = require("../../../../demo/example-data/deckgl-map.json");
 export const testStore = createStore(testState, (patch: Operation[]) => {
     patch;
 });
