@@ -1,4 +1,5 @@
-import * as exampleData from "../../../../demo/example-data/deckgl-map.json";
+// eslint-disable-next-line
+const exampleData = require("../../../../demo/example-data/deckgl-map.json")
 
 const demoData = exampleData[0].deckglSpecBase;
 
