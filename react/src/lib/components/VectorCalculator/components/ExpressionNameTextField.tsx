@@ -1,15 +1,21 @@
 import React from "react";
-import { TextField, Icon } from "@equinor/eds-core-react";
 import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
-
+import { TextField, Icon } from "@equinor/eds-core-react";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
+
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import {
-    nameOccupiedByVectors,
-    nameInExpressions,
-    parseName,
-    nameParseMessage,
+    isNameOccupiedByVectors,
+    doesNameExistInExpressionList,
+    isValidExpressionName,
+    expressionNameValidationMessage,
 } from "../utils/VectorCalculatorHelperFunctions";
+
+type ExpressionNameTextFieldVariantType =
+    | "success"
+    | "error"
+    | "warning"
+    | "default";
 
 interface ExpressionNameTextFieldProps {
     initialName: string;
@@ -29,7 +35,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     const [name, setName] = React.useState(initialName);
 
     const [textFieldVariantState, setTextFieldVariantState] =
-        React.useState<"success" | "error" | "warning" | "default">("success");
+        React.useState<ExpressionNameTextFieldVariantType>("success");
     const [textFieldHelperTextState, setTextFieldHelperTextState] =
         React.useState<string>("");
     const [textFieldIconState, setTextFieldIconState] = React.useState<
@@ -39,28 +45,28 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     Icon.add({ error_filled, thumbs_up, warning_filled });
 
     const getTextFieldVariant = React.useCallback(
-        (name: string): "success" | "error" | "warning" | "default" => {
+        (name: string): ExpressionNameTextFieldVariantType => {
             if (name === "") {
                 return "default";
             }
-            if (!parseName(name)) {
+            if (!isValidExpressionName(name)) {
                 return "error";
             }
             if (name == initialName) {
                 return "success";
             }
             if (
-                nameOccupiedByVectors(name, vectors) ||
-                nameInExpressions(name, existingExpressions)
+                isNameOccupiedByVectors(name, vectors) ||
+                doesNameExistInExpressionList(name, existingExpressions)
             ) {
                 return "warning";
             }
             return "success";
         },
         [
-            parseName,
-            nameOccupiedByVectors,
-            nameInExpressions,
+            isValidExpressionName,
+            isNameOccupiedByVectors,
+            doesNameExistInExpressionList,
             existingExpressions,
             initialName,
             vectors,
@@ -72,21 +78,21 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             if (name === "" || name === initialName) {
                 return "";
             }
-            if (!parseName(name)) {
-                return nameParseMessage(name);
+            if (!isValidExpressionName(name)) {
+                return expressionNameValidationMessage(name);
             }
-            if (nameOccupiedByVectors(name, vectors)) {
+            if (isNameOccupiedByVectors(name, vectors)) {
                 return "Name occupied by existing vector!";
             }
-            if (nameInExpressions(name, existingExpressions)) {
+            if (doesNameExistInExpressionList(name, existingExpressions)) {
                 return "Name of existing expression!";
             }
             return "";
         },
         [
-            parseName,
-            nameOccupiedByVectors,
-            nameInExpressions,
+            isValidExpressionName,
+            isNameOccupiedByVectors,
+            doesNameExistInExpressionList,
             existingExpressions,
             initialName,
             vectors,
@@ -95,24 +101,24 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
 
     const getTextFieldIcon = React.useCallback(
         (name: string): React.ReactNode | undefined => {
-            if (!parseName(name)) {
+            if (!isValidExpressionName(name)) {
                 return <Icon key="error" name="error_filled" />;
             }
             if (name === initialName) {
                 return <Icon key="thumbs" name="thumbs_up" />;
             }
             if (
-                nameOccupiedByVectors(name, vectors) ||
-                nameInExpressions(name, existingExpressions)
+                isNameOccupiedByVectors(name, vectors) ||
+                doesNameExistInExpressionList(name, existingExpressions)
             ) {
                 return <Icon key="warning" name="warning_filled" />;
             }
             return <Icon key="thumbs" name="thumbs_up" />;
         },
         [
-            parseName,
-            nameOccupiedByVectors,
-            nameInExpressions,
+            isValidExpressionName,
+            isNameOccupiedByVectors,
+            doesNameExistInExpressionList,
             existingExpressions,
             initialName,
             vectors,
@@ -136,24 +142,24 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
 
     const validateName = React.useCallback(
         (name: string): boolean => {
-            if (!parseName(name)) {
+            if (!isValidExpressionName(name)) {
                 return false;
             }
-            if (nameOccupiedByVectors(name, vectors)) {
+            if (isNameOccupiedByVectors(name, vectors)) {
                 return false;
             }
             if (name === initialName) {
                 return true;
             }
-            if (nameInExpressions(name, existingExpressions)) {
+            if (doesNameExistInExpressionList(name, existingExpressions)) {
                 return false;
             }
             return true;
         },
         [
-            parseName,
-            nameInExpressions,
-            nameOccupiedByVectors,
+            isValidExpressionName,
+            doesNameExistInExpressionList,
+            isNameOccupiedByVectors,
             existingExpressions,
             initialName,
             vectors,

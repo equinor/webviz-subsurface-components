@@ -7,18 +7,9 @@ import "./VectorCalculator.css";
 
 export const VectorCalculator = (props) => {
     return (
-        <React.StrictMode>
-            <div className={"VectorCalculator"}>
-                <VectorCalculatorComponent
-                    id={props.id}
-                    vectors={props.vectors}
-                    expressions={props.expressions}
-                    isDashControlled={props.isDashControlled}
-                    externalParseData={props.externalParseData}
-                    setProps={props.setProps}
-                />
-            </div>
-        </React.StrictMode>
+        <div className={"VectorCalculator"}>
+            <VectorCalculatorComponent {...props} />
+        </div>
     );
 };
 
@@ -60,12 +51,15 @@ VectorCalculator.propTypes = {
     ).isRequired,
 
     /**
-     * State for expression parsing in dash plugin
+     * Set True when component is utilized by Dash plugin.
+     * When controlled in Dash, the user must provide an external expression parser responsible for
+     * validation of the active mathematical expression and provide the parsing data for the
+     * externalParseData prop.
      */
     isDashControlled: PropTypes.bool,
 
     /**
-     * Data for external parsing
+     * Data for external parsing of mathematical expression
      */
     externalParseData: PropTypes.shape({
         expression: PropTypes.string.isRequired,

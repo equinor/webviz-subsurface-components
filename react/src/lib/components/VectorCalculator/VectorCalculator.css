@@ -36,16 +36,7 @@
     table-layout: fixed;
 }
 
-.VectorCalculator .ExpressionsTableNameCell {
-    display: inline-block;
-    position: relative;
-    width: 99%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.VectorCalculator .ExpressionsTableExpressionCell {
+.VectorCalculator .ExpressionsTableCell {
     display: inline-block;
     position: relative;
     width: 99%;
@@ -74,11 +65,11 @@
 }
 
 .VectorCalculator .BlinkingTableRow {
-    animation: invalid 1s;
+    animation: VectorCalculator_invalid 1s;
     animation-iteration-count: infinite;
 }
 
-@keyframes invalid {
+@keyframes VectorCalculator_invalid {
     0% {
         background-color: red;
     }

@@ -12,6 +12,7 @@ import cloneDeep from "lodash/cloneDeep";
 
 import { VariableVectorMapType } from "../utils/VectorCalculatorTypes";
 import VectorSelector from "../../VectorSelector";
+
 import "../VectorCalculator.css";
 
 interface VariablesTableProps {
@@ -33,7 +34,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
     const { vectorData } = props;
     const disabled = props.disabled || false;
 
-    const updatedProps = React.useCallback(
+    const updateProps = React.useCallback(
         (
             vectorSelectorProps: VectorSelectorParentProps,
             index: number
@@ -78,7 +79,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
                                         label=""
                                         selectedTags={row.vectorName}
                                         setProps={(props) =>
-                                            updatedProps(props, index)
+                                            updateProps(props, index)
                                         }
                                         numMetaNodes={0}
                                         maxNumSelectedNodes={1}

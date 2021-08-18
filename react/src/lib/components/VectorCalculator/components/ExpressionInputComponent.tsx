@@ -19,13 +19,10 @@ import {
 } from "../utils/VectorCalculatorTypes";
 import {
     isVariableVectorMapValid,
-    validName,
+    isExpressionNameValidAndNotOccupiedByVectors,
 } from "../utils/VectorCalculatorHelperFunctions";
-import {
-    expressionVariables,
-    expressionParseMessage,
-    validateExpression,
-} from "../utils/ExpressionParser";
+import { getExpressionParseData } from "../utils/ExpressionParser";
+
 import "../VectorCalculator.css";
 
 interface ExpressionInputComponent {
@@ -43,9 +40,13 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     props: ExpressionInputComponent
 ) => {
     const { activeExpression, expressions, externalParsing, disabled } = props;
-    const [isValidName, setIsValidName] = React.useState<boolean>(
-        validName(activeExpression.name, props.vectors)
-    );
+    const [isExpressionNameValid, setIsExpressionNameValid] =
+        React.useState<boolean>(
+            isExpressionNameValidAndNotOccupiedByVectors(
+                activeExpression.name,
+                props.vectors
+            )
+        );
     const [expressionStatus, setExpressionStatus] =
         React.useState<ExpressionStatus>(ExpressionStatus.Invalid);
     const [isValidVariableVectorMap, setIsValidVariableVectorMap] =
@@ -57,8 +58,8 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             )
         );
     const [isValid, setIsValid] = React.useState<boolean>(
-        isValidName &&
-            expressionStatus == ExpressionStatus.Valid &&
+        isExpressionNameValid &&
+            expressionStatus === ExpressionStatus.Valid &&
             isValidVariableVectorMap
     );
     const [editableExpression, setEditableExpression] =
@@ -73,11 +74,10 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         (variables: string[]): VariableVectorMapType[] => {
             const map: VariableVectorMapType[] = [];
             for (const variable of variables) {
-                const cachedElm: VariableVectorMapType | undefined =
-                    cachedVariableVectorMap.find(
-                        (elm) => elm.variableName === variable
-                    );
-                if (cachedElm === undefined) {
+                const cachedElm = cachedVariableVectorMap.find(
+                    (elm) => elm.variableName === variable
+                );
+                if (!cachedElm) {
                     map.push({ variableName: variable, vectorName: [] });
                 } else {
                     map.push(cachedElm);
@@ -88,27 +88,22 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         [cachedVariableVectorMap]
     );
 
-    const getVariableVectorMapFromExpression = React.useCallback(
+    const makeVariableVectorMapFromExpression = React.useCallback(
         (expression: ExpressionType): VariableVectorMapType[] => {
             if (expression.expression.length === 0) {
                 return [];
             }
 
-            if (!validateExpression(expression.expression)) {
+            const parseData = getExpressionParseData(expression.expression);
+            if (!parseData.isValid) {
                 return cloneDeep(editableExpression.variableVectorMap);
             }
-
-            const variables: string[] = expressionVariables(
-                expression.expression
-            );
-
-            return getVariableVectorMapFromVariables(variables);
+            return getVariableVectorMapFromVariables(parseData.variables);
         },
         [
             editableExpression,
-            expressionVariables,
+            getExpressionParseData,
             getVariableVectorMapFromVariables,
-            validateExpression,
         ]
     );
 
@@ -118,12 +113,10 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 cachedVariableVectorMap
             );
             for (const elm of newMap) {
-                const cachedElm: VariableVectorMapType | undefined =
-                    newCachedVariableVectorMap.find(
-                        (cachedElm) =>
-                            cachedElm.variableName === elm.variableName
-                    );
-                if (cachedElm === undefined) {
+                const cachedElm = newCachedVariableVectorMap.find(
+                    (cachedElm) => cachedElm.variableName === elm.variableName
+                );
+                if (!cachedElm) {
                     newCachedVariableVectorMap.push(elm);
                 } else {
                     cachedElm.vectorName = elm.vectorName;
@@ -137,14 +130,14 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
 
     React.useEffect(() => {
         setIsValid(
-            isValidName &&
-                expressionStatus == ExpressionStatus.Valid &&
+            isExpressionNameValid &&
+                expressionStatus === ExpressionStatus.Valid &&
                 isValidVariableVectorMap
         );
-    }, [isValidName, expressionStatus, isValidVariableVectorMap]);
+    }, [isExpressionNameValid, expressionStatus, isValidVariableVectorMap]);
 
     React.useEffect(() => {
-        if (props.externalParseData === undefined) {
+        if (!props.externalParseData) {
             return;
         }
 
@@ -156,7 +149,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             return;
         }
 
-        const newEditabledExpression = cloneDeep(editableExpression);
+        const newEditableExpression = cloneDeep(editableExpression);
 
         setParsingMessage(props.externalParseData.message);
         setExpressionStatus(
@@ -167,16 +160,16 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
 
         // Update variable vector map when valid expression
         if (props.externalParseData.isValid) {
-            newEditabledExpression.variableVectorMap =
+            newEditableExpression.variableVectorMap =
                 getVariableVectorMapFromVariables(
                     props.externalParseData.variables
                 );
         }
 
-        setEditableExpression(newEditabledExpression);
+        setEditableExpression(newEditableExpression);
         setIsValidVariableVectorMap(
             isVariableVectorMapValid(
-                newEditabledExpression.variableVectorMap,
+                newEditableExpression.variableVectorMap,
                 ":",
                 props.vectors
             )
@@ -196,7 +189,12 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         setEditableExpression(activeExpressionClone);
         setCachedVariableVectorMap(variableVectorMapClone);
 
-        setIsValidName(validName(activeExpressionClone.name, props.vectors));
+        setIsExpressionNameValid(
+            isExpressionNameValidAndNotOccupiedByVectors(
+                activeExpressionClone.name,
+                props.vectors
+            )
+        );
         setIsValidVariableVectorMap(
             isVariableVectorMapValid(
                 activeExpressionClone.variableVectorMap,
@@ -208,23 +206,25 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         if (externalParsing) {
             props.onExternalExpressionParsing(activeExpressionClone);
         } else {
+            const parseData = getExpressionParseData(
+                activeExpressionClone.expression
+            );
             setExpressionStatus(
-                validateExpression(activeExpressionClone.expression)
+                parseData.isValid
                     ? ExpressionStatus.Valid
                     : ExpressionStatus.Invalid
             );
-            setParsingMessage(
-                expressionParseMessage(activeExpressionClone.expression)
-            );
+            getExpressionParseData(activeExpressionClone.expression)
+                .parsingMessage;
+            setParsingMessage(parseData.parsingMessage);
         }
     }, [
         activeExpression,
         externalParsing,
         props.vectors,
         props.onExternalExpressionParsing,
-        expressionParseMessage,
-        validName,
-        validateExpression,
+        getExpressionParseData,
+        isExpressionNameValidAndNotOccupiedByVectors,
         isVariableVectorMapValid,
     ]);
 
@@ -247,7 +247,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             props.onExternalExpressionParsing(activeExpression);
         } else {
             setExpressionStatus(
-                validateExpression(activeExpression.expression)
+                getExpressionParseData(activeExpression.expression).isValid
                     ? ExpressionStatus.Valid
                     : ExpressionStatus.Invalid
             );
@@ -260,15 +260,15 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         setExpressionStatus,
         setParsingMessage,
         props.onExternalExpressionParsing,
-        validateExpression,
+        getExpressionParseData,
     ]);
 
-    const handleNameChange = (newName: string): void => {
+    const handleExpressionNameChange = (newName: string): void => {
         setEditableExpression({ ...editableExpression, name: newName });
     };
 
-    const handleValidNameChange = (isValid: boolean): void => {
-        setIsValidName(isValid);
+    const handleIsExpressionNameValidChange = (isValid: boolean): void => {
+        setIsExpressionNameValid(isValid);
     };
 
     const handleExpressionChange = React.useCallback(
@@ -286,20 +286,21 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 props.onExternalExpressionParsing(updatedExpression);
             } else {
                 const newMap =
-                    getVariableVectorMapFromExpression(updatedExpression);
+                    makeVariableVectorMapFromExpression(updatedExpression);
                 updatedExpression.variableVectorMap = newMap;
 
                 setIsValidVariableVectorMap(
                     isVariableVectorMapValid(newMap, ":", props.vectors)
                 );
+                const parseData = getExpressionParseData(
+                    updatedExpression.expression
+                );
                 setExpressionStatus(
-                    validateExpression(updatedExpression.expression)
+                    parseData.isValid
                         ? ExpressionStatus.Valid
                         : ExpressionStatus.Invalid
                 );
-                setParsingMessage(
-                    expressionParseMessage(updatedExpression.expression)
-                );
+                setParsingMessage(parseData.parsingMessage);
                 setEditableExpression(updatedExpression);
             }
         },
@@ -311,10 +312,9 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             setParsingMessage,
             setIsValidVariableVectorMap,
             isVariableVectorMapValid,
-            expressionParseMessage,
-            validateExpression,
+            getExpressionParseData,
             props.onExternalExpressionParsing,
-            getVariableVectorMapFromExpression,
+            makeVariableVectorMapFromExpression,
         ]
     );
 
@@ -364,8 +364,8 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                     existingExpressions={expressions}
                     vectors={props.vectors}
                     disabled={disabled}
-                    onNameChange={handleNameChange}
-                    onValidChange={handleValidNameChange}
+                    onNameChange={handleExpressionNameChange}
+                    onValidChange={handleIsExpressionNameValidChange}
                 />
             </Grid>
             <Grid item>

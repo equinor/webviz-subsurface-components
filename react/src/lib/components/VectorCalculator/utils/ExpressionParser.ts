@@ -7,15 +7,11 @@ const { parse } = create({
 const operatorWhitelist: string[] = ["+", "-", "*", "/", "^"];
 const functionWhitelist: string[] = ["log", "sqrt"];
 
-type ParseData = {
-    variables: string[];
-    functions: string[];
-    operators: string[];
-};
+type ParsingResult = { variables: string[] };
 
-const parseExpression = (expression: string): ParseData => {
+const parseExpression = (expression: string): ParsingResult => {
     if (expression.length <= 0) {
-        throw new Error("");
+        throw new Error("Empty expression!");
     }
 
     if (expression.match(/\s+/)) {
@@ -39,15 +35,14 @@ const parseExpression = (expression: string): ParseData => {
             case "OperatorNode":
                 node.op && operatorNodes.push(node.op);
                 break;
-            case "ConstantNode":
-                break;
-            case "ParenthesisNode":
-                break;
             case "SymbolNode":
                 node.name && symbolNodes.push(node.name);
                 break;
             case "FunctionNode":
                 node.name && functionNodes.push(node.name);
+                break;
+            case "ConstantNode":
+            case "ParenthesisNode":
                 break;
             default:
                 throw new Error(`Unsupported expression node: ${node.type}`);
@@ -70,9 +65,6 @@ const parseExpression = (expression: string): ParseData => {
     const functions = functionNodes.filter(
         (elm, idx) => functionNodes.indexOf(elm) === idx
     );
-    const operators = operatorNodes.filter(
-        (elm, idx) => operatorNodes.indexOf(elm) === idx
-    );
     const symbols = symbolNodes.filter(
         (elm, idx) => symbolNodes.indexOf(elm) === idx
     );
@@ -88,36 +80,31 @@ const parseExpression = (expression: string): ParseData => {
         );
     }
 
-    return {
-        variables: variables,
-        functions: functions,
-        operators: operators,
-    };
+    return { variables: variables };
 };
 
-export const validateExpression = (expression: string): boolean => {
-    try {
-        parseExpression(expression);
-        return true;
-    } catch (e) {
-        return false;
-    }
+export type ExpressionParsingData = {
+    isValid: boolean;
+    parsingMessage: string;
+    variables: string[];
 };
 
-export const expressionParseMessage = (expression: string): string => {
-    try {
-        parseExpression(expression);
-        return "";
-    } catch (e) {
-        return String(e.message);
-    }
-};
-
-export const expressionVariables = (expression: string): string[] => {
+export const getExpressionParseData = (
+    expression: string
+): ExpressionParsingData => {
     try {
         const variables = parseExpression(expression).variables;
-        return variables;
+        return {
+            isValid: true,
+            parsingMessage: "",
+            variables: variables,
+        };
     } catch (e) {
-        return [];
+        // Return empty message for empty expression
+        return {
+            isValid: false,
+            parsingMessage: expression.length <= 0 ? "" : String(e.message),
+            variables: [],
+        };
     }
 };

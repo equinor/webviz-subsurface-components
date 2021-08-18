@@ -13,6 +13,7 @@ import { getDetailedExpression } from "../utils/VectorCalculatorHelperFunctions"
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import { BlinkingTableRow } from "../utils/BlinkingTableRow";
 import { EnhancedTableHead } from "../utils/EnhancedTableHead";
+
 import "../VectorCalculator.css";
 
 interface ExpressionsTableProps {
@@ -21,6 +22,7 @@ interface ExpressionsTableProps {
     onExpressionsSelect: (expressions: ExpressionType[]) => void;
     onActiveExpressionSelect: (expression: ExpressionType) => void;
 }
+
 export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     props: ExpressionsTableProps
 ) => {
@@ -129,7 +131,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     );
 
     return (
-        <TableContainer className={"ExpressionsTable"} component={Paper}>
+        <TableContainer className="ExpressionsTable" component={Paper}>
             <Table stickyHeader aria-label="sticky table">
                 <EnhancedTableHead
                     numSelected={selectedExpressions.length}
@@ -165,7 +167,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                     align="left"
                                     onClick={() => handleRowClick(row)}
                                 >
-                                    <div className={"ExpressionsTableNameCell"}>
+                                    <div className={"ExpressionsTableCell"}>
                                         {row.name}
                                     </div>
                                 </TableCell>
@@ -179,11 +181,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                         title={expressionFromMap}
                                         enterDelay={1000}
                                     >
-                                        <div
-                                            className={
-                                                "ExpressionsTableExpressionCell"
-                                            }
-                                        >
+                                        <div className={"ExpressionsTableCell"}>
                                             {expressionFromMap}
                                         </div>
                                     </Tooltip>

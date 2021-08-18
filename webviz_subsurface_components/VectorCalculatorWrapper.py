@@ -47,7 +47,7 @@ class VectorCalculatorParser(Parser):
     I.e.: Configured expression parser for vector calculator
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(VectorCalculatorParser, self).__init__()
 
         self.characterBlacklist = ['"', "'"]
@@ -73,7 +73,7 @@ class VectorCalculatorWrapper(VectorCalculator):
     parser = VectorCalculatorParser()
 
     @wraps(VectorCalculator)
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super(VectorCalculatorWrapper, self).__init__(
             *args, **kwargs, isDashControlled=True
         )
@@ -99,7 +99,7 @@ class VectorCalculatorWrapper(VectorCalculator):
             parsed_expr = VectorCalculatorWrapper.parser.parse(expression)
             variables: List[str] = parsed_expr.variables()
 
-            # Whitelisit rules
+            # Whitelist rules
             mul_char_vars = [elm for elm in variables if len(elm) > 1]
             if len(mul_char_vars) > 0:
                 raise Exception(

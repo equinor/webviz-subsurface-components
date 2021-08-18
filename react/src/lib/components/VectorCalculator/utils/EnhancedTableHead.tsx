@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Checkbox, TableCell, TableHead, TableRow } from "@material-ui/core";
 
 interface EnhancedTableProps {

@@ -9,6 +9,7 @@ import { cloneDeep } from "lodash";
 import { ExpressionsTable } from "./ExpressionsTable";
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import { getAvailableName } from "../utils/VectorCalculatorHelperFunctions";
+
 import "../VectorCalculator.css";
 
 interface ExpressionsTableComponentProps {
@@ -27,7 +28,7 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
         >([]);
         const [disableDelete, setDisableDelete] =
             React.useState<boolean>(false);
-        const deleteTimer =
+        const blinkingTimer =
             React.useRef<ReturnType<typeof setTimeout> | null>(null);
         const [blinkingTableExpressions, setBlinkingTableExpressions] =
             React.useState<ExpressionType[]>([]);
@@ -37,7 +38,7 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
         React.useEffect(() => {
             // Unmount timer
             return () => {
-                deleteTimer.current && clearTimeout(deleteTimer.current);
+                blinkingTimer.current && clearTimeout(blinkingTimer.current);
             };
         }, []);
 
@@ -100,7 +101,7 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
 
             // Handle blinking in table
             setBlinkingTableExpressions(nonDeletableExpressions);
-            deleteTimer.current = setTimeout(
+            blinkingTimer.current = setTimeout(
                 () => setBlinkingTableExpressions([]),
                 3000
             );
@@ -122,7 +123,7 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
             }
         }, [
             activeExpression,
-            deleteTimer,
+            blinkingTimer,
             expressions,
             selectedExpressions,
             setActiveExpression,

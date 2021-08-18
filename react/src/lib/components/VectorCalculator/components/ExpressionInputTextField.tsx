@@ -10,6 +10,8 @@ export enum ExpressionStatus {
     Evaluating = 3,
 }
 
+type ExpressionInputTextFieldVariantType = "success" | "error" | "default";
+
 interface ExpressionInputTextFieldProps {
     expression: string;
     status: ExpressionStatus;
@@ -23,26 +25,22 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
         const { expression, status, helperText, disabled } = props;
 
         const [textFieldVariantState, setTextFieldVariantState] =
-            React.useState<"success" | "error" | "warning" | "default">(
-                "default"
-            );
+            React.useState<ExpressionInputTextFieldVariantType>("default");
         const [textFieldIconState, setTextFieldIconState] =
             React.useState<React.ReactNode | undefined>(undefined);
 
         Icon.add({ error_filled, thumbs_up });
 
-        const textFieldVariant = React.useCallback(():
-            | "error"
-            | "success"
-            | "default" => {
-            if (status === ExpressionStatus.Valid) {
-                return "success";
-            }
-            if (status === ExpressionStatus.Invalid) {
-                return "error";
-            }
-            return "default";
-        }, [status]);
+        const textFieldVariant =
+            React.useCallback((): ExpressionInputTextFieldVariantType => {
+                if (status === ExpressionStatus.Valid) {
+                    return "success";
+                }
+                if (status === ExpressionStatus.Invalid) {
+                    return "error";
+                }
+                return "default";
+            }, [status]);
 
         const textFieldIcon = React.useCallback(():
             | React.ReactNode

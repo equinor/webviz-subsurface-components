@@ -5,14 +5,14 @@ import {
 } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
 
-export const parseName = (name: string): boolean => {
+export const isValidExpressionName = (name: string): boolean => {
     const regex = new RegExp(
         /^(?=.{1,50}$)[A-Za-z]{1}([:_]?[A-Za-z0-9]+){0,}$/
     );
     return regex.test(name);
 };
 
-export const nameOccupiedByVectors = (
+export const isNameOccupiedByVectors = (
     name: string,
     vectors: TreeDataNode[]
 ): boolean => {
@@ -38,12 +38,17 @@ export const nameOccupiedByVectors = (
     return true;
 };
 
-export const validName = (name: string, vectors: TreeDataNode[]): boolean => {
-    return parseName(name) && !nameOccupiedByVectors(name, vectors);
+export const isExpressionNameValidAndNotOccupiedByVectors = (
+    name: string,
+    vectors: TreeDataNode[]
+): boolean => {
+    return (
+        isValidExpressionName(name) && !isNameOccupiedByVectors(name, vectors)
+    );
 };
 
-export const nameParseMessage = (name: string): string => {
-    if (parseName(name)) {
+export const expressionNameValidationMessage = (name: string): string => {
+    if (isValidExpressionName(name)) {
         return "";
     }
 
@@ -81,7 +86,7 @@ export const nameParseMessage = (name: string): string => {
     return 'Valid characters: a-z, A-Z, 0-9, " _ " and " : "';
 };
 
-export const nameInExpressions = (
+export const doesNameExistInExpressionList = (
     name: string,
     expressions: ExpressionType[]
 ): boolean => {
@@ -108,7 +113,7 @@ export const getAvailableName = (
 ): string => {
     let availableName = nameSuggestion;
     let n = 1;
-    while (nameInExpressions(availableName, expressions)) {
+    while (doesNameExistInExpressionList(availableName, expressions)) {
         availableName = `${nameSuggestion}_${n}`;
         ++n;
     }
@@ -128,10 +133,10 @@ export const isVariableVectorMapValid = (
             return pair.vectorName.length <= 0 ? undefined : pair.vectorName[0];
         }
     );
-    return allVectorNamesValid(vectorNames, delimiter, vectorData);
+    return areAllVectorNamesValid(vectorNames, delimiter, vectorData);
 };
 
-export const allVectorNamesValid = (
+export const areAllVectorNamesValid = (
     names: (string | undefined)[],
     delimiter: string,
     vectorData: TreeDataNode[]
