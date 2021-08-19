@@ -7,7 +7,7 @@ import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import {
     isNameOccupiedByVectors,
     doesNameExistInExpressionList,
-    isValidExpressionName,
+    isValidExpressionNameString,
     expressionNameValidationMessage,
 } from "../utils/VectorCalculatorHelperFunctions";
 
@@ -16,6 +16,12 @@ type ExpressionNameTextFieldVariantType =
     | "error"
     | "warning"
     | "default";
+
+type ExpressionNameTextFieldAnimationData = {
+    icon: React.ReactNode | undefined;
+    variant: ExpressionNameTextFieldVariantType;
+    helperText: string;
+};
 
 interface ExpressionNameTextFieldProps {
     initialName: string;
@@ -33,90 +39,54 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     const { currentName, initialName, existingExpressions, vectors, disabled } =
         props;
     const [name, setName] = React.useState(initialName);
-
-    const [textFieldVariantState, setTextFieldVariantState] =
-        React.useState<ExpressionNameTextFieldVariantType>("success");
-    const [textFieldHelperTextState, setTextFieldHelperTextState] =
-        React.useState<string>("");
-    const [textFieldIconState, setTextFieldIconState] = React.useState<
-        React.ReactNode | undefined
-    >(<Icon key="thumbs" name="thumbs_up" />);
+    const [textFieldAnimationDataState, setTextFieldAnimationDataState] =
+        React.useState<ExpressionNameTextFieldAnimationData>({
+            variant: "success",
+            icon: [],
+            helperText: "",
+        });
 
     Icon.add({ error_filled, thumbs_up, warning_filled });
 
-    const getTextFieldVariant = React.useCallback(
-        (name: string): ExpressionNameTextFieldVariantType => {
-            if (name === "") {
-                return "default";
+    const getTextFieldAnimationData = React.useCallback(
+        (name: string): ExpressionNameTextFieldAnimationData => {
+            if (!isValidExpressionNameString(name)) {
+                return {
+                    variant: "error",
+                    icon: <Icon key="error" name="error_filled" />,
+                    helperText: expressionNameValidationMessage(name),
+                };
             }
-            if (!isValidExpressionName(name)) {
-                return "error";
-            }
-            if (name == initialName) {
-                return "success";
+
+            if (
+                isNameOccupiedByVectors(name, vectors) &&
+                name !== initialName
+            ) {
+                return {
+                    variant: "warning",
+                    icon: <Icon key="warning" name="warning_filled" />,
+                    helperText: "Name occupied by existing vector!",
+                };
             }
             if (
-                isNameOccupiedByVectors(name, vectors) ||
-                doesNameExistInExpressionList(name, existingExpressions)
+                doesNameExistInExpressionList(name, existingExpressions) &&
+                name !== initialName
             ) {
-                return "warning";
+                return {
+                    variant: "warning",
+                    icon: <Icon key="warning" name="warning_filled" />,
+                    helperText: "Name of existing expression!",
+                };
             }
-            return "success";
+            return {
+                variant: "success",
+                icon: <Icon key="thumbs" name="thumbs_up" />,
+                helperText: "",
+            };
         },
         [
-            isValidExpressionName,
-            isNameOccupiedByVectors,
-            doesNameExistInExpressionList,
-            existingExpressions,
-            initialName,
-            vectors,
-        ]
-    );
-
-    const getTextFieldHelperText = React.useCallback(
-        (name: string): string => {
-            if (name === "" || name === initialName) {
-                return "";
-            }
-            if (!isValidExpressionName(name)) {
-                return expressionNameValidationMessage(name);
-            }
-            if (isNameOccupiedByVectors(name, vectors)) {
-                return "Name occupied by existing vector!";
-            }
-            if (doesNameExistInExpressionList(name, existingExpressions)) {
-                return "Name of existing expression!";
-            }
-            return "";
-        },
-        [
-            isValidExpressionName,
-            isNameOccupiedByVectors,
-            doesNameExistInExpressionList,
-            existingExpressions,
-            initialName,
-            vectors,
-        ]
-    );
-
-    const getTextFieldIcon = React.useCallback(
-        (name: string): React.ReactNode | undefined => {
-            if (!isValidExpressionName(name)) {
-                return <Icon key="error" name="error_filled" />;
-            }
-            if (name === initialName) {
-                return <Icon key="thumbs" name="thumbs_up" />;
-            }
-            if (
-                isNameOccupiedByVectors(name, vectors) ||
-                doesNameExistInExpressionList(name, existingExpressions)
-            ) {
-                return <Icon key="warning" name="warning_filled" />;
-            }
-            return <Icon key="thumbs" name="thumbs_up" />;
-        },
-        [
-            isValidExpressionName,
+            expressionNameValidationMessage,
+            isValidExpressionNameString,
             isNameOccupiedByVectors,
             doesNameExistInExpressionList,
             existingExpressions,
@@ -128,21 +98,15 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     React.useEffect(() => {
         if (currentName === initialName) {
             setName(currentName);
-            setTextFieldVariantState(getTextFieldVariant(currentName));
-            setTextFieldHelperTextState(getTextFieldHelperText(currentName));
-            setTextFieldIconState(getTextFieldIcon(currentName));
+            setTextFieldAnimationDataState(
+                getTextFieldAnimationData(currentName)
+            );
         }
-    }, [
-        currentName,
-        initialName,
-        getTextFieldVariant,
-        getTextFieldHelperText,
-        getTextFieldIcon,
-    ]);
+    }, [currentName, initialName, getTextFieldAnimationData]);
 
     const validateName = React.useCallback(
         (name: string): boolean => {
-            if (!isValidExpressionName(name)) {
+            if (!isValidExpressionNameString(name)) {
                 return false;
             }
             if (isNameOccupiedByVectors(name, vectors)) {
@@ -157,7 +121,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             return true;
         },
         [
-            isValidExpressionName,
+            isValidExpressionNameString,
             doesNameExistInExpressionList,
             isNameOccupiedByVectors,
             existingExpressions,
@@ -174,9 +138,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             const isValid = validateName(newName);
 
             setName(newName);
-            setTextFieldVariantState(getTextFieldVariant(newName));
-            setTextFieldHelperTextState(getTextFieldHelperText(newName));
-            setTextFieldIconState(getTextFieldIcon(newName));
+            setTextFieldAnimationDataState(getTextFieldAnimationData(newName));
 
             props.onNameChange(newName);
             props.onValidChange(isValid);
@@ -184,12 +146,8 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         [
             validateName,
             setName,
-            setTextFieldVariantState,
-            setTextFieldHelperTextState,
-            setTextFieldIconState,
-            getTextFieldVariant,
-            getTextFieldHelperText,
-            getTextFieldIcon,
+            setTextFieldAnimationDataState,
+            getTextFieldAnimationData,
             props.onNameChange,
             props.onValidChange,
         ]
@@ -203,9 +161,9 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 placeholder="New name"
                 onChange={handleInputChange}
                 value={name}
-                variant={textFieldVariantState}
-                inputIcon={textFieldIconState}
-                helperText={textFieldHelperTextState}
+                variant={textFieldAnimationDataState.variant}
+                inputIcon={textFieldAnimationDataState.icon}
+                helperText={textFieldAnimationDataState.helperText}
                 disabled={disabled}
             />
         </div>

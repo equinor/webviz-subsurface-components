@@ -12,6 +12,11 @@ export enum ExpressionStatus {
 
 type ExpressionInputTextFieldVariantType = "success" | "error" | "default";
 
+type ExpressionInputTextFieldAnimationData = {
+    icon: React.ReactNode | undefined;
+    variant: ExpressionInputTextFieldVariantType;
+};
+
 interface ExpressionInputTextFieldProps {
     expression: string;
     status: ExpressionStatus;
@@ -24,42 +29,38 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
     (props: ExpressionInputTextFieldProps) => {
         const { expression, status, helperText, disabled } = props;
 
-        const [textFieldVariantState, setTextFieldVariantState] =
-            React.useState<ExpressionInputTextFieldVariantType>("default");
-        const [textFieldIconState, setTextFieldIconState] =
-            React.useState<React.ReactNode | undefined>(undefined);
+        const [textFieldAnimationDataState, setTextFieldAnimationDataState] =
+            React.useState<ExpressionInputTextFieldAnimationData>({
+                variant: "default",
+                icon: [],
+            });
 
         Icon.add({ error_filled, thumbs_up });
 
-        const textFieldVariant =
-            React.useCallback((): ExpressionInputTextFieldVariantType => {
+        const textFieldAnimationData =
+            React.useCallback((): ExpressionInputTextFieldAnimationData => {
+                const animationData: ExpressionInputTextFieldAnimationData = {
+                    variant: "default",
+                    icon: [],
+                };
+                if (status === ExpressionStatus.Evaluating) {
+                    animationData.icon = <Progress.Circular />;
+                }
                 if (status === ExpressionStatus.Valid) {
-                    return "success";
+                    animationData.variant = "success";
+                    animationData.icon = <Icon key="thumbs" name="thumbs_up" />;
                 }
                 if (status === ExpressionStatus.Invalid) {
-                    return "error";
+                    animationData.variant = "error";
+                    animationData.icon = (
+                        <Icon key="error" name="error_filled" />
+                    );
                 }
-                return "default";
+                return animationData;
             }, [status]);
 
-        const textFieldIcon = React.useCallback(():
-            | React.ReactNode
-            | undefined => {
-            if (status === ExpressionStatus.Evaluating) {
-                return <Progress.Circular />;
-            }
-            if (status === ExpressionStatus.Valid) {
-                return <Icon key="thumbs" name="thumbs_up" />;
-            }
-            if (status === ExpressionStatus.Invalid) {
-                return <Icon key="error" name="error_filled" />;
-            }
-            return undefined;
-        }, [status]);
-
         React.useEffect(() => {
-            setTextFieldVariantState(textFieldVariant());
-            setTextFieldIconState(textFieldIcon());
+            setTextFieldAnimationDataState(textFieldAnimationData());
         }, [status]);
 
         const handleInputChange = (
@@ -78,8 +79,8 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
                     onChange={handleInputChange}
                     value={expression}
                     disabled={disabled}
-                    variant={textFieldVariantState}
-                    inputIcon={textFieldIconState}
+                    variant={textFieldAnimationDataState.variant}
+                    inputIcon={textFieldAnimationDataState.icon}
                     helperText={helperText}
                 ></TextField>
             </div>

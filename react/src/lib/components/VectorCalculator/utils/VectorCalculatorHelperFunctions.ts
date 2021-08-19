@@ -5,7 +5,7 @@ import {
 } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
 
-export const isValidExpressionName = (name: string): boolean => {
+export const isValidExpressionNameString = (name: string): boolean => {
     const regex = new RegExp(
         /^(?=.{1,50}$)[A-Za-z]{1}([:_]?[A-Za-z0-9]+){0,}$/
     );
@@ -43,17 +43,18 @@ export const isExpressionNameValidAndNotOccupiedByVectors = (
     vectors: TreeDataNode[]
 ): boolean => {
     return (
-        isValidExpressionName(name) && !isNameOccupiedByVectors(name, vectors)
+        isValidExpressionNameString(name) &&
+        !isNameOccupiedByVectors(name, vectors)
     );
 };
 
 export const expressionNameValidationMessage = (name: string): string => {
-    if (isValidExpressionName(name)) {
+    if (isValidExpressionNameString(name)) {
         return "";
     }
 
-    if (name.length < 0) {
-        return "Minimum 1 character!";
+    if (name.length <= 0) {
+        return "Empty name!";
     }
     if (name.length > 50) {
         return "Maximum 50 characters!";
