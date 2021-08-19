@@ -536,7 +536,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                     const elm = track.elm.parentElement; // class track
                     if (elm) {
                         const visible = iFrom <= iTrack && iTrack < iTo;
-                        elm.style.visibility = visible ? "visible" : "collapse";
+                        elm.style.display = visible ? "flex" : "none";
                     }
                 }
                 iTrack++;
