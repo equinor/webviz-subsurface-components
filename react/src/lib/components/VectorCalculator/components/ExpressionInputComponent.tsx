@@ -388,16 +388,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                     onMapChange={handleVariableVectorMapChange}
                 />
             </Grid>
-            <Grid container item spacing={4} justify="flex-start">
-                <Grid item>
-                    <Button
-                        onClick={handleSaveClick}
-                        disabled={disabled || !isValid}
-                    >
-                        <Icon key="save" name="save" />
-                        Save
-                    </Button>
-                </Grid>
+            <Grid container item spacing={2} justify="flex-end">
                 <Grid item>
                     <Button
                         onClick={handleCancelClick}
@@ -406,6 +397,15 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                     >
                         <Icon key="cancel" name="clear" />
                         Cancel
+                    </Button>
+                </Grid>
+                <Grid item>
+                    <Button
+                        onClick={handleSaveClick}
+                        disabled={disabled || !isValid}
+                    >
+                        <Icon key="save" name="save" />
+                        Save
                     </Button>
                 </Grid>
             </Grid>

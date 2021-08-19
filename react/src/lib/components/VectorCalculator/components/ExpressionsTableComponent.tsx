@@ -169,28 +169,39 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
                         )}
                     </Grid>
                 </Grid>
-                <Grid container item spacing={2} alignItems="flex-end">
-                    <Grid item>
-                        <Button onClick={handleCloneClick} variant="outlined">
-                            <Icon key="clone" name="copy" />
-                            Clone
-                        </Button>
+                <Grid container item xs={12}>
+                    <Grid container item xs={8} spacing={2}>
+                        <Grid item>
+                            <Button
+                                onClick={handleCloneClick}
+                                variant="outlined"
+                                disabled={selectedExpressions.length <= 0}
+                            >
+                                <Icon key="clone" name="copy" />
+                                Clone
+                            </Button>
+                        </Grid>
+                        <Grid item>
+                            <Button
+                                onClick={handleDeleteClick}
+                                color="danger"
+                                disabled={
+                                    disableDelete ||
+                                    selectedExpressions.length <= 0
+                                }
+                            >
+                                <Icon key="delete" name="delete_forever" />
+                                Delete
+                            </Button>
+                        </Grid>
                     </Grid>
-                    <Grid item>
-                        <Button
-                            onClick={handleDeleteClick}
-                            color="danger"
-                            disabled={disableDelete}
-                        >
-                            <Icon key="delete" name="delete_forever" />
-                            Delete
-                        </Button>
-                    </Grid>
-                    <Grid item>
-                        <Button onClick={handleNewClick}>
-                            <Icon key="new" name="add" />
-                            New
-                        </Button>
+                    <Grid container item xs={4} spacing={1} justify="flex-end">
+                        <Grid item>
+                            <Button onClick={handleNewClick}>
+                                <Icon key="new" name="add" />
+                                New
+                            </Button>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Paper>
