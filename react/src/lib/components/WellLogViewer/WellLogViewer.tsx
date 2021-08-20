@@ -143,62 +143,56 @@ class WellLogViewer extends Component<Props, State> {
 
     render(): ReactNode {
         return (
-            <div>
-                <table style={{ height: "100%", width: "100%" }}>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <WellLogView
-                                    welllog={this.props.welllog}
-                                    template={this.props.template}
-                                    primaryAxis={this.state.primaryAxis}
-                                    axisTitles={axisTitles}
-                                    axisMnemos={axisMnemos}
-                                    maxTrackNum={7}
-                                    setInfo={this.setInfo.bind(this)}
-                                    setController={this.setController.bind(
-                                        this
-                                    )}
-                                    setScrollPos={this.setScrollPos.bind(this)}
-                                />{" "}
-                                {/*scroll={this.state.scroll}*/}
-                            </td>
-                            <td valign="top" style={{ width: "250px" }}>
-                                <AxisSelector
-                                    header="Primary scale"
-                                    axes={this.state.axes}
-                                    axisLabels={axisTitles}
-                                    value={this.state.primaryAxis}
-                                    onChange={this.onChangePrimaryAxis.bind(
-                                        this
-                                    )}
-                                />
-                                <InfoPanel
-                                    header="Readout"
-                                    infos={this.state.infos}
-                                />
-                                <div>
-                                    <br />
-                                    <button
-                                        id="buttonUp"
-                                        type="button"
-                                        onClick={this.onScrollUp.bind(this)}
-                                    >
-                                        {"\u25C4"}
-                                    </button>
-                                    <button
-                                        id="buttonDown"
-                                        type="button"
-                                        onClick={this.onScrollDown.bind(this)}
-                                    >
-                                        {"\u25BA"}
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table style={{ height: "100%", width: "100%" }}>
+                <tbody>
+                    <tr>
+                        <td style={{ height: "100%" }}>
+                            <WellLogView
+                                welllog={this.props.welllog}
+                                template={this.props.template}
+                                primaryAxis={this.state.primaryAxis}
+                                axisTitles={axisTitles}
+                                axisMnemos={axisMnemos}
+                                maxTrackNum={7}
+                                setInfo={this.setInfo.bind(this)}
+                                setController={this.setController.bind(this)}
+                                setScrollPos={this.setScrollPos.bind(this)}
+                            />{" "}
+                            {/*scroll={this.state.scroll}*/}
+                        </td>
+                        <td valign="top" style={{ width: "250px" }}>
+                            <AxisSelector
+                                header="Primary scale"
+                                axes={this.state.axes}
+                                axisLabels={axisTitles}
+                                value={this.state.primaryAxis}
+                                onChange={this.onChangePrimaryAxis.bind(this)}
+                            />
+                            <InfoPanel
+                                header="Readout"
+                                infos={this.state.infos}
+                            />
+                            <div>
+                                <br />
+                                <button
+                                    id="buttonUp"
+                                    type="button"
+                                    onClick={this.onScrollUp.bind(this)}
+                                >
+                                    {"\u25C4"}
+                                </button>
+                                <button
+                                    id="buttonDown"
+                                    type="button"
+                                    onClick={this.onScrollDown.bind(this)}
+                                >
+                                    {"\u25BA"}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         );
     }
 }
