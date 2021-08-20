@@ -18,6 +18,7 @@ import {
     VariableVectorMapType,
 } from "../utils/VectorCalculatorTypes";
 import {
+    areVariableVectorMapsEqual,
     isVariableVectorMapValid,
     isExpressionNameValidAndNotOccupiedByVectors,
 } from "../utils/VectorCalculatorHelperFunctions";
@@ -62,6 +63,9 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             expressionStatus === ExpressionStatus.Valid &&
             isValidVariableVectorMap
     );
+    const [isExpressionEdited, setIsExpressionEdited] =
+        React.useState<boolean>(false);
+
     const [editableExpression, setEditableExpression] =
         React.useState<ExpressionType>(activeExpression);
     const [cachedVariableVectorMap, setCachedVariableVectorMap] =
@@ -135,6 +139,21 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 isValidVariableVectorMap
         );
     }, [isExpressionNameValid, expressionStatus, isValidVariableVectorMap]);
+
+    React.useEffect(() => {
+        const isNameEdited = activeExpression.name !== editableExpression.name;
+        const isExpressionEdited =
+            activeExpression.expression !== editableExpression.expression;
+        const isVariableVectorMapEdited = !areVariableVectorMapsEqual(
+            activeExpression.variableVectorMap,
+            editableExpression.variableVectorMap
+        );
+        const isEdited =
+            activeExpression.id === editableExpression.id &&
+            (isNameEdited || isExpressionEdited || isVariableVectorMapEdited);
+
+        setIsExpressionEdited(isEdited);
+    }, [editableExpression]);
 
     React.useEffect(() => {
         if (!props.externalParseData) {
@@ -392,7 +411,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 <Grid item>
                     <Button
                         onClick={handleCancelClick}
-                        disabled={disabled}
+                        disabled={disabled || !isExpressionEdited}
                         variant="outlined"
                     >
                         <Icon key="cancel" name="clear" />
@@ -402,7 +421,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 <Grid item>
                     <Button
                         onClick={handleSaveClick}
-                        disabled={disabled || !isValid}
+                        disabled={disabled || !isValid || !isExpressionEdited}
                     >
                         <Icon key="save" name="save" />
                         Save

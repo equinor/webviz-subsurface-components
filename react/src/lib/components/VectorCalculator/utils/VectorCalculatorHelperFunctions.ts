@@ -137,6 +137,25 @@ export const isVariableVectorMapValid = (
     return areAllVectorNamesValid(vectorNames, delimiter, vectorData);
 };
 
+export const areVariableVectorMapsEqual = (
+    first: VariableVectorMapType[],
+    second: VariableVectorMapType[]
+): boolean => {
+    if (first.length !== second.length) {
+        return false;
+    }
+
+    // Compare if the element matches in the same index
+    const res = first.every((elm, idx) => {
+        return (
+            elm.variableName === second[idx].variableName &&
+            elm.vectorName[0] === second[idx].vectorName[0]
+        );
+    });
+
+    return res;
+};
+
 export const areAllVectorNamesValid = (
     names: (string | undefined)[],
     delimiter: string,
