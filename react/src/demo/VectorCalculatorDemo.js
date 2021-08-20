@@ -34,20 +34,6 @@ class VectorCalculatorDemo extends Component {
                 ],
             },
             {
-                name: "Test",
-                description: "Test Vector",
-                children: [
-                    {
-                        name: "1",
-                        children: [{ name: "1_1" }, { name: "1_2" }],
-                    },
-                    {
-                        name: "2",
-                        children: [{ name: "2_1" }, { name: "2_2" }],
-                    },
-                ],
-            },
-            {
                 name: "FGIR",
                 description: "Gas Injection Rate",
                 children: [],

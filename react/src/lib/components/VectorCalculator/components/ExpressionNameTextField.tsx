@@ -58,10 +58,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 };
             }
 
-            if (
-                isNameOccupiedByVectors(name, vectors) &&
-                name !== initialName
-            ) {
+            if (isNameOccupiedByVectors(name, vectors)) {
                 return {
                     variant: "warning",
                     icon: <Icon key="warning" name="warning_filled" />,
