@@ -50,6 +50,8 @@ const Map: React.FC<MapProps> = ({
             return;
         }
 
+        // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
+        // See https://deck.gl/docs/api-reference/json/overview for more details.
         const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
         if (resources) {
             configuration.merge({
