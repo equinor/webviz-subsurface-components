@@ -22,7 +22,7 @@ interface InfoCardDataType {
     properties: PropertyDataType[];
 }
 
-interface InfoCardProps {
+export interface InfoCardProps {
     pickInfos: PickInfo<unknown>[];
 }
 
