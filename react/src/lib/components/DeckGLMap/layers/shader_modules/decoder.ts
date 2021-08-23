@@ -1,6 +1,9 @@
 import { ValueDecoder } from "../utils/propertyMapTools";
 import fs from "./decoder.fs.glsl";
 
+// Shader module for the property map value decoder.
+// See https://luma.gl/docs/developer-guide/shader-modules
+
 const DEFAULT_DECODER: ValueDecoder = {
     rgbScaler: [1, 1, 1],
     floatScaler: 1,
