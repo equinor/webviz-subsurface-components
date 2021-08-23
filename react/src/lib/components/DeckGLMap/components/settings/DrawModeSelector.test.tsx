@@ -6,9 +6,10 @@ import { testStore, Wrapper } from "../../test/TestWrapper";
 import DrawModeSelector from "./DrawModeSelector";
 
 describe("Test draw-mode menu", () => {
+    // The render function is rendering just 'null'
     it("snapshot test", () => {
         const { container } = render(
-            Wrapper({ children: <DrawModeSelector layerId="colormap-layer" /> })
+            Wrapper({ children: <DrawModeSelector layerId="" /> })
         );
         expect(container.firstChild).toMatchSnapshot();
     });

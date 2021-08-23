@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
-import { Wrapper } from "../../test/TestWrapper";
+import { Wrapper, EmptyWrapper } from "../../test/TestWrapper";
 import Settings from "./Settings";
 
 describe("test settings component", () => {
@@ -9,7 +9,8 @@ describe("test settings component", () => {
         const { container } = render(Wrapper({ children: <Settings /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
-    it("test hide layers settings button", () => {
-        render(Wrapper({ children: <Settings /> }));
+    it("test empty MapState", () => {
+        const { container } = render(EmptyWrapper({ children: <Settings /> }));
+        expect(container.firstChild).toMatchSnapshot();
     });
 });

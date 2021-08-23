@@ -6,7 +6,7 @@ import { testStore, Wrapper } from "../../test/TestWrapper";
 import LayersButton from "./LayersButton";
 
 describe("test 'layers' button", () => {
-    xit("snapshot test", () => {
+    it("snapshot test", () => {
         const { container } = render(Wrapper({ children: <LayersButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });

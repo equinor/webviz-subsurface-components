@@ -6,14 +6,12 @@ import { testStore, Wrapper } from "../../test/TestWrapper";
 import LayerSettingsButton from "./LayerSettingsButton";
 
 describe("test layers settings button", () => {
+    // render function is rendering just 'null'
     it("snapshot test", () => {
         const { container } = render(
             Wrapper({
                 children: (
-                    <LayerSettingsButton
-                        layerId="colormap-layer"
-                        layerType="ColormapLayer"
-                    />
+                    <LayerSettingsButton layerId="" layerType="ColormapLayer" />
                 ),
             })
         );
