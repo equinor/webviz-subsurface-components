@@ -88,7 +88,7 @@ export const uiSlice = createSlice({
         },
         deleteSortKey: (state, action: PayloadAction<string>) => {
             const newSortBy = Object.keys(state.sortBy).reduce(
-                (acc, current) => {
+                (acc: Record<string, SortDirection>, current) => {
                     if (current !== action.payload) {
                         acc[current] = state.sortBy[current];
                     }

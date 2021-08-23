@@ -21,7 +21,8 @@ export interface ExtPlotOptions extends AreaPlotOptions {
     };
 }
 
-import { PlotConfig } from "../../../../../node_modules/@equinor/videx-wellog/dist/tracks/graph/interfaces" 
+import { PlotConfig } from "../../../../../node_modules/@equinor/videx-wellog/dist/tracks/graph/interfaces"
+
 
 
 //import { GraphTrackOptions } from "@equinor/videx-wellog";

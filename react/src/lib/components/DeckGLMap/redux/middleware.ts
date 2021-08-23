@@ -24,10 +24,11 @@ export const patchMiddleware = (
                     op.path = op.path.substring(5);
                     const layerInfo = /\/layers\/(\d+)(\/\w+)/gm.exec(op.path);
                     if (layerInfo) {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const layerId = (stateAft.spec.layers as any[])[
-                            layerInfo[1]
-                        ].id;
+                        const layers = stateAft.spec["layers"] as Record<
+                            string,
+                            any // eslint-disable-line @typescript-eslint/no-explicit-any
+                        >;
+                        const layerId = layers[layerInfo[1]].id;
                         op.path = "/layers/[" + layerId + "]" + layerInfo[2];
                     }
                 });

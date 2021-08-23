@@ -1,0 +1,108 @@
+{
+    "definitions": {
+        "zone": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "color": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                },
+                "subzones": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/zone" }
+                }
+            },
+            "required": ["name", "color"]
+        }
+    },
+    "type": "object",
+    "properties": {
+        "version": { "type": "string", "minLength": 1 },
+        "units": {
+            "type": "object",
+            "properties": {
+                "kh": {
+                    "type": "object",
+                    "properties": {
+                        "unit": {
+                            "type": "string"
+                        },
+                        "decimalPlaces": { "type": "number" }
+                    }
+                }
+            }
+        },
+        "stratigraphy": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/zone" }
+        },
+        "timeSteps": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+        },
+        "wells": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "completions": {
+                        "type": "object",
+                        "patternProperties": {
+                            ".+": {
+                                "type": "object",
+                                "properties": {
+                                    "t": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "open": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "shut": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "khMean": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "khMin": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    },
+                                    "khMax": {
+                                        "type": "array",
+                                        "items": { "type": "number" }
+                                    }
+                                },
+                                "required": [
+                                    "t",
+                                    "open",
+                                    "shut",
+                                    "khMean",
+                                    "khMin",
+                                    "khMax"
+                                ]
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "attributes": {
+                        "type": "object"
+                    }
+                },
+                "required": ["name", "completions", "attributes"]
+            }
+        }
+    },
+    "required": ["stratigraphy", "timeSteps", "wells"]
+}

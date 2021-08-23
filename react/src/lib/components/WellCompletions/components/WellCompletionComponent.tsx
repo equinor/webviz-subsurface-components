@@ -7,7 +7,8 @@ import DataProvider from "./DataLoader";
 import WellCompletionsViewer from "./WellCompletionsViewer";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const inputSchema = require("../../../../../inputSchema/wellCompletions.json");
+const inputSchema = require("../../../inputSchema/wellCompletions.json");
+
 const ajv = new Ajv();
 const minVersion = "1.0.0";
 interface Props {

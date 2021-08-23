@@ -45,10 +45,10 @@ export const getLayout = (
 };
 
 export const updateOrCreate = (
-    selection: d3.Selection<d3.BaseType, unknown, d3.BaseType, unknown>,
+    selection: d3.Selection<HTMLDivElement, unknown, null, undefined>,
     element: string,
     elementClass: string
-): d3.Selection<d3.BaseType, unknown, d3.BaseType, unknown> => {
+): d3.Selection<d3.BaseType, unknown, null, undefined> => {
     if (selection.select(element + "." + elementClass).empty())
         return selection.append(element).attr("class", elementClass);
     return selection.select(element + "." + elementClass);

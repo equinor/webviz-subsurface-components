@@ -15,7 +15,7 @@ import "./layers/L.tileWebGLLayer";
 // Components
 import Controls from "./components/Controls";
 import CompositeMapLayers from "./components/CompositeMapLayers";
-import Context from "./context";
+import Context from "./utils/context";
 
 // Utils
 import { onSizeChange } from "./utils/element";

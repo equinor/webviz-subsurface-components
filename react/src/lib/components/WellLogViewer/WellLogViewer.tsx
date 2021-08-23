@@ -1,5 +1,6 @@
 import React, { Component, ReactNode } from "react";
 
+import PropTypes from "prop-types";
 import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
@@ -45,6 +46,8 @@ interface State {
 }
 
 class WellLogViewer extends Component<Props, State> {
+    public static propTypes: Record<string, unknown>;
+
     controller?: WellLogController;
 
     constructor(props: Props) {
@@ -140,10 +143,10 @@ class WellLogViewer extends Component<Props, State> {
 
     render(): ReactNode {
         return (
-            <div>
-                <table style={{ height: "100%", width: "100%" }}>
+            <table style={{ height: "100%", width: "100%" }}>
+                <tbody>
                     <tr>
-                        <td>
+                        <td style={{ height: "100%" }}>
                             <WellLogView
                                 welllog={this.props.welllog}
                                 template={this.props.template}
@@ -188,10 +191,25 @@ class WellLogViewer extends Component<Props, State> {
                             </div>
                         </td>
                     </tr>
-                </table>
-            </div>
+                </tbody>
+            </table>
         );
     }
 }
+
+WellLogViewer.propTypes = {
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    id: PropTypes.string.isRequired,
+
+    // TODO: Add doc
+    welllog: PropTypes.array,
+
+    // TODO: Add doc
+    template: PropTypes.object,
+};
 
 export default WellLogViewer;

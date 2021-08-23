@@ -31,7 +31,7 @@ const Settings: React.FC = React.memo(() => {
     return (
         <div className={classes.root}>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {(spec.layers as any[]).map((layer) => (
+            {(spec["layers"] as any[]).map((layer) => (
                 <LayerSettingsButton
                     layerId={layer.id}
                     layerType={layer["@@type"]}
