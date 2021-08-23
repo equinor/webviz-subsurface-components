@@ -18,9 +18,11 @@ export interface MapProps {
     resources: Record<string, unknown>;
     deckglSpec: Record<string, unknown>;
     setSpecPatch: (patch: Operation[]) => void;
-    onHover: <D>(info: PickInfo<D>, e: MouseEvent) => void;
-    hoverInfo: PickInfo<unknown>[];
-    showInfoCard: boolean;
+    coords: {
+        visible: boolean;
+        multiPicking: boolean;
+        pickDepth: number;
+    };
     children?: React.ReactNode;
 }
 
@@ -29,9 +31,7 @@ const Map: React.FC<MapProps> = ({
     resources,
     deckglSpec,
     setSpecPatch,
-    onHover,
-    hoverInfo,
-    showInfoCard,
+    coords,
     children,
 }: MapProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,6 +85,24 @@ const Map: React.FC<MapProps> = ({
         store.current.dispatch(setSpec(specObj ? deckglSpec : {}));
     }, [deckglSpec, specObj]);
 
+    const [hoverInfo, setHoverInfo] = React.useState([]);
+    const onHover = React.useCallback(
+        (pickInfo, event) => {
+            if (coords.multiPicking && pickInfo.layer) {
+                const infos = pickInfo.layer.context.deck.pickMultipleObjects({
+                    x: event.offsetCenter.x,
+                    y: event.offsetCenter.y,
+                    radius: 1,
+                    depth: coords.pickDepth,
+                });
+                setHoverInfo(infos);
+            } else {
+                setHoverInfo([pickInfo]);
+            }
+        },
+        [coords]
+    );
+
     return (
         specObj && (
             <ReduxProvider store={store.current}>
@@ -109,7 +127,7 @@ const Map: React.FC<MapProps> = ({
                 >
                     {children}
                 </DeckGL>
-                {showInfoCard ? <InfoCard pickInfos={hoverInfo} /> : null}
+                {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
                 <Settings />
             </ReduxProvider>
         )

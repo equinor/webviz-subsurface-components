@@ -1,8 +1,7 @@
 import * as jsonpatch from "fast-json-patch";
-import { cloneDeep } from "lodash";
 import PropTypes from "prop-types";
 import * as React from "react";
-import Map from "./components/Map";
+import Map from "./Map";
 
 function _idsToIndices(doc, path) {
     // The path looks something like this: `/layers/[layer-id]/property`,
@@ -30,14 +29,6 @@ function _idsToIndices(doc, path) {
     return path;
 }
 
-const _getPatch = (base, modified) => {
-    if (typeof modified === "function") {
-        const baseClone = cloneDeep(base);
-        return jsonpatch.compare(base, modified(baseClone));
-    }
-    return jsonpatch.compare(base, modified);
-};
-
 const _setPatch = (base, patch) => {
     let result = base;
     try {
@@ -59,7 +50,7 @@ const _setPatch = (base, patch) => {
     return result;
 };
 
-DeckGLMap.defaultProps = {
+MapWrapper.defaultProps = {
     coords: {
         visible: true,
         multiPicking: true,
@@ -67,78 +58,25 @@ DeckGLMap.defaultProps = {
     },
 };
 
-function DeckGLMap({
-    id,
-    resources,
-    deckglSpecBase,
-    deckglSpecPatch,
-    coords,
-    setProps,
-}) {
-    let [patchedSpec, setPatchedSpec] = React.useState(null);
+function MapWrapper(props) {
+    let [mapSpec, setMapSpec] = React.useState(null);
 
     React.useEffect(() => {
-        if (!deckglSpecBase) return;
-
-        setPatchedSpec(
-            deckglSpecPatch
-                ? _setPatch(deckglSpecBase, deckglSpecPatch)
-                : deckglSpecBase
-        );
-    }, [deckglSpecBase, deckglSpecPatch]);
-
-    React.useEffect(() => {
-        if (!patchedSpec) return;
-
-        const drawingEnabled = patchedSpec.layers.some((layer) => {
-            return layer["@@type"] == "DrawingLayer" && layer["mode"] != "view";
-        });
-
-        const patch = _getPatch(patchedSpec, (newSpec) => {
-            newSpec.layers.forEach((layer) => {
-                if (layer["@@type"] == "WellsLayer") {
-                    layer.selectionEnabled = !drawingEnabled;
-                }
-            });
-            return newSpec;
-        });
-
-        if (patch.length !== 0) {
-            setProps({
-                deckglSpecBase: patchedSpec,
-                deckglSpecPatch: patch,
-            });
-        }
-    }, [patchedSpec]);
-
-    const setSpecPatch = React.useCallback(
-        (patch) => {
-            setProps({
-                deckglSpecBase: patchedSpec,
-                deckglSpecPatch: patch,
-            });
-        },
-        [setProps, patchedSpec]
-    );
+        setMapSpec(props.deckglSpecBase);
+    }, [props.deckglSpecBase]);
 
     return (
-        patchedSpec && (
-            <div
-                style={{ height: "100%", width: "100%", position: "relative" }}
-            >
-                <Map
-                    id={id}
-                    resources={resources}
-                    deckglSpec={patchedSpec}
-                    setSpecPatch={setSpecPatch}
-                    coords={coords}
-                />
-            </div>
-        )
+        <Map
+            {...props}
+            deckglSpec={mapSpec}
+            setSpecPatch={(patch) => {
+                setMapSpec(_setPatch(mapSpec, patch));
+            }}
+        />
     );
 }
 
-DeckGLMap.propTypes = {
+MapWrapper.propTypes = {
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
@@ -187,4 +125,4 @@ DeckGLMap.propTypes = {
     setProps: PropTypes.func,
 };
 
-export default DeckGLMap;
+export default MapWrapper;
