@@ -1,3 +1,4 @@
+export default `
 struct Decoder
 {
   vec3 rgbScaler;
@@ -21,3 +22,4 @@ float decode_rgb2float(vec3 rgb, Decoder dec) {
 float decode_rgb2float(vec3 rgb) {
   return decode_rgb2float(rgb, decoder);
 }
+`;

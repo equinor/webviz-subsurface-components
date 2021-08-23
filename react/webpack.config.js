@@ -108,14 +108,6 @@ module.exports = (env, argv) => {
                     ],
                 },
                 {
-                    test: /\.(fs|vs).glsl$/i,
-                    use: [
-                        {
-                            loader: "raw-loader",
-                        },
-                    ],
-                },
-                {
                     enforce: "pre",
                     test: /\.js$/,
                     exclude: /node_modules/,

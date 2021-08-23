@@ -1,3 +1,4 @@
+export default `
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -8,7 +9,7 @@ attribute vec2 a_position;
 attribute vec2 a_texCoord;
 
 uniform vec2 u_resolution_vertex;
-    
+
 varying vec2 v_texCoord;
 
 void main() {
@@ -21,3 +22,4 @@ void main() {
     // Pass the texCoord to the fragment shader
     v_texCoord = a_texCoord;
 }
+`;
