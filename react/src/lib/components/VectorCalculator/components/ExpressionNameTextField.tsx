@@ -17,7 +17,7 @@ type ExpressionNameTextFieldVariantType =
     | "warning"
     | "default";
 
-type ExpressionNameTextFieldAnimationData = {
+type ExpressionNameTextFieldStyleData = {
     icon: React.ReactNode | undefined;
     variant: ExpressionNameTextFieldVariantType;
     helperText: string;
@@ -39,8 +39,8 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     const { currentName, initialName, existingExpressions, vectors, disabled } =
         props;
     const [name, setName] = React.useState(initialName);
-    const [textFieldAnimationDataState, setTextFieldAnimationDataState] =
-        React.useState<ExpressionNameTextFieldAnimationData>({
+    const [textFieldStyleDataState, setTextFieldStyleDataState] =
+        React.useState<ExpressionNameTextFieldStyleData>({
             variant: "success",
             icon: [],
             helperText: "",
@@ -48,8 +48,8 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
 
     Icon.add({ error_filled, thumbs_up, warning_filled });
 
-    const getTextFieldAnimationData = React.useCallback(
-        (name: string): ExpressionNameTextFieldAnimationData => {
+    const getTextFieldStyleData = React.useCallback(
+        (name: string): ExpressionNameTextFieldStyleData => {
             if (!isValidExpressionNameString(name)) {
                 return {
                     variant: "error",
@@ -95,11 +95,9 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     React.useEffect(() => {
         if (currentName === initialName) {
             setName(currentName);
-            setTextFieldAnimationDataState(
-                getTextFieldAnimationData(currentName)
-            );
+            setTextFieldStyleDataState(getTextFieldStyleData(currentName));
         }
-    }, [currentName, initialName, getTextFieldAnimationData]);
+    }, [currentName, initialName, getTextFieldStyleData]);
 
     const validateName = React.useCallback(
         (name: string): boolean => {
@@ -135,7 +133,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             const isValid = validateName(newName);
 
             setName(newName);
-            setTextFieldAnimationDataState(getTextFieldAnimationData(newName));
+            setTextFieldStyleDataState(getTextFieldStyleData(newName));
 
             props.onNameChange(newName);
             props.onValidChange(isValid);
@@ -143,8 +141,8 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         [
             validateName,
             setName,
-            setTextFieldAnimationDataState,
-            getTextFieldAnimationData,
+            setTextFieldStyleDataState,
+            getTextFieldStyleData,
             props.onNameChange,
             props.onValidChange,
         ]
@@ -158,9 +156,9 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 placeholder="New name"
                 onChange={handleInputChange}
                 value={name}
-                variant={textFieldAnimationDataState.variant}
-                inputIcon={textFieldAnimationDataState.icon}
-                helperText={textFieldAnimationDataState.helperText}
+                variant={textFieldStyleDataState.variant}
+                inputIcon={textFieldStyleDataState.icon}
+                helperText={textFieldStyleDataState.helperText}
                 disabled={disabled}
             />
         </div>
