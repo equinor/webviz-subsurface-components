@@ -7,8 +7,6 @@ import {
     GraphTrack,
 } from "@equinor/videx-wellog";
 
-
-
 //import { Plot } from "@equinor/videx-wellog";
 
 //import { PlotOptions } from "../../../../../node_modules/@equinor/videx-wellog/plots/interfaces"
@@ -44,9 +42,10 @@ import { checkMinMaxValue, checkMinMax, roundMinMax } from "./minmax";
 
 function indexOfElementByName(array: Named[], name: string): number {
     if (name) {
+        const nameUpper = name.toUpperCase();
         let i = 0;
         for (const element of array) {
-            if (element.name.toUpperCase() == name) {
+            if (element.name.toUpperCase() == nameUpper) {
                 return i;
             }
             i++;
@@ -56,7 +55,7 @@ function indexOfElementByName(array: Named[], name: string): number {
 }
 
 function indexOfElementByNames(array: Named[], names: string[]): number {
-    if (names) {
+    if (names) { /* should be already in upper case */
         let i = 0;
         for (const element of array) {
             if (names.indexOf(element.name.toUpperCase()) >= 0) return i;
@@ -83,6 +82,8 @@ const colors = [
  * `DotPlot` - discrete points graph
  * `DifferentialPlot` - differential graph, for correlation of two data series.
  */
+const defPlotType = "line";
+/*
 const plotTypes = [
     "line",
     "line",
@@ -92,9 +93,9 @@ const plotTypes = [
     "dot",
     "area",
     "dot",
-    "linestep" /*, 'differential'*/,
+    "linestep" /*, 'differential'* /,
 ];
-
+*/
 class PlotData {
     minmax: [number, number];
     minmaxPrimaryAxis: [number, number];
@@ -221,7 +222,7 @@ function fillPlotOptions(
             ? { ...templateStyles[iStyle], ...templatePlot }
             : { ...templatePlot };
     if (!isValidPlotType(options.type))
-        options.type = plotTypes[iPlot % plotTypes.length];
+        options.type = defPlotType;//plotTypes[iPlot % plotTypes.length];
     if (!options.color) options.color = colors[iPlot % colors.length];
     return options;
 }
@@ -403,7 +404,9 @@ export default (
                     domain: roundMinMax(plotData.minmax),
                     color: options.color,
                     // for 'area'!  fill: 'red',
+                    // for 'area'! inverseColor: "red",
                     fillOpacity: 0.3, // for 'area'!
+                    useMinAsBase: true, // for 'area'!
                     dataAccessor: makeDataAccessor(plots.length),
                     legendInfo: () => ({
                         label: curve.name,
@@ -418,16 +421,17 @@ export default (
 
                 iPlot++;
             }
-            if (plots.length || templateTrack.required)
-                info.tracks.push(
-                    new GraphTrack(info.tracks.length, {
-                        label: makeTrackHeader(welllog, templateTrack),
-                        legendConfig: graphLegendConfig,
-                        data: plotDatas,
-                        plots: plots,
-                    })
-                );
-        }
+            if (plots.length || templateTrack.required) {
+                    info.tracks.push(
+                        new GraphTrack(info.tracks.length, {
+                            label: makeTrackHeader(welllog, templateTrack),
+                            legendConfig: graphLegendConfig,
+                            data: plotDatas,
+                            plots: plots,
+                        })
+                    );
+                }
+            }
     }
     return info;
 };

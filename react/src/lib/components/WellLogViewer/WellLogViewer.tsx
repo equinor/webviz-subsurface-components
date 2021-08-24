@@ -20,8 +20,19 @@ const axisTitles: Record<string, string> = {
 
 // mnemos could be case insentitive ("Depth")
 const axisMnemos: Record<string, string[]> = {
-    md: ["DEPTH", "DEPT", "MD", "TDEP" /*"Tool Depth"*/], // depth based logging data,
-    tvd: ["TVD", "TVDSS", "DVER" /*"TRUE Vertical depth"*/],
+    md: [
+        "DEPTH",
+        "DEPT",
+        "MD",
+        "TDEP" /*"Tool Depth"*/,
+        "MD_RKB" /*Rotary kelly bushing*/,
+    ], // depth based logging data,
+    tvd: [
+        "TVD",
+        "TVDSS" /*subsea*/,
+        "DVER" /*"TRUE Vertical depth"*/,
+        "TVD_MSL" /*below mean sea level*/,
+    ],
     time: ["TIME"], //  time based logging data
 };
 

@@ -15,7 +15,9 @@ interface Props {
 
 function createSeparator() {
     return (
-        <tr>
+        <tr key={"separator"}>
+            {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
+
             <td colSpan={3}>
                 {" "}
                 <hr />
@@ -26,31 +28,31 @@ function createSeparator() {
 
 function createRow(info: Info) {
     if (info.type === "separator")
-        // special
+        // special case
         return createSeparator();
 
     return (
-        <>
-            <tr>
-                {/*info.type*/}
-                <td>
-                    <span style={{ color: info.color }}>{"\u2B24"}</span>&nbsp;
-                    {info.name}
-                </td>
-                <td style={{ paddingLeft: "1em", fontSize: "x-small" }}>
-                    {info.units}
-                </td>
-                <td
-                    style={{
-                        width: "80px",
-                        paddingLeft: "2em",
-                        textAlign: "right",
-                    }}
-                >
-                    {info.value}
-                </td>
-            </tr>
-        </>
+        <tr key={info.name}>
+            {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
+
+            {/*info.type*/}
+            <td>
+                <span style={{ color: info.color }}>{"\u2B24"}</span>&nbsp;
+                {info.name}
+            </td>
+            <td style={{ paddingLeft: "1em", fontSize: "x-small" }}>
+                {info.units}
+            </td>
+            <td
+                style={{
+                    width: "80px",
+                    paddingLeft: "2em",
+                    textAlign: "right",
+                }}
+            >
+                {info.value}
+            </td>
+        </tr>
     );
 }
 
@@ -60,7 +62,11 @@ class InfoPanel extends Component<Props> {
             <div>
                 <fieldset>
                     <legend>{this.props.header}</legend>
-                    <small>{this.props.infos.map(createRow)}</small>
+                    <small>
+                        <table>
+                            <tbody>{this.props.infos.map(createRow)}</tbody>
+                        </table>
+                    </small>
                 </fieldset>
             </div>
         );

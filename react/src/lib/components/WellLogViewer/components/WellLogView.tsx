@@ -62,18 +62,30 @@ class SimpleMenu extends Component<Props1, State1> {
         }*/
     }
 
-    handleCloseMenu(ev: MouseEvent) {
-        ev;
+    closeMenu() {
         this.setState({ anchorEl: null });
     }
-    handleClickItem(ev: MouseEvent) {
+
+    handleContextMenu(ev: React.MouseEvent<HTMLElement>) {
+        ev.preventDefault();
+        this.closeMenu();
+    }
+    handleCloseMenu(ev: React.MouseEvent<HTMLElement>) {
         ev;
-        this.setState({ anchorEl: null });
+        this.closeMenu();
+    }
+    handleClickItem(ev: React.MouseEvent<HTMLElement>) {
+        ev;
+        this.closeMenu();
     }
 
     createMenuItem(item: string): ReactNode {
         //onClick = { this.handleClickItem.bind(this) }
-        return <MenuItem>{item}</MenuItem>;
+        return (
+            <MenuItem onClick={this.handleClickItem.bind(this)}>
+                {item}
+            </MenuItem>
+        );
     }
     menuItems(): ReactNode[] {
         const nodes: ReactNode[] = [];
@@ -114,6 +126,7 @@ class SimpleMenu extends Component<Props1, State1> {
                     keepMounted
                     open={Boolean(this.state.anchorEl)}
                     onClose={this.handleCloseMenu.bind(this)}
+                    onContextMenu={this.handleContextMenu.bind(this)}
                 >
                     {this.menuItems()}
                 </Menu>
@@ -122,10 +135,11 @@ class SimpleMenu extends Component<Props1, State1> {
     }
 }
 function localMenu(parent: HTMLElement, track: Track, welllog: WellLog) {
-    if (track) return; // not ready
+    //if (track) return; // not ready
     const el: HTMLElement = document.createElement("div");
-    el.style.width = "100px";
-    el.style.height = "500px";
+    el.style.width = "10px";
+    el.style.height = "3px";
+    el.style.backgroundColor = "red";
     parent.appendChild(el);
     ReactDOM.render(
         <SimpleMenu anchorEl={el} track={track} welllog={welllog} />,
@@ -536,6 +550,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                     const elm = track.elm.parentElement; // class track
                     if (elm) {
                         const visible = iFrom <= iTrack && iTrack < iTo;
+                        //was: elm.style.visibility = visible ? "visible" : "collapse";
                         elm.style.display = visible ? "flex" : "none";
                     }
                 }
