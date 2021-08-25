@@ -1,7 +1,11 @@
 import React from "react";
 
-const DistanceScale = (props: any) => {
+interface Props {
+    zoomLevel: number
+}
+const DistanceScale: React.FC<Props> = (props) => {
     const [width] = React.useState(100);
+    const pixelPerUnit = width / Math.pow(2, props.zoomLevel)
     // styling
     const scaleBarStyle = {
         width: width,
@@ -9,16 +13,14 @@ const DistanceScale = (props: any) => {
         border: "2px solid gray",
         borderTop: "none",
         display: "inline-block",
-        right: 0, 
-        bottom:0
+        marginLeft: "3px",
+        right: 0,
+        bottom: 0
     };
 
-    let zoom = props.zoomLevel.viewState.zoom
-    let pixelPerUnit = width / Math.pow(2, zoom)
-
     return (
-        <div style={{bottom: 0,right: 0,position: "absolute"}}>
-            <label style={{marginRight: "5px"}}>{parseFloat(pixelPerUnit.toFixed(2))}</label>
+        <div style={{ bottom: 0, right: 0, position: "absolute" }}>
+            <label>{parseFloat(pixelPerUnit.toFixed(2))}</label>
             <div style={scaleBarStyle}></div>
         </div>
     )

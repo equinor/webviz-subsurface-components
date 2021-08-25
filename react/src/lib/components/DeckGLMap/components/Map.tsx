@@ -46,7 +46,7 @@ const Map: React.FC<MapProps> = ({
 
     const [specObj, setSpecObj] = React.useState(null);
 
-    const [viewState, setviewState] = React.useState<any | null>(null)
+    const [zoomState, setZoomState] = React.useState<any | null>(null)
 
     React.useEffect(() => {
         if (!deckglSpec) {
@@ -111,13 +111,13 @@ const Map: React.FC<MapProps> = ({
                     }}
                     ref={refCb}
                     onHover={onHover}
-                    onViewStateChange={({viewState}) => setviewState({viewState})}
+                    onViewStateChange={({viewState}) => setZoomState({viewState})}
                 >
                     {children}
                 </DeckGL>
                 {showInfoCard ? <InfoCard pickInfos={hoverInfo} /> : null}
                 <Settings />
-                {viewState ? <DistanceScale zoomLevel={viewState} /> : null}
+                {zoomState ? <DistanceScale zoomLevel={zoomState.viewState.zoom} /> : null}
                 </ReduxProvider>
         )
     );
