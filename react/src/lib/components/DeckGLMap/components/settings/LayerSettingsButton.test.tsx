@@ -11,8 +11,8 @@ describe("test layers settings button", () => {
             Wrapper({
                 children: (
                     <LayerSettingsButton
-                        layerId="colormap-layer"
-                        layerType="ColormapLayer"
+                        layerId="drawing-layer"
+                        layerType="DrawingLayer"
                     />
                 ),
             })
