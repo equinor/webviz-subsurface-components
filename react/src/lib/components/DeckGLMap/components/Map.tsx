@@ -12,6 +12,7 @@ import { setSpec } from "../redux/actions";
 import { createStore } from "../redux/store";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
+import DistanceScale from "../components/DistanceScale";
 
 export interface MapProps {
     id: string;
@@ -32,7 +33,7 @@ const Map: React.FC<MapProps> = ({
     onHover,
     hoverInfo,
     showInfoCard,
-    children,
+    children
 }: MapProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
@@ -44,6 +45,8 @@ const Map: React.FC<MapProps> = ({
     }, [setSpecPatch]);
 
     const [specObj, setSpecObj] = React.useState(null);
+
+    const [viewState, setviewState] = React.useState<any | null>(null)
 
     React.useEffect(() => {
         if (!deckglSpec) {
@@ -106,12 +109,14 @@ const Map: React.FC<MapProps> = ({
                     }}
                     ref={refCb}
                     onHover={onHover}
+                    onViewStateChange={({viewState}) => setviewState({viewState})}
                 >
                     {children}
                 </DeckGL>
                 {showInfoCard ? <InfoCard pickInfos={hoverInfo} /> : null}
                 <Settings />
-            </ReduxProvider>
+                {viewState ? <DistanceScale zoomLevel={viewState} /> : null}
+                </ReduxProvider>
         )
     );
 };
