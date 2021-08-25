@@ -1,3 +1,5 @@
+import { layers } from "@equinor/eds-icons";
+import { Icon } from "@equinor/eds-core-react";
 import { render, screen } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
@@ -7,6 +9,7 @@ import LayersButton from "./LayersButton";
 
 describe("test 'layers' button", () => {
     it("snapshot test", () => {
+        Icon.add({ layers });
         const { container } = render(Wrapper({ children: <LayersButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
