@@ -42,7 +42,7 @@ class VectorCalculatorParser(Parser):
     """Creates expression parser configured to handle vector variables
 
     Overrides operators and functions to provide whitelist for parsing. Note that the overrides also replace
-    math lib functions with numpy functions.
+    math lib functions with numpy functions for handling array data.
 
     I.e.: Configured expression parser for vector calculator
     """
@@ -51,14 +51,14 @@ class VectorCalculatorParser(Parser):
         super(VectorCalculatorParser, self).__init__()
 
         self.characterBlacklist = ['"', "'"]
-
-        # Override internal operators and functions (whitelisting)
+        
+        # Whitelist with numpy operators
         self.ops1 = {
             "sqrt": np.sqrt,
             "abs": np.abs,
             "-": np.negative,
         }
-
+        # Whitelist with numpy operators
         self.ops2 = {
             "+": np.add,
             "-": np.subtract,
@@ -66,7 +66,11 @@ class VectorCalculatorParser(Parser):
             "/": np.divide,
             "^": np.power,
         }
-        self.functions = {"log": np.log}
+        # Whitelist with numpy functions
+        self.functions = {
+            "log": np.log, # Natural logarithm
+            "log10": np.log10 # Base-10 logarithm
+        }
 
 
 class VectorCalculatorWrapper(VectorCalculator):

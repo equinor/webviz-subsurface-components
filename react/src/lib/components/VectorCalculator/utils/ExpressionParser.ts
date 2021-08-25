@@ -5,10 +5,21 @@ const { parse } = create({
 });
 
 const operatorWhitelist: string[] = ["+", "-", "*", "/", "^"];
-const functionWhitelist: string[] = ["log", "sqrt"];
+
+/** Note whitelisted functions:
+ * log - https://mathjs.org/docs/reference/functions/log.html
+ * log10 - https://mathjs.org/docs/reference/functions/log10.html
+ * sqrt - https://mathjs.org/docs/reference/functions/sqrt.html
+ */
+const functionWhitelist: string[] = ["log", "log10", "sqrt"];
 
 type ParsingResult = { variables: string[] };
 
+/** Parsing is handled by usage of parsing function, generating a
+ * node tree - which can be further analyzed and evaluated.
+ * - parsing and evaluation - https://mathjs.org/docs/expressions/parsing.html
+ * - expression trees - https://mathjs.org/docs/expressions/expression_trees.html
+ */
 const parseExpression = (expression: string): ParsingResult => {
     if (expression.length <= 0) {
         throw new Error("Empty expression!");
