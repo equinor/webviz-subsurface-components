@@ -46,8 +46,8 @@ const Map: React.FC<MapProps> = ({
 
     const [specObj, setSpecObj] = React.useState(null);
 
-    const [zoomState, setZoomState] = React.useState<any | null>(null)
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [zoomState, setZoomState] = React.useState<any>();
     React.useEffect(() => {
         if (!deckglSpec) {
             return;
@@ -111,14 +111,18 @@ const Map: React.FC<MapProps> = ({
                     }}
                     ref={refCb}
                     onHover={onHover}
-                    onViewStateChange={({viewState}) => setZoomState({viewState})}
+                    onViewStateChange={({ viewState }) =>
+                        setZoomState({ viewState })
+                    }
                 >
                     {children}
                 </DeckGL>
                 {showInfoCard ? <InfoCard pickInfos={hoverInfo} /> : null}
                 <Settings />
-                {zoomState ? <DistanceScale zoomLevel={zoomState.viewState.zoom} /> : null}
-                </ReduxProvider>
+                {zoomState ? (
+                    <DistanceScale zoom={zoomState.viewState.zoom} />
+                ) : null}
+            </ReduxProvider>
         )
     );
 };
