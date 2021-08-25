@@ -18,6 +18,7 @@ import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 import { CompositeLayer, PickInfo } from "deck.gl";
 import { patchLayerProps } from "../utils/layerTools";
 
+// Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {
     handleKeyUp(event: KeyboardEvent, props: ModeProps<FeatureCollection>) {
         super.handleKeyUp(event, props);
@@ -56,6 +57,8 @@ const SELECTED_LINE_COLOR: RGBAColor = [0x0, 0x0, 0x0, 0xff];
 const defaultProps = {
     pickable: true,
     mode: "drawLineString",
+
+    // Props mainly used to make the information available to the Map parent comp.
     selectedFeatureIndexes: [],
     data: {
         type: "FeatureCollection",
@@ -64,10 +67,12 @@ const defaultProps = {
 };
 
 export interface DrawingLayerProps<D> extends CompositeLayerProps<D> {
-    mode: string;
+    mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
 }
 
+// Composite layer that contains an EditableGeoJsonLayer from nebula.gl
+// See https://nebula.gl/docs/api-reference/layers/editable-geojson-layer
 export default class DrawingLayer extends CompositeLayer<
     FeatureCollection,
     DrawingLayerProps<FeatureCollection>
@@ -84,6 +89,8 @@ export default class DrawingLayer extends CompositeLayer<
         }
     }
 
+    // Select features when clicking on them if in view or modify modes.
+    // The selection is sent to the map component parent as a patch.
     onClick(info: PickInfo<FeatureCollection>): boolean {
         if (this.props.mode === "view" || this.props.mode === "modify") {
             const featureIndex = this.state.data.features.indexOf(info.object);
@@ -99,6 +106,8 @@ export default class DrawingLayer extends CompositeLayer<
         return false;
     }
 
+    // Callback for various editing events. Most events will update this component
+    // through patches sent to the map parent. See patchLayerPropsin layerTools.ts.
     _onEdit(editAction: EditAction<FeatureCollection>): void {
         switch (editAction.editType) {
             case "addFeature":
@@ -131,6 +140,8 @@ export default class DrawingLayer extends CompositeLayer<
         }
     }
 
+    // Return the line color based on the selection status.
+    // The same can be done for other features (polygons, points etc).
     _getLineColor(feature: Feature): RGBAColor {
         const is_feature_selected = this.props.selectedFeatureIndexes.some(
             (i) => this.state.data.features[i] === feature
