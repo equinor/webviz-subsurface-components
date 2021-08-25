@@ -33,7 +33,7 @@ const Map: React.FC<MapProps> = ({
     onHover,
     hoverInfo,
     showInfoCard,
-    children
+    children,
 }: MapProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(

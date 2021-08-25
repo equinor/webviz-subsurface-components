@@ -17,7 +17,7 @@ const DistanceScale = (props: any) => {
     let pixelPerUnit = width / Math.pow(2, zoom)
 
     return (
-        <div className="distanceScale">
+        <div style={{bottom: 0,right: 0,position: "absolute"}}>
             <label style={{marginRight: "5px"}}>{parseFloat(pixelPerUnit.toFixed(2))}</label>
             <div style={scaleBarStyle}></div>
         </div>

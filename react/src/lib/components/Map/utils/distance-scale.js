@@ -114,7 +114,6 @@ export default class DistanceScale {
         }
 
         this.element.selectAll("rect").remove();
-
         this.element
             .selectAll("rect")
             .data(positions)

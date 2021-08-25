@@ -146,7 +146,6 @@ export default class Map2D extends Component {
             .attr("height", this.height)
             .style("position", "absolute");
 
-        // called at first load
         this.containerControls = d3
             .select(this.elementSelector)
             .append("svg")
@@ -216,9 +215,11 @@ export default class Map2D extends Component {
 
     handleZoom() {
         const { transform } = d3.event;
+
         this.mapTransform.x = transform.x;
         this.mapTransform.y = transform.y;
         this.mapTransform.k = transform.k * this.kInit;
+
         this.scale.setK(this.mapTransform.k);
         this.map.setTransform(this.mapTransform);
         this.emit("zoom", this.mapTransform);
