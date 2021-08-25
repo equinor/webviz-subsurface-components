@@ -10,7 +10,6 @@ else:
     from typing_extensions import TypedDict
 
 import numpy as np
-import pandas as pd
 from py_expression_eval import Parser
 
 from .VectorCalculator import VectorCalculator
@@ -51,7 +50,7 @@ class VectorCalculatorParser(Parser):
         super(VectorCalculatorParser, self).__init__()
 
         self.characterBlacklist = ['"', "'"]
-        
+
         # Whitelist with numpy operators
         self.ops1 = {
             "sqrt": np.sqrt,
@@ -68,8 +67,8 @@ class VectorCalculatorParser(Parser):
         }
         # Whitelist with numpy functions
         self.functions = {
-            "log": np.log, # Natural logarithm
-            "log10": np.log10 # Base-10 logarithm
+            "log": np.log,  # Natural logarithm
+            "log10": np.log10,  # Base-10 logarithm
         }
 
 
@@ -165,25 +164,21 @@ class VectorCalculatorWrapper(VectorCalculator):
 
     @staticmethod
     def evaluate_expression(
-        expression: str, values: Dict[str, pd.Series]
-    ) -> Union[pd.Series, None]:
-        result: pd.Series = pd.Series()
-
+        expression: str, values: Dict[str, np.ndarray]
+    ) -> Union[np.ndarray, None]:
         # Ensure variables in expression
         invalid_variables = [var for var in values if var not in expression]
         if len(invalid_variables) > 0:
             warnings.warn(
                 f"Variables {invalid_variables} is not present in expression '{expression}'"
             )
-            return result
+            return None
         try:
             expression = VectorCalculatorWrapper.parse_expression(expression)
             parsed_expr = VectorCalculatorWrapper.parser.parse(expression)
-            evaluated_expr: list = parsed_expr.evaluate(values)
-            result = pd.Series(evaluated_expr)
+            return parsed_expr.evaluate(values)
         except ValueError as e:
-            result = None
-        return result
+            return None
 
     @staticmethod
     def detailed_expression(expression: ExpressionInfo) -> str:
