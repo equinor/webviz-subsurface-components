@@ -15,3 +15,15 @@ export const Wrapper = ({
 }): JSX.Element => {
     return <Provider store={testStore}>{children}</Provider>;
 };
+
+export const emptytestStore = createStore({}, (patch: Operation[]) => {
+    patch;
+});
+emptytestStore.dispatch = jest.fn();
+export const EmptyWrapper = ({
+    children,
+}: {
+    children: JSX.Element;
+}): JSX.Element => {
+    return <Provider store={emptytestStore}>{children}</Provider>;
+};
