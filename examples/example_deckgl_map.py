@@ -19,8 +19,9 @@ from PIL import Image
 
 import webviz_subsurface_components
 
-
+# Helper class for dealing with map patches.
 class MapSpec:
+    # Initialize the class from a base spec + a patch that is applied to the base spec.
     def __init__(self, initialSpec=None, initialPatch=None):
         self._spec = initialSpec
         if initialPatch:
@@ -32,6 +33,9 @@ class MapSpec:
     def get_spec_clone(self):
         return copy.deepcopy(self._spec)
 
+    # Update the current spec to a new spec and return the diff patch between them.
+    # If new_spec is a callable, call it with the current spec and diff the current spec
+    # against the returned value.
     def update(self, new_spec):
         updated_spec = new_spec
         if callable(new_spec):
@@ -42,6 +46,11 @@ class MapSpec:
         self._spec = updated_spec
         return patch
 
+    # Create and return a patch by diffing the current spec and the provided new_spec.
+    # If new_spec is a callable, call it with the current spec and diff the current spec
+    # against the returned value.
+    # This is usually used to make some modifications to the received map spec
+    # and send those modifications back to the frontend as a patch.
     def create_patch(self, new_spec=None):
         if new_spec is None:
             return jsonpatch.make_patch(None, self._spec).patch
@@ -55,7 +64,11 @@ class MapSpec:
     def apply_patch(self, patch):
         jsonpatch.apply_patch(self._spec, self.normalize_patch(patch), True)
 
-    # Replace ids with indices in the patch paths
+    # The path looks something like this: `/layers/[layer-id]/property`,
+    # where `[layer-id]` is the id of an object in the `layers` array.
+    # This function will replace all object ids with their indices in the array,
+    # resulting in a path that would look like this: `/layers/2/property`,
+    # which is a valid json pointer that can be used by json patch.
     def normalize_patch(self, in_patch, inplace=False):
         def replace_path_id(matched):
             parent = matched.group(1)
