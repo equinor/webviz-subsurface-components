@@ -25,6 +25,7 @@ class WellLogViewerDemo extends Component {
             example: 0,
             template: 0,
             text: JSON.stringify(templates[0], null, 2), //"{}"
+            horizontal: undefined,
         };
     }
 
@@ -41,6 +42,9 @@ class WellLogViewerDemo extends Component {
             template: ev.target.value,
             text: JSON.stringify(templates[ev.target.value], null, 2),
         });
+    }
+    onLayoutChange(ev) {
+        this.setState({ horizontal: !ev.target.checked });
     }
 
     onEditorChanged(txt) {
@@ -83,6 +87,14 @@ class WellLogViewerDemo extends Component {
         return (
             <div>
                 <div align="center">
+                    <input
+                        type="checkbox"
+                        id="layout"
+                        checked={!this.state.horizontal}
+                        onChange={this.onLayoutChange.bind(this)}
+                    />
+                    <label htmlFor="layout">Vertical layout</label>
+                    <span> &nbsp; &nbsp; &nbsp; </span>
                     Template:
                     <select
                         value={this.state.template}
@@ -114,6 +126,7 @@ class WellLogViewerDemo extends Component {
                             id="WellLogViewer"
                             welllog={this.getData(this.state.example)}
                             template={JSON.parse(this.state.text)}
+                            horizontal={this.state.horizontal}
                         />
                     </div>
                 </div>

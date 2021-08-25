@@ -39,6 +39,7 @@ const axisMnemos: Record<string, string[]> = {
 interface Props {
     welllog: WellLog;
     template: Template;
+    horizontal?: boolean;
 }
 
 interface Info {
@@ -161,6 +162,7 @@ class WellLogViewer extends Component<Props, State> {
                             <WellLogView
                                 welllog={this.props.welllog}
                                 template={this.props.template}
+                                horizontal={this.props.horizontal}
                                 primaryAxis={this.state.primaryAxis}
                                 axisTitles={axisTitles}
                                 axisMnemos={axisMnemos}

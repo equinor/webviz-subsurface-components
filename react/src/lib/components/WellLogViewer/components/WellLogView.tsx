@@ -31,6 +31,8 @@ import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
 
+import { removeOverlay } from "../utils/log-viewer";
+
 import ReactDOM from "react-dom";
 
 import Menu from "@material-ui/core/Menu";
@@ -40,6 +42,7 @@ interface Props1 {
     anchorEl: HTMLElement;
     track: Track;
     welllog: WellLog;
+    type: string;
 }
 interface State1 {
     anchorEl: HTMLElement | null;
@@ -83,7 +86,7 @@ class SimpleMenu extends Component<Props1, State1> {
         //onClick = { this.handleClickItem.bind(this) }
         return (
             <MenuItem onClick={this.handleClickItem.bind(this)}>
-                {item}
+                &nbsp;&nbsp;&nbsp;&nbsp;{item}
             </MenuItem>
         );
     }
@@ -118,6 +121,49 @@ class SimpleMenu extends Component<Props1, State1> {
     }
 
     render(): ReactNode {
+        if (this.props.type == "title") {
+            return (
+                <div>
+                    <Menu
+                        id="simple-menu"
+                        anchorEl={this.state.anchorEl}
+                        open={Boolean(this.state.anchorEl)}
+                        onClose={this.handleCloseMenu.bind(this)}
+                        onContextMenu={this.handleContextMenu.bind(this)}
+                    >
+                        <MenuItem onClick={this.handleClickItem.bind(this)}>
+                            {"Add track"}
+                        </MenuItem>
+                        <MenuItem onClick={this.handleClickItem.bind(this)}>
+                            {"Remove track"}
+                        </MenuItem>
+                    </Menu>
+                </div>
+            );
+        }
+
+        if (this.props.type == "container") {
+            return (
+                <div>
+                    <Menu
+                        id="simple-menu"
+                        anchorEl={this.state.anchorEl}
+                        keepMounted
+                        open={Boolean(this.state.anchorEl)}
+                        onClose={this.handleCloseMenu.bind(this)}
+                        onContextMenu={this.handleContextMenu.bind(this)}
+                    >
+                        <MenuItem onClick={this.handleClickItem.bind(this)}>
+                            {"Menu item 1"}
+                        </MenuItem>
+                        <MenuItem onClick={this.handleClickItem.bind(this)}>
+                            {"Menu item 2"}
+                        </MenuItem>
+                    </Menu>
+                </div>
+            );
+        }
+
         return (
             <div>
                 <Menu
@@ -128,32 +174,72 @@ class SimpleMenu extends Component<Props1, State1> {
                     onClose={this.handleCloseMenu.bind(this)}
                     onContextMenu={this.handleContextMenu.bind(this)}
                 >
+                    <MenuItem onClick={this.handleClickItem.bind(this)}>
+                        {"Add"}
+                    </MenuItem>
                     {this.menuItems()}
                 </Menu>
             </div>
         );
     }
 }
-function localMenu(parent: HTMLElement, track: Track, welllog: WellLog) {
+function localMenuTitle(parent: HTMLElement, track: Track, welllog: WellLog) {
+    //if (track) return; // not ready
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "13px";
+    parent.appendChild(el);
+    ReactDOM.render(
+        <SimpleMenu
+            type="title"
+            anchorEl={el}
+            track={track}
+            welllog={welllog}
+        />,
+        el
+    );
+}
+function localMenuLegend(parent: HTMLElement, track: Track, welllog: WellLog) {
     //if (track) return; // not ready
     const el: HTMLElement = document.createElement("div");
     el.style.width = "10px";
     el.style.height = "3px";
-    el.style.backgroundColor = "red";
     parent.appendChild(el);
     ReactDOM.render(
         <SimpleMenu anchorEl={el} track={track} welllog={welllog} />,
         el
     );
 }
+function localMenuContainer(
+    parent: HTMLElement,
+    track: Track,
+    welllog: WellLog
+) {
+    //if (track) return; // not ready
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "3px";
+    parent.appendChild(el);
+    ReactDOM.render(
+        <SimpleMenu
+            type="container"
+            anchorEl={el}
+            track={track}
+            welllog={welllog}
+        />,
+        el
+    );
+}
 
-function addRubberbandOverlay(instance: LogViewer) {
+function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
     const offset = (rubberBandSize - 1) / 2;
     const rbelm = instance.overlay.create("rubber-band", {
         onMouseMove: (event: OverlayMouseMoveEvent) => {
             if (event.target) {
-                event.target.style.top = `${event.y - (offset + 0.5)}px`;
+                if (parent.props.horizontal)
+                    event.target.style.left = `${event.x - (offset + 0.5)}px`;
+                else event.target.style.top = `${event.y - (offset + 0.5)}px`;
                 event.target.style.visibility = "visible";
             }
         },
@@ -173,45 +259,48 @@ function addRubberbandOverlay(instance: LogViewer) {
 
     const rb = select(rbelm)
         .classed("rubber-band", true)
-        .style("height", `${rubberBandSize}px`)
+        .style(
+            parent.props.horizontal ? "width" : "height",
+            `${rubberBandSize}px`
+        )
+        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
         .style("background-color", "rgba(255,0,0,0.1)")
         .style("visibility", "hidden");
 
     rb.append("div")
-        .style("height", "1px")
+        .style(parent.props.horizontal ? "width" : "height", "1px")
+        .style(parent.props.horizontal ? "left" : "top", `${offset}px`)
         .style("background-color", "rgba(255,0,0,0.7)")
-        .style("position", "relative")
-        .style("top", `${offset}px`);
+        .style("position", "relative");
 }
 
 function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
-    parent;
     //instance.overlay.register(key: string, callbacks: OverlayCallbacks): void;
     const elm = instance.overlay.create("depth", {
         onClick: (event: OverlayClickEvent): void => {
-            const { caller, y } = event;
-            const x = caller.scale.invert(y);
+            const { caller, x, y } = event;
+            const value = caller.scale.invert(parent.props.horizontal ? x : y);
             if (event.target) {
-                event.target.textContent = Number.isFinite(x)
-                    ? `Pinned MD: ${x.toFixed(1)}`
+                event.target.textContent = Number.isFinite(value)
+                    ? `Pinned MD: ${value.toFixed(1)}`
                     : "-";
                 event.target.style.visibility = "visible";
             }
         },
         onMouseMove: (event: OverlayMouseMoveEvent): void => {
-            const { caller, y } = event;
-            const x = caller.scale.invert(y);
+            const { caller, x, y } = event;
+            const value = caller.scale.invert(parent.props.horizontal ? x : y);
             if (event.target) {
-                event.target.textContent = Number.isFinite(x)
-                    ? `MD: ${x.toFixed(1)}`
+                event.target.textContent = Number.isFinite(value)
+                    ? `MD: ${value.toFixed(1)}`
                     : "-";
                 event.target.style.visibility = "visible";
             }
 
             const x2 = (
                 caller.scaleHandler as InterpolatedScaleHandler
-            ).interpolator.reverse(x);
-            parent.onMouseMove(x, x2);
+            ).interpolator.reverse(value);
+            parent.onMouseMove(value, x2);
         },
         onMouseExit: (event: OverlayMouseExitEvent): void => {
             if (event.target) event.target.style.visibility = "hidden";
@@ -237,14 +326,16 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
     elm.style.bottom = "5px";
 }
 
-function addPinnedValueOverlay(instance: LogViewer) {
+function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
     const offset = (rubberBandSize - 1) / 2;
     const rbelm = instance.overlay.create("pinned", {
         onClick: (event: OverlayClickEvent): void => {
-            const { y } = event;
+            const { x, y } = event;
             if (event.target) {
-                event.target.style.top = `${y - (offset + 0.5)}px`;
+                if (parent.props.horizontal)
+                    event.target.style.left = `${x - (offset + 0.5)}px`;
+                else event.target.style.top = `${y - (offset + 0.5)}px`;
                 event.target.style.visibility = "visible";
             }
         },
@@ -255,17 +346,22 @@ function addPinnedValueOverlay(instance: LogViewer) {
 
     const rb = select(rbelm)
         .classed("pinned", true)
-        .style("height", `${rubberBandSize}px`)
+        .style(
+            parent.props.horizontal ? "width" : "height",
+            `${rubberBandSize}px`
+        )
+        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
+        .style(parent.props.horizontal ? "top" : "left", `${0}px`)
         .style("background-color", "rgba(0,0,0,0.1)")
         .style("position", "absolute")
-        .style("width", "100%")
         .style("visibility", "hidden");
 
     rb.append("div")
-        .style("height", "1px")
+        .style(parent.props.horizontal ? "width" : "height", "1px")
+        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
+        .style(parent.props.horizontal ? "left" : "top", `${offset}px`)
         .style("background-color", "rgba(0,255,0,0.7)")
-        .style("position", "relative")
-        .style("top", `${offset}px`);
+        .style("position", "relative");
 }
 
 function createInterpolator(from: Float32Array, to: Float32Array) {
@@ -414,6 +510,7 @@ interface Info {
 interface Props {
     welllog: WellLog;
     template: Template;
+    horizontal?: boolean;
     primaryAxis: string;
     //setAvailableAxes : (scales: string[]) => void;
     setInfo: (infos: Info[]) => void;
@@ -461,6 +558,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     componentDidUpdate(prevProps: Props, prevState: State): void {
         // Typical usage (don't forget to compare props):
+
+        if (this.props.horizontal !== prevProps.horizontal) {
+            this.createLogViewer();
+        }
+
         if (this.props.welllog !== prevProps.welllog) {
             this.setTracks();
         } else if (this.props.template !== prevProps.template) {
@@ -493,20 +595,22 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             // remove old LogViewer
             this.logController.reset(); // clear UI
             this.logController.onUnmount(); //?
+            removeOverlay(this.logController);
             this.logController = undefined;
         }
         if (this.container) {
             // create new LogViewer
+            console.log("createLogViewer horizontal=" + this.props.horizontal);
             this.logController = new LogViewer({
                 showLegend: true,
-                horizontal: false,
+                horizontal: this.props.horizontal,
             });
 
             this.logController.init(this.container);
 
             addReadoutOverlay(this.logController, this);
-            addRubberbandOverlay(this.logController);
-            addPinnedValueOverlay(this.logController);
+            addRubberbandOverlay(this.logController, this);
+            addPinnedValueOverlay(this.logController, this);
         }
         this.setInfo();
     }
@@ -664,6 +768,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         );
     }
     onTrackTitleContextMenu(ev: TrackEvent): void {
+        /*
         const track = ev.track;
         let msg = "";
 
@@ -690,12 +795,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         }
 
         alert("Available tracks:" + msg);
+        */
+        localMenuTitle(ev.element, ev.track, this.props.welllog);
     }
     onTrackLegendContextMenu(ev: TrackEvent): void {
-        localMenu(ev.element, ev.track, this.props.welllog);
+        localMenuLegend(ev.element, ev.track, this.props.welllog);
     }
     onTrackContainerContextMenu(ev: TrackEvent): void {
-        ev;
+        localMenuContainer(ev.element, ev.track, this.props.welllog);
     }
 
     _posMax(): number {
