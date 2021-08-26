@@ -5,7 +5,7 @@ interface Info {
     units?: string;
     color: string;
     value: string;
-    type: string; // line, linestep, area, ?dot?
+    type: string; // "seperator"; "line", "linestep", "area", "dot"
 }
 
 interface Props {
@@ -36,13 +36,8 @@ function createRow(info: Info) {
             {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
 
             {/*info.type*/}
-            <td>
-                <span style={{ color: info.color }}>{"\u2B24"}</span>&nbsp;
-                {info.name}
-            </td>
-            <td style={{ paddingLeft: "1em", fontSize: "x-small" }}>
-                {info.units}
-            </td>
+            <td style={{ color: info.color }}>{"\u2B24" /*big circle*/}</td>
+            <td>{info.name}</td>
             <td
                 style={{
                     width: "80px",
@@ -51,6 +46,9 @@ function createRow(info: Info) {
                 }}
             >
                 {info.value}
+            </td>
+            <td style={{ paddingLeft: "1em", fontSize: "x-small" }}>
+                {info.units}
             </td>
         </tr>
     );
