@@ -1,7 +1,7 @@
 import React from "react";
 import DeckGLMapWrapper from "./DeckGLMapWrapper";
 
-const exampleData = require("../../../demo/example-data/deckgl-map.json");
+const exampleData = require("../../../../demo/example-data/deckgl-map.json");
 
 export default {
     component: DeckGLMapWrapper,

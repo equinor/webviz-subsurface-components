@@ -1,5 +1,5 @@
 import React from "react";
-import InfoCard from "./InfoCard";
+import InfoCard from "../../components/InfoCard";
 
 export default {
     component: InfoCard,

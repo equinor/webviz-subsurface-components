@@ -1,7 +1,7 @@
 import * as jsonpatch from "fast-json-patch";
 import PropTypes from "prop-types";
 import * as React from "react";
-import Map from "./Map";
+import Map from "../../components/Map";
 
 function _idsToIndices(doc, path) {
     // The path looks something like this: `/layers/[layer-id]/property`,
@@ -58,16 +58,18 @@ MapWrapper.defaultProps = {
     },
 };
 
-function MapWrapper(props) {
+function MapWrapper({ id, resources, deckglSpec, coords }) {
     let [mapSpec, setMapSpec] = React.useState(null);
 
     React.useEffect(() => {
-        setMapSpec(props.deckglSpecBase);
-    }, [props.deckglSpecBase]);
+        setMapSpec(deckglSpec);
+    }, [deckglSpec]);
 
     return (
         <Map
-            {...props}
+            id={id}
+            resources={resources}
+            coords={coords}
             deckglSpec={mapSpec}
             setSpecPatch={(patch) => {
                 setMapSpec(_setPatch(mapSpec, patch));
@@ -94,21 +96,11 @@ MapWrapper.propTypes = {
     resources: PropTypes.object,
 
     /**
-     * JSON object describing the map structure to which deckglSpecPatch will be
-     * applied in order to form the final map specification.
+     * JSON object describing the map specification.
      * More detailes about the specification format can be found here:
      * https://deck.gl/docs/api-reference/json/conversion-reference
      */
-    deckglSpecBase: PropTypes.object,
-
-    /**
-     * A JSON patch (http://jsonpatch.com/) applied to deckglSpecBase.
-     * This split (base + patch) allows doing partial updates to the map
-     * while keeping the map state in the Dash store, as well as
-     * making it easier for the Dash component user to figure out what changed
-     * in the map spec when recieving a callback on the python side.
-     */
-    deckglSpecPatch: PropTypes.arrayOf(PropTypes.object),
+    deckglSpec: PropTypes.object,
 
     /**
      * Parameters for the coordinates component
@@ -118,11 +110,6 @@ MapWrapper.propTypes = {
         multiPicking: PropTypes.bool,
         pickDepth: PropTypes.number,
     }),
-
-    /**
-     * For reacting to prop changes
-     */
-    setProps: PropTypes.func,
 };
 
 export default MapWrapper;
