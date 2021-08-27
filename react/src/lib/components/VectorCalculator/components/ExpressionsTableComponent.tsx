@@ -8,7 +8,10 @@ import { cloneDeep } from "lodash";
 
 import { ExpressionsTable } from "./ExpressionsTable";
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
-import { getAvailableName } from "../utils/VectorCalculatorHelperFunctions";
+import {
+    getAvailableName,
+    getDefaultExpression,
+} from "../utils/VectorCalculatorHelperFunctions";
 
 import "../VectorCalculator.css";
 
@@ -136,12 +139,8 @@ export const ExpressionsTableComponent: React.FC<ExpressionsTableComponentProps>
         const handleNewClick = React.useCallback((): void => {
             const newName = getAvailableName("New Expression", expressions);
             const newExpression: ExpressionType = {
+                ...getDefaultExpression(),
                 name: newName,
-                expression: "",
-                id: uuidv4(),
-                variableVectorMap: [],
-                isValid: false,
-                isDeletable: true,
             };
             addNewExpressions([newExpression]);
         }, [expressions, addNewExpressions, getAvailableName]);

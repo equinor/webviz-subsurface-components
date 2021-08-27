@@ -1,9 +1,25 @@
+import { v4 as uuidv4 } from "uuid";
+
 import { ExpressionType, VariableVectorMapType } from "./VectorCalculatorTypes";
 import {
     TreeDataNode,
     TreeDataNodeMetaData,
 } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
+
+export const getDefaultExpression = (): ExpressionType => {
+    return {
+        name: "",
+        expression: "x+2*y",
+        id: uuidv4(),
+        variableVectorMap: [
+            { variableName: "x", vectorName: [] },
+            { variableName: "y", vectorName: [] },
+        ],
+        isValid: false,
+        isDeletable: true,
+    };
+};
 
 export const isValidExpressionNameString = (name: string): boolean => {
     const regex = new RegExp(

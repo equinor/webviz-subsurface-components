@@ -5,6 +5,19 @@ import { VectorCalculatorComponent } from "./components/VectorCalculatorComponen
 import { string } from "jsverify";
 import "./VectorCalculator.css";
 
+/**
+ * VectorCalculator is a component that allows to calculate new vectors by creating a mathematical expression
+ * based existing vectors.
+ *
+ * New calcualted vectors are created by writing a mathematical equation with single character variables,
+ * where each variable is assigned a vector from the set of existing vectors.
+ *
+ * The component provides a list of valid expressions which can be used externally to calculate the wanted
+ * vector data.
+ *
+ * The component can handle validation of the mathematical equations internally or externally. External
+ * validation can be utilized to obtain coherent parsing in the component and the user.
+ */
 export const VectorCalculator = (props) => {
     return (
         <div className={"VectorCalculator"}>
@@ -55,6 +68,8 @@ VectorCalculator.propTypes = {
      * When controlled in Dash, the user must provide an external expression parser responsible for
      * validation of the active mathematical expression and provide the parsing data for the
      * externalParseData prop.
+     * If set to false, an internal JS-parser library is utilized for validation of the mathematical
+     * expressions.
      */
     isDashControlled: PropTypes.bool,
 
