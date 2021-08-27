@@ -1,11 +1,13 @@
 import { layers } from "@equinor/eds-icons";
 import { Icon } from "@equinor/eds-core-react";
-import { render, screen } from "@testing-library/react";
+import { getByRole, render, screen , fireEvent, waitFor, waitForElementToBeRemoved, act} from "@testing-library/react";
 import "jest-styled-components";
+import '@testing-library/jest-dom'
 import React from "react";
 import userEvent from "@testing-library/user-event";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import LayersButton from "./LayersButton";
+
 
 describe("test 'layers' button", () => {
     it("snapshot test", () => {
@@ -13,11 +15,9 @@ describe("test 'layers' button", () => {
         const { container } = render(Wrapper({ children: <LayersButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
-    xit("click to dispatch redux action", async () => {
-        render(<LayersButton />);
-        userEvent.hover(screen.getByLabelText("layers-selector-button"));
-        expect(await screen.findByText("Layers")).toBeInTheDocument();
-
+    it("click to dispatch redux action", async () => {
+        Icon.add({ layers });
+        render(Wrapper({ children: <LayersButton /> }));
         userEvent.click(screen.getByRole("button"));
         expect(screen.getByRole("menu")).toBeInTheDocument();
         userEvent.click(
@@ -29,4 +29,21 @@ describe("test 'layers' button", () => {
             type: "spec/updateVisibleLayers",
         });
     });
+    it('should close menu when clicked on backdrop', async () => {
+        render(Wrapper({ children: <LayersButton /> }));
+        userEvent.click(screen.getByRole("button"));
+        const layers_menu = screen.getByRole("menu");
+        expect(layers_menu).toBeInTheDocument();
+        userEvent.click(document.body);
+        await waitFor(() => expect(layers_menu).not.toBeVisible());
+
+    })
+    it('should close menu when clicked twice on layers button', async () => {
+        render(Wrapper({ children: <LayersButton /> }));
+        userEvent.click(screen.getByRole("button"));
+        const layers_menu = screen.getByRole("menu");
+        expect(layers_menu).toBeInTheDocument();
+        userEvent.click(screen.getByRole("button"));
+        await waitFor(() => expect(layers_menu).not.toBeVisible());
+    })
 });
