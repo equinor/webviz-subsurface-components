@@ -126,8 +126,8 @@ export const getDetailedExpression = (expression: ExpressionType): string => {
     );
 
     // Iterate thorugh list and replace variables from map with vector name
-    let newExpression: string[] = [];
-    for (let elm of expressionSplit) {
+    const newExpression: string[] = [];
+    for (const elm of expressionSplit) {
         const mapElm = map.get(elm);
         if (mapElm) {
             newExpression.push(mapElm);
