@@ -8,7 +8,7 @@ import DrawModeSelector from "./DrawModeSelector";
 describe("Test draw-mode menu", () => {
     it("snapshot test", () => {
         const { container } = render(
-            Wrapper({ children: <DrawModeSelector layerId="colormap-layer" /> })
+            Wrapper({ children: <DrawModeSelector layerId="drawing-layer" /> })
         );
         expect(container.firstChild).toMatchSnapshot();
     });
