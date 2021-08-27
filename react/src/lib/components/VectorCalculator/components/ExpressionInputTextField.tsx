@@ -43,6 +43,9 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
                     variant: "default",
                     icon: [],
                 };
+                if (disabled) {
+                    return styleData;
+                }
                 if (status === ExpressionStatus.Evaluating) {
                     styleData.icon = <Progress.Circular />;
                 }
@@ -55,7 +58,7 @@ export const ExpressionInputTextField: React.FC<ExpressionInputTextFieldProps> =
                     styleData.icon = <Icon key="error" name="error_filled" />;
                 }
                 return styleData;
-            }, [status]);
+            }, [disabled, status]);
 
         React.useEffect(() => {
             setTextFieldStyleDataState(getTextFieldStyleData());

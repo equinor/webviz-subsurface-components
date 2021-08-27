@@ -50,6 +50,9 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
 
     const getTextFieldStyleData = React.useCallback(
         (name: string): ExpressionNameTextFieldStyleData => {
+            if (disabled) {
+                return { variant: "default", icon: [], helperText: "" };
+            }
             if (!isValidExpressionNameString(name)) {
                 return {
                     variant: "error",
@@ -86,6 +89,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             isValidExpressionNameString,
             isNameOccupiedByVectors,
             doesNameExistInExpressionList,
+            disabled,
             existingExpressions,
             initialName,
             vectors,
