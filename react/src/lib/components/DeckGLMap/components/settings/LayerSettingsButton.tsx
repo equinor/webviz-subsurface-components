@@ -14,7 +14,14 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 interface Props {
+    /**
+     * Layer type defines the icon that should be displayed on the layer settings button.
+     */
     layerType: LayerType;
+    /**
+     * It defines setting options that should be made available based on
+     * the unique layer ID, on clicking layer setting button.
+     */
     layerId: string;
 }
 const LayerSettingsButton: React.FC<Props> = React.memo(
