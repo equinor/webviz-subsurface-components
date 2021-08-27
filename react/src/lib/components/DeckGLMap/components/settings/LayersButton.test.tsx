@@ -1,6 +1,10 @@
 import { layers } from "@equinor/eds-icons";
 import { Icon } from "@equinor/eds-core-react";
+<<<<<<< HEAD
 import { render, screen, waitFor } from "@testing-library/react";
+=======
+import { render, screen } from "@testing-library/react";
+>>>>>>> master
 import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
