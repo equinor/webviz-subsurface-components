@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import "jest-styled-components";
-import '@testing-library/jest-dom'
+import "@testing-library/jest-dom";
 import React from "react";
 import userEvent from "@testing-library/user-event";
 import { testStore, Wrapper } from "../../test/TestWrapper";
@@ -14,8 +14,10 @@ describe("Test draw-mode menu", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     it("select option to dispatch redux action", async () => {
-        render(Wrapper({ children: <DrawModeSelector layerId="drawing-layer" /> }));
-        expect(screen.getByLabelText(/draw mode/i)).toBeVisible()
+        render(
+            Wrapper({ children: <DrawModeSelector layerId="drawing-layer" /> })
+        );
+        expect(screen.getByLabelText(/draw mode/i)).toBeVisible();
         expect(
             screen.getByRole("combobox", { name: /draw mode/i })
         ).toHaveDisplayValue("drawLineString");

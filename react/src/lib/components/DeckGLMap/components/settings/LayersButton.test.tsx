@@ -1,13 +1,12 @@
 import { layers } from "@equinor/eds-icons";
 import { Icon } from "@equinor/eds-core-react";
-import { getByRole, render, screen , fireEvent, waitFor, waitForElementToBeRemoved, act} from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import "jest-styled-components";
-import '@testing-library/jest-dom'
+import "@testing-library/jest-dom";
 import React from "react";
 import userEvent from "@testing-library/user-event";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import LayersButton from "./LayersButton";
-
 
 describe("test 'layers' button", () => {
     it("snapshot test", () => {
@@ -29,21 +28,20 @@ describe("test 'layers' button", () => {
             type: "spec/updateVisibleLayers",
         });
     });
-    it('should close menu when clicked on backdrop', async () => {
+    it("should close menu when clicked on backdrop", async () => {
         render(Wrapper({ children: <LayersButton /> }));
         userEvent.click(screen.getByRole("button"));
         const layers_menu = screen.getByRole("menu");
         expect(layers_menu).toBeInTheDocument();
         userEvent.click(document.body);
         await waitFor(() => expect(layers_menu).not.toBeVisible());
-
-    })
-    it('should close menu when clicked twice on layers button', async () => {
+    });
+    it("should close menu when clicked twice on layers button", async () => {
         render(Wrapper({ children: <LayersButton /> }));
         userEvent.click(screen.getByRole("button"));
         const layers_menu = screen.getByRole("menu");
         expect(layers_menu).toBeInTheDocument();
         userEvent.click(screen.getByRole("button"));
         await waitFor(() => expect(layers_menu).not.toBeVisible());
-    })
+    });
 });
