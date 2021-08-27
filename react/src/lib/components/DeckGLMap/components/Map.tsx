@@ -15,15 +15,43 @@ import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 
 export interface MapProps {
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
     id: string;
+
+    /**
+     * Resource dictionary made available in the DeckGL specification as an enum.
+     * The values can be accessed like this: `"@@#resources.resourceId"`, where
+     * `resourceId` is the key in the `resources` dict. For more information,
+     * see the DeckGL documentation on enums in the json spec:
+     * https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
+     */
     resources: Record<string, unknown>;
+
+    /**
+     * JSON object describing the map specification.
+     * More details about the specification format can be found here:
+     * https://deck.gl/docs/api-reference/json/conversion-reference
+     */
     deckglSpec: Record<string, unknown>;
+
+    /**
+     * For reacting to prop changes
+     */
     setSpecPatch: (patch: Operation[]) => void;
+
+    /**
+     * Parameters for the InfoCard component
+     */
     coords: {
         visible: boolean;
         multiPicking: boolean;
         pickDepth: number;
     };
+
     children?: React.ReactNode;
 }
 
