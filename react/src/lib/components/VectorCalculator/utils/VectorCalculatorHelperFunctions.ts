@@ -114,14 +114,50 @@ export const getDetailedExpression = (expression: ExpressionType): string => {
     if (!expression.isValid) {
         return "";
     }
-    let detailedExpr = expression.expression;
-    for (const elm of expression.variableVectorMap) {
-        detailedExpr = detailedExpr.replace(
-            elm.variableName,
-            elm.vectorName[0]
-        );
+
+    // Retreive map as maptype
+    const map = getVariablesVectorMap(expression.variableVectorMap);
+
+    // Split if positive and negative lookahead character is non-single
+    // character a-zA-Z.
+    // Doc: https://medium.com/@shemar.gordon32/how-to-split-and-keep-the-delimiter-s-d433fb697c65
+    const expressionSplit = expression.expression.split(
+        /(?=[^a-zA-Z])|(?<=[^a-zA-Z])/g
+    );
+
+    // Iterate thorugh list and replace variables from map with vector name
+    let newExpression: string[] = [];
+    for (let elm of expressionSplit) {
+        const mapElm = map.get(elm);
+        if (mapElm) {
+            newExpression.push(mapElm);
+            continue;
+        }
+        newExpression.push(elm);
     }
-    return detailedExpr;
+    return newExpression.join("");
+};
+
+const getVariablesVectorMap = (
+    variableVectorMap: VariableVectorMapType[]
+): Map<string, string> => {
+    const map = new Map<string, string>();
+
+    for (const elm of variableVectorMap) {
+        map.set(elm.variableName, elm.vectorName[0]);
+    }
+
+    return map;
+};
+
+export const getVariablesInMap = (
+    variableVectorMap: VariableVectorMapType[]
+): string[] => {
+    let output: string[] = [];
+    for (const elm of variableVectorMap) {
+        output.push(elm.variableName);
+    }
+    return output;
 };
 
 export const getAvailableName = (
