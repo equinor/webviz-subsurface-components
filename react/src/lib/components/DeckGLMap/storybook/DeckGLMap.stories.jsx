@@ -1,16 +1,39 @@
 import React from "react";
-import DeckGLMapWrapper from "./DeckGLMapWrapper";
+import DeckGLMap from "../DeckGLMap";
 
 const exampleData = require("../../../../demo/example-data/deckgl-map.json");
 
 export default {
-    component: DeckGLMapWrapper,
+    component: DeckGLMap,
     title: "DeckGLMapComponent",
 };
 
 const Template = (args) => {
-    return <DeckGLMapWrapper {...args} />;
+    const [mapSpecBase, setMapSpecBase] = React.useState(null);
+    const [mapSpecPatch, setMapSpecPatch] = React.useState(null);
+
+    React.useEffect(() => {
+        setMapSpecBase(args.deckglSpecBase);
+    }, [args.deckglSpecBase]);
+
+    React.useEffect(() => {
+        setMapSpecPatch(args.deckglSpecPatch);
+    }, [args.deckglSpecPatch]);
+
+    return (
+        <DeckGLMap
+            id={args.id}
+            resources={args.resources}
+            coords={args.coords}
+            deckglSpecBase={mapSpecBase}
+            deckglSpecPatch={mapSpecPatch}
+            setProps={(updatedSpec) => {
+                setMapSpecBase(updatedSpec.deckglSpecBase);
+                setMapSpecPatch(updatedSpec.deckglSpecPatch);
+            }}
+        />
+    );
 };
 
-export const DeckGLMap = Template.bind({});
-DeckGLMap.args = exampleData[0];
+export const Default = Template.bind({});
+Default.args = exampleData[0];
