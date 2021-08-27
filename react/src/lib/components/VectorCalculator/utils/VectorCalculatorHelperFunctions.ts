@@ -150,16 +150,6 @@ const getVariablesVectorMap = (
     return map;
 };
 
-export const getVariablesInMap = (
-    variableVectorMap: VariableVectorMapType[]
-): string[] => {
-    let output: string[] = [];
-    for (const elm of variableVectorMap) {
-        output.push(elm.variableName);
-    }
-    return output;
-};
-
 export const getAvailableName = (
     nameSuggestion: string,
     expressions: ExpressionType[]
