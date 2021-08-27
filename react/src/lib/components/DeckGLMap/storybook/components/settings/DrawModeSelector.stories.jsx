@@ -8,7 +8,7 @@ const store = createStore(exampleData[0].deckglSpecBase, (patch) => patch);
 
 export default {
     component: DrawModeSelector,
-    title: "DeckGLMapComponent/Components/Settings/Components/DrawModeSelector",
+    title: "DeckGLMapComponent/Components/Settings/DrawModeSelector",
     decorators: [(story) => <Provider store={store}> {story()} </Provider>],
 };
 
@@ -16,7 +16,7 @@ const Template = (args) => {
     return <DrawModeSelector layerId={args.layerId} />;
 };
 
-export const DrawMode = Template.bind({});
-DrawMode.args = {
+export const Default = Template.bind({});
+Default.args = {
     layerId: "drawing-layer",
 };

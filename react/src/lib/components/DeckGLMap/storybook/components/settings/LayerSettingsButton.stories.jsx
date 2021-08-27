@@ -8,7 +8,7 @@ const store = createStore(exampleData[0].deckglSpecBase, (patch) => patch);
 
 export default {
     component: LayerSettingsButton,
-    title: "DeckGLMapComponent/Components/Settings/Components/LayerSettingsButton",
+    title: "DeckGLMapComponent/Components/Settings/LayerSettingsButton",
     decorators: [(story) => <Provider store={store}> {story()} </Provider>],
 };
 
@@ -22,8 +22,8 @@ const Template = (args) => {
     );
 };
 
-export const LayerSettings = Template.bind({});
-LayerSettings.args = {
+export const Default = Template.bind({});
+Default.args = {
     layerId: "drawing-layer",
     layerType: "DrawingLayer",
 };

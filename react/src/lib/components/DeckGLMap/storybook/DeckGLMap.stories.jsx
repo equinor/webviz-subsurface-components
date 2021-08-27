@@ -12,5 +12,5 @@ const Template = (args) => {
     return <DeckGLMapWrapper {...args} />;
 };
 
-export const Default = Template.bind({});
-Default.args = exampleData[0];
+export const DeckGLMap = Template.bind({});
+DeckGLMap.args = exampleData[0];

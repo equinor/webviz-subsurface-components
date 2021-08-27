@@ -90,7 +90,8 @@ const Map: React.FC<MapProps> = ({
         store.current.dispatch(setSpec(specObj ? deckglSpec : {}));
     }, [deckglSpec, specObj]);
 
-    const [hoverInfo, setHoverInfo] = React.useState([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [hoverInfo, setHoverInfo] = React.useState<any>([]);
     const onHover = React.useCallback(
         (pickInfo, event) => {
             if (coords.multiPicking && pickInfo.layer) {
