@@ -128,17 +128,13 @@ function DeckGLMap({
 
     return (
         patchedSpec && (
-            <div
-                style={{ height: "100%", width: "100%", position: "relative" }}
-            >
-                <Map
-                    id={id}
-                    resources={resources}
-                    deckglSpec={patchedSpec}
-                    setSpecPatch={setSpecPatch}
-                    coords={coords}
-                />
-            </div>
+            <Map
+                id={id}
+                resources={resources}
+                deckglSpec={patchedSpec}
+                setSpecPatch={setSpecPatch}
+                coords={coords}
+            />
         )
     );
 }
