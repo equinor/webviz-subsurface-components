@@ -12,6 +12,7 @@ import { setSpec } from "../redux/actions";
 import { createStore } from "../redux/store";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
+import DistanceScale from "../components/DistanceScale";
 
 export interface MapProps {
     id: string;
@@ -45,11 +46,15 @@ const Map: React.FC<MapProps> = ({
 
     const [specObj, setSpecObj] = React.useState(null);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [viewState, setViewState] = React.useState<any>();
     React.useEffect(() => {
         if (!deckglSpec) {
             return;
         }
 
+        // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
+        // See https://deck.gl/docs/api-reference/json/overview for more details.
         const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
         if (resources) {
             configuration.merge({
@@ -106,11 +111,15 @@ const Map: React.FC<MapProps> = ({
                     }}
                     ref={refCb}
                     onHover={onHover}
+                    onViewStateChange={({ viewState }) =>
+                        setViewState(viewState)
+                    }
                 >
                     {children}
                 </DeckGL>
                 {showInfoCard ? <InfoCard pickInfos={hoverInfo} /> : null}
                 <Settings />
+                {viewState ? <DistanceScale zoom={viewState.zoom} /> : null}
             </ReduxProvider>
         )
     );

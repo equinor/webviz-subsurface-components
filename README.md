@@ -45,7 +45,7 @@ then:
     ```
 2. Run some potentially optional postinstall scripts
     ```
-    npm run setup_deckgl_types --prefix ./react  # only needed if ignored scripts during install
+    npm run setup-deckgl-types --prefix ./react  # only needed if ignored scripts during install
     npm run copy-package-json --prefix ./react  # only needed if building Dash components
     ```
 3. Install python packages required to build components.
@@ -68,7 +68,7 @@ then:
 - To test your code in a Python environment:
     1. Build your code
         ```
-        npm run build:all --prefix ./react
+        npm run build --prefix ./react
         ```
     2. Install the Python pacakge in development mode (if not already done and
        assuming you are using a virtual environment):
@@ -90,17 +90,17 @@ then:
         `webviz_subsurface_components/__init__.py` so dash will serve them
         automatically when the component suite is requested.
 
-- Every file related to the component should be located in the component directory, unless the file is shared between multiple components. Only the component you want to export as a Dash-component should have the `.jsx`-extension, the rest of the sub-components should have `.js`. For example the file-structure should look something like this:
+- Every file related to the component should be located in the component directory, unless the file is shared between multiple components. For example the file-structure should look something like this:
 ```
 src
 |--lib
     |----<component_name>
         |----components
-              |----<sub_component>.js
+              |----<sub_component>.ts
         |----utils
-        |----<component_name>.jsx
+        |----<component_name>.tsx
         |----<component_name>.css
-        |----index.js
+        |----index.ts
 ```
 
 ### Automatically upload demo application
@@ -108,7 +108,7 @@ src
 This repository has a GitHub workflow which can automatically build and deploy a demo
 app with your changes, to GitHub pages.
 
-- On push to your feature branch, in your fork, the workflow will build and deploy a 
+- On push to your feature branch, in your fork, the workflow will build and deploy a
   demo app to your fork's GitHub page, given that your commit message includes the
   substring `[deploy test]`.
 - On merge to `master` in the main repository, a build + deploy will be done to the

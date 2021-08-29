@@ -9,13 +9,21 @@ export interface PropertyMapPickInfo extends BitmapPickInfo {
     propertyValue?: number;
 }
 
+// Parameters used to decode a float value from RGB pixels.
 export interface ValueDecoder {
+    // r, g and b multipliers
     rgbScaler: [number, number, number];
+    // value multiplier
     floatScaler: number;
+    // translation of the r, g, b sum
     offset: number;
+    // discretize the value in a number of steps
     step: number;
 }
 
+// Decode an RGB pixel to a float value. Same operation the one performed in decoder.fs.glsl,
+// but this time performed in the js world.
+// Optionally, this function can also remap an [0, 1] value to a different range, [min, max].
 export function decodeRGB(
     [r, g, b]: RGBColor,
     decoder: ValueDecoder,

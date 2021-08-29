@@ -1,4 +1,5 @@
 // This configuration object determines which deck.gl classes are accessible in the serialized json
+// See https://deck.gl/docs/api-reference/json/overview for more details.
 
 import {
     COORDINATE_SYSTEM,
