@@ -38,26 +38,25 @@ import ReactDOM from "react-dom";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
-interface Props1 {
+interface SimpleMenuProps {
     anchorEl: HTMLElement;
     track: Track;
     welllog: WellLog;
     type: string;
 }
-interface State1 {
+interface SimpleMenuState {
     anchorEl: HTMLElement | null;
 }
 
-class SimpleMenu extends Component<Props1, State1> {
-    constructor(props: Props1) {
+class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
+    constructor(props: SimpleMenuProps) {
         super(props);
         this.state = { anchorEl: this.props.anchorEl };
     }
-    componentDidUpdate(prevProps: Props1) {
+    componentDidUpdate(prevProps: SimpleMenuProps) {
         if (this.props.anchorEl !== prevProps.anchorEl) {
             this.setState({ anchorEl: this.props.anchorEl });
         }
-
         /*if (
             this.props.welllog !== prevProps.welllog ||
             this.props.track !== prevProps.track
@@ -307,6 +306,8 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         },
         onRescale: (event: OverlayRescaleEvent): void => {
             if (event.target && event.transform) {
+                parent.onRescale(event.transform.k);
+
                 event.target.style.visibility = "visible";
                 event.target.textContent = `Zoom: x${event.transform.k.toFixed(
                     1
@@ -513,13 +514,15 @@ interface Props {
     horizontal?: boolean;
     primaryAxis: string;
     //setAvailableAxes : (scales: string[]) => void;
-    setInfo: (infos: Info[]) => void;
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
+    setInfo?: (infos: Info[]) => void;
     setController?: (controller: WellLogController) => void;
     setScrollPos?: (pos: number) => void;
+    setZoom?: (pos: number) => void;
 
+    zoom?: number;
     scrollPos?: number;
     maxTrackNum?: number;
 }
@@ -583,6 +586,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.setScroll();
             this.setInfo();
         }
+        if (this.props.zoom !== prevProps.horizontal) {
+            this.setZoom();
+        }
+
         /*??
         if (this.props.setController !== prevProps.setController) {
             if (this.props.setController) // set callback to component caller
@@ -635,10 +642,26 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.props.welllog,
                 this.props.template
             );
-            this.addTrackContextMenus();
+            // not ready! this.addTrackContextMenus();
         }
         this.setScroll();
         this.setInfo(); // Clear old track information
+    }
+    setZoom(): void {
+        if (this.logController) {
+            const [b1, b2] = this.logController.scaleHandler.baseDomain();
+            const zoom = this.props.zoom ? this.props.zoom : 1;
+            const [d1, d2] = this.logController.domain;
+            const k = Math.abs(b2 - b1) / Math.abs(d2 - d1);
+            console.log("k=" + k);
+            console.log("zoom=" + zoom);
+            if (k !== zoom) {
+                let d = (d2 - d1) * 0.5;
+                const c = d1 + d;
+                d = (d * k) / zoom;
+                this.logController.zoomTo([c - d, c + d]);
+            }
+        }
     }
     setScroll(): void {
         const iFrom = this._newPos(this.state.scrollPos);
@@ -667,6 +690,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
     setInfo(x: number = Number.NaN, x2: number = Number.NaN): void {
         if (!this.logController) return;
+        if (!this.props.setInfo) return;
+
         const iFrom = this._newPos(this.state.scrollPos);
         const iTo = iFrom + this._maxmaxTrackNum();
         let iTrack = 0;
@@ -733,6 +758,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(x, x2);
     }
 
+    onRescale(k: number): void {
+        if (this.props.setZoom) this.props.setZoom(k);
+    }
+
     _addTrackContextMenu(
         className: string,
         func: (ev: TrackEvent) => void
@@ -768,34 +797,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         );
     }
     onTrackTitleContextMenu(ev: TrackEvent): void {
-        /*
-        const track = ev.track;
-        let msg = "";
-
-        const plots = (track as GraphTrack).plots;
-        const abbr = track.options.abbr;
-
-        const welllog = this.props.welllog;
-        if (welllog && welllog[0]) {
-            const curves = welllog[0].curves;
-            let iCurve = 0;
-            for (const curve of curves) {
-                msg += "\r\n" + curve.name;
-                if (plots) {
-                    // GraphTrack
-                    for (const plot of plots)
-                        if (plot.id == iCurve) {
-                            msg += "   *";
-                        }
-                } else if (abbr === curve.name) {
-                    msg += "   *";
-                }
-                iCurve++;
-            }
-        }
-
-        alert("Available tracks:" + msg);
-        */
         localMenuTitle(ev.element, ev.track, this.props.welllog);
     }
     onTrackLegendContextMenu(ev: TrackEvent): void {
@@ -824,7 +825,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     _maxmaxTrackNum(): number {
         return this.props.maxTrackNum
             ? this.props.maxTrackNum
-            : 20 /*some default value*/;
+            : 7 /*some default value*/;
     }
 
     scrollUp(): boolean {

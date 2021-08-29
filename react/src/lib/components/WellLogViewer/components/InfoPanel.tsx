@@ -18,7 +18,7 @@ function createSeparator() {
         <tr key={"separator"}>
             {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
 
-            <td colSpan={3}>
+            <td colSpan={4}>
                 {" "}
                 <hr />
             </td>
