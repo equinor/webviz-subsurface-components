@@ -207,7 +207,7 @@ class WellLogViewer extends Component<Props, State> {
                         setZoom={this.setZoom.bind(this)}
                     />{" "}
                 </div>
-                <div valign="top" style={{ flex: "0, 0, 280px" }}>
+                <div style={{ flex: "0, 0, 280px" }}>
                     <AxisSelector
                         header="Primary scale"
                         axes={this.state.axes}

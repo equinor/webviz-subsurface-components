@@ -205,7 +205,12 @@ function localMenuLegend(parent: HTMLElement, track: Track, welllog: WellLog) {
     el.style.height = "3px";
     parent.appendChild(el);
     ReactDOM.render(
-        <SimpleMenu anchorEl={el} track={track} welllog={welllog} />,
+        <SimpleMenu
+            type="legend"
+            anchorEl={el}
+            track={track}
+            welllog={welllog}
+        />,
         el
     );
 }
