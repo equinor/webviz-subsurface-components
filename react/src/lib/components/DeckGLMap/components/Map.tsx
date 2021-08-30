@@ -52,6 +52,15 @@ export interface MapProps {
         pickDepth: number;
     };
 
+    /**
+     * Parameters for the Distance Scale component
+     */
+    scale: {
+        visible: boolean;
+        incrementValue: number;
+        widthPerUnit: number;
+    };
+
     children?: React.ReactNode;
 }
 
@@ -61,6 +70,7 @@ const Map: React.FC<MapProps> = ({
     deckglSpec,
     setSpecPatch,
     coords,
+    scale,
     children,
 }: MapProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -168,11 +178,11 @@ const Map: React.FC<MapProps> = ({
                 </DeckGL>
                 {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
                 <Settings />
-                {viewState ? (
+                {viewState && scale.visible ? (
                     <DistanceScale
                         zoom={viewState.zoom}
-                        incrementValue={100}
-                        widthPerUnit={100}
+                        incrementValue={scale.incrementValue}
+                        widthPerUnit={scale.widthPerUnit}
                     />
                 ) : null}
             </ReduxProvider>
