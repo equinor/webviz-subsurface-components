@@ -15,13 +15,43 @@ import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 
 export interface MapProps {
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
     id: string;
+
+    /**
+     * Resource dictionary made available in the DeckGL specification as an enum.
+     * The values can be accessed like this: `"@@#resources.resourceId"`, where
+     * `resourceId` is the key in the `resources` dict. For more information,
+     * see the DeckGL documentation on enums in the json spec:
+     * https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
+     */
     resources: Record<string, unknown>;
+
+    /**
+     * JSON object describing the map specification.
+     * More details about the specification format can be found here:
+     * https://deck.gl/docs/api-reference/json/conversion-reference
+     */
     deckglSpec: Record<string, unknown>;
+
+    /**
+     * For reacting to prop changes
+     */
     setSpecPatch: (patch: Operation[]) => void;
-    onHover: <D>(info: PickInfo<D>, e: MouseEvent) => void;
-    hoverInfo: PickInfo<unknown>[];
-    showInfoCard: boolean;
+
+    /**
+     * Parameters for the InfoCard component
+     */
+    coords: {
+        visible: boolean;
+        multiPicking: boolean;
+        pickDepth: number;
+    };
+
     children?: React.ReactNode;
 }
 
@@ -30,9 +60,7 @@ const Map: React.FC<MapProps> = ({
     resources,
     deckglSpec,
     setSpecPatch,
-    onHover,
-    hoverInfo,
-    showInfoCard,
+    coords,
     children,
 }: MapProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,6 +118,25 @@ const Map: React.FC<MapProps> = ({
         store.current.dispatch(setSpec(specObj ? deckglSpec : {}));
     }, [deckglSpec, specObj]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [hoverInfo, setHoverInfo] = React.useState<any>([]);
+    const onHover = React.useCallback(
+        (pickInfo, event) => {
+            if (coords.multiPicking && pickInfo.layer) {
+                const infos = pickInfo.layer.context.deck.pickMultipleObjects({
+                    x: event.offsetCenter.x,
+                    y: event.offsetCenter.y,
+                    radius: 1,
+                    depth: coords.pickDepth,
+                });
+                setHoverInfo(infos);
+            } else {
+                setHoverInfo([pickInfo]);
+            }
+        },
+        [coords]
+    );
+
     return (
         specObj && (
             <ReduxProvider store={store.current}>
@@ -117,7 +164,7 @@ const Map: React.FC<MapProps> = ({
                 >
                     {children}
                 </DeckGL>
-                {showInfoCard ? <InfoCard pickInfos={hoverInfo} /> : null}
+                {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
                 <Settings />
                 {viewState ? <DistanceScale zoom={viewState.zoom} /> : null}
             </ReduxProvider>

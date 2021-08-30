@@ -7,6 +7,7 @@ module.exports = {
         "@storybook/addon-links",
         "@storybook/addon-essentials",
         "@storybook/addon-actions",
+        "addon-redux"
     ],
     core: {
         builder: "webpack5",
