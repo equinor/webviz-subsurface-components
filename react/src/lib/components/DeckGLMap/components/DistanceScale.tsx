@@ -3,17 +3,21 @@ import React from "react";
 interface scaleProps {
     // Needed the zoom value to calculate width in units
     zoom: number;
+    // Scale increment value
+    incrementValue: number;
+    // width per unit value to calculate width in units
+    widthPerUnit: number;
 }
-
-const incrementValue = 100;
-let scaleValue = 0;
 
 const roundOffvalues = function (num: number, step: number) {
     return Math.floor(num / step + 0.5) * step;
 };
 
-const DistanceScale: React.FC<scaleProps> = ({ zoom }: scaleProps) => {
-    const widthPerUnit = 100;
+const DistanceScale: React.FC<scaleProps> = ({
+    zoom,
+    incrementValue,
+    widthPerUnit,
+}: scaleProps) => {
     const [rulerWidth, setRulerWidth] = React.useState<number>(widthPerUnit);
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
     const scaleRulerStyle = {
@@ -28,11 +32,12 @@ const DistanceScale: React.FC<scaleProps> = ({ zoom }: scaleProps) => {
         bottom: 0,
     };
 
-    if (widthInUnits < incrementValue) {
-        scaleValue = Math.round(widthInUnits);
-    } else {
-        scaleValue = roundOffvalues(widthInUnits, incrementValue);
-    }
+    let scaleValue = 0;
+
+    scaleValue =
+        widthInUnits < incrementValue
+            ? Math.round(widthInUnits)
+            : roundOffvalues(widthInUnits, incrementValue);
 
     React.useEffect(() => {
         setRulerWidth(scaleValue * Math.pow(2, zoom));

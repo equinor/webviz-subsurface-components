@@ -168,7 +168,13 @@ const Map: React.FC<MapProps> = ({
                 </DeckGL>
                 {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
                 <Settings />
-                {viewState ? <DistanceScale zoom={viewState.zoom} /> : null}
+                {viewState ? (
+                    <DistanceScale
+                        zoom={viewState.zoom}
+                        incrementValue={100}
+                        widthPerUnit={100}
+                    />
+                ) : null}
             </ReduxProvider>
         )
     );
