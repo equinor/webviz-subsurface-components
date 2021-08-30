@@ -7,6 +7,9 @@ import { DrawModes } from "../../redux/types";
 import { getDrawMode } from "../../utils/specExtractor";
 
 interface Props {
+    /**
+     * It defines the mode that are available for a particular layer based on layer ID.
+     */
     layerId: string;
 }
 const DrawModeSelector: React.FC<Props> = React.memo(({ layerId }: Props) => {

@@ -135,7 +135,15 @@ const DeckGLMapDemo = () => {
                             setErrorReset(false);
                         }}
                     >
-                        <DeckGLMap {...parsedJson} setProps={setMapProps} />
+                        <div
+                            style={{
+                                height: "100%",
+                                width: "100%",
+                                position: "relative",
+                            }}
+                        >
+                            <DeckGLMap {...parsedJson} setProps={setMapProps} />
+                        </div>
                     </ErrorBoundary>
                     <div>
                         {colormaps.map((colormap, index) => (
