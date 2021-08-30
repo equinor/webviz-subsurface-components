@@ -118,8 +118,7 @@ export const getDetailedExpression = (expression: ExpressionType): string => {
     // Retreive map as maptype
     const map = getVariablesVectorMap(expression.variableVectorMap);
 
-    // Split if positive and negative lookahead character is non-single
-    // character a-zA-Z.
+    // Split if positive lookahead or positive lookbehind character is not character a-zA-Z.
     // Doc: https://medium.com/@shemar.gordon32/how-to-split-and-keep-the-delimiter-s-d433fb697c65
     const expressionSplit = expression.expression.split(
         /(?=[^a-zA-Z])|(?<=[^a-zA-Z])/g
