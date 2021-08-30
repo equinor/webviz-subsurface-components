@@ -70,6 +70,8 @@ const Map: React.FC<MapProps> = ({
     const refCb = React.useCallback(
         (deckRef) => {
             if (deckRef) {
+                // Needed to initialize the viewState on first load
+                setViewState(deckRef.deck.viewState);
                 deckRef.deck.setProps({
                     // userData is undocumented and it doesn't appear in the
                     // deckProps type, but it is used by the layersManager
