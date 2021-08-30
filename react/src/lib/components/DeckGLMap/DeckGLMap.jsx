@@ -113,24 +113,6 @@ function DeckGLMap({
         }
     }, [patchedSpec]);
 
-    const [hoverInfo, setHoverInfo] = React.useState([]);
-    const onHover = React.useCallback(
-        (pickInfo, event) => {
-            if (coords.multiPicking && pickInfo.layer) {
-                const infos = pickInfo.layer.context.deck.pickMultipleObjects({
-                    x: event.offsetCenter.x,
-                    y: event.offsetCenter.y,
-                    radius: 1,
-                    depth: coords.pickDepth,
-                });
-                setHoverInfo(infos);
-            } else {
-                setHoverInfo([pickInfo]);
-            }
-        },
-        [coords]
-    );
-
     // This callback is used as a mechanism to update the component from the layers or toolbar.
     // The changes done in a layer, for example, are bundled into a patch
     // and sent to the parent component via setProps. (See layers/utils/layerTools.ts)
@@ -146,19 +128,13 @@ function DeckGLMap({
 
     return (
         patchedSpec && (
-            <div
-                style={{ height: "100%", width: "100%", position: "relative" }}
-            >
-                <Map
-                    id={id}
-                    resources={resources}
-                    deckglSpec={patchedSpec}
-                    setSpecPatch={setSpecPatch}
-                    onHover={onHover}
-                    hoverInfo={hoverInfo}
-                    showInfoCard={coords.visible}
-                />
-            </div>
+            <Map
+                id={id}
+                resources={resources}
+                deckglSpec={patchedSpec}
+                setSpecPatch={setSpecPatch}
+                coords={coords}
+            />
         )
     );
 }
