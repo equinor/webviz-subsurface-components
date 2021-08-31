@@ -65,6 +65,11 @@ DeckGLMap.defaultProps = {
         multiPicking: true,
         pickDepth: 10,
     },
+    scale: {
+        visible: true,
+        incrementValue: 100,
+        widthPerUnit: 100,
+    },
 };
 
 function DeckGLMap({
@@ -73,6 +78,7 @@ function DeckGLMap({
     deckglSpecBase,
     deckglSpecPatch,
     coords,
+    scale,
     setProps,
 }) {
     // Map specification formed from applying the deckglSpecPatch to deckglSpecBase.
@@ -134,6 +140,7 @@ function DeckGLMap({
                 deckglSpec={patchedSpec}
                 setSpecPatch={setSpecPatch}
                 coords={coords}
+                scale={scale}
             />
         )
     );
@@ -191,6 +198,24 @@ DeckGLMap.propTypes = {
          * See https://deck.gl/docs/api-reference/core/deck#pickmultipleobjects
          */
         pickDepth: PropTypes.number,
+    }),
+
+    /**
+     * Parameters for the Distance Scale component
+     */
+    scale: PropTypes.shape({
+        /**
+         * Toggle component visibility.
+         */
+        visible: PropTypes.bool,
+        /**
+         * Increment value for the scale.
+         */
+        incrementValue: PropTypes.number,
+        /**
+         * Scale bar width in pixels per unit value.
+         */
+        widthPerUnit: PropTypes.number,
     }),
 
     /**
