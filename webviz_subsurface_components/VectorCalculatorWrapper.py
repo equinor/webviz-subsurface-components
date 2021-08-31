@@ -120,12 +120,10 @@ class VectorCalculatorWrapper(VectorCalculator):
                 )
                 raise Exception(message + f" {invalid_var_chars}")
 
-            # Evaluate to ensure valid expression (not captured by parse() method)
-            # - Parser allow assignment of function to variable, e.g. parse("f(x)").evaluate({"f":np.sqrt, "x":2})
-            # - Assign value to variables and evaluate to ensure valid expression
-            evaluation_values = np.ones(len(variables))
-            evaluation_dict = dict(zip(variables, evaluation_values))
-            parsed_expr.evaluate(evaluation_dict)
+            # Ensure expression contains no invalid function call
+            VectorCalculatorWrapper._raise_exception_on_invalid_function_call(
+                expression
+            )
 
             return expression
 
@@ -202,3 +200,39 @@ class VectorCalculatorWrapper(VectorCalculator):
         for elm in var_vec_map:
             var_vec_dict[elm["variableName"]] = elm["vectorName"][0]
         return var_vec_dict
+
+    @staticmethod
+    def _raise_exception_on_invalid_function_call(expression: str) -> None:
+        # Parser allow assignment of function to variable, e.g. parse("f(x)").evaluate({"f":np.sqrt, "x":2}),
+        # and "f(x)" will thereby be successfully parsed. However, when assigning vector to "f" and "x", the
+        # evaluation will fail. For consistence between parsing and evaulation, this corner case is handled.
+        # Solution:
+        # - Split if positive lookahead or positive lookbehind character is not character a-zA-Z or
+        #   numeric 0-9: (?=[^a-zA-Z0-9])|(?<=[^a-zA-Z0-9])
+        # - Ensure character in front of "(" is whitelisted operator or function.
+        # - Example: "log10(x)+f(y)" -> ['log10', '(', 'x', ')', '+', 'f', '(', 'y', ')', '']
+        # - Doc: https://medium.com/@shemar.gordon32/how-to-split-and-keep-the-delimiter-s-d433fb697c65
+        expression_split: List[str] = re.split(
+            "(?=[^a-zA-Z0-9])|(?<=[^a-zA-Z0-9])", expression
+        )
+
+        # Remove the empty strings and whitespace.
+        # - If first or last character meets split condition - emtpy string is added in front or back
+        expression_split = [
+            elm for elm in expression_split if not elm == "" and not elm.isspace()
+        ]
+
+        # Ensure "(" can only come after valid functions or operators, unless "(" is first character
+        operators_and_functions: List[str] = (
+            list(VectorCalculatorWrapper.parser.ops1.keys())
+            + list(VectorCalculatorWrapper.parser.ops2.keys())
+            + list(VectorCalculatorWrapper.parser.functions.keys())
+        )
+        for i, elm in enumerate(expression_split):
+            if i == 0:
+                continue
+
+            prev_elm = expression_split[i - 1]
+            if elm == "(" and not prev_elm in operators_and_functions:
+                message = 'Invalid function call with "' + prev_elm + '"'
+                raise Exception(message)
