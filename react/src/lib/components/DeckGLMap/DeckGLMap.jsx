@@ -213,7 +213,7 @@ DeckGLMap.propTypes = {
          */
         incrementValue: PropTypes.number,
         /**
-         * width per unit value to calculate width in units.
+         * Scale bar width in pixels per unit value.
          */
         widthPerUnit: PropTypes.number,
     }),

@@ -5,11 +5,11 @@ interface scaleProps {
     zoom: number;
     // Scale increment value
     incrementValue: number;
-    // width per unit value to calculate width in units
+    // Scale bar width in pixels per unit value
     widthPerUnit: number;
 }
 
-const roundOffvalues = function (num: number, step: number) {
+const roundToStep = function (num: number, step: number) {
     return Math.floor(num / step + 0.5) * step;
 };
 
@@ -18,7 +18,7 @@ const DistanceScale: React.FC<scaleProps> = ({
     incrementValue,
     widthPerUnit,
 }: scaleProps) => {
-    const [rulerWidth, setRulerWidth] = React.useState<number>(widthPerUnit);
+    const [rulerWidth, setRulerWidth] = React.useState<number>(0);
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
     const scaleRulerStyle = {
         width: rulerWidth,
@@ -32,12 +32,10 @@ const DistanceScale: React.FC<scaleProps> = ({
         bottom: 0,
     };
 
-    let scaleValue = 0;
-
-    scaleValue =
+    const scaleValue =
         widthInUnits < incrementValue
             ? Math.round(widthInUnits)
-            : roundOffvalues(widthInUnits, incrementValue);
+            : roundToStep(widthInUnits, incrementValue);
 
     React.useEffect(() => {
         setRulerWidth(scaleValue * Math.pow(2, zoom));
