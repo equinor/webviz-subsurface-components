@@ -7,11 +7,11 @@ const { parse } = create({
 const operatorWhitelist: string[] = ["+", "-", "*", "/", "^"];
 
 /** Note whitelisted functions:
- * log - https://mathjs.org/docs/reference/functions/log.html
- * log10 - https://mathjs.org/docs/reference/functions/log10.html
- * sqrt - https://mathjs.org/docs/reference/functions/sqrt.html
+ * ln - Natural logarithm
+ * log10 - Base-10 logarithm
+ * sqrt - Square root
  */
-const functionWhitelist: string[] = ["log", "log10", "sqrt"];
+const functionWhitelist: string[] = ["ln", "log10", "sqrt"];
 
 type ParsingResult = { variables: string[] };
 

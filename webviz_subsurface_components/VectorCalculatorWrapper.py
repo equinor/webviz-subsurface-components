@@ -67,7 +67,7 @@ class VectorCalculatorParser(Parser):
         }
         # Whitelist with numpy functions
         self.functions = {
-            "log": np.log,  # Natural logarithm
+            "ln": np.log,  # Natural logarithm
             "log10": np.log10,  # Base-10 logarithm
         }
 
