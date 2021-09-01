@@ -8,7 +8,7 @@ const store = createStore(exampleData[0].deckglSpecBase, (patch) => patch);
 
 export default {
     component: Settings,
-    title: "DeckGLMapComponent/Components/Settings",
+    title: "DeckGLMap/Components/Settings",
     decorators: [(story) => <Provider store={store}> {story()} </Provider>],
 };
 

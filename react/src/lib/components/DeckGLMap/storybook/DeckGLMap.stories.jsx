@@ -5,7 +5,7 @@ const exampleData = require("../../../../demo/example-data/deckgl-map.json");
 
 export default {
     component: DeckGLMap,
-    title: "DeckGLMapComponent",
+    title: "DeckGLMap",
 };
 
 const Template = (args) => {

@@ -5,7 +5,7 @@ import Map from "../../components/Map";
 const exampleData = require("../../../../../demo/example-data/deckgl-map-spec.json");
 export default {
     component: Map,
-    title: "DeckGLMapComponent/Components/Map",
+    title: "DeckGLMap/Components/Map",
 };
 
 function _idsToIndices(doc, path) {

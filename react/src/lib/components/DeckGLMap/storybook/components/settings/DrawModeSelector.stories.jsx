@@ -8,7 +8,7 @@ const store = createStore(exampleData[0].deckglSpecBase, (patch) => patch);
 
 export default {
     component: DrawModeSelector,
-    title: "DeckGLMapComponent/Components/Settings/DrawModeSelector",
+    title: "DeckGLMap/Components/Settings/DrawModeSelector",
     decorators: [(story) => <Provider store={store}> {story()} </Provider>],
 };
 

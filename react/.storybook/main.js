@@ -13,6 +13,10 @@ module.exports = {
         builder: "webpack5",
     },
     webpackFinal: (config) => {
+        config.module.rules.push({
+            test: /\.scss$/,
+            use: ["vue-style-loader", "css-loader", "sass-loader"],
+        });
         return {
             ...config,
             resolve: {
