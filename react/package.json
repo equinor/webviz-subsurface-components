@@ -59,6 +59,7 @@
         "@webviz/core-components": "^0.5.1",
         "ajv": "^7.2.1",
         "clsx": "^1.1.1",
+        "convert-units": "^2.3.4",
         "d3": "^5.11.0",
         "deck.gl": "^8.4.13",
         "deep-equal": "^2.0.5",
