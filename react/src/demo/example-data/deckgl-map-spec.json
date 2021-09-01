@@ -6,6 +6,11 @@
       "multiPicking": true,
       "pickDepth": 10
     },
+    "scale": {
+      "visible": true,
+      "incrementValue": 100,
+      "widthPerUnit": 100
+    },
     "resources": {
       "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png"
     },

@@ -22,9 +22,7 @@ const Template = (args) => {
 
     return (
         <DeckGLMap
-            id={args.id}
-            resources={args.resources}
-            coords={args.coords}
+            {...args}
             deckglSpecBase={mapSpecBase}
             deckglSpecPatch={mapSpecPatch}
             setProps={(updatedSpec) => {
