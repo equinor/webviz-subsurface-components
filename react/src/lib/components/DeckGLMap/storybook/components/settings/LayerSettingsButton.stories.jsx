@@ -8,7 +8,7 @@ const store = createStore(exampleData[0].deckglSpecBase, (patch) => patch);
 
 export default {
     component: LayerSettingsButton,
-    title: "DeckGLMapComponent/Components/Settings/LayerSettingsButton",
+    title: "DeckGLMap/Components/Settings/LayerSettingsButton",
     decorators: [(story) => <Provider store={store}> {story()} </Provider>],
 };
 
