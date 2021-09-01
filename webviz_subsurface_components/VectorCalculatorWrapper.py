@@ -203,16 +203,22 @@ class VectorCalculatorWrapper(VectorCalculator):
 
     @staticmethod
     def _raise_exception_on_invalid_function_call(expression: str) -> None:
-        # Parser allow assignment of function to variable, e.g. parse("f(x)").evaluate({"f":np.sqrt, "x":2}),
-        # and "f(x)" will thereby be successfully parsed. However, when assigning vector to "f" and "x", the
-        # evaluation will fail. For consistence between parsing and evaulation, this corner case is handled.
-        # Solution:
-        # - Split if positive lookahead or positive lookbehind character is not character a-zA-Z or
-        #   numeric 0-9: (?=[^a-zA-Z0-9])|(?<=[^a-zA-Z0-9])
-        # - Ensure character in front of "(" is whitelisted operator or function.
-        # - Example: "log10(x)+f(y)" -> ['log10', '(', 'x', ')', '+', 'f', '(', 'y', ')', '']
-        # - Doc: https://medium.com/@shemar.gordon32/how-to-split-and-keep-the-delimiter-s-d433fb697c65
-        expression_split: List[str] = re.split(
+        """
+        Raise exception when detecting invalid function call missed by parser function.
+
+        Parser allow assignment of function to variable, e.g. parse("f(x)").evaluate({"f":np.sqrt, "x":2}),
+        and "f(x)" will thereby be successfully parsed. However, when assigning vector to "f" and "x", the
+        evaluation will fail. For consistence between parsing and evaulation, this corner case is handled.
+
+        Solution:
+        - Split string at character not a-z,A-Z or 0-9 and keep all characters i split array.
+        - To obtain this use positive lookahead and positive lookbehind: (?=[^a-zA-Z0-9])|(?<=[^a-zA-Z0-9])
+        - Ensure character in front of "(" is whitelisted operator or function.
+        - Example: "log10(x)+f(y)" -> ['log10', '(', 'x', ')', '+', 'f', '(', 'y', ')', '']
+        - Doc: https://medium.com/@shemar.gordon32/how-to-split-and-keep-the-delimiter-s-d433fb697c65
+        """
+
+        expression_split: List[str] = VectorCalculatorWrapper._str_split(
             "(?=[^a-zA-Z0-9])|(?<=[^a-zA-Z0-9])", expression
         )
 
@@ -236,3 +242,20 @@ class VectorCalculatorWrapper(VectorCalculator):
             if elm == "(" and not prev_elm in operators_and_functions:
                 message = 'Invalid function call with "' + prev_elm + '"'
                 raise Exception(message)
+
+    def _str_split(pattern: str, string: str) -> List[str]:
+        """
+        String split function.
+
+        Define split function as re.split() in Python version <= 3.6 requires non-empty
+        pattern match - use separate implementation for these python versions.
+
+        Doc: https://docs.python.org/3/library/re.html#re.split
+        """
+        if sys.version_info[0] == 3 and sys.version_info[1] >= 7:
+            return re.split(pattern, string)
+        else:
+            splits = list((el.start(), el.end()) for el in re.finditer(pattern, string))
+            starts = [0] + [i[1] for i in splits]
+            ends = [i[0] for i in splits] + [len(string)]
+            return [string[start:end] for start, end in zip(starts, ends)]
