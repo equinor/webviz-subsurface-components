@@ -34,6 +34,12 @@ const GroupTreeViewer: React.FC = () => {
         (state: GroupTreeState) => state.ui.currentFlowRate
     );
     useEffect(() => {
+        // Clear possible elements added from earlier updates.
+        const node = document.getElementById("grouptree_tree");
+        if (node) {
+            node.innerHTML = "";
+        }
+
         renderer.current = new GroupTree(
             "#grouptree_tree",
             cloneDeep(data),
