@@ -35,7 +35,7 @@
         "test": "jest --coverage",
         "test:watch": "npm test -- --watch",
         "build:npm": "rimraf dist && tsc --declaration && npm run copy-files",
-        "copy-files": "copyfiles package.json dist && copyfiles --up 1 ../README.md dist && copyfiles --up 2 src/lib/**/*.css src/lib/**/*.glsl src/lib/**/*.svg src/lib/inputSchema/*.json dist/",
+        "copy-files": "copyfiles package.json dist && copyfiles --up 1 ../README.md dist && copyfiles --up 2 \"src/lib/**/*.{css, glsl, svg}\" src/lib/inputSchema/*.json dist/",
         "prepare": "npm run build:npm",
         "postpack": "npm run tidy-up",
         "prepublishOnly": "npm test && npm run lint",
