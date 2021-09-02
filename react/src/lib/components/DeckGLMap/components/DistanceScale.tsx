@@ -1,4 +1,6 @@
 import React from "react";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const convert = require("convert-units");
 
 interface scaleProps {
     // Needed the zoom value to calculate width in units
@@ -7,6 +9,10 @@ interface scaleProps {
     incrementValue: number;
     // Scale bar width in pixels per unit value
     widthPerUnit: number;
+    // positioning the scale ruler based on x and y values
+    position: number[];
+    // default unit for the scale ruler
+    scaleUnit: string;
 }
 
 const roundToStep = function (num: number, step: number) {
@@ -17,6 +23,8 @@ const DistanceScale: React.FC<scaleProps> = ({
     zoom,
     incrementValue,
     widthPerUnit,
+    position,
+    scaleUnit,
 }: scaleProps) => {
     const [rulerWidth, setRulerWidth] = React.useState<number>(0);
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
@@ -37,13 +45,23 @@ const DistanceScale: React.FC<scaleProps> = ({
             ? Math.round(widthInUnits)
             : roundToStep(widthInUnits, incrementValue);
 
+    const convertedUnit = convert(scaleValue).from(scaleUnit).toBest().unit;
+    const convertedValue = convert(scaleValue).from(scaleUnit).toBest().val;
+
     React.useEffect(() => {
         setRulerWidth(scaleValue * Math.pow(2, zoom));
     }, [zoom]);
 
     return (
-        <div style={{ bottom: 0, right: 0, position: "absolute" }}>
-            <label>{scaleValue}</label>
+        <div
+            style={{
+                bottom: position[0],
+                left: position[1],
+                position: "relative",
+            }}
+        >
+            <label>{convertedValue.toFixed(0)}</label>
+            {convertedUnit}
             <div style={scaleRulerStyle}></div>
         </div>
     );
