@@ -20,7 +20,11 @@ const useStyles = makeStyles(() =>
     })
 );
 
-const GroupTreeViewer: React.FC = () => {
+interface Props {
+    id: string;
+}
+
+const GroupTreeViewer: React.FC<Props> = ({ id }: Props) => {
     const classes = useStyles();
     const divRef = useRef<HTMLDivElement>(null);
     const data = useContext(DataContext);
@@ -35,13 +39,13 @@ const GroupTreeViewer: React.FC = () => {
     );
     useEffect(() => {
         // Clear possible elements added from earlier updates.
-        const node = document.getElementById("grouptree_tree");
+        const node = document.getElementById(id);
         if (node) {
             node.innerHTML = "";
         }
 
         renderer.current = new GroupTree(
-            "#grouptree_tree",
+            id,
             cloneDeep(data),
             "oilrate",
             currentDateTime
@@ -59,10 +63,11 @@ const GroupTreeViewer: React.FC = () => {
         renderer.current.flowrate = currentFlowRate;
     }, [currentFlowRate]);
 
+    console.log("HEI 2")
     return (
         <div className={classes.root}>
             <SettingsBar />
-            <div id="grouptree_tree" ref={divRef} />
+            <div id={id} ref={divRef} />
             {/* <GroupTreePlot root={root} currentFlowRate={currentFlowRate} /> */}
         </div>
     );

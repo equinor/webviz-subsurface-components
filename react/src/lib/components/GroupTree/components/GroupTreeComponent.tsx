@@ -21,7 +21,7 @@ const GroupTreeComponent: React.FC<Props> = React.memo(
     ({ id, data }: Props) => {
         return (
             <DataProvider id={id} data={data}>
-                <GroupTreeViewer />
+                <GroupTreeViewer id={id} />
             </DataProvider>
         );
     }
