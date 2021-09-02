@@ -64,10 +64,7 @@ const Template = (args) => {
 
     return (
         <Map
-            id={args.id}
-            resources={args.resources}
-            coords={args.coords}
-            deckglSpec={mapSpec}
+            {...args}
             setSpecPatch={(patch) => {
                 setMapSpec(_setPatch(mapSpec, patch));
             }}
