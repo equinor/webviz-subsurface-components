@@ -79,6 +79,7 @@ function DeckGLMap({
     deckglSpecPatch,
     coords,
     scale,
+    coordinateUnit,
     setProps,
 }) {
     // Map specification formed from applying the deckglSpecPatch to deckglSpecBase.
@@ -141,6 +142,7 @@ function DeckGLMap({
                 setSpecPatch={setSpecPatch}
                 coords={coords}
                 scale={scale}
+                coordinateUnit={coordinateUnit}
             />
         )
     );
@@ -217,6 +219,12 @@ DeckGLMap.propTypes = {
          */
         widthPerUnit: PropTypes.number,
     }),
+
+    /**
+     * Parameters for the Distance Scale component
+     * Unit for the scale ruler
+     */
+    coordinateUnit: PropTypes.string,
 
     /**
      * For reacting to prop changes

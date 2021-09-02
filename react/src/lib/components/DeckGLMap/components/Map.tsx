@@ -59,7 +59,10 @@ export interface MapProps {
         visible: boolean;
         incrementValue: number;
         widthPerUnit: number;
+        position: number[];
     };
+
+    coordinateUnit: string;
 
     children?: React.ReactNode;
 }
@@ -71,6 +74,7 @@ const Map: React.FC<MapProps> = ({
     setSpecPatch,
     coords,
     scale,
+    coordinateUnit,
     children,
 }: MapProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -183,6 +187,8 @@ const Map: React.FC<MapProps> = ({
                         zoom={viewState.zoom}
                         incrementValue={scale.incrementValue}
                         widthPerUnit={scale.widthPerUnit}
+                        position={scale.position}
+                        scaleUnit={coordinateUnit}
                     />
                 ) : null}
             </ReduxProvider>
