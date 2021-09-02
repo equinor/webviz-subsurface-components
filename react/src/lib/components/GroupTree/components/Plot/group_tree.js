@@ -31,7 +31,6 @@ export default class GroupTree {
             dom_element_id = "#" + dom_element_id;
         }
 
-        console.log("dom_element_id", dom_element_id) // XXX
         this._currentFlowrate = defaultFlowrate;
         this._currentDateTime = currentDateTime;
         this._transitionTime = 200;

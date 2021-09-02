@@ -63,7 +63,6 @@ const GroupTreeViewer: React.FC<Props> = ({ id }: Props) => {
         renderer.current.flowrate = currentFlowRate;
     }, [currentFlowRate]);
 
-    console.log("HEI 2")
     return (
         <div className={classes.root}>
             <SettingsBar />
