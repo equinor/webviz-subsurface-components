@@ -115,10 +115,13 @@ jobs:
       - name: 📚 Build demo application
         run: npm run build:js-demo --prefix ./react
 
-      - name: 📚 Update GitHub demo application
+      - name: 📚 Build Storybook
+        run: npm run build-storybook --prefix ./react
+
+      - name: 📚 Update Storybook and GitHub demo application
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.6'
         run: |
-          cp ./react/{index.html,output.css,output.js} ..
+          cp -r ./react/{index.html,output.css,output.js,storybook-static} ..
 
           git config --local user.email "webviz-github-action"
           git config --local user.name "webviz-github-action"
@@ -127,7 +130,7 @@ jobs:
           git clean -f -f -d -x
           git rm -r --ignore-unmatch *
 
-          mv ../{index.html,output.css,output.js} .
+          mv ../{index.html,output.css,output.js,storybook-static} .
 
           git add .
 
