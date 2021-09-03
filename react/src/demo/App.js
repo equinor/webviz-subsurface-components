@@ -18,7 +18,7 @@ import VectorSelectorDemo from "./VectorSelectorDemo";
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "DeckGLMapDemo" };
+        this.state = { value: "LeafletMap" };
     }
 
     onChange(e) {
