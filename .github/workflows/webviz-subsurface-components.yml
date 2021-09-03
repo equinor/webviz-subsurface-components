@@ -121,7 +121,7 @@ jobs:
       - name: 📚 Update Storybook and GitHub demo application
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.6'
         run: |
-          cp ./react/{index.html,output.css,output.js,storybook-static} ..
+          cp -r ./react/{index.html,output.css,output.js,storybook-static} ..
 
           git config --local user.email "webviz-github-action"
           git config --local user.name "webviz-github-action"
