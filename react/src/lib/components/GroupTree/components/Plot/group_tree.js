@@ -26,6 +26,11 @@ export default class GroupTree {
      * @param defaultFlowrate
      */
     constructor(dom_element_id, tree_data, defaultFlowrate, currentDateTime) {
+        // Add "#" if missing.
+        if (dom_element_id.charAt(0) !== "#") {
+            dom_element_id = "#" + dom_element_id;
+        }
+
         this._currentFlowrate = defaultFlowrate;
         this._currentDateTime = currentDateTime;
         this._transitionTime = 200;
