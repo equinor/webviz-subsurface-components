@@ -161,8 +161,8 @@ if __name__ == "__main__":
     )
 
     bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
-    width = bounds[2] - bounds[0]  # right - left
-    height = bounds[3] - bounds[1]  # top - bottom
+    WIDTH = bounds[2] - bounds[0]  # right - left
+    HEIGHT = bounds[3] - bounds[1]  # top - bottom
 
     map_obj = webviz_subsurface_components.DeckGLMap(
         id="deckgl-map",
@@ -171,7 +171,7 @@ if __name__ == "__main__":
         },
         deckglSpecBase={
             "initialViewState": {
-                "target": [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+                "target": [bounds[0] + WIDTH / 2, bounds[1] + HEIGHT / 2, 0],
                 "zoom": -3,
             },
             "layers": [
