@@ -35,7 +35,7 @@ if not hasattr(_dash, "development"):
 
 _basepath = _os.path.dirname(__file__)
 _filepath = _os.path.abspath(_os.path.join(_basepath, "package.json"))
-with open(_filepath) as f:
+with open(_filepath, encoding="utf8") as f:
     package = json.load(f)
 
 package_name = (
