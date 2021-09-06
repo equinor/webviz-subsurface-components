@@ -14,7 +14,7 @@ import webviz_subsurface_components
 # Basic test for the component rendering.
 def test_render_hm(dash_duo):
 
-    with open("tests/data/hm_data.json", "r") as json_file:
+    with open("tests/data/hm_data.json", encoding="utf8") as json_file:
         hm_data = json.load(json_file)
 
     app = dash.Dash(__name__)
