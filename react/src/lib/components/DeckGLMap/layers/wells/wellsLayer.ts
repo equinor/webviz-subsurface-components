@@ -14,7 +14,7 @@ import {
 } from "geojson";
 import { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
-import { splineRefine, convertTo2D } from "./utils/spline";
+import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 
@@ -82,11 +82,9 @@ export default class WellsLayer extends CompositeLayer<
         }
 
         const refine = this.props.refine;
-        let data = refine
+        const data = refine
             ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
             : (this.props.data as FeatureCollection);
-
-        data = convertTo2D(data);
 
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
@@ -94,6 +92,7 @@ export default class WellsLayer extends CompositeLayer<
                 data,
                 pickable: false,
                 stroked: false,
+                positionFormat: "XY",
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale,
@@ -108,6 +107,7 @@ export default class WellsLayer extends CompositeLayer<
                 data,
                 pickable: true,
                 stroked: false,
+                positionFormat: "XY",
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale - 1,
@@ -124,6 +124,7 @@ export default class WellsLayer extends CompositeLayer<
                 data: this.props.selectedFeature,
                 pickable: false,
                 stroked: false,
+                positionFormat: "XY",
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale + 2,
@@ -175,6 +176,7 @@ export default class WellsLayer extends CompositeLayer<
         if (!info.object) return info;
 
         const md_property = getMdProperty(info.coordinate, info.object);
+        const tvd_property = getTvdProperty(info.coordinate, info.object);
         const log_property = getLogProperty(
             info.coordinate,
             (this.props.data as FeatureCollection).features,
@@ -183,14 +185,15 @@ export default class WellsLayer extends CompositeLayer<
             this.props.logName
         );
 
-        let layer_property: PropertyDataType | null = null;
-        if (md_property) layer_property = md_property;
-        if (log_property) layer_property = log_property;
+        const layer_properties: PropertyDataType[] = [];
+        if (md_property) layer_properties.push(md_property);
+        if (tvd_property) layer_properties.push(tvd_property);
+        if (log_property) layer_properties.push(log_property);
 
         return {
             ...info,
-            property: layer_property,
-            logName: layer_property?.name,
+            properties: layer_properties,
+            logName: log_property?.name,
         };
     }
 }
@@ -384,13 +387,20 @@ function getMd(coord: Position2D, feature: Feature): number | null {
     const measured_depths = feature.properties["md"][0];
 
     const gc = feature.geometry as GeometryCollection;
-    const trajectory = (gc.geometries[1] as LineString).coordinates;
+    const trajectory3D = (gc.geometries[1] as LineString).coordinates;
+    const trajectory2D = trajectory3D.map((v) => {
+        return v.slice(0, 2);
+    });
 
     // Identify closest well path leg to coord.
     let min_d = Number.MAX_VALUE;
     let segment_index = 0;
-    for (let i = 0; i < trajectory?.length - 1; i++) {
-        const d = distToSegmentSquared(trajectory[i], trajectory[i + 1], coord);
+    for (let i = 0; i < trajectory2D?.length - 1; i++) {
+        const d = distToSegmentSquared(
+            trajectory2D[i],
+            trajectory2D[i + 1],
+            coord
+        );
 
         if (d > min_d) continue;
 
@@ -406,8 +416,8 @@ function getMd(coord: Position2D, feature: Feature): number | null {
     const md1 = measured_depths[index1];
 
     // Get the nearest survey points.
-    const survey0 = trajectory[index0];
-    const survey1 = trajectory[index1];
+    const survey0 = trajectory2D[index0];
+    const survey1 = trajectory2D[index1];
 
     const dv = distance(survey0, survey1) as number;
     if (dv === 0) {
@@ -438,6 +448,43 @@ function getMdProperty(
     return null;
 }
 
+function getTvd(coord: Position2D, feature: Feature): number | null {
+    const trajectory3D = getWellCoordinates(feature);
+    if (trajectory3D == undefined) return null;
+
+    const tvds = trajectory3D.map((v) => {
+        return v[2];
+    });
+
+    const segment_index = getSegmentIndex(coord, trajectory3D);
+    return tvds[segment_index];
+}
+
+function getTvdProperty(
+    coord: Position2D,
+    feature: Feature
+): PropertyDataType | null {
+    const tvd = getTvd(coord, feature);
+    if (tvd != null) {
+        const prop_name = "TVD " + feature.properties?.["name"];
+        return { name: prop_name, value: tvd };
+    }
+    return null;
+}
+
+function getSegmentIndex(coord: Position2D, path: Position[]): number {
+    let min_d = Number.MAX_VALUE;
+    let segment_index = 0;
+    for (let i = 0; i < path?.length; i++) {
+        const d = squared_distance(path[i], coord);
+        if (d > min_d) continue;
+
+        segment_index = i;
+        min_d = d;
+    }
+    return segment_index;
+}
+
 // Returns segment index of discrete logs
 function getLogSegmentIndex(
     coord: Position2D,
@@ -446,17 +493,7 @@ function getLogSegmentIndex(
     logrun_name: string
 ): number {
     const trajectory = getLogPath(wells_data, log_data, logrun_name);
-
-    let min_d = Number.MAX_VALUE;
-    let segment_index = 0;
-    for (let i = 0; i < trajectory?.length; i++) {
-        const d = squared_distance(trajectory[i], coord);
-        if (d > min_d) continue;
-
-        segment_index = i;
-        min_d = d;
-    }
-    return segment_index;
+    return getSegmentIndex(coord, trajectory);
 }
 
 function getLogProperty(
