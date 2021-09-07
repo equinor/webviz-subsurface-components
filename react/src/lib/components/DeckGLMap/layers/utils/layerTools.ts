@@ -7,8 +7,9 @@ export interface PropertyDataType {
     value: string | number;
 }
 
+// Layer pick info can have multiple properties
 export interface LayerPickInfo extends PickInfo<unknown> {
-    property: PropertyDataType | null;
+    properties: PropertyDataType[];
 }
 
 // Generate a patch from a layer and it's new props and call setSpecPatch with it,
