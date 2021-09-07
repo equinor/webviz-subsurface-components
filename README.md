@@ -12,8 +12,8 @@
 # Webviz subsurface components
 
 `webviz_subsurface_components` is a Dash/React component library for use in `webviz`,
-which have in common that they are geared towards subsurface dashboards. There is an online
-demo available at https://equinor.github.io/webviz-subsurface-components/.
+which have in common that they are geared towards subsurface dashboards. There storybook is available at https://equinor.github.io/webviz-subsurface-components/storybook-static.
+And the demo of old components is available at https://equinor.github.io/webviz-subsurface-components.
 
 ## How to install the components
 

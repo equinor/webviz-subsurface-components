@@ -11,7 +11,9 @@ import dash_html_components as html
 
 import webviz_subsurface_components
 
-with open("./react/src/demo/example-data/well-completions.json", "r") as json_file:
+with open(
+    "./react/src/demo/example-data/well-completions.json", encoding="utf8"
+) as json_file:
     data = json.load(json_file)
 
 app = dash.Dash(__name__)
