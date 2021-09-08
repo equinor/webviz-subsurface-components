@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
+import React from "react";
 import SmartNodeSelectorComponent from "@webviz/core-components/dist/components/SmartNodeSelector/components/SmartNodeSelectorComponent";
 import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
@@ -22,7 +22,7 @@ import region_region from "./images/region-region.svg";
 import segment from "./images/segment.svg";
 import well from "./images/well.svg";
 import well_completion from "./images/well-completion.svg";
-import React from "react";
+import calculated from "./images/calculated.svg";
 
 type ParentProps = {
     selectedTags: string[];
@@ -186,6 +186,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
         const typeIcons: Record<string, string> = {
             aquifer: aquifer,
             block: block,
+            calculated: calculated,
             field: field,
             group: group,
             misc: misc,
