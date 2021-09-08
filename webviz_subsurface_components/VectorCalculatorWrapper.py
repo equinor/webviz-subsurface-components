@@ -16,13 +16,34 @@ from .VectorCalculator import VectorCalculator
 
 
 class VariableVectorMapInfo(TypedDict):
+    """
+    Variable vector map pair
+
+    `Description`:
+    Dictionary with pair of varible name and mapped vector name
+
+    `Required keys`:
+    * variableName: str, variable name
+    * vectorName: List[str], vector name
+    """
     variableName: str
     vectorName: List[str]
 
 
 class ExpressionInfoBase(TypedDict):
     """
-    Base type with all required items for expression
+    Base dict for expression info type
+    
+    `Description`:
+    Dictionary with all required items for an expression
+
+    `Required keys`:
+    * name: str, expression name
+    * expression: str, mathematical expression
+    * id: str, identifier string
+    * variableVectorMap: List[VariableVectorMapInfo], List of variable- and vector name pairs
+    * isValid: bool, valid state for expression
+    * isDeletable: bool, True if expression can be deleted, False otherwise
     """
 
     name: str
@@ -35,18 +56,43 @@ class ExpressionInfoBase(TypedDict):
 
 class ExpressionInfo(ExpressionInfoBase, total=False):
     """
-    Expression info appending non-required items.
+    Expression info dict for expression info, with required and non-required keys.
+    
+    `Description`:\n
+    Dictionary with all possible items for an expression.
+    All keys of ExpressionInfoBase are required keys, appended keys in ExpressionInfo are non-required.
 
-    All keys of ExpressionInfoBase are required keys,
-    appended keys in ExpressionInfo are non-required.
+    `Non-required keys`:
+    * description: str, description of mathematical expression
 
-    Doc: https://mypy.readthedocs.io/en/latest/more_types.html#mixing-required-and-non-required-items
+    `Required keys`:
+    * name: str, expression name
+    * expression: str, mathematical expression
+    * id: str, identifier string
+    * variableVectorMap: List[VariableVectorMapInfo], List of variable- and vector name pairs
+    * isValid: bool, valid state for expression
+    * isDeletable: bool, True if expression can be deleted, False otherwise
+
+    `Doc`: https://mypy.readthedocs.io/en/latest/more_types.html#mixing-required-and-non-required-items
     """
 
     description: str
 
 
 class ExternalParseData(TypedDict):
+    """
+    Expression parse data type
+    
+    `Description`:\n
+    Dictionary with all required items for external parsing status of expression
+
+    `Required keys`:
+    * expression: str, mathematical expression
+    * id: str, identifier string
+    * variables: List[str], list of all variables
+    * isValid: bool, parsing state for expression
+    * message: str, parsing message
+    """
     expression: str
     id: str
     variables: List[str]
