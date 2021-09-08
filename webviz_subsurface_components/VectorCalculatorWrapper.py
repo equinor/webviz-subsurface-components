@@ -20,13 +20,30 @@ class VariableVectorMapInfo(TypedDict):
     vectorName: List[str]
 
 
-class ExpressionInfo(TypedDict):
+class ExpressionInfoBase(TypedDict):
+    """
+    Base type with all required items for expression
+    """
+
     name: str
     expression: str
     id: str
     variableVectorMap: List[VariableVectorMapInfo]
     isValid: bool
     isDeletable: bool
+
+
+class ExpressionInfo(ExpressionInfoBase, total=False):
+    """
+    Expression info appending non-required items.
+
+    All keys of ExpressionInfoBase are required keys,
+    appended keys in ExpressionInfo are non-required.
+
+    Doc: https://mypy.readthedocs.io/en/latest/more_types.html#mixing-required-and-non-required-items
+    """
+
+    description: str
 
 
 class ExternalParseData(TypedDict):
@@ -74,11 +91,15 @@ class VectorCalculatorParser(Parser):
 
 class VectorCalculatorWrapper(VectorCalculator):
     parser = VectorCalculatorParser()
+    max_description_length = 50
 
     @wraps(VectorCalculator)
     def __init__(self, *args, **kwargs) -> None:
         super(VectorCalculatorWrapper, self).__init__(
-            *args, **kwargs, isDashControlled=True
+            *args,
+            **kwargs,
+            isDashControlled=True,
+            maxExpressionDescriptionLength=self.max_description_length,
         )
 
     @staticmethod

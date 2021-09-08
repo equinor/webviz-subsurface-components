@@ -6,6 +6,7 @@ import { clear, save, sync } from "@equinor/eds-icons";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
 
 import { VariablesTable } from "./VariablesTable";
+import { ExpressionDescriptionTextField } from "./ExpressionDescriptionTextField";
 import { ExpressionNameTextField } from "./ExpressionNameTextField";
 import {
     ExpressionInputTextField,
@@ -31,6 +32,7 @@ interface ExpressionInputComponent {
     expressions: ExpressionType[];
     vectors: TreeDataNode[];
     externalParsing: boolean;
+    maxExpressionDescriptionLength: number;
     externalParseData?: ExternalParseData;
     disabled?: boolean;
     onExpressionChange: (expression: ExpressionType) => void;
@@ -148,9 +150,14 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             activeExpression.variableVectorMap,
             editableExpression.variableVectorMap
         );
+        const isDescriptionEdited =
+            activeExpression.description !== editableExpression.description;
         const isEdited =
             activeExpression.id === editableExpression.id &&
-            (isNameEdited || isExpressionEdited || isVariableVectorMapEdited);
+            (isNameEdited ||
+                isExpressionEdited ||
+                isVariableVectorMapEdited ||
+                isDescriptionEdited);
 
         setIsExpressionEdited(isEdited);
     }, [editableExpression]);
@@ -290,6 +297,15 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         setIsExpressionNameValid(isValid);
     };
 
+    const handleExpressionDescriptionChange = (
+        newDescription: string
+    ): void => {
+        setEditableExpression({
+            ...editableExpression,
+            description: newDescription,
+        });
+    };
+
     const handleExpressionChange = React.useCallback(
         (newExpression: string): void => {
             const updatedExpression = {
@@ -394,6 +410,14 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                     helperText={parsingMessage}
                     disabled={disabled}
                     onExpressionChange={handleExpressionChange}
+                />
+            </Grid>
+            <Grid item>
+                <ExpressionDescriptionTextField
+                    description={editableExpression.description}
+                    disabled={disabled}
+                    maxLength={props.maxExpressionDescriptionLength}
+                    onDescriptionChange={handleExpressionDescriptionChange}
                 />
             </Grid>
             <Grid container item xs={12} spacing={0}>

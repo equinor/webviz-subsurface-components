@@ -19,6 +19,7 @@ interface VectorCalculatorProps {
     vectors: TreeDataNode[];
     expressions: ExpressionType[];
     isDashControlled: boolean;
+    maxExpressionDescriptionLength: number;
     externalParseData?: ExternalParseData;
     setProps: (props: ParentProps) => void;
 }
@@ -123,6 +124,9 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
                     vectors={props.vectors}
                     externalParsing={isDashControlled}
                     externalParseData={props.externalParseData}
+                    maxExpressionDescriptionLength={
+                        props.maxExpressionDescriptionLength
+                    }
                     disabled={disabledInputComponent}
                     onExpressionChange={handleActiveExpressionEdit}
                     onExternalExpressionParsing={

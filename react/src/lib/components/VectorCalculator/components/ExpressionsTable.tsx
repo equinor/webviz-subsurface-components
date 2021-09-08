@@ -167,9 +167,20 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                     align="left"
                                     onClick={() => handleRowClick(row)}
                                 >
-                                    <div className={"ExpressionsTableCell"}>
-                                        {row.name}
-                                    </div>
+                                    <Tooltip
+                                        key={row.name}
+                                        placement="top"
+                                        title={row.description}
+                                        enterDelay={1000}
+                                        hidden={
+                                            !row.description ||
+                                            row.description.length <= 0
+                                        }
+                                    >
+                                        <div className={"ExpressionsTableCell"}>
+                                            {row.name}
+                                        </div>
+                                    </Tooltip>
                                 </TableCell>
                                 <TableCell
                                     align="left"

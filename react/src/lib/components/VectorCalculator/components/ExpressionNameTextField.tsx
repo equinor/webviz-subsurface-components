@@ -11,6 +11,8 @@ import {
     expressionNameValidationMessage,
 } from "../utils/VectorCalculatorHelperFunctions";
 
+import "../VectorCalculator.css";
+
 type ExpressionNameTextFieldVariantType =
     | "success"
     | "error"

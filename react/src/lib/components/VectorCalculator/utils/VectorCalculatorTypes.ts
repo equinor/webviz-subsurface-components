@@ -8,6 +8,7 @@ export type ExpressionType = {
     expression: string;
     id: string;
     variableVectorMap: VariableVectorMapType[];
+    description?: string;
     isValid: boolean; ///! Is name, expression and map valid
     isDeletable: boolean;
 };

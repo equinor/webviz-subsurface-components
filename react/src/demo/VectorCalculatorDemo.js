@@ -554,6 +554,7 @@ class VectorCalculatorDemo extends Component {
                     { variableName: "x", vectorName: ["WOPT:OP_1"] },
                     { variableName: "y", vectorName: ["FGIR"] },
                 ],
+                description: "First expression description text",
                 isValid: true,
                 isDeletable: false,
             },
@@ -565,6 +566,7 @@ class VectorCalculatorDemo extends Component {
                     { variableName: "x", vectorName: ["WOPT:OP_3"] },
                     { variableName: "y", vectorName: ["FGIR"] },
                 ],
+                description: "Second expression description text is too long",
                 isValid: true,
                 isDeletable: false,
             },
@@ -605,6 +607,7 @@ class VectorCalculatorDemo extends Component {
                 vectors={this.vectors}
                 expressions={this.expressions}
                 isDashControlled={false}
+                maxExpressionDescriptionLength={35}
                 setProps={this.setProps}
             />
         );

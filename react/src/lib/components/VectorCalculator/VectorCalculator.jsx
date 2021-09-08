@@ -29,6 +29,7 @@ export const VectorCalculator = (props) => {
 VectorCalculator.defaultProps = {
     // Set all non isRequired props
     isDashControlled: false,
+    maxExpressionDescriptionLength: 50,
 };
 
 VectorCalculator.propTypes = {
@@ -58,6 +59,7 @@ VectorCalculator.propTypes = {
                     vectorName: string.isRequired,
                 })
             ).isRequired,
+            description: PropTypes.string,
             isValid: PropTypes.bool.isRequired,
             isDeletable: PropTypes.bool.isRequired,
         })
@@ -72,6 +74,11 @@ VectorCalculator.propTypes = {
      * expressions.
      */
     isDashControlled: PropTypes.bool,
+
+    /**
+     * Set maximal number of characters for expression description text
+     */
+    maxExpressionDescriptionLength: PropTypes.number,
 
     /**
      * Data for external parsing of mathematical expression
