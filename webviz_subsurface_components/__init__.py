@@ -18,9 +18,9 @@ import dash as _dash
 from ._imports_ import *
 from ._imports_ import __all__
 
+from .py_expression_eval import Parser
 from .VectorCalculatorWrapper import VectorCalculatorWrapper as VectorCalculator
 from .VectorCalculatorWrapper import (
-    VectorCalculatorParser,
     ExpressionInfo,
     ExternalParseData,
     VariableVectorMapInfo,
