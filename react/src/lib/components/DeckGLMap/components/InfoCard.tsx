@@ -14,6 +14,7 @@ import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { LayerPickInfo, PropertyDataType } from "../layers/utils/layerTools";
 import { PropertyMapPickInfo } from "../layers/utils/propertyMapTools";
+import { rgb } from "d3-color";
 
 Icon.add({ arrow_drop_up, arrow_drop_down });
 
@@ -97,6 +98,17 @@ function Row(props: { layer_data: InfoCardDataType }) {
                                                 paddingRight: 10,
                                             }}
                                         >
+                                            {propertyRow.color && (
+                                                <span
+                                                    style={{
+                                                        color: rgb(
+                                                            ...propertyRow.color
+                                                        ).toString(),
+                                                    }}
+                                                >
+                                                    {"\u2B24"}
+                                                </span>
+                                            )}
                                             {propertyRow.name}
                                         </TableCell>
                                         <TableCell

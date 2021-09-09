@@ -12,7 +12,11 @@ import {
     Position,
     FeatureCollection,
 } from "geojson";
-import { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
+import {
+    LayerPickInfo,
+    PropertyDataType,
+    createPropertyData,
+} from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
@@ -439,7 +443,7 @@ function getMdProperty(
     const md = getMd(coord, feature);
     if (md != null) {
         const prop_name = "MD " + feature.properties?.["name"];
-        return { name: prop_name, value: md };
+        return createPropertyData(prop_name, md, feature.properties?.["color"]);
     }
     return null;
 }
@@ -466,7 +470,11 @@ function getTvdProperty(
     const tvd = getTvd(coord, feature);
     if (tvd != null) {
         const prop_name = "TVD " + feature.properties?.["name"];
-        return { name: prop_name, value: tvd };
+        return createPropertyData(
+            prop_name,
+            tvd,
+            feature.properties?.["color"]
+        );
     }
     return null;
 }
@@ -529,6 +537,15 @@ function getLogProperty(
     const prop_name = log + " " + log_data.header.well;
     log_value = dl_attrs ? dl_attrs[0] + " (" + log_value + ")" : log_value;
 
-    if (log_value) return { name: prop_name, value: log_value };
-    else return null;
+    if (log_value) {
+        const well_object = getWellObjectByName(
+            wells_data,
+            log_data.header.well
+        );
+        return createPropertyData(
+            prop_name,
+            log_value,
+            well_object?.properties?.["color"]
+        );
+    } else return null;
 }
