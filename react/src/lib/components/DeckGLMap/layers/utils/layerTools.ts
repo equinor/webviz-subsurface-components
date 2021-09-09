@@ -1,15 +1,31 @@
 import Layer, { LayerProps } from "@deck.gl/core/lib/layer";
 import * as jsonpatch from "fast-json-patch";
 import { PickInfo } from "@deck.gl/core/lib/deck";
+import { RGBAColor } from "@deck.gl/core/utils/color";
 
 export interface PropertyDataType {
     name: string;
     value: string | number;
+    color?: RGBAColor;
 }
 
 // Layer pick info can have multiple properties
 export interface LayerPickInfo extends PickInfo<unknown> {
     properties: PropertyDataType[];
+}
+
+// Creates property object which will be used to display layer property
+// in the info card.
+export function createPropertyData(
+    name: string,
+    value: string | number,
+    color?: RGBAColor
+): PropertyDataType {
+    return {
+        name: name,
+        value: value,
+        color: color,
+    };
 }
 
 // Generate a patch from a layer and it's new props and call setSpecPatch with it,
