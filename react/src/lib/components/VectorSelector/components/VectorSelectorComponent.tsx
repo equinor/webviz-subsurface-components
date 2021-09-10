@@ -210,6 +210,8 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                     if (data[i].name in VectorData) {
                         const asKey = data[i].name as keyof typeof VectorData;
                         type = VectorData[asKey].type;
+                    } else if (data[i].name[0] === "U") {
+                        type = "calculated";
                     }
                     if (!(type in types)) {
                         types[type] = [];
