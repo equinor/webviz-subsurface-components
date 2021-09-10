@@ -15,7 +15,7 @@ INVALID_EXPRESSIONS = (
     INVALID_FUNCTIONS + INVALID_STRINGS + INVALID_COMMA + INVALID_OPERATORS
 )
 
-
+# pylint: disable=broad-except
 def test_valid_parsing():
     parser = py_expression_eval.Parser()
 
