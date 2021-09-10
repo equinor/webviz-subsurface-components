@@ -31,12 +31,6 @@ class App extends Component {
             case "VectorCalculator": {
                 return <VectorCalculatorDemo />;
             }
-            case "DeckGLMapDemo": {
-                return <DeckGLMapDemo />;
-            }
-            case "GroupTree": {
-                return <GroupTreeDemo />;
-            }
             case "LeafletMap": {
                 return <LeafletMapDemo />;
             }
@@ -72,8 +66,6 @@ class App extends Component {
                     onChange={this.onChange.bind(this)}
                 >
                     <option value="VectorCalculator">VectorCalculator</option>
-                    <option value="DeckGLMapDemo">DeckGLMapDemo</option>
-                    <option value="GroupTree">GroupTree</option>
                     <option value="LeafletMap">LeafletMap</option>
                     <option value="HistoryMatch">HistoryMatch</option>
                     <option value="Morris">Morris</option>
