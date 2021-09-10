@@ -14,7 +14,6 @@ import MorrisDemo from "./MorrisDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import VectorSelectorDemo from "./VectorSelectorDemo";
-import WellLogViewerDemo from "./WellLogViewerDemo";
 import VectorCalculatorDemo from "./VectorCalculatorDemo";
 
 class App extends Component {
