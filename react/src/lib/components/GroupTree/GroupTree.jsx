@@ -9,7 +9,13 @@ import React from "react";
 import GroupTreeComponent from "./components/GroupTreeComponent";
 
 const GroupTree = (props) => {
-    return <GroupTreeComponent id={props.id} data={props.data} />;
+    return (
+        <GroupTreeComponent
+            id={props.id}
+            data={props.data}
+            edge_options={props.edge_options}
+        />
+    );
 };
 
 GroupTree.propTypes = {
