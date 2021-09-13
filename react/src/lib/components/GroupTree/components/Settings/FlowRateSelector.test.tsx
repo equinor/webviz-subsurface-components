@@ -11,7 +11,7 @@ const edge_options = [
     { name: "oilrate", label: "Oil Rate" },
     { name: "gasrate", label: "Gas Rate" },
     { name: "waterinjrate", label: "Water Injection Rate" },
-    { name: "gasinjrate", label: "Gas Injection Rate" }
+    { name: "gasinjrate", label: "Gas Injection Rate" },
 ];
 
 describe("Test flow rate selector component", () => {
