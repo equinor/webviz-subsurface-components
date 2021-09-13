@@ -25,6 +25,9 @@ class WellCompletionsDemo extends Component {
                     delimiter=":"
                     selectedTags={["iter-0:WGOR:OP_1"]}
                     numMetaNodes={1}
+                    customVectorDefinitions={{
+                        Test: { type: "calculated", description: "Test" },
+                    }}
                     label="Select a vector"
                     data={[
                         {
@@ -37,6 +40,17 @@ class WellCompletionsDemo extends Component {
                                     id: "0-0",
                                     name: "WGOR",
                                     description: "Gas-Oil Ratio",
+                                    children: [
+                                        {
+                                            id: "0-0-0",
+                                            name: "OP_1",
+                                        },
+                                    ],
+                                },
+                                {
+                                    id: "0-1",
+                                    name: "Test",
+                                    description: "Test",
                                     children: [
                                         {
                                             id: "0-0-0",
