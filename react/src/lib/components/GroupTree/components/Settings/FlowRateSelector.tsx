@@ -4,7 +4,6 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentFlowRate } from "../../redux/actions";
 import { GroupTreeState } from "../../redux/store";
-// import { FlowRate, FlowRates } from "../../redux/types";  // XXX fjern
 import { EdgeOptions, EdgeOption } from "../../redux/types";
 
 const useStyles = makeStyles((theme: Theme) =>

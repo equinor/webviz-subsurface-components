@@ -6,15 +6,29 @@ import React from "react";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import FlowRateSelector from "./FlowRateSelector";
 
+const edge_options = [
+    { name: "waterrate", label: "Water Rate" },
+    { name: "oilrate", label: "Oil Rate" },
+    { name: "gasrate", label: "Gas Rate" },
+    { name: "waterinjrate", label: "Water Injection Rate" },
+    { name: "gasinjrate", label: "Gas Injection Rate" }
+];
+
 describe("Test flow rate selector component", () => {
     it("snapshot test", () => {
         const { container } = render(
-            Wrapper({ children: <FlowRateSelector /> })
+            Wrapper({
+                children: <FlowRateSelector edge_options={edge_options} />,
+            })
         );
         expect(container.firstChild).toMatchSnapshot();
     });
     it("select 'water rate' option to dispatch redux action", async () => {
-        render(Wrapper({ children: <FlowRateSelector /> }));
+        render(
+            Wrapper({
+                children: <FlowRateSelector edge_options={edge_options} />,
+            })
+        );
         userEvent.selectOptions(
             screen.getByRole("combobox", { name: /flow rate/i }),
             "Water Rate"
