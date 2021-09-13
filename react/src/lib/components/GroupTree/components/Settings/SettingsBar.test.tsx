@@ -15,7 +15,8 @@ const edge_options = [
 
 describe("Test Settins Bar component", () => {
     it("snapshot test", () => {
-        const { container } = render(
+        //const { container } = render(
+        render(
             Wrapper({ children: <SettingsBar edge_options={edge_options} /> })
         );
         //expect(container.firstChild).toMatchSnapshot();

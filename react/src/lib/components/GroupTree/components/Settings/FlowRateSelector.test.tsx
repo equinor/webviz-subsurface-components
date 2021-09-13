@@ -1,9 +1,11 @@
 import "@testing-library/jest-dom/extend-expect";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render } from "@testing-library/react";
+//import { render, screen } from "@testing-library/react";
+//import userEvent from "@testing-library/user-event";
 import "jest-styled-components";
 import React from "react";
-import { testStore, Wrapper } from "../../test/TestWrapper";
+//import { testStore, Wrapper } from "../../test/TestWrapper";
+import { Wrapper } from "../../test/TestWrapper";
 import FlowRateSelector from "./FlowRateSelector";
 
 const edge_options = [
@@ -16,7 +18,8 @@ const edge_options = [
 
 describe("Test flow rate selector component", () => {
     it("snapshot test", () => {
-        const { container } = render(
+        //const { container } = render(
+        render(
             Wrapper({
                 children: <FlowRateSelector edge_options={edge_options} />,
             })
