@@ -31,8 +31,8 @@ type ParentProps = {
 };
 
 type VectorDefinitions = {
-    [key: string]: { type: string; description: string;}
-}
+    [key: string]: { type: string; description: string };
+};
 
 type VectorSelectorPropType = {
     id: string;
@@ -67,17 +67,25 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
 
         this.vectorDefinitions = VectorData;
         if (props.customVectorDefinitions) {
-            Object.keys(props.customVectorDefinitions).forEach((vectorName: string) => {
-                if (vectorName in VectorData === false) {
-                    this.vectorDefinitions[vectorName] = (props.customVectorDefinitions as VectorDefinitions)[vectorName];
+            Object.keys(props.customVectorDefinitions).forEach(
+                (vectorName: string) => {
+                    if (vectorName in VectorData === false) {
+                        this.vectorDefinitions[vectorName] = (
+                            props.customVectorDefinitions as VectorDefinitions
+                        )[vectorName];
+                    }
                 }
-            });
+            );
         }
 
         let error: string | undefined;
         try {
             this.treeData = new TreeData({
-                treeData: this.modifyTreeData(props.data, props.numMetaNodes, this.vectorDefinitions),
+                treeData: this.modifyTreeData(
+                    props.data,
+                    props.numMetaNodes,
+                    this.vectorDefinitions
+                ),
                 delimiter: props.delimiter,
             });
         } catch (e: any) {
@@ -225,7 +233,8 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                 for (let i = 0; i < data.length; i++) {
                     let type = "others";
                     if (data[i].name in vectorDefinitions) {
-                        const asKey = data[i].name as keyof typeof vectorDefinitions;
+                        const asKey = data[i]
+                            .name as keyof typeof vectorDefinitions;
                         type = vectorDefinitions[asKey].type;
                     }
                     if (!(type in types)) {
@@ -236,7 +245,9 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                 for (const type in types) {
                     newData.push({
                         name: type.charAt(0).toUpperCase() + type.slice(1),
-                        description: vectorDefinitions[type] ? vectorDefinitions[type].description : "",
+                        description: vectorDefinitions[type]
+                            ? vectorDefinitions[type].description
+                            : "",
                         icon: typeIcons[type],
                         children: types[type],
                     });
