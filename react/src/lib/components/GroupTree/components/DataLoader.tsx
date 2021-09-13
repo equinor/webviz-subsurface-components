@@ -19,7 +19,8 @@ const DataProvider: React.FC<Props> = ({
 }: PropsWithChildren<Props>) => {
     const preloadedState = useMemo(() => {
         const initialDateTime = data.length > 0 ? data[0].dates[0] : "";
-        const initialFlowRate = edge_options.length > 0 ? edge_options[0].name : "";
+        const initialFlowRate =
+            edge_options.length > 0 ? edge_options[0].name : "";
 
         return {
             id: id,

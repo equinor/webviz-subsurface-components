@@ -7,6 +7,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import GroupTreeComponent from "./components/GroupTreeComponent";
+import { EdgeOptions } from "../redux/types";
 
 const GroupTree = (props) => {
     return (
@@ -29,6 +30,8 @@ GroupTree.propTypes = {
      * Array of JSON objects describing group tree data.
      */
     data: PropTypes.arrayOf(PropTypes.object),
+
+    edge_options: EdgeOptions,
 };
 
 export default GroupTree;

@@ -52,7 +52,6 @@ export const DataTypes = {
 };
 export type DataType = keyof typeof DataTypes;
 
-
 export interface UISettings {
     currentDateTime: string;
     currentFlowRate: string;
