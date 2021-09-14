@@ -25,7 +25,7 @@ package_name = (
     .replace("@", "")
 )
 
-INSTALL_REQUIRES = ["dash>=1.6"]
+INSTALL_REQUIRES = ["dash>=1.6", "jsonpatch>=1.32"]
 
 TESTS_REQUIRE = [
     "bandit",
