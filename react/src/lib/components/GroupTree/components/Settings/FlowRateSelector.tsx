@@ -9,8 +9,7 @@ import { EdgeOptions, EdgeOption } from "../../redux/types";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            minWidth: "170px",
-            maxWidth: "170px",
+            maxWidth: "250px",
             padding: theme.spacing(1),
         },
     })
@@ -25,19 +24,16 @@ const FlowRateSelector: React.FC<Props> = React.memo(
         const classes = useStyles();
         // Redux
         const dispatch = useDispatch();
-        let currentFlowRate = useSelector(
+        const currentFlowRate = useSelector(
             (st: GroupTreeState) => st.ui.currentFlowRate
         );
         // handlers
         const handleSelectedItemChange = useCallback(
-            (event) => dispatch(updateCurrentFlowRate(event.target.value)),
+            (event) => {
+                dispatch(updateCurrentFlowRate(event.target.value));
+            },
             [dispatch]
         );
-
-        // If currentFlowRate is not contained in options use first option.
-        if (!edge_options.some((e: EdgeOption) => e.name === currentFlowRate)) {
-            currentFlowRate = edge_options[0].label;
-        }
 
         return (
             <NativeSelect
@@ -49,7 +45,7 @@ const FlowRateSelector: React.FC<Props> = React.memo(
             >
                 {edge_options.map((key: EdgeOption) => (
                     <option key={`option-${key.name}`} value={key.name}>
-                        {key.name}
+                        {key.label}
                     </option>
                 ))}
             </NativeSelect>
