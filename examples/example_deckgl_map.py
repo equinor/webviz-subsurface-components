@@ -9,15 +9,13 @@ import base64
 import copy
 import re
 
-import dash
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import Dash, html, Input, Output, State, callback
 import jsonpatch
 import jsonpointer
 import numpy as np
 from PIL import Image
-
-import webviz_subsurface_components
+import webviz_core_components as wcc
+import webviz_subsurface_components as wsc
 
 # Helper class for dealing with map patches.
 class MapSpec:
@@ -164,11 +162,19 @@ if __name__ == "__main__":
     WIDTH = bounds[2] - bounds[0]  # right - left
     HEIGHT = bounds[3] - bounds[1]  # top - bottom
 
-    map_obj = webviz_subsurface_components.DeckGLMap(
+    map_obj = wsc.DeckGLMap(
         id="deckgl-map",
         resources={
             "propertyMap": map_data,
         },
+        coords={"visible": True, "multiPicking": True, "pickDepth": 10},
+        scale={
+            "visible": True,
+            "incrementValue": 100,
+            "widthPerUnit": 100,
+            "position": [10, 10],
+        },
+        coordinateUnit="m",
         deckglSpecBase={
             "initialViewState": {
                 "target": [bounds[0] + WIDTH / 2, bounds[1] + HEIGHT / 2, 0],
@@ -229,7 +235,8 @@ if __name__ == "__main__":
         },
     )
 
-    colormap_dropdown = dcc.Dropdown(
+    colormap_dropdown = wcc.Dropdown(
+        label="Colormap",
         id="colormap-select",
         options=[
             {
@@ -268,12 +275,14 @@ if __name__ == "__main__":
         clearable=False,
     )
 
-    app = dash.Dash(__name__)
+    app = Dash(__name__)
 
-    app.layout = html.Div(
+    app.layout = wcc.FlexBox(
         children=[
-            html.Div(
-                style={"float": "left", "width": "256px"},
+            wcc.Frame(
+                style={
+                    "flex": 1,
+                },
                 children=[
                     colormap_dropdown,
                     html.Img(
@@ -281,26 +290,26 @@ if __name__ == "__main__":
                     ),
                 ],
             ),
-            html.Div(
-                style={"float": "left", "width": "95%", "height": "90vh"},
+            wcc.Frame(
+                style={"flex": 10, "height": "90vh"},
                 children=[map_obj],
             ),
         ]
     )
 
-    @app.callback(
-        dash.dependencies.Output("colormap-img", "src"),
-        [dash.dependencies.Input("colormap-select", "value")],
+    @callback(
+        Output("colormap-img", "src"),
+        Input("colormap-select", "value"),
     )
     def update_img(value):
         return value
 
-    @app.callback(
-        dash.dependencies.Output("deckgl-map", "deckglSpecBase"),
-        dash.dependencies.Output("deckgl-map", "deckglSpecPatch"),
-        dash.dependencies.Input("colormap-select", "value"),
-        dash.dependencies.State("deckgl-map", "deckglSpecBase"),
-        dash.dependencies.State("deckgl-map", "deckglSpecPatch"),
+    @callback(
+        Output("deckgl-map", "deckglSpecBase"),
+        Output("deckgl-map", "deckglSpecPatch"),
+        Input("colormap-select", "value"),
+        State("deckgl-map", "deckglSpecBase"),
+        State("deckgl-map", "deckglSpecPatch"),
     )
     def sync_drawing(colormap, spec_base, spec_patch):
         if not colormap:
