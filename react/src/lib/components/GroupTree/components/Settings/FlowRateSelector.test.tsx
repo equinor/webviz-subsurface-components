@@ -16,8 +16,7 @@ const edge_options = [
 
 describe("Test flow rate selector component", () => {
     it("snapshot test", () => {
-        const { container } = 
-        render(
+        const { container } = render(
             Wrapper({
                 children: <FlowRateSelector edge_options={edge_options} />,
             })
