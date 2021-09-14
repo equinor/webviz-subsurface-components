@@ -1,5 +1,5 @@
 import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FlowRate, UISettings } from "./types";
+import { FlowRate, DataType, UISettings } from "./types";
 
 export const idSlice = createSlice({
     name: "id",
@@ -12,7 +12,8 @@ export const uiSlice = createSlice({
     name: "ui",
     initialState: {
         currentDateTime: "",
-        currentFlowRate: "oilrate",
+        currentFlowRate: "",
+        currentDataType: "simulated",
     } as UISettings,
     reducers: {
         updateCurrentDateTime: (state, action: PayloadAction<string>) => {
@@ -20,6 +21,9 @@ export const uiSlice = createSlice({
         },
         updateCurrentFlowRate: (state, action: PayloadAction<FlowRate>) => {
             state.currentFlowRate = action.payload;
+        },
+        updateCurrentDataType: (state, action: PayloadAction<DataType>) => {
+            state.currentDataType = action.payload;
         },
     },
 });
