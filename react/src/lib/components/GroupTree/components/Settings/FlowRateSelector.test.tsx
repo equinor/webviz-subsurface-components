@@ -1,11 +1,9 @@
 import "@testing-library/jest-dom/extend-expect";
-import { render } from "@testing-library/react";
-//import { render, screen } from "@testing-library/react";
-//import userEvent from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "jest-styled-components";
 import React from "react";
-//import { testStore, Wrapper } from "../../test/TestWrapper";
-import { Wrapper } from "../../test/TestWrapper";
+import { testStore, Wrapper } from "../../test/TestWrapper";
 import FlowRateSelector from "./FlowRateSelector";
 
 const edge_options = [
@@ -18,13 +16,13 @@ const edge_options = [
 
 describe("Test flow rate selector component", () => {
     it("snapshot test", () => {
-        //const { container } = render(
+        const { container } = 
         render(
             Wrapper({
                 children: <FlowRateSelector edge_options={edge_options} />,
             })
         );
-        //expect(container.firstChild).toMatchSnapshot();
+        expect(container.firstChild).toMatchSnapshot();
     });
     it("select 'water rate' option to dispatch redux action", async () => {
         render(
@@ -32,14 +30,14 @@ describe("Test flow rate selector component", () => {
                 children: <FlowRateSelector edge_options={edge_options} />,
             })
         );
-        // userEvent.selectOptions(
-        //     screen.getByRole("combobox", { name: /flow rate/i }),
-        //     "Water Rate"
-        // );
-        // expect(testStore.dispatch).toHaveBeenCalledTimes(1);
-        // expect(testStore.dispatch).toHaveBeenCalledWith({
-        //     payload: "waterrate",
-        //     type: "ui/updateCurrentFlowRate",
-        // });
+        userEvent.selectOptions(
+            screen.getByRole("combobox", { name: "Flow Rate" }),
+            "waterrate"
+        );
+        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
+        expect(testStore.dispatch).toHaveBeenCalledWith({
+            payload: "waterrate",
+            type: "ui/updateCurrentFlowRate",
+        });
     });
 });
