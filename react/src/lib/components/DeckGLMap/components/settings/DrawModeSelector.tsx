@@ -1,10 +1,11 @@
 import { NativeSelect } from "@equinor/eds-core-react";
-import React, { useCallback } from "react";
+import React, { useCallback, Profiler } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateDrawingMode } from "../../redux/actions";
 import { MapState } from "../../redux/store";
 import { DrawModes } from "../../redux/types";
 import { getDrawMode } from "../../utils/specExtractor";
+import logTimes  from "../../../../performanceUtility/onRenderFunction"
 
 interface Props {
     /**
@@ -26,16 +27,18 @@ const DrawModeSelector: React.FC<Props> = React.memo(({ layerId }: Props) => {
     );
     return (
         drawMode && (
-            <NativeSelect
-                id={`${layerId}-mode-selector`}
-                label="Draw Mode"
-                value={drawMode}
-                onChange={handleSelectedItemChange}
-            >
-                {DrawModes.map((mode) => (
-                    <option key={mode}>{mode}</option>
-                ))}
-            </NativeSelect>
+            <Profiler id="Native Select" onRender={logTimes}>
+                <NativeSelect
+                    id={`${layerId}-mode-selector`}
+                    label="Draw Mode"
+                    value={drawMode}
+                    onChange={handleSelectedItemChange}
+                >
+                    {DrawModes.map((mode) => (
+                        <option key={mode}>{mode}</option>
+                    ))}
+                </NativeSelect>
+            </Profiler>
         )
     );
 });
