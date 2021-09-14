@@ -7,6 +7,7 @@ import { DataContext } from "./DataLoader";
 import "./Plot/dynamic_tree.css";
 import GroupTree from "./Plot/group_tree";
 import SettingsBar from "./Settings/SettingsBar";
+import { EdgeOptions } from "../redux/types";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -22,9 +23,10 @@ const useStyles = makeStyles(() =>
 
 interface Props {
     id: string;
+    edge_options: EdgeOptions;
 }
 
-const GroupTreeViewer: React.FC<Props> = ({ id }: Props) => {
+const GroupTreeViewer: React.FC<Props> = ({ id, edge_options }: Props) => {
     const classes = useStyles();
     const divRef = useRef<HTMLDivElement>(null);
     const data = useContext(DataContext);
@@ -37,6 +39,10 @@ const GroupTreeViewer: React.FC<Props> = ({ id }: Props) => {
     const currentFlowRate = useSelector(
         (state: GroupTreeState) => state.ui.currentFlowRate
     );
+    const currentDataType = useSelector(
+        (state: GroupTreeState) => state.ui.currentDataType
+    );
+
     useEffect(() => {
         // Clear possible elements added from earlier updates.
         const node = document.getElementById(id);
@@ -47,7 +53,8 @@ const GroupTreeViewer: React.FC<Props> = ({ id }: Props) => {
         renderer.current = new GroupTree(
             id,
             cloneDeep(data),
-            "oilrate",
+            // XXX "oilrate",
+            currentFlowRate,
             currentDateTime
         );
     }, [data]);
@@ -60,12 +67,15 @@ const GroupTreeViewer: React.FC<Props> = ({ id }: Props) => {
 
     useEffect(() => {
         if (!renderer.current) return;
-        renderer.current.flowrate = currentFlowRate;
-    }, [currentFlowRate]);
+        renderer.current.flowrate =
+            currentDataType === "simulated"
+                ? currentFlowRate
+                : currentFlowRate + "_h";
+    }, [currentFlowRate, currentDataType]);
 
     return (
         <div className={classes.root}>
-            <SettingsBar />
+            <SettingsBar edge_options={edge_options} />
             <div id={id} ref={divRef} />
             {/* <GroupTreePlot root={root} currentFlowRate={currentFlowRate} /> */}
         </div>
