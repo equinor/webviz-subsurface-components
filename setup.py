@@ -25,11 +25,13 @@ package_name = (
     .replace("@", "")
 )
 
-INSTALL_REQUIRES = ["dash>=1.6", "jsonpatch>=1.32"]
+INSTALL_REQUIRES = ["dash>=1.6"]
 
 TESTS_REQUIRE = [
     "bandit",
     "black>=20.8b1",
+    "jsonpatch>=1.32",
+    "jsonpointer>=2.1",
     "matplotlib>=3.0",
     "numpy>=1.14",
     "pandas>=0.25",
@@ -37,8 +39,7 @@ TESTS_REQUIRE = [
     "pylint>=2.4",
     "scipy>=1.2",
     "selenium>=3.141",
-    "jsonpatch>=1.32",
-    "jsonpointer>=2.1",
+    "webviz-core-components>=0.5.0",
 ]
 
 # 'dash[testing]' to be added in TEST_REQUIRE when

@@ -42,7 +42,6 @@ jobs:
           npm run setup-deckgl-types --prefix ./react
           npm run copy-package-json --prefix ./react
           pip install .[dependencies]
-          pip install webviz-core-components --pre
           pip install dash[dev]
 
       - name: ⏭️ Modifications when prerelease
