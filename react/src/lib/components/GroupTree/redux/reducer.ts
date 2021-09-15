@@ -18,7 +18,7 @@ export const uiSlice = createSlice({
         updateCurrentDateTime: (state, action: PayloadAction<string>) => {
             state.currentDateTime = action.payload;
         },
-        updateCurrentFlowRate: (state, action: PayloadAction<FlowRate>) => {
+        updateCurrentFlowRate: (state, action: PayloadAction<string>) => {
             state.currentFlowRate = action.payload;
         },
     },
