@@ -19,6 +19,7 @@ const VectorSelector = (props) => {
                 props.numSecondsUntilSuggestionsAreShown
             }
             lineBreakAfterTag={props.lineBreakAfterTag}
+            customVectorDefinitions={props.customVectorDefinitions}
             persistence={props.persistence}
         />
     );
@@ -33,6 +34,7 @@ VectorSelector.defaultProps = {
     placeholder: "Add new tag...",
     numSecondsUntilSuggestionsAreShown: 0.5,
     lineBreakAfterTag: false,
+    customVectorDefinitions: {},
     persisted_props: ["selectedNodes", "selectedTags", "selectedIds"],
     persistence_type: "local",
 };
@@ -99,6 +101,16 @@ VectorSelector.propTypes = {
      * If set to true, tags will be separated by a line break.
      */
     lineBreakAfterTag: PropTypes.bool,
+
+    /**
+     * An object containing custom vector type definitions.
+     */
+    customVectorDefinitions: PropTypes.objectOf(
+        PropTypes.shape({
+            type: PropTypes.string.isRequired,
+            description: PropTypes.string.isRequired,
+        })
+    ),
 
     /**
      * Used to allow user interactions in this component to be persisted when
