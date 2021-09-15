@@ -78,6 +78,9 @@ export default class GroupTree {
         const height = 700 - margin.top - margin.bottom;
         this._width = +this._width - margin.left - margin.right;
 
+        // Clear possible existing svg's.
+        d3.select(dom_element_id).selectAll("svg").remove();
+
         this._svg = d3
             .select(dom_element_id)
             .append("svg")
@@ -93,6 +96,8 @@ export default class GroupTree {
         this._data = GroupTree.initHierarchies(tree_data, height);
 
         this._currentTree = {};
+
+        this.update(currentDateTime);
     }
 
     /**

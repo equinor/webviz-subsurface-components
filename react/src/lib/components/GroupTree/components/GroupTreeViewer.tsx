@@ -39,21 +39,11 @@ const GroupTreeViewer: React.FC<Props> = ({ id, edge_options }: Props) => {
     const currentFlowRate = useSelector(
         (state: GroupTreeState) => state.ui.currentFlowRate
     );
-    const currentDataType = useSelector(
-        (state: GroupTreeState) => state.ui.currentDataType
-    );
 
     useEffect(() => {
-        // Clear possible elements added from earlier updates.
-        const node = document.getElementById(id);
-        if (node) {
-            node.innerHTML = "";
-        }
-
         renderer.current = new GroupTree(
             id,
             cloneDeep(data),
-            // XXX "oilrate",
             currentFlowRate,
             currentDateTime
         );
@@ -67,11 +57,8 @@ const GroupTreeViewer: React.FC<Props> = ({ id, edge_options }: Props) => {
 
     useEffect(() => {
         if (!renderer.current) return;
-        renderer.current.flowrate =
-            currentDataType === "simulated"
-                ? currentFlowRate
-                : currentFlowRate + "_h";
-    }, [currentFlowRate, currentDataType]);
+        renderer.current.flowrate = currentFlowRate;
+    }, [currentFlowRate]);
 
     return (
         <div className={classes.root}>
