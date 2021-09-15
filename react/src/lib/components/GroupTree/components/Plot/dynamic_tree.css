@@ -188,7 +188,6 @@
 
 .grouptree__pressureunit{
     font-size: 6px;
-
 }
 
 .grouptree__grupnet_text{
@@ -198,4 +197,5 @@
 .grouptree__node--withchildren {
     stroke-width: 2.5px;
     cursor: pointer;
+    
 }
