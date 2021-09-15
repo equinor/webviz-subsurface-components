@@ -107,27 +107,27 @@ exports[`Test flow rate selector component snapshot test 1`] = `
     <option
       value="waterrate"
     >
-      waterrate
+      Water Rate
     </option>
     <option
       value="oilrate"
     >
-      oilrate
+      Oil Rate
     </option>
     <option
       value="gasrate"
     >
-      gasrate
+      Gas Rate
     </option>
     <option
       value="waterinjrate"
     >
-      waterinjrate
+      Water Injection Rate
     </option>
     <option
       value="gasinjrate"
     >
-      gasinjrate
+      Gas Injection Rate
     </option>
   </select>
 </div>

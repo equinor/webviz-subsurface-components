@@ -270,6 +270,19 @@ export default class GroupTree {
             return node_data.pressure?.[date_index].toFixed(0);
         }
 
+        function getNodeToolTipText(node_data, date_index) {
+            const propNames = Object.keys(node_data);
+            let text = "";
+            propNames.forEach(function (s) {
+                text +=
+                    s +
+                    ": " +
+                    (node_data[s]?.[date_index].toFixed(0) ?? "NA") +
+                    "\n";
+            });
+            return text;
+        }
+
         /**
          * Clone old node start position to new node start position.
          * Clone new node end position to old node end position.
@@ -354,6 +367,10 @@ export default class GroupTree {
                 .attr("dominant-baseline", "text-before-edge")
                 .attr("text-anchor", "middle")
                 .text("bar");
+
+            nodeEnter
+                .append("title")
+                .text((d) => getNodeToolTipText(d.data.node_data, date_index));
 
             const nodeUpdate = nodeEnter.merge(node);
 
