@@ -1,5 +1,5 @@
 import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FlowRate, UISettings } from "./types";
+import { UISettings } from "./types";
 
 export const idSlice = createSlice({
     name: "id",
