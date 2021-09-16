@@ -18,8 +18,6 @@ GitHub: https://github.com/AxiaCore/py-expression-eval/
 Based on js-expression-eval, by Matthew Crumley (email@matthewcrumley.com, http://silentmatt.com/)
 https://github.com/silentmatt/js-expression-eval
 
-Ported to Python and modified by Vera Mazhuga (ctrl-alt-delete@live.com, http://vero4ka.info/)
-
 You are free to use and modify this code in anyway you find useful. Please leave this comment
 in the code to acknowledge its original source. If you feel like it, I enjoy hearing about
 projects that use my code, but don't feel like you have to let me know or ask permission.
@@ -99,7 +97,6 @@ class Expression:
                 if item.index_ in values:
                     nstack.append(values[item.index_])
                 else:
-                    # raise Exception("undefined variable: " + item.index_)
                     raise ParserError(f"undefined variable: {item.index_}")
             elif type_ == TOP1:
                 n_1 = nstack.pop()
@@ -114,13 +111,10 @@ class Expression:
                     else:
                         nstack.append(func(n_1))
                 else:
-                    # raise Exception(func + " is not a function")
                     raise ParserError(f"{func} is not a function")
             else:
-                # raise Exception("invalid Expression")
                 raise ParserError("invalid Expression")
         if len(nstack) > 1:
-            # raise Exception("invalid Expression (parity)")
             raise ParserError("invalid Expression (parity)")
         return nstack[0]
 
@@ -316,7 +310,6 @@ class Parser:
         self.errormsg = (
             f"parse error [column {column}]: {msg}, expression: {self.expression}"
         )
-        # raise Exception(self.errormsg)
         raise ParserError(self.errormsg)
 
     def addfunc(self, tokenstack, operstack, type_):
