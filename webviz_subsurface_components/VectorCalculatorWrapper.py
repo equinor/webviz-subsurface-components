@@ -4,14 +4,14 @@ import sys
 import re
 import warnings
 
-if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
+if sys.version_info >= (3, 8):
     from typing import TypedDict
 else:
     from typing_extensions import TypedDict
 
 import numpy as np
 
-from .py_expression_eval import Parser
+from .py_expression_eval import (Parser, ParserError)
 from .VectorCalculator import VectorCalculator
 
 
@@ -117,10 +117,8 @@ class VectorCalculatorWrapper(VectorCalculator):
 
     @staticmethod
     def parse_expression(expression: str) -> str:
-        # Set numpy error state to raise exception in local scope
-        with np.errstate(all="raise"):
-            VectorCalculatorWrapper.parser.parse(expression)
-            return expression
+        VectorCalculatorWrapper.parser.parse(expression)
+        return expression
 
     @staticmethod
     def external_parse_data(expression: ExpressionInfo) -> ExternalParseData:
@@ -139,19 +137,19 @@ class VectorCalculatorWrapper(VectorCalculator):
                 "isValid": True,
                 "message": "",
             }
-        except Exception as e:
+        except ParserError as e:
             return {
                 "expression": expression["expression"],
                 "id": expression["id"],
                 "variables": [],
                 "isValid": False,
-                "message": "" if len(expression["expression"]) <= 0 else str(e),
+                "message": "" if len(expression["expression"]) == 0 else str(e),
             }
 
     def validate_expression(expression: ExpressionInfo) -> bool:
         try:
             VectorCalculatorWrapper.parse_expression(expression["expression"])
-        except:
+        except ParserError as e:
             return False
         return True
 
@@ -170,7 +168,7 @@ class VectorCalculatorWrapper(VectorCalculator):
             expression = VectorCalculatorWrapper.parse_expression(expression)
             parsed_expr = VectorCalculatorWrapper.parser.parse(expression)
             return parsed_expr.evaluate(values)
-        except ValueError as e:
+        except ParserError as e:
             return None
 
     @staticmethod
@@ -217,7 +215,7 @@ class VectorCalculatorWrapper(VectorCalculator):
 
         Doc: https://docs.python.org/3/library/re.html#re.split
         """
-        if sys.version_info[0] == 3 and sys.version_info[1] >= 7:
+        if sys.version_info >= (3, 7):
             return re.split(pattern, string)
         else:
             splits = list((el.start(), el.end()) for el in re.finditer(pattern, string))

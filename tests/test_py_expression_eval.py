@@ -2,6 +2,8 @@ import pytest
 import numpy as np
 from webviz_subsurface_components import py_expression_eval
 
+from webviz_subsurface_components.py_expression_eval import ParserError
+
 VALID_OPERATORS = ["x-y/100", "x^y", "a %b", "x/(y-z)", "x*y", "a**2", "a+d"]
 VALID_FUNCTIONS = ["ln(a)-b", "log10(a-b)", "x-abs(y)", "sqrt(a-b^2)", "-y^2"]
 VALID_CONSTANTS = ["E^2", "2*PI"]
@@ -15,15 +17,14 @@ INVALID_EXPRESSIONS = (
     INVALID_FUNCTIONS + INVALID_STRINGS + INVALID_COMMA + INVALID_OPERATORS
 )
 
-# pylint: disable=broad-except
 def test_valid_parsing():
     parser = py_expression_eval.Parser()
 
     for expression in VALID_EXPRESSIONS:
-        # Expect no exceptions when parsing
+        # Expect no ParserError when parsing
         try:
             parser.parse(expression)
-        except Exception as err:
+        except ParserError as err:
             msg: str = (
                 "Expected successful parse for valid expression: "
                 + expression
@@ -36,8 +37,8 @@ def test_invalid_parsing():
     parser = py_expression_eval.Parser()
 
     for expression in INVALID_EXPRESSIONS:
-        # Expect Exception on each parse
-        with pytest.raises(Exception):
+        # Expect ParserError on each parse
+        with pytest.raises(ParserError):
             parser.parse(expression)
             msg: str = (
                 "Expected unsuccessful parsing and Exception raise for invalid expression: "

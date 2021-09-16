@@ -4,7 +4,7 @@ Copyright (c) 2021- Equinor ASA
 This source code is licensed under the MIT license found in the
 LICENSE file in the root directory of this source tree.
 
-This is a modification of py-expression-eval created by AxiaCore. 
+This is a modification of py-expression-eval created by AxiaCore.
 
 Moifications are done to obtain simplifed functionality for itended usage.
 
@@ -24,10 +24,6 @@ You are free to use and modify this code in anyway you find useful. Please leave
 in the code to acknowledge its original source. If you feel like it, I enjoy hearing about
 projects that use my code, but don't feel like you have to let me know or ask permission.
 """
-# pylint: skip-file
-
-from __future__ import division
-
 import re
 
 import numpy as np
@@ -38,23 +34,25 @@ TOP2 = 2
 TVAR = 3
 TFUNCALL = 4
 
+class ParserError(Exception):
+    pass
 
+# pylint: disable=too-few-public-methods
 class Token:
     def __init__(self, type_, index_, prio_, number_):
         self.type_ = type_
         self.index_ = index_ or 0
         self.prio_ = prio_ or 0
-        self.number_ = number_ if number_ != None else 0
+        self.number_ = number_ if number_ is not None else 0
 
-    def toString(self):
+    def to_string(self):
         if self.type_ == TNUMBER:
             return self.number_
         if self.type_ == TOP1 or self.type_ == TOP2 or self.type_ == TVAR:
             return self.index_
-        elif self.type_ == TFUNCALL:
+        if self.type_ == TFUNCALL:
             return "CALL"
-        else:
-            return "Invalid Token"
+        return "Invalid Token"
 
 
 class Expression:
@@ -84,42 +82,46 @@ class Expression:
         self.ops1 = ops1
         self.ops2 = ops2
 
+    # pylint: disable=too-many-branches
     def evaluate(self, values):
         values = values or {}
         nstack = []
-        L = len(self.tokens)
         for item in self.tokens:
             type_ = item.type_
             if type_ == TNUMBER:
                 nstack.append(item.number_)
             elif type_ == TOP2:
-                n2 = nstack.pop()
-                n1 = nstack.pop()
-                f = self.ops2[item.index_]
-                nstack.append(f(n1, n2))
+                n_2 = nstack.pop()
+                n_1 = nstack.pop()
+                func = self.ops2[item.index_]
+                nstack.append(func(n_1, n_2))
             elif type_ == TVAR:
                 if item.index_ in values:
                     nstack.append(values[item.index_])
                 else:
-                    raise Exception("undefined variable: " + item.index_)
+                    # raise Exception("undefined variable: " + item.index_)
+                    raise ParserError(f"undefined variable: {item.index_}")
             elif type_ == TOP1:
-                n1 = nstack.pop()
-                f = self.ops1[item.index_]
-                nstack.append(f(n1))
+                n_1 = nstack.pop()
+                func = self.ops1[item.index_]
+                nstack.append(func(n_1))
             elif type_ == TFUNCALL:
-                n1 = nstack.pop()
-                f = nstack.pop()
-                if callable(f):
-                    if type(n1) is list:
-                        nstack.append(f(*n1))
+                n_1 = nstack.pop()
+                func = nstack.pop()
+                if callable(func):
+                    if isinstance(n_1, list):
+                        nstack.append(func(*n_1))
                     else:
-                        nstack.append(f(n1))
+                        nstack.append(func(n_1))
                 else:
-                    raise Exception(f + " is not a function")
+                    # raise Exception(func + " is not a function")
+                    raise ParserError(f"{func} is not a function")
             else:
-                raise Exception("invalid Expression")
+                # raise Exception("invalid Expression")
+                raise ParserError("invalid Expression")
         if len(nstack) > 1:
-            raise Exception("invalid Expression (parity)")
+            # raise Exception("invalid Expression (parity)")
+            raise ParserError("invalid Expression (parity)")
         return nstack[0]
 
     def variables(self):
@@ -131,6 +133,7 @@ class Expression:
         return variables
 
 
+# pylint: disable= too-many-instance-attributes
 class Parser:
     """
     Expression parser based on py_expression_eval, modifications are done.
@@ -209,6 +212,7 @@ class Parser:
             "PI": np.pi,
         }
 
+    # pylint: disable = too-many-branches, too-many-statements
     def parse(self, expr):
         self.errormsg = ""
         self.success = True
@@ -221,9 +225,9 @@ class Parser:
         self.pos = 0
 
         while self.pos < len(self.expression):
-            if self.isOperator():
-                if self.isSign() and expected & self.SIGN:
-                    if self.isNegativeSign():
+            if self.is_operator():
+                if self.is_sign() and expected & self.SIGN:
+                    if self.is_negative_sign():
                         self.tokenprio = 5
                         self.tokenindex = "-"
                         noperators += 1
@@ -235,13 +239,13 @@ class Parser:
                     noperators += 2
                     self.addfunc(tokenstack, operstack, TOP2)
                     expected = self.PRIMARY | self.LPAREN | self.FUNCTION | self.SIGN
-            elif self.isNumber():
+            elif self.is_number():
                 if expected and self.PRIMARY == 0:
                     self.error_parsing(self.pos, "unexpected number")
                 token = Token(TNUMBER, 0, 0, self.tokennumber)
                 tokenstack.append(token)
                 expected = self.OPERATOR | self.RPAREN
-            elif self.isLeftParenth():
+            elif self.is_left_parenth():
                 if (expected & self.LPAREN) == 0:
                     self.error_parsing(self.pos, 'unexpected "("')
                 if expected & self.CALL:
@@ -256,38 +260,38 @@ class Parser:
                     | self.SIGN
                     | self.NULLARY_CALL
                 )
-            elif self.isRightParenth():
+            elif self.is_right_parenth():
                 if expected & self.NULLARY_CALL:
                     token = Token(TNUMBER, 0, 0, [])
                     tokenstack.append(token)
                 elif (expected & self.RPAREN) == 0:
                     self.error_parsing(self.pos, 'unexpected ")"')
                 expected = self.OPERATOR | self.RPAREN | self.LPAREN | self.CALL
-            elif self.isConst():
+            elif self.is_const():
                 if (expected & self.PRIMARY) == 0:
                     self.error_parsing(self.pos, "unexpected constant")
                 consttoken = Token(TNUMBER, 0, 0, self.tokennumber)
                 tokenstack.append(consttoken)
                 expected = self.OPERATOR | self.RPAREN
-            elif self.isOp2():
+            elif self.is_op2():
                 if (expected & self.FUNCTION) == 0:
                     self.error_parsing(self.pos, "unexpected function")
                 self.addfunc(tokenstack, operstack, TOP2)
                 noperators += 2
                 expected = self.LPAREN
-            elif self.isOp1():
+            elif self.is_op1():
                 if (expected & self.FUNCTION) == 0:
                     self.error_parsing(self.pos, "unexpected function")
                 self.addfunc(tokenstack, operstack, TOP1)
                 noperators += 1
                 expected = self.LPAREN
-            elif self.isVar():
+            elif self.is_var():
                 if (expected & self.PRIMARY) == 0:
                     self.error_parsing(self.pos, "unexpected variable")
                 vartoken = Token(TVAR, self.tokenindex, 0, 0)
                 tokenstack.append(vartoken)
                 expected = self.OPERATOR | self.RPAREN | self.CALL
-            elif self.isWhite():
+            elif self.is_white():
                 pass
             else:
                 if self.errormsg == "":
@@ -310,14 +314,10 @@ class Parser:
     def error_parsing(self, column, msg):
         self.success = False
         self.errormsg = (
-            "parse error [column "
-            + str(column)
-            + "]: "
-            + msg
-            + ", expression: "
-            + self.expression
+            f"parse error [column {column}]: {msg}, expression: {self.expression}"
         )
-        raise Exception(self.errormsg)
+        # raise Exception(self.errormsg)
+        raise ParserError(self.errormsg)
 
     def addfunc(self, tokenstack, operstack, type_):
         operator = Token(
@@ -333,8 +333,8 @@ class Parser:
                 break
         operstack.append(operator)
 
-    def isNumber(self):
-        r = False
+    def is_number(self):
+        res = False
 
         if self.expression[self.pos] == "E":
             return False
@@ -348,49 +348,49 @@ class Parser:
             return True
 
         # number in decimal
-        str = ""
+        _str = ""
         while self.pos < len(self.expression):
             code = self.expression[self.pos]
             if (code >= "0" and code <= "9") or code == ".":
-                if len(str) == 0 and code == ".":
-                    str = "0"
-                str += code
+                if len(_str) == 0 and code == ".":
+                    _str = "0"
+                _str += code
                 self.pos += 1
                 try:
-                    self.tokennumber = int(str)
+                    self.tokennumber = int(_str)
                 except ValueError:
-                    self.tokennumber = float(str)
-                r = True
+                    self.tokennumber = float(_str)
+                res = True
             else:
                 break
-        return r
+        return res
 
-    def isConst(self):
+    def is_const(self):
         for i in self.consts:
-            L = len(i)
-            str = self.expression[self.pos : self.pos + L]
-            if i == str:
-                if len(self.expression) <= self.pos + L:
+            _len = len(i)
+            _str = self.expression[self.pos : self.pos + _len]
+            if i == _str:
+                if len(self.expression) <= self.pos + _len:
                     self.tokennumber = self.consts[i]
-                    self.pos += L
+                    self.pos += _len
                     return True
                 if (
-                    not self.expression[self.pos + L].isalnum()
-                    and self.expression[self.pos + L] != "_"
+                    not self.expression[self.pos + _len].isalnum()
+                    and self.expression[self.pos + _len] != "_"
                 ):
                     self.tokennumber = self.consts[i]
-                    self.pos += L
+                    self.pos += _len
                     return True
         return False
 
-    def isOperator(self):
+    def is_operator(self):
         ops = (
             ("**", 8, "**"),
             ("^", 8, "^"),
             ("%", 6, "%"),
             ("/", 6, "/"),
-            (u"\u2219", 5, "*"),  # bullet operator
-            (u"\u2022", 5, "*"),  # black small circle
+            ("\u2219", 5, "*"),  # bullet operator
+            ("\u2022", 5, "*"),  # black small circle
             ("*", 5, "*"),
             ("+", 4, "+"),
             ("-", 4, "-"),
@@ -403,19 +403,19 @@ class Parser:
                 return True
         return False
 
-    def isSign(self):
+    def is_sign(self):
         code = self.expression[self.pos - 1]
         return (code == "+") or (code == "-")
 
-    def isPositiveSign(self):
+    def is_positive_sign(self):
         code = self.expression[self.pos - 1]
         return code == "+"
 
-    def isNegativeSign(self):
+    def is_negative_sign(self):
         code = self.expression[self.pos - 1]
         return code == "-"
 
-    def isLeftParenth(self):
+    def is_left_parenth(self):
         code = self.expression[self.pos]
         if code == "(":
             self.pos += 1
@@ -423,7 +423,7 @@ class Parser:
             return True
         return False
 
-    def isRightParenth(self):
+    def is_right_parenth(self):
         code = self.expression[self.pos]
         if code == ")":
             self.pos += 1
@@ -431,53 +431,53 @@ class Parser:
             return True
         return False
 
-    def isWhite(self):
+    def is_white(self):
         code = self.expression[self.pos]
         if code.isspace():
             self.pos += 1
             return True
         return False
 
-    def isOp1(self):
-        str = ""
+    def is_op1(self):
+        _str = ""
         for i in range(self.pos, len(self.expression)):
             c = self.expression[i]
             if c.upper() == c.lower():
                 if i == self.pos or (c != "_" and (c < "0" or c > "9")):
                     break
-            str += c
-        if len(str) > 0 and str in self.ops1:
-            self.tokenindex = str
+            _str += c
+        if len(_str) > 0 and _str in self.ops1:
+            self.tokenindex = _str
             self.tokenprio = 9
-            self.pos += len(str)
+            self.pos += len(_str)
             return True
         return False
 
-    def isOp2(self):
-        str = ""
+    def is_op2(self):
+        _str = ""
         for i in range(self.pos, len(self.expression)):
-            c = self.expression[i]
-            if c.upper() == c.lower():
-                if i == self.pos or (c != "_" and (c < "0" or c > "9")):
+            char = self.expression[i]
+            if char.upper() == char.lower():
+                if i == self.pos or (char != "_" and (char < "0" or char > "9")):
                     break
-            str += c
-        if len(str) > 0 and (str in self.ops2):
-            self.tokenindex = str
+            _str += char
+        if len(_str) > 0 and (_str in self.ops2):
+            self.tokenindex = _str
             self.tokenprio = 9
-            self.pos += len(str)
+            self.pos += len(_str)
             return True
         return False
 
-    def isVar(self):
-        str = ""
+    def is_var(self):
+        _str = ""
         for i in range(self.pos, len(self.expression)):
-            c = self.expression[i]
-            if c.lower() == c.upper() and not (c in "_.") and (c < "0" or c > "9"):
+            char = self.expression[i]
+            if char.lower() == char.upper() and not (char in "_.") and (char < "0" or char > "9"):
                 break
-            str += c
-        if str:
-            self.tokenindex = str
+            _str += char
+        if _str:
+            self.tokenindex = _str
             self.tokenprio = 6
-            self.pos += len(str)
+            self.pos += len(_str)
             return True
         return False
