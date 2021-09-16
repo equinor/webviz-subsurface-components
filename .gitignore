@@ -3,6 +3,8 @@
 react/webviz_subsurface_components/**/*
 webviz_subsurface_components/**/*
 !webviz_subsurface_components/__init__.py
+!webviz_subsurface_components/VectorCalculatorWrapper.py
+!webviz_subsurface_components/py_expression_eval.py
 
 DESCRIPTION
 NAMESPACE

@@ -18,6 +18,15 @@ import dash as _dash
 from ._imports_ import *
 from ._imports_ import __all__
 
+from .py_expression_eval import Parser
+from .VectorCalculatorWrapper import VectorCalculatorWrapper as VectorCalculator
+from .VectorCalculatorWrapper import (
+    ExpressionInfo,
+    ExternalParseData,
+    VariableVectorMapInfo,
+)
+
+
 try:
     __version__ = get_distribution(__name__).version
 except DistributionNotFound:
