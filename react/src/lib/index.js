@@ -14,6 +14,7 @@ import Morris from "./components/Morris";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
 import VectorSelector from "./components/VectorSelector";
 import WellCompletions from "./components/WellCompletions";
+import { VectorCalculator } from "./components/VectorCalculator";
 import WellLogViewer from "./components/WellLogViewer";
 
 export {
@@ -26,6 +27,7 @@ export {
     DeckGLMap,
     VectorSelector,
     WellCompletions,
+    VectorCalculator,
     GroupTree,
     WellLogViewer,
 };
