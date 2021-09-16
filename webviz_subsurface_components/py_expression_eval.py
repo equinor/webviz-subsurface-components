@@ -133,8 +133,7 @@ class Expression:
 
     def variables(self):
         variables = []
-        for i in range(0, len(self.tokens)):
-            item = self.tokens[i]
+        for item in self.tokens:
             if item.type_ == TVAR and not item.index_ in variables:
                 variables.append(item.index_)
         return variables
@@ -357,7 +356,7 @@ class Parser:
         _str = ""
         while self.pos < len(self.expression):
             code = self.expression[self.pos]
-            if (code >= "0" and code <= "9") or code == ".":
+            if "0" <= code <= "9" or code == ".":
                 if len(_str) == 0 and code == ".":
                     _str = "0"
                 _str += code
@@ -411,7 +410,7 @@ class Parser:
 
     def is_sign(self):
         code = self.expression[self.pos - 1]
-        return (code == "+") or (code == "-")
+        return code in ("+", "-")
 
     def is_positive_sign(self):
         code = self.expression[self.pos - 1]
