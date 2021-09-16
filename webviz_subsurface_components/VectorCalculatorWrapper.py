@@ -11,7 +11,7 @@ else:
 
 import numpy as np
 
-from .py_expression_eval import (Parser, ParserError)
+from .py_expression_eval import Parser, ParserError
 from .VectorCalculator import VectorCalculator
 
 

@@ -17,6 +17,7 @@ INVALID_EXPRESSIONS = (
     INVALID_FUNCTIONS + INVALID_STRINGS + INVALID_COMMA + INVALID_OPERATORS
 )
 
+
 def test_valid_parsing():
     parser = py_expression_eval.Parser()
 
@@ -25,12 +26,9 @@ def test_valid_parsing():
         try:
             parser.parse(expression)
         except ParserError as err:
-            msg: str = (
-                "Expected successful parse for valid expression: "
-                + expression
-                + ". Exception: "
+            pytest.fail(
+                f"Expected successful parse for valid expression: {expression}. Exception: {err}"
             )
-            pytest.fail(msg + str(err))
 
 
 def test_invalid_parsing():
@@ -40,11 +38,10 @@ def test_invalid_parsing():
         # Expect ParserError on each parse
         with pytest.raises(ParserError):
             parser.parse(expression)
-            msg: str = (
-                "Expected unsuccessful parsing and Exception raise for invalid expression: "
-                + expression
+            pytest.fail(
+                f"Expected unsuccessful parsing and Exception raise for invalid expression: "
+                f"{expression}"
             )
-            pytest.fail(msg)
 
 
 def test_variables():

@@ -1,12 +1,27 @@
 """
-Copyright (c) 2021- Equinor ASA
+This _specific file/module_ is licensed under the MIT license.
 
-This source code is licensed under the MIT license found in the
-LICENSE file in the root directory of this source tree.
+Copyright (c) 2015 Matthew Crumley
+Copyright (c) 2015 AxioCore
+Copyright (c) 2021 Equinor ASA
 
-This is a modification of py-expression-eval created by AxiaCore.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Moifications are done to obtain simplifed functionality for itended usage.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+This is a modification of `py-expression-eval` created by AxiaCore.
+Moifications are done to obtain simplified functionality for intended usage.
 
 Thanks to AxiaCore!
 
@@ -15,12 +30,8 @@ Thanks to AxiaCore!
 Author: AxiaCore S.A.S. http://axiacore.com
 GitHub: https://github.com/AxiaCore/py-expression-eval/
 
-Based on js-expression-eval, by Matthew Crumley (email@matthewcrumley.com, http://silentmatt.com/)
+Based on js-expression-eval, by Matthew Crumley
 https://github.com/silentmatt/js-expression-eval
-
-You are free to use and modify this code in anyway you find useful. Please leave this comment
-in the code to acknowledge its original source. If you feel like it, I enjoy hearing about
-projects that use my code, but don't feel like you have to let me know or ask permission.
 """
 import re
 
@@ -32,8 +43,10 @@ TOP2 = 2
 TVAR = 3
 TFUNCALL = 4
 
+
 class ParserError(Exception):
     pass
+
 
 # pylint: disable=too-few-public-methods
 class Token:
@@ -434,11 +447,11 @@ class Parser:
     def is_op1(self):
         _str = ""
         for i in range(self.pos, len(self.expression)):
-            c = self.expression[i]
-            if c.upper() == c.lower():
-                if i == self.pos or (c != "_" and (c < "0" or c > "9")):
+            char = self.expression[i]
+            if char.upper() == char.lower():
+                if i == self.pos or (char != "_" and (char < "0" or char > "9")):
                     break
-            _str += c
+            _str += char
         if len(_str) > 0 and _str in self.ops1:
             self.tokenindex = _str
             self.tokenprio = 9
@@ -465,7 +478,11 @@ class Parser:
         _str = ""
         for i in range(self.pos, len(self.expression)):
             char = self.expression[i]
-            if char.lower() == char.upper() and not (char in "_.") and (char < "0" or char > "9"):
+            if (
+                char.lower() == char.upper()
+                and not (char in "_.")
+                and (char < "0" or char > "9")
+            ):
                 break
             _str += char
         if _str:
