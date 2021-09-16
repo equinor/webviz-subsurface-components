@@ -78,6 +78,9 @@ export default class GroupTree {
         const height = 700 - margin.top - margin.bottom;
         this._width = +this._width - margin.left - margin.right;
 
+        // Clear possible existing svg's.
+        d3.select(dom_element_id).selectAll("svg").remove();
+
         this._svg = d3
             .select(dom_element_id)
             .append("svg")
@@ -93,6 +96,8 @@ export default class GroupTree {
         this._data = GroupTree.initHierarchies(tree_data, height);
 
         this._currentTree = {};
+
+        this.update(currentDateTime);
     }
 
     /**
@@ -152,12 +157,13 @@ export default class GroupTree {
             .style("stroke-width", (d) =>
                 this.getEdgeStrokeWidth(
                     flowrate,
-                    d.data.edge_data[flowrate][date_index]
+                    d.data.edge_data[flowrate]?.[date_index] ?? 0
                 )
             )
             .style("stroke-dasharray", (d) => {
-                const rate = d.data.edge_data[flowrate][date_index];
-                return rate !== undefined && rate > 0 ? "none" : "5,5";
+                return (d.data.edge_data[flowrate]?.[date_index] ?? 0) > 0
+                    ? "none"
+                    : "5,5";
             });
     }
 
@@ -166,7 +172,12 @@ export default class GroupTree {
     }
 
     getEdgeStrokeWidth(key, val) {
-        const normalized = val !== undefined ? this._path_scale[key](val) : 0;
+        if (!this._path_scale.has(key)) {
+            return 0;
+        }
+
+        const val_ = val ?? 0;
+        const normalized = this._path_scale[key](val_);
         return `${normalized}px`;
     }
 
@@ -267,17 +278,17 @@ export default class GroupTree {
         }
 
         function getNodeText(node_data, date_index) {
-            return node_data.pressure?.[date_index].toFixed(0);
+            return node_data.pressure?.[date_index]?.toFixed(1) ?? "NA";
         }
 
-        function getNodeToolTipText(node_data, date_index) {
-            const propNames = Object.keys(node_data);
+        function getToolTipText(data, date_index) {
+            const propNames = Object.keys(data);
             let text = "";
             propNames.forEach(function (s) {
                 text +=
                     s +
                     ": " +
-                    (node_data[s]?.[date_index].toFixed(0) ?? "NA") +
+                    (data[s]?.[date_index]?.toFixed(1) ?? "NA") +
                     "\n";
             });
             return text;
@@ -370,7 +381,7 @@ export default class GroupTree {
 
             nodeEnter
                 .append("title")
-                .text((d) => getNodeToolTipText(d.data.node_data, date_index));
+                .text((d) => getToolTipText(d.data.node_data, date_index));
 
             const nodeUpdate = nodeEnter.merge(node);
 
@@ -397,6 +408,10 @@ export default class GroupTree {
                 .transition()
                 .duration(self._transitionTime)
                 .attr("r", 15);
+
+            nodeUpdate
+                .select("title")
+                .text((d) => getToolTipText(d.data.node_data, date_index));
 
             const nodeExit = node
                 .exit()
@@ -456,11 +471,11 @@ export default class GroupTree {
                 .style("stroke-width", (d) =>
                     self.getEdgeStrokeWidth(
                         flowrate,
-                        d.data.edge_data[flowrate][date_index]
+                        d.data.edge_data[flowrate]?.[date_index] ?? 0
                     )
                 )
                 .style("stroke-dasharray", (d) => {
-                    return d.data.edge_data[flowrate][date_index] > 0
+                    return (d.data.edge_data[flowrate]?.[date_index] ?? 0) > 0
                         ? "none"
                         : "5,5";
                 });

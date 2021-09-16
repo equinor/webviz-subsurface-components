@@ -27,7 +27,6 @@ const DataProvider: React.FC<Props> = ({
             ui: {
                 currentDateTime: initialDateTime,
                 currentFlowRate: initialFlowRate,
-                currentDataType: "simulated",
             } as UISettings,
         };
     }, [id, data]);
