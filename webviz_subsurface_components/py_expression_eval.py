@@ -371,19 +371,19 @@ class Parser:
         return res
 
     def is_const(self):
-        for i in self.consts:
-            _len = len(i)
+        for constant_name, constant_value in self.consts.items():
+            _len = len(constant_name)
             _str = self.expression[self.pos : self.pos + _len]
-            if i == _str:
+            if constant_name == _str:
                 if len(self.expression) <= self.pos + _len:
-                    self.tokennumber = self.consts[i]
+                    self.tokennumber = constant_value
                     self.pos += _len
                     return True
                 if (
                     not self.expression[self.pos + _len].isalnum()
                     and self.expression[self.pos + _len] != "_"
                 ):
-                    self.tokennumber = self.consts[i]
+                    self.tokennumber = constant_value
                     self.pos += _len
                     return True
         return False
