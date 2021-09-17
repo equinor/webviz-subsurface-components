@@ -70,6 +70,23 @@ DeckGLMap.defaultProps = {
         incrementValue: 100,
         widthPerUnit: 100,
     },
+    legendData: {
+        Above_BCU: [[255, 13, 186, 255], 0],
+        ABOVE: [[255, 64, 53, 255], 1],
+        H12: [[247, 255, 164, 255], 2],
+        H11: [[112, 255, 97, 255], 3],
+        H10: [[9, 254, 133, 255], 4],
+        H9: [[254, 4, 135, 255], 5],
+        H8: [[255, 5, 94, 255], 6],
+        H7: [[32, 50, 255, 255], 7],
+        H6: [[109, 255, 32, 255], 8],
+        H5: [[254, 146, 92, 255], 9],
+        H4: [[185, 116, 255, 255], 10],
+        H3: [[255, 144, 1, 255], 11],
+        H2: [[157, 32, 255, 255], 12],
+        H1: [[255, 26, 202, 255], 13],
+        BELOW: [[73, 255, 35, 255], 14],
+    },
 };
 
 function DeckGLMap({
@@ -79,6 +96,7 @@ function DeckGLMap({
     deckglSpecPatch,
     coords,
     scale,
+    legendData,
     coordinateUnit,
     setProps,
 }) {
@@ -142,6 +160,7 @@ function DeckGLMap({
                 setSpecPatch={setSpecPatch}
                 coords={coords}
                 scale={scale}
+                legendData={legendData}
                 coordinateUnit={coordinateUnit}
             />
         )
@@ -230,6 +249,8 @@ DeckGLMap.propTypes = {
      * For reacting to prop changes
      */
     setProps: PropTypes.func,
+    //
+    legendData: PropTypes.object,
 };
 
 export default DeckGLMap;

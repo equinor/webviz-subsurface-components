@@ -13,6 +13,7 @@ import { createStore } from "../redux/store";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
+import ColorLegend from "../components/ColorLegend";
 
 export interface MapProps {
     /**
@@ -62,6 +63,10 @@ export interface MapProps {
         position: number[];
     };
 
+    legendData: {
+        legendData: Record<string, unknown>;
+    };
+
     coordinateUnit: string;
 
     children?: React.ReactNode;
@@ -74,6 +79,7 @@ const Map: React.FC<MapProps> = ({
     setSpecPatch,
     coords,
     scale,
+    legendData,
     coordinateUnit,
     children,
 }: MapProps) => {
@@ -191,6 +197,8 @@ const Map: React.FC<MapProps> = ({
                         scaleUnit={coordinateUnit}
                     />
                 ) : null}
+
+                <ColorLegend data={legendData} />
             </ReduxProvider>
         )
     );
