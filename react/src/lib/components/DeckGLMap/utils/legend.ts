@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+
 export default function colorLegend(itemColor: any) {
     let legendValues= [{color: "black", stop: [0,1]},{color: "black", stop: [1,2]},
     {color: "black", stop: [2,3]},{color: "black", stop: [3,4]},{color: "black", stop: [4,5]}];
@@ -18,9 +19,7 @@ export default function colorLegend(itemColor: any) {
                 })
             }
             g.selectAll("g.legendCells").data(legendValues).exit().remove();
-            g.selectAll("g.legendCells").select("rect").style("fill", function(d: any) {
-                return d.color;
-            });
+            g.selectAll("g.legendCells").select("rect").style("fill", function(d: any) { return d.color; });
             if (orientation == "vertical") {
                 g.selectAll("g.legendCells").select("text.breakLabels").style("display", "block").style("text-anchor", "start").attr("x", cellWidth + cellPadding).attr("y", 5 + (cellHeight / 2)).text(function(d: any) {
                     return labelFormat(d.stop[0]) + (d.stop[1].length > 0 ? " - " + labelFormat(d.stop[1]) : "");
@@ -48,22 +47,22 @@ export default function colorLegend(itemColor: any) {
     legend.inputScale = function(newScale: any) {
         let scale:any = {};
         if (!arguments.length) return scale;
-            scale = newScale;
-            legendValues = [];
-            // continous scale
-            if (scale.invertExtent) {
-                //Is a quantile scale
-                scale.range().forEach(function(el: any) {
-                    const cellObject = { color: el, stop: scale.invertExtent(el) }
-                    legendValues.push(cellObject);
-                })
-            }
-            // discrete scale
-            else {
-                scale.domain().forEach(function (el: any) {
-                    const cellObject = {color: scale(el), stop: [el,""]};
-                    legendValues.push(cellObject);
-                })
+        scale = newScale;
+        legendValues = [];
+        // continous scale
+        if (scale.invertExtent) {
+            //Is a quantile scale
+            scale.range().forEach(function(el: any) {
+                const cellObject = { color: el, stop: scale.invertExtent(el) }
+                legendValues.push(cellObject);
+            })
+        }
+        // discrete scale
+        else {
+            scale.domain().forEach(function (el: any) {
+                const cellObject = {color: scale(el), stop: [el,""]};
+                legendValues.push(cellObject);
+            })
         }
         return this;
     };
@@ -78,9 +77,10 @@ export default function colorLegend(itemColor: any) {
         return foundColor;
     };
     legend.cellWidth = function(newCellSize: number) {
-        if (!arguments.length) return cellWidth;
+        if (!arguments.length)
+            return cellWidth;
         cellWidth = newCellSize;
-        return this;
+            return this;
     };
     legend.cellHeight = function(newCellSize: number) {
         if (!arguments.length) return cellHeight;
@@ -99,24 +99,31 @@ export default function colorLegend(itemColor: any) {
         return this;
     };
     legend.cellStepping = function(incStep: any) {
-        if (!arguments.length) return changeValue;
+        if (!arguments.length)
+        return changeValue;
         changeValue = incStep;
         return this;
     };
     legend.units = function(incUnits: string) {
-        if (!arguments.length) return labelUnits;
+        if (!arguments.length)
+        return labelUnits;
         labelUnits = incUnits;
         return this;
     };
     legend.orientation = function(incOrient: any) {
-        if (!arguments.length) return orientation;
+        if (!arguments.length)
+        return orientation;
         orientation = incOrient;
         return this;
     };
     legend.labelFormat = function(incFormat: any) {
         if (!arguments.length) return labelFormat;
             labelFormat = incFormat;
-        if (incFormat == "none") { labelFormat = function(inc: any) { return inc }; };
+        if (incFormat == "none") {
+            labelFormat = function(inc: any) {
+                return inc
+            };
+        };
         return this;
     };
     return legend;
