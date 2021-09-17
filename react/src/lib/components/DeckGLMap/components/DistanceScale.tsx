@@ -67,4 +67,11 @@ const DistanceScale: React.FC<scaleProps> = ({
     );
 };
 
+DistanceScale.defaultProps = {
+    incrementValue: 100,
+    widthPerUnit: 100,
+    position: [10, 10],
+    scaleUnit: "m",
+};
+
 export default DistanceScale;
