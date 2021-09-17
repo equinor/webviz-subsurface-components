@@ -1,0 +1,79 @@
+.VectorCalculator {
+    display: block;
+    padding: 5px;
+    flex-grow: 1;
+}
+
+.VectorCalculator .ExpressionInputComponent {
+    padding: 20px;
+    min-width: 400px;
+}
+
+.VectorCalculator .ExpressionTableComponent {
+    padding: 20px;
+    min-width: 360px;
+}
+
+.VectorCalculator .ExpressionsTableHeader {
+    font-weight: bold;
+}
+
+.VectorCalculator .ExpressionsTableHeaderNameCell {
+    width: 35%;
+}
+
+.VectorCalculator .ExpressionsTableHeaderExpressionCell {
+    width: 65%;
+}
+
+.VectorCalculator .ExpressionsTable {
+    position: relative;
+    max-height: 450px;
+    max-width: 100%;
+}
+
+.VectorCalculator .ExpressionsTable table {
+    table-layout: fixed;
+}
+
+.VectorCalculator .ExpressionsTableCell {
+    display: inline-block;
+    position: relative;
+    width: 99%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.VectorCalculator .TextFieldWrapper {
+    height: 58px;
+}
+
+.VectorCalculator .VariablesTableContainer {
+    overflow: visible;
+    position: relative;
+}
+
+.VectorCalculator .DisableOverlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ccc;
+    opacity: 0.1;
+    z-index: 20;
+    cursor: not-allowed;
+}
+
+.VectorCalculator .BlinkingTableRow {
+    animation: VectorCalculator_invalid 1s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes VectorCalculator_invalid {
+    0% {
+        background-color: red;
+    }
+    100% {
+        background-color: inherit;
+    }
+}
