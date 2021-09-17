@@ -40,13 +40,6 @@ export default class GroupTree {
         tree_data.map((datedTree) => {
             let tree = datedTree.tree;
             d3.hierarchy(tree, (d) => d.children).each((node) => {
-                // node_data
-                Object.keys(node.data.node_data).forEach((key) => {
-                    if (!tree_values[key]) {
-                        tree_values[key] = [];
-                    }
-                    tree_values[key].push(node.data.node_data[key]);
-                });
                 // edge_data
                 Object.keys(node.data.edge_data).forEach((key) => {
                     if (!tree_values[key]) {
@@ -172,12 +165,10 @@ export default class GroupTree {
     }
 
     getEdgeStrokeWidth(key, val) {
-        if (!this._path_scale.has(key)) {
-            return 0;
-        }
-
-        const val_ = val ?? 0;
-        const normalized = this._path_scale[key](val_);
+        const normalized =
+            this._path_scale[key] !== undefined
+                ? this._path_scale[key](val ?? 0)
+                : 1;
         return `${normalized}px`;
     }
 
