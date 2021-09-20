@@ -14,6 +14,7 @@ import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { LayerPickInfo, PropertyDataType } from "../layers/utils/layerTools";
 import { PropertyMapPickInfo } from "../layers/utils/propertyMapTools";
+import { rgb } from "d3-color";
 
 Icon.add({ arrow_drop_up, arrow_drop_down });
 
@@ -85,7 +86,7 @@ function Row(props: { layer_data: InfoCardDataType }) {
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Table size="small" aria-label="properties">
                             <TableBody>
-                                {layer_data.properties.map((propertyRow) => (
+                                {layer_data.properties?.map((propertyRow) => (
                                     <TableRow
                                         key={propertyRow.name}
                                         className={classes.table_row}
@@ -97,6 +98,17 @@ function Row(props: { layer_data: InfoCardDataType }) {
                                                 paddingRight: 10,
                                             }}
                                         >
+                                            {propertyRow.color && (
+                                                <span
+                                                    style={{
+                                                        color: rgb(
+                                                            ...propertyRow.color
+                                                        ).toString(),
+                                                    }}
+                                                >
+                                                    {"\u2B24"}
+                                                </span>
+                                            )}
                                             {propertyRow.name}
                                         </TableCell>
                                         <TableCell
@@ -150,26 +162,26 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         });
 
         props.pickInfos.forEach((info) => {
-            const layer_props = (info as LayerPickInfo)?.property;
+            const layer_properties = (info as LayerPickInfo)?.properties;
             const parent = infoCardData.find(
                 (item) => item.layerName === info.layer?.id
             );
-            if (layer_props) {
-                if (parent) {
+            if (parent) {
+                layer_properties?.forEach((layer_prop) => {
                     const property = parent.properties.find(
-                        (item) => item.name === layer_props.name
+                        (item) => item.name === layer_prop.name
                     );
                     if (property) {
-                        property.value = layer_props.value;
+                        property.value = layer_prop.value;
                     } else {
-                        parent.properties.push(layer_props);
+                        parent.properties.push(layer_prop);
                     }
-                } else {
-                    infoCardData.push({
-                        layerName: info.layer?.id || "unknown-layer",
-                        properties: [layer_props],
-                    });
-                }
+                });
+            } else {
+                infoCardData.push({
+                    layerName: info.layer?.id || "unknown-layer",
+                    properties: layer_properties,
+                });
             }
 
             const zValue = (info as PropertyMapPickInfo).propertyValue;
@@ -192,14 +204,17 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
     return (
         infoCardData && (
             <TableContainer component={Paper}>
-                <Table aria-label="info card" className={classes.table}>
+                <Table aria-label="info-card" className={classes.table}>
                     <TableBody>
-                        {infoCardData.map((card_data) => (
-                            <Row
-                                key={card_data.layerName}
-                                layer_data={card_data}
-                            />
-                        ))}
+                        {infoCardData.map(
+                            (card_data) =>
+                                card_data.properties && (
+                                    <Row
+                                        key={card_data.layerName}
+                                        layer_data={card_data}
+                                    />
+                                )
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>

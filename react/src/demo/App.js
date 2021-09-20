@@ -6,8 +6,6 @@
 
 /* eslint no-magic-numbers: 0 */
 import React, { Component } from "react";
-import DeckGLMapDemo from "./DeckGLMapDemo";
-import GroupTreeDemo from "./GroupTreeDemo";
 // Components
 import HistoryMatchDemo from "./HistoryMatchDemo";
 import LayeredMapDemo from "./LayeredMapDemo";
@@ -15,14 +13,13 @@ import LeafletMapDemo from "./LeafletMapDemo";
 import MorrisDemo from "./MorrisDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
-import WellCompletionsDemo from "./WellCompletionsDemo";
 import VectorSelectorDemo from "./VectorSelectorDemo";
-import WellLogViewerDemo from "./WellLogViewerDemo";
+import VectorCalculatorDemo from "./VectorCalculatorDemo";
 
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "DeckGLMapDemo" };
+        this.state = { value: "LeafletMap" };
     }
 
     onChange(e) {
@@ -31,12 +28,6 @@ class App extends Component {
 
     renderDemo() {
         switch (this.state.value) {
-            case "DeckGLMapDemo": {
-                return <DeckGLMapDemo />;
-            }
-            case "GroupTree": {
-                return <GroupTreeDemo />;
-            }
             case "LeafletMap": {
                 return <LeafletMapDemo />;
             }
@@ -55,14 +46,11 @@ class App extends Component {
             case "PriorPosteriorDistribution": {
                 return <PriorPosteriorDistributionDemo />;
             }
-            case "WellCompletions": {
-                return <WellCompletionsDemo />;
-            }
             case "VectorSelector": {
                 return <VectorSelectorDemo />;
             }
-            case "WellLogViewer": {
-                return <WellLogViewerDemo />;
+            case "VectorCalculator": {
+                return <VectorCalculatorDemo />;
             }
             default: {
                 return null;
@@ -77,8 +65,6 @@ class App extends Component {
                     value={this.state.value}
                     onChange={this.onChange.bind(this)}
                 >
-                    <option value="DeckGLMapDemo">DeckGLMapDemo</option>
-                    <option value="GroupTree">GroupTree</option>
                     <option value="LeafletMap">LeafletMap</option>
                     <option value="HistoryMatch">HistoryMatch</option>
                     <option value="Morris">Morris</option>
@@ -87,9 +73,8 @@ class App extends Component {
                     <option value="PriorPosteriorDistribution">
                         PriorPosteriorDistribution
                     </option>
-                    <option value="WellCompletions">WellCompletions</option>
                     <option value="VectorSelector">VectorSelector</option>
-                    <option value="WellLogViewer">WellLogViewer</option>
+                    <option value="VectorCalculator">VectorCalculator</option>
                 </select>
                 {this.renderDemo()}
             </div>

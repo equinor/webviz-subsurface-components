@@ -3,7 +3,7 @@ import InfoCard from "../../components/InfoCard";
 
 export default {
     component: InfoCard,
-    title: "DeckGLMapComponent/Components/InfoCard",
+    title: "DeckGLMap/Components/InfoCard",
 };
 
 const Template = (args) => <InfoCard {...args} />;

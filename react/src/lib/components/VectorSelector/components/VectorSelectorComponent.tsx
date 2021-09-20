@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
+import React from "react";
 import SmartNodeSelectorComponent from "@webviz/core-components/dist/components/SmartNodeSelector/components/SmartNodeSelectorComponent";
 import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
 import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
@@ -22,12 +22,16 @@ import region_region from "./images/region-region.svg";
 import segment from "./images/segment.svg";
 import well from "./images/well.svg";
 import well_completion from "./images/well-completion.svg";
-import React from "react";
+import calculated from "./images/calculated.svg";
 
 type ParentProps = {
     selectedTags: string[];
     selectedNodes: string[];
     selectedIds: string[];
+};
+
+type VectorDefinitions = {
+    [key: string]: { type: string; description: string };
 };
 
 type VectorSelectorPropType = {
@@ -43,6 +47,7 @@ type VectorSelectorPropType = {
     placeholder?: string;
     numSecondsUntilSuggestionsAreShown: number;
     lineBreakAfterTag?: boolean;
+    customVectorDefinitions?: VectorDefinitions;
     persistence: boolean | string | number;
     persisted_props: "selectedTags"[];
     persistence_type: "local" | "session" | "memory";
@@ -54,19 +59,37 @@ type VectorSelectorPropType = {
  */
 export default class VectorSelectorComponent extends SmartNodeSelectorComponent {
     public props: VectorSelectorPropType;
+    protected vectorDefinitions: VectorDefinitions;
 
     constructor(props: VectorSelectorPropType) {
         super(props);
         this.props = props;
 
+        this.vectorDefinitions = VectorData;
+        if (props.customVectorDefinitions) {
+            Object.keys(props.customVectorDefinitions).forEach(
+                (vectorName: string) => {
+                    if (vectorName in VectorData === false) {
+                        this.vectorDefinitions[vectorName] = (
+                            props.customVectorDefinitions as VectorDefinitions
+                        )[vectorName];
+                    }
+                }
+            );
+        }
+
         let error: string | undefined;
         try {
             this.treeData = new TreeData({
-                treeData: this.modifyTreeData(props.data, props.numMetaNodes),
+                treeData: this.modifyTreeData(
+                    props.data,
+                    props.numMetaNodes,
+                    this.vectorDefinitions
+                ),
                 delimiter: props.delimiter,
             });
-        } catch (e) {
-            error = e;
+        } catch (e: any) {
+            error = e.toString();
         }
 
         const nodeSelections: VectorSelection[] = [];
@@ -108,13 +131,14 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                 this.treeData = new TreeData({
                     treeData: this.modifyTreeData(
                         this.props.data,
-                        this.props.numMetaNodes
+                        this.props.numMetaNodes,
+                        this.vectorDefinitions
                     ),
                     delimiter: this.props.delimiter,
                 });
-            } catch (e) {
+            } catch (e: any) {
                 this.treeData = null;
-                error = e;
+                error = e.toString();
             }
             const nodeSelections: VectorSelection[] = [];
             for (const node of this.state.nodeSelections) {
@@ -181,11 +205,13 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
 
     modifyTreeData(
         treeData: TreeDataNode[],
-        numMetaNodes: number
+        numMetaNodes: number,
+        vectorDefinitions: VectorDefinitions
     ): TreeDataNode[] {
         const typeIcons: Record<string, string> = {
             aquifer: aquifer,
             block: block,
+            calculated: calculated,
             field: field,
             group: group,
             misc: misc,
@@ -206,9 +232,10 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                 const types: Record<string, Array<TreeDataNode>> = {};
                 for (let i = 0; i < data.length; i++) {
                     let type = "others";
-                    if (data[i].name in VectorData) {
-                        const asKey = data[i].name as keyof typeof VectorData;
-                        type = VectorData[asKey].type;
+                    if (data[i].name in vectorDefinitions) {
+                        const asKey = data[i]
+                            .name as keyof typeof vectorDefinitions;
+                        type = vectorDefinitions[asKey].type;
                     }
                     if (!(type in types)) {
                         types[type] = [];
@@ -218,6 +245,9 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                 for (const type in types) {
                     newData.push({
                         name: type.charAt(0).toUpperCase() + type.slice(1),
+                        description: vectorDefinitions[type]
+                            ? vectorDefinitions[type].description
+                            : "",
                         icon: typeIcons[type],
                         children: types[type],
                     });
@@ -226,7 +256,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                 for (let i = 0; i < data.length; i++) {
                     newData.push({
                         name: data[i].name,
-                        description: data[i].description,
+                        description: data[i].description || "",
                         color: data[i].color,
                         children: populateData(data[i].children, level + 1),
                     });

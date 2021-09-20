@@ -5,7 +5,7 @@ import Map from "../../components/Map";
 const exampleData = require("../../../../../demo/example-data/deckgl-map-spec.json");
 export default {
     component: Map,
-    title: "DeckGLMapComponent/Components/Map",
+    title: "DeckGLMap/Components/Map",
 };
 
 function _idsToIndices(doc, path) {
@@ -64,10 +64,7 @@ const Template = (args) => {
 
     return (
         <Map
-            id={args.id}
-            resources={args.resources}
-            coords={args.coords}
-            deckglSpec={mapSpec}
+            {...args}
             setSpecPatch={(patch) => {
                 setMapSpec(_setPatch(mapSpec, patch));
             }}

@@ -5,7 +5,7 @@ const exampleData = require("../../../../demo/example-data/deckgl-map.json");
 
 export default {
     component: DeckGLMap,
-    title: "DeckGLMapComponent",
+    title: "DeckGLMap",
 };
 
 const Template = (args) => {
@@ -22,9 +22,7 @@ const Template = (args) => {
 
     return (
         <DeckGLMap
-            id={args.id}
-            resources={args.resources}
-            coords={args.coords}
+            {...args}
             deckglSpecBase={mapSpecBase}
             deckglSpecPatch={mapSpecPatch}
             setProps={(updatedSpec) => {
