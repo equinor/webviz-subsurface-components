@@ -337,7 +337,9 @@ export default class GroupTree {
          * @param nodes - list of nodes in a tree
          */
         function updateNodes(nodes) {
-            const node = self._svg.selectAll("g.node").data(nodes, (d) => d.id);
+            const node = self._svg
+                .selectAll("g.node")
+                .data(nodes, (d) => d.id);
 
             const nodeEnter = node
                 .enter()
