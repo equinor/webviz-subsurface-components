@@ -7,6 +7,7 @@ import { DataContext } from "./DataLoader";
 import "./Plot/dynamic_tree.css";
 import GroupTree from "./Plot/group_tree";
 import SettingsBar from "./Settings/SettingsBar";
+import { EdgeOptions } from "../redux/types";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -22,9 +23,10 @@ const useStyles = makeStyles(() =>
 
 interface Props {
     id: string;
+    edge_options: EdgeOptions;
 }
 
-const GroupTreeViewer: React.FC<Props> = ({ id }: Props) => {
+const GroupTreeViewer: React.FC<Props> = ({ id, edge_options }: Props) => {
     const classes = useStyles();
     const divRef = useRef<HTMLDivElement>(null);
     const data = useContext(DataContext);
@@ -37,17 +39,12 @@ const GroupTreeViewer: React.FC<Props> = ({ id }: Props) => {
     const currentFlowRate = useSelector(
         (state: GroupTreeState) => state.ui.currentFlowRate
     );
-    useEffect(() => {
-        // Clear possible elements added from earlier updates.
-        const node = document.getElementById(id);
-        if (node) {
-            node.innerHTML = "";
-        }
 
+    useEffect(() => {
         renderer.current = new GroupTree(
             id,
             cloneDeep(data),
-            "oilrate",
+            currentFlowRate,
             currentDateTime
         );
     }, [data]);
@@ -65,7 +62,7 @@ const GroupTreeViewer: React.FC<Props> = ({ id }: Props) => {
 
     return (
         <div className={classes.root}>
-            <SettingsBar />
+            <SettingsBar edge_options={edge_options} />
             <div id={id} ref={divRef} />
             {/* <GroupTreePlot root={root} currentFlowRate={currentFlowRate} /> */}
         </div>
