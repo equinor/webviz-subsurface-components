@@ -200,7 +200,7 @@ class WellLogViewer extends Component<Props, State> {
                         axisTitles={axisTitles}
                         axisMnemos={axisMnemos}
                         zoom={this.state.zoom}
-                        maxTrackNum={7}
+                        maxTrackNum={5}
                         setInfo={this.setInfo.bind(this)}
                         setController={this.setController.bind(this)}
                         setScrollPos={this.setScrollPos.bind(this)}

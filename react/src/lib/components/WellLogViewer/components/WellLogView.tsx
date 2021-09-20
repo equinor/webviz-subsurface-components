@@ -566,21 +566,26 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     componentDidUpdate(prevProps: Props, prevState: State): void {
         // Typical usage (don't forget to compare props):
-
+        let shouldSetTracks = false;
         if (this.props.horizontal !== prevProps.horizontal) {
             this.createLogViewer();
+            shouldSetTracks = true;
         }
 
         if (this.props.welllog !== prevProps.welllog) {
-            this.setTracks();
+            shouldSetTracks = true;
         } else if (this.props.template !== prevProps.template) {
-            this.setTracks();
+            shouldSetTracks = true;
         } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
-            this.setTracks();
+            shouldSetTracks = true;
         } else if (
             this.props.axisTitles !== prevProps.axisTitles ||
             this.props.axisMnemos !== prevProps.axisMnemos
         ) {
+            shouldSetTracks = true;
+        }
+
+        if (shouldSetTracks) {
             this.setTracks();
         } else if (this.props.scrollPos !== prevProps.scrollPos) {
             this.scrollTo(this.props.scrollPos ? this.props.scrollPos : 0);
@@ -591,7 +596,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.setScroll();
             this.setInfo();
         }
-        if (this.props.zoom !== prevProps.horizontal) {
+        if (this.props.zoom !== prevProps.zoom) {
             this.setZoom();
         }
 
