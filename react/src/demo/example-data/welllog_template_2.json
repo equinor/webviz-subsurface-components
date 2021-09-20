@@ -7,6 +7,29 @@
     {
       "plots": [
         {
+          "name": "ZONELOG",
+          "style": "discrete"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "NTG"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "FAULT_PROXIMITY_FLAG",
+          "style": "discrete"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
           "name": "BDIA"
         }
       ]
@@ -123,6 +146,12 @@
           "name": "RPAELM"
         }
       ]
+    }
+  ],
+  "styles": [
+    {
+      "name": "discrete",
+      "type": "linestep"
     }
   ]
 }
