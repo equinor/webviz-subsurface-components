@@ -25,7 +25,13 @@ from .VectorCalculatorWrapper import (
     ExternalParseData,
     VariableVectorMapInfo,
 )
-
+from .deckgl_map_wrapper import (
+    DeckGLMapViewer,
+    DeckGLMapController,
+    XtgeoSurfaceArray,
+    XtgeoWellsJson,
+    XtgeoLogsJson,
+)
 
 try:
     __version__ = get_distribution(__name__).version
