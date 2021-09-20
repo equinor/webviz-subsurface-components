@@ -206,8 +206,7 @@ export default class GroupTree {
 
         const root = self._data[new_tree_index];
 
-        const date_index = root.dates.indexOf(self._currentDateTime); 
-
+        const date_index = root.dates.indexOf(self._currentDateTime);
 
         /**
          * Assigns y coordinates to all tree nodes in the rendered tree.
@@ -338,9 +337,7 @@ export default class GroupTree {
          * @param nodes - list of nodes in a tree
          */
         function updateNodes(nodes) {
-            const node = self._svg
-                .selectAll("g.node")
-                .data(nodes, (d) => d.id);
+            const node = self._svg.selectAll("g.node").data(nodes, (d) => d.id);
 
             const nodeEnter = node
                 .enter()
