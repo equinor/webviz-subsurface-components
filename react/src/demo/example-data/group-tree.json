@@ -43,11 +43,11 @@
                     },
                     "edge_label": "VFP12",
                     "edge_data":{
-                        "waterrate": [20, 30],
-                        "oilrate": [30, 40],
-                        "gasrate": [40, 50],
-                        "waterinjrate": [50, 60],
-                        "gasinjrate": [60, 70]
+                        "waterrate": [25, 35],
+                        "oilrate": [35, 45],
+                        "gasrate": [45, 55],
+                        "waterinjrate": [55, 65],
+                        "gasinjrate": [65, 75]
                     }
                 }
             ]
