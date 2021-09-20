@@ -4,15 +4,24 @@ import React, { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { MapState } from "../../redux/store";
 import { LayerIcons, LayerType } from "../../redux/types";
-import { getLayerVisibility } from "../../utils/specExtractor";
-import DrawModeSelector from "./DrawModeSelector";
+import {
+    getPropVisibility,
+    getLayerVisibility,
+} from "../../utils/specExtractor";
+import LayerProperty from "./LayerProperty";
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             marginBottom: theme.spacing(1),
         },
+        menu: {
+            display: "flex",
+            flexDirection: "column",
+        },
     })
 );
+
 interface Props {
     /**
      * Layer type defines the icon that should be displayed on the layer settings button.
@@ -23,12 +32,21 @@ interface Props {
      * the unique layer ID, on clicking layer setting button.
      */
     layerId: string;
+    /**
+     * Layer display name.
+     */
+    name: string;
 }
+
 const LayerSettingsButton: React.FC<Props> = React.memo(
-    ({ layerId, layerType }: Props) => {
+    ({ layerId, layerType, name }: Props) => {
         const classes = useStyles();
         const spec = useSelector((st: MapState) => st.spec);
         const layerVisibility = useMemo(() => getLayerVisibility(spec), [spec]);
+        const propVisibility = useMemo(
+            () => getPropVisibility(spec, layerId),
+            [spec, layerId]
+        );
         const [anchorEl, setAnchorEl] =
             React.useState<null | HTMLElement>(null);
 
@@ -44,7 +62,13 @@ const LayerSettingsButton: React.FC<Props> = React.memo(
             setAnchorEl(null);
         }, []);
 
-        if (!LayerIcons[layerType] || !layerVisibility[layerId]) return null;
+        if (
+            !LayerIcons[layerType] ||
+            !layerVisibility[layerId] ||
+            !propVisibility
+        )
+            return null;
+
         return (
             <>
                 <Fab
@@ -53,7 +77,7 @@ const LayerSettingsButton: React.FC<Props> = React.memo(
                     onClick={handleClick}
                     className={classes.root}
                 >
-                    <Tooltip title={layerId}>
+                    <Tooltip title={name}>
                         <Icon
                             color="currentColor"
                             name={LayerIcons[layerType]}
@@ -61,13 +85,17 @@ const LayerSettingsButton: React.FC<Props> = React.memo(
                     </Tooltip>
                 </Fab>
                 <Menu
+                    className={classes.menu}
                     anchorEl={anchorEl}
                     aria-labelledby={`${layerId}-button`}
                     onClose={handleClose}
                     placement="left"
                     open={Boolean(anchorEl)}
                 >
-                    <DrawModeSelector layerId={layerId} />
+                    <LayerProperty
+                        layerId={layerId}
+                        key={`layer-property-${layerId}`}
+                    />
                 </Menu>
             </>
         );

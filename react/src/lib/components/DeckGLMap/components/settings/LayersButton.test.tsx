@@ -19,9 +19,7 @@ describe("test 'layers' button", () => {
         render(Wrapper({ children: <LayersButton /> }));
         userEvent.click(screen.getByRole("button"));
         expect(screen.getByRole("menu")).toBeInTheDocument();
-        userEvent.click(
-            screen.getByRole("checkbox", { name: /colormap-layer/i })
-        );
+        userEvent.click(screen.getByRole("checkbox", { name: /map/i }));
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["colormap-layer", false],
