@@ -31,6 +31,22 @@ export default class GroupTree {
             dom_element_id = "#" + dom_element_id;
         }
 
+        // Represent possible empty data by single empty node.
+        if (tree_data.length === 0) {
+            currentDateTime = "";
+            tree_data = [
+                {
+                    dates: [currentDateTime],
+                    tree: {
+                        node_label: "NO DATA",
+                        edge_label: "NO DATA",
+                        node_data: {},
+                        edge_data: {},
+                    },
+                },
+            ];
+        }
+
         this._currentFlowrate = defaultFlowrate;
         this._currentDateTime = currentDateTime;
         this._transitionTime = 200;
@@ -69,7 +85,7 @@ export default class GroupTree {
         };
 
         const height = 700 - margin.top - margin.bottom;
-        this._width = +this._width - margin.left - margin.right;
+        this._width = this._width - margin.left - margin.right;
 
         // Clear possible existing svg's.
         d3.select(dom_element_id).selectAll("svg").remove();
@@ -129,6 +145,8 @@ export default class GroupTree {
      * @param flowrate - key identifying the flowrate of the incoming edge
      */
     set flowrate(flowrate) {
+        this._currentFlowrate = flowrate;
+
         const current_tree_index = this._data.findIndex((e) => {
             return e.dates.includes(this._currentDateTime);
         });
@@ -136,8 +154,6 @@ export default class GroupTree {
         const date_index = this._data[current_tree_index].dates.indexOf(
             this._currentDateTime
         );
-
-        this._currentFlowrate = flowrate;
 
         this._svg
             .selectAll("path.link")
@@ -182,15 +198,15 @@ export default class GroupTree {
     update(newDateTime) {
         const self = this;
 
+        self._currentDateTime = newDateTime;
+
         const new_tree_index = self._data.findIndex((e) => {
             return e.dates.includes(newDateTime);
         });
 
-        self._currentDateTime = newDateTime;
-
         const root = self._data[new_tree_index];
 
-        const date_index = root.dates.indexOf(self._currentDateTime); // index in edge data arrays.
+        const date_index = root.dates.indexOf(self._currentDateTime);
 
         /**
          * Assigns y coordinates to all tree nodes in the rendered tree.
@@ -222,7 +238,7 @@ export default class GroupTree {
 
         function getClosestVisibleParentStartCoordinates(d) {
             const p = findClosestVisibleParent(d);
-            return { x: p.x0, y: p.y0 };
+            return { x: p.x0 ?? 0, y: p.y0 ?? 0 };
         }
 
         function getClosestVisibleParentEndCoordinates(d) {
@@ -269,18 +285,19 @@ export default class GroupTree {
         }
 
         function getNodeText(node_data, date_index) {
-            return node_data.pressure?.[date_index]?.toFixed(1) ?? "NA";
+            return node_data?.pressure?.[date_index]?.toFixed(0) ?? "NA";
         }
 
         function getToolTipText(data, date_index) {
+            if (data === undefined || date_index === undefined) {
+                return "";
+            }
+
             const propNames = Object.keys(data);
             let text = "";
             propNames.forEach(function (s) {
                 text +=
-                    s +
-                    ": " +
-                    (data[s]?.[date_index]?.toFixed(1) ?? "NA") +
-                    "\n";
+                    s + ": " + (data[s]?.[date_index]?.toFixed(0) ?? "") + "\n";
             });
             return text;
         }
@@ -449,6 +466,10 @@ export default class GroupTree {
                     return diagonal(c, c);
                 });
 
+            linkEnter
+                .append("title")
+                .text((d) => getToolTipText(d.data.edge_data, date_index));
+
             const linkUpdate = linkEnter.merge(link);
 
             linkUpdate
@@ -470,6 +491,10 @@ export default class GroupTree {
                         ? "none"
                         : "5,5";
                 });
+
+            linkUpdate
+                .select("title")
+                .text((d) => getToolTipText(d.data.edge_data, date_index));
 
             link.exit()
                 .transition()
