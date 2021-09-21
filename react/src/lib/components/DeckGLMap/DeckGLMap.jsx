@@ -69,6 +69,7 @@ DeckGLMap.defaultProps = {
         visible: true,
         incrementValue: 100,
         widthPerUnit: 100,
+        position: [10, 10],
     },
 };
 
@@ -218,6 +219,10 @@ DeckGLMap.propTypes = {
          * Scale bar width in pixels per unit value.
          */
         widthPerUnit: PropTypes.number,
+        /**
+         * Scale bar position in pixels.
+         */
+        position: PropTypes.arrayOf(PropTypes.number),
     }),
 
     /**

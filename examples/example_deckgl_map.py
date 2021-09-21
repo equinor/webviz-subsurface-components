@@ -168,12 +168,7 @@ if __name__ == "__main__":
             "propertyMap": map_data,
         },
         coords={"visible": True, "multiPicking": True, "pickDepth": 10},
-        scale={
-            "visible": True,
-            "incrementValue": 100,
-            "widthPerUnit": 100,
-            "position": [10, 10],
-        },
+        scale={"visible": True},
         coordinateUnit="m",
         deckglSpecBase={
             "initialViewState": {
