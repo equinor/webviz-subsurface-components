@@ -54,7 +54,8 @@
       "required": true,
       "plots": [
         {
-          "name": "TQA"
+          "name": "TQA",
+          "type": "dot"
         }
       ]
     },
@@ -82,7 +83,8 @@
     {
       "plots": [
         {
-          "name": "SW"
+          "name": "SW",
+          "type": "line"
         }
       ]
     },
@@ -96,21 +98,24 @@
     {
       "plots": [
         {
-          "name": "MFIA"
+          "name": "MFIA",
+          "type": "dot"
         }
       ]
     },
     {
       "plots": [
         {
-          "name": "MDOA"
+          "name": "MDOA",
+          "type": "linestep"
         }
       ]
     },
     {
       "plots": [
         {
-          "name": "MDIA"
+          "name": "MDIA",
+          "type": "linestep"
         }
       ]
     },

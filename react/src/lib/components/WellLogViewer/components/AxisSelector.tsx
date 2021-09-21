@@ -11,7 +11,8 @@ interface Props {
 class AxisSelector extends Component<Props> {
     createItem(label: string, value: string): ReactNode {
         return (
-            <div>
+            <div key={value}>
+                {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
                 <input
                     type="radio"
                     value={value}
@@ -19,9 +20,7 @@ class AxisSelector extends Component<Props> {
                     onChange={(ev) => {
                         this.props.onChange(ev.target.value);
                     }}
-                    key={value}
                 />
-                {/* set key prop just for react pleasure */}
                 {label}
             </div>
         );
