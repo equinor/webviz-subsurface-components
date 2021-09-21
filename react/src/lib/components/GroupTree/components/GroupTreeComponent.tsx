@@ -1,5 +1,5 @@
 import React from "react";
-import { Data, EdgeOptions } from "../redux/types";
+import { Data, DataInfos } from "../redux/types";
 import DataProvider from "./DataLoader";
 import GroupTreeViewer from "./GroupTreeViewer";
 
@@ -17,16 +17,26 @@ interface Props {
     data: Data;
 
     /**
-     * Array of edge options. Used in drop down selector.
+     * Arrays of options. Used in drop down selectors.
      */
-    edge_options: EdgeOptions;
+    edge_options: DataInfos;
+    node_options: DataInfos;
 }
 
 const GroupTreeComponent: React.FC<Props> = React.memo(
-    ({ id, data, edge_options }: Props) => {
+    ({ id, data, edge_options, node_options }: Props) => {
         return (
-            <DataProvider id={id} data={data} edge_options={edge_options}>
-                <GroupTreeViewer id={id} edge_options={edge_options} />
+            <DataProvider
+                id={id}
+                data={data}
+                edge_options={edge_options}
+                node_options={node_options}
+            >
+                <GroupTreeViewer
+                    id={id}
+                    edge_options={edge_options}
+                    node_options={node_options}
+                />
             </DataProvider>
         );
     }

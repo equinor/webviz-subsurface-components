@@ -13,13 +13,14 @@ export interface Node {
     children: Node[];
 }
 
-export interface EdgeOption {
+export interface DataInfo {
     name: string;
     label: string;
 }
-export type EdgeOptions = EdgeOption[];
+export type DataInfos = DataInfo[];
 
 export interface UISettings {
     currentDateTime: string;
     currentFlowRate: string;
+    currentNodeInfo: string;
 }
