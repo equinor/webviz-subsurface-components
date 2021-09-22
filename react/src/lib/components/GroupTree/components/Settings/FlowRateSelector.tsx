@@ -39,7 +39,7 @@ const FlowRateSelector: React.FC<Props> = React.memo(
             <NativeSelect
                 className={classes.root}
                 id="flow-rate-selector"
-                label="Edge Data"
+                label="Flow Rate"
                 value={currentFlowRate}
                 onChange={handleSelectedItemChange}
             >
