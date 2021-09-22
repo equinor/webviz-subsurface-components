@@ -15,7 +15,7 @@ const edge_options = [
 
 const node_options = [
     { name: "pressure", label: "Pressure" },
-    { name: "bhp", label: "Bottom Hole Pressure" }
+    { name: "bhp", label: "Bottom Hole Pressure" },
 ];
 
 describe("Test Settins Bar component", () => {
