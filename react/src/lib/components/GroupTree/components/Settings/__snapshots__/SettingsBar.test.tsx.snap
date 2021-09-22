@@ -153,7 +153,7 @@ exports[`Test Settins Bar component snapshot test 1`] = `
         <span
           class="c4"
         >
-          Flow Rate
+          Edge Data
         </span>
       </label>
       <select
@@ -187,18 +187,47 @@ exports[`Test Settins Bar component snapshot test 1`] = `
         </option>
       </select>
     </div>
+    <div
+      class="c2 makeStyles-root-4"
+    >
+      <label
+        class="c3"
+        for="node-info-selector"
+      >
+        <span
+          class="c4"
+        >
+          Node Data
+        </span>
+      </label>
+      <select
+        class="c5"
+        id="node-info-selector"
+      >
+        <option
+          value="pressure"
+        >
+          Pressure
+        </option>
+        <option
+          value="bhp"
+        >
+          Bottom Hole Pressure
+        </option>
+      </select>
+    </div>
   </div>
   <div
     class="c6 makeStyles-actions-2"
   >
     <div
-      class="makeStyles-root-4"
+      class="makeStyles-root-5"
     >
       <span>
         Time Steps
       </span>
       <span
-        class="MuiSlider-root WithStyles(ForwardRef(Slider))-root-5 MuiSlider-colorPrimary MuiSlider-trackFalse"
+        class="MuiSlider-root WithStyles(ForwardRef(Slider))-root-6 MuiSlider-colorPrimary MuiSlider-trackFalse"
       >
         <span
           class="MuiSlider-rail"
@@ -237,20 +266,20 @@ exports[`Test Settins Bar component snapshot test 1`] = `
           aria-valuemax="3"
           aria-valuemin="0"
           aria-valuenow="0"
-          class="MuiSlider-thumb MuiSlider-thumbColorPrimary PrivateValueLabel-open-8 PrivateValueLabel-thumb-7"
+          class="MuiSlider-thumb MuiSlider-thumbColorPrimary PrivateValueLabel-open-9 PrivateValueLabel-thumb-8"
           data-index="0"
           role="slider"
           style="left: 0%;"
           tabindex="0"
         >
           <span
-            class="PrivateValueLabel-offset-9 MuiSlider-valueLabel WithStyles(ForwardRef(Slider))-valueLabel-6"
+            class="PrivateValueLabel-offset-10 MuiSlider-valueLabel WithStyles(ForwardRef(Slider))-valueLabel-7"
           >
             <span
-              class="PrivateValueLabel-circle-10"
+              class="PrivateValueLabel-circle-11"
             >
               <span
-                class="PrivateValueLabel-label-11"
+                class="PrivateValueLabel-label-12"
               >
                 2018-02-01
               </span>
