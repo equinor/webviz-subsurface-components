@@ -153,7 +153,7 @@ exports[`Test Settins Bar component snapshot test 1`] = `
         <span
           class="c4"
         >
-          Edge Data
+          Flow Rate
         </span>
       </label>
       <select
