@@ -25,7 +25,7 @@ interface Props {
 }
 
 const SettingsBar: React.FC<Props> = React.memo(
-    ({ node_options, edge_options }: Props) => {
+    ({ edge_options, node_options }: Props) => {
         const classes = useStyles();
         return (
             <TopBar className={classes.topBar}>
