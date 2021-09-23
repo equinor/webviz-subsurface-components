@@ -1,6 +1,12 @@
-const logToDatabase = ( id: any,
+const logToDatabase = (
+    id: any,
     phase: any,
     actualDuration: any,
-    baseDuration: any,) => {console.log(id, phase, actualDuration, baseDuration)};
+    baseDuration: any
+) => {
+    console.log(
+        `${id}'s phase: ${phase}\nActual time: ${actualDuration} \nBase time: ${baseDuration}`
+    );
+};
 
 export default logToDatabase;

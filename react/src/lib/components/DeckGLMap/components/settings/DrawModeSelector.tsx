@@ -5,7 +5,7 @@ import { updateDrawingMode } from "../../redux/actions";
 import { MapState } from "../../redux/store";
 import { DrawModes } from "../../redux/types";
 import { getDrawMode } from "../../utils/specExtractor";
-import logTimes  from "../../../../performanceUtility/onRenderFunction"
+import logTimes from "../../../../performanceUtility/onRenderFunction";
 
 interface Props {
     /**
