@@ -21,8 +21,8 @@
                     "node_type": "Well",
                     "node_data": {
                         "pressure":[20, 30],
-                        "bhp": [10, 10],
-                        "wmctl": [10, 10]
+                        "bhp": [11, 10],
+                        "wmctl": [12, 10]
                     },
                     "edge_label": "VFP11",
                     "edge_data":{
@@ -37,8 +37,7 @@
                     "node_label": "TRE_1_2",
                     "node_type": "Well",
                     "node_data": {
-                        "pressure":[20, 30],
-                        "bhp": [10, 10],
+                        "pressure":[22, 30],
                         "wmctl": [10, 10]
                     },
                     "edge_label": "VFP12",

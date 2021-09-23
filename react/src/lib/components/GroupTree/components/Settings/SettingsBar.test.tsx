@@ -13,10 +13,22 @@ const edge_options = [
     { name: "gasinjrate", label: "Gas Injection Rate" },
 ];
 
+const node_options = [
+    { name: "pressure", label: "Pressure" },
+    { name: "bhp", label: "Bottom Hole Pressure" },
+];
+
 describe("Test Settins Bar component", () => {
     it("snapshot test", () => {
         const { container } = render(
-            Wrapper({ children: <SettingsBar edge_options={edge_options} /> })
+            Wrapper({
+                children: (
+                    <SettingsBar
+                        edge_options={edge_options}
+                        node_options={node_options}
+                    />
+                ),
+            })
         );
         expect(container.firstChild).toMatchSnapshot();
     });
