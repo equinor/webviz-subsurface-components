@@ -13,6 +13,7 @@ export const uiSlice = createSlice({
     initialState: {
         currentDateTime: "",
         currentFlowRate: "",
+        currentNodeInfo: "",
     } as UISettings,
     reducers: {
         updateCurrentDateTime: (state, action: PayloadAction<string>) => {
@@ -20,6 +21,9 @@ export const uiSlice = createSlice({
         },
         updateCurrentFlowRate: (state, action: PayloadAction<string>) => {
             state.currentFlowRate = action.payload;
+        },
+        updateCurrentNodeInfo: (state, action: PayloadAction<string>) => {
+            state.currentNodeInfo = action.payload;
         },
     },
 });
