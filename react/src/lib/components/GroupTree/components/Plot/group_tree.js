@@ -85,9 +85,10 @@ export default class GroupTree {
 
         this._path_scale = new Map();
         Object.keys(tree_values).forEach((key) => {
+            const extent = [0, d3.max(tree_values[key].flat())];
             this._path_scale[key] = d3
                 .scaleLinear()
-                .domain(d3.extent(tree_values[key].flat()))
+                .domain(extent)
                 .range([2, 100]);
         });
 
@@ -225,7 +226,7 @@ export default class GroupTree {
         const normalized =
             this._path_scale[key] !== undefined
                 ? this._path_scale[key](val ?? 0)
-                : 1;
+                : 2;
         return `${normalized}px`;
     }
 
