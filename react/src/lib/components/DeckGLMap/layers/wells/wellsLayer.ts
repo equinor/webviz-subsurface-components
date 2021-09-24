@@ -39,6 +39,13 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
 const defaultProps = {
     autoHighlight: true,
     selectionEnabled: true,
+    opacity: 1,
+    lineWidthScale: 5,
+    pointRadiusScale: 8,
+    outline: true,
+    logRadius: 6,
+    logCurves: true,
+    refine: true,
 };
 
 export interface LogCurveDataType {

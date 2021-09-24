@@ -45,6 +45,8 @@ const defaultProps = {
             step: 0,
         },
     },
+    opacity: 1,
+    pickable: true,
 };
 
 export default class Hillshading2DLayer extends BitmapLayer<
