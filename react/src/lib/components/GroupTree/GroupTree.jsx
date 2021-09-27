@@ -9,7 +9,14 @@ import React from "react";
 import GroupTreeComponent from "./components/GroupTreeComponent";
 
 const GroupTree = (props) => {
-    return <GroupTreeComponent id={props.id} data={props.data} />;
+    return (
+        <GroupTreeComponent
+            id={props.id}
+            data={props.data}
+            edge_options={props.edge_options}
+            node_options={props.node_options}
+        />
+    );
 };
 
 GroupTree.propTypes = {
@@ -23,6 +30,9 @@ GroupTree.propTypes = {
      * Array of JSON objects describing group tree data.
      */
     data: PropTypes.arrayOf(PropTypes.object),
+
+    edge_options: PropTypes.arrayOf(PropTypes.object),
+    node_options: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default GroupTree;

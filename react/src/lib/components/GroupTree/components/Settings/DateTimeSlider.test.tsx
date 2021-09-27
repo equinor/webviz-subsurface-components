@@ -9,6 +9,7 @@ import DateTimeSlider from "./DateTimeSlider";
 describe("Test  Date-Time Slider", () => {
     it("snapshot test", () => {
         const { container } = render(Wrapper({ children: <DateTimeSlider /> }));
+        render(Wrapper({ children: <DateTimeSlider /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
     it("test slider", async () => {
@@ -20,7 +21,7 @@ describe("Test  Date-Time Slider", () => {
             type: "ui/updateCurrentDateTime",
         });
         expect(testStore.dispatch).toHaveBeenNthCalledWith(2, {
-            payload: "2018-02-01",
+            payload: "2018-03-01",
             type: "ui/updateCurrentDateTime",
         });
     });
