@@ -443,7 +443,13 @@ export default class GroupTree {
                 .attr("dy", ".04em")
                 .attr("dominant-baseline", "text-before-edge")
                 .attr("text-anchor", "middle")
-                .text("bar");
+                .text(() => {
+                    const t = self._propertyToLabelMap.get(nodeinfo) ?? [
+                        "",
+                        "",
+                    ];
+                    return t[1];
+                });
 
             nodeEnter
                 .append("title")
