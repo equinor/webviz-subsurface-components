@@ -13,7 +13,8 @@ import { createStore } from "../redux/store";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
-import ColorLegend from "../components/ColorLegend";
+import ColorLegend from "../components/DiscreteLegend";
+// import { ContinousLegend } from "../components/continousLegend";
 
 export interface MapProps {
     /**
@@ -63,10 +64,6 @@ export interface MapProps {
         position: number[];
     };
 
-    legendData: {
-        legendData: Record<string, unknown>;
-    };
-
     coordinateUnit: string;
 
     children?: React.ReactNode;
@@ -79,10 +76,11 @@ const Map: React.FC<MapProps> = ({
     setSpecPatch,
     coords,
     scale,
-    legendData,
     coordinateUnit,
     children,
 }: MapProps) => {
+    //let dataPresent = false
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
         createStore(deckglSpec, setSpecPatch)
@@ -96,6 +94,7 @@ const Map: React.FC<MapProps> = ({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [viewState, setViewState] = React.useState<any>();
+
     React.useEffect(() => {
         if (!deckglSpec) {
             return;
@@ -104,6 +103,7 @@ const Map: React.FC<MapProps> = ({
         // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
         // See https://deck.gl/docs/api-reference/json/overview for more details.
         const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
+
         if (resources) {
             configuration.merge({
                 enumerations: {
@@ -120,6 +120,19 @@ const Map: React.FC<MapProps> = ({
             if (deckRef) {
                 // Needed to initialize the viewState on first load
                 setViewState(deckRef.deck.viewState);
+                const logData = deckRef.props.layers[2].props.logData;
+                const logName = deckRef.props.layers[2].props.logName;
+                const fetchData = async () => {
+                    const res = await fetch(logData);
+                    const json = await res.json();
+                    const firstData = json[0];
+
+                    const metadata_discrete =
+                        firstData["metadata_discrete"][logName].objects;
+                    setSomeState(metadata_discrete);
+                    //dataPresent = true
+                };
+                fetchData();
                 deckRef.deck.setProps({
                     // userData is undocumented and it doesn't appear in the
                     // deckProps type, but it is used by the layersManager
@@ -135,6 +148,26 @@ const Map: React.FC<MapProps> = ({
         },
         [setSpecPatch]
     );
+
+    const [someState, setSomeState] = React.useState([]);
+
+    // React.useEffect(() => {
+    //     if (deckglSpec) {
+    //         let logData = deckglSpec.layers[2].logData
+    //         let logName = deckglSpec.layers[2].logName
+
+    //         const fetchData = async () => {
+    //             const res = await fetch(logData,);
+    //             const json = await res.json();
+    //             let firstData = json[0];
+
+    //             var metadata_discrete = firstData['metadata_discrete'][logName].objects
+    //             setSomeState(metadata_discrete);
+    //             //dataPresent = true
+    //         };
+    //         fetchData();
+    //     }
+    // }, [setSomeState]);
 
     React.useEffect(() => {
         store.current.dispatch(setSpec(specObj ? deckglSpec : {}));
@@ -183,6 +216,16 @@ const Map: React.FC<MapProps> = ({
                     onViewStateChange={({ viewState }) =>
                         setViewState(viewState)
                     }
+                    pickObject={(
+                        info: PickInfo<unknown> | WellsPickInfo
+                    ): string | null | undefined => {
+                        if ((info as WellsPickInfo)?.logName) {
+                            return (info as WellsPickInfo)?.logName;
+                        } else {
+                            const feat = info.object as Feature;
+                            return feat?.properties?.["name"];
+                        }
+                    }}
                 >
                     {children}
                 </DeckGL>
@@ -197,8 +240,9 @@ const Map: React.FC<MapProps> = ({
                         scaleUnit={coordinateUnit}
                     />
                 ) : null}
-
-                <ColorLegend data={legendData} />
+                {/* { dataPresent ? <ColorLegend data={someState} /> : null } */}
+                <ColorLegend data={someState} />
+                {/* <ContinousLegend /> */}
             </ReduxProvider>
         )
     );
