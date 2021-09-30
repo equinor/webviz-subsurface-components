@@ -18,6 +18,9 @@ describe("Test draw-mode menu", () => {
         //expect(obj.plottable[2]).toBeLessThan(10);
         if (obj.plottable[2] > 10) {
             core.warning("Check the DrwaModeSelector test");
+            core.notice(
+                "Something happened that you might want to know about."
+            );
         }
     });
     it("select option to dispatch redux action", async () => {
@@ -41,6 +44,9 @@ describe("Test draw-mode menu", () => {
         //expect(obj.plottable[2]).toBeLessThan(10);
         if (obj.plottable[2] > 10) {
             core.warning("Check the DrwaModeSelector test");
+            core.notice(
+                "Something happened that you might want to know about."
+            );
         }
     });
 });
