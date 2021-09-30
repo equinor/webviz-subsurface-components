@@ -1,16 +1,21 @@
 import * as d3 from "d3";
 
-export default function legendUtil(itemColor?: any) {
+interface ItemColor {
+    color: string;
+}
+
+export default function legendUtil(itemColor: ItemColor[]) {
     let legendValues = [{ color: "black" }];
     const cellWidth = 30;
     const cellHeight = 25;
+    // eslint-disable-next-line
     let labelFormat: any = d3.format(".01f");
-    //let labelFormat: (n: number | { valueOf(): number; }) => string  = d3.format(".01f");
     const cellPadding = 4;
 
+    // eslint-disable-next-line
     function legend(g: any) {
         function redraw() {
-            itemColor.forEach((item: any, index: number) => {
+            itemColor.forEach((item, index) => {
                 legendValues[index].color = item.color;
             });
             g.selectAll("g.legendCells")
@@ -63,6 +68,7 @@ export default function legendUtil(itemColor?: any) {
         redraw();
     }
     legend.inputScale = function (newScale: string[]) {
+        // eslint-disable-next-line
         let scale: any = {};
         if (!arguments.length) return scale;
         scale = newScale;

@@ -2,7 +2,12 @@ import React from "react";
 import legendUtil from "../utils/legend";
 import * as d3 from "d3";
 
+interface ItemColor {
+    color: string;
+}
+
 interface colorLegendProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any;
 }
 
@@ -15,13 +20,11 @@ const ColorLegend: React.FC<colorLegendProps> = ({
         }
     }, [data]);
 
-    //console.log('data', data)
-
     function legendDemo(legend: string) {
         const itemName: string[] = [];
-        const itemColor: Record<string, unknown>[] = [];
+        const itemColor: ItemColor[] = [];
 
-        Object.keys(data).forEach((key) => {
+        Object.keys(data).forEach((key: string) => {
             itemColor.push({ color: RGBAToHexA(data[key][0]) });
             itemName.push(key);
         });
