@@ -39,11 +39,14 @@ export default class GroupTree {
             dom_element_id = "#" + dom_element_id;
         }
 
-        // Map from property to label/name
+        // Map from property to [label/name, unit]
         const options = [...edge_options, ...node_options];
         this._propertyToLabelMap = new Map();
         options.forEach((key) => {
-            this._propertyToLabelMap.set(key.name, key.label);
+            this._propertyToLabelMap.set(key.name, [
+                key.label ?? "",
+                key.unit ?? "",
+            ]);
         });
 
         // Represent possible empty data by single empty node.
@@ -216,6 +219,11 @@ export default class GroupTree {
                     d.data.node_data?.[nodeinfo]?.[date_index]?.toFixed(0) ??
                     "NA"
             );
+
+        this._svg.selectAll(".grouptree__pressureunit").text(() => {
+            const t = this._propertyToLabelMap.get(nodeinfo) ?? ["", ""];
+            return t[1];
+        });
     }
 
     get nodeinfo() {
@@ -331,17 +339,18 @@ export default class GroupTree {
                 return "";
             }
 
-            function prefix(s) {
-                const pre = self._propertyToLabelMap.get(s) ?? s;
-                return pre + (pre !== "" ? ": " : "");
-            }
-
             const propNames = Object.keys(data);
             let text = "";
             propNames.forEach(function (s) {
+                const t = self._propertyToLabelMap.get(s) ?? [s, ""];
+                const pre = t[0];
+                const unit = t[1];
                 text +=
-                    prefix(s) +
+                    pre +
+                    " " +
                     (data[s]?.[date_index]?.toFixed(0) ?? "") +
+                    " " +
+                    unit +
                     "\n";
             });
             return text;
@@ -434,7 +443,13 @@ export default class GroupTree {
                 .attr("dy", ".04em")
                 .attr("dominant-baseline", "text-before-edge")
                 .attr("text-anchor", "middle")
-                .text("bar");
+                .text(() => {
+                    const t = self._propertyToLabelMap.get(nodeinfo) ?? [
+                        "",
+                        "",
+                    ];
+                    return t[1];
+                });
 
             nodeEnter
                 .append("title")
