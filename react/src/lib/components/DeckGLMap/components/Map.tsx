@@ -13,6 +13,7 @@ import { createStore } from "../redux/store";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
+import ColorLegend from "../components/DiscreteLegend";
 
 export interface MapProps {
     /**
@@ -109,11 +110,27 @@ const Map: React.FC<MapProps> = ({
         setSpecObj(jsonConverter.convert(deckglSpec));
     }, [deckglSpec, resources]);
 
+    const [discreteDataState, setDiscreteDataState] = React.useState([]);
+    const [dataPresent, setDataPresent] = React.useState(false);
+
     const refCb = React.useCallback(
         (deckRef) => {
             if (deckRef) {
                 // Needed to initialize the viewState on first load
                 setViewState(deckRef.deck.viewState);
+                const logData = deckRef.props.layers[2].props.logData;
+                const logName = deckRef.props.layers[2].props.logName;
+                const fetchData = async () => {
+                    const res = await fetch(logData);
+                    const json = await res.json();
+                    const firstData = json[0];
+
+                    const metadata_discrete =
+                        firstData["metadata_discrete"][logName].objects;
+                    setDiscreteDataState(metadata_discrete);
+                    setDataPresent(true);
+                };
+                fetchData();
                 deckRef.deck.setProps({
                     // userData is undocumented and it doesn't appear in the
                     // deckProps type, but it is used by the layersManager
@@ -191,6 +208,7 @@ const Map: React.FC<MapProps> = ({
                         scaleUnit={coordinateUnit}
                     />
                 ) : null}
+                {dataPresent ? <ColorLegend data={discreteDataState} /> : null}
             </ReduxProvider>
         )
     );
