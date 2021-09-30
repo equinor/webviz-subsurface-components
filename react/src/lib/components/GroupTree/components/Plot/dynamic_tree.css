@@ -182,12 +182,12 @@
 }
 
 .grouptree__pressurelabel {
-    font-size: 9px;
+    font-size: 10px;
     font-family: "Statoil Sans Light", Lucida, Arial, Helvetica, sans-serif;
 }
 
 .grouptree__pressureunit{
-    font-size: 6px;
+    font-size: 9px;
 }
 
 .grouptree__grupnet_text{
