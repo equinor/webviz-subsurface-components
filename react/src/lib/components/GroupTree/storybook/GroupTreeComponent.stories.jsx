@@ -11,12 +11,12 @@ const edge_options = [
     { name: "oilrate", label: "Oil Rate", unit: "m3/s" },
     { name: "gasrate", label: "Gas Rate", unit: "m3/s" },
     { name: "waterinjrate", label: "Water Injection Rate", unit: "m3/s" },
-    { name: "gasinjrate", label: "Gas Injection Rate", unit: "m3/s" }
+    { name: "gasinjrate", label: "Gas Injection Rate", unit: "m3/s" },
 ];
 
 const node_options = [
     { name: "pressure", label: "Pressure", unit: "Bar" },
-    { name: "bhp", label: "Bottom Hole Pressure", unit: "N/m2" }
+    { name: "bhp", label: "Bottom Hole Pressure", unit: "N/m2" },
 ];
 
 const Template = (args) => {
