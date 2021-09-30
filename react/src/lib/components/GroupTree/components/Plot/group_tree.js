@@ -447,7 +447,7 @@ export default class GroupTree {
                 .filter(".exiting")
                 .interrupt()
                 .classed("exiting", false)
-                .attr("opacity", 1)
+                .attr("opacity", 1);
 
             nodeUpdate
                 .select("text.grouptree__pressurelabel")
@@ -481,8 +481,7 @@ export default class GroupTree {
                 .select("title")
                 .text((d) => getToolTipText(d.data.node_data, date_index));
 
-            const nodeExit = node
-                .exit()
+            node.exit()
                 .classed("exiting", true)
                 .attr("opacity", 1)
                 .transition()
