@@ -142,7 +142,7 @@ class DeckGLMapViewer(DeckGLMap):
         return {
             "@@type": "DrawingLayer",
             "id": "drawing-layer",
-            "mode": "drawLineString",
+            "mode": "view",
             "data": {"type": "FeatureCollection", "features": []},
         }
 

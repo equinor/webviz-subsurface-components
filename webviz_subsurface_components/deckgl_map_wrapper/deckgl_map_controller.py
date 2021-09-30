@@ -93,6 +93,29 @@ class DeckGLMapController:
         layer_idx = self._layer_idx_from_id(self.PIE_ID)
         self._spec["layers"][layer_idx]["data"] = pie_data
 
+    @property
+    def _drawing_layer_selected_feature(self):
+        layer_idx = self._layer_idx_from_id(self.DRAWING_ID)
+
+        drawing_layer = self._spec["layers"][layer_idx]
+        selected_feature_idx = drawing_layer.get("selectedFeatureIndexes")
+        for idx, feature in enumerate(drawing_layer["data"]["features"]):
+            if idx == selected_feature_idx[0]:
+                return feature
+
+    def get_polylines(self):
+        """Returns coordinates of any drawn polylines"""
+        if not self._drawing_layer_selected_feature:
+            return None
+        if (
+            self._drawing_layer_selected_feature.get("geometry", {}).get("type")
+            == "LineString"
+        ):
+            return self._drawing_layer_selected_feature["geometry"].get(
+                "coordinates", []
+            )
+        return None
+
     def clear_drawing_layer(self):
         layer_idx = self._layer_idx_from_id(self.DRAWING_ID)
         self._spec["layers"][layer_idx]["data"] = {
@@ -114,6 +137,14 @@ class DeckGLMapController:
                 if (patch["op"] == "add" and path in patch["path"])
             ]
         )
+
+    def get_selected_well(self):
+        """Get selected well from spec"""
+        layer_idx = self._layer_idx_from_id(self.WELLS_ID)
+        feature = self._spec["layers"][layer_idx].get("selectedFeature")
+        if feature is None:
+            return None
+        return feature.get("properties", {}).get("name", None)
 
     @property
     def spec_patch(self):

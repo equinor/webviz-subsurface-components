@@ -28,6 +28,7 @@ from .VectorCalculatorWrapper import (
 from .deckgl_map_wrapper import (
     DeckGLMapViewer,
     DeckGLMapController,
+    DeckGLMapAIO,
     XtgeoSurfaceArray,
     XtgeoWellsJson,
     XtgeoLogsJson,
