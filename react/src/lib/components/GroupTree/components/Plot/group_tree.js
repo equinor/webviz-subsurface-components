@@ -457,6 +457,13 @@ export default class GroupTree {
 
             const nodeUpdate = nodeEnter.merge(node);
 
+            // Nodes from earlier exit selection may reenter if transition is interupted. Restore state.
+            nodeUpdate
+                .filter(".exiting")
+                .interrupt()
+                .classed("exiting", false)
+                .attr("opacity", 1);
+
             nodeUpdate
                 .select("text.grouptree__pressurelabel")
                 .text(
@@ -489,8 +496,8 @@ export default class GroupTree {
                 .select("title")
                 .text((d) => getToolTipText(d.data.node_data, date_index));
 
-            const nodeExit = node
-                .exit()
+            node.exit()
+                .classed("exiting", true)
                 .attr("opacity", 1)
                 .transition()
                 .duration(self._transitionTime)
@@ -501,17 +508,6 @@ export default class GroupTree {
                     return `translate(${c.y},${c.x})`;
                 })
                 .remove();
-
-            nodeExit.select("text").style("fill-opacity", 1e-6);
-            nodeExit
-                .select(".grouptree__nodelabel")
-                .style("fill-opacity", 1e-6);
-            nodeExit
-                .select(".grouptree__pressurelabel")
-                .style("fill-opacity", 1e-6);
-            nodeExit
-                .select(".grouptree__pressureunit")
-                .style("fill-opacity", 1e-6);
         }
 
         /**
@@ -541,12 +537,12 @@ export default class GroupTree {
             const linkUpdate = linkEnter.merge(link);
 
             linkUpdate
-                .transition()
-                .duration(self._transitionTime)
                 .attr(
                     "class",
                     () => `link grouptree_link grouptree_link__${flowrate}`
                 )
+                .transition()
+                .duration(self._transitionTime)
                 .attr("d", (d) => diagonal(d, d.parent))
                 .style("stroke-width", (d) =>
                     self.getEdgeStrokeWidth(
