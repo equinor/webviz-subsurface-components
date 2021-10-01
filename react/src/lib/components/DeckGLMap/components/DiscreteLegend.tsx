@@ -40,9 +40,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         const ordinalValues = d3
             .scaleOrdinal(d3.schemeCategory10)
             .domain(itemName);
-        const discreteLegend = legendUtil(itemColor)
-            .labelFormat("none")
-            .inputScale(ordinalValues);
+        const discreteLegend = legendUtil(itemColor).inputScale(ordinalValues);
         d3.select(legend)
             .append("svg")
             .attr("height", 600 + "px")
