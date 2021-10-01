@@ -13,7 +13,7 @@ import { createStore } from "../redux/store";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
-import ColorLegend from "../components/DiscreteLegend";
+import DiscreteColorLegend from "../components/DiscreteLegend";
 
 export interface MapProps {
     /**
@@ -110,7 +110,7 @@ const Map: React.FC<MapProps> = ({
         setSpecObj(jsonConverter.convert(deckglSpec));
     }, [deckglSpec, resources]);
 
-    const [discreteDataState, setDiscreteDataState] = React.useState([]);
+    const [discreteData, setDiscreteData] = React.useState([]);
     const [dataPresent, setDataPresent] = React.useState(false);
 
     const refCb = React.useCallback(
@@ -121,14 +121,14 @@ const Map: React.FC<MapProps> = ({
                 const logData = deckRef.props.layers[2].props.logData;
                 const logName = deckRef.props.layers[2].props.logName;
                 const fetchData = async () => {
-                    const res = await fetch(logData);
-                    const json = await res.json();
-                    const firstData = json[0];
-
-                    const metadata_discrete =
-                        firstData["metadata_discrete"][logName].objects;
-                    setDiscreteDataState(metadata_discrete);
-                    setDataPresent(true);
+                    fetch(logData)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            const metadata_discrete =
+                                data[0]["metadata_discrete"][logName].objects;
+                            setDiscreteData(metadata_discrete);
+                            setDataPresent(true);
+                        });
                 };
                 fetchData();
                 deckRef.deck.setProps({
@@ -208,7 +208,9 @@ const Map: React.FC<MapProps> = ({
                         scaleUnit={coordinateUnit}
                     />
                 ) : null}
-                {dataPresent ? <ColorLegend data={discreteDataState} /> : null}
+                {dataPresent ? (
+                    <DiscreteColorLegend discreteData={discreteData} />
+                ) : null}
             </ReduxProvider>
         )
     );

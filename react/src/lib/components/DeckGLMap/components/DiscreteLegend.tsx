@@ -8,24 +8,22 @@ interface ItemColor {
 
 interface colorLegendProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any;
+    discreteData: any;
 }
 
-const ColorLegend: React.FC<colorLegendProps> = ({
-    data,
+const DiscreteColorLegend: React.FC<colorLegendProps> = ({
+    discreteData,
 }: colorLegendProps) => {
     React.useEffect(() => {
-        if (data) {
-            legendDemo("#legend");
-        }
-    }, [data]);
+        legendDemo("#legend");
+    }, [discreteData]);
 
     function legendDemo(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
 
-        Object.keys(data).forEach((key: string) => {
-            itemColor.push({ color: RGBAToHexA(data[key][0]) });
+        Object.keys(discreteData).forEach((key: string) => {
+            itemColor.push({ color: RGBAToHexA(discreteData[key][0]) });
             itemName.push(key);
         });
         function RGBAToHexA(rgba: number[]) {
@@ -59,4 +57,4 @@ const ColorLegend: React.FC<colorLegendProps> = ({
     return <div id="legend"></div>;
 };
 
-export default ColorLegend;
+export default DiscreteColorLegend;
