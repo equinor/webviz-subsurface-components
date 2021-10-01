@@ -126,7 +126,6 @@ function DeckGLMap({
     // and sent to the parent component via setProps. (See layers/utils/layerTools.ts)
     const setSpecPatch = React.useCallback(
         (patch) => {
-            console.log(patchedSpec);
             setProps({
                 deckglSpecBase: patchedSpec,
                 deckglSpecPatch: patch,

@@ -32,7 +32,6 @@
         {
           "@@type": "ColormapLayer",
           "id": "colormap-layer",
-          "name": "Surface map",
           "bounds": [
             432205,
             6475078,
@@ -50,7 +49,6 @@
         {
           "@@type": "Hillshading2DLayer",
           "id": "hillshading-layer",
-          "name": "Hill shading",
           "bounds": [
             432205,
             6475078,
@@ -68,36 +66,25 @@
         {
           "@@type": "WellsLayer",
           "id": "wells-layer",
-          "name": "Wells",
           "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
           "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
-          "opacity": 1.0,
-          "lineWidthScale": 5,
-          "logRadius": 6,
           "logrunName": "BLOCKING",
           "logName": "ZONELOG",
-          "pointRadiusScale": 8,
-          "outline": true,
-          "logCurves": true,
-          "refine": true
         },
         {
           "@@type": "FaultPolygonsLayer",
           "id": "fault-polygons-layer",
-          "name": "Fault polygons",
           "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson",
           "lineWidthMinPixels": 2
         },
         {
           "@@type": "PieChartLayer",
           "id": "pie-layer",
-          "name": "Pie chart",
           "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
         },
         {
           "@@type": "DrawingLayer",
           "id": "drawing-layer",
-          "name": "Drawing",
           "mode": "drawLineString",
           "data": {
             "type": "FeatureCollection",
