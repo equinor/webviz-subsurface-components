@@ -10,7 +10,7 @@ import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { setSpec } from "../redux/actions";
 import { createStore } from "../redux/store";
-import { WellsPickInfo } from "../layers/wells/wellsLayer";
+import { WellsPickInfo, getLogInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
@@ -113,24 +113,32 @@ const Map: React.FC<MapProps> = ({
     const [discreteData, setDiscreteData] = React.useState([]);
     const [dataPresent, setDataPresent] = React.useState(false);
 
+    React.useEffect(() => {
+        if (deckglSpec) {
+            //eslint-disable-next-line
+            const logData = (deckglSpec["layers"] as any[])[2].logData;
+            //eslint-disable-next-line
+            const logName = (deckglSpec["layers"] as any[])[2].logName;
+            fetch(logData)
+                .then((response) => response.json())
+                .then((data) => {
+                    const log_info = getLogInfo(data[0], "BLOCKING", logName);
+                    if (log_info?.description == "discrete") {
+                        const metadata_discrete =
+                            data[0]["metadata_discrete"][logName].objects;
+                        setDiscreteData(metadata_discrete);
+                        setDataPresent(true);
+                    }
+                });
+        }
+        //eslint-disable-next-line
+    }, [(deckglSpec["layers"] as any[])[2].logName]);
+
     const refCb = React.useCallback(
         (deckRef) => {
             if (deckRef) {
                 // Needed to initialize the viewState on first load
                 setViewState(deckRef.deck.viewState);
-                const logData = deckRef.props.layers[2].props.logData;
-                const logName = deckRef.props.layers[2].props.logName;
-                const fetchData = async () => {
-                    fetch(logData)
-                        .then((response) => response.json())
-                        .then((data) => {
-                            const metadata_discrete =
-                                data[0]["metadata_discrete"][logName].objects;
-                            setDiscreteData(metadata_discrete);
-                            setDataPresent(true);
-                        });
-                };
-                fetchData();
                 deckRef.deck.setProps({
                     // userData is undocumented and it doesn't appear in the
                     // deckProps type, but it is used by the layersManager

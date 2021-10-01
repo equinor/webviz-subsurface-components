@@ -241,7 +241,7 @@ function getLogValues(
     return log_id >= 0 ? getColumn(d.data, log_id) : [];
 }
 
-function getLogInfo(
+export function getLogInfo(
     d: LogCurveDataType,
     logrun_name: string,
     log_name: string

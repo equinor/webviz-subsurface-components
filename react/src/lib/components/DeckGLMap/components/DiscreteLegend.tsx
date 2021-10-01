@@ -48,7 +48,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
             .attr("height", 600 + "px")
             .attr("width", 150 + "px")
             .style("position", "absolute")
-            .style("right", "0px")
+            .style("right", "40px")
             .style("top", "0px")
             .attr("transform", "translate(0,30)")
             .call(discreteLegend);

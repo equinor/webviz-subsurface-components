@@ -18,8 +18,11 @@ export default function legendUtil(itemColor: ItemColor[]) {
             itemColor.forEach((item, index) => {
                 legendValues[index].color = item.color;
             });
+            // fill the color
             g.selectAll("g.legendCells")
                 .select("rect")
+                .attr("height", cellHeight)
+                .attr("width", cellWidth)
                 .style("fill", function (d: Record<string, unknown>) {
                     return d["color"];
                 });
@@ -56,8 +59,6 @@ export default function legendUtil(itemColor: ItemColor[]) {
         // fill the color
         g.selectAll("g.legendCells")
             .append("rect")
-            .attr("height", cellHeight)
-            .attr("width", cellWidth)
             .style("fill", function (d: Record<string, unknown>) {
                 return d["color"];
             });
