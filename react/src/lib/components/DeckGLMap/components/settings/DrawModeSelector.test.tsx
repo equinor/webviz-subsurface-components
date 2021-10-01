@@ -16,10 +16,9 @@ describe("Test draw-mode menu", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
         //expect(obj.plottable[2]).toBeLessThan(10);
-        if (obj.plottable[2] > 10) {
-            core.warning("Check the DrwaModeSelector test");
-            core.notice(
-                "Something happened that you might want to know about."
+        if (obj.plottable[2] > 1) {
+            core.warning(
+                "DrawModeSelector Component in '/components/DeckGLMap/components/settings/' seems to have performance issues"
             );
         }
     });
@@ -42,11 +41,8 @@ describe("Test draw-mode menu", () => {
         });
         console.log(obj.plottable);
         //expect(obj.plottable[2]).toBeLessThan(10);
-        if (obj.plottable[2] > 10) {
+        if (obj.plottable[2] > 100) {
             core.warning("Check the DrwaModeSelector test");
-            core.notice(
-                "Something happened that you might want to know about."
-            );
         }
     });
 });
