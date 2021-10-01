@@ -32,7 +32,6 @@
         {
           "@@type": "ColormapLayer",
           "id": "colormap-layer",
-          "name": "Surface map",
           "bounds": [
             432205,
             6475078,
@@ -71,15 +70,8 @@
           "name": "Wells",
           "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
           "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
-          "opacity": 1.0,
-          "lineWidthScale": 5,
-          "logRadius": 6,
           "logrunName": "BLOCKING",
-          "logName": "ZONELOG",
-          "pointRadiusScale": 8,
-          "outline": true,
-          "logCurves": true,
-          "refine": true
+          "logName": "ZONELOG"
         },
         {
           "@@type": "FaultPolygonsLayer",
@@ -91,7 +83,6 @@
         {
           "@@type": "PieChartLayer",
           "id": "pie-layer",
-          "name": "Pie chart",
           "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
         },
         {
