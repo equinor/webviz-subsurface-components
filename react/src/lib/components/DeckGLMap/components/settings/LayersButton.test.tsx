@@ -14,7 +14,7 @@ describe("test 'layers' button", () => {
         const { container } = render(Wrapper({ children: <LayersButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
-    it("click to dispatch redux action", async () => {
+    xit("click to dispatch redux action", async () => {
         Icon.add({ layers });
         render(Wrapper({ children: <LayersButton /> }));
         userEvent.click(screen.getByRole("button"));
