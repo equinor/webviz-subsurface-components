@@ -97,7 +97,7 @@ exports[`Test draw-mode menu snapshot test 1`] = `
     <span
       class="c2"
     >
-      Draw Mode
+      Draw mode
     </span>
   </label>
   <select
@@ -105,19 +105,19 @@ exports[`Test draw-mode menu snapshot test 1`] = `
     id="drawing-layer-mode-selector"
   >
     <option>
-      view
+      View
     </option>
     <option>
-      modify
+      Edit
     </option>
     <option>
-      drawPoint
+      Create point
     </option>
     <option>
-      drawLineString
+      Create polyline
     </option>
     <option>
-      drawPolygon
+      Create polygon
     </option>
   </select>
 </div>

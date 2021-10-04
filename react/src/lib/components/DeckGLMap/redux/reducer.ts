@@ -27,6 +27,15 @@ export const specSlice = createSlice({
             if (layer["@@type"] === "DrawingLayer")
                 layer.mode = action.payload[1];
         },
+        updateLayerProp: (
+            state,
+            action: PayloadAction<[string, string, boolean | string | number]>
+        ) => {
+            const layer = (state["layers"] as any[]).find(
+                (layer) => layer.id === action.payload[0]
+            );
+            layer[action.payload[1]] = action.payload[2];
+        },
     },
 });
 export const rootReducer = combineReducers({
