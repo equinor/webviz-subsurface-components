@@ -37,6 +37,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
 }
 
 const defaultProps = {
+    name: "Wells",
     autoHighlight: true,
     selectionEnabled: true,
     opacity: 1,

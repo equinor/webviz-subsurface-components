@@ -31,6 +31,7 @@ interface PolygonData {
 export type PieChartLayerProps<D> = CompositeLayerProps<D>;
 
 const defaultProps = {
+    name: "Pie chart",
     pickable: true,
 };
 export default class PieChartLayer extends CompositeLayer<

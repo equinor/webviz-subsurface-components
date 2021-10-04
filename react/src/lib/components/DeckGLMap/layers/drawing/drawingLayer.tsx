@@ -55,6 +55,7 @@ const UNSELECTED_LINE_COLOR: RGBAColor = [0x50, 0x50, 0x50, 0xcc];
 const SELECTED_LINE_COLOR: RGBAColor = [0x0, 0x0, 0x0, 0xff];
 
 const defaultProps = {
+    name: "Drawing",
     pickable: true,
     mode: "drawLineString",
 
