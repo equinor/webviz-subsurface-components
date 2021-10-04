@@ -1,5 +1,5 @@
 import { CompositeLayer } from "@deck.gl/core";
-import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
+import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
@@ -22,7 +22,7 @@ import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 
-export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
+export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
@@ -37,6 +37,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
 }
 
 const defaultProps = {
+    name: "Wells",
     autoHighlight: true,
     selectionEnabled: true,
     opacity: 1,

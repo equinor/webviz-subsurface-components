@@ -12,9 +12,14 @@ import { Button, Icon } from "@equinor/eds-core-react";
 import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
 
 import { PickInfo } from "@deck.gl/core/lib/deck";
-import { LayerPickInfo, PropertyDataType } from "../layers/utils/layerTools";
+import {
+    ExtendedLayerProps,
+    LayerPickInfo,
+    PropertyDataType,
+} from "../layers/utils/layerTools";
 import { PropertyMapPickInfo } from "../layers/utils/propertyMapTools";
 import { rgb } from "d3-color";
+import { FeatureCollection } from "geojson";
 
 Icon.add({ arrow_drop_up, arrow_drop_down });
 
@@ -163,8 +168,11 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
 
         props.pickInfos.forEach((info) => {
             const layer_properties = (info as LayerPickInfo)?.properties;
+            const group_name = (
+                info.layer?.props as ExtendedLayerProps<FeatureCollection>
+            )?.name;
             const parent = infoCardData.find(
-                (item) => item.layerName === info.layer?.id
+                (item) => item.layerName === group_name
             );
             if (parent) {
                 layer_properties?.forEach((layer_prop) => {
@@ -179,7 +187,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
                 });
             } else {
                 infoCardData.push({
-                    layerName: info.layer?.id || "unknown-layer",
+                    layerName: group_name || "unknown-layer",
                     properties: layer_properties,
                 });
             }
@@ -192,7 +200,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
                 if (property) {
                     property.value = zValue;
                 } else {
-                    xy_properties.push({ name: info.layer.id, value: zValue });
+                    xy_properties.push({ name: group_name, value: zValue });
                 }
             }
         });

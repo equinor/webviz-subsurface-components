@@ -14,6 +14,7 @@ describe("test layers settings button", () => {
                     <LayerSettingsButton
                         layerId="drawing-layer"
                         layerType="DrawingLayer"
+                        name="Drawing"
                     />
                 ),
             })
@@ -27,6 +28,7 @@ describe("test layers settings button", () => {
                     <LayerSettingsButton
                         layerId="drawing-layer"
                         layerType="DrawingLayer"
+                        name="Drawing"
                     />
                 ),
             })
@@ -35,10 +37,10 @@ describe("test layers settings button", () => {
         expect(screen.getByText(/draw mode/i)).toBeVisible();
         expect(
             screen.getByRole("combobox", { name: /draw mode/i })
-        ).toHaveDisplayValue("drawLineString");
+        ).toHaveDisplayValue("Create polyline");
         userEvent.selectOptions(
             screen.getByRole("combobox", { name: /draw mode/i }),
-            "view"
+            "View"
         );
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
@@ -53,6 +55,7 @@ describe("test layers settings button", () => {
                     <LayerSettingsButton
                         layerId="drawing-layer"
                         layerType="DrawingLayer"
+                        name="Drawing"
                     />
                 ),
             })
@@ -70,6 +73,7 @@ describe("test layers settings button", () => {
                     <LayerSettingsButton
                         layerId="drawing-layer"
                         layerType="DrawingLayer"
+                        name="Drawing"
                     />
                 ),
             })
