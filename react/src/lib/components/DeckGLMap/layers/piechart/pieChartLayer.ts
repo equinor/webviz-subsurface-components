@@ -1,5 +1,5 @@
 import { CompositeLayer } from "@deck.gl/core";
-import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
+import { ExtendedLayerProps } from "../utils/layerTools";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { Position } from "@deck.gl/core/utils/positions";
 import { SolidPolygonLayer } from "@deck.gl/layers";
@@ -28,7 +28,7 @@ interface PolygonData {
     };
 }
 
-export type PieChartLayerProps<D> = CompositeLayerProps<D>;
+export type PieChartLayerProps<D> = ExtendedLayerProps<D>;
 
 const defaultProps = {
     name: "Pie chart",
