@@ -26,7 +26,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
-    selectedFeature: Feature;
+    selectedFeature: string;
     selectionEnabled: boolean;
     logData: string | LogCurveDataType;
     logName: string;
@@ -82,7 +82,7 @@ export default class WellsLayer extends CompositeLayer<
 
         patchLayerProps<FeatureCollection>(this, {
             ...this.props,
-            selectedFeature: info.object,
+            selectedFeature: (info.object as Feature).properties?.["name"],
         } as WellsLayerProps<FeatureCollection>);
         return true;
     }
@@ -132,7 +132,10 @@ export default class WellsLayer extends CompositeLayer<
         const highlight = new GeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "highlight",
-                data: this.props.selectedFeature,
+                data: getWellObjectByName(
+                    data.features,
+                    this.props.selectedFeature
+                ),
                 pickable: false,
                 stroked: false,
                 positionFormat: "XY",
