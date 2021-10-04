@@ -16,14 +16,21 @@ const Template = (args) => {
     return (
         <LayerSettingsButton
             layerId={args.layerId}
-            layerType={args.layerType}
             key={`settings-button-${args.layerId}`}
         />
     );
 };
 
-export const Default = Template.bind({});
-Default.args = {
+export const DrawingSettings = Template.bind({});
+DrawingSettings.args = {
     layerId: "drawing-layer",
     layerType: "DrawingLayer",
+    name: "Drawing",
+};
+
+export const WellsSettings = Template.bind({});
+WellsSettings.args = {
+    layerId: "wells-layer",
+    layerType: "WellsLayer",
+    name: "Wells",
 };
