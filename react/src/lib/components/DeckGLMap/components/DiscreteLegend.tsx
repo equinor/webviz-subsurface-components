@@ -1,14 +1,15 @@
 import React from "react";
 import legendUtil from "../utils/legend";
-import * as d3 from "d3";
+import { schemeCategory10, select, scaleOrdinal } from "d3";
 
 interface ItemColor {
     color: string;
 }
 
 interface colorLegendProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    discreteData: any;
+    discreteData: {
+        objects: Record<string, [number[], number]>;
+    };
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
@@ -22,7 +23,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
 
-        Object.keys(discreteData).forEach((key: string) => {
+        Object.keys(discreteData).forEach((key) => {
             itemColor.push({ color: RGBAToHexA(discreteData[key][0]) });
             itemName.push(key);
         });
@@ -37,11 +38,9 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
             if (a.length == 1) a = "0" + a;
             return "#" + r + g + b;
         }
-        const ordinalValues = d3
-            .scaleOrdinal(d3.schemeCategory10)
-            .domain(itemName);
+        const ordinalValues = scaleOrdinal(schemeCategory10).domain(itemName);
         const discreteLegend = legendUtil(itemColor).inputScale(ordinalValues);
-        d3.select(legend)
+        select(legend)
             .append("svg")
             .attr("height", 600 + "px")
             .attr("width", 150 + "px")

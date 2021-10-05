@@ -110,19 +110,30 @@ const Map: React.FC<MapProps> = ({
         setSpecObj(jsonConverter.convert(deckglSpec));
     }, [deckglSpec, resources]);
 
-    const [discreteData, setDiscreteData] = React.useState([]);
+    //eslint-disable-next-line
+    const [discreteData, setDiscreteData] = React.useState<any>([]);
     const [dataPresent, setDataPresent] = React.useState(false);
 
     React.useEffect(() => {
         if (deckglSpec) {
             //eslint-disable-next-line
-            const logData = (deckglSpec["layers"] as any[])[2].logData;
-            //eslint-disable-next-line
-            const logName = (deckglSpec["layers"] as any[])[2].logName;
+            const layers = (deckglSpec["layers"] as any);
+            const wellsLayerData = layers.filter(
+                //eslint-disable-next-line
+                (item: any) =>
+                    item.id.toLowerCase() == "wells-layer".toLowerCase()
+            );
+            const logData = wellsLayerData[0].logData;
+            const logName = wellsLayerData[0].logName;
+
             fetch(logData)
                 .then((response) => response.json())
                 .then((data) => {
-                    const log_info = getLogInfo(data[0], "BLOCKING", logName);
+                    const log_info = getLogInfo(
+                        data[0],
+                        data[0].header.name,
+                        logName
+                    );
                     if (log_info?.description == "discrete") {
                         const metadata_discrete =
                             data[0]["metadata_discrete"][logName].objects;
@@ -131,8 +142,7 @@ const Map: React.FC<MapProps> = ({
                     }
                 });
         }
-        //eslint-disable-next-line
-    }, [(deckglSpec["layers"] as any[])[2].logName]);
+    }, [deckglSpec["layers"]]);
 
     const refCb = React.useCallback(
         (deckRef) => {
