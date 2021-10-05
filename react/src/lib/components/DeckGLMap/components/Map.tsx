@@ -14,6 +14,50 @@ import { WellsPickInfo, getLogInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
+import {
+    ColormapLayer,
+    Hillshading2DLayer,
+    WellsLayer,
+    FaultPolygonsLayer,
+    PieChartLayer,
+    DrawingLayer,
+} from "../layers";
+
+// update spec object to include default layer props
+function getSpecWithDefaultProps(
+    deckglSpec: Record<string, unknown>
+): Record<string, unknown> {
+    const modified_spec = Object.assign({}, deckglSpec);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const layers = [...(modified_spec["layers"] as any[])];
+    layers?.forEach((layer) => {
+        let default_props = undefined;
+        if (layer["@@type"] === ColormapLayer.name)
+            default_props = ColormapLayer.defaultProps;
+        else if (layer["@@type"] === Hillshading2DLayer.name)
+            default_props = Hillshading2DLayer.defaultProps;
+        else if (layer["@@type"] === WellsLayer.name)
+            default_props = WellsLayer.defaultProps;
+        else if (layer["@@type"] === FaultPolygonsLayer.name)
+            default_props = FaultPolygonsLayer.defaultProps;
+        else if (layer["@@type"] === PieChartLayer.name)
+            default_props = PieChartLayer.defaultProps;
+        else if (layer["@@type"] === DrawingLayer.name)
+            default_props = DrawingLayer.defaultProps;
+
+        if (default_props) {
+            Object.entries(default_props).forEach(([prop, value]) => {
+                const prop_type = typeof value;
+                if (["string", "boolean", "number"].includes(prop_type)) {
+                    if (layer[prop] === undefined) layer[prop] = value;
+                }
+            });
+        }
+    });
+
+    modified_spec["layers"] = layers;
+    return modified_spec;
+}
 
 export interface MapProps {
     /**
@@ -78,13 +122,19 @@ const Map: React.FC<MapProps> = ({
     coordinateUnit,
     children,
 }: MapProps) => {
+    const [deckglSpecWithDefaultProps, setDeckglSpecWithDefaultProps] =
+        React.useState(deckglSpec);
+    React.useEffect(() => {
+        setDeckglSpecWithDefaultProps(getSpecWithDefaultProps(deckglSpec));
+    }, [deckglSpec]);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
-        createStore(deckglSpec, setSpecPatch)
+        createStore(deckglSpecWithDefaultProps, setSpecPatch)
     );
 
     React.useEffect(() => {
-        store.current = createStore(deckglSpec, setSpecPatch);
+        store.current = createStore(deckglSpecWithDefaultProps, setSpecPatch);
     }, [setSpecPatch]);
 
     const [specObj, setSpecObj] = React.useState(null);
@@ -92,7 +142,7 @@ const Map: React.FC<MapProps> = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [viewState, setViewState] = React.useState<any>();
     React.useEffect(() => {
-        if (!deckglSpec) {
+        if (!deckglSpecWithDefaultProps) {
             return;
         }
 
@@ -107,8 +157,8 @@ const Map: React.FC<MapProps> = ({
             });
         }
         const jsonConverter = new JSONConverter({ configuration });
-        setSpecObj(jsonConverter.convert(deckglSpec));
-    }, [deckglSpec, resources]);
+        setSpecObj(jsonConverter.convert(deckglSpecWithDefaultProps));
+    }, [deckglSpecWithDefaultProps, resources]);
 
     //eslint-disable-next-line
     const [discreteData, setDiscreteData] = React.useState<any>([]);
@@ -166,8 +216,10 @@ const Map: React.FC<MapProps> = ({
     );
 
     React.useEffect(() => {
-        store.current.dispatch(setSpec(specObj ? deckglSpec : {}));
-    }, [deckglSpec, specObj]);
+        store.current.dispatch(
+            setSpec(specObj ? deckglSpecWithDefaultProps : {})
+        );
+    }, [deckglSpecWithDefaultProps, specObj]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = React.useState<any>([]);
