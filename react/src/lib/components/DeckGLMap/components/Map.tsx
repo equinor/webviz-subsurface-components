@@ -161,7 +161,7 @@ const Map: React.FC<MapProps> = ({
     }, [deckglSpecWithDefaultProps, resources]);
 
     //eslint-disable-next-line
-    const [discreteData, setDiscreteData] = React.useState<any>([]);
+    const [discreteData, setDiscreteData] = React.useState(Object);
     const [dataPresent, setDataPresent] = React.useState(false);
 
     React.useEffect(() => {

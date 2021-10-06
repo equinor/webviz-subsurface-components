@@ -1,15 +1,13 @@
 import React from "react";
 import legendUtil from "../utils/legend";
-import { schemeCategory10, select, scaleOrdinal } from "d3";
+import { schemeCategory10, scaleOrdinal, select } from "d3";
 
 interface ItemColor {
     color: string;
 }
 
 interface colorLegendProps {
-    discreteData: {
-        objects: Record<string, [number[], number]>;
-    };
+    discreteData: { objects: Record<string, [number[], number]> };
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
@@ -24,7 +22,12 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         const itemColor: ItemColor[] = [];
 
         Object.keys(discreteData).forEach((key) => {
-            itemColor.push({ color: RGBAToHexA(discreteData[key][0]) });
+            itemColor.push({
+                color: RGBAToHexA(
+                    // eslint-disable-next-line
+                    (discreteData as { [key: string]: any })[key][0]
+                ),
+            });
             itemName.push(key);
         });
         function RGBAToHexA(rgba: number[]) {
