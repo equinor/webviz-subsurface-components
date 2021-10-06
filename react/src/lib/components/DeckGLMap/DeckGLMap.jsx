@@ -240,8 +240,8 @@ DeckGLMap.propTypes = {
     setProps: PropTypes.func,
 
     /**
-         * Toggle component visibility.
-    */
+     * Toggle component visibility.
+     */
     discreteLegendVisible: PropTypes.bool,
 };
 
