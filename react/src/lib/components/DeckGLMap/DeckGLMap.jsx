@@ -71,6 +71,7 @@ DeckGLMap.defaultProps = {
         widthPerUnit: 100,
         position: [10, 10],
     },
+    discreteLegendVisible: true,
 };
 
 function DeckGLMap({
@@ -80,6 +81,7 @@ function DeckGLMap({
     deckglSpecPatch,
     coords,
     scale,
+    discreteLegendVisible,
     coordinateUnit,
     setProps,
 }) {
@@ -143,6 +145,7 @@ function DeckGLMap({
                 setSpecPatch={setSpecPatch}
                 coords={coords}
                 scale={scale}
+                discreteLegendVisible={discreteLegendVisible}
                 coordinateUnit={coordinateUnit}
             />
         )
@@ -235,6 +238,11 @@ DeckGLMap.propTypes = {
      * For reacting to prop changes
      */
     setProps: PropTypes.func,
+
+    /**
+         * Toggle component visibility.
+    */
+    discreteLegendVisible: PropTypes.bool,
 };
 
 export default DeckGLMap;

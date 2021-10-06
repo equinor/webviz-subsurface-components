@@ -109,6 +109,8 @@ export interface MapProps {
 
     coordinateUnit: string;
 
+    discreteLegendVisible: boolean,
+
     children?: React.ReactNode;
 }
 

@@ -19,6 +19,8 @@ export default function legendUtil(itemColor: ItemColor[]) {
                 .append("rect")
                 .attr("height", cellHeight)
                 .attr("width", cellWidth)
+                .style("stroke", "black")
+                .style("stroke-width", "1px")
                 .style("fill", function (d: Record<string, unknown>) {
                     return d["color"];
                 });
@@ -26,6 +28,7 @@ export default function legendUtil(itemColor: ItemColor[]) {
             g.selectAll("g.legendCells")
                 .append("text")
                 .attr("class", "breakLabels")
+                .style("fill", "#6F6F6F")
                 .attr("x", cellWidth + cellPadding)
                 .attr("y", 5 + cellHeight / 2)
                 .text(function (d: Record<string, unknown>) {
