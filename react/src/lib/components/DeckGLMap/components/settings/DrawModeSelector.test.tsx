@@ -9,21 +9,37 @@ import DrawModeSelector from "./DrawModeSelector";
 describe("Test draw-mode menu", () => {
     it("snapshot test", () => {
         const { container } = render(
-            Wrapper({ children: <DrawModeSelector layerId="drawing-layer" /> })
+            Wrapper({
+                children: (
+                    <DrawModeSelector
+                        layerId="drawing-layer"
+                        label="Draw mode"
+                        value="drawLineString"
+                    />
+                ),
+            })
         );
         expect(container.firstChild).toMatchSnapshot();
     });
     it("select option to dispatch redux action", async () => {
         render(
-            Wrapper({ children: <DrawModeSelector layerId="drawing-layer" /> })
+            Wrapper({
+                children: (
+                    <DrawModeSelector
+                        layerId="drawing-layer"
+                        label="Draw mode"
+                        value="drawLineString"
+                    />
+                ),
+            })
         );
         expect(screen.getByLabelText(/draw mode/i)).toBeVisible();
         expect(
             screen.getByRole("combobox", { name: /draw mode/i })
-        ).toHaveDisplayValue("drawLineString");
+        ).toHaveDisplayValue("Create polyline");
         userEvent.selectOptions(
             screen.getByRole("combobox", { name: /draw mode/i }),
-            "view"
+            "View"
         );
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({

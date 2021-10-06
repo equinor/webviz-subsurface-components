@@ -1,6 +1,6 @@
 import { COORDINATE_SYSTEM, RGBAColor } from "@deck.gl/core";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
-import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
+import { ExtendedLayerProps } from "../utils/layerTools";
 import {
     DrawLineStringMode,
     DrawPointMode,
@@ -55,6 +55,7 @@ const UNSELECTED_LINE_COLOR: RGBAColor = [0x50, 0x50, 0x50, 0xcc];
 const SELECTED_LINE_COLOR: RGBAColor = [0x0, 0x0, 0x0, 0xff];
 
 const defaultProps = {
+    name: "Drawing",
     pickable: true,
     mode: "drawLineString",
 
@@ -66,7 +67,7 @@ const defaultProps = {
     },
 };
 
-export interface DrawingLayerProps<D> extends CompositeLayerProps<D> {
+export interface DrawingLayerProps<D> extends ExtendedLayerProps<D> {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
 }

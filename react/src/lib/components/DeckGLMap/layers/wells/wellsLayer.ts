@@ -1,5 +1,5 @@
 import { CompositeLayer } from "@deck.gl/core";
-import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
+import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
@@ -22,11 +22,11 @@ import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 
-export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
+export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
-    selectedFeature: Feature;
+    selectedFeature: string;
     selectionEnabled: boolean;
     logData: string | LogCurveDataType;
     logName: string;
@@ -37,6 +37,7 @@ export interface WellsLayerProps<D> extends CompositeLayerProps<D> {
 }
 
 const defaultProps = {
+    name: "Wells",
     autoHighlight: true,
     selectionEnabled: true,
     opacity: 1,
@@ -82,7 +83,7 @@ export default class WellsLayer extends CompositeLayer<
 
         patchLayerProps<FeatureCollection>(this, {
             ...this.props,
-            selectedFeature: info.object,
+            selectedFeature: (info.object as Feature).properties?.["name"],
         } as WellsLayerProps<FeatureCollection>);
         return true;
     }
@@ -132,7 +133,10 @@ export default class WellsLayer extends CompositeLayer<
         const highlight = new GeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "highlight",
-                data: this.props.selectedFeature,
+                data: getWellObjectByName(
+                    data.features,
+                    this.props.selectedFeature
+                ),
                 pickable: false,
                 stroked: false,
                 positionFormat: "XY",

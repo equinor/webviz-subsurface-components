@@ -2,6 +2,11 @@ import Layer, { LayerProps } from "@deck.gl/core/lib/layer";
 import * as jsonpatch from "fast-json-patch";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { RGBAColor } from "@deck.gl/core/utils/color";
+import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
+
+export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
+    name: string;
+}
 
 export interface PropertyDataType {
     name: string;

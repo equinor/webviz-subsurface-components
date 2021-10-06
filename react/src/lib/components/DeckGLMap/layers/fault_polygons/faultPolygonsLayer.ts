@@ -12,6 +12,7 @@ const getColor = (d: Feature): RGBAColor => {
 };
 
 const defaultProps = {
+    name: "Fault polygons",
     pickable: true,
     filled: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,

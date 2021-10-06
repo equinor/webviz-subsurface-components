@@ -31,6 +31,7 @@ export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
 }
 
 const defaultProps = {
+    name: "Hill shading",
     valueRange: { type: "array" },
     lightDirection: { type: "array", value: [1, 1, 1] },
     ambientLightIntensity: { type: "number", value: 0.5 },

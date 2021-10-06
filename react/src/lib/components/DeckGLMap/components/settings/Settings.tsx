@@ -35,6 +35,7 @@ const Settings: React.FC = React.memo(() => {
                 <LayerSettingsButton
                     layerId={layer.id}
                     layerType={layer["@@type"]}
+                    name={layer.name}
                     key={`settings-button-${layer.id}`}
                 />
             ))}

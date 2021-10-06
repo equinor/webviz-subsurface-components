@@ -55,6 +55,7 @@ export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
 }
 
 const defaultProps = {
+    name: "Property map",
     colormap: { type: "object", value: null, async: true },
     valueRange: { type: "array" },
     colorMapRange: { type: "array" },
