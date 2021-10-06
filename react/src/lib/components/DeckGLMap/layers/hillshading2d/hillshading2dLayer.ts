@@ -26,12 +26,16 @@ export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
     // Intensity of light that is applied to the lightened potions of the map.
     diffuseLightIntensity: number;
 
+    // Use color map in this range
+    colorMapRange: [number, number];
+
     // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
     valueDecoder: ValueDecoder;
 }
 
 const defaultProps = {
     valueRange: { type: "array" },
+    colorMapRange: { type: "array" },
     lightDirection: { type: "array", value: [1, 1, 1] },
     ambientLightIntensity: { type: "number", value: 0.5 },
     diffuseLightIntensity: { type: "number", value: 0.5 },
@@ -70,8 +74,10 @@ export default class Hillshading2DLayer extends BitmapLayer<
 
             const valueRangeMin = this.props.valueRange[0] ?? 0.0;
             const valueRangeMax = this.props.valueRange[1] ?? 1.0;
-            const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
-            const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+            const colorMapRangeMin =
+                this.props.colorMapRange?.[0] ?? valueRangeMin;
+            const colorMapRangeMax =
+                this.props.colorMapRange?.[1] ?? valueRangeMax;
 
             const [minVal, maxVal] = this.props.valueRange;
             super.draw({
