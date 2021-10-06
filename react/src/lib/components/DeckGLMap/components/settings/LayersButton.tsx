@@ -1,10 +1,12 @@
-import { Checkbox, Icon, Menu, Tooltip } from "@equinor/eds-core-react";
+import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
 import { createStyles, Fab, makeStyles } from "@material-ui/core";
 import React, { ChangeEvent, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateVisibleLayers } from "../../redux/actions";
 import { MapState } from "../../redux/store";
 import { getLayerVisibility } from "../../utils/specExtractor";
+import { isEmpty } from "lodash";
+import ToggleButton from "./ToggleButton";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -22,7 +24,7 @@ const LayersButton: React.FC = React.memo(() => {
 
     const spec = useSelector((st: MapState) => st.spec);
 
-    const layers = useMemo(() => getLayerVisibility(spec), [spec]);
+    const layers_visiblity = useMemo(() => getLayerVisibility(spec), [spec]);
 
     // handlers
     const handleClick = useCallback(
@@ -41,6 +43,7 @@ const LayersButton: React.FC = React.memo(() => {
         [dispatch]
     );
 
+    if (isEmpty(spec) || !("layers" in spec)) return null;
     return (
         <>
             <Fab id="layers-selector-button" onClick={handleClick}>
@@ -57,14 +60,15 @@ const LayersButton: React.FC = React.memo(() => {
                 open={Boolean(anchorEl)}
                 className={classes.root}
             >
-                {Object.keys(layers).map((layer) => (
-                    <Checkbox
-                        key={`layer-checkbox-${layer}`}
-                        label={layer}
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {(spec["layers"] as any[]).map((layer) => (
+                    <ToggleButton
+                        label={layer.name}
+                        checked={layers_visiblity[layer.id]}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            updateChecked(layer, e.target.checked);
+                            updateChecked(layer.id, e.target.checked);
                         }}
-                        checked={layers[layer]}
+                        key={`layer-toggle-${layer.id}`}
                     />
                 ))}
             </Menu>

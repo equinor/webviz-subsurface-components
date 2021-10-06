@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Test draw-mode menu snapshot test 1`] = `
+exports[`Test flow rate selector component snapshot test 1`] = `
 .c1 {
   display: -webkit-box;
   display: -webkit-flex;
@@ -88,36 +88,31 @@ exports[`Test draw-mode menu snapshot test 1`] = `
 }
 
 <div
-  class="c0"
+  class="c0 makeStyles-root-1"
 >
   <label
     class="c1"
-    for="drawing-layer-mode-selector"
+    for="node-info-selector"
   >
     <span
       class="c2"
     >
-      Draw mode
+      Node Data
     </span>
   </label>
   <select
     class="c3"
-    id="drawing-layer-mode-selector"
+    id="node-info-selector"
   >
-    <option>
-      View
+    <option
+      value="pressure"
+    >
+      Pressure
     </option>
-    <option>
-      Edit
-    </option>
-    <option>
-      Create point
-    </option>
-    <option>
-      Create polyline
-    </option>
-    <option>
-      Create polygon
+    <option
+      value="bhp"
+    >
+      Bottom Hole Pressure
     </option>
   </select>
 </div>
