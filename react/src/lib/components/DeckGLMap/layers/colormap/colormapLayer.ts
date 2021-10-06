@@ -136,7 +136,6 @@ export default class ColormapLayer extends BitmapLayer<
         };
         // The picked color is the one in raw image, not the one after colormapping.
         // We just need to decode that RGB color into a property float value.
-        //console.log("info.color: ", info.color)
         const val = decodeRGB(info.color, mergedDecoder, this.props.valueRange);
 
         return {
