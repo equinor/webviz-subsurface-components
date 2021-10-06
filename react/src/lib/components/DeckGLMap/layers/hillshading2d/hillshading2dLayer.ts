@@ -68,6 +68,11 @@ export default class Hillshading2DLayer extends BitmapLayer<
             };
             super.setModuleParameters(mergedModuleParams);
 
+            const valueRangeMin = this.props.valueRange[0] ?? 0.0;
+            const valueRangeMax = this.props.valueRange[1] ?? 1.0;
+            const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
+            const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+
             const [minVal, maxVal] = this.props.valueRange;
             super.draw({
                 uniforms: {
@@ -81,6 +86,10 @@ export default class Hillshading2DLayer extends BitmapLayer<
                     lightDirection: this.props.lightDirection,
                     ambientLightIntensity: this.props.ambientLightIntensity,
                     diffuseLightIntensity: this.props.diffuseLightIntensity,
+                    valueRangeMin,
+                    valueRangeMax,
+                    colorMapRangeMin,
+                    colorMapRangeMax,
                 },
                 moduleParameters: mergedModuleParams,
             });
