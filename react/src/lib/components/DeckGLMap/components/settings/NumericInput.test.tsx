@@ -1,9 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React, { ChangeEvent } from "react";
-import userEvent from "@testing-library/user-event";
-import { testStore, Wrapper } from "../../test/TestWrapper";
+import { Wrapper } from "../../test/TestWrapper";
 import NumericInput from "./NumericInput";
 
 describe("Test Numeric Input", () => {
