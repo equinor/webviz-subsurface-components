@@ -10,6 +10,11 @@ struct Decoder
 
 uniform Decoder decoder;
 
+uniform float valueRangeMin;
+uniform float valueRangeMax;
+uniform float colorMapRangeMin;
+uniform float colorMapRangeMax;
+
 // Decode the RGB value using the decoder parameter.
 float decode_rgb2float(vec3 rgb, Decoder dec) {
   rgb *= dec.rgbScaler * vec3(16711680.0, 65280.0, 255.0); //255*256*256, 255*256, 255
@@ -18,7 +23,13 @@ float decode_rgb2float(vec3 rgb, Decoder dec) {
   // Value must be in [0, 1] and step in (0, 1]
   value = floor(value / dec.step + 0.5) * dec.step;
 
-  return value;
+  // If colorMapRangeMin/Max specified, color map will span this interval.
+  float x  = value * (valueRangeMax - valueRangeMin) + valueRangeMin;
+  x = (x - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
+  x = max(0.0, x);
+  x = min(1.0, x);
+
+  return x;
 }
 
 // Decode the RGB value using the decoder uniform.
