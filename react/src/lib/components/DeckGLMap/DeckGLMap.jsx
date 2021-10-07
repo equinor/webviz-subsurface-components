@@ -72,6 +72,10 @@ DeckGLMap.defaultProps = {
         position: [10, 10],
     },
     legendVisible: true,
+    views: {
+        count: 1,
+        layout: [1, 1],
+    },
 };
 
 function DeckGLMap({
@@ -82,6 +86,7 @@ function DeckGLMap({
     coords,
     scale,
     legendVisible,
+    views,
     coordinateUnit,
     setProps,
 }) {
@@ -144,6 +149,7 @@ function DeckGLMap({
                 deckglSpec={patchedSpec}
                 setSpecPatch={setSpecPatch}
                 coords={coords}
+                views={views}
                 scale={scale}
                 legendVisible={legendVisible}
                 coordinateUnit={coordinateUnit}
@@ -168,6 +174,11 @@ DeckGLMap.propTypes = {
      * https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
      */
     resources: PropTypes.object,
+
+    /**
+     * Object defining view count and layout for displaying multiple maps.
+     */
+    views: PropTypes.object,
 
     /**
      * JSON object describing the map structure to which deckglSpecPatch will be

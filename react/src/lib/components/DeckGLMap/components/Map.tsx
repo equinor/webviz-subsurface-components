@@ -59,6 +59,41 @@ function getSpecWithDefaultProps(
     return modified_spec;
 }
 
+interface viewsType {
+    count: number;
+    layout: [number, number];
+}
+
+// construct views object for DeckGL component
+function getViewsForDeckGL(views: viewsType) {
+    const deckgl_views = [];
+
+    let yPos = 0;
+    const [nY, nX] = views.layout;
+    for (let y = 1; y <= nY; y++) {
+        let xPos = 0;
+        for (let x = 1; x <= nX; x++) {
+            if (deckgl_views.length >= views.count) return deckgl_views;
+
+            deckgl_views.push({
+                "@@type": "OrthographicView",
+                id: "main",
+                controller: {
+                    doubleClickZoom: false,
+                },
+                x: xPos + "%",
+                y: yPos + "%",
+                width: 100 / nX + "%",
+                height: 100 / nY + "%",
+                flipY: false,
+            });
+            xPos = xPos + 100 / nX;
+        }
+        yPos = yPos + 100 / nY;
+    }
+    return deckgl_views;
+}
+
 export interface MapProps {
     /**
      * The ID of this component, used to identify dash components
@@ -107,6 +142,19 @@ export interface MapProps {
         position: number[];
     };
 
+    /**
+     * Object defining view count and layout for displaying multiple maps.
+     */
+    views: {
+        count: number;
+        layout: [number, number];
+    };
+
+    /**
+     * Number of maps views to be displayed.
+     */
+    count: number;
+
     coordinateUnit: string;
 
     legendVisible: boolean;
@@ -123,8 +171,19 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     legendVisible,
+    views,
     children,
 }: MapProps) => {
+    // state for views prop of DeckGL component
+    const [deckGLViews, setDeckGLViews] = React.useState(null);
+    React.useEffect(() => {
+        const deckgl_views = getViewsForDeckGL(views);
+        const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
+        const jsonConverter = new JSONConverter({ configuration });
+        setDeckGLViews(jsonConverter.convert(deckgl_views));
+    }, [views]);
+
+    // state to update deckglSpec to include layer's defualt props
     const [deckglSpecWithDefaultProps, setDeckglSpecWithDefaultProps] =
         React.useState(deckglSpec);
     React.useEffect(() => {
@@ -254,6 +313,7 @@ const Map: React.FC<MapProps> = ({
                 <DeckGL
                     id={id}
                     {...specObj}
+                    views={deckGLViews}
                     getCursor={({ isDragging }): string =>
                         isDragging ? "grabbing" : "default"
                     }

@@ -170,6 +170,7 @@ if __name__ == "__main__":
         coords={"visible": True, "multiPicking": True, "pickDepth": 10},
         scale={"visible": True},
         coordinateUnit="m",
+        views={"count": 1, "layout": [1, 1]},
         deckglSpecBase={
             "initialViewState": {
                 "target": [bounds[0] + WIDTH / 2, bounds[1] + HEIGHT / 2, 0],
@@ -205,19 +206,7 @@ if __name__ == "__main__":
                     "logrunName": "BLOCKING",
                     "logName": "ZONELOG",
                 },
-            ],
-            "views": [
-                {
-                    "@@type": "OrthographicView",
-                    "id": "main",
-                    "controller": {"doubleClickZoom": False},
-                    "x": "0%",
-                    "y": "0%",
-                    "width": "100%",
-                    "height": "100%",
-                    "flipY": False,
-                }
-            ],
+            ]
         },
     )
 
