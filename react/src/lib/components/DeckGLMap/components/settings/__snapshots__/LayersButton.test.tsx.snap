@@ -38,3 +38,5 @@ exports[`test 'layers' button snapshot test 1`] = `
   />
 </button>
 `;
+
+exports[`test 'layers' button test empty MapState/specbase 1`] = `null`;
