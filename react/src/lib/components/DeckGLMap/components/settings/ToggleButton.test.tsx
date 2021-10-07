@@ -4,16 +4,16 @@ import "@testing-library/jest-dom";
 import React, { ChangeEvent } from "react";
 import userEvent from "@testing-library/user-event";
 import { testStore, Wrapper } from "../../test/TestWrapper";
-import NumericInput from "./NumericInput";
+import ToggleButton from "./ToggleButton";
 
-describe("Test Numeric Input", () => {
+describe("Test Toggle Input", () => {
     it("snapshot test", () => {
         const { container } = render(
             Wrapper({
                 children: (
-                    <NumericInput
-                        label="Trajectory thickness"
-                        value={15}
+                    <ToggleButton
+                        label="Log curves"
+                        checked={false}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             e;
                         }}
