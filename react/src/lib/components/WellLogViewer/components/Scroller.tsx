@@ -4,8 +4,8 @@ interface Props {
     zoomX: number;
     zoomY?: number;
 
-    x: number;
-    y: number;
+    x: number; // fraction
+    y: number; // fraction
     onScroll: (x: number, y: number) => void;
 }
 

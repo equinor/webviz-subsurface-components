@@ -279,7 +279,7 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
             this.props.wellLogView.setZoomTrack();
             this.props.wellLogView.setScrollTrack();
 
-            this.props.wellLogView.addTrackContextMenus(trackNew); //ZZZZ~!!!!
+            //this.props.wellLogView.addTrackContextMenus(trackNew); //ZZZZ~!!!!
         }
     }
     removeTrack() {
@@ -952,6 +952,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         }
         if (this.container) {
             // create new LogViewer
+            let that = this;
             this.logController = new LogViewer({
                 showLegend: true,
                 horizontal: this.props.horizontal,
@@ -960,7 +961,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                     console.log("onResize", event);
                 },
                 onTrackEnter: function (elm: HTMLElement, track: Track): void {
-                    elm;
+                    that.addTrackContextMenus(elm, track);
                     console.log("onTrackEnter", track);
                 },
                 onTrackUpdate: function (elm: HTMLElement, track: Track): void {
@@ -1006,7 +1007,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.props.welllog,
                 this.props.template
             );
-            this.addTrackContextMenus();
         }
         this.setScrollTrack();
         this.setZoomTrack();
@@ -1107,36 +1107,33 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.setZoom) this.props.setZoom(k);
     }
 
-    _addTrackContextMenu(
+    _addTrackContextMenu(elm: HTMLElement,
         className: string,
         func: (ev: TrackEvent) => void,
-        trackNew?: Track
+        track: Track
     ): void {
         if (!this.logController || !this.logController.container) return;
-        const elements = this.logController.container
-            .node()
-            .getElementsByClassName(className);
-        let iTrack = 0;
+        const elements = elm.getElementsByClassName(className);
         for (const element of elements) {
-            const track = this.logController.tracks[iTrack];
-            if (!trackNew || trackNew === track)
-                addTrackContextMenu(element, track, func);
-            iTrack++;
+            addTrackContextMenu(element as HTMLElement, track, func);
         }
     }
 
-    addTrackContextMenus(track?: Track): void {
+    addTrackContextMenus(elm: HTMLElement, track: Track): void {
         this._addTrackContextMenu(
+            elm, 
             "track-title",
             this.onTrackTitleContextMenu.bind(this),
             track
         );
         this._addTrackContextMenu(
+            elm, 
             "track-legend",
             this.onTrackLegendContextMenu.bind(this),
             track
         );
         this._addTrackContextMenu(
+            elm, 
             "track-container",
             this.onTrackContainerContextMenu.bind(this),
             track
