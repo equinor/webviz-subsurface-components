@@ -5,7 +5,7 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import userEvent from "@testing-library/user-event";
-import { testStore, Wrapper } from "../../test/TestWrapper";
+import { testStore, Wrapper, EmptyWrapper } from "../../test/TestWrapper";
 import LayersButton from "./LayersButton";
 
 describe("test 'layers' button", () => {
@@ -14,16 +14,15 @@ describe("test 'layers' button", () => {
         const { container } = render(Wrapper({ children: <LayersButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
-    xit("click to dispatch redux action", async () => {
+    it("click to dispatch redux action", async () => {
         Icon.add({ layers });
         render(Wrapper({ children: <LayersButton /> }));
         userEvent.click(screen.getByRole("button"));
         expect(screen.getByRole("menu")).toBeInTheDocument();
-        userEvent.click(
-            screen.getByRole("checkbox", {
-                name: /property map/i,
-            })
-        );
+        const property_map_checkbox = screen.getAllByRole("checkbox", {
+            name: "",
+        })[0];
+        userEvent.click(property_map_checkbox);
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["colormap-layer", false],
@@ -45,5 +44,11 @@ describe("test 'layers' button", () => {
         expect(layers_menu).toBeInTheDocument();
         userEvent.click(screen.getByRole("button"));
         await waitFor(() => expect(layers_menu).not.toBeVisible());
+    });
+    it("test empty MapState/specbase", () => {
+        const { container } = render(
+            EmptyWrapper({ children: <LayersButton /> })
+        );
+        expect(container.firstChild).toMatchSnapshot();
     });
 });
