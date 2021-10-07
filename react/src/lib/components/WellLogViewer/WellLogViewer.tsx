@@ -22,20 +22,22 @@ const axisTitles: Record<string, string> = {
 
 // mnemos could be case insentitive ("Depth")
 const axisMnemos: Record<string, string[]> = {
+    // depth based logging data
     md: [
         "DEPTH",
         "DEPT",
-        "MD",
-        "TDEP" /*"Tool Depth"*/,
-        "MD_RKB" /*Rotary kelly bushing*/,
-    ], // depth based logging data,
-    tvd: [
-        "TVD",
-        "TVDSS" /*subsea*/,
-        "DVER" /*"TRUE Vertical depth"*/,
-        "TVD_MSL" /*below mean sea level*/,
+        "MD" /*Measured Depth*/,
+        "TDEP" /*"Tool DEPth"*/,
+        "MD_RKB" /*Rotary Relly Bushing*/,
     ],
-    time: ["TIME"], //  time based logging data
+    tvd: [
+        "TVD" /*True Vertical Depth*/,
+        "TVDSS" /*SubSea*/,
+        "DVER" /*"VERtical Depth"*/,
+        "TVD_MSL" /*below Mean Sea Level*/,
+    ],
+    //  time based logging data
+    time: ["TIME"],
 };
 
 interface Props {
@@ -123,7 +125,7 @@ class WellLogViewer extends Component<Props, State> {
         this._enableScroll();
     }
     // callback function
-    setScrollPos(pos: number): void {
+    setScrollTrackPos(pos: number): void {
         console.log(pos);
         this._enableScroll();
     }
@@ -203,7 +205,7 @@ class WellLogViewer extends Component<Props, State> {
                         maxTrackNum={5}
                         setInfo={this.setInfo.bind(this)}
                         setController={this.setController.bind(this)}
-                        setScrollPos={this.setScrollPos.bind(this)}
+                        setScrollTrackPos={this.setScrollTrackPos.bind(this)}
                         setZoom={this.setZoom.bind(this)}
                     />{" "}
                 </div>
@@ -244,6 +246,7 @@ class WellLogViewer extends Component<Props, State> {
                             />
                         </span>
                     </div>
+                    {/*
                     <br />
                     <div style={{ paddingLeft: "10px" }}>
                         Track scrolling:{" "}
@@ -264,6 +267,7 @@ class WellLogViewer extends Component<Props, State> {
                             {this.props.horizontal ? "\u25BC" : "\u25BA"}
                         </button>
                     </div>
+                    */}
                 </div>
             </div>
         );
