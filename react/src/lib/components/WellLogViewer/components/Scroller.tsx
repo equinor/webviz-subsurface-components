@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from "react";
 
 interface Props {
-    zoomX: number;
+    zoomX?: number;
     zoomY?: number;
 
     x: number; // fraction
@@ -60,11 +60,13 @@ class Scroller extends Component<Props> {
     }
 
     onScroll(): void {
+        // callback from HTML element
         const el = this.scroller.current as HTMLElement;
         const scrollTop = el.scrollTop;
         const scrollHeight = el.scrollHeight - el.clientHeight;
         const scrollLeft = el.scrollLeft;
         const scrollWidth = el.scrollWidth - el.clientWidth;
+        /*
         console.log(
             "scrollTop=" +
                 scrollTop +
@@ -75,11 +77,13 @@ class Scroller extends Component<Props> {
                 " scrollWidth=" +
                 scrollWidth
         );
-        const x = scrollHeight ? scrollTop / scrollHeight : 0;
-        const y = scrollWidth ? scrollLeft / scrollWidth : 0;
-        console.log("scroller x=" + x + " y=" + y);
+        */
+        // compute fractions
+        const x = scrollWidth ? scrollLeft / scrollWidth : 0;
+        const y = scrollHeight ? scrollTop / scrollHeight : 0;
+        console.log("from scrollbars x=" + x + " y=" + y);
 
-        this.props.onScroll(x, y);
+        this.props.onScroll(x, y); // notify parent
         /*
         scrollTo(this.logController, this.props.horizontal ? f2 : f1)
         const posMax = this._scrollPosMax();
@@ -91,6 +95,12 @@ class Scroller extends Component<Props> {
     }
 
     scrollTo(x: number, y: number): void {
+        console.log("scrollTo(" + x + "," + y + ")");
+        if (x < 0.0) x = 0.0;
+        if (x > 1.0) x = 1.0;
+        if (y < 0.0) y = 0.0;
+        if (y > 1.0) y = 1.0;
+
         const { vertical, horizontal } = getScrollbarSizes();
         const el = this.scroller.current as HTMLElement;
         const width = el.getBoundingClientRect().width;
@@ -99,40 +109,63 @@ class Scroller extends Component<Props> {
         const el2 = this.scrollable.current as HTMLElement;
         const width2 = el2.getBoundingClientRect().width + vertical;
         const height2 = el2.getBoundingClientRect().height + horizontal;
-        el2.style.left = -x * (width2 - width) + "px";
-        el2.style.top = -y * (height2 - height) + "px";
+
+        //console.log("el.scroll=", el.scrollLeft, el.scrollTop);
+        let left = x * (width2 - width);
+        let top = y * (height2 - height);
+        left = Math.round(left);
+        top = Math.round(top);
+
+        if (el.scrollLeft !== left || el.scrollTop !== top) {
+            //console.log(left, top);
+            el.scrollLeft = left;
+            el.scrollTop = top;
+        }
     }
 
     render(): ReactNode {
         const { vertical, horizontal } = getScrollbarSizes();
-        const width = 1165;
-        const height = 390;
+        const Width = 1165;
+        const Height = 390;
+
+        const width = Width - vertical;
+        const height = Height - horizontal;
+
         const wZ = this.props.zoomX ? this.props.zoomX : 1;
         const hZ = this.props.zoomY ? this.props.zoomY : 1;
 
+        const width2 = width * wZ;
+        const height2 = height * hZ;
+
+        //const left = this.props.x * (width2 - width);
+        //const top = this.props.y * (height2 - height);
+        //console.log("render scrollTo(" + left + "," + top + ")", wZ, hZ);
+        //console.log("Scroller render zoom=", wZ, hZ);
         return (
             <div style={{ width: "100%", height: "100%" }}>
                 <div
                     style={{
                         overflow: "scroll",
-                        width: width + "px",
-                        height: height + "px",
+                        width: Width + "px",
+                        height: Height + "px",
                     }}
                     ref={this.scroller}
                     onScroll={this.onScroll}
                 >
                     <div
                         style={{
-                            width: (width - vertical) * wZ,
-                            height: (height - horizontal) * hZ + "px",
+                            /*left: -left + "px",
+                            top: -top + "px",*/
+                            width: width2 + "px",
+                            height: height2 + "px",
                         }}
                         ref={this.scrollable}
                     >
                         <div
                             style={{
                                 position: "absolute",
-                                width: width - vertical + "px",
-                                height: height - horizontal + "px",
+                                width: width + "px",
+                                height: height + "px",
                             }}
                         >
                             {this.props.children}

@@ -44,16 +44,19 @@ export function setZoom(logViewer: LogViewer, zoom: number): void {
     }
 }
 
-export function scrollTo(logViewer: LogViewer, f: number): void {
+export function scrollContentTo(
+    logViewer: LogViewer,
+    f: /*fraction*/ number
+): void {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
-    console.log("b1=" + b1 + " b2=" + b2);
-    console.log("d1=" + d1 + " d2=" + d2);
+    //console.log("b1=" + b1 + " b2=" + b2);
+    //console.log("d1=" + d1 + " d2=" + d2);
     const d = d2 - d1;
     const m = b2 - b1 - d;
 
     const c = b1 + f * m;
-    console.log("c=" + c + " c+d=" + (c + d));
+    //console.log("c=" + c + " c+d=" + (c + d));
     if (c !== d1) logViewer.zoomTo([c, c + d]);
 }
 
