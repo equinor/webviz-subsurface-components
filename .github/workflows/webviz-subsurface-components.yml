@@ -10,7 +10,7 @@ on:
       - published
   schedule:
     # Run CI daily and check that tests are working with latest dependencies
-    - cron:  '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   webviz-subsurface-components:
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.9']
+        python-version: ["3.6", "3.7", "3.8", "3.9"]
 
     steps:
       - name: 📖 Checkout commit locally
@@ -80,10 +80,21 @@ jobs:
           bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
 
       - name: 🤖 Run tests
-        if: github.event_name != 'release'  # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
+        if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
         run: |
           npm run test --prefix ./react
           pytest ./tests --headless
+        id: unit-tests-results
+      - name: Get annotation status
+        run: echo "The annotation status is ${{ steps.unit-tests-results.outputs.annotation_status }}"
+        if ${{ steps.unit-tests-results.outputs.annotation_status }} == "annotation_present"
+        - name: Create comment
+          uses: peter-evans/create-or-update-comment@v1
+          with:
+            issue-number: ${{ github.event.number }}
+            body: |
+              There are some performance issues.Please see the workflow annotations
+              - With GitHub **Markdown** :warning:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

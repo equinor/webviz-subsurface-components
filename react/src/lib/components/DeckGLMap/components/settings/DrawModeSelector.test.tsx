@@ -20,6 +20,7 @@ describe("Test draw-mode menu", () => {
             core.warning(
                 "DrawModeSelector Component in '/components/DeckGLMap/components/settings/' seems to have performance issues"
             );
+            core.setOutput("annotation_status", "annotation_present");
         }
     });
     it("select option to dispatch redux action", async () => {
