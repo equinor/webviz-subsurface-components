@@ -3,7 +3,7 @@ interface ItemColor {
 }
 
 export default function legendUtil(itemColor: ItemColor[]) {
-    let legendValues = [{ color: "black" }];
+    let legendValues: ItemColor[] = [];
     const cellWidth = 30;
     const cellHeight = 25;
     const cellPadding = 4;

@@ -1,6 +1,6 @@
 import React from "react";
 import legendUtil from "../utils/legend";
-import { schemeCategory10, scaleOrdinal, select } from "d3";
+import { scaleOrdinal, select } from "d3";
 
 interface ItemColor {
     color: string;
@@ -14,10 +14,10 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     discreteData,
 }: colorLegendProps) => {
     React.useEffect(() => {
-        legendDemo("#legend");
+        discreteLegend("#legend");
     }, [discreteData]);
 
-    function legendDemo(legend: string) {
+    function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
 
@@ -33,16 +33,14 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         function RGBAToHexA(rgba: number[]) {
             let r = rgba[0].toString(16),
                 g = rgba[1].toString(16),
-                b = rgba[2].toString(16),
-                a = Math.round(rgba[3] * 255).toString(16);
+                b = rgba[2].toString(16);
             if (r.length == 1) r = "0" + r;
             if (g.length == 1) g = "0" + g;
             if (b.length == 1) b = "0" + b;
-            if (a.length == 1) a = "0" + a;
             return "#" + r + g + b;
         }
-        const ordinalValues = scaleOrdinal(schemeCategory10).domain(itemName);
-        const discreteLegend = legendUtil(itemColor).inputScale(ordinalValues);
+        const ordinalValues = scaleOrdinal().domain(itemName);
+        const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
         select(legend)
             .append("svg")
             .attr("height", 600 + "px")
@@ -51,7 +49,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
             .style("right", "40px")
             .style("top", "0px")
             .attr("transform", "translate(0,30)")
-            .call(discreteLegend);
+            .call(colorLegend);
     }
 
     return <div id="legend"></div>;
