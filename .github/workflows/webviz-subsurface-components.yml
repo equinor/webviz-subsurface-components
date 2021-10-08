@@ -88,13 +88,13 @@ jobs:
       - name: Get annotation status
         run: echo "The annotation status is ${{ steps.unit-tests-results.outputs.annotation_status }}"
         if ${{ steps.unit-tests-results.outputs.annotation_status }} == "annotation_present"
-        - name: Create comment
-          uses: peter-evans/create-or-update-comment@v1
-          with:
-            issue-number: ${{ github.event.number }}
-            body: |
-              There are some performance issues.Please see the workflow annotations
-              - With GitHub **Markdown** :warning:
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.number }}
+          body: |
+            There are some performance issues.Please see the workflow annotations
+            - With GitHub **Markdown** :warning:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
