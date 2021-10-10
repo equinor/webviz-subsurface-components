@@ -166,17 +166,18 @@ const Map: React.FC<MapProps> = ({
     const [discreteData, setDiscreteData] = React.useState(Object);
     const [dataPresent, setDataPresent] = React.useState(false);
 
-    React.useEffect(() => {
+    //eslint-disable-next-line
+    const layers = (deckglSpec["layers"] as any);
+    const wellsLayerData = layers.filter(
         //eslint-disable-next-line
-            const layers = (deckglSpec["layers"] as any);
-        const wellsLayerData = layers.filter(
-            //eslint-disable-next-line
-                (item: any) =>
-                    item.id.toLowerCase() == "wells-layer".toLowerCase()
-        );
-        const logData = wellsLayerData[0].logData;
-        const logName = wellsLayerData[0].logName;
+            (item: any) =>
+                item.id.toLowerCase() == "wells-layer".toLowerCase()
+    );
+    const logData = wellsLayerData[0].logData;
+    const logName = wellsLayerData[0].logName;
 
+    React.useEffect(() => {
+        let isMounted = true;
         fetch(logData)
             .then((response) => response.json())
             .then((data) => {
@@ -188,16 +189,17 @@ const Map: React.FC<MapProps> = ({
                 if (log_info?.description == "discrete") {
                     const metadata_discrete =
                         data[0]["metadata_discrete"][logName].objects;
-                    setDiscreteData(metadata_discrete);
-                    setDataPresent(true);
+                    if (isMounted) {
+                        setDiscreteData(metadata_discrete);
+                        setDataPresent(true);
+                    }
                 }
             });
         // fix for memory leak error
         return () => {
-            setDiscreteData({});
-            setDataPresent(false);
+            isMounted = false;
         };
-    }, [deckglSpec["layers"]]);
+    }, [logData, logName]);
 
     const refCb = React.useCallback(
         (deckRef) => {
