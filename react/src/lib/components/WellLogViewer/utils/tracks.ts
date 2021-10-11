@@ -5,9 +5,7 @@ import {
     GraphTrack,
 } from "@equinor/videx-wellog";
 
-//import { Plot } from "@equinor/videx-wellog";
 
-//import { PlotOptions } from "@equinor/videx-wellog/plots/interfaces"
 import { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 import { GraphTrackOptions } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
