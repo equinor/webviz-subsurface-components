@@ -16,7 +16,6 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     React.useEffect(() => {
         discreteLegend("#legend");
     }, [discreteData]);
-
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];

@@ -122,6 +122,7 @@ const Map: React.FC<MapProps> = ({
     coords,
     scale,
     coordinateUnit,
+    legendVisible,
     children,
 }: MapProps) => {
     const [deckglSpecWithDefaultProps, setDeckglSpecWithDefaultProps] =
@@ -164,7 +165,7 @@ const Map: React.FC<MapProps> = ({
 
     //eslint-disable-next-line
     const [discreteData, setDiscreteData] = React.useState(Object);
-    const [dataPresent, setDataPresent] = React.useState(false);
+    const [discreteDataPresent, setDiscreteDataPresent] = React.useState(false);
 
     //eslint-disable-next-line
     const layers = (deckglSpec["layers"] as any);
@@ -191,7 +192,7 @@ const Map: React.FC<MapProps> = ({
                         data[0]["metadata_discrete"][logName].objects;
                     if (isMounted) {
                         setDiscreteData(metadata_discrete);
-                        setDataPresent(true);
+                        setDiscreteDataPresent(true);
                     }
                 }
             });
@@ -285,7 +286,7 @@ const Map: React.FC<MapProps> = ({
                         scaleUnit={coordinateUnit}
                     />
                 ) : null}
-                {dataPresent ? (
+                {legendVisible && discreteDataPresent ? (
                     <DiscreteColorLegend discreteData={discreteData} />
                 ) : null}
             </ReduxProvider>
