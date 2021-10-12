@@ -56,6 +56,7 @@ const SELECTED_LINE_COLOR: RGBAColor = [0x0, 0x0, 0x0, 0xff];
 
 const defaultProps = {
     name: "Drawing",
+    id: "drawing-layer",
     pickable: true,
     mode: "drawLineString",
 

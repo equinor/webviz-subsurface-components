@@ -158,10 +158,6 @@ if __name__ == "__main__":
         "master/react/src/demo/example-data/volve_logs.json"
     )
 
-    bounds = [432205, 6475078, 437720, 6481113]  # left, bottom, right, top
-    WIDTH = bounds[2] - bounds[0]  # right - left
-    HEIGHT = bounds[3] - bounds[1]  # top - bottom
-
     map_obj = wsc.DeckGLMap(
         id="deckgl-map",
         resources={
@@ -170,33 +166,25 @@ if __name__ == "__main__":
         coords={"visible": True, "multiPicking": True, "pickDepth": 10},
         scale={"visible": True},
         coordinateUnit="m",
-        bounds=bounds,
+        bounds=[432205, 6475078, 437720, 6481113],  # left, bottom, right, top
         deckglSpecBase={
             "layers": [
                 {
                     "@@type": "ColormapLayer",
-                    "id": "colormap-layer",
-                    "bounds": bounds,
                     "image": "@@#resources.propertyMap",
                     "colormap": COLOR_MAP,
                     "valueRange": [min_value, max_value],
-                    "pickable": True,
                 },
                 {
                     "@@type": "Hillshading2DLayer",
-                    "id": "hillshading-layer",
-                    "bounds": bounds,
                     "valueRange": [min_value, max_value],
                     "image": "@@#resources.propertyMap",
                 },
                 {
                     "@@type": "DrawingLayer",
-                    "id": "drawing-layer",
-                    "data": {"type": "FeatureCollection", "features": []},
                 },
                 {
                     "@@type": "WellsLayer",
-                    "id": "wells-layer",
                     "data": WELLS,
                     "logData": LOGS,
                     "logrunName": "BLOCKING",

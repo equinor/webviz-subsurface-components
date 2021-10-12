@@ -32,6 +32,7 @@ export type PieChartLayerProps<D> = ExtendedLayerProps<D>;
 
 const defaultProps = {
     name: "Pie chart",
+    id: "pie-layer",
     pickable: true,
 };
 export default class PieChartLayer extends CompositeLayer<

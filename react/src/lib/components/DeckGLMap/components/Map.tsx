@@ -116,12 +116,19 @@ const Map: React.FC<MapProps> = ({
         setInitialViewState(getInitialViewState(bounds, zoom));
     }, [bounds, zoom]);
 
-    // state to update deckglSpec to include layer's defualt props
+    // state to update layers to include defualt props
     const [deckglSpecWithDefaultProps, setDeckglSpecWithDefaultProps] =
         React.useState(getSpecWithDefaultProps(deckglSpec));
     React.useEffect(() => {
         setDeckglSpecWithDefaultProps(getSpecWithDefaultProps(deckglSpec));
     }, [deckglSpec]);
+
+    // Add bounds props to Colormap and HillShading2D layers
+    React.useEffect(() => {
+        setDeckglSpecWithDefaultProps(
+            setBoundsOnCMAndHSLayers(deckglSpecWithDefaultProps, bounds)
+        );
+    }, [bounds]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
@@ -159,8 +166,9 @@ const Map: React.FC<MapProps> = ({
     const [discreteData, setDiscreteData] = React.useState(Object);
     const [discreteDataPresent, setDiscreteDataPresent] = React.useState(false);
 
+    console.log(deckglSpecWithDefaultProps);
     //eslint-disable-next-line
-    const layers = (deckglSpec["layers"] as any);
+    const layers = (deckglSpecWithDefaultProps["layers"] as any);
     const wellsLayerData = layers.filter(
         //eslint-disable-next-line
             (item: any) =>
@@ -359,6 +367,25 @@ function getSpecWithDefaultProps(
         }
     });
 
+    modified_spec["layers"] = layers;
+    return modified_spec;
+}
+
+function setBoundsOnCMAndHSLayers(
+    spec: Record<string, unknown>,
+    bounds: [number, number, number, number]
+): Record<string, unknown> {
+    const modified_spec = Object.assign({}, spec);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const layers = [...(modified_spec["layers"] as any[])];
+    layers?.forEach((layer) => {
+        if (
+            layer["@@type"] === ColormapLayer.name ||
+            layer["@@type"] === Hillshading2DLayer.name
+        ) {
+            layer["bounds"] = bounds;
+        }
+    });
     modified_spec["layers"] = layers;
     return modified_spec;
 }

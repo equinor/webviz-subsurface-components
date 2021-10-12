@@ -38,6 +38,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
 
 const defaultProps = {
     name: "Wells",
+    id: "wells-layer",
     autoHighlight: true,
     selectionEnabled: true,
     opacity: 1,
