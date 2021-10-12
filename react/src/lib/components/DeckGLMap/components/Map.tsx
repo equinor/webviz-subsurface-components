@@ -10,9 +10,10 @@ import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { setSpec } from "../redux/actions";
 import { createStore } from "../redux/store";
-import { WellsPickInfo } from "../layers/wells/wellsLayer";
+import { WellsPickInfo, getLogInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
+import DiscreteColorLegend from "../components/DiscreteLegend";
 import {
     ColormapLayer,
     Hillshading2DLayer,
@@ -108,6 +109,8 @@ export interface MapProps {
 
     coordinateUnit: string;
 
+    legendVisible: boolean;
+
     children?: React.ReactNode;
 }
 
@@ -119,6 +122,7 @@ const Map: React.FC<MapProps> = ({
     coords,
     scale,
     coordinateUnit,
+    legendVisible,
     children,
 }: MapProps) => {
     const [deckglSpecWithDefaultProps, setDeckglSpecWithDefaultProps] =
@@ -158,6 +162,45 @@ const Map: React.FC<MapProps> = ({
         const jsonConverter = new JSONConverter({ configuration });
         setSpecObj(jsonConverter.convert(deckglSpecWithDefaultProps));
     }, [deckglSpecWithDefaultProps, resources]);
+
+    //eslint-disable-next-line
+    const [discreteData, setDiscreteData] = React.useState(Object);
+    const [discreteDataPresent, setDiscreteDataPresent] = React.useState(false);
+
+    //eslint-disable-next-line
+    const layers = (deckglSpec["layers"] as any);
+    const wellsLayerData = layers.filter(
+        //eslint-disable-next-line
+            (item: any) =>
+                item.id.toLowerCase() == "wells-layer".toLowerCase()
+    );
+    const logData = wellsLayerData[0].logData;
+    const logName = wellsLayerData[0].logName;
+
+    React.useEffect(() => {
+        let isMounted = true;
+        fetch(logData)
+            .then((response) => response.json())
+            .then((data) => {
+                const log_info = getLogInfo(
+                    data[0],
+                    data[0].header.name,
+                    logName
+                );
+                if (log_info?.description == "discrete") {
+                    const metadata_discrete =
+                        data[0]["metadata_discrete"][logName].objects;
+                    if (isMounted) {
+                        setDiscreteData(metadata_discrete);
+                        setDiscreteDataPresent(true);
+                    }
+                }
+            });
+        // fix for memory leak error
+        return () => {
+            isMounted = false;
+        };
+    }, [logData, logName]);
 
     const refCb = React.useCallback(
         (deckRef) => {
@@ -242,6 +285,9 @@ const Map: React.FC<MapProps> = ({
                         position={scale.position}
                         scaleUnit={coordinateUnit}
                     />
+                ) : null}
+                {legendVisible && discreteDataPresent ? (
+                    <DiscreteColorLegend discreteData={discreteData} />
                 ) : null}
             </ReduxProvider>
         )
