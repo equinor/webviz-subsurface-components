@@ -5,10 +5,11 @@ import {
     GraphTrack,
 } from "@equinor/videx-wellog";
 
-//import { Plot } from "@equinor/videx-wellog";
+import { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
-//import { PlotOptions } from "../../../../../node_modules/@equinor/videx-wellog/plots/interfaces"
-import { AreaPlotOptions } from "../../../../../node_modules/@equinor/videx-wellog/dist/plots/interfaces";
+import { GraphTrackOptions } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
+
+import WellLogView from "../components/WellLogView";
 
 export interface ExtPlotOptions extends AreaPlotOptions {
     legendInfo: () => {
@@ -17,7 +18,7 @@ export interface ExtPlotOptions extends AreaPlotOptions {
     };
 }
 
-import { PlotConfig } from "../../../../../node_modules/@equinor/videx-wellog/dist/tracks/graph/interfaces";
+import { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 
 //import { GraphTrackOptions } from "@equinor/videx-wellog";
 
@@ -29,7 +30,11 @@ import {
     TemplatePlot,
     TemplateStyle,
 } from "../components/WellLogTemplateTypes";
-import { WellLog, WellLogDataRow } from "../components/WellLogTypes";
+import {
+    WellLog,
+    WellLogCurve,
+    WellLogDataRow,
+} from "../components/WellLogTypes";
 
 import { checkMinMaxValue, checkMinMax, roundMinMax } from "./minmax";
 
@@ -59,7 +64,7 @@ function indexOfElementByNames(array: Named[], names: string[]): number {
     return -1;
 }
 
-const colors = [
+const __colors = [
     "red",
     "blue",
     "orange",
@@ -69,6 +74,11 @@ const colors = [
     "gray",
     "brown",
 ];
+let __iPlotColor = 0;
+function generateColor(): string {
+    return __colors[__iPlotColor++ % __colors.length];
+}
+
 /*
  * `LinePlot` - linear line graph
  * `LineStepPlot` - linear stepladder graph
@@ -196,18 +206,19 @@ function isValidPlotType(plotType: string) {
     return ["line", "linestep", "dot", "area"].indexOf(plotType) >= 0;
 }
 
-function fillPlotOptions(
+function getTemplatePlotProps(
     templatePlot: TemplatePlot,
-    templateStyles: TemplateStyle[],
-    iPlot: number
+    templateStyles: TemplateStyle[]
 ): TemplatePlotProps {
-    const iStyle = indexOfElementByName(templateStyles, templatePlot.style);
+    const iStyle = templatePlot.style
+        ? indexOfElementByName(templateStyles, templatePlot.style)
+        : -1;
     const options =
         iStyle >= 0
             ? { ...templateStyles[iStyle], ...templatePlot }
             : { ...templatePlot };
     if (!isValidPlotType(options.type)) options.type = defPlotType;
-    if (!options.color) options.color = colors[iPlot % colors.length];
+    if (!options.color) options.color = generateColor();
     return options;
 }
 
@@ -227,14 +238,153 @@ function makeDataAccessor(iPlot: number) {
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
 }
 
+function getPlotOptions(
+    curve: WellLogCurve,
+    templateOptions: TemplatePlotProps,
+    domain: [number, number],
+    iPlot: number
+): ExtPlotOptions {
+    return {
+        scale: "linear", // or "log"
+        domain: domain,
+        color: templateOptions.color,
+        // for 'area'!  fill: 'red',
+        // for 'area'! inverseColor: "red",
+        fillOpacity: 0.3, // for 'area'!
+        useMinAsBase: true, // for 'area'!
+        dataAccessor: makeDataAccessor(iPlot),
+        legendInfo: () => ({
+            label: curve.name,
+            unit: curve.unit ? curve.unit : "",
+        }),
+    };
+}
+
+function getPlotConfig(
+    id: string | number,
+    curve: WellLogCurve,
+    templateOptions: TemplatePlotProps,
+    domain: [number, number],
+    iPlot: number
+): PlotConfig {
+    return {
+        id: id,
+        type: templateOptions.type,
+        options: getPlotOptions(curve, templateOptions, domain, iPlot),
+    };
+}
+
+export function addTrackPlot(
+    wellLogView: WellLogView,
+    track: GraphTrack,
+    name: string,
+    type: string
+): void {
+    const axes = wellLogView.getAxesInfo();
+    const plotFactory = (track.options as GraphTrackOptions).plotFactory;
+    if (plotFactory) {
+        const welllog = wellLogView.props.welllog;
+        if (welllog && welllog[0]) {
+            const data = welllog[0].data;
+            const curves = welllog[0].curves;
+
+            const iPrimaryAxis = indexOfElementByNames(
+                curves,
+                axes.mnemos[axes.primaryAxis]
+            );
+
+            const iCurve = indexOfElementByName(curves, name);
+
+            const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+            const curve = curves[iCurve];
+
+            const templatePlot: TemplatePlot = {
+                name: name,
+                style: "",
+                color: "",
+                type: type,
+            };
+            const plotDatas = track.options.data;
+            const plots = (track as GraphTrack).plots;
+
+            const templateOptions = getTemplatePlotProps(
+                templatePlot,
+                /*templateStyles*/ []
+            );
+            const p = getPlotConfig(
+                iCurve,
+                curve,
+                templateOptions,
+                roundMinMax(plotData.minmax),
+                plotDatas.length
+            );
+
+            //checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
+            plotDatas.push(plotData.data);
+
+            // GraphTrack
+            const createPlot = plotFactory[p.type];
+            if (!createPlot)
+                throw Error(
+                    `No factory function for creating '${p.type}'-plot!`
+                );
+            const plot = createPlot(p, (track as GraphTrack).trackScale);
+            if (plot) {
+                //if (Array.isArray(plots))
+                plots.push(plot);
+
+                (track as GraphTrack).prepareData(); //
+
+                if (wellLogView.logController) {
+                    wellLogView.logController.updateTracks();
+                }
+                //(track as GraphTrack).plot();
+            }
+        }
+    }
+}
+
+export function removeTrackPlot(
+    wellLogView: WellLogView,
+    track: GraphTrack,
+    name: string
+): void {
+    {
+        const welllog = wellLogView.props.welllog;
+        if (welllog && welllog[0]) {
+            const curves = welllog[0].curves;
+            const iCurve = indexOfElementByName(curves, name);
+
+            //let plotDatas = track.options.data
+            const plots = (track as GraphTrack).plots;
+
+            let index = 0;
+            for (const plot of plots) {
+                if ((plot.id as number) === iCurve) {
+                    //plotDatas.splice(index, 1)
+                    plots.splice(index, 1);
+                    break;
+                }
+                index++;
+            }
+
+            (track as GraphTrack).prepareData(); //
+
+            if (wellLogView.logController) {
+                wellLogView.logController.updateTracks();
+            }
+            //(track as GraphTrack).plot();
+        }
+    }
+}
+
 function newDualScaleTrack(
-    id: number,
     mode: number,
     title: string,
     abbr: string,
     units: string
 ): DualScaleTrack {
-    return new DualScaleTrack(id, {
+    return new DualScaleTrack(undefined as unknown as number, {
         mode: mode,
         maxWidth: 50,
         width: 2,
@@ -245,19 +395,27 @@ function newDualScaleTrack(
     });
 }
 
-function newScaleTrack(
-    id: number,
-    title: string,
-    abbr: string,
-    units: string
-): ScaleTrack {
-    return new ScaleTrack(id, {
+function newScaleTrack(title: string, abbr: string, units: string): ScaleTrack {
+    return new ScaleTrack(undefined as unknown as number, {
         maxWidth: 50,
         width: 2,
         label: title,
         abbr: abbr ? abbr : title,
         units: units ? units : "",
         legendConfig: scaleLegendConfig,
+    });
+}
+
+export function newGraphTrack(
+    title: string,
+    data: [number, number][][],
+    plots: PlotConfig[]
+): GraphTrack {
+    return new GraphTrack(undefined as unknown as number, {
+        label: title,
+        legendConfig: graphLegendConfig,
+        data: data,
+        plots: plots,
     });
 }
 
@@ -281,12 +439,12 @@ export interface AxesInfo {
     mnemos: Record<string, string[]>;
 }
 
-export default (
+export function createTracks(
     welllog: WellLog,
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
     templateStyles: TemplateStyle[] // Part of JSON
-): TracksInfo => {
+): TracksInfo {
     const info = new TracksInfo();
 
     if (welllog && welllog[0]) {
@@ -308,7 +466,7 @@ export default (
             if (iSecondaryAxis >= 0) {
                 info.tracks.push(
                     newDualScaleTrack(
-                        info.tracks.length,
+                        //info.tracks.length,
                         0,
                         titlePrimaryAxis,
                         curvePrimaryAxis.name,
@@ -320,7 +478,7 @@ export default (
                 const curveSecondaryAxis = curves[iSecondaryAxis];
                 info.tracks.push(
                     newDualScaleTrack(
-                        info.tracks.length,
+                        //info.tracks.length,
                         1,
                         titleSecondaryAxis,
                         curveSecondaryAxis.name,
@@ -357,7 +515,7 @@ export default (
             } else {
                 info.tracks.push(
                     newScaleTrack(
-                        info.tracks.length,
+                        //info.tracks.length,
                         titlePrimaryAxis,
                         curvePrimaryAxis.name,
                         curvePrimaryAxis.unit
@@ -365,7 +523,7 @@ export default (
                 );
             }
         }
-        let iPlot = 0;
+
         for (const templateTrack of templateTracks) {
             const plotDatas: [number, number][][] = [];
             const plots: PlotConfig[] = [];
@@ -377,48 +535,34 @@ export default (
                 if (curve.dimensions !== 1) continue;
                 if (curve.valueType === "string") continue; //??
 
-                const options = fillPlotOptions(
-                    templatePlot,
-                    templateStyles,
-                    iPlot
-                );
-
                 const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
                 checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
-                plotDatas.push(plotData.data);
-                const plotOptions: ExtPlotOptions = {
-                    scale: "linear",
-                    domain: roundMinMax(plotData.minmax),
-                    color: options.color,
-                    // for 'area'!  fill: 'red',
-                    // for 'area'! inverseColor: "red",
-                    fillOpacity: 0.3, // for 'area'!
-                    useMinAsBase: true, // for 'area'!
-                    dataAccessor: makeDataAccessor(plots.length),
-                    legendInfo: () => ({
-                        label: curve.name,
-                        unit: curve.unit ? curve.unit : "",
-                    }),
-                };
-                plots.push({
-                    id: iCurve, // set some id
-                    type: options.type,
-                    options: plotOptions,
-                });
 
-                iPlot++;
+                const templateOptions = getTemplatePlotProps(
+                    templatePlot,
+                    templateStyles
+                );
+                const p = getPlotConfig(
+                    iCurve,
+                    curve,
+                    templateOptions,
+                    roundMinMax(plotData.minmax),
+                    plotDatas.length
+                );
+
+                plotDatas.push(plotData.data);
+                plots.push(p);
             }
             if (plots.length || templateTrack.required) {
                 info.tracks.push(
-                    new GraphTrack(info.tracks.length, {
-                        label: makeTrackHeader(welllog, templateTrack),
-                        legendConfig: graphLegendConfig,
-                        data: plotDatas,
-                        plots: plots,
-                    })
+                    newGraphTrack(
+                        makeTrackHeader(welllog, templateTrack),
+                        plotDatas,
+                        plots
+                    )
                 );
             }
         }
     }
     return info;
-};
+}
