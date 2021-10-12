@@ -206,7 +206,7 @@ if __name__ == "__main__":
                     "logrunName": "BLOCKING",
                     "logName": "ZONELOG",
                 },
-            ]
+            ],
         },
     )
 

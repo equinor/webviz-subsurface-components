@@ -150,11 +150,6 @@ export interface MapProps {
         layout: [number, number];
     };
 
-    /**
-     * Number of maps views to be displayed.
-     */
-    count: number;
-
     coordinateUnit: string;
 
     legendVisible: boolean;
