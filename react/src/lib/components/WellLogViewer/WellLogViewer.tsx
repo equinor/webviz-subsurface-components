@@ -22,20 +22,22 @@ const axisTitles: Record<string, string> = {
 
 // mnemos could be case insentitive ("Depth")
 const axisMnemos: Record<string, string[]> = {
+    // depth based logging data
     md: [
         "DEPTH",
         "DEPT",
-        "MD",
-        "TDEP" /*"Tool Depth"*/,
-        "MD_RKB" /*Rotary kelly bushing*/,
-    ], // depth based logging data,
-    tvd: [
-        "TVD",
-        "TVDSS" /*subsea*/,
-        "DVER" /*"TRUE Vertical depth"*/,
-        "TVD_MSL" /*below mean sea level*/,
+        "MD" /*Measured Depth*/,
+        "TDEP" /*"Tool DEPth"*/,
+        "MD_RKB" /*Rotary Relly Bushing*/,
     ],
-    time: ["TIME"], //  time based logging data
+    tvd: [
+        "TVD" /*True Vertical Depth*/,
+        "TVDSS" /*SubSea*/,
+        "DVER" /*"VERtical Depth"*/,
+        "TVD_MSL" /*below Mean Sea Level*/,
+    ],
+    //  time based logging data
+    time: ["TIME"],
 };
 
 interface Props {
@@ -112,25 +114,28 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     // callback function
-    setInfo(infos: Info[]): void {
+    onInfo(infos: Info[]): void {
         this.setState({
             infos: infos,
         });
     }
     // callback function
-    setController(controller: WellLogController): void {
+    onCreateController(controller: WellLogController): void {
         this.controller = controller;
         this._enableScroll();
     }
     // callback function
-    setScrollPos(pos: number): void {
-        console.log(pos);
+    onScrollTrackPos(pos: number): void {
+        pos;
+        //console.log("setScrollTrackPos("+pos+")");
         this._enableScroll();
     }
     // callback function
-    setZoom(zoom: number): void {
-        console.log(zoom);
-        this.setState({ zoom: zoom });
+    onZoom(zoom: number): void {
+        //console.log("callback setZoom(" + zoom + ")", Math.abs(Math.log(this.state.zoom / zoom)));
+        if (Math.abs(Math.log(this.state.zoom / zoom)) > 0.01) {
+            this.setState({ zoom: zoom });
+        }
     }
 
     onChangePrimaryAxis(value: string): void {
@@ -140,29 +145,38 @@ class WellLogViewer extends Component<Props, State> {
         });
     }
 
+    // scroll buttons support DEBUG CODE
     onScrollBegin(): void {
-        if (this.controller) this.controller.scrollTo(0);
+        if (this.controller) this.controller.scrollTrackTo(0);
     }
 
     onScrollUp(): void {
-        if (this.controller) this.controller.scrollUp();
+        if (this.controller)
+            this.controller.scrollTrackTo(
+                this.controller.getScrollTrackPos() - 1
+            );
     }
     onScrollDown(): void {
-        if (this.controller) this.controller.scrollDown();
+        if (this.controller)
+            this.controller.scrollTrackTo(
+                this.controller.getScrollTrackPos() + 1
+            );
     }
 
     onScrollEnd(): void {
         if (this.controller)
-            this.controller.scrollTo(this.controller.getScrollMax() - 1);
+            this.controller.scrollTrackTo(
+                this.controller.getScrollTrackPosMax() - 1
+            );
     }
 
     _enableScroll(): void {
-        const pos = this.controller ? this.controller.getScrollPos() : 0;
-        const n = this.controller ? this.controller.getScrollMax() : 0;
+        const pos = this.controller ? this.controller.getScrollTrackPos() : 0;
+        const n = this.controller ? this.controller.getScrollTrackPosMax() : 0;
         const down = document.getElementById("buttonDown") as HTMLButtonElement;
         const up = document.getElementById("buttonUp") as HTMLButtonElement;
         if (down) {
-            if (pos + 1 < n) down.removeAttribute("disabled");
+            if (pos + 1 <= n) down.removeAttribute("disabled");
             else down.setAttribute("disabled", "true");
         }
         if (up) {
@@ -170,6 +184,7 @@ class WellLogViewer extends Component<Props, State> {
             else up.setAttribute("disabled", "true");
         }
     }
+    // end of scroll buttons support DEBUG CODE
 
     valueLabelFormat(value: number, index: number): string {
         index;
@@ -201,10 +216,10 @@ class WellLogViewer extends Component<Props, State> {
                         axisMnemos={axisMnemos}
                         zoom={this.state.zoom}
                         maxTrackNum={5}
-                        setInfo={this.setInfo.bind(this)}
-                        setController={this.setController.bind(this)}
-                        setScrollPos={this.setScrollPos.bind(this)}
-                        setZoom={this.setZoom.bind(this)}
+                        onInfo={this.onInfo.bind(this)}
+                        onCreateController={this.onCreateController.bind(this)}
+                        onScrollTrackPos={this.onScrollTrackPos.bind(this)}
+                        onZoom={this.onZoom.bind(this)}
                     />{" "}
                 </div>
                 <div style={{ flex: "0, 0, 280px" }}>
@@ -244,6 +259,8 @@ class WellLogViewer extends Component<Props, State> {
                             />
                         </span>
                     </div>
+
+                    {/* DEBUG code
                     <br />
                     <div style={{ paddingLeft: "10px" }}>
                         Track scrolling:{" "}
@@ -264,6 +281,7 @@ class WellLogViewer extends Component<Props, State> {
                             {this.props.horizontal ? "\u25BC" : "\u25BA"}
                         </button>
                     </div>
+                    */}
                 </div>
             </div>
         );
