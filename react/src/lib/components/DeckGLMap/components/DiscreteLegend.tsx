@@ -8,10 +8,14 @@ interface ItemColor {
 
 interface colorLegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
+    logName: string;
+    logType: string;
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     discreteData,
+    logName,
+    logType,
 }: colorLegendProps) => {
     React.useEffect(() => {
         discreteLegend("#legend");
@@ -45,13 +49,22 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
             .attr("height", 600 + "px")
             .attr("width", 150 + "px")
             .style("position", "absolute")
-            .style("right", "40px")
-            .style("top", "0px")
+            .style("right", "65px")
+            .style("top", "35px")
             .attr("transform", "translate(0,30)")
             .call(colorLegend);
     }
 
-    return <div id="legend"></div>;
+    return (
+        <div>
+            <label
+                style={{ marginRight: "65px", color: "grey", float: "right" }}
+            >
+                {logName}/{logType}
+            </label>
+            <div id="legend"></div>
+        </div>
+    );
 };
 
 export default DiscreteColorLegend;

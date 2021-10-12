@@ -10,10 +10,16 @@ import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { setSpec } from "../redux/actions";
 import { createStore } from "../redux/store";
-import { WellsPickInfo, getLogInfo } from "../layers/wells/wellsLayer";
+import {
+    WellsPickInfo,
+    getLogInfo,
+    getLogValues,
+    LogCurveDataType,
+} from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
+import ContinousLegend from "../components/ContinousLegend";
 import {
     ColormapLayer,
     Hillshading2DLayer,
@@ -166,6 +172,10 @@ const Map: React.FC<MapProps> = ({
     //eslint-disable-next-line
     const [discreteData, setDiscreteData] = React.useState(Object);
     const [discreteDataPresent, setDiscreteDataPresent] = React.useState(false);
+    const [min, setMin] = React.useState<number>(0);
+    const [max, setMax] = React.useState<number>(0);
+    const [continousDataPresent, setContinousDataPresent] =
+        React.useState(false);
 
     //eslint-disable-next-line
     const layers = (deckglSpec["layers"] as any);
@@ -174,9 +184,10 @@ const Map: React.FC<MapProps> = ({
             (item: any) =>
                 item.id.toLowerCase() == "wells-layer".toLowerCase()
     );
+
     const logData = wellsLayerData[0].logData;
     const logName = wellsLayerData[0].logName;
-
+    const logType = wellsLayerData[0]["@@type"];
     React.useEffect(() => {
         let isMounted = true;
         fetch(logData)
@@ -193,6 +204,25 @@ const Map: React.FC<MapProps> = ({
                     if (isMounted) {
                         setDiscreteData(metadata_discrete);
                         setDiscreteDataPresent(true);
+                    }
+                } else {
+                    const minArray: number[] = [];
+                    const maxArray: number[] = [];
+                    data.forEach(function (item: LogCurveDataType) {
+                        const logValues = getLogValues(
+                            item,
+                            item.header.name,
+                            logName
+                        );
+
+                        minArray.push(Math.min(...logValues));
+                        maxArray.push(Math.max(...logValues));
+                    });
+
+                    if (isMounted) {
+                        setMin(Math.min(...minArray));
+                        setMax(Math.max(...maxArray));
+                        setContinousDataPresent(true);
                     }
                 }
             });
@@ -287,7 +317,19 @@ const Map: React.FC<MapProps> = ({
                     />
                 ) : null}
                 {legendVisible && discreteDataPresent ? (
-                    <DiscreteColorLegend discreteData={discreteData} />
+                    <DiscreteColorLegend
+                        discreteData={discreteData}
+                        logName={logName}
+                        logType={logType}
+                    />
+                ) : null}
+                {legendVisible && continousDataPresent ? (
+                    <ContinousLegend
+                        min={min}
+                        max={max}
+                        logName={logName}
+                        logType={logType}
+                    />
                 ) : null}
             </ReduxProvider>
         )
