@@ -206,18 +206,6 @@ if __name__ == "__main__":
                     "logName": "ZONELOG",
                 },
             ],
-            "views": [
-                {
-                    "@@type": "OrthographicView",
-                    "id": "main",
-                    "controller": {"doubleClickZoom": False},
-                    "x": "0%",
-                    "y": "0%",
-                    "width": "100%",
-                    "height": "100%",
-                    "flipY": False,
-                }
-            ],
         },
     )
 
