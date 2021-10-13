@@ -31,7 +31,8 @@
     {
       "plots": [
         {
-          "name": "WOBA"
+          "name": "WOBA",
+          "type": "linestep"
         }
       ]
     },
@@ -45,8 +46,7 @@
     {
       "plots": [
         {
-          "name": "TEMP",
-          "type": "linestep"
+          "name": "TEMP"
         }
       ]
     },
