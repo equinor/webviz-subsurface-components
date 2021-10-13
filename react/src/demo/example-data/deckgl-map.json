@@ -20,15 +20,14 @@
     "resources": {
       "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png"
     },
+    "bounds": [
+      432205,
+      6475078,
+      437720,
+      6481113
+    ],
+    "zoom": -3,
     "deckglSpecBase": {
-      "initialViewState": {
-        "target": [
-          434962.5,
-          6478095.5,
-          0
-        ],
-        "zoom": -3
-      },
       "layers": [
         {
           "@@type": "ColormapLayer",

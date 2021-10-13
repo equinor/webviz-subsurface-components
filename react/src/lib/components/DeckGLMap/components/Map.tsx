@@ -23,61 +23,6 @@ import {
     DrawingLayer,
 } from "../layers";
 
-// update spec object to include default layer props
-function getSpecWithDefaultProps(
-    deckglSpec: Record<string, unknown>
-): Record<string, unknown> {
-    const modified_spec = Object.assign({}, deckglSpec);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const layers = [...(modified_spec["layers"] as any[])];
-    layers?.forEach((layer) => {
-        let default_props = undefined;
-        if (layer["@@type"] === ColormapLayer.name)
-            default_props = ColormapLayer.defaultProps;
-        else if (layer["@@type"] === Hillshading2DLayer.name)
-            default_props = Hillshading2DLayer.defaultProps;
-        else if (layer["@@type"] === WellsLayer.name)
-            default_props = WellsLayer.defaultProps;
-        else if (layer["@@type"] === FaultPolygonsLayer.name)
-            default_props = FaultPolygonsLayer.defaultProps;
-        else if (layer["@@type"] === PieChartLayer.name)
-            default_props = PieChartLayer.defaultProps;
-        else if (layer["@@type"] === DrawingLayer.name)
-            default_props = DrawingLayer.defaultProps;
-
-        if (default_props) {
-            Object.entries(default_props).forEach(([prop, value]) => {
-                const prop_type = typeof value;
-                if (["string", "boolean", "number"].includes(prop_type)) {
-                    if (layer[prop] === undefined) layer[prop] = value;
-                }
-            });
-        }
-    });
-
-    modified_spec["layers"] = layers;
-    return modified_spec;
-}
-
-// construct views object for DeckGL component
-function getViewsForDeckGL() {
-    const deckgl_views = [
-        {
-            "@@type": "OrthographicView",
-            id: "main",
-            controller: {
-                doubleClickZoom: false,
-            },
-            x: "0%",
-            y: "0%",
-            width: "100%",
-            height: "100%",
-            flipY: false,
-        },
-    ];
-    return deckgl_views;
-}
-
 export interface MapProps {
     /**
      * The ID of this component, used to identify dash components
@@ -106,6 +51,16 @@ export interface MapProps {
      * For reacting to prop changes
      */
     setSpecPatch: (patch: Operation[]) => void;
+
+    /**
+     * Coordinate boundary for the view defined as [left, bottom, right, top].
+     */
+    bounds: [number, number, number, number];
+
+    /**
+     * Zoom level for the view.
+     */
+    zoom: number;
 
     /**
      * Parameters for the InfoCard component
@@ -138,6 +93,8 @@ const Map: React.FC<MapProps> = ({
     resources,
     deckglSpec,
     setSpecPatch,
+    bounds,
+    zoom,
     coords,
     scale,
     coordinateUnit,
@@ -152,6 +109,12 @@ const Map: React.FC<MapProps> = ({
         const jsonConverter = new JSONConverter({ configuration });
         setDeckGLViews(jsonConverter.convert(deckgl_views));
     }, []);
+
+    const [initialViewState, setInitialViewState] =
+        React.useState<Record<string, unknown>>();
+    React.useEffect(() => {
+        setInitialViewState(getInitialViewState(bounds, zoom));
+    }, [bounds, zoom]);
 
     // state to update deckglSpec to include layer's defualt props
     const [deckglSpecWithDefaultProps, setDeckglSpecWithDefaultProps] =
@@ -283,6 +246,7 @@ const Map: React.FC<MapProps> = ({
                 <DeckGL
                     id={id}
                     {...specObj}
+                    initialViewState={initialViewState}
                     views={deckGLViews}
                     getCursor={({ isDragging }): string =>
                         isDragging ? "grabbing" : "default"
@@ -325,3 +289,76 @@ const Map: React.FC<MapProps> = ({
 };
 
 export default Map;
+
+// ------------- Helper functions ---------- //
+// returns initial view state for DeckGL
+function getInitialViewState(
+    bounds: [number, number, number, number],
+    zoom: number
+): Record<string, unknown> {
+    const width = bounds[2] - bounds[0]; // right - left
+    const height = bounds[3] - bounds[1]; // top - bottom
+
+    const initial_view_state = {
+        // target to center of the bound
+        target: [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+        zoom: zoom,
+    };
+
+    return initial_view_state;
+}
+
+// construct views object for DeckGL component
+function getViewsForDeckGL() {
+    const deckgl_views = [
+        {
+            "@@type": "OrthographicView",
+            id: "main",
+            controller: {
+                doubleClickZoom: false,
+            },
+            x: "0%",
+            y: "0%",
+            width: "100%",
+            height: "100%",
+            flipY: false,
+        },
+    ];
+    return deckgl_views;
+}
+
+// update spec object to include default layer props
+function getSpecWithDefaultProps(
+    deckglSpec: Record<string, unknown>
+): Record<string, unknown> {
+    const modified_spec = Object.assign({}, deckglSpec);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const layers = [...(modified_spec["layers"] as any[])];
+    layers?.forEach((layer) => {
+        let default_props = undefined;
+        if (layer["@@type"] === ColormapLayer.name)
+            default_props = ColormapLayer.defaultProps;
+        else if (layer["@@type"] === Hillshading2DLayer.name)
+            default_props = Hillshading2DLayer.defaultProps;
+        else if (layer["@@type"] === WellsLayer.name)
+            default_props = WellsLayer.defaultProps;
+        else if (layer["@@type"] === FaultPolygonsLayer.name)
+            default_props = FaultPolygonsLayer.defaultProps;
+        else if (layer["@@type"] === PieChartLayer.name)
+            default_props = PieChartLayer.defaultProps;
+        else if (layer["@@type"] === DrawingLayer.name)
+            default_props = DrawingLayer.defaultProps;
+
+        if (default_props) {
+            Object.entries(default_props).forEach(([prop, value]) => {
+                const prop_type = typeof value;
+                if (["string", "boolean", "number"].includes(prop_type)) {
+                    if (layer[prop] === undefined) layer[prop] = value;
+                }
+            });
+        }
+    });
+
+    modified_spec["layers"] = layers;
+    return modified_spec;
+}

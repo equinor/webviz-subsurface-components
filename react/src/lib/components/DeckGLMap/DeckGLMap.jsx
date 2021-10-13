@@ -72,6 +72,7 @@ DeckGLMap.defaultProps = {
         position: [10, 10],
     },
     legendVisible: true,
+    zoom: -3,
 };
 
 function DeckGLMap({
@@ -79,6 +80,8 @@ function DeckGLMap({
     resources,
     deckglSpecBase,
     deckglSpecPatch,
+    bounds,
+    zoom,
     coords,
     scale,
     legendVisible,
@@ -143,6 +146,8 @@ function DeckGLMap({
                 resources={resources}
                 deckglSpec={patchedSpec}
                 setSpecPatch={setSpecPatch}
+                bounds={bounds}
+                zoom={zoom}
                 coords={coords}
                 scale={scale}
                 legendVisible={legendVisible}
@@ -168,6 +173,16 @@ DeckGLMap.propTypes = {
      * https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
      */
     resources: PropTypes.object,
+
+    /**
+     * Coordinate boundary for the view defined as [left, bottom, right, top].
+     */
+    bounds: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Zoom level for the view.
+     */
+    zoom: PropTypes.number,
 
     /**
      * JSON object describing the map structure to which deckglSpecPatch will be

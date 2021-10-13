@@ -20,6 +20,13 @@
     "resources": {
       "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png"
     },
+    "bounds": [
+      432205,
+      6475078,
+      437720,
+      6481113
+    ],
+    "zoom": -3,
     "deckglSpec": {
       "initialViewState": {
         "target": [

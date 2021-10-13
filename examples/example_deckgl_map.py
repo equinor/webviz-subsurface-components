@@ -170,11 +170,8 @@ if __name__ == "__main__":
         coords={"visible": True, "multiPicking": True, "pickDepth": 10},
         scale={"visible": True},
         coordinateUnit="m",
+        bounds=bounds,
         deckglSpecBase={
-            "initialViewState": {
-                "target": [bounds[0] + WIDTH / 2, bounds[1] + HEIGHT / 2, 0],
-                "zoom": -3,
-            },
             "layers": [
                 {
                     "@@type": "ColormapLayer",
