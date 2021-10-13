@@ -59,6 +59,25 @@ function getSpecWithDefaultProps(
     return modified_spec;
 }
 
+// construct views object for DeckGL component
+function getViewsForDeckGL() {
+    const deckgl_views = [
+        {
+            "@@type": "OrthographicView",
+            id: "main",
+            controller: {
+                doubleClickZoom: false,
+            },
+            x: "0%",
+            y: "0%",
+            width: "100%",
+            height: "100%",
+            flipY: false,
+        },
+    ];
+    return deckgl_views;
+}
+
 export interface MapProps {
     /**
      * The ID of this component, used to identify dash components
@@ -125,8 +144,18 @@ const Map: React.FC<MapProps> = ({
     legendVisible,
     children,
 }: MapProps) => {
+    // state for views prop of DeckGL component
+    const [deckGLViews, setDeckGLViews] = React.useState(null);
+    React.useEffect(() => {
+        const deckgl_views = getViewsForDeckGL();
+        const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
+        const jsonConverter = new JSONConverter({ configuration });
+        setDeckGLViews(jsonConverter.convert(deckgl_views));
+    }, []);
+
+    // state to update deckglSpec to include layer's defualt props
     const [deckglSpecWithDefaultProps, setDeckglSpecWithDefaultProps] =
-        React.useState(deckglSpec);
+        React.useState(getSpecWithDefaultProps(deckglSpec));
     React.useEffect(() => {
         setDeckglSpecWithDefaultProps(getSpecWithDefaultProps(deckglSpec));
     }, [deckglSpec]);
@@ -254,6 +283,7 @@ const Map: React.FC<MapProps> = ({
                 <DeckGL
                     id={id}
                     {...specObj}
+                    views={deckGLViews}
                     getCursor={({ isDragging }): string =>
                         isDragging ? "grabbing" : "default"
                     }
