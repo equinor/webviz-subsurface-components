@@ -50,6 +50,7 @@ export const LayerIcons = {
     Hillshading2DLayer: "change_history",
     WellsLayer: "turbine",
     PieChartLayer: "pie_chart",
+    GridLayer: "pie_chart",
     FaultPolygonsLayer: "waves",
     DrawingLayer: "brush",
 };
