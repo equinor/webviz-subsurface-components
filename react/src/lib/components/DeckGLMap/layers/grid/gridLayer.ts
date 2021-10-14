@@ -30,7 +30,7 @@ interface PolygonData {
     properties: CellProperties;
 }
 
-export type GridLayerProps<D> = ExtendedLayerProps<D>
+export type GridLayerProps<D> = ExtendedLayerProps<D>;
 
 const defaultProps = {
     name: "Grid",
