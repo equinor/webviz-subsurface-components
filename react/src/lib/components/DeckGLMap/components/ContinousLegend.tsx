@@ -14,6 +14,7 @@ interface legendProps {
     max: number;
     logName: string;
     logType: string;
+    position: number[];
 }
 
 const ContinousLegend: React.FC<legendProps> = ({
@@ -21,6 +22,7 @@ const ContinousLegend: React.FC<legendProps> = ({
     max,
     logName,
     logType,
+    position,
 }: legendProps) => {
     React.useEffect(() => {
         continuousLegend("#legend", interpolatorContinous().domain([min, max]));
@@ -30,21 +32,23 @@ const ContinousLegend: React.FC<legendProps> = ({
         selected_id: string,
         colorscale: ScaleSequential<string, never>
     ) {
-        const legendheight = 200,
+        const legendheight = 230,
             legendwidth = 80,
-            margin = { top: 10, right: 60, bottom: 10, left: 2 };
+            margin = { top: 15, right: 60, bottom: 15, left: 2 };
 
         const canvas = select(selected_id)
-            .style("position", "relative")
             .append("canvas")
-            .attr("height", legendheight - margin.top - margin.bottom)
+            .attr("height", legendheight + 5 - margin.top - margin.bottom)
             .attr("width", 1)
-            .style("height", legendheight - margin.top - margin.bottom + "px")
-            .style("width", legendwidth - margin.left - margin.right + "px")
-            .style("border", "1px solid #000")
-            .style("position", "absolute")
-            .style("right", "131px")
-            .style("top", "15px")
+            .style(
+                "height",
+                legendheight + 5 - margin.top - margin.bottom + "px"
+            )
+            .style(
+                "width",
+                legendwidth + 13 - margin.left - margin.right + "px"
+            )
+            .style("border", "1px solid")
             .node();
 
         if (canvas) {
@@ -67,16 +71,12 @@ const ContinousLegend: React.FC<legendProps> = ({
 
             const legendaxis = axisRight(legendscale)
                 .scale(legendscale)
-
-                .tickSize(20)
                 .tickValues(legendscale.domain());
             const svg = select(selected_id)
                 .append("svg")
-                .attr("height", legendheight + "px")
+                .attr("height", legendheight - 3 + "px")
                 .attr("width", legendwidth + 20 + "px")
-                .style("position", "absolute")
-                .style("right", "72px")
-                .style("top", "5px");
+                .style("top", "10px");
 
             svg.append("g")
                 .attr("class", "axis")
@@ -85,9 +85,9 @@ const ContinousLegend: React.FC<legendProps> = ({
                 .attr(
                     "transform",
                     "translate(" +
-                        (80 - margin.left - margin.right + 3) +
+                        (80 - margin.left - margin.right - 25) +
                         "," +
-                        margin.top +
+                        (margin.top + 7) +
                         ")"
                 )
                 .call(legendaxis)
@@ -97,13 +97,23 @@ const ContinousLegend: React.FC<legendProps> = ({
     }
 
     return (
-        <div style={{ float: "right" }}>
-            <label style={{ marginRight: "65px", color: "#6F6F6F" }}>
+        <div
+            style={{
+                position: "absolute",
+                right: position[0],
+                top: position[1],
+            }}
+        >
+            <label style={{ color: "#6F6F6F", marginRight: "35px" }}>
                 {logName}/{logType}
             </label>
             <div id="legend"></div>
         </div>
     );
+};
+
+ContinousLegend.defaultProps = {
+    position: [45, 10],
 };
 
 export default ContinousLegend;

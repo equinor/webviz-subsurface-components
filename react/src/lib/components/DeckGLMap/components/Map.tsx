@@ -65,6 +65,25 @@ function getSpecWithDefaultProps(
     return modified_spec;
 }
 
+// construct views object for DeckGL component
+function getViewsForDeckGL() {
+    const deckgl_views = [
+        {
+            "@@type": "OrthographicView",
+            id: "main",
+            controller: {
+                doubleClickZoom: false,
+            },
+            x: "0%",
+            y: "0%",
+            width: "100%",
+            height: "100%",
+            flipY: false,
+        },
+    ];
+    return deckgl_views;
+}
+
 export interface MapProps {
     /**
      * The ID of this component, used to identify dash components
@@ -115,7 +134,10 @@ export interface MapProps {
 
     coordinateUnit: string;
 
-    legendVisible: boolean;
+    legend: {
+        visible: boolean;
+        position: number[];
+    };
 
     children?: React.ReactNode;
 }
@@ -128,11 +150,21 @@ const Map: React.FC<MapProps> = ({
     coords,
     scale,
     coordinateUnit,
-    legendVisible,
+    legend,
     children,
 }: MapProps) => {
+    // state for views prop of DeckGL component
+    const [deckGLViews, setDeckGLViews] = React.useState(null);
+    React.useEffect(() => {
+        const deckgl_views = getViewsForDeckGL();
+        const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
+        const jsonConverter = new JSONConverter({ configuration });
+        setDeckGLViews(jsonConverter.convert(deckgl_views));
+    }, []);
+
+    // state to update deckglSpec to include layer's defualt props
     const [deckglSpecWithDefaultProps, setDeckglSpecWithDefaultProps] =
-        React.useState(deckglSpec);
+        React.useState(getSpecWithDefaultProps(deckglSpec));
     React.useEffect(() => {
         setDeckglSpecWithDefaultProps(getSpecWithDefaultProps(deckglSpec));
     }, [deckglSpec]);
@@ -181,8 +213,8 @@ const Map: React.FC<MapProps> = ({
     const layers = (deckglSpec["layers"] as any);
     const wellsLayerData = layers.filter(
         //eslint-disable-next-line
-            (item: any) =>
-                item.id.toLowerCase() == "wells-layer".toLowerCase()
+            (log: any) =>
+                log.id.toLowerCase() == "wells-layer".toLowerCase()
     );
 
     const logData = wellsLayerData[0].logData;
@@ -208,10 +240,10 @@ const Map: React.FC<MapProps> = ({
                 } else {
                     const minArray: number[] = [];
                     const maxArray: number[] = [];
-                    data.forEach(function (item: LogCurveDataType) {
+                    data.forEach(function (log: LogCurveDataType) {
                         const logValues = getLogValues(
-                            item,
-                            item.header.name,
+                            log,
+                            log.header.name,
                             logName
                         );
 
@@ -284,6 +316,7 @@ const Map: React.FC<MapProps> = ({
                 <DeckGL
                     id={id}
                     {...specObj}
+                    views={deckGLViews}
                     getCursor={({ isDragging }): string =>
                         isDragging ? "grabbing" : "default"
                     }
@@ -316,19 +349,21 @@ const Map: React.FC<MapProps> = ({
                         scaleUnit={coordinateUnit}
                     />
                 ) : null}
-                {legendVisible && discreteDataPresent ? (
+                {legend.visible && discreteDataPresent ? (
                     <DiscreteColorLegend
                         discreteData={discreteData}
                         logName={logName}
                         logType={logType}
+                        position={legend.position}
                     />
                 ) : null}
-                {legendVisible && continousDataPresent ? (
+                {legend.visible && continousDataPresent ? (
                     <ContinousLegend
                         min={min}
                         max={max}
                         logName={logName}
                         logType={logType}
+                        position={legend.position}
                     />
                 ) : null}
             </ReduxProvider>

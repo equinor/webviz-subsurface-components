@@ -5,8 +5,8 @@ interface ItemColor {
 // eslint-disable-next-line
 export default function legendUtil(itemColor: ItemColor[]): any {
     let legendValues: ItemColor[] = [];
-    const cellWidth = 30;
-    const cellHeight = 25;
+    const cellWidth = 22;
+    const cellHeight = 22;
     const cellPadding = 4;
 
     // eslint-disable-next-line

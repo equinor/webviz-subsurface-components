@@ -10,12 +10,14 @@ interface colorLegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
     logName: string;
     logType: string;
+    position: number[];
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     discreteData,
     logName,
     logType,
+    position,
 }: colorLegendProps) => {
     React.useEffect(() => {
         discreteLegend("#legend");
@@ -46,25 +48,30 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
         select(legend)
             .append("svg")
-            .attr("height", 600 + "px")
+            .attr("height", 450 + "px")
             .attr("width", 150 + "px")
-            .style("position", "absolute")
-            .style("right", "65px")
-            .style("top", "35px")
-            .attr("transform", "translate(0,30)")
+            .attr("transform", "translate(0,10)")
             .call(colorLegend);
     }
 
     return (
-        <div>
-            <label
-                style={{ marginRight: "65px", color: "grey", float: "right" }}
-            >
+        <div
+            style={{
+                position: "absolute",
+                right: position[0],
+                top: position[1],
+            }}
+        >
+            <label style={{ color: "#6F6F6F" }}>
                 {logName}/{logType}
             </label>
             <div id="legend"></div>
         </div>
     );
+};
+
+DiscreteColorLegend.defaultProps = {
+    position: [45, 10],
 };
 
 export default DiscreteColorLegend;
