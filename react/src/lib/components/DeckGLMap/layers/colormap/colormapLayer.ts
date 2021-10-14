@@ -58,6 +58,7 @@ const defaultProps = {
     name: "Property map",
     id: "colormap-layer",
     pickable: true,
+    visible: true,
     colormap: { type: "object", value: null, async: true },
     valueRange: { type: "array" },
     colorMapRange: { type: "array" },

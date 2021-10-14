@@ -18,6 +18,7 @@
     "legendVisible": true,
     "coordinateUnit": "m",
     "resources": {
+      "selectedFeature": "Well_A",
       "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png"
     },
     "bounds": [
@@ -27,48 +28,50 @@
       6481113
     ],
     "zoom": -3,
-    "deckglSpecBase": {
-      "layers": [
-        {
-          "@@type": "ColormapLayer",
-          "image": "@@#resources.propertyMap",
-          "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
-          "valueRange": [
-            2782,
-            3513
-          ],
-          "colorMapRange": [
-            2782,
-            3513
-          ]
-        },
-        {
-          "@@type": "Hillshading2DLayer",
-          "valueRange": [
-            2782,
-            3513
-          ],
-          "image": "@@#resources.propertyMap"
-        },
-        {
-          "@@type": "WellsLayer",
-          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-          "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
-          "logrunName": "BLOCKING",
-          "logName": "ZONELOG"
-        },
-        {
-          "@@type": "FaultPolygonsLayer",
-          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson"
-        },
-        {
-          "@@type": "PieChartLayer",
-          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
-        },
-        {
-          "@@type": "DrawingLayer"
-        }
-      ]
+    "layers": [
+      {
+        "@@type": "ColormapLayer",
+        "image": "@@#resources.propertyMap",
+        "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
+        "valueRange": [
+          2782,
+          3513
+        ],
+        "colorMapRange": [
+          2782,
+          3513
+        ]
+      },
+      {
+        "@@type": "Hillshading2DLayer",
+        "valueRange": [
+          2782,
+          3513
+        ],
+        "image": "@@#resources.propertyMap"
+      },
+      {
+        "@@type": "WellsLayer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+        "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+        "logrunName": "BLOCKING",
+        "logName": "ZONELOG",
+        "selectedFeature": "@@#resources.selectedFeature"
+      },
+      {
+        "@@type": "FaultPolygonsLayer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson"
+      },
+      {
+        "@@type": "PieChartLayer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
+      },
+      {
+        "@@type": "DrawingLayer"
+      }
+    ],
+    "editedData": {
+      "selectedFeature": ""
     }
   }
 ]

@@ -38,6 +38,7 @@ const defaultProps = {
     id: "hillshading-layer",
     opacity: 1.0,
     pickable: true,
+    visible: true,
     valueRange: { type: "array" },
     colorMapRange: { type: "array" },
     lightDirection: { type: "array", value: [1, 1, 1] },

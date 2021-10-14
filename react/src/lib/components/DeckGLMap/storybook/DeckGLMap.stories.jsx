@@ -9,26 +9,28 @@ export default {
 };
 
 const Template = (args) => {
-    const [mapSpecBase, setMapSpecBase] = React.useState(null);
-    const [mapSpecPatch, setMapSpecPatch] = React.useState(null);
-
+    //const [mapLayers, setMapLayers] = React.useState(null);
+    //const [mapSpecPatch, setMapSpecPatch] = React.useState(null);
+    /*
     React.useEffect(() => {
-        setMapSpecBase(args.deckglSpecBase);
-    }, [args.deckglSpecBase]);
+        setMapLayers(args.deckglLayers);
+    }, [args.deckglLayers]);
+
 
     React.useEffect(() => {
         setMapSpecPatch(args.deckglSpecPatch);
     }, [args.deckglSpecPatch]);
-
+    */
     return (
         <DeckGLMap
             {...args}
-            deckglSpecBase={mapSpecBase}
-            deckglSpecPatch={mapSpecPatch}
-            setProps={(updatedSpec) => {
-                setMapSpecBase(updatedSpec.deckglSpecBase);
-                setMapSpecPatch(updatedSpec.deckglSpecPatch);
-            }}
+            //layers={mapLayers}
+            //deckglSpecBase={mapSpecBase}
+            //deckglSpecPatch={mapSpecPatch}
+            //setProps={(updatedSpec) => {
+            //    setMapLayers(updatedSpec.deckglLayers);
+            //    setMapSpecPatch(updatedSpec.deckglSpecPatch);
+            //}}
         />
     );
 };

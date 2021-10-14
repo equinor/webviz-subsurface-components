@@ -15,6 +15,7 @@ const defaultProps = {
     name: "Fault polygons",
     id: "fault-polygons-layer",
     pickable: true,
+    visible: true,
     filled: true,
     lineWidthMinPixels: 2,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,

@@ -48,6 +48,7 @@ const defaultProps = {
     logRadius: 6,
     logCurves: true,
     refine: true,
+    visible: true,
 };
 
 export interface LogCurveDataType {
@@ -77,13 +78,19 @@ export default class WellsLayer extends CompositeLayer<
     FeatureCollection,
     WellsLayerProps<FeatureCollection>
 > {
+    /*onHover(): boolean {
+        if (!this.props.selectionEnabled) {
+            return false;
+        }
+        return true;
+    }*/
+
     onClick(info: WellsPickInfo): boolean {
         if (!this.props.selectionEnabled) {
             return false;
         }
 
         patchLayerProps<FeatureCollection>(this, {
-            ...this.props,
             selectedFeature: (info.object as Feature).properties?.["name"],
         } as WellsLayerProps<FeatureCollection>);
         return true;
@@ -271,7 +278,7 @@ function getWellObjectByName(
 ): Feature | undefined {
     return wells_data?.find(
         (item) =>
-            item.properties?.["name"].toLowerCase() === name?.toLowerCase()
+            item.properties?.["name"]?.toLowerCase() === name?.toLowerCase()
     );
 }
 

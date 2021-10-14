@@ -1,4 +1,4 @@
-import React from "react";
+/*import React from "react";
 import { Provider } from "react-redux";
 import { createStore } from "../redux/store";
 import { Operation } from "fast-json-patch";
@@ -27,3 +27,4 @@ export const EmptyWrapper = ({
 }): JSX.Element => {
     return <Provider store={emptytestStore}>{children}</Provider>;
 };
+*/

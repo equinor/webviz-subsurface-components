@@ -58,6 +58,7 @@ const defaultProps = {
     name: "Drawing",
     id: "drawing-layer",
     pickable: true,
+    visible: true,
     mode: "drawLineString",
 
     // Props mainly used to make the information available to the Map parent comp.

@@ -34,6 +34,7 @@ const defaultProps = {
     name: "Pie chart",
     id: "pie-layer",
     pickable: true,
+    visible: true,
 };
 export default class PieChartLayer extends CompositeLayer<
     PiesData,

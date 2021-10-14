@@ -167,31 +167,29 @@ if __name__ == "__main__":
         scale={"visible": True},
         coordinateUnit="m",
         bounds=[432205, 6475078, 437720, 6481113],  # left, bottom, right, top
-        deckglSpecBase={
-            "layers": [
-                {
-                    "@@type": "ColormapLayer",
-                    "image": "@@#resources.propertyMap",
-                    "colormap": COLOR_MAP,
-                    "valueRange": [min_value, max_value],
-                },
-                {
-                    "@@type": "Hillshading2DLayer",
-                    "valueRange": [min_value, max_value],
-                    "image": "@@#resources.propertyMap",
-                },
-                {
-                    "@@type": "DrawingLayer",
-                },
-                {
-                    "@@type": "WellsLayer",
-                    "data": WELLS,
-                    "logData": LOGS,
-                    "logrunName": "BLOCKING",
-                    "logName": "ZONELOG",
-                },
-            ],
-        },
+        layers=[
+            {
+                "@@type": "ColormapLayer",
+                "image": "@@#resources.propertyMap",
+                "colormap": COLOR_MAP,
+                "valueRange": [min_value, max_value],
+            },
+            {
+                "@@type": "Hillshading2DLayer",
+                "valueRange": [min_value, max_value],
+                "image": "@@#resources.propertyMap",
+            },
+            {
+                "@@type": "DrawingLayer",
+            },
+            {
+                "@@type": "WellsLayer",
+                "data": WELLS,
+                "logData": LOGS,
+                "logrunName": "BLOCKING",
+                "logName": "ZONELOG",
+            },
+        ],
     )
 
     colormap_dropdown = wcc.Dropdown(

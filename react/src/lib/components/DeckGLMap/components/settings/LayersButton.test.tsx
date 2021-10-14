@@ -1,3 +1,4 @@
+/*
 import { layers } from "@equinor/eds-icons";
 import { Icon } from "@equinor/eds-core-react";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -52,3 +53,4 @@ describe("test 'layers' button", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
 });
+*/
