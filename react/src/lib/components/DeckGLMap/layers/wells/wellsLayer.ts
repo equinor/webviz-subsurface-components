@@ -69,7 +69,7 @@ export interface LogCurveDataType {
 }
 
 export interface WellsPickInfo extends LayerPickInfo {
-    logName?: string;
+    logName: string;
 }
 
 export default class WellsLayer extends CompositeLayer<

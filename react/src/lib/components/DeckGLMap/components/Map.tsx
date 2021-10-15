@@ -1,7 +1,7 @@
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 import { AnyAction, EnhancedStore } from "@reduxjs/toolkit";
-import { PickInfo } from "deck.gl";
+import { PickInfo, Layer } from "deck.gl";
 import { Operation } from "fast-json-patch";
 import { Feature } from "geojson";
 import React from "react";
@@ -20,6 +20,7 @@ import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
+import StatusIndicator from "./StatusIndicator";
 import {
     ColormapLayer,
     Hillshading2DLayer,
@@ -87,6 +88,25 @@ function getViewsForDeckGL() {
     return deckgl_views;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getToolTip(info: PickInfo<any> | WellsPickInfo): string | null {
+    if ((info as WellsPickInfo)?.logName) {
+        return (info as WellsPickInfo)?.logName;
+    } else {
+        const feat = info.object as Feature;
+        return feat?.properties?.["name"];
+    }
+}
+
+function getLayer(deckGlProps: Record<string, unknown>, id: string) {
+    const layers = deckGlProps["layers"] as Layer<unknown>[];
+    if (null == layers) return;
+    const wellsLayers = (layers as WellsLayer[]).filter(
+        (item) => item.id.toLowerCase() == id.toLowerCase()
+    );
+    return wellsLayers[0];
+}
+
 export interface MapProps {
     /**
      * The ID of this component, used to identify dash components
@@ -140,6 +160,9 @@ export interface MapProps {
     legend: {
         visible: boolean;
         position: number[];
+        dataObjectName: string;
+        valueRange: number[];
+        discreteData: { objects: Record<string, [number[], number]> };
     };
 
     children?: React.ReactNode;
@@ -157,7 +180,7 @@ const Map: React.FC<MapProps> = ({
     children,
 }: MapProps) => {
     // state for views prop of DeckGL component
-    const [deckGLViews, setDeckGLViews] = React.useState(null);
+    const [deckGLViews, setDeckGLViews] = React.useState([]);
     React.useEffect(() => {
         const deckgl_views = getViewsForDeckGL();
         const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
@@ -181,7 +204,7 @@ const Map: React.FC<MapProps> = ({
         store.current = createStore(deckglSpecWithDefaultProps, setSpecPatch);
     }, [setSpecPatch]);
 
-    const [specObj, setSpecObj] = React.useState(null);
+    const [specObj, setSpecObj] = React.useState<Record<string, unknown>>({});
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [viewState, setViewState] = React.useState<any>();
@@ -203,70 +226,6 @@ const Map: React.FC<MapProps> = ({
         const jsonConverter = new JSONConverter({ configuration });
         setSpecObj(jsonConverter.convert(deckglSpecWithDefaultProps));
     }, [deckglSpecWithDefaultProps, resources]);
-
-    //eslint-disable-next-line
-    const [discreteData, setDiscreteData] = React.useState(Object);
-    const [discreteDataPresent, setDiscreteDataPresent] = React.useState(false);
-    const [min, setMin] = React.useState<number>(0);
-    const [max, setMax] = React.useState<number>(0);
-    const [continuousDataPresent, setContinuousDataPresent] =
-        React.useState(false);
-
-    //eslint-disable-next-line
-    const layers = (deckglSpec["layers"] as any);
-    const wellsLayerData = layers.filter(
-        (log: Record<string, string>) =>
-            log["id"].toLowerCase() === "wells-layer".toLowerCase()
-    );
-
-    const logData = wellsLayerData[0].logData;
-    const logName = wellsLayerData[0].logName;
-    const logType = wellsLayerData[0]["@@type"];
-    React.useEffect(() => {
-        let isMounted = true;
-        fetch(logData)
-            .then((response) => response.json())
-            .then((data) => {
-                const log_info = getLogInfo(
-                    data[0],
-                    data[0].header.name,
-                    logName
-                );
-                setDiscreteDataPresent(false);
-                setContinuousDataPresent(false);
-                if (log_info?.description == "discrete") {
-                    const metadata_discrete =
-                        data[0]["metadata_discrete"][logName].objects;
-                    if (isMounted) {
-                        setDiscreteData(metadata_discrete);
-                        setDiscreteDataPresent(true);
-                    }
-                } else {
-                    const minArray: number[] = [];
-                    const maxArray: number[] = [];
-                    data.forEach(function (log: LogCurveDataType) {
-                        const logValues = getLogValues(
-                            log,
-                            log.header.name,
-                            logName
-                        );
-
-                        minArray.push(Math.min(...logValues));
-                        maxArray.push(Math.max(...logValues));
-                    });
-
-                    if (isMounted) {
-                        setMin(Math.min(...minArray));
-                        setMax(Math.max(...maxArray));
-                        setContinuousDataPresent(true);
-                    }
-                }
-            });
-        // fix for memory leak error
-        return () => {
-            isMounted = false;
-        };
-    }, [logData, logName]);
 
     const refCb = React.useCallback(
         (deckRef) => {
@@ -314,6 +273,53 @@ const Map: React.FC<MapProps> = ({
         [coords]
     );
 
+    const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
+    const [continuousDataPresent, setContinuousDataPresent] =
+        React.useState<boolean>(false);
+    const [discreteDataPresent, setDiscreteDataPresent] =
+        React.useState<boolean>(false);
+    const onAfterRender = React.useCallback(() => {
+        const layers = specObj["layers"] as Layer<unknown>[];
+        const state = layers.every((layer) => layer.isLoaded);
+        setIsLoaded(state);
+    }, [specObj]);
+
+    const wellsLayer = getLayer(specObj, "wells-layer");
+
+    // Get color table for log curves.
+    React.useEffect(() => {
+        if (!wellsLayer?.isLoaded) return;
+        const logName = wellsLayer.props.logName;
+        const pathLayer = wellsLayer.internalState.subLayers[1];
+        if (!pathLayer.isLoaded) return;
+        const logs = pathLayer?.props.data;
+        const logData = logs[0];
+        const logInfo = getLogInfo(logData, logData.header.name, logName);
+        legend.dataObjectName = "Wells / " + logName;
+        if (logInfo?.description == "discrete") {
+            const meta = logData["metadata_discrete"];
+            const metadataDiscrete = meta[logName].objects;
+            legend.discreteData = metadataDiscrete;
+            legend.valueRange = [];
+            setDiscreteDataPresent(true);
+            setContinuousDataPresent(false);
+        } else {
+            const minArray: number[] = [];
+            const maxArray: number[] = [];
+            logs.forEach(function (log: LogCurveDataType) {
+                const logValues = getLogValues(log, log.header.name, logName);
+
+                minArray.push(Math.min(...logValues));
+                maxArray.push(Math.max(...logValues));
+            });
+
+            legend.valueRange = [Math.min(...minArray), Math.max(...maxArray)];
+            legend.discreteData = { objects: {} };
+            setDiscreteDataPresent(false);
+            setContinuousDataPresent(true);
+        }
+    }, [isLoaded, legend, wellsLayer?.props?.logName]);
+
     return (
         specObj && (
             <ReduxProvider store={store.current}>
@@ -324,21 +330,13 @@ const Map: React.FC<MapProps> = ({
                     getCursor={({ isDragging }): string =>
                         isDragging ? "grabbing" : "default"
                     }
-                    getTooltip={(
-                        info: PickInfo<unknown> | WellsPickInfo
-                    ): string | null | undefined => {
-                        if ((info as WellsPickInfo)?.logName) {
-                            return (info as WellsPickInfo)?.logName;
-                        } else {
-                            const feat = info.object as Feature;
-                            return feat?.properties?.["name"];
-                        }
-                    }}
+                    getTooltip={getToolTip}
                     ref={refCb}
                     onHover={onHover}
                     onViewStateChange={({ viewState }) =>
                         setViewState(viewState)
                     }
+                    onAfterRender={onAfterRender}
                 >
                     {children}
                 </DeckGL>
@@ -353,23 +351,27 @@ const Map: React.FC<MapProps> = ({
                         scaleUnit={coordinateUnit}
                     />
                 ) : null}
-                {legend.visible && discreteDataPresent ? (
+                {discreteDataPresent && legend.visible && (
                     <DiscreteColorLegend
-                        discreteData={discreteData}
-                        logName={logName}
-                        logType={logType}
-                        position={legend.position}
+                        discreteData={legend?.discreteData}
+                        dataObjectName={legend?.dataObjectName}
+                        position={legend?.position}
                     />
-                ) : null}
-                {legend.visible && continuousDataPresent ? (
+                )}
+                {continuousDataPresent && legend.visible && (
                     <ContinuousLegend
-                        min={min}
-                        max={max}
-                        logName={logName}
-                        logType={logType}
+                        min={legend.valueRange[0]}
+                        max={legend.valueRange[1]}
+                        dataObjectName={legend.dataObjectName}
                         position={legend.position}
                     />
-                ) : null}
+                )}
+                {
+                    <StatusIndicator
+                        layers={specObj["layers"] as Layer<unknown>[]}
+                        isLoaded={isLoaded}
+                    />
+                }
             </ReduxProvider>
         )
     );
