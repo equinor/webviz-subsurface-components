@@ -3,7 +3,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { interpolatorContinous } from "../../utils/continousLegend";
+import { interpolatorContinuous } from "../../utils/continuousLegend";
 import { color } from "d3-color";
 import {
     Feature,
@@ -351,7 +351,7 @@ function getLogColor(
 
         log_data.forEach((value) => {
             const rgb = color(
-                interpolatorContinous()((value - min) / max_delta)
+                interpolatorContinuous()((value - min) / max_delta)
             )?.rgb();
             if (rgb != undefined) {
                 log_color.push([rgb.r, rgb.g, rgb.b]);

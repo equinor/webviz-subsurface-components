@@ -22,6 +22,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     React.useEffect(() => {
         discreteLegend("#legend");
     }, [discreteData]);
+
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
@@ -46,12 +47,15 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         }
         const ordinalValues = scaleOrdinal().domain(itemName);
         const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
-        select(legend)
-            .append("svg")
-            .attr("height", 450 + "px")
-            .attr("width", 150 + "px")
-            .attr("transform", "translate(0,10)")
-            .call(colorLegend);
+
+        if (colorLegend) {
+            select(legend)
+                .append("svg")
+                .attr("height", 410 + "px")
+                .attr("width", 130 + "px")
+                .attr("transform", "translate(0,10)")
+                .call(colorLegend);
+        }
     }
 
     return (
@@ -71,7 +75,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
 };
 
 DiscreteColorLegend.defaultProps = {
-    position: [45, 10],
+    position: [16, 10],
 };
 
 export default DiscreteColorLegend;

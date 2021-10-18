@@ -7,7 +7,7 @@ import {
     rgb,
     ScaleSequential,
 } from "d3";
-import { interpolatorContinous } from "../utils/continousLegend";
+import { interpolatorContinuous } from "../utils/continuousLegend";
 
 interface legendProps {
     min: number;
@@ -17,15 +17,19 @@ interface legendProps {
     position: number[];
 }
 
-const ContinousLegend: React.FC<legendProps> = ({
+const ContinuousLegend: React.FC<legendProps> = ({
     min,
     max,
     logName,
     logType,
     position,
 }: legendProps) => {
+    const [legendLoaded, setLegendLoaded] = React.useState(false);
     React.useEffect(() => {
-        continuousLegend("#legend", interpolatorContinous().domain([min, max]));
+        continuousLegend(
+            "#legend",
+            interpolatorContinuous().domain([min, max])
+        );
     }, [min, max]);
 
     function continuousLegend(
@@ -37,6 +41,7 @@ const ContinousLegend: React.FC<legendProps> = ({
             margin = { top: 15, right: 60, bottom: 15, left: 2 };
 
         const canvas = select(selected_id)
+            .style("width", 150 + "px")
             .append("canvas")
             .attr("height", legendheight + 5 - margin.top - margin.bottom)
             .attr("width", 1)
@@ -75,8 +80,7 @@ const ContinousLegend: React.FC<legendProps> = ({
             const svg = select(selected_id)
                 .append("svg")
                 .attr("height", legendheight - 3 + "px")
-                .attr("width", legendwidth + 20 + "px")
-                .style("top", "10px");
+                .attr("width", legendwidth - 20 + "px");
 
             svg.append("g")
                 .attr("class", "axis")
@@ -93,6 +97,8 @@ const ContinousLegend: React.FC<legendProps> = ({
                 .call(legendaxis)
                 .selectAll("text")
                 .style("fill", "#6F6F6F");
+
+            setLegendLoaded(true);
         }
     }
 
@@ -104,16 +110,18 @@ const ContinousLegend: React.FC<legendProps> = ({
                 top: position[1],
             }}
         >
-            <label style={{ color: "#6F6F6F", marginRight: "35px" }}>
-                {logName}/{logType}
-            </label>
+            {legendLoaded && (
+                <label style={{ color: "#6F6F6F" }}>
+                    {logName}/{logType}
+                </label>
+            )}
             <div id="legend"></div>
         </div>
     );
 };
 
-ContinousLegend.defaultProps = {
-    position: [45, 10],
+ContinuousLegend.defaultProps = {
+    position: [16, 10],
 };
 
-export default ContinousLegend;
+export default ContinuousLegend;

@@ -19,7 +19,7 @@ import {
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
-import ContinousLegend from "../components/ContinousLegend";
+import ContinuousLegend from "../components/ContinuousLegend";
 import {
     ColormapLayer,
     Hillshading2DLayer,
@@ -206,15 +206,14 @@ const Map: React.FC<MapProps> = ({
     const [discreteDataPresent, setDiscreteDataPresent] = React.useState(false);
     const [min, setMin] = React.useState<number>(0);
     const [max, setMax] = React.useState<number>(0);
-    const [continousDataPresent, setContinousDataPresent] =
+    const [continuousDataPresent, setContinuousDataPresent] =
         React.useState(false);
 
     //eslint-disable-next-line
     const layers = (deckglSpec["layers"] as any);
     const wellsLayerData = layers.filter(
-        //eslint-disable-next-line
-            (log: any) =>
-                log.id.toLowerCase() == "wells-layer".toLowerCase()
+        (log: Record<string, string>) =>
+            log["id"].toLowerCase() === "wells-layer".toLowerCase()
     );
 
     const logData = wellsLayerData[0].logData;
@@ -230,6 +229,8 @@ const Map: React.FC<MapProps> = ({
                     data[0].header.name,
                     logName
                 );
+                setDiscreteDataPresent(false);
+                setContinuousDataPresent(false);
                 if (log_info?.description == "discrete") {
                     const metadata_discrete =
                         data[0]["metadata_discrete"][logName].objects;
@@ -254,7 +255,7 @@ const Map: React.FC<MapProps> = ({
                     if (isMounted) {
                         setMin(Math.min(...minArray));
                         setMax(Math.max(...maxArray));
-                        setContinousDataPresent(true);
+                        setContinuousDataPresent(true);
                     }
                 }
             });
@@ -357,8 +358,8 @@ const Map: React.FC<MapProps> = ({
                         position={legend.position}
                     />
                 ) : null}
-                {legend.visible && continousDataPresent ? (
-                    <ContinousLegend
+                {legend.visible && continuousDataPresent ? (
+                    <ContinuousLegend
                         min={min}
                         max={max}
                         logName={logName}
