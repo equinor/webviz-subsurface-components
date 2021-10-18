@@ -20,6 +20,7 @@ import {
     WellsLayer,
     FaultPolygonsLayer,
     PieChartLayer,
+    GridLayer,
     DrawingLayer,
 } from "../layers";
 
@@ -42,6 +43,8 @@ function getSpecWithDefaultProps(
             default_props = FaultPolygonsLayer.defaultProps;
         else if (layer["@@type"] === PieChartLayer.name)
             default_props = PieChartLayer.defaultProps;
+        else if (layer["@@type"] === GridLayer.name)
+            default_props = GridLayer.defaultProps;
         else if (layer["@@type"] === DrawingLayer.name)
             default_props = DrawingLayer.defaultProps;
 
