@@ -5,8 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import TreeNodeSelection from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeNodeSelection";
-import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
+import { TreeNodeSelection, TreeData } from "@webviz/core-components";
 
 export default class VectorSelection extends TreeNodeSelection {
     private myTreeData: TreeData;
@@ -18,6 +17,8 @@ export default class VectorSelection extends TreeNodeSelection {
         delimiter: string;
         numMetaNodes: number;
         treeData: TreeData;
+        caseInsensitiveMatching: boolean;
+        allowOrOperator: boolean;
     }) {
         super(argumentObject);
         this.myTreeData = argumentObject.treeData;
@@ -104,10 +105,15 @@ export default class VectorSelection extends TreeNodeSelection {
     }
 
     containsWildcard(): boolean {
+        const reg = RegExp(
+            `^(([^${super.delimiter}\\|]+\\|)+([^${super.delimiter}\\|]+){1})$`
+        );
         let level = 0;
         for (const el of this.getNodePath()) {
             if (
-                (el.includes("?") || el.includes("*")) &&
+                (el.includes("?") ||
+                    el.includes("*") ||
+                    (super.allowOrOperator && reg.test(el))) &&
                 level != super.getNumMetaNodes() - 1
             ) {
                 return true;
@@ -149,6 +155,8 @@ export default class VectorSelection extends TreeNodeSelection {
             delimiter: super.getDelimiter(),
             numMetaNodes: super.getNumMetaNodes(),
             treeData: this.myTreeData,
+            caseInsensitiveMatching: super.caseInsensitiveMatching,
+            allowOrOperator: super.allowOrOperator,
         });
     }
 }

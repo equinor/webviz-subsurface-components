@@ -50,7 +50,7 @@ const parseExpression = (expression: string): ParsingResult => {
                 node.name && symbolNodes.push(node.name);
                 break;
             case "FunctionNode":
-                node.name && functionNodes.push(node.name);
+                node.fn && node.name && functionNodes.push(node.name);
                 break;
             case "ConstantNode":
             case "ParenthesisNode":
@@ -114,7 +114,8 @@ export const getExpressionParseData = (
         // Return empty message for empty expression
         return {
             isValid: false,
-            parsingMessage: expression.length <= 0 ? "" : String(e.message),
+            parsingMessage:
+                expression.length <= 0 ? "" : String((e as Error).message),
             variables: [],
         };
     }

@@ -2,10 +2,10 @@ import { v4 as uuidv4 } from "uuid";
 
 import { ExpressionType, VariableVectorMapType } from "./VectorCalculatorTypes";
 import {
+    TreeData,
     TreeDataNode,
     TreeDataNodeMetaData,
-} from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
-import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
+} from "@webviz/core-components";
 
 export const getDefaultExpression = (): ExpressionType => {
     return {
@@ -218,6 +218,7 @@ export const isVectorNameValid = (
     const treeData = new TreeData({
         treeData: vectorData,
         delimiter: delimiter,
+        allowOrOperator: false,
     });
 
     if (nodePath.length <= 0 || vectorData.length <= 0) {
