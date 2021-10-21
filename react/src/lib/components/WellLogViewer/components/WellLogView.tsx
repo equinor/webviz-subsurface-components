@@ -28,7 +28,6 @@ import { select } from "d3";
 import Scroller from "./Scroller";
 import { WellLog } from "./WellLogTypes";
 import { Template } from "./WellLogTemplateTypes";
-import { ColorTable } from "./ColorTableTypes"
 
 import { createTracks } from "../utils/tracks";
 import { newGraphTrack } from "../utils/tracks";
@@ -819,15 +818,13 @@ function setTracksToController(
     logController: LogViewer,
     axes: AxesInfo,
     welllog: WellLog, // JSON Log Format
-    template: Template, // JSON
-    colorTables: ColorTable[] // JSON
+    template: Template // JSON
 ) {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
         axes,
         template.tracks,
-        template.styles,
-        colorTables
+        template.styles
     );
     logController.reset();
     const scaleHandler = createScaleHandler(primaries, secondaries);
@@ -870,7 +867,6 @@ interface Info {
 interface Props {
     welllog: WellLog;
     template: Template;
-    colorTables: ColorTable[];
     horizontal?: boolean;
     primaryAxis: string;
     //setAvailableAxes : (scales: string[]) => void;
@@ -945,8 +941,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             shouldSetTracks = true;
         } else if (this.props.template !== prevProps.template) {
             shouldSetTracks = true;
-        } else if (this.props.colorTables !== prevProps.colorTables) {
-            shouldSetTracks = true; // force to repaint
         } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
             shouldSetTracks = true;
         } else if (

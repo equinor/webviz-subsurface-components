@@ -9,9 +9,10 @@
       "title": "Multiple",
       "plots": [
         {
-          "name": "ROPA",
-          "name2": "BDIA",
-          "_type": "differential"
+          "name": "BDIA"
+        },
+        {
+          "name": "ROPA"
         },
         {
           "name": "HKLA",
@@ -20,7 +21,6 @@
       ]
     },
     {
-      "title": "Single",
       "plots": [
         {
           "name": "MFIA",

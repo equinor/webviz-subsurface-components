@@ -267,6 +267,9 @@ function makeDataAccessor(iPlot: number) {
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
 }
 
+const colorTables = require("../../../../demo/example-data/color-tables.json");
+
+
 import { ColorTable } from "../components/ColorTableTypes"
 
 const defColorTable: ColorTable = {
@@ -280,7 +283,7 @@ const defColorTable: ColorTable = {
 }
 
 function getColorTable(id: string|undefined, colorTables: ColorTable[]): ColorTable|undefined {
-    if (id && colorTables) {
+    if (id) {
         for (let i = 0; i < colorTables.length; i++) {
             if (colorTables[i].name == id)
                 return colorTables[i]
@@ -511,8 +514,7 @@ export function createTracks(
     welllog: WellLog,
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
-    templateStyles: TemplateStyle[], // Part of JSON
-    colorTables: ColorTable[] // JSON
+    templateStyles: TemplateStyle[] // Part of JSON
 ): TracksInfo {
     const info = new TracksInfo();
 
@@ -620,13 +622,6 @@ export function createTracks(
                     plotDatas.length
                 );
 
-                /* DifferentialPlotOptions
-                DifferentialPlotSerieOptions
-                p.options.serie1.color='red'
-                p.options.serie1.fill='yellow'
-                p.options.serie2.color='blue'
-                p.options.serie2.fill = 'green'
-                */
                 plotDatas.push(plotData.data);
                 plots.push(p);
             }

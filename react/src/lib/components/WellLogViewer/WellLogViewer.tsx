@@ -9,9 +9,6 @@ import Slider from "@material-ui/core/Slider"; // Zoom selector
 
 import { WellLog } from "./components/WellLogTypes";
 import { Template } from "./components/WellLogTemplateTypes";
-import { ColorTable } from "./components/ColorTableTypes"
-const g_colorTables = require("../../../demo/example-data/color-tables.json") as ColorTable[];
-
 import { WellLogController } from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
@@ -46,7 +43,6 @@ const axisMnemos: Record<string, string[]> = {
 interface Props {
     welllog: WellLog;
     template: Template;
-    colorTables: ColorTable[];
     horizontal?: boolean;
 }
 
@@ -73,9 +69,6 @@ class WellLogViewer extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        if (!this.props.colorTables)
-            this.props.colorTables = g_colorTables;
-
         const axes = getAvailableAxes(this.props.welllog, axisMnemos);
         let primaryAxis = axes[0];
         if (this.props.template && this.props.template.scale.primary) {
@@ -100,8 +93,7 @@ class WellLogViewer extends Component<Props, State> {
     componentDidUpdate(prevProps: Props): void {
         if (
             this.props.welllog !== prevProps.welllog ||
-            this.props.template !== prevProps.template || 
-            this.props.colorTables !== prevProps.colorTables  
+            this.props.template !== prevProps.template
         ) {
             const axes = getAvailableAxes(this.props.welllog, axisMnemos);
             let primaryAxis = axes[0];
@@ -218,7 +210,6 @@ class WellLogViewer extends Component<Props, State> {
                     <WellLogView
                         welllog={this.props.welllog}
                         template={this.props.template}
-                        colorTables={g_colorTables/*this.props.colorTables*/}
                         horizontal={this.props.horizontal}
                         primaryAxis={this.state.primaryAxis}
                         axisTitles={axisTitles}
