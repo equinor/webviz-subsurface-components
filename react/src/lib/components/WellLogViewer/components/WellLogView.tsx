@@ -40,7 +40,7 @@ import { getPlotType } from "../utils/tracks";
 
 import {
     removeOverlay,
-    setZoom,
+    zoomContent,
     scrollContentTo,
     scrollTracks,
 } from "../utils/log-viewer";
@@ -277,8 +277,8 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
             }
             this.props.wellLogView.logController.addTrack(trackNew);
 
-            this.props.wellLogView.setZoomTrack();
-            this.props.wellLogView.setScrollTrack();
+            this.props.wellLogView.zoomTrack();
+            this.props.wellLogView.scrollTrack();
 
             //this.props.wellLogView.addTrackContextMenus(trackNew); //ZZZZ~!!!!
         }
@@ -288,8 +288,8 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         if (this.props.wellLogView.logController) {
             this.props.wellLogView.logController.removeTrack(this.props.track);
 
-            this.props.wellLogView.setZoomTrack();
-            this.props.wellLogView.setScrollTrack();
+            this.props.wellLogView.zoomTrack();
+            this.props.wellLogView.scrollTrack();
         }
     }
 
@@ -653,7 +653,7 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
                         event.transform.y
                 );*/
                 //console.log("event.domain", event.domain);
-                parent.onRescale(event.transform.k);
+                parent.onRescaleContent(event.transform.k);
 
                 event.target.style.visibility = "visible";
                 event.target.textContent = `Zoom: x${event.transform.k.toFixed(
@@ -880,12 +880,12 @@ interface Props {
     onInfo?: (infos: Info[]) => void;
     onCreateController?: (controller: WellLogController) => void;
     onScrollTrackPos?: (pos: number) => void;
-    onZoom?: (pos: number) => void;
+    onZoomContent?: (pos: number) => void;
 
     maxTrackNum?: number;
 
-    zoom?: number;
-    scrollPos?: number; // fraction
+    zoomContent?: number;
+    scrollContentPos?: number; // fraction
     zoomTrack?: number;
     scrollTrackPos?: number; // the first track number
 }
@@ -893,8 +893,8 @@ interface Props {
 interface State {
     infos: Info[];
 
-    zoom: number;
-    scrollPos: number; // fraction
+    zoomContent: number;
+    scrollContentPos: number; // fraction
     zoomTrack: number;
     scrollTrackPos: number; // the first track number
 }
@@ -914,8 +914,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         this.state = {
             infos: [],
-            zoom: props.zoom ? props.zoom : 1.0,
-            scrollPos: props.scrollPos ? props.scrollPos : 0,
+            zoomContent: props.zoomContent ? props.zoomContent : 1.0,
+            scrollContentPos: props.scrollContentPos ? props.scrollContentPos : 0,
             zoomTrack: props.zoomTrack ? props.zoomTrack : 1.0,
             scrollTrackPos: props.scrollTrackPos ? props.scrollTrackPos : 0,
         };
@@ -966,17 +966,17 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
             this.props.maxTrackNum !== prevProps.maxTrackNum
         ) {
-            this.setZoomTrack(); // ZLP
-            this.setScrollTrack();
+            this.zoomTrack(); // ZLP
+            this.scrollTrack();
             this.setInfo();
         }
 
-        if (this.state.scrollPos !== prevState.scrollTrackPos) {
+        if (this.state.scrollContentPos !== prevState.scrollTrackPos) {
             //this.setZoom();
             //this.setScroll();
         }
-        if (this.props.zoom !== prevProps.zoom) {
-            this.setZoom();
+        if (this.props.zoomContent !== prevProps.zoomContent) {
+            this.zoomContent();
         }
 
         /*??
@@ -1050,8 +1050,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.props.colorTables
             );
         }
-        this.setScrollTrack();
-        this.setZoomTrack();
+        this.scrollTrack();
+        this.zoomTrack();
         this.setInfo(); // Clear old track information
     }
 
@@ -1066,25 +1066,25 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo();
     }
 
-    setZoom(): void {
-        const zoom = this.props.zoom ? this.props.zoom : 1;
+    zoomContent(): void {
+        const zoom = this.props.zoomContent ? this.props.zoomContent : 1;
         if (this.logController) {
-            setZoom(this.logController, zoom);
+            zoomContent(this.logController, zoom);
         }
-        if (Math.abs(Math.log(this.state.zoom / zoom)) > 0.01)
-            this.setState({ zoom: zoom });
+        if (Math.abs(Math.log(this.state.zoomContent / zoom)) > 0.01)
+            this.setState({ zoomContent: zoom });
     }
-    setZoomTrack(): void {
+    zoomTrack(): void {
         const nGraphTracks = this._graphTrackMax();
 
-        let zoomTrack = nGraphTracks / this._maxTrackNum();
-        if (zoomTrack < 1) zoomTrack = 1;
+        let zoom = nGraphTracks / this._maxTrackNum();
+        if (zoom < 1) zoom = 1;
 
-        if (Math.abs(Math.log(this.state.zoomTrack / zoomTrack)) > 0.01)
-            this.setState({ zoomTrack: zoomTrack });
+        if (Math.abs(Math.log(this.state.zoomTrack / zoom)) > 0.01)
+            this.setState({ zoomTrack: zoom });
     }
-    setScrollTrack(): void {
-        const iFrom = this._newScrollPos(this.state.scrollTrackPos);
+    scrollTrack(): void {
+        const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
         if (this.logController) scrollTracks(this.logController, iFrom, iTo);
 
@@ -1095,7 +1095,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (!this.logController) return;
 
-        const iFrom = this._newScrollPos(this.state.scrollTrackPos);
+        const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
         let iTrack = 0;
 
@@ -1158,8 +1158,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(x, x2);
     }
 
-    onRescale(k: number): void {
-        if (this.props.onZoom) this.props.onZoom(k);
+    onRescaleContent(k: number): void {
+        if (this.props.onZoomContent) this.props.onZoomContent(k);
 
         if (this.logController) {
             const [b1, b2] = this.logController.scaleHandler.baseDomain();
@@ -1168,15 +1168,15 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             //console.log("b1=", b1, "b2=", b2);
             //console.log("d1=", d1, "d2=", d2);
             const w = b2 - b1 - (d2 - d1);
-            const scrollPos = w ? (d1 - b1) / w : 0;
+            const scrollContentPos = w ? (d1 - b1) / w : 0;
+            const delta = Math.abs(scrollContentPos - this.state.scrollContentPos);
             console.log(
-                "onRescale scrollPos=",
-                scrollPos,
-                Math.abs(this.state.scrollPos - scrollPos)
+                "WellLogView.onRescaleContent new scrollContentPos=",
+                scrollContentPos, "delta=", delta, delta > 0.001
             );
 
-            if (Math.abs(this.state.scrollPos - scrollPos) > 0.0001)
-                this.setState({ scrollPos: scrollPos });
+            if (delta > 0.001)
+                this.setState({ scrollContentPos: scrollContentPos });
         }
     }
 
@@ -1229,16 +1229,16 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         const nScaleTracks = getScaleTrackNum(this.logController.tracks);
         return this.logController.tracks.length - nScaleTracks;
     }
-    _scrollTrackPosMax(): number {
+    _getScrollTrackPosMax(): number {
         // for scrollbar
         const nGraphTracks = this._graphTrackMax();
         let posMax = nGraphTracks - this._maxTrackNum();
         if (posMax < 0) posMax = 0;
         return posMax;
     }
-    _newScrollPos(pos: number): number {
+    _newTrackScrollPos(pos: number): number {
         let newPos = pos;
-        const posMax = this._scrollTrackPosMax();
+        const posMax = this._getScrollTrackPosMax();
         if (newPos > posMax) newPos = posMax;
         if (newPos < 0) newPos = 0;
         return newPos;
@@ -1250,7 +1250,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     scrollTrackTo(pos: number): boolean {
-        const newPos = this._newScrollPos(pos);
+        const newPos = this._newTrackScrollPos(pos);
         if (this.state.scrollTrackPos == newPos) return false;
         this.setState({ scrollTrackPos: newPos });
         return true;
@@ -1259,39 +1259,34 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this.state.scrollTrackPos;
     }
     getScrollTrackPosMax(): number {
-        return this._scrollTrackPosMax();
+        return this._getScrollTrackPosMax();
     }
 
-    onScroll(x: number, y: number): void {
+    onScroll(x: number, y: number): void { // callback from scrollbar
         if (this.logController) {
             const f = this.props.horizontal ? x : y;
+            console.log("scrollContentTo("+f+")");
             scrollContentTo(this.logController, f);
         }
-        const posMax = this._scrollTrackPosMax();
+        const posMax = this._getScrollTrackPosMax();
         let posTrack = (this.props.horizontal ? y : x) * posMax;
         posTrack = Math.round(posTrack);
-        /*
-        console.log(
-            "posTrack=" + posTrack,
-            "horizontal=" + this.props.horizontal
-        );
-        */
         this.scrollTrackTo(posTrack);
     }
 
     render(): ReactNode {
-        const fTrack = this._scrollTrackPosMax()
-            ? this.state.scrollTrackPos / this._scrollTrackPosMax()
+        const fTrack = this._getScrollTrackPosMax()
+            ? this.state.scrollTrackPos / this._getScrollTrackPosMax()
             : 0.0; // fraction
-        const x = this.props.horizontal ? this.state.scrollPos : fTrack;
-        const y = this.props.horizontal ? fTrack : this.state.scrollPos;
+        const x = this.props.horizontal ? this.state.scrollContentPos : fTrack;
+        const y = this.props.horizontal ? fTrack : this.state.scrollContentPos;
 
         const zoomX = this.props.horizontal
-            ? this.state.zoom
+            ? this.state.zoomContent
             : this.state.zoomTrack;
         const zoomY = this.props.horizontal
             ? this.state.zoomTrack
-            : this.state.zoom;
+            : this.state.zoomContent;
         //console.log("WLV render zoomX=" + zoomX, "zoomY=" + zoomY)
 
         return (

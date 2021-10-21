@@ -26,14 +26,14 @@ export function showTrack(track: Track, visible: boolean): void {
     }
 }
 
-export function setZoom(logViewer: LogViewer, zoom: number): void {
+export function zoomContent(logViewer: LogViewer, zoom: number): void {
     if (!zoom) zoom = 1.0;
 
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
     const currentZoom = Math.abs(b2 - b1) / Math.abs(d2 - d1);
-    console.log("zoom=" + zoom + " current=" + currentZoom);
     const f = Math.abs(Math.log(currentZoom / zoom));
+    console.log("Content zoom=" + zoom + " current=" + currentZoom, f > 0.01);
     //console.log("f=" + f);
     if (f > 0.01 /*currentZoom !== zoom*/) {
         let d = (d2 - d1) * 0.5;

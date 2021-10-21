@@ -61,7 +61,7 @@ interface State {
     primaryAxis: string;
     infos: Info[];
 
-    zoom: number;
+    zoomContent: number;
 }
 
 class WellLogViewer extends Component<Props, State> {
@@ -83,7 +83,7 @@ class WellLogViewer extends Component<Props, State> {
             axes: axes, //["md", "tvd"]
             infos: [],
 
-            zoom: 1,
+            zoomContent: 1,
         };
 
         this.controller = undefined;
@@ -135,10 +135,10 @@ class WellLogViewer extends Component<Props, State> {
         this._enableScroll();
     }
     // callback function
-    onZoom(zoom: number): void {
+    onZoomContent(zoom: number): void {
         //console.log("callback setZoom(" + zoom + ")", Math.abs(Math.log(this.state.zoom / zoom)));
-        if (Math.abs(Math.log(this.state.zoom / zoom)) > 0.01) {
-            this.setState({ zoom: zoom });
+        if (Math.abs(Math.log(this.state.zoomContent / zoom)) > 0.01) {
+            this.setState({ zoomContent: zoom });
         }
     }
 
@@ -150,24 +150,24 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     // scroll buttons support DEBUG CODE
-    onScrollBegin(): void {
+    onScrollTrackBegin(): void {
         if (this.controller) this.controller.scrollTrackTo(0);
     }
 
-    onScrollUp(): void {
+    onScrollTrackUp(): void {
         if (this.controller)
             this.controller.scrollTrackTo(
                 this.controller.getScrollTrackPos() - 1
             );
     }
-    onScrollDown(): void {
+    onScrollTrackDown(): void {
         if (this.controller)
             this.controller.scrollTrackTo(
                 this.controller.getScrollTrackPos() + 1
             );
     }
 
-    onScrollEnd(): void {
+    onScrollTrackEnd(): void {
         if (this.controller)
             this.controller.scrollTrackTo(
                 this.controller.getScrollTrackPosMax() - 1
@@ -195,16 +195,16 @@ class WellLogViewer extends Component<Props, State> {
         return value.toFixed(Number.isInteger(value) || value > 20 ? 0 : 1);
     }
 
-    getZoomValue(): number {
-        return Math.log2(this.state.zoom);
+    getContentZoomValue(): number {
+        return Math.log2(this.state.zoomContent);
     }
 
-    handleZoomChange(
+    handleContentZoomChange(
         event: React.ChangeEvent<Record<string, unknown> /*{}*/>,
         value: number | number[]
     ): void {
         event;
-        if (typeof value === "number") this.setState({ zoom: 2 ** value });
+        if (typeof value === "number") this.setState({ zoomContent: 2 ** value });
     }
 
     render(): ReactNode {
@@ -219,12 +219,12 @@ class WellLogViewer extends Component<Props, State> {
                         primaryAxis={this.state.primaryAxis}
                         axisTitles={axisTitles}
                         axisMnemos={axisMnemos}
-                        zoom={this.state.zoom}
+                        zoomContent={this.state.zoomContent}
                         maxTrackNum={this.props.horizontal?3:5}
                         onInfo={this.onInfo.bind(this)}
                         onCreateController={this.onCreateController.bind(this)}
                         onScrollTrackPos={this.onScrollTrackPos.bind(this)}
-                        onZoom={this.onZoom.bind(this)}
+                        onZoomContent={this.onZoomContent.bind(this)}
                     />{" "}
                 </div>
                 <div style={{ flex: "0, 0, 280px" }}>
@@ -246,13 +246,13 @@ class WellLogViewer extends Component<Props, State> {
                             }}
                         >
                             <Slider
-                                value={this.getZoomValue()}
+                                value={this.getContentZoomValue()}
                                 min={0}
                                 step={0.5}
                                 max={8}
                                 scale={(x) => 2 ** x}
                                 defaultValue={0}
-                                onChange={this.handleZoomChange.bind(this)}
+                                onChange={this.handleContentZoomChange.bind(this)}
                                 valueLabelDisplay="auto"
                                 aria-labelledby="non-linear-slider"
                                 getAriaValueText={this.valueLabelFormat.bind(
@@ -273,7 +273,7 @@ class WellLogViewer extends Component<Props, State> {
                         <button
                             id="buttonUp"
                             type="button"
-                            onClick={this.onScrollUp.bind(this)}
+                            onClick={this.onScrollTrackUp.bind(this)}
                         >
                             {this.props.horizontal ? "\u25B2" : "\u25C4"}
                         </button>
@@ -281,7 +281,7 @@ class WellLogViewer extends Component<Props, State> {
                         <button
                             id="buttonDown"
                             type="button"
-                            onClick={this.onScrollDown.bind(this)}
+                            onClick={this.onScrollTrackDown.bind(this)}
                         >
                             {this.props.horizontal ? "\u25BC" : "\u25BA"}
                         </button>

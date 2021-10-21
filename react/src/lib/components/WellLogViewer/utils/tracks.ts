@@ -244,7 +244,7 @@ function getTemplatePlotProps(
             ? { ...templateStyles[iStyle], ...templatePlot }
             : { ...templatePlot };
     if (!isValidPlotType(options.type)) {
-      console.log("unknown plot type '" + options.type + "'")
+        console.log("unknown plot type '" + options.type + "': use default type '" + defPlotType + "'")
       options.type = defPlotType;
     }
     if (!options.color) options.color = generateColor();
@@ -288,8 +288,8 @@ function getColorTable(id: string|undefined, colorTables: ColorTable[]): ColorTa
         console.log("colorTable id='" + id + "' is not found in getColorTable()")
         return /*undefined;*/defColorTable;
     }
-    if (!colorTables) console.log("colorTables is not given in getColorTable()")
-    else console.log("enpty colorTable id in getColorTable()")
+    if (id && !colorTables)
+        console.log("colorTables is not given in getColorTable()")   
     return undefined;//defColorTable;
 }
 
@@ -368,6 +368,8 @@ export function addGraphTrackPlot(
             };
             const plotDatas = track.options.data;
             const plots = track.plots;
+
+            const colorTables = wellLogView.props.colorTables;
 
             const templateOptions = getTemplatePlotProps(
                 templatePlot,
