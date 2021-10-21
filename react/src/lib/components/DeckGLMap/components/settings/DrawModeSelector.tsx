@@ -1,8 +1,9 @@
 import { NativeSelect } from "@equinor/eds-core-react";
-import React, { useCallback } from "react";
+import React, { useCallback, Profiler } from "react";
 import { useDispatch } from "react-redux";
 import { updateDrawingMode } from "../../redux/actions";
 import { DrawMode, DrawModes } from "../../redux/types";
+import logTimes from "../../../../performanceUtility/onRenderFunction";
 
 interface Props {
     /**
@@ -38,16 +39,18 @@ const DrawModeSelector: React.FC<Props> = React.memo(
         );
         const cur_selection = DrawModes.find((mode) => mode.id === value);
         return (
-            <NativeSelect
-                id={`${layerId}-mode-selector`}
-                label={label}
-                value={cur_selection?.displayName}
-                onChange={handleSelectedItemChange}
-            >
-                {DrawModes.map((mode) => (
-                    <option key={mode.id}>{mode.displayName}</option>
-                ))}
-            </NativeSelect>
+            <Profiler id="Native Select" onRender={logTimes}>
+                <NativeSelect
+                    id={`${layerId}-mode-selector`}
+                    label={label}
+                    value={cur_selection?.displayName}
+                    onChange={handleSelectedItemChange}
+                >
+                    {DrawModes.map((mode) => (
+                        <option key={mode.id}>{mode.displayName}</option>
+                    ))}
+                </NativeSelect>
+            </Profiler>
         );
     }
 );
