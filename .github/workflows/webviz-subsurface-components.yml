@@ -87,11 +87,11 @@ jobs:
 
         id: unit-tests-results
       - name: Get annotation status
-        run: echo "event name  and event type is:" ${{ github.event_name }} ${{ github.event.action }}
+        run: echo "The annotation status is ${{ steps.unit-tests-results.outputs.annotation_status }}"
 
       - name: Create comment
+        if: ${{ github.event_name }} == 'pull_request' && ${{ steps.unit-tests-results.outputs.annotation_status }} == "annotation_present"
         uses: peter-evans/create-or-update-comment@v1
-        if: github.event_name == 'pull_request' && ${{ steps.unit-tests-results.outputs.annotation_status }} == "annotation_present"
         with:
           issue-number: ${{ github.event.number }}
           body: |
