@@ -1,6 +1,10 @@
 export type TemplatePlotProps = {
-    color: string;
     type: string;
+    color: string;
+    inverseColor?: string;
+    fill?: string; // for 'area'
+    colorTable?: string; // table id (name) for 'gradientfilling'
+    inverseColorTable?: string; // table id (name) for 'gradientfilling'
     //...
 }; // Part of JSON
 

@@ -8,11 +8,10 @@ import {
 
 import {
     Track,
-    GraphTrack /*, ScaleTrack, DualScaleTrack*/,
+    GraphTrack,
 } from "@equinor/videx-wellog";
 
 import { ScaleTrackOptions } from "@equinor/videx-wellog/dist/tracks/scale/interfaces";
-import { GraphTrackOptions } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 
 import {
     OverlayClickEvent,
@@ -35,7 +34,8 @@ import { newGraphTrack } from "../utils/tracks";
 import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
-import { addTrackPlot, removeTrackPlot } from "../utils/tracks";
+import { addGraphTrackPlot, removeGraphTrackPlot } from "../utils/tracks";
+import { getPlotType } from "../utils/tracks";
 
 import {
     removeOverlay,
@@ -143,14 +143,14 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
 
         /*const track = this.props.track;
         const type = "line";
-        addTrackPlot(this.props.wellLogView, (track as GraphTrack), item, type);*/
+        addGraphTrackPlot(this.props.wellLogView, (track as GraphTrack), item, type);*/
     }
 
     _addPlot(item?: string, type?: string) {
         console.log("_addPlot(" + item + ", " + type + ")");
         if (!item || !type) return;
         const track = this.props.track;
-        addTrackPlot(this.props.wellLogView, track as GraphTrack, item, type);
+        this.props.wellLogView.addGraphTrackPlot(track as GraphTrack, item, type);
     }
 
     menuAddPlotItems(): ReactNode[] {
@@ -193,7 +193,7 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         console.log("removePlot(" + item + ")");
         const track = this.props.track;
 
-        removeTrackPlot(this.props.wellLogView, track as GraphTrack, item);
+        this.props.wellLogView.removeGraphTrackPlot(track as GraphTrack, item);
     }
 
     menuRemovePlotItems(): ReactNode[] {
@@ -434,6 +434,32 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                             }}
                         >
                             {"area"}
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                this.handleClickItem(
+                                    this._addPlot.bind(
+                                        this,
+                                        this.props.plotName,
+                                        "gradientfill"
+                                    )
+                                );
+                            }}
+                        >
+                            {"gradient fill"}
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                this.handleClickItem(
+                                    this._addPlot.bind(
+                                        this,
+                                        this.props.plotName,
+                                        "differential"
+                                    )
+                                );
+                            }}
+                        >
+                            {"differential"}
                         </MenuItem>
                     </Menu>
                 </div>
@@ -750,8 +776,8 @@ function formatValue(v1: number) {
     }
     return v;
 }
-
-function getValue(x: number, data: [], type: string) {
+    
+function getValue(x: number, data: [], type: string): string {
     let v = "";
     if (Number.isFinite(x)) {
         const n = data.length;
@@ -786,6 +812,7 @@ function getValue(x: number, data: [], type: string) {
     }
     return v;
 }
+
 
 function setTracksToController(
     logController: LogViewer,
@@ -867,6 +894,7 @@ interface State {
     zoomTrack: number;
     scrollTrackPos: number; // the first track number
 }
+
 
 class WellLogView extends Component<Props, State> implements WellLogController {
     container?: HTMLElement;
@@ -972,15 +1000,12 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 },
                 onTrackEnter: function (elm: HTMLElement, track: Track): void {
                     addTrackContextMenus(elm, track);
-                    console.log("onTrackEnter", track);
                 },
+                /* never called 
                 onTrackUpdate: function (elm: HTMLElement, track: Track): void {
-                    // never called
-                    elm;
-                    console.log("onTrackUpdate", track);
                 },
+                */
                 onTrackExit: function (): void {
-                    //console.log("onTrackExit");
                 },
             });
 
@@ -1022,6 +1047,18 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setZoomTrack();
         this.setInfo(); // Clear old track information
     }
+
+    addGraphTrackPlot(track: GraphTrack, name: string, type: string)
+    {
+        addGraphTrackPlot(this, track, name, type);
+        this.setInfo();
+    }
+
+    removeGraphTrackPlot(track: GraphTrack, name: string): void {
+        removeGraphTrackPlot(this, track, name);
+        this.setInfo();
+    }
+
     setZoom(): void {
         const zoom = this.props.zoom ? this.props.zoom : 1;
         if (this.logController) {
@@ -1062,12 +1099,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             const bScaleTrack = isScaleTrack(track);
             const visible = (iFrom <= iTrack && iTrack < iTo) || bScaleTrack;
             if (visible) {
-                const plotConfigs = (track.options as GraphTrackOptions)[
-                    "plots"
-                ];
                 const datas = track.data;
 
-                if (plotConfigs) {
+                if (!bScaleTrack) {
                     if (!bSeparator) {
                         bSeparator = true;
                         infos.push({
@@ -1076,22 +1110,22 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                             type: "separator",
                         });
                     }
-
-                    const nPlots = plotConfigs.length;
+                    const nPlots = (track as GraphTrack).plots.length;
                     for (let p = 0; p < nPlots; p++) {
-                        const plotConfig = plotConfigs[p];
-                        const v = getValue(x, datas[p], plotConfig.type);
+                        const plot = (track as GraphTrack).plots[p];
+                        const type = getPlotType(plot)
+                        const v = getValue(x, datas[p], type);
                         const legend = (
-                            plotConfig.options as ExtPlotOptions
+                            plot.options as ExtPlotOptions
                         ).legendInfo();
                         infos.push({
                             name: legend.label,
                             units: legend.unit,
-                            color: plotConfig.options.color
-                                ? plotConfig.options.color
+                            color: plot.options.color
+                                ? plot.options.color
                                 : "",
                             value: v,
-                            type: plotConfig.type,
+                            type: type,
                         });
                         iPlot++;
                     }

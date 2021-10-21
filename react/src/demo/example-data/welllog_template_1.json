@@ -23,8 +23,12 @@
     {
       "plots": [
         {
-          "name": "HKLX",
-          "style": "HKL"
+          "name": "MFIA",
+          "type": "gradientfill",
+          "colorTable": "Physics reverse",
+          "_inverseColorTable": "Physics",
+          "fill": "white",
+          "color": "black"
         }
       ]
     },
@@ -33,6 +37,15 @@
         {
           "name": "WOBA",
           "type": "linestep"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "MFOA",
+          "type": "gradientfill",
+          "colorTable": "Rainbow"
         }
       ]
     },
@@ -85,13 +98,6 @@
         {
           "name": "SW",
           "type": "line"
-        }
-      ]
-    },
-    {
-      "plots": [
-        {
-          "name": "MFOA"
         }
       ]
     },
@@ -172,7 +178,8 @@
   "styles": [
     {
       "name": "HKL",
-      "type": "area"
+      "type": "gradientfill",
+      "colorTable": "Physics"
     }
   ]
 }

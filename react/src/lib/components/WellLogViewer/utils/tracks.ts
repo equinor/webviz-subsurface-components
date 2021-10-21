@@ -5,22 +5,21 @@ import {
     GraphTrack,
 } from "@equinor/videx-wellog";
 
-import { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
-
-import { GraphTrackOptions } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
-
-import WellLogView from "../components/WellLogView";
-
-export interface ExtPlotOptions extends AreaPlotOptions {
+import { GradientFillPlotOptions } from "./gradientfill-plot" //import { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
+export interface ExtPlotOptions extends GradientFillPlotOptions/*AreaPlotOptions*/ {
     legendInfo: () => {
         label: string;
         unit: string;
     };
 }
 
+
+
+import WellLogView from "../components/WellLogView";
+
 import { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 
-//import { GraphTrackOptions } from "@equinor/videx-wellog";
+import { PlotFactory } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 
 import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
 
@@ -202,8 +201,35 @@ export function getAvailableAxes(
     return result;
 }
 
+import {
+    Plot,
+    LinePlot,
+    AreaPlot,
+    DotPlot,
+    DifferentialPlot,
+    LineStepPlot,
+} from "@equinor/videx-wellog";
+import GradientFillPlot from "../utils/gradientfill-plot"
+export function getPlotType(plot: Plot): string {
+    if (plot instanceof GradientFillPlot)
+        return "gradientfill"
+    if (plot instanceof LinePlot)
+        return "line"
+    if (plot instanceof AreaPlot)
+        return "area"
+    if (plot instanceof DotPlot)
+        return "dot"
+    if (plot instanceof DifferentialPlot)
+        return "differential"
+    if (plot instanceof LineStepPlot)
+        return "linestep"
+    if (plot instanceof LineStepPlot)
+        return "linestep"
+    return "";
+}
+
 function isValidPlotType(plotType: string) {
-    return ["line", "linestep", "dot", "area"].indexOf(plotType) >= 0;
+    return ["line", "linestep", "dot", "area", "differential", "gradientfill"].indexOf(plotType) >= 0;
 }
 
 function getTemplatePlotProps(
@@ -217,7 +243,10 @@ function getTemplatePlotProps(
         iStyle >= 0
             ? { ...templateStyles[iStyle], ...templatePlot }
             : { ...templatePlot };
-    if (!isValidPlotType(options.type)) options.type = defPlotType;
+    if (!isValidPlotType(options.type)) {
+      console.log("unknown plot type '" + options.type + "'")
+      options.type = defPlotType;
+    }
     if (!options.color) options.color = generateColor();
     return options;
 }
@@ -238,21 +267,53 @@ function makeDataAccessor(iPlot: number) {
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
 }
 
+const colorTables = require("../../../../demo/example-data/color-tables.json");
+
+
+import { ColorTable } from "../components/ColorTableTypes"
+
+const defColorTable: ColorTable = {
+    name: "not found",
+    discrete: false,
+    colors: [
+        [0.00, 1.00, 0.00, 0.00],
+        [0.50, 0.50, 0.00, 0.00],
+        [1.00, 1.00, 0.00, 0.00],
+    ],
+}
+
+function getColorTable(id: string|undefined, colorTables: ColorTable[]): ColorTable|undefined {
+    if (id) {
+        for (let i = 0; i < colorTables.length; i++) {
+            if (colorTables[i].name == id)
+                return colorTables[i]
+        }
+        return /*undefined;*/defColorTable;
+    }
+    return undefined;//defColorTable;
+}
+
 function getPlotOptions(
     curve: WellLogCurve,
     templateOptions: TemplatePlotProps,
+    colorTables: ColorTable[],
     domain: [number, number],
     iPlot: number
 ): ExtPlotOptions {
     return {
         scale: "linear", // or "log"
         domain: domain,
-        color: templateOptions.color,
-        // for 'area'!  fill: 'red',
-        // for 'area'! inverseColor: "red",
-        fillOpacity: 0.3, // for 'area'!
-        useMinAsBase: true, // for 'area'!
         dataAccessor: makeDataAccessor(iPlot),
+
+        color: templateOptions.color,
+        inverseColor: templateOptions.inverseColor,
+        fill: templateOptions.fill, // for 'area'!
+        fillOpacity: 0.3, // for 'area' and 'gradientfill'!
+        useMinAsBase: true, // for 'area' and 'gradientfill'!
+
+        colorTable: getColorTable(templateOptions.colorTable, colorTables),
+        inverseColorTable: getColorTable(templateOptions.inverseColorTable, colorTables),
+
         legendInfo: () => ({
             label: curve.name,
             unit: curve.unit ? curve.unit : "",
@@ -264,24 +325,25 @@ function getPlotConfig(
     id: string | number,
     curve: WellLogCurve,
     templateOptions: TemplatePlotProps,
+    colorTables: ColorTable[],
     domain: [number, number],
     iPlot: number
 ): PlotConfig {
     return {
         id: id,
         type: templateOptions.type,
-        options: getPlotOptions(curve, templateOptions, domain, iPlot),
+        options: getPlotOptions(curve, templateOptions, colorTables, domain, iPlot),
     };
 }
 
-export function addTrackPlot(
+export function addGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
     name: string,
     type: string
 ): void {
     const axes = wellLogView.getAxesInfo();
-    const plotFactory = (track.options as GraphTrackOptions).plotFactory;
+    const plotFactory = track.options.plotFactory;
     if (plotFactory) {
         const welllog = wellLogView.props.welllog;
         if (welllog && welllog[0]) {
@@ -305,7 +367,7 @@ export function addTrackPlot(
                 type: type,
             };
             const plotDatas = track.options.data;
-            const plots = (track as GraphTrack).plots;
+            const plots = track.plots;
 
             const templateOptions = getTemplatePlotProps(
                 templatePlot,
@@ -315,6 +377,7 @@ export function addTrackPlot(
                 iCurve,
                 curve,
                 templateOptions,
+                colorTables,
                 roundMinMax(plotData.minmax),
                 plotDatas.length
             );
@@ -328,12 +391,12 @@ export function addTrackPlot(
                 throw Error(
                     `No factory function for creating '${p.type}'-plot!`
                 );
-            const plot = createPlot(p, (track as GraphTrack).trackScale);
+            const plot = createPlot(p, track.trackScale);
             if (plot) {
                 //if (Array.isArray(plots))
                 plots.push(plot);
 
-                (track as GraphTrack).prepareData(); //
+                track.prepareData(); //
 
                 if (wellLogView.logController) {
                     wellLogView.logController.updateTracks();
@@ -344,7 +407,7 @@ export function addTrackPlot(
     }
 }
 
-export function removeTrackPlot(
+export function removeGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
     name: string
@@ -406,6 +469,13 @@ function newScaleTrack(title: string, abbr: string, units: string): ScaleTrack {
     });
 }
 
+import { createPlotType } from "@equinor/videx-wellog";
+import { defaultPlotFactory } from "@equinor/videx-wellog";
+const plotFactory: PlotFactory = {
+    ...defaultPlotFactory,
+    gradientfill: createPlotType(GradientFillPlot),
+}
+
 export function newGraphTrack(
     title: string,
     data: [number, number][][],
@@ -416,6 +486,7 @@ export function newGraphTrack(
         legendConfig: graphLegendConfig,
         data: data,
         plots: plots,
+        plotFactory: plotFactory,
     });
 }
 
@@ -546,6 +617,7 @@ export function createTracks(
                     iCurve,
                     curve,
                     templateOptions,
+                    colorTables,
                     roundMinMax(plotData.minmax),
                     plotDatas.length
                 );
@@ -566,3 +638,4 @@ export function createTracks(
     }
     return info;
 }
+
