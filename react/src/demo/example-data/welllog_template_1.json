@@ -113,7 +113,7 @@
       "plots": [
         {
           "name": "MDOA",
-          "type": "linestep"
+          "style": "MD"
         }
       ]
     },
@@ -121,7 +121,7 @@
       "plots": [
         {
           "name": "MDIA",
-          "type": "linestep"
+          "style": "MD"
         }
       ]
     },
@@ -179,7 +179,14 @@
     {
       "name": "HKL",
       "type": "gradientfill",
+      "color": "red",
       "colorTable": "Physics"
+    },
+    {
+      "name": "MD",
+      "type": "area",
+      "color": "blue",
+      "fill": "green"
     }
   ]
 }

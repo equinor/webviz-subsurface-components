@@ -57,7 +57,6 @@ export default class GradientFillPlot extends Plot {
             = renderGradientFillPlotLegend
     }
 
-
     /**
      * Renders area plot to canvas context
      * @param ctx canvas context instance
