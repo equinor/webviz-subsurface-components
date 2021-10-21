@@ -24,7 +24,7 @@ describe("Test draw-mode menu", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
         //expect(obj.plottable[2]).toBeLessThan(10);
-        if (obj.plottable[2] > 100) {
+        if (obj.plottable[2] > 1) {
             core.warning(
                 "DrawModeSelector Component in '/components/DeckGLMap/components/settings/' seems to have performance issues"
             );
