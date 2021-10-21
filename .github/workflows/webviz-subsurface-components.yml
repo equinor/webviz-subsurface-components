@@ -91,6 +91,7 @@ jobs:
 
       - name: Create comment
         uses: peter-evans/create-or-update-comment@v1
+        run: echo github.event_name
         if: github.event_name == 'pull_request' && ${{ steps.unit-tests-results.outputs.annotation_status }} == "annotation_present"
         with:
           issue-number: ${{ github.event.number }}
