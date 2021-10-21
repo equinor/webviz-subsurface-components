@@ -94,8 +94,7 @@ jobs:
         with:
           issue-number: ${{ github.event.number }}
           body: |
-            There are some performance issues.Please see the workflow annotations
-            - With GitHub **Markdown** :warning:
+            :warning: There are some performance issues. Please see the workflow annotations for more details :warning:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
