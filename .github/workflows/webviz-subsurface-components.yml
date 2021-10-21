@@ -87,7 +87,7 @@ jobs:
 
         id: unit-tests-results
       - name: Get annotation status
-        run: echo github.event_name
+        run: echo "event name  and event type is:" ${{ github.event_name }} ${{ github.event.action }}
 
       - name: Create comment
         uses: peter-evans/create-or-update-comment@v1
