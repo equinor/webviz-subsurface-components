@@ -55,7 +55,7 @@ export default class GridLayer extends CompositeLayer<
         };
 
         // For now just cycle over the timesteps.
-        setInterval(updateTimeStepNo, 500);
+        setInterval(updateTimeStepNo, 2500);
     }
 
     // For now, use `any` for the picking types because this function should
@@ -106,7 +106,7 @@ export default class GridLayer extends CompositeLayer<
                 stroked: true,
                 filled: true,
                 lineWidthMinPixels: 1,
-                visible: true,
+                visible: this.props.visible,
             })
         );
 
