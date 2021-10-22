@@ -90,7 +90,7 @@ jobs:
         run: echo "The annotation status is ${{ steps.unit-tests-results.outputs.annotation_status }}"
 
       - name: Create comment
-        if: github.event_name == 'pull_request' && steps.unit-tests-results.outputs.annotation_status == "annotation_present"
+        if: github.event_name == 'pull_request' && steps.unit-tests-results.outputs.annotation_status == 'annotation_present'
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.number }}
