@@ -87,7 +87,9 @@ jobs:
 
         id: unit-tests-results
       - name: Get annotation status
-        run: echo "The annotation status is ${{ steps.unit-tests-results.outputs.annotation_status }}"
+        run: |
+          echo "The annotation status is ${{ steps.unit-tests-results.outputs.annotation_status }}"
+          echo ${{ steps.unit-tests-results.outputs }}
 
       - name: Create comment
         if: github.event_name == 'pull_request' && steps.unit-tests-results.outputs.annotation_status == 'annotation_present'
@@ -96,6 +98,7 @@ jobs:
           issue-number: ${{ github.event.number }}
           body: |
             :warning: There are some performance issues. Please see the workflow annotations for more details :warning:
+            -
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
