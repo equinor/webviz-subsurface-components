@@ -26,11 +26,13 @@ describe("Test draw-mode menu", () => {
         //expect(obj.plottable[2]).toBeLessThan(10);
         if (obj.plottable[2] > 1) {
             core.warning(
-                "DrawModeSelector Component in '/components/DeckGLMap/components/settings/' seems to have performance issues"
+                "DrawModeSelector Component in '/components/DeckGLMap/components/settings/' seems to have performance issues. Actual render time:" +
+                    obj.plottable[2] +
+                    " Expected render time: 1.5"
             );
             core.setOutput("annotation_status", "annotation_present");
-            core.setOutput("Actual render time in ms", obj.plottable[2]);
-            core.setOutput("Expected render time in ms", "1");
+            // core.setOutput("Actual render time in ms", obj.plottable[2]);
+            // core.setOutput("Expected render time in ms", "1");
         }
     });
     it("select option to dispatch redux action", async () => {
