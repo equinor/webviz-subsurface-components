@@ -115,8 +115,8 @@ module.exports = (env, argv) => {
                 },
                 {
                     test: /\.(fs|vs).glsl$/i,
-                    use: ["raw-loader"]
-                }
+                    use: ["raw-loader"],
+                },
             ],
         },
         devtool,
