@@ -42,6 +42,7 @@ import {
     removeOverlay,
     zoomContent,
     scrollContentTo,
+    getScrollContentPos,
     scrollTracks,
 } from "../utils/log-viewer";
 
@@ -1162,19 +1163,13 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.onZoomContent) this.props.onZoomContent(k);
 
         if (this.logController) {
-            const [b1, b2] = this.logController.scaleHandler.baseDomain();
-            const [d1, d2] = this.logController.domain;
+            const scrollContentPos = getScrollContentPos(this.logController)
 
-            //console.log("b1=", b1, "b2=", b2);
-            //console.log("d1=", d1, "d2=", d2);
-            const w = b2 - b1 - (d2 - d1);
-            const scrollContentPos = w ? (d1 - b1) / w : 0;
             const delta = Math.abs(scrollContentPos - this.state.scrollContentPos);
             console.log(
                 "WellLogView.onRescaleContent new scrollContentPos=",
                 scrollContentPos, "delta=", delta, delta > 0.001
             );
-
             if (delta > 0.001)
                 this.setState({ scrollContentPos: scrollContentPos });
         }
@@ -1281,19 +1276,19 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         const x = this.props.horizontal ? this.state.scrollContentPos : fTrack;
         const y = this.props.horizontal ? fTrack : this.state.scrollContentPos;
 
-        const zoomX = this.props.horizontal
+        const xZoom = this.props.horizontal
             ? this.state.zoomContent
             : this.state.zoomTrack;
-        const zoomY = this.props.horizontal
+        const yZoom = this.props.horizontal
             ? this.state.zoomTrack
             : this.state.zoomContent;
-        //console.log("WLV render zoomX=" + zoomX, "zoomY=" + zoomY)
+        //console.log("WLV render xZoom=" + xZoom, "yZoom=" + yZoom)
 
         return (
             <div style={{ width: "100%", height: "100%" }}>
                 <Scroller
-                    zoomX={zoomX}
-                    zoomY={zoomY}
+                    xZoom={xZoom}
+                    yZoom={yZoom}
                     x={x}
                     y={y}
                     onScroll={this.onScroll}

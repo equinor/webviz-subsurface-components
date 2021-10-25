@@ -241,10 +241,10 @@ function getTemplatePlotProps(
         : -1;
     const options =
         iStyle >= 0
-            ? { ...templateStyles[iStyle], ...templatePlot }
-            : { ...templatePlot };
+            ? { type:defPlotType, ...templateStyles[iStyle], ...templatePlot }
+            : { type:defPlotType, ...templatePlot };
     if (!isValidPlotType(options.type)) {
-        console.log("unknown plot type '" + options.type + "': use default type '" + defPlotType + "'")
+      console.log("unknown plot type '" + options.type + "': use default type '" + defPlotType + "'")
       options.type = defPlotType;
     }
     if (!options.color) options.color = generateColor();

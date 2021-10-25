@@ -2,7 +2,7 @@
   {
     "name": "Physics",
     "discrete": "false",
-    "description": "Minimal otions color table",
+    "description": "Minimal options color table",
     "colors": [
       [ 0.00, 1.00, 0.00, 0.00 ],
       [ 0.25, 0.71, 0.71, 0.00 ],

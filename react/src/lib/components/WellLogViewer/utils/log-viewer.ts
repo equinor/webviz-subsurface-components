@@ -53,11 +53,23 @@ export function scrollContentTo(
     //console.log("b1=" + b1 + " b2=" + b2);
     //console.log("d1=" + d1 + " d2=" + d2);
     const d = d2 - d1;
-    const m = b2 - b1 - d;
+    const w = (b2 - b1) - (d2 - d1);
 
-    const c = b1 + f * m;
-    //console.log("c=" + c + " c+d=" + (c + d));
+    const c = b1 + f * w;
+    console.log("c=" + c + " c+d=" + (c + d));
     if (c !== d1) logViewer.zoomTo([c, c + d]);
+}
+
+export function getScrollContentPos(
+    logViewer: LogViewer,
+): number /*fraction*/ {
+    const [b1, b2] = logViewer.scaleHandler.baseDomain();
+    const [d1, d2] = logViewer.domain;
+
+    //console.log("b1=", b1, "b2=", b2);
+    //console.log("d1=", d1, "d2=", d2);
+    const w = (b2 - b1) - (d2 - d1);
+    return w ? (d1 - b1) / w : 0
 }
 
 export function scrollTracks(

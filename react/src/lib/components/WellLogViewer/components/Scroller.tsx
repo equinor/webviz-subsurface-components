@@ -1,8 +1,8 @@
 import React, { Component, ReactNode } from "react";
 
 interface Props {
-    zoomX?: number;
-    zoomY?: number;
+    xZoom?: number;
+    yZoom?: number;
 
     x: number; // fraction
     y: number; // fraction
@@ -18,22 +18,23 @@ function getScrollbarSizes(): { vertical: number; horizontal: number } {
     //!!! outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
     document.body.appendChild(outer);
 
+    /*
     // Creating inner element and placing it in the container
     const inner = document.createElement("div");
     outer.appendChild(inner);
-
     // Calculating difference between container's full width and the child width
     const vertical = outer.offsetWidth - inner.offsetWidth; // vertical scrollbar
     const horizontal = outer.offsetHeight - inner.offsetHeight; // horizontal scrollbar
 
-    // Removing temporary elements from the DOM
-    document.body /*outer.parentNode*/
-        .removeChild(outer);
+    */
+    //scrollbarWidth = offsetWidth - clientWidth - getComputedStyle().borderLeftWidth - getComputedStyle().borderRightWidth
+    const vertical = outer.offsetWidth - outer.clientWidth 
+    const horizontal = outer.offsetHeight - outer.clientHeight
 
-    return {
-        vertical,
-        horizontal,
-    };
+    // Removing temporary elements from the DOM
+    document.body.removeChild(outer);
+
+    return { vertical, horizontal };
 }
 
 class Scroller extends Component<Props> {
@@ -42,15 +43,10 @@ class Scroller extends Component<Props> {
 
     constructor(props: Props) {
         super(props);
-
         this.scroller = React.createRef();
         this.scrollable = React.createRef();
 
         this.onScroll = this.onScroll.bind(this);
-    }
-
-    componentDidMount(): void {
-        //this.scrollTo(this.props.x, this.props.y);
     }
 
     componentDidUpdate(prevProps: Props): void {
@@ -59,14 +55,13 @@ class Scroller extends Component<Props> {
         }
     }
 
-    onScroll(): void {
-        // callback from HTML element
+    onScroll(): void { // callback from HTML element
         const el = this.scroller.current as HTMLElement;
         const scrollTop = el.scrollTop;
         const scrollHeight = el.scrollHeight - el.clientHeight;
         const scrollLeft = el.scrollLeft;
         const scrollWidth = el.scrollWidth - el.clientWidth;
-        /*
+        
         console.log(
             "scrollTop=" +
                 scrollTop +
@@ -77,7 +72,7 @@ class Scroller extends Component<Props> {
                 " scrollWidth=" +
                 scrollWidth
         );
-        */
+        
         // compute fractions
         const x = scrollWidth ? scrollLeft / scrollWidth : 0;
         const y = scrollHeight ? scrollTop / scrollHeight : 0;
@@ -96,19 +91,25 @@ class Scroller extends Component<Props> {
 
     scrollTo(x: number, y: number): void {
         console.log("Scroller.scrollTo(" + x + "," + y + ")");
-        if (x < 0.0) x = 0.0;
-        if (x > 1.0) x = 1.0;
-        if (y < 0.0) y = 0.0;
-        if (y > 1.0) y = 1.0;
+        if (x < 0.0) x = 0.0; else if (x > 1.0) x = 1.0;
+        if (y < 0.0) y = 0.0; else if (y > 1.0) y = 1.0;
+
+        
+            const el = this.scroller.current as HTMLElement;
+            let scrollLeft = x * (el.scrollWidth - el.clientWidth) 
+            let scrollTop = y * (el.scrollHeight - el.clientHeight)
+        scrollLeft = Math.round(scrollLeft);
+        scrollTop = Math.round(scrollTop);
+        
 
         const { vertical, horizontal } = getScrollbarSizes();
         const elOuter = this.scroller.current as HTMLElement;
-        const widthOuter = elOuter.getBoundingClientRect().width;
-        const heightOuter = elOuter.getBoundingClientRect().height;
+        const widthOuter = elOuter.getBoundingClientRect().width - vertical;
+        const heightOuter = elOuter.getBoundingClientRect().height - horizontal;
 
         const elInner = this.scrollable.current as HTMLElement;
-        const widthInner = elInner.getBoundingClientRect().width + vertical;
-        const heightInner = elInner.getBoundingClientRect().height + horizontal;
+        const widthInner = elInner.offsetWidth//getBoundingClientRect().width;
+        const heightInner = elInner.offsetHeight//getBoundingClientRect().height;
 
         //console.log("el.scroll=", el.scrollLeft, el.scrollTop);
         let left = x * (widthInner - widthOuter);
@@ -116,11 +117,14 @@ class Scroller extends Component<Props> {
         left = Math.round(left);
         top = Math.round(top);
 
+        console.log("left, top=", scrollLeft, scrollTop);
+        console.log("left, top=", left, top);
+        left = scrollLeft;
+        top = scrollTop;
+
         if (elOuter.scrollLeft !== left || elOuter.scrollTop !== top) {
             console.log("elOuter.scrollTo("+left+","+top+")");
-            //elOuter.scrollLeft = left;
-            //elOuter.scrollTop = top;
-            elOuter.scrollTo(left, top)
+            elOuter.scrollTo(left, top) //elOuter.scrollLeft = left; elOuter.scrollTop = top;
         }
     }
 
@@ -132,16 +136,18 @@ class Scroller extends Component<Props> {
         const width = Width - vertical;
         const height = Height - horizontal;
 
-        const xZoom = this.props.zoomX ? this.props.zoomX : 1;
-        const yZoom = this.props.zoomY ? this.props.zoomY : 1;
+        const xZoom = this.props.xZoom ? this.props.xZoom : 1;
+        const yZoom = this.props.yZoom ? this.props.yZoom : 1;
 
         const widthInner = width * xZoom;
         const heightInner = height * yZoom;
 
-        //const left = this.props.x * (widthinner - width);
-        //const top = this.props.y * (heightinner - height);
-        //console.log("render scrollTo(" + left + "," + top + ")", wZ, hZ);
-        //console.log("Scroller render zoom=", wZoom, hZoom);
+        let left = this.props.x * (widthInner - width);
+        let top = this.props.y * (heightInner - height);
+        left = Math.round(left);
+        top = Math.round(top);
+        console.log("render scrollTo(" + left + "," + top + ")", xZoom, yZoom);
+        //console.log("Scroller render zoom=", xZoom, yZoom);
         return (
             <div style={{ width: "100%", height: "100%" }}>
                 <div
