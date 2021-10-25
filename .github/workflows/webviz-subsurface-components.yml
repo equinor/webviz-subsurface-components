@@ -154,4 +154,4 @@ jobs:
           fi
 
   performance-check:
-    uses: ./.github/workflows/webviz-subsurface-components.yml@v1
+    uses: avanti-em/webviz-subsurface-components/.github/workflows/webviz-subsurface-components.yml@v1
