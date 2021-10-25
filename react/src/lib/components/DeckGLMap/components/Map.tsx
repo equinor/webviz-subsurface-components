@@ -10,10 +10,16 @@ import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { setSpec } from "../redux/actions";
 import { createStore } from "../redux/store";
-import { WellsPickInfo, getLogInfo } from "../layers/wells/wellsLayer";
+import {
+    WellsPickInfo,
+    getLogInfo,
+    getLogValues,
+    LogCurveDataType,
+} from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
+import ContinuousLegend from "../components/ContinuousLegend";
 import {
     ColormapLayer,
     Hillshading2DLayer,
@@ -131,7 +137,10 @@ export interface MapProps {
 
     coordinateUnit: string;
 
-    legendVisible: boolean;
+    legend: {
+        visible: boolean;
+        position: number[];
+    };
 
     children?: React.ReactNode;
 }
@@ -144,7 +153,7 @@ const Map: React.FC<MapProps> = ({
     coords,
     scale,
     coordinateUnit,
-    legendVisible,
+    legend,
     children,
 }: MapProps) => {
     // state for views prop of DeckGL component
@@ -198,17 +207,21 @@ const Map: React.FC<MapProps> = ({
     //eslint-disable-next-line
     const [discreteData, setDiscreteData] = React.useState(Object);
     const [discreteDataPresent, setDiscreteDataPresent] = React.useState(false);
+    const [min, setMin] = React.useState<number>(0);
+    const [max, setMax] = React.useState<number>(0);
+    const [continuousDataPresent, setContinuousDataPresent] =
+        React.useState(false);
 
     //eslint-disable-next-line
     const layers = (deckglSpec["layers"] as any);
     const wellsLayerData = layers.filter(
-        //eslint-disable-next-line
-            (item: any) =>
-                item.id.toLowerCase() == "wells-layer".toLowerCase()
+        (log: Record<string, string>) =>
+            log["id"].toLowerCase() === "wells-layer".toLowerCase()
     );
+
     const logData = wellsLayerData[0].logData;
     const logName = wellsLayerData[0].logName;
-
+    const logType = wellsLayerData[0]["@@type"];
     React.useEffect(() => {
         let isMounted = true;
         fetch(logData)
@@ -219,12 +232,33 @@ const Map: React.FC<MapProps> = ({
                     data[0].header.name,
                     logName
                 );
+                setDiscreteDataPresent(false);
+                setContinuousDataPresent(false);
                 if (log_info?.description == "discrete") {
                     const metadata_discrete =
                         data[0]["metadata_discrete"][logName].objects;
                     if (isMounted) {
                         setDiscreteData(metadata_discrete);
                         setDiscreteDataPresent(true);
+                    }
+                } else {
+                    const minArray: number[] = [];
+                    const maxArray: number[] = [];
+                    data.forEach(function (log: LogCurveDataType) {
+                        const logValues = getLogValues(
+                            log,
+                            log.header.name,
+                            logName
+                        );
+
+                        minArray.push(Math.min(...logValues));
+                        maxArray.push(Math.max(...logValues));
+                    });
+
+                    if (isMounted) {
+                        setMin(Math.min(...minArray));
+                        setMax(Math.max(...maxArray));
+                        setContinuousDataPresent(true);
                     }
                 }
             });
@@ -319,8 +353,22 @@ const Map: React.FC<MapProps> = ({
                         scaleUnit={coordinateUnit}
                     />
                 ) : null}
-                {legendVisible && discreteDataPresent ? (
-                    <DiscreteColorLegend discreteData={discreteData} />
+                {legend.visible && discreteDataPresent ? (
+                    <DiscreteColorLegend
+                        discreteData={discreteData}
+                        logName={logName}
+                        logType={logType}
+                        position={legend.position}
+                    />
+                ) : null}
+                {legend.visible && continuousDataPresent ? (
+                    <ContinuousLegend
+                        min={min}
+                        max={max}
+                        logName={logName}
+                        logType={logType}
+                        position={legend.position}
+                    />
                 ) : null}
             </ReduxProvider>
         )
