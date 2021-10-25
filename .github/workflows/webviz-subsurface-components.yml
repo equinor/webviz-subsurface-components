@@ -154,4 +154,9 @@ jobs:
           fi
 
   performance-check:
-    uses: avanti-em/webviz-subsurface-components/.github/workflows/webviz-subsurface-components.yml@master
+    needs: webviz-subsurface-components
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🤖 Run tests
+        if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
+        run: npm run test --prefix ./react
