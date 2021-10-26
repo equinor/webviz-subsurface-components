@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useCallback } from "react";
+import React, { ChangeEvent, FormEvent, useCallback, Profiler } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateLayerProp } from "../../redux/actions";
 import { MapState } from "../../redux/store";
@@ -13,6 +13,7 @@ import {
     NumericTypeProps,
 } from "../../redux/types";
 import { getLayerProps } from "../../utils/specExtractor";
+import logTimes from "../../../../performanceUtility/onRenderFunction";
 
 interface Props {
     layerId: string;
@@ -40,95 +41,97 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
 
     return (
         layerProps && (
-            <>
-                {
-                    // first render all boolean properties
-                    ToggleTypeProps.map(
-                        ({ id, displayName }) =>
-                            id in layerProps && (
-                                <ToggleButton
-                                    label={displayName}
-                                    checked={layerProps[id] as boolean}
-                                    onChange={(
-                                        e: ChangeEvent<HTMLInputElement>
-                                    ) => {
-                                        updateProp(
-                                            layerId,
-                                            id,
-                                            e.target.checked
-                                        );
-                                    }}
-                                    key={`prop-toggle-${layerId}-${id}`}
-                                />
-                            )
-                    )
-                }
+            <Profiler id="Native Select" onRender={logTimes}>
+                <>
+                    {
+                        // first render all boolean properties
+                        ToggleTypeProps.map(
+                            ({ id, displayName }) =>
+                                id in layerProps && (
+                                    <ToggleButton
+                                        label={displayName}
+                                        checked={layerProps[id] as boolean}
+                                        onChange={(
+                                            e: ChangeEvent<HTMLInputElement>
+                                        ) => {
+                                            updateProp(
+                                                layerId,
+                                                id,
+                                                e.target.checked
+                                            );
+                                        }}
+                                        key={`prop-toggle-${layerId}-${id}`}
+                                    />
+                                )
+                        )
+                    }
 
-                {
-                    // then render all numeric properties
-                    NumericTypeProps.map(
-                        ({ id, displayName }) =>
-                            id in layerProps && (
-                                <NumericInput
-                                    label={displayName}
-                                    value={layerProps[id] as number}
-                                    onChange={(
-                                        e: ChangeEvent<HTMLInputElement>
-                                    ) => {
-                                        updateProp(
-                                            layerId,
-                                            id,
-                                            Number(e.target.value)
-                                        );
-                                    }}
-                                    key={`prop-numeric-input-${layerId}-${id}`}
-                                />
-                            )
-                    )
-                }
+                    {
+                        // then render all numeric properties
+                        NumericTypeProps.map(
+                            ({ id, displayName }) =>
+                                id in layerProps && (
+                                    <NumericInput
+                                        label={displayName}
+                                        value={layerProps[id] as number}
+                                        onChange={(
+                                            e: ChangeEvent<HTMLInputElement>
+                                        ) => {
+                                            updateProp(
+                                                layerId,
+                                                id,
+                                                Number(e.target.value)
+                                            );
+                                        }}
+                                        key={`prop-numeric-input-${layerId}-${id}`}
+                                    />
+                                )
+                        )
+                    }
 
-                {
-                    // then render all slider properties
-                    SliderTypeProps.map(
-                        ({ id, displayName, min, max, step }) =>
-                            id in layerProps && (
-                                <SliderInput
-                                    label={displayName}
-                                    min={min}
-                                    max={max}
-                                    step={step}
-                                    value={layerProps[id] as number}
-                                    onChange={(
-                                        _: FormEvent<HTMLDivElement>,
-                                        value: number | number[]
-                                    ) => {
-                                        updateProp(
-                                            layerId,
-                                            id,
-                                            (value as number) / 100
-                                        );
-                                    }}
-                                    key={`prop-slider-${layerId}-${id}`}
-                                />
-                            )
-                    )
-                }
+                    {
+                        // then render all slider properties
+                        SliderTypeProps.map(
+                            ({ id, displayName, min, max, step }) =>
+                                id in layerProps && (
+                                    <SliderInput
+                                        label={displayName}
+                                        min={min}
+                                        max={max}
+                                        step={step}
+                                        value={layerProps[id] as number}
+                                        onChange={(
+                                            _: FormEvent<HTMLDivElement>,
+                                            value: number | number[]
+                                        ) => {
+                                            updateProp(
+                                                layerId,
+                                                id,
+                                                (value as number) / 100
+                                            );
+                                        }}
+                                        key={`prop-slider-${layerId}-${id}`}
+                                    />
+                                )
+                        )
+                    }
 
-                {
-                    // lastly render all menu type properties
-                    MenuTypeProps.map(
-                        ({ id, displayName }) =>
-                            id in layerProps && (
-                                <DrawModeSelector
-                                    layerId={layerId}
-                                    label={displayName}
-                                    value={layerProps[id] as string}
-                                    key={`prop-menu-${layerId}-${id}`}
-                                />
-                            )
-                    )
-                }
-            </>
+                    {
+                        // lastly render all menu type properties
+                        MenuTypeProps.map(
+                            ({ id, displayName }) =>
+                                id in layerProps && (
+                                    <DrawModeSelector
+                                        layerId={layerId}
+                                        label={displayName}
+                                        value={layerProps[id] as string}
+                                        key={`prop-menu-${layerId}-${id}`}
+                                    />
+                                )
+                        )
+                    }
+                </>
+            </Profiler>
         )
     );
 });

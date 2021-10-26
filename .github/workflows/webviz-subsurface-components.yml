@@ -214,8 +214,7 @@ jobs:
           pylint webviz_subsurface_components/ tests/ setup.py examples/*.py --ignore well-completions-csv2json.py
           bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
 
-      - name: 🤖 Run tests
+      - name: 🤖 Run performance tests
         if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
         run: |
-          npm run test --prefix ./react
-          pytest ./tests --headless
+          npm run test_perf --prefix ./react
