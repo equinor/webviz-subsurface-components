@@ -14,16 +14,13 @@ describe("Test Layer Property", () => {
                 children: <LayerProperty layerId="drawing-layer" />,
             })
         );
-        if (obj.plottable[2] > 1) {
+        if (obj.plottable[2] > 100) {
             core.warning(
-                "DrawModeSelector Component in '/components/DeckGLMap/components/settings/' seems to have performance issues. Actual render time:" +
+                "Layer Property Component in '/components/DeckGLMap/components/settings/' seems to have performance issues. Actual render time:" +
                     obj.plottable[2] +
-                    " Expected render time: 1.5"
+                    " Expected render time: 100"
             );
-            core.setOutput("annotation_status", "annotation_present");
-            // core.setOutput("Actual render time in ms", obj.plottable[2]);
-            // core.setOutput("Expected render time in ms", "1");
         }
-        expect(obj.plottable[2]).toBeLessThan(1);
+        expect(obj.plottable[2]).toBeLessThan(100);
     });
 });
