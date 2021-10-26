@@ -4,7 +4,6 @@ import "@testing-library/jest-dom";
 import React from "react";
 import { Wrapper } from "../../test/TestWrapper";
 import DrawModeSelector from "./DrawModeSelector";
-//import logToDataBase from "../../../../performanceUtility/logPerformanceData";
 import { obj } from "../../../../performanceUtility/onRenderFunction";
 import * as core from "@actions/core";
 
@@ -21,14 +20,13 @@ describe("Test draw-mode menu", () => {
                 ),
             })
         );
-        //expect(obj.plottable[2]).toBeLessThan(10);
-        if (obj.plottable[2] > 100) {
+        if (obj.perf_metrics[2] > 100) {
             core.warning(
                 "DrawModeSelector Component in '/components/DeckGLMap/components/settings/' seems to have performance issues. Actual render time:" +
-                    obj.plottable[2] +
+                    obj.perf_metrics[2] +
                     " Expected render time: 100"
             );
         }
-        expect(obj.plottable[2]).toBeLessThan(100);
+        expect(obj.perf_metrics[2]).toBeLessThan(100);
     });
 });

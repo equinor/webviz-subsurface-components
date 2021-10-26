@@ -41,7 +41,7 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
 
     return (
         layerProps && (
-            <Profiler id="Native Select" onRender={logTimes}>
+            <Profiler id="Layer properties" onRender={logTimes}>
                 <>
                     {
                         // first render all boolean properties

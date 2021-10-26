@@ -5,9 +5,6 @@ import React from "react";
 import userEvent from "@testing-library/user-event";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import DrawModeSelector from "./DrawModeSelector";
-//import logToDataBase from "../../../../performanceUtility/logPerformanceData";
-import { obj } from "../../../../performanceUtility/onRenderFunction";
-import * as core from "@actions/core";
 
 describe("Test draw-mode menu", () => {
     it("snapshot test", () => {
@@ -49,10 +46,5 @@ describe("Test draw-mode menu", () => {
             payload: ["drawing-layer", "view"],
             type: "spec/updateDrawingMode",
         });
-        console.log(obj.plottable);
-        //expect(obj.plottable[2]).toBeLessThan(10);
-        if (obj.plottable[2] > 100) {
-            core.warning("Check the DrwaModeSelector test");
-        }
     });
 });
