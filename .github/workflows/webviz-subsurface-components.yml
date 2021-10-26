@@ -85,18 +85,6 @@ jobs:
           npm run test --prefix ./react
           pytest ./tests --headless
 
-        id: unit-tests-results
-      - name: Get annotation status
-        run: echo "The annotation status is ${{ steps.unit-tests-results.outputs.annotation_status }}"
-
-      - name: Create comment
-        if: github.event_name == 'pull_request' && steps.unit-tests-results.outputs.annotation_status == 'annotation_present'
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.number }}
-          body: |
-            :warning: There are some performance issues. Please see the workflow annotations for more details :warning:
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
 
