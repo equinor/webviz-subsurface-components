@@ -31,6 +31,7 @@ describe("Test draw-mode menu", () => {
                     " Expected render time: 1.5"
             );
             core.setOutput("annotation_status", "annotation_present");
+            core.setFailed("Please check Annotations for performance issues");
             // core.setOutput("Actual render time in ms", obj.plottable[2]);
             // core.setOutput("Expected render time in ms", "1");
         }
