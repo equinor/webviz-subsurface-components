@@ -38,6 +38,9 @@ const ContinuousLegend: React.FC<legendProps> = ({
             legendwidth = 80,
             margin = { top: 15, right: 60, bottom: 15, left: 2 };
 
+        select(selected_id).select("canvas").remove();
+        select(selected_id).select("svg").remove();
+
         const canvas = select(selected_id)
             .style("width", 150 + "px")
             .append("canvas")
