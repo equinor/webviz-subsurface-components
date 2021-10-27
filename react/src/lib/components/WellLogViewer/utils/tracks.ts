@@ -13,12 +13,9 @@ export interface ExtPlotOptions extends GradientFillPlotOptions/*AreaPlotOptions
     };
 }
 
-
-
 import WellLogView from "../components/WellLogView";
 
 import { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
-
 import { PlotFactory } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 
 import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
@@ -241,8 +238,10 @@ function getTemplatePlotProps(
         : -1;
     const options =
         iStyle >= 0
-            ? { type:defPlotType, ...templateStyles[iStyle], ...templatePlot }
-            : { type:defPlotType, ...templatePlot };
+            ? { ...templateStyles[iStyle], ...templatePlot }
+            : { ...templatePlot };
+    if (!options.type)
+        options.type = defPlotType;
     if (!isValidPlotType(options.type)) {
       console.log("unknown plot type '" + options.type + "': use default type '" + defPlotType + "'")
       options.type = defPlotType;
@@ -267,6 +266,24 @@ function makeDataAccessor(iPlot: number) {
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
 }
 
+class __dataAccessor2 {
+    iPlot: number;
+    iPlot2: number;
+
+    constructor(iPlot: number, iPlot2: number) {
+        this.iPlot = iPlot;
+        this.iPlot2 = iPlot2;
+    }
+
+    dataAccessor(d: number[][]): [number[], number[]] {
+        return [d[this.iPlot], d[this.iPlot2]];
+    }
+}
+function makeDataAccessor2(iPlot: number, iPlot2: number) {
+    const _dataAccessor = new __dataAccessor2(iPlot, iPlot2);
+    return _dataAccessor.dataAccessor.bind(_dataAccessor);
+}
+
 import { ColorTable } from "../components/ColorTableTypes"
 
 const defColorTable: ColorTable = {
@@ -279,7 +296,11 @@ const defColorTable: ColorTable = {
     ],
 }
 
-function getColorTable(id: string|undefined, colorTables: ColorTable[]): ColorTable|undefined {
+function getColorTable(id: string | undefined, colorTables: ColorTable[]): ColorTable | undefined {
+    if (id && typeof (id) !== "string") {
+        console.log("colorTable id='" + id + "' is not string")
+        return id;
+    }
     if (id && colorTables) {
         for (let i = 0; i < colorTables.length; i++) {
             if (colorTables[i].name == id)
@@ -295,24 +316,31 @@ function getColorTable(id: string|undefined, colorTables: ColorTable[]): ColorTa
 
 function getPlotOptions(
     curve: WellLogCurve,
-    templateOptions: TemplatePlotProps,
+    templatePlotProps: TemplatePlotProps,
     colorTables: ColorTable[],
     domain: [number, number],
-    iPlot: number
+    iPlot: number,
+    curve2: WellLogCurve, iPlot2: number
 ): ExtPlotOptions {
     return {
         scale: "linear", // or "log"
         domain: domain,
-        dataAccessor: makeDataAccessor(iPlot),
+        dataAccessor: curve2? makeDataAccessor2(iPlot, iPlot2) : makeDataAccessor(iPlot),
 
-        color: templateOptions.color,
-        inverseColor: templateOptions.inverseColor,
-        fill: templateOptions.fill, // for 'area'!
+        color: templatePlotProps.color,
+        inverseColor: templatePlotProps.inverseColor,
+        fill: templatePlotProps.fill, // for 'area'!
         fillOpacity: 0.3, // for 'area' and 'gradientfill'!
         useMinAsBase: true, // for 'area' and 'gradientfill'!
 
-        colorTable: getColorTable(templateOptions.colorTable, colorTables),
-        inverseColorTable: getColorTable(templateOptions.inverseColorTable, colorTables),
+        colorTable: getColorTable(templatePlotProps.colorTable, colorTables),
+        inverseColorTable: getColorTable(templatePlotProps.inverseColorTable, colorTables),
+
+        //DifferentialPlotOptions
+        serie1: {
+        },
+        serie2: {
+        },
 
         legendInfo: () => ({
             label: curve.name,
@@ -324,23 +352,24 @@ function getPlotOptions(
 function getPlotConfig(
     id: string | number,
     curve: WellLogCurve,
-    templateOptions: TemplatePlotProps,
+    templatePlotProps: TemplatePlotProps,
     colorTables: ColorTable[],
     domain: [number, number],
-    iPlot: number
+    iPlot: number,
+    curve2: WellLogCurve, iPlot2: number,
 ): PlotConfig {
     return {
         id: id,
-        type: templateOptions.type,
-        options: getPlotOptions(curve, templateOptions, colorTables, domain, iPlot),
+        type: templatePlotProps.type,
+        options: getPlotOptions(curve, templatePlotProps, colorTables, domain, iPlot, curve2, iPlot2),
     };
 }
+
 
 export function addGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
-    name: string,
-    type: string
+    templatePlot: TemplatePlot
 ): void {
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
@@ -355,37 +384,44 @@ export function addGraphTrackPlot(
                 axes.mnemos[axes.primaryAxis]
             );
 
-            const iCurve = indexOfElementByName(curves, name);
+            const iCurve = indexOfElementByName(curves, templatePlot.name);
 
             const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
             const curve = curves[iCurve];
 
-            const templatePlot: TemplatePlot = {
-                name: name,
-                style: "",
-                color: "",
-                type: type,
-            };
             const plotDatas = track.options.data;
             const plots = track.plots;
 
             const colorTables = wellLogView.props.colorTables;
 
-            const templateOptions = getTemplatePlotProps(
+            var iCurve2;
+            var curve2;
+            var plotData2;
+            if (templatePlot.type==="differential") {
+                var iCurve2 = indexOfElementByName(curves, templatePlot.name2);
+                var curve2 = iCurve2 >= 0 ? curves[iCurve2] : null;
+                var plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+            }
+
+            const templatePlotProps = getTemplatePlotProps(
                 templatePlot,
                 /*templateStyles*/ []
             );
             const p = getPlotConfig(
                 iCurve,
                 curve,
-                templateOptions,
+                templatePlotProps,
                 colorTables,
                 roundMinMax(plotData.minmax),
                 plotDatas.length
+                , curve2, plotDatas.length+1
             );
 
             //checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
             plotDatas.push(plotData.data);
+            if (templatePlot.type === "differential") {
+                plotDatas.push(plotData2.data);
+            }
 
             // GraphTrack
             const createPlot = plotFactory[p.type];
@@ -395,15 +431,13 @@ export function addGraphTrackPlot(
                 );
             const plot = createPlot(p, track.trackScale);
             if (plot) {
-                //if (Array.isArray(plots))
                 plots.push(plot);
 
                 track.prepareData(); //
 
                 if (wellLogView.logController) {
                     wellLogView.logController.updateTracks();
-                }
-                //(track as GraphTrack).plot();
+                }                
             }
         }
     }
@@ -473,6 +507,7 @@ function newScaleTrack(title: string, abbr: string, units: string): ScaleTrack {
 
 import { createPlotType } from "@equinor/videx-wellog";
 import { defaultPlotFactory } from "@equinor/videx-wellog";
+
 const plotFactory: PlotFactory = {
     ...defaultPlotFactory,
     gradientfill: createPlotType(GradientFillPlot),
@@ -610,29 +645,37 @@ export function createTracks(
                 if (curve.valueType === "string") continue; //??
 
                 const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+
                 checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
 
-                const templateOptions = getTemplatePlotProps(
+                var iCurve2;
+                var curve2;
+                var plotData2;
+                if (templatePlot.name2) {
+                    var iCurve2 = indexOfElementByName(curves, templatePlot.name2);
+                    var curve2 = iCurve2 >= 0 ? curves[iCurve2] : null;
+                    var plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+                }
+
+                const templatePlotProps = getTemplatePlotProps(
                     templatePlot,
                     templateStyles
                 );
                 const p = getPlotConfig(
                     iCurve,
                     curve,
-                    templateOptions,
+                    templatePlotProps,
                     colorTables,
                     roundMinMax(plotData.minmax),
                     plotDatas.length
+                    ,curve2 , plotDatas.length+1
                 );
 
-                /* DifferentialPlotOptions
-                DifferentialPlotSerieOptions
-                p.options.serie1.color='red'
-                p.options.serie1.fill='yellow'
-                p.options.serie2.color='blue'
-                p.options.serie2.fill = 'green'
-                */
                 plotDatas.push(plotData.data);
+                if (templatePlot.name2) {
+                    plotDatas.push(plotData2.data);
+                }
+
                 plots.push(p);
             }
             if (plots.length || templateTrack.required) {

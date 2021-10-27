@@ -15,7 +15,8 @@ export type TemplateTrack = {
 }; // Part of JSON
 export interface TemplatePlot extends TemplatePlotProps {
     name: string;
-    style: string;
+    style?: string;
+    name2?: string;// for differential plot
 } // Part of JSON
 export interface TemplateStyle extends TemplatePlotProps {
     name: string;

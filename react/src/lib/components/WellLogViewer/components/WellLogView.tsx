@@ -1,3 +1,4 @@
+
 import React, { Component, ReactNode } from "react";
 import { LogViewer } from "@equinor/videx-wellog";
 
@@ -35,6 +36,7 @@ import { newGraphTrack } from "../utils/tracks";
 import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
+import { GradientFillPlotOptions } from "../utils/gradientfill-plot";  
 import { addGraphTrackPlot, removeGraphTrackPlot } from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
 
@@ -47,6 +49,14 @@ import {
 } from "../utils/log-viewer";
 
 import ReactDOM from "react-dom";
+
+import {
+    TemplatePlotProps,
+    TemplateTrack,
+    TemplatePlot,
+    TemplateStyle,
+} from "./WellLogTemplateTypes";
+
 
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -98,18 +108,6 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         this.closeMenu();
     }
 
-    createAddPlotMenuItem(item: string, parent: HTMLElement | null): ReactNode {
-        return (
-            <MenuItem
-                key={item}
-                onClick={() => {
-                    this.handleClickItem(this.addPlot.bind(this, item, parent));
-                }}
-            >
-                &nbsp;&nbsp;&nbsp;&nbsp;{item}
-            </MenuItem>
-        );
-    }
     createRemovePlotMenuItem(item: string): ReactNode {
         return (
             <MenuItem
@@ -123,73 +121,6 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         );
     }
 
-    addPlot(item: string, parent: HTMLElement | null) {
-        console.log("addPlot(" + item + ")");
-
-        if (parent) {
-            const el: HTMLElement = document.createElement("div");
-            el.style.width = "10px";
-            el.style.height = "13px";
-            parent.appendChild(el);
-            ReactDOM.render(
-                <SimpleMenu
-                    type="type"
-                    anchorEl={el}
-                    wellLogView={this.props.wellLogView}
-                    track={this.props.track}
-                    plotName={item}
-                />,
-                el
-            );
-        }
-
-        /*const track = this.props.track;
-        const type = "line";
-        addGraphTrackPlot(this.props.wellLogView, (track as GraphTrack), item, type);*/
-    }
-
-    _addPlot(item?: string, type?: string) {
-        console.log("_addPlot(" + item + ", " + type + ")");
-        if (!item || !type) return;
-        const track = this.props.track;
-        this.props.wellLogView.addGraphTrackPlot(track as GraphTrack, item, type);
-    }
-
-    menuAddPlotItems(): ReactNode[] {
-        const nodes: ReactNode[] = [];
-        const track = this.props.track;
-        const plots = (track as GraphTrack).plots;
-        const abbr = track.options.abbr;
-
-        const welllog = this.props.wellLogView.props.welllog;
-        if (welllog && welllog[0]) {
-            const curves = welllog[0].curves;
-            let iCurve = 0;
-            for (const curve of curves) {
-                let bUsed = false;
-                if (plots) {
-                    // GraphTrack
-                    for (const plot of plots)
-                        if (plot.id == iCurve) {
-                            bUsed = true;
-                            break;
-                        }
-                } else if (abbr === curve.name) {
-                    bUsed = true;
-                }
-                if (!bUsed)
-                    nodes.push(
-                        this.createAddPlotMenuItem(
-                            curve.name,
-                            this.state.anchorEl
-                        )
-                    );
-                iCurve++;
-            }
-        }
-
-        return nodes;
-    }
 
     removePlot(item: string) {
         console.log("removePlot(" + item + ")");
@@ -216,24 +147,52 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         return nodes;
     }
 
-    addPlots(parent: HTMLElement | null) {
+    onOK(templatePlot: TemplatePlot): void {
+        console.log("onOK(" + templatePlot + ")");
+        const track = this.props.track;
+
+        this.props.wellLogView.addGraphTrackPlot(track as GraphTrack, templatePlot);
+    }
+    addPlots(parent: HTMLElement | null): void {
         if (parent) {
             const el: HTMLElement = document.createElement("div");
             el.style.width = "10px";
             el.style.height = "13px";
             parent.appendChild(el);
             ReactDOM.render(
-                <SimpleMenu
-                    type="addPlots"
-                    anchorEl={el}
+                <PlotPropertiesDialog
                     wellLogView={this.props.wellLogView}
                     track={this.props.track}
-                />,
-                el
+                    onOK={this.onOK.bind(this)}
+                />, el
             );
         }
     }
-    removePlots(parent: HTMLElement | null) {
+    editPlots(parent: HTMLElement | null): void {
+        if (parent) {
+            const el: HTMLElement = document.createElement("div");
+            el.style.width = "10px";
+            el.style.height = "13px";
+            parent.appendChild(el);
+
+            let templatePlot = {
+                name: "DEPT",
+                style: "",
+                type: "line",
+                color:"black"
+            }
+
+            ReactDOM.render(
+                <PlotPropertiesDialog
+                    templatePlot={templatePlot}
+                    wellLogView={this.props.wellLogView}
+                    track={this.props.track}
+                    onOK={this.onOK.bind(this)}
+                />, el
+            );
+        }
+    }
+    removePlots(parent: HTMLElement | null): void {
         if (parent) {
             const el: HTMLElement = document.createElement("div");
             el.style.width = "10px";
@@ -342,22 +301,6 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
             );
         }
 
-        if (this.props.type == "addPlots") {
-            return (
-                <div>
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={this.state.anchorEl}
-                        keepMounted
-                        open={Boolean(this.state.anchorEl)}
-                        onClose={this.handleCloseMenu.bind(this)}
-                        onContextMenu={this.handleContextMenu.bind(this)}
-                    >
-                        {this.menuAddPlotItems()}
-                    </Menu>
-                </div>
-            );
-        }
         if (this.props.type == "removePlots") {
             return (
                 <div>
@@ -370,99 +313,6 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                         onContextMenu={this.handleContextMenu.bind(this)}
                     >
                         {this.menuRemovePlotItems()}
-                    </Menu>
-                </div>
-            );
-        }
-
-        if (this.props.type == "type") {
-            return (
-                <div>
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={this.state.anchorEl}
-                        open={Boolean(this.state.anchorEl)}
-                        onClose={this.handleCloseMenu.bind(this)}
-                        onContextMenu={this.handleContextMenu.bind(this)}
-                    >
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(
-                                    this._addPlot.bind(
-                                        this,
-                                        this.props.plotName,
-                                        "line"
-                                    )
-                                );
-                            }}
-                        >
-                            {"line"}
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(
-                                    this._addPlot.bind(
-                                        this,
-                                        this.props.plotName,
-                                        "dot"
-                                    )
-                                );
-                            }}
-                        >
-                            {"dot"}
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(
-                                    this._addPlot.bind(
-                                        this,
-                                        this.props.plotName,
-                                        "linestep"
-                                    )
-                                );
-                            }}
-                        >
-                            {"linestep"}
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(
-                                    this._addPlot.bind(
-                                        this,
-                                        this.props.plotName,
-                                        "area"
-                                    )
-                                );
-                            }}
-                        >
-                            {"area"}
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(
-                                    this._addPlot.bind(
-                                        this,
-                                        this.props.plotName,
-                                        "gradientfill"
-                                    )
-                                );
-                            }}
-                        >
-                            {"gradient fill"}
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(
-                                    this._addPlot.bind(
-                                        this,
-                                        this.props.plotName,
-                                        "differential"
-                                    )
-                                );
-                            }}
-                        >
-                            {"differential"}
-                        </MenuItem>
                     </Menu>
                 </div>
             );
@@ -481,6 +331,7 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                     onClose={this.handleCloseMenu.bind(this)}
                     onContextMenu={this.handleContextMenu.bind(this)}
                 >
+
                     <MenuItem
                         onClick={this.handleClickItem.bind(
                             this,
@@ -490,17 +341,30 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                         {"Add plot"}
                     </MenuItem>
 
+                    {!plots.length || 1 ? (
+                        <></>
+                    ) : (
+                            <MenuItem
+                                onClick={this.handleClickItem.bind(
+                                    this,
+                                    this.editPlots.bind(this, this.state.anchorEl)
+                                )}
+                            >
+                                {"Edit plot"}
+                            </MenuItem>
+                        )}
+
                     {!plots.length ? (
                         <></>
                     ) : (
-                        <MenuItem
-                            onClick={this.handleClickItem.bind(
-                                this,
-                                this.removePlots.bind(this, this.state.anchorEl)
-                            )}
-                        >
-                            {"Remove plot"}
-                        </MenuItem>
+                            <MenuItem
+                                onClick={this.handleClickItem.bind(
+                                    this,
+                                    this.removePlots.bind(this, this.state.anchorEl)
+                                )}
+                            >
+                                {"Remove plot"}
+                            </MenuItem>
                     )}
                 </Menu>
             </div>
@@ -510,7 +374,7 @@ class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
 function localMenuTitle(
     parent: HTMLElement,
     track: Track,
-    wellLogView: WellLogView
+    wellLogView: WellLogView,
 ) {
     //if (track) return; // not ready
     const el: HTMLElement = document.createElement("div");
@@ -567,6 +431,10 @@ function localMenuContainer(
         el
     );
 }
+
+
+import { PlotPropertiesDialog } from "./PlotDialog.tsx"
+
 
 function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
@@ -865,7 +733,7 @@ interface Info {
     units?: string;
     color: string;
     value: string;
-    type: string; // line, linestep, area, ?dot?
+    type: string; // line, linestep, area, 
 }
 
 interface Props {
@@ -1056,9 +924,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(); // Clear old track information
     }
 
-    addGraphTrackPlot(track: GraphTrack, name: string, type: string)
+    addGraphTrackPlot(track: GraphTrack, templatePlot: TemplatePlot)
     {
-        addGraphTrackPlot(this, track, name, type);
+        addGraphTrackPlot(this, track, templatePlot);
         this.setInfo();
     }
 
