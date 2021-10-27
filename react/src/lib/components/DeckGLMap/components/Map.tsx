@@ -273,15 +273,15 @@ const Map: React.FC<MapProps> = ({
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
 
     const [legendProps, setLegendProps] = React.useState<{
-            title: string,
-            discrete: boolean,
-            metadata: {objects: Record<string, [number[], number]>},
-            valueRange: number[],
+        title: string;
+        discrete: boolean;
+        metadata: { objects: Record<string, [number[], number]> };
+        valueRange: number[];
     }>({
-            title: "",
-            discrete: false,
-            metadata: {objects: {}},
-            valueRange: [],
+        title: "",
+        discrete: false,
+        metadata: { objects: {} },
+        valueRange: [],
     });
 
     const onAfterRender = React.useCallback(() => {
@@ -306,10 +306,10 @@ const Map: React.FC<MapProps> = ({
             const meta = logData["metadata_discrete"];
             const metadataDiscrete = meta[logName].objects;
             setLegendProps({
-                    title: title,
-                    discrete: true,
-                    metadata: metadataDiscrete,
-                    valueRange: [],
+                title: title,
+                discrete: true,
+                metadata: metadataDiscrete,
+                valueRange: [],
             });
         } else {
             const minArray: number[] = [];
@@ -322,10 +322,10 @@ const Map: React.FC<MapProps> = ({
             });
 
             setLegendProps({
-                    title: title,
-                    discrete: false,
-                    metadata: {objects: {}},
-                    valueRange: [Math.min(...minArray), Math.max(...maxArray)],
+                title: title,
+                discrete: false,
+                metadata: { objects: {} },
+                valueRange: [Math.min(...minArray), Math.max(...maxArray)],
             });
         }
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
@@ -368,14 +368,16 @@ const Map: React.FC<MapProps> = ({
                         position={legend.position}
                     />
                 )}
-                {legendProps.valueRange?.length && legend.visible && legendProps && (
-                    <ContinuousLegend
-                        min={legendProps.valueRange[0]}
-                        max={legendProps.valueRange[1]}
-                        dataObjectName={legendProps.title}
-                        position={legend.position}
-                    />
-                )}
+                {legendProps.valueRange?.length &&
+                    legend.visible &&
+                    legendProps && (
+                        <ContinuousLegend
+                            min={legendProps.valueRange[0]}
+                            max={legendProps.valueRange[1]}
+                            dataObjectName={legendProps.title}
+                            position={legend.position}
+                        />
+                    )}
                 {
                     <StatusIndicator
                         layers={specObj["layers"] as Layer<unknown>[]}
