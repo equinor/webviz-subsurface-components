@@ -113,6 +113,10 @@ module.exports = (env, argv) => {
                     exclude: /node_modules/,
                     loader: "source-map-loader",
                 },
+                {
+                    test: /\.(fs|vs).glsl$/i,
+                    use: ["raw-loader"],
+                },
             ],
         },
         devtool,
