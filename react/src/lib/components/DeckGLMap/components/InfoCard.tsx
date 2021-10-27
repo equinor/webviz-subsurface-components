@@ -25,7 +25,7 @@ Icon.add({ arrow_drop_up, arrow_drop_down });
 
 interface InfoCardDataType {
     layerName: string;
-    properties: PropertyDataType[];
+    properties?: PropertyDataType[];
 }
 
 export interface InfoCardProps {
@@ -176,13 +176,13 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
             );
             if (parent) {
                 layer_properties?.forEach((layer_prop) => {
-                    const property = parent.properties.find(
+                    const property = parent.properties?.find(
                         (item) => item.name === layer_prop.name
                     );
                     if (property) {
                         property.value = layer_prop.value;
                     } else {
-                        parent.properties.push(layer_prop);
+                        parent.properties?.push(layer_prop);
                     }
                 });
             } else {
