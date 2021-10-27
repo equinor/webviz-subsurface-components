@@ -368,7 +368,7 @@ const Map: React.FC<MapProps> = ({
                         position={legend.position}
                     />
                 )}
-                {legendProps.valueRange?.length &&
+                {legendProps.valueRange?.length > 0 &&
                     legend.visible &&
                     legendProps && (
                         <ContinuousLegend
