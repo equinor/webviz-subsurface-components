@@ -160,9 +160,6 @@ export interface MapProps {
     legend: {
         visible: boolean;
         position: number[];
-        dataObjectName: string;
-        valueRange: number[];
-        discreteData: { objects: Record<string, [number[], number]> };
     };
 
     children?: React.ReactNode;
@@ -274,10 +271,19 @@ const Map: React.FC<MapProps> = ({
     );
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
-    const [continuousDataPresent, setContinuousDataPresent] =
-        React.useState<boolean>(false);
-    const [discreteDataPresent, setDiscreteDataPresent] =
-        React.useState<boolean>(false);
+
+    const [legendProps, setLegendProps] = React.useState<{
+            title: string,
+            discrete: boolean,
+            metadata: {objects: Record<string, [number[], number]>},
+            valueRange: number[],
+    }>({
+            title: "",
+            discrete: false,
+            metadata: {objects: {}},
+            valueRange: [],
+    });
+
     const onAfterRender = React.useCallback(() => {
         const layers = specObj["layers"] as Layer<unknown>[];
         const state = layers.every((layer) => layer.isLoaded);
@@ -295,14 +301,16 @@ const Map: React.FC<MapProps> = ({
         const logs = pathLayer?.props.data;
         const logData = logs[0];
         const logInfo = getLogInfo(logData, logData.header.name, logName);
-        legend.dataObjectName = "Wells / " + logName;
+        const title = "Wells / " + logName;
         if (logInfo?.description == "discrete") {
             const meta = logData["metadata_discrete"];
             const metadataDiscrete = meta[logName].objects;
-            legend.discreteData = metadataDiscrete;
-            legend.valueRange = [];
-            setDiscreteDataPresent(true);
-            setContinuousDataPresent(false);
+            setLegendProps({
+                    title: title,
+                    discrete: true,
+                    metadata: metadataDiscrete,
+                    valueRange: [],
+            });
         } else {
             const minArray: number[] = [];
             const maxArray: number[] = [];
@@ -313,10 +321,12 @@ const Map: React.FC<MapProps> = ({
                 maxArray.push(Math.max(...logValues));
             });
 
-            legend.valueRange = [Math.min(...minArray), Math.max(...maxArray)];
-            legend.discreteData = { objects: {} };
-            setDiscreteDataPresent(false);
-            setContinuousDataPresent(true);
+            setLegendProps({
+                    title: title,
+                    discrete: false,
+                    metadata: {objects: {}},
+                    valueRange: [Math.min(...minArray), Math.max(...maxArray)],
+            });
         }
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
@@ -351,18 +361,18 @@ const Map: React.FC<MapProps> = ({
                         scaleUnit={coordinateUnit}
                     />
                 ) : null}
-                {discreteDataPresent && legend.visible && (
+                {legend.visible && legendProps.discrete && (
                     <DiscreteColorLegend
-                        discreteData={legend?.discreteData}
-                        dataObjectName={legend?.dataObjectName}
-                        position={legend?.position}
+                        discreteData={legendProps.metadata}
+                        dataObjectName={legendProps.title}
+                        position={legend.position}
                     />
                 )}
-                {continuousDataPresent && legend.visible && (
+                {legendProps.valueRange?.length && legend.visible && legendProps && (
                     <ContinuousLegend
-                        min={legend.valueRange[0]}
-                        max={legend.valueRange[1]}
-                        dataObjectName={legend.dataObjectName}
+                        min={legendProps.valueRange[0]}
+                        max={legendProps.valueRange[1]}
+                        dataObjectName={legendProps.title}
                         position={legend.position}
                     />
                 )}
