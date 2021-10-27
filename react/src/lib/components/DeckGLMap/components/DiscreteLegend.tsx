@@ -8,15 +8,13 @@ interface ItemColor {
 
 interface colorLegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
-    logName: string;
-    logType: string;
+    dataObjectName: string;
     position: number[];
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     discreteData,
-    logName,
-    logType,
+    dataObjectName,
     position,
 }: colorLegendProps) => {
     React.useEffect(() => {
@@ -49,6 +47,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
 
         if (colorLegend) {
+            select(legend).select("svg").remove();
             select(legend)
                 .append("svg")
                 .attr("height", 410 + "px")
@@ -66,9 +65,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
                 top: position[1],
             }}
         >
-            <label style={{ color: "#6F6F6F" }}>
-                {logName}/{logType}
-            </label>
+            <label style={{ color: "#6F6F6F" }}>{dataObjectName}</label>
             <div id="legend"></div>
         </div>
     );
