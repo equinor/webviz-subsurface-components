@@ -57,6 +57,11 @@ export interface DeckGLWrapperProps {
 
     legendVisible: boolean;
 
+    /**
+     * For reacting to prop changes
+     */
+    setEditedData: (data: Record<string, unknown>) => void;
+
     children?: React.ReactNode;
 }
 
@@ -69,15 +74,16 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     scale,
     coordinateUnit,
     legendVisible,
+    setEditedData,
     children,
 }: DeckGLWrapperProps) => {
     // state for views prop of DeckGL component
-    const [deckGLViews, setDeckGLViews] = useState();
+    const [deckGLViews, setDeckGLViews] = useState(null);
     useEffect(() => {
         const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
         const jsonConverter = new JSONConverter({ configuration });
         setDeckGLViews(jsonConverter.convert(views));
-    }, []);
+    }, [views]);
 
     const dispatch = useDispatch();
     const layersData = useSelector((st: MapState) => st.layers);
@@ -168,11 +174,11 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     // userData is undocumented and it doesn't appear in the
                     // deckProps type, but it is used by the layersManager
                     // and forwarded though the context to all the layers.
-                    //
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore: TS2345
                     userData: {
-                        setSpecPatch: (layer_id, updated_prop) => {
+                        setSpecPatch: (
+                            layer_id: string,
+                            updated_prop: Record<string, unknown>
+                        ) => {
                             dispatch(
                                 updateLayerProp([
                                     layer_id,
@@ -180,7 +186,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                     Object.entries(updated_prop)[0][1] as any,
                                 ])
                             );
-                            //setEditedData?.(updated_prop);
+                            setEditedData?.(updated_prop);
                         },
                     },
                 });

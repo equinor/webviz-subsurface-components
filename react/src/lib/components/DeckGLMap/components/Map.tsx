@@ -2,7 +2,7 @@ import * as jsonpatch from "fast-json-patch";
 import DeckGLWrapper from "./DeckGLWrapper";
 import { AnyAction, EnhancedStore } from "@reduxjs/toolkit";
 import { Operation } from "fast-json-patch";
-import React from "react";
+import React, { useCallback } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
 import { setLayers } from "../redux/actions";
@@ -83,6 +83,11 @@ export interface MapProps {
 
     legendVisible: boolean;
 
+    /**
+     * For reacting to prop changes
+     */
+    setEditedData: (data: Record<string, unknown>) => void;
+
     children?: React.ReactNode;
 }
 
@@ -96,6 +101,7 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     legendVisible,
+    setEditedData,
 }: MapProps) => {
     // state for initial views prop (target and zoom) of DeckGL component
     const [initialViewState, setInitialViewState] =
@@ -157,6 +163,7 @@ const Map: React.FC<MapProps> = ({
                     scale={scale}
                     coordinateUnit={coordinateUnit}
                     legendVisible={legendVisible}
+                    setEditedData={setEditedData}
                 />
             </ReduxProvider>
         )

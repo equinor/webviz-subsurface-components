@@ -28,20 +28,19 @@ function DeckGLMap({
     scale,
     legendVisible,
     coordinateUnit,
+    setProps,
 }) {
-    /*
     // This callback is used as a mechanism to update the component from the layers or toolbar.
     // The changes done in a layer, for example, are bundled into a patch
     // and sent to the parent component via setProps. (See layers/utils/layerTools.ts)
-    const setSpecPatch = React.useCallback(
-        (patch) => {
+    const setEditedData = React.useCallback(
+        (data) => {
             setProps({
-                editedData: patchedSpec,
+                editedData: data,
             });
         },
-        [setProps, patchedSpec]
+        [setProps]
     );
-    */
 
     return (
         <Map
@@ -54,6 +53,7 @@ function DeckGLMap({
             scale={scale}
             legendVisible={legendVisible}
             coordinateUnit={coordinateUnit}
+            setEditedData={setEditedData}
         />
     );
 }

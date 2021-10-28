@@ -9,28 +9,20 @@ export default {
 };
 
 const Template = (args) => {
-    //const [mapLayers, setMapLayers] = React.useState(null);
-    //const [mapSpecPatch, setMapSpecPatch] = React.useState(null);
-    /*
-    React.useEffect(() => {
-        setMapLayers(args.deckglLayers);
-    }, [args.deckglLayers]);
-
+    const [editedData, setEditedData] = React.useState(null);
 
     React.useEffect(() => {
-        setMapSpecPatch(args.deckglSpecPatch);
-    }, [args.deckglSpecPatch]);
-    */
+        setEditedData(args.editedData);
+    }, [args.editedData]);
+
     return (
         <DeckGLMap
             {...args}
-            //layers={mapLayers}
-            //deckglSpecBase={mapSpecBase}
-            //deckglSpecPatch={mapSpecPatch}
-            //setProps={(updatedSpec) => {
-            //    setMapLayers(updatedSpec.deckglLayers);
-            //    setMapSpecPatch(updatedSpec.deckglSpecPatch);
-            //}}
+            editedData={editedData}
+            setProps={(data) => {
+                console.log("story", data);
+                setEditedData(data);
+            }}
         />
     );
 };
