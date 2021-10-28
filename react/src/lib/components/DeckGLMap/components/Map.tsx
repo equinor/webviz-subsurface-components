@@ -226,7 +226,7 @@ const Map: React.FC<MapProps> = ({
 
     const refCb = React.useCallback(
         (deckRef) => {
-            if (deckRef) {
+            if (deckRef && deckRef.deck) {
                 // Needed to initialize the viewState on first load
                 setViewState(deckRef.deck.viewState);
                 deckRef.deck.setProps({
