@@ -8,8 +8,9 @@ import io
 import base64
 import copy
 import re
+import json
 
-from dash import Dash, html, Input, Output, State, callback
+from dash import Dash, html, Input, Output, State, callback, no_update
 import jsonpatch
 import jsonpointer
 import numpy as np
@@ -266,7 +267,13 @@ if __name__ == "__main__":
             ),
             wcc.Frame(
                 style={"flex": 10, "height": "90vh"},
-                children=[map_obj],
+                children=[
+                    map_obj,
+                    html.Pre(
+                        style={"fontSize": "1.2em", "overflow-x": "auto"},
+                        id="drawn-polyline",
+                    ),
+                ],
             ),
         ]
     )
@@ -285,7 +292,7 @@ if __name__ == "__main__":
         State("deckgl-map", "deckglSpecBase"),
         State("deckgl-map", "deckglSpecPatch"),
     )
-    def sync_drawing(colormap, spec_base, spec_patch):
+    def _update_spec(colormap, spec_base, spec_patch):
         if not colormap:
             return None
 
@@ -304,5 +311,53 @@ if __name__ == "__main__":
         #   Send local modifications as deckglSpecBase. (Current solution)
         # - Send just the input patch and local modifications as deckglSpecBase
         return map_spec.get_spec(), map_spec.create_patch(apply_colormap)
+
+    @callback(
+        Output("drawn-polyline", "children"),
+        Input("deckgl-map", "deckglSpecPatch"),
+        State("deckgl-map", "deckglSpecBase"),
+        State("drawn-polyline", "children"),
+    )
+    def _get_client_update(spec_patch, spec_base, current_coords):
+        """Do some operation when the spec is updated. E.g. get edited drawing feature.
+        Note that such data must be retrieved from the deckglSpecPatch as the Spec is
+        not in sync (It will return the previous state).
+        """
+
+        def get_selected_drawing_feature(patches, spec):
+            for patch in patches:
+                # If there is a patch adding a new feature return it
+                if (
+                    patch["op"] == "add"
+                    and "/layers/[drawing-layer]/data/features" in patch["path"]
+                ):
+                    if patch["value"]["geometry"]["type"] == "LineString":
+                        return patch["value"]["geometry"]["coordinates"]
+            for patch in patches:
+                # If there instead is a patch replacing the selected feature
+                # (When view mode is activate and the feature is clicked on)
+                # Find the feature index and retrieve the coordinated from the
+                # deckglSpecBase
+                if (
+                    patch["op"] == "replace"
+                    and "/layers/[drawing-layer]/selectedFeatureIndexes"
+                    in patch["path"]
+                ):
+                    feature_idx = patch["value"]
+                    drawing_layer = spec["layers"][2]
+                    feature = drawing_layer["data"]["features"][feature_idx]
+
+                    return (
+                        feature["geometry"].get("coordinates", [])
+                        if feature.get("geometry", {}).get("type") == "LineString"
+                        else []
+                    )
+            return []
+
+        coords = get_selected_drawing_feature(spec_patch, spec_base)
+        if current_coords is not None and coords == json.loads(current_coords):
+            return no_update
+
+        return json.dumps(coords)
 
     app.run_server(debug=True)
