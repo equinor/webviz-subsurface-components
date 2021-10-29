@@ -10,7 +10,7 @@ import {
     TreeData,
     TreeDataNode,
     SmartNodeSelectorComponent,
-} from "../../SmartNodeSelector";
+} from "@webviz/core-components";
 import VectorSelection from "../utils/VectorSelection";
 import VectorData from "../utils/VectorData";
 import aquifer from "./images/aquifer.svg";
