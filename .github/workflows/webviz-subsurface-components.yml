@@ -46,11 +46,8 @@ jobs:
 
       - name: ⏭️ Modifications when prerelease
         if: github.event.release.prerelease
-        working-directory: ./react
         run: |
           echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
-          npm install --ignore-scripts @webviz/core-components@next
-          npm run setup-deckgl-types
 
       - name: 🏗️ Build JavaScript part
         run: |
