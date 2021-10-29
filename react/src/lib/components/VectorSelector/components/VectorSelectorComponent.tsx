@@ -10,7 +10,7 @@ import {
     TreeData,
     TreeDataNode,
     SmartNodeSelectorComponent,
-} from "@webviz/core-components";
+} from "../../SmartNodeSelector";
 import VectorSelection from "../utils/VectorSelection";
 import VectorData from "../utils/VectorData";
 import aquifer from "./images/aquifer.svg";
@@ -52,9 +52,11 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             Object.keys(props.customVectorDefinitions).forEach(
                 (vectorName: string) => {
                     if (vectorName in VectorData === false) {
-                        this.vectorDefinitions[vectorName] = (
-                            props.customVectorDefinitions as VectorDefinitions
-                        )[vectorName];
+                        this.vectorDefinitions[
+                            vectorName
+                        ] = (props.customVectorDefinitions as VectorDefinitions)[
+                            vectorName
+                        ];
                     }
                 }
             );
@@ -97,6 +99,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             suggestionsVisible: false,
             hasError: error !== undefined,
             error: error || "",
+            currentTagShaking: false,
         };
     }
 

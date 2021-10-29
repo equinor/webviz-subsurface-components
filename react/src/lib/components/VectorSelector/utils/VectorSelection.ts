@@ -5,7 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { TreeNodeSelection, TreeData } from "@webviz/core-components";
+import { TreeNodeSelection, TreeData } from "../../SmartNodeSelector";
+import { MatchType } from "../../SmartNodeSelector";
 
 export default class VectorSelection extends TreeNodeSelection {
     private myTreeData: TreeData;
@@ -27,34 +28,64 @@ export default class VectorSelection extends TreeNodeSelection {
     setNodeName(data: string, index?: number): void {
         let increment = false;
         const newData = data;
-        if (index !== undefined) {
-            if (index == super.getNumMetaNodes() - 1 && data.length == 1) {
-                data = "*";
-                increment = true;
-            }
-            super.setNodeName(data, index);
+        if (
+            data === "" &&
+            ((index !== undefined && index === super.getNumMetaNodes()) ||
+                (index === undefined &&
+                    super.getFocussedLevel() === super.getNumMetaNodes()))
+        ) {
+            super.setNodeName(data, index || super.getFocussedLevel());
+            super.decrementFocussedLevel();
+            super.setNodeName("", (index || super.getFocussedLevel() + 1) - 1);
         } else {
-            if (
-                super.getFocussedLevel() == super.getNumMetaNodes() - 1 &&
-                data.length == 1
-            ) {
-                data = "*";
-                increment = true;
+            if (index !== undefined) {
+                if (
+                    index === super.getNumMetaNodes() - 1 &&
+                    data.length === 1
+                ) {
+                    data = "*";
+                    increment = true;
+                }
+                super.setNodeName(data, index);
+            } else {
+                if (
+                    super.getFocussedLevel() === super.getNumMetaNodes() - 1 &&
+                    data.length == 1
+                ) {
+                    data = "*";
+                    increment = true;
+                }
+                super.setNodeName(data, super.getFocussedLevel());
             }
-            super.setNodeName(data, super.getFocussedLevel());
+            if (increment) {
+                super.incrementFocussedLevel();
+                super.setNodeName(newData, super.getFocussedLevel());
+            }
         }
-        if (increment) {
-            super.incrementFocussedLevel();
-            super.setNodeName(newData, super.getFocussedLevel());
+    }
+
+    incrementFocussedLevel(): boolean {
+        const focussedLevel = super.getFocussedLevel();
+        if (
+            focussedLevel + 1 === super.getNumMetaNodes() - 1 &&
+            super.countLevel() >= super.getNumMetaNodes()
+        ) {
+            super.setFocussedLevel(focussedLevel + 1);
         }
+        return super.incrementFocussedLevel();
     }
 
     decrementFocussedLevel(): void {
         const focussedLevel = super.getFocussedLevel();
-        this.setFocussedLevel(focussedLevel - 1, true);
-        if (focussedLevel - 1 == super.getNumMetaNodes() - 1) {
-            this.setNodeName("");
+        if (focussedLevel - 1 === super.getNumMetaNodes() - 1) {
+            if (super.getNodeName(focussedLevel) === "") {
+                super.setNodeName("", super.getNumMetaNodes() - 1);
+            }
+            this.setFocussedLevel(focussedLevel - 2, true);
+        } else {
+            this.setFocussedLevel(focussedLevel - 1, true);
         }
+        super.tidy();
     }
 
     setFocussedLevel(index: number, includeMetaData = true): void {
@@ -136,7 +167,7 @@ export default class VectorSelection extends TreeNodeSelection {
     exactlyMatchedNodePaths(): Array<string> {
         const selections = this.myTreeData.findNodes(
             super.getNodePath(),
-            true
+            MatchType.fullMatch
         ).nodePaths;
         const nodePaths: string[] = [];
         for (const selection of selections) {
