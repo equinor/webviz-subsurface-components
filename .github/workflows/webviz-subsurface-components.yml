@@ -46,12 +46,10 @@ jobs:
 
       - name: ⏭️ Modifications when prerelease
         if: github.event.release.prerelease
-        run: |
-          echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
+        run: echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
 
       - name: 🏗️ Build JavaScript part
-        run: |
-          npm run build --prefix ./react
+        run: npm run build --prefix ./react
 
       - name: 📦 Install webviz-subsurface-components with dependencies
         run: |
