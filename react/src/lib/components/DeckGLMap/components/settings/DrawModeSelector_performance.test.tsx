@@ -1,22 +1,25 @@
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
-import React from "react";
+import React, { Profiler } from "react";
 import { Wrapper } from "../../test/TestWrapper";
 import DrawModeSelector from "./DrawModeSelector";
 import { obj } from "../../../../performanceUtility/onRenderFunction";
 import * as core from "@actions/core";
+import logTimes from "../../../../performanceUtility/onRenderFunction";
 
-describe("Test draw-mode menu", () => {
+xdescribe("Test draw-mode menu", () => {
     it("performance test", () => {
         render(
             Wrapper({
                 children: (
-                    <DrawModeSelector
-                        layerId="drawing-layer"
-                        label="Draw mode"
-                        value="drawLineString"
-                    />
+                    <Profiler id="Native Select" onRender={logTimes}>
+                        <DrawModeSelector
+                            layerId="drawing-layer"
+                            label="Draw mode"
+                            value="drawLineString"
+                        />
+                    </Profiler>
                 ),
             })
         );

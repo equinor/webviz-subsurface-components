@@ -1,17 +1,22 @@
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
-import React from "react";
+import React, { Profiler } from "react";
 import { Wrapper } from "../../test/TestWrapper";
 import LayerProperty from "./LayerProperty";
 import * as core from "@actions/core";
 import { obj } from "../../../../performanceUtility/onRenderFunction";
+import logTimes from "../../../../performanceUtility/onRenderFunction";
 
 describe("Test Layer Property", () => {
     it("performance test", () => {
         render(
             Wrapper({
-                children: <LayerProperty layerId="drawing-layer" />,
+                children: (
+                    <Profiler id="Layer properties" onRender={logTimes}>
+                        <LayerProperty layerId="drawing-layer" />
+                    </Profiler>
+                ),
             })
         );
         if (obj.perf_metrics[2] > 100) {
