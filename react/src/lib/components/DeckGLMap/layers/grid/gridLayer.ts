@@ -6,6 +6,7 @@ import { PolygonLayer } from "@deck.gl/layers";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { Feature } from "geojson";
 import { Position2D } from "@deck.gl/core/utils/positions";
+import { PolygonLayerProps } from "@deck.gl/layers";
 
 // These are the data GridLayer expects.
 type CellData = {
@@ -17,7 +18,7 @@ type CellData = {
 };
 type GridData = CellData[];
 
-// These are the data SolidPolygonLayer expects.
+// These are the data PolygonLayer expects.
 type CellProperties = {
     color: RGBAColor;
     i: number;
@@ -97,7 +98,7 @@ export default class GridLayer extends CompositeLayer<
         }
 
         const layer = new PolygonLayer<PolygonData>(
-            this.getSubLayerProps<PolygonData, PolygonLayer<PolygonData>>({
+            this.getSubLayerProps<PolygonData, PolygonLayerProps<PolygonData>>({
                 data: makeLayerData(data, this.state.ti),
                 id: "grid-layer",
                 getFillColor: (d: PolygonData) => d.properties.color,
