@@ -9,7 +9,7 @@ import Slider from "@material-ui/core/Slider"; // Zoom selector
 
 import { WellLog } from "./components/WellLogTypes";
 import { Template } from "./components/WellLogTemplateTypes";
-import { ColorTable } from "./components/ColorTableTypes"
+import { ColorTable } from "./components/ColorTableTypes";
 
 import { WellLogController } from "./components/WellLogView";
 
@@ -42,12 +42,70 @@ const axisMnemos: Record<string, string[]> = {
     time: ["TIME"],
 };
 
-interface Props {
-    welllog: WellLog;
-    template: Template;
-    colorTables: ColorTable[];
-    horizontal?: boolean;
+import ReactDOM from "react-dom";
+
+import { SimpleMenu } from "./components/LocalMenus";
+import { Track } from "@equinor/videx-wellog";
+
+function localMenuTitle(
+    parent: HTMLElement,
+    track: Track,
+    wellLogView: WellLogView
+) {
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "13px";
+    parent.appendChild(el);
+    ReactDOM.render(
+        <SimpleMenu
+            type="title"
+            anchorEl={el}
+            wellLogView={wellLogView}
+            track={track}
+        />,
+        el
+    );
 }
+function localMenuLegend(
+    parent: HTMLElement,
+    track: Track,
+    wellLogView: WellLogView
+) {
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "3px";
+    parent.appendChild(el);
+    ReactDOM.render(
+        <SimpleMenu
+            type="legend"
+            anchorEl={el}
+            wellLogView={wellLogView}
+            track={track}
+        />,
+        el
+    );
+}
+function localMenuContainer(
+    parent: HTMLElement,
+    track: Track,
+    wellLogView: WellLogView
+) {
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "3px";
+    parent.appendChild(el);
+    ReactDOM.render(
+        <SimpleMenu
+            type="container"
+            anchorEl={el}
+            wellLogView={wellLogView}
+            track={track}
+        />,
+        el
+    );
+}
+
+///////////
 
 interface Info {
     name?: string;
@@ -55,6 +113,13 @@ interface Info {
     color: string;
     value: string;
     type: string; // line, linestep, area, ?dot?
+}
+
+interface Props {
+    welllog: WellLog;
+    template: Template;
+    colorTables: ColorTable[];
+    horizontal?: boolean;
 }
 interface State {
     axes: string[]; // axes available in welllog
@@ -96,8 +161,8 @@ class WellLogViewer extends Component<Props, State> {
     componentDidUpdate(prevProps: Props): void {
         if (
             this.props.welllog !== prevProps.welllog ||
-            this.props.template !== prevProps.template || 
-            this.props.colorTables !== prevProps.colorTables  
+            this.props.template !== prevProps.template ||
+            this.props.colorTables !== prevProps.colorTables
         ) {
             const axes = getAvailableAxes(this.props.welllog, axisMnemos);
             let primaryAxis = axes[0];
@@ -204,7 +269,8 @@ class WellLogViewer extends Component<Props, State> {
         value: number | number[]
     ): void {
         event;
-        if (typeof value === "number") this.setState({ zoomContent: 2 ** value });
+        if (typeof value === "number")
+            this.setState({ zoomContent: 2 ** value });
     }
 
     render(): ReactNode {
@@ -220,9 +286,12 @@ class WellLogViewer extends Component<Props, State> {
                         axisTitles={axisTitles}
                         axisMnemos={axisMnemos}
                         zoomContent={this.state.zoomContent}
-                        maxTrackNum={this.props.horizontal?3:5}
+                        maxTrackNum={this.props.horizontal ? 3 : 5}
                         onInfo={this.onInfo.bind(this)}
                         onCreateController={this.onCreateController.bind(this)}
+                        onLocalMenuTitle={localMenuTitle}
+                        onLocalMenuLegend={localMenuLegend}
+                        onLocalMenuContainer={localMenuContainer}
                         onScrollTrackPos={this.onScrollTrackPos.bind(this)}
                         onZoomContent={this.onZoomContent.bind(this)}
                     />{" "}
@@ -252,7 +321,9 @@ class WellLogViewer extends Component<Props, State> {
                                 max={8}
                                 scale={(x) => 2 ** x}
                                 defaultValue={0}
-                                onChange={this.handleContentZoomChange.bind(this)}
+                                onChange={this.handleContentZoomChange.bind(
+                                    this
+                                )}
                                 valueLabelDisplay="auto"
                                 aria-labelledby="non-linear-slider"
                                 getAriaValueText={this.valueLabelFormat.bind(

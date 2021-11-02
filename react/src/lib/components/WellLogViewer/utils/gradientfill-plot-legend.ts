@@ -1,37 +1,37 @@
-import { LegendBounds } from "@equinor/videx-wellog/dist/utils/legend-helper"
+import { LegendBounds } from "@equinor/videx-wellog/dist/utils/legend-helper";
 import { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
-import { GradientFillPlotOptions } from "./gradientfill-plot"
-import GradientFillPlot from "./gradientfill-plot"
-import { setAttrs } from "@equinor/videx-wellog"; 
+import { GradientFillPlotOptions } from "./gradientfill-plot";
+import GradientFillPlot from "./gradientfill-plot";
+import { setAttrs } from "@equinor/videx-wellog";
 
 /* missed exports from "@equinor/videx-wellog */
+// eslint-disable-next-line
 declare type D3Selection = any; //import { D3Selection } from "@equinor/videx-wellog/dist/common/interfaces';
 import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicPlotLegend } from "@equinor/videx-wellog/dist/plots/legend/common';
 /**/
 
-import { ColorTable } from "../components/ColorTableTypes"
-
+import { ColorTable } from "../components/ColorTableTypes";
 
 import { colorToString4 } from "./color-table";
 let __id = 0;
 function createGradient(g: D3Selection, colorTable: ColorTable): string {
-    let id = "grad"+ ++__id; // generate unique id 
-    
-    let lg = g.append("defs").append("linearGradient")
-        .attr("id", id)//id of the gradient
-        .attr("x1", "0%")
-        .attr("x2", "100%")//since it's a horizontal linear gradient 
-        .attr("y1", "0%")
-        .attr("y2", "0%")
-        ;
+    const id = "grad" + ++__id; // generate unique id
 
+    const lg = g
+        .append("defs")
+        .append("linearGradient")
+        .attr("id", id) //id of the gradient
+        .attr("x1", "0%")
+        .attr("x2", "100%") //since it's a horizontal linear gradient
+        .attr("y1", "0%")
+        .attr("y2", "0%");
     const colors = colorTable.colors;
     for (let i = 0; i < colors.length; i++) {
         const color = colors[i];
         const c = colorToString4(color);
         lg.append("stop")
-            .attr("offset", (color[0] * 100.0) + "%")
-            .style("stop-color", c)
+            .attr("offset", color[0] * 100.0 + "%")
+            .style("stop-color", c);
     }
 
     return id;
@@ -40,7 +40,12 @@ function createGradient(g: D3Selection, colorTable: ColorTable): string {
 /**
  * Renders area legend to a SVG group element according to bounds.
  */
-export default function renderGradientFillPlotLegend(g: D3Selection, bounds: LegendBounds, legendInfo: LegendInfo, plot: /*AreaPlot*/GradientFillPlot): void {
+export default function renderGradientFillPlotLegend(
+    g: D3Selection,
+    bounds: LegendBounds,
+    legendInfo: LegendInfo,
+    plot: /*AreaPlot*/ GradientFillPlot
+): void {
     const options = plot.options as GradientFillPlotOptions;
     const { top, left, width, height } = bounds;
     const shadeH = height / 2;
@@ -51,65 +56,74 @@ export default function renderGradientFillPlotLegend(g: D3Selection, bounds: Leg
         const [min, max] = plot.scale.domain();
         const minIsLeft = min <= max;
         const centerX = left + width / 2;
-        const useMinAsBase = options.useMinAsBase === undefined ? true : options.useMinAsBase;
+        const useMinAsBase =
+            options.useMinAsBase === undefined ? true : options.useMinAsBase;
 
         const shadeW = Math.max(0, width - 2);
 
-        let fillNrm = useMinAsBase && minIsLeft
-            ? plot.options.color : options.inverseColor;
+        let fillNrm =
+            useMinAsBase && minIsLeft
+                ? plot.options.color
+                : options.inverseColor;
 
-        let fillInv = useMinAsBase && minIsLeft
-            ? options.inverseColor : plot.options.color;
+        let fillInv =
+            useMinAsBase && minIsLeft
+                ? options.inverseColor
+                : plot.options.color;
 
         /* Start GradientFill code */
-        let colorTable = useMinAsBase && minIsLeft
-            ? options.colorTable : options.inverseColorTable;
+        let colorTable =
+            useMinAsBase && minIsLeft
+                ? options.colorTable
+                : options.inverseColorTable;
         if (colorTable) {
-            let id=createGradient(g, colorTable);
-            fillNrm = "url(#"+ id+ ")";
+            const id = createGradient(g, colorTable);
+            fillNrm = "url(#" + id + ")";
         }
-        colorTable = useMinAsBase && minIsLeft
-            ? options.inverseColorTable : options.colorTable;
+        colorTable =
+            useMinAsBase && minIsLeft
+                ? options.inverseColorTable
+                : options.colorTable;
         if (colorTable) {
-            let id=createGradient(g, colorTable);
+            const id = createGradient(g, colorTable);
             fillInv = "url(#" + id + ")";
         }
         /* end GradientFill code */
 
-        setAttrs(g.append('rect'), {
+        setAttrs(g.append("rect"), {
             x: left + 2,
             y: shadeY,
             width: shadeW / 2,
             height: shadeH,
             fill: fillNrm,
-            'fill-opacity': fillOpacity,
+            "fill-opacity": fillOpacity,
         });
 
-        setAttrs(g.append('rect'), {
+        setAttrs(g.append("rect"), {
             x: centerX,
             y: shadeY,
             width: shadeW / 2,
             height: shadeH,
             fill: fillInv,
-            'fill-opacity': fillOpacity,
+            "fill-opacity": fillOpacity,
         });
     } else {
         let fillNrm = plot.options.color;
         /* Start GradientFill code */
         const colorTable = options.colorTable;
         if (colorTable) {
-            let id = createGradient(g, colorTable);
+            const id = createGradient(g, colorTable);
             fillNrm = "url(#" + id + ")";
         }
         /* end GradientFill code */
 
-        setAttrs(g.append('rect'), {
+        setAttrs(g.append("rect"), {
             x: left + 2,
             y: shadeY,
             width: Math.max(0, width - 4),
             height: shadeH,
             fill: fillNrm,
-            'fill-opacity': fillOpacity,
+            "fill-opacity": fillOpacity,
         });
     }
 
@@ -120,6 +134,6 @@ export default function renderGradientFillPlotLegend(g: D3Selection, bounds: Leg
         legendInfo.unit ? legendInfo.unit : "",
         plot.scale.domain(),
         plot.options.color ? plot.options.color : "",
-        true,
+        true
     );
 }

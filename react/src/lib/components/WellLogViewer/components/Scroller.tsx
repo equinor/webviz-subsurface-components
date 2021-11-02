@@ -28,8 +28,8 @@ function getScrollbarSizes(): { vertical: number; horizontal: number } {
 
     */
     //scrollbarWidth = offsetWidth - clientWidth - getComputedStyle().borderLeftWidth - getComputedStyle().borderRightWidth
-    const vertical = outer.offsetWidth - outer.clientWidth 
-    const horizontal = outer.offsetHeight - outer.clientHeight
+    const vertical = outer.offsetWidth - outer.clientWidth;
+    const horizontal = outer.offsetHeight - outer.clientHeight;
 
     // Removing temporary elements from the DOM
     document.body.removeChild(outer);
@@ -38,7 +38,7 @@ function getScrollbarSizes(): { vertical: number; horizontal: number } {
 }
 
 class Scroller extends Component<Props> {
-    scroller: React.RefObject<HTMLInputElement>;  // Outer
+    scroller: React.RefObject<HTMLInputElement>; // Outer
     scrollable: React.RefObject<HTMLInputElement>; // Inner
 
     constructor(props: Props) {
@@ -55,13 +55,14 @@ class Scroller extends Component<Props> {
         }
     }
 
-    onScroll(): void { // callback from HTML element
+    onScroll(): void {
+        // callback from HTML element
         const el = this.scroller.current as HTMLElement;
         const scrollTop = el.scrollTop;
         const scrollHeight = el.scrollHeight - el.clientHeight;
         const scrollLeft = el.scrollLeft;
         const scrollWidth = el.scrollWidth - el.clientWidth;
-        
+
         console.log(
             "scrollTop=" +
                 scrollTop +
@@ -72,7 +73,7 @@ class Scroller extends Component<Props> {
                 " scrollWidth=" +
                 scrollWidth
         );
-        
+
         // compute fractions
         const x = scrollWidth ? scrollLeft / scrollWidth : 0;
         const y = scrollHeight ? scrollTop / scrollHeight : 0;
@@ -91,16 +92,16 @@ class Scroller extends Component<Props> {
 
     scrollTo(x: number, y: number): void {
         console.log("Scroller.scrollTo(" + x + "," + y + ")");
-        if (x < 0.0) x = 0.0; else if (x > 1.0) x = 1.0;
-        if (y < 0.0) y = 0.0; else if (y > 1.0) y = 1.0;
+        if (x < 0.0) x = 0.0;
+        else if (x > 1.0) x = 1.0;
+        if (y < 0.0) y = 0.0;
+        else if (y > 1.0) y = 1.0;
 
-        
-            const el = this.scroller.current as HTMLElement;
-            let scrollLeft = x * (el.scrollWidth - el.clientWidth) 
-            let scrollTop = y * (el.scrollHeight - el.clientHeight)
+        const el = this.scroller.current as HTMLElement;
+        let scrollLeft = x * (el.scrollWidth - el.clientWidth);
+        let scrollTop = y * (el.scrollHeight - el.clientHeight);
         scrollLeft = Math.round(scrollLeft);
         scrollTop = Math.round(scrollTop);
-        
 
         const { vertical, horizontal } = getScrollbarSizes();
         const elOuter = this.scroller.current as HTMLElement;
@@ -108,8 +109,8 @@ class Scroller extends Component<Props> {
         const heightOuter = elOuter.getBoundingClientRect().height - horizontal;
 
         const elInner = this.scrollable.current as HTMLElement;
-        const widthInner = elInner.offsetWidth//getBoundingClientRect().width;
-        const heightInner = elInner.offsetHeight//getBoundingClientRect().height;
+        const widthInner = elInner.offsetWidth; //getBoundingClientRect().width;
+        const heightInner = elInner.offsetHeight; //getBoundingClientRect().height;
 
         //console.log("el.scroll=", el.scrollLeft, el.scrollTop);
         let left = x * (widthInner - widthOuter);
@@ -123,8 +124,8 @@ class Scroller extends Component<Props> {
         top = scrollTop;
 
         if (elOuter.scrollLeft !== left || elOuter.scrollTop !== top) {
-            console.log("elOuter.scrollTo("+left+","+top+")");
-            elOuter.scrollTo(left, top) //elOuter.scrollLeft = left; elOuter.scrollTop = top;
+            console.log("elOuter.scrollTo(" + left + "," + top + ")");
+            elOuter.scrollTo(left, top); //elOuter.scrollLeft = left; elOuter.scrollTop = top;
         }
     }
 

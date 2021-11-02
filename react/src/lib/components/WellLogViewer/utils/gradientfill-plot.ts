@@ -1,40 +1,48 @@
-import { area } from 'd3';
+import { area } from "d3";
 import { Scale } from "@equinor/videx-wellog/dist/common/interfaces";
 import { Plot } from "@equinor/videx-wellog";
 import { PlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 import { DefinedFunction } from "@equinor/videx-wellog/dist/plots/interfaces";
 
-import renderGradientFillPlotLegend from "./gradientfill-plot-legend" 
+import renderGradientFillPlotLegend from "./gradientfill-plot-legend";
 import { getInterpolatedColorString } from "./color-table";
 
-
-import { ColorTable } from "../components/ColorTableTypes"
+import { ColorTable } from "../components/ColorTableTypes";
 
 import { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 export interface GradientFillPlotOptions extends AreaPlotOptions {
-    colorTable?: ColorTable,
-    inverseColorTable?: ColorTable,
+    colorTable?: ColorTable;
+    inverseColorTable?: ColorTable;
 }
 
-function createGradient(ctx: CanvasRenderingContext2D, scale: Scale, horizontal: boolean|undefined, plotdata: number[][], xscale: Scale, colorTable: ColorTable): CanvasGradient
-{
+/*
+ Create gradient based on colorTable
+ */
+function createGradient(
+    ctx: CanvasRenderingContext2D,
+    scale: Scale,
+    horizontal: boolean | undefined,
+    plotdata: number[][],
+    xscale: Scale,
+    colorTable: ColorTable
+): CanvasGradient {
     const dataFrom = plotdata[0];
     const dataTo = plotdata[plotdata.length - 1];
     const sFrom = scale(dataFrom[0]);
     const sTo = scale(dataTo[0]);
 
-    let gradient: CanvasGradient = horizontal ?
-        ctx.createLinearGradient(sFrom, 0, sTo, 0):
-        ctx.createLinearGradient(0, sFrom, 0, sTo);
+    const gradient: CanvasGradient = horizontal
+        ? ctx.createLinearGradient(sFrom, 0, sTo, 0)
+        : ctx.createLinearGradient(0, sFrom, 0, sTo);
 
-    const xFrom = dataFrom[0]
-    const xDelta = dataTo[0] - xFrom
-    const yFrom = xscale.domain()[0]
-    const yDelta = xscale.domain()[1] - yFrom
+    const xFrom = dataFrom[0];
+    const xDelta = dataTo[0] - xFrom;
+    const yFrom = xscale.domain()[0];
+    const yDelta = xscale.domain()[1] - yFrom;
     for (let i = 0; i < plotdata.length; i++) {
-        let stop = (plotdata[i][0] - xFrom) / xDelta;
+        const stop = (plotdata[i][0] - xFrom) / xDelta;
         if (0 <= stop && stop <= 1.0) {
             const v = (plotdata[i][1] - yFrom) / yDelta;
             const c = getInterpolatedColorString(colorTable, v);
@@ -49,12 +57,11 @@ function createGradient(ctx: CanvasRenderingContext2D, scale: Scale, horizontal:
  * GradientFillPlot plot
  */
 export default class GradientFillPlot extends Plot {
-
     constructor(id: string | number, options: PlotOptions = {}) {
         super(id, options);
-        // subclass render function
-        (this.options as any).renderLegend // see function updateLegendRows
-            = renderGradientFillPlotLegend
+        // subclass render function.
+        // eslint-disable-next-line
+        (this.options as any).renderLegend = renderGradientFillPlotLegend; // see updateLegendRows() in videx-wellog\src\tracks\graph\graph-legend.ts 
     }
 
     /**
@@ -63,17 +70,14 @@ export default class GradientFillPlot extends Plot {
      * @param scale y-scale
      */
     plot(ctx: CanvasRenderingContext2D, scale: Scale): void {
-        const {
-            scale: xscale,
-            data: plotdata,
-            options: _options,
-        } = this;
+        const { scale: xscale, data: plotdata, options: _options } = this;
 
-        let options = _options as GradientFillPlotOptions
+        const options = _options as GradientFillPlotOptions;
 
         if (!xscale || options.hidden) return;
 
-        const useMinAsBase = options.useMinAsBase === undefined ? true : options.useMinAsBase;
+        const useMinAsBase =
+            options.useMinAsBase === undefined ? true : options.useMinAsBase;
 
         const [d0, d1] = xscale.domain();
         const dmin = Math.min(d0, d1);
@@ -88,19 +92,19 @@ export default class GradientFillPlot extends Plot {
 
         const areaFunction = area()
             // this.options.defined is always initialized by some function
-            .defined(d => (options.defined as DefinedFunction)(d[1], d[0]))
+            .defined((d) => (options.defined as DefinedFunction)(d[1], d[0]))
             .context(ctx);
 
         if (options.horizontal) {
             areaFunction
-                .y1(d => xscale(d[1]))
+                .y1((d) => xscale(d[1]))
                 .y0(zeroValue)
-                .x(d => scale(d[0]));
+                .x((d) => scale(d[0]));
         } else {
             areaFunction
-                .x1(d => xscale(d[1]))
+                .x1((d) => xscale(d[1]))
                 .x0(zeroValue)
-                .y(d => scale(d[0]));
+                .y((d) => scale(d[0]));
         }
 
         ctx.globalAlpha = options.fillOpacity || 1;
@@ -110,19 +114,21 @@ export default class GradientFillPlot extends Plot {
 
             const inverseAreaFunction = area()
                 // this.options.defined is always initialized by some function
-                .defined(d => (options.defined as DefinedFunction)(d[1], d[0]))
+                .defined((d) =>
+                    (options.defined as DefinedFunction)(d[1], d[0])
+                )
                 .context(ctx);
 
             if (options.horizontal) {
                 inverseAreaFunction
-                    .y1(d => xscale(d[1]))
+                    .y1((d) => xscale(d[1]))
                     .y0(inverseValue)
-                    .x(d => scale(d[0]));
+                    .x((d) => scale(d[0]));
             } else {
                 inverseAreaFunction
-                    .x1(d => xscale(d[1]))
+                    .x1((d) => xscale(d[1]))
                     .x0(inverseValue)
-                    .y(d => scale(d[0]));
+                    .y((d) => scale(d[0]));
             }
             ctx.beginPath();
             inverseAreaFunction(plotdata);
@@ -130,7 +136,14 @@ export default class GradientFillPlot extends Plot {
             /* Start GradientFill code */
             const colorTable = options.inverseColorTable;
             if (colorTable)
-                ctx.fillStyle = createGradient(ctx, scale, options.horizontal, plotdata, xscale, colorTable);
+                ctx.fillStyle = createGradient(
+                    ctx,
+                    scale,
+                    options.horizontal,
+                    plotdata,
+                    xscale,
+                    colorTable
+                );
             /* End GradientFill code */
 
             ctx.fill();
@@ -143,8 +156,15 @@ export default class GradientFillPlot extends Plot {
         ctx.fillStyle = options.fill || options.color || "";
         /* Start GradientFill code */
         const colorTable = options.colorTable;
-        if (colorTable) 
-            ctx.fillStyle = createGradient(ctx, scale, options.horizontal, plotdata, xscale, colorTable);
+        if (colorTable)
+            ctx.fillStyle = createGradient(
+                ctx,
+                scale,
+                options.horizontal,
+                plotdata,
+                xscale,
+                colorTable
+            );
         /* End GradientFill code */
 
         ctx.fill();

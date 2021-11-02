@@ -5,12 +5,14 @@ import {
     GraphTrack,
 } from "@equinor/videx-wellog";
 
-import { GradientFillPlotOptions } from "./gradientfill-plot" //import { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
-export interface ExtPlotOptions extends GradientFillPlotOptions/*AreaPlotOptions*/ {
-    legendInfo: () => {
-        label: string;
-        unit: string;
-    };
+import {
+    LegendInfo /*,DifferentialPlotLegendInfo*/,
+} from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+// import { DifferentialPlotOptions/*,AreaPlotOptions*/ } from "@equinor/videx-wellog/dist/plots/interfaces";
+import { GradientFillPlotOptions } from "./gradientfill-plot";
+export interface ExtPlotOptions
+    extends GradientFillPlotOptions /*|DifferentialPlotOptions|AreaPlotOptions*/ {
+    legendInfo: () => LegendInfo;
 }
 
 import WellLogView from "../components/WellLogView";
@@ -206,27 +208,29 @@ import {
     DifferentialPlot,
     LineStepPlot,
 } from "@equinor/videx-wellog";
-import GradientFillPlot from "../utils/gradientfill-plot"
+import GradientFillPlot from "../utils/gradientfill-plot";
 export function getPlotType(plot: Plot): string {
-    if (plot instanceof GradientFillPlot)
-        return "gradientfill"
-    if (plot instanceof LinePlot)
-        return "line"
-    if (plot instanceof AreaPlot)
-        return "area"
-    if (plot instanceof DotPlot)
-        return "dot"
-    if (plot instanceof DifferentialPlot)
-        return "differential"
-    if (plot instanceof LineStepPlot)
-        return "linestep"
-    if (plot instanceof LineStepPlot)
-        return "linestep"
+    if (plot instanceof GradientFillPlot) return "gradientfill";
+    if (plot instanceof LinePlot) return "line";
+    if (plot instanceof AreaPlot) return "area";
+    if (plot instanceof DotPlot) return "dot";
+    if (plot instanceof DifferentialPlot) return "differential";
+    if (plot instanceof LineStepPlot) return "linestep";
+    if (plot instanceof LineStepPlot) return "linestep";
     return "";
 }
 
 function isValidPlotType(plotType: string) {
-    return ["line", "linestep", "dot", "area", "differential", "gradientfill"].indexOf(plotType) >= 0;
+    return (
+        [
+            "line",
+            "linestep",
+            "dot",
+            "area",
+            "differential",
+            "gradientfill",
+        ].indexOf(plotType) >= 0
+    );
 }
 
 function getTemplatePlotProps(
@@ -240,13 +244,37 @@ function getTemplatePlotProps(
         iStyle >= 0
             ? { ...templateStyles[iStyle], ...templatePlot }
             : { ...templatePlot };
-    if (!options.type)
-        options.type = defPlotType;
+    if (!options.type) options.type = defPlotType;
     if (!isValidPlotType(options.type)) {
-      console.log("unknown plot type '" + options.type + "': use default type '" + defPlotType + "'")
-      options.type = defPlotType;
+        console.log(
+            "unknown plot type '" +
+                options.type +
+                "': use default type '" +
+                defPlotType +
+                "'"
+        );
+        options.type = defPlotType;
     }
     if (!options.color) options.color = generateColor();
+
+    if (options.type === "area") {
+        // "area" plot
+        if (!options.fill) {
+            //options.fill = generateColor();
+            options.fillOpacity = 0.0;
+        }
+    } else if (options.type === "gradientfill") {
+        // "area" plot
+        if (!options.colorTable) {
+            //options.fill = generateColor();
+            options.fillOpacity = 0.0;
+        }
+    } else if (options.type === "differential") {
+        // "differential" plot
+        if (!options.fill) options.fill = generateColor();
+        if (!options.color2) options.color2 = generateColor();
+        if (!options.fill2) options.fill2 = generateColor();
+    }
     return options;
 }
 
@@ -284,87 +312,133 @@ function makeDataAccessor2(iPlot: number, iPlot2: number) {
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
 }
 
-import { ColorTable } from "../components/ColorTableTypes"
+import { ColorTable } from "../components/ColorTableTypes";
 
 const defColorTable: ColorTable = {
     name: "not found",
     discrete: false,
     colors: [
-        [0.00, 1.00, 0.00, 0.00],
-        [0.50, 0.50, 0.00, 0.00],
-        [1.00, 1.00, 0.00, 0.00],
+        [0.0, 1.0, 0.0, 0.0],
+        [0.5, 0.5, 0.0, 0.0],
+        [1.0, 1.0, 0.0, 0.0],
     ],
-}
+};
 
-function getColorTable(id: string | undefined, colorTables: ColorTable[]): ColorTable | undefined {
-    if (id && typeof (id) !== "string") {
-        console.log("colorTable id='" + id + "' is not string")
-        return id;
+function getColorTable(
+    id: string | undefined,
+    colorTables: ColorTable[]
+): ColorTable | undefined {
+    if (id && typeof id !== "string") {
+        console.log("colorTable id='" + id + "' is not string");
+        //return id;
+        return /*undefined;*/ defColorTable;
     }
     if (id && colorTables) {
         for (let i = 0; i < colorTables.length; i++) {
-            if (colorTables[i].name == id)
-                return colorTables[i]
+            if (colorTables[i].name == id) return colorTables[i];
         }
-        console.log("colorTable id='" + id + "' is not found in getColorTable()")
-        return /*undefined;*/defColorTable;
+        console.log(
+            "colorTable id='" + id + "' is not found in getColorTable()"
+        );
+        return /*undefined;*/ defColorTable;
     }
     if (id && !colorTables)
-        console.log("colorTables is not given in getColorTable()")   
-    return undefined;//defColorTable;
+        console.log("colorTables is not given in getColorTable()");
+    return undefined; //defColorTable;
 }
 
 function getPlotOptions(
-    curve: WellLogCurve,
     templatePlotProps: TemplatePlotProps,
-    colorTables: ColorTable[],
+    colorTables: ColorTable[], //"gradientfill" plot
     domain: [number, number],
+    curve: WellLogCurve,
     iPlot: number,
-    curve2: WellLogCurve, iPlot2: number
+    curve2: WellLogCurve | undefined, //"differential" plot
+    iPlot2: number //"differential" plot
 ): ExtPlotOptions {
-    return {
-        scale: "linear", // or "log"
+    const options = {
+        dataAccessor: curve2
+            ? makeDataAccessor2(iPlot, iPlot2)
+            : makeDataAccessor(iPlot),
+
+        scale: templatePlotProps.scale || "linear", //"linear" or "log"
         domain: domain,
-        dataAccessor: curve2? makeDataAccessor2(iPlot, iPlot2) : makeDataAccessor(iPlot),
 
         color: templatePlotProps.color,
         inverseColor: templatePlotProps.inverseColor,
+
         fill: templatePlotProps.fill, // for 'area'!
-        fillOpacity: 0.3, // for 'area' and 'gradientfill'!
+        fillOpacity: templatePlotProps.fillOpacity
+            ? templatePlotProps.fillOpacity
+            : 0.25, // for 'area' and 'gradientfill'!
         useMinAsBase: true, // for 'area' and 'gradientfill'!
 
+        //GradientFillPlotOptions
         colorTable: getColorTable(templatePlotProps.colorTable, colorTables),
-        inverseColorTable: getColorTable(templatePlotProps.inverseColorTable, colorTables),
+        inverseColorTable: getColorTable(
+            templatePlotProps.inverseColorTable,
+            colorTables
+        ),
 
-        //DifferentialPlotOptions
+        // DifferentialPlotOptions
         serie1: {
+            scale: templatePlotProps.scale || "linear", //"linear" or "log"
+            domain: domain,
+            color: templatePlotProps.color,
+            fill: templatePlotProps.fill,
         },
         serie2: {
+            // ? =scale2, =domain2 ?
+            scale: templatePlotProps.scale || "linear",
+            domain: domain,
+            color: templatePlotProps.color2,
+            fill: templatePlotProps.fill2,
         },
 
         legendInfo: () => ({
             label: curve.name,
             unit: curve.unit ? curve.unit : "",
+
+            // DifferentialPlotLegendInfo,
+            serie1: {
+                show: true,
+                label: curve.name,
+                unit: curve.unit ? curve.unit : "",
+            },
+            serie2: {
+                show: true,
+                label: curve2 ? curve2.name : "",
+                unit: curve2 && curve2.unit ? curve2.unit : "",
+            },
         }),
     };
+    return options;
 }
 
 function getPlotConfig(
     id: string | number,
-    curve: WellLogCurve,
     templatePlotProps: TemplatePlotProps,
     colorTables: ColorTable[],
     domain: [number, number],
+    curve: WellLogCurve,
     iPlot: number,
-    curve2: WellLogCurve, iPlot2: number,
+    curve2: WellLogCurve | undefined,
+    iPlot2: number
 ): PlotConfig {
     return {
         id: id,
         type: templatePlotProps.type,
-        options: getPlotOptions(curve, templatePlotProps, colorTables, domain, iPlot, curve2, iPlot2),
+        options: getPlotOptions(
+            templatePlotProps,
+            colorTables,
+            domain,
+            curve,
+            iPlot,
+            curve2,
+            iPlot2
+        ),
     };
 }
-
 
 export function addGraphTrackPlot(
     wellLogView: WellLogView,
@@ -388,19 +462,26 @@ export function addGraphTrackPlot(
 
             const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
             const curve = curves[iCurve];
+            const minmax: [number, number] = [
+                plotData.minmax[0],
+                plotData.minmax[1],
+            ];
 
             const plotDatas = track.options.data;
             const plots = track.plots;
 
             const colorTables = wellLogView.props.colorTables;
 
-            var iCurve2;
-            var curve2;
-            var plotData2;
-            if (templatePlot.type==="differential") {
-                var iCurve2 = indexOfElementByName(curves, templatePlot.name2);
-                var curve2 = iCurve2 >= 0 ? curves[iCurve2] : null;
-                var plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+            let iCurve2 = -1;
+            let curve2: WellLogCurve | undefined = undefined;
+            let plotData2: PlotData | undefined = undefined;
+            if (templatePlot.type === "differential") {
+                iCurve2 = templatePlot.name2
+                    ? indexOfElementByName(curves, templatePlot.name2)
+                    : -1;
+                curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
+                plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+                checkMinMax(minmax, plotData2.minmax);
             }
 
             const templatePlotProps = getTemplatePlotProps(
@@ -409,17 +490,18 @@ export function addGraphTrackPlot(
             );
             const p = getPlotConfig(
                 iCurve,
-                curve,
                 templatePlotProps,
                 colorTables,
-                roundMinMax(plotData.minmax),
-                plotDatas.length
-                , curve2, plotDatas.length+1
+                roundMinMax(minmax),
+                curve,
+                plotDatas.length,
+                curve2,
+                plotDatas.length + 1
             );
 
             //checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
             plotDatas.push(plotData.data);
-            if (templatePlot.type === "differential") {
+            if (plotData2) {
                 plotDatas.push(plotData2.data);
             }
 
@@ -434,13 +516,42 @@ export function addGraphTrackPlot(
                 plots.push(plot);
 
                 track.prepareData(); //
-
-                if (wellLogView.logController) {
-                    wellLogView.logController.updateTracks();
-                }                
             }
         }
     }
+}
+
+export function editGraphTrackPlot(
+    wellLogView: WellLogView,
+    track: GraphTrack,
+    name: string, //plot: Plot,
+    templatePlot: TemplatePlot
+): void {
+    removeGraphTrackPlot(wellLogView, track, name);
+
+    addGraphTrackPlot(wellLogView, track, templatePlot);
+}
+
+export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
+    const plots = (track as GraphTrack).plots;
+
+    let index = 0;
+    for (const plot of plots) {
+        if (plot === _plot) {
+            plots.splice(index, 1);
+            break;
+        }
+        index++;
+    }
+
+    /*
+    (track as GraphTrack).prepareData(); //
+
+    if (wellLogView.logController) {
+        wellLogView.logController.updateTracks();
+    }
+    */
+    return index;
 }
 
 export function removeGraphTrackPlot(
@@ -468,11 +579,6 @@ export function removeGraphTrackPlot(
             }
 
             (track as GraphTrack).prepareData(); //
-
-            if (wellLogView.logController) {
-                wellLogView.logController.updateTracks();
-            }
-            //(track as GraphTrack).plot();
         }
     }
 }
@@ -511,7 +617,7 @@ import { defaultPlotFactory } from "@equinor/videx-wellog";
 const plotFactory: PlotFactory = {
     ...defaultPlotFactory,
     gradientfill: createPlotType(GradientFillPlot),
-}
+};
 
 export function newGraphTrack(
     title: string,
@@ -648,13 +754,15 @@ export function createTracks(
 
                 checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
 
-                var iCurve2;
-                var curve2;
-                var plotData2;
-                if (templatePlot.name2) {
-                    var iCurve2 = indexOfElementByName(curves, templatePlot.name2);
-                    var curve2 = iCurve2 >= 0 ? curves[iCurve2] : null;
-                    var plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+                let iCurve2 = -1;
+                let curve2: WellLogCurve | undefined = undefined;
+                let plotData2: PlotData | undefined = undefined;
+                if (templatePlot.type === "differential") {
+                    iCurve2 = templatePlot.name2
+                        ? indexOfElementByName(curves, templatePlot.name2)
+                        : -1;
+                    curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
+                    plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
                 }
 
                 const templatePlotProps = getTemplatePlotProps(
@@ -663,16 +771,17 @@ export function createTracks(
                 );
                 const p = getPlotConfig(
                     iCurve,
-                    curve,
                     templatePlotProps,
                     colorTables,
                     roundMinMax(plotData.minmax),
-                    plotDatas.length
-                    ,curve2 , plotDatas.length+1
+                    curve,
+                    plotDatas.length,
+                    curve2,
+                    plotDatas.length + 1
                 );
 
                 plotDatas.push(plotData.data);
-                if (templatePlot.name2) {
+                if (plotData2) {
                     plotDatas.push(plotData2.data);
                 }
 
@@ -691,4 +800,3 @@ export function createTracks(
     }
     return info;
 }
-

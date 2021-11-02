@@ -32,7 +32,8 @@ function createRow(info: Info) {
         return createSeparator();
 
     return (
-        <tr key={info.name}>
+        <tr>
+            {/* key={info.name} is not good. It could be duplicated */}
             {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
 
             {/*info.type*/}

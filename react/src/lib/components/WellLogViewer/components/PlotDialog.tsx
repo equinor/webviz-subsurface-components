@@ -1,11 +1,11 @@
 import React, { Component, ReactNode } from "react";
 
-import {TemplatePlot} from "./WellLogTemplateTypes";
+import { TemplatePlot } from "./WellLogTemplateTypes";
 
-import {Track, GraphTrack} from "@equinor/videx-wellog";
+import { Track, GraphTrack } from "@equinor/videx-wellog";
 
-import WellLogView from "./WellLogView"
-
+import WellLogView from "./WellLogView";
+import { ColorTable } from "./ColorTableTypes";
 
 // material ui
 import {
@@ -14,8 +14,79 @@ import {
     DialogContent,
     DialogActions,
     Button,
-    FormControl, InputLabel, NativeSelect 
-} from '@material-ui/core';
+    FormControl,
+    InputLabel,
+    NativeSelect,
+} from "@material-ui/core";
+
+const typeItems: Record<string, string> = {
+    // language dependent names of plot types
+    line: "Line",
+    linestep: "Line Step",
+    dot: "Dot",
+    area: "Area",
+    gradientfill: "Gradient Fill",
+    differential: "Differential",
+};
+
+const scaleItems: Record<string, string> = {
+    // language dependent names of plot types
+    linear: "Linear",
+    log: "Logarithmic",
+};
+
+const colorItems: Record<string, string> = {
+    // language dependent names of colors
+    black: "Black",
+    red: "Red",
+    green: "Green",
+    blue: "Blue",
+    brown: "Brown",
+    magenta: "Magenta",
+    orange: "Orange",
+    gray: "Gray",
+    lightred: "Light red",
+    lightgreen: "Light green",
+    lightblue: "Light blue",
+    yellow: "Yellow",
+    white: "White",
+};
+
+const noneValue = "-";
+
+function _createItems(
+    items: Record<string, string>,
+    insertEmpty?: boolean
+): ReactNode[] {
+    const nodes: ReactNode[] = [];
+    if (insertEmpty) nodes.push(<option value={noneValue}>{"\u2014"}</option>);
+    for (const key in items) {
+        nodes.push(<option value={key}>{items[key]}</option>);
+    }
+    return nodes;
+}
+
+function createTypeItems(): ReactNode[] {
+    return _createItems(typeItems);
+}
+function createScaleItems(): ReactNode[] {
+    return _createItems(scaleItems);
+}
+function createColorItems(insertEmpty?: boolean): ReactNode[] {
+    return _createItems(colorItems, insertEmpty);
+}
+
+function createColorTableItems(
+    colorTables: ColorTable[],
+    insertEmpty?: boolean
+): ReactNode[] {
+    const nodes: ReactNode[] = [];
+    if (insertEmpty) nodes.push(<option value={noneValue}>{"\u2014"}</option>);
+    for (const colorTable of colorTables) {
+        nodes.push(<option key={colorTable.name}>{colorTable.name}</option>);
+    }
+    return nodes;
+}
 
 interface PlotPropertiesDialogProps {
     templatePlot?: TemplatePlot; // input for editting
@@ -29,83 +100,46 @@ interface PlotPropertiesDialogState extends TemplatePlot {
     open: boolean;
 }
 
-export class PlotPropertiesDialog extends Component<PlotPropertiesDialogProps, PlotPropertiesDialogState> {
+export class PlotPropertiesDialog extends Component<
+    PlotPropertiesDialogProps,
+    PlotPropertiesDialogState
+> {
     constructor(props: PlotPropertiesDialogProps) {
         super(props);
 
-        this.state = this.props.templatePlot ?
-            {
-                ...this.props.templatePlot,
+        this.state = this.props.templatePlot
+            ? {
+                  ...this.props.templatePlot,
 
-                open: true
-            } :
-            {
-                type: "line", //??
-                name: "DEPT", //??
-                name2: "DVER", //?
+                  open: true,
+              }
+            : {
+                  type: "line", //??
+                  name: "DEPT", //??
+                  name2: "DVER", //?
 
-                color: "black", //??
-                fill: "red",
-                colorTable: "Physics",
+                  color: "black", //??
+                  fill: "red",
+                  fillOpacity: 0.25,
+                  colorTable: this.props.wellLogView.props.colorTables[0].name,
 
-                open: true
-            }
+                  open: true,
+              };
         this.closeDialog = this.closeDialog.bind(this);
         this.onOK = this.onOK.bind(this);
-
-        this.handleTypeChange = this.handleTypeChange.bind(this);
-        this.handleDataChange = this.handleDataChange.bind(this);
-        this.handleDataChange2 = this.handleDataChange2.bind(this);
-        this.handleColorChange = this.handleColorChange.bind(this);
-        this.handleFillColorChange = this.handleFillColorChange.bind(this);
-        this.handleColorTableChange = this.handleColorTableChange.bind(this);
     }
 
-    onOK() {
+    onOK(): void {
         this.props.onOK(this.state);
-        this.closeDialog()
+        this.closeDialog();
     }
 
-    closeDialog() {
+    closeDialog(): void {
         this.setState({ open: false });
     }
 
-    handleTypeChange(event) {
-        const type = event.currentTarget.value;
-        const template = this.props.wellLogView.props.template;
-        template.styles;
-        this.setState({
-            type: type,            
-        })
-        console.log("selectedOption", event.currentTarget.value)
-    }
-    handleDataChange(event) {
-        this.setState({ name: event.currentTarget.value });
-        console.log("selectedOption", event.currentTarget.value)
-    }
-    handleDataChange2(event) {
-        this.setState({ name2: event.currentTarget.value });
-        console.log("selectedOption2", event.currentTarget.value)
-    }
-    handleColorChange(event) {
-        this.setState({ color: event.currentTarget.value } );
-        console.log("selectedOption", event.currentTarget.value)
-    }
-    handleFillColorChange(event) {
-        this.setState({fill: event.currentTarget.value });
-        console.log("selectedOption", event.currentTarget.value)
-    }
-    handleColorTableChange(event) {
-        this.setState({colorTable: event.currentTarget.value});
-        console.log("selectedOption", event.currentTarget.value)
-    }
-
     createDataItem(item: string): ReactNode {
-        return (
-            <option key={item}>
-                {item}
-            </option>
-        );
+        return <option key={item}>{item}</option>;
     }
 
     createDataItems(): ReactNode[] {
@@ -127,127 +161,159 @@ export class PlotPropertiesDialog extends Component<PlotPropertiesDialogProps, P
                             bUsed = true;
                             break;
                         }
-                } else if (abbr === curve.name) { // Scale tracks?
+                } else if (abbr === curve.name) {
+                    // Scale tracks?
                     bUsed = true;
                 }
-                if (!bUsed)
-                    nodes.push(this.createDataItem(curve.name));
+                if (!bUsed) nodes.push(this.createDataItem(curve.name));
                 iCurve++;
             }
         }
         return nodes;
     }
 
+    createSelectControl(
+        valueName: string, // use it as "a pointer to member" of an object
+        label: string,
+        createItems: () => ReactNode[]
+    ): ReactNode {
+        const value = (this.state as unknown as Record<string, string>)[
+            valueName
+        ];
+        return (
+            <FormControl fullWidth>
+                <InputLabel>{label}</InputLabel>
+                <NativeSelect
+                    value={value}
+                    onChange={(event) => {
+                        const values = new Object() as Record<string, string>;
+                        values[valueName] =
+                            event.currentTarget.value === noneValue
+                                ? ""
+                                : event.currentTarget.value;
+                        this.setState(
+                            values as unknown as PlotPropertiesDialogState
+                        );
+                    }}
+                >
+                    {createItems()}
+                </NativeSelect>
+            </FormControl>
+        );
+    }
+
     //{ this.props.wellLogView.logController.tracks }
-    render() {
+    render(): ReactNode {
+        const colorTables = this.props.wellLogView.props.colorTables;
         return (
             <Dialog open={this.state.open} maxWidth="sm" fullWidth>
-                <DialogTitle>{this.props.templatePlot ? "Edit plot" : "Add new plot"}</DialogTitle>
-                <DialogContent style={{ display: "flex" }}>
-                    <div style={{ width: "50%" }}>
-                        <FormControl fullWidth>
-                            <InputLabel>Data</InputLabel>
-                            <NativeSelect
-                                value={this.state.name}
-                                onChange={this.handleDataChange}
-                            >
-                                {this.createDataItems()}
-                            </NativeSelect>
-                        </FormControl>
+                <DialogTitle>
+                    {this.props.templatePlot ? "Edit plot" : "Add New Plot"}
+                </DialogTitle>
+                <DialogContent
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr  1fr",
+                    }}
+                >
+                    {this.createSelectControl("type", "Type", createTypeItems)}
+                    {this.createSelectControl(
+                        "scale",
+                        "Scale",
+                        createScaleItems
+                    )}
+                    <FormControl fullWidth key="12" />
 
-                        <FormControl fullWidth>
-                            <InputLabel>{this.state.type === "dot" ? "Dot Color" : "Line Color"}</InputLabel>
-                            <NativeSelect
-                                value={this.state.color}
-                                onChange={this.handleColorChange}
-                            >
-                                <option value={"black"}>Black</option>
-                                <option value={"red"}>Red</option>
-                                <option value={"green"}>Green</option>
-                                <option value={"blue"}>Blue</option>
-                                <option value={"white"}>Whilte</option>
-                            </NativeSelect>
-                        </FormControl>
+                    {this.createSelectControl(
+                        "name",
+                        "Data",
+                        this.createDataItems.bind(this)
+                    )}
+                    {this.createSelectControl(
+                        "color",
+                        this.state.type === "dot" ? "Dot Color" : "Line Color",
+                        createColorItems
+                    )}
 
-                    </div>
-                    <div style={{ width: "50%" }}>
-                        <FormControl fullWidth>
-                            <InputLabel>Type</InputLabel>
-                            <NativeSelect
-                                value={this.state.type}
-                                onChange={this.handleTypeChange}
-                            >
-                                <option value={"line"}>line</option>
-                                <option value={"linestep"}>linestep</option>
-                                <option value={"dot"}>dot</option>
-                                <option value={"area"}>area</option>
-                                <option value={"gradientfill"}>gradientfill</option>
-                                <option value={"differential"}>differential</option>
-                            </NativeSelect>
-                        </FormControl>
-                        {
-                            this.state.type === "area" ?
-                                <FormControl fullWidth>
-                                    <InputLabel>Fill Color</InputLabel>
-                                    <NativeSelect
-                                        value={this.state.fill}
-                                        onChange={this.handleFillColorChange}
-                                    >
-                                        <option value={"black"}>Black</option>
-                                        <option value={"red"}>Red</option>
-                                        <option value={"green"}>Green</option>
-                                        <option value={"blue"}>Blue</option>
-                                        <option value={"white"}>Whilte</option>
-                                    </NativeSelect>
-                                </FormControl>
-                            :
-                            this.state.type === "gradientfill" ?
-                            <FormControl fullWidth>
-                                <InputLabel>Fill Color table</InputLabel>
-                                <NativeSelect
-                                            value={this.state.colorTable}
-                                            onChange={this.handleColorTableChange}
-                                >
-                                    <option>Physics</option>
-                                    <option>Physics reverse</option>
-                                    <option>Rainbow</option>
-                                            <option>Rainbow reverse</option>
-                                </NativeSelect>
-                            </FormControl>
-                                    : <></>
-                        }
-                        {(this.state.type === "differential") ?
-                            <FormControl fullWidth>
-                                <InputLabel>Data 2</InputLabel>
-                                <NativeSelect
-                                    value={this.state.name2}
-                                    onChange={this.handleDataChange2}
-                                >
-                                    <option>DVER</option>
-                                    <option>BDIA</option>
-                                    <option>ROPA</option>
-                                    <option>HKLA</option>
-                                    <option>HKLX</option>
-                                    <option>WOBA</option>
-                                    <option>TQA</option>
-                                    <option>TQX</option>
-                                    <option>TQM</option>
-                                    <option>MFIA</option>
-                                </NativeSelect>
-                            </FormControl>
-                            : <></>
-                        }
+                    {this.state.type === "area" ||
+                    this.state.type === "differential"
+                        ? [
+                              this.createSelectControl(
+                                  "fill",
+                                  "Fill Color",
+                                  createColorItems.bind(null, false)
+                              ),
+                              <FormControl fullWidth key="112" />,
+                              <FormControl fullWidth key="113" />,
+                              this.state.type === "area" ? (
+                                  this.createSelectControl(
+                                      "inverseColor",
+                                      "Inverse Color",
+                                      createColorItems.bind(null, true)
+                                  )
+                              ) : (
+                                  <FormControl fullWidth />
+                              ),
+                          ]
+                        : this.state.type === "gradientfill"
+                        ? [
+                              this.createSelectControl(
+                                  "colorTable",
+                                  "Fill Color table",
+                                  createColorTableItems.bind(this, colorTables,
+                                      false)
+                              ),
+                              <FormControl fullWidth key="211" />,
+                              <FormControl fullWidth key="212" />,
+                              this.createSelectControl(
+                                  "inverseColorTable",
+                                  "Inverse Color table",
+                                  createColorTableItems.bind(
+                                      this,
+                                      colorTables,
+                                      true
+                                  )
+                              ),
+                          ]
+                        : []}
 
-                    </div>
-
+                    {this.state.type === "differential"
+                        ? [
+                              this.createSelectControl(
+                                  "name2",
+                                  "Data 2",
+                                  this.createDataItems.bind(this)
+                              ),
+                              this.createSelectControl(
+                                  "color2",
+                                  "Line Color 2",
+                                  createColorItems
+                              ),
+                              this.createSelectControl(
+                                  "fill2",
+                                  "Fill Color 2",
+                                  createColorItems
+                              ),
+                          ]
+                        : []}
                 </DialogContent>
                 <DialogActions>
-                    <Button color="secondary" variant="contained" onClick={this.closeDialog}>Cancel</Button>
-                    <Button color="primary" variant="contained" onClick={this.onOK}>OK</Button>
+                    <Button
+                        color="secondary"
+                        variant="contained"
+                        onClick={this.closeDialog}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={this.onOK}
+                    >
+                        OK
+                    </Button>
                 </DialogActions>
             </Dialog>
         );
     }
-};
-
-
+}

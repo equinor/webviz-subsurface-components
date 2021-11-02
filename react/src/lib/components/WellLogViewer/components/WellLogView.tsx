@@ -1,4 +1,3 @@
-
 import React, { Component, ReactNode } from "react";
 import { LogViewer } from "@equinor/videx-wellog";
 
@@ -7,10 +6,7 @@ import {
     ScaleInterpolator,
 } from "@equinor/videx-wellog";
 
-import {
-    Track,
-    GraphTrack,
-} from "@equinor/videx-wellog";
+import { Track, GraphTrack } from "@equinor/videx-wellog";
 
 import { ScaleTrackOptions } from "@equinor/videx-wellog/dist/tracks/scale/interfaces";
 
@@ -29,16 +25,21 @@ import { select } from "d3";
 import Scroller from "./Scroller";
 import { WellLog } from "./WellLogTypes";
 import { Template } from "./WellLogTemplateTypes";
-import { ColorTable } from "./ColorTableTypes"
+import { ColorTable } from "./ColorTableTypes";
 
 import { createTracks } from "../utils/tracks";
-import { newGraphTrack } from "../utils/tracks";
 import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
-import { GradientFillPlotOptions } from "../utils/gradientfill-plot";  
-import { addGraphTrackPlot, removeGraphTrackPlot } from "../utils/tracks";
+
+import {
+    addGraphTrackPlot,
+    editGraphTrackPlot,
+    removeGraphTrackPlot,
+} from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
+
+import { TemplatePlot } from "./WellLogTemplateTypes";
 
 import {
     removeOverlay,
@@ -47,394 +48,6 @@ import {
     getScrollContentPos,
     scrollTracks,
 } from "../utils/log-viewer";
-
-import ReactDOM from "react-dom";
-
-import {
-    TemplatePlotProps,
-    TemplateTrack,
-    TemplatePlot,
-    TemplateStyle,
-} from "./WellLogTemplateTypes";
-
-
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-
-interface SimpleMenuProps {
-    anchorEl: HTMLElement;
-    wellLogView: WellLogView;
-    track: Track;
-    type: string;
-    plotName?: string;
-}
-interface SimpleMenuState {
-    anchorEl: HTMLElement | null;
-}
-
-class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
-    constructor(props: SimpleMenuProps) {
-        super(props);
-        this.state = { anchorEl: this.props.anchorEl };
-
-        this.addTrack = this.addTrack.bind(this);
-        this.removeTrack = this.removeTrack.bind(this);
-    }
-    componentDidUpdate(prevProps: SimpleMenuProps) {
-        if (this.props.anchorEl !== prevProps.anchorEl) {
-            this.setState({ anchorEl: this.props.anchorEl });
-        }
-        /*if (
-            this.props.welllog !== prevProps.welllog ||
-            this.props.track !== prevProps.track
-        ) {
-        }*/
-    }
-
-    closeMenu() {
-        this.setState({ anchorEl: null });
-    }
-
-    handleContextMenu(ev: React.MouseEvent<HTMLElement>) {
-        ev.preventDefault();
-        this.closeMenu();
-    }
-    handleCloseMenu(ev: React.MouseEvent<HTMLElement>) {
-        ev;
-        this.closeMenu();
-    }
-    handleClickItem(action?: () => void) {
-        if (action) action();
-        this.closeMenu();
-    }
-
-    createRemovePlotMenuItem(item: string): ReactNode {
-        return (
-            <MenuItem
-                key={item}
-                onClick={() => {
-                    this.handleClickItem(this.removePlot.bind(this, item));
-                }}
-            >
-                &nbsp;&nbsp;&nbsp;&nbsp;{item}
-            </MenuItem>
-        );
-    }
-
-
-    removePlot(item: string) {
-        console.log("removePlot(" + item + ")");
-        const track = this.props.track;
-
-        this.props.wellLogView.removeGraphTrackPlot(track as GraphTrack, item);
-    }
-
-    menuRemovePlotItems(): ReactNode[] {
-        const nodes: ReactNode[] = [];
-        const track = this.props.track;
-        const plots = (track as GraphTrack).plots;
-
-        const welllog = this.props.wellLogView.props.welllog;
-        if (welllog && welllog[0]) {
-            const curves = welllog[0].curves;
-
-            for (const plot of plots) {
-                const iCurve = plot.id as number;
-                nodes.push(this.createRemovePlotMenuItem(curves[iCurve].name));
-            }
-        }
-
-        return nodes;
-    }
-
-    onOK(templatePlot: TemplatePlot): void {
-        console.log("onOK(" + templatePlot + ")");
-        const track = this.props.track;
-
-        this.props.wellLogView.addGraphTrackPlot(track as GraphTrack, templatePlot);
-    }
-    addPlots(parent: HTMLElement | null): void {
-        if (parent) {
-            const el: HTMLElement = document.createElement("div");
-            el.style.width = "10px";
-            el.style.height = "13px";
-            parent.appendChild(el);
-            ReactDOM.render(
-                <PlotPropertiesDialog
-                    wellLogView={this.props.wellLogView}
-                    track={this.props.track}
-                    onOK={this.onOK.bind(this)}
-                />, el
-            );
-        }
-    }
-    editPlots(parent: HTMLElement | null): void {
-        if (parent) {
-            const el: HTMLElement = document.createElement("div");
-            el.style.width = "10px";
-            el.style.height = "13px";
-            parent.appendChild(el);
-
-            let templatePlot = {
-                name: "DEPT",
-                style: "",
-                type: "line",
-                color:"black"
-            }
-
-            ReactDOM.render(
-                <PlotPropertiesDialog
-                    templatePlot={templatePlot}
-                    wellLogView={this.props.wellLogView}
-                    track={this.props.track}
-                    onOK={this.onOK.bind(this)}
-                />, el
-            );
-        }
-    }
-    removePlots(parent: HTMLElement | null): void {
-        if (parent) {
-            const el: HTMLElement = document.createElement("div");
-            el.style.width = "10px";
-            el.style.height = "13px";
-            parent.appendChild(el);
-            ReactDOM.render(
-                <SimpleMenu
-                    type="removePlots"
-                    anchorEl={el}
-                    wellLogView={this.props.wellLogView}
-                    track={this.props.track}
-                />,
-                el
-            );
-        }
-    }
-
-    addTrack() {
-        console.log("addTrack");
-        if (this.props.wellLogView.logController) {
-            //newScaleTrack
-            //newDualScaleTrack
-            const trackNew = newGraphTrack("new Track", [], []);
-            const trackCurrent = this.props.track;
-            const bAfter = true;
-            {
-                let order = 0;
-                for (const track of this.props.wellLogView.logController
-                    .tracks) {
-                    track.order = order++;
-                    if (trackCurrent == track) {
-                        if (bAfter) {
-                            // add after
-                            trackNew.order = order++;
-                        } else {
-                            // insert before current
-                            trackNew.order = track.order;
-                            track.order = order++;
-                        }
-                    }
-                }
-            }
-            this.props.wellLogView.logController.addTrack(trackNew);
-
-            this.props.wellLogView.zoomTrack();
-            this.props.wellLogView.scrollTrack();
-
-            //this.props.wellLogView.addTrackContextMenus(trackNew); //ZZZZ~!!!!
-        }
-    }
-    removeTrack() {
-        console.log("removeTrack");
-        if (this.props.wellLogView.logController) {
-            this.props.wellLogView.logController.removeTrack(this.props.track);
-
-            this.props.wellLogView.zoomTrack();
-            this.props.wellLogView.scrollTrack();
-        }
-    }
-
-    render(): ReactNode {
-        if (this.props.type == "title") {
-            return (
-                <div>
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={this.state.anchorEl}
-                        open={Boolean(this.state.anchorEl)}
-                        onClose={this.handleCloseMenu.bind(this)}
-                        onContextMenu={this.handleContextMenu.bind(this)}
-                    >
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(this.addTrack);
-                            }}
-                        >
-                            {"Add track"}
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(this.removeTrack);
-                            }}
-                        >
-                            {"Remove track"}
-                        </MenuItem>
-                    </Menu>
-                </div>
-            );
-        }
-
-        if (this.props.type == "container") {
-            return (
-                <div>
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={this.state.anchorEl}
-                        keepMounted
-                        open={Boolean(this.state.anchorEl)}
-                        onClose={this.handleCloseMenu.bind(this)}
-                        onContextMenu={this.handleContextMenu.bind(this)}
-                    >
-                        <MenuItem>{"Menu item 1"}</MenuItem>
-                        <MenuItem>{"Menu item 2"}</MenuItem>
-                    </Menu>
-                </div>
-            );
-        }
-
-        if (this.props.type == "removePlots") {
-            return (
-                <div>
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={this.state.anchorEl}
-                        keepMounted
-                        open={Boolean(this.state.anchorEl)}
-                        onClose={this.handleCloseMenu.bind(this)}
-                        onContextMenu={this.handleContextMenu.bind(this)}
-                    >
-                        {this.menuRemovePlotItems()}
-                    </Menu>
-                </div>
-            );
-        }
-
-        const track = this.props.track;
-        const plots = (track as GraphTrack).plots;
-
-        return (
-            <div>
-                <Menu
-                    id="simple-menu"
-                    anchorEl={this.state.anchorEl}
-                    keepMounted
-                    open={Boolean(this.state.anchorEl)}
-                    onClose={this.handleCloseMenu.bind(this)}
-                    onContextMenu={this.handleContextMenu.bind(this)}
-                >
-
-                    <MenuItem
-                        onClick={this.handleClickItem.bind(
-                            this,
-                            this.addPlots.bind(this, this.state.anchorEl)
-                        )}
-                    >
-                        {"Add plot"}
-                    </MenuItem>
-
-                    {!plots.length || 1 ? (
-                        <></>
-                    ) : (
-                            <MenuItem
-                                onClick={this.handleClickItem.bind(
-                                    this,
-                                    this.editPlots.bind(this, this.state.anchorEl)
-                                )}
-                            >
-                                {"Edit plot"}
-                            </MenuItem>
-                        )}
-
-                    {!plots.length ? (
-                        <></>
-                    ) : (
-                            <MenuItem
-                                onClick={this.handleClickItem.bind(
-                                    this,
-                                    this.removePlots.bind(this, this.state.anchorEl)
-                                )}
-                            >
-                                {"Remove plot"}
-                            </MenuItem>
-                    )}
-                </Menu>
-            </div>
-        );
-    }
-}
-function localMenuTitle(
-    parent: HTMLElement,
-    track: Track,
-    wellLogView: WellLogView,
-) {
-    //if (track) return; // not ready
-    const el: HTMLElement = document.createElement("div");
-    el.style.width = "10px";
-    el.style.height = "13px";
-    parent.appendChild(el);
-    ReactDOM.render(
-        <SimpleMenu
-            type="title"
-            anchorEl={el}
-            wellLogView={wellLogView}
-            track={track}
-        />,
-        el
-    );
-}
-function localMenuLegend(
-    parent: HTMLElement,
-    track: Track,
-    wellLogView: WellLogView
-) {
-    //if (track) return; // not ready
-    const el: HTMLElement = document.createElement("div");
-    el.style.width = "10px";
-    el.style.height = "3px";
-    parent.appendChild(el);
-    ReactDOM.render(
-        <SimpleMenu
-            type="legend"
-            anchorEl={el}
-            wellLogView={wellLogView}
-            track={track}
-        />,
-        el
-    );
-}
-function localMenuContainer(
-    parent: HTMLElement,
-    track: Track,
-    wellLogView: WellLogView
-) {
-    //if (track) return; // not ready
-    const el: HTMLElement = document.createElement("div");
-    el.style.width = "10px";
-    el.style.height = "3px";
-    parent.appendChild(el);
-    ReactDOM.render(
-        <SimpleMenu
-            type="container"
-            anchorEl={el}
-            wellLogView={wellLogView}
-            track={track}
-        />,
-        el
-    );
-}
-
-
-import { PlotPropertiesDialog } from "./PlotDialog.tsx"
-
 
 function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
@@ -480,7 +93,6 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
 }
 
 function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
-    //instance.overlay.register(key: string, callbacks: OverlayCallbacks): void;
     const elm = instance.overlay.create("depth", {
         onClick: (event: OverlayClickEvent): void => {
             const { caller, x, y } = event;
@@ -598,11 +210,11 @@ function createInterpolator(from: Float32Array, to: Float32Array) {
     return (x: number, expand: boolean) => {
         for (let i = 0; i < n; i++) {
             if (x < from[i]) {
-                if (!i) return expand ? to[0] : Number.NaN; //(null as unknown as number);
+                if (!i) return expand ? to[0] : Number.NaN;
                 return (x - from[i]) * mul[i] + to[i];
             }
         }
-        return expand ? to[n ? n - 1 : 0] : Number.NaN; //(null as unknown as number);
+        return expand ? to[n ? n - 1 : 0] : Number.NaN;
     };
 }
 
@@ -646,7 +258,7 @@ function formatValue(v1: number) {
     }
     return v;
 }
-    
+
 function getValue(x: number, data: [], type: string): string {
     let v = "";
     if (Number.isFinite(x)) {
@@ -682,7 +294,6 @@ function getValue(x: number, data: [], type: string): string {
     }
     return v;
 }
-
 
 function setTracksToController(
     logController: LogViewer,
@@ -733,7 +344,7 @@ interface Info {
     units?: string;
     color: string;
     value: string;
-    type: string; // line, linestep, area, 
+    type: string; // line, linestep, area,
 }
 
 interface Props {
@@ -748,6 +359,23 @@ interface Props {
 
     onInfo?: (infos: Info[]) => void;
     onCreateController?: (controller: WellLogController) => void;
+
+    onLocalMenuTitle?: (
+        parent: HTMLElement,
+        track: Track,
+        wellLogView: WellLogView
+    ) => void;
+    onLocalMenuLegend?: (
+        parent: HTMLElement,
+        track: Track,
+        wellLogView: WellLogView
+    ) => void;
+    onLocalMenuContainer?: (
+        parent: HTMLElement,
+        track: Track,
+        wellLogView: WellLogView
+    ) => void;
+
     onScrollTrackPos?: (pos: number) => void;
     onZoomContent?: (pos: number) => void;
 
@@ -768,7 +396,6 @@ interface State {
     scrollTrackPos: number; // the first track number
 }
 
-
 class WellLogView extends Component<Props, State> implements WellLogController {
     container?: HTMLElement;
     logController?: LogViewer;
@@ -784,7 +411,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.state = {
             infos: [],
             zoomContent: props.zoomContent ? props.zoomContent : 1.0,
-            scrollContentPos: props.scrollContentPos ? props.scrollContentPos : 0,
+            scrollContentPos: props.scrollContentPos
+                ? props.scrollContentPos
+                : 0,
             zoomTrack: props.zoomTrack ? props.zoomTrack : 1.0,
             scrollTrackPos: props.scrollTrackPos ? props.scrollTrackPos : 0,
         };
@@ -880,8 +509,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 onTrackUpdate: function (elm: HTMLElement, track: Track): void {
                 },
                 */
-                onTrackExit: function (): void {
-                },
+                // TODO: how to use it?  onTrackExit: function (): void {},
             });
 
             this.logController.init(this.container);
@@ -924,14 +552,25 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(); // Clear old track information
     }
 
-    addGraphTrackPlot(track: GraphTrack, templatePlot: TemplatePlot)
-    {
+    addGraphTrackPlot(track: GraphTrack, templatePlot: TemplatePlot): void {
         addGraphTrackPlot(this, track, templatePlot);
+        if (this.logController) this.logController.updateTracks();
+        this.setInfo();
+    }
+
+    editGraphTrackPlot(
+        track: GraphTrack,
+        name: string,
+        templatePlot: TemplatePlot
+    ): void {
+        editGraphTrackPlot(this, track, name, templatePlot);
+        if (this.logController) this.logController.updateTracks();
         this.setInfo();
     }
 
     removeGraphTrackPlot(track: GraphTrack, name: string): void {
         removeGraphTrackPlot(this, track, name);
+        if (this.logController) this.logController.updateTracks();
         this.setInfo();
     }
 
@@ -989,7 +628,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                     const nPlots = (track as GraphTrack).plots.length;
                     for (let p = 0; p < nPlots; p++) {
                         const plot = (track as GraphTrack).plots[p];
-                        const type = getPlotType(plot)
+                        const type = getPlotType(plot);
                         const v = getValue(x, datas[p], type);
                         const legend = (
                             plot.options as ExtPlotOptions
@@ -997,9 +636,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                         infos.push({
                             name: legend.label,
                             units: legend.unit,
-                            color: plot.options.color
-                                ? plot.options.color
-                                : "",
+                            color: plot.options.color ? plot.options.color : "",
                             value: v,
                             type: type,
                         });
@@ -1031,12 +668,17 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.onZoomContent) this.props.onZoomContent(k);
 
         if (this.logController) {
-            const scrollContentPos = getScrollContentPos(this.logController)
+            const scrollContentPos = getScrollContentPos(this.logController);
 
-            const delta = Math.abs(scrollContentPos - this.state.scrollContentPos);
+            const delta = Math.abs(
+                scrollContentPos - this.state.scrollContentPos
+            );
             console.log(
                 "WellLogView.onRescaleContent new scrollContentPos=",
-                scrollContentPos, "delta=", delta, delta > 0.001
+                scrollContentPos,
+                "delta=",
+                delta,
+                delta > 0.001
             );
             if (delta > 0.001)
                 this.setState({ scrollContentPos: scrollContentPos });
@@ -1077,13 +719,16 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         );
     }
     onTrackTitleContextMenu(ev: TrackEvent): void {
-        if (this.logController) localMenuTitle(ev.element, ev.track, this);
+        if (this.logController && this.props.onLocalMenuTitle)
+            this.props.onLocalMenuTitle(ev.element, ev.track, this);
     }
     onTrackLegendContextMenu(ev: TrackEvent): void {
-        if (this.logController) localMenuLegend(ev.element, ev.track, this);
+        if (this.logController && this.props.onLocalMenuLegend)
+            this.props.onLocalMenuLegend(ev.element, ev.track, this);
     }
     onTrackContainerContextMenu(ev: TrackEvent): void {
-        if (this.logController) localMenuContainer(ev.element, ev.track, this);
+        if (this.logController && this.props.onLocalMenuContainer)
+            this.props.onLocalMenuContainer(ev.element, ev.track, this);
     }
 
     _graphTrackMax(): number {
@@ -1125,10 +770,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this._getScrollTrackPosMax();
     }
 
-    onScroll(x: number, y: number): void { // callback from scrollbar
+    onScroll(x: number, y: number): void {
+        // callback from scrollbar
         if (this.logController) {
             const f = this.props.horizontal ? x : y;
-            console.log("scrollContentTo("+f+")");
+            console.log("scrollContentTo(" + f + ")");
             scrollContentTo(this.logController, f);
         }
         const posMax = this._getScrollTrackPosMax();

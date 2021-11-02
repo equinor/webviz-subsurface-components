@@ -6,14 +6,7 @@
   },
   "tracks": [
     {
-      "title": "Multiple",
       "plots": [
-        {
-          "name": "BDIA"
-        },
-        {
-          "name": "ROPA"
-        },
         {
           "name": "HKLA",
           "style": "HKL"
@@ -23,20 +16,44 @@
     {
       "plots": [
         {
-          "name": "MFIA",
-          "type": "gradientfill",
-          "colorTable": "Physics reverse",
-          "_inverseColorTable": "Physics",
-          "fill": "white",
-          "color": "black"
+          "name": "HKLX",
+          "style": "HKL",
+          "color": "blue"
         }
       ]
     },
     {
       "plots": [
         {
-          "name": "WOBA",
-          "type": "linestep"
+          "name": "HKLA",
+          "style": "HKL",
+          "type": "area",
+          "color": "blue",
+          "fill": "red",
+          "inverseColor": "green"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "HKLX",
+          "name2": "HKLA",
+          "type": "differential",
+          "scale": "linear",
+          "color": "blue",
+          "color2": "red"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "HKLA",
+          "type": "gradientfill",
+          "color": "blue",
+          "colorTable": "Physics",
+          "inverseColorTable": "Physics reverse"
         }
       ]
     },
@@ -178,6 +195,7 @@
   "styles": [
     {
       "name": "HKL",
+      "scale": "linear",
       "type": "gradientfill",
       "color": "red",
       "colorTable": "Physics"
