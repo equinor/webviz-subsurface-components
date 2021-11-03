@@ -8,7 +8,7 @@ import {
     ValueDecoder,
 } from "../utils/propertyMapTools";
 
-import fsHillshading from "./hillshading2d.fs.glsl";
+import fsHillshading from "!!raw-loader!./hillshading2d.fs.glsl";
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see
 // https://deck.gl/docs/api-reference/layers/bitmap-layer
