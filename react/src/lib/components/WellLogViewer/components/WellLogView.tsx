@@ -400,6 +400,9 @@ interface Props {
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
+    maxTrackNum?: number;
+    scrollTrackPos?: number; // the first track number
+
     onInfo?: (infos: Info[]) => void;
     onCreateController?: (controller: WellLogController) => void;
 
@@ -422,10 +425,6 @@ interface Props {
     onScrollTrackPos?: (pos: number) => void;
     onZoomContent?: (zoom: number) => void;
     onScrollContentPos?: (pos: number) => void;
-
-    maxTrackNum?: number;
-
-    scrollTrackPos?: number; // the first track number
 }
 
 interface State {
@@ -466,6 +465,21 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setTracks();
     }
 
+    shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
+        if (this.props.horizontal !== nextProps.horizontal) return true;
+        if (this.props.welllog !== nextProps.welllog) return true;
+        if (this.props.template !== nextProps.template) return true;
+        if (this.props.colorTables !== nextProps.colorTables) return true;
+        if (this.props.primaryAxis !== nextProps.primaryAxis) return true;
+        if (this.props.axisTitles !== nextProps.axisTitles) return true;
+        if (this.props.axisMnemos !== nextProps.axisMnemos) return true;
+        if (this.props.scrollTrackPos !== nextProps.scrollTrackPos) return true;
+
+        if (this.props.maxTrackNum !== nextProps.maxTrackNum) return true;
+        if (this.state.scrollTrackPos !== nextState.scrollTrackPos) return true;
+
+        return false;
+    }
     componentDidUpdate(prevProps: Props, prevState: State): void {
         // Typical usage (don't forget to compare props):
         let shouldSetTracks = false;
@@ -489,9 +503,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             shouldSetTracks = true;
         }
 
-        console.log(
-            "WellLogView.componentDidUpdate shouldSetTracks=" + shouldSetTracks
-        );
+        //console.log("WellLogView.componentDidUpdate shouldSetTracks=" + shouldSetTracks);
         if (shouldSetTracks) {
             this.setTracks();
         } else if (this.props.scrollTrackPos !== prevProps.scrollTrackPos) {

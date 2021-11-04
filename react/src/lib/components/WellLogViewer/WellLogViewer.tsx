@@ -136,7 +136,6 @@ class WellLogViewer extends Component<Props, State> {
 
     controller: WellLogController | null;
     scroller: Scroller | null;
-    container: HTMLElement | null;
 
     constructor(props: Props) {
         super(props);
@@ -157,7 +156,6 @@ class WellLogViewer extends Component<Props, State> {
 
         this.controller = null;
         this.scroller = null;
-        this.container = null;
 
         this.onCreateController = this.onCreateController.bind(this);
 
@@ -174,8 +172,6 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     componentDidMount(): void {
-        const node = ReactDOM.findDOMNode(this);
-        this.container = node ? (node.parentNode as HTMLElement) : null;
         this._enableScroll();
     }
 
@@ -292,26 +288,11 @@ class WellLogViewer extends Component<Props, State> {
 
     render(): ReactNode {
         const rightWidth = 280;
-        let width = 1165;
-        let height = 390;
-        if (this.container) {
-            width = this.container.clientWidth - rightWidth;
-            height = this.container.clientHeight;
-            //console.log("container.clientWidth=", this.container.clientWidth);
-            //console.log("container.clientHeight=", this.container.clientHeight);
-        }
-        console.log(
-            "WellLogViewer.render width, height=",
-            width,
-            height,
-            this.state.primaryAxis
-        );
+
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <Scroller
-                    style={{ height: "100%", flex: "1 1 auto" }}
-                    width={width}
-                    height={height}
+                    //style={{ height: "100%", flex: "1 1 auto" }}
                     ref={(el) => (this.scroller = el as Scroller)}
                     onScroll={this.onScrollerScroll}
                 >

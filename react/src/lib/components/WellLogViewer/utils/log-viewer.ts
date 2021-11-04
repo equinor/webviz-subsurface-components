@@ -64,7 +64,7 @@ export function scrollContentTo(
     const w = b2 - b1 - (d2 - d1);
 
     const c = b1 + f * w;
-    console.log("c=" + c + " c+d=" + (c + d));
+    //console.log("c=" + c + " c+d=" + (c + d));
     if (c !== d1) {
         logViewer.zoomTo([c, c + d]);
         return true;
