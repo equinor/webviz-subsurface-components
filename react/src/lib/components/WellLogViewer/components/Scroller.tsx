@@ -1,14 +1,5 @@
 import React, { Component, ReactNode } from "react";
 
-interface Props {
-    xZoom?: number;
-    yZoom?: number;
-
-    x: number; // fraction
-    y: number; // fraction
-    onScroll: (x: number, y: number) => void;
-}
-
 function getScrollbarSizes(): { vertical: number; horizontal: number } {
     // Creating invisible container
     const outer = document.createElement("div");
@@ -18,16 +9,16 @@ function getScrollbarSizes(): { vertical: number; horizontal: number } {
     //!!! outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
     document.body.appendChild(outer);
 
-    /*
+    /* Old variant
     // Creating inner element and placing it in the container
     const inner = document.createElement("div");
     outer.appendChild(inner);
     // Calculating difference between container's full width and the child width
     const vertical = outer.offsetWidth - inner.offsetWidth; // vertical scrollbar
     const horizontal = outer.offsetHeight - inner.offsetHeight; // horizontal scrollbar
-
     */
-    //scrollbarWidth = offsetWidth - clientWidth - getComputedStyle().borderLeftWidth - getComputedStyle().borderRightWidth
+
+    // New variant: scrollbarWidth = offsetWidth - clientWidth - getComputedStyle().borderLeftWidth - getComputedStyle().borderRightWidth
     const vertical = outer.offsetWidth - outer.clientWidth;
     const horizontal = outer.offsetHeight - outer.clientHeight;
 
@@ -37,42 +28,64 @@ function getScrollbarSizes(): { vertical: number; horizontal: number } {
     return { vertical, horizontal };
 }
 
-class Scroller extends Component<Props> {
-    scroller: React.RefObject<HTMLInputElement>; // Outer
-    scrollable: React.RefObject<HTMLInputElement>; // Inner
+interface Props {
+    width: number;
+    height: number;
+    onScroll: (x: number, y: number) => void;
+}
+interface State {
+    width: number;
+    height: number;
+}
+
+class Scroller extends Component<Props, State> {
+    scroller?: HTMLDivElement | null; // Outer
+    scrollable: HTMLDivElement | null; // Inner
+    resizeObserver: ResizeObserver;
 
     constructor(props: Props) {
         super(props);
-        this.scroller = React.createRef();
-        this.scrollable = React.createRef();
+        this.scroller = null;
+        this.scrollable = null;
+
+        this.state = {
+            width: this.props.width,
+            height: this.props.height,
+        };
 
         this.onScroll = this.onScroll.bind(this);
-    }
 
-    componentDidUpdate(prevProps: Props): void {
-        if (this.props.x !== prevProps.x || this.props.y !== prevProps.y) {
-            this.scrollTo(this.props.x, this.props.y);
-        }
+        this.resizeObserver = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (entry && entry.target) {
+                const Width = (entry.target as HTMLElement).offsetWidth;//getBoundingClientRect().width;
+                const Height = (entry.target as HTMLElement).offsetHeight;//getBoundingClientRect().height;
+                console.log("resizeObserver width, height=", Width, Height);
+
+                this.setState({
+                    width: Width,
+                    height: Height,
+                });
+            }
+        });
+    }
+    componentDidMount(): void {
+        console.log("componentDidMount", this.scroller);
+        if (this.scroller) this.resizeObserver.observe(this.scroller);
+    }
+    componentWillUnmount(): void {
+        if (this.scroller) this.resizeObserver.unobserve(this.scroller);
     }
 
     onScroll(): void {
         // callback from HTML element
-        const el = this.scroller.current as HTMLElement;
-        const scrollTop = el.scrollTop;
-        const scrollHeight = el.scrollHeight - el.clientHeight;
-        const scrollLeft = el.scrollLeft;
-        const scrollWidth = el.scrollWidth - el.clientWidth;
+        const elOuter = this.scroller;
+        if (!elOuter) return;
 
-        console.log(
-            "scrollTop=" +
-                scrollTop +
-                " scrollLeft=" +
-                scrollLeft +
-                " scrollHeight=" +
-                scrollHeight +
-                " scrollWidth=" +
-                scrollWidth
-        );
+        const scrollTop = elOuter.scrollTop;
+        const scrollHeight = elOuter.scrollHeight - elOuter.clientHeight;
+        const scrollLeft = elOuter.scrollLeft;
+        const scrollWidth = elOuter.scrollWidth - elOuter.clientWidth;
 
         // compute fractions
         const x = scrollWidth ? scrollLeft / scrollWidth : 0;
@@ -80,16 +93,7 @@ class Scroller extends Component<Props> {
         console.log("from HTML scrollbars x=" + x + " y=" + y);
 
         this.props.onScroll(x, y); // notify parent
-        /*
-        scrollTo(this.logController, this.props.horizontal ? f2 : f1)
-        const posMax = this._scrollPosMax();
-        //let pos = this.props.horizontal ? scrollTop: scrollLeft;
-        let pos = (this.props.horizontal ? f1 : f2) * posMax;
-        console.log("pos=" + pos, "horizontal=" + this.props.horizontal)
-        this.scrollTo(pos)
-        */
     }
-
     scrollTo(x: number, y: number): void {
         console.log("Scroller.scrollTo(" + x + "," + y + ")");
         if (x < 0.0) x = 0.0;
@@ -97,29 +101,28 @@ class Scroller extends Component<Props> {
         if (y < 0.0) y = 0.0;
         else if (y > 1.0) y = 1.0;
 
-        const el = this.scroller.current as HTMLElement;
-        let scrollLeft = x * (el.scrollWidth - el.clientWidth);
-        let scrollTop = y * (el.scrollHeight - el.clientHeight);
+        const elOuter = this.scroller;
+        if (!elOuter) return;
+
+        let scrollLeft = x * (elOuter.scrollWidth - elOuter.clientWidth);
+        let scrollTop = y * (elOuter.scrollHeight - elOuter.clientHeight);
         scrollLeft = Math.round(scrollLeft);
         scrollTop = Math.round(scrollTop);
 
         const { vertical, horizontal } = getScrollbarSizes();
-        const elOuter = this.scroller.current as HTMLElement;
         const widthOuter = elOuter.getBoundingClientRect().width - vertical;
         const heightOuter = elOuter.getBoundingClientRect().height - horizontal;
 
-        const elInner = this.scrollable.current as HTMLElement;
+        const elInner = this.scrollable;
+        if (!elInner) return;
         const widthInner = elInner.offsetWidth; //getBoundingClientRect().width;
         const heightInner = elInner.offsetHeight; //getBoundingClientRect().height;
 
-        //console.log("el.scroll=", el.scrollLeft, el.scrollTop);
         let left = x * (widthInner - widthOuter);
         let top = y * (heightInner - heightOuter);
         left = Math.round(left);
         top = Math.round(top);
 
-        console.log("left, top=", scrollLeft, scrollTop);
-        console.log("left, top=", left, top);
         left = scrollLeft;
         top = scrollTop;
 
@@ -128,56 +131,63 @@ class Scroller extends Component<Props> {
             elOuter.scrollTo(left, top); //elOuter.scrollLeft = left; elOuter.scrollTop = top;
         }
     }
+    zoom(xZoom: number, yZoom: number): void {
+        console.log("Scroller.zoom(" + xZoom + "," + yZoom + ")");
+
+        const elOuter = this.scroller;
+        if (!elOuter) return;
+
+        const elInner = this.scrollable;
+        if (!elInner) return;
+
+        const { vertical, horizontal } = getScrollbarSizes();
+
+        const widthOuter = elOuter.getBoundingClientRect().width - vertical;
+        const heightOuter = elOuter.getBoundingClientRect().height - horizontal;
+
+        const widthInner = widthOuter * xZoom + "px";
+        const heightInner = heightOuter * yZoom + "px";
+
+        if (
+            elInner.style.width !== widthInner &&
+            elInner.style.height !== heightInner
+        ) {
+            console.log(
+                "elOuter.elInner.width,height(" +
+                    widthInner +
+                    "," +
+                    heightInner +
+                    ")"
+            );
+            elInner.style.width = widthInner;
+            elInner.style.height = heightInner;
+        }
+    }
 
     render(): ReactNode {
+        const Width = this.state.width;
+        const Height = this.state.height;
         const { vertical, horizontal } = getScrollbarSizes();
-        const Width = 1165;
-        const Height = 390;
 
         const width = Width - vertical;
         const height = Height - horizontal;
 
-        const xZoom = this.props.xZoom ? this.props.xZoom : 1;
-        const yZoom = this.props.yZoom ? this.props.yZoom : 1;
-
-        const widthInner = width * xZoom;
-        const heightInner = height * yZoom;
-
-        let left = this.props.x * (widthInner - width);
-        let top = this.props.y * (heightInner - height);
-        left = Math.round(left);
-        top = Math.round(top);
-        console.log("render scrollTo(" + left + "," + top + ")", xZoom, yZoom);
-        //console.log("Scroller render zoom=", xZoom, yZoom);
+        console.log("Scroller.render Width, Weight=", Width, Height);
         return (
-            <div style={{ width: "100%", height: "100%" }}>
-                <div
-                    style={{
-                        overflow: "scroll",
-                        width: Width + "px",
-                        height: Height + "px",
-                    }}
-                    ref={this.scroller}
-                    onScroll={this.onScroll}
-                >
+            <div
+                style={{ overflow: "scroll", width: "100%", height: "100%" }}
+                ref={(el) => (this.scroller = el as HTMLDivElement)}
+                onScroll={this.onScroll}
+            >
+                <div ref={(el) => (this.scrollable = el as HTMLDivElement)}>
                     <div
                         style={{
-                            /*left: -left + "px",
-                            top: -top + "px",*/
-                            width: widthInner + "px",
-                            height: heightInner + "px",
+                            position: "absolute",
+                            width: width + "px",
+                            height: height + "px",
                         }}
-                        ref={this.scrollable}
                     >
-                        <div
-                            style={{
-                                position: "absolute",
-                                width: width + "px",
-                                height: height + "px",
-                            }}
-                        >
-                            {this.props.children}
-                        </div>
+                        {this.props.children}
                     </div>
                 </div>
             </div>

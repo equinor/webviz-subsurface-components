@@ -168,46 +168,13 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     }
 
     addTrack(): void {
-        console.log("addTrack");
-        if (this.props.wellLogView.logController) {
-            //newScaleTrack
-            //newDualScaleTrack
-            const trackNew = newGraphTrack("new Track", [], []);
-            const trackCurrent = this.props.track;
-            const bAfter = true;
-            {
-                let order = 0;
-                for (const track of this.props.wellLogView.logController
-                    .tracks) {
-                    track.order = order++;
-                    if (trackCurrent == track) {
-                        if (bAfter) {
-                            // add after
-                            trackNew.order = order++;
-                        } else {
-                            // insert before current
-                            trackNew.order = track.order;
-                            track.order = order++;
-                        }
-                    }
-                }
-            }
-            this.props.wellLogView.logController.addTrack(trackNew);
-
-            this.props.wellLogView.zoomTrack();
-            this.props.wellLogView.scrollTrack();
-
-            //this.props.wellLogView.addTrackContextMenus(trackNew); //ZZZZ~!!!!
-        }
+        //newScaleTrack
+        //newDualScaleTrack
+        const trackNew = newGraphTrack("new Track", [], []);
+        this.props.wellLogView.addTrack(trackNew, this.props.track, true);
     }
     removeTrack(): void {
-        console.log("removeTrack");
-        if (this.props.wellLogView.logController) {
-            this.props.wellLogView.logController.removeTrack(this.props.track);
-
-            this.props.wellLogView.zoomTrack();
-            this.props.wellLogView.scrollTrack();
-        }
+        this.props.wellLogView.removeTrack(this.props.track);
     }
 
     render(): ReactNode {

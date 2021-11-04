@@ -15,14 +15,13 @@ import {
     OverlayMouseMoveEvent,
     OverlayMouseExitEvent,
     OverlayRescaleEvent,
-    LogControllerResizeEvent,
+    //LogControllerResizeEvent,
 } from "@equinor/videx-wellog/dist/ui/interfaces";
 
 import "./styles.scss";
 
 import { select } from "d3";
 
-import Scroller from "./Scroller";
 import { WellLog } from "./WellLogTypes";
 import { Template } from "./WellLogTemplateTypes";
 import { ColorTable } from "./ColorTableTypes";
@@ -45,7 +44,8 @@ import {
     removeOverlay,
     zoomContent,
     scrollContentTo,
-    getScrollContentPos,
+    getContentScrollPos,
+    getContentZoom,
     scrollTracks,
 } from "../utils/log-viewer";
 
@@ -124,17 +124,8 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         },
         onRescale: (event: OverlayRescaleEvent): void => {
             if (event.target && event.transform) {
-                /*
-                console.log(
-                    "event.transform=" +
-                        event.transform.k +
-                        "; " +
-                        event.transform.x +
-                        "; " +
-                        event.transform.y
-                );*/
-                //console.log("event.domain", event.domain);
-                parent.onRescaleContent(event.transform.k);
+                const pos = getContentScrollPos(instance);
+                parent.onRescaleContent(pos, event.transform.k);
 
                 event.target.style.visibility = "visible";
                 event.target.textContent = `Zoom: x${event.transform.k.toFixed(
@@ -244,23 +235,12 @@ function createScaleHandler(
     return new InterpolatedScaleHandler(interpolator);
 }
 
-function formatValue(v1: number) {
-    if (!Number.isFinite(v1)) return "";
-    let v = v1.toPrecision(4);
-    if (v.indexOf(".") >= 0) {
-        // cut trailing zeroes
-        for (;;) {
-            let l = v.length;
-            if (!l--) break;
-            if (v[l] !== "0") break;
-            v = v.substring(0, l);
-        }
-    }
-    return v;
-}
-
-function getValue(x: number, data: [], type: string): string {
-    let v = "";
+function getValue(
+    x: number,
+    data: [],
+    type: string
+): number /*|string for discrete?*/ {
+    let v = Number.NaN;
     if (Number.isFinite(x)) {
         const n = data.length;
         for (let i = 0; i < n; i++) {
@@ -268,26 +248,24 @@ function getValue(x: number, data: [], type: string): string {
             if (row[0] == null) continue;
             if (row[1] == null) continue;
             if (x < row[0]) {
-                let v1: number;
                 if (!i) break;
                 else {
                     const rowPrev = data[i - 1];
                     if (rowPrev[0] == null || rowPrev[1] == null) break;
                     if (type === "linestep") {
-                        v1 = row[1]; //!! not rPrev[1] !!
+                        v = row[1]; //!! not rPrev[1] !!
                     } else {
                         const d = row[0] - rowPrev[0];
                         const f = x - rowPrev[0];
                         if (type === "dot") {
-                            v1 = f < d * 0.5 ? rowPrev[1] : row[1];
+                            v = f < d * 0.5 ? rowPrev[1] : row[1];
                         } else {
                             // "line", "area"
                             const mul = d ? (row[1] - rowPrev[1]) / d : 1.0;
-                            v1 = f * mul + rowPrev[1];
+                            v = f * mul + rowPrev[1];
                         }
                     }
                 }
-                v = formatValue(v1);
                 break;
             }
         }
@@ -327,6 +305,69 @@ function addTrackContextMenu(
     });
 }
 
+function fillInfos(
+    x: number,
+    x2: number,
+    tracks: Track[],
+    iFrom: number,
+    iTo: number
+): Info[] {
+    const infos: Info[] = [];
+    let iPlot = 0;
+    let bSeparatorCreated = false;
+    let iTrack = 0;
+    for (const track of tracks) {
+        const bScaleTrack = isScaleTrack(track);
+        const visible = (iFrom <= iTrack && iTrack < iTo) || bScaleTrack;
+        if (visible) {
+            const datas = track.data;
+            if (!bScaleTrack) {
+                if (!bSeparatorCreated) {
+                    // Add separator line
+                    infos.push({
+                        color: "", // dummy value
+                        value: Number.NaN, // dummy value
+                        type: "separator",
+                        track_id: track.id,
+                    });
+                    bSeparatorCreated = true;
+                }
+                const nPlots = (track as GraphTrack).plots.length;
+                for (let p = 0; p < nPlots; p++) {
+                    const plot = (track as GraphTrack).plots[p];
+                    const type = getPlotType(plot);
+                    const v = getValue(x, datas[p], type);
+                    const legend = (
+                        plot.options as ExtPlotOptions
+                    ).legendInfo();
+                    infos.push({
+                        name: legend.label,
+                        units: legend.unit,
+                        color: plot.options.color ? plot.options.color : "",
+                        value: v,
+                        type: type,
+                        track_id: track.id,
+                    });
+                    iPlot++;
+                }
+            } else {
+                const _x = iPlot == 0 ? x : x2;
+                infos.push({
+                    name: track.options.abbr,
+                    units: (track.options as ScaleTrackOptions)["units"],
+                    color: iPlot == 0 ? "black" : "grey", //??
+                    value: _x,
+                    type: "", // "scale"
+                    track_id: track.id,
+                });
+                iPlot++;
+            }
+        }
+        if (!bScaleTrack) iTrack++;
+    }
+    return infos;
+}
+
 interface TrackEvent {
     track: Track;
     element: HTMLElement;
@@ -335,17 +376,19 @@ interface TrackEvent {
 
 export interface WellLogController {
     scrollTrackTo(pos: number): boolean;
-    getScrollTrackPos(): number;
-    getScrollTrackPosMax(): number;
+    getTrackScrollPos(): number;
+    getTrackScrollPosMax(): number;
+
+    _graphTrackMax(): number;
+    _maxTrackNum(): number;
+
+    scrollContentTo(f: number): boolean;
+    zoomContent(zoom: number): void;
+    getContentScrollPos(): number;
+    getContentZoom(): number;
 }
 
-interface Info {
-    name?: string;
-    units?: string;
-    color: string;
-    value: string;
-    type: string; // line, linestep, area,
-}
+import { Info } from "./InfoTypes";
 
 interface Props {
     welllog: WellLog;
@@ -377,29 +420,23 @@ interface Props {
     ) => void;
 
     onScrollTrackPos?: (pos: number) => void;
-    onZoomContent?: (pos: number) => void;
+    onZoomContent?: (zoom: number) => void;
+    onScrollContentPos?: (pos: number) => void;
 
     maxTrackNum?: number;
 
-    zoomContent?: number;
-    scrollContentPos?: number; // fraction
-    zoomTrack?: number;
     scrollTrackPos?: number; // the first track number
 }
 
 interface State {
     infos: Info[];
 
-    zoomContent: number;
-    scrollContentPos: number; // fraction
-    zoomTrack: number;
     scrollTrackPos: number; // the first track number
 }
 
 class WellLogView extends Component<Props, State> implements WellLogController {
     container?: HTMLElement;
     logController?: LogViewer;
-    //scroller: React.RefObject<Scroller>;
 
     constructor(props: Props) {
         super(props);
@@ -410,20 +447,18 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         this.state = {
             infos: [],
-            zoomContent: props.zoomContent ? props.zoomContent : 1.0,
-            scrollContentPos: props.scrollContentPos
-                ? props.scrollContentPos
-                : 0,
-            zoomTrack: props.zoomTrack ? props.zoomTrack : 1.0,
             scrollTrackPos: props.scrollTrackPos ? props.scrollTrackPos : 0,
         };
+
+        this.onTrackTitleContextMenu = this.onTrackTitleContextMenu.bind(this);
+        this.onTrackLegendContextMenu =
+            this.onTrackLegendContextMenu.bind(this);
+        this.onTrackContainerContextMenu =
+            this.onTrackContainerContextMenu.bind(this);
 
         if (this.props.onCreateController)
             // set callback to component caller
             this.props.onCreateController(this);
-
-        //this.scroller = React.createRef();
-        this.onScroll = this.onScroll.bind(this);
     }
 
     componentDidMount(): void {
@@ -454,6 +489,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             shouldSetTracks = true;
         }
 
+        console.log(
+            "WellLogView.componentDidUpdate shouldSetTracks=" + shouldSetTracks
+        );
         if (shouldSetTracks) {
             this.setTracks();
         } else if (this.props.scrollTrackPos !== prevProps.scrollTrackPos) {
@@ -464,17 +502,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
             this.props.maxTrackNum !== prevProps.maxTrackNum
         ) {
-            this.zoomTrack(); // ZLP
             this.scrollTrack();
             this.setInfo();
-        }
-
-        if (this.state.scrollContentPos !== prevState.scrollTrackPos) {
-            //this.setZoom();
-            //this.setScroll();
-        }
-        if (this.props.zoomContent !== prevProps.zoomContent) {
-            this.zoomContent();
         }
 
         /*??
@@ -499,9 +528,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 showLegend: true,
                 horizontal: this.props.horizontal,
 
+                /*
                 onResize: function (event: LogControllerResizeEvent): void {
                     console.log("onResize", event);
                 },
+                */
                 onTrackEnter: function (elm: HTMLElement, track: Track): void {
                     addTrackContextMenus(elm, track);
                 },
@@ -548,7 +579,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             );
         }
         this.scrollTrack();
-        this.zoomTrack();
         this.setInfo(); // Clear old track information
     }
 
@@ -574,24 +604,13 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo();
     }
 
-    zoomContent(): void {
-        const zoom = this.props.zoomContent ? this.props.zoomContent : 1;
-        if (this.logController) {
-            zoomContent(this.logController, zoom);
-        }
-        if (Math.abs(Math.log(this.state.zoomContent / zoom)) > 0.01)
-            this.setState({ zoomContent: zoom });
-    }
-    zoomTrack(): void {
+    scrollTrack(): void {
+        /*
         const nGraphTracks = this._graphTrackMax();
-
         let zoom = nGraphTracks / this._maxTrackNum();
         if (zoom < 1) zoom = 1;
+        */
 
-        if (Math.abs(Math.log(this.state.zoomTrack / zoom)) > 0.01)
-            this.setState({ zoomTrack: zoom });
-    }
-    scrollTrack(): void {
         const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
         if (this.logController) scrollTracks(this.logController, iFrom, iTo);
@@ -599,64 +618,12 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.onScrollTrackPos) this.props.onScrollTrackPos(iFrom);
     }
     setInfo(x: number = Number.NaN, x2: number = Number.NaN): void {
-        if (!this.props.onInfo) return;
-
+        if (!this.props.onInfo) return; // no callback is given
         if (!this.logController) return;
 
         const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
-        let iTrack = 0;
-
-        const infos: Info[] = [];
-        let iPlot = 0;
-        let bSeparator = false;
-        for (const track of this.logController.tracks) {
-            const bScaleTrack = isScaleTrack(track);
-            const visible = (iFrom <= iTrack && iTrack < iTo) || bScaleTrack;
-            if (visible) {
-                const datas = track.data;
-
-                if (!bScaleTrack) {
-                    if (!bSeparator) {
-                        bSeparator = true;
-                        infos.push({
-                            color: "",
-                            value: "",
-                            type: "separator",
-                        });
-                    }
-                    const nPlots = (track as GraphTrack).plots.length;
-                    for (let p = 0; p < nPlots; p++) {
-                        const plot = (track as GraphTrack).plots[p];
-                        const type = getPlotType(plot);
-                        const v = getValue(x, datas[p], type);
-                        const legend = (
-                            plot.options as ExtPlotOptions
-                        ).legendInfo();
-                        infos.push({
-                            name: legend.label,
-                            units: legend.unit,
-                            color: plot.options.color ? plot.options.color : "",
-                            value: v,
-                            type: type,
-                        });
-                        iPlot++;
-                    }
-                } else {
-                    const _x = iPlot == 0 ? x : x2;
-                    infos.push({
-                        name: track.options.abbr,
-                        units: (track.options as ScaleTrackOptions)["units"],
-                        color: iPlot == 0 ? "black" : "grey",
-                        value: formatValue(_x),
-                        type: "", //plot.type,
-                    });
-                    iPlot++;
-                }
-            }
-            if (!bScaleTrack) iTrack++;
-        }
-
+        const infos = fillInfos(x, x2, this.logController.tracks, iFrom, iTo);
         this.props.onInfo(infos);
     }
 
@@ -664,25 +631,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(x, x2);
     }
 
-    onRescaleContent(k: number): void {
-        if (this.props.onZoomContent) this.props.onZoomContent(k);
+    onRescaleContent(pos: number, zoom: number): void {
+        if (this.props.onZoomContent) this.props.onZoomContent(zoom);
 
-        if (this.logController) {
-            const scrollContentPos = getScrollContentPos(this.logController);
-
-            const delta = Math.abs(
-                scrollContentPos - this.state.scrollContentPos
-            );
-            console.log(
-                "WellLogView.onRescaleContent new scrollContentPos=",
-                scrollContentPos,
-                "delta=",
-                delta,
-                delta > 0.001
-            );
-            if (delta > 0.001)
-                this.setState({ scrollContentPos: scrollContentPos });
-        }
+        if (this.props.onScrollContentPos) this.props.onScrollContentPos(pos);
     }
 
     _addTrackContextMenu(
@@ -702,19 +654,19 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this._addTrackContextMenu(
             elm,
             "track-title",
-            this.onTrackTitleContextMenu.bind(this),
+            this.onTrackTitleContextMenu,
             track
         );
         this._addTrackContextMenu(
             elm,
             "track-legend",
-            this.onTrackLegendContextMenu.bind(this),
+            this.onTrackLegendContextMenu,
             track
         );
         this._addTrackContextMenu(
             elm,
             "track-container",
-            this.onTrackContainerContextMenu.bind(this),
+            this.onTrackContainerContextMenu,
             track
         );
     }
@@ -737,7 +689,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         const nScaleTracks = getScaleTrackNum(this.logController.tracks);
         return this.logController.tracks.length - nScaleTracks;
     }
-    _getScrollTrackPosMax(): number {
+    _getTrackScrollPosMax(): number {
         // for scrollbar
         const nGraphTracks = this._graphTrackMax();
         let posMax = nGraphTracks - this._maxTrackNum();
@@ -746,7 +698,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
     _newTrackScrollPos(pos: number): number {
         let newPos = pos;
-        const posMax = this._getScrollTrackPosMax();
+        const posMax = this._getTrackScrollPosMax();
         if (newPos > posMax) newPos = posMax;
         if (newPos < 0) newPos = 0;
         return newPos;
@@ -763,57 +715,86 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setState({ scrollTrackPos: newPos });
         return true;
     }
-    getScrollTrackPos(): number {
+    getTrackScrollPos(): number {
         return this.state.scrollTrackPos;
     }
-    getScrollTrackPosMax(): number {
-        return this._getScrollTrackPosMax();
+    getTrackScrollPosMax(): number {
+        return this._getTrackScrollPosMax();
     }
 
-    onScroll(x: number, y: number): void {
-        // callback from scrollbar
+    scrollContentTo(f: number): boolean {
         if (this.logController) {
-            const f = this.props.horizontal ? x : y;
-            console.log("scrollContentTo(" + f + ")");
-            scrollContentTo(this.logController, f);
+            const ret = scrollContentTo(this.logController, f);
+            console.log("WellLogView::scrollContentTo(" + f + ")=" + ret);
+            return ret;
         }
-        const posMax = this._getScrollTrackPosMax();
-        let posTrack = (this.props.horizontal ? y : x) * posMax;
-        posTrack = Math.round(posTrack);
-        this.scrollTrackTo(posTrack);
+        return false;
+    }
+    zoomContent(zoom: number): boolean {
+        if (this.logController) {
+            const ret = zoomContent(this.logController, zoom);
+            console.log("WellLogView::zoomContent(" + zoom + ")=" + ret);
+            return ret;
+        }
+        return false;
+    }
+    getContentScrollPos(): number {
+        if (this.logController) {
+            return getContentScrollPos(this.logController);
+        }
+        return 0.0;
+    }
+
+    getContentZoom(): number {
+        if (this.logController) {
+            return getContentZoom(this.logController);
+        }
+        return 1.0;
+    }
+
+    addTrack(trackNew: Track, trackCurrent: Track, bAfter: boolean): void {
+        console.log("addTrack");
+        if (this.logController) {
+            let order = 0;
+            for (const track of this.logController.tracks) {
+                track.order = order++;
+                if (trackCurrent == track) {
+                    if (bAfter) {
+                        // add after
+                        trackNew.order = order++;
+                    } else {
+                        // insert before current
+                        trackNew.order = track.order;
+                        track.order = order++;
+                    }
+                }
+            }
+
+            this.logController.addTrack(trackNew);
+
+            this.scrollTrack();
+        }
+    }
+
+    removeTrack(track: Track): void {
+        console.log("removeTrack");
+        if (this.logController) {
+            this.logController.removeTrack(track);
+
+            this.scrollTrack();
+        }
     }
 
     render(): ReactNode {
-        const fTrack = this._getScrollTrackPosMax()
-            ? this.state.scrollTrackPos / this._getScrollTrackPosMax()
-            : 0.0; // fraction
-        const x = this.props.horizontal ? this.state.scrollContentPos : fTrack;
-        const y = this.props.horizontal ? fTrack : this.state.scrollContentPos;
-
-        const xZoom = this.props.horizontal
-            ? this.state.zoomContent
-            : this.state.zoomTrack;
-        const yZoom = this.props.horizontal
-            ? this.state.zoomTrack
-            : this.state.zoomContent;
-        //console.log("WLV render xZoom=" + xZoom, "yZoom=" + yZoom)
-
+        console.log("WellLogView.render");
         return (
             <div style={{ width: "100%", height: "100%" }}>
-                <Scroller
-                    xZoom={xZoom}
-                    yZoom={yZoom}
-                    x={x}
-                    y={y}
-                    onScroll={this.onScroll}
-                >
-                    <div
-                        className="welllogview"
-                        ref={(el) => {
-                            this.container = el as HTMLElement;
-                        }}
-                    />
-                </Scroller>
+                <div
+                    className="welllogview"
+                    ref={(el) => {
+                        this.container = el as HTMLElement;
+                    }}
+                />
             </div>
         );
     }

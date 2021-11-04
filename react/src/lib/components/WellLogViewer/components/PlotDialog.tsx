@@ -260,8 +260,11 @@ export class PlotPropertiesDialog extends Component<
                               this.createSelectControl(
                                   "colorTable",
                                   "Fill Color table",
-                                  createColorTableItems.bind(this, colorTables,
-                                      false)
+                                  createColorTableItems.bind(
+                                      this,
+                                      colorTables,
+                                      false
+                                  )
                               ),
                               <FormControl fullWidth key="211" />,
                               <FormControl fullWidth key="212" />,
