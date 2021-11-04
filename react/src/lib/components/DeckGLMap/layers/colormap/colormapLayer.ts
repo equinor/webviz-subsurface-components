@@ -13,6 +13,10 @@ import {
 
 import fsColormap from "!!raw-loader!./colormap.fs.glsl";
 
+import { Matrix4, Vector4 } from "math.gl";
+//import {Vector4} from '@math.gl/core';
+
+
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
     [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
@@ -52,6 +56,29 @@ export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
 
     // See ValueDecoder in propertyMapTools.ts
     valueDecoder: ValueDecoder;
+
+    // TESTING
+    rotDeg: number
+}
+
+// Return a model matrix representing a roation around the point x, y
+function getModelMatrix(deg: number, x: number, y: number): Matrix4 {
+
+    // bounds: [left, bottom, right, top]
+    const rad = deg * 0.017453;
+    const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+    //console.log("identity: ", identity)
+
+    const m1 = new Matrix4(IDENTITY).translate([-x, -y, 0, 1]); // translate to origin
+    const mRot = new Matrix4(IDENTITY).rotateZ(rad); // rotate
+    const m2 = new Matrix4(IDENTITY).translate([x, y, 0, 1]); // translate back
+
+    // Make  m2*mRot*m1
+    mRot.multiplyRight(m1);
+    const m2mRotm1 = m2.multiplyRight(mRot);
+
+    return m2mRotm1;
 }
 
 const defaultProps = {
@@ -69,6 +96,9 @@ const defaultProps = {
             step: 0,
         },
     },
+
+    rotDeg: 0,
+    //modelMatrix: getModelMatrix(),
 };
 
 export default class ColormapLayer extends BitmapLayer<
@@ -78,6 +108,7 @@ export default class ColormapLayer extends BitmapLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms, context }: any): void {
+
         const mergedModuleParams = {
             ...moduleParameters,
             valueDecoder: {
@@ -86,6 +117,17 @@ export default class ColormapLayer extends BitmapLayer<
                 ...defaultProps.valueDecoder.value,
                 ...moduleParameters.valueDecoder,
             },
+            // XXX
+            // modelMatrix: getModelMatrix(
+            //     this.props.rotDeg,
+            //     this.props.bounds[0] as number, // Rotate around lower left corner of bounds
+            //     this.props.bounds[1] as number
+            // ),
+            modelMatrix: getModelMatrix(
+                this.props.rotDeg,
+                2.5, // Rotate around middle
+                0.5
+            ),
         };
         super.setModuleParameters(mergedModuleParams);
 
