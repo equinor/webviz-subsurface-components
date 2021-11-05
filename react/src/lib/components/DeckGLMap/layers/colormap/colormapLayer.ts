@@ -14,8 +14,6 @@ import { getModelMatrix } from "../utils/layerTools";
 
 import fsColormap from "!!raw-loader!./colormap.fs.glsl";
 
-
-
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
     [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
@@ -86,7 +84,6 @@ export default class ColormapLayer extends BitmapLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms, context }: any): void {
-
         const mergedModuleParams = {
             ...moduleParameters,
             valueDecoder: {
