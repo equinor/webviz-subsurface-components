@@ -1,0 +1,19 @@
+[  
+    {
+        "name": "Template A",
+        "properties": [
+            {
+                "objectName" : "PORO",
+                "colorTable" : "Rainbow",
+                "context" : "wells-layer",
+                "color-interpolation" : "linear"
+            },
+            {
+                "objectName" : "PERM",
+                "colorTable" : "Physics",
+                "context" : "wells-layer",
+                "color-interpolation" : "linear"
+            }
+        ]
+    }
+]

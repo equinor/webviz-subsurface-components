@@ -3,8 +3,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { interpolatorContinuous } from "../../utils/continuousLegend";
-import { color } from "d3-color";
+import { rgbValues } from "../../utils/continuousLegend";
 import {
     Feature,
     GeometryCollection,
@@ -34,6 +33,8 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
+    legendProps: any;
+    legendData: () => {};
 }
 
 const defaultProps = {
@@ -47,6 +48,8 @@ const defaultProps = {
     logRadius: 6,
     logCurves: true,
     refine: true,
+    legendProps: [],
+    legendData: () => {},
 };
 
 export interface LogCurveDataType {
@@ -181,6 +184,8 @@ export default class WellsLayer extends CompositeLayer<
             layers.splice(1, 0, log_layer);
         }
 
+       
+
         return layers;
     }
 
@@ -211,11 +216,12 @@ export default class WellsLayer extends CompositeLayer<
             logName: log_property?.name,
         };
     }
+
 }
+
 
 WellsLayer.layerName = "WellsLayer";
 WellsLayer.defaultProps = defaultProps;
-
 //================= Local help functions. ==================
 
 function getColumn<D>(data: D[][], col: number): D[] {
@@ -240,7 +246,6 @@ export function getLogValues(
     log_name: string
 ): number[] {
     if (!isSelectedLogRun(d, logrun_name)) return [];
-
     const log_id = getLogIndexByName(d, log_name);
     return log_id >= 0 ? getColumn(d.data, log_id) : [];
 }
@@ -341,8 +346,8 @@ function getLogColor(
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
-    if (log_data.length == 0 || log_info == undefined) return [];
 
+    if (log_data.length == 0 || log_info == undefined) return [];
     const log_color: RGBAColor[] = [];
     if (log_info.description == "continuous") {
         const min = Math.min(...log_data);
@@ -350,11 +355,14 @@ function getLogColor(
         const max_delta = max - min;
 
         log_data.forEach((value) => {
-            const rgb = color(
-                interpolatorContinuous()((value - min) / max_delta)
-            )?.rgb();
+           let data = rgbValues(log_name, (value - min) / max_delta)
+            const rgb = data;
             if (rgb != undefined) {
-                log_color.push([rgb.r, rgb.g, rgb.b]);
+                if (rgb == Array.isArray(rgb)) {
+                    log_color.push([data[0], data[1], data[2]]);
+                } else {
+                    log_color.push([rgb.r, rgb.g, rgb.b]);
+                }
             }
         });
     } else {
