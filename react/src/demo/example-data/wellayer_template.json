@@ -6,13 +6,13 @@
                 "objectName" : "PORO",
                 "colorTable" : "Rainbow",
                 "context" : "wells-layer",
-                "color-interpolation" : "linear"
+                "colorInterpolation" : "linear"
             },
             {
                 "objectName" : "PERM",
                 "colorTable" : "Physics",
                 "context" : "wells-layer",
-                "color-interpolation" : "linear"
+                "colorInterpolation" : "linear"
             }
         ]
     }

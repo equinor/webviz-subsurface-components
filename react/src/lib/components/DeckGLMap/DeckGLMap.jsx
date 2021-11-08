@@ -88,7 +88,7 @@ function DeckGLMap({
     coordinateUnit,
     setProps,
     colorTemplate,
-    colorTables
+    colorTables,
 }) {
     // Map specification formed from applying the deckglSpecPatch to deckglSpecBase.
     let [patchedSpec, setPatchedSpec] = React.useState(null);
@@ -259,6 +259,10 @@ DeckGLMap.propTypes = {
          */
         position: PropTypes.arrayOf(PropTypes.number),
     }),
+
+    colorTables: PropTypes.arrayOf(PropTypes.object),
+
+    colorTemplate: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default DeckGLMap;

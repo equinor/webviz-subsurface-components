@@ -20,6 +20,7 @@ import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
+import { colorTableValues } from "../utils/continuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import {
     ColormapLayer,
@@ -163,10 +164,6 @@ export interface MapProps {
     };
 
     children?: React.ReactNode;
-
-    colorTemplate: any,
-
-    colorTables: any,
 }
 
 const Map: React.FC<MapProps> = ({
@@ -179,8 +176,6 @@ const Map: React.FC<MapProps> = ({
     coordinateUnit,
     legend,
     children,
-    colorTemplate,
-    colorTables,
 }: MapProps) => {
     // state for views prop of DeckGL component
     const [deckGLViews, setDeckGLViews] = React.useState([]);
@@ -277,9 +272,16 @@ const Map: React.FC<MapProps> = ({
     );
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
-    const [colorTable, setColorTable] = React.useState<any>([]);
+    const [colorTable, setColorTable] = React.useState<
+        [number, number, number, number][]
+    >([]);
 
-    const [legendProps, setLegendProps] = React.useState<{title: string;discrete: boolean;metadata: { objects: Record<string, [number[], number]> };valueRange: number[];}>({
+    const [legendProps, setLegendProps] = React.useState<{
+        title: string;
+        discrete: boolean;
+        metadata: { objects: Record<string, [number[], number]> };
+        valueRange: number[];
+    }>({
         title: "",
         discrete: false,
         metadata: { objects: {} },
@@ -307,7 +309,12 @@ const Map: React.FC<MapProps> = ({
         if (logInfo?.description == "discrete") {
             const meta = logData["metadata_discrete"];
             const metadataDiscrete = meta[logName].objects;
-            setLegendProps({title: title,discrete: true,metadata: metadataDiscrete,valueRange: [],});
+            setLegendProps({
+                title: title,
+                discrete: true,
+                metadata: metadataDiscrete,
+                valueRange: [],
+            });
         } else {
             const minArray: number[] = [];
             const maxArray: number[] = [];
@@ -317,17 +324,15 @@ const Map: React.FC<MapProps> = ({
                 minArray.push(Math.min(...logValues));
                 maxArray.push(Math.max(...logValues));
             });
-            setLegendProps({title: title,discrete: false,metadata: { objects: {} },valueRange: [Math.min(...minArray), Math.max(...maxArray)],});
+            setLegendProps({
+                title: title,
+                discrete: false,
+                metadata: { objects: {} },
+                valueRange: [Math.min(...minArray), Math.max(...maxArray)],
+            });
         }
-        const colorTemplateData: any = colorTemplate;
-        const colorTableData: any = colorTables;
 
-        let properties = colorTemplateData[0]['properties']
-        const propertiesData = properties.filter((value: any) => value.objectName == "PORO")
-        const colorTableName = propertiesData[0].colorTable
-        const colorTable = colorTableData.filter((value: any) => value.name == colorTableName)
-        setColorTable(colorTable[0].colors)
-
+        setColorTable(colorTableValues(wellsLayer?.props?.logName));
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
     return (

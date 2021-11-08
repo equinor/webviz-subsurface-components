@@ -33,8 +33,6 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
-    legendProps: any;
-    legendData: () => {};
 }
 
 const defaultProps = {
@@ -48,8 +46,6 @@ const defaultProps = {
     logRadius: 6,
     logCurves: true,
     refine: true,
-    legendProps: [],
-    legendData: () => {},
 };
 
 export interface LogCurveDataType {
@@ -184,8 +180,6 @@ export default class WellsLayer extends CompositeLayer<
             layers.splice(1, 0, log_layer);
         }
 
-       
-
         return layers;
     }
 
@@ -216,9 +210,7 @@ export default class WellsLayer extends CompositeLayer<
             logName: log_property?.name,
         };
     }
-
 }
-
 
 WellsLayer.layerName = "WellsLayer";
 WellsLayer.defaultProps = defaultProps;
@@ -355,11 +347,11 @@ function getLogColor(
         const max_delta = max - min;
 
         log_data.forEach((value) => {
-           let data = rgbValues(log_name, (value - min) / max_delta)
+            const data = rgbValues(log_name, (value - min) / max_delta);
             const rgb = data;
             if (rgb != undefined) {
-                if (rgb == Array.isArray(rgb)) {
-                    log_color.push([data[0], data[1], data[2]]);
+                if (Array.isArray(rgb)) {
+                    log_color.push([rgb[0], rgb[1], rgb[2]]);
                 } else {
                     log_color.push([rgb.r, rgb.g, rgb.b]);
                 }
