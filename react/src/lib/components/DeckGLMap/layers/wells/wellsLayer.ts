@@ -349,8 +349,7 @@ function getLogColor(
         const max_delta = max - min;
 
         log_data.forEach((value) => {
-            const data = rgbValues(log_name, (value - min) / max_delta);
-            const rgb = data;
+            const rgb = rgbValues(log_name, (value - min) / max_delta);
             if (rgb != undefined) {
                 if (Array.isArray(rgb)) {
                     log_color.push([rgb[0], rgb[1], rgb[2]]);

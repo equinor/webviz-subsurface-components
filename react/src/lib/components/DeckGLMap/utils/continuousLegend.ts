@@ -25,32 +25,24 @@ interface colorTemplate {
     properties: propertiesArr;
 }
 
-interface RGBToHexObject {
-    color: string;
-    offset: number;
-}
-
-export function colorTableValues(
+export function colorsArray(
     objectName: string
 ): [number, number, number, number][] {
     const properties = colorTemplate[0]["properties"];
     const propertiesData = properties.filter(
         (value: propertiesObj) => value.objectName == objectName
     );
-    const colorTableValues = colorTables.filter(
+    const colorTableData = colorTables.filter(
         (value: colorTables) => value.name == propertiesData[0].colorTable
     );
-    return colorTableValues[0].colors;
+    return colorTableData[0].colors;
 }
 
 export function rgbValues(
     objectName: string,
     point: number
-):
-    | number[]
-    | { r: number; g: number; b: number; opacity: number; 0?: number }
-    | undefined {
-    const color_table = colorTableValues(objectName);
+): number[] | { r: number; g: number; b: number; opacity: number } | undefined {
+    const color_table = colorsArray(objectName);
     const colorArrays = color_table.find(
         (value: [number, number, number, number]) => {
             return point.toFixed(2) == value[0].toFixed(2);
@@ -81,7 +73,7 @@ export function rgbValues(
     }
 }
 
-export function RGBToHex(rgb: number[]): RGBToHexObject {
+export function RGBToHex(rgb: number[]): { color: string; offset: number } {
     let r = rgb[1].toString(16),
         g = rgb[2].toString(16),
         b = rgb[3].toString(16);

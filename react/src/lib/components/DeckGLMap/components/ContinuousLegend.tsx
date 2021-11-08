@@ -1,5 +1,5 @@
-import { RGBToHex } from "../utils/continuousLegend";
 import React from "react";
+import { RGBToHex } from "../utils/continuousLegend";
 import { select, scaleLinear, scaleSequential, axisBottom } from "d3";
 
 interface legendProps {
@@ -7,7 +7,7 @@ interface legendProps {
     max: number;
     dataObjectName: string;
     position: number[];
-    colorTable: [number, number, number, number][];
+    colorTableColors: [number, number, number, number][];
 }
 
 interface ItemColor {
@@ -20,7 +20,7 @@ const ContinuousLegend: React.FC<legendProps> = ({
     max,
     dataObjectName,
     position,
-    colorTable,
+    colorTableColors,
 }: legendProps) => {
     React.useEffect(() => {
         continuousLegend("#legend");
@@ -28,7 +28,7 @@ const ContinuousLegend: React.FC<legendProps> = ({
 
     function continuousLegend(selected_id: string) {
         const itemColor: ItemColor[] = [];
-        colorTable.forEach((value: [number, number, number, number]) => {
+        colorTableColors.forEach((value: [number, number, number, number]) => {
             itemColor.push({
                 offset: RGBToHex(value).offset,
                 color: RGBToHex(value).color,
@@ -61,7 +61,7 @@ const ContinuousLegend: React.FC<legendProps> = ({
         svgLegend
             .append("text")
             .attr("class", "legendTitle")
-            .attr("x", 0)
+            .attr("x", 25)
             .attr("y", 20)
             .style("text-anchor", "left")
             .text(dataObjectName);
@@ -69,7 +69,7 @@ const ContinuousLegend: React.FC<legendProps> = ({
         // draw the rectangle and fill with gradient
         svgLegend
             .append("rect")
-            .attr("x", 10)
+            .attr("x", 25)
             .attr("y", 30)
             .attr("width", 250)
             .attr("height", 25)
@@ -83,12 +83,10 @@ const ContinuousLegend: React.FC<legendProps> = ({
         svgLegend
             .attr("class", "axis")
             .append("g")
-            .attr("transform", "translate(0, 55)")
+            .attr("transform", "translate(15, 55)")
             .style("font-size", "10px")
             .style("font-weight", "700")
-
-            .call(axisLeg)
-            .style("stroke", "none !important");
+            .call(axisLeg);
     }
 
     return (
@@ -99,7 +97,7 @@ const ContinuousLegend: React.FC<legendProps> = ({
                 top: position[1],
             }}
         >
-            <div id="legend" style={{ marginRight: "-10px" }}></div>
+            <div id="legend"></div>
         </div>
     );
 };
