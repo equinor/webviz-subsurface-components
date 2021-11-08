@@ -35,7 +35,10 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     }
     componentDidUpdate(prevProps: SimpleMenuProps): void {
         if (this.props.anchorEl !== prevProps.anchorEl) {
-            this.setState((state, props) => { return { anchorEl: props.anchorEl } });
+            this.setState((state, props) => {
+                state;
+                return { anchorEl: props.anchorEl }
+            });
         }
         /*if (
             this.props.welllog !== prevProps.welllog ||
