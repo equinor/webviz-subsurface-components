@@ -11,7 +11,7 @@ import {
     ValueDecoder,
 } from "../utils/propertyMapTools";
 
-import fsColormap from "./colormap.fs.glsl";
+import fsColormap from "!!raw-loader!./colormap.fs.glsl";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,

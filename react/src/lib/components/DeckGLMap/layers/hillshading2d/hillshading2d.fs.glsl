@@ -1,4 +1,3 @@
-export default `
 #define SHADER_NAME hillshading2d-shader
 
 #ifdef GL_ES
@@ -58,4 +57,4 @@ void main(void) {
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }
-`;
+

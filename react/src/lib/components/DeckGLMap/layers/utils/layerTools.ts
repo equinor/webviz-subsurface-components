@@ -16,7 +16,7 @@ export interface PropertyDataType {
 
 // Layer pick info can have multiple properties
 export interface LayerPickInfo extends PickInfo<unknown> {
-    properties: PropertyDataType[];
+    properties?: PropertyDataType[];
 }
 
 // Creates property object which will be used to display layer property

@@ -12,16 +12,14 @@ import { interpolatorContinuous } from "../utils/continuousLegend";
 interface legendProps {
     min: number;
     max: number;
-    logName: string;
-    logType: string;
+    dataObjectName: string;
     position: number[];
 }
 
 const ContinuousLegend: React.FC<legendProps> = ({
     min,
     max,
-    logName,
-    logType,
+    dataObjectName,
     position,
 }: legendProps) => {
     const [legendLoaded, setLegendLoaded] = React.useState(false);
@@ -39,6 +37,9 @@ const ContinuousLegend: React.FC<legendProps> = ({
         const legendheight = 230,
             legendwidth = 80,
             margin = { top: 15, right: 60, bottom: 15, left: 2 };
+
+        select(selected_id).select("canvas").remove();
+        select(selected_id).select("svg").remove();
 
         const canvas = select(selected_id)
             .style("width", 150 + "px")
@@ -111,9 +112,7 @@ const ContinuousLegend: React.FC<legendProps> = ({
             }}
         >
             {legendLoaded && (
-                <label style={{ color: "#6F6F6F" }}>
-                    {logName}/{logType}
-                </label>
+                <label style={{ color: "#6F6F6F" }}>{dataObjectName}</label>
             )}
             <div id="legend"></div>
         </div>
