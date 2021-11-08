@@ -3,6 +3,7 @@ import * as jsonpatch from "fast-json-patch";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
+import { Matrix4 } from "math.gl";
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
     name: string;
@@ -57,4 +58,20 @@ export function patchLayerProps<
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore: TS2339
     layer.context.userData.setSpecPatch(patch);
+}
+
+// Return a model matrix representing a rotation of "deg" degrees around the point x, y
+export function getModelMatrix(deg: number, x: number, y: number): Matrix4 {
+    const rad = deg * 0.017453;
+    const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+    const m1 = new Matrix4(IDENTITY).translate([-x, -y, 0, 1]); // translate to origin
+    const mRot = new Matrix4(IDENTITY).rotateZ(rad); // rotate
+    const m2 = new Matrix4(IDENTITY).translate([x, y, 0, 1]); // translate back
+
+    // Make  m2*mRot*m1
+    mRot.multiplyRight(m1);
+    const m2mRotm1 = m2.multiplyRight(mRot);
+
+    return m2mRotm1;
 }
