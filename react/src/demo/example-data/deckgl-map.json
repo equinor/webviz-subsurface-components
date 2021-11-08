@@ -45,6 +45,7 @@
             437720,
             6481113
           ],
+          "rotDeg": 0,
           "image": "@@#resources.propertyMap",
           "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
           "valueRange": [
@@ -58,12 +59,6 @@
           "pickable": true
         },
         {
-          "@@type": "GridLayer",
-          "id": "grid-layer",
-          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
-          "visible": false
-        },
-        {
           "@@type": "Hillshading2DLayer",
           "id": "hillshading-layer",
           "bounds": [
@@ -72,6 +67,7 @@
             437720,
             6481113
           ],
+          "rotDeg": 0,
           "valueRange": [
             2782,
             3513
@@ -79,6 +75,12 @@
           "opacity": 1.0,
           "image": "@@#resources.propertyMap",
           "pickable": true
+        },
+        {
+          "@@type": "GridLayer",
+          "id": "grid-layer",
+          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
+          "visible": false
         },
         {
           "@@type": "WellsLayer",

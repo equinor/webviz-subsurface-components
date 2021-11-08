@@ -10,6 +10,7 @@ import {
     PropertyMapPickInfo,
     ValueDecoder,
 } from "../utils/propertyMapTools";
+import { getModelMatrix } from "../utils/layerTools";
 
 import fsColormap from "!!raw-loader!./colormap.fs.glsl";
 
@@ -52,6 +53,9 @@ export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
 
     // See ValueDecoder in propertyMapTools.ts
     valueDecoder: ValueDecoder;
+
+    // Rotates image around bounds upper left corner counterclockwise in degrees.
+    rotDeg: number;
 }
 
 const defaultProps = {
@@ -69,6 +73,8 @@ const defaultProps = {
             step: 0,
         },
     },
+
+    rotDeg: 0,
 };
 
 export default class ColormapLayer extends BitmapLayer<
@@ -86,6 +92,11 @@ export default class ColormapLayer extends BitmapLayer<
                 ...defaultProps.valueDecoder.value,
                 ...moduleParameters.valueDecoder,
             },
+            modelMatrix: getModelMatrix(
+                this.props.rotDeg,
+                this.props.bounds[0] as number, // Rotate around upper left corner of bounds
+                this.props.bounds[3] as number
+            ),
         };
         super.setModuleParameters(mergedModuleParams);
 
