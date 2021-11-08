@@ -7,6 +7,7 @@ import {
     PropertyMapPickInfo,
     ValueDecoder,
 } from "../utils/propertyMapTools";
+import { getModelMatrix } from "../utils/layerTools";
 
 import fsHillshading from "!!raw-loader!./hillshading2d.fs.glsl";
 
@@ -31,6 +32,9 @@ export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
 
     // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
     valueDecoder: ValueDecoder;
+
+    // Rotates image around bounds upper left corner counterclockwise in degrees.
+    rotDeg: number;
 }
 
 const defaultProps = {
@@ -52,6 +56,8 @@ const defaultProps = {
     },
     opacity: 1,
     pickable: true,
+
+    rotDeg: 0,
 };
 
 export default class Hillshading2DLayer extends BitmapLayer<
@@ -70,6 +76,11 @@ export default class Hillshading2DLayer extends BitmapLayer<
                     ...defaultProps.valueDecoder.value,
                     ...moduleParameters.valueDecoder,
                 },
+                modelMatrix: getModelMatrix(
+                    this.props.rotDeg,
+                    this.props.bounds[0] as number, // Rotate around upper left corner of bounds
+                    this.props.bounds[3] as number
+                ),
             };
             super.setModuleParameters(mergedModuleParams);
 
