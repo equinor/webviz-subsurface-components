@@ -8,14 +8,19 @@ interface ItemColor {
 
 interface colorLegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
+    dataObjectName: string;
+    position: number[];
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     discreteData,
+    dataObjectName,
+    position,
 }: colorLegendProps) => {
     React.useEffect(() => {
         discreteLegend("#legend");
     }, [discreteData]);
+
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
@@ -40,18 +45,34 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         }
         const ordinalValues = scaleOrdinal().domain(itemName);
         const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
-        select(legend)
-            .append("svg")
-            .attr("height", 600 + "px")
-            .attr("width", 150 + "px")
-            .style("position", "absolute")
-            .style("right", "40px")
-            .style("top", "0px")
-            .attr("transform", "translate(0,30)")
-            .call(colorLegend);
+
+        if (colorLegend) {
+            select(legend).select("svg").remove();
+            select(legend)
+                .append("svg")
+                .attr("height", 410 + "px")
+                .attr("width", 130 + "px")
+                .attr("transform", "translate(0,10)")
+                .call(colorLegend);
+        }
     }
 
-    return <div id="legend"></div>;
+    return (
+        <div
+            style={{
+                position: "absolute",
+                right: position[0],
+                top: position[1],
+            }}
+        >
+            <label style={{ color: "#6F6F6F" }}>{dataObjectName}</label>
+            <div id="legend"></div>
+        </div>
+    );
+};
+
+DiscreteColorLegend.defaultProps = {
+    position: [16, 10],
 };
 
 export default DiscreteColorLegend;

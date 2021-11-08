@@ -3,7 +3,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { interpolateRgbBasis } from "d3-interpolate";
+import { interpolatorContinuous } from "../../utils/continuousLegend";
 import { color } from "d3-color";
 import {
     Feature,
@@ -69,7 +69,7 @@ export interface LogCurveDataType {
 }
 
 export interface WellsPickInfo extends LayerPickInfo {
-    logName?: string;
+    logName: string;
 }
 
 export default class WellsLayer extends CompositeLayer<
@@ -234,7 +234,7 @@ function getLogMd(d: LogCurveDataType, logrun_name: string): number[] {
     return log_id >= 0 ? getColumn(d.data, log_id) : [];
 }
 
-function getLogValues(
+export function getLogValues(
     d: LogCurveDataType,
     logrun_name: string,
     log_name: string
@@ -334,7 +334,6 @@ function getLogIndexByNames(d: LogCurveDataType, names: string[]): number {
     return -1;
 }
 
-const color_interp = interpolateRgbBasis(["red", "yellow", "green", "blue"]);
 function getLogColor(
     d: LogCurveDataType,
     logrun_name: string,
@@ -349,8 +348,11 @@ function getLogColor(
         const min = Math.min(...log_data);
         const max = Math.max(...log_data);
         const max_delta = max - min;
+
         log_data.forEach((value) => {
-            const rgb = color(color_interp((value - min) / max_delta))?.rgb();
+            const rgb = color(
+                interpolatorContinuous()((value - min) / max_delta)
+            )?.rgb();
             if (rgb != undefined) {
                 log_color.push([rgb.r, rgb.g, rgb.b]);
             }

@@ -1,4 +1,3 @@
-export default `
 // RGB to float decoder parameters.
 struct Decoder
 {
@@ -36,4 +35,4 @@ float decode_rgb2float(vec3 rgb, Decoder dec) {
 float decode_rgb2float(vec3 rgb) {
   return decode_rgb2float(rgb, decoder);
 }
-`;
+
