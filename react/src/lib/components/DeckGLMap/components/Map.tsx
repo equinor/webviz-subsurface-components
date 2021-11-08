@@ -20,6 +20,7 @@ import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
+import { colorTableValues } from "../utils/continuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import {
     ColormapLayer,
@@ -271,6 +272,9 @@ const Map: React.FC<MapProps> = ({
     );
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
+    const [colorTable, setColorTable] = React.useState<
+        [number, number, number, number][]
+    >([]);
 
     const [legendProps, setLegendProps] = React.useState<{
         title: string;
@@ -320,13 +324,13 @@ const Map: React.FC<MapProps> = ({
                 minArray.push(Math.min(...logValues));
                 maxArray.push(Math.max(...logValues));
             });
-
             setLegendProps({
                 title: title,
                 discrete: false,
                 metadata: { objects: {} },
                 valueRange: [Math.min(...minArray), Math.max(...maxArray)],
             });
+            setColorTable(colorTableValues(wellsLayer?.props?.logName));
         }
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
@@ -376,6 +380,7 @@ const Map: React.FC<MapProps> = ({
                             max={legendProps.valueRange[1]}
                             dataObjectName={legendProps.title}
                             position={legend.position}
+                            colorTable={colorTable}
                         />
                     )}
                 {

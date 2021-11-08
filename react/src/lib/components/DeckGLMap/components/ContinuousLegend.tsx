@@ -1,19 +1,18 @@
+import { RGBToHex } from "../utils/continuousLegend";
 import React from "react";
-import {
-    select,
-    scaleLinear,
-    range,
-    axisRight,
-    rgb,
-    ScaleSequential,
-} from "d3";
-import { interpolatorContinuous } from "../utils/continuousLegend";
+import { select, scaleLinear, scaleSequential, axisBottom } from "d3";
 
 interface legendProps {
     min: number;
     max: number;
     dataObjectName: string;
     position: number[];
+    colorTable: [number, number, number, number][];
+}
+
+interface ItemColor {
+    color: string;
+    offset: number;
 }
 
 const ContinuousLegend: React.FC<legendProps> = ({
@@ -21,86 +20,75 @@ const ContinuousLegend: React.FC<legendProps> = ({
     max,
     dataObjectName,
     position,
+    colorTable,
 }: legendProps) => {
-    const [legendLoaded, setLegendLoaded] = React.useState(false);
     React.useEffect(() => {
-        continuousLegend(
-            "#legend",
-            interpolatorContinuous().domain([min, max])
-        );
+        continuousLegend("#legend");
     }, [min, max]);
 
-    function continuousLegend(
-        selected_id: string,
-        colorscale: ScaleSequential<string, never>
-    ) {
-        const legendheight = 230,
-            legendwidth = 80,
-            margin = { top: 15, right: 60, bottom: 15, left: 2 };
+    function continuousLegend(selected_id: string) {
+        const itemColor: ItemColor[] = [];
+        colorTable.forEach((value: [number, number, number, number]) => {
+            itemColor.push({
+                offset: RGBToHex(value).offset,
+                color: RGBToHex(value).color,
+            });
+        });
 
-        select(selected_id).select("canvas").remove();
         select(selected_id).select("svg").remove();
+        const colorScale = scaleSequential().domain([min, max]);
+        // append a defs (for definition) element to your SVG
+        const svgLegend = select(selected_id).append("svg").attr("width", 300);
+        const defs = svgLegend.append("defs");
+        // append a linearGradient element to the defs and give it a unique id
+        const linearGradient = defs
+            .append("linearGradient")
+            .attr("id", "linear-gradient");
+        // append multiple color stops by using D3's data/enter step
+        linearGradient
+            .selectAll("stop")
+            .data(itemColor)
+            .enter()
+            .append("stop")
+            .attr("offset", function (data) {
+                return data.offset;
+            })
+            .attr("stop-color", function (data) {
+                return data.color;
+            });
 
-        const canvas = select(selected_id)
-            .style("width", 150 + "px")
-            .append("canvas")
-            .attr("height", legendheight + 5 - margin.top - margin.bottom)
-            .attr("width", 1)
-            .style(
-                "height",
-                legendheight + 5 - margin.top - margin.bottom + "px"
-            )
-            .style(
-                "width",
-                legendwidth + 13 - margin.left - margin.right + "px"
-            )
-            .style("border", "1px solid")
-            .node();
+        // append title
+        svgLegend
+            .append("text")
+            .attr("class", "legendTitle")
+            .attr("x", 0)
+            .attr("y", 20)
+            .style("text-anchor", "left")
+            .text(dataObjectName);
 
-        if (canvas) {
-            const context = canvas.getContext("2d");
-            const legendscale = scaleLinear()
-                .range([legendheight - margin.top - margin.bottom, 0])
-                .domain(colorscale.domain());
+        // draw the rectangle and fill with gradient
+        svgLegend
+            .append("rect")
+            .attr("x", 10)
+            .attr("y", 30)
+            .attr("width", 250)
+            .attr("height", 25)
+            .style("fill", "url(#linear-gradient)");
 
-            if (context) {
-                const image = context.createImageData(1, legendheight);
-                range(legendheight).forEach(function (i) {
-                    const c = rgb(colorscale(legendscale.invert(i)));
-                    image.data[4 * i] = c.r;
-                    image.data[4 * i + 1] = c.g;
-                    image.data[4 * i + 2] = c.b;
-                    image.data[4 * i + 3] = 255;
-                });
-                context.putImageData(image, 0, 0);
-            }
+        //create tick marks
+        const xLeg = scaleLinear().domain([min, max]).range([10, 258]);
 
-            const legendaxis = axisRight(legendscale)
-                .scale(legendscale)
-                .tickValues(legendscale.domain());
-            const svg = select(selected_id)
-                .append("svg")
-                .attr("height", legendheight - 3 + "px")
-                .attr("width", legendwidth - 20 + "px");
+        const axisLeg = axisBottom(xLeg).tickValues(colorScale.domain());
 
-            svg.append("g")
-                .attr("class", "axis")
-                .style("font-size", "14px")
-                .style("font-weight", "700")
-                .attr(
-                    "transform",
-                    "translate(" +
-                        (80 - margin.left - margin.right - 25) +
-                        "," +
-                        (margin.top + 7) +
-                        ")"
-                )
-                .call(legendaxis)
-                .selectAll("text")
-                .style("fill", "#6F6F6F");
+        svgLegend
+            .attr("class", "axis")
+            .append("g")
+            .attr("transform", "translate(0, 55)")
+            .style("font-size", "10px")
+            .style("font-weight", "700")
 
-            setLegendLoaded(true);
-        }
+            .call(axisLeg)
+            .style("stroke", "none !important");
     }
 
     return (
@@ -111,10 +99,7 @@ const ContinuousLegend: React.FC<legendProps> = ({
                 top: position[1],
             }}
         >
-            {legendLoaded && (
-                <label style={{ color: "#6F6F6F" }}>{dataObjectName}</label>
-            )}
-            <div id="legend"></div>
+            <div id="legend" style={{ marginRight: "-10px" }}></div>
         </div>
     );
 };
