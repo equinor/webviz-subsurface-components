@@ -444,7 +444,12 @@ export function addGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
     templatePlot: TemplatePlot
-): void {
+): [number, number] {
+    const minmaxPrimaryAxis: [number, number] = [
+        Number.POSITIVE_INFINITY,
+        Number.NEGATIVE_INFINITY,
+    ];
+
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
     if (plotFactory) {
@@ -459,9 +464,12 @@ export function addGraphTrackPlot(
             );
 
             const iCurve = indexOfElementByName(curves, templatePlot.name);
+            const curve = curves[iCurve];
+
+            // TODO: check curve.dimensions !== 1 && curve.valueType === "string"
 
             const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
-            const curve = curves[iCurve];
+            checkMinMax(minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
             const minmax: [number, number] = [
                 plotData.minmax[0],
                 plotData.minmax[1],
@@ -481,6 +489,7 @@ export function addGraphTrackPlot(
                     : -1;
                 curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
                 plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+                checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
                 checkMinMax(minmax, plotData2.minmax);
             }
 
@@ -519,6 +528,7 @@ export function addGraphTrackPlot(
             }
         }
     }
+    return minmaxPrimaryAxis;
 }
 
 export function editGraphTrackPlot(
@@ -751,8 +761,11 @@ export function createTracks(
                 if (curve.valueType === "string") continue; //??
 
                 const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
-
                 checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
+                const minmax: [number, number] = [
+                    plotData.minmax[0],
+                    plotData.minmax[1],
+                ];
 
                 let iCurve2 = -1;
                 let curve2: WellLogCurve | undefined = undefined;
@@ -763,6 +776,11 @@ export function createTracks(
                         : -1;
                     curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
                     plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+                    checkMinMax(
+                        info.minmaxPrimaryAxis,
+                        plotData2.minmaxPrimaryAxis
+                    );
+                    checkMinMax(minmax, plotData2.minmax);
                 }
 
                 const templatePlotProps = getTemplatePlotProps(
@@ -773,7 +791,7 @@ export function createTracks(
                     iCurve,
                     templatePlotProps,
                     colorTables,
-                    roundMinMax(plotData.minmax),
+                    roundMinMax(minmax),
                     curve,
                     plotDatas.length,
                     curve2,

@@ -209,13 +209,11 @@ class WellLogViewer extends Component<Props, State> {
         this._enableScroll();
     }
     // callback function from View
-    onScrollTrackPos(pos: number): void {
-        pos;
-        //console.log("onScrollTrackPos("+pos+")");
+    onScrollTrackPos(/*pos: number*/): void {
         this._enableScroll();
     }
     // callback function from View
-    onZoomContent(zoom: number): void {
+    onZoomContent(zoom: number): boolean {
         this._enableScroll();
 
         let ret = false;
@@ -223,12 +221,11 @@ class WellLogViewer extends Component<Props, State> {
             this.setState({ zoomContent: zoom }); // for slider
             ret = true;
         }
-        console.log("onZoomContent(" + zoom + ")", ret);
+        return ret;
     }
     // callback function from Axis
     onChangePrimaryAxis(value: string): void {
         this.setState({ primaryAxis: value });
-        console.log("primaryAxis: ", value);
     }
     // callback function from Zoom slider
     onZoomSliderChange(

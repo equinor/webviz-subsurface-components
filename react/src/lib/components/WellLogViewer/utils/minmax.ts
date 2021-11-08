@@ -17,12 +17,13 @@ export function checkMinMax(
     if (minmax[0] === Number.POSITIVE_INFINITY) {
         minmax[0] = minmaxSrc[0];
         minmax[1] = minmaxSrc[1];
-    } else if (minmax[0] > minmaxSrc[0]) minmax[0] = minmaxSrc[0];
-    else if (minmax[1] < minmaxSrc[1]) minmax[1] = minmaxSrc[1];
+    } else {
+        if (minmax[0] > minmaxSrc[0]) minmax[0] = minmaxSrc[0];
+        if (minmax[1] < minmaxSrc[1]) minmax[1] = minmaxSrc[1];
+    }
 }
 
 export function roundMinMax(minmax: [number, number]): [number, number] {
-    //const kmax = 7; const kmin = 5;
     const kmin = 6;
     const kmax = 9;
 

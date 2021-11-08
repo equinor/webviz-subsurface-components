@@ -39,7 +39,9 @@
           "type": "differential",
           "scale": "linear",
           "color": "blue",
-          "color2": "red"
+          "color2": "orange",
+          "fill": "green",
+          "fill2": "red"
         }
       ]
     },

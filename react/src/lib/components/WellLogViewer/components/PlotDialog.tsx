@@ -114,6 +114,7 @@ export class PlotPropertiesDialog extends Component<
                   open: true,
               }
             : {
+                  // we shold fill every posible state to allow this.setState() to set it
                   type: "line", //??
                   name: "DEPT", //??
                   name2: "DVER", //?
@@ -122,6 +123,9 @@ export class PlotPropertiesDialog extends Component<
                   fill: "red",
                   fillOpacity: 0.25,
                   colorTable: this.props.wellLogView.props.colorTables[0].name,
+
+                  color2: "black", //??
+                  fill2: "green",
 
                   open: true,
               };

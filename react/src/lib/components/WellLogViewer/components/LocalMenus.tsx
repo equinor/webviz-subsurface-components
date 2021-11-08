@@ -288,11 +288,11 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                         {"Add plot"}
                     </MenuItem>
 
-                    {/*!plots.length
+                    {/*!plots || !plots.length
                         ? []
                         : [
                               <MenuItem
-                                  key="111"
+                                  key="222"
                                   onClick={this.handleClickItem.bind(
                                       this,
                                       this.editPlots.bind(
@@ -305,7 +305,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                               </MenuItem>,
                           ]*/}
 
-                    {!plots.length
+                    {!plots || !plots.length
                         ? []
                         : [
                               <MenuItem

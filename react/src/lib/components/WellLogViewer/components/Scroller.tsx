@@ -84,13 +84,11 @@ class Scroller extends Component<Props> {
         // compute fractions
         const x = scrollWidth ? scrollLeft / scrollWidth : 0;
         const y = scrollHeight ? scrollTop / scrollHeight : 0;
-        console.log("from HTML scrollbars x=" + x + " y=" + y);
 
         this.props.onScroll(x, y); // notify parent
     }
 
     scrollTo(x: number, y: number): boolean {
-        console.log("Scroller.scrollTo(" + x + "," + y + ")");
         if (x < 0.0) x = 0.0;
         else if (x > 1.0) x = 1.0;
         if (y < 0.0) y = 0.0;
@@ -110,17 +108,12 @@ class Scroller extends Component<Props> {
             elOuter.scrollLeft !== scrollLeft ||
             elOuter.scrollTop !== scrollTop
         ) {
-            console.log(
-                "elOuter.scrollTo(" + scrollLeft + "," + scrollTop + ")"
-            );
             elOuter.scrollTo(scrollLeft, scrollTop); //elOuter.scrollLeft = scrollLeft; elOuter.scrollTop = scrollTop;
             return true;
         }
         return false;
     }
     zoom(xZoom: number, yZoom: number): boolean {
-        console.log("Scroller.zoom(" + xZoom + "," + yZoom + ")");
-
         const elOuter = this.scroller;
         if (!elOuter) return false;
 
@@ -142,7 +135,6 @@ class Scroller extends Component<Props> {
     }
 
     render(): ReactNode {
-        console.log("Scroller.render");
         return (
             <div
                 ref={(el) => (this.scroller = el as HTMLDivElement)}

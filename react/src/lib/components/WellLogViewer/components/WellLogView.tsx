@@ -31,6 +31,8 @@ import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
 
+import { checkMinMax } from "../utils/minmax";
+
 import {
     addGraphTrackPlot,
     editGraphTrackPlot,
@@ -503,7 +505,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             shouldSetTracks = true;
         }
 
-        //console.log("WellLogView.componentDidUpdate shouldSetTracks=" + shouldSetTracks);
         if (shouldSetTracks) {
             this.setTracks();
         } else if (this.props.scrollTrackPos !== prevProps.scrollTrackPos) {
@@ -540,19 +541,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 showLegend: true,
                 horizontal: this.props.horizontal,
 
-                /*
-                onResize: function (event: LogControllerResizeEvent): void {
-                    console.log("onResize", event);
-                },
-                */
                 onTrackEnter: function (elm: HTMLElement, track: Track): void {
                     addTrackContextMenus(elm, track);
                 },
-                /* never called 
-                onTrackUpdate: function (elm: HTMLElement, track: Track): void {
-                },
-                */
-                // TODO: how to use it?  onTrackExit: function (): void {},
             });
 
             this.logController.init(this.container);
@@ -595,8 +586,17 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     addGraphTrackPlot(track: GraphTrack, templatePlot: TemplatePlot): void {
-        addGraphTrackPlot(this, track, templatePlot);
-        if (this.logController) this.logController.updateTracks();
+        const minmaxPrimaryAxis = addGraphTrackPlot(this, track, templatePlot);
+        if (this.logController) {
+            const minmax: [number, number] = [
+                this.logController.domain[0],
+                this.logController.domain[1],
+            ];
+            checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
+            this.logController.domain = minmax;
+
+            this.logController.updateTracks();
+        }
         this.setInfo();
     }
 
@@ -736,17 +736,13 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     scrollContentTo(f: number): boolean {
         if (this.logController) {
-            const ret = scrollContentTo(this.logController, f);
-            console.log("WellLogView::scrollContentTo(" + f + ")=" + ret);
-            return ret;
+            return scrollContentTo(this.logController, f);
         }
         return false;
     }
     zoomContent(zoom: number): boolean {
         if (this.logController) {
-            const ret = zoomContent(this.logController, zoom);
-            console.log("WellLogView::zoomContent(" + zoom + ")=" + ret);
-            return ret;
+            return zoomContent(this.logController, zoom);
         }
         return false;
     }
@@ -765,7 +761,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     addTrack(trackNew: Track, trackCurrent: Track, bAfter: boolean): void {
-        console.log("addTrack");
         if (this.logController) {
             let order = 0;
             for (const track of this.logController.tracks) {
@@ -789,7 +784,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     removeTrack(track: Track): void {
-        console.log("removeTrack");
         if (this.logController) {
             this.logController.removeTrack(track);
 
@@ -798,7 +792,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     render(): ReactNode {
-        console.log("WellLogView.render");
         return (
             <div style={{ width: "100%", height: "100%" }}>
                 <div
