@@ -35,8 +35,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     }
     componentDidUpdate(prevProps: SimpleMenuProps): void {
         if (this.props.anchorEl !== prevProps.anchorEl) {
-            this.setState((state, props) => {
-                state;
+            this.setState((_state, props) => {
                 return { anchorEl: props.anchorEl };
             });
         }
@@ -55,8 +54,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         ev.preventDefault();
         this.closeMenu();
     }
-    handleCloseMenu(ev: React.MouseEvent<HTMLElement>): void {
-        ev;
+    handleCloseMenu(/*ev: React.MouseEvent<HTMLElement>*/): void {
         this.closeMenu();
     }
     handleClickItem(action?: () => void): void {

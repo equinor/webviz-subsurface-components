@@ -107,8 +107,7 @@ function localMenuContainer(
 }
 
 ///////////
-function valueLabelFormat(value: number, index: number): string {
-    index;
+function valueLabelFormat(value: number /*, index: number*/): string {
     return value.toFixed(Number.isInteger(value) || value > 20 ? 0 : 1);
 }
 
