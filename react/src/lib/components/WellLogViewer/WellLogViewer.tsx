@@ -48,7 +48,6 @@ import ReactDOM from "react-dom";
 
 import { SimpleMenu } from "./components/LocalMenus";
 import { Track } from "@equinor/videx-wellog";
-
 function localMenuTitle(
     parent: HTMLElement,
     track: Track,
@@ -287,8 +286,6 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     render(): ReactNode {
-        const rightWidth = 280;
-
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <Scroller
@@ -312,9 +309,9 @@ class WellLogViewer extends Component<Props, State> {
                         onLocalMenuContainer={localMenuContainer}
                         onScrollTrackPos={this.onScrollTrackPos}
                         onZoomContent={this.onZoomContent}
-                    />{" "}
+                    />
                 </Scroller>
-                <div style={{ flex: "0, 0, " + rightWidth + "px" }}>
+                <div style={{ flex: "0, 0, 280px" }}>
                     <AxisSelector
                         header="Primary scale"
                         axes={this.state.axes}

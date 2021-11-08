@@ -70,11 +70,11 @@ export default class GradientFillPlot extends Plot {
      * @param scale y-scale
      */
     plot(ctx: CanvasRenderingContext2D, scale: Scale): void {
-        const { scale: xscale, data: plotdata, options: _options } = this;
+        const { scale: xscale, data: plotdata } = this;
+        if (!xscale) return;
 
-        const options = _options as GradientFillPlotOptions;
-
-        if (!xscale || options.hidden) return;
+        const options = this.options as GradientFillPlotOptions;
+        if (options.hidden) return;
 
         const useMinAsBase =
             options.useMinAsBase === undefined ? true : options.useMinAsBase;

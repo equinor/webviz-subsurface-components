@@ -6,23 +6,19 @@
   },
   "tracks": [
     {
+      "title":  "Multiple",
       "plots": [
         {
-          "name": "HKLA",
+          "name": "MDIA"
+        },
+        {
+          "name": "HKLX",
           "style": "HKL"
         }
       ]
     },
     {
-      "plots": [
-        {
-          "name": "HKLX",
-          "style": "HKL",
-          "color": "blue"
-        }
-      ]
-    },
-    {
+      "title": "Area",
       "plots": [
         {
           "name": "HKLA",
@@ -35,6 +31,7 @@
       ]
     },
     {
+      "title": "Differential",
       "plots": [
         {
           "name": "HKLX",
@@ -47,6 +44,7 @@
       ]
     },
     {
+      "title": "Gradient Fill",
       "plots": [
         {
           "name": "HKLA",
@@ -60,9 +58,7 @@
     {
       "plots": [
         {
-          "name": "MFOA",
-          "type": "gradientfill",
-          "colorTable": "Rainbow"
+          "name": "MFOA"
         }
       ]
     },
@@ -197,8 +193,8 @@
       "name": "HKL",
       "scale": "linear",
       "type": "gradientfill",
-      "color": "red",
-      "colorTable": "Physics"
+      "colorTable": "Physics",
+      "color": "green"
     },
     {
       "name": "MD",

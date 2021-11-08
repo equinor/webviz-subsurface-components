@@ -12,11 +12,14 @@ import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicP
 
 import { ColorTable } from "../components/ColorTableTypes";
 
-import { colorToString4 } from "./color-table";
+import { color4ToString } from "./color-table";
 let __id = 0;
-function createGradient(g: D3Selection, colorTable: ColorTable): string {
+function createGradient(
+    g: D3Selection,
+    colorTable: ColorTable,
+    scale: string | undefined
+): string {
     const id = "grad" + ++__id; // generate unique id
-
     const lg = g
         .append("defs")
         .append("linearGradient")
@@ -26,12 +29,23 @@ function createGradient(g: D3Selection, colorTable: ColorTable): string {
         .attr("y1", "0%")
         .attr("y2", "0%");
     const colors = colorTable.colors;
-    for (let i = 0; i < colors.length; i++) {
-        const color = colors[i];
-        const c = colorToString4(color);
-        lg.append("stop")
-            .attr("offset", color[0] * 100.0 + "%")
-            .style("stop-color", c);
+    if (scale === "log") {
+        // TODO: "log" scale
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            const c = color4ToString(color);
+            lg.append("stop")
+                .attr("offset", color[0] * 100.0 + "%")
+                .style("stop-color", c);
+        }
+    } else {
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            const c = color4ToString(color);
+            lg.append("stop")
+                .attr("offset", color[0] * 100.0 + "%")
+                .style("stop-color", c);
+        }
     }
 
     return id;
@@ -44,7 +58,7 @@ export default function renderGradientFillPlotLegend(
     g: D3Selection,
     bounds: LegendBounds,
     legendInfo: LegendInfo,
-    plot: /*AreaPlot*/ GradientFillPlot
+    plot: GradientFillPlot
 ): void {
     const options = plot.options as GradientFillPlotOptions;
     const { top, left, width, height } = bounds;
@@ -77,7 +91,7 @@ export default function renderGradientFillPlotLegend(
                 ? options.colorTable
                 : options.inverseColorTable;
         if (colorTable) {
-            const id = createGradient(g, colorTable);
+            const id = createGradient(g, colorTable, options.scale);
             fillNrm = "url(#" + id + ")";
         }
         colorTable =
@@ -85,7 +99,7 @@ export default function renderGradientFillPlotLegend(
                 ? options.inverseColorTable
                 : options.colorTable;
         if (colorTable) {
-            const id = createGradient(g, colorTable);
+            const id = createGradient(g, colorTable, options.scale);
             fillInv = "url(#" + id + ")";
         }
         /* end GradientFill code */
@@ -112,7 +126,7 @@ export default function renderGradientFillPlotLegend(
         /* Start GradientFill code */
         const colorTable = options.colorTable;
         if (colorTable) {
-            const id = createGradient(g, colorTable);
+            const id = createGradient(g, colorTable, options.scale);
             fillNrm = "url(#" + id + ")";
         }
         /* end GradientFill code */

@@ -264,7 +264,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                         {"Add plot"}
                     </MenuItem>
 
-                    {!plots.length
+                    {/*!plots.length
                         ? []
                         : [
                               <MenuItem
@@ -279,7 +279,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                               >
                                   {"Edit plot"}
                               </MenuItem>,
-                          ]}
+                          ]*/}
 
                     {!plots.length
                         ? []

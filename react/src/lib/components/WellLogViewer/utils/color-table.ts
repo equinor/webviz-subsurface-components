@@ -32,7 +32,7 @@ export function colorToString(
 /*
   get HTML string in #xxxxxx format with color value given in the [1],[2],[3] elements of array (skip the first element [0] containing stop value)
 */
-export function colorToString4(
+export function color4ToString(
     color: [number, number, number, number]
 ): string {
     const p =
@@ -72,7 +72,7 @@ export function getInterpolatedColorString(
             {
                 const f = (v - color0[0]) / (color[0] - color0[0]);
 
-                const p = // see also colorToString4
+                const p = // see also color4ToString
                     0x1000000 |
                     (((color0[1] + f * (color[1] - color0[1])) * 255) << 16) |
                     (((color0[2] + f * (color[2] - color0[2])) * 255) << 8) |
