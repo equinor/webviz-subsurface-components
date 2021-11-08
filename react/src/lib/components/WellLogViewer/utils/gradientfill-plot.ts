@@ -1,7 +1,6 @@
 import { area } from "d3";
 import { Scale } from "@equinor/videx-wellog/dist/common/interfaces";
 import { Plot } from "@equinor/videx-wellog";
-import { PlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 import { DefinedFunction } from "@equinor/videx-wellog/dist/plots/interfaces";
 
@@ -57,7 +56,7 @@ function createGradient(
  * GradientFillPlot plot
  */
 export default class GradientFillPlot extends Plot {
-    constructor(id: string | number, options: PlotOptions = {}) {
+    constructor(id: string | number, options: GradientFillPlotOptions = {}) {
         super(id, options);
         // subclass render function.
         // eslint-disable-next-line

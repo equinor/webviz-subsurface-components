@@ -11,6 +11,11 @@ import { Track, GraphTrack } from "@equinor/videx-wellog";
 
 import WellLogView from "./WellLogView";
 
+import { Plot } from "@equinor/videx-wellog";
+import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+
+import { ExtPlotOptions } from "../utils/tracks";
+
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
@@ -25,6 +30,21 @@ export interface SimpleMenuState {
     anchorEl: HTMLElement | null;
 }
 
+function getPlotTitle(plot: Plot): string {
+    let title = "";
+    const extOptions = plot.options as ExtPlotOptions;
+    const legend = extOptions.legendInfo();
+    if (legend) {
+        if (legend.label) title = legend.label;
+        const legend2 = legend as DifferentialPlotLegendInfo;
+        // DifferentialPlot - 2 names!
+        if (legend2.serie1 && legend2.serie1.label)
+            title = legend2.serie1.label;
+        if (legend2.serie2 && legend2.serie2.label)
+            title += " \u2013 " + legend2.serie2.label;
+    }
+    return title;
+}
 export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     constructor(props: SimpleMenuProps) {
         super(props);
@@ -62,7 +82,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         this.closeMenu();
     }
 
-    createRemovePlotMenuItem(item: string): ReactNode {
+    createRemovePlotMenuItem(title: string, item: string): ReactNode {
         return (
             <MenuItem
                 key={item}
@@ -70,7 +90,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                     this.handleClickItem(this.removePlot.bind(this, item));
                 }}
             >
-                &nbsp;&nbsp;&nbsp;&nbsp;{item}
+                &nbsp;&nbsp;&nbsp;&nbsp;{title}
             </MenuItem>
         );
     }
@@ -93,7 +113,10 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
 
             for (const plot of plots) {
                 const iCurve = plot.id as number;
-                nodes.push(this.createRemovePlotMenuItem(curves[iCurve].name));
+                const title = getPlotTitle(plot) || curves[iCurve].name;
+                nodes.push(
+                    this.createRemovePlotMenuItem(title, curves[iCurve].name)
+                );
             }
         }
 
