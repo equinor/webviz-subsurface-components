@@ -20,6 +20,9 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
+        include:
+          # Run performance tests
+          run-performance-tests: true
 
     steps:
       - name: 📖 Checkout commit locally
@@ -73,6 +76,11 @@ jobs:
           black --check webviz_subsurface_components/ tests/ setup.py examples/
           pylint webviz_subsurface_components/ tests/ setup.py examples/*.py --ignore well-completions-csv2json.py
           bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
+
+      - name: 🤖 Run performance tests
+        if: github.event_name != 'release'
+        run: |
+          npm run test_perf --prefix ./react
 
       - name: 🤖 Run tests
         if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
@@ -135,69 +143,3 @@ jobs:
             git commit -m "Update Github Pages"
             git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
           fi
-
-  performance-check:
-    if: github.event_name != 'push' || github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📖 Checkout commit locally
-        uses: actions/checkout@v2
-
-      - name: 🐍 Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Use Node.js 15.12
-        uses: actions/setup-node@v1
-        with:
-          node-version: "15.12"
-
-      - name: 📦 Install build dependencies
-        # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
-        run: |
-          npm ci --ignore-scripts --prefix ./react
-          npm run setup-deckgl-types --prefix ./react
-          npm run copy-package-json --prefix ./react
-          pip install .[dependencies]
-          pip install dash[dev]
-
-      - name: ⏭️ Modifications when prerelease
-        if: github.event.release.prerelease
-        working-directory: ./react
-        run: |
-          echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
-          npm install --ignore-scripts @webviz/core-components@next
-          npm run setup-deckgl-types
-
-      - name: 🏗️ Build JavaScript part
-        run: |
-          npm run build --prefix ./react
-
-      - name: 📦 Install webviz-subsurface-components with dependencies
-        run: |
-          pip install --upgrade pip
-          pip install .
-
-      - name: 📦 Install test dependencies
-        run: |
-          pip install .[tests]
-          pip install dash[testing]
-          wget https://chromedriver.storage.googleapis.com/$(wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
-
-      - name: 🧾 List all installed packages
-        run: pip freeze
-
-      - name: 🕵️ Check code style, linting and typechecking
-        if: matrix.python-version == '3.8'
-        run: |
-          npm run validate --prefix ./react
-          black --check webviz_subsurface_components/ tests/ setup.py examples/
-          pylint webviz_subsurface_components/ tests/ setup.py examples/*.py --ignore well-completions-csv2json.py
-          bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
-
-      - name: 🤖 Run performance tests
-        if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
-        run: |
-          npm run test_perf --prefix ./react
