@@ -22,11 +22,12 @@ export function colorToString(
     cDefault: string
 ): string {
     if (!color) return cDefault;
+    // TODO: consider Math.floor(color[0] * 256)... with special processing of 1.0
     const p =
         0x1000000 | // force value to have 7 hex digits : 1rrggbb
-        ((color[0] * 255) << 16) |
-        ((color[1] * 255) << 8) |
-        (color[2] * 255);
+        (Math.round(color[0] * 255) << 16) |
+        (Math.round(color[1] * 255) << 8) |
+        Math.round(color[2] * 255);
     return "#" + p.toString(16).substr(1); // cut the first (additional) character
 }
 /*
@@ -37,9 +38,9 @@ export function color4ToString(
 ): string {
     const p =
         0x1000000 |
-        ((color[1] * 255) << 16) |
-        ((color[2] * 255) << 8) |
-        (color[3] * 255);
+        (Math.round(color[1] * 255) << 16) |
+        (Math.round(color[2] * 255) << 8) |
+        Math.round(color[3] * 255);
     return "#" + p.toString(16).substr(1);
 }
 
@@ -74,9 +75,15 @@ export function getInterpolatedColorString(
 
                 const p = // see also color4ToString
                     0x1000000 |
-                    (((color0[1] + f * (color[1] - color0[1])) * 255) << 16) |
-                    (((color0[2] + f * (color[2] - color0[2])) * 255) << 8) |
-                    ((color0[3] + f * (color[3] - color0[3])) * 255);
+                    (Math.round(
+                        (color0[1] + f * (color[1] - color0[1])) * 255
+                    ) <<
+                        16) |
+                    (Math.round(
+                        (color0[2] + f * (color[2] - color0[2])) * 255
+                    ) <<
+                        8) |
+                    Math.round((color0[3] + f * (color[3] - color0[3])) * 255);
                 c = "#" + p.toString(16).substr(1);
             }
         }

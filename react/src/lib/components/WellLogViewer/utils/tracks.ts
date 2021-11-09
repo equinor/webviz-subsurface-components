@@ -34,7 +34,12 @@ import {
     WellLogDataRow,
 } from "../components/WellLogTypes";
 
-import { checkMinMaxValue, checkMinMax, roundMinMax } from "./minmax";
+import {
+    checkMinMaxValue,
+    checkMinMax,
+    roundMinMax,
+    roundLogMinMax,
+} from "./minmax";
 
 function indexOfElementByName(array: Named[], name: string): number {
     if (name) {
@@ -493,6 +498,7 @@ export function addGraphTrackPlot(
                 checkMinMax(minmax, plotData2.minmax);
             }
 
+            // make full props
             const templatePlotProps = getTemplatePlotProps(
                 templatePlot,
                 /*templateStyles*/ []
@@ -501,7 +507,9 @@ export function addGraphTrackPlot(
                 iCurve,
                 templatePlotProps,
                 colorTables,
-                roundMinMax(minmax),
+                (templatePlotProps.scale === "log"
+                    ? roundLogMinMax
+                    : roundMinMax)(minmax),
                 curve,
                 plotDatas.length,
                 curve2,
@@ -783,6 +791,7 @@ export function createTracks(
                     checkMinMax(minmax, plotData2.minmax);
                 }
 
+                // make full props
                 const templatePlotProps = getTemplatePlotProps(
                     templatePlot,
                     templateStyles
@@ -791,7 +800,9 @@ export function createTracks(
                     iCurve,
                     templatePlotProps,
                     colorTables,
-                    roundMinMax(minmax),
+                    (templatePlotProps.scale === "log"
+                        ? roundLogMinMax
+                        : roundMinMax)(minmax),
                     curve,
                     plotDatas.length,
                     curve2,

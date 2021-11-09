@@ -14,11 +14,7 @@ import { ColorTable } from "../components/ColorTableTypes";
 
 import { color4ToString } from "./color-table";
 let __id = 0;
-function createGradient(
-    g: D3Selection,
-    colorTable: ColorTable,
-    scale: string | undefined
-): string {
+function createGradient(g: D3Selection, colorTable: ColorTable): string {
     const id = "grad" + ++__id; // generate unique id
     const lg = g
         .append("defs")
@@ -29,25 +25,13 @@ function createGradient(
         .attr("y1", "0%")
         .attr("y2", "0%");
     const colors = colorTable.colors;
-    if (scale === "log") {
-        // TODO: "log" scale
-        for (let i = 0; i < colors.length; i++) {
-            const color = colors[i];
-            const c = color4ToString(color);
-            lg.append("stop")
-                .attr("offset", color[0] * 100.0 + "%")
-                .style("stop-color", c);
-        }
-    } else {
-        for (let i = 0; i < colors.length; i++) {
-            const color = colors[i];
-            const c = color4ToString(color);
-            lg.append("stop")
-                .attr("offset", color[0] * 100.0 + "%")
-                .style("stop-color", c);
-        }
+    for (let i = 0; i < colors.length; i++) {
+        const color = colors[i];
+        const c = color4ToString(color);
+        lg.append("stop")
+            .attr("offset", color[0] * 100.0 + "%")
+            .style("stop-color", c);
     }
-
     return id;
 }
 
@@ -91,7 +75,7 @@ export default function renderGradientFillPlotLegend(
                 ? options.colorTable
                 : options.inverseColorTable;
         if (colorTable) {
-            const id = createGradient(g, colorTable, options.scale);
+            const id = createGradient(g, colorTable);
             fillNrm = "url(#" + id + ")";
         }
         colorTable =
@@ -99,7 +83,7 @@ export default function renderGradientFillPlotLegend(
                 ? options.inverseColorTable
                 : options.colorTable;
         if (colorTable) {
-            const id = createGradient(g, colorTable, options.scale);
+            const id = createGradient(g, colorTable);
             fillInv = "url(#" + id + ")";
         }
         /* end GradientFill code */
@@ -126,7 +110,7 @@ export default function renderGradientFillPlotLegend(
         /* Start GradientFill code */
         const colorTable = options.colorTable;
         if (colorTable) {
-            const id = createGradient(g, colorTable, options.scale);
+            const id = createGradient(g, colorTable);
             fillNrm = "url(#" + id + ")";
         }
         /* end GradientFill code */
