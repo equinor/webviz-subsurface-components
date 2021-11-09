@@ -21,8 +21,7 @@ jobs:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
         include:
-          # Run performance tests
-          run-performance-tests: true
+          - run-performance-tests: true
 
     steps:
       - name: 📖 Checkout commit locally
@@ -78,9 +77,8 @@ jobs:
           bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
 
       - name: 🤖 Run performance tests
-        if: github.event_name != 'release'
-        run: |
-          npm run test_perf --prefix ./react
+        if: github.event_name != 'release' && matrix.run-performance-tests
+        run: npm run test_perf --prefix ./react
 
       - name: 🤖 Run tests
         if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
