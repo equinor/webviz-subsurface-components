@@ -4,10 +4,7 @@ import React, { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { MapState } from "../../redux/store";
 import { LayerIcons, LayerType } from "../../redux/types";
-import {
-    getPropVisibility,
-    getLayerVisibility,
-} from "../../utils/specExtractor";
+import { getLayerProps, getPropVisibility } from "../../utils/specExtractor";
 import LayerProperty from "./LayerProperty";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -41,11 +38,14 @@ interface Props {
 const LayerSettingsButton: React.FC<Props> = React.memo(
     ({ layerId, layerType, name }: Props) => {
         const classes = useStyles();
-        const spec = useSelector((st: MapState) => st.spec);
-        const layerVisibility = useMemo(() => getLayerVisibility(spec), [spec]);
+        const layers = useSelector((st: MapState) => st.layers);
+        const layerProps = useMemo(
+            () => getLayerProps(layers, layerId),
+            [layers, layerId]
+        );
         const propVisibility = useMemo(
-            () => getPropVisibility(spec, layerId),
-            [spec, layerId]
+            () => getPropVisibility(layers, layerId),
+            [layers, layerId]
         );
         const [anchorEl, setAnchorEl] =
             React.useState<null | HTMLElement>(null);
@@ -64,7 +64,7 @@ const LayerSettingsButton: React.FC<Props> = React.memo(
 
         if (
             !LayerIcons[layerType] ||
-            !layerVisibility[layerId] ||
+            !layerProps?.["visible"] ||
             !propVisibility
         )
             return null;

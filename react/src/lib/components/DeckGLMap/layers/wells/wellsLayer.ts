@@ -26,7 +26,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
-    selectedFeature: string;
+    selectedWell: string;
     selectionEnabled: boolean;
     logData: string | LogCurveDataType;
     logName: string;
@@ -38,6 +38,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
 
 const defaultProps = {
     name: "Wells",
+    id: "wells-layer",
     autoHighlight: true,
     selectionEnabled: true,
     opacity: 1,
@@ -47,6 +48,7 @@ const defaultProps = {
     logRadius: 6,
     logCurves: true,
     refine: true,
+    visible: true,
 };
 
 export interface LogCurveDataType {
@@ -82,8 +84,7 @@ export default class WellsLayer extends CompositeLayer<
         }
 
         patchLayerProps<FeatureCollection>(this, {
-            ...this.props,
-            selectedFeature: (info.object as Feature).properties?.["name"],
+            selectedWell: (info.object as Feature).properties?.["name"],
         } as WellsLayerProps<FeatureCollection>);
         return true;
     }
@@ -135,7 +136,7 @@ export default class WellsLayer extends CompositeLayer<
                 id: "highlight",
                 data: getWellObjectByName(
                     data.features,
-                    this.props.selectedFeature
+                    this.props.selectedWell
                 ),
                 pickable: false,
                 stroked: false,
@@ -270,7 +271,7 @@ function getWellObjectByName(
 ): Feature | undefined {
     return wells_data?.find(
         (item) =>
-            item.properties?.["name"].toLowerCase() === name?.toLowerCase()
+            item.properties?.["name"]?.toLowerCase() === name?.toLowerCase()
     );
 }
 
