@@ -207,7 +207,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
             const state = deckGLLayers.every((layer) => layer.isLoaded);
             setIsLoaded(state);
         }
-    }, [layersData]);
+    }, [deckGLLayers]);
 
     const wellsLayer = getLayer(deckGLLayers, "wells-layer") as WellsLayer;
 
@@ -252,8 +252,8 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [viewState, setViewState] = useState<any>();
 
+    if (!deckGLViews) return null;
     return (
-        //deckGLViews && (
         <div>
             <DeckGL
                 id={id}
@@ -313,7 +313,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
             )}
         </div>
-        //)
     );
 };
 
