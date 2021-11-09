@@ -183,7 +183,7 @@ if __name__ == "__main__":
             {
                 "@@type": "DrawingLayer",
                 "data": "@@#editedData.data",
-                "selectedDrawingFeature": "@@#editedData.selectedDrawingFeature"
+                "selectedDrawingFeature": "@@#editedData.selectedDrawingFeature",
             },
             {
                 "@@type": "WellsLayer",
@@ -194,14 +194,11 @@ if __name__ == "__main__":
                 "selectedWell": "@@#editedData.selectedWell",
             },
         ],
-        editedData= {
+        editedData={
             "selectedWell": "",
             "selectedDrawingFeature": [],
-            "data": {
-                "type": "FeatureCollection",
-                "features": []
-            }
-        }
+            "data": {"type": "FeatureCollection", "features": []},
+        },
     )
 
     colormap_dropdown = wcc.Dropdown(
