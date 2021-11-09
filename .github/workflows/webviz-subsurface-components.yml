@@ -10,7 +10,7 @@ on:
       - published
   schedule:
     # Run CI daily and check that tests are working with latest dependencies
-    - cron:  '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   webviz-subsurface-components:
@@ -19,7 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.9']
+        python-version: ["3.6", "3.7", "3.8", "3.9"]
+        include:
+          # Run performance tests
+          run-performance-tests: true
 
     steps:
       - name: 📖 Checkout commit locally
@@ -74,8 +77,13 @@ jobs:
           pylint webviz_subsurface_components/ tests/ setup.py examples/*.py --ignore well-completions-csv2json.py
           bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
 
+      - name: 🤖 Run performance tests
+        if: github.event_name != 'release'
+        run: |
+          npm run test_perf --prefix ./react
+
       - name: 🤖 Run tests
-        if: github.event_name != 'release'  # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
+        if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
         run: |
           npm run test --prefix ./react
           pytest ./tests --headless
