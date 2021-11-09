@@ -39,6 +39,11 @@ export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
 
 const defaultProps = {
     name: "Hill shading",
+    id: "hillshading-layer",
+    opacity: 1.0,
+    pickable: true,
+    visible: true,
+    rotDeg: 0,
     valueRange: { type: "array" },
     colorMapRange: { type: "array" },
     lightDirection: { type: "array", value: [1, 1, 1] },
@@ -54,10 +59,6 @@ const defaultProps = {
             step: 0,
         },
     },
-    opacity: 1,
-    pickable: true,
-
-    rotDeg: 0,
 };
 
 export default class Hillshading2DLayer extends BitmapLayer<
