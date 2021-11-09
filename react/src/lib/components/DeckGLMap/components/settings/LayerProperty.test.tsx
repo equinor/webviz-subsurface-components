@@ -15,7 +15,7 @@ describe("Test Layer Property", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
     });
-    it("select option to dispatch redux action", async () => {
+    xit("select option to dispatch redux action", async () => {
         render(
             Wrapper({
                 children: <LayerProperty layerId="drawing-layer" />,
@@ -28,7 +28,7 @@ describe("Test Layer Property", () => {
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["drawing-layer", "view"],
-            type: "spec/updateDrawingMode",
+            type: "layers/updateDrawingMode",
         });
     });
 });

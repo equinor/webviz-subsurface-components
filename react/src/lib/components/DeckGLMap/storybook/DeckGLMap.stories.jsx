@@ -9,25 +9,17 @@ export default {
 };
 
 const Template = (args) => {
-    const [mapSpecBase, setMapSpecBase] = React.useState(null);
-    const [mapSpecPatch, setMapSpecPatch] = React.useState(null);
-
+    const [editedData, setEditedData] = React.useState(args.editedData);
     React.useEffect(() => {
-        setMapSpecBase(args.deckglSpecBase);
-    }, [args.deckglSpecBase]);
-
-    React.useEffect(() => {
-        setMapSpecPatch(args.deckglSpecPatch);
-    }, [args.deckglSpecPatch]);
+        setEditedData(args.editedData);
+    }, [args.editedData]);
 
     return (
         <DeckGLMap
             {...args}
-            deckglSpecBase={mapSpecBase}
-            deckglSpecPatch={mapSpecPatch}
-            setProps={(updatedSpec) => {
-                setMapSpecBase(updatedSpec.deckglSpecBase);
-                setMapSpecPatch(updatedSpec.deckglSpecPatch);
+            editedData={editedData}
+            setProps={(updatedProps) => {
+                setEditedData(updatedProps.editedData);
             }}
         />
     );
