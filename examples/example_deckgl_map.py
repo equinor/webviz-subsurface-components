@@ -8,9 +8,8 @@ import io
 import base64
 import copy
 import re
-import json
 
-from dash import Dash, html, Input, Output, State, callback, no_update
+from dash import Dash, html, Input, Output, State, callback
 import jsonpatch
 import jsonpointer
 import numpy as np
