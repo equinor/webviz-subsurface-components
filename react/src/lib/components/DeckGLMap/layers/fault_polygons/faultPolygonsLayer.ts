@@ -13,8 +13,11 @@ const getColor = (d: Feature): RGBAColor => {
 
 const defaultProps = {
     name: "Fault polygons",
+    id: "fault-polygons-layer",
     pickable: true,
+    visible: true,
     filled: true,
+    lineWidthMinPixels: 2,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     getLineColor: (d: Feature) => d?.properties?.["color"] ?? [0, 0, 0, 255],
     getFillColor: getColor,
