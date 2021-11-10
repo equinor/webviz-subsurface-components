@@ -52,11 +52,9 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             Object.keys(props.customVectorDefinitions).forEach(
                 (vectorName: string) => {
                     if (vectorName in VectorData === false) {
-                        this.vectorDefinitions[
-                            vectorName
-                        ] = (props.customVectorDefinitions as VectorDefinitions)[
-                            vectorName
-                        ];
+                        this.vectorDefinitions[vectorName] = (
+                            props.customVectorDefinitions as VectorDefinitions
+                        )[vectorName];
                     }
                 }
             );
@@ -97,6 +95,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             nodeSelections,
             currentTagIndex: 0,
             suggestionsVisible: false,
+            showAllSuggestions: false,
             hasError: error !== undefined,
             error: error || "",
             currentTagShaking: false,
