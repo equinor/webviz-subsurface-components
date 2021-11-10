@@ -25,7 +25,7 @@ export function colorToString(
     cDefault: string
 ): string {
     if (!color) return cDefault;
-    // old code 
+    // old code
     // const p =
     //    0x1000000 | // force value to have 7 hex digits : 1rrggbb
     //    (Math.round(color[0] * 255) << 16) |
@@ -33,7 +33,7 @@ export function colorToString(
     //    Math.round(color[2] * 255);
     // was based on following algorithm for every x component :
     // c = Math.round(color[x] * 255) // component values from range [0.0, 1.0] is mapped to the range [0,255]
-    // it results in: 
+    // it results in:
     // [0.0, 0.5/255)          => 0
     // [0.5/255, 1.5/255)      => 1
     // [1.5/255, 2.5/255)      => 2
@@ -52,13 +52,13 @@ export function colorToString(
     // [254/256, 255/256)  => 254
     // [255/256, 1.0)      => 255
     // [1.0, 1.0]          => 256
-    // So we should add 
+    // So we should add
     //    if(c>255) c=255 // Special processing for component value 1.0.
     //
     // 2) slighly decrease a factor 256 to exclude a need of special processing for component value 1.0.
     //    c=Math.floor(color[x] * 255.9999999999999) // make all component values from range [0.0, 1.0] to be mapped to the range [0,255]
     //           // because Math.floor(1.0*255.9999999999999) === 255
-    // 3) we do not need to call Math.floor() before Shift or Binary OR operations because these operators convert their operands to integers 
+    // 3) we do not need to call Math.floor() before Shift or Binary OR operations because these operators convert their operands to integers
     const p =
         0x1000000 | // force value to have 7 hex digits : 1rrggbb
         ((color[0] * 255.999999) << 16) |

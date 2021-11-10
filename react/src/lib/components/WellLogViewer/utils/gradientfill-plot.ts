@@ -58,7 +58,7 @@ function createGradient(
         const yDelta = xscale.domain()[1] - yFrom;
         for (const data of plotdata) {
             // TODO: add some additional intermediate stop positions when y changes significantly
-            // and color-table stops exists between consequent y values 
+            // and color-table stops exists between consequent y values
             const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
                 const v = (data[1] - yFrom) / yDelta;
