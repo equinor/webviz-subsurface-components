@@ -12,7 +12,7 @@
           "name": "MDIA"
         },
         {
-          "name": "HKLX",
+          "name": "HKLA",
           "style": "HKL"
         }
       ]
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "title": "Gradient Fill",
+      "title": "Gradient Fill & inverse",
       "plots": [
         {
           "name": "HKLA",

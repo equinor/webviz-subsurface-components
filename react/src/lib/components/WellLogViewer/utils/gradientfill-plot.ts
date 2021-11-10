@@ -42,10 +42,10 @@ function createGradient(
         const xDelta = dataTo[0] - xFrom;
         const yFrom = Math.log(xscale.domain()[0]);
         const yDelta = Math.log(xscale.domain()[1]) - yFrom;
-        for (let i = 0; i < plotdata.length; i++) {
-            const stop = (plotdata[i][0] - xFrom) / xDelta;
+        for (const data of plotdata) {
+            const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
-                const v = (Math.log(plotdata[i][1]) - yFrom) / yDelta;
+                const v = (Math.log(data[1]) - yFrom) / yDelta;
                 const c = getInterpolatedColorString(colorTable, v);
                 gradient.addColorStop(stop, c);
             }
@@ -56,10 +56,11 @@ function createGradient(
         const xDelta = dataTo[0] - xFrom;
         const yFrom = xscale.domain()[0];
         const yDelta = xscale.domain()[1] - yFrom;
-        for (let i = 0; i < plotdata.length; i++) {
-            const stop = (plotdata[i][0] - xFrom) / xDelta;
+        for (const data of plotdata) {
+            // TODO: add some additional intermediate stop positions when y changes significally
+            const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
-                const v = (plotdata[i][1] - yFrom) / yDelta;
+                const v = (data[1] - yFrom) / yDelta;
                 const c = getInterpolatedColorString(colorTable, v);
                 gradient.addColorStop(stop, c);
             }
@@ -85,7 +86,7 @@ export default class GradientFillPlot extends Plot {
      * @param ctx canvas context instance
      * @param scale y-scale
      */
-    plot(ctx: CanvasRenderingContext2D, yscale: Scale): void {
+    plot(ctx: CanvasRenderingContext2D, scale: Scale): void {
         const { scale: xscale, data: plotdata } = this;
         if (!xscale) return;
 
@@ -115,12 +116,12 @@ export default class GradientFillPlot extends Plot {
             areaFunction
                 .y1((d) => xscale(d[1]))
                 .y0(zeroValue)
-                .x((d) => yscale(d[0]));
+                .x((d) => scale(d[0]));
         } else {
             areaFunction
                 .x1((d) => xscale(d[1]))
                 .x0(zeroValue)
-                .y((d) => yscale(d[0]));
+                .y((d) => scale(d[0]));
         }
 
         ctx.globalAlpha = options.fillOpacity || 1;
@@ -139,12 +140,12 @@ export default class GradientFillPlot extends Plot {
                 inverseAreaFunction
                     .y1((d) => xscale(d[1]))
                     .y0(inverseValue)
-                    .x((d) => yscale(d[0]));
+                    .x((d) => scale(d[0]));
             } else {
                 inverseAreaFunction
                     .x1((d) => xscale(d[1]))
                     .x0(inverseValue)
-                    .y((d) => yscale(d[0]));
+                    .y((d) => scale(d[0]));
             }
             ctx.beginPath();
             inverseAreaFunction(plotdata);
@@ -154,7 +155,7 @@ export default class GradientFillPlot extends Plot {
             if (colorTable)
                 ctx.fillStyle = createGradient(
                     ctx,
-                    yscale,
+                    scale,
                     options.horizontal,
                     plotdata,
                     xscale,
@@ -176,7 +177,7 @@ export default class GradientFillPlot extends Plot {
         if (colorTable)
             ctx.fillStyle = createGradient(
                 ctx,
-                yscale,
+                scale,
                 options.horizontal,
                 plotdata,
                 xscale,

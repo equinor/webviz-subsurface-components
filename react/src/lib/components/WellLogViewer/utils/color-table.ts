@@ -25,15 +25,35 @@ export function colorToString(
     cDefault: string
 ): string {
     if (!color) return cDefault;
-    // TODO: consider more accurate algorithm for x component :
-    // c=Math.floor(color[x] * 256) // make all component values to be mapped to the range [0,255] and only one value 1.0 is mapped to 256
-    // if(c>255) c=255 // Special processing for component value 1.0.
+    // old code was based on following algorithm for every x component :
+    // c = Math.round(color[x] * 255) // component values from range [0.0, 1.0] is mapped to the range [0,255]
+    // const p =
+    //    0x1000000 | // force value to have 7 hex digits : 1rrggbb
+    //    (Math.round(color[0] * 255) << 16) |
+    //    (Math.round(color[1] * 255) << 8) |
+    //    Math.round(color[2] * 255);
+    // it results in: 
+    // [0.0, 0.5/255) = [0.0, 0.00196078431372549) => 0
+    // [0.5/255, 1.5/255) = [0.00196078431372549, 0.0058823529411764705) => 1
+    // [1.5/255, 2.5/255) = [0.0058823529411764705, 0.00980392156862745) => 2
+    // ...
+    // [253.5/255, 254.5/255) = [0.9941176470588236, 0.9980392156862745) => 254
+    // [254.5/255, 1.0] = [0.9980392156862745, 1.0] => 255
+    // but the first and the last subranges is 2 times smaller than another ones!
+    //
+    // So use more accurate algorithm for every x component :
+    // 1) c=Math.floor(color[x] * 256) // make all component values from range [0.0, 1.0] to be mapped to the range [0,255] and only one value 1.0 is mapped to 256
+    //    if(c>255) c=255 // Special processing for component value 1.0.
+    // 2) slighly decrease a factor 256 to exclude a need of special processing for component value 1.0.
+    //    c=Math.floor(color[x] * 255.9999999999999) // make all component values from range [0.0, 1.0] to be mapped to the range [0,255]
+    //           // because Math.floor(1.0*255.9999999999999) === 255
+    // 3) we do not need to call Math.floor() before shift or binary OR operations because these operators convert their operands to integers 
     const p =
         0x1000000 | // force value to have 7 hex digits : 1rrggbb
-        (Math.round(color[0] * 255) << 16) |
-        (Math.round(color[1] * 255) << 8) |
-        Math.round(color[2] * 255);
-    return "#" + p.toString(16).substr(1); // cut the first (additional) character anfd add leading '#' character
+        ((color[0] * 255.999999) << 16) |
+        ((color[1] * 255.999999) << 8) |
+        (color[2] * 255.999999);
+    return "#" + p.toString(16).substr(1); // cut the first (additional) character and add leading '#' character
 }
 /*
   get HTML string in #xxxxxx format with color value given in the [1],[2],[3] elements of array (skip the first element [0] containing stop value)
@@ -41,11 +61,12 @@ export function colorToString(
 export function color4ToString(
     color: [number, number, number, number] // [stop, r,g,b]
 ): string {
+    // see colorToString()
     const p =
         0x1000000 |
-        (Math.round(color[1] * 255) << 16) |
-        (Math.round(color[2] * 255) << 8) |
-        Math.round(color[3] * 255);
+        ((color[1] * 255.999999) << 16) |
+        ((color[2] * 255.999999) << 8) |
+        (color[3] * 255.999999);
     return "#" + p.toString(16).substr(1);
 }
 
@@ -75,11 +96,11 @@ export function getInterpolatedColorString(
 
         const f = (v - color0[0]) / (color[0] - color0[0]);
 
-        const p = // see also color4ToString
+        const p = // see also color4ToString()
             0x1000000 |
-            (Math.round((color0[1] + f * (color[1] - color0[1])) * 255) << 16) |
-            (Math.round((color0[2] + f * (color[2] - color0[2])) * 255) << 8) |
-            Math.round((color0[3] + f * (color[3] - color0[3])) * 255);
+            (((color0[1] + f * (color[1] - color0[1])) * 255.999999) << 16) |
+            (((color0[2] + f * (color[2] - color0[2])) * 255.999999) << 8) |
+            ((color0[3] + f * (color[3] - color0[3])) * 255.999999);
         c = "#" + p.toString(16).substr(1);
     }
 
