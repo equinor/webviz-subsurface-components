@@ -25,29 +25,40 @@ export function colorToString(
     cDefault: string
 ): string {
     if (!color) return cDefault;
-    // old code was based on following algorithm for every x component :
-    // c = Math.round(color[x] * 255) // component values from range [0.0, 1.0] is mapped to the range [0,255]
+    // old code 
     // const p =
     //    0x1000000 | // force value to have 7 hex digits : 1rrggbb
     //    (Math.round(color[0] * 255) << 16) |
     //    (Math.round(color[1] * 255) << 8) |
     //    Math.round(color[2] * 255);
+    // was based on following algorithm for every x component :
+    // c = Math.round(color[x] * 255) // component values from range [0.0, 1.0] is mapped to the range [0,255]
     // it results in: 
-    // [0.0, 0.5/255) = [0.0, 0.00196078431372549) => 0
-    // [0.5/255, 1.5/255) = [0.00196078431372549, 0.0058823529411764705) => 1
-    // [1.5/255, 2.5/255) = [0.0058823529411764705, 0.00980392156862745) => 2
+    // [0.0, 0.5/255)          => 0
+    // [0.5/255, 1.5/255)      => 1
+    // [1.5/255, 2.5/255)      => 2
     // ...
-    // [253.5/255, 254.5/255) = [0.9941176470588236, 0.9980392156862745) => 254
-    // [254.5/255, 1.0] = [0.9980392156862745, 1.0] => 255
+    // [253.5/255, 254.5/255)  => 254
+    // [254.5/255, 1.0]        => 255
     // but the first and the last subranges is 2 times smaller than another ones!
+    //
     //
     // So use more accurate algorithm for every x component :
     // 1) c=Math.floor(color[x] * 256) // make all component values from range [0.0, 1.0] to be mapped to the range [0,255] and only one value 1.0 is mapped to 256
+    // [0.0, 1/256)        => 0
+    // [1/256, 2/256)      => 1
+    // [2/256, 3/256)      => 2
+    // ...
+    // [254/256, 255/256)  => 254
+    // [255/256, 1.0)      => 255
+    // [1.0, 1.0]          => 256
+    // So we should add 
     //    if(c>255) c=255 // Special processing for component value 1.0.
+    //
     // 2) slighly decrease a factor 256 to exclude a need of special processing for component value 1.0.
     //    c=Math.floor(color[x] * 255.9999999999999) // make all component values from range [0.0, 1.0] to be mapped to the range [0,255]
     //           // because Math.floor(1.0*255.9999999999999) === 255
-    // 3) we do not need to call Math.floor() before shift or binary OR operations because these operators convert their operands to integers 
+    // 3) we do not need to call Math.floor() before Shift or Binary OR operations because these operators convert their operands to integers 
     const p =
         0x1000000 | // force value to have 7 hex digits : 1rrggbb
         ((color[0] * 255.999999) << 16) |
