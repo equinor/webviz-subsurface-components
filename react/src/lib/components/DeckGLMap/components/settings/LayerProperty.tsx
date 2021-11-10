@@ -21,15 +21,15 @@ interface Props {
 const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
     // Redux
     const dispatch = useDispatch();
-    const spec = useSelector((st: MapState) => st.spec);
+    const layers = useSelector((st: MapState) => st.layers);
 
     // states
     const [layerProps, setLayerProps] =
         React.useState<Record<string, unknown> | null>(null);
 
     React.useEffect(() => {
-        setLayerProps(getLayerProps(spec, layerId));
-    }, [spec, layerId]);
+        setLayerProps(getLayerProps(layers, layerId));
+    }, [layers, layerId]);
 
     // handlers
     const updateProp = useCallback(
