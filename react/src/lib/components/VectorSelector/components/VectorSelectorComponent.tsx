@@ -11,6 +11,10 @@ import {
     TreeDataNode,
     SmartNodeSelectorComponent,
 } from "@webviz/core-components";
+import {
+    KeyEventType,
+    Direction,
+} from "@webviz/core-components/dist/components/SmartNodeSelector/components/SmartNodeSelectorComponent";
 import VectorSelection from "../utils/VectorSelection";
 import VectorData from "../utils/VectorData";
 import aquifer from "./images/aquifer.svg";
@@ -256,6 +260,47 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
         };
 
         return populateData(treeData, 0);
+    }
+
+    handleArrowLeftKeyEvent(
+        e: React.KeyboardEvent<HTMLInputElement>,
+        eventType: KeyEventType
+    ): void {
+        const eventTarget = e.target as HTMLInputElement;
+        if (!eventTarget) {
+            return;
+        }
+        if (eventType === KeyEventType.KeyDown && !e.repeat) {
+            if (
+                e.shiftKey &&
+                eventTarget.selectionStart === 0 &&
+                eventTarget.selectionEnd === 0 &&
+                this.currentTagIndex() > 0
+            ) {
+                super.handleArrowLeftKeyEvent(e, eventType);
+                return;
+            } else {
+                if (
+                    eventTarget.selectionStart === 0 &&
+                    eventTarget.selectionEnd === 0
+                ) {
+                    if (
+                        this.currentNodeSelection() &&
+                        this.currentNodeSelection().getFocussedLevel() === 1
+                    ) {
+                        if (this.currentTagIndex() > 0) {
+                            this.decrementCurrentTagIndex(() => {
+                                this.focusCurrentTag(Direction.Right);
+                            });
+                        }
+                        e.preventDefault();
+                        return;
+                    }
+                }
+            }
+        }
+        super.handleArrowLeftKeyEvent(e, eventType);
+        return;
     }
 
     handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {

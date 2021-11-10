@@ -81,7 +81,9 @@ export default class VectorSelection extends TreeNodeSelection {
             if (super.getNodeName(focussedLevel) === "") {
                 super.setNodeName("", super.getNumMetaNodes() - 1);
             }
-            this.setFocussedLevel(focussedLevel - 2, true);
+            if (super.getNumMetaNodes() > 1) {
+                this.setFocussedLevel(focussedLevel - 2, true);
+            }
         } else {
             this.setFocussedLevel(focussedLevel - 1, true);
         }
@@ -90,13 +92,13 @@ export default class VectorSelection extends TreeNodeSelection {
 
     setFocussedLevel(index: number, includeMetaData = true): void {
         if (!includeMetaData) {
-            if (index == 0) {
+            if (index === 0) {
                 index = super.getNumMetaNodes();
             } else {
                 index = super.getNumMetaNodes() + index;
             }
         } else {
-            if (index == super.getNumMetaNodes() - 1) {
+            if (index === super.getNumMetaNodes() - 1) {
                 index = super.getNumMetaNodes() - 1;
             }
         }
