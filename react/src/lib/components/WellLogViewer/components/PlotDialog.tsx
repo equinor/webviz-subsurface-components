@@ -93,8 +93,6 @@ interface PlotPropertiesDialogProps {
     onOK: (templatePlot: TemplatePlot) => void;
     wellLogView: WellLogView;
     track: Track;
-    //type: string;
-    //plotName?: string;
 }
 interface PlotPropertiesDialogState extends TemplatePlot {
     open: boolean;
@@ -115,9 +113,9 @@ export class PlotPropertiesDialog extends Component<
               }
             : {
                   // we shold fill every posible state to allow this.setState() to set it
-                  type: "line", //??
-                  name: "DEPT", //??
-                  name2: "DVER", //?
+                  type: "line",
+                  name: "DEPT", //?? the first data in data selector ?? welllog[0].curves[0].name?
+                  name2: "DVER", //? the second data in data selector ??
 
                   color: "black", //??
                   fill: "red",

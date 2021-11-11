@@ -3,7 +3,7 @@
 import { setProps, setAttrs } from "@equinor/videx-wellog";
 import { LegendBounds } from "@equinor/videx-wellog/dist/utils/legend-helper";
 // eslint-disable-next-line
-declare type D3Selection = any; // not exported! import { D3Selection } from "@equinor/videx-wellog/dist/common/interfaces';
+declare type D3Selection = any; // not exported from videx-wellog! import { D3Selection } from "@equinor/videx-wellog/dist/common/interfaces';
 
 /**
  * Renders label, min/max values for domain and unit

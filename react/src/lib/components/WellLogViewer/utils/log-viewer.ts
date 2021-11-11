@@ -37,7 +37,7 @@ export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
     const currentZoom = Math.abs(b2 - b1) / Math.abs(d2 - d1);
-    // see also: const currentZoom = getContentZoom(logViewer);
+    // see also: getContentZoom(logViewer);
 
     const f = Math.abs(Math.log(currentZoom / zoom));
     if (f > 0.01) {
@@ -45,7 +45,6 @@ export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
         let d = (d2 - d1) * 0.5;
         const c = d1 + d;
         d = d * (currentZoom / zoom);
-        //console.log("c-d=" + (c-d) + " c+d=" + (c+d));
         logViewer.zoomTo([c - d, c + d]);
         return true;
     }
@@ -58,13 +57,10 @@ export function scrollContentTo(
 ): boolean {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
-    //console.log("b1=" + b1 + " b2=" + b2);
-    //console.log("d1=" + d1 + " d2=" + d2);
     const d = d2 - d1;
     const w = b2 - b1 - (d2 - d1);
 
     const c = b1 + f * w;
-    //console.log("c=" + c + " c+d=" + (c + d));
     if (c !== d1) {
         logViewer.zoomTo([c, c + d]);
         return true;
@@ -75,14 +71,12 @@ export function scrollContentTo(
 export function getContentScrollPos(logViewer: LogViewer): number /*fraction*/ {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
-
-    //console.log("b1=", b1, "b2=", b2);
-    //console.log("d1=", d1, "d2=", d2);
     const w = b2 - b1 - (d2 - d1);
     return w ? (d1 - b1) / w : 0;
 }
 
 export function getContentZoom(logViewer: LogViewer): number /*fraction*/ {
+    // see also zoomContent(logViewer)
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
     return Math.abs(b2 - b1) / Math.abs(d2 - d1);
@@ -94,7 +88,7 @@ export function scrollTracks(
     iTo: number
 ): boolean {
     let visibilityIsChanged = false;
-    let iTrack = 0; // non-scale tracks counter
+    let iTrack = 0; // non-scale (graph) tracks counter
     for (const track of logViewer.tracks) {
         if (isScaleTrack(track)) continue; // skip scales
 
@@ -103,7 +97,6 @@ export function scrollTracks(
 
         iTrack++;
     }
-    //console.log("::scrollTracks visibilityIsChanged=" + visibilityIsChanged);
     if (visibilityIsChanged) logViewer.updateTracks();
     return visibilityIsChanged;
 }

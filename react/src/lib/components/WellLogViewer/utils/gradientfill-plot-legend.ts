@@ -4,11 +4,11 @@ import { GradientFillPlotOptions } from "./gradientfill-plot";
 import GradientFillPlot from "./gradientfill-plot";
 import { setAttrs } from "@equinor/videx-wellog";
 
-/* missed exports from "@equinor/videx-wellog */
+/* Missed exports from "@equinor/videx-wellog !!! */
 // eslint-disable-next-line
 declare type D3Selection = any; //import { D3Selection } from "@equinor/videx-wellog/dist/common/interfaces';
 import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicPlotLegend } from "@equinor/videx-wellog/dist/plots/legend/common';
-/**/
+/* End of missed from "@equinor/videx-wellog */
 
 import { ColorTable } from "../components/ColorTableTypes";
 
@@ -86,7 +86,7 @@ export default function renderGradientFillPlotLegend(
             const id = createGradient(g, colorTable);
             fillInv = "url(#" + id + ")";
         }
-        /* end GradientFill code */
+        /* End GradientFill code */
 
         setAttrs(g.append("rect"), {
             x: left + 2,
@@ -113,7 +113,7 @@ export default function renderGradientFillPlotLegend(
             const id = createGradient(g, colorTable);
             fillNrm = "url(#" + id + ")";
         }
-        /* end GradientFill code */
+        /* End GradientFill code */
 
         setAttrs(g.append("rect"), {
             x: left + 2,

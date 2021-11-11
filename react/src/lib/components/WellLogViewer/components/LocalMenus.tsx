@@ -59,11 +59,6 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                 return { anchorEl: props.anchorEl };
             });
         }
-        /*if (
-            this.props.welllog !== prevProps.welllog ||
-            this.props.track !== prevProps.track
-        ) {
-        }*/
     }
 
     closeMenu(): void {

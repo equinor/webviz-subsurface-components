@@ -15,7 +15,6 @@ import {
     OverlayMouseMoveEvent,
     OverlayMouseExitEvent,
     OverlayRescaleEvent,
-    //LogControllerResizeEvent,
 } from "@equinor/videx-wellog/dist/ui/interfaces";
 
 import "./styles.scss";
@@ -230,9 +229,9 @@ function createScaleHandler(
         forward,
         reverse,
         forwardInterpolatedDomain: (domain) =>
-            domain.map((v) => /*forward(v)*/ secondary2primary(v, true)),
+            domain.map((v) => secondary2primary(v, true)),
         reverseInterpolatedDomain: (domain) =>
-            domain.map((v) => /*reverse(v)*/ primary2secondary(v, true)),
+            domain.map((v) => primary2secondary(v, true)),
     };
     return new InterpolatedScaleHandler(interpolator);
 }
@@ -255,14 +254,14 @@ function getValue(
                     const rowPrev = data[i - 1];
                     if (rowPrev[0] == null || rowPrev[1] == null) break;
                     if (type === "linestep") {
-                        v = row[1]; //!! not rPrev[1] !!
+                        v = row[1]; //!! not rowPrev[1] !!
                     } else {
                         const d = row[0] - rowPrev[0];
                         const f = x - rowPrev[0];
                         if (type === "dot") {
                             v = f < d * 0.5 ? rowPrev[1] : row[1];
                         } else {
-                            // "line", "area"
+                            // "line", "area", "gradientfill"
                             const mul = d ? (row[1] - rowPrev[1]) / d : 1.0;
                             v = f * mul + rowPrev[1];
                         }
@@ -398,7 +397,7 @@ interface Props {
     colorTables: ColorTable[];
     horizontal?: boolean;
     primaryAxis: string;
-    //setAvailableAxes : (scales: string[]) => void;
+
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
@@ -432,7 +431,7 @@ interface Props {
 interface State {
     infos: Info[];
 
-    scrollTrackPos: number; // the first track number
+    scrollTrackPos: number; // the first visible graph track number
 }
 
 class WellLogView extends Component<Props, State> implements WellLogController {
@@ -441,7 +440,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     constructor(props: Props) {
         super(props);
-        //alert("props=" + props)
 
         this.container = undefined;
         this.logController = undefined;
@@ -458,7 +456,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.onTrackContainerContextMenu.bind(this);
 
         if (this.props.onCreateController)
-            // set callback to component caller
+            // set callback to component's caller
             this.props.onCreateController(this);
     }
 
@@ -484,6 +482,12 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
     componentDidUpdate(prevProps: Props, prevState: State): void {
         // Typical usage (don't forget to compare props):
+        if (this.props.onCreateController !== prevProps.onCreateController) {
+            if (this.props.onCreateController)
+                // update callback to component's caller
+                this.props.onCreateController(this);
+        }
+
         let shouldSetTracks = false;
         if (this.props.horizontal !== prevProps.horizontal) {
             this.createLogViewer();
@@ -518,12 +522,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.scrollTrack();
             this.setInfo();
         }
-
-        /*??
-        if (this.props.onCreateController !== prevProps.onCreateController) {
-            if (this.props.onCreateController) // set callback to component caller
-                this.props.onCreateController(this);
-        }*/
     }
 
     createLogViewer(): void {
@@ -617,12 +615,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     scrollTrack(): void {
-        /*
-        const nGraphTracks = this._graphTrackMax();
-        let zoom = nGraphTracks / this._maxTrackNum();
-        if (zoom < 1) zoom = 1;
-        */
-
         const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
         if (this.logController) scrollTracks(this.logController, iFrom, iTo);
@@ -631,7 +623,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
     setInfo(x: number = Number.NaN, x2: number = Number.NaN): void {
         if (!this.props.onInfo) return; // no callback is given
-        if (!this.logController) return;
+        if (!this.logController) return; // not initialized yet
 
         const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
@@ -718,7 +710,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     _maxTrackNum(): number {
         return this.props.maxTrackNum
             ? this.props.maxTrackNum
-            : 7 /*some default value*/;
+            : 6 /*some default value*/;
     }
 
     scrollTrackTo(pos: number): boolean {

@@ -5,7 +5,7 @@ import WellLogView from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
-import Slider from "@material-ui/core/Slider"; // Zoom selector
+import Slider from "@material-ui/core/Slider"; // for Zoom value selector
 
 import { WellLog } from "./components/WellLogTypes";
 import { Template } from "./components/WellLogTemplateTypes";
@@ -111,8 +111,6 @@ function valueLabelFormat(value: number /*, index: number*/): string {
     return value.toFixed(Number.isInteger(value) || value > 20 ? 0 : 1);
 }
 
-//////////
-
 import { Info } from "./components/InfoTypes";
 
 interface Props {
@@ -183,8 +181,7 @@ class WellLogViewer extends Component<Props, State> {
             let primaryAxis = axes[0];
             if (this.props.template && this.props.template.scale.primary) {
                 if (axes.indexOf(this.props.template.scale.primary) < 0) {
-                    if (this.props.welllog === prevProps.welllog)
-                        return /* false*/; // nothing to update
+                    if (this.props.welllog === prevProps.welllog) return; // nothing to update
                 } else {
                     primaryAxis = this.props.template.scale.primary;
                 }
@@ -197,33 +194,33 @@ class WellLogViewer extends Component<Props, State> {
         }
     }
 
-    // callback function
+    // callback function from WellLogView
     onInfo(infos: Info[]): void {
         this.setState({
             infos: infos,
         });
     }
-    // callback function from View
+    // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;
         this._enableScroll();
     }
-    // callback function from View
+    // callback function from WellLogView
     onScrollTrackPos(/*pos: number*/): void {
         this._enableScroll();
     }
-    // callback function from View
+    // callback function from WellLogView
     onZoomContent(zoom: number): boolean {
         this._enableScroll();
 
         let ret = false;
         if (Math.abs(Math.log(this.state.zoomContent / zoom)) > 0.01) {
-            this.setState({ zoomContent: zoom }); // for slider
+            this.setState({ zoomContent: zoom }); // for Zoom slider
             ret = true;
         }
         return ret;
     }
-    // callback function from Axis
+    // callback function from Axis selector
     onChangePrimaryAxis(value: string): void {
         this.setState({ primaryAxis: value });
     }
@@ -240,7 +237,6 @@ class WellLogViewer extends Component<Props, State> {
     }
     // callback function from Scroller
     onScrollerScroll(x: number, y: number): void {
-        // callback from scrollbar
         if (this.controller) {
             const fContent = this.props.horizontal ? x : y; // fraction
             this.controller.scrollContentTo(fContent);
@@ -355,10 +351,10 @@ WellLogViewer.propTypes = {
      */
     id: PropTypes.string.isRequired,
 
-    // TODO: Add doc
+    // TODO: Add documentation
     welllog: PropTypes.array,
 
-    // TODO: Add doc
+    // TODO: Add documentation
     template: PropTypes.object,
 };
 

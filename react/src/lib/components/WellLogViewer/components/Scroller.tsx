@@ -9,16 +9,6 @@ function getScrollbarSizes(): { vertical: number; horizontal: number } {
     //!!! outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
     document.body.appendChild(outer);
 
-    /* Old variant
-    // Creating inner element and placing it in the container
-    const inner = document.createElement("div");
-    outer.appendChild(inner);
-    // Calculating difference between container's full width and the child width
-    const vertical = outer.offsetWidth - inner.offsetWidth; // vertical scrollbar
-    const horizontal = outer.offsetHeight - inner.offsetHeight; // horizontal scrollbar
-    */
-
-    // New variant: scrollbarWidth = offsetWidth - clientWidth - getComputedStyle().borderLeftWidth - getComputedStyle().borderRightWidth
     const vertical = outer.offsetWidth - outer.clientWidth;
     const horizontal = outer.offsetHeight - outer.clientHeight;
 
@@ -108,7 +98,7 @@ class Scroller extends Component<Props> {
             elOuter.scrollLeft !== scrollLeft ||
             elOuter.scrollTop !== scrollTop
         ) {
-            elOuter.scrollTo(scrollLeft, scrollTop); //elOuter.scrollLeft = scrollLeft; elOuter.scrollTop = scrollTop;
+            elOuter.scrollTo(scrollLeft, scrollTop);
             return true;
         }
         return false;

@@ -25,12 +25,12 @@ export function colorToString(
     cDefault: string
 ): string {
     if (!color) return cDefault;
-    // old code
-    // const p =
-    //    0x1000000 | // force value to have 7 hex digits : 1rrggbb
-    //    (Math.round(color[0] * 255) << 16) |
-    //    (Math.round(color[1] * 255) << 8) |
-    //    Math.round(color[2] * 255);
+    // Old code
+    //    const p =
+    //      0x1000000 | // force value to have 7 hex digits : 1rrggbb
+    //      (Math.round(color[0] * 255) << 16) |
+    //      (Math.round(color[1] * 255) << 8) |
+    //      Math.round(color[2] * 255);
     // was based on following algorithm for every x component :
     // c = Math.round(color[x] * 255) // component values from range [0.0, 1.0] is mapped to the range [0,255]
     // it results in:
@@ -101,7 +101,7 @@ export function getInterpolatedColorString(
     if (j <= 0) c = cBelow;
     else if (j >= colors.length) c = cAbove;
     else {
-        // linear interpolate on interval [colors[j-1][0], colors[j-1][0]]
+        // linear interpolation on interval [colors[j-1][0], colors[j-1][0]]
         const color0 = colors[j - 1];
         const color = colors[j];
 

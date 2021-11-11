@@ -5,10 +5,8 @@ import {
     GraphTrack,
 } from "@equinor/videx-wellog";
 
-import {
-    LegendInfo /*,DifferentialPlotLegendInfo*/,
-} from "@equinor/videx-wellog/dist/plots/legend/interfaces";
-// import { DifferentialPlotOptions/*,AreaPlotOptions*/ } from "@equinor/videx-wellog/dist/plots/interfaces";
+import { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+
 import { GradientFillPlotOptions } from "./gradientfill-plot";
 export interface ExtPlotOptions
     extends GradientFillPlotOptions /*|DifferentialPlotOptions|AreaPlotOptions*/ {
@@ -57,7 +55,7 @@ function indexOfElementByName(array: Named[], name: string): number {
 
 function indexOfElementByNames(array: Named[], names: string[]): number {
     if (names) {
-        /* should be already in upper case */
+        /* names should be already in upper case */
         let i = 0;
         for (const element of array) {
             if (names.indexOf(element.name.toUpperCase()) >= 0) return i;
@@ -263,13 +261,11 @@ function getTemplatePlotProps(
     if (!options.color) options.color = generateColor();
 
     if (options.type === "area") {
-        // "area" plot
         if (!options.fill) {
             //options.fill = generateColor();
             options.fillOpacity = 0.0;
         }
     } else if (options.type === "gradientfill") {
-        // "area" plot
         if (!options.colorTable) {
             //options.fill = generateColor();
             options.fillOpacity = 0.0;
@@ -335,8 +331,7 @@ function getColorTable(
 ): ColorTable | undefined {
     if (id && typeof id !== "string") {
         console.log("colorTable id='" + id + "' is not string");
-        //return id;
-        return /*undefined;*/ defColorTable;
+        return defColorTable;
     }
     if (id && colorTables) {
         for (let i = 0; i < colorTables.length; i++) {
@@ -345,7 +340,7 @@ function getColorTable(
         console.log(
             "colorTable id='" + id + "' is not found in getColorTable()"
         );
-        return /*undefined;*/ defColorTable;
+        return defColorTable;
     }
     if (id && !colorTables)
         console.log("colorTables is not given in getColorTable()");
@@ -469,9 +464,12 @@ export function addGraphTrackPlot(
             );
 
             const iCurve = indexOfElementByName(curves, templatePlot.name);
+            if (iCurve < 0) console.log("iCurve < 0");
             const curve = curves[iCurve];
 
-            // TODO: check curve.dimensions !== 1 && curve.valueType === "string"
+            if (curve.dimensions !== 1) console.log("curve.dimensions !== 1");
+            if (curve.valueType === "string")
+                console.log('curve.valueType === "string"');
 
             const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
             checkMinMax(minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
@@ -498,7 +496,7 @@ export function addGraphTrackPlot(
                 checkMinMax(minmax, plotData2.minmax);
             }
 
-            // make full props
+            // Make full props
             const templatePlotProps = getTemplatePlotProps(
                 templatePlot,
                 /*templateStyles*/ []
@@ -516,7 +514,6 @@ export function addGraphTrackPlot(
                 plotDatas.length + 1
             );
 
-            //checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
             plotDatas.push(plotData.data);
             if (plotData2) {
                 plotDatas.push(plotData2.data);
@@ -532,7 +529,7 @@ export function addGraphTrackPlot(
             if (plot) {
                 plots.push(plot);
 
-                track.prepareData(); //
+                track.prepareData();
             }
         }
     }
@@ -542,7 +539,7 @@ export function addGraphTrackPlot(
 export function editGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
-    name: string, //plot: Plot,
+    name: string,
     templatePlot: TemplatePlot
 ): void {
     removeGraphTrackPlot(wellLogView, track, name);
@@ -561,14 +558,6 @@ export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
         }
         index++;
     }
-
-    /*
-    (track as GraphTrack).prepareData(); //
-
-    if (wellLogView.logController) {
-        wellLogView.logController.updateTracks();
-    }
-    */
     return index;
 }
 
@@ -583,20 +572,18 @@ export function removeGraphTrackPlot(
             const curves = welllog[0].curves;
             const iCurve = indexOfElementByName(curves, name);
 
-            //let plotDatas = track.options.data
             const plots = (track as GraphTrack).plots;
 
             let index = 0;
             for (const plot of plots) {
                 if ((plot.id as number) === iCurve) {
-                    //plotDatas.splice(index, 1)
                     plots.splice(index, 1);
                     break;
                 }
                 index++;
             }
 
-            (track as GraphTrack).prepareData(); //
+            (track as GraphTrack).prepareData();
         }
     }
 }
@@ -699,7 +686,6 @@ export function createTracks(
             if (iSecondaryAxis >= 0) {
                 info.tracks.push(
                     newDualScaleTrack(
-                        //info.tracks.length,
                         0,
                         titlePrimaryAxis,
                         curvePrimaryAxis.name,
@@ -711,7 +697,6 @@ export function createTracks(
                 const curveSecondaryAxis = curves[iSecondaryAxis];
                 info.tracks.push(
                     newDualScaleTrack(
-                        //info.tracks.length,
                         1,
                         titleSecondaryAxis,
                         curveSecondaryAxis.name,
@@ -724,9 +709,6 @@ export function createTracks(
                 {
                     let count = 0;
                     for (const row of data) {
-                        //if (row[iSecondaryAxis] !== null) // DEBUG: make TVD more non-linear
-                        //    row[iSecondaryAxis] += 150 * Math.sin((row[iSecondaryAxis] - data[0][iSecondaryAxis])*0.01)
-
                         const secondary: number = row[iSecondaryAxis];
                         checkMinMaxValue(info.minmaxSecondaryAxis, secondary);
 
@@ -748,7 +730,6 @@ export function createTracks(
             } else {
                 info.tracks.push(
                     newScaleTrack(
-                        //info.tracks.length,
                         titlePrimaryAxis,
                         curvePrimaryAxis.name,
                         curvePrimaryAxis.unit
@@ -766,7 +747,7 @@ export function createTracks(
                 const curve = curves[iCurve];
 
                 if (curve.dimensions !== 1) continue;
-                if (curve.valueType === "string") continue; //??
+                if (curve.valueType === "string") continue;
 
                 const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
                 checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);

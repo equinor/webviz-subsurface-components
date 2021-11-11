@@ -5,7 +5,7 @@ export type TemplatePlotProps = {
     color: string;
     inverseColor?: string;
 
-    fill?: string; // for 'area'
+    fill?: string; // for 'area' plot
     fillOpacity?: number; // for 'area' and 'gradientfill' plots! default 0.25
     colorTable?: string; // table id (name) for 'gradientfill' plot
     inverseColorTable?: string; // table id (name) for 'gradientfill' plot
