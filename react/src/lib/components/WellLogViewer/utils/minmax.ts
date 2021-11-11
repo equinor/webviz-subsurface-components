@@ -17,14 +17,15 @@ export function checkMinMax(
     if (minmax[0] === Number.POSITIVE_INFINITY) {
         minmax[0] = minmaxSrc[0];
         minmax[1] = minmaxSrc[1];
-    } else if (minmax[0] > minmaxSrc[0]) minmax[0] = minmaxSrc[0];
-    else if (minmax[1] < minmaxSrc[1]) minmax[1] = minmaxSrc[1];
+    } else {
+        if (minmax[0] > minmaxSrc[0]) minmax[0] = minmaxSrc[0];
+        if (minmax[1] < minmaxSrc[1]) minmax[1] = minmaxSrc[1];
+    }
 }
 
 export function roundMinMax(minmax: [number, number]): [number, number] {
-    //const kmax = 7; const kmin = 5;
-    const kmin = 6;
-    const kmax = 9;
+    const kmin = 6; // a minimal number of intervals
+    const kmax = 9; // a maximal number of intervals
 
     if (!isFinite(minmax[0]) || !isFinite(minmax[1]))
         return [minmax[0], minmax[1]];
@@ -97,5 +98,15 @@ export function roundMinMax(minmax: [number, number]): [number, number] {
     }
     const a = k1 * d + c,
         b = k2 * d + c;
+    return [parseFloat(a.toPrecision(5)), parseFloat(b.toPrecision(5))];
+}
+
+export function roundLogMinMax(minmax: [number, number]): [number, number] {
+    const a = minmax[0],
+        b = minmax[1];
+    /* TODO: make Log version
+      const ret = roundMinMax([Math.log10(minmax[0]), Math.log10(minmax[1])]);
+      const a=Math.pow(10, ret[0]), b=Math.pow(10, ret[1]);
+      */
     return [parseFloat(a.toPrecision(5)), parseFloat(b.toPrecision(5))];
 }
