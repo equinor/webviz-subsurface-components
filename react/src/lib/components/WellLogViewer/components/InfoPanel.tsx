@@ -1,12 +1,6 @@
 import React, { Component, ReactNode } from "react";
 
-interface Info {
-    name?: string;
-    units?: string;
-    color: string;
-    value: string;
-    type: string; // "seperator"; "line", "linestep", "area", "dot"
-}
+import { Info } from "./InfoTypes";
 
 interface Props {
     header: string;
@@ -17,7 +11,6 @@ function createSeparator() {
     return (
         <tr key={"separator"}>
             {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
-
             <td colSpan={4}>
                 {" "}
                 <hr />
@@ -32,9 +25,8 @@ function createRow(info: Info) {
         return createSeparator();
 
     return (
-        <tr key={info.name}>
+        <tr key={info.track_id + "." + info.name}>
             {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
-
             {/*info.type*/}
             <td style={{ color: info.color }}>{"\u2B24" /*big circle*/}</td>
             <td>{info.name}</td>
@@ -45,13 +37,28 @@ function createRow(info: Info) {
                     textAlign: "right",
                 }}
             >
-                {info.value}
+                {formatValue(info.value)}
             </td>
             <td style={{ paddingLeft: "1em", fontSize: "x-small" }}>
                 {info.units}
             </td>
         </tr>
     );
+}
+
+function formatValue(v1: number) {
+    if (!Number.isFinite(v1)) return "";
+    let v = v1.toPrecision(4);
+    if (v.indexOf(".") >= 0) {
+        // cut trailing zeroes
+        for (;;) {
+            let l = v.length;
+            if (!l--) break;
+            if (v[l] !== "0") break;
+            v = v.substring(0, l);
+        }
+    }
+    return v;
 }
 
 class InfoPanel extends Component<Props> {

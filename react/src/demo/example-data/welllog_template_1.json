@@ -6,13 +6,10 @@
   },
   "tracks": [
     {
-      "title": "Multiple",
+      "title":  "Multiple",
       "plots": [
         {
-          "name": "BDIA"
-        },
-        {
-          "name": "ROPA"
+          "name": "MDIA"
         },
         {
           "name": "HKLA",
@@ -21,18 +18,49 @@
       ]
     },
     {
+      "title": "Area",
+      "plots": [
+        {
+          "name": "HKLA",
+          "style": "HKL",
+          "type": "area",
+          "color": "blue",
+          "fill": "red",
+          "inverseColor": "green"
+        }
+      ]
+    },
+    {
+      "title": "Differential",
       "plots": [
         {
           "name": "HKLX",
-          "style": "HKL"
+          "name2": "HKLA",
+          "type": "differential",
+          "scale": "linear",
+          "color": "blue",
+          "color2": "orange",
+          "fill": "green",
+          "fill2": "red"
+        }
+      ]
+    },
+    {
+      "title": "Gradient Fill & inverse",
+      "plots": [
+        {
+          "name": "HKLA",
+          "type": "gradientfill",
+          "color": "blue",
+          "colorTable": "Physics",
+          "inverseColorTable": "Physics reverse"
         }
       ]
     },
     {
       "plots": [
         {
-          "name": "WOBA",
-          "type": "linestep"
+          "name": "MFOA"
         }
       ]
     },
@@ -91,13 +119,6 @@
     {
       "plots": [
         {
-          "name": "MFOA"
-        }
-      ]
-    },
-    {
-      "plots": [
-        {
           "name": "MFIA",
           "type": "dot"
         }
@@ -107,7 +128,7 @@
       "plots": [
         {
           "name": "MDOA",
-          "type": "linestep"
+          "style": "MD"
         }
       ]
     },
@@ -115,7 +136,7 @@
       "plots": [
         {
           "name": "MDIA",
-          "type": "linestep"
+          "style": "MD"
         }
       ]
     },
@@ -172,7 +193,16 @@
   "styles": [
     {
       "name": "HKL",
-      "type": "area"
+      "scale": "linear",
+      "type": "gradientfill",
+      "colorTable": "Physics",
+      "color": "green"
+    },
+    {
+      "name": "MD",
+      "type": "area",
+      "color": "blue",
+      "fill": "green"
     }
   ]
 }
