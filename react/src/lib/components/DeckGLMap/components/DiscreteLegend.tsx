@@ -59,9 +59,12 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
             // eslint-disable-next-line
             let code = (discreteData as { [key: string]: any })[key][1]
             // from color table
-            const colorArrays = colorTableData[0].colors.find((value: any) => 
-                { return value[0] == code })
-            const splicedData = colorArrays
+            const colorArrays = colorTableData[0].colors.find(
+                (value: number[]) => {
+                    return value[0] == code;
+                }
+            );
+            const splicedData = colorArrays;
             itemColor.push({
                 color: RGBToHex(splicedData),
             });

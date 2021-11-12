@@ -300,7 +300,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 <DiscreteColorLegend
                     discreteData={legendProps.metadata}
                     dataObjectName={legendProps.title}
-                    logName= {legendProps.logName}
+                    logName={legendProps.logName}
                     position={legend.position}
                 />
             )}
