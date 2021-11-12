@@ -28,6 +28,8 @@ jobs:
           - python-version: 3.8
             run-performance-tests: false
           - python-version: 3.9
+            run-performance-tests: false
+          - python-version: 3.9 # This particular job in the matrix is allowed to fail(for performance test)
             run-performance-tests: true
 
     steps:
