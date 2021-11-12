@@ -21,6 +21,28 @@ import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const colorTemplate = require("../../../../../demo/example-data/welllayer_discrete_template.json");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const colorTables = require("../../../../../demo/example-data/color-tables.json");
+
+interface colorTablesObj {
+    name: string;
+    description: string;
+    colors: [number, number, number, number][];
+}
+
+interface colorTemplatePropertiesObj {
+    objectName: string;
+    colorTable: string;
+    context: string;
+    colorInterpolation: string;
+}
+
+interface colorTemplate {
+    name: string;
+    properties: Array<colorTemplatePropertiesObj>;
+}
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -359,14 +381,30 @@ function getLogColor(
             }
         });
     } else {
+        const properties = colorTemplate[0]["properties"];
+        const propertiesData = properties.filter(
+            (value: colorTemplatePropertiesObj) => value.objectName == log_name
+        );
+        const colorTableData = colorTables.filter(
+            (value: colorTablesObj) => value.name == propertiesData[0].colorTable
+        );
+
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
+        const attributesObject: {[key: string]: any}  = { }
+        Object.keys(log_attributes).forEach((key) => {
+            let code = log_attributes[key][1]
+            const colorArrays: any | unknown = colorTableData[0].colors.find((value: any) => { 
+                return value[0] == code 
+            })
+            attributesObject[key]=[[colorArrays[1],colorArrays[2],colorArrays[3]], code]
+        });
         log_data.forEach((log_value) => {
-            const dl_attrs = Object.entries(log_attributes).find(
+            const dl_attrs = Object.entries(attributesObject).find(
                 ([, value]) => value[1] == log_value
             )?.[1];
             dl_attrs
                 ? log_color.push(dl_attrs[0])
-                : log_color.push([0, 0, 0, 0]);
+                : log_color.push([0, 0, 0]);
         });
     }
     return log_color;

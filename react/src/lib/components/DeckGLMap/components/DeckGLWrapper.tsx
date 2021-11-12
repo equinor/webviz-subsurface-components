@@ -192,11 +192,13 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
     const [legendProps, setLegendProps] = React.useState<{
         title: string;
+        logName: string;
         discrete: boolean;
         metadata: { objects: Record<string, [number[], number]> };
         valueRange: number[];
     }>({
         title: "",
+        logName: "",
         discrete: false,
         metadata: { objects: {} },
         valueRange: [],
@@ -228,6 +230,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 title: title,
                 discrete: true,
                 metadata: metadataDiscrete,
+                logName: logName,
                 valueRange: [],
             });
         } else {
@@ -242,6 +245,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
             setLegendProps({
                 title: title,
+                logName: logName,
                 discrete: false,
                 metadata: { objects: {} },
                 valueRange: [Math.min(...minArray), Math.max(...maxArray)],
@@ -296,6 +300,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 <DiscreteColorLegend
                     discreteData={legendProps.metadata}
                     dataObjectName={legendProps.title}
+                    logName= {legendProps.logName}
                     position={legend.position}
                 />
             )}

@@ -1,0 +1,47 @@
+[  
+    {
+        "name": "Discrete Template",
+        "properties": [
+            {
+                "objectName" : "ZONELOG",
+                "colorTable" : "ZonelogData",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "RDE_ORIG",
+                "colorTable" : "RdeOrigData",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "FACIES",
+                "colorTable" : "FaciesData",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "ZONE_MAIN",
+                "colorTable" : "ZoneMainData",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "FaultDistance_HUM",
+                "colorTable" : "FaultDistanceHumData",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "FAULT_PROXIMITY_FLAG",
+                "colorTable" : "FaultProximityFlagData",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "FACIES_NoCalcite",
+                "colorTable" : "FaciesNoCalciteData",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "RDE",
+                "colorTable" : "RdeData",
+                "context" : "wells-layer"
+            }
+        ]
+    }
+]
