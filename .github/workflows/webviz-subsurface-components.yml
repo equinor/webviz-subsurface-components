@@ -21,7 +21,14 @@ jobs:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
         include:
-          - run-performance-tests: true
+          - python-version: 3.6
+            run-performance-tests: false
+          - python-version: 3.7
+            run-performance-tests: false
+          - python-version: 3.8
+            run-performance-tests: false
+          - python-version: 3.9
+            run-performance-tests: true
 
     steps:
       - name: 📖 Checkout commit locally
