@@ -13,6 +13,7 @@ import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
+import { colorsArray } from "../utils/continuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer } from "../layers";
 import { getLogValues, LogCurveDataType } from "../layers/wells/wellsLayer";
@@ -189,7 +190,9 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     );
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
-
+    const [colorsArrays, setcolorsArrays] = React.useState<
+        [number, number, number, number][]
+    >([]);
     const [legendProps, setLegendProps] = React.useState<{
         title: string;
         discrete: boolean;
@@ -246,6 +249,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 metadata: { objects: {} },
                 valueRange: [Math.min(...minArray), Math.max(...maxArray)],
             });
+            setcolorsArrays(colorsArray(wellsLayer?.props?.logName));
         }
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
@@ -307,6 +311,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         max={legendProps.valueRange[1]}
                         dataObjectName={legendProps.title}
                         position={legend.position}
+                        colorTableColors={colorsArrays}
                     />
                 )}
             {deckGLLayers && (
