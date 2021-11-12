@@ -47,7 +47,9 @@ import {
     scrollContentTo,
     getContentScrollPos,
     getContentZoom,
-    scrollTracks,
+    scrollTracksTo,
+    isTrackSelected,
+    selectTrack,
 } from "../utils/log-viewer";
 
 function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
@@ -295,15 +297,52 @@ function setTracksToController(
     logController.setTracks(tracks);
 }
 
-function addTrackContextMenu(
+function addTrackEventListner(
+    type: /*string, */ "click" | "contextmenu" | "dblclick",
+    area: /*string, */ "title" | "legend" | "container",
     element: HTMLElement,
     track: Track,
     func: (ev: TrackEvent) => void
 ): void {
-    element.addEventListener("contextmenu", (ev: MouseEvent) => {
-        func({ track: track, element: element, ev: ev });
+    element.addEventListener(type, (ev: Event) => {
+        func({
+            track: track,
+            element: element,
+            ev: ev,
+            type: type,
+            area: area,
+        });
         ev.preventDefault();
     });
+}
+
+const types: ("contextmenu" | "click" | "dblclick")[] = [
+    "contextmenu",
+    "click",
+    "dblclick",
+];
+const areas: ("title" | "legend" | "container")[] = [
+    "title",
+    "legend",
+    "container",
+];
+function addTrackEventHandlers(
+    elm: HTMLElement,
+    track: Track,
+    func: (ev: TrackEvent) => void
+): void {
+    for (const area of areas) {
+        const elements = elm.getElementsByClassName("track-" + area);
+        for (const element of elements)
+            for (const type of types)
+                addTrackEventListner(
+                    type,
+                    area,
+                    element as HTMLElement,
+                    track,
+                    func
+                );
+    }
 }
 
 function fillInfos(
@@ -369,10 +408,12 @@ function fillInfos(
     return infos;
 }
 
-interface TrackEvent {
+export interface TrackEvent {
     track: Track;
+    type: /*string, */ "click" | "contextmenu" | "dblclick";
+    area: /*string, */ "title" | "legend" | "container";
     element: HTMLElement;
-    ev: MouseEvent;
+    ev: /*Mouse*/ Event;
 }
 
 export interface WellLogController {
@@ -407,21 +448,7 @@ interface Props {
     onInfo?: (infos: Info[]) => void;
     onCreateController?: (controller: WellLogController) => void;
 
-    onLocalMenuTitle?: (
-        parent: HTMLElement,
-        track: Track,
-        wellLogView: WellLogView
-    ) => void;
-    onLocalMenuLegend?: (
-        parent: HTMLElement,
-        track: Track,
-        wellLogView: WellLogView
-    ) => void;
-    onLocalMenuContainer?: (
-        parent: HTMLElement,
-        track: Track,
-        wellLogView: WellLogView
-    ) => void;
+    onTrackEvent?: (wellLogView: WellLogView, ev: TrackEvent) => void;
 
     onScrollTrackPos?: (pos: number) => void;
     onZoomContent?: (zoom: number) => void;
@@ -449,11 +476,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             scrollTrackPos: props.scrollTrackPos ? props.scrollTrackPos : 0,
         };
 
-        this.onTrackTitleContextMenu = this.onTrackTitleContextMenu.bind(this);
-        this.onTrackLegendContextMenu =
-            this.onTrackLegendContextMenu.bind(this);
-        this.onTrackContainerContextMenu =
-            this.onTrackContainerContextMenu.bind(this);
+        this.onTrackEvent = this.onTrackEvent.bind(this);
 
         if (this.props.onCreateController)
             // set callback to component's caller
@@ -534,14 +557,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         }
         if (this.container) {
             // create new LogViewer
-            const addTrackContextMenus = this.addTrackContextMenus.bind(this);
             this.logController = new LogViewer({
                 showLegend: true,
                 horizontal: this.props.horizontal,
-
-                onTrackEnter: function (elm: HTMLElement, track: Track): void {
-                    addTrackContextMenus(elm, track);
-                },
+                onTrackEnter: (elm: HTMLElement, track: Track) =>
+                    addTrackEventHandlers(elm, track, this.onTrackEvent),
             });
 
             this.logController.init(this.container);
@@ -583,6 +603,24 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(); // Clear old track information
     }
 
+    isTrackSelected(track: Track): boolean {
+        return (
+            !!this.logController && isTrackSelected(this.logController, track)
+        );
+    }
+
+    selectTrack(track: Track, selected: boolean): void {
+        if (this.logController)
+            for (const _track of this.logController.tracks) {
+                // single lecetion: remove selection from another tracks
+                selectTrack(
+                    this.logController,
+                    _track,
+                    selected && track === _track
+                );
+            }
+    }
+
     addGraphTrackPlot(track: GraphTrack, templatePlot: TemplatePlot): void {
         const minmaxPrimaryAxis = addGraphTrackPlot(this, track, templatePlot);
         if (this.logController) {
@@ -617,7 +655,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     scrollTrack(): void {
         const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
-        if (this.logController) scrollTracks(this.logController, iFrom, iTo);
+        if (this.logController) scrollTracksTo(this.logController, iFrom, iTo);
 
         if (this.props.onScrollTrackPos) this.props.onScrollTrackPos(iFrom);
     }
@@ -641,52 +679,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.onScrollContentPos) this.props.onScrollContentPos(pos);
     }
 
-    _addTrackContextMenu(
-        elm: HTMLElement,
-        className: string,
-        func: (ev: TrackEvent) => void,
-        track: Track
-    ): void {
-        if (!this.logController || !this.logController.container) return;
-        const elements = elm.getElementsByClassName(className);
-        for (const element of elements) {
-            addTrackContextMenu(element as HTMLElement, track, func);
-        }
+    onTrackEvent(ev: TrackEvent): void {
+        if (this.props.onTrackEvent) this.props.onTrackEvent(this, ev);
     }
-
-    addTrackContextMenus(elm: HTMLElement, track: Track): void {
-        this._addTrackContextMenu(
-            elm,
-            "track-title",
-            this.onTrackTitleContextMenu,
-            track
-        );
-        this._addTrackContextMenu(
-            elm,
-            "track-legend",
-            this.onTrackLegendContextMenu,
-            track
-        );
-        this._addTrackContextMenu(
-            elm,
-            "track-container",
-            this.onTrackContainerContextMenu,
-            track
-        );
-    }
-    onTrackTitleContextMenu(ev: TrackEvent): void {
-        if (this.logController && this.props.onLocalMenuTitle)
-            this.props.onLocalMenuTitle(ev.element, ev.track, this);
-    }
-    onTrackLegendContextMenu(ev: TrackEvent): void {
-        if (this.logController && this.props.onLocalMenuLegend)
-            this.props.onLocalMenuLegend(ev.element, ev.track, this);
-    }
-    onTrackContainerContextMenu(ev: TrackEvent): void {
-        if (this.logController && this.props.onLocalMenuContainer)
-            this.props.onLocalMenuContainer(ev.element, ev.track, this);
-    }
-
     _graphTrackMax(): number {
         // for scrollbar
         if (!this.logController) return 0;

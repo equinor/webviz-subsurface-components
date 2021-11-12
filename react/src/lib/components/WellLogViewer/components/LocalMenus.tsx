@@ -41,7 +41,7 @@ function getPlotTitle(plot: Plot): string {
         if (legend2.serie1 && legend2.serie1.label)
             title = legend2.serie1.label;
         if (legend2.serie2 && legend2.serie2.label)
-            title += " \u2013 " + legend2.serie2.label;
+            title += " \u2013 " /*ndash*/ + legend2.serie2.label;
     }
     return title;
 }
@@ -191,6 +191,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         //newDualScaleTrack
         const trackNew = newGraphTrack("new Track", [], []);
         this.props.wellLogView.addTrack(trackNew, this.props.track, true);
+        this.props.wellLogView.selectTrack(trackNew, true);
     }
     removeTrack(): void {
         this.props.wellLogView.removeTrack(this.props.track);

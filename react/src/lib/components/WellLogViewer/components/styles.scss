@@ -4,6 +4,8 @@
 @import '@equinor/videx-wellog/dist/styles/scale-styles.scss';
 
 
+$scale_slave_scale_bg: #ff0000;
+
 .welllogview { // log-controller
   height: inherit;
   .track {
@@ -13,5 +15,11 @@
       color: black;
       font-family: inherit;
     }
+  }
+  .selected {
+    background-color: rgba(255,128,0,0.1);
+  }
+  .slave-scale {
+    background-color: rgba(255,255,255,0.0235);
   }
 }

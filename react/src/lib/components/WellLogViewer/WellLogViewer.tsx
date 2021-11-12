@@ -1,7 +1,9 @@
 import React, { Component, ReactNode } from "react";
 
 import PropTypes from "prop-types";
+
 import WellLogView from "./components/WellLogView";
+import { TrackEvent } from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
@@ -47,65 +49,32 @@ const axisMnemos: Record<string, string[]> = {
 import ReactDOM from "react-dom";
 
 import { SimpleMenu } from "./components/LocalMenus";
-import { Track } from "@equinor/videx-wellog";
-function localMenuTitle(
-    parent: HTMLElement,
-    track: Track,
-    wellLogView: WellLogView
-) {
-    const el: HTMLElement = document.createElement("div");
-    el.style.width = "10px";
-    el.style.height = "13px";
-    parent.appendChild(el);
-    ReactDOM.render(
-        <SimpleMenu
-            type="title"
-            anchorEl={el}
-            wellLogView={wellLogView}
-            track={track}
-        />,
-        el
-    );
-}
-function localMenuLegend(
-    parent: HTMLElement,
-    track: Track,
-    wellLogView: WellLogView
-) {
-    const el: HTMLElement = document.createElement("div");
-    el.style.width = "10px";
-    el.style.height = "3px";
-    parent.appendChild(el);
-    ReactDOM.render(
-        <SimpleMenu
-            type="legend"
-            anchorEl={el}
-            wellLogView={wellLogView}
-            track={track}
-        />,
-        el
-    );
-}
-function localMenuContainer(
-    parent: HTMLElement,
-    track: Track,
-    wellLogView: WellLogView
-) {
-    const el: HTMLElement = document.createElement("div");
-    el.style.width = "10px";
-    el.style.height = "3px";
-    parent.appendChild(el);
-    ReactDOM.render(
-        <SimpleMenu
-            type="container"
-            anchorEl={el}
-            wellLogView={wellLogView}
-            track={track}
-        />,
-        el
-    );
-}
 
+function onTrackEvent(wellLogView: WellLogView, ev: TrackEvent) {
+    const track = ev.track;
+
+    if (ev.type === "click") {
+        wellLogView.selectTrack(track, !wellLogView.isTrackSelected(track));
+    } else if (ev.type === "dblclick") {
+        wellLogView.selectTrack(track, true);
+        alert("track prop=" + ev.area);
+    } else if (ev.type === "contextmenu") {
+        wellLogView.selectTrack(track, true);
+        const el: HTMLElement = document.createElement("div");
+        el.style.width = "10px";
+        el.style.height = ev.area === "title" ? "3px" : "3px";
+        ev.element.appendChild(el);
+        ReactDOM.render(
+            <SimpleMenu
+                type={ev.area}
+                anchorEl={el}
+                wellLogView={wellLogView}
+                track={track}
+            />,
+            el
+        );
+    }
+}
 ///////////
 function valueLabelFormat(value: number /*, index: number*/): string {
     return value.toFixed(Number.isInteger(value) || value > 20 ? 0 : 1);
@@ -296,9 +265,7 @@ class WellLogViewer extends Component<Props, State> {
                         axisMnemos={axisMnemos}
                         onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
-                        onLocalMenuTitle={localMenuTitle}
-                        onLocalMenuLegend={localMenuLegend}
-                        onLocalMenuContainer={localMenuContainer}
+                        onTrackEvent={onTrackEvent}
                         onScrollTrackPos={this.onScrollTrackPos}
                         onZoomContent={this.onZoomContent}
                     />
