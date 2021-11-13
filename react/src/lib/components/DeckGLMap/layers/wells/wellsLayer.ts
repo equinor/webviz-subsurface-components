@@ -170,6 +170,11 @@ export default class WellsLayer extends CompositeLayer<
                     getColor: [this.props.logName],
                     getWidth: [this.props.logName, this.props.logRadius],
                 },
+                onDataLoad: (value: LogCurveDataType) => {
+                    this.setState({
+                        legend: legendData(value, this.props.logName),
+                    });
+                },
             })
         );
 
@@ -562,4 +567,38 @@ function getLogProperty(
             well_object?.properties?.["color"]
         );
     } else return null;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function legendData(logs: any, logName: string) {
+    const logData = logs[0];
+    const logInfo = getLogInfo(logData, logData.header.name, logName);
+    const title = "Wells / " + logName;
+    const legendProps = [];
+    if (logInfo?.description == "discrete") {
+        const meta = logData["metadata_discrete"];
+        const metadataDiscrete = meta[logName].objects;
+        legendProps.push({
+            title: title,
+            discrete: true,
+            metadata: metadataDiscrete,
+            valueRange: [],
+        });
+        return legendProps;
+    } else {
+        const minArray: number[] = [];
+        const maxArray: number[] = [];
+        logs.forEach(function (log: LogCurveDataType) {
+            const logValues = getLogValues(log, log.header.name, logName);
+            minArray.push(Math.min(...logValues));
+            maxArray.push(Math.max(...logValues));
+        });
+        legendProps.push({
+            title: title,
+            discrete: false,
+            metadata: { objects: {} },
+            valueRange: [Math.min(...minArray), Math.max(...maxArray)],
+        });
+        return legendProps;
+    }
 }

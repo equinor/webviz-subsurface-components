@@ -8,14 +8,13 @@ import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { updateLayerProp } from "../redux/actions";
-import { WellsPickInfo, getLogInfo } from "../layers/wells/wellsLayer";
+import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer } from "../layers";
-import { getLogValues, LogCurveDataType } from "../layers/wells/wellsLayer";
 import { Layer } from "deck.gl";
 
 export interface DeckGLWrapperProps {
@@ -214,39 +213,13 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     // Get color table for log curves.
     React.useEffect(() => {
         if (!wellsLayer?.isLoaded) return;
-        const logName = wellsLayer.props.logName;
-        const pathLayer = wellsLayer.internalState.subLayers[1];
-        if (!pathLayer.isLoaded) return;
-        const logs = pathLayer?.props.data;
-        const logData = logs[0];
-        const logInfo = getLogInfo(logData, logData.header.name, logName);
-        const title = "Wells / " + logName;
-        if (logInfo?.description == "discrete") {
-            const meta = logData["metadata_discrete"];
-            const metadataDiscrete = meta[logName].objects;
-            setLegendProps({
-                title: title,
-                discrete: true,
-                metadata: metadataDiscrete,
-                valueRange: [],
-            });
-        } else {
-            const minArray: number[] = [];
-            const maxArray: number[] = [];
-            logs.forEach(function (log: LogCurveDataType) {
-                const logValues = getLogValues(log, log.header.name, logName);
-
-                minArray.push(Math.min(...logValues));
-                maxArray.push(Math.max(...logValues));
-            });
-
-            setLegendProps({
-                title: title,
-                discrete: false,
-                metadata: { objects: {} },
-                valueRange: [Math.min(...minArray), Math.max(...maxArray)],
-            });
-        }
+        const legend = wellsLayer.state.legend[0];
+        setLegendProps({
+            title: legend.title,
+            discrete: legend.discrete,
+            metadata: legend.metadata,
+            valueRange: legend.valueRange,
+        });
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
