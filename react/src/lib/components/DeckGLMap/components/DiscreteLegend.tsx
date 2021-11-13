@@ -44,30 +44,24 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     React.useEffect(() => {
         discreteLegend("#legend");
     }, [discreteData]);
-    const properties = colorTemplate[0]["properties"];
-    const propertiesData = properties.filter(
-        (value: colorTemplatePropertiesObj) => value.objectName == logName
-    );
-    const colorTableData = colorTables.filter(
-        (value: colorTablesObj) => value.name == propertiesData[0].colorTable
-    );
+
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
-
+        const colorsArrayData: [number, number, number, number][] =
+            colorTableData(logName);
         Object.keys(discreteData).forEach((key) => {
             // eslint-disable-next-line
             let code = (discreteData as { [key: string]: any })[key][1]
             // from color table
-            const colorArrays = colorTableData[0].colors.find(
-                (value: number[]) => {
-                    return value[0] == code;
-                }
-            );
-            const splicedData = colorArrays;
-            itemColor.push({
-                color: RGBToHex(splicedData),
+            const colorArrays = colorsArrayData.find((value: number[]) => {
+                return value[0] == code;
             });
+            const splicedData = colorArrays;
+            if (splicedData)
+                itemColor.push({
+                    color: RGBToHex(splicedData),
+                });
             itemName.push(key);
         });
 
@@ -107,6 +101,20 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         </div>
     );
 };
+
+export function colorTableData(
+    logName: string
+): [number, number, number, number][] {
+    const properties = colorTemplate[0]["properties"];
+    const propertiesData = properties.filter(
+        (value: colorTemplatePropertiesObj) => value.objectName == logName
+    );
+    const colorTableData = colorTables.filter(
+        (value: colorTablesObj) => value.name == propertiesData[0].colorTable
+    );
+
+    return colorTableData[0].colors;
+}
 
 DiscreteColorLegend.defaultProps = {
     position: [16, 10],

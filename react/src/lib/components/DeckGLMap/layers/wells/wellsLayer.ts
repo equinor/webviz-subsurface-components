@@ -4,6 +4,7 @@ import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
 import { interpolatorContinuous } from "../../utils/continuousLegend";
+import { colorTableData } from "../../components/DiscreteLegend";
 import { color } from "d3-color";
 import {
     Feature,
@@ -21,28 +22,6 @@ import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTemplate = require("../../../../../demo/example-data/welllayer_discrete_template.json");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("../../../../../demo/example-data/color-tables.json");
-
-interface colorTablesObj {
-    name: string;
-    description: string;
-    colors: [number, number, number, number][];
-}
-
-interface colorTemplatePropertiesObj {
-    objectName: string;
-    colorTable: string;
-    context: string;
-    colorInterpolation: string;
-}
-
-interface colorTemplate {
-    name: string;
-    properties: Array<colorTemplatePropertiesObj>;
-}
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -381,28 +360,22 @@ function getLogColor(
             }
         });
     } else {
-        const properties = colorTemplate[0]["properties"];
-        const propertiesData = properties.filter(
-            (value: colorTemplatePropertiesObj) => value.objectName == log_name
-        );
-        const colorTableData = colorTables.filter(
-            (value: colorTablesObj) =>
-                value.name == propertiesData[0].colorTable
-        );
+        const colorsArrayData: [number, number, number, number][] =
+            colorTableData(log_name);
 
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
         // eslint-disable-next-line
         const attributesObject: { [key: string]: any } = {};
         Object.keys(log_attributes).forEach((key) => {
             const code = log_attributes[key][1];
-            const colorArrays: [number, number, number, number][] | string =
-                colorTableData[0].colors.find((value: number[]) => {
-                    return value[0] == code;
-                });
-            attributesObject[key] = [
-                [colorArrays[1], colorArrays[2], colorArrays[3]],
-                code,
-            ];
+            const colorArrays = colorsArrayData.find((value: number[]) => {
+                return value[0] == code;
+            });
+            if (colorArrays)
+                attributesObject[key] = [
+                    [colorArrays[1], colorArrays[2], colorArrays[3]],
+                    code,
+                ];
         });
         log_data.forEach((log_value) => {
             const dl_attrs = Object.entries(attributesObject).find(
