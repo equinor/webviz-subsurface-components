@@ -186,7 +186,19 @@ function getViewsForDeckGL(): Record<string, unknown>[] {
     const deckgl_views = [
         {
             "@@type": "OrthographicView",
-            id: "main",
+            id: "main2D",
+            controller: {
+                doubleClickZoom: false,
+            },
+            x: "0%",
+            y: "0%",
+            width: "100%",
+            height: "100%",
+            flipY: false,
+        },
+        {
+            "@@type": "OrbitView",
+            id: "main3D",
             controller: {
                 doubleClickZoom: false,
             },
