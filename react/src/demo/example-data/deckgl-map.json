@@ -77,7 +77,8 @@
       },
       {
         "@@type": "PieChartLayer",
-        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json",
+        "selectedPie": "@@#editedData.selectedPie"
       },
       {
         "@@type": "DrawingLayer",
@@ -87,6 +88,7 @@
     ],
     "editedData": {
       "selectedWell": "",
+      "selectedPie": {},
       "selectedDrawingFeature": [],
       "data": {
           "type": "FeatureCollection",
