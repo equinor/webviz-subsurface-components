@@ -64,7 +64,7 @@
     ]
   },
   {
-    "name": "ZonelogData",
+    "name": "Colors_set_1",
     "discrete": "true",
     "colors": [
       [ 0, 255, 13, 186 ],
@@ -85,7 +85,7 @@
     ]
   },
   {
-    "name": "RdeOrigData",
+    "name": "Colors_set_2",
     "discrete": "true",
     "colors": [
       [ 0, 159, 76, 255 ],
@@ -107,7 +107,7 @@
     ]
   },
   {
-    "name": "FaciesData",
+    "name": "Colors_set_3",
     "discrete": "true",
     "colors": [
       [ 0, 120, 181, 255 ],
@@ -123,7 +123,7 @@
     ]
   },
   {
-    "name": "ZoneMainData",
+    "name": "Colors_set_4",
     "discrete": "true",
     "colors": [
       [ 0, 144, 255, 188 ],
@@ -134,7 +134,7 @@
     ]
   },
   {
-    "name": "FaultDistanceHumData",
+    "name": "Colors_set_5",
     "discrete": "true",
     "colors": [
       [ 0, 244, 237, 255 ],
@@ -142,7 +142,7 @@
     ]
   },
   {
-    "name": "FaultProximityFlagData",
+    "name": "Colors_set_6",
     "discrete": "true",
     "colors": [
       [ 0, 244, 237, 255 ],
@@ -150,7 +150,7 @@
     ]
   },
   {
-    "name": "FaciesNoCalciteData",
+    "name": "Colors_set_7",
     "discrete": "true",
     "colors": [
       [ 0, 159, 76, 255 ],
@@ -166,7 +166,7 @@
     ]
   },
   {
-    "name": "RdeData",
+    "name": "Colors_set_8",
     "discrete": "true",
     "colors": [
       [ 0, 159, 76, 255 ],

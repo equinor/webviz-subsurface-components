@@ -4,42 +4,42 @@
         "properties": [
             {
                 "objectName" : "ZONELOG",
-                "colorTable" : "ZonelogData",
+                "colorTable" : "Colors_set_1",
                 "context" : "wells-layer"
             },
             {
                 "objectName" : "RDE_ORIG",
-                "colorTable" : "RdeOrigData",
+                "colorTable" : "Colors_set_2",
                 "context" : "wells-layer"
             },
             {
                 "objectName" : "FACIES",
-                "colorTable" : "FaciesData",
+                "colorTable" : "Colors_set_3",
                 "context" : "wells-layer"
             },
             {
                 "objectName" : "ZONE_MAIN",
-                "colorTable" : "ZoneMainData",
+                "colorTable" : "Colors_set_4",
                 "context" : "wells-layer"
             },
             {
                 "objectName" : "FaultDistance_HUM",
-                "colorTable" : "FaultDistanceHumData",
+                "colorTable" : "Colors_set_5",
                 "context" : "wells-layer"
             },
             {
                 "objectName" : "FAULT_PROXIMITY_FLAG",
-                "colorTable" : "FaultProximityFlagData",
+                "colorTable" : "Colors_set_6",
                 "context" : "wells-layer"
             },
             {
                 "objectName" : "FACIES_NoCalcite",
-                "colorTable" : "FaciesNoCalciteData",
+                "colorTable" : "Colors_set_7",
                 "context" : "wells-layer"
             },
             {
                 "objectName" : "RDE",
-                "colorTable" : "RdeData",
+                "colorTable" : "Colors_set_8",
                 "context" : "wells-layer"
             }
         ]
