@@ -33,7 +33,9 @@ export function colorsArray(
         (value: propertiesObj) => value.objectName == objectName
     );
     const colorTableData = colorTables.filter(
-        (value: colorTables) => value.name == propertiesData[0].colorTable
+        (value: colorTables) =>
+            value.name.toLowerCase() ==
+            propertiesData[0].colorTable.toLowerCase()
     );
     return colorTableData[0].colors;
 }
@@ -45,7 +47,7 @@ export function rgbValues(
     const color_table = colorsArray(objectName);
     const colorArrays = color_table.find(
         (value: [number, number, number, number]) => {
-            return point.toFixed(2) == value[0].toFixed(2);
+            return point == value[0];
         }
     );
 
@@ -56,7 +58,7 @@ export function rgbValues(
     // if no match then need to do interpolation
     else {
         const index = color_table.findIndex((value: number[]) => {
-            return value[0].toFixed(2) > point.toFixed(2);
+            return value[0] > point;
         });
 
         const firstColorArray = color_table[index - 1];
@@ -66,7 +68,7 @@ export function rgbValues(
             const interpolatedValues = interpolateRgb(
                 RGBToHex(firstColorArray).color,
                 RGBToHex(secondColorArray).color
-            )(Number(point.toFixed(2)));
+            )(point);
             return color(interpolatedValues)?.rgb();
         }
         return undefined;
