@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Info panel snapshot test 1`] = `
+<div>
+  <fieldset>
+    <legend>
+      Readout
+    </legend>
+    <small>
+      <table>
+        <tbody />
+      </table>
+    </small>
+  </fieldset>
+</div>
+`;
