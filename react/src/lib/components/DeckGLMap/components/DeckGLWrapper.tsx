@@ -146,6 +146,9 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 !drawingEnabled,
             ])
         );
+        dispatch(
+            updateLayerProp(["pie-layer", "selectionEnabled", !drawingEnabled])
+        );
     }, [drawingEnabled, dispatch]);
 
     const refCb = React.useCallback(

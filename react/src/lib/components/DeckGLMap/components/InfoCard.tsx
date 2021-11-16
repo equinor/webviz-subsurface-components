@@ -160,52 +160,62 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         xy_properties.push({ name: "x", value: topObject.coordinate[0] });
         xy_properties.push({ name: "y", value: topObject.coordinate[1] });
 
-        const infoCardData: InfoCardDataType[] = [];
-        infoCardData.push({
+        const info_card_data: InfoCardDataType[] = [];
+        info_card_data.push({
             layerName: "Position",
             properties: xy_properties,
         });
 
         props.pickInfos.forEach((info) => {
             const layer_properties = (info as LayerPickInfo)?.properties;
-            const group_name = (
+            const layer_name = (
                 info.layer?.props as ExtendedLayerProps<FeatureCollection>
             )?.name;
-            const parent = infoCardData.find(
-                (item) => item.layerName === group_name
+
+            // pick info can have 2 types of properties that can be displayed on the info card
+            // 1. defined as propertyValue, used for general layer info (now using for positional data)
+            // 2. Another defined as array of property object described by type PropertyDataType
+
+            // collecting card data for 1st type
+            const zValue = (info as PropertyMapPickInfo).propertyValue;
+            if (zValue) {
+                const property = xy_properties.find(
+                    (item) => item.name === layer_name
+                );
+                if (property) {
+                    property.value = zValue;
+                } else {
+                    xy_properties.push({
+                        name: layer_name,
+                        value: zValue,
+                    });
+                }
+            }
+
+            // collecting card data for 2nd type
+            const layer = info_card_data.find(
+                (item) => item.layerName === layer_name
             );
-            if (parent) {
+            if (layer) {
                 layer_properties?.forEach((layer_prop) => {
-                    const property = parent.properties?.find(
+                    const property = layer.properties?.find(
                         (item) => item.name === layer_prop.name
                     );
                     if (property) {
                         property.value = layer_prop.value;
                     } else {
-                        parent.properties?.push(layer_prop);
+                        layer.properties?.push(layer_prop);
                     }
                 });
             } else {
-                infoCardData.push({
-                    layerName: group_name || "unknown-layer",
+                info_card_data.push({
+                    layerName: layer_name || "unknown-layer",
                     properties: layer_properties,
                 });
             }
-
-            const zValue = (info as PropertyMapPickInfo).propertyValue;
-            if (zValue) {
-                const property = xy_properties.find(
-                    (item) => item.name === info.layer.id
-                );
-                if (property) {
-                    property.value = zValue;
-                } else {
-                    xy_properties.push({ name: group_name, value: zValue });
-                }
-            }
         });
 
-        setInfoCardData(infoCardData);
+        setInfoCardData(info_card_data);
     }, [props.pickInfos]);
 
     const classes = useStyles();
