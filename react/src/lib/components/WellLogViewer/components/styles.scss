@@ -17,9 +17,12 @@ $scale_slave_scale_bg: #ff0000;
     }
   }
   .selected {
-    background-color: rgba(255,128,0,0.1);
+    background-color: rgba(255,155,79,0.1);
   }
-  .slave-scale {
-    background-color: rgba(255,255,255,0.0235);
+  .slave-scale { 
+    background-color: rgba(255,255,255,0.0235); // to make track selection background visible
+  }
+  .track-container { 
+    pointer-events: all; // to allow mouse events handling
   }
 }

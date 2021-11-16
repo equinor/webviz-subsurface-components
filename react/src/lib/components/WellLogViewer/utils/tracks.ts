@@ -539,12 +539,112 @@ export function addGraphTrackPlot(
 export function editGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
-    name: string,
+    plot: Plot,
     templatePlot: TemplatePlot
-): void {
-    removeGraphTrackPlot(wellLogView, track, name);
+): [number, number] {
+    const minmaxPrimaryAxis: [number, number] = [
+        Number.POSITIVE_INFINITY,
+        Number.NEGATIVE_INFINITY,
+    ];
 
-    addGraphTrackPlot(wellLogView, track, templatePlot);
+    const axes = wellLogView.getAxesInfo();
+    const plotFactory = track.options.plotFactory;
+    if (plotFactory) {
+        const welllog = wellLogView.props.welllog;
+        if (welllog && welllog[0]) {
+            const data = welllog[0].data;
+            const curves = welllog[0].curves;
+
+            const iPrimaryAxis = indexOfElementByNames(
+                curves,
+                axes.mnemos[axes.primaryAxis]
+            );
+
+            const iCurve = indexOfElementByName(curves, templatePlot.name);
+            if (iCurve < 0) console.log("iCurve < 0");
+            const curve = curves[iCurve];
+
+            if (curve.dimensions !== 1) console.log("curve.dimensions !== 1");
+            if (curve.valueType === "string")
+                console.log('curve.valueType === "string"');
+
+            const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+            checkMinMax(minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
+            const minmax: [number, number] = [
+                plotData.minmax[0],
+                plotData.minmax[1],
+            ];
+
+            const plotDatas = track.options.data;
+            const plots = track.plots;
+
+            const colorTables = wellLogView.props.colorTables;
+
+            let iCurve2 = -1;
+            let curve2: WellLogCurve | undefined = undefined;
+            let plotData2: PlotData | undefined = undefined;
+            if (templatePlot.type === "differential") {
+                iCurve2 = templatePlot.name2
+                    ? indexOfElementByName(curves, templatePlot.name2)
+                    : -1;
+                curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
+                plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+                checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
+                checkMinMax(minmax, plotData2.minmax);
+            }
+
+            //console.log(typeof plot.data);
+
+            // Make full props
+            const templatePlotProps = getTemplatePlotProps(
+                templatePlot,
+                /*templateStyles*/ []
+            );
+            const p = getPlotConfig(
+                iCurve,
+                templatePlotProps,
+                colorTables,
+                (templatePlotProps.scale === "log"
+                    ? roundLogMinMax
+                    : roundMinMax)(minmax),
+                curve,
+                plotDatas.length,
+                curve2,
+                plotDatas.length + 1
+            );
+
+            plotDatas.push(plotData.data);
+            if (plotData2) {
+                plotDatas.push(plotData2.data);
+            }
+
+            // GraphTrack
+            const createPlot = plotFactory[p.type];
+            if (!createPlot)
+                throw Error(
+                    `No factory function for creating '${p.type}'-plot!`
+                );
+            const plotNew = createPlot(p, track.trackScale);
+            if (plotNew) {
+                let bFound = false;
+                for (const i in plots) {
+                    if (plot === plots[i]) {
+                        bFound = true;
+                        plots[i] = plotNew; // replace
+                        break;
+                    }
+                }
+
+                if (!bFound) {
+                    console.log("Error!", "Edited plot not found!");
+                    plots.push(plot);
+                }
+
+                track.prepareData();
+            }
+        }
+    }
+    return minmaxPrimaryAxis;
 }
 
 export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
@@ -562,30 +662,22 @@ export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
 }
 
 export function removeGraphTrackPlot(
-    wellLogView: WellLogView,
+    _wellLogView: WellLogView,
     track: GraphTrack,
-    name: string
+    _plot: Plot
 ): void {
-    {
-        const welllog = wellLogView.props.welllog;
-        if (welllog && welllog[0]) {
-            const curves = welllog[0].curves;
-            const iCurve = indexOfElementByName(curves, name);
+    const plots = (track as GraphTrack).plots;
 
-            const plots = (track as GraphTrack).plots;
-
-            let index = 0;
-            for (const plot of plots) {
-                if ((plot.id as number) === iCurve) {
-                    plots.splice(index, 1);
-                    break;
-                }
-                index++;
-            }
-
-            (track as GraphTrack).prepareData();
+    let index = 0;
+    for (const plot of plots) {
+        if (plot === _plot) {
+            plots.splice(index, 1);
+            break;
         }
+        index++;
     }
+
+    (track as GraphTrack).prepareData();
 }
 
 function newDualScaleTrack(

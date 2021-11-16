@@ -47,22 +47,28 @@ const axisMnemos: Record<string, string[]> = {
 };
 
 import ReactDOM from "react-dom";
-
-import { SimpleMenu } from "./components/LocalMenus";
+import { SimpleMenu, editPlots } from "./components/LocalMenus";
+import { Plot } from "@equinor/videx-wellog";
 
 function onTrackEvent(wellLogView: WellLogView, ev: TrackEvent) {
     const track = ev.track;
-
+    console.log(ev.area, ev.type);
     if (ev.type === "click") {
-        wellLogView.selectTrack(track, !wellLogView.isTrackSelected(track));
+        wellLogView.selectTrack(track, !wellLogView.isTrackSelected(track)); // toggle selection
     } else if (ev.type === "dblclick") {
         wellLogView.selectTrack(track, true);
-        alert("track prop=" + ev.area);
+        if (ev.area !== "title") {
+            // Not ready
+            const plot: Plot | null = ev.plot;
+            if (!plot) editPlots(ev.element, wellLogView, ev.track);
+            else wellLogView.editPlot(ev.element, ev.track, plot);
+        }
+        //alert("track prop=" + ev.area);
     } else if (ev.type === "contextmenu") {
         wellLogView.selectTrack(track, true);
         const el: HTMLElement = document.createElement("div");
         el.style.width = "10px";
-        el.style.height = ev.area === "title" ? "3px" : "3px";
+        el.style.height = "3px";
         ev.element.appendChild(el);
         ReactDOM.render(
             <SimpleMenu

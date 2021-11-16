@@ -8,7 +8,7 @@ export default {
 
 const Template = (args) => {
     return (
-        <div style={{ height: "80vh", display: "flex" }}>
+        <div style={{ height: "93vh", display: "flex" }}>
             <div style={{ width: "100%", flex: 1 }}>
                 <WellLogViewer id="WellLogViewer" {...args} />
             </div>

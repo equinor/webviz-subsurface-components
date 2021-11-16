@@ -7,6 +7,7 @@ import {
 } from "@equinor/videx-wellog";
 
 import { Track, GraphTrack } from "@equinor/videx-wellog";
+import { Plot } from "@equinor/videx-wellog";
 
 import { ScaleTrackOptions } from "@equinor/videx-wellog/dist/tracks/scale/interfaces";
 
@@ -305,8 +306,10 @@ function addTrackEventListner(
     func: (ev: TrackEvent) => void
 ): void {
     element.addEventListener(type, (ev: Event) => {
+        const plot: Plot | null = null; ///!!
         func({
             track: track,
+            plot: plot,
             element: element,
             ev: ev,
             type: type,
@@ -345,6 +348,83 @@ function addTrackEventHandlers(
     }
 }
 
+import ReactDOM from "react-dom";
+import { PlotPropertiesDialog } from "./PlotDialog";
+import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+import { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
+
+function addPlot(
+    parent: HTMLElement,
+    wellLogView: WellLogView,
+    track: Track
+): void {
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "13px";
+    parent.appendChild(el);
+
+    ReactDOM.render(
+        <PlotPropertiesDialog
+            wellLogView={wellLogView}
+            track={track}
+            onOK={wellLogView.addTrackPlot.bind(wellLogView, track)}
+        />,
+        el
+    );
+}
+
+function fillTemplatePlot(plot: Plot): TemplatePlot {
+    const options = plot.options as ExtPlotOptions;
+    const optionsDifferential = plot.options as DifferentialPlotOptions; // DifferentialPlot - 2 series!
+    const options1 = optionsDifferential.serie1;
+    const options2 = optionsDifferential.serie2;
+
+    const legend = options.legendInfo();
+    const legendDifferential = legend as DifferentialPlotLegendInfo; // DifferentialPlot - 2 series!
+    const legend1 = legendDifferential.serie1;
+    const legend2 = legendDifferential.serie2;
+
+    return {
+        style: "", // No style for this full Plot options.
+        type: getPlotType(plot),
+        scale: options.scale,
+        name: (legend1 && legend1.label ? legend1.label : legend.label) || "",
+        name2: legend2 && legend2.label ? legend2.label : "",
+        color: (options1 ? options1.color : options.color) || "",
+        color2: options2 ? options2.color : "",
+        inverseColor: options.inverseColor || "",
+        fill: (options1 ? options1.fill : options.fill) || "",
+        fill2: options2 ? options2.fill : "",
+        colorTable: options.colorTable ? options.colorTable.name : "",
+        inverseColorTable: options.inverseColorTable
+            ? options.inverseColorTable.name
+            : "",
+    };
+}
+
+function editPlot(
+    parent: HTMLElement,
+    wellLogView: WellLogView,
+    track: Track,
+    plot: Plot
+): void {
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "13px";
+    parent.appendChild(el);
+
+    const templatePlot = fillTemplatePlot(plot);
+
+    ReactDOM.render(
+        <PlotPropertiesDialog
+            templatePlot={templatePlot}
+            wellLogView={wellLogView}
+            track={track}
+            onOK={wellLogView.editTrackPlot.bind(wellLogView, track, plot)}
+        />,
+        el
+    );
+}
 function fillInfos(
     x: number,
     x2: number,
@@ -377,18 +457,40 @@ function fillInfos(
                     const plot = (track as GraphTrack).plots[p];
                     const type = getPlotType(plot);
                     const v = getValue(x, datas[p], type);
-                    const legend = (
-                        plot.options as ExtPlotOptions
-                    ).legendInfo();
+
+                    const options = plot.options as ExtPlotOptions;
+                    const optionsDifferential =
+                        plot.options as DifferentialPlotOptions; // DifferentialPlot - 2 series!
+                    const options1 = optionsDifferential.serie1;
+                    const options2 = optionsDifferential.serie2;
+
+                    const legend = options.legendInfo();
+                    const legendDifferential =
+                        legend as DifferentialPlotLegendInfo; // DifferentialPlot - 2 series!
+                    const legend1 = legendDifferential.serie1;
+                    const legend2 = legendDifferential.serie2;
+
                     infos.push({
-                        name: legend.label,
-                        units: legend.unit,
-                        color: plot.options.color ? plot.options.color : "",
+                        name: legend1 ? legend1.label : legend.label,
+                        units: legend1 ? legend1.unit : legend.unit,
+                        color: options1 ? options1.color : options.color,
                         value: v,
                         type: type,
                         track_id: track.id,
                     });
                     iPlot++;
+
+                    if (options2) {
+                        infos.push({
+                            name: legend2.label,
+                            units: legend2.unit,
+                            color: options2.color ? options2.color : "",
+                            value: v,
+                            type: type,
+                            track_id: track.id,
+                        });
+                        iPlot++;
+                    }
                 }
             } else {
                 const _x = iPlot == 0 ? x : x2;
@@ -412,6 +514,7 @@ export interface TrackEvent {
     track: Track;
     type: /*string, */ "click" | "contextmenu" | "dblclick";
     area: /*string, */ "title" | "legend" | "container";
+    plot: Plot | null;
     element: HTMLElement;
     ev: /*Mouse*/ Event;
 }
@@ -621,8 +724,12 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             }
     }
 
-    addGraphTrackPlot(track: GraphTrack, templatePlot: TemplatePlot): void {
-        const minmaxPrimaryAxis = addGraphTrackPlot(this, track, templatePlot);
+    addTrackPlot(track: Track, templatePlot: TemplatePlot): void {
+        const minmaxPrimaryAxis = addGraphTrackPlot(
+            this,
+            track as GraphTrack,
+            templatePlot
+        );
         if (this.logController) {
             const minmax: [number, number] = [
                 this.logController.domain[0],
@@ -636,18 +743,28 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo();
     }
 
-    editGraphTrackPlot(
-        track: GraphTrack,
-        name: string,
-        templatePlot: TemplatePlot
-    ): void {
-        editGraphTrackPlot(this, track, name, templatePlot);
-        if (this.logController) this.logController.updateTracks();
+    editTrackPlot(track: Track, plot: Plot, templatePlot: TemplatePlot): void {
+        const minmaxPrimaryAxis = editGraphTrackPlot(
+            this,
+            track as GraphTrack,
+            plot,
+            templatePlot
+        );
+        if (this.logController) {
+            const minmax: [number, number] = [
+                this.logController.domain[0],
+                this.logController.domain[1],
+            ];
+            checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
+            this.logController.domain = minmax;
+
+            this.logController.updateTracks();
+        }
         this.setInfo();
     }
 
-    removeGraphTrackPlot(track: GraphTrack, name: string): void {
-        removeGraphTrackPlot(this, track, name);
+    removeTrackPlot(track: Track, plot: Plot): void {
+        removeGraphTrackPlot(this, track as GraphTrack, plot);
         if (this.logController) this.logController.updateTracks();
         this.setInfo();
     }
@@ -776,6 +893,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
             this.scrollTrack();
         }
+    }
+
+    // Dialog functions
+    addPlot(parent: HTMLElement | null, track: Track): void {
+        if (parent) addPlot(parent, this, track);
+    }
+    editPlot(parent: HTMLElement | null, track: Track, plot: Plot): void {
+        if (parent) editPlot(parent, this, track, plot);
     }
 
     render(): ReactNode {
