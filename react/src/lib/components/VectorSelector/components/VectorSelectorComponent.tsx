@@ -107,6 +107,10 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
     }
 
     componentDidUpdate(prevProps: VectorSelectorPropsType): void {
+        if (this.updateFromWithin) {
+            this.updateFromWithin = false;
+            return;
+        }
         if (
             (this.props.data &&
                 JSON.stringify(this.props.data) !==
