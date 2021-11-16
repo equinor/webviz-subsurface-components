@@ -38,6 +38,13 @@
         "@@type": "ColormapLayer",
         "image": "@@#resources.propertyMap",
         "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
+        "rotDeg": 0,
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
+        ],
         "valueRange": [
           2782,
           3513
@@ -46,6 +53,13 @@
       {
         "@@type": "Hillshading2DLayer",
         "id": "hillshading-layer",
+        "rotDeg": 0,
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
+        ],
         "valueRange": [
           2782,
           3513

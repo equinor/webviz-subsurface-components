@@ -15,7 +15,7 @@ import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
 import { colorsArray } from "../utils/continuousLegend";
 import StatusIndicator from "./StatusIndicator";
-import { DrawingLayer, WellsLayer } from "../layers";
+import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { getLogValues, LogCurveDataType } from "../layers/wells/wellsLayer";
 import { Layer } from "deck.gl";
 
@@ -81,10 +81,10 @@ export interface DeckGLWrapperProps {
 
 function getLayer(layers: Layer<unknown>[] | undefined, id: string) {
     if (!layers) return;
-    const wellsLayers = layers.filter(
+    const layer = layers.filter(
         (item) => item.id?.toLowerCase() == id.toLowerCase()
     );
-    return wellsLayers[0];
+    return layer[0];
 }
 
 const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
@@ -139,16 +139,29 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     ) as DrawingLayer;
     const drawingEnabled = drawingLayer && drawingLayer.props.mode != "view";
     React.useEffect(() => {
-        dispatch(
-            updateLayerProp([
-                "wells-layer",
-                "selectionEnabled",
-                !drawingEnabled,
-            ])
-        );
-        dispatch(
-            updateLayerProp(["pie-layer", "selectionEnabled", !drawingEnabled])
-        );
+        if (!drawingLayer) return;
+
+        const wellsLayer = getLayer(deckGLLayers, "wells-layer") as WellsLayer;
+        if (wellsLayer) {
+            dispatch(
+                updateLayerProp([
+                    "wells-layer",
+                    "selectionEnabled",
+                    !drawingEnabled,
+                ])
+            );
+        }
+
+        const pieLayer = getLayer(deckGLLayers, "pie-layer") as PieChartLayer;
+        if (pieLayer) {
+            dispatch(
+                updateLayerProp([
+                    "pie-layer",
+                    "selectionEnabled",
+                    !drawingEnabled,
+                ])
+            );
+        }
     }, [drawingEnabled, dispatch]);
 
     const refCb = React.useCallback(
