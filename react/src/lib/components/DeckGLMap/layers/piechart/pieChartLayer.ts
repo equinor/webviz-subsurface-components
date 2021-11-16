@@ -3,6 +3,8 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { Position } from "@deck.gl/core/utils/positions";
 import { SolidPolygonLayer } from "@deck.gl/layers";
+import { patchLayerProps } from "../utils/layerTools";
+import { PickInfo } from "deck.gl";
 
 type PieProperties = [{ color: RGBAColor; label: string }];
 
@@ -25,21 +27,38 @@ interface PolygonData {
     properties: {
         color: RGBAColor;
         name: string;
+        pieIndex: number;
     };
 }
 
-export type PieChartLayerProps<D> = ExtendedLayerProps<D>;
+export interface PieChartLayerProps<D> extends ExtendedLayerProps<D> {
+    selectedPie: PieData;
+    selectionEnabled: boolean;
+}
 
 const defaultProps = {
     name: "Pie chart",
     id: "pie-layer",
     pickable: true,
     visible: true,
+    selectionEnabled: true,
 };
 export default class PieChartLayer extends CompositeLayer<
     PiesData,
     PieChartLayerProps<PiesData>
 > {
+    onClick(info: PickInfo<PolygonData>): boolean {
+        if (!this.props.selectionEnabled) {
+            return false;
+        }
+
+        const pie_idx = (info.object as PolygonData)?.properties.pieIndex;
+        patchLayerProps<PiesData>(this, {
+            selectedPie: (this.props.data as PiesData)?.pies[pie_idx],
+        } as PieChartLayerProps<PiesData>);
+        return true;
+    }
+
     renderLayers(): SolidPolygonLayer<PolygonData>[] {
         const pieData = this.props.data as PiesData;
         if (!pieData?.pies) {
@@ -65,14 +84,19 @@ PieChartLayer.defaultProps = defaultProps;
 
 function makePies(data: PiesData): PolygonData[] {
     let polygons: PolygonData[] = [];
+    let pie_index = 0;
     for (const pie of data.pies) {
-        polygons = polygons.concat(makePie(pie, data.properties));
+        polygons = polygons.concat(makePie(pie, data.properties, pie_index++));
     }
     return polygons;
 }
 
 // return array of one pie's polygon's
-function makePie(pie: PieData, properties: PieProperties): PolygonData[] {
+function makePie(
+    pie: PieData,
+    properties: PieProperties,
+    pieIndex: number
+): PolygonData[] {
     const dA = 10; // delta angle
 
     const x = pie.x;
@@ -113,6 +137,7 @@ function makePie(pie: PieData, properties: PieProperties): PolygonData[] {
             properties: {
                 color: col,
                 name: label + ": " + (frac * 100).toFixed(1) + "%",
+                pieIndex: pieIndex,
             },
         });
         start_a = end_a;

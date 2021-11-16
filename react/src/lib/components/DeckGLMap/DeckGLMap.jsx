@@ -34,6 +34,20 @@ function DeckGLMap({
     editedData,
     setProps,
 }) {
+    // Contains layers data received from map layers by user interaction
+    let [layerEditedData, setLayerEditedData] = React.useState(null);
+
+    React.useEffect(() => {
+        if (!layerEditedData) {
+            setLayerEditedData(editedData);
+        } else {
+            setLayerEditedData({
+                ...layerEditedData,
+                ...editedData,
+            });
+        }
+    }, [editedData]);
+
     // This callback is used as a mechanism to update the component from the layers or toolbar.
     // The changes done in a layer, for example, are bundled into a patch
     // and sent to the parent component via setProps. (See layers/utils/layerTools.ts)
@@ -41,28 +55,30 @@ function DeckGLMap({
         (data) => {
             setProps({
                 editedData: {
-                    ...editedData,
+                    ...layerEditedData,
                     ...data,
                 },
             });
         },
-        [setProps]
+        [setProps, layerEditedData]
     );
 
     return (
-        <Map
-            id={id}
-            resources={resources}
-            layers={layers}
-            bounds={bounds}
-            zoom={zoom}
-            coords={coords}
-            scale={scale}
-            legend={legend}
-            coordinateUnit={coordinateUnit}
-            editedData={editedData}
-            setEditedData={setEditedData}
-        />
+        layerEditedData && (
+            <Map
+                id={id}
+                resources={resources}
+                layers={layers}
+                bounds={bounds}
+                zoom={zoom}
+                coords={coords}
+                scale={scale}
+                legend={legend}
+                coordinateUnit={coordinateUnit}
+                editedData={layerEditedData}
+                setEditedData={setEditedData}
+            />
+        )
     );
 }
 
