@@ -4,6 +4,7 @@ import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
 import { interpolatorContinuous } from "../../utils/continuousLegend";
+import { colorTableData } from "../../components/DiscreteLegend";
 import { color } from "d3-color";
 import {
     Feature,
@@ -170,9 +171,9 @@ export default class WellsLayer extends CompositeLayer<
                     getColor: [this.props.logName],
                     getWidth: [this.props.logName, this.props.logRadius],
                 },
-                onDataLoad: (value: LogCurveDataType) => {
+                onDataLoad: (value: LogCurveDataType[]) => {
                     this.setState({
-                        legend: legendData(value, this.props.logName),
+                        legend: getLegendData(value, this.props.logName),
                     });
                 },
             })
@@ -364,14 +365,28 @@ function getLogColor(
             }
         });
     } else {
+        const colorsArrayData: [number, number, number, number][] =
+            colorTableData(log_name);
+
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
+        // eslint-disable-next-line
+        const attributesObject: { [key: string]: any } = {};
+        Object.keys(log_attributes).forEach((key) => {
+            const code = log_attributes[key][1];
+            const colorArrays = colorsArrayData.find((value: number[]) => {
+                return value[0] == code;
+            });
+            if (colorArrays)
+                attributesObject[key] = [
+                    [colorArrays[1], colorArrays[2], colorArrays[3]],
+                    code,
+                ];
+        });
         log_data.forEach((log_value) => {
-            const dl_attrs = Object.entries(log_attributes).find(
+            const dl_attrs = Object.entries(attributesObject).find(
                 ([, value]) => value[1] == log_value
             )?.[1];
-            dl_attrs
-                ? log_color.push(dl_attrs[0])
-                : log_color.push([0, 0, 0, 0]);
+            dl_attrs ? log_color.push(dl_attrs[0]) : log_color.push([0, 0, 0]);
         });
     }
     return log_color;
@@ -569,17 +584,16 @@ function getLogProperty(
     } else return null;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function legendData(logs: any, logName: string) {
-    const logData = logs[0];
-    const logInfo = getLogInfo(logData, logData.header.name, logName);
+function getLegendData(logs: LogCurveDataType[], logName: string) {
+    const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
     const title = "Wells / " + logName;
     const legendProps = [];
     if (logInfo?.description == "discrete") {
-        const meta = logData["metadata_discrete"];
+        const meta = logs[0]["metadata_discrete"];
         const metadataDiscrete = meta[logName].objects;
         legendProps.push({
             title: title,
+            logName: logName,
             discrete: true,
             metadata: metadataDiscrete,
             valueRange: [],
@@ -595,6 +609,7 @@ function legendData(logs: any, logName: string) {
         });
         legendProps.push({
             title: title,
+            logName: "",
             discrete: false,
             metadata: { objects: {} },
             valueRange: [Math.min(...minArray), Math.max(...maxArray)],

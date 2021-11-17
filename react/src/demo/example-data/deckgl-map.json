@@ -39,6 +39,12 @@
         "image": "@@#resources.propertyMap",
         "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
         "rotDeg": 0,
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
+        ],
         "valueRange": [
           2782,
           3513
@@ -50,6 +56,12 @@
       },
       {
         "@@type": "Hillshading2DLayer",
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
+        ],
         "valueRange": [
           2782,
           3513
@@ -77,7 +89,8 @@
       },
       {
         "@@type": "PieChartLayer",
-        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json",
+        "selectedPie": "@@#editedData.selectedPie"
       },
       {
         "@@type": "DrawingLayer",
@@ -87,6 +100,7 @@
     ],
     "editedData": {
       "selectedWell": "",
+      "selectedPie": {},
       "selectedDrawingFeature": [],
       "data": {
           "type": "FeatureCollection",

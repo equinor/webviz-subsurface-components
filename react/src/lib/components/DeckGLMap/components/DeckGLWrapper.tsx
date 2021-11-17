@@ -14,8 +14,9 @@ import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
-import { DrawingLayer, WellsLayer } from "../layers";
+import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer } from "deck.gl";
+import ToggleButton from "./settings/ToggleButton";
 
 export interface DeckGLWrapperProps {
     /**
@@ -79,10 +80,10 @@ export interface DeckGLWrapperProps {
 
 function getLayer(layers: Layer<unknown>[] | undefined, id: string) {
     if (!layers) return;
-    const wellsLayers = layers.filter(
+    const layer = layers.filter(
         (item) => item.id?.toLowerCase() == id.toLowerCase()
     );
-    return wellsLayers[0];
+    return layer[0];
 }
 
 const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
@@ -137,13 +138,29 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     ) as DrawingLayer;
     const drawingEnabled = drawingLayer && drawingLayer.props.mode != "view";
     React.useEffect(() => {
-        dispatch(
-            updateLayerProp([
-                "wells-layer",
-                "selectionEnabled",
-                !drawingEnabled,
-            ])
-        );
+        if (!drawingLayer) return;
+
+        const wellsLayer = getLayer(deckGLLayers, "wells-layer") as WellsLayer;
+        if (wellsLayer) {
+            dispatch(
+                updateLayerProp([
+                    "wells-layer",
+                    "selectionEnabled",
+                    !drawingEnabled,
+                ])
+            );
+        }
+
+        const pieLayer = getLayer(deckGLLayers, "pie-layer") as PieChartLayer;
+        if (pieLayer) {
+            dispatch(
+                updateLayerProp([
+                    "pie-layer",
+                    "selectionEnabled",
+                    !drawingEnabled,
+                ])
+            );
+        }
     }, [drawingEnabled, dispatch]);
 
     const refCb = React.useCallback(
@@ -189,13 +206,17 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
 
+    const [is3D, setIs3D] = useState(false);
+
     const [legendProps, setLegendProps] = React.useState<{
         title: string;
+        logName: string;
         discrete: boolean;
         metadata: { objects: Record<string, [number[], number]> };
         valueRange: number[];
     }>({
         title: "",
+        logName: "",
         discrete: false,
         metadata: { objects: {} },
         valueRange: [],
@@ -216,6 +237,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         const legend = wellsLayer.state.legend[0];
         setLegendProps({
             title: legend.title,
+            logName: legend.logName,
             discrete: legend.discrete,
             metadata: legend.metadata,
             valueRange: legend.valueRange,
@@ -226,12 +248,16 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     const [viewState, setViewState] = useState<any>();
 
     if (!deckGLViews) return null;
+
+    // Set view to 2D or 3D
+    const deckGLView = deckGLViews?.[is3D ? 1 : 0];
+
     return (
         <div>
             <DeckGL
                 id={id}
                 initialViewState={initialViewState}
-                views={deckGLViews}
+                views={deckGLView}
                 layers={deckGLLayers}
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
@@ -265,10 +291,20 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
+            <div style={{ border: "2px solid gray", display: "inline-block" }}>
+                <ToggleButton
+                    label={"3D"}
+                    checked={is3D}
+                    onChange={() => {
+                        setIs3D(!is3D);
+                    }}
+                />
+            </div>
             {legend.visible && legendProps.discrete && (
                 <DiscreteColorLegend
                     discreteData={legendProps.metadata}
                     dataObjectName={legendProps.title}
+                    logName={legendProps.logName}
                     position={legend.position}
                 />
             )}
