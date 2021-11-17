@@ -57,13 +57,11 @@ function onTrackEvent(wellLogView: WellLogView, ev: TrackEvent) {
         wellLogView.selectTrack(track, !wellLogView.isTrackSelected(track)); // toggle selection
     } else if (ev.type === "dblclick") {
         wellLogView.selectTrack(track, true);
-        if (ev.area !== "title") {
-            // Not ready
+        /*if (ev.area !== "title")*/ {
             const plot: Plot | null = ev.plot;
             if (!plot) editPlots(ev.element, wellLogView, ev.track);
             else wellLogView.editPlot(ev.element, ev.track, plot);
         }
-        //alert("track prop=" + ev.area);
     } else if (ev.type === "contextmenu") {
         wellLogView.selectTrack(track, true);
         const el: HTMLElement = document.createElement("div");

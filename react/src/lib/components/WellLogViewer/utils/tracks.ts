@@ -280,37 +280,50 @@ function getTemplatePlotProps(
 }
 
 class __dataAccessor {
-    iPlot: number;
+    iData: number;
 
-    constructor(iPlot: number) {
-        this.iPlot = iPlot;
+    constructor(iData: number) {
+        this.iData = iData;
     }
 
     dataAccessor(d: number[][]): number[] {
-        return d[this.iPlot];
+        return d[this.iData];
     }
 }
-function makeDataAccessor(iPlot: number) {
-    const _dataAccessor = new __dataAccessor(iPlot);
+function makeDataAccessor(iData: number) {
+    const _dataAccessor = new __dataAccessor(iData);
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
 }
 
 class __dataAccessor2 {
-    iPlot: number;
-    iPlot2: number;
+    iData: number;
+    iData2: number;
 
-    constructor(iPlot: number, iPlot2: number) {
-        this.iPlot = iPlot;
-        this.iPlot2 = iPlot2;
+    constructor(iData: number, iData2: number) {
+        this.iData = iData;
+        this.iData2 = iData2;
     }
 
     dataAccessor(d: number[][]): [number[], number[]] {
-        return [d[this.iPlot], d[this.iPlot2]];
+        return [d[this.iData], d[this.iData2]];
     }
 }
-function makeDataAccessor2(iPlot: number, iPlot2: number) {
-    const _dataAccessor = new __dataAccessor2(iPlot, iPlot2);
+function makeDataAccessor2(iData: number, iData2: number) {
+    const _dataAccessor = new __dataAccessor2(iData, iData2);
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
+}
+
+export function getDataAccessorNumbers(accessor: Object): number[] {
+    const ret: number[] = [];
+    if (accessor instanceof __dataAccessor2) {
+        ret.push((accessor as __dataAccessor2).iData);
+        ret.push((accessor as __dataAccessor2).iData2);
+    } else if (accessor instanceof __dataAccessor)
+        ret.push((accessor as __dataAccessor).iData);
+    else {
+        console.log("getDataAccessorNumbers() called with unusual accessor");
+    }
+    return ret;
 }
 
 import { ColorTable } from "../components/ColorTableTypes";

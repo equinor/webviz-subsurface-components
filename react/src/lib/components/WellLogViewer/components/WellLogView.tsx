@@ -440,7 +440,6 @@ function fillInfos(
         const bScaleTrack = isScaleTrack(track);
         const visible = (iFrom <= iTrack && iTrack < iTo) || bScaleTrack;
         if (visible) {
-            const datas = track.data;
             if (!bScaleTrack) {
                 if (!bSeparatorCreated) {
                     // Add separator line
@@ -452,11 +451,10 @@ function fillInfos(
                     });
                     bSeparatorCreated = true;
                 }
-                const nPlots = (track as GraphTrack).plots.length;
-                for (let p = 0; p < nPlots; p++) {
-                    const plot = (track as GraphTrack).plots[p];
+                for (const plot of (track as GraphTrack).plots) {
                     const type = getPlotType(plot);
-                    const v = getValue(x, datas[p], type);
+                    let data = plot.data;
+                    if (type === "differential") data = plot.data[0]; // DifferentialPlot has 2 arrays of data pairs
 
                     const options = plot.options as ExtPlotOptions;
                     const optionsDifferential =
@@ -474,20 +472,21 @@ function fillInfos(
                         name: legend1 ? legend1.label : legend.label,
                         units: legend1 ? legend1.unit : legend.unit,
                         color: options1 ? options1.color : options.color,
-                        value: v,
+                        value: getValue(x, data, type),
                         type: type,
                         track_id: track.id,
                     });
                     iPlot++;
 
-                    if (options2) {
+                    if (type === "differential") {
+                        data = plot.data[1];
                         infos.push({
                             name: legend2.label,
                             units: legend2.unit,
                             color: options2.color ? options2.color : "",
-                            value: v,
+                            value: getValue(x, data, type),
                             type: type,
-                            track_id: track.id,
+                            track_id: "_"+track.id,
                         });
                         iPlot++;
                     }
