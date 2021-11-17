@@ -17,6 +17,7 @@ import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { getLogValues, LogCurveDataType } from "../layers/wells/wellsLayer";
 import { Layer } from "deck.gl";
+import ToggleButton from "./settings/ToggleButton";
 
 export interface DeckGLWrapperProps {
     /**
@@ -206,6 +207,8 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
 
+    const [is3D, setIs3D] = useState(false);
+
     const [legendProps, setLegendProps] = React.useState<{
         title: string;
         logName: string;
@@ -273,12 +276,16 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     const [viewState, setViewState] = useState<any>();
 
     if (!deckGLViews) return null;
+
+    // Set view to 2D or 3D
+    const deckGLView = deckGLViews?.[is3D ? 1 : 0];
+
     return (
         <div>
             <DeckGL
                 id={id}
                 initialViewState={initialViewState}
-                views={deckGLViews}
+                views={deckGLView}
                 layers={deckGLLayers}
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
@@ -312,6 +319,15 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
+            <div style={{ border: "2px solid gray", display: "inline-block" }}>
+                <ToggleButton
+                    label={"3D"}
+                    checked={is3D}
+                    onChange={() => {
+                        setIs3D(!is3D);
+                    }}
+                />
+            </div>
             {legend.visible && legendProps.discrete && (
                 <DiscreteColorLegend
                     discreteData={legendProps.metadata}
