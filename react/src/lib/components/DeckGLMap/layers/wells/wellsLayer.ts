@@ -4,6 +4,7 @@ import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
 import { interpolatorContinuous } from "../../utils/continuousLegend";
+import { colorTableData } from "../../components/DiscreteLegend";
 import { color } from "d3-color";
 import {
     Feature,
@@ -359,14 +360,28 @@ function getLogColor(
             }
         });
     } else {
+        const colorsArrayData: [number, number, number, number][] =
+            colorTableData(log_name);
+
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
+        // eslint-disable-next-line
+        const attributesObject: { [key: string]: any } = {};
+        Object.keys(log_attributes).forEach((key) => {
+            const code = log_attributes[key][1];
+            const colorArrays = colorsArrayData.find((value: number[]) => {
+                return value[0] == code;
+            });
+            if (colorArrays)
+                attributesObject[key] = [
+                    [colorArrays[1], colorArrays[2], colorArrays[3]],
+                    code,
+                ];
+        });
         log_data.forEach((log_value) => {
-            const dl_attrs = Object.entries(log_attributes).find(
+            const dl_attrs = Object.entries(attributesObject).find(
                 ([, value]) => value[1] == log_value
             )?.[1];
-            dl_attrs
-                ? log_color.push(dl_attrs[0])
-                : log_color.push([0, 0, 0, 0]);
+            dl_attrs ? log_color.push(dl_attrs[0]) : log_color.push([0, 0, 0]);
         });
     }
     return log_color;
