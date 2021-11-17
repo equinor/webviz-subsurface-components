@@ -7,17 +7,75 @@ import InfoPanel from "./InfoPanel";
 
 describe("Test Info panel", () => {
     it("snapshot test", () => {
-        const { container } = render(<InfoPanel header="Readout" infos={[]} />);
+        const { container } = render(
+            <InfoPanel
+                header="Readout"
+                infos={[
+                    {
+                        color: "black",
+                        value: 2366,
+                        type: "line",
+                        track_id: "",
+                        name: "DVER",
+                        units: "M",
+                    },
+                    {
+                        color: "",
+                        value: Number.NaN,
+                        type: "separator",
+                        track_id: "",
+                    },
+                    {
+                        color: "orange",
+                        value: 8.5,
+                        type: "line",
+                        track_id: 11,
+                    },
+                    {
+                        color: "green",
+                        value: 17.57,
+                        type: "line",
+                        track_id: 9,
+                    },
+                ]}
+            />
+        );
         expect(container.firstChild).toMatchSnapshot();
     });
-    it("update axis to TVD", () => {
-        const mockFn = jest.fn();
-        render(<InfoPanel header="Readout" infos={[]} />);
-        const axis_selectors = screen.getAllByRole("radio");
-        expect(axis_selectors[0]).toBeChecked();
-        userEvent.click(axis_selectors[1]);
-        expect(mockFn).toHaveBeenCalledTimes(1);
-        expect(mockFn).toHaveBeenCalledWith("tvd");
-        expect(axis_selectors[1]).toBeChecked();
+    it("snapshot test when value is infinity", () => {
+        const { container } = render(
+            <InfoPanel
+                header="Readout"
+                infos={[
+                    {
+                        color: "black",
+                        value: Infinity,
+                        type: "line",
+                        track_id: "",
+                        name: "DVER",
+                        units: "M",
+                    },
+                    {
+                        color: "",
+                        value: Number.NaN,
+                        type: "separator",
+                        track_id: "",
+                    },
+                    {
+                        color: "orange",
+                        value: 8.5,
+                        type: "line",
+                        track_id: 11,
+                    },
+                    {
+                        color: "green",
+                        value: 17.57,
+                        type: "line",
+                        track_id: 9,
+                    },
+                ]}
+            />
+        );
+        expect(container.firstChild).toMatchSnapshot();
     });
 });
