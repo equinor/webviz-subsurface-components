@@ -883,6 +883,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.logController.addTrack(trackNew);
 
             this.scrollTrack();
+            this.setInfo();
         }
     }
 
@@ -891,6 +892,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.logController.removeTrack(track);
 
             this.scrollTrack();
+            this.setInfo();
         }
     }
 
