@@ -1,6 +1,10 @@
 import React from "react";
-import legendUtil from "../utils/legend";
+import legendUtil from "../utils/discreteLegend";
 import { scaleOrdinal, select } from "d3";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const colorTemplate = require("../../../../demo/example-data/welllayer_discrete_template.json");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const colorTables = require("../../../../demo/example-data/color-tables.json");
 
 interface ItemColor {
     color: string;
@@ -9,11 +13,31 @@ interface ItemColor {
 interface colorLegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
     dataObjectName: string;
+    logName: string;
     position: number[];
+}
+
+interface colorTablesObj {
+    name: string;
+    description: string;
+    colors: [number, number, number, number][];
+}
+
+interface colorTemplatePropertiesObj {
+    objectName: string;
+    colorTable: string;
+    context: string;
+    colorInterpolation: string;
+}
+
+interface colorTemplate {
+    name: string;
+    properties: Array<colorTemplatePropertiesObj>;
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     discreteData,
+    logName,
     dataObjectName,
     position,
 }: colorLegendProps) => {
@@ -24,20 +48,27 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
-
+        const colorsArrayData: [number, number, number, number][] =
+            colorTableData(logName);
         Object.keys(discreteData).forEach((key) => {
-            itemColor.push({
-                color: RGBAToHexA(
-                    // eslint-disable-next-line
-                    (discreteData as { [key: string]: any })[key][0]
-                ),
+            // eslint-disable-next-line
+            let code = (discreteData as { [key: string]: any })[key][1]
+            // from color table
+            const colorArrays = colorsArrayData.find((value: number[]) => {
+                return value[0] == code;
             });
+            const splicedData = colorArrays;
+            if (splicedData)
+                itemColor.push({
+                    color: RGBToHex(splicedData),
+                });
             itemName.push(key);
         });
-        function RGBAToHexA(rgba: number[]) {
-            let r = rgba[0].toString(16),
-                g = rgba[1].toString(16),
-                b = rgba[2].toString(16);
+
+        function RGBToHex(rgb: number[]) {
+            let r = rgb[1].toString(16),
+                g = rgb[2].toString(16),
+                b = rgb[3].toString(16);
             if (r.length == 1) r = "0" + r;
             if (g.length == 1) g = "0" + g;
             if (b.length == 1) b = "0" + b;
@@ -51,7 +82,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
             select(legend)
                 .append("svg")
                 .attr("height", 410 + "px")
-                .attr("width", 130 + "px")
+                .attr("width", 230 + "px")
                 .attr("transform", "translate(0,10)")
                 .call(colorLegend);
         }
@@ -70,6 +101,20 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         </div>
     );
 };
+
+export function colorTableData(
+    logName: string
+): [number, number, number, number][] {
+    const properties = colorTemplate[0]["properties"];
+    const propertiesData = properties.filter(
+        (value: colorTemplatePropertiesObj) => value.objectName == logName
+    );
+    const colorTableData = colorTables.filter(
+        (value: colorTablesObj) => value.name == propertiesData[0].colorTable
+    );
+
+    return colorTableData[0].colors;
+}
 
 DiscreteColorLegend.defaultProps = {
     position: [16, 10],
