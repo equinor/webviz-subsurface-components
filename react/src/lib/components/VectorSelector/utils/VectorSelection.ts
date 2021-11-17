@@ -30,6 +30,7 @@ export default class VectorSelection extends TreeNodeSelection {
         const newData = data;
         if (
             data === "" &&
+            index === super.countLevel() - 1 &&
             ((index !== undefined && index === super.getNumMetaNodes()) ||
                 (index === undefined &&
                     super.getFocussedLevel() === super.getNumMetaNodes()))
