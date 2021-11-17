@@ -8,8 +8,9 @@ import io
 import base64
 import copy
 import re
+import json
 
-from dash import Dash, html, Input, Output, State, callback
+from dash import Dash, html, Input, Output, State, callback, no_update
 import jsonpatch
 import jsonpointer
 import numpy as np
@@ -197,11 +198,15 @@ if __name__ == "__main__":
                 "selectedWell": "@@#editedData.selectedWell",
             },
         ],
-        editedData={
+        editedData= {
             "selectedWell": "",
+            "selectedPie": {},
             "selectedDrawingFeature": [],
-            "data": {"type": "FeatureCollection", "features": []},
-        },
+            "data": {
+                "type": "FeatureCollection",
+                "features": []
+            }
+        }
     )
 
     colormap_dropdown = wcc.Dropdown(
@@ -261,7 +266,13 @@ if __name__ == "__main__":
             ),
             wcc.Frame(
                 style={"flex": 10, "height": "90vh"},
-                children=[map_obj],
+                children=[
+                    map_obj,
+                    html.Pre(
+                        style={"fontSize": "1.2em", "overflow-x": "auto"},
+                        id="selected-map-data",
+                    ),
+                ],
             ),
         ]
     )
@@ -288,5 +299,31 @@ if __name__ == "__main__":
             return layers
 
         return apply_colormap(deckgl_layers)
+
+    @callback(
+        Output("selected-map-data", "children"),
+        Input("deckgl-map", "editedData")
+    )
+    def _get_client_update(edited_data):
+        if not edited_data:
+            return {}
+        def get_selected_well(edited_data):
+            return edited_data["selectedWell"]
+
+        def get_selected_drawing_feature(edited_data):
+            feature = edited_data["selectedDrawingFeature"]
+            if feature:
+                return edited_data["selectedDrawingFeature"]["geometry"]["coordinates"]
+            else:
+                return []
+
+        well_name = get_selected_well(edited_data)
+        coordinates = get_selected_drawing_feature(edited_data)
+
+        data = {
+            "selectedWell": well_name,
+            "selectedDrawing": coordinates,
+        }
+        return json.dumps(data, indent=2)
 
     app.run_server(debug=True)
