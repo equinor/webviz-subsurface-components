@@ -21,8 +21,8 @@ const Template = (args) => {
     return <DiscreteColorLegend {...args} />;
 };
 
-export const DiscreteLegend = Template.bind({});
-DiscreteLegend.args = {
+export const DiscreteTemplate = Template.bind({});
+DiscreteTemplate.args = {
     discreteData,
     logName,
     dataObjectName,
