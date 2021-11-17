@@ -313,19 +313,6 @@ function makeDataAccessor2(iData: number, iData2: number) {
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
 }
 
-export function getDataAccessorNumbers(accessor: Object): number[] {
-    const ret: number[] = [];
-    if (accessor instanceof __dataAccessor2) {
-        ret.push((accessor as __dataAccessor2).iData);
-        ret.push((accessor as __dataAccessor2).iData2);
-    } else if (accessor instanceof __dataAccessor)
-        ret.push((accessor as __dataAccessor).iData);
-    else {
-        console.log("getDataAccessorNumbers() called with unusual accessor");
-    }
-    return ret;
-}
-
 import { ColorTable } from "../components/ColorTableTypes";
 
 const defColorTable: ColorTable = {
