@@ -111,6 +111,25 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             this.updateFromWithin = false;
             return;
         }
+
+        if (
+            this.props.customVectorDefinitions &&
+            JSON.stringify(this.props.customVectorDefinitions) !==
+                JSON.stringify(prevProps.customVectorDefinitions)
+        ) {
+            this.vectorDefinitions = VectorData;
+            Object.keys(this.props.customVectorDefinitions).forEach(
+                (vectorName: string) => {
+                    if (vectorName in VectorData === false) {
+                        this.vectorDefinitions[vectorName] = (
+                            this.props
+                                .customVectorDefinitions as VectorDefinitions
+                        )[vectorName];
+                    }
+                }
+            );
+        }
+
         if (
             (this.props.data &&
                 JSON.stringify(this.props.data) !==
