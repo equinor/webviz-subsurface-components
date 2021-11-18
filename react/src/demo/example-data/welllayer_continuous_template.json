@@ -1,0 +1,49 @@
+[  
+    {
+        "name": "Continuous Template",
+        "properties": [
+            {
+                "objectName" : "PORO",
+                "colorTable" : "Rainbow",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "PERM",
+                "colorTable" : "Physics",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "MD",
+                "colorTable" : "Physics reverse",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "PORO_TOT",
+                "colorTable" : "Rainbow reverse",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "NTG",
+                "colorTable" : "Rainbow",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "PERM_TOT",
+                "colorTable" : "Physics",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "SW",
+                "colorTable" : "Rainbow",
+                "context" : "wells-layer",
+                "scale": "linear"
+            }
+        ]
+    }
+]
