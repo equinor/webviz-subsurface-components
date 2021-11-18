@@ -205,9 +205,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     );
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
-    // const [colorsArrays, setcolorsArrays] = React.useState<
-    //     [number, number, number, number][]
-    // >([]);
 
     const [is3D, setIs3D] = useState(false);
 
