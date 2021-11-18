@@ -187,7 +187,7 @@ if __name__ == "__main__":
             {
                 "@@type": "DrawingLayer",
                 "data": "@@#editedData.data",
-                "selectedDrawingFeature": "@@#editedData.selectedDrawingFeature",
+                "selectedFeatureIndexes": "@@#editedData.selectedFeatureIndexes"
             },
             {
                 "@@type": "WellsLayer",
@@ -200,8 +200,7 @@ if __name__ == "__main__":
         ],
         editedData= {
             "selectedWell": "",
-            "selectedPie": {},
-            "selectedDrawingFeature": [],
+            "selectedFeatureIndexes": [],
             "data": {
                 "type": "FeatureCollection",
                 "features": []
@@ -311,9 +310,11 @@ if __name__ == "__main__":
             return edited_data["selectedWell"]
 
         def get_selected_drawing_feature(edited_data):
-            feature = edited_data["selectedDrawingFeature"]
-            if feature:
-                return edited_data["selectedDrawingFeature"]["geometry"]["coordinates"]
+            indexes = edited_data["selectedFeatureIndexes"]
+            features = edited_data["data"]["features"]
+            if len(indexes) > 0 and len(features) > 0:
+                selected_feature = features[indexes[0]]
+                return selected_feature["geometry"]["coordinates"]
             else:
                 return []
 
