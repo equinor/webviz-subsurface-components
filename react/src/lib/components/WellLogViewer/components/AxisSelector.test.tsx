@@ -19,6 +19,7 @@ describe("Test Axis Selector", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
     });
+    // Below test is failing
     it("update axis to TVD", () => {
         const mockFn = jest.fn();
         render(
