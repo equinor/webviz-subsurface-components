@@ -3,9 +3,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { interpolatorContinuous } from "../../utils/continuousLegend";
-import { colorTableData } from "../../components/DiscreteLegend";
-import { color } from "d3-color";
+import { rgbValues, colorsArray } from "../../utils/continuousLegend";
 import {
     Feature,
     GeometryCollection,
@@ -348,8 +346,8 @@ function getLogColor(
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
-    if (log_data.length == 0 || log_info == undefined) return [];
 
+    if (log_data.length == 0 || log_info == undefined) return [];
     const log_color: RGBAColor[] = [];
     if (log_info.description == "continuous") {
         const min = Math.min(...log_data);
@@ -357,36 +355,24 @@ function getLogColor(
         const max_delta = max - min;
 
         log_data.forEach((value) => {
-            const rgb = color(
-                interpolatorContinuous()((value - min) / max_delta)
-            )?.rgb();
+            const rgb = rgbValues(log_name, (value - min) / max_delta);
             if (rgb != undefined) {
-                log_color.push([rgb.r, rgb.g, rgb.b]);
+                if (Array.isArray(rgb)) {
+                    log_color.push([rgb[0], rgb[1], rgb[2]]);
+                } else {
+                    log_color.push([rgb.r, rgb.g, rgb.b]);
+                }
             }
         });
     } else {
-        const colorsArrayData: [number, number, number, number][] =
-            colorTableData(log_name);
-
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
-        // eslint-disable-next-line
-        const attributesObject: { [key: string]: any } = {};
-        Object.keys(log_attributes).forEach((key) => {
-            const code = log_attributes[key][1];
-            const colorArrays = colorsArrayData.find((value: number[]) => {
-                return value[0] == code;
-            });
-            if (colorArrays)
-                attributesObject[key] = [
-                    [colorArrays[1], colorArrays[2], colorArrays[3]],
-                    code,
-                ];
-        });
         log_data.forEach((log_value) => {
-            const dl_attrs = Object.entries(attributesObject).find(
+            const dl_attrs = Object.entries(log_attributes).find(
                 ([, value]) => value[1] == log_value
             )?.[1];
-            dl_attrs ? log_color.push(dl_attrs[0]) : log_color.push([0, 0, 0]);
+            dl_attrs
+                ? log_color.push(dl_attrs[0])
+                : log_color.push([0, 0, 0, 0]);
         });
     }
     return log_color;
@@ -597,6 +583,7 @@ function getLegendData(logs: LogCurveDataType[], logName: string) {
             discrete: true,
             metadata: metadataDiscrete,
             valueRange: [],
+            colorsArray: [],
         });
         return legendProps;
     } else {
@@ -613,6 +600,7 @@ function getLegendData(logs: LogCurveDataType[], logName: string) {
             discrete: false,
             metadata: { objects: {} },
             valueRange: [Math.min(...minArray), Math.max(...maxArray)],
+            colorsArray: colorsArray(logName),
         });
         return legendProps;
     }

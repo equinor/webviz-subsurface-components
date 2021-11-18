@@ -205,6 +205,9 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     );
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
+    // const [colorsArrays, setcolorsArrays] = React.useState<
+    //     [number, number, number, number][]
+    // >([]);
 
     const [is3D, setIs3D] = useState(false);
 
@@ -214,12 +217,14 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         discrete: boolean;
         metadata: { objects: Record<string, [number[], number]> };
         valueRange: number[];
+        colorsArray: [number, number, number, number][];
     }>({
         title: "",
         logName: "",
         discrete: false,
         metadata: { objects: {} },
         valueRange: [],
+        colorsArray: [],
     });
 
     const onAfterRender = React.useCallback(() => {
@@ -241,6 +246,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
             discrete: legend.discrete,
             metadata: legend.metadata,
             valueRange: legend.valueRange,
+            colorsArray: legend.colorsArray,
         });
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
@@ -316,6 +322,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         max={legendProps.valueRange[1]}
                         dataObjectName={legendProps.title}
                         position={legend.position}
+                        colorTableColors={legendProps.colorsArray}
                     />
                 )}
             {deckGLLayers && (

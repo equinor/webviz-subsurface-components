@@ -186,6 +186,14 @@ DeckGLMap.propTypes = {
      * Prop containing edited data from layers
      */
     editedData: PropTypes.object,
+    /**
+     * Prop containing color table data
+     */
+    colorTables: PropTypes.arrayOf(PropTypes.object),
+    /**
+     * Prop containing color template data
+     */
+    colorTemplate: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default DeckGLMap;
