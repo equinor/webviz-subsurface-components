@@ -471,7 +471,8 @@ function fillInfos(
                     infos.push({
                         name: legend1 ? legend1.label : legend.label,
                         units: legend1 ? legend1.unit : legend.unit,
-                        color: (options1 ? options1.color : options.color) || "",
+                        color:
+                            (options1 ? options1.color : options.color) || "",
                         value: getValue(x, data, type),
                         type: type,
                         track_id: track.id,
@@ -483,7 +484,9 @@ function fillInfos(
                         infos.push({
                             name: legend2.label,
                             units: legend2.unit,
-                            color: (options2 ? options2.color : options.color) || "",
+                            color:
+                                (options2 ? options2.color : options.color) ||
+                                "",
                             value: getValue(x, data, type),
                             type: type,
                             track_id: "_" + track.id,
@@ -880,7 +883,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 }
             }
 
-            this.logController.addTrack(trackNew); 
+            this.logController.addTrack(trackNew);
 
             /* Not work. Scrollbar asynchroniously send old trackpos value 
             if (bAfter) 
