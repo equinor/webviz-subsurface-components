@@ -79,9 +79,9 @@ function createColorItems(): ReactNode[] {
 function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
     const nodes: ReactNode[] = [];
     for (const colorTable of colorTables) {
-        if (colorTable.discrete)
-            // skip discrete color tables?
-            continue;
+        ///if (colorTable.discrete)
+        // skip discrete color tables?
+        ///    continue;
         nodes.push(<option key={colorTable.name}>{colorTable.name}</option>);
     }
     return nodes;
@@ -144,7 +144,10 @@ export class PlotPropertiesDialog extends Component<
     }
 
     onOK(): void {
-        this.props.onOK(this.state);
+        const templatePlot = { ...this.state };
+        if (templatePlot.type === "gradientfill")
+            templatePlot.inverseColor = ""; // clear value not edited by the dialog
+        this.props.onOK(templatePlot);
         this.closeDialog();
     }
 

@@ -648,7 +648,7 @@ export function editGraphTrackPlot(
 }
 
 export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
-    const plots = (track as GraphTrack).plots;
+    const plots = track.plots;
 
     let index = 0;
     for (const plot of plots) {
@@ -666,7 +666,7 @@ export function removeGraphTrackPlot(
     track: GraphTrack,
     _plot: Plot
 ): void {
-    const plots = (track as GraphTrack).plots;
+    const plots = track.plots;
 
     let index = 0;
     for (const plot of plots) {
@@ -677,7 +677,7 @@ export function removeGraphTrackPlot(
         index++;
     }
 
-    (track as GraphTrack).prepareData();
+    track.prepareData();
 }
 
 function newDualScaleTrack(

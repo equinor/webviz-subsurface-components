@@ -246,18 +246,23 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                     onClose={this.handleCloseMenu.bind(this)}
                     onContextMenu={this.handleContextMenu.bind(this)}
                 >
-                    <MenuItem
-                        onClick={this.handleClickItem.bind(
-                            this,
-                            this.props.wellLogView.addPlot.bind(
-                                this.props.wellLogView,
-                                this.state.anchorEl,
-                                track
-                            )
-                        )}
-                    >
-                        {"Add plot"}
-                    </MenuItem>
+                    {!(track as GraphTrack).options.plotFactory
+                        ? []
+                        : [
+                              <MenuItem
+                                  key="333"
+                                  onClick={this.handleClickItem.bind(
+                                      this,
+                                      this.props.wellLogView.addPlot.bind(
+                                          this.props.wellLogView,
+                                          this.state.anchorEl,
+                                          track
+                                      )
+                                  )}
+                              >
+                                  {"Add plot"}
+                              </MenuItem>,
+                          ]}
 
                     {!plots || !plots.length
                         ? []

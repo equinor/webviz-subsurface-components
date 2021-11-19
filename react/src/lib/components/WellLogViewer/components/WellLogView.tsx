@@ -751,6 +751,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
             this.logController.domain = minmax;
 
+            // protectedthis.logController.updateLegendRows();
             this.logController.updateTracks();
         }
         this.setInfo();
@@ -771,6 +772,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
             this.logController.domain = minmax;
 
+            // protectedthis.logController.updateLegendRows();
             this.logController.updateTracks();
         }
         this.setInfo();
@@ -778,7 +780,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     removeTrackPlot(track: Track, plot: Plot): void {
         removeGraphTrackPlot(this, track as GraphTrack, plot);
-        if (this.logController) this.logController.updateTracks();
+        if (this.logController) {
+            // protected this.logController.updateLegendRows();
+            this.logController.updateTracks();
+        }
         this.setInfo();
     }
 
