@@ -3,7 +3,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { rgbValues } from "../../utils/continuousLegend";
+import { rgbValues, colorsArray } from "../../utils/continuousLegend";
 import {
     Feature,
     GeometryCollection,
@@ -168,6 +168,11 @@ export default class WellsLayer extends CompositeLayer<
                 updateTriggers: {
                     getColor: [this.props.logName],
                     getWidth: [this.props.logName, this.props.logRadius],
+                },
+                onDataLoad: (value: LogCurveDataType[]) => {
+                    this.setState({
+                        legend: getLegendData(value, this.props.logName),
+                    });
                 },
             })
         );
@@ -563,4 +568,40 @@ function getLogProperty(
             well_object?.properties?.["color"]
         );
     } else return null;
+}
+
+function getLegendData(logs: LogCurveDataType[], logName: string) {
+    const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
+    const title = "Wells / " + logName;
+    const legendProps = [];
+    if (logInfo?.description == "discrete") {
+        const meta = logs[0]["metadata_discrete"];
+        const metadataDiscrete = meta[logName].objects;
+        legendProps.push({
+            title: title,
+            logName: logName,
+            discrete: true,
+            metadata: metadataDiscrete,
+            valueRange: [],
+            colorsArray: [],
+        });
+        return legendProps;
+    } else {
+        const minArray: number[] = [];
+        const maxArray: number[] = [];
+        logs.forEach(function (log: LogCurveDataType) {
+            const logValues = getLogValues(log, log.header.name, logName);
+            minArray.push(Math.min(...logValues));
+            maxArray.push(Math.max(...logValues));
+        });
+        legendProps.push({
+            title: title,
+            logName: "",
+            discrete: false,
+            metadata: { objects: {} },
+            valueRange: [Math.min(...minArray), Math.max(...maxArray)],
+            colorsArray: colorsArray(logName),
+        });
+        return legendProps;
+    }
 }
