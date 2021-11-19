@@ -76,13 +76,12 @@ function createColorItems(): ReactNode[] {
     return _createItems(colorItems);
 }
 
-function createColorTableItems(
-    colorTables: ColorTable[],
-    insertEmpty?: boolean
-): ReactNode[] {
+function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
     const nodes: ReactNode[] = [];
-    if (insertEmpty) nodes.push(<option value={noneValue}>{"\u2014"}</option>);
     for (const colorTable of colorTables) {
+        if (colorTable.discrete)
+            // skip discrete color tables?
+            continue;
         nodes.push(<option key={colorTable.name}>{colorTable.name}</option>);
     }
     return nodes;
@@ -123,10 +122,17 @@ export class PlotPropertiesDialog extends Component<
                   name2: name2, //? the second data in data selector ??
 
                   color: "black", //??
+
+                  // for 'area' plot
                   fill: "red",
                   fillOpacity: 0.25,
-                  colorTable: this.props.wellLogView.props.colorTables[0].name,
+                  inverseColor: "",
 
+                  // for 'gradient fill' plot
+                  colorTable: this.props.wellLogView.props.colorTables[0].name,
+                  inverseColorTable: "",
+
+                  // for 'differetial' plot
                   color2: "black", //??
                   fill2: "green",
 
@@ -293,14 +299,15 @@ export class PlotPropertiesDialog extends Component<
                               this.createSelectControl(
                                   "colorTable",
                                   "Fill Color table",
-                                  createColorTableItems(colorTables, false)
+                                  createColorTableItems(colorTables)
                               ),
                               <FormControl fullWidth key="211" />,
                               <FormControl fullWidth key="212" />,
                               this.createSelectControl(
                                   "inverseColorTable",
                                   "Inverse Color table",
-                                  createColorTableItems(colorTables, true)
+                                  createColorTableItems(colorTables),
+                                  true
                               ),
                           ]
                         : []}
