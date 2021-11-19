@@ -128,8 +128,10 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         },
         onRescale: (event: OverlayRescaleEvent): void => {
             if (event.target && event.transform) {
+                const zoom = getContentZoom(instance); // event.transform.k not valid after updateTracks();
+                //console.log("zoom=", zoom, event.transform.k)
                 const pos = getContentScrollPos(instance);
-                parent.onRescaleContent(pos, event.transform.k);
+                parent.onRescaleContent(pos, zoom);
 
                 event.target.style.visibility = "visible";
                 event.target.textContent = `Zoom: x${event.transform.k.toFixed(
@@ -551,6 +553,8 @@ interface Props {
     maxTrackNum?: number;
     scrollTrackPos?: number; // the first track number
 
+    maxContentZoom?: number; // default is 256
+
     onInfo?: (infos: Info[]) => void;
     onCreateController?: (controller: WellLogController) => void;
 
@@ -602,10 +606,12 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.primaryAxis !== nextProps.primaryAxis) return true;
         if (this.props.axisTitles !== nextProps.axisTitles) return true;
         if (this.props.axisMnemos !== nextProps.axisMnemos) return true;
-        if (this.props.scrollTrackPos !== nextProps.scrollTrackPos) return true;
 
         if (this.props.maxTrackNum !== nextProps.maxTrackNum) return true;
+        if (this.props.scrollTrackPos !== nextProps.scrollTrackPos) return true;
         if (this.state.scrollTrackPos !== nextState.scrollTrackPos) return true;
+
+        if (this.props.maxContentZoom !== nextProps.maxContentZoom) return true;
 
         return false;
     }
@@ -618,7 +624,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         }
 
         let shouldSetTracks = false;
-        if (this.props.horizontal !== prevProps.horizontal) {
+        if (
+            this.props.horizontal !== prevProps.horizontal ||
+            this.props.maxContentZoom !== prevProps.maxContentZoom
+        ) {
             this.createLogViewer();
             shouldSetTracks = true;
         }
@@ -666,6 +675,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.logController = new LogViewer({
                 showLegend: true,
                 horizontal: this.props.horizontal,
+                maxZoom: this.props.maxContentZoom,
                 onTrackEnter: (elm: HTMLElement, track: Track) =>
                     addTrackEventHandlers(elm, track, this.onTrackEvent),
             });

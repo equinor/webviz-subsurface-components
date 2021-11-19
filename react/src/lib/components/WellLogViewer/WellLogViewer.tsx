@@ -251,6 +251,7 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     render(): ReactNode {
+        const maxContentZoom = 256;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <Scroller
@@ -264,6 +265,7 @@ class WellLogViewer extends Component<Props, State> {
                         colorTables={this.props.colorTables}
                         horizontal={this.props.horizontal}
                         maxTrackNum={this.props.horizontal ? 3 : 5}
+                        maxContentZoom={maxContentZoom}
                         primaryAxis={this.state.primaryAxis}
                         axisTitles={axisTitles}
                         axisMnemos={axisMnemos}
@@ -296,7 +298,7 @@ class WellLogViewer extends Component<Props, State> {
                                 value={Math.log2(this.state.zoomContent)}
                                 min={0}
                                 step={0.5}
-                                max={8}
+                                max={Math.log2(maxContentZoom)}
                                 scale={(x) => 2 ** x}
                                 defaultValue={0}
                                 onChange={this.onZoomSliderChange}
