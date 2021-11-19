@@ -24,7 +24,7 @@ const ContinuousLegend: React.FC<legendProps> = ({
 }: legendProps) => {
     React.useEffect(() => {
         continuousLegend("#legend");
-    }, [min, max]);
+    }, [min, max, colorTableColors, dataObjectName]);
 
     function continuousLegend(selected_id: string) {
         const itemColor: ItemColor[] = [];
