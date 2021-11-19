@@ -3,8 +3,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { interpolatorContinuous } from "../../utils/continuousLegend";
-import { color } from "d3-color";
+import { rgbValues, colorsArray } from "../../utils/continuousLegend";
 import {
     Feature,
     GeometryCollection,
@@ -169,6 +168,11 @@ export default class WellsLayer extends CompositeLayer<
                 updateTriggers: {
                     getColor: [this.props.logName],
                     getWidth: [this.props.logName, this.props.logRadius],
+                },
+                onDataLoad: (value: LogCurveDataType[]) => {
+                    this.setState({
+                        legend: getLegendData(value, this.props.logName),
+                    });
                 },
             })
         );
@@ -342,8 +346,8 @@ function getLogColor(
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
-    if (log_data.length == 0 || log_info == undefined) return [];
 
+    if (log_data.length == 0 || log_info == undefined) return [];
     const log_color: RGBAColor[] = [];
     if (log_info.description == "continuous") {
         const min = Math.min(...log_data);
@@ -351,11 +355,13 @@ function getLogColor(
         const max_delta = max - min;
 
         log_data.forEach((value) => {
-            const rgb = color(
-                interpolatorContinuous()((value - min) / max_delta)
-            )?.rgb();
+            const rgb = rgbValues(log_name, (value - min) / max_delta);
             if (rgb != undefined) {
-                log_color.push([rgb.r, rgb.g, rgb.b]);
+                if (Array.isArray(rgb)) {
+                    log_color.push([rgb[0], rgb[1], rgb[2]]);
+                } else {
+                    log_color.push([rgb.r, rgb.g, rgb.b]);
+                }
             }
         });
     } else {
@@ -562,4 +568,40 @@ function getLogProperty(
             well_object?.properties?.["color"]
         );
     } else return null;
+}
+
+function getLegendData(logs: LogCurveDataType[], logName: string) {
+    const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
+    const title = "Wells / " + logName;
+    const legendProps = [];
+    if (logInfo?.description == "discrete") {
+        const meta = logs[0]["metadata_discrete"];
+        const metadataDiscrete = meta[logName].objects;
+        legendProps.push({
+            title: title,
+            logName: logName,
+            discrete: true,
+            metadata: metadataDiscrete,
+            valueRange: [],
+            colorsArray: [],
+        });
+        return legendProps;
+    } else {
+        const minArray: number[] = [];
+        const maxArray: number[] = [];
+        logs.forEach(function (log: LogCurveDataType) {
+            const logValues = getLogValues(log, log.header.name, logName);
+            minArray.push(Math.min(...logValues));
+            maxArray.push(Math.max(...logValues));
+        });
+        legendProps.push({
+            title: title,
+            logName: "",
+            discrete: false,
+            metadata: { objects: {} },
+            valueRange: [Math.min(...minArray), Math.max(...maxArray)],
+            colorsArray: colorsArray(logName),
+        });
+        return legendProps;
+    }
 }

@@ -113,11 +113,11 @@ const Map: React.FC<MapProps> = ({
 
     // state to update layers to include default props
     const [layersWithDefaultProps, setLayersWithDefaultProps] = React.useState(
-        getLayersWithDefaultProps(layers, bounds)
+        getLayersWithDefaultProps(layers)
     );
     React.useEffect(() => {
-        setLayersWithDefaultProps(getLayersWithDefaultProps(layers, bounds));
-    }, [layers, bounds]);
+        setLayersWithDefaultProps(getLayersWithDefaultProps(layers));
+    }, [layers]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
@@ -186,7 +186,19 @@ function getViewsForDeckGL(): Record<string, unknown>[] {
     const deckgl_views = [
         {
             "@@type": "OrthographicView",
-            id: "main",
+            id: "main2D",
+            controller: {
+                doubleClickZoom: false,
+            },
+            x: "0%",
+            y: "0%",
+            width: "100%",
+            height: "100%",
+            flipY: false,
+        },
+        {
+            "@@type": "OrbitView",
+            id: "main3D",
             controller: {
                 doubleClickZoom: false,
             },
@@ -202,8 +214,7 @@ function getViewsForDeckGL(): Record<string, unknown>[] {
 
 // update layer object to include default props
 function getLayersWithDefaultProps(
-    deckgl_layers: Record<string, unknown>[],
-    bounds: [number, number, number, number]
+    deckgl_layers: Record<string, unknown>[]
 ): Record<string, unknown>[] {
     const layers = deckgl_layers.map((a) => {
         return { ...a };
@@ -213,10 +224,8 @@ function getLayersWithDefaultProps(
         let default_props = undefined;
         if (layer["@@type"] === ColormapLayer.name) {
             default_props = ColormapLayer.defaultProps;
-            if (default_props) default_props["bounds"] = bounds;
         } else if (layer["@@type"] === Hillshading2DLayer.name) {
             default_props = Hillshading2DLayer.defaultProps;
-            if (default_props) default_props["bounds"] = bounds;
         } else if (layer["@@type"] === GridLayer.name)
             default_props = GridLayer.defaultProps;
         else if (layer["@@type"] === WellsLayer.name)
