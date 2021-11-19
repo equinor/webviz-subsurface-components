@@ -523,6 +523,7 @@ export interface TrackEvent {
 
 export interface WellLogController {
     scrollTrackTo(pos: number): boolean;
+    scrollTrackBy(delta: number): void;
     getTrackScrollPos(): number;
     getTrackScrollPosMax(): number;
 
@@ -771,6 +772,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo();
     }
 
+    /* 
+      Display current state of track scrolling
+      */
     scrollTrack(): void {
         const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
@@ -825,6 +829,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this.props.maxTrackNum
             ? this.props.maxTrackNum
             : 6 /*some default value*/;
+    }
+
+    scrollTrackBy(delta: number): void {
+        this.setState((prevState: State) => ({
+            scrollTrackPos: this._newTrackScrollPos(
+                prevState.scrollTrackPos + delta
+            ),
+        }));
     }
 
     scrollTrackTo(pos: number): boolean {
@@ -884,13 +896,13 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             }
 
             this.logController.addTrack(trackNew);
-
-            /* Not work. Scrollbar asynchroniously send old trackpos value 
-            if (bAfter) 
-                this.scrollTrackTo(this.getTrackScrollPos() + 1); // force new track to be visible
-            */
-            this.scrollTrack();
-            this.setInfo();
+            if (bAfter)
+                // force new track to be visible when added after the current
+                this.scrollTrackBy(+1);
+            else {
+                this.scrollTrack();
+                this.setInfo();
+            }
         }
     }
 
