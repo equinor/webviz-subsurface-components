@@ -20,6 +20,7 @@ import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -34,21 +35,6 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logCurves: boolean;
     refine: boolean;
 }
-
-const defaultProps = {
-    name: "Wells",
-    id: "wells-layer",
-    autoHighlight: true,
-    selectionEnabled: true,
-    opacity: 1,
-    lineWidthScale: 5,
-    pointRadiusScale: 8,
-    outline: true,
-    logRadius: 6,
-    logCurves: true,
-    refine: true,
-    visible: true,
-};
 
 export interface LogCurveDataType {
     header: {
@@ -219,7 +205,7 @@ export default class WellsLayer extends CompositeLayer<
 }
 
 WellsLayer.layerName = "WellsLayer";
-WellsLayer.defaultProps = defaultProps;
+WellsLayer.defaultProps = layersDefaultProps["WellsLayer"];
 
 //================= Local help functions. ==================
 

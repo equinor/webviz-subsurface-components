@@ -11,7 +11,7 @@ import {
     ValueDecoder,
 } from "../utils/propertyMapTools";
 import { getModelMatrix } from "../utils/layerTools";
-
+import { layersDefaultProps } from "../layersDefaultProps";
 import fsColormap from "!!raw-loader!./colormap.fs.glsl";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
@@ -58,26 +58,7 @@ export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
     rotDeg: number;
 }
 
-const defaultProps = {
-    name: "Property map",
-    id: "colormap-layer",
-    pickable: true,
-    visible: true,
-    colormap: { type: "object", value: null, async: true },
-    valueRange: { type: "array" },
-    colorMapRange: { type: "array" },
-    valueDecoder: {
-        type: "object",
-        value: {
-            rgbScaler: [1, 1, 1],
-            // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
-            floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
-            offset: 0,
-            step: 0,
-        },
-    },
-    rotDeg: 0,
-};
+const defaultProps = layersDefaultProps["ColormapLayer"];
 
 export default class ColormapLayer extends BitmapLayer<
     unknown,

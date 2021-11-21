@@ -7,6 +7,7 @@ import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { Feature } from "geojson";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { PolygonLayerProps } from "@deck.gl/layers";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 // These are the data GridLayer expects.
 type CellData = {
@@ -32,12 +33,6 @@ interface PolygonData {
 }
 
 export type GridLayerProps<D> = ExtendedLayerProps<D>;
-
-const defaultProps = {
-    name: "Grid",
-    pickable: true,
-    coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-};
 
 export default class GridLayer extends CompositeLayer<
     GridData,
@@ -108,6 +103,7 @@ export default class GridLayer extends CompositeLayer<
                 filled: true,
                 lineWidthMinPixels: 1,
                 visible: this.props.visible,
+                coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
             })
         );
 
@@ -116,7 +112,7 @@ export default class GridLayer extends CompositeLayer<
 }
 
 GridLayer.layerName = "GridLayer";
-GridLayer.defaultProps = defaultProps;
+GridLayer.defaultProps = layersDefaultProps["GridLayer"];
 
 //================= Local help functions. ==================
 function makeLayerData(data: GridData, ti: number): PolygonData[] {
