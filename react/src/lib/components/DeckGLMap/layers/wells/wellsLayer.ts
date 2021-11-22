@@ -21,6 +21,8 @@ import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
+import { templateArray } from "../../components/WelllayerTemplateTypes";
+import { colorTablesArray } from "../../components/ColorTableTypes";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -70,24 +72,6 @@ export interface LogCurveDataType {
     >;
 }
 
-export interface template {
-    name: string;
-    properties: Array<{
-        objectName: string;
-        colorTable: string;
-        context: string;
-        colorInterpolation: string;
-    }>;
-}
-
-type colorTemplateArray = Array<template>;
-
-export interface colorTables {
-    name: string;
-    description: string;
-    colors: [number, number, number, number][];
-}
-type colorTablesArray = Array<colorTables>;
 export interface WellsPickInfo extends LayerPickInfo {
     logName: string;
 }
@@ -368,7 +352,7 @@ function getLogColor(
     d: LogCurveDataType,
     logrun_name: string,
     log_name: string,
-    template: colorTemplateArray,
+    template: templateArray,
     colorTables: colorTablesArray
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);

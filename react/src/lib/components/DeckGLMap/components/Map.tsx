@@ -14,6 +14,8 @@ import {
     GridLayer,
     DrawingLayer,
 } from "../layers";
+import { templateArray } from "./WelllayerTemplateTypes";
+import { colorTablesArray } from "./ColorTableTypes";
 
 export interface MapProps {
     /**
@@ -86,21 +88,9 @@ export interface MapProps {
 
     children?: React.ReactNode;
 
-    template: Array<{
-        name: string;
-        properties: Array<{
-            objectName: string;
-            colorTable: string;
-            context: string;
-            colorInterpolation: string;
-        }>;
-    }>;
+    template: templateArray;
 
-    colorTables: Array<{
-        name: string;
-        description: string;
-        colors: [number, number, number, number][];
-    }>;
+    colorTables: colorTablesArray;
 }
 
 const Map: React.FC<MapProps> = ({

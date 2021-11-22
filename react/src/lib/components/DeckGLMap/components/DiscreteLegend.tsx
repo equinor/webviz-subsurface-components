@@ -1,6 +1,8 @@
 import React from "react";
 import legendUtil from "../utils/discreteLegend";
 import { scaleOrdinal, select } from "d3";
+import { templateArray, propertiesObj } from "./WelllayerTemplateTypes";
+import { colorTablesArray, colorTablesObj } from "./ColorTableTypes";
 
 interface ItemColor {
     color: string;
@@ -11,30 +13,8 @@ interface colorLegendProps {
     dataObjectName: string;
     name: string;
     position: number[];
-    template: colorTemplateArray;
+    template: templateArray;
     colorTables: colorTablesArray;
-}
-
-interface colorTablesObj {
-    name: string;
-    description: string;
-    colors: [number, number, number, number][];
-}
-
-type colorTablesArray = Array<colorTablesObj>;
-
-interface colorTemplate {
-    name: string;
-    properties: Array<colorTemplatePropertiesObj>;
-}
-
-type colorTemplateArray = Array<colorTemplate>;
-
-interface colorTemplatePropertiesObj {
-    objectName: string;
-    colorTable: string;
-    context: string;
-    colorInterpolation: string;
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
@@ -107,12 +87,12 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
 // Based on name return the colors array from color.tables.json file
 export function colorTableData(
     name: string,
-    template: colorTemplateArray,
+    template: templateArray,
     colorTables: colorTablesArray
 ): [number, number, number, number][] {
     const properties = template[0]["properties"];
     const propertiesData = properties.filter(
-        (value: colorTemplatePropertiesObj) => value.objectName == name
+        (value: propertiesObj) => value.objectName == name
     );
     const colorTableData = colorTables.filter(
         (value: colorTablesObj) =>

@@ -1,28 +1,13 @@
 import { color } from "d3-color";
 import { interpolateRgb } from "d3-interpolate";
-
-interface colorTables {
-    name: string;
-    description: string;
-    colors: [number, number, number, number][];
-}
-type colorTablesArray = Array<colorTables>;
-
-interface propertiesObj {
-    objectName: string;
-    colorTable: string;
-    context: string;
-    colorInterpolation: string;
-}
-
-type propertiesArr = Array<propertiesObj>;
-
-interface template {
-    name: string;
-    properties: propertiesArr;
-}
-
-type templateArray = Array<template>;
+import {
+    templateArray,
+    propertiesObj,
+} from "../components/WelllayerTemplateTypes";
+import {
+    colorTablesArray,
+    colorTablesObj,
+} from "../components/ColorTableTypes";
 
 // Based on objectName return the colors array from color.tables.json file
 export function colorsArray(
@@ -35,7 +20,7 @@ export function colorsArray(
         (value: propertiesObj) => value.objectName == objectName
     );
     const colorTableData = colorTables.filter(
-        (value: colorTables) =>
+        (value: colorTablesObj) =>
             value.name.toLowerCase() ==
             propertiesData[0].colorTable.toLowerCase()
     );

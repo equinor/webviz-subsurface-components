@@ -1,6 +1,8 @@
 import React from "react";
 import { RGBToHex, colorsArray } from "../utils/continuousLegend";
 import { select, scaleLinear, scaleSequential, axisBottom } from "d3";
+import { templateArray } from "./WelllayerTemplateTypes";
+import { colorTablesArray } from "./ColorTableTypes";
 
 interface legendProps {
     min: number;
@@ -8,20 +10,8 @@ interface legendProps {
     dataObjectName: string;
     position: number[];
     name: string;
-    template: Array<{
-        name: string;
-        properties: Array<{
-            objectName: string;
-            colorTable: string;
-            context: string;
-            colorInterpolation: string;
-        }>;
-    }>;
-    colorTables: Array<{
-        name: string;
-        description: string;
-        colors: [number, number, number, number][];
-    }>;
+    template: templateArray;
+    colorTables: colorTablesArray;
 }
 
 interface ItemColor {

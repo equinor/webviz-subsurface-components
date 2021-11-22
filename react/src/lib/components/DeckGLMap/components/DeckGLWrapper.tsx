@@ -17,6 +17,8 @@ import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer } from "deck.gl";
 import ToggleButton from "./settings/ToggleButton";
+import { templateArray } from "./WelllayerTemplateTypes";
+import { colorTablesArray } from "./ColorTableTypes";
 
 export interface DeckGLWrapperProps {
     /**
@@ -77,21 +79,9 @@ export interface DeckGLWrapperProps {
 
     children?: React.ReactNode;
 
-    template: Array<{
-        name: string;
-        properties: Array<{
-            objectName: string;
-            colorTable: string;
-            context: string;
-            colorInterpolation: string;
-        }>;
-    }>;
+    template: templateArray;
 
-    colorTables: Array<{
-        name: string;
-        description: string;
-        colors: [number, number, number, number][];
-    }>;
+    colorTables: colorTablesArray;
 }
 
 function getLayer(layers: Layer<unknown>[] | undefined, id: string) {
