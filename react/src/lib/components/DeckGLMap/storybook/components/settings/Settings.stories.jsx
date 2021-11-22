@@ -4,7 +4,7 @@ import { createStore } from "../../../redux/store";
 import Settings from "../../../components/settings/Settings";
 
 const exampleData = require("../../../../../../demo/example-data/deckgl-map.json");
-const store = createStore(exampleData[0].deckglSpecBase, (patch) => patch);
+const store = createStore(exampleData[0].layers);
 
 export default {
     component: Settings,

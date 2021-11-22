@@ -15,7 +15,7 @@ describe("Test Layer Property", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
     });
-    xit("select option to dispatch redux action", async () => {
+    it("select option to dispatch redux action", async () => {
         render(
             Wrapper({
                 children: <LayerProperty layerId="drawing-layer" />,

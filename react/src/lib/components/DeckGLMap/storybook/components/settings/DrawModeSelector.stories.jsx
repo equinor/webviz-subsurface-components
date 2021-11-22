@@ -4,7 +4,7 @@ import { createStore } from "../../../redux/store";
 import DrawModeSelector from "../../../components/settings/DrawModeSelector";
 
 const exampleData = require("../../../../../../demo/example-data/deckgl-map.json");
-const store = createStore(exampleData[0].deckglSpecBase, (patch) => patch);
+const store = createStore(exampleData[0].layers);
 
 export default {
     component: DrawModeSelector,
