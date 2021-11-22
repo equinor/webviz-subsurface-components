@@ -550,11 +550,12 @@ interface Props {
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
-    maxTrackNum?: number;
+    maxTrackNum?: number; // default horizontal ? 3 : 5
     scrollTrackPos?: number; // the first track number
 
     maxContentZoom?: number; // default is 256
 
+    // callbacks:
     onInfo?: (infos: Info[]) => void;
     onCreateController?: (controller: WellLogController) => void;
 
