@@ -1,7 +1,8 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
-
 const exampleData = require("../../../../demo/example-data/deckgl-map.json");
+const template = require("../../../../demo/example-data/welllayer_template.json");
+const colorTables = require("../../../../demo/example-data/color-tables.json");
 
 export default {
     component: DeckGLMap,
@@ -13,7 +14,6 @@ const Template = (args) => {
     React.useEffect(() => {
         setEditedData(args.editedData);
     }, [args.editedData]);
-
     return (
         <DeckGLMap
             {...args}
@@ -26,4 +26,8 @@ const Template = (args) => {
 };
 
 export const Default = Template.bind({});
-Default.args = exampleData[0];
+Default.args = {
+    ...exampleData[0],
+    template: template,
+    colorTables: colorTables,
+};

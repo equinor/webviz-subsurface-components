@@ -1,5 +1,5 @@
 import React from "react";
-import { RGBToHex } from "../utils/continuousLegend";
+import { RGBToHex, colorsArray } from "../utils/continuousLegend";
 import { select, scaleLinear, scaleSequential, axisBottom } from "d3";
 
 interface legendProps {
@@ -7,7 +7,21 @@ interface legendProps {
     max: number;
     dataObjectName: string;
     position: number[];
-    colorTableColors: [number, number, number, number][];
+    name: string;
+    template: Array<{
+        name: string;
+        properties: Array<{
+            objectName: string;
+            colorTable: string;
+            context: string;
+            colorInterpolation: string;
+        }>;
+    }>;
+    colorTables: Array<{
+        name: string;
+        description: string;
+        colors: [number, number, number, number][];
+    }>;
 }
 
 interface ItemColor {
@@ -20,21 +34,23 @@ const ContinuousLegend: React.FC<legendProps> = ({
     max,
     dataObjectName,
     position,
-    colorTableColors,
+    name,
+    template,
+    colorTables,
 }: legendProps) => {
     React.useEffect(() => {
         continuousLegend("#legend");
-    }, [min, max, colorTableColors, dataObjectName]);
+    }, [min, max, dataObjectName]);
 
     function continuousLegend(selected_id: string) {
         const itemColor: ItemColor[] = [];
+        const colorTableColors = colorsArray(name, template, colorTables);
         colorTableColors.forEach((value: [number, number, number, number]) => {
             itemColor.push({
                 offset: RGBToHex(value).offset,
                 color: RGBToHex(value).color,
             });
         });
-
         select(selected_id).select("svg").remove();
         const colorScale = scaleSequential().domain([min, max]);
         // append a defs (for definition) element to your SVG

@@ -1,6 +1,10 @@
 import PropTypes from "prop-types";
 import * as React from "react";
 import Map from "./components/Map";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const template = require("../../../demo/example-data/welllayer_template.json");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const colorTables = require("../../../demo/example-data/color-tables.json");
 
 DeckGLMap.defaultProps = {
     coords: {
@@ -19,6 +23,8 @@ DeckGLMap.defaultProps = {
         position: [46, 10],
     },
     zoom: -3,
+    colorTables: { colorTables },
+    template: { template },
 };
 
 function DeckGLMap({
@@ -30,6 +36,8 @@ function DeckGLMap({
     coords,
     scale,
     legend,
+    template,
+    colorTables,
     coordinateUnit,
     editedData,
     setProps,
@@ -74,6 +82,8 @@ function DeckGLMap({
                 coords={coords}
                 scale={scale}
                 legend={legend}
+                template={template}
+                colorTables={colorTables}
                 coordinateUnit={coordinateUnit}
                 editedData={layerEditedData}
                 setEditedData={setEditedData}
@@ -193,7 +203,7 @@ DeckGLMap.propTypes = {
     /**
      * Prop containing color template data
      */
-    colorTemplate: PropTypes.arrayOf(PropTypes.object),
+    template: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default DeckGLMap;

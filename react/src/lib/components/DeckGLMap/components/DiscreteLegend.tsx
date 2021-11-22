@@ -1,10 +1,6 @@
 import React from "react";
 import legendUtil from "../utils/discreteLegend";
 import { scaleOrdinal, select } from "d3";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTemplate = require("../../../../demo/example-data/welllayer_discrete_template.json");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("../../../../demo/example-data/color-tables.json");
 
 interface ItemColor {
     color: string;
@@ -13,8 +9,10 @@ interface ItemColor {
 interface colorLegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
     dataObjectName: string;
-    logName: string;
+    name: string;
     position: number[];
+    template: colorTemplateArray;
+    colorTables: colorTablesArray;
 }
 
 interface colorTablesObj {
@@ -23,6 +21,15 @@ interface colorTablesObj {
     colors: [number, number, number, number][];
 }
 
+type colorTablesArray = Array<colorTablesObj>;
+
+interface colorTemplate {
+    name: string;
+    properties: Array<colorTemplatePropertiesObj>;
+}
+
+type colorTemplateArray = Array<colorTemplate>;
+
 interface colorTemplatePropertiesObj {
     objectName: string;
     colorTable: string;
@@ -30,30 +37,25 @@ interface colorTemplatePropertiesObj {
     colorInterpolation: string;
 }
 
-interface colorTemplate {
-    name: string;
-    properties: Array<colorTemplatePropertiesObj>;
-}
-
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     discreteData,
-    logName,
+    name,
     dataObjectName,
     position,
+    template,
+    colorTables,
 }: colorLegendProps) => {
     React.useEffect(() => {
         discreteLegend("#legend");
     }, [discreteData]);
-
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
         const colorsArrayData: [number, number, number, number][] =
-            colorTableData(logName);
+            colorTableData(name, template, colorTables);
         Object.keys(discreteData).forEach((key) => {
             // eslint-disable-next-line
             let code = (discreteData as { [key: string]: any })[key][1]
-            // from color table
             const colorArrays = colorsArrayData.find((value: number[]) => {
                 return value[0] == code;
             });
@@ -102,17 +104,21 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     );
 };
 
+// Based on name return the colors array from color.tables.json file
 export function colorTableData(
-    logName: string
+    name: string,
+    template: colorTemplateArray,
+    colorTables: colorTablesArray
 ): [number, number, number, number][] {
-    const properties = colorTemplate[0]["properties"];
+    const properties = template[0]["properties"];
     const propertiesData = properties.filter(
-        (value: colorTemplatePropertiesObj) => value.objectName == logName
+        (value: colorTemplatePropertiesObj) => value.objectName == name
     );
     const colorTableData = colorTables.filter(
-        (value: colorTablesObj) => value.name == propertiesData[0].colorTable
+        (value: colorTablesObj) =>
+            value.name.toLowerCase() ==
+            propertiesData[0].colorTable.toLowerCase()
     );
-
     return colorTableData[0].colors;
 }
 

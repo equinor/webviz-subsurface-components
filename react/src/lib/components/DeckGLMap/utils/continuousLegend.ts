@@ -1,15 +1,12 @@
 import { color } from "d3-color";
 import { interpolateRgb } from "d3-interpolate";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTemplate = require("../../../../demo/example-data/welllayer_continuous_template.json");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("../../../../demo/example-data/color-tables.json");
 
 interface colorTables {
     name: string;
     description: string;
     colors: [number, number, number, number][];
 }
+type colorTablesArray = Array<colorTables>;
 
 interface propertiesObj {
     objectName: string;
@@ -20,15 +17,20 @@ interface propertiesObj {
 
 type propertiesArr = Array<propertiesObj>;
 
-interface colorTemplate {
+interface template {
     name: string;
     properties: propertiesArr;
 }
 
+type templateArray = Array<template>;
+
+// Based on objectName return the colors array from color.tables.json file
 export function colorsArray(
-    objectName: string
+    objectName: string,
+    template: templateArray,
+    colorTables: colorTablesArray
 ): [number, number, number, number][] {
-    const properties = colorTemplate[0]["properties"];
+    const properties = template[0]["properties"];
     const propertiesData = properties.filter(
         (value: propertiesObj) => value.objectName == objectName
     );
@@ -40,11 +42,14 @@ export function colorsArray(
     return colorTableData[0].colors;
 }
 
+// return the colors based on the point
 export function rgbValues(
     objectName: string,
-    point: number
+    point: number,
+    template: templateArray,
+    colorTables: colorTablesArray
 ): number[] | { r: number; g: number; b: number; opacity: number } | undefined {
-    const color_table = colorsArray(objectName);
+    const color_table = colorsArray(objectName, template, colorTables);
     const colorArrays = color_table.find(
         (value: [number, number, number, number]) => {
             return point == value[0];
@@ -75,6 +80,7 @@ export function rgbValues(
     }
 }
 
+// return the color in rgb format
 export function RGBToHex(rgb: number[]): { color: string; offset: number } {
     let r = Math.round(rgb[1] * 255).toString(16),
         g = Math.round(rgb[2] * 255).toString(16),

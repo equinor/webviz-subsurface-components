@@ -85,6 +85,22 @@ export interface MapProps {
     setEditedData: (data: Record<string, unknown>) => void;
 
     children?: React.ReactNode;
+
+    template: Array<{
+        name: string;
+        properties: Array<{
+            objectName: string;
+            colorTable: string;
+            context: string;
+            colorInterpolation: string;
+        }>;
+    }>;
+
+    colorTables: Array<{
+        name: string;
+        description: string;
+        colors: [number, number, number, number][];
+    }>;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -97,6 +113,8 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     legend,
+    template,
+    colorTables,
     editedData,
     setEditedData,
 }: MapProps) => {
@@ -155,6 +173,8 @@ const Map: React.FC<MapProps> = ({
                     legend={legend}
                     editedData={editedData}
                     setEditedData={setEditedData}
+                    template={template}
+                    colorTables={colorTables}
                 />
             </ReduxProvider>
         )

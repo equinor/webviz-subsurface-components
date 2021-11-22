@@ -76,6 +76,22 @@ export interface DeckGLWrapperProps {
     setEditedData: (data: Record<string, unknown>) => void;
 
     children?: React.ReactNode;
+
+    template: Array<{
+        name: string;
+        properties: Array<{
+            objectName: string;
+            colorTable: string;
+            context: string;
+            colorInterpolation: string;
+        }>;
+    }>;
+
+    colorTables: Array<{
+        name: string;
+        description: string;
+        colors: [number, number, number, number][];
+    }>;
 }
 
 function getLayer(layers: Layer<unknown>[] | undefined, id: string) {
@@ -97,6 +113,8 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     legend,
     editedData,
     setEditedData,
+    template,
+    colorTables,
     children,
 }: DeckGLWrapperProps) => {
     // state for views prop of DeckGL component
@@ -210,18 +228,16 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
     const [legendProps, setLegendProps] = React.useState<{
         title: string;
-        logName: string;
+        name: string;
         discrete: boolean;
         metadata: { objects: Record<string, [number[], number]> };
         valueRange: number[];
-        colorsArray: [number, number, number, number][];
     }>({
         title: "",
-        logName: "",
+        name: "string",
         discrete: false,
         metadata: { objects: {} },
         valueRange: [],
-        colorsArray: [],
     });
 
     const onAfterRender = React.useCallback(() => {
@@ -233,17 +249,24 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
     const wellsLayer = getLayer(deckGLLayers, "wells-layer") as WellsLayer;
 
+    const onLoad = React.useCallback(() => {
+        if (wellsLayer) {
+            wellsLayer.setState({
+                template: template,
+                colorTables: colorTables,
+            });
+        }
+    }, [wellsLayer]);
     // Get color table for log curves.
     React.useEffect(() => {
         if (!wellsLayer?.isLoaded) return;
         const legend = wellsLayer.state.legend[0];
         setLegendProps({
             title: legend.title,
-            logName: legend.logName,
+            name: legend.name,
             discrete: legend.discrete,
             metadata: legend.metadata,
             valueRange: legend.valueRange,
-            colorsArray: legend.colorsArray,
         });
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
@@ -280,6 +303,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 onHover={onHover}
                 onViewStateChange={({ viewState }) => setViewState(viewState)}
                 onAfterRender={onAfterRender}
+                onLoad={onLoad}
             >
                 {children}
             </DeckGL>
@@ -307,8 +331,10 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 <DiscreteColorLegend
                     discreteData={legendProps.metadata}
                     dataObjectName={legendProps.title}
-                    logName={legendProps.logName}
                     position={legend.position}
+                    name={legendProps.name}
+                    template={template}
+                    colorTables={colorTables}
                 />
             )}
             {legendProps.valueRange?.length > 0 &&
@@ -319,7 +345,9 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         max={legendProps.valueRange[1]}
                         dataObjectName={legendProps.title}
                         position={legend.position}
-                        colorTableColors={legendProps.colorsArray}
+                        name={legendProps.name}
+                        template={template}
+                        colorTables={colorTables}
                     />
                 )}
             {deckGLLayers && (
