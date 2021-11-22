@@ -128,7 +128,7 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         },
         onRescale: (event: OverlayRescaleEvent): void => {
             if (event.target && event.transform) {
-                const zoom = getContentZoom(instance); // event.transform.k not valid after updateTracks();
+                const zoom = getContentZoom(instance); // event.transform.k could be not valid after updateTracks();
                 //console.log("zoom=", zoom, event.transform.k)
                 const pos = getContentScrollPos(instance);
                 parent.onRescaleContent(pos, zoom);
@@ -551,10 +551,12 @@ interface Props {
     axisMnemos: Record<string, string[]>;
 
     maxTrackNum?: number;
-    scrollTrackPos?: number; // the first track number
-
     maxContentZoom?: number; // default is 256
 
+    // current view position:
+    scrollTrackPos?: number; // the first track number
+
+    // callbacks:
     onInfo?: (infos: Info[]) => void;
     onCreateController?: (controller: WellLogController) => void;
 
