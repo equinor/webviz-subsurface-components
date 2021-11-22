@@ -56,15 +56,14 @@ const LayersButton: React.FC = React.memo(() => {
                 open={Boolean(anchorEl)}
                 className={classes.root}
             >
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {(layers as any[]).map((layer) => (
+                {(layers.slice().reverse() as Record<string, unknown>[]).map((layer) => (
                     <ToggleButton
-                        label={layer.name}
-                        checked={layer.visible}
+                        label={layer["name"] as string}
+                        checked={layer["visible"] as boolean}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            updateChecked(layer.id, e.target.checked);
+                            updateChecked(layer["id"], e.target.checked);
                         }}
-                        key={`layer-toggle-${layer.id}`}
+                        key={`layer-toggle-${layer["id"]}`}
                     />
                 ))}
             </Menu>
