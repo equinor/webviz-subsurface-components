@@ -95,13 +95,13 @@
       {
         "@@type": "DrawingLayer",
         "data": "@@#editedData.data",
-        "selectedDrawingData": "@@#editedData.selectedDrawingFeature"
+        "selectedFeatureIndexes": "@@#editedData.selectedFeatureIndexes"
       }
     ],
     "editedData": {
       "selectedWell": "",
       "selectedPie": {},
-      "selectedDrawingFeature": [],
+      "selectedFeatureIndexes": [],
       "data": {
           "type": "FeatureCollection",
           "features": []
