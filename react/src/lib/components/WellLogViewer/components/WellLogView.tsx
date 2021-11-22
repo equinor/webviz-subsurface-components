@@ -550,6 +550,7 @@ interface Props {
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
+
     maxTrackNum?: number;
     maxContentZoom?: number; // default is 256
 
