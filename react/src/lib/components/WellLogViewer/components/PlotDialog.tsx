@@ -79,9 +79,8 @@ function createColorItems(): ReactNode[] {
 function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
     const nodes: ReactNode[] = [];
     for (const colorTable of colorTables) {
-        ///if (colorTable.discrete)
-        // skip discrete color tables?
-        ///    continue;
+        if (colorTable.discrete) // skip discrete color tables
+            continue;
         nodes.push(<option key={colorTable.name}>{colorTable.name}</option>);
     }
     return nodes;
