@@ -38,7 +38,10 @@ export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
     rotDeg: number;
 }
 
-const defaultProps = layersDefaultProps["Hillshading2DLayer"];
+const defaultProps = layersDefaultProps[
+    "Hillshading2DLayer"
+] as Hillshading2DProps<unknown>;
+
 export default class Hillshading2DLayer extends BitmapLayer<
     unknown,
     Hillshading2DProps<unknown>
@@ -52,7 +55,7 @@ export default class Hillshading2DLayer extends BitmapLayer<
                 valueDecoder: {
                     // The prop objects are not merged with the defaultProps by default.
                     // See https://github.com/facebook/react/issues/2568
-                    ...defaultProps.valueDecoder.value,
+                    ...defaultProps.valueDecoder,
                     ...moduleParameters.valueDecoder,
                 },
                 modelMatrix: getModelMatrix(
@@ -110,7 +113,7 @@ export default class Hillshading2DLayer extends BitmapLayer<
         }
 
         const mergedDecoder = {
-            ...defaultProps.valueDecoder.value,
+            ...defaultProps.valueDecoder,
             ...this.props.valueDecoder,
         };
         // The picked color is the one in raw image, not the one after hillshading.

@@ -72,7 +72,9 @@ export default class PieChartLayer extends CompositeLayer<
 }
 
 PieChartLayer.layerName = "PieChartLayer";
-PieChartLayer.defaultProps = layersDefaultProps["PieChartLayer"];
+PieChartLayer.defaultProps = layersDefaultProps[
+    "PieChartLayer"
+] as PieChartLayerProps<PiesData>;
 
 //================= Local help functions. ==================
 

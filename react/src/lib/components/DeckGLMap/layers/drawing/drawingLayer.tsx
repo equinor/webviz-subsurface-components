@@ -168,4 +168,6 @@ export default class DrawingLayer extends CompositeLayer<
 }
 
 DrawingLayer.layerName = "DrawingLayer";
-DrawingLayer.defaultProps = layersDefaultProps["DrawingLayer"];
+DrawingLayer.defaultProps = layersDefaultProps[
+    "DrawingLayer"
+] as DrawingLayerProps<FeatureCollection>;

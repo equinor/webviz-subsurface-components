@@ -16,7 +16,7 @@ const getColor = (d: Feature): RGBAColor => {
 export type FaultPolygonsLayerProps<D> = GeoJsonLayerProps<D>;
 export default class FaultPolygonsLayer extends CompositeLayer<
     unknown,
-    GeoJsonLayerProps<unknown>
+    FaultPolygonsLayerProps<unknown>
 > {
     renderLayers(): GeoJsonLayer<unknown>[] {
         const layer = new GeoJsonLayer<unknown>(
@@ -38,4 +38,6 @@ export default class FaultPolygonsLayer extends CompositeLayer<
 }
 
 FaultPolygonsLayer.layerName = "FaultPolygonsLayer";
-FaultPolygonsLayer.defaultProps = layersDefaultProps["FaultPolygonsLayer"];
+FaultPolygonsLayer.defaultProps = layersDefaultProps[
+    "FaultPolygonsLayer"
+] as FaultPolygonsLayerProps<unknown>;

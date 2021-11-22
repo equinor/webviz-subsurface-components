@@ -205,7 +205,9 @@ export default class WellsLayer extends CompositeLayer<
 }
 
 WellsLayer.layerName = "WellsLayer";
-WellsLayer.defaultProps = layersDefaultProps["WellsLayer"];
+WellsLayer.defaultProps = layersDefaultProps[
+    "WellsLayer"
+] as WellsLayerProps<FeatureCollection>;
 
 //================= Local help functions. ==================
 

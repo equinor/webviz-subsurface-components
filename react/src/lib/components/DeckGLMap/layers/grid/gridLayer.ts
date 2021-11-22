@@ -112,7 +112,9 @@ export default class GridLayer extends CompositeLayer<
 }
 
 GridLayer.layerName = "GridLayer";
-GridLayer.defaultProps = layersDefaultProps["GridLayer"];
+GridLayer.defaultProps = layersDefaultProps[
+    "GridLayer"
+] as GridLayerProps<GridData>;
 
 //================= Local help functions. ==================
 function makeLayerData(data: GridData, ti: number): PolygonData[] {

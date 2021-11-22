@@ -2,9 +2,11 @@ import React from "react";
 import { Provider } from "react-redux";
 import { createStore } from "../../../redux/store";
 import LayerSettingsButton from "../../../components/settings/LayerSettingsButton";
+import { getLayersWithDefaultProps } from "../../../../DeckGLMap/layers/utils/layerTools";
 
 const exampleData = require("../../../../../../demo/example-data/deckgl-map.json");
-const store = createStore(exampleData[0].layers);
+const layers = getLayersWithDefaultProps(exampleData[0].layers);
+const store = createStore(layers);
 
 export default {
     component: LayerSettingsButton,
@@ -16,6 +18,8 @@ const Template = (args) => {
     return (
         <LayerSettingsButton
             layerId={args.layerId}
+            layerType={args.layerType}
+            name={args.name}
             key={`settings-button-${args.layerId}`}
         />
     );

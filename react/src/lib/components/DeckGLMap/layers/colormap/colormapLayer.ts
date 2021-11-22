@@ -58,7 +58,9 @@ export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
     rotDeg: number;
 }
 
-const defaultProps = layersDefaultProps["ColormapLayer"];
+const defaultProps = layersDefaultProps[
+    "ColormapLayer"
+] as ColormapLayerProps<unknown>;
 
 export default class ColormapLayer extends BitmapLayer<
     unknown,
@@ -72,7 +74,7 @@ export default class ColormapLayer extends BitmapLayer<
             valueDecoder: {
                 // The prop objects are not merged with the defaultProps by default.
                 // See https://github.com/facebook/react/issues/2568
-                ...defaultProps.valueDecoder.value,
+                ...defaultProps.valueDecoder,
                 ...moduleParameters.valueDecoder,
             },
             modelMatrix: getModelMatrix(
@@ -125,7 +127,7 @@ export default class ColormapLayer extends BitmapLayer<
         }
 
         const mergedDecoder = {
-            ...defaultProps.valueDecoder.value,
+            ...defaultProps.valueDecoder,
             ...this.props.valueDecoder,
         };
         // The picked color is the one in raw image, not the one after colormapping.

@@ -77,7 +77,9 @@ export function getLayersWithDefaultProps(
     });
 
     layers?.forEach((layer) => {
-        const default_props = layersDefaultProps[layer["@@type"] as string];
+        const default_props = layersDefaultProps[
+            layer["@@type"] as string
+        ] as Record<string, unknown>;
         if (default_props) {
             Object.entries(default_props).forEach(([prop, value]) => {
                 const prop_type = typeof value;

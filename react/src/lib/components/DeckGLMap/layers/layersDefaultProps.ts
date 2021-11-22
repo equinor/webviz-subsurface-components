@@ -1,4 +1,4 @@
-export const layersDefaultProps: Record<string, Record<string, unknown>> = {
+export const layersDefaultProps: Record<string, unknown> = {
     ColormapLayer: {
         name: "Property map",
         id: "colormap-layer",
@@ -8,14 +8,11 @@ export const layersDefaultProps: Record<string, Record<string, unknown>> = {
         valueRange: { type: "array" },
         colorMapRange: { type: "array" },
         valueDecoder: {
-            type: "object",
-            value: {
-                rgbScaler: [1, 1, 1],
-                // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
-                floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
-                offset: 0,
-                step: 0,
-            },
+            rgbScaler: [1, 1, 1],
+            // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
+            floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
+            offset: 0,
+            step: 0,
         },
         rotDeg: 0,
     },
@@ -32,14 +29,11 @@ export const layersDefaultProps: Record<string, Record<string, unknown>> = {
         ambientLightIntensity: { type: "number", value: 0.5 },
         diffuseLightIntensity: { type: "number", value: 0.5 },
         valueDecoder: {
-            type: "object",
-            value: {
-                rgbScaler: [1, 1, 1],
-                // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
-                floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
-                offset: 0,
-                step: 0,
-            },
+            rgbScaler: [1, 1, 1],
+            // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
+            floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
+            offset: 0,
+            step: 0,
         },
     },
     GridLayer: {
