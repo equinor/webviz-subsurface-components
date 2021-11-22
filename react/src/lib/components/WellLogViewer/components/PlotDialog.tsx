@@ -145,11 +145,12 @@ export class PlotPropertiesDialog extends Component<
 
     onOK(): void {
         const templatePlot = { ...this.state };
+        // set some values wich are not edited by the dialog
         if (templatePlot.type === "gradientfill")
-            templatePlot.inverseColor = ""; // clear value not edited by the dialog
+            templatePlot.inverseColor = "";
         else if (templatePlot.type === "differential") {
             const skipUsed = this.props.templatePlot ? false : true; /*??*/
-            templatePlot.name2 = this.dataNames(skipUsed)[0]
+            templatePlot.name2 = this.dataNames(skipUsed)[0];
         }
         this.props.onOK(templatePlot);
         this.closeDialog();
