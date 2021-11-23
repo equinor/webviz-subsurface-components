@@ -152,9 +152,8 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-        console.log("WellLogViewer.shouldComponentUpdate()");
         {
-            //console.log(Object.keys(nextProps), Object.keys(this.props))
+            //compare (Object.keys(nextProps), Object.keys(this.props))
             for (const p in nextProps) {
                 if (nextProps[p] !== this.props[p]) {
                     console.log(p /*, nextProps[p], this.props[p]*/);
@@ -173,17 +172,6 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props, prevState: State): void {
-        //console.log("WellLogViewer.componentDidUpdate()");
-        /*{
-            for (let p in prevProps) {
-                if (prevProps[p] !== this.props[p])
-                    console.log(p, prevProps[p], this.props[p])
-            }
-            for (let s in prevState) {
-                if (prevState[s] !== this.state[s])
-                    console.log(s, prevState[s], this.state[s])
-            }
-        }*/
         if (
             this.props.welllog !== prevProps.welllog ||
             this.props.template !== prevProps.template ||
@@ -198,7 +186,6 @@ class WellLogViewer extends Component<Props, State> {
                     primaryAxis = this.props.template.scale.primary;
                 }
             }
-            console.log("Axes");
             this.setState({
                 primaryAxis: primaryAxis,
                 axes: axes,
@@ -214,11 +201,6 @@ class WellLogViewer extends Component<Props, State> {
                 (this.props.domain[0] !== prevProps.domain[0] ||
                     this.props.domain[1] !== prevProps.domain[1]))
         ) {
-            console.log(
-                "this.setControllerZoom()",
-                this.props.domain,
-                prevProps.domain
-            );
             this.setControllerZoom();
         }
     }
@@ -325,7 +307,6 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     render(): ReactNode {
-        console.log("WellLogViewer.render()");
         const maxContentZoom = 256;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>

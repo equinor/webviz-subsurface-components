@@ -11,14 +11,11 @@ const Template = (args) => {
     const [info, setInfo] = React.useState("");
     const onCreateController = React.useCallback(
         (controller) => {
-            console.log("onCreateController");
             setController(controller);
         },
         [controller]
     );
     const onRescaleContent = React.useCallback(() => {
-        console.log("onRescaleContent");
-
         setInfo(
             controller
                 ? "[" +
@@ -29,7 +26,7 @@ const Template = (args) => {
                 : "-"
         );
     }, [controller]);
-    console.log("Template.render()");
+
     return (
         <div
             style={{ height: "92vh", display: "flex", flexDirection: "column" }}

@@ -622,12 +622,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return false;
     }
     componentDidUpdate(prevProps: Props, prevState: State): void {
-        console.log("WellLogView.componentDidUpdate()");
         // Typical usage (don't forget to compare props):
         if (this.props.onCreateController !== prevProps.onCreateController) {
-            console.log(
-                "this.props.onCreateController !== prevProps.onCreateController"
-            );
             if (this.props.onCreateController)
                 // update callback to component's caller
                 this.props.onCreateController(this);
@@ -920,7 +916,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     render(): ReactNode {
-        console.log("WellLogView.render()");
         return (
             <div style={{ width: "100%", height: "100%" }}>
                 <div
