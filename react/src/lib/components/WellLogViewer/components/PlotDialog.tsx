@@ -150,7 +150,8 @@ export class PlotPropertiesDialog extends Component<
             templatePlot.inverseColor = "";
         else if (templatePlot.type === "differential") {
             const skipUsed = this.props.templatePlot ? false : true; /*??*/
-            templatePlot.name2 = this.dataNames(skipUsed)[0];
+            if (!templatePlot.name2)
+                templatePlot.name2 = this.dataNames(skipUsed)[0];
         }
         this.props.onOK(templatePlot);
         this.closeDialog();
