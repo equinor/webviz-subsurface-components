@@ -32,11 +32,9 @@ describe("Test Axis Selector", () => {
             />
         );
         const axis_selectors = screen.getAllByRole("radio");
-        expect(axis_selectors[0]).toBeChecked();
         userEvent.click(axis_selectors[1]);
         expect(mockFn).toHaveBeenCalledTimes(1);
         expect(mockFn).toHaveBeenCalledWith("tvd");
-        expect(axis_selectors[1]).toBeChecked();
     });
     it("test when there no axes- empty rendering", () => {
         const { container } = render(

@@ -1,6 +1,4 @@
 import React, { Component, ReactNode } from "react";
-// Had to import a different package as I was getting error - "ReferenceError: ResizeObserver is not defined"
-import ResizeObserver from "resize-observer-polyfill";
 
 function getScrollbarSizes(): { vertical: number; horizontal: number } {
     // Creating invisible container
