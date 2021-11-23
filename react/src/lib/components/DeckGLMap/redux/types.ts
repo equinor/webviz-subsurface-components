@@ -27,22 +27,41 @@ export const DrawModes = [
 ] as const;
 
 export const SliderTypeProps = [
-    { id: "opacity", displayName: "Opacity", min: 0, max: 100, step: 1 },
+    {
+        id: "opacity",
+        displayName: "Opacity",
+        min: 0,
+        max: 100,
+        step: 1,
+        dependentOnProp: undefined,
+    },
 ] as const;
 
 export const ToggleTypeProps = [
-    { id: "logCurves", displayName: "Log curves" },
+    { id: "logCurves", displayName: "Log curves", dependentOnProp: "logData" },
 ] as const;
 
 export const MenuTypeProps = [
-    { id: "mode", displayName: "Draw mode" },
+    { id: "mode", displayName: "Draw mode", dependentOnProp: undefined },
 ] as const;
 
 export const NumericTypeProps = [
-    { id: "lineWidthScale", displayName: "Trajectory thickness" },
-    { id: "logRadius", displayName: "Log radius" },
-    { id: "pointRadiusScale", displayName: "Well head radius" },
-    { id: "lineWidthMinPixels", displayName: "Line thickness" },
+    {
+        id: "lineWidthScale",
+        displayName: "Trajectory thickness",
+        dependentOnProp: undefined,
+    },
+    { id: "logRadius", displayName: "Log radius", dependentOnProp: "logData" },
+    {
+        id: "pointRadiusScale",
+        displayName: "Well head radius",
+        dependentOnProp: undefined,
+    },
+    {
+        id: "lineWidthMinPixels",
+        displayName: "Line thickness",
+        dependentOnProp: undefined,
+    },
 ] as const;
 
 export const LayerIcons = {
