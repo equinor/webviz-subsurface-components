@@ -1,7 +1,9 @@
 import React, { Component, ReactNode } from "react";
 
 import PropTypes from "prop-types";
+
 import WellLogView from "./components/WellLogView";
+import { TrackEvent } from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
@@ -45,67 +47,38 @@ const axisMnemos: Record<string, string[]> = {
 };
 
 import ReactDOM from "react-dom";
+import { SimpleMenu, editPlots } from "./components/LocalMenus";
+import { Plot } from "@equinor/videx-wellog";
 
-import { SimpleMenu } from "./components/LocalMenus";
-import { Track } from "@equinor/videx-wellog";
-function localMenuTitle(
-    parent: HTMLElement,
-    track: Track,
-    wellLogView: WellLogView
-) {
-    const el: HTMLElement = document.createElement("div");
-    el.style.width = "10px";
-    el.style.height = "13px";
-    parent.appendChild(el);
-    ReactDOM.render(
-        <SimpleMenu
-            type="title"
-            anchorEl={el}
-            wellLogView={wellLogView}
-            track={track}
-        />,
-        el
-    );
+function onTrackEvent(wellLogView: WellLogView, ev: TrackEvent) {
+    const track = ev.track;
+    console.log(ev.area, ev.type);
+    if (ev.type === "click") {
+        wellLogView.selectTrack(track, !wellLogView.isTrackSelected(track)); // toggle selection
+    } else if (ev.type === "dblclick") {
+        wellLogView.selectTrack(track, true);
+        /*if (ev.area !== "title")*/ {
+            const plot: Plot | null = ev.plot;
+            if (!plot) editPlots(ev.element, wellLogView, ev.track);
+            else wellLogView.editPlot(ev.element, ev.track, plot);
+        }
+    } else if (ev.type === "contextmenu") {
+        wellLogView.selectTrack(track, true);
+        const el: HTMLElement = document.createElement("div");
+        el.style.width = "10px";
+        el.style.height = "3px";
+        ev.element.appendChild(el);
+        ReactDOM.render(
+            <SimpleMenu
+                type={ev.area}
+                anchorEl={el}
+                wellLogView={wellLogView}
+                track={track}
+            />,
+            el
+        );
+    }
 }
-function localMenuLegend(
-    parent: HTMLElement,
-    track: Track,
-    wellLogView: WellLogView
-) {
-    const el: HTMLElement = document.createElement("div");
-    el.style.width = "10px";
-    el.style.height = "3px";
-    parent.appendChild(el);
-    ReactDOM.render(
-        <SimpleMenu
-            type="legend"
-            anchorEl={el}
-            wellLogView={wellLogView}
-            track={track}
-        />,
-        el
-    );
-}
-function localMenuContainer(
-    parent: HTMLElement,
-    track: Track,
-    wellLogView: WellLogView
-) {
-    const el: HTMLElement = document.createElement("div");
-    el.style.width = "10px";
-    el.style.height = "3px";
-    parent.appendChild(el);
-    ReactDOM.render(
-        <SimpleMenu
-            type="container"
-            anchorEl={el}
-            wellLogView={wellLogView}
-            track={track}
-        />,
-        el
-    );
-}
-
 ///////////
 function valueLabelFormat(value: number /*, index: number*/): string {
     return value.toFixed(Number.isInteger(value) || value > 20 ? 0 : 1);
@@ -278,6 +251,7 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     render(): ReactNode {
+        const maxContentZoom = 256;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <Scroller
@@ -291,14 +265,13 @@ class WellLogViewer extends Component<Props, State> {
                         colorTables={this.props.colorTables}
                         horizontal={this.props.horizontal}
                         maxTrackNum={this.props.horizontal ? 3 : 5}
+                        maxContentZoom={maxContentZoom}
                         primaryAxis={this.state.primaryAxis}
                         axisTitles={axisTitles}
                         axisMnemos={axisMnemos}
                         onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
-                        onLocalMenuTitle={localMenuTitle}
-                        onLocalMenuLegend={localMenuLegend}
-                        onLocalMenuContainer={localMenuContainer}
+                        onTrackEvent={onTrackEvent}
                         onScrollTrackPos={this.onScrollTrackPos}
                         onZoomContent={this.onZoomContent}
                     />
@@ -325,7 +298,7 @@ class WellLogViewer extends Component<Props, State> {
                                 value={Math.log2(this.state.zoomContent)}
                                 min={0}
                                 step={0.5}
-                                max={8}
+                                max={Math.log2(maxContentZoom)}
                                 scale={(x) => 2 ** x}
                                 defaultValue={0}
                                 onChange={this.onZoomSliderChange}

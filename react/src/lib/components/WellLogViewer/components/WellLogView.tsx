@@ -7,6 +7,7 @@ import {
 } from "@equinor/videx-wellog";
 
 import { Track, GraphTrack } from "@equinor/videx-wellog";
+import { Plot } from "@equinor/videx-wellog";
 
 import { ScaleTrackOptions } from "@equinor/videx-wellog/dist/tracks/scale/interfaces";
 
@@ -47,7 +48,9 @@ import {
     scrollContentTo,
     getContentScrollPos,
     getContentZoom,
-    scrollTracks,
+    scrollTracksTo,
+    isTrackSelected,
+    selectTrack,
 } from "../utils/log-viewer";
 
 function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
@@ -125,8 +128,10 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         },
         onRescale: (event: OverlayRescaleEvent): void => {
             if (event.target && event.transform) {
+                const zoom = getContentZoom(instance); // event.transform.k not valid after updateTracks();
+                //console.log("zoom=", zoom, event.transform.k)
                 const pos = getContentScrollPos(instance);
-                parent.onRescaleContent(pos, event.transform.k);
+                parent.onRescaleContent(pos, zoom);
 
                 event.target.style.visibility = "visible";
                 event.target.textContent = `Zoom: x${event.transform.k.toFixed(
@@ -295,17 +300,133 @@ function setTracksToController(
     logController.setTracks(tracks);
 }
 
-function addTrackContextMenu(
+function addTrackEventListner(
+    type: /*string, */ "click" | "contextmenu" | "dblclick",
+    area: /*string, */ "title" | "legend" | "container",
     element: HTMLElement,
     track: Track,
     func: (ev: TrackEvent) => void
 ): void {
-    element.addEventListener("contextmenu", (ev: MouseEvent) => {
-        func({ track: track, element: element, ev: ev });
+    element.addEventListener(type, (ev: Event) => {
+        const plot: Plot | null = null; ///!!
+        func({
+            track: track,
+            plot: plot,
+            element: element,
+            ev: ev,
+            type: type,
+            area: area,
+        });
         ev.preventDefault();
     });
 }
 
+const types: ("contextmenu" | "click" | "dblclick")[] = [
+    "contextmenu",
+    "click",
+    "dblclick",
+];
+const areas: ("title" | "legend" | "container")[] = [
+    "title",
+    "legend",
+    "container",
+];
+function addTrackEventHandlers(
+    elm: HTMLElement,
+    track: Track,
+    func: (ev: TrackEvent) => void
+): void {
+    for (const area of areas) {
+        const elements = elm.getElementsByClassName("track-" + area);
+        for (const element of elements)
+            for (const type of types)
+                addTrackEventListner(
+                    type,
+                    area,
+                    element as HTMLElement,
+                    track,
+                    func
+                );
+    }
+}
+
+import ReactDOM from "react-dom";
+import { PlotPropertiesDialog } from "./PlotDialog";
+import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+import { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
+
+function addPlot(
+    parent: HTMLElement,
+    wellLogView: WellLogView,
+    track: Track
+): void {
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "13px";
+    parent.appendChild(el);
+
+    ReactDOM.render(
+        <PlotPropertiesDialog
+            wellLogView={wellLogView}
+            track={track}
+            onOK={wellLogView.addTrackPlot.bind(wellLogView, track)}
+        />,
+        el
+    );
+}
+
+function fillTemplatePlot(plot: Plot): TemplatePlot {
+    const options = plot.options as ExtPlotOptions;
+    const optionsDifferential = plot.options as DifferentialPlotOptions; // DifferentialPlot - 2 series!
+    const options1 = optionsDifferential.serie1;
+    const options2 = optionsDifferential.serie2;
+
+    const legend = options.legendInfo();
+    const legendDifferential = legend as DifferentialPlotLegendInfo; // DifferentialPlot - 2 series!
+    const legend1 = legendDifferential.serie1;
+    const legend2 = legendDifferential.serie2;
+
+    return {
+        style: "", // No style for this full Plot options.
+        type: getPlotType(plot),
+        scale: options.scale,
+        name: (legend1 && legend1.label ? legend1.label : legend.label) || "",
+        name2: legend2 && legend2.label ? legend2.label : "",
+        color: (options1 ? options1.color : options.color) || "",
+        color2: options2 ? options2.color : "",
+        inverseColor: options.inverseColor || "",
+        fill: (options1 ? options1.fill : options.fill) || "",
+        fill2: options2 ? options2.fill : "",
+        colorTable: options.colorTable ? options.colorTable.name : "",
+        inverseColorTable: options.inverseColorTable
+            ? options.inverseColorTable.name
+            : "",
+    };
+}
+
+function editPlot(
+    parent: HTMLElement,
+    wellLogView: WellLogView,
+    track: Track,
+    plot: Plot
+): void {
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "13px";
+    parent.appendChild(el);
+
+    const templatePlot = fillTemplatePlot(plot);
+
+    ReactDOM.render(
+        <PlotPropertiesDialog
+            templatePlot={templatePlot}
+            wellLogView={wellLogView}
+            track={track}
+            onOK={wellLogView.editTrackPlot.bind(wellLogView, track, plot)}
+        />,
+        el
+    );
+}
 function fillInfos(
     x: number,
     x2: number,
@@ -321,7 +442,6 @@ function fillInfos(
         const bScaleTrack = isScaleTrack(track);
         const visible = (iFrom <= iTrack && iTrack < iTo) || bScaleTrack;
         if (visible) {
-            const datas = track.data;
             if (!bScaleTrack) {
                 if (!bSeparatorCreated) {
                     // Add separator line
@@ -333,23 +453,48 @@ function fillInfos(
                     });
                     bSeparatorCreated = true;
                 }
-                const nPlots = (track as GraphTrack).plots.length;
-                for (let p = 0; p < nPlots; p++) {
-                    const plot = (track as GraphTrack).plots[p];
+                for (const plot of (track as GraphTrack).plots) {
                     const type = getPlotType(plot);
-                    const v = getValue(x, datas[p], type);
-                    const legend = (
-                        plot.options as ExtPlotOptions
-                    ).legendInfo();
+                    let data = plot.data;
+                    if (type === "differential") data = plot.data[0]; // DifferentialPlot has 2 arrays of data pairs
+
+                    const options = plot.options as ExtPlotOptions;
+                    const optionsDifferential =
+                        plot.options as DifferentialPlotOptions; // DifferentialPlot - 2 series!
+                    const options1 = optionsDifferential.serie1;
+                    const options2 = optionsDifferential.serie2;
+
+                    const legend = options.legendInfo();
+                    const legendDifferential =
+                        legend as DifferentialPlotLegendInfo; // DifferentialPlot - 2 series!
+                    const legend1 = legendDifferential.serie1;
+                    const legend2 = legendDifferential.serie2;
+
                     infos.push({
-                        name: legend.label,
-                        units: legend.unit,
-                        color: plot.options.color ? plot.options.color : "",
-                        value: v,
+                        name: legend1 ? legend1.label : legend.label,
+                        units: legend1 ? legend1.unit : legend.unit,
+                        color:
+                            (options1 ? options1.color : options.color) || "",
+                        value: getValue(x, data, type),
                         type: type,
                         track_id: track.id,
                     });
                     iPlot++;
+
+                    if (type === "differential") {
+                        data = plot.data[1];
+                        infos.push({
+                            name: legend2.label,
+                            units: legend2.unit,
+                            color:
+                                (options2 ? options2.color : options.color) ||
+                                "",
+                            value: getValue(x, data, type),
+                            type: type,
+                            track_id: "_" + track.id,
+                        });
+                        iPlot++;
+                    }
                 }
             } else {
                 const _x = iPlot == 0 ? x : x2;
@@ -369,14 +514,18 @@ function fillInfos(
     return infos;
 }
 
-interface TrackEvent {
+export interface TrackEvent {
     track: Track;
+    type: /*string, */ "click" | "contextmenu" | "dblclick";
+    area: /*string, */ "title" | "legend" | "container";
+    plot: Plot | null;
     element: HTMLElement;
-    ev: MouseEvent;
+    ev: /*Mouse*/ Event;
 }
 
 export interface WellLogController {
     scrollTrackTo(pos: number): boolean;
+    scrollTrackBy(delta: number): void;
     getTrackScrollPos(): number;
     getTrackScrollPosMax(): number;
 
@@ -401,27 +550,16 @@ interface Props {
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
-    maxTrackNum?: number;
+    maxTrackNum?: number; // default horizontal ? 3 : 5
     scrollTrackPos?: number; // the first track number
 
+    maxContentZoom?: number; // default is 256
+
+    // callbacks:
     onInfo?: (infos: Info[]) => void;
     onCreateController?: (controller: WellLogController) => void;
 
-    onLocalMenuTitle?: (
-        parent: HTMLElement,
-        track: Track,
-        wellLogView: WellLogView
-    ) => void;
-    onLocalMenuLegend?: (
-        parent: HTMLElement,
-        track: Track,
-        wellLogView: WellLogView
-    ) => void;
-    onLocalMenuContainer?: (
-        parent: HTMLElement,
-        track: Track,
-        wellLogView: WellLogView
-    ) => void;
+    onTrackEvent?: (wellLogView: WellLogView, ev: TrackEvent) => void;
 
     onScrollTrackPos?: (pos: number) => void;
     onZoomContent?: (zoom: number) => void;
@@ -449,11 +587,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             scrollTrackPos: props.scrollTrackPos ? props.scrollTrackPos : 0,
         };
 
-        this.onTrackTitleContextMenu = this.onTrackTitleContextMenu.bind(this);
-        this.onTrackLegendContextMenu =
-            this.onTrackLegendContextMenu.bind(this);
-        this.onTrackContainerContextMenu =
-            this.onTrackContainerContextMenu.bind(this);
+        this.onTrackEvent = this.onTrackEvent.bind(this);
 
         if (this.props.onCreateController)
             // set callback to component's caller
@@ -473,10 +607,12 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.primaryAxis !== nextProps.primaryAxis) return true;
         if (this.props.axisTitles !== nextProps.axisTitles) return true;
         if (this.props.axisMnemos !== nextProps.axisMnemos) return true;
-        if (this.props.scrollTrackPos !== nextProps.scrollTrackPos) return true;
 
         if (this.props.maxTrackNum !== nextProps.maxTrackNum) return true;
+        if (this.props.scrollTrackPos !== nextProps.scrollTrackPos) return true;
         if (this.state.scrollTrackPos !== nextState.scrollTrackPos) return true;
+
+        if (this.props.maxContentZoom !== nextProps.maxContentZoom) return true;
 
         return false;
     }
@@ -489,7 +625,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         }
 
         let shouldSetTracks = false;
-        if (this.props.horizontal !== prevProps.horizontal) {
+        if (
+            this.props.horizontal !== prevProps.horizontal ||
+            this.props.maxContentZoom !== prevProps.maxContentZoom
+        ) {
             this.createLogViewer();
             shouldSetTracks = true;
         }
@@ -534,14 +673,12 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         }
         if (this.container) {
             // create new LogViewer
-            const addTrackContextMenus = this.addTrackContextMenus.bind(this);
             this.logController = new LogViewer({
                 showLegend: true,
                 horizontal: this.props.horizontal,
-
-                onTrackEnter: function (elm: HTMLElement, track: Track): void {
-                    addTrackContextMenus(elm, track);
-                },
+                maxZoom: this.props.maxContentZoom,
+                onTrackEnter: (elm: HTMLElement, track: Track) =>
+                    addTrackEventHandlers(elm, track, this.onTrackEvent),
             });
 
             this.logController.init(this.container);
@@ -583,8 +720,30 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(); // Clear old track information
     }
 
-    addGraphTrackPlot(track: GraphTrack, templatePlot: TemplatePlot): void {
-        const minmaxPrimaryAxis = addGraphTrackPlot(this, track, templatePlot);
+    isTrackSelected(track: Track): boolean {
+        return (
+            !!this.logController && isTrackSelected(this.logController, track)
+        );
+    }
+
+    selectTrack(track: Track, selected: boolean): void {
+        if (this.logController)
+            for (const _track of this.logController.tracks) {
+                // single lecetion: remove selection from another tracks
+                selectTrack(
+                    this.logController,
+                    _track,
+                    selected && track === _track
+                );
+            }
+    }
+
+    addTrackPlot(track: Track, templatePlot: TemplatePlot): void {
+        const minmaxPrimaryAxis = addGraphTrackPlot(
+            this,
+            track as GraphTrack,
+            templatePlot
+        );
         if (this.logController) {
             const minmax: [number, number] = [
                 this.logController.domain[0],
@@ -593,31 +752,49 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
             this.logController.domain = minmax;
 
+            // protectedthis.logController.updateLegendRows();
             this.logController.updateTracks();
         }
         this.setInfo();
     }
 
-    editGraphTrackPlot(
-        track: GraphTrack,
-        name: string,
-        templatePlot: TemplatePlot
-    ): void {
-        editGraphTrackPlot(this, track, name, templatePlot);
-        if (this.logController) this.logController.updateTracks();
+    editTrackPlot(track: Track, plot: Plot, templatePlot: TemplatePlot): void {
+        const minmaxPrimaryAxis = editGraphTrackPlot(
+            this,
+            track as GraphTrack,
+            plot,
+            templatePlot
+        );
+        if (this.logController) {
+            const minmax: [number, number] = [
+                this.logController.domain[0],
+                this.logController.domain[1],
+            ];
+            checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
+            this.logController.domain = minmax;
+
+            // protectedthis.logController.updateLegendRows();
+            this.logController.updateTracks();
+        }
         this.setInfo();
     }
 
-    removeGraphTrackPlot(track: GraphTrack, name: string): void {
-        removeGraphTrackPlot(this, track, name);
-        if (this.logController) this.logController.updateTracks();
+    removeTrackPlot(track: Track, plot: Plot): void {
+        removeGraphTrackPlot(this, track as GraphTrack, plot);
+        if (this.logController) {
+            // protected this.logController.updateLegendRows();
+            this.logController.updateTracks();
+        }
         this.setInfo();
     }
 
+    /* 
+      Display current state of track scrolling
+      */
     scrollTrack(): void {
         const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
-        if (this.logController) scrollTracks(this.logController, iFrom, iTo);
+        if (this.logController) scrollTracksTo(this.logController, iFrom, iTo);
 
         if (this.props.onScrollTrackPos) this.props.onScrollTrackPos(iFrom);
     }
@@ -641,52 +818,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.onScrollContentPos) this.props.onScrollContentPos(pos);
     }
 
-    _addTrackContextMenu(
-        elm: HTMLElement,
-        className: string,
-        func: (ev: TrackEvent) => void,
-        track: Track
-    ): void {
-        if (!this.logController || !this.logController.container) return;
-        const elements = elm.getElementsByClassName(className);
-        for (const element of elements) {
-            addTrackContextMenu(element as HTMLElement, track, func);
-        }
+    onTrackEvent(ev: TrackEvent): void {
+        if (this.props.onTrackEvent) this.props.onTrackEvent(this, ev);
     }
-
-    addTrackContextMenus(elm: HTMLElement, track: Track): void {
-        this._addTrackContextMenu(
-            elm,
-            "track-title",
-            this.onTrackTitleContextMenu,
-            track
-        );
-        this._addTrackContextMenu(
-            elm,
-            "track-legend",
-            this.onTrackLegendContextMenu,
-            track
-        );
-        this._addTrackContextMenu(
-            elm,
-            "track-container",
-            this.onTrackContainerContextMenu,
-            track
-        );
-    }
-    onTrackTitleContextMenu(ev: TrackEvent): void {
-        if (this.logController && this.props.onLocalMenuTitle)
-            this.props.onLocalMenuTitle(ev.element, ev.track, this);
-    }
-    onTrackLegendContextMenu(ev: TrackEvent): void {
-        if (this.logController && this.props.onLocalMenuLegend)
-            this.props.onLocalMenuLegend(ev.element, ev.track, this);
-    }
-    onTrackContainerContextMenu(ev: TrackEvent): void {
-        if (this.logController && this.props.onLocalMenuContainer)
-            this.props.onLocalMenuContainer(ev.element, ev.track, this);
-    }
-
     _graphTrackMax(): number {
         // for scrollbar
         if (!this.logController) return 0;
@@ -711,6 +845,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this.props.maxTrackNum
             ? this.props.maxTrackNum
             : 6 /*some default value*/;
+    }
+
+    scrollTrackBy(delta: number): void {
+        this.setState((prevState: State) => ({
+            scrollTrackPos: this._newTrackScrollPos(
+                prevState.scrollTrackPos + delta
+            ),
+        }));
     }
 
     scrollTrackTo(pos: number): boolean {
@@ -770,8 +912,13 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             }
 
             this.logController.addTrack(trackNew);
-
-            this.scrollTrack();
+            if (bAfter)
+                // force new track to be visible when added after the current
+                this.scrollTrackBy(+1);
+            else {
+                this.scrollTrack();
+                this.setInfo();
+            }
         }
     }
 
@@ -780,7 +927,16 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.logController.removeTrack(track);
 
             this.scrollTrack();
+            this.setInfo();
         }
+    }
+
+    // Dialog functions
+    addPlot(parent: HTMLElement | null, track: Track): void {
+        if (parent) addPlot(parent, this, track);
+    }
+    editPlot(parent: HTMLElement | null, track: Track, plot: Plot): void {
+        if (parent) editPlot(parent, this, track, plot);
     }
 
     render(): ReactNode {
