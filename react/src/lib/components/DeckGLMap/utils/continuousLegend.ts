@@ -1,13 +1,13 @@
 import { color } from "d3-color";
 import { interpolateRgb } from "d3-interpolate";
 import {
-    templateArray,
-    propertiesObj,
-} from "../components/WelllayerTemplateTypes";
-import {
     colorTablesArray,
     colorTablesObj,
 } from "../components/ColorTableTypes";
+import {
+    templateArray,
+    propertiesObj,
+} from "../components/WelllayerTemplateTypes";
 
 // Based on objectName return the colors array from color.tables.json file
 export function colorsArray(
@@ -34,25 +34,27 @@ export function rgbValues(
     template: templateArray,
     colorTables: colorTablesArray
 ): number[] | { r: number; g: number; b: number; opacity: number } | undefined {
-    const color_table = colorsArray(objectName, template, colorTables);
-    const colorArrays = color_table.find(
+    const colorTableColors = colorsArray(objectName, template, colorTables);
+    // compare the point and first value from colorTableColors
+    const colorArrays = colorTableColors.find(
         (value: [number, number, number, number]) => {
             return point == value[0];
         }
     );
 
-    // if point and value in color table matches
+    // if point and value in color table matches then return particular colors
     if (colorArrays) {
         return colorArrays.slice(1);
     }
     // if no match then need to do interpolation
     else {
-        const index = color_table.findIndex((value: number[]) => {
+        // Get index of first match of colortable point greater than point
+        const index = colorTableColors.findIndex((value: number[]) => {
             return value[0] > point;
         });
 
-        const firstColorArray = color_table[index - 1];
-        const secondColorArray = color_table[index];
+        const firstColorArray = colorTableColors[index - 1];
+        const secondColorArray = colorTableColors[index];
 
         if ((firstColorArray || secondColorArray) != undefined) {
             const interpolatedValues = interpolateRgb(
@@ -65,7 +67,7 @@ export function rgbValues(
     }
 }
 
-// return the color in rgb format
+// return the hex color code and offset
 export function RGBToHex(rgb: number[]): { color: string; offset: number } {
     let r = Math.round(rgb[1] * 255).toString(16),
         g = Math.round(rgb[2] * 255).toString(16),

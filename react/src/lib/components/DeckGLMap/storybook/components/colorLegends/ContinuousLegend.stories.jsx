@@ -4,19 +4,14 @@ export default {
     component: ContinuousLegend,
     title: "DeckGLMap/Components/ColorLegends",
 };
+const template = require("../../../../../../demo/example-data/welllayer_template.json");
+const colorTables = require("../../../../../../demo/example-data/color-tables.json");
 
 const min = 0;
 const max = 0.35;
 const dataObjectName = "Wells / PORO";
 const position = [16, 10];
-const colorTableColors = [
-    [0, 1, 0, 0],
-    [0.2, 0.71, 0.71, 0],
-    [0.4, 0, 1, 0],
-    [0.6, 0, 0.71, 0.71],
-    [0.8, 0, 0, 1],
-    [1, 0.71, 0, 0.71],
-];
+const name = "PORO";
 
 const Template = (args) => {
     return <ContinuousLegend {...args} />;
@@ -28,5 +23,7 @@ ContinuousTemplate.args = {
     max,
     dataObjectName,
     position,
-    colorTableColors,
+    name,
+    template,
+    colorTables,
 };

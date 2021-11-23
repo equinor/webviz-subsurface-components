@@ -27,22 +27,25 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
 }: colorLegendProps) => {
     React.useEffect(() => {
         discreteLegend("#legend");
-    }, [discreteData]);
+    }, [discreteData, template, colorTables]);
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
-        const colorsArrayData: [number, number, number, number][] =
-            colorTableData(name, template, colorTables);
+        const colorsArray: [number, number, number, number][] = colorTableData(
+            name,
+            template,
+            colorTables
+        );
         Object.keys(discreteData).forEach((key) => {
             // eslint-disable-next-line
             let code = (discreteData as { [key: string]: any })[key][1]
-            const colorArrays = colorsArrayData.find((value: number[]) => {
+            // compare the first value in colorarray(colortable) and code from discreteData
+            const matchedColorsArrays = colorsArray.find((value: number[]) => {
                 return value[0] == code;
             });
-            const splicedData = colorArrays;
-            if (splicedData)
+            if (matchedColorsArrays)
                 itemColor.push({
-                    color: RGBToHex(splicedData),
+                    color: RGBToHex(matchedColorsArrays),
                 });
             itemName.push(key);
         });
@@ -58,7 +61,6 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         }
         const ordinalValues = scaleOrdinal().domain(itemName);
         const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
-
         if (colorLegend) {
             select(legend).select("svg").remove();
             select(legend)
@@ -69,7 +71,6 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
                 .call(colorLegend);
         }
     }
-
     return (
         <div
             style={{

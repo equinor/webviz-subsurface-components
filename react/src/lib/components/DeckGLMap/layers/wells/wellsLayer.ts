@@ -380,15 +380,20 @@ function getLogColor(
             }
         });
     } else {
-        const colorsArrayData: [number, number, number, number][] =
-            colorTableData(log_name, template, colorTables);
+        const colorsArray: [number, number, number, number][] = colorTableData(
+            log_name,
+            template,
+            colorTables
+        );
 
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
         // eslint-disable-next-line
         const attributesObject: { [key: string]: any } = {};
         Object.keys(log_attributes).forEach((key) => {
+            // get the code from log_attributes
             const code = log_attributes[key][1];
-            const colorArrays = colorsArrayData.find((value: number[]) => {
+            // compare the code and first value from colorsArray(colortable)
+            const colorArrays = colorsArray.find((value: number[]) => {
                 return value[0] == code;
             });
             if (colorArrays)
@@ -599,6 +604,7 @@ function getLogProperty(
     } else return null;
 }
 
+// Return data required to build welllayer legend
 function getLegendData(logs: LogCurveDataType[], logName: string) {
     const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
     const title = "Wells / " + logName;

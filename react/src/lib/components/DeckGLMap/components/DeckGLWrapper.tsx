@@ -246,7 +246,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 colorTables: colorTables,
             });
         }
-    }, [wellsLayer]);
+    }, [wellsLayer, template, colorTables]);
     // Get color table for log curves.
     React.useEffect(() => {
         if (!wellsLayer?.isLoaded) return;

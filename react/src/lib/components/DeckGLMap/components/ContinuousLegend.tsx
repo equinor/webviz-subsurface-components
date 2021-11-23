@@ -30,12 +30,14 @@ const ContinuousLegend: React.FC<legendProps> = ({
 }: legendProps) => {
     React.useEffect(() => {
         continuousLegend("#legend");
-    }, [min, max, dataObjectName]);
+    }, [min, max, template, colorTables]);
 
     function continuousLegend(selected_id: string) {
         const itemColor: ItemColor[] = [];
+        // Return the matched colors array from color.tables.json file
         const colorTableColors = colorsArray(name, template, colorTables);
         colorTableColors.forEach((value: [number, number, number, number]) => {
+            // return the color and offset needed to draw the legend
             itemColor.push({
                 offset: RGBToHex(value).offset,
                 color: RGBToHex(value).color,
