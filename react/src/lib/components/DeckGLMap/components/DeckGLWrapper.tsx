@@ -8,15 +8,13 @@ import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { updateLayerProp } from "../redux/actions";
-import { WellsPickInfo, getLogInfo } from "../layers/wells/wellsLayer";
+import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
 import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
-import { colorsArray } from "../utils/continuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
-import { getLogValues, LogCurveDataType } from "../layers/wells/wellsLayer";
 import { Layer } from "deck.gl";
 import ToggleButton from "./settings/ToggleButton";
 
@@ -207,9 +205,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     );
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
-    const [colorsArrays, setcolorsArrays] = React.useState<
-        [number, number, number, number][]
-    >([]);
 
     const [is3D, setIs3D] = useState(false);
 
@@ -219,12 +214,14 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         discrete: boolean;
         metadata: { objects: Record<string, [number[], number]> };
         valueRange: number[];
+        colorsArray: [number, number, number, number][];
     }>({
         title: "",
         logName: "",
         discrete: false,
         metadata: { objects: {} },
         valueRange: [],
+        colorsArray: [],
     });
 
     const onAfterRender = React.useCallback(() => {
@@ -239,42 +236,15 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     // Get color table for log curves.
     React.useEffect(() => {
         if (!wellsLayer?.isLoaded) return;
-        const logName = wellsLayer.props.logName;
-        const pathLayer = wellsLayer.internalState.subLayers[1];
-        if (!pathLayer.isLoaded) return;
-        const logs = pathLayer?.props.data;
-        const logData = logs[0];
-        const logInfo = getLogInfo(logData, logData.header.name, logName);
-        const title = "Wells / " + logName;
-        if (logInfo?.description == "discrete") {
-            const meta = logData["metadata_discrete"];
-            const metadataDiscrete = meta[logName].objects;
-            setLegendProps({
-                title: title,
-                discrete: true,
-                metadata: metadataDiscrete,
-                logName: logName,
-                valueRange: [],
-            });
-        } else {
-            const minArray: number[] = [];
-            const maxArray: number[] = [];
-            logs.forEach(function (log: LogCurveDataType) {
-                const logValues = getLogValues(log, log.header.name, logName);
-
-                minArray.push(Math.min(...logValues));
-                maxArray.push(Math.max(...logValues));
-            });
-
-            setLegendProps({
-                title: title,
-                logName: logName,
-                discrete: false,
-                metadata: { objects: {} },
-                valueRange: [Math.min(...minArray), Math.max(...maxArray)],
-            });
-            setcolorsArrays(colorsArray(wellsLayer?.props?.logName));
-        }
+        const legend = wellsLayer.state.legend[0];
+        setLegendProps({
+            title: legend.title,
+            logName: legend.logName,
+            discrete: legend.discrete,
+            metadata: legend.metadata,
+            valueRange: legend.valueRange,
+            colorsArray: legend.colorsArray,
+        });
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -349,7 +319,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         max={legendProps.valueRange[1]}
                         dataObjectName={legendProps.title}
                         position={legend.position}
-                        colorTableColors={colorsArrays}
+                        colorTableColors={legendProps.colorsArray}
                     />
                 )}
             {deckGLLayers && (
