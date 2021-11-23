@@ -699,7 +699,7 @@ export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
 }
 
 export function removeGraphTrackPlot(
-    wellLogView: WellLogView,
+    _wellLogView: WellLogView,
     track: GraphTrack,
     _plot: Plot
 ): void {
@@ -721,6 +721,8 @@ export function removeGraphTrackPlot(
         (wellLogView.logController as any).updateLegendRows();
         wellLogView.logController.updateTracks();
     }
+
+    track.prepareData();
 }
 
 function newDualScaleTrack(
