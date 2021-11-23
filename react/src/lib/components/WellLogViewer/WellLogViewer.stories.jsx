@@ -7,11 +7,42 @@ export default {
 };
 
 const Template = (args) => {
+    const [controller, setController] = React.useState(null);
+    const [info, setInfo] = React.useState("");
+    const onCreateController = React.useCallback(
+        (controller) => {
+            console.log("onCreateController");
+            setController(controller);
+        },
+        [controller]
+    );
+    const onRescaleContent = React.useCallback(() => {
+        console.log("onRescaleContent");
+
+        setInfo(
+            controller
+                ? "[" +
+                      controller.getContentDomain()[0].toFixed(0) +
+                      ", " +
+                      controller.getContentDomain()[1].toFixed(0) +
+                      "]"
+                : "-"
+        );
+    }, [controller]);
+    console.log("Template.render()");
     return (
-        <div style={{ height: "93vh", display: "flex" }}>
-            <div style={{ width: "100%", flex: 1 }}>
-                <WellLogViewer id="WellLogViewer" {...args} />
+        <div
+            style={{ height: "92vh", display: "flex", flexDirection: "column" }}
+        >
+            <div style={{ width: "100%", height: "100%", flex: 1 }}>
+                <WellLogViewer
+                    id="WellLogViewer"
+                    {...args}
+                    onCreateController={onCreateController}
+                    onRescaleContent={onRescaleContent}
+                />
             </div>
+            <div>{"Current: " + info}</div>
         </div>
     );
 };

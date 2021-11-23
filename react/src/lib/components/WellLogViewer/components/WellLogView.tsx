@@ -22,6 +22,8 @@ import "./styles.scss";
 
 import { select } from "d3";
 
+import { debouncer, DebounceFunction } from "@equinor/videx-wellog";
+
 import { WellLog } from "./WellLogTypes";
 import { Template } from "./WellLogTemplateTypes";
 import { ColorTable } from "./ColorTableTypes";
@@ -31,13 +33,7 @@ import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
 
-import { checkMinMax } from "../utils/minmax";
-
-import {
-    addGraphTrackPlot,
-    editGraphTrackPlot,
-    removeGraphTrackPlot,
-} from "../utils/tracks";
+import { addOrEditGraphTrackPlot, removeGraphTrackPlot } from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
 
 import { TemplatePlot } from "./WellLogTemplateTypes";
@@ -46,6 +42,8 @@ import {
     removeOverlay,
     zoomContent,
     scrollContentTo,
+    zoomContentTo,
+    getContentDomain,
     getContentScrollPos,
     getContentZoom,
     scrollTracksTo,
@@ -128,10 +126,11 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         },
         onRescale: (event: OverlayRescaleEvent): void => {
             if (event.target && event.transform) {
-                const zoom = getContentZoom(instance); // event.transform.k could be not valid after updateTracks();
+                // event.transform.k could be not valid after updateTracks();
+                // so use getContentZoom(instance) to be consistent
                 //console.log("zoom=", zoom, event.transform.k)
-                const pos = getContentScrollPos(instance);
-                parent.onRescaleContent(pos, zoom);
+
+                parent.onRescaleContent();
 
                 event.target.style.visibility = "visible";
                 event.target.textContent = `Zoom: x${event.transform.k.toFixed(
@@ -524,6 +523,13 @@ export interface TrackEvent {
 }
 
 export interface WellLogController {
+    zoomContentTo(domain: [number, number]): boolean;
+    scrollContentTo(f: number): boolean; // fraction of content
+    zoomContent(zoom: number): void;
+    getContentDomain(): [number, number];
+    getContentScrollPos(): number; // fraction of content
+    getContentZoom(): number;
+
     scrollTrackTo(pos: number): boolean;
     scrollTrackBy(delta: number): void;
     getTrackScrollPos(): number;
@@ -531,11 +537,6 @@ export interface WellLogController {
 
     _graphTrackMax(): number;
     _maxTrackNum(): number;
-
-    scrollContentTo(f: number): boolean;
-    zoomContent(zoom: number): void;
-    getContentScrollPos(): number;
-    getContentZoom(): number;
 }
 
 import { Info } from "./InfoTypes";
@@ -550,22 +551,20 @@ interface Props {
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
-
-    maxTrackNum?: number;
+    maxTrackNum?: number; // default is horizontal ? 3: 5
     maxContentZoom?: number; // default is 256
 
     // current view position:
     scrollTrackPos?: number; // the first track number
 
     // callbacks:
-    onInfo?: (infos: Info[]) => void;
     onCreateController?: (controller: WellLogController) => void;
+    onInfo?: (infos: Info[]) => void;
+
+    onScrollTrackPos?: (pos: /*fraction*/ number) => void; // called when track scrolling are changed
+    onRescaleContent?: () => void; // called when content zoom and scrolling are changed
 
     onTrackEvent?: (wellLogView: WellLogView, ev: TrackEvent) => void;
-
-    onScrollTrackPos?: (pos: number) => void;
-    onZoomContent?: (zoom: number) => void;
-    onScrollContentPos?: (pos: number) => void;
 }
 
 interface State {
@@ -577,12 +576,14 @@ interface State {
 class WellLogView extends Component<Props, State> implements WellLogController {
     container?: HTMLElement;
     logController?: LogViewer;
+    debounce: DebounceFunction;
 
     constructor(props: Props) {
         super(props);
 
         this.container = undefined;
         this.logController = undefined;
+        this.debounce = debouncer();
 
         this.state = {
             infos: [],
@@ -591,16 +592,16 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         this.onTrackEvent = this.onTrackEvent.bind(this);
 
-        if (this.props.onCreateController)
+        if (this.props.onCreateController) {
             // set callback to component's caller
             this.props.onCreateController(this);
+        }
     }
 
     componentDidMount(): void {
         this.createLogViewer();
         this.setTracks();
     }
-
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
         if (this.props.horizontal !== nextProps.horizontal) return true;
         if (this.props.welllog !== nextProps.welllog) return true;
@@ -616,11 +617,17 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (this.props.maxContentZoom !== nextProps.maxContentZoom) return true;
 
+        // callbacks
+
         return false;
     }
     componentDidUpdate(prevProps: Props, prevState: State): void {
+        console.log("WellLogView.componentDidUpdate()");
         // Typical usage (don't forget to compare props):
         if (this.props.onCreateController !== prevProps.onCreateController) {
+            console.log(
+                "this.props.onCreateController !== prevProps.onCreateController"
+            );
             if (this.props.onCreateController)
                 // update callback to component's caller
                 this.props.onCreateController(this);
@@ -660,7 +667,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
             this.props.maxTrackNum !== prevProps.maxTrackNum
         ) {
-            this.scrollTrack();
+            this.onScrollTrack();
             this.setInfo();
         }
     }
@@ -718,82 +725,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.props.colorTables
             );
         }
-        this.scrollTrack();
+        this.onScrollTrack();
         this.setInfo(); // Clear old track information
-    }
-
-    isTrackSelected(track: Track): boolean {
-        return (
-            !!this.logController && isTrackSelected(this.logController, track)
-        );
-    }
-
-    selectTrack(track: Track, selected: boolean): void {
-        if (this.logController)
-            for (const _track of this.logController.tracks) {
-                // single lecetion: remove selection from another tracks
-                selectTrack(
-                    this.logController,
-                    _track,
-                    selected && track === _track
-                );
-            }
-    }
-
-    addTrackPlot(track: Track, templatePlot: TemplatePlot): void {
-        const minmaxPrimaryAxis = addGraphTrackPlot(
-            this,
-            track as GraphTrack,
-            templatePlot
-        );
-        if (this.logController) {
-            const minmax: [number, number] = [
-                this.logController.domain[0],
-                this.logController.domain[1],
-            ];
-            checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
-            this.logController.domain = minmax;
-
-            // protectedthis.logController.updateLegendRows();
-            this.logController.updateTracks();
-        }
-        this.setInfo();
-    }
-
-    editTrackPlot(track: Track, plot: Plot, templatePlot: TemplatePlot): void {
-        const minmaxPrimaryAxis = editGraphTrackPlot(
-            this,
-            track as GraphTrack,
-            plot,
-            templatePlot
-        );
-        if (this.logController) {
-            const minmax: [number, number] = [
-                this.logController.domain[0],
-                this.logController.domain[1],
-            ];
-            checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
-            this.logController.domain = minmax;
-
-            // protectedthis.logController.updateLegendRows();
-            this.logController.updateTracks();
-        }
-        this.setInfo();
-    }
-
-    removeTrackPlot(track: Track, plot: Plot): void {
-        removeGraphTrackPlot(this, track as GraphTrack, plot);
-        if (this.logController) {
-            // protected this.logController.updateLegendRows();
-            this.logController.updateTracks();
-        }
-        this.setInfo();
     }
 
     /* 
       Display current state of track scrolling
       */
-    scrollTrack(): void {
+    onScrollTrack(): void {
         const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
         const iTo = iFrom + this._maxTrackNum();
         if (this.logController) scrollTracksTo(this.logController, iFrom, iTo);
@@ -814,15 +753,45 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(x, x2);
     }
 
-    onRescaleContent(pos: number, zoom: number): void {
-        if (this.props.onZoomContent) this.props.onZoomContent(zoom);
-
-        if (this.props.onScrollContentPos) this.props.onScrollContentPos(pos);
+    onRescaleContent(): void {
+        // use debouncer to prevent too frequent notifications while animation
+        this.debounce(() => {
+            if (this.props.onRescaleContent) this.props.onRescaleContent();
+        });
     }
 
     onTrackEvent(ev: TrackEvent): void {
         if (this.props.onTrackEvent) this.props.onTrackEvent(this, ev);
     }
+
+    // content
+    zoomContentTo(domain: [number, number]): boolean {
+        if (this.logController)
+            return zoomContentTo(this.logController, domain);
+        return false;
+    }
+    scrollContentTo(f: number): boolean {
+        if (this.logController) return scrollContentTo(this.logController, f);
+        return false;
+    }
+    zoomContent(zoom: number): boolean {
+        if (this.logController) return zoomContent(this.logController, zoom);
+        return false;
+    }
+    getContentDomain(): [number, number] {
+        if (this.logController) return getContentDomain(this.logController);
+        return [0.0, 0.0];
+    }
+    getContentScrollPos(): number {
+        if (this.logController) return getContentScrollPos(this.logController);
+        return 0.0;
+    }
+    getContentZoom(): number {
+        if (this.logController) return getContentZoom(this.logController);
+        return 1.0;
+    }
+
+    // tracks
     _graphTrackMax(): number {
         // for scrollbar
         if (!this.logController) return 0;
@@ -870,31 +839,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this._getTrackScrollPosMax();
     }
 
-    scrollContentTo(f: number): boolean {
-        if (this.logController) {
-            return scrollContentTo(this.logController, f);
-        }
-        return false;
-    }
-    zoomContent(zoom: number): boolean {
-        if (this.logController) {
-            return zoomContent(this.logController, zoom);
-        }
-        return false;
-    }
-    getContentScrollPos(): number {
-        if (this.logController) {
-            return getContentScrollPos(this.logController);
-        }
-        return 0.0;
-    }
-
-    getContentZoom(): number {
-        if (this.logController) {
-            return getContentZoom(this.logController);
-        }
-        return 1.0;
-    }
+    // editting
 
     addTrack(trackNew: Track, trackCurrent: Track, bAfter: boolean): void {
         if (this.logController) {
@@ -918,7 +863,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 // force new track to be visible when added after the current
                 this.scrollTrackBy(+1);
             else {
-                this.scrollTrack();
+                this.onScrollTrack();
                 this.setInfo();
             }
         }
@@ -928,9 +873,42 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.logController) {
             this.logController.removeTrack(track);
 
-            this.scrollTrack();
+            this.onScrollTrack();
             this.setInfo();
         }
+    }
+
+    isTrackSelected(track: Track): boolean {
+        return (
+            !!this.logController && isTrackSelected(this.logController, track)
+        );
+    }
+
+    selectTrack(track: Track, selected: boolean): void {
+        if (this.logController)
+            for (const _track of this.logController.tracks) {
+                // single lecetion: remove selection from another tracks
+                selectTrack(
+                    this.logController,
+                    _track,
+                    selected && track === _track
+                );
+            }
+    }
+
+    addTrackPlot(track: Track, templatePlot: TemplatePlot): void {
+        addOrEditGraphTrackPlot(this, track as GraphTrack, null, templatePlot);
+        this.setInfo();
+    }
+
+    editTrackPlot(track: Track, plot: Plot, templatePlot: TemplatePlot): void {
+        addOrEditGraphTrackPlot(this, track as GraphTrack, plot, templatePlot);
+        this.setInfo();
+    }
+
+    removeTrackPlot(track: Track, plot: Plot): void {
+        removeGraphTrackPlot(this, track as GraphTrack, plot);
+        this.setInfo();
     }
 
     // Dialog functions
@@ -942,6 +920,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     render(): ReactNode {
+        console.log("WellLogView.render()");
         return (
             <div style={{ width: "100%", height: "100%" }}>
                 <div

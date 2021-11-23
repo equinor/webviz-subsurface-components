@@ -440,7 +440,7 @@ function getPlotConfig(
     };
 }
 
-export function addGraphTrackPlot(
+function addGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
     templatePlot: TemplatePlot
@@ -492,6 +492,12 @@ export function addGraphTrackPlot(
                     : -1;
                 curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
                 plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+                if (!curve2)
+                    console.error(
+                        "templatePlot.name2 '" +
+                            templatePlot.name2 +
+                            "' not found"
+                    );
                 checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
                 checkMinMax(minmax, plotData2.minmax);
             }
@@ -536,7 +542,7 @@ export function addGraphTrackPlot(
     return minmaxPrimaryAxis;
 }
 
-export function editGraphTrackPlot(
+function editGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
     plot: Plot,
@@ -588,6 +594,12 @@ export function editGraphTrackPlot(
                     ? indexOfElementByName(curves, templatePlot.name2)
                     : -1;
                 curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
+                if (!curve2)
+                    console.error(
+                        "templatePlot.name2 '" +
+                            templatePlot.name2 +
+                            "' not found"
+                    );
                 plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
                 checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
                 checkMinMax(minmax, plotData2.minmax);
@@ -647,6 +659,31 @@ export function editGraphTrackPlot(
     return minmaxPrimaryAxis;
 }
 
+export function addOrEditGraphTrackPlot(
+    wellLogView: WellLogView,
+    track: GraphTrack,
+    plot: Plot | null,
+    templatePlot: TemplatePlot
+): void {
+    const minmaxPrimaryAxis = plot
+        ? editGraphTrackPlot(wellLogView, track, plot, templatePlot)
+        : addGraphTrackPlot(wellLogView, track, templatePlot);
+
+    if (wellLogView.logController) {
+        const minmax: [number, number] = [
+            // get base domain
+            wellLogView.logController.domain[0],
+            wellLogView.logController.domain[1],
+        ];
+        checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
+        wellLogView.logController.domain = minmax;
+
+        // protected
+        (wellLogView.logController as any).updateLegendRows();
+        wellLogView.logController.updateTracks();
+    }
+}
+
 export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
     const plots = track.plots;
 
@@ -662,7 +699,7 @@ export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
 }
 
 export function removeGraphTrackPlot(
-    _wellLogView: WellLogView,
+    wellLogView: WellLogView,
     track: GraphTrack,
     _plot: Plot
 ): void {
@@ -678,6 +715,12 @@ export function removeGraphTrackPlot(
     }
 
     track.prepareData();
+
+    if (wellLogView.logController) {
+        // protected
+        (wellLogView.logController as any).updateLegendRows();
+        wellLogView.logController.updateTracks();
+    }
 }
 
 function newDualScaleTrack(

@@ -63,7 +63,7 @@ export function getInterpolatedColorString(
     if (j <= 0) c = cBelow;
     else if (j >= colors.length) c = cAbove;
     else {
-        // linear interpolation on interval [colors[j-1][0], colors[j-1][0]]
+        // linear interpolation on interval [colors[j-1][0], colors[j][0]]
         const color0 = colors[j - 1];
         const color = colors[j];
 

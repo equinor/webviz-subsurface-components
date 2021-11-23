@@ -95,13 +95,29 @@ export function scrollContentTo(
     return false;
 }
 
+export function zoomContentTo(
+    logViewer: LogViewer,
+    domain: [number, number]
+): boolean {
+    const [d1, d2] = logViewer.domain;
+    if (domain[0] !== d1 || domain[1] !== d2) {
+        logViewer.zoomTo(domain);
+        return true;
+    }
+    return false;
+}
+
+export function getContentDomain(logViewer: LogViewer): [number, number] {
+    const [d1, d2] = logViewer.domain;
+    return [d1, d2];
+}
+
 export function getContentScrollPos(logViewer: LogViewer): number /*fraction*/ {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
     const w = b2 - b1 - (d2 - d1);
     return w ? (d1 - b1) / w : 0;
 }
-
 export function getContentZoom(logViewer: LogViewer): number /*fraction*/ {
     // see also zoomContent(logViewer)
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
