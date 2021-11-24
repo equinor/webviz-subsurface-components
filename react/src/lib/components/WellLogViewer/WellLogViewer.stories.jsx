@@ -4,6 +4,18 @@ import WellLogViewer from "./WellLogViewer";
 export default {
     component: WellLogViewer,
     title: "WellLogViewer/Demo",
+    argTypes: {
+        id: {
+            description:
+                "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
+        },
+        welllog: {
+            description: "Array of JSON objects describing well log data.",
+        },
+        template: {
+            description: "Prop containing track template data.",
+        },
+    },
 };
 
 const Template = (args) => {
@@ -15,7 +27,7 @@ const Template = (args) => {
         },
         [controller]
     );
-    const onRescaleContent = React.useCallback(() => {
+    const onContentRescale = React.useCallback(() => {
         setInfo(
             controller
                 ? "[" +
@@ -36,10 +48,10 @@ const Template = (args) => {
                     id="WellLogViewer"
                     {...args}
                     onCreateController={onCreateController}
-                    onRescaleContent={onRescaleContent}
+                    onContentRescale={onContentRescale}
                 />
             </div>
-            <div>{"Current: " + info}</div>
+            <div style={{ width: "100%", flex: 0 }}>{"Current: " + info}</div>
         </div>
     );
 };

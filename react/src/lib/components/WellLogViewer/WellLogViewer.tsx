@@ -95,7 +95,7 @@ interface Props {
     domain?: [number, number]; //  initial range
 
     // callbacks
-    onRescaleContent: () => void;
+    onContentRescale: () => void;
     onCreateController?: (controller: WellLogController) => void;
 }
 interface State {
@@ -139,9 +139,9 @@ class WellLogViewer extends Component<Props, State> {
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
 
         this.onScrollerScroll = this.onScrollerScroll.bind(this);
-        this.onScrollTrackPos = this.onScrollTrackPos.bind(this);
+        this.onTrackScroll = this.onTrackScroll.bind(this);
 
-        this.onRescaleContent = this.onRescaleContent.bind(this);
+        this.onContentRescale = this.onContentRescale.bind(this);
 
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
     }
@@ -156,13 +156,13 @@ class WellLogViewer extends Component<Props, State> {
             //compare (Object.keys(nextProps), Object.keys(this.props))
             for (const p in nextProps) {
                 if (nextProps[p] !== this.props[p]) {
-                    console.log(p /*, nextProps[p], this.props[p]*/);
+                    //console.log(p /*, nextProps[p], this.props[p]*/);
                     return true;
                 }
             }
             for (const s in nextState) {
                 if (nextState[s] !== this.state[s]) {
-                    console.log(s /*, nextState[s], this.state[s]*/);
+                    //console.log(s /*, nextState[s], this.state[s]*/);
                     return true;
                 }
             }
@@ -171,7 +171,7 @@ class WellLogViewer extends Component<Props, State> {
         return false;
     }
 
-    componentDidUpdate(prevProps: Props, prevState: State): void {
+    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
         if (
             this.props.welllog !== prevProps.welllog ||
             this.props.template !== prevProps.template ||
@@ -223,14 +223,14 @@ class WellLogViewer extends Component<Props, State> {
         //this.setSliderZoom();
     }
     // callback function from WellLogView
-    onScrollTrackPos(/*pos: number*/): void {
+    onTrackScroll(): void {
         this.setScrollerPosAndZoom();
     }
     // callback function from WellLogView
-    onRescaleContent(): void {
+    onContentRescale(): void {
         this.setScrollerPosAndZoom();
         this.setSliderZoom();
-        if (this.props.onRescaleContent) this.props.onRescaleContent();
+        if (this.props.onContentRescale) this.props.onContentRescale();
     }
 
     // callback function from Axis selector
@@ -328,8 +328,8 @@ class WellLogViewer extends Component<Props, State> {
                         onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
                         onTrackEvent={onTrackEvent}
-                        onScrollTrackPos={this.onScrollTrackPos}
-                        onRescaleContent={this.onRescaleContent}
+                        onTrackScroll={this.onTrackScroll}
+                        onContentRescale={this.onContentRescale}
                     />
                 </Scroller>
                 <div style={{ flex: "0, 0, 280px" }}>
@@ -380,19 +380,29 @@ WellLogViewer.propTypes = {
      */
     id: PropTypes.string.isRequired,
 
-    // TODO: Add documentation
-    welllog: PropTypes.array,
+    /**
+     * Array of JSON objects describing well log data
+     */
+    welllog: PropTypes.array.isRequired,
 
-    // TODO: Add documentation
-    template: PropTypes.object,
+    /**
+     * Prop containing track template data
+     */
+    template: PropTypes.object.isRequired,
 
-    // TODO: Add documentation
-    colorTables: PropTypes.array,
+    /**
+     * Prop containing color table data
+     */
+    colorTables: PropTypes.array.isRequired,
 
-    // TODO: Add documentation
+    /**
+     * Orientation of the track plots on the screen. Default is false
+     */
     horizontal: PropTypes.bool,
 
-    // TODO: Add documentation
+    /**
+     * Initial visible interval of the log data
+     */
     domain: PropTypes.array,
 };
 

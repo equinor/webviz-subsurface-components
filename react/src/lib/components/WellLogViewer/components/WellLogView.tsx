@@ -130,7 +130,7 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
                 // so use getContentZoom(instance) to be consistent
                 //console.log("zoom=", zoom, event.transform.k)
 
-                parent.onRescaleContent();
+                parent.onContentRescale();
 
                 event.target.style.visibility = "visible";
                 event.target.textContent = `Zoom: x${event.transform.k.toFixed(
@@ -561,8 +561,8 @@ interface Props {
     onCreateController?: (controller: WellLogController) => void;
     onInfo?: (infos: Info[]) => void;
 
-    onScrollTrackPos?: (pos: /*fraction*/ number) => void; // called when track scrolling are changed
-    onRescaleContent?: () => void; // called when content zoom and scrolling are changed
+    onTrackScroll?: () => void; // called when track scrolling are changed
+    onContentRescale?: () => void; // called when content zoom and scrolling are changed
 
     onTrackEvent?: (wellLogView: WellLogView, ev: TrackEvent) => void;
 }
@@ -583,7 +583,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         this.container = undefined;
         this.logController = undefined;
-        this.debounce = debouncer();
+        this.debounce = debouncer(50);
 
         this.state = {
             infos: [],
@@ -729,17 +729,17 @@ class WellLogView extends Component<Props, State> implements WellLogController {
       Display current state of track scrolling
       */
     onScrollTrack(): void {
-        const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
+        const iFrom = this.getTrackScrollPos();
         const iTo = iFrom + this._maxTrackNum();
         if (this.logController) scrollTracksTo(this.logController, iFrom, iTo);
 
-        if (this.props.onScrollTrackPos) this.props.onScrollTrackPos(iFrom);
+        if (this.props.onTrackScroll) this.props.onTrackScroll();
     }
     setInfo(x: number = Number.NaN, x2: number = Number.NaN): void {
         if (!this.props.onInfo) return; // no callback is given
         if (!this.logController) return; // not initialized yet
 
-        const iFrom = this._newTrackScrollPos(this.state.scrollTrackPos);
+        const iFrom = this.getTrackScrollPos();
         const iTo = iFrom + this._maxTrackNum();
         const infos = fillInfos(x, x2, this.logController.tracks, iFrom, iTo);
         this.props.onInfo(infos);
@@ -749,10 +749,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(x, x2);
     }
 
-    onRescaleContent(): void {
+    onContentRescale(): void {
         // use debouncer to prevent too frequent notifications while animation
         this.debounce(() => {
-            if (this.props.onRescaleContent) this.props.onRescaleContent();
+            if (this.props.onContentRescale) this.props.onContentRescale();
         });
     }
 
