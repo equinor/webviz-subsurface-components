@@ -1,10 +1,8 @@
 import PropTypes from "prop-types";
 import * as React from "react";
 import Map from "./components/Map";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const template = require("../../../demo/example-data/welllayer_template.json");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("../../../demo/example-data/color-tables.json");
+import template from "../../../demo/example-data/welllayer_template.json";
+import colorTables from "../../../demo/example-data/color-tables.json";
 
 DeckGLMap.defaultProps = {
     coords: {

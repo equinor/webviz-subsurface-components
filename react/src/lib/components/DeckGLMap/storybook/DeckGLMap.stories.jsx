@@ -1,8 +1,8 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
-const exampleData = require("../../../../demo/example-data/deckgl-map.json");
-const template = require("../../../../demo/example-data/welllayer_template.json");
-const colorTables = require("../../../../demo/example-data/color-tables.json");
+import exampleData from "../../../../demo/example-data/deckgl-map.json";
+import template from "../../../../demo/example-data/welllayer_template.json";
+import colorTables from "../../../../demo/example-data/color-tables.json";
 
 export default {
     component: DeckGLMap,

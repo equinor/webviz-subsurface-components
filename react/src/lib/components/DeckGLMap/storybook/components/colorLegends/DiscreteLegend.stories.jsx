@@ -1,7 +1,7 @@
 import React from "react";
 import DiscreteColorLegend from "../../../components/DiscreteLegend";
-const template = require("../../../../../../demo/example-data/welllayer_template.json");
-const colorTables = require("../../../../../../demo/example-data/color-tables.json");
+import template from "../../../../../../demo/example-data/welllayer_template.json";
+import colorTables from "../../../../../../demo/example-data/color-tables.json";
 
 export default {
     component: DiscreteColorLegend,

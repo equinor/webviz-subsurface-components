@@ -4,8 +4,8 @@ export default {
     component: ContinuousLegend,
     title: "DeckGLMap/Components/ColorLegends",
 };
-const template = require("../../../../../../demo/example-data/welllayer_template.json");
-const colorTables = require("../../../../../../demo/example-data/color-tables.json");
+import template from "../../../../../../demo/example-data/welllayer_template.json";
+import colorTables from "../../../../../../demo/example-data/color-tables.json";
 
 const min = 0;
 const max = 0.35;
