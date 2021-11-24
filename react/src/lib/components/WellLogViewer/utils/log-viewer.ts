@@ -31,6 +31,33 @@ export function showTrack(track: Track, visible: boolean): boolean {
     return false; // visibility is not changed
 }
 
+export function isTrackSelected(_logViewer: LogViewer, track: Track): boolean {
+    if (track.elm) {
+        const elm = track.elm.parentElement;
+        if (elm) {
+            return elm.classList.contains("selected");
+        }
+    }
+    return false;
+}
+
+export function selectTrack(
+    logViewer: LogViewer,
+    track: Track,
+    selected: boolean
+): boolean {
+    if (track.elm) {
+        const elm = track.elm.parentElement;
+        if (elm) {
+            if (isTrackSelected(logViewer, track) !== selected) {
+                elm.classList.toggle("selected");
+                return true; // selection is changed
+            }
+        }
+    }
+    return false; // selection is not changed
+}
+
 export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
     if (!zoom) zoom = 1.0;
 
@@ -82,7 +109,7 @@ export function getContentZoom(logViewer: LogViewer): number /*fraction*/ {
     return Math.abs(b2 - b1) / Math.abs(d2 - d1);
 }
 
-export function scrollTracks(
+export function scrollTracksTo(
     logViewer: LogViewer,
     iFrom: number,
     iTo: number
