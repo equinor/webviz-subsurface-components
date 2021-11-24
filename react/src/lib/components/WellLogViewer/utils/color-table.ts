@@ -25,45 +25,11 @@ export function colorToString(
     cDefault: string
 ): string {
     if (!color) return cDefault;
-    // Old code
-    //    const p =
-    //      0x1000000 | // force value to have 7 hex digits : 1rrggbb
-    //      (Math.round(color[0] * 255) << 16) |
-    //      (Math.round(color[1] * 255) << 8) |
-    //      Math.round(color[2] * 255);
-    // was based on following algorithm for every x component :
-    // c = Math.round(color[x] * 255) // component values from range [0.0, 1.0] is mapped to the range [0,255]
-    // it results in:
-    // [0.0, 0.5/255)          => 0
-    // [0.5/255, 1.5/255)      => 1
-    // [1.5/255, 2.5/255)      => 2
-    // ...
-    // [253.5/255, 254.5/255)  => 254
-    // [254.5/255, 1.0]        => 255
-    // but the first and the last subranges is 2 times smaller than another ones!
-    //
-    //
-    // So use more accurate algorithm for every x component :
-    // 1) c=Math.floor(color[x] * 256) // make all component values from range [0.0, 1.0] to be mapped to the range [0,255] and only one value 1.0 is mapped to 256
-    // [0.0, 1/256)        => 0
-    // [1/256, 2/256)      => 1
-    // [2/256, 3/256)      => 2
-    // ...
-    // [254/256, 255/256)  => 254
-    // [255/256, 1.0)      => 255
-    // [1.0, 1.0]          => 256
-    // So we should add
-    //    if(c>255) c=255 // Special processing for component value 1.0.
-    //
-    // 2) slighly decrease a factor 256 to exclude a need of special processing for component value 1.0.
-    //    c=Math.floor(color[x] * 255.9999999999999) // make all component values from range [0.0, 1.0] to be mapped to the range [0,255]
-    //           // because Math.floor(1.0*255.9999999999999) === 255
-    // 3) we do not need to call Math.floor() before Shift or Binary OR operations because these operators convert their operands to integers
     const p =
         0x1000000 | // force value to have 7 hex digits : 1rrggbb
-        ((color[0] * 255.999999) << 16) |
-        ((color[1] * 255.999999) << 8) |
-        (color[2] * 255.999999);
+        (color[0] << 16) |
+        (color[1] << 8) |
+        color[2];
     return "#" + p.toString(16).substr(1); // cut the first (additional) character and add leading '#' character
 }
 /*
@@ -73,11 +39,7 @@ export function color4ToString(
     color: [number, number, number, number] // [stop, r,g,b]
 ): string {
     // see colorToString()
-    const p =
-        0x1000000 |
-        ((color[1] * 255.999999) << 16) |
-        ((color[2] * 255.999999) << 8) |
-        (color[3] * 255.999999);
+    const p = 0x1000000 | (color[1] << 16) | (color[2] << 8) | color[3];
     return "#" + p.toString(16).substr(1);
 }
 
@@ -109,11 +71,15 @@ export function getInterpolatedColorString(
 
         const p = // see also color4ToString()
             0x1000000 |
-            (((color0[1] + f * (color[1] - color0[1])) * 255.999999) << 16) |
-            (((color0[2] + f * (color[2] - color0[2])) * 255.999999) << 8) |
-            ((color0[3] + f * (color[3] - color0[3])) * 255.999999);
+            ((color0[1] + f * (color[1] - color0[1])) << 16) |
+            ((color0[2] + f * (color[2] - color0[2])) << 8) |
+            (color0[3] + f * (color[3] - color0[3]));
         c = "#" + p.toString(16).substr(1);
+        if (c.length !== 7) {
+            console.error("wrong color table ");
+            console.log(c, p, p.toString(16), f, color, color0);
+            return cNaN;
+        }
     }
-
     return c;
 }
