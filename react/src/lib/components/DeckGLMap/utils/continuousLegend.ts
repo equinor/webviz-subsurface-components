@@ -69,9 +69,9 @@ export function rgbValues(
 
 // return the hex color code and offset
 export function RGBToHex(rgb: number[]): { color: string; offset: number } {
-    let r = Math.round(rgb[1] * 255).toString(16),
-        g = Math.round(rgb[2] * 255).toString(16),
-        b = Math.round(rgb[3] * 255).toString(16);
+    let r = Math.round(rgb[1]).toString(16),
+        g = Math.round(rgb[2]).toString(16),
+        b = Math.round(rgb[3]).toString(16);
     if (r.length == 1) r = "0" + r;
     if (g.length == 1) g = "0" + g;
     if (b.length == 1) b = "0" + b;

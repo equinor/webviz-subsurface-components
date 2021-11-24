@@ -21,7 +21,7 @@ describe("test layers settings button", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
     });
-    xit("click to dispatch redux action", async () => {
+    it("click to dispatch redux action", async () => {
         render(
             Wrapper({
                 children: (
@@ -48,7 +48,7 @@ describe("test layers settings button", () => {
             type: "layers/updateDrawingMode",
         });
     });
-    xit("should close menu when clicked on backdrop", async () => {
+    it("should close menu when clicked on backdrop", async () => {
         render(
             Wrapper({
                 children: (
@@ -66,7 +66,7 @@ describe("test layers settings button", () => {
         userEvent.click(document.body);
         await waitFor(() => expect(layer_settings_menu).not.toBeVisible());
     });
-    xit("should close menu when clicked twice on layers button", async () => {
+    it("should close menu when clicked twice on layers button", async () => {
         render(
             Wrapper({
                 children: (

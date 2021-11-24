@@ -5,15 +5,7 @@ import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
 import { setLayers } from "../redux/actions";
-import {
-    ColormapLayer,
-    Hillshading2DLayer,
-    WellsLayer,
-    FaultPolygonsLayer,
-    PieChartLayer,
-    GridLayer,
-    DrawingLayer,
-} from "../layers";
+import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
 import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 
@@ -220,43 +212,4 @@ function getViewsForDeckGL(): Record<string, unknown>[] {
         },
     ];
     return deckgl_views;
-}
-
-// update layer object to include default props
-function getLayersWithDefaultProps(
-    deckgl_layers: Record<string, unknown>[]
-): Record<string, unknown>[] {
-    const layers = deckgl_layers.map((a) => {
-        return { ...a };
-    });
-
-    layers?.forEach((layer) => {
-        let default_props = undefined;
-        if (layer["@@type"] === ColormapLayer.name) {
-            default_props = ColormapLayer.defaultProps;
-        } else if (layer["@@type"] === Hillshading2DLayer.name) {
-            default_props = Hillshading2DLayer.defaultProps;
-        } else if (layer["@@type"] === GridLayer.name)
-            default_props = GridLayer.defaultProps;
-        else if (layer["@@type"] === WellsLayer.name)
-            default_props = WellsLayer.defaultProps;
-        else if (layer["@@type"] === FaultPolygonsLayer.name)
-            default_props = FaultPolygonsLayer.defaultProps;
-        else if (layer["@@type"] === PieChartLayer.name)
-            default_props = PieChartLayer.defaultProps;
-        else if (layer["@@type"] === DrawingLayer.name)
-            default_props = DrawingLayer.defaultProps;
-
-        if (default_props) {
-            Object.entries(default_props).forEach(([prop, value]) => {
-                const prop_type = typeof value;
-                if (
-                    ["string", "boolean", "number", "array"].includes(prop_type)
-                ) {
-                    if (layer[prop] === undefined) layer[prop] = value;
-                }
-            });
-        }
-    });
-    return layers;
 }
