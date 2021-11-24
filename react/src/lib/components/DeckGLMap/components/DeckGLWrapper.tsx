@@ -235,7 +235,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
     // Get color table for log curves.
     React.useEffect(() => {
-        if (!wellsLayer?.isLoaded) return;
+        if (!wellsLayer?.isLoaded || !wellsLayer.props.logData) return;
         const legend = wellsLayer.state.legend[0];
         setLegendProps({
             title: legend.title,

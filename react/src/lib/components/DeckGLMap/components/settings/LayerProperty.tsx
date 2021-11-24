@@ -38,14 +38,25 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
         [dispatch]
     );
 
+    const isControlDisplayable = (
+        propId: string,
+        dependentOnProp: string | undefined
+    ): boolean => {
+        if (!layerProps) return false;
+
+        return dependentOnProp
+            ? dependentOnProp in layerProps && propId in layerProps
+            : propId in layerProps;
+    };
+
     return (
         layerProps && (
             <>
                 {
                     // first render all boolean properties
                     ToggleTypeProps.map(
-                        ({ id, displayName }) =>
-                            id in layerProps && (
+                        ({ id, displayName, dependentOnProp }) =>
+                            isControlDisplayable(id, dependentOnProp) && (
                                 <ToggleButton
                                     label={displayName}
                                     checked={layerProps[id] as boolean}
@@ -67,8 +78,8 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
                 {
                     // then render all numeric properties
                     NumericTypeProps.map(
-                        ({ id, displayName }) =>
-                            id in layerProps && (
+                        ({ id, displayName, dependentOnProp }) =>
+                            isControlDisplayable(id, dependentOnProp) && (
                                 <NumericInput
                                     label={displayName}
                                     value={layerProps[id] as number}
@@ -90,8 +101,15 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
                 {
                     // then render all slider properties
                     SliderTypeProps.map(
-                        ({ id, displayName, min, max, step }) =>
-                            id in layerProps && (
+                        ({
+                            id,
+                            displayName,
+                            min,
+                            max,
+                            step,
+                            dependentOnProp,
+                        }) =>
+                            isControlDisplayable(id, dependentOnProp) && (
                                 <SliderInput
                                     label={displayName}
                                     min={min}
@@ -117,8 +135,8 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
                 {
                     // lastly render all menu type properties
                     MenuTypeProps.map(
-                        ({ id, displayName }) =>
-                            id in layerProps && (
+                        ({ id, displayName, dependentOnProp }) =>
+                            isControlDisplayable(id, dependentOnProp) && (
                                 <DrawModeSelector
                                     layerId={layerId}
                                     label={displayName}
