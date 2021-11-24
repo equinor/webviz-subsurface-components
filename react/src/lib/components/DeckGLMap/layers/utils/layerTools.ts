@@ -3,6 +3,7 @@ import { PickInfo } from "@deck.gl/core/lib/deck";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { Matrix4 } from "math.gl";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
     name: string;
@@ -65,4 +66,30 @@ export function getModelMatrix(deg: number, x: number, y: number): Matrix4 {
     const m2mRotm1 = m2.multiplyRight(mRot);
 
     return m2mRotm1;
+}
+
+// update layer object to include default props
+export function getLayersWithDefaultProps(
+    deckgl_layers: Record<string, unknown>[]
+): Record<string, unknown>[] {
+    const layers = deckgl_layers.map((a) => {
+        return { ...a };
+    });
+
+    layers?.forEach((layer) => {
+        const default_props = layersDefaultProps[
+            layer["@@type"] as string
+        ] as Record<string, unknown>;
+        if (default_props) {
+            Object.entries(default_props).forEach(([prop, value]) => {
+                const prop_type = typeof value;
+                if (
+                    ["string", "boolean", "number", "array"].includes(prop_type)
+                ) {
+                    if (layer[prop] === undefined) layer[prop] = value;
+                }
+            });
+        }
+    });
+    return layers;
 }

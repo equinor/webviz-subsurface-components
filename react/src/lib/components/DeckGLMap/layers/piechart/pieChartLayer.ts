@@ -5,6 +5,7 @@ import { Position } from "@deck.gl/core/utils/positions";
 import { SolidPolygonLayer } from "@deck.gl/layers";
 import { patchLayerProps } from "../utils/layerTools";
 import { PickInfo } from "deck.gl";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 type PieProperties = [{ color: RGBAColor; label: string }];
 
@@ -36,13 +37,6 @@ export interface PieChartLayerProps<D> extends ExtendedLayerProps<D> {
     selectionEnabled: boolean;
 }
 
-const defaultProps = {
-    name: "Pie chart",
-    id: "pie-layer",
-    pickable: true,
-    visible: true,
-    selectionEnabled: true,
-};
 export default class PieChartLayer extends CompositeLayer<
     PiesData,
     PieChartLayerProps<PiesData>
@@ -78,7 +72,9 @@ export default class PieChartLayer extends CompositeLayer<
 }
 
 PieChartLayer.layerName = "PieChartLayer";
-PieChartLayer.defaultProps = defaultProps;
+PieChartLayer.defaultProps = layersDefaultProps[
+    "PieChartLayer"
+] as PieChartLayerProps<PiesData>;
 
 //================= Local help functions. ==================
 
