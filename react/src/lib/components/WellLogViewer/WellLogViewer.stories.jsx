@@ -15,6 +15,16 @@ export default {
         template: {
             description: "Prop containing track template data.",
         },
+        colorTables: {
+            description: "Prop containing color table data.",
+        },
+        horizontal: {
+            description: "Orientation of the track plots on the screen.",
+            defaultValue: false,
+        },
+        domain: {
+            description: "Initial visible interval of the log data.",
+        },
     },
 };
 
