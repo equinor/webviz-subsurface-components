@@ -8,6 +8,7 @@ import {
     ValueDecoder,
 } from "../utils/propertyMapTools";
 import { getModelMatrix } from "../utils/layerTools";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 import fsHillshading from "!!raw-loader!./hillshading2d.fs.glsl";
 
@@ -37,29 +38,9 @@ export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
     rotDeg: number;
 }
 
-const defaultProps = {
-    name: "Hill shading",
-    id: "hillshading-layer",
-    opacity: 1.0,
-    pickable: true,
-    visible: true,
-    rotDeg: 0,
-    valueRange: { type: "array" },
-    colorMapRange: { type: "array" },
-    lightDirection: { type: "array", value: [1, 1, 1] },
-    ambientLightIntensity: { type: "number", value: 0.5 },
-    diffuseLightIntensity: { type: "number", value: 0.5 },
-    valueDecoder: {
-        type: "object",
-        value: {
-            rgbScaler: [1, 1, 1],
-            // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
-            floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
-            offset: 0,
-            step: 0,
-        },
-    },
-};
+const defaultProps = layersDefaultProps[
+    "Hillshading2DLayer"
+] as Hillshading2DProps<unknown>;
 
 export default class Hillshading2DLayer extends BitmapLayer<
     unknown,
@@ -74,7 +55,7 @@ export default class Hillshading2DLayer extends BitmapLayer<
                 valueDecoder: {
                     // The prop objects are not merged with the defaultProps by default.
                     // See https://github.com/facebook/react/issues/2568
-                    ...defaultProps.valueDecoder.value,
+                    ...defaultProps.valueDecoder,
                     ...moduleParameters.valueDecoder,
                 },
                 modelMatrix: getModelMatrix(
@@ -132,7 +113,7 @@ export default class Hillshading2DLayer extends BitmapLayer<
         }
 
         const mergedDecoder = {
-            ...defaultProps.valueDecoder.value,
+            ...defaultProps.valueDecoder,
             ...this.props.valueDecoder,
         };
         // The picked color is the one in raw image, not the one after hillshading.
