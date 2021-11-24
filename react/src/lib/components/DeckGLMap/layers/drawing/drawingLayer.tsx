@@ -17,6 +17,7 @@ import {
 import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 import { CompositeLayer, PickInfo } from "deck.gl";
 import { patchLayerProps } from "../utils/layerTools";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {
@@ -53,21 +54,6 @@ const MODE_MAP = {
 
 const UNSELECTED_LINE_COLOR: RGBAColor = [0x50, 0x50, 0x50, 0xcc];
 const SELECTED_LINE_COLOR: RGBAColor = [0x0, 0x0, 0x0, 0xff];
-
-const defaultProps = {
-    name: "Drawing",
-    id: "drawing-layer",
-    pickable: true,
-    visible: true,
-    mode: "drawLineString",
-
-    // Props mainly used to make the information available to the Map parent comp.
-    selectedFeatureIndexes: [] as number[],
-    data: {
-        type: "FeatureCollection",
-        features: [],
-    },
-};
 
 export interface DrawingLayerProps<D> extends ExtendedLayerProps<D> {
     mode: string; // One of modes in MODE_MAP
@@ -182,4 +168,6 @@ export default class DrawingLayer extends CompositeLayer<
 }
 
 DrawingLayer.layerName = "DrawingLayer";
-DrawingLayer.defaultProps = defaultProps;
+DrawingLayer.defaultProps = layersDefaultProps[
+    "DrawingLayer"
+] as DrawingLayerProps<FeatureCollection>;
