@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "jest-styled-components";
 import React from "react";
 import { testStore, Wrapper } from "../../test/TestWrapper";
@@ -15,16 +16,28 @@ describe("test well attributes selector", () => {
             Wrapper({ children: <WellAttributesSelector /> })
         );
         expect(container.firstChild).toMatchSnapshot();
+        // SmartNodeSelector call parent's setProps on mount
+        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
+        expect(testStore.dispatch).toBeCalledWith({
+            payload: [],
+            type: "ui/updateFilterByAttributes",
+        });
     });
 
     it("click to dispatch redux action", async () => {
         render(Wrapper({ children: <WellAttributesSelector /> }));
+        // SmartNodeSelector call parent's setProps on mount
+        expect(testStore.dispatch).toHaveBeenCalledTimes(2);
+        expect(testStore.dispatch).toBeCalledWith({
+            payload: [],
+            type: "ui/updateFilterByAttributes",
+        });
 
         const attributeFilter = screen.getByRole("textbox");
-        fireEvent.change(attributeFilter, {
-            target: { value: "type:Injector" },
-        });
-        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
+        userEvent.type(attributeFilter, "type:Injector");
+        fireEvent.keyDown(attributeFilter, { key: "Enter" });
+        fireEvent.keyUp(attributeFilter, { key: "Enter" });
+        expect(testStore.dispatch).toHaveBeenCalledTimes(3);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["type:Injector"],
             type: "ui/updateFilterByAttributes",
