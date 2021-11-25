@@ -6,6 +6,8 @@ import { PolygonLayer } from "@deck.gl/layers";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { Feature } from "geojson";
 import { Position2D } from "@deck.gl/core/utils/positions";
+import { PolygonLayerProps } from "@deck.gl/layers";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 // These are the data GridLayer expects.
 type CellData = {
@@ -17,7 +19,7 @@ type CellData = {
 };
 type GridData = CellData[];
 
-// These are the data SolidPolygonLayer expects.
+// These are the data PolygonLayer expects.
 type CellProperties = {
     color: RGBAColor;
     i: number;
@@ -31,12 +33,6 @@ interface PolygonData {
 }
 
 export type GridLayerProps<D> = ExtendedLayerProps<D>;
-
-const defaultProps = {
-    name: "Grid",
-    pickable: true,
-    coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-};
 
 export default class GridLayer extends CompositeLayer<
     GridData,
@@ -97,7 +93,7 @@ export default class GridLayer extends CompositeLayer<
         }
 
         const layer = new PolygonLayer<PolygonData>(
-            this.getSubLayerProps<PolygonData, PolygonLayer<PolygonData>>({
+            this.getSubLayerProps<PolygonData, PolygonLayerProps<PolygonData>>({
                 data: makeLayerData(data, this.state.ti),
                 id: "grid-layer",
                 getFillColor: (d: PolygonData) => d.properties.color,
@@ -107,6 +103,7 @@ export default class GridLayer extends CompositeLayer<
                 filled: true,
                 lineWidthMinPixels: 1,
                 visible: this.props.visible,
+                coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
             })
         );
 
@@ -115,7 +112,9 @@ export default class GridLayer extends CompositeLayer<
 }
 
 GridLayer.layerName = "GridLayer";
-GridLayer.defaultProps = defaultProps;
+GridLayer.defaultProps = layersDefaultProps[
+    "GridLayer"
+] as GridLayerProps<GridData>;
 
 //================= Local help functions. ==================
 function makeLayerData(data: GridData, ti: number): PolygonData[] {

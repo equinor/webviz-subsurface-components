@@ -1,7 +1,8 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
-
-const exampleData = require("../../../../demo/example-data/deckgl-map.json");
+import exampleData from "../../../../demo/example-data/deckgl-map.json";
+import template from "../../../../demo/example-data/welllayer_template.json";
+import colorTables from "../../../../demo/example-data/color-tables.json";
 
 export default {
     component: DeckGLMap,
@@ -9,29 +10,24 @@ export default {
 };
 
 const Template = (args) => {
-    const [mapSpecBase, setMapSpecBase] = React.useState(null);
-    const [mapSpecPatch, setMapSpecPatch] = React.useState(null);
-
+    const [editedData, setEditedData] = React.useState(args.editedData);
     React.useEffect(() => {
-        setMapSpecBase(args.deckglSpecBase);
-    }, [args.deckglSpecBase]);
-
-    React.useEffect(() => {
-        setMapSpecPatch(args.deckglSpecPatch);
-    }, [args.deckglSpecPatch]);
-
+        setEditedData(args.editedData);
+    }, [args.editedData]);
     return (
         <DeckGLMap
             {...args}
-            deckglSpecBase={mapSpecBase}
-            deckglSpecPatch={mapSpecPatch}
-            setProps={(updatedSpec) => {
-                setMapSpecBase(updatedSpec.deckglSpecBase);
-                setMapSpecPatch(updatedSpec.deckglSpecPatch);
+            editedData={editedData}
+            setProps={(updatedProps) => {
+                setEditedData(updatedProps.editedData);
             }}
         />
     );
 };
 
 export const Default = Template.bind({});
-Default.args = exampleData[0];
+Default.args = {
+    ...exampleData[0],
+    template: template,
+    colorTables: colorTables,
+};

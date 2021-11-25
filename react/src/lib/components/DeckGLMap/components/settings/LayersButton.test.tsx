@@ -20,13 +20,13 @@ describe("test 'layers' button", () => {
         userEvent.click(screen.getByRole("button"));
         expect(screen.getByRole("menu")).toBeInTheDocument();
         const property_map_checkbox = screen.getAllByRole("checkbox", {
-            name: "",
+            name: "Property map",
         })[0];
         userEvent.click(property_map_checkbox);
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["colormap-layer", false],
-            type: "spec/updateVisibleLayers",
+            type: "layers/updateVisibleLayers",
         });
     });
     it("should close menu when clicked on backdrop", async () => {

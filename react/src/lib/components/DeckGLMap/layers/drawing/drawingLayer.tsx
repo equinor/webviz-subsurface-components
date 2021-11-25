@@ -17,6 +17,7 @@ import {
 import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 import { CompositeLayer, PickInfo } from "deck.gl";
 import { patchLayerProps } from "../utils/layerTools";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {
@@ -54,19 +55,6 @@ const MODE_MAP = {
 const UNSELECTED_LINE_COLOR: RGBAColor = [0x50, 0x50, 0x50, 0xcc];
 const SELECTED_LINE_COLOR: RGBAColor = [0x0, 0x0, 0x0, 0xff];
 
-const defaultProps = {
-    name: "Drawing",
-    pickable: true,
-    mode: "drawLineString",
-
-    // Props mainly used to make the information available to the Map parent comp.
-    selectedFeatureIndexes: [],
-    data: {
-        type: "FeatureCollection",
-        features: [],
-    },
-};
-
 export interface DrawingLayerProps<D> extends ExtendedLayerProps<D> {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
@@ -97,7 +85,6 @@ export default class DrawingLayer extends CompositeLayer<
             const featureIndex = this.state.data.features.indexOf(info.object);
             if (featureIndex >= 0) {
                 patchLayerProps<FeatureCollection>(this, {
-                    ...this.props,
                     selectedFeatureIndexes: [info.index],
                 } as DrawingLayerProps<FeatureCollection>);
                 return true;
@@ -113,7 +100,6 @@ export default class DrawingLayer extends CompositeLayer<
         switch (editAction.editType) {
             case "addFeature":
                 patchLayerProps<FeatureCollection>(this, {
-                    ...this.props,
                     data: editAction.updatedData,
                     selectedFeatureIndexes:
                         editAction.editContext.featureIndexes,
@@ -121,15 +107,13 @@ export default class DrawingLayer extends CompositeLayer<
                 break;
             case "removeFeature":
                 patchLayerProps<FeatureCollection>(this, {
-                    ...this.props,
                     data: editAction.updatedData,
-                    selectedFeatureIndexes: [],
+                    selectedFeatureIndexes: [] as number[],
                 } as DrawingLayerProps<FeatureCollection>);
                 break;
             case "removePosition":
             case "finishMovePosition":
                 patchLayerProps<FeatureCollection>(this, {
-                    ...this.props,
                     data: editAction.updatedData,
                 } as DrawingLayerProps<FeatureCollection>);
                 break;
@@ -184,4 +168,6 @@ export default class DrawingLayer extends CompositeLayer<
 }
 
 DrawingLayer.layerName = "DrawingLayer";
-DrawingLayer.defaultProps = defaultProps;
+DrawingLayer.defaultProps = layersDefaultProps[
+    "DrawingLayer"
+] as DrawingLayerProps<FeatureCollection>;

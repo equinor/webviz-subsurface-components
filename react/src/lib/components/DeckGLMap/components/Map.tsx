@@ -1,111 +1,13 @@
-import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
-import DeckGL from "@deck.gl/react";
+import * as jsonpatch from "fast-json-patch";
+import DeckGLWrapper from "./DeckGLWrapper";
 import { AnyAction, EnhancedStore } from "@reduxjs/toolkit";
-import { PickInfo, Layer } from "deck.gl";
-import { Operation } from "fast-json-patch";
-import { Feature } from "geojson";
 import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
-import Settings from "./settings/Settings";
-import JSON_CONVERTER_CONFIG from "../utils/configuration";
-import { setSpec } from "../redux/actions";
 import { createStore } from "../redux/store";
-import {
-    WellsPickInfo,
-    getLogInfo,
-    getLogValues,
-    LogCurveDataType,
-} from "../layers/wells/wellsLayer";
-import InfoCard from "./InfoCard";
-import DistanceScale from "../components/DistanceScale";
-import DiscreteColorLegend from "../components/DiscreteLegend";
-import ContinuousLegend from "../components/ContinuousLegend";
-import StatusIndicator from "./StatusIndicator";
-import {
-    ColormapLayer,
-    Hillshading2DLayer,
-    WellsLayer,
-    FaultPolygonsLayer,
-    PieChartLayer,
-    GridLayer,
-    DrawingLayer,
-} from "../layers";
-
-// update spec object to include default layer props
-function getSpecWithDefaultProps(
-    deckglSpec: Record<string, unknown>
-): Record<string, unknown> {
-    const modified_spec = Object.assign({}, deckglSpec);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const layers = [...(modified_spec["layers"] as any[])];
-    layers?.forEach((layer) => {
-        let default_props = undefined;
-        if (layer["@@type"] === ColormapLayer.name)
-            default_props = ColormapLayer.defaultProps;
-        else if (layer["@@type"] === Hillshading2DLayer.name)
-            default_props = Hillshading2DLayer.defaultProps;
-        else if (layer["@@type"] === WellsLayer.name)
-            default_props = WellsLayer.defaultProps;
-        else if (layer["@@type"] === FaultPolygonsLayer.name)
-            default_props = FaultPolygonsLayer.defaultProps;
-        else if (layer["@@type"] === PieChartLayer.name)
-            default_props = PieChartLayer.defaultProps;
-        else if (layer["@@type"] === GridLayer.name)
-            default_props = GridLayer.defaultProps;
-        else if (layer["@@type"] === DrawingLayer.name)
-            default_props = DrawingLayer.defaultProps;
-
-        if (default_props) {
-            Object.entries(default_props).forEach(([prop, value]) => {
-                const prop_type = typeof value;
-                if (["string", "boolean", "number"].includes(prop_type)) {
-                    if (layer[prop] === undefined) layer[prop] = value;
-                }
-            });
-        }
-    });
-
-    modified_spec["layers"] = layers;
-    return modified_spec;
-}
-
-// construct views object for DeckGL component
-function getViewsForDeckGL() {
-    const deckgl_views = [
-        {
-            "@@type": "OrthographicView",
-            id: "main",
-            controller: {
-                doubleClickZoom: false,
-            },
-            x: "0%",
-            y: "0%",
-            width: "100%",
-            height: "100%",
-            flipY: false,
-        },
-    ];
-    return deckgl_views;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getToolTip(info: PickInfo<any> | WellsPickInfo): string | null {
-    if ((info as WellsPickInfo)?.logName) {
-        return (info as WellsPickInfo)?.logName;
-    } else {
-        const feat = info.object as Feature;
-        return feat?.properties?.["name"];
-    }
-}
-
-function getLayer(deckGlProps: Record<string, unknown>, id: string) {
-    const layers = deckGlProps["layers"] as Layer<unknown>[];
-    if (null == layers) return;
-    const wellsLayers = (layers as WellsLayer[]).filter(
-        (item) => item.id.toLowerCase() == id.toLowerCase()
-    );
-    return wellsLayers[0];
-}
+import { setLayers } from "../redux/actions";
+import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
+import { templateArray } from "./WelllayerTemplateTypes";
+import { colorTablesArray } from "./ColorTableTypes";
 
 export interface MapProps {
     /**
@@ -124,17 +26,21 @@ export interface MapProps {
      */
     resources: Record<string, unknown>;
 
-    /**
-     * JSON object describing the map specification.
-     * More details about the specification format can be found here:
-     * https://deck.gl/docs/api-reference/json/conversion-reference
+    /* List of JSON object containing layer specific data.
+     * Each JSON object will consist of layer type with key as "@@type" and
+     * layer specific data, if any.
      */
-    deckglSpec: Record<string, unknown>;
+    layers: Record<string, unknown>[];
 
     /**
-     * For reacting to prop changes
+     * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
-    setSpecPatch: (patch: Operation[]) => void;
+    bounds: [number, number, number, number];
+
+    /**
+     * Zoom level for the view.
+     */
+    zoom: number;
 
     /**
      * Parameters for the InfoCard component
@@ -162,231 +68,148 @@ export interface MapProps {
         position: number[];
     };
 
+    /**
+     * Prop containing edited data from layers
+     */
+    editedData: Record<string, unknown>;
+
+    /**
+     * For reacting to prop changes
+     */
+    setEditedData: (data: Record<string, unknown>) => void;
+
     children?: React.ReactNode;
+
+    template: templateArray;
+
+    colorTables: colorTablesArray;
 }
 
 const Map: React.FC<MapProps> = ({
     id,
     resources,
-    deckglSpec,
-    setSpecPatch,
+    layers,
+    bounds,
+    zoom,
     coords,
     scale,
     coordinateUnit,
     legend,
-    children,
+    template,
+    colorTables,
+    editedData,
+    setEditedData,
 }: MapProps) => {
-    // state for views prop of DeckGL component
-    const [deckGLViews, setDeckGLViews] = React.useState([]);
+    // state for initial views prop (target and zoom) of DeckGL component
+    const [initialViewState, setInitialViewState] =
+        React.useState<Record<string, unknown>>();
     React.useEffect(() => {
-        const deckgl_views = getViewsForDeckGL();
-        const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
-        const jsonConverter = new JSONConverter({ configuration });
-        setDeckGLViews(jsonConverter.convert(deckgl_views));
-    }, []);
+        setInitialViewState(getInitialViewState(bounds, zoom));
+    }, [bounds, zoom]);
 
-    // state to update deckglSpec to include layer's defualt props
-    const [deckglSpecWithDefaultProps, setDeckglSpecWithDefaultProps] =
-        React.useState(getSpecWithDefaultProps(deckglSpec));
+    // state for views prop of DeckGL component
+    // Now we are using single view, will extend to support multiple synced views
+    const deckGLViews = getViewsForDeckGL();
+
+    // state to update layers to include default props
+    const [layersWithDefaultProps, setLayersWithDefaultProps] = React.useState(
+        getLayersWithDefaultProps(layers)
+    );
     React.useEffect(() => {
-        setDeckglSpecWithDefaultProps(getSpecWithDefaultProps(deckglSpec));
-    }, [deckglSpec]);
+        setLayersWithDefaultProps(getLayersWithDefaultProps(layers));
+    }, [layers]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
-        createStore(deckglSpecWithDefaultProps, setSpecPatch)
+        createStore(layersWithDefaultProps)
     );
 
+    // update the store if layer prop is changed
     React.useEffect(() => {
-        store.current = createStore(deckglSpecWithDefaultProps, setSpecPatch);
-    }, [setSpecPatch]);
-
-    const [specObj, setSpecObj] = React.useState<Record<string, unknown>>({});
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [viewState, setViewState] = React.useState<any>();
-    React.useEffect(() => {
-        if (!deckglSpecWithDefaultProps) {
-            return;
+        const prev_state = store.current.getState()["layers"];
+        const cur_state = layers;
+        const patch = jsonpatch.compare(prev_state, cur_state);
+        const replace_operations = patch.filter((obj) => obj.op === "replace");
+        if (replace_operations.length > 0) {
+            const new_state = jsonpatch.applyPatch(
+                prev_state,
+                replace_operations,
+                false,
+                false
+            ).newDocument;
+            store.current.dispatch(setLayers(new_state));
         }
-
-        // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
-        // See https://deck.gl/docs/api-reference/json/overview for more details.
-        const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
-        if (resources) {
-            configuration.merge({
-                enumerations: {
-                    resources,
-                },
-            });
-        }
-        const jsonConverter = new JSONConverter({ configuration });
-        setSpecObj(jsonConverter.convert(deckglSpecWithDefaultProps));
-    }, [deckglSpecWithDefaultProps, resources]);
-
-    const refCb = React.useCallback(
-        (deckRef) => {
-            if (deckRef) {
-                // Needed to initialize the viewState on first load
-                setViewState(deckRef.deck.viewState);
-                deckRef.deck.setProps({
-                    // userData is undocumented and it doesn't appear in the
-                    // deckProps type, but it is used by the layersManager
-                    // and forwarded though the context to all the layers.
-                    //
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore: TS2345
-                    userData: {
-                        setSpecPatch: setSpecPatch,
-                    },
-                });
-            }
-        },
-        [setSpecPatch]
-    );
-
-    React.useEffect(() => {
-        store.current.dispatch(
-            setSpec(specObj ? deckglSpecWithDefaultProps : {})
-        );
-    }, [deckglSpecWithDefaultProps, specObj]);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [hoverInfo, setHoverInfo] = React.useState<any>([]);
-    const onHover = React.useCallback(
-        (pickInfo, event) => {
-            if (coords.multiPicking && pickInfo.layer) {
-                const infos = pickInfo.layer.context.deck.pickMultipleObjects({
-                    x: event.offsetCenter.x,
-                    y: event.offsetCenter.y,
-                    radius: 1,
-                    depth: coords.pickDepth,
-                });
-                setHoverInfo(infos);
-            } else {
-                setHoverInfo([pickInfo]);
-            }
-        },
-        [coords]
-    );
-
-    const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
-
-    const [legendProps, setLegendProps] = React.useState<{
-        title: string;
-        discrete: boolean;
-        metadata: { objects: Record<string, [number[], number]> };
-        valueRange: number[];
-    }>({
-        title: "",
-        discrete: false,
-        metadata: { objects: {} },
-        valueRange: [],
-    });
-
-    const onAfterRender = React.useCallback(() => {
-        const layers = specObj["layers"] as Layer<unknown>[];
-        const state = layers.every((layer) => layer.isLoaded);
-        setIsLoaded(state);
-    }, [specObj]);
-
-    const wellsLayer = getLayer(specObj, "wells-layer");
-
-    // Get color table for log curves.
-    React.useEffect(() => {
-        if (!wellsLayer?.isLoaded) return;
-        const logName = wellsLayer.props.logName;
-        const pathLayer = wellsLayer.internalState.subLayers[1];
-        if (!pathLayer.isLoaded) return;
-        const logs = pathLayer?.props.data;
-        const logData = logs[0];
-        const logInfo = getLogInfo(logData, logData.header.name, logName);
-        const title = "Wells / " + logName;
-        if (logInfo?.description == "discrete") {
-            const meta = logData["metadata_discrete"];
-            const metadataDiscrete = meta[logName].objects;
-            setLegendProps({
-                title: title,
-                discrete: true,
-                metadata: metadataDiscrete,
-                valueRange: [],
-            });
-        } else {
-            const minArray: number[] = [];
-            const maxArray: number[] = [];
-            logs.forEach(function (log: LogCurveDataType) {
-                const logValues = getLogValues(log, log.header.name, logName);
-
-                minArray.push(Math.min(...logValues));
-                maxArray.push(Math.max(...logValues));
-            });
-
-            setLegendProps({
-                title: title,
-                discrete: false,
-                metadata: { objects: {} },
-                valueRange: [Math.min(...minArray), Math.max(...maxArray)],
-            });
-        }
-    }, [isLoaded, legend, wellsLayer?.props?.logName]);
+    }, [layers]);
 
     return (
-        specObj && (
+        deckGLViews && (
             <ReduxProvider store={store.current}>
-                <DeckGL
+                <DeckGLWrapper
                     id={id}
-                    {...specObj}
+                    initialViewState={initialViewState}
                     views={deckGLViews}
-                    getCursor={({ isDragging }): string =>
-                        isDragging ? "grabbing" : "default"
-                    }
-                    getTooltip={getToolTip}
-                    ref={refCb}
-                    onHover={onHover}
-                    onViewStateChange={({ viewState }) =>
-                        setViewState(viewState)
-                    }
-                    onAfterRender={onAfterRender}
-                >
-                    {children}
-                </DeckGL>
-                {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
-                <Settings />
-                {viewState && scale.visible ? (
-                    <DistanceScale
-                        zoom={viewState.zoom}
-                        incrementValue={scale.incrementValue}
-                        widthPerUnit={scale.widthPerUnit}
-                        position={scale.position}
-                        scaleUnit={coordinateUnit}
-                    />
-                ) : null}
-                {legend.visible && legendProps.discrete && (
-                    <DiscreteColorLegend
-                        discreteData={legendProps.metadata}
-                        dataObjectName={legendProps.title}
-                        position={legend.position}
-                    />
-                )}
-                {legendProps.valueRange?.length > 0 &&
-                    legend.visible &&
-                    legendProps && (
-                        <ContinuousLegend
-                            min={legendProps.valueRange[0]}
-                            max={legendProps.valueRange[1]}
-                            dataObjectName={legendProps.title}
-                            position={legend.position}
-                        />
-                    )}
-                {
-                    <StatusIndicator
-                        layers={specObj["layers"] as Layer<unknown>[]}
-                        isLoaded={isLoaded}
-                    />
-                }
+                    resources={resources}
+                    coords={coords}
+                    scale={scale}
+                    coordinateUnit={coordinateUnit}
+                    legend={legend}
+                    editedData={editedData}
+                    setEditedData={setEditedData}
+                    template={template}
+                    colorTables={colorTables}
+                />
             </ReduxProvider>
         )
     );
 };
 
 export default Map;
+
+// ------------- Helper functions ---------- //
+// returns initial view state for DeckGL
+function getInitialViewState(
+    bounds: [number, number, number, number],
+    zoom: number
+): Record<string, unknown> {
+    const width = bounds[2] - bounds[0]; // right - left
+    const height = bounds[3] - bounds[1]; // top - bottom
+
+    const initial_view_state = {
+        // target to center of the bound
+        target: [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+        zoom: zoom,
+    };
+
+    return initial_view_state;
+}
+
+// construct views object for DeckGL component
+function getViewsForDeckGL(): Record<string, unknown>[] {
+    const deckgl_views = [
+        {
+            "@@type": "OrthographicView",
+            id: "main2D",
+            controller: {
+                doubleClickZoom: false,
+            },
+            x: "0%",
+            y: "0%",
+            width: "100%",
+            height: "100%",
+            flipY: false,
+        },
+        {
+            "@@type": "OrbitView",
+            id: "main3D",
+            controller: {
+                doubleClickZoom: false,
+            },
+            x: "0%",
+            y: "0%",
+            width: "100%",
+            height: "100%",
+            flipY: false,
+        },
+    ];
+    return deckgl_views;
+}

@@ -1,178 +1,208 @@
 {
-  "name": "Template 1",
-  "scale": {
-    "primary": "md",
-    "allowSecondary": true
-  },
-  "tracks": [
-    {
-      "title": "Multiple",
-      "plots": [
+    "name": "Template 1",
+    "scale": {
+        "primary": "md",
+        "allowSecondary": true
+    },
+    "tracks": [
         {
-          "name": "BDIA"
+            "title": "Multiple",
+            "plots": [
+                {
+                    "name": "MDIA"
+                },
+                {
+                    "name": "HKLA",
+                    "style": "HKL"
+                }
+            ]
         },
         {
-          "name": "ROPA"
+            "title": "Area",
+            "plots": [
+                {
+                    "name": "HKLA",
+                    "style": "HKL",
+                    "type": "area",
+                    "color": "blue",
+                    "fill": "red",
+                    "inverseColor": "green"
+                }
+            ]
         },
         {
-          "name": "HKLA",
-          "style": "HKL"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "title": "Differential",
+            "plots": [
+                {
+                    "name": "HKLX",
+                    "name2": "HKLA",
+                    "type": "differential",
+                    "scale": "linear",
+                    "color": "blue",
+                    "color2": "orange",
+                    "fill": "green",
+                    "fill2": "red"
+                }
+            ]
+        },
         {
-          "name": "HKLX",
-          "style": "HKL"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "title": "Gradient Fill & inverse",
+            "plots": [
+                {
+                    "name": "HKLA",
+                    "type": "gradientfill",
+                    "color": "blue",
+                    "colorTable": "Physics",
+                    "inverseColorTable": "Physics reverse"
+                }
+            ]
+        },
         {
-          "name": "WOBA",
-          "type": "linestep"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MFOA"
+                }
+            ]
+        },
         {
-          "name": "DD_VOLUME"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "DD_VOLUME"
+                }
+            ]
+        },
         {
-          "name": "TEMP"
-        }
-      ]
-    },
-    {
-      "required": true,
-      "plots": [
+            "plots": [
+                {
+                    "name": "TEMP"
+                }
+            ]
+        },
         {
-          "name": "TQA",
-          "type": "dot"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "required": true,
+            "plots": [
+                {
+                    "name": "TQA",
+                    "type": "dot"
+                }
+            ]
+        },
         {
-          "name": "BITSIZE"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BITSIZE"
+                }
+            ]
+        },
         {
-          "name": "GRSIM"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "GRSIM"
+                }
+            ]
+        },
         {
-          "name": "RACESHM"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "RACESHM"
+                }
+            ]
+        },
         {
-          "name": "SW",
-          "type": "line"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "SW",
+                    "type": "line"
+                }
+            ]
+        },
         {
-          "name": "MFOA"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MFIA",
+                    "type": "dot"
+                }
+            ]
+        },
         {
-          "name": "MFIA",
-          "type": "dot"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MDOA",
+                    "style": "MD"
+                }
+            ]
+        },
         {
-          "name": "MDOA",
-          "type": "linestep"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MDIA",
+                    "style": "MD"
+                }
+            ]
+        },
         {
-          "name": "MDIA",
-          "type": "linestep"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MTOA"
+                }
+            ]
+        },
         {
-          "name": "MTOA"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MTIA"
+                }
+            ]
+        },
         {
-          "name": "MTIA"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "ECDT"
+                }
+            ]
+        },
         {
-          "name": "ECDT"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BDTI"
+                }
+            ]
+        },
         {
-          "name": "BDTI"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BDDI"
+                }
+            ]
+        },
         {
-          "name": "BDDI"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BRVC"
+                }
+            ]
+        },
         {
-          "name": "BRVC"
+            "plots": [
+                {
+                    "name": "TCTI"
+                }
+            ]
         }
-      ]
-    },
-    {
-      "plots": [
+    ],
+    "styles": [
         {
-          "name": "TCTI"
+            "name": "HKL",
+            "scale": "linear",
+            "type": "gradientfill",
+            "colorTable": "Physics",
+            "color": "green"
+        },
+        {
+            "name": "MD",
+            "type": "area",
+            "color": "blue",
+            "fill": "green"
         }
-      ]
-    }
-  ],
-  "styles": [
-    {
-      "name": "HKL",
-      "type": "area"
-    }
-  ]
+    ]
 }

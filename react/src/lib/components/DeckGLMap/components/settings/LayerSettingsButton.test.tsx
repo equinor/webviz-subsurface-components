@@ -45,7 +45,7 @@ describe("test layers settings button", () => {
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["drawing-layer", "view"],
-            type: "spec/updateDrawingMode",
+            type: "layers/updateDrawingMode",
         });
     });
     it("should close menu when clicked on backdrop", async () => {

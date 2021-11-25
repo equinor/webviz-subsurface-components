@@ -1,0 +1,89 @@
+[  
+    {
+        "name": "Welllayer Template",
+        "properties": [
+            {
+                "objectName" : "PORO",
+                "colorTable" : "Rainbow",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "PERM",
+                "colorTable" : "Physics",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "MD",
+                "colorTable" : "Physics reverse",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "PORO_TOT",
+                "colorTable" : "Rainbow reverse",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "NTG",
+                "colorTable" : "Rainbow",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "PERM_TOT",
+                "colorTable" : "Physics",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "SW",
+                "colorTable" : "Rainbow",
+                "context" : "wells-layer",
+                "scale": "linear"
+            },
+            {
+                "objectName" : "ZONELOG",
+                "colorTable" : "Colors_set_1",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "RDE_ORIG",
+                "colorTable" : "Colors_set_2",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "FACIES",
+                "colorTable" : "Colors_set_3",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "ZONE_MAIN",
+                "colorTable" : "Colors_set_4",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "FaultDistance_HUM",
+                "colorTable" : "Colors_set_5",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "FAULT_PROXIMITY_FLAG",
+                "colorTable" : "Colors_set_6",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "FACIES_NoCalcite",
+                "colorTable" : "Colors_set_7",
+                "context" : "wells-layer"
+            },
+            {
+                "objectName" : "RDE",
+                "colorTable" : "Colors_set_8",
+                "context" : "wells-layer"
+            }
+        ]
+    }
+]

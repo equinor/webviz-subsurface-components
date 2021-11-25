@@ -26,89 +26,86 @@
     "resources": {
       "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png"
     },
-    "deckglSpecBase": {
-      "initialViewState": {
-        "target": [
-          434962.5,
-          6478095.5,
-          0
+    "bounds": [
+      432205,
+      6475078,
+      437720,
+      6481113
+    ],
+    "zoom": -3,
+    "layers": [
+      {
+        "@@type": "ColormapLayer",
+        "image": "@@#resources.propertyMap",
+        "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
+        "rotDeg": 0,
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
         ],
-        "zoom": -3
+        "valueRange": [
+          2782,
+          3513
+        ],
+        "colorMapRange": [
+          2782,
+          3513
+        ]
       },
-      "layers": [
-        {
-          "@@type": "ColormapLayer",
-          "id": "colormap-layer",
-          "bounds": [
-            432205,
-            6475078,
-            437720,
-            6481113
-          ],
-          "image": "@@#resources.propertyMap",
-          "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
-          "valueRange": [
-            2782,
-            3513
-          ],
-          "colorMapRange": [
-            2782,
-            3513
-          ],
-          "pickable": true
-        },
-        {
-          "@@type": "GridLayer",
-          "id": "grid-layer",
-          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
-          "visible": false
-        },
-        {
-          "@@type": "Hillshading2DLayer",
-          "id": "hillshading-layer",
-          "bounds": [
-            432205,
-            6475078,
-            437720,
-            6481113
-          ],
-          "valueRange": [
-            2782,
-            3513
-          ],
-          "opacity": 1.0,
-          "image": "@@#resources.propertyMap",
-          "pickable": true
-        },
-        {
-          "@@type": "WellsLayer",
-          "id": "wells-layer",
-          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-          "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
-          "logrunName": "BLOCKING",
-          "logName": "ZONELOG"
-        },
-        {
-          "@@type": "FaultPolygonsLayer",
-          "id": "fault-polygons-layer",
-          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson",
-          "lineWidthMinPixels": 2
-        },
-        {
-          "@@type": "PieChartLayer",
-          "id": "pie-layer",
-          "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
-        },
-        {
-          "@@type": "DrawingLayer",
-          "id": "drawing-layer",
-          "mode": "drawLineString",
-          "data": {
-            "type": "FeatureCollection",
-            "features": []
-          }
-        }
-      ]
+      {
+        "@@type": "Hillshading2DLayer",
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
+        ],
+        "valueRange": [
+          2782,
+          3513
+        ],
+        "rotDeg": 0,
+        "image": "@@#resources.propertyMap"
+      },
+      {
+        "@@type": "GridLayer",
+        "id": "grid-layer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
+        "visible": false
+      },
+      {
+        "@@type": "WellsLayer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+        "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+        "logrunName": "BLOCKING",
+        "logName": "ZONELOG",
+        "selectedWell": "@@#editedData.selectedWell"
+      },
+      {
+        "@@type": "FaultPolygonsLayer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson"
+      },
+      {
+        "@@type": "PieChartLayer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json",
+        "selectedPie": "@@#editedData.selectedPie"
+      },
+      {
+        "@@type": "DrawingLayer",
+        "data": "@@#editedData.data",
+        "selectedFeatureIndexes": "@@#editedData.selectedFeatureIndexes"
+      }
+    ],
+    "editedData": {
+      "selectedWell": "",
+      "selectedPie": {},
+      "selectedFeatureIndexes": [],
+      "data": {
+          "type": "FeatureCollection",
+          "features": []
+      }
     }
   }
 ]

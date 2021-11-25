@@ -28,7 +28,7 @@ describe("Test Layer Property", () => {
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["drawing-layer", "view"],
-            type: "spec/updateDrawingMode",
+            type: "layers/updateDrawingMode",
         });
     });
 });

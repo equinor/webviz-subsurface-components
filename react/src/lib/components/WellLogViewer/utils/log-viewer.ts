@@ -17,62 +17,113 @@ export function isTrackVisible(track: Track): boolean {
     return false;
 }
 
-export function showTrack(track: Track, visible: boolean): void {
+export function showTrack(track: Track, visible: boolean): boolean {
     if (track.elm) {
         const elm = track.elm.parentElement;
         if (elm) {
-            elm.style.display = visible ? "flex" : "none";
+            const display = visible ? "flex" : "none";
+            if (elm.style.display !== display) {
+                elm.style.display = display;
+                return true; // visibility is changed
+            }
         }
     }
+    return false; // visibility is not changed
 }
 
-export function setZoom(logViewer: LogViewer, zoom: number): void {
+export function isTrackSelected(_logViewer: LogViewer, track: Track): boolean {
+    if (track.elm) {
+        const elm = track.elm.parentElement;
+        if (elm) {
+            return elm.classList.contains("selected");
+        }
+    }
+    return false;
+}
+
+export function selectTrack(
+    logViewer: LogViewer,
+    track: Track,
+    selected: boolean
+): boolean {
+    if (track.elm) {
+        const elm = track.elm.parentElement;
+        if (elm) {
+            if (isTrackSelected(logViewer, track) !== selected) {
+                elm.classList.toggle("selected");
+                return true; // selection is changed
+            }
+        }
+    }
+    return false; // selection is not changed
+}
+
+export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
     if (!zoom) zoom = 1.0;
 
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
     const currentZoom = Math.abs(b2 - b1) / Math.abs(d2 - d1);
-    console.log("zoom=" + zoom + " current=" + currentZoom);
+    // see also: getContentZoom(logViewer);
+
     const f = Math.abs(Math.log(currentZoom / zoom));
-    //console.log("f=" + f);
-    if (f > 0.01 /*currentZoom !== zoom*/) {
+    if (f > 0.01) {
+        /*currentZoom !~= zoom*/
         let d = (d2 - d1) * 0.5;
         const c = d1 + d;
         d = d * (currentZoom / zoom);
-        //console.log("c-d=" + (c-d) + " c+d=" + (c+d));
         logViewer.zoomTo([c - d, c + d]);
+        return true;
     }
+    return false;
 }
 
 export function scrollContentTo(
     logViewer: LogViewer,
     f: /*fraction*/ number
-): void {
+): boolean {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
-    //console.log("b1=" + b1 + " b2=" + b2);
-    //console.log("d1=" + d1 + " d2=" + d2);
     const d = d2 - d1;
-    const m = b2 - b1 - d;
+    const w = b2 - b1 - (d2 - d1);
 
-    const c = b1 + f * m;
-    //console.log("c=" + c + " c+d=" + (c + d));
-    if (c !== d1) logViewer.zoomTo([c, c + d]);
+    const c = b1 + f * w;
+    if (c !== d1) {
+        logViewer.zoomTo([c, c + d]);
+        return true;
+    }
+    return false;
 }
 
-export function scrollTracks(
+export function getContentScrollPos(logViewer: LogViewer): number /*fraction*/ {
+    const [b1, b2] = logViewer.scaleHandler.baseDomain();
+    const [d1, d2] = logViewer.domain;
+    const w = b2 - b1 - (d2 - d1);
+    return w ? (d1 - b1) / w : 0;
+}
+
+export function getContentZoom(logViewer: LogViewer): number /*fraction*/ {
+    // see also zoomContent(logViewer)
+    const [b1, b2] = logViewer.scaleHandler.baseDomain();
+    const [d1, d2] = logViewer.domain;
+    return Math.abs(b2 - b1) / Math.abs(d2 - d1);
+}
+
+export function scrollTracksTo(
     logViewer: LogViewer,
     iFrom: number,
     iTo: number
-): void {
-    let iTrack = 0; // non-scale tracks counter
+): boolean {
+    let visibilityIsChanged = false;
+    let iTrack = 0; // non-scale (graph) tracks counter
     for (const track of logViewer.tracks) {
         if (isScaleTrack(track)) continue; // skip scales
 
         const visible = iFrom <= iTrack && iTrack < iTo;
-        showTrack(track, visible);
+        if (showTrack(track, visible)) visibilityIsChanged = true;
 
         iTrack++;
     }
-    logViewer.updateTracks();
+    if (visibilityIsChanged) logViewer.updateTracks();
+    return visibilityIsChanged;
 }

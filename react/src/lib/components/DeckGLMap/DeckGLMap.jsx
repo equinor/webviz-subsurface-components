@@ -1,63 +1,8 @@
-import * as jsonpatch from "fast-json-patch";
-import { cloneDeep } from "lodash";
 import PropTypes from "prop-types";
 import * as React from "react";
 import Map from "./components/Map";
-
-function _idsToIndices(doc, path) {
-    // The path looks something like this: `/layers/[layer-id]/property`,
-    // where `[layer-id]` is the id of an object in the `layers` array.
-    // This function will replace all object ids with their indices in the array,
-    // resulting in a path that would look like this: `/layers/2/property`,
-    // which is a valid json pointer that can be used by json patch.
-
-    const replaced = path.replace(
-        /([\w-/]*)\/\[([\w-]+)\]/,
-        (_, parent, matchedId) => {
-            const parentArray = jsonpatch.getValueByPointer(doc, parent);
-            const index = parentArray.findIndex(({ id }) => {
-                return matchedId == id;
-            });
-            if (index < 0) throw `Id [${matchedId}] not found!`;
-            return `${parent}/${index}`;
-        }
-    );
-
-    // Replace all ids in the path.
-    if (path != replaced) {
-        return _idsToIndices(doc, replaced);
-    }
-    return path;
-}
-
-const _getPatch = (base, modified) => {
-    if (typeof modified === "function") {
-        const baseClone = cloneDeep(base);
-        return jsonpatch.compare(base, modified(baseClone));
-    }
-    return jsonpatch.compare(base, modified);
-};
-
-const _setPatch = (base, patch) => {
-    let result = base;
-    try {
-        const normalizedPatch = patch.map((patch) => {
-            return {
-                ...patch,
-                path: _idsToIndices(base, patch.path),
-            };
-        });
-        result = jsonpatch.applyPatch(
-            base,
-            normalizedPatch,
-            true,
-            false
-        ).newDocument;
-    } catch (error) {
-        console.error("Unable to apply patch: " + error);
-    }
-    return result;
-};
+import template from "../../../demo/example-data/welllayer_template.json";
+import colorTables from "../../../demo/example-data/color-tables.json";
 
 DeckGLMap.defaultProps = {
     coords: {
@@ -75,81 +20,71 @@ DeckGLMap.defaultProps = {
         visible: true,
         position: [46, 10],
     },
+    zoom: -3,
+    colorTables: { colorTables },
+    template: { template },
 };
 
 function DeckGLMap({
     id,
     resources,
-    deckglSpecBase,
-    deckglSpecPatch,
+    layers,
+    bounds,
+    zoom,
     coords,
     scale,
     legend,
+    template,
+    colorTables,
     coordinateUnit,
+    editedData,
     setProps,
 }) {
-    // Map specification formed from applying the deckglSpecPatch to deckglSpecBase.
-    let [patchedSpec, setPatchedSpec] = React.useState(null);
+    // Contains layers data received from map layers by user interaction
+    let [layerEditedData, setLayerEditedData] = React.useState(null);
 
     React.useEffect(() => {
-        if (!deckglSpecBase) return;
-
-        setPatchedSpec(
-            deckglSpecPatch
-                ? _setPatch(deckglSpecBase, deckglSpecPatch)
-                : deckglSpecBase
-        );
-    }, [deckglSpecBase, deckglSpecPatch]);
-
-    // Hacky way of disabling well selection when drawing.
-    React.useEffect(() => {
-        if (!patchedSpec) return;
-
-        const drawingEnabled = patchedSpec.layers.some((layer) => {
-            return layer["@@type"] == "DrawingLayer" && layer["mode"] != "view";
-        });
-
-        const patch = _getPatch(patchedSpec, (newSpec) => {
-            newSpec.layers.forEach((layer) => {
-                if (layer["@@type"] == "WellsLayer") {
-                    layer.selectionEnabled = !drawingEnabled;
-                }
-            });
-            return newSpec;
-        });
-
-        if (patch.length !== 0) {
-            setProps({
-                deckglSpecBase: patchedSpec,
-                deckglSpecPatch: patch,
+        if (!layerEditedData) {
+            setLayerEditedData(editedData);
+        } else {
+            setLayerEditedData({
+                ...layerEditedData,
+                ...editedData,
             });
         }
-    }, [patchedSpec]);
+    }, [editedData]);
 
     // This callback is used as a mechanism to update the component from the layers or toolbar.
     // The changes done in a layer, for example, are bundled into a patch
     // and sent to the parent component via setProps. (See layers/utils/layerTools.ts)
-    const setSpecPatch = React.useCallback(
-        (patch) => {
+    const setEditedData = React.useCallback(
+        (data) => {
             setProps({
-                deckglSpecBase: patchedSpec,
-                deckglSpecPatch: patch,
+                editedData: {
+                    ...layerEditedData,
+                    ...data,
+                },
             });
         },
-        [setProps, patchedSpec]
+        [setProps, layerEditedData]
     );
 
     return (
-        patchedSpec && (
+        layerEditedData && (
             <Map
                 id={id}
                 resources={resources}
-                deckglSpec={patchedSpec}
-                setSpecPatch={setSpecPatch}
+                layers={layers}
+                bounds={bounds}
+                zoom={zoom}
                 coords={coords}
                 scale={scale}
                 legend={legend}
+                template={template}
+                colorTables={colorTables}
                 coordinateUnit={coordinateUnit}
+                editedData={layerEditedData}
+                setEditedData={setEditedData}
             />
         )
     );
@@ -173,21 +108,20 @@ DeckGLMap.propTypes = {
     resources: PropTypes.object,
 
     /**
-     * JSON object describing the map structure to which deckglSpecPatch will be
-     * applied in order to form the final map specification.
-     * More details about the specification format can be found here:
-     * https://deck.gl/docs/api-reference/json/conversion-reference
+     * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
-    deckglSpecBase: PropTypes.object,
+    bounds: PropTypes.arrayOf(PropTypes.number),
 
     /**
-     * A JSON patch (http://jsonpatch.com/) applied to deckglSpecBase.
-     * This split (base + patch) allows doing partial updates to the map
-     * while keeping the map state in the Dash store, as well as
-     * making it easier for the Dash component user to figure out what changed
-     * in the map spec when receiving a callback on the python side.
+     * Zoom level for the view.
      */
-    deckglSpecPatch: PropTypes.arrayOf(PropTypes.object),
+    zoom: PropTypes.number,
+
+    /* List of JSON object containing layer specific data.
+     * Each JSON object will consist of layer type with key as "@@type" and
+     * layer specific data, if any.
+     */
+    layers: PropTypes.arrayOf(PropTypes.object),
 
     /**
      * Parameters for the InfoCard component
@@ -255,6 +189,19 @@ DeckGLMap.propTypes = {
          */
         position: PropTypes.arrayOf(PropTypes.number),
     }),
+
+    /**
+     * Prop containing edited data from layers
+     */
+    editedData: PropTypes.object,
+    /**
+     * Prop containing color table data
+     */
+    colorTables: PropTypes.arrayOf(PropTypes.object),
+    /**
+     * Prop containing color template data
+     */
+    template: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default DeckGLMap;
