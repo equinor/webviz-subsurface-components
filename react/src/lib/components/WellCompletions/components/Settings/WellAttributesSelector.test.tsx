@@ -16,7 +16,7 @@ describe("test well attributes selector", () => {
             Wrapper({ children: <WellAttributesSelector /> })
         );
         expect(container.firstChild).toMatchSnapshot();
-        // SmartNodeSelector call parent's setProps on mount
+        // SmartNodeSelector calls parent's setProps on mount
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: [],
@@ -26,7 +26,7 @@ describe("test well attributes selector", () => {
 
     it("click to dispatch redux action", async () => {
         render(Wrapper({ children: <WellAttributesSelector /> }));
-        // SmartNodeSelector call parent's setProps on mount
+        // SmartNodeSelector calls parent's setProps on mount
         expect(testStore.dispatch).toHaveBeenCalledTimes(2);
         expect(testStore.dispatch).toBeCalledWith({
             payload: [],
