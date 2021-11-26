@@ -145,7 +145,7 @@ export class PlotPropertiesDialog extends Component<
 
     onOK(): void {
         const templatePlot = { ...this.state };
-        // set some values wich are not edited by the dialog
+        // set some values which are not edited by the dialog
         if (templatePlot.type === "gradientfill")
             templatePlot.inverseColor = "";
         else if (templatePlot.type === "differential") {
@@ -251,7 +251,7 @@ export class PlotPropertiesDialog extends Component<
         const skipUsed = this.props.templatePlot ? false : true; /*??*/
         const colorTables = this.props.wellLogView.props.colorTables;
         return (
-            <Dialog open={this.state.open} maxWidth="sm" fullWidth>
+            <Dialog open={this.state.open} maxWidth="sm" fullWidth onClose={() => this.setState({ open: false })}>
                 <DialogTitle>{title}</DialogTitle>
                 <DialogContent
                     style={{

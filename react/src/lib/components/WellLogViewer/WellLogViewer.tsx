@@ -48,6 +48,7 @@ const axisMnemos: Record<string, string[]> = {
 
 import ReactDOM from "react-dom";
 import { SimpleMenu, editPlots } from "./components/LocalMenus";
+import { editTrack } from "./components/WellLogView";
 import { Plot } from "@equinor/videx-wellog";
 
 function onTrackEvent(wellLogView: WellLogView, ev: TrackEvent) {
@@ -57,7 +58,9 @@ function onTrackEvent(wellLogView: WellLogView, ev: TrackEvent) {
         wellLogView.selectTrack(track, !wellLogView.isTrackSelected(track)); // toggle selection
     } else if (ev.type === "dblclick") {
         wellLogView.selectTrack(track, true);
-        /*if (ev.area !== "title")*/ {
+        if (ev.area === "title") {
+            editTrack(ev.element, wellLogView, ev.track);
+        } else {
             const plot: Plot | null = ev.plot;
             if (!plot) editPlots(ev.element, wellLogView, ev.track);
             else wellLogView.editPlot(ev.element, ev.track, plot);

@@ -219,7 +219,6 @@ export function getPlotType(plot: Plot): string {
     if (plot instanceof DotPlot) return "dot";
     if (plot instanceof DifferentialPlot) return "differential";
     if (plot instanceof LineStepPlot) return "linestep";
-    if (plot instanceof LineStepPlot) return "linestep";
     return "";
 }
 
@@ -684,7 +683,7 @@ export function addOrEditGraphTrackPlot(
     }
 }
 
-export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
+function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
     const plots = track.plots;
 
     let index = 0;
@@ -699,21 +698,11 @@ export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
 }
 
 export function removeGraphTrackPlot(
-    _wellLogView: WellLogView,
+    wellLogView: WellLogView,
     track: GraphTrack,
     _plot: Plot
 ): void {
-    const plots = track.plots;
-
-    let index = 0;
-    for (const plot of plots) {
-        if (plot === _plot) {
-            plots.splice(index, 1);
-            break;
-        }
-        index++;
-    }
-
+    _removeGraphTrackPlot(track, _plot);
     track.prepareData();
 
     if (wellLogView.logController) {

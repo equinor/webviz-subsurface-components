@@ -37,6 +37,7 @@ import { addOrEditGraphTrackPlot, removeGraphTrackPlot } from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
 
 import { TemplatePlot } from "./WellLogTemplateTypes";
+import { TemplateTrack } from "./WellLogTemplateTypes";
 
 import {
     removeOverlay,
@@ -351,6 +352,7 @@ function addTrackEventHandlers(
 
 import ReactDOM from "react-dom";
 import { PlotPropertiesDialog } from "./PlotDialog";
+import { TrackPropertiesDialog } from "./TrackDialog";
 import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 import { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
@@ -421,11 +423,44 @@ function editPlot(
             templatePlot={templatePlot}
             wellLogView={wellLogView}
             track={track}
-            onOK={wellLogView.editTrackPlot.bind(wellLogView, track, plot)}
+            onOK={wellLogView._editTrackPlot.bind(wellLogView, track, plot)}
         />,
         el
     );
 }
+
+function fillTemplateTrack(track: Track): TemplateTrack {
+    const options = track.options;
+
+    return {
+        title: options.label ? options.label : "",
+        plots: [],
+    };
+}
+
+export function editTrack(
+    parent: HTMLElement,
+    wellLogView: WellLogView,
+    track: Track
+): void {
+    const el: HTMLElement = document.createElement("div");
+    el.style.width = "10px";
+    el.style.height = "13px";
+    parent.appendChild(el);
+
+    const templateTrack = fillTemplateTrack(track);
+
+    ReactDOM.render(
+        <TrackPropertiesDialog
+            templateTrack={templateTrack}
+            wellLogView={wellLogView}
+            track={track}
+            onOK={wellLogView._editTrack.bind(wellLogView, track)}
+        />,
+        el
+    );
+}
+
 function fillInfos(
     x: number,
     x2: number,
@@ -663,7 +698,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
             this.props.maxTrackNum !== prevProps.maxTrackNum
         ) {
-            this.onScrollTrack();
+            this.onTrackScroll();
             this.setInfo();
         }
     }
@@ -721,14 +756,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.props.colorTables
             );
         }
-        this.onScrollTrack();
+        this.onTrackScroll();
         this.setInfo(); // Clear old track information
     }
 
     /* 
       Display current state of track scrolling
       */
-    onScrollTrack(): void {
+    onTrackScroll(): void {
         const iFrom = this.getTrackScrollPos();
         const iTo = iFrom + this._maxTrackNum();
         if (this.logController) scrollTracksTo(this.logController, iFrom, iTo);
@@ -859,17 +894,26 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 // force new track to be visible when added after the current
                 this.scrollTrackBy(+1);
             else {
-                this.onScrollTrack();
+                this.onTrackScroll();
                 this.setInfo();
             }
         }
+    }
+
+    _editTrack(track: Track, templateTrack: TemplateTrack): void {
+        //addOrEditGraphTrackPlot(this, track as GraphTrack, templateTrack);
+        /*if (this.logController) {
+            this.logController.removeTrack(track);
+        }*/
+        this.onTrackScroll();
+        this.setInfo();
     }
 
     removeTrack(track: Track): void {
         if (this.logController) {
             this.logController.removeTrack(track);
 
-            this.onScrollTrack();
+            this.onTrackScroll();
             this.setInfo();
         }
     }
@@ -897,7 +941,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo();
     }
 
-    editTrackPlot(track: Track, plot: Plot, templatePlot: TemplatePlot): void {
+    _editTrackPlot(track: Track, plot: Plot, templatePlot: TemplatePlot): void {
         addOrEditGraphTrackPlot(this, track as GraphTrack, plot, templatePlot);
         this.setInfo();
     }
@@ -908,6 +952,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     // Dialog functions
+    editTrack(parent: HTMLElement | null, track: Track): void {
+        if (parent) editTrack(parent, this, track);
+    }
     addPlot(parent: HTMLElement | null, track: Track): void {
         if (parent) addPlot(parent, this, track);
     }

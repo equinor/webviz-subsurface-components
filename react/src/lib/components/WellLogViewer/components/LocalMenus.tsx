@@ -41,6 +41,7 @@ function getPlotTitle(plot: Plot): string {
     }
     return title;
 }
+
 export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     constructor(props: SimpleMenuProps) {
         super(props);
@@ -169,6 +170,14 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         this.props.wellLogView.removeTrack(this.props.track);
     }
 
+    createMenuItem(title: string, action?: () => void): ReactNode {
+        return (
+            <MenuItem key={title} onClick={() => this.handleClickItem(action)}>
+                &nbsp;&nbsp;&nbsp;&nbsp;{title}
+            </MenuItem>
+        );
+    }
+
     render(): ReactNode {
         if (this.props.type == "removePlots") {
             return (
@@ -203,6 +212,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         }
 
         if (this.props.type == "title") {
+            const track = this.props.track;
             return (
                 <div>
                     <Menu
@@ -212,20 +222,16 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                         onClose={this.handleCloseMenu.bind(this)}
                         onContextMenu={this.handleContextMenu.bind(this)}
                     >
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(this.addTrack);
-                            }}
-                        >
-                            {"Add track"}
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(this.removeTrack);
-                            }}
-                        >
-                            {"Remove track"}
-                        </MenuItem>
+                        {this.createMenuItem("Add track", this.addTrack)}
+                        {this.createMenuItem(
+                            "Edit track",
+                            this.props.wellLogView.editTrack.bind(
+                                this.props.wellLogView,
+                                this.state.anchorEl,
+                                track
+                            )
+                        )}
+                        {this.createMenuItem("Remove track", this.removeTrack)}
                     </Menu>
                 </div>
             );
