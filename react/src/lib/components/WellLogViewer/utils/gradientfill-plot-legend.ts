@@ -106,7 +106,7 @@ export default function renderGradientFillPlotLegend(
             "fill-opacity": fillOpacity,
         });
     } else {
-        let fillNrm = plot.options.color;
+        let fillNrm = plot.options.color; // see area-plot-legend.ts! should be? plot.options.fill || plot.options.color;
         /* Start GradientFill code */
         const colorTable = options.colorTable;
         if (colorTable) {

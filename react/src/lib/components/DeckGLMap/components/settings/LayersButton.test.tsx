@@ -14,13 +14,13 @@ describe("test 'layers' button", () => {
         const { container } = render(Wrapper({ children: <LayersButton /> }));
         expect(container.firstChild).toMatchSnapshot();
     });
-    xit("click to dispatch redux action", async () => {
+    it("click to dispatch redux action", async () => {
         Icon.add({ layers });
         render(Wrapper({ children: <LayersButton /> }));
         userEvent.click(screen.getByRole("button"));
         expect(screen.getByRole("menu")).toBeInTheDocument();
         const property_map_checkbox = screen.getAllByRole("checkbox", {
-            name: "",
+            name: "Property map",
         })[0];
         userEvent.click(property_map_checkbox);
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
@@ -29,7 +29,7 @@ describe("test 'layers' button", () => {
             type: "layers/updateVisibleLayers",
         });
     });
-    xit("should close menu when clicked on backdrop", async () => {
+    it("should close menu when clicked on backdrop", async () => {
         render(Wrapper({ children: <LayersButton /> }));
         userEvent.click(screen.getByRole("button"));
         const layers_menu = screen.getByRole("menu");
@@ -37,7 +37,7 @@ describe("test 'layers' button", () => {
         userEvent.click(document.body);
         await waitFor(() => expect(layers_menu).not.toBeVisible());
     });
-    xit("should close menu when clicked twice on layers button", async () => {
+    it("should close menu when clicked twice on layers button", async () => {
         render(Wrapper({ children: <LayersButton /> }));
         userEvent.click(screen.getByRole("button"));
         const layers_menu = screen.getByRole("menu");

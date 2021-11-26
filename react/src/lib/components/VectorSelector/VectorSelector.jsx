@@ -3,26 +3,7 @@ import React from "react";
 import VectorSelectorComponent from "./components/VectorSelectorComponent";
 
 const VectorSelector = (props) => {
-    return (
-        <VectorSelectorComponent
-            id={props.id}
-            maxNumSelectedNodes={props.maxNumSelectedNodes}
-            delimiter={props.delimiter}
-            numMetaNodes={props.numMetaNodes}
-            data={props.data}
-            label={props.label}
-            showSuggestions={props.showSuggestions}
-            setProps={props.setProps}
-            selectedTags={props.selectedTags}
-            placeholder={props.placeholder}
-            numSecondsUntilSuggestionsAreShown={
-                props.numSecondsUntilSuggestionsAreShown
-            }
-            lineBreakAfterTag={props.lineBreakAfterTag}
-            customVectorDefinitions={props.customVectorDefinitions}
-            persistence={props.persistence}
-        />
-    );
+    return <VectorSelectorComponent {...props} />;
 };
 
 VectorSelector.defaultProps = {

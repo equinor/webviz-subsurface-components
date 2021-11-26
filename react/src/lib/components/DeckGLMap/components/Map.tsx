@@ -5,15 +5,9 @@ import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
 import { setLayers } from "../redux/actions";
-import {
-    ColormapLayer,
-    Hillshading2DLayer,
-    WellsLayer,
-    FaultPolygonsLayer,
-    PieChartLayer,
-    GridLayer,
-    DrawingLayer,
-} from "../layers";
+import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
+import { templateArray } from "./WelllayerTemplateTypes";
+import { colorTablesArray } from "./ColorTableTypes";
 
 export interface MapProps {
     /**
@@ -85,6 +79,10 @@ export interface MapProps {
     setEditedData: (data: Record<string, unknown>) => void;
 
     children?: React.ReactNode;
+
+    template: templateArray;
+
+    colorTables: colorTablesArray;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -97,6 +95,8 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     legend,
+    template,
+    colorTables,
     editedData,
     setEditedData,
 }: MapProps) => {
@@ -113,11 +113,11 @@ const Map: React.FC<MapProps> = ({
 
     // state to update layers to include default props
     const [layersWithDefaultProps, setLayersWithDefaultProps] = React.useState(
-        getLayersWithDefaultProps(layers, bounds)
+        getLayersWithDefaultProps(layers)
     );
     React.useEffect(() => {
-        setLayersWithDefaultProps(getLayersWithDefaultProps(layers, bounds));
-    }, [layers, bounds]);
+        setLayersWithDefaultProps(getLayersWithDefaultProps(layers));
+    }, [layers]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
@@ -155,6 +155,8 @@ const Map: React.FC<MapProps> = ({
                     legend={legend}
                     editedData={editedData}
                     setEditedData={setEditedData}
+                    template={template}
+                    colorTables={colorTables}
                 />
             </ReduxProvider>
         )
@@ -186,7 +188,19 @@ function getViewsForDeckGL(): Record<string, unknown>[] {
     const deckgl_views = [
         {
             "@@type": "OrthographicView",
-            id: "main",
+            id: "main2D",
+            controller: {
+                doubleClickZoom: false,
+            },
+            x: "0%",
+            y: "0%",
+            width: "100%",
+            height: "100%",
+            flipY: false,
+        },
+        {
+            "@@type": "OrbitView",
+            id: "main3D",
             controller: {
                 doubleClickZoom: false,
             },
@@ -198,46 +212,4 @@ function getViewsForDeckGL(): Record<string, unknown>[] {
         },
     ];
     return deckgl_views;
-}
-
-// update layer object to include default props
-function getLayersWithDefaultProps(
-    deckgl_layers: Record<string, unknown>[],
-    bounds: [number, number, number, number]
-): Record<string, unknown>[] {
-    const layers = deckgl_layers.map((a) => {
-        return { ...a };
-    });
-
-    layers?.forEach((layer) => {
-        let default_props = undefined;
-        if (layer["@@type"] === ColormapLayer.name) {
-            default_props = ColormapLayer.defaultProps;
-            if (default_props) default_props["bounds"] = bounds;
-        } else if (layer["@@type"] === Hillshading2DLayer.name) {
-            default_props = Hillshading2DLayer.defaultProps;
-            if (default_props) default_props["bounds"] = bounds;
-        } else if (layer["@@type"] === GridLayer.name)
-            default_props = GridLayer.defaultProps;
-        else if (layer["@@type"] === WellsLayer.name)
-            default_props = WellsLayer.defaultProps;
-        else if (layer["@@type"] === FaultPolygonsLayer.name)
-            default_props = FaultPolygonsLayer.defaultProps;
-        else if (layer["@@type"] === PieChartLayer.name)
-            default_props = PieChartLayer.defaultProps;
-        else if (layer["@@type"] === DrawingLayer.name)
-            default_props = DrawingLayer.defaultProps;
-
-        if (default_props) {
-            Object.entries(default_props).forEach(([prop, value]) => {
-                const prop_type = typeof value;
-                if (
-                    ["string", "boolean", "number", "array"].includes(prop_type)
-                ) {
-                    if (layer[prop] === undefined) layer[prop] = value;
-                }
-            });
-        }
-    });
-    return layers;
 }

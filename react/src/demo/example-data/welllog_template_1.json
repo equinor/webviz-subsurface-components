@@ -1,208 +1,208 @@
 {
-  "name": "Template 1",
-  "scale": {
-    "primary": "md",
-    "allowSecondary": true
-  },
-  "tracks": [
-    {
-      "title":  "Multiple",
-      "plots": [
+    "name": "Template 1",
+    "scale": {
+        "primary": "md",
+        "allowSecondary": true
+    },
+    "tracks": [
         {
-          "name": "MDIA"
+            "title": "Multiple",
+            "plots": [
+                {
+                    "name": "MDIA"
+                },
+                {
+                    "name": "HKLA",
+                    "style": "HKL"
+                }
+            ]
         },
         {
-          "name": "HKLA",
-          "style": "HKL"
-        }
-      ]
-    },
-    {
-      "title": "Area",
-      "plots": [
+            "title": "Area",
+            "plots": [
+                {
+                    "name": "HKLA",
+                    "style": "HKL",
+                    "type": "area",
+                    "color": "blue",
+                    "fill": "red",
+                    "inverseColor": "green"
+                }
+            ]
+        },
         {
-          "name": "HKLA",
-          "style": "HKL",
-          "type": "area",
-          "color": "blue",
-          "fill": "red",
-          "inverseColor": "green"
-        }
-      ]
-    },
-    {
-      "title": "Differential",
-      "plots": [
+            "title": "Differential",
+            "plots": [
+                {
+                    "name": "HKLX",
+                    "name2": "HKLA",
+                    "type": "differential",
+                    "scale": "linear",
+                    "color": "blue",
+                    "color2": "orange",
+                    "fill": "green",
+                    "fill2": "red"
+                }
+            ]
+        },
         {
-          "name": "HKLX",
-          "name2": "HKLA",
-          "type": "differential",
-          "scale": "linear",
-          "color": "blue",
-          "color2": "orange",
-          "fill": "green",
-          "fill2": "red"
-        }
-      ]
-    },
-    {
-      "title": "Gradient Fill & inverse",
-      "plots": [
+            "title": "Gradient Fill & inverse",
+            "plots": [
+                {
+                    "name": "HKLA",
+                    "type": "gradientfill",
+                    "color": "blue",
+                    "colorTable": "Physics",
+                    "inverseColorTable": "Physics reverse"
+                }
+            ]
+        },
         {
-          "name": "HKLA",
-          "type": "gradientfill",
-          "color": "blue",
-          "colorTable": "Physics",
-          "inverseColorTable": "Physics reverse"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MFOA"
+                }
+            ]
+        },
         {
-          "name": "MFOA"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "DD_VOLUME"
+                }
+            ]
+        },
         {
-          "name": "DD_VOLUME"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "TEMP"
+                }
+            ]
+        },
         {
-          "name": "TEMP"
-        }
-      ]
-    },
-    {
-      "required": true,
-      "plots": [
+            "required": true,
+            "plots": [
+                {
+                    "name": "TQA",
+                    "type": "dot"
+                }
+            ]
+        },
         {
-          "name": "TQA",
-          "type": "dot"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BITSIZE"
+                }
+            ]
+        },
         {
-          "name": "BITSIZE"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "GRSIM"
+                }
+            ]
+        },
         {
-          "name": "GRSIM"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "RACESHM"
+                }
+            ]
+        },
         {
-          "name": "RACESHM"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "SW",
+                    "type": "line"
+                }
+            ]
+        },
         {
-          "name": "SW",
-          "type": "line"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MFIA",
+                    "type": "dot"
+                }
+            ]
+        },
         {
-          "name": "MFIA",
-          "type": "dot"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MDOA",
+                    "style": "MD"
+                }
+            ]
+        },
         {
-          "name": "MDOA",
-          "style": "MD"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MDIA",
+                    "style": "MD"
+                }
+            ]
+        },
         {
-          "name": "MDIA",
-          "style": "MD"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MTOA"
+                }
+            ]
+        },
         {
-          "name": "MTOA"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "MTIA"
+                }
+            ]
+        },
         {
-          "name": "MTIA"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "ECDT"
+                }
+            ]
+        },
         {
-          "name": "ECDT"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BDTI"
+                }
+            ]
+        },
         {
-          "name": "BDTI"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BDDI"
+                }
+            ]
+        },
         {
-          "name": "BDDI"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BRVC"
+                }
+            ]
+        },
         {
-          "name": "BRVC"
+            "plots": [
+                {
+                    "name": "TCTI"
+                }
+            ]
         }
-      ]
-    },
-    {
-      "plots": [
+    ],
+    "styles": [
         {
-          "name": "TCTI"
+            "name": "HKL",
+            "scale": "linear",
+            "type": "gradientfill",
+            "colorTable": "Physics",
+            "color": "green"
+        },
+        {
+            "name": "MD",
+            "type": "area",
+            "color": "blue",
+            "fill": "green"
         }
-      ]
-    }
-  ],
-  "styles": [
-    {
-      "name": "HKL",
-      "scale": "linear",
-      "type": "gradientfill",
-      "colorTable": "Physics",
-      "color": "green"
-    },
-    {
-      "name": "MD",
-      "type": "area",
-      "color": "blue",
-      "fill": "green"
-    }
-  ]
+    ]
 }
