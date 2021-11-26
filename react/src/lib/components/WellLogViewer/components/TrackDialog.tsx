@@ -2,8 +2,6 @@ import React, { Component, ReactNode } from "react";
 
 import { TemplateTrack } from "./WellLogTemplateTypes";
 
-import { Track, GraphTrack } from "@equinor/videx-wellog";
-
 import WellLogView from "./WellLogView";
 
 // material ui
@@ -13,7 +11,6 @@ import {
     DialogContent,
     DialogActions,
     Button,
-    FormControl,
     TextField,
 } from "@material-ui/core";
 
@@ -21,7 +18,6 @@ interface TrackPropertiesDialogProps {
     templateTrack?: TemplateTrack; // input for editting
     onOK: (templateTrack: TemplateTrack) => void;
     wellLogView: WellLogView;
-    track: Track;
 }
 interface TrackPropertiesDialogState extends TemplateTrack {
     open: boolean;
@@ -42,7 +38,7 @@ export class TrackPropertiesDialog extends Component<
               }
             : {
                   // we shold fill every posible state to allow this.setState() to set it
-                  title: "",
+                  title: "New Track",
 
                   plots: [],
                   open: true,
@@ -54,14 +50,12 @@ export class TrackPropertiesDialog extends Component<
     }
 
     onOK(): void {
-        const templateTrack = { ...this.state };
-        // set some values wich are not edited by the dialog
-        this.props.onOK(templateTrack);
+        this.props.onOK(this.state);
         this.closeDialog();
     }
 
-    onChange(e): void {
-        this.setState({ [e.target.id]: e.target.value })
+    onChange(e: React.ChangeEvent<TextField>): void {
+        this.setState({ [e.target.id]: e.target.value });
     }
 
     closeDialog(): void {
@@ -71,7 +65,12 @@ export class TrackPropertiesDialog extends Component<
     render(): ReactNode {
         const title = this.props.templateTrack ? "Edit track" : "Add New Track";
         return (
-            <Dialog open={this.state.open} maxWidth="sm" fullWidth onClose={() => this.setState({open:false})}>
+            <Dialog
+                open={this.state.open}
+                maxWidth="sm"
+                fullWidth
+                onClose={() => this.setState({ open: false })}
+            >
                 <DialogTitle>{title}</DialogTitle>
                 <DialogContent
                     style={{

@@ -10,7 +10,6 @@ import { Plot } from "@equinor/videx-wellog";
 import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 
 import { ExtPlotOptions } from "../utils/tracks";
-import { newGraphTrack } from "../utils/tracks";
 
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -48,6 +47,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         this.state = { anchorEl: this.props.anchorEl };
 
         this.addTrack = this.addTrack.bind(this);
+        this.editTrack = this.editTrack.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
     }
     componentDidUpdate(prevProps: SimpleMenuProps): void {
@@ -160,11 +160,10 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     }
 
     addTrack(): void {
-        //newScaleTrack
-        //newDualScaleTrack
-        const trackNew = newGraphTrack("new Track", [], []);
-        this.props.wellLogView.addTrack(trackNew, this.props.track, true);
-        this.props.wellLogView.selectTrack(trackNew, true);
+        this.props.wellLogView.addTrack(this.state.anchorEl, this.props.track);
+    }
+    editTrack(): void {
+        this.props.wellLogView.editTrack(this.state.anchorEl, this.props.track);
     }
     removeTrack(): void {
         this.props.wellLogView.removeTrack(this.props.track);
@@ -212,7 +211,6 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         }
 
         if (this.props.type == "title") {
-            const track = this.props.track;
             return (
                 <div>
                     <Menu
@@ -223,14 +221,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                         onContextMenu={this.handleContextMenu.bind(this)}
                     >
                         {this.createMenuItem("Add track", this.addTrack)}
-                        {this.createMenuItem(
-                            "Edit track",
-                            this.props.wellLogView.editTrack.bind(
-                                this.props.wellLogView,
-                                this.state.anchorEl,
-                                track
-                            )
-                        )}
+                        {this.createMenuItem("Edit track", this.editTrack)}
                         {this.createMenuItem("Remove track", this.removeTrack)}
                     </Menu>
                 </div>
