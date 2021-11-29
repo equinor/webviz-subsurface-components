@@ -18,6 +18,7 @@ const discreteData = {
 const name = "ZONELOG";
 const dataObjectName = "Wells / ZONELOG";
 const position = [16, 10];
+const horizontal= true;
 const Template = (args) => {
     return <DiscreteColorLegend {...args} />;
 };
@@ -30,4 +31,5 @@ DiscreteTemplate.args = {
     position,
     template,
     colorTables,
+    horizontal
 };

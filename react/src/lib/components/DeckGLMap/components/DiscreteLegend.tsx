@@ -13,6 +13,7 @@ interface colorLegendProps {
     dataObjectName: string;
     name: string;
     position: number[];
+    horizontal: boolean;
     template: templateArray;
     colorTables: colorTablesArray;
 }
@@ -23,11 +24,13 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     dataObjectName,
     position,
     template,
+    horizontal,
     colorTables,
 }: colorLegendProps) => {
     React.useEffect(() => {
         discreteLegend("#legend");
-    }, [discreteData, template, colorTables]);
+    }, [discreteData, template, colorTables, horizontal]);
+    
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
@@ -61,13 +64,24 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         }
         const ordinalValues = scaleOrdinal().domain(itemName);
         const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
-        if (colorLegend) {
-            select(legend).select("svg").remove();
+        select(legend).select("svg").remove();
+        if (colorLegend && horizontal) {
             select(legend)
                 .append("svg")
-                .attr("height", 410 + "px")
-                .attr("width", 230 + "px")
-                .attr("transform", "translate(0,10)")
+                .attr("height", 100 + "%")
+                .attr("width", 100 + "%")
+                .style("background-color", "#ffffffcc")
+                .style("border-radius", "5px")
+                .style("overflow", "visible")
+                .call(colorLegend);
+        } else {
+            select(legend)
+                .append("svg")
+                .style("transform", "rotate(90deg)")
+                .style("margin-top", "96px")
+                .attr("height", 100 + "%")
+                .attr("width", 100 + "%")
+                .style("overflow", "visible")
                 .call(colorLegend);
         }
     }
@@ -104,7 +118,7 @@ export function colorTableData(
 }
 
 DiscreteColorLegend.defaultProps = {
-    position: [16, 10],
+    position: [5, 10],
 };
 
 export default DiscreteColorLegend;

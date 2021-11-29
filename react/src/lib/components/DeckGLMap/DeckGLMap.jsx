@@ -18,7 +18,8 @@ DeckGLMap.defaultProps = {
     },
     legend: {
         visible: true,
-        position: [46, 10],
+        horizontal: true,
+        position: [5, 10],
     },
     zoom: -3,
     colorTables: { colorTables },
@@ -188,6 +189,10 @@ DeckGLMap.propTypes = {
          * Legend position in pixels.
          */
         position: PropTypes.arrayOf(PropTypes.number),
+        /**
+         * Legend layout.
+         */
+        horizontal: PropTypes.bool,
     }),
 
     /**

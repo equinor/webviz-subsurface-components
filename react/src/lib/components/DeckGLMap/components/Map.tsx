@@ -66,6 +66,7 @@ export interface MapProps {
     legend: {
         visible: boolean;
         position: number[];
+        horizontal: boolean;
     };
 
     /**

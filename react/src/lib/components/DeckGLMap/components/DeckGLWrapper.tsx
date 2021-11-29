@@ -65,6 +65,7 @@ export interface DeckGLWrapperProps {
     legend: {
         visible: boolean;
         position: number[];
+        horizontal: boolean;
     };
 
     /**
@@ -323,6 +324,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     dataObjectName={legendProps.title}
                     position={legend.position}
                     name={legendProps.name}
+                    horizontal={legend.horizontal}
                     template={template}
                     colorTables={colorTables}
                 />
@@ -335,6 +337,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         max={legendProps.valueRange[1]}
                         dataObjectName={legendProps.title}
                         position={legend.position}
+                        horizontal={legend.horizontal}
                         name={legendProps.name}
                         template={template}
                         colorTables={colorTables}
