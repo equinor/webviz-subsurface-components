@@ -91,6 +91,7 @@ export function colorTableData(
     template: templateArray,
     colorTables: colorTablesArray
 ): [number, number, number, number][] {
+    if (!template) return [];
     const properties = template[0]["properties"];
     const propertiesData = properties.filter(
         (value: propertiesObj) => value.objectName == name
@@ -100,6 +101,7 @@ export function colorTableData(
             value.name.toLowerCase() ==
             propertiesData[0].colorTable.toLowerCase()
     );
+    if (!colorTableData) return [];
     return colorTableData[0].colors;
 }
 
