@@ -5,7 +5,7 @@ import colorTables from "../../../../../../demo/example-data/color-tables.json";
 
 export default {
     component: DiscreteColorLegend,
-    title: "DeckGLMap/Components/ColorLegends",
+    title: "DeckGLMap/Components/ColorLegends/DiscreteColorLegend",
 };
 
 const discreteData = {
