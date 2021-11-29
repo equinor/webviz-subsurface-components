@@ -8,6 +8,8 @@ import { setLayers } from "../redux/actions";
 import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
 import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
+import defaultTemplate from "../../../../demo/example-data/welllayer_template.json";
+import defaultColorTables from "../../../../demo/example-data/color-tables.json";
 
 export interface MapProps {
     /**
@@ -95,8 +97,8 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     legend,
-    template,
-    colorTables,
+    template = defaultTemplate,
+    colorTables = defaultColorTables,
     editedData,
     setEditedData,
 }: MapProps) => {
