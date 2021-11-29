@@ -121,16 +121,16 @@ Default.args = {
 };
 
 // Storybook example 2
-export const CustomLayer = Template.bind({});
-CustomLayer.args = {
+export const UserDefinedLayer1 = Template.bind({});
+UserDefinedLayer1.args = {
     id: exampleData[0].id,
     bounds: exampleData[0].bounds,
     layers: layersData1,
 };
 
 // Storybook example 3
-export const CustomLayerWithColormap = Template.bind({});
-CustomLayerWithColormap.args = {
+export const UserDefinedLayer2 = Template.bind({});
+UserDefinedLayer2.args = {
     id: exampleData[0].id,
     resources: exampleData[0].resources,
     bounds: exampleData[0].bounds,
