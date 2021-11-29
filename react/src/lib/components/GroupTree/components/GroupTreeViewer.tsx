@@ -25,12 +25,14 @@ interface Props {
     id: string;
     edge_options: DataInfos;
     node_options: DataInfos;
+    currentDateTimeChangedCallBack: (currentDateTime: string) => void;
 }
 
 const GroupTreeViewer: React.FC<Props> = ({
     id,
     edge_options,
     node_options,
+    currentDateTimeChangedCallBack,
 }: Props) => {
     const classes = useStyles();
     const divRef = useRef<HTMLDivElement>(null);
@@ -64,6 +66,7 @@ const GroupTreeViewer: React.FC<Props> = ({
         if (!renderer.current) return;
 
         renderer.current.update(currentDateTime);
+        currentDateTimeChangedCallBack(currentDateTime);
     }, [currentDateTime]);
 
     useEffect(() => {
