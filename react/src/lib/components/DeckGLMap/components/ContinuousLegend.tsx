@@ -12,6 +12,7 @@ interface legendProps {
     name: string;
     template: templateArray;
     colorTables: colorTablesArray;
+    horizontal: boolean;
 }
 
 interface ItemColor {
@@ -27,10 +28,11 @@ const ContinuousLegend: React.FC<legendProps> = ({
     name,
     template,
     colorTables,
+    horizontal,
 }: legendProps) => {
     React.useEffect(() => {
         continuousLegend("#legend");
-    }, [min, max, template, colorTables]);
+    }, [min, max, template, colorTables, horizontal]);
 
     function continuousLegend(selected_id: string) {
         const itemColor: ItemColor[] = [];
@@ -46,7 +48,22 @@ const ContinuousLegend: React.FC<legendProps> = ({
         select(selected_id).select("svg").remove();
         const colorScale = scaleSequential().domain([min, max]);
         // append a defs (for definition) element to your SVG
-        const svgLegend = select(selected_id).append("svg").attr("width", 300);
+        if (horizontal) {
+            // append a defs (for definition) element to your SVG
+            var svgLegend = select(selected_id)
+                .append("svg")
+                .attr("width", 100 + "%")
+                .style("background-color", "#ffffffcc")
+                .style("border-radius", "5px");
+        } else {
+            var svgLegend = select(selected_id)
+                .append("svg")
+                .attr("width", 100 + "%")
+                .style("transform", "rotate(90deg)")
+                .style("margin-top", "80px")
+                .style("background-color", "#ffffffcc")
+                .style("border-radius", "5px");
+        }
         const defs = svgLegend.append("defs");
         // append a linearGradient element to the defs and give it a unique id
         const linearGradient = defs
@@ -115,7 +132,7 @@ const ContinuousLegend: React.FC<legendProps> = ({
 };
 
 ContinuousLegend.defaultProps = {
-    position: [16, 10],
+    position: [5, 10],
 };
 
 export default ContinuousLegend;
