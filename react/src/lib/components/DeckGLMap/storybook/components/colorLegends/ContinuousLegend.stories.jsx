@@ -2,7 +2,7 @@ import React from "react";
 import ContinuousLegend from "../../../components/ContinuousLegend";
 export default {
     component: ContinuousLegend,
-    title: "DeckGLMap/Components/ColorLegends",
+    title: "DeckGLMap/Components/ColorLegends/ContinuousLegend",
 };
 import template from "../../../../../../demo/example-data/welllayer_template.json";
 import colorTables from "../../../../../../demo/example-data/color-tables.json";

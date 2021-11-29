@@ -127,10 +127,16 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
         // See https://deck.gl/docs/api-reference/json/overview for more details.
         const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
-        if (resources && editedData) {
+        if (resources) {
             configuration.merge({
                 enumerations: {
                     resources,
+                },
+            });
+        }
+        if (editedData) {
+            configuration.merge({
+                enumerations: {
                     editedData,
                 },
             });
