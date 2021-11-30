@@ -938,7 +938,9 @@ export function createTracks(
 
 function addTrack(
     wellLogView: WellLogView,
-    trackNew: Track, trackCurrent: Track, bAfter: boolean
+    trackNew: Track,
+    trackCurrent: Track,
+    bAfter: boolean
 ): void {
     if (wellLogView.logController) {
         let order = 0;
@@ -960,7 +962,6 @@ function addTrack(
     }
 }
 
-
 export function addOrEditGraphTrack(
     wellLogView: WellLogView,
     track: GraphTrack | null,
@@ -968,10 +969,10 @@ export function addOrEditGraphTrack(
     trackCurrent: Track,
     bAfter: boolean
 ): GraphTrack {
-    if (track) { // edit existing track
+    if (track) {
+        // edit existing track
         track.options.label = templateTrack.title;
-    }
-    else {
+    } else {
         track = newGraphTrack(templateTrack.title, [], []);
         addTrack(wellLogView, track, trackCurrent, bAfter);
     }
@@ -980,4 +981,3 @@ export function addOrEditGraphTrack(
     }
     return track;
 }
-

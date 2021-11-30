@@ -158,13 +158,15 @@ class WellLogViewer extends Component<Props, State> {
         {
             //compare (Object.keys(nextProps), Object.keys(this.props))
             for (const p in nextProps) {
-                if (nextProps[p] !== this.props[p]) {
+                // eslint-disable-next-line
+                if ((nextProps as any)[p] !== (this.props as any)[p]) {
                     //console.log(p /*, nextProps[p], this.props[p]*/);
                     return true;
                 }
             }
             for (const s in nextState) {
-                if (nextState[s] !== this.state[s]) {
+                // eslint-disable-next-line
+                if ((nextState as any)[s] !== (this.state as any)[s]) {
                     //console.log(s /*, nextState[s], this.state[s]*/);
                     return true;
                 }

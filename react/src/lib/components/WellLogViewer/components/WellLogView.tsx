@@ -33,7 +33,11 @@ import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
 
-import { addOrEditGraphTrack, addOrEditGraphTrackPlot, removeGraphTrackPlot } from "../utils/tracks";
+import {
+    addOrEditGraphTrack,
+    addOrEditGraphTrackPlot,
+    removeGraphTrackPlot,
+} from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
 
 import { TemplatePlot } from "./WellLogTemplateTypes";
@@ -77,7 +81,7 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
                                 pinelm.style.left = `${x}px`;
 
                                 pinelm1.style.left = `${offset + 0.5}px`;
-                                pinelm1.style.right = null;
+                                pinelm1.style.right = "";
                             } else {
                                 const x = event.x - (offset + 0.5);
                                 const w =
@@ -86,7 +90,7 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
                                 pinelm.style.left = `${x}px`;
 
                                 pinelm1.style.right = `${offset + 0.5}px`;
-                                pinelm1.style.left = null;
+                                pinelm1.style.left = "";
                             }
                         } else {
                             if (parent.selPinned < event.y) {
@@ -97,7 +101,7 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
                                 pinelm.style.top = `${y}px`;
 
                                 pinelm1.style.top = `${offset + 0.5}px`;
-                                pinelm1.style.bottom = null;
+                                pinelm1.style.bottom = "";
                             } else {
                                 const y = event.y - (offset + 0.5);
                                 const h =
@@ -106,7 +110,7 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
                                 pinelm.style.top = `${y}px`;
 
                                 pinelm1.style.top = `${offset + 0.5}px`;
-                                pinelm1.style.bottom = null;
+                                pinelm1.style.bottom = "";
                             }
                         }
                     }
@@ -1006,7 +1010,13 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     _addTrack(trackCurrent: Track, templateTrack: TemplateTrack): void {
         const bAfter = true;
-        const trackNew = addOrEditGraphTrack(this, null, templateTrack, trackCurrent, bAfter);
+        const trackNew = addOrEditGraphTrack(
+            this,
+            null,
+            templateTrack,
+            trackCurrent,
+            bAfter
+        );
 
         if (bAfter)
             // force new track to be visible when added after the current
@@ -1019,7 +1029,13 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     _editTrack(track: Track, templateTrack: TemplateTrack): void {
-        addOrEditGraphTrack(this, track as GraphTrack, templateTrack, track, false);
+        addOrEditGraphTrack(
+            this,
+            track as GraphTrack,
+            templateTrack,
+            track,
+            false
+        );
         this.setInfo();
     }
 
