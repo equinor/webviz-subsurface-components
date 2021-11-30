@@ -48,21 +48,14 @@ const ContinuousLegend: React.FC<legendProps> = ({
         select(selected_id).select("svg").remove();
         const colorScale = scaleSequential().domain([min, max]);
         // append a defs (for definition) element to your SVG
-        if (horizontal) {
-            // append a defs (for definition) element to your SVG
-            var svgLegend = select(selected_id)
-                .append("svg")
-                .attr("width", 100 + "%")
-                .style("background-color", "#ffffffcc")
-                .style("border-radius", "5px");
-        } else {
-            var svgLegend = select(selected_id)
-                .append("svg")
-                .attr("width", 100 + "%")
-                .style("transform", "rotate(90deg)")
-                .style("margin-top", "80px")
-                .style("background-color", "#ffffffcc")
-                .style("border-radius", "5px");
+        const svgLegend = select(selected_id)
+            .append("svg")
+            .style("background-color", "#ffffffcc")
+            .style("border-radius", "5px");
+        if (!horizontal) {
+            svgLegend
+                .style("transform", "rotate(270deg)")
+                .style("margin-top", "80px");
         }
         const defs = svgLegend.append("defs");
         // append a linearGradient element to the defs and give it a unique id

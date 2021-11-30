@@ -64,27 +64,21 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         const ordinalValues = scaleOrdinal().domain(itemName);
         const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
         select(legend).select("svg").remove();
+        const legendLength = itemColor.length;
+        const calcLegendHeight = 22 * legendLength + 4 * legendLength;
+        const svgLegend = select(legend)
+            .append("svg")
+            .style("margin", "10px 10px")
+            .call(colorLegend);
         if (colorLegend && horizontal) {
-            select(legend)
-                .append("svg")
-                .attr("height", 100 + "%")
-                .attr("width", 100 + "%")
-                .style("background-color", "#ffffffcc")
-                .style("border-radius", "5px")
-                .style("overflow", "visible")
-                .call(colorLegend);
+            svgLegend
+                .attr("height", calcLegendHeight + "px")
+                .attr("width", 50 + "%");
         } else {
-            select(legend)
-                .append("svg")
-                .attr("height", 410 + "px")
-                .attr("width", 230 + "px")
-                .attr("transform", "translate(0,10)")
+            svgLegend
                 .style("transform", "rotate(90deg)")
-                .style("margin-top", "96px")
-                .attr("height", 100 + "%")
-                .attr("width", 100 + "%")
-                .style("overflow", "visible")
-                .call(colorLegend);
+                .attr("width", calcLegendHeight + "px")
+                .attr("height", calcLegendHeight + "px");
         }
     }
     return (
@@ -93,9 +87,13 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
                 position: "absolute",
                 right: position[0],
                 top: position[1],
+                backgroundColor: "#ffffffcc",
+                borderRadius: "5px",
             }}
         >
-            <label style={{ color: "#6F6F6F" }}>{dataObjectName}</label>
+            <label style={{ color: "#6F6F6F", margin: "10px 10px" }}>
+                {dataObjectName}
+            </label>
             <div id="legend"></div>
         </div>
     );
