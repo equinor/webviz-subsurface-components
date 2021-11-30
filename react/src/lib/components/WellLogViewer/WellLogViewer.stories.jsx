@@ -38,13 +38,23 @@ const Template = (args) => {
         [controller]
     );
     const onContentRescale = React.useCallback(() => {
+        const domain = controller.getContentDomain();
+        const selection = controller.getContentSelection();
         setInfo(
             controller
-                ? "[" +
-                      controller.getContentDomain()[0].toFixed(0) +
+                ? "visible: [" +
+                      domain[0].toFixed(0) +
                       ", " +
-                      controller.getContentDomain()[1].toFixed(0) +
-                      "]"
+                      domain[1].toFixed(0) +
+                      "]" +
+                      (selection[0] !== undefined
+                          ? ", current: [" +
+                            selection[0].toFixed(0) +
+                            (selection[1] !== undefined
+                                ? ", " + selection[1].toFixed(0)
+                                : "") +
+                            "]"
+                          : "")
                 : "-"
         );
     }, [controller]);
@@ -61,7 +71,7 @@ const Template = (args) => {
                     onContentRescale={onContentRescale}
                 />
             </div>
-            <div style={{ width: "100%", flex: 0 }}>{"Current: " + info}</div>
+            <div style={{ width: "100%", flex: 0 }}>{info}</div>
         </div>
     );
 };

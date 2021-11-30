@@ -58,6 +58,14 @@ export function selectTrack(
     return false; // selection is not changed
 }
 
+export function updateLegendRows(logViewer: LogViewer): void {
+    // access protected member function
+    // eslint-disable-next-line
+    (logViewer as any).updateLegendRows();
+}
+
+///////////////////////
+
 export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
     if (!zoom) zoom = 1.0;
 

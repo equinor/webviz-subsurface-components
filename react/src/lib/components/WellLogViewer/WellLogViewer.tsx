@@ -291,10 +291,7 @@ class WellLogViewer extends Component<Props, State> {
             y = this.props.horizontal ? fTrack : fContent;
 
             const contentZoom = this.controller.getContentZoom();
-            const trackZoom =
-                this.controller._graphTrackMax() /
-                this.controller._maxTrackNum();
-
+            const trackZoom = this.controller.getTrackZoom();
             xZoom = this.props.horizontal ? contentZoom : trackZoom;
             yZoom = this.props.horizontal ? trackZoom : contentZoom;
         }

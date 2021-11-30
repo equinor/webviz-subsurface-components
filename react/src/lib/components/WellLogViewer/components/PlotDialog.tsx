@@ -113,7 +113,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   open: true,
               }
             : {
-                  // we shold fill every posible state to allow this.setState() to set it
+                  // we should fill every posible state to allow this.setState() to set it
                   type: "line",
                   name: name, //?? the first data in data selector
                   name2: name2, //? the second data in data selector ??
@@ -240,14 +240,10 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                             event.currentTarget.value === noneValue
                                 ? ""
                                 : event.currentTarget.value;
+
                         const values = new Object() as Record<string, string>;
                         values[valueName] = value;
                         this.setState(values as unknown as State);
-                        /* should be something like this:
-                        this.setState({
-                            [valueName]:value,
-                        })
-                        */
                     }}
                 >
                     {nodes}

@@ -33,9 +33,7 @@ import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
 
-import { newGraphTrack } from "../utils/tracks";
-
-import { addOrEditGraphTrackPlot, removeGraphTrackPlot } from "../utils/tracks";
+import { addOrEditGraphTrack, addOrEditGraphTrackPlot, removeGraphTrackPlot } from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
 
 import { TemplatePlot } from "./WellLogTemplateTypes";
@@ -64,7 +62,58 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
                     event.target.style.left = `${event.x - (offset + 0.5)}px`;
                 else event.target.style.top = `${event.y - (offset + 0.5)}px`;
                 event.target.style.visibility = "visible";
+
+                const pinelms = document.getElementsByClassName("pinned");
+                if (parent.selPinned !== undefined && pinelms) {
+                    const pinelm = pinelms[0] as HTMLElement;
+                    if (pinelm) {
+                        const pinelm1 = pinelm.firstElementChild as HTMLElement;
+                        if (parent.props.horizontal) {
+                            if (parent.selPinned < event.x) {
+                                const x = parent.selPinned - (offset + 0.5);
+                                const w =
+                                    event.x - parent.selPinned + rubberBandSize;
+                                pinelm.style.width = `${w}px`;
+                                pinelm.style.left = `${x}px`;
+
+                                pinelm1.style.left = `${offset + 0.5}px`;
+                                pinelm1.style.right = null;
+                            } else {
+                                const x = event.x - (offset + 0.5);
+                                const w =
+                                    parent.selPinned - event.x + rubberBandSize;
+                                pinelm.style.width = `${w}px`;
+                                pinelm.style.left = `${x}px`;
+
+                                pinelm1.style.right = `${offset + 0.5}px`;
+                                pinelm1.style.left = null;
+                            }
+                        } else {
+                            if (parent.selPinned < event.y) {
+                                const y = parent.selPinned - (offset + 0.5);
+                                const h =
+                                    event.y - parent.selPinned + rubberBandSize;
+                                pinelm.style.height = `${h}px`;
+                                pinelm.style.top = `${y}px`;
+
+                                pinelm1.style.top = `${offset + 0.5}px`;
+                                pinelm1.style.bottom = null;
+                            } else {
+                                const y = event.y - (offset + 0.5);
+                                const h =
+                                    parent.selPinned - event.y + rubberBandSize;
+                                pinelm.style.height = `${h}px`;
+                                pinelm.style.top = `${y}px`;
+
+                                pinelm1.style.top = `${offset + 0.5}px`;
+                                pinelm1.style.bottom = null;
+                            }
+                        }
+                    }
+                }
             }
+            if (parent.props.horizontal) parent.selCurrent = event.x;
+            else parent.selCurrent = event.y;
         },
         onMouseExit: (event: OverlayMouseExitEvent) => {
             if (event.target) {
@@ -92,6 +141,7 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
 
     rb.append("div")
         .style(parent.props.horizontal ? "width" : "height", "1px")
+        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
         .style(parent.props.horizontal ? "left" : "top", `${offset}px`)
         .style("background-color", "rgba(255,0,0,0.7)")
         .style("position", "relative");
@@ -157,22 +207,39 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
 function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
     const offset = (rubberBandSize - 1) / 2;
-    const rbelm = instance.overlay.create("pinned", {
+    const pinelm = instance.overlay.create("pinned", {
         onClick: (event: OverlayClickEvent): void => {
             const { x, y } = event;
             if (event.target) {
-                if (parent.props.horizontal)
-                    event.target.style.left = `${x - (offset + 0.5)}px`;
-                else event.target.style.top = `${y - (offset + 0.5)}px`;
-                event.target.style.visibility = "visible";
+                if (event.target.style.visibility == "visible") {
+                    event.target.style.visibility = "hidden";
+                    parent.selPinned = undefined;
+                    parent.onContentRescale();
+                } else {
+                    if (parent.props.horizontal)
+                        event.target.style.left = `${x - (offset + 0.5)}px`;
+                    else event.target.style.top = `${y - (offset + 0.5)}px`;
+                    if (parent.props.horizontal)
+                        event.target.style.width = `${rubberBandSize}px`;
+                    else event.target.style.height = `${rubberBandSize}px`;
+                    event.target.style.visibility = "visible";
+
+                    const pinelm1 = pinelm.firstElementChild as HTMLElement;
+                    if (parent.props.horizontal)
+                        pinelm1.style.left = `${offset}px`;
+                    else pinelm1.style.top = `${offset}px`;
+
+                    if (parent.props.horizontal) parent.selPinned = event.x;
+                    else parent.selPinned = event.y;
+                }
             }
         },
-        onMouseExit: (event: OverlayMouseExitEvent): void => {
+        /* keep selection  onMouseExit: (event: OverlayMouseExitEvent): void => {
             if (event.target) event.target.style.visibility = "hidden";
-        },
+        },*/
     });
 
-    const rb = select(rbelm)
+    const pin = select(pinelm)
         .classed("pinned", true)
         .style(
             parent.props.horizontal ? "width" : "height",
@@ -184,12 +251,13 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
         .style("position", "absolute")
         .style("visibility", "hidden");
 
-    rb.append("div")
+    pin.append("div")
         .style(parent.props.horizontal ? "width" : "height", "1px")
         .style(parent.props.horizontal ? "height" : "width", `${100}%`)
         .style(parent.props.horizontal ? "left" : "top", `${offset}px`)
         .style("background-color", "rgba(0,255,0,0.7)")
-        .style("position", "relative");
+        //.style("position", "relative");
+        .style("position", "absolute");
 }
 
 function createInterpolator(from: Float32Array, to: Float32Array) {
@@ -584,14 +652,13 @@ export interface WellLogController {
     getContentDomain(): [number, number];
     getContentScrollPos(): number; // fraction of content
     getContentZoom(): number;
+    getContentSelection(): [number | undefined, number | undefined]; // [current, pinned]
 
     scrollTrackTo(pos: number): boolean;
     scrollTrackBy(delta: number): void;
     getTrackScrollPos(): number;
     getTrackScrollPosMax(): number;
-
-    _graphTrackMax(): number;
-    _maxTrackNum(): number;
+    getTrackZoom(): number;
 }
 
 import { Info } from "./InfoTypes";
@@ -632,6 +699,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     container?: HTMLElement;
     logController?: LogViewer;
     debounce: DebounceFunction;
+    selCurrent: number | undefined; // current mouse position
+    selPinned: number | undefined; // pinned position
 
     constructor(props: Props) {
         super(props);
@@ -639,6 +708,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.container = undefined;
         this.logController = undefined;
         this.debounce = debouncer(50);
+        this.selCurrent = undefined;
+        this.selPinned = undefined;
 
         this.state = {
             infos: [],
@@ -728,7 +799,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             // remove old LogViewer
             this.logController.reset(); // clear UI
             this.logController.onUnmount(); //?
-            removeOverlay(this.logController);
+            removeOverlay(this.logController); // we should remove it because LogViewer do not delete it
             this.logController = undefined;
         }
         if (this.container) {
@@ -780,7 +851,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo(); // Clear old track information
     }
 
-    /* 
+    /** 
       Display current state of track scrolling
       */
     onTrackScroll(): void {
@@ -802,6 +873,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     onMouseMove(x: number, x2: number): void {
         this.setInfo(x, x2);
+
+        this.onContentRescale();
     }
 
     onContentRescale(): void {
@@ -841,6 +914,17 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.logController) return getContentZoom(this.logController);
         return 1.0;
     }
+    getContentSelection(): [number | undefined, number | undefined] {
+        if (!this.logController) return [undefined, undefined];
+        let current = this.selCurrent;
+        let pinned = this.selPinned;
+
+        if (current !== undefined)
+            current = this.logController.scale.invert(current);
+        if (pinned !== undefined)
+            pinned = this.logController.scale.invert(pinned);
+        return [current, pinned];
+    }
 
     // tracks
     _graphTrackMax(): number {
@@ -849,16 +933,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         const nScaleTracks = getScaleTrackNum(this.logController.tracks);
         return this.logController.tracks.length - nScaleTracks;
     }
-    _getTrackScrollPosMax(): number {
-        // for scrollbar
-        const nGraphTracks = this._graphTrackMax();
-        let posMax = nGraphTracks - this._maxTrackNum();
-        if (posMax < 0) posMax = 0;
-        return posMax;
-    }
     _newTrackScrollPos(pos: number): number {
         let newPos = pos;
-        const posMax = this._getTrackScrollPosMax();
+        const posMax = this.getTrackScrollPosMax();
         if (newPos > posMax) newPos = posMax;
         if (newPos < 0) newPos = 0;
         return newPos;
@@ -887,7 +964,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this.state.scrollTrackPos;
     }
     getTrackScrollPosMax(): number {
-        return this._getTrackScrollPosMax();
+        // for scrollbar
+        const nGraphTracks = this._graphTrackMax();
+        let posMax = nGraphTracks - this._maxTrackNum();
+        if (posMax < 0) posMax = 0;
+        return posMax;
+    }
+    getTrackZoom(): number {
+        return this._graphTrackMax() / this._maxTrackNum();
     }
 
     // editting
@@ -921,18 +1005,21 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     _addTrack(trackCurrent: Track, templateTrack: TemplateTrack): void {
-        const trackNew = newGraphTrack(templateTrack.title, [], []);
-        this.__addTrack(trackNew, trackCurrent, true);
+        const bAfter = true;
+        const trackNew = addOrEditGraphTrack(this, null, templateTrack, trackCurrent, bAfter);
+
+        if (bAfter)
+            // force new track to be visible when added after the current
+            this.scrollTrackBy(+1);
+        else {
+            this.onTrackScroll();
+            this.setInfo();
+        }
         this.selectTrack(trackNew, true);
     }
 
     _editTrack(track: Track, templateTrack: TemplateTrack): void {
-        track.options.label = templateTrack.title;
-        //addOrEditGraphTrackPlot(this, track as GraphTrack, templateTrack);
-        if (this.logController) {
-            this.logController.updateTracks();
-        }
-        //this.onTrackScroll();
+        addOrEditGraphTrack(this, track as GraphTrack, templateTrack, track, false);
         this.setInfo();
     }
 
@@ -954,7 +1041,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     selectTrack(track: Track, selected: boolean): void {
         if (this.logController)
             for (const _track of this.logController.tracks) {
-                // single lecetion: remove selection from another tracks
+                // single selection: remove selection from another tracks
                 selectTrack(
                     this.logController,
                     _track,

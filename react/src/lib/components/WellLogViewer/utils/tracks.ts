@@ -39,6 +39,8 @@ import {
     roundLogMinMax,
 } from "./minmax";
 
+import { updateLegendRows } from "./log-viewer";
+
 function indexOfElementByName(array: Named[], name: string): number {
     if (name) {
         const nameUpper = name.toUpperCase();
@@ -677,8 +679,7 @@ export function addOrEditGraphTrackPlot(
         checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
         wellLogView.logController.domain = minmax;
 
-        // protected
-        (wellLogView.logController as any).updateLegendRows();
+        updateLegendRows(wellLogView.logController);
         wellLogView.logController.updateTracks();
     }
 }
@@ -703,11 +704,9 @@ export function removeGraphTrackPlot(
     _plot: Plot
 ): void {
     _removeGraphTrackPlot(track, _plot);
-    track.prepareData();
 
     if (wellLogView.logController) {
-        // protected
-        (wellLogView.logController as any).updateLegendRows();
+        updateLegendRows(wellLogView.logController);
         wellLogView.logController.updateTracks();
     }
 
@@ -936,3 +935,49 @@ export function createTracks(
     }
     return info;
 }
+
+function addTrack(
+    wellLogView: WellLogView,
+    trackNew: Track, trackCurrent: Track, bAfter: boolean
+): void {
+    if (wellLogView.logController) {
+        let order = 0;
+        for (const track of wellLogView.logController.tracks) {
+            track.order = order++;
+            if (trackCurrent == track) {
+                if (bAfter) {
+                    // add after
+                    trackNew.order = order++;
+                } else {
+                    // insert before current
+                    trackNew.order = track.order;
+                    track.order = order++;
+                }
+            }
+        }
+
+        wellLogView.logController.addTrack(trackNew);
+    }
+}
+
+
+export function addOrEditGraphTrack(
+    wellLogView: WellLogView,
+    track: GraphTrack | null,
+    templateTrack: TemplateTrack,
+    trackCurrent: Track,
+    bAfter: boolean
+): GraphTrack {
+    if (track) { // edit existing track
+        track.options.label = templateTrack.title;
+    }
+    else {
+        track = newGraphTrack(templateTrack.title, [], []);
+        addTrack(wellLogView, track, trackCurrent, bAfter);
+    }
+    if (wellLogView.logController) {
+        wellLogView.logController.updateTracks();
+    }
+    return track;
+}
+

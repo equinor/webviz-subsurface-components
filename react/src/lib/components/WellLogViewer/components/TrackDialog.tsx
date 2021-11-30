@@ -14,20 +14,17 @@ import {
     TextField,
 } from "@material-ui/core";
 
-interface TrackPropertiesDialogProps {
+interface Props {
     templateTrack?: TemplateTrack; // input for editting
     onOK: (templateTrack: TemplateTrack) => void;
     wellLogView: WellLogView;
 }
-interface TrackPropertiesDialogState extends TemplateTrack {
+interface State extends TemplateTrack {
     open: boolean;
 }
 
-export class TrackPropertiesDialog extends Component<
-    TrackPropertiesDialogProps,
-    TrackPropertiesDialogState
-> {
-    constructor(props: TrackPropertiesDialogProps) {
+export class TrackPropertiesDialog extends Component<Props, State> {
+    constructor(props: Props) {
         super(props);
 
         this.state = this.props.templateTrack
@@ -54,8 +51,8 @@ export class TrackPropertiesDialog extends Component<
         this.closeDialog();
     }
 
-    onChange(e: React.ChangeEvent<TextField>): void {
-        this.setState({ [e.target.id]: e.target.value });
+    onChange(e: React.ChangeEvent<HTMLInputElement>): void {
+        this.setState({ [e.target.id]: e.target.value } as unknown as State);
     }
 
     closeDialog(): void {
