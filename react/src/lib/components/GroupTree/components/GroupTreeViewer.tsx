@@ -66,7 +66,10 @@ const GroupTreeViewer: React.FC<Props> = ({
         if (!renderer.current) return;
 
         renderer.current.update(currentDateTime);
-        currentDateTimeChangedCallBack(currentDateTime);
+
+        if (typeof currentDateTimeChangedCallBack !== "undefined") {
+            currentDateTimeChangedCallBack(currentDateTime);
+        }
     }, [currentDateTime]);
 
     useEffect(() => {

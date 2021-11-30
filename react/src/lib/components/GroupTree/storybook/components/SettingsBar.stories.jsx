@@ -2,6 +2,19 @@ import React from "react";
 import DataProvider from "../../components/DataLoader";
 import SettingsBar from "../../components/Settings/SettingsBar";
 
+const edge_options = [
+    { name: "waterrate", label: "Water Rate" },
+    { name: "oilrate", label: "Oil Rate" },
+    { name: "gasrate", label: "Gas Rate" },
+    { name: "waterinjrate", label: "Water Injection Rate" },
+    { name: "gasinjrate", label: "Gas Injection Rate" },
+];
+
+const node_options = [
+    { name: "pressure", label: "Pressure" },
+    { name: "bhp", label: "Bottom Hole Pressure" },
+];
+
 export default {
     component: SettingsBar,
     title: "GroupTree/Components/SettingsBar",
@@ -19,7 +32,10 @@ export default {
 const Template = (args) => {
     return (
         <DataProvider id={args.id} data={args.data}>
-            <SettingsBar />
+            <SettingsBar
+                edge_options={edge_options}
+                node_options={node_options}
+            />
         </DataProvider>
     );
 };
@@ -28,4 +44,6 @@ export const Default = Template.bind({});
 Default.args = {
     id: "grouptree",
     data: require("../../../../../demo/example-data/group-tree.json"),
+    edge_options,
+    node_options,
 };

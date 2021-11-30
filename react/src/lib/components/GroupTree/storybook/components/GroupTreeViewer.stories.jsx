@@ -2,6 +2,19 @@ import React from "react";
 import DataProvider from "../../components/DataLoader";
 import GroupTreeViewer from "../../components/GroupTreeViewer";
 
+const edge_options = [
+    { name: "waterrate", label: "Water Rate" },
+    { name: "oilrate", label: "Oil Rate" },
+    { name: "gasrate", label: "Gas Rate" },
+    { name: "waterinjrate", label: "Water Injection Rate" },
+    { name: "gasinjrate", label: "Gas Injection Rate" },
+];
+
+const node_options = [
+    { name: "pressure", label: "Pressure" },
+    { name: "bhp", label: "Bottom Hole Pressure" },
+];
+
 export default {
     component: GroupTreeViewer,
     title: "GroupTree/Components/GroupTreeViewer",
@@ -19,7 +32,11 @@ export default {
 const Template = (args) => {
     return (
         <DataProvider id={args.id} data={args.data}>
-            <GroupTreeViewer />
+            <GroupTreeViewer
+                id={args.id}
+                edge_options={edge_options}
+                node_options={node_options}
+            />
         </DataProvider>
     );
 };
@@ -28,4 +45,6 @@ export const Default = Template.bind({});
 Default.args = {
     id: "grouptree",
     data: require("../../../../../demo/example-data/group-tree.json"),
+    edge_options,
+    node_options,
 };
