@@ -23,18 +23,18 @@ const DataProvider: React.FC<Props> = ({
 }: PropsWithChildren<Props>) => {
     const preloadedState = useMemo(() => {
         // Use "initial_index" from previous data if it refers to a valid date otherwise use first date.
-        const idx1 = initial_index[0];
-        const idx2 = initial_index[1];
+        const idx1 = initial_index?.[0];
+        const idx2 = initial_index?.[1];
         const initialDateTime =
             data.length > idx1 && data[idx1].dates.length > idx2
                 ? data[idx1].dates[idx2]
                 : data[0].dates[0];
 
         const initialFlowRate =
-            edge_options.length > 0 ? edge_options[0].name : "";
+            edge_options?.length > 0 ? edge_options[0].name : "";
 
         const intialNodeInfo =
-            node_options.length > 0 ? node_options[0].name : "";
+            node_options?.length > 0 ? node_options[0].name : "";
 
         return {
             id: id,
