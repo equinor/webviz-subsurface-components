@@ -1,0 +1,99 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Info panel snapshot test 1`] = `
+<div>
+  <fieldset>
+    <legend>
+      Readout
+    </legend>
+    <small>
+      <table>
+        <tbody>
+          <tr>
+            <td
+              style="color: black;"
+            >
+              ⬤
+            </td>
+            <td>
+              DVER
+            </td>
+            <td
+              style="width: 80px; padding-left: 2em; text-align: right;"
+            >
+              2366
+            </td>
+            <td
+              style="padding-left: 1em; font-size: x-small;"
+            >
+              M
+            </td>
+          </tr>
+          <tr>
+            <td
+              colspan="4"
+            >
+               
+              <hr />
+            </td>
+          </tr>
+          <tr>
+            <td
+              style="color: orange;"
+            >
+              ⬤
+            </td>
+            <td>
+              BDIA
+            </td>
+            <td
+              style="width: 80px; padding-left: 2em; text-align: right;"
+            >
+              8.5
+            </td>
+            <td
+              style="padding-left: 1em; font-size: x-small;"
+            >
+              INCH
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </small>
+  </fieldset>
+</div>
+`;
+
+exports[`Test Info panel snapshot test when value is infinity 1`] = `
+<div>
+  <fieldset>
+    <legend>
+      Readout
+    </legend>
+    <small>
+      <table>
+        <tbody>
+          <tr>
+            <td
+              style="color: black;"
+            >
+              ⬤
+            </td>
+            <td>
+              DVER
+            </td>
+            <td
+              style="width: 80px; padding-left: 2em; text-align: right;"
+            />
+            <td
+              style="padding-left: 1em; font-size: x-small;"
+            >
+              M
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </small>
+  </fieldset>
+</div>
+`;

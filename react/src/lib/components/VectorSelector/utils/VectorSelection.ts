@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import TreeNodeSelection from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeNodeSelection";
-import TreeData from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeData";
+import { TreeNodeSelection, TreeData } from "@webviz/core-components";
+import { MatchType } from "@webviz/core-components/dist/components/SmartNodeSelector/";
 
 export default class VectorSelection extends TreeNodeSelection {
     private myTreeData: TreeData;
@@ -18,6 +18,8 @@ export default class VectorSelection extends TreeNodeSelection {
         delimiter: string;
         numMetaNodes: number;
         treeData: TreeData;
+        caseInsensitiveMatching: boolean;
+        allowOrOperator: boolean;
     }) {
         super(argumentObject);
         this.myTreeData = argumentObject.treeData;
@@ -26,45 +28,78 @@ export default class VectorSelection extends TreeNodeSelection {
     setNodeName(data: string, index?: number): void {
         let increment = false;
         const newData = data;
-        if (index !== undefined) {
-            if (index == super.getNumMetaNodes() - 1 && data.length == 1) {
-                data = "*";
-                increment = true;
-            }
-            super.setNodeName(data, index);
+        if (
+            data === "" &&
+            index === super.countLevel() - 1 &&
+            ((index !== undefined && index === super.getNumMetaNodes()) ||
+                (index === undefined &&
+                    super.getFocussedLevel() === super.getNumMetaNodes()))
+        ) {
+            super.setNodeName(data, index || super.getFocussedLevel());
+            super.decrementFocussedLevel();
+            super.setNodeName("", (index || super.getFocussedLevel() + 1) - 1);
         } else {
-            if (
-                super.getFocussedLevel() == super.getNumMetaNodes() - 1 &&
-                data.length == 1
-            ) {
-                data = "*";
-                increment = true;
+            if (index !== undefined) {
+                if (
+                    index === super.getNumMetaNodes() - 1 &&
+                    data.length === 1
+                ) {
+                    data = "*";
+                    increment = true;
+                }
+                super.setNodeName(data, index);
+            } else {
+                if (
+                    super.getFocussedLevel() === super.getNumMetaNodes() - 1 &&
+                    data.length == 1
+                ) {
+                    data = "*";
+                    increment = true;
+                }
+                super.setNodeName(data, super.getFocussedLevel());
             }
-            super.setNodeName(data, super.getFocussedLevel());
+            if (increment) {
+                super.incrementFocussedLevel();
+                super.setNodeName(newData, super.getFocussedLevel());
+            }
         }
-        if (increment) {
-            super.incrementFocussedLevel();
-            super.setNodeName(newData, super.getFocussedLevel());
+    }
+
+    incrementFocussedLevel(): boolean {
+        const focussedLevel = super.getFocussedLevel();
+        if (
+            focussedLevel + 1 === super.getNumMetaNodes() - 1 &&
+            super.countLevel() >= super.getNumMetaNodes()
+        ) {
+            super.setFocussedLevel(focussedLevel + 1);
         }
+        return super.incrementFocussedLevel();
     }
 
     decrementFocussedLevel(): void {
         const focussedLevel = super.getFocussedLevel();
-        this.setFocussedLevel(focussedLevel - 1, true);
-        if (focussedLevel - 1 == super.getNumMetaNodes() - 1) {
-            this.setNodeName("");
+        if (focussedLevel - 1 === super.getNumMetaNodes() - 1) {
+            if (super.getNodeName(focussedLevel) === "") {
+                super.setNodeName("", super.getNumMetaNodes() - 1);
+            }
+            if (super.getNumMetaNodes() > 1) {
+                this.setFocussedLevel(focussedLevel - 2, true);
+            }
+        } else {
+            this.setFocussedLevel(focussedLevel - 1, true);
         }
+        super.tidy();
     }
 
     setFocussedLevel(index: number, includeMetaData = true): void {
         if (!includeMetaData) {
-            if (index == 0) {
+            if (index === 0) {
                 index = super.getNumMetaNodes();
             } else {
                 index = super.getNumMetaNodes() + index;
             }
         } else {
-            if (index == super.getNumMetaNodes() - 1) {
+            if (index === super.getNumMetaNodes() - 1) {
                 index = super.getNumMetaNodes() - 1;
             }
         }
@@ -104,10 +139,15 @@ export default class VectorSelection extends TreeNodeSelection {
     }
 
     containsWildcard(): boolean {
+        const reg = RegExp(
+            `^(([^${super.delimiter}\\|]+\\|)+([^${super.delimiter}\\|]+){1})$`
+        );
         let level = 0;
         for (const el of this.getNodePath()) {
             if (
-                (el.includes("?") || el.includes("*")) &&
+                (el.includes("?") ||
+                    el.includes("*") ||
+                    (super.allowOrOperator && reg.test(el))) &&
                 level != super.getNumMetaNodes() - 1
             ) {
                 return true;
@@ -130,7 +170,7 @@ export default class VectorSelection extends TreeNodeSelection {
     exactlyMatchedNodePaths(): Array<string> {
         const selections = this.myTreeData.findNodes(
             super.getNodePath(),
-            true
+            MatchType.fullMatch
         ).nodePaths;
         const nodePaths: string[] = [];
         for (const selection of selections) {
@@ -149,6 +189,8 @@ export default class VectorSelection extends TreeNodeSelection {
             delimiter: super.getDelimiter(),
             numMetaNodes: super.getNumMetaNodes(),
             treeData: this.myTreeData,
+            caseInsensitiveMatching: super.caseInsensitiveMatching,
+            allowOrOperator: super.allowOrOperator,
         });
     }
 }

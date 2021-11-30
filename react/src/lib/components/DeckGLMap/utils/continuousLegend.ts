@@ -1,68 +1,60 @@
 import { color } from "d3-color";
 import { interpolateRgb } from "d3-interpolate";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTemplate = require("../../../../demo/example-data/welllayer_continuous_template.json");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("../../../../demo/example-data/color-tables.json");
+import {
+    colorTablesArray,
+    colorTablesObj,
+} from "../components/ColorTableTypes";
+import {
+    templateArray,
+    propertiesObj,
+} from "../components/WelllayerTemplateTypes";
 
-interface colorTables {
-    name: string;
-    description: string;
-    colors: [number, number, number, number][];
-}
-
-interface propertiesObj {
-    objectName: string;
-    colorTable: string;
-    context: string;
-    colorInterpolation: string;
-}
-
-type propertiesArr = Array<propertiesObj>;
-
-interface colorTemplate {
-    name: string;
-    properties: propertiesArr;
-}
-
+// Based on objectName return the colors array from color.tables.json file
 export function colorsArray(
-    objectName: string
+    objectName: string,
+    template: templateArray,
+    colorTables: colorTablesArray
 ): [number, number, number, number][] {
-    const properties = colorTemplate[0]["properties"];
+    const properties = template[0]["properties"];
     const propertiesData = properties.filter(
         (value: propertiesObj) => value.objectName == objectName
     );
     const colorTableData = colorTables.filter(
-        (value: colorTables) =>
+        (value: colorTablesObj) =>
             value.name.toLowerCase() ==
             propertiesData[0].colorTable.toLowerCase()
     );
     return colorTableData[0].colors;
 }
 
+// return the colors based on the point
 export function rgbValues(
     objectName: string,
-    point: number
+    point: number,
+    template: templateArray,
+    colorTables: colorTablesArray
 ): number[] | { r: number; g: number; b: number; opacity: number } | undefined {
-    const color_table = colorsArray(objectName);
-    const colorArrays = color_table.find(
+    const colorTableColors = colorsArray(objectName, template, colorTables);
+    // compare the point and first value from colorTableColors
+    const colorArrays = colorTableColors.find(
         (value: [number, number, number, number]) => {
             return point == value[0];
         }
     );
 
-    // if point and value in color table matches
+    // if point and value in color table matches then return particular colors
     if (colorArrays) {
         return colorArrays.slice(1);
     }
     // if no match then need to do interpolation
     else {
-        const index = color_table.findIndex((value: number[]) => {
+        // Get index of first match of colortable point greater than point
+        const index = colorTableColors.findIndex((value: number[]) => {
             return value[0] > point;
         });
 
-        const firstColorArray = color_table[index - 1];
-        const secondColorArray = color_table[index];
+        const firstColorArray = colorTableColors[index - 1];
+        const secondColorArray = colorTableColors[index];
 
         if ((firstColorArray || secondColorArray) != undefined) {
             const interpolatedValues = interpolateRgb(
@@ -75,10 +67,11 @@ export function rgbValues(
     }
 }
 
+// return the hex color code and offset
 export function RGBToHex(rgb: number[]): { color: string; offset: number } {
-    let r = Math.round(rgb[1] * 255).toString(16),
-        g = Math.round(rgb[2] * 255).toString(16),
-        b = Math.round(rgb[3] * 255).toString(16);
+    let r = Math.round(rgb[1]).toString(16),
+        g = Math.round(rgb[2]).toString(16),
+        b = Math.round(rgb[3]).toString(16);
     if (r.length == 1) r = "0" + r;
     if (g.length == 1) g = "0" + g;
     if (b.length == 1) b = "0" + b;

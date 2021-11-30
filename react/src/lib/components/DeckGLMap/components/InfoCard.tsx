@@ -36,6 +36,15 @@ export interface InfoCardProps {
     pickInfos: PickInfo<unknown>[];
 }
 
+const roundToSignificant = function (num: number) {
+    // Returns two significant figures (non-zero) for numbers with an absolute value less
+    // than 1, and two decimal places for numbers with an absolute value greater
+    // than 1.
+    return parseFloat(
+        num.toExponential(Math.max(1, 2 + Math.log10(Math.abs(num))))
+    );
+};
+
 const useStyles = makeStyles({
     table: {
         "& > *": {
@@ -124,7 +133,9 @@ function Row(props: { layer_data: InfoCardDataType }) {
                                         >
                                             {typeof propertyRow.value ==
                                             "number"
-                                                ? propertyRow.value?.toFixed(2)
+                                                ? roundToSignificant(
+                                                      propertyRow.value
+                                                  )
                                                 : propertyRow.value}
                                         </TableCell>
                                     </TableRow>

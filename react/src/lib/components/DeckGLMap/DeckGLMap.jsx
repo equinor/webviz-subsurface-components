@@ -1,6 +1,8 @@
 import PropTypes from "prop-types";
 import * as React from "react";
 import Map from "./components/Map";
+import template from "../../../demo/example-data/welllayer_template.json";
+import colorTables from "../../../demo/example-data/color-tables.json";
 
 DeckGLMap.defaultProps = {
     coords: {
@@ -19,6 +21,8 @@ DeckGLMap.defaultProps = {
         position: [46, 10],
     },
     zoom: -3,
+    colorTables: colorTables,
+    template: template,
 };
 
 function DeckGLMap({
@@ -30,22 +34,22 @@ function DeckGLMap({
     coords,
     scale,
     legend,
+    template,
+    colorTables,
     coordinateUnit,
     editedData,
     setProps,
 }) {
     // Contains layers data received from map layers by user interaction
-    let [layerEditedData, setLayerEditedData] = React.useState(null);
+    let [layerEditedData, setLayerEditedData] = React.useState(editedData);
 
     React.useEffect(() => {
-        if (!layerEditedData) {
-            setLayerEditedData(editedData);
-        } else {
-            setLayerEditedData({
-                ...layerEditedData,
-                ...editedData,
-            });
-        }
+        if (!editedData) return;
+
+        setLayerEditedData({
+            ...layerEditedData,
+            ...editedData,
+        });
     }, [editedData]);
 
     // This callback is used as a mechanism to update the component from the layers or toolbar.
@@ -64,21 +68,21 @@ function DeckGLMap({
     );
 
     return (
-        layerEditedData && (
-            <Map
-                id={id}
-                resources={resources}
-                layers={layers}
-                bounds={bounds}
-                zoom={zoom}
-                coords={coords}
-                scale={scale}
-                legend={legend}
-                coordinateUnit={coordinateUnit}
-                editedData={layerEditedData}
-                setEditedData={setEditedData}
-            />
-        )
+        <Map
+            id={id}
+            resources={resources}
+            layers={layers}
+            bounds={bounds}
+            zoom={zoom}
+            coords={coords}
+            scale={scale}
+            legend={legend}
+            template={template}
+            colorTables={colorTables}
+            coordinateUnit={coordinateUnit}
+            editedData={layerEditedData}
+            setEditedData={setEditedData}
+        />
     );
 }
 
@@ -193,7 +197,7 @@ DeckGLMap.propTypes = {
     /**
      * Prop containing color template data
      */
-    colorTemplate: PropTypes.arrayOf(PropTypes.object),
+    template: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default DeckGLMap;

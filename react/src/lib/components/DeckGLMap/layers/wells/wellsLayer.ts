@@ -3,7 +3,8 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { rgbValues, colorsArray } from "../../utils/continuousLegend";
+import { rgbValues } from "../../utils/continuousLegend";
+import { colorTableData } from "../../components/DiscreteLegend";
 import {
     Feature,
     GeometryCollection,
@@ -20,6 +21,9 @@ import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
+import { layersDefaultProps } from "../layersDefaultProps";
+import { templateArray } from "../../components/WelllayerTemplateTypes";
+import { colorTablesArray } from "../../components/ColorTableTypes";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -34,21 +38,6 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logCurves: boolean;
     refine: boolean;
 }
-
-const defaultProps = {
-    name: "Wells",
-    id: "wells-layer",
-    autoHighlight: true,
-    selectionEnabled: true,
-    opacity: 1,
-    lineWidthScale: 5,
-    pointRadiusScale: 8,
-    outline: true,
-    logRadius: 6,
-    logCurves: true,
-    refine: true,
-    visible: true,
-};
 
 export interface LogCurveDataType {
     header: {
@@ -161,7 +150,13 @@ export default class WellsLayer extends CompositeLayer<
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath(data.features, d, this.props.logrunName),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
-                    getLogColor(d, this.props.logrunName, this.props.logName),
+                    getLogColor(
+                        d,
+                        this.props.logrunName,
+                        this.props.logName,
+                        this.state.template,
+                        this.state.colorTables
+                    ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
                     getLogWidth(d, this.props.logrunName, this.props.logName),
@@ -219,7 +214,9 @@ export default class WellsLayer extends CompositeLayer<
 }
 
 WellsLayer.layerName = "WellsLayer";
-WellsLayer.defaultProps = defaultProps;
+WellsLayer.defaultProps = layersDefaultProps[
+    "WellsLayer"
+] as WellsLayerProps<FeatureCollection>;
 
 //================= Local help functions. ==================
 
@@ -342,7 +339,9 @@ function getLogIndexByNames(d: LogCurveDataType, names: string[]): number {
 function getLogColor(
     d: LogCurveDataType,
     logrun_name: string,
-    log_name: string
+    log_name: string,
+    template: templateArray,
+    colorTables: colorTablesArray
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
@@ -353,9 +352,13 @@ function getLogColor(
         const min = Math.min(...log_data);
         const max = Math.max(...log_data);
         const max_delta = max - min;
-
         log_data.forEach((value) => {
-            const rgb = rgbValues(log_name, (value - min) / max_delta);
+            const rgb = rgbValues(
+                log_name,
+                (value - min) / max_delta,
+                template,
+                colorTables
+            );
             if (rgb != undefined) {
                 if (Array.isArray(rgb)) {
                     log_color.push([rgb[0], rgb[1], rgb[2]]);
@@ -365,14 +368,33 @@ function getLogColor(
             }
         });
     } else {
+        const colorsArray: [number, number, number, number][] = colorTableData(
+            log_name,
+            template,
+            colorTables
+        );
+
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
+        // eslint-disable-next-line
+        const attributesObject: { [key: string]: any } = {};
+        Object.keys(log_attributes).forEach((key) => {
+            // get the code from log_attributes
+            const code = log_attributes[key][1];
+            // compare the code and first value from colorsArray(colortable)
+            const colorArrays = colorsArray.find((value: number[]) => {
+                return value[0] == code;
+            });
+            if (colorArrays)
+                attributesObject[key] = [
+                    [colorArrays[1], colorArrays[2], colorArrays[3]],
+                    code,
+                ];
+        });
         log_data.forEach((log_value) => {
-            const dl_attrs = Object.entries(log_attributes).find(
+            const dl_attrs = Object.entries(attributesObject).find(
                 ([, value]) => value[1] == log_value
             )?.[1];
-            dl_attrs
-                ? log_color.push(dl_attrs[0])
-                : log_color.push([0, 0, 0, 0]);
+            dl_attrs ? log_color.push(dl_attrs[0]) : log_color.push([0, 0, 0]);
         });
     }
     return log_color;
@@ -570,6 +592,7 @@ function getLogProperty(
     } else return null;
 }
 
+// Return data required to build welllayer legend
 function getLegendData(logs: LogCurveDataType[], logName: string) {
     const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
     const title = "Wells / " + logName;
@@ -579,11 +602,10 @@ function getLegendData(logs: LogCurveDataType[], logName: string) {
         const metadataDiscrete = meta[logName].objects;
         legendProps.push({
             title: title,
-            logName: logName,
+            name: logName,
             discrete: true,
             metadata: metadataDiscrete,
             valueRange: [],
-            colorsArray: [],
         });
         return legendProps;
     } else {
@@ -596,11 +618,10 @@ function getLegendData(logs: LogCurveDataType[], logName: string) {
         });
         legendProps.push({
             title: title,
-            logName: "",
+            name: logName,
             discrete: false,
             metadata: { objects: {} },
             valueRange: [Math.min(...minArray), Math.max(...maxArray)],
-            colorsArray: colorsArray(logName),
         });
         return legendProps;
     }

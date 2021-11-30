@@ -1,9 +1,11 @@
 import React from "react";
 import DiscreteColorLegend from "../../../components/DiscreteLegend";
+import template from "../../../../../../demo/example-data/welllayer_template.json";
+import colorTables from "../../../../../../demo/example-data/color-tables.json";
 
 export default {
     component: DiscreteColorLegend,
-    title: "DeckGLMap/Components/ColorLegends",
+    title: "DeckGLMap/Components/ColorLegends/DiscreteColorLegend",
 };
 
 const discreteData = {
@@ -13,10 +15,9 @@ const discreteData = {
     BELOW: [[73, 255, 35, 255], 14],
     H3: [[255, 144, 1, 255], 11],
 };
-const logName = "ZONELOG";
+const name = "ZONELOG";
 const dataObjectName = "Wells / ZONELOG";
 const position = [16, 10];
-
 const Template = (args) => {
     return <DiscreteColorLegend {...args} />;
 };
@@ -24,7 +25,9 @@ const Template = (args) => {
 export const DiscreteTemplate = Template.bind({});
 DiscreteTemplate.args = {
     discreteData,
-    logName,
+    name,
     dataObjectName,
     position,
+    template,
+    colorTables,
 };
