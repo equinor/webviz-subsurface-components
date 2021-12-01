@@ -25,6 +25,9 @@ export default {
         domain: {
             description: "Initial visible interval of the log data.",
         },
+        selection: {
+            description: "Initial selected interval of the log data.",
+        },
     },
 };
 
@@ -48,7 +51,7 @@ const Template = (args) => {
                       domain[1].toFixed(0) +
                       "]" +
                       (selection[0] !== undefined
-                          ? ", current: [" +
+                          ? ", selected: [" +
                             selection[0].toFixed(0) +
                             (selection[1] !== undefined
                                 ? ", " + selection[1].toFixed(0)

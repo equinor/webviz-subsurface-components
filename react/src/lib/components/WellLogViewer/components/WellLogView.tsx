@@ -56,68 +56,71 @@ import {
     selectTrack,
 } from "../utils/log-viewer";
 
+function modifySelection(
+    rbelm: HTMLElement,
+    pinelm: HTMLElement,
+    vCur: number | undefined,
+    vPin: number | undefined,
+    horizontal: boolean | undefined
+) {
+    if (vCur === undefined) {
+        rbelm.style.visibility = "hidden";
+        pinelm.style.visibility = "hidden";
+        return;
+    }
+
+    const pinelm1 = pinelm.firstElementChild as HTMLElement;
+
+    const rubberBandSize = 9;
+    const offset = (rubberBandSize - 1) / 2;
+
+    rbelm.style[horizontal ? "left" : "top"] = `${vCur - (offset + 0.5)}px`;
+    rbelm.style.visibility = "visible";
+
+    if (vPin !== undefined) {
+        let min, max;
+        if (vPin < vCur) {
+            pinelm1.style[horizontal ? "left" : "top"] = `${offset + 0.5}px`;
+            pinelm1.style[horizontal ? "right" : "bottom"] = "";
+            min = vPin;
+            max = vCur;
+        } else {
+            pinelm1.style[horizontal ? "right" : "bottom"] = `${
+                offset + 0.5
+                }px`;
+            pinelm1.style[horizontal ? "left" : "top"] = "";
+            min = vCur;
+            max = vPin;
+        }
+        const x = min - (offset + 0.5);
+        const w = max - min + rubberBandSize;
+        pinelm.style[horizontal ? "width" : "height"] = `${w}px`;
+        pinelm.style[horizontal ? "left" : "top"] = `${x}px`;
+    }
+    else {
+        pinelm.style.visibility = "hidden";
+    }
+}
+
 function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
     const offset = (rubberBandSize - 1) / 2;
     const rbelm = instance.overlay.create("rubber-band", {
         onMouseMove: (event: OverlayMouseMoveEvent) => {
-            if (event.target) {
-                if (parent.props.horizontal)
-                    event.target.style.left = `${event.x - (offset + 0.5)}px`;
-                else event.target.style.top = `${event.y - (offset + 0.5)}px`;
-                event.target.style.visibility = "visible";
-
-                const pinelms = document.getElementsByClassName("pinned");
-                if (parent.selPinned !== undefined && pinelms) {
-                    const pinelm = pinelms[0] as HTMLElement;
-                    if (pinelm) {
-                        const pinelm1 = pinelm.firstElementChild as HTMLElement;
-                        if (parent.props.horizontal) {
-                            if (parent.selPinned < event.x) {
-                                const x = parent.selPinned - (offset + 0.5);
-                                const w =
-                                    event.x - parent.selPinned + rubberBandSize;
-                                pinelm.style.width = `${w}px`;
-                                pinelm.style.left = `${x}px`;
-
-                                pinelm1.style.left = `${offset + 0.5}px`;
-                                pinelm1.style.right = "";
-                            } else {
-                                const x = event.x - (offset + 0.5);
-                                const w =
-                                    parent.selPinned - event.x + rubberBandSize;
-                                pinelm.style.width = `${w}px`;
-                                pinelm.style.left = `${x}px`;
-
-                                pinelm1.style.right = `${offset + 0.5}px`;
-                                pinelm1.style.left = "";
-                            }
-                        } else {
-                            if (parent.selPinned < event.y) {
-                                const y = parent.selPinned - (offset + 0.5);
-                                const h =
-                                    event.y - parent.selPinned + rubberBandSize;
-                                pinelm.style.height = `${h}px`;
-                                pinelm.style.top = `${y}px`;
-
-                                pinelm1.style.top = `${offset + 0.5}px`;
-                                pinelm1.style.bottom = "";
-                            } else {
-                                const y = event.y - (offset + 0.5);
-                                const h =
-                                    parent.selPinned - event.y + rubberBandSize;
-                                pinelm.style.height = `${h}px`;
-                                pinelm.style.top = `${y}px`;
-
-                                pinelm1.style.top = `${offset + 0.5}px`;
-                                pinelm1.style.bottom = "";
-                            }
-                        }
-                    }
-                }
+            const horizontal = parent.props.horizontal;
+            const v = horizontal ? event.x : event.y;
+            parent.selCurrent = v;
+            const rbelm = event.target;
+            const pinelm = instance.overlay.elements["pinned"];
+            if (rbelm && pinelm) {
+                modifySelection(
+                    rbelm,
+                    pinelm,
+                    parent.selCurrent,
+                    parent.selPinned,
+                    horizontal
+                );
             }
-            if (parent.props.horizontal) parent.selCurrent = event.x;
-            else parent.selCurrent = event.y;
         },
         onMouseExit: (event: OverlayMouseExitEvent) => {
             if (event.target) {
@@ -158,7 +161,9 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
             if (event.target) {
                 event.target.textContent = Number.isFinite(value)
-                    ? `Pinned MD: ${value.toFixed(1)}`
+                    ? `Pinned ${
+                          parent.props.axisTitles[parent.props.primaryAxis]
+                      }: ${value.toFixed(1)}`
                     : "-";
                 event.target.style.visibility = "visible";
             }
@@ -168,7 +173,9 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
             if (event.target) {
                 event.target.textContent = Number.isFinite(value)
-                    ? `MD: ${value.toFixed(1)}`
+                    ? `${
+                          parent.props.axisTitles[parent.props.primaryAxis]
+                      }: ${value.toFixed(1)}`
                     : "-";
                 event.target.style.visibility = "visible";
             }
@@ -213,28 +220,26 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
     const offset = (rubberBandSize - 1) / 2;
     const pinelm = instance.overlay.create("pinned", {
         onClick: (event: OverlayClickEvent): void => {
-            const { x, y } = event;
-            if (event.target) {
-                if (event.target.style.visibility == "visible") {
-                    event.target.style.visibility = "hidden";
+            const horizontal = parent.props.horizontal;
+            const v = horizontal ? event.x : event.y;
+            const pinelm = event.target;
+            parent.selPinned = v;
+            if (pinelm) {
+                if (pinelm.style.visibility == "visible") {
+                    pinelm.style.visibility = "hidden";
                     parent.selPinned = undefined;
                     parent.onContentRescale();
                 } else {
-                    if (parent.props.horizontal)
-                        event.target.style.left = `${x - (offset + 0.5)}px`;
-                    else event.target.style.top = `${y - (offset + 0.5)}px`;
-                    if (parent.props.horizontal)
-                        event.target.style.width = `${rubberBandSize}px`;
-                    else event.target.style.height = `${rubberBandSize}px`;
-                    event.target.style.visibility = "visible";
+                    pinelm.style[horizontal ? "left" : "top"] = `${
+                        v - (offset + 0.5)
+                    }px`;
+                    pinelm.style[
+                        horizontal ? "width" : "height"
+                    ] = `${rubberBandSize}px`;
+                    pinelm.style.visibility = "visible";
 
                     const pinelm1 = pinelm.firstElementChild as HTMLElement;
-                    if (parent.props.horizontal)
-                        pinelm1.style.left = `${offset}px`;
-                    else pinelm1.style.top = `${offset}px`;
-
-                    if (parent.props.horizontal) parent.selPinned = event.x;
-                    else parent.selPinned = event.y;
+                    pinelm1.style[horizontal ? "left" : "top"] = `${offset}px`;
                 }
             }
         },
@@ -374,12 +379,12 @@ function setTracksToController(
     logController.setTracks(tracks);
 }
 
-function addTrackEventListner(
+function addTrackMouseEventListner(
     type: /*string, */ "click" | "contextmenu" | "dblclick",
     area: /*string, */ "title" | "legend" | "container",
     element: HTMLElement,
     track: Track,
-    func: (ev: TrackEvent) => void
+    func: (ev: TrackMouseEvent) => void
 ): void {
     element.addEventListener(type, (ev: Event) => {
         const plot: Plot | null = null; ///!!
@@ -405,16 +410,16 @@ const areas: ("title" | "legend" | "container")[] = [
     "legend",
     "container",
 ];
-function addTrackEventHandlers(
+function addTrackMouseEventHandlers(
     elm: HTMLElement,
     track: Track,
-    func: (ev: TrackEvent) => void
+    func: (ev: TrackMouseEvent) => void
 ): void {
     for (const area of areas) {
         const elements = elm.getElementsByClassName("track-" + area);
         for (const element of elements)
             for (const type of types)
-                addTrackEventListner(
+                addTrackMouseEventListner(
                     type,
                     area,
                     element as HTMLElement,
@@ -640,7 +645,7 @@ function fillInfos(
     return infos;
 }
 
-export interface TrackEvent {
+export interface TrackMouseEvent {
     track: Track;
     type: /*string, */ "click" | "contextmenu" | "dblclick";
     area: /*string, */ "title" | "legend" | "container";
@@ -653,6 +658,7 @@ export interface WellLogController {
     zoomContentTo(domain: [number, number]): boolean;
     scrollContentTo(f: number): boolean; // fraction of content
     zoomContent(zoom: number): void;
+    selectContent(selection: [number | undefined, number | undefined]): void;
     getContentDomain(): [number, number];
     getContentScrollPos(): number; // fraction of content
     getContentZoom(): number;
@@ -690,7 +696,7 @@ interface Props {
     onTrackScroll?: () => void; // called when track scrolling are changed
     onContentRescale?: () => void; // called when content zoom and scrolling are changed
 
-    onTrackEvent?: (wellLogView: WellLogView, ev: TrackEvent) => void;
+    onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
 }
 
 interface State {
@@ -720,7 +726,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             scrollTrackPos: props.scrollTrackPos ? props.scrollTrackPos : 0,
         };
 
-        this.onTrackEvent = this.onTrackEvent.bind(this);
+        this.onTrackMouseEvent = this.onTrackMouseEvent.bind(this);
 
         if (this.props.onCreateController) {
             // set callback to component's caller
@@ -813,7 +819,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 horizontal: this.props.horizontal,
                 maxZoom: this.props.maxContentZoom,
                 onTrackEnter: (elm: HTMLElement, track: Track) =>
-                    addTrackEventHandlers(elm, track, this.onTrackEvent),
+                    addTrackMouseEventHandlers(
+                        elm,
+                        track,
+                        this.onTrackMouseEvent
+                    ),
             });
 
             this.logController.init(this.container);
@@ -888,8 +898,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         });
     }
 
-    onTrackEvent(ev: TrackEvent): void {
-        if (this.props.onTrackEvent) this.props.onTrackEvent(this, ev);
+    onTrackMouseEvent(ev: TrackMouseEvent): void {
+        if (this.props.onTrackMouseEvent)
+            this.props.onTrackMouseEvent(this, ev);
     }
 
     // content
@@ -905,6 +916,31 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     zoomContent(zoom: number): boolean {
         if (this.logController) return zoomContent(this.logController, zoom);
         return false;
+    }
+    selectContent(selection: [number | undefined, number | undefined]): void {
+        this.selCurrent = selection[0];
+        this.selPinned = selection[1];
+
+        if (this.logController) {
+            if (this.selCurrent !== undefined)
+                this.selCurrent = this.logController.scale(this.selCurrent);
+            if (this.selPinned !== undefined)
+                this.selPinned = this.logController.scale(this.selPinned);
+
+            const rbelm = this.logController.overlay.elements["rubber-band"];
+            const pinelm = this.logController.overlay.elements["pinned"];
+            if (rbelm && pinelm) {
+                rbelm.style.visibility = this.selCurrent === undefined ? "hidden" : "visible";
+                pinelm.style.visibility = this.selPinned === undefined ? "hidden" : "visible";
+                modifySelection(
+                    rbelm,
+                    pinelm,
+                    this.selCurrent,
+                    this.selPinned,
+                    this.props.horizontal
+                );
+            }
+        }
     }
     getContentDomain(): [number, number] {
         if (this.logController) return getContentDomain(this.logController);

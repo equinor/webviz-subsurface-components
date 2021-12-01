@@ -3,7 +3,7 @@ import React, { Component, ReactNode } from "react";
 import PropTypes from "prop-types";
 
 import WellLogView from "./components/WellLogView";
-import { TrackEvent } from "./components/WellLogView";
+import { TrackMouseEvent } from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
@@ -51,7 +51,7 @@ import { SimpleMenu, editPlots } from "./components/LocalMenus";
 import { editTrack } from "./components/WellLogView";
 import { Plot } from "@equinor/videx-wellog";
 
-function onTrackEvent(wellLogView: WellLogView, ev: TrackEvent) {
+function onTrackMouseEvent(wellLogView: WellLogView, ev: TrackMouseEvent) {
     const track = ev.track;
     console.log(ev.area, ev.type);
     if (ev.type === "click") {
@@ -95,7 +95,8 @@ interface Props {
     colorTables: ColorTable[];
     horizontal?: boolean;
 
-    domain?: [number, number]; //  initial range
+    domain?: [number, number]; //  initial visible range
+    selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
 
     // callbacks
     onContentRescale: () => void;
@@ -208,6 +209,17 @@ class WellLogViewer extends Component<Props, State> {
         ) {
             this.setControllerZoom();
         }
+
+        if (
+            this.props.selection !== prevProps.selection ||
+            !this.props.selection !== !prevProps.selection ||
+            (this.props.selection &&
+                prevProps.selection &&
+                (this.props.selection[0] !== prevProps.selection[0] ||
+                    this.props.selection[1] !== prevProps.selection[1]))
+        ) {
+            this.setControllerSelection();
+        }
     }
 
     // callback function from WellLogView
@@ -307,6 +319,12 @@ class WellLogViewer extends Component<Props, State> {
         if (this.props.domain) this.controller.zoomContentTo(this.props.domain);
         // this.controller.zoomContent(1.0);
     }
+    setControllerSelection(): void {
+        if (!this.controller) return;
+        if (this.props.selection)
+            this.controller.selectContent(this.props.selection);
+        // this.controller.zoomContent(1.0);
+    }
 
     render(): ReactNode {
         const maxContentZoom = 256;
@@ -329,7 +347,7 @@ class WellLogViewer extends Component<Props, State> {
                         axisMnemos={axisMnemos}
                         onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
-                        onTrackEvent={onTrackEvent}
+                        onTrackMouseEvent={onTrackMouseEvent}
                         onTrackScroll={this.onTrackScroll}
                         onContentRescale={this.onContentRescale}
                     />
@@ -406,6 +424,11 @@ WellLogViewer.propTypes = {
      * Initial visible interval of the log data
      */
     domain: PropTypes.array,
+
+    /**
+     * Initial selected interval of the log data
+     */
+    selection: PropTypes.array,
 };
 
 export default WellLogViewer;
