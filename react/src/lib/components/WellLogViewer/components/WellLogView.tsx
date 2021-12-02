@@ -131,7 +131,7 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
         },
         onMouseExit: (event: OverlayMouseExitEvent) => {
             if (event.target) {
-                event.target.style.visibility = "hidden";
+                // do not hide! event.target.style.visibility = "hidden";
                 /* does not exist ?
                 if (instance.options.rubberbandExit) {
                     instance.options.rubberbandExit({
@@ -826,7 +826,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     createLogViewer(): void {
-        this.selCurrent = this.selPinned = undefined; // clear old slection (primary scale could be changed)
         this.selPersistent = undefined;
         if (this.logController) {
             // remove old LogViewer
@@ -874,6 +873,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     setTracks(): void {
+        this.selCurrent = this.selPinned = undefined; // clear old selection (primary scale could be changed)
+
         if (this.logController) {
             const axes = this.getAxesInfo();
             setTracksToController(
