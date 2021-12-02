@@ -200,23 +200,19 @@ class WellLogViewer extends Component<Props, State> {
         }
 
         if (
-            this.props.domain !== prevProps.domain ||
-            !this.props.domain !== !prevProps.domain ||
-            (this.props.domain &&
-                prevProps.domain &&
-                (this.props.domain[0] !== prevProps.domain[0] ||
-                    this.props.domain[1] !== prevProps.domain[1]))
+            this.props.domain &&
+            (!prevProps.domain ||
+                this.props.domain[0] !== prevProps.domain[0] ||
+                this.props.domain[1] !== prevProps.domain[1])
         ) {
             this.setControllerZoom();
         }
 
         if (
-            this.props.selection !== prevProps.selection ||
-            !this.props.selection !== !prevProps.selection ||
-            (this.props.selection &&
-                prevProps.selection &&
-                (this.props.selection[0] !== prevProps.selection[0] ||
-                    this.props.selection[1] !== prevProps.selection[1]))
+            this.props.selection &&
+            (!prevProps.selection ||
+                this.props.selection[0] !== prevProps.selection[0] ||
+                this.props.selection[1] !== prevProps.selection[1])
         ) {
             this.setControllerSelection();
         }
@@ -317,13 +313,11 @@ class WellLogViewer extends Component<Props, State> {
     setControllerZoom(): void {
         if (!this.controller) return;
         if (this.props.domain) this.controller.zoomContentTo(this.props.domain);
-        // this.controller.zoomContent(1.0);
     }
     setControllerSelection(): void {
         if (!this.controller) return;
         if (this.props.selection)
             this.controller.selectContent(this.props.selection);
-        // this.controller.zoomContent(1.0);
     }
 
     render(): ReactNode {

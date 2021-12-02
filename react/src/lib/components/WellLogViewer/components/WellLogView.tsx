@@ -111,6 +111,7 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
     const offset = rubberBandSize / 2;
     const rbelm = instance.overlay.create("rubber-band", {
         onMouseMove: (event: OverlayMouseMoveEvent) => {
+            if (parent.selPersistent) return;
             const horizontal = parent.props.horizontal;
             const v = horizontal ? event.x : event.y;
             parent.selCurrent = instance.scale.invert(v);
@@ -175,6 +176,7 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             }
         },
         onMouseMove: (event: OverlayMouseMoveEvent): void => {
+            if (parent.selPersistent) return;
             const { caller, x, y } = event;
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
             if (event.target) {
@@ -229,13 +231,23 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
             const horizontal = parent.props.horizontal;
             const v = horizontal ? event.x : event.y;
             const pinelm = event.target;
-            parent.selPinned = instance.scale.invert(v);
             if (pinelm) {
                 if (pinelm.style.visibility == "visible") {
-                    pinelm.style.visibility = "hidden";
-                    parent.selPinned = undefined;
-                    parent.onContentRescale();
+                    if (!parent.selPersistent) {
+                        parent.selPersistent = true;
+                    } else {
+                        parent.selPersistent = false;
+                        parent.selCurrent = instance.scale.invert(v);
+
+                        pinelm.style.visibility = "hidden";
+                        parent.selPinned = undefined;
+                        parent.onContentRescale();
+                    }
                 } else {
+                    parent.selPinned = instance.scale.invert(v);
+                    if (parent.selCurrent === undefined)
+                        parent.selCurrent = parent.selPinned;
+
                     const rbelm = instance.overlay.elements["rubber-band"];
                     if (rbelm && pinelm) {
                         showSelection(
@@ -718,6 +730,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     debounce: DebounceFunction;
     selCurrent: number | undefined; // current mouse position
     selPinned: number | undefined; // pinned position
+    selPersistent: boolean | undefined;
 
     constructor(props: Props) {
         super(props);
@@ -727,6 +740,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.debounce = debouncer(50);
         this.selCurrent = undefined;
         this.selPinned = undefined;
+        this.selPersistent = undefined;
 
         this.state = {
             infos: [],
@@ -813,6 +827,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     createLogViewer(): void {
         this.selCurrent = this.selPinned = undefined; // clear old slection (primary scale could be changed)
+        this.selPersistent = undefined;
         if (this.logController) {
             // remove old LogViewer
             this.logController.reset(); // clear UI
@@ -950,6 +965,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     selectContent(selection: [number | undefined, number | undefined]): void {
         this.selCurrent = selection[0];
         this.selPinned = selection[1];
+        this.selPersistent = true;
 
         this.showSelection();
     }
