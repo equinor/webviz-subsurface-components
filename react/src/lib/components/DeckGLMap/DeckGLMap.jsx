@@ -114,9 +114,12 @@ DeckGLMap.propTypes = {
      */
     zoom: PropTypes.number,
 
-    /* List of JSON object containing layer specific data.
+    /** List of JSON object containing layer specific data.
      * Each JSON object will consist of layer type with key as "@@type" and
      * layer specific data, if any.
+     * Supports both upstream Deck.gl layers and custom WebViz layers.
+     * See Storybook examples for example layer stacks.
+     * See also: https://deck.gl/docs/api-reference/core/deck#layers
      */
     layers: PropTypes.arrayOf(PropTypes.object),
 
