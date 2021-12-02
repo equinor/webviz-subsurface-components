@@ -43,6 +43,11 @@ export interface MapProps {
     zoom: number;
 
     /**
+     * If true, displays map in 3D view, default is 2D view (false)
+     */
+    view3D: boolean;
+
+    /**
      * Parameters for the InfoCard component
      */
     coords: {
@@ -92,6 +97,7 @@ const Map: React.FC<MapProps> = ({
     layers,
     bounds,
     zoom,
+    view3D,
     coords,
     scale,
     coordinateUnit,
@@ -101,17 +107,6 @@ const Map: React.FC<MapProps> = ({
     editedData,
     setEditedData,
 }: MapProps) => {
-    // state for initial views prop (target and zoom) of DeckGL component
-    const [initialViewState, setInitialViewState] =
-        React.useState<Record<string, unknown>>();
-    React.useEffect(() => {
-        setInitialViewState(getInitialViewState(bounds, zoom));
-    }, [bounds, zoom]);
-
-    // state for views prop of DeckGL component
-    // Now we are using single view, will extend to support multiple synced views
-    const deckGLViews = getViewsForDeckGL();
-
     // state to update layers to include default props
     const [layersWithDefaultProps, setLayersWithDefaultProps] = React.useState(
         getLayersWithDefaultProps(layers)
@@ -143,74 +138,24 @@ const Map: React.FC<MapProps> = ({
     }, [layers]);
 
     return (
-        deckGLViews && (
-            <ReduxProvider store={store.current}>
-                <DeckGLWrapper
-                    id={id}
-                    initialViewState={initialViewState}
-                    views={deckGLViews}
-                    resources={resources}
-                    coords={coords}
-                    scale={scale}
-                    coordinateUnit={coordinateUnit}
-                    legend={legend}
-                    editedData={editedData}
-                    setEditedData={setEditedData}
-                    template={template}
-                    colorTables={colorTables}
-                />
-            </ReduxProvider>
-        )
+        <ReduxProvider store={store.current}>
+            <DeckGLWrapper
+                id={id}
+                resources={resources}
+                bounds={bounds}
+                zoom={zoom}
+                view3D={view3D}
+                coords={coords}
+                scale={scale}
+                coordinateUnit={coordinateUnit}
+                legend={legend}
+                editedData={editedData}
+                setEditedData={setEditedData}
+                template={template}
+                colorTables={colorTables}
+            />
+        </ReduxProvider>
     );
 };
 
 export default Map;
-
-// ------------- Helper functions ---------- //
-// returns initial view state for DeckGL
-function getInitialViewState(
-    bounds: [number, number, number, number],
-    zoom: number
-): Record<string, unknown> {
-    const width = bounds[2] - bounds[0]; // right - left
-    const height = bounds[3] - bounds[1]; // top - bottom
-
-    const initial_view_state = {
-        // target to center of the bound
-        target: [bounds[0] + width / 2, bounds[1] + height / 2, 0],
-        zoom: zoom,
-    };
-
-    return initial_view_state;
-}
-
-// construct views object for DeckGL component
-function getViewsForDeckGL(): Record<string, unknown>[] {
-    const deckgl_views = [
-        {
-            "@@type": "OrthographicView",
-            id: "main2D",
-            controller: {
-                doubleClickZoom: false,
-            },
-            x: "0%",
-            y: "0%",
-            width: "100%",
-            height: "100%",
-            flipY: false,
-        },
-        {
-            "@@type": "OrbitView",
-            id: "main3D",
-            controller: {
-                doubleClickZoom: false,
-            },
-            x: "0%",
-            y: "0%",
-            width: "100%",
-            height: "100%",
-            flipY: false,
-        },
-    ];
-    return deckgl_views;
-}
