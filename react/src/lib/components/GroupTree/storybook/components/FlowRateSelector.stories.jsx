@@ -2,6 +2,14 @@ import React from "react";
 import DataProvider from "../../components/DataLoader";
 import FlowRateSelector from "../../components/Settings/FlowRateSelector";
 
+const edge_options = [
+    { name: "waterrate", label: "Water Rate" },
+    { name: "oilrate", label: "Oil Rate" },
+    { name: "gasrate", label: "Gas Rate" },
+    { name: "waterinjrate", label: "Water Injection Rate" },
+    { name: "gasinjrate", label: "Gas Injection Rate" },
+];
+
 export default {
     component: FlowRateSelector,
     title: "GroupTree/Components/Settings/FLowRateSelector",
@@ -19,7 +27,7 @@ export default {
 const Template = (args) => {
     return (
         <DataProvider id={args.id} data={args.data}>
-            <FlowRateSelector />
+            <FlowRateSelector edge_options={edge_options} />
         </DataProvider>
     );
 };
@@ -28,4 +36,5 @@ export const Default = Template.bind({});
 Default.args = {
     id: "grouptree",
     data: require("../../../../../demo/example-data/group-tree.json"),
+    edge_options,
 };
