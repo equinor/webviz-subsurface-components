@@ -56,12 +56,13 @@ import {
     selectTrack,
 } from "../utils/log-viewer";
 
-function modifySelection(
+function showSelection(
     rbelm: HTMLElement,
     pinelm: HTMLElement,
     vCur: number | undefined,
     vPin: number | undefined,
-    horizontal: boolean | undefined
+    horizontal: boolean | undefined,
+    logViewer: LogViewer /*LogController*/
 ) {
     if (vCur === undefined) {
         rbelm.style.visibility = "hidden";
@@ -72,53 +73,58 @@ function modifySelection(
     const pinelm1 = pinelm.firstElementChild as HTMLElement;
 
     const rubberBandSize = 9;
-    const offset = (rubberBandSize - 1) / 2;
+    const offset = rubberBandSize / 2;
 
-    rbelm.style[horizontal ? "left" : "top"] = `${vCur - (offset + 0.5)}px`;
+    rbelm.style[horizontal ? "left" : "top"] = `${
+        logViewer.scale(vCur) - offset
+    }px`;
     rbelm.style.visibility = "visible";
 
     if (vPin !== undefined) {
         let min, max;
         if (vPin < vCur) {
-            pinelm1.style[horizontal ? "left" : "top"] = `${offset + 0.5}px`;
+            pinelm1.style[horizontal ? "left" : "top"] = `${offset}px`;
             pinelm1.style[horizontal ? "right" : "bottom"] = "";
             min = vPin;
             max = vCur;
         } else {
-            pinelm1.style[horizontal ? "right" : "bottom"] = `${
-                offset + 0.5
-                }px`;
+            pinelm1.style[horizontal ? "right" : "bottom"] = `${offset}px`;
             pinelm1.style[horizontal ? "left" : "top"] = "";
             min = vCur;
             max = vPin;
         }
-        const x = min - (offset + 0.5);
+
+        min = logViewer.scale(min);
+        max = logViewer.scale(max);
+
+        const x = min - offset;
         const w = max - min + rubberBandSize;
         pinelm.style[horizontal ? "width" : "height"] = `${w}px`;
         pinelm.style[horizontal ? "left" : "top"] = `${x}px`;
-    }
-    else {
+    } else {
         pinelm.style.visibility = "hidden";
     }
 }
 
 function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
-    const offset = (rubberBandSize - 1) / 2;
+    const offset = rubberBandSize / 2;
     const rbelm = instance.overlay.create("rubber-band", {
         onMouseMove: (event: OverlayMouseMoveEvent) => {
             const horizontal = parent.props.horizontal;
             const v = horizontal ? event.x : event.y;
-            parent.selCurrent = v;
+            parent.selCurrent = instance.scale.invert(v);
+
             const rbelm = event.target;
             const pinelm = instance.overlay.elements["pinned"];
             if (rbelm && pinelm) {
-                modifySelection(
+                showSelection(
                     rbelm,
                     pinelm,
                     parent.selCurrent,
                     parent.selPinned,
-                    horizontal
+                    horizontal,
+                    instance
                 );
             }
         },
@@ -217,29 +223,30 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
 
 function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
-    const offset = (rubberBandSize - 1) / 2;
+    const offset = rubberBandSize / 2;
     const pinelm = instance.overlay.create("pinned", {
         onClick: (event: OverlayClickEvent): void => {
             const horizontal = parent.props.horizontal;
             const v = horizontal ? event.x : event.y;
             const pinelm = event.target;
-            parent.selPinned = v;
+            parent.selPinned = instance.scale.invert(v);
             if (pinelm) {
                 if (pinelm.style.visibility == "visible") {
                     pinelm.style.visibility = "hidden";
                     parent.selPinned = undefined;
                     parent.onContentRescale();
                 } else {
-                    pinelm.style[horizontal ? "left" : "top"] = `${
-                        v - (offset + 0.5)
-                    }px`;
-                    pinelm.style[
-                        horizontal ? "width" : "height"
-                    ] = `${rubberBandSize}px`;
-                    pinelm.style.visibility = "visible";
-
-                    const pinelm1 = pinelm.firstElementChild as HTMLElement;
-                    pinelm1.style[horizontal ? "left" : "top"] = `${offset}px`;
+                    const rbelm = instance.overlay.elements["rubber-band"];
+                    if (rbelm && pinelm) {
+                        showSelection(
+                            rbelm,
+                            pinelm,
+                            parent.selCurrent,
+                            parent.selPinned,
+                            horizontal,
+                            instance
+                        );
+                    }
                 }
             }
         },
@@ -805,6 +812,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     createLogViewer(): void {
+        this.selCurrent = this.selPinned = undefined; // clear old slection (primary scale could be changed)
         if (this.logController) {
             // remove old LogViewer
             this.logController.reset(); // clear UI
@@ -892,6 +900,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     onContentRescale(): void {
+        this.showSelection();
+
         // use debouncer to prevent too frequent notifications while animation
         this.debounce(() => {
             if (this.props.onContentRescale) this.props.onContentRescale();
@@ -917,30 +927,31 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.logController) return zoomContent(this.logController, zoom);
         return false;
     }
-    selectContent(selection: [number | undefined, number | undefined]): void {
-        this.selCurrent = selection[0];
-        this.selPinned = selection[1];
-
+    showSelection(): void {
         if (this.logController) {
-            if (this.selCurrent !== undefined)
-                this.selCurrent = this.logController.scale(this.selCurrent);
-            if (this.selPinned !== undefined)
-                this.selPinned = this.logController.scale(this.selPinned);
-
             const rbelm = this.logController.overlay.elements["rubber-band"];
             const pinelm = this.logController.overlay.elements["pinned"];
             if (rbelm && pinelm) {
-                rbelm.style.visibility = this.selCurrent === undefined ? "hidden" : "visible";
-                pinelm.style.visibility = this.selPinned === undefined ? "hidden" : "visible";
-                modifySelection(
+                rbelm.style.visibility =
+                    this.selCurrent === undefined ? "hidden" : "visible";
+                pinelm.style.visibility =
+                    this.selPinned === undefined ? "hidden" : "visible";
+                showSelection(
                     rbelm,
                     pinelm,
                     this.selCurrent,
                     this.selPinned,
-                    this.props.horizontal
+                    this.props.horizontal,
+                    this.logController
                 );
             }
         }
+    }
+    selectContent(selection: [number | undefined, number | undefined]): void {
+        this.selCurrent = selection[0];
+        this.selPinned = selection[1];
+
+        this.showSelection();
     }
     getContentDomain(): [number, number] {
         if (this.logController) return getContentDomain(this.logController);
@@ -956,14 +967,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
     getContentSelection(): [number | undefined, number | undefined] {
         if (!this.logController) return [undefined, undefined];
-        let current = this.selCurrent;
-        let pinned = this.selPinned;
-
-        if (current !== undefined)
-            current = this.logController.scale.invert(current);
-        if (pinned !== undefined)
-            pinned = this.logController.scale.invert(pinned);
-        return [current, pinned];
+        return [this.selCurrent, this.selPinned];
     }
 
     // tracks
