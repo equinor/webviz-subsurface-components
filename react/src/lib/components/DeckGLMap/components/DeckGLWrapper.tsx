@@ -16,7 +16,6 @@ import ContinuousLegend from "../components/ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer } from "deck.gl";
-import ToggleButton from "./settings/ToggleButton";
 import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 
@@ -28,10 +27,6 @@ export interface DeckGLWrapperProps {
      */
     id: string;
 
-    initialViewState?: Record<string, unknown>;
-
-    views: Record<string, unknown>[];
-
     /**
      * Resource dictionary made available in the DeckGL specification as an enum.
      * The values can be accessed like this: `"@@#resources.resourceId"`, where
@@ -40,6 +35,21 @@ export interface DeckGLWrapperProps {
      * https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
      */
     resources: Record<string, unknown>;
+
+    /**
+     * Coordinate boundary for the view defined as [left, bottom, right, top].
+     */
+    bounds: [number, number, number, number];
+
+    /**
+     * Zoom level for the view.
+     */
+    zoom: number;
+
+    /**
+     * If true, displays map in 3D view, default is 2D view (false)
+     */
+    view3D: boolean;
 
     /**
      * Parameters for the InfoCard component
@@ -94,9 +104,10 @@ function getLayer(layers: Layer<unknown>[] | undefined, id: string) {
 
 const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     id,
-    initialViewState,
-    views,
     resources,
+    bounds,
+    zoom,
+    view3D,
     coords,
     scale,
     coordinateUnit,
@@ -107,13 +118,20 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     colorTables,
     children,
 }: DeckGLWrapperProps) => {
+    // state for initial views prop (target and zoom) of DeckGL component
+    const [initialViewState, setInitialViewState] = React.useState(
+        getInitialViewState(bounds, zoom)
+    );
+    React.useEffect(() => {
+        setInitialViewState(getInitialViewState(bounds, zoom));
+    }, [bounds, zoom]);
+
     // state for views prop of DeckGL component
-    const [deckGLViews, setDeckGLViews] = useState();
-    useEffect(() => {
-        const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
-        const jsonConverter = new JSONConverter({ configuration });
-        setDeckGLViews(jsonConverter.convert(views));
-    }, [views]);
+    // Now we are using single view, will extend to support multiple synced views
+    const [deckGLViews, setDeckGLViews] = useState(getViewsForDeckGL(view3D));
+    React.useEffect(() => {
+        setDeckGLViews(getViewsForDeckGL(view3D));
+    }, [view3D]);
 
     const dispatch = useDispatch();
     const layersData = useSelector((st: MapState) => st.layers);
@@ -220,8 +238,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
     const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
 
-    const [is3D, setIs3D] = useState(false);
-
     const [legendProps, setLegendProps] = React.useState<{
         title: string;
         name: string;
@@ -271,15 +287,12 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
     if (!deckGLViews) return null;
 
-    // Set view to 2D or 3D
-    const deckGLView = deckGLViews?.[is3D ? 1 : 0];
-
     return (
         <div>
             <DeckGL
                 id={id}
                 initialViewState={initialViewState}
-                views={deckGLView}
+                views={deckGLViews}
                 layers={deckGLLayers}
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
@@ -314,15 +327,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
-            <div style={{ border: "2px solid gray", display: "inline-block" }}>
-                <ToggleButton
-                    label={"3D"}
-                    checked={is3D}
-                    onChange={() => {
-                        setIs3D(!is3D);
-                    }}
-                />
-            </div>
             {legend.visible && legendProps.discrete && (
                 <DiscreteColorLegend
                     discreteData={legendProps.metadata}
@@ -354,3 +358,53 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 };
 
 export default DeckGLWrapper;
+
+// ------------- Helper functions ---------- //
+function deckGLJsonConverter(json: any) {
+    const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
+    const jsonConverter = new JSONConverter({ configuration });
+    return jsonConverter.convert(json);
+}
+
+// Returns DeckGL specific views object
+function getViewsForDeckGL(view3D: boolean) {
+    return deckGLJsonConverter(getViews(view3D));
+}
+
+// returns initial view state for DeckGL
+function getInitialViewState(
+    bounds: [number, number, number, number],
+    zoom: number
+): Record<string, unknown> {
+    const width = bounds[2] - bounds[0]; // right - left
+    const height = bounds[3] - bounds[1]; // top - bottom
+
+    const initial_view_state = {
+        // target to center of the bound
+        target: [bounds[0] + width / 2, bounds[1] + height / 2, 0],
+        zoom: zoom,
+    };
+
+    return initial_view_state;
+}
+
+// construct views object for DeckGL component
+function getViews(view3D: boolean): Record<string, unknown>[] {
+    const view_type = view3D ? "OrbitView" : "OrthographicView";
+    const id = view3D ? "main3D" : "main2D";
+    const deckgl_views = [
+        {
+            "@@type": view_type,
+            id: id,
+            controller: {
+                doubleClickZoom: false,
+            },
+            x: "0%",
+            y: "0%",
+            width: "100%",
+            height: "100%",
+            flipY: false,
+        },
+    ];
+    return deckgl_views;
+}

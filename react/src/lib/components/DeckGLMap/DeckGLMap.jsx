@@ -3,6 +3,7 @@ import * as React from "react";
 import Map from "./components/Map";
 import template from "../../../demo/example-data/welllayer_template.json";
 import colorTables from "../../../demo/example-data/color-tables.json";
+import { prototype } from "semver/classes/range";
 
 DeckGLMap.defaultProps = {
     coords: {
@@ -21,6 +22,7 @@ DeckGLMap.defaultProps = {
         position: [46, 10],
     },
     zoom: -3,
+    view3D: false,
     colorTables: colorTables,
     template: template,
 };
@@ -31,6 +33,7 @@ function DeckGLMap({
     layers,
     bounds,
     zoom,
+    view3D,
     coords,
     scale,
     legend,
@@ -74,6 +77,7 @@ function DeckGLMap({
             layers={layers}
             bounds={bounds}
             zoom={zoom}
+            view3D={view3D}
             coords={coords}
             scale={scale}
             legend={legend}
@@ -112,6 +116,11 @@ DeckGLMap.propTypes = {
      * Zoom level for the view.
      */
     zoom: PropTypes.number,
+
+    /**
+     * If true, displays map in 3D view, default is 2D view (false)
+     */
+    view3D: PropTypes.bool,
 
     /** List of JSON object containing layer specific data.
      * Each JSON object will consist of layer type with key as "@@type" and

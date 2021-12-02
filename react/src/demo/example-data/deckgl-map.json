@@ -33,6 +33,7 @@
       6481113
     ],
     "zoom": -3,
+    "view3D": false,
     "layers": [
       {
         "@@type": "ColormapLayer",
