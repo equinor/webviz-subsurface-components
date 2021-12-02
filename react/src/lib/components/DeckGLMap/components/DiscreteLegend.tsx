@@ -66,8 +66,8 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         select(legend).select("svg").remove();
         const legendLength = itemColor.length;
         const calcLegendHeight = 22 * legendLength + 4 * legendLength;
-        const selectedLegend = select(legend)
-        if (!horizontal) selectedLegend.style("height", 150 + "px")
+        const selectedLegend = select(legend);
+        if (!horizontal) selectedLegend.style("height", 150 + "px");
         const svgLegend = selectedLegend
             .append("svg")
             .style("margin", "10px 10px")
@@ -84,7 +84,7 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         }
     }
     return (
-       <div 
+        <div
             style={{
                 position: "absolute",
                 right: position[0],
