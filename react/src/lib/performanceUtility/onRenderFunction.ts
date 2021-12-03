@@ -11,7 +11,7 @@ const logTimes = (
     console.log(
         `${id}'s phase: ${phase}\nActual time: ${actualDuration} \nBase time: ${baseDuration}`
     );
-    perf_metrics.push(id, phase, actualDuration, baseDuration);
+    perf_metrics.push([id, phase, actualDuration, baseDuration]);
 };
 
 export default logTimes;

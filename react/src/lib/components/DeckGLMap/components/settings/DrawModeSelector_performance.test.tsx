@@ -8,7 +8,7 @@ import { obj } from "../../../../performanceUtility/onRenderFunction";
 import * as core from "@actions/core";
 import logTimes from "../../../../performanceUtility/onRenderFunction";
 
-xdescribe("Test draw-mode menu", () => {
+describe("Test draw-mode menu", () => {
     it("performance test", () => {
         render(
             Wrapper({

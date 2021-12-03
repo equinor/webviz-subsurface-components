@@ -92,7 +92,7 @@ jobs:
       - name: 🤖 Run tests
         if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
         run: |
-          npm run test --prefix ./react
+          npm run test_correctness --prefix ./react
           pytest ./tests --headless
 
       - name: Upload coverage to Codecov
