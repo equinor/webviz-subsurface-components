@@ -15,6 +15,7 @@ interface colorLegendProps {
     position: number[];
     template: templateArray;
     colorTables: colorTablesArray;
+    horizontal: boolean;
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
@@ -24,10 +25,11 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     position,
     template,
     colorTables,
+    horizontal,
 }: colorLegendProps) => {
     React.useEffect(() => {
         discreteLegend("#legend");
-    }, [discreteData, template, colorTables]);
+    }, [discreteData, template, colorTables, horizontal]);
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
@@ -61,14 +63,24 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         }
         const ordinalValues = scaleOrdinal().domain(itemName);
         const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
-        if (colorLegend) {
-            select(legend).select("svg").remove();
-            select(legend)
-                .append("svg")
-                .attr("height", 410 + "px")
-                .attr("width", 230 + "px")
-                .attr("transform", "translate(0,10)")
-                .call(colorLegend);
+        select(legend).select("svg").remove();
+        const legendLength = itemColor.length;
+        const calcLegendHeight = 22 * legendLength + 4 * legendLength;
+        const selectedLegend = select(legend);
+        if (!horizontal) selectedLegend.style("height", 150 + "px");
+        const svgLegend = selectedLegend
+            .append("svg")
+            .style("margin", "10px 10px")
+            .call(colorLegend);
+        if (colorLegend && horizontal) {
+            svgLegend
+                .attr("height", calcLegendHeight + "px")
+                .attr("width", 220 + "px");
+        } else {
+            svgLegend
+                .style("transform", "rotate(90deg)")
+                .attr("width", calcLegendHeight + "px")
+                .attr("height", calcLegendHeight + "px");
         }
     }
     return (
@@ -77,9 +89,13 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
                 position: "absolute",
                 right: position[0],
                 top: position[1],
+                backgroundColor: "#ffffffcc",
+                borderRadius: "5px",
             }}
         >
-            <label style={{ color: "#6F6F6F" }}>{dataObjectName}</label>
+            <label style={{ color: "#6F6F6F", margin: "10px 10px" }}>
+                {dataObjectName}
+            </label>
             <div id="legend"></div>
         </div>
     );
@@ -104,7 +120,7 @@ export function colorTableData(
 }
 
 DiscreteColorLegend.defaultProps = {
-    position: [16, 10],
+    position: [5, 10],
 };
 
 export default DiscreteColorLegend;
