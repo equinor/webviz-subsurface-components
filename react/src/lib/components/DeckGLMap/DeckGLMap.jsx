@@ -18,11 +18,12 @@ DeckGLMap.defaultProps = {
     },
     legend: {
         visible: true,
-        position: [46, 10],
+        position: [5, 10],
+        horizontal: true,
     },
     zoom: -3,
-    colorTables: { colorTables },
-    template: { template },
+    colorTables: colorTables,
+    template: template,
 };
 
 function DeckGLMap({
@@ -41,17 +42,15 @@ function DeckGLMap({
     setProps,
 }) {
     // Contains layers data received from map layers by user interaction
-    let [layerEditedData, setLayerEditedData] = React.useState(null);
+    let [layerEditedData, setLayerEditedData] = React.useState(editedData);
 
     React.useEffect(() => {
-        if (!layerEditedData) {
-            setLayerEditedData(editedData);
-        } else {
-            setLayerEditedData({
-                ...layerEditedData,
-                ...editedData,
-            });
-        }
+        if (!editedData) return;
+
+        setLayerEditedData({
+            ...layerEditedData,
+            ...editedData,
+        });
     }, [editedData]);
 
     // This callback is used as a mechanism to update the component from the layers or toolbar.
@@ -70,23 +69,21 @@ function DeckGLMap({
     );
 
     return (
-        layerEditedData && (
-            <Map
-                id={id}
-                resources={resources}
-                layers={layers}
-                bounds={bounds}
-                zoom={zoom}
-                coords={coords}
-                scale={scale}
-                legend={legend}
-                template={template}
-                colorTables={colorTables}
-                coordinateUnit={coordinateUnit}
-                editedData={layerEditedData}
-                setEditedData={setEditedData}
-            />
-        )
+        <Map
+            id={id}
+            resources={resources}
+            layers={layers}
+            bounds={bounds}
+            zoom={zoom}
+            coords={coords}
+            scale={scale}
+            legend={legend}
+            template={template}
+            colorTables={colorTables}
+            coordinateUnit={coordinateUnit}
+            editedData={layerEditedData}
+            setEditedData={setEditedData}
+        />
     );
 }
 
@@ -117,9 +114,12 @@ DeckGLMap.propTypes = {
      */
     zoom: PropTypes.number,
 
-    /* List of JSON object containing layer specific data.
+    /** List of JSON object containing layer specific data.
      * Each JSON object will consist of layer type with key as "@@type" and
      * layer specific data, if any.
+     * Supports both upstream Deck.gl layers and custom WebViz layers.
+     * See Storybook examples for example layer stacks.
+     * See also: https://deck.gl/docs/api-reference/core/deck#layers
      */
     layers: PropTypes.arrayOf(PropTypes.object),
 
@@ -188,6 +188,10 @@ DeckGLMap.propTypes = {
          * Legend position in pixels.
          */
         position: PropTypes.arrayOf(PropTypes.number),
+        /**
+         * Legend layout.
+         */
+        horizontal: PropTypes.bool,
     }),
 
     /**

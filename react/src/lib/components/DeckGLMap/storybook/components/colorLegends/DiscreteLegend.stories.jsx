@@ -5,7 +5,7 @@ import colorTables from "../../../../../../demo/example-data/color-tables.json";
 
 export default {
     component: DiscreteColorLegend,
-    title: "DeckGLMap/Components/ColorLegends",
+    title: "DeckGLMap/Components/ColorLegends/DiscreteColorLegend",
 };
 
 const discreteData = {
@@ -18,6 +18,8 @@ const discreteData = {
 const name = "ZONELOG";
 const dataObjectName = "Wells / ZONELOG";
 const position = [16, 10];
+const horizontal = true;
+
 const Template = (args) => {
     return <DiscreteColorLegend {...args} />;
 };
@@ -30,4 +32,5 @@ DiscreteTemplate.args = {
     position,
     template,
     colorTables,
+    horizontal,
 };
