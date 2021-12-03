@@ -65,6 +65,7 @@ export interface DeckGLWrapperProps {
     legend: {
         visible: boolean;
         position: number[];
+        horizontal: boolean;
     };
 
     /**
@@ -331,6 +332,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     name={legendProps.name}
                     template={template}
                     colorTables={colorTables}
+                    horizontal={legend.horizontal}
                 />
             )}
             {legendProps.valueRange?.length > 0 &&
@@ -344,6 +346,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         name={legendProps.name}
                         template={template}
                         colorTables={colorTables}
+                        horizontal={legend.horizontal}
                     />
                 )}
             {deckGLLayers && (
