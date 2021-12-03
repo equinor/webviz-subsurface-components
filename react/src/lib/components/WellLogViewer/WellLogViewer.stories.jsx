@@ -43,31 +43,31 @@ const Template = (args) => {
     const onContentRescale = React.useCallback(() => {
         if (!controller) {
             setInfo("-");
-        } else {
-            const baseDomain = controller.getContentBaseDomain();
-            const domain = controller.getContentDomain();
-            const selection = controller.getContentSelection();
-            setInfo(
-                "total: [" +
-                    baseDomain[0].toFixed(0) +
-                    ", " +
-                    baseDomain[1].toFixed(0) +
-                    "], " +
-                    "visible: [" +
-                    domain[0].toFixed(0) +
-                    ", " +
-                    domain[1].toFixed(0) +
-                    "]" +
-                    (selection[0] !== undefined
-                        ? ", selected: [" +
-                          selection[0].toFixed(0) +
-                          (selection[1] !== undefined
-                              ? ", " + selection[1].toFixed(0)
-                              : "") +
-                          "]"
-                        : "")
-            );
+            return;
         }
+        const baseDomain = controller.getContentBaseDomain();
+        const domain = controller.getContentDomain();
+        const selection = controller.getContentSelection();
+        setInfo(
+            "total: [" +
+                baseDomain[0].toFixed(0) +
+                ", " +
+                baseDomain[1].toFixed(0) +
+                "], " +
+                "visible: [" +
+                domain[0].toFixed(0) +
+                ", " +
+                domain[1].toFixed(0) +
+                "]" +
+                (selection[0] !== undefined
+                    ? ", selected: [" +
+                      selection[0].toFixed(0) +
+                      (selection[1] !== undefined
+                          ? ", " + selection[1].toFixed(0)
+                          : "") +
+                      "]"
+                    : "")
+        );
     }, [controller]);
 
     return (
