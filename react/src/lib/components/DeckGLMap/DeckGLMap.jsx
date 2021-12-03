@@ -3,7 +3,6 @@ import * as React from "react";
 import Map from "./components/Map";
 import template from "../../../demo/example-data/welllayer_template.json";
 import colorTables from "../../../demo/example-data/color-tables.json";
-import { prototype } from "semver/classes/range";
 
 DeckGLMap.defaultProps = {
     coords: {
@@ -118,7 +117,7 @@ DeckGLMap.propTypes = {
     zoom: PropTypes.number,
 
     /**
-     * If true, displays map in 3D view, default is 2D view (false)
+     * If true, displays map in 3D view, default is 2D view
      */
     view3D: PropTypes.bool,
 

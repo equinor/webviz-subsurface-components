@@ -18,6 +18,7 @@ import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer } from "deck.gl";
 import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
+import { LayerProps } from "@deck.gl/core/lib/layer";
 
 export interface DeckGLWrapperProps {
     /**
@@ -47,7 +48,7 @@ export interface DeckGLWrapperProps {
     zoom: number;
 
     /**
-     * If true, displays map in 3D view, default is 2D view (false)
+     * If true, displays map in 3D view, default is 2D view
      */
     view3D: boolean;
 
@@ -142,25 +143,12 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
             return;
         }
 
-        // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
-        // See https://deck.gl/docs/api-reference/json/overview for more details.
-        const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
-        if (resources) {
-            configuration.merge({
-                enumerations: {
-                    resources,
-                },
-            });
-        }
-        if (editedData) {
-            configuration.merge({
-                enumerations: {
-                    editedData,
-                },
-            });
-        }
-        const jsonConverter = new JSONConverter({ configuration });
-        setDeckGLLayers(jsonConverter.convert(layersData));
+        const enumerations = [
+            { resources: resources },
+            { editedData: editedData },
+        ];
+        const layers_obj = jsonToObject(layersData, enumerations);
+        setDeckGLLayers(layers_obj);
     }, [layersData, resources, editedData]);
 
     // Hacky way of disabling well selection when drawing.
@@ -360,15 +348,29 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 export default DeckGLWrapper;
 
 // ------------- Helper functions ---------- //
-function deckGLJsonConverter(json: any) {
+// Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
+// See https://deck.gl/docs/api-reference/json/overview for more details.
+function jsonToObject(
+    data: Record<string, unknown>[] | LayerProps<unknown>[],
+    enums: Record<string, unknown>[] | undefined = undefined
+) {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
+    enums?.forEach((enumeration) => {
+        if (enumeration) {
+            configuration.merge({
+                enumerations: {
+                    ...enumeration,
+                },
+            });
+        }
+    });
     const jsonConverter = new JSONConverter({ configuration });
-    return jsonConverter.convert(json);
+    return jsonConverter.convert(data);
 }
 
 // Returns DeckGL specific views object
 function getViewsForDeckGL(view3D: boolean) {
-    return deckGLJsonConverter(getViews(view3D));
+    return jsonToObject(getViews(view3D));
 }
 
 // returns initial view state for DeckGL
