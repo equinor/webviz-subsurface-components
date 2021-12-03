@@ -12,6 +12,7 @@ const max = 0.35;
 const dataObjectName = "Wells / PORO";
 const position = [16, 10];
 const name = "PORO";
+const horizontal = true;
 
 const Template = (args) => {
     return <ContinuousLegend {...args} />;
@@ -26,4 +27,5 @@ ContinuousTemplate.args = {
     name,
     template,
     colorTables,
+    horizontal,
 };

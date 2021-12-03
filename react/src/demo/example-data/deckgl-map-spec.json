@@ -18,9 +18,10 @@
     "legend": {
       "visible": true,
       "position": [
-        16,
+        5,
         10
-      ]
+      ],
+      "horizontal": true
     },
     "coordinateUnit": "m",
     "resources": {
