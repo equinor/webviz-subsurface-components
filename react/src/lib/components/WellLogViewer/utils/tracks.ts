@@ -671,13 +671,16 @@ export function addOrEditGraphTrackPlot(
         : addGraphTrackPlot(wellLogView, track, templatePlot);
 
     if (wellLogView.logController) {
-        const minmax: [number, number] = [
-            // get base domain
-            wellLogView.logController.domain[0],
-            wellLogView.logController.domain[1],
-        ];
-        checkMinMax(minmax, minmaxPrimaryAxis); // update domain to take into account new plot data ramge
-        wellLogView.logController.domain = minmax;
+        {
+            const baseDomain =
+                wellLogView.logController.scaleHandler.baseDomain();
+            // update base domain to take into account new plot data range
+            if (baseDomain[0] > minmaxPrimaryAxis[0])
+                baseDomain[0] = minmaxPrimaryAxis[0];
+            if (baseDomain[1] < minmaxPrimaryAxis[1])
+                baseDomain[1] = minmaxPrimaryAxis[1];
+            wellLogView.logController.rescale();
+        }
 
         updateLegendRows(wellLogView.logController);
         wellLogView.logController.updateTracks();

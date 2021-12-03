@@ -118,6 +118,11 @@ export function zoomContentTo(
     return false;
 }
 
+export function getContentBaseDomain(logViewer: LogViewer): [number, number] {
+    const [b1, b2] = logViewer.scaleHandler.baseDomain();
+    return [b1, b2];
+}
+
 export function getContentDomain(logViewer: LogViewer): [number, number] {
     const [d1, d2] = logViewer.domain;
     return [d1, d2];

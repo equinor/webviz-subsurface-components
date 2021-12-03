@@ -48,6 +48,7 @@ import {
     zoomContent,
     scrollContentTo,
     zoomContentTo,
+    getContentBaseDomain,
     getContentDomain,
     getContentScrollPos,
     getContentZoom,
@@ -198,9 +199,9 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         },
         onRescale: (event: OverlayRescaleEvent): void => {
             if (event.target && event.transform) {
-                // event.transform.k could be not valid after updateTracks();
+                // event.transform.k could be not valid after add/edit plot
                 // so use getContentZoom(instance) to be consistent
-                //console.log("zoom=", zoom, event.transform.k)
+                // console.log("zoom=", getContentZoom(instance), event.transform.k)
 
                 parent.onContentRescale();
 
@@ -678,7 +679,8 @@ export interface WellLogController {
     scrollContentTo(f: number): boolean; // fraction of content
     zoomContent(zoom: number): void;
     selectContent(selection: [number | undefined, number | undefined]): void;
-    getContentDomain(): [number, number];
+    getContentBaseDomain(): [number, number]; // full scale range
+    getContentDomain(): [number, number]; // visible range
     getContentScrollPos(): number; // fraction of content
     getContentZoom(): number;
     getContentSelection(): [number | undefined, number | undefined]; // [current, pinned]
@@ -969,6 +971,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.selPersistent = true;
 
         this.showSelection();
+    }
+    getContentBaseDomain(): [number, number] {
+        if (this.logController) return getContentBaseDomain(this.logController);
+        return [0.0, 0.0];
     }
     getContentDomain(): [number, number] {
         if (this.logController) return getContentDomain(this.logController);
