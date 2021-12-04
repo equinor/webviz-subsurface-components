@@ -1,6 +1,5 @@
 import * as jsonpatch from "fast-json-patch";
 import DeckGLWrapper from "./DeckGLWrapper";
-import { AnyAction, EnhancedStore } from "@reduxjs/toolkit";
 import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
@@ -107,22 +106,15 @@ const Map: React.FC<MapProps> = ({
     editedData,
     setEditedData,
 }: MapProps) => {
-    // state to update layers to include default props
-    const [layersWithDefaultProps, setLayersWithDefaultProps] = React.useState(
-        getLayersWithDefaultProps(layers)
-    );
-    React.useEffect(() => {
-        setLayersWithDefaultProps(getLayersWithDefaultProps(layers));
-    }, [layers]);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const store = React.useRef<EnhancedStore<any, AnyAction, any>>(
-        createStore(layersWithDefaultProps)
+    // create store once with layers data
+    const store = React.useMemo(
+        () => createStore(getLayersWithDefaultProps(layers)),
+        []
     );
 
-    // update the store if layer prop is changed
+    // update store if any of the layer prop is changed
     React.useEffect(() => {
-        const prev_state = store.current.getState()["layers"];
+        const prev_state = store.getState()["layers"];
         const cur_state = layers;
         const patch = jsonpatch.compare(prev_state, cur_state);
         const replace_operations = patch.filter((obj) => obj.op === "replace");
@@ -133,12 +125,12 @@ const Map: React.FC<MapProps> = ({
                 false,
                 false
             ).newDocument;
-            store.current.dispatch(setLayers(new_state));
+            store.dispatch(setLayers(new_state));
         }
     }, [layers]);
 
     return (
-        <ReduxProvider store={store.current}>
+        <ReduxProvider store={store}>
             <DeckGLWrapper
                 id={id}
                 resources={resources}

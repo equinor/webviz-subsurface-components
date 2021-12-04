@@ -2,7 +2,7 @@ import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 import { PickInfo } from "deck.gl";
 import { Feature } from "geojson";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
@@ -15,7 +15,7 @@ import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
-import { Layer } from "deck.gl";
+import { Layer, View } from "deck.gl";
 import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 import { LayerProps } from "@deck.gl/core/lib/layer";
@@ -121,24 +121,22 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     children,
 }: DeckGLWrapperProps) => {
     // state for initial views prop (target and zoom) of DeckGL component
-    const [initialViewState, setInitialViewState] = React.useState(
-        getInitialViewState(bounds, zoom)
-    );
-    React.useEffect(() => {
+    const [initialViewState, setInitialViewState] =
+        useState<Record<string, unknown>>();
+    useEffect(() => {
         setInitialViewState(getInitialViewState(bounds, zoom));
     }, [bounds, zoom]);
 
     // state for views prop of DeckGL component
-    // Now we are using single view, will extend to support multiple synced views
-    const [deckGLViews, setDeckGLViews] = useState(getViewsForDeckGL(view3D));
-    React.useEffect(() => {
+    const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
+    useEffect(() => {
         setDeckGLViews(getViewsForDeckGL(view3D));
     }, [view3D]);
 
-    const dispatch = useDispatch();
+    // get layers data from store
     const layersData = useSelector((st: MapState) => st.layers);
+    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
 
-    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>();
     useEffect(() => {
         if (!layersData.length) {
             return;
@@ -148,20 +146,23 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
             { resources: resources },
             { editedData: editedData },
         ];
-        const layers_obj = jsonToObject(layersData, enumerations);
-        setDeckGLLayers(layers_obj);
+        setDeckGLLayers(
+            jsonToObject(layersData, enumerations) as Layer<unknown>[]
+        );
     }, [layersData, resources, editedData]);
 
     // Hacky way of disabling well selection when drawing.
-    const drawingLayer = getLayer(
-        deckGLLayers,
-        "drawing-layer"
-    ) as DrawingLayer;
-    const drawingEnabled = drawingLayer && drawingLayer.props.mode != "view";
-    React.useEffect(() => {
+    const drawingLayer = useMemo(
+        () => getLayer(deckGLLayers, "drawing-layer") as DrawingLayer,
+        [deckGLLayers]
+    );
+
+    const dispatch = useDispatch();
+    useEffect(() => {
         if (!drawingLayer) return;
 
         const wellsLayer = getLayer(deckGLLayers, "wells-layer") as WellsLayer;
+        const drawingEnabled = drawingLayer.props.mode != "view";
         if (wellsLayer) {
             dispatch(
                 updateLayerProp([
@@ -182,9 +183,9 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 ])
             );
         }
-    }, [drawingEnabled, dispatch]);
+    }, [drawingLayer?.props.mode, dispatch]);
 
-    const refCb = React.useCallback(
+    const refCb = useCallback(
         (deckRef) => {
             if (deckRef && deckRef.deck) {
                 // Needed to initialize the viewState on first load
@@ -225,9 +226,9 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         [coords]
     );
 
-    const [isLoaded, setIsLoaded] = React.useState<boolean>(false);
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-    const [legendProps, setLegendProps] = React.useState<{
+    const [legendProps, setLegendProps] = useState<{
         title: string;
         name: string;
         discrete: boolean;
@@ -241,16 +242,18 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         valueRange: [],
     });
 
-    const onAfterRender = React.useCallback(() => {
+    const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
             const state = deckGLLayers.every((layer) => layer.isLoaded);
             setIsLoaded(state);
         }
     }, [deckGLLayers]);
 
-    const wellsLayer = getLayer(deckGLLayers, "wells-layer") as WellsLayer;
-
-    const onLoad = React.useCallback(() => {
+    const wellsLayer = useMemo(
+        () => getLayer(deckGLLayers, "wells-layer") as WellsLayer,
+        [deckGLLayers]
+    );
+    const onLoad = useCallback(() => {
         if (wellsLayer) {
             wellsLayer.setState({
                 template: template,
@@ -259,7 +262,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         }
     }, [wellsLayer, template, colorTables]);
     // Get color table for log curves.
-    React.useEffect(() => {
+    useEffect(() => {
         if (!wellsLayer?.isLoaded || !wellsLayer.props.logData) return;
         const legend = wellsLayer.state.legend[0];
         setLegendProps({
@@ -356,7 +359,7 @@ export default DeckGLWrapper;
 function jsonToObject(
     data: Record<string, unknown>[] | LayerProps<unknown>[],
     enums: Record<string, unknown>[] | undefined = undefined
-) {
+): Layer<unknown>[] | View[] {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {
@@ -372,8 +375,8 @@ function jsonToObject(
 }
 
 // Returns DeckGL specific views object
-function getViewsForDeckGL(view3D: boolean) {
-    return jsonToObject(getViews(view3D));
+function getViewsForDeckGL(view3D: boolean): View[] {
+    return jsonToObject(getViews(view3D)) as View[];
 }
 
 // returns initial view state for DeckGL

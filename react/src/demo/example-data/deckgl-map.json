@@ -25,7 +25,9 @@
     },
     "coordinateUnit": "m",
     "resources": {
-      "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png"
+      "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+      "wellsData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+      "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json"
     },
     "bounds": [
       432205,
@@ -79,8 +81,8 @@
       },
       {
         "@@type": "WellsLayer",
-        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-        "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+        "data": "@@#resources.wellsData",
+        "logData": "@@#resources.logData",
         "logrunName": "BLOCKING",
         "logName": "ZONELOG",
         "selectedWell": "@@#editedData.selectedWell"
