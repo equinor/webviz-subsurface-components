@@ -19,13 +19,13 @@ describe("Test Layer Property", () => {
                 ),
             })
         );
-        if (obj.perf_metrics[2] > 100) {
+        if (obj.perf_metrics[0][2] > 100) {
             core.warning(
                 "Layer Property Component in '/components/DeckGLMap/components/settings/' seems to have performance issues. Actual render time:" +
-                    obj.perf_metrics[2] +
+                    obj.perf_metrics[0][2] +
                     " Expected render time: 100"
             );
         }
-        expect(obj.perf_metrics[2]).toBeLessThan(100);
+        expect(obj.perf_metrics[0][2]).toBeLessThan(100);
     });
 });
