@@ -3,7 +3,7 @@ import React, { Component, ReactNode } from "react";
 import PropTypes from "prop-types";
 
 import WellLogView from "./components/WellLogView";
-import { TrackEvent } from "./components/WellLogView";
+import { TrackMouseEvent } from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
@@ -48,16 +48,18 @@ const axisMnemos: Record<string, string[]> = {
 
 import ReactDOM from "react-dom";
 import { SimpleMenu, editPlots } from "./components/LocalMenus";
+import { editTrack } from "./components/WellLogView";
 import { Plot } from "@equinor/videx-wellog";
 
-function onTrackEvent(wellLogView: WellLogView, ev: TrackEvent) {
+function onTrackMouseEvent(wellLogView: WellLogView, ev: TrackMouseEvent) {
     const track = ev.track;
-    console.log(ev.area, ev.type);
     if (ev.type === "click") {
         wellLogView.selectTrack(track, !wellLogView.isTrackSelected(track)); // toggle selection
     } else if (ev.type === "dblclick") {
         wellLogView.selectTrack(track, true);
-        /*if (ev.area !== "title")*/ {
+        if (ev.area === "title") {
+            editTrack(ev.element, wellLogView, ev.track);
+        } else {
             const plot: Plot | null = ev.plot;
             if (!plot) editPlots(ev.element, wellLogView, ev.track);
             else wellLogView.editPlot(ev.element, ev.track, plot);
@@ -91,13 +93,20 @@ interface Props {
     template: Template;
     colorTables: ColorTable[];
     horizontal?: boolean;
+
+    domain?: [number, number]; //  initial visible range
+    selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
+
+    // callbacks
+    onContentRescale: () => void;
+    onCreateController?: (controller: WellLogController) => void;
 }
 interface State {
     axes: string[]; // axes available in welllog
     primaryAxis: string;
     infos: Info[];
 
-    zoomContent: number;
+    contentZoom: number; // value for zoom slider
 }
 
 class WellLogViewer extends Component<Props, State> {
@@ -120,7 +129,7 @@ class WellLogViewer extends Component<Props, State> {
             axes: axes, //["md", "tvd"]
             infos: [],
 
-            zoomContent: 1.0,
+            contentZoom: 4.0,
         };
 
         this.controller = null;
@@ -133,18 +142,41 @@ class WellLogViewer extends Component<Props, State> {
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
 
         this.onScrollerScroll = this.onScrollerScroll.bind(this);
-        this.onScrollTrackPos = this.onScrollTrackPos.bind(this);
+        this.onTrackScroll = this.onTrackScroll.bind(this);
 
-        this.onZoomContent = this.onZoomContent.bind(this);
+        this.onContentRescale = this.onContentRescale.bind(this);
 
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
     }
 
     componentDidMount(): void {
-        this._enableScroll();
+        this.setScrollerPosAndZoom();
+        this.setSliderZoom();
     }
 
-    componentDidUpdate(prevProps: Props): void {
+    shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
+        {
+            //compare (Object.keys(nextProps), Object.keys(this.props))
+            for (const p in nextProps) {
+                // eslint-disable-next-line
+                if ((nextProps as any)[p] !== (this.props as any)[p]) {
+                    //console.log(p /*, nextProps[p], this.props[p]*/);
+                    return true;
+                }
+            }
+            for (const s in nextState) {
+                // eslint-disable-next-line
+                if ((nextState as any)[s] !== (this.state as any)[s]) {
+                    //console.log(s /*, nextState[s], this.state[s]*/);
+                    return true;
+                }
+            }
+        }
+        //return true;
+        return false;
+    }
+
+    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
         if (
             this.props.welllog !== prevProps.welllog ||
             this.props.template !== prevProps.template ||
@@ -165,6 +197,24 @@ class WellLogViewer extends Component<Props, State> {
                 // will be changed by callback! infos: [],
             });
         }
+
+        if (
+            this.props.domain &&
+            (!prevProps.domain ||
+                this.props.domain[0] !== prevProps.domain[0] ||
+                this.props.domain[1] !== prevProps.domain[1])
+        ) {
+            this.setControllerZoom();
+        }
+
+        if (
+            this.props.selection &&
+            (!prevProps.selection ||
+                this.props.selection[0] !== prevProps.selection[0] ||
+                this.props.selection[1] !== prevProps.selection[1])
+        ) {
+            this.setControllerSelection();
+        }
     }
 
     // callback function from WellLogView
@@ -176,23 +226,25 @@ class WellLogViewer extends Component<Props, State> {
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;
-        this._enableScroll();
-    }
-    // callback function from WellLogView
-    onScrollTrackPos(/*pos: number*/): void {
-        this._enableScroll();
-    }
-    // callback function from WellLogView
-    onZoomContent(zoom: number): boolean {
-        this._enableScroll();
+        if (this.props.onCreateController)
+            // set callback to component's caller
+            this.props.onCreateController(controller);
 
-        let ret = false;
-        if (Math.abs(Math.log(this.state.zoomContent / zoom)) > 0.01) {
-            this.setState({ zoomContent: zoom }); // for Zoom slider
-            ret = true;
-        }
-        return ret;
+        this.setControllerZoom();
+        this.setScrollerPosAndZoom();
+        //this.setSliderZoom();
     }
+    // callback function from WellLogView
+    onTrackScroll(): void {
+        this.setScrollerPosAndZoom();
+    }
+    // callback function from WellLogView
+    onContentRescale(): void {
+        this.setScrollerPosAndZoom();
+        this.setSliderZoom();
+        if (this.props.onContentRescale) this.props.onContentRescale();
+    }
+
     // callback function from Axis selector
     onChangePrimaryAxis(value: string): void {
         this.setState({ primaryAxis: value });
@@ -204,8 +256,8 @@ class WellLogViewer extends Component<Props, State> {
     ): void {
         event;
         if (this.controller && typeof value === "number") {
-            const zoomContent = 2 ** value;
-            this.controller.zoomContent(zoomContent);
+            const zoom = 2 ** value;
+            this.controller.zoomContent(zoom);
         }
     }
     // callback function from Scroller
@@ -221,7 +273,18 @@ class WellLogViewer extends Component<Props, State> {
         }
     }
 
-    _enableScroll(): void {
+    setSliderZoom(): void {
+        if (!this.controller) return;
+        const zoom = this.controller.getContentZoom();
+
+        if (Math.abs(Math.log(this.state.contentZoom / zoom)) > 0.01) {
+            this.setState({ contentZoom: zoom }); // for Zoom slider
+        }
+    }
+
+    setScrollerPosAndZoom(): void {
+        if (!this.scroller) return;
+
         let x, y;
         let xZoom, yZoom;
         if (!this.controller) {
@@ -236,18 +299,24 @@ class WellLogViewer extends Component<Props, State> {
             x = this.props.horizontal ? fContent : fTrack;
             y = this.props.horizontal ? fTrack : fContent;
 
-            const zoomContent = this.controller.getContentZoom();
-            const zoomTrack =
-                this.controller._graphTrackMax() /
-                this.controller._maxTrackNum();
+            const contentZoom = this.controller.getContentZoom();
+            const trackZoom = this.controller.getTrackZoom();
+            xZoom = this.props.horizontal ? contentZoom : trackZoom;
+            yZoom = this.props.horizontal ? trackZoom : contentZoom;
+        }
 
-            xZoom = this.props.horizontal ? zoomContent : zoomTrack;
-            yZoom = this.props.horizontal ? zoomTrack : zoomContent;
-        }
-        if (this.scroller) {
-            this.scroller.zoom(xZoom, yZoom);
-            this.scroller.scrollTo(x, y);
-        }
+        this.scroller.zoom(xZoom, yZoom);
+        this.scroller.scrollTo(x, y);
+    }
+
+    setControllerZoom(): void {
+        if (!this.controller) return;
+        if (this.props.domain) this.controller.zoomContentTo(this.props.domain);
+    }
+    setControllerSelection(): void {
+        if (!this.controller) return;
+        if (this.props.selection)
+            this.controller.selectContent(this.props.selection);
     }
 
     render(): ReactNode {
@@ -271,9 +340,9 @@ class WellLogViewer extends Component<Props, State> {
                         axisMnemos={axisMnemos}
                         onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
-                        onTrackEvent={onTrackEvent}
-                        onScrollTrackPos={this.onScrollTrackPos}
-                        onZoomContent={this.onZoomContent}
+                        onTrackMouseEvent={onTrackMouseEvent}
+                        onTrackScroll={this.onTrackScroll}
+                        onContentRescale={this.onContentRescale}
                     />
                 </Scroller>
                 <div style={{ flex: "0, 0, 280px" }}>
@@ -295,7 +364,7 @@ class WellLogViewer extends Component<Props, State> {
                             }}
                         >
                             <Slider
-                                value={Math.log2(this.state.zoomContent)}
+                                value={Math.log2(this.state.contentZoom)}
                                 min={0}
                                 step={0.5}
                                 max={Math.log2(maxContentZoom)}
@@ -324,11 +393,35 @@ WellLogViewer.propTypes = {
      */
     id: PropTypes.string.isRequired,
 
-    // TODO: Add documentation
-    welllog: PropTypes.array,
+    /**
+     * Array of JSON objects describing well log data
+     */
+    welllog: PropTypes.array.isRequired,
 
-    // TODO: Add documentation
-    template: PropTypes.object,
+    /**
+     * Prop containing track template data
+     */
+    template: PropTypes.object.isRequired,
+
+    /**
+     * Prop containing color table data
+     */
+    colorTables: PropTypes.array.isRequired,
+
+    /**
+     * Orientation of the track plots on the screen. Default is false
+     */
+    horizontal: PropTypes.bool,
+
+    /**
+     * Initial visible interval of the log data
+     */
+    domain: PropTypes.array,
+
+    /**
+     * Initial selected interval of the log data
+     */
+    selection: PropTypes.array,
 };
 
 export default WellLogViewer;

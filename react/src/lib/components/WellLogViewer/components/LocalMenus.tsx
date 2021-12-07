@@ -10,7 +10,6 @@ import { Plot } from "@equinor/videx-wellog";
 import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 
 import { ExtPlotOptions } from "../utils/tracks";
-import { newGraphTrack } from "../utils/tracks";
 
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -41,12 +40,14 @@ function getPlotTitle(plot: Plot): string {
     }
     return title;
 }
+
 export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     constructor(props: SimpleMenuProps) {
         super(props);
         this.state = { anchorEl: this.props.anchorEl };
 
         this.addTrack = this.addTrack.bind(this);
+        this.editTrack = this.editTrack.bind(this);
         this.removeTrack = this.removeTrack.bind(this);
     }
     componentDidUpdate(prevProps: SimpleMenuProps): void {
@@ -159,14 +160,21 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     }
 
     addTrack(): void {
-        //newScaleTrack
-        //newDualScaleTrack
-        const trackNew = newGraphTrack("new Track", [], []);
-        this.props.wellLogView.addTrack(trackNew, this.props.track, true);
-        this.props.wellLogView.selectTrack(trackNew, true);
+        this.props.wellLogView.addTrack(this.state.anchorEl, this.props.track);
+    }
+    editTrack(): void {
+        this.props.wellLogView.editTrack(this.state.anchorEl, this.props.track);
     }
     removeTrack(): void {
         this.props.wellLogView.removeTrack(this.props.track);
+    }
+
+    createMenuItem(title: string, action?: () => void): ReactNode {
+        return (
+            <MenuItem key={title} onClick={() => this.handleClickItem(action)}>
+                &nbsp;&nbsp;&nbsp;&nbsp;{title}
+            </MenuItem>
+        );
     }
 
     render(): ReactNode {
@@ -212,20 +220,9 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                         onClose={this.handleCloseMenu.bind(this)}
                         onContextMenu={this.handleContextMenu.bind(this)}
                     >
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(this.addTrack);
-                            }}
-                        >
-                            {"Add track"}
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                this.handleClickItem(this.removeTrack);
-                            }}
-                        >
-                            {"Remove track"}
-                        </MenuItem>
+                        {this.createMenuItem("Add track", this.addTrack)}
+                        {this.createMenuItem("Edit track", this.editTrack)}
+                        {this.createMenuItem("Remove track", this.removeTrack)}
                     </Menu>
                 </div>
             );

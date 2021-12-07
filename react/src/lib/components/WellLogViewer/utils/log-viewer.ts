@@ -58,6 +58,14 @@ export function selectTrack(
     return false; // selection is not changed
 }
 
+export function updateLegendRows(logViewer: LogViewer): void {
+    // access protected member function
+    // eslint-disable-next-line
+    (logViewer as any).updateLegendRows();
+}
+
+///////////////////////
+
 export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
     if (!zoom) zoom = 1.0;
 
@@ -70,8 +78,11 @@ export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
     if (f > 0.01) {
         /*currentZoom !~= zoom*/
         let d = (d2 - d1) * 0.5;
-        const c = d1 + d;
+        let c = d1 + d; // the center of the visible part
         d = d * (currentZoom / zoom);
+        // check if new domain is in the base domain
+        if (c + d > b2) c = b2 - d;
+        if (c - d < b1) c = b1 + d;
         logViewer.zoomTo([c - d, c + d]);
         return true;
     }
@@ -85,7 +96,7 @@ export function scrollContentTo(
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
     const d = d2 - d1;
-    const w = b2 - b1 - (d2 - d1);
+    const w = b2 - b1 - d; // width of not visible part of content
 
     const c = b1 + f * w;
     if (c !== d1) {
@@ -95,13 +106,34 @@ export function scrollContentTo(
     return false;
 }
 
+export function zoomContentTo(
+    logViewer: LogViewer,
+    domain: [number, number]
+): boolean {
+    const [d1, d2] = logViewer.domain;
+    if (domain[0] !== d1 || domain[1] !== d2) {
+        logViewer.zoomTo(domain);
+        return true;
+    }
+    return false;
+}
+
+export function getContentBaseDomain(logViewer: LogViewer): [number, number] {
+    const [b1, b2] = logViewer.scaleHandler.baseDomain();
+    return [b1, b2];
+}
+
+export function getContentDomain(logViewer: LogViewer): [number, number] {
+    const [d1, d2] = logViewer.domain;
+    return [d1, d2];
+}
+
 export function getContentScrollPos(logViewer: LogViewer): number /*fraction*/ {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
     const w = b2 - b1 - (d2 - d1);
     return w ? (d1 - b1) / w : 0;
 }
-
 export function getContentZoom(logViewer: LogViewer): number /*fraction*/ {
     // see also zoomContent(logViewer)
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
