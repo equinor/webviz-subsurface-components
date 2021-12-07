@@ -74,7 +74,6 @@ class Scroller extends Component<Props> {
         // compute fractions
         const x = scrollWidth ? scrollLeft / scrollWidth : 0;
         const y = scrollHeight ? scrollTop / scrollHeight : 0;
-
         this.props.onScroll(x, y); // notify parent
     }
 
