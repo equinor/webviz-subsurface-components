@@ -250,7 +250,7 @@ function getTemplatePlotProps(
             : { ...templatePlot };
     if (!options.type) options.type = defPlotType;
     if (!isValidPlotType(options.type)) {
-        console.log(
+        console.error(
             "unknown plot type '" +
                 options.type +
                 "': use default type '" +
@@ -606,8 +606,6 @@ function editGraphTrackPlot(
                 checkMinMax(minmax, plotData2.minmax);
             }
 
-            //console.log(typeof plot.data);
-
             // Make full props
             const templatePlotProps = getTemplatePlotProps(
                 templatePlot,
@@ -649,7 +647,7 @@ function editGraphTrackPlot(
                 }
 
                 if (!bFound) {
-                    console.log("Error!", "Edited plot not found!");
+                    console.error("Error!", "Edited plot not found!");
                     plots.push(plot);
                 }
 

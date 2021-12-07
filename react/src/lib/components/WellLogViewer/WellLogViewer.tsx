@@ -53,7 +53,6 @@ import { Plot } from "@equinor/videx-wellog";
 
 function onTrackMouseEvent(wellLogView: WellLogView, ev: TrackMouseEvent) {
     const track = ev.track;
-    console.log(ev.area, ev.type);
     if (ev.type === "click") {
         wellLogView.selectTrack(track, !wellLogView.isTrackSelected(track)); // toggle selection
     } else if (ev.type === "dblclick") {
