@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@deck.gl/core": "^8.6.4",
+    "@deck.gl/mesh-layers": "^8.6.4",
+    "@loaders.gl/terrain": "^3.0.13",
+    "loaders": "^1.1.3"
+  }
+}

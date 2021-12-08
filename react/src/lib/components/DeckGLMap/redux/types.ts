@@ -77,6 +77,7 @@ export const LayerIcons = {
     ColormapLayer: "surface_layer",
     Hillshading2DLayer: "hill_shading",
     WellsLayer: "well",
+    Map3DLayer: "color_palette",
     PieChartLayer: "pie_chart",
     GridLayer: "grid_layer",
     FaultPolygonsLayer: "fault",
