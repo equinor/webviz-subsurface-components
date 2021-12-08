@@ -66,6 +66,7 @@ export const NumericTypeProps = [
 
 export const LayerIcons = {
     ColormapLayer: "color_palette",
+    Map3DLayer: "color_palette",
     Hillshading2DLayer: "change_history",
     WellsLayer: "turbine",
     PieChartLayer: "pie_chart",

@@ -198,6 +198,8 @@ function getViewsForDeckGL(): Record<string, unknown>[] {
             width: "100%",
             height: "100%",
             flipY: false,
+            near: -9999,
+            far: 9999,
         },
         {
             "@@type": "OrbitView",

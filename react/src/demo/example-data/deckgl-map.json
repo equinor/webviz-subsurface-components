@@ -71,6 +71,20 @@
         "image": "@@#resources.propertyMap"
       },
       {
+        "@@type": "Map3DLayer",
+        "id": "map3d-layer",
+        "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/heightMap.png",
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
+        ],
+        "meshMaxError": 5,
+        "propertyTexture": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+        "rotDeg": 0
+      },
+      {
         "@@type": "GridLayer",
         "id": "grid-layer",
         "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
