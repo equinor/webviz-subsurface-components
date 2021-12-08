@@ -21,6 +21,12 @@ export type TerrainMapLayerData = [DataItem?];
 export type TerrainMapLayerProps<D> = SimpleMeshLayerProps<D>;
 
 const defaultProps = {
+    data: [{ position: [0, 0], angle: 0, color: [255, 0, 0] }], // dummy data
+
+    getPosition: (d: DataItem) => d.position,
+    getColor: (d: DataItem) => d.color,
+    getOrientation: (d: DataItem) => [0, d.angle, 0],
+
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
 };
 
@@ -46,6 +52,10 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         // Overwrite the default fragment shader with ours.
         parentShaders.fs = fsShader;
         return parentShaders;
+    }
+
+    decodePickingColor(): number {
+        return 0;
     }
 
     // For now, use `any` for the picking types.

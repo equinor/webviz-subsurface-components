@@ -2,14 +2,12 @@ import { CompositeLayer } from "@deck.gl/core";
 import TerrainMapLayer, {
     TerrainMapLayerProps,
     TerrainMapLayerData,
-    DataItem,
 } from "./terrainMapLayer";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
 
 import { getModelMatrix } from "../utils/layerTools";
 
@@ -52,8 +50,6 @@ export default class Map3DLayer extends CompositeLayer<
                 TerrainMapLayerData,
                 TerrainMapLayerProps<TerrainMapLayerData>
             >({
-                data: [{ position: [0, 0], angle: 0, color: [255, 0, 0] }],
-
                 mesh: load(this.props.mesh, TerrainLoader, {
                     terrain: {
                         elevationDecoder: ELEVATION_DECODER,
@@ -64,13 +60,6 @@ export default class Map3DLayer extends CompositeLayer<
 
                 texture: load(this.props.propertyTexture, ImageLoader, {}),
                 pickable: this.props.pickable,
-
-                getPosition: (d: DataItem) => d.position,
-                getColor: (d: DataItem) => d.color,
-                getOrientation: (d: DataItem) => [0, d.angle, 0],
-
-                coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-
                 modelMatrix: rotatingModelMatrix,
             })
         );
