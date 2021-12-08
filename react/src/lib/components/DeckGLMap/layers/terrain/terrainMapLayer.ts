@@ -10,7 +10,15 @@ const DECODER = {
     offset: 0,
 };
 
-type TerrainMapLayerProps<D> = SimpleMeshLayerProps<D>;
+export type DataItem = {
+    position: [number, number];
+    angle: number;
+    color: [number, number, number];
+};
+
+export type TerrainMapLayerData = [DataItem?];
+
+export type TerrainMapLayerProps<D> = SimpleMeshLayerProps<D>;
 
 const defaultProps = {
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -20,11 +28,12 @@ const defaultProps = {
 // It is an extension of SimpleMeshLayer but with modified fragment shader
 // so that the texture pixel values can be used as lookup in  a supplied color map.
 export default class TerrainMapLayer extends SimpleMeshLayer<
-    unknown,
-    TerrainMapLayerProps<unknown>
+    TerrainMapLayerData,
+    TerrainMapLayerProps<TerrainMapLayerData>
 > {
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    draw({ moduleParameters, uniforms, context }: any) {
+    // Signature from the base class, eslint doesn't like the any type.
+    // eslint-disable-next-line
+    draw({ uniforms }: any): void {
         super.draw({
             uniforms: {
                 ...uniforms,

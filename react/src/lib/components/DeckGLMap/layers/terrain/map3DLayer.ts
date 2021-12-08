@@ -1,5 +1,9 @@
 import { CompositeLayer } from "@deck.gl/core";
-import TerrainMapLayer from "./terrainMapLayer";
+import TerrainMapLayer, {
+    TerrainMapLayerProps,
+    TerrainMapLayerData,
+    DataItem,
+} from "./terrainMapLayer";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { TerrainLoader } from "@loaders.gl/terrain";
@@ -15,6 +19,7 @@ const ELEVATION_DECODER = {
     bScaler: -1,
     offset: 0,
 };
+
 export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image representing the height mesh.
     mesh: string;
@@ -43,7 +48,10 @@ export default class Map3DLayer extends CompositeLayer<
         );
 
         const layer = new TerrainMapLayer(
-            this.getSubLayerProps<unknown, Map3DLayerProps<unknown>>({
+            this.getSubLayerProps<
+                TerrainMapLayerData,
+                TerrainMapLayerProps<TerrainMapLayerData>
+            >({
                 data: [{ position: [0, 0], angle: 0, color: [255, 0, 0] }],
 
                 mesh: load(this.props.mesh, TerrainLoader, {
@@ -57,9 +65,9 @@ export default class Map3DLayer extends CompositeLayer<
                 texture: load(this.props.propertyTexture, ImageLoader, {}),
                 pickable: this.props.pickable,
 
-                getPosition: (d) => d.position,
-                getColor: (d) => d.color,
-                getOrientation: (d) => [0, d.angle, 0],
+                getPosition: (d: DataItem) => d.position,
+                getColor: (d: DataItem) => d.color,
+                getOrientation: (d: DataItem) => [0, d.angle, 0],
 
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
 
@@ -73,4 +81,4 @@ export default class Map3DLayer extends CompositeLayer<
 Map3DLayer.layerName = "Map3DLayer";
 Map3DLayer.defaultProps = layersDefaultProps[
     "Map3DLayer"
-] as Map3DLayerProps<unknown>;
+] as Map3DLayerProps<TerrainMapLayerData>;
