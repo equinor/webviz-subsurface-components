@@ -1,5 +1,5 @@
 import * as jsonpatch from "fast-json-patch";
-import DeckGLWrapper from "./DeckGLWrapper";
+import DeckGLWrapper, { ViewsType } from "./DeckGLWrapper";
 import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
@@ -42,9 +42,10 @@ export interface MapProps {
     zoom: number;
 
     /**
-     * If true, displays map in 3D view, default is 2D view (false)
+     * Views configuration for map. If not specified, all the layers will be
+     * displayed in a single 2D viewport
      */
-    view3D: boolean;
+    views?: ViewsType;
 
     /**
      * Parameters for the InfoCard component
@@ -96,7 +97,7 @@ const Map: React.FC<MapProps> = ({
     layers,
     bounds,
     zoom,
-    view3D,
+    views,
     coords,
     scale,
     coordinateUnit,
@@ -141,7 +142,7 @@ const Map: React.FC<MapProps> = ({
                 resources={resources}
                 bounds={bounds}
                 zoom={zoom}
-                view3D={view3D}
+                views={views}
                 coords={coords}
                 scale={scale}
                 coordinateUnit={coordinateUnit}

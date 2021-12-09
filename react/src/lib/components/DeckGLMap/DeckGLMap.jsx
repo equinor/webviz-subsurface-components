@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import * as React from "react";
+import React, { ErrorBoundary } from "react";
 import Map from "./components/Map";
 import template from "../../../demo/example-data/welllayer_template.json";
 import colorTables from "../../../demo/example-data/color-tables.json";
@@ -22,7 +22,11 @@ DeckGLMap.defaultProps = {
         horizontal: true,
     },
     zoom: -3,
-    view3D: false,
+    views: {
+        view3D: false,
+        layout: [1, 1],
+        viewport: [{ id: "main-view", layerIds: [] }],
+    },
     colorTables: colorTables,
     template: template,
 };
@@ -33,7 +37,7 @@ function DeckGLMap({
     layers,
     bounds,
     zoom,
-    view3D,
+    views,
     coords,
     scale,
     legend,
@@ -77,7 +81,7 @@ function DeckGLMap({
             layers={layers}
             bounds={bounds}
             zoom={zoom}
-            view3D={view3D}
+            views={views}
             coords={coords}
             scale={scale}
             legend={legend}
@@ -118,9 +122,37 @@ DeckGLMap.propTypes = {
     zoom: PropTypes.number,
 
     /**
-     * If true, displays map in 3D view, default is 2D view
+     * Views configuration for map. If not specified, all the layers will be
+     * displayed in a single 2D viewport
      */
-    view3D: PropTypes.bool,
+    views: PropTypes.shape({
+        /**
+         * If true, displays map in 3D view, default is 2D view
+         */
+        show3D: PropTypes.bool,
+
+        /**
+         * Layout for viewport in specified as [row, column]
+         */
+        layout: PropTypes.arrayOf(PropTypes.number),
+
+        /**
+         * Layers configuration for multiple viewport
+         */
+        viewports: PropTypes.arrayOf(
+            PropTypes.shape({
+                /**
+                 * Viewport id
+                 */
+                id: PropTypes.string,
+
+                /**
+                 * Layers to be displayed on viewport
+                 */
+                layerIds: PropTypes.arrayOf(PropTypes.string),
+            })
+        ),
+    }),
 
     /** List of JSON object containing layer specific data.
      * Each JSON object will consist of layer type with key as "@@type" and
