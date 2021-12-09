@@ -412,8 +412,6 @@ function getViews(view3D: boolean): Record<string, unknown>[] {
             width: "100%",
             height: "100%",
             flipY: false,
-            near: -9999,
-            far: 9999,
         },
     ];
     return deckgl_views;
