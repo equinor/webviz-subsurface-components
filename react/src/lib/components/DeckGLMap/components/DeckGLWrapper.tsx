@@ -15,10 +15,38 @@ import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
-import { Layer, View } from "deck.gl";
+import { Layer } from "deck.gl";
+import { View, Viewport } from "@deck.gl/core";
 import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 import { LayerProps } from "@deck.gl/core/lib/layer";
+
+export interface ViewsType {
+    /**
+     * If true, displays map in 3D view, default is 2D view (false)
+     */
+    show3D: boolean;
+
+    /**
+     * Layout for viewport in specified as [row, column]
+     */
+    layout: [number, number];
+
+    /**
+     * Layers configuration for multiple viewport
+     */
+    viewports: {
+        /**
+         * Viewport id
+         */
+        id: string;
+
+        /**
+         * Layers to be displayed on viewport
+         */
+        layerIds: string[];
+    }[];
+}
 
 export interface DeckGLWrapperProps {
     /**
@@ -48,9 +76,10 @@ export interface DeckGLWrapperProps {
     zoom: number;
 
     /**
-     * If true, displays map in 3D view, default is 2D view
+     * Views configuration for map. If not specified, all the layers will be
+     * displayed in a single 2D viewport
      */
-    view3D: boolean;
+    views?: ViewsType;
 
     /**
      * Parameters for the InfoCard component
@@ -109,7 +138,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     resources,
     bounds,
     zoom,
-    view3D,
+    views,
     coords,
     scale,
     coordinateUnit,
@@ -130,8 +159,8 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     // state for views prop of DeckGL component
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
     useEffect(() => {
-        setDeckGLViews(getViewsForDeckGL(view3D));
-    }, [view3D]);
+        setDeckGLViews(getViewsForDeckGL(views));
+    }, [views]);
 
     // get layers data from store
     const layersData = useSelector((st: MapState) => st.layers);
@@ -184,6 +213,9 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
             );
         }
     }, [drawingLayer?.props.mode, dispatch]);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [viewState, setViewState] = useState<any>();
 
     const refCb = useCallback(
         (deckRef) => {
@@ -274,8 +306,24 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         });
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [viewState, setViewState] = useState<any>();
+    const layerFilter = (args: {
+        layer: Layer<unknown, LayerProps<unknown>>;
+        viewport: Viewport;
+    }): boolean => {
+        // display all the layers if views are not specified correctly
+        if (!views || !views.viewports || !views.layout) return true;
+
+        const id_suffix = views.show3D ? "_3D" : "_2D";
+        const cur_view = views.viewports.find(({ id }) => {
+            return id + id_suffix === args.viewport.id;
+        });
+        if (cur_view) {
+            const layer_ids = cur_view.layerIds;
+            return layer_ids.some((layer_id) => args.layer.id.match(layer_id));
+        } else {
+            return true;
+        }
+    };
 
     if (!deckGLViews) return null;
 
@@ -283,8 +331,10 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         <div>
             <DeckGL
                 id={id}
+                viewState={viewState}
                 initialViewState={initialViewState}
                 views={deckGLViews}
+                layerFilter={layerFilter}
                 layers={deckGLLayers}
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
@@ -302,14 +352,26 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 }}
                 ref={refCb}
                 onHover={onHover}
-                onViewStateChange={({ viewState }) => setViewState(viewState)}
+                onViewStateChange={(viewport) =>
+                    setViewState(viewport.viewState)
+                }
                 onAfterRender={onAfterRender}
                 onLoad={onLoad}
             >
                 {children}
+                {deckGLViews.map((viewport) => (
+                    <View id={viewport.id} key={viewport.id}>
+                        {deckGLLayers && (
+                            <StatusIndicator
+                                layers={deckGLLayers}
+                                isLoaded={isLoaded}
+                            />
+                        )}
+                        <Settings />
+                    </View>
+                ))}
             </DeckGL>
-            {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
-            <Settings />
+
             {viewState && scale.visible ? (
                 <DistanceScale
                     zoom={viewState.zoom}
@@ -319,6 +381,9 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
+
+            {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
+
             {legend.visible && legendProps.discrete && (
                 <DiscreteColorLegend
                     discreteData={legendProps.metadata}
@@ -344,9 +409,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         horizontal={legend.horizontal}
                     />
                 )}
-            {deckGLLayers && (
-                <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
-            )}
         </div>
     );
 };
@@ -354,6 +416,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 export default DeckGLWrapper;
 
 // ------------- Helper functions ---------- //
+
 // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
 // See https://deck.gl/docs/api-reference/json/overview for more details.
 function jsonToObject(
@@ -375,8 +438,8 @@ function jsonToObject(
 }
 
 // Returns DeckGL specific views object
-function getViewsForDeckGL(view3D: boolean): View[] {
-    return jsonToObject(getViews(view3D)) as View[];
+function getViewsForDeckGL(views: ViewsType | undefined): View[] {
+    return jsonToObject(getViews(views)) as View[];
 }
 
 // returns initial view state for DeckGL
@@ -397,22 +460,51 @@ function getInitialViewState(
 }
 
 // construct views object for DeckGL component
-function getViews(view3D: boolean): Record<string, unknown>[] {
-    const view_type = view3D ? "OrbitView" : "OrthographicView";
-    const id = view3D ? "main3D" : "main2D";
-    const deckgl_views = [
-        {
-            "@@type": view_type,
-            id: id,
-            controller: {
-                doubleClickZoom: false,
-            },
+function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
+    const deckgl_views = [];
+    // if props for multiple viewport are not proper, return 2d view
+    if (!views || !views.viewports || !views.layout) {
+        deckgl_views.push({
+            "@@type": "OrthographicView",
+            id: "main",
+            controller: { doubleClickZoom: false },
             x: "0%",
             y: "0%",
             width: "100%",
             height: "100%",
             flipY: false,
-        },
-    ];
+        });
+    } else {
+        const view_type = views.show3D ? "OrbitView" : "OrthographicView";
+        const id_suffix = views.show3D ? "_3D" : "_2D";
+
+        let yPos = 0;
+        const [nY, nX] = views.layout;
+        for (let y = 1; y <= nY; y++) {
+            let xPos = 0;
+            for (let x = 1; x <= nX; x++) {
+                if (
+                    views.viewports == undefined ||
+                    deckgl_views.length >= views.viewports.length
+                )
+                    return deckgl_views;
+
+                deckgl_views.push({
+                    "@@type": view_type,
+                    id: views.viewports[deckgl_views.length].id + id_suffix,
+                    controller: {
+                        doubleClickZoom: false,
+                    },
+                    x: xPos + "%",
+                    y: yPos + "%",
+                    width: 100 / nX + "%", // remove -5
+                    height: 100 / nY + "%",
+                    flipY: false,
+                });
+                xPos = xPos + 100 / nX;
+            }
+            yPos = yPos + 100 / nY;
+        }
+    }
     return deckgl_views;
 }
