@@ -1,5 +1,6 @@
 import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
 import { rootReducer } from "./reducer";
+import { enhancer } from "addon-redux";
 import { LayerProps } from "@deck.gl/core/lib/layer";
 
 export type MapState = ReturnType<typeof rootReducer>;
@@ -9,4 +10,5 @@ export const createStore: (
     configureStore({
         reducer: rootReducer,
         preloadedState: { layers: initialState },
+        enhancers: [enhancer],
     });

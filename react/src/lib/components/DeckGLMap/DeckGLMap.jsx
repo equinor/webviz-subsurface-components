@@ -22,6 +22,7 @@ DeckGLMap.defaultProps = {
         horizontal: true,
     },
     zoom: -3,
+    view3D: false,
     colorTables: colorTables,
     template: template,
 };
@@ -32,6 +33,7 @@ function DeckGLMap({
     layers,
     bounds,
     zoom,
+    view3D,
     coords,
     scale,
     legend,
@@ -75,6 +77,7 @@ function DeckGLMap({
             layers={layers}
             bounds={bounds}
             zoom={zoom}
+            view3D={view3D}
             coords={coords}
             scale={scale}
             legend={legend}
@@ -113,6 +116,11 @@ DeckGLMap.propTypes = {
      * Zoom level for the view.
      */
     zoom: PropTypes.number,
+
+    /**
+     * If true, displays map in 3D view, default is 2D view
+     */
+    view3D: PropTypes.bool,
 
     /** List of JSON object containing layer specific data.
      * Each JSON object will consist of layer type with key as "@@type" and

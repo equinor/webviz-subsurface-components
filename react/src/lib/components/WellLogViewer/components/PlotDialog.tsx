@@ -87,21 +87,18 @@ function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
     return nodes;
 }
 
-interface PlotPropertiesDialogProps {
+interface Props {
     templatePlot?: TemplatePlot; // input for editting
     onOK: (templatePlot: TemplatePlot) => void;
     wellLogView: WellLogView;
     track: Track;
 }
-interface PlotPropertiesDialogState extends TemplatePlot {
+interface State extends TemplatePlot {
     open: boolean;
 }
 
-export class PlotPropertiesDialog extends Component<
-    PlotPropertiesDialogProps,
-    PlotPropertiesDialogState
-> {
-    constructor(props: PlotPropertiesDialogProps) {
+export class PlotPropertiesDialog extends Component<Props, State> {
+    constructor(props: Props) {
         super(props);
         let name = "",
             name2 = "";
@@ -116,7 +113,7 @@ export class PlotPropertiesDialog extends Component<
                   open: true,
               }
             : {
-                  // we shold fill every posible state to allow this.setState() to set it
+                  // we should fill every posible state to allow this.setState() to set it
                   type: "line",
                   name: name, //?? the first data in data selector
                   name2: name2, //? the second data in data selector ??
@@ -143,17 +140,26 @@ export class PlotPropertiesDialog extends Component<
         this.onOK = this.onOK.bind(this);
     }
 
-    onOK(): void {
-        const templatePlot = { ...this.state };
-        // set some values wich are not edited by the dialog
-        if (templatePlot.type === "gradientfill")
-            templatePlot.inverseColor = "";
-        else if (templatePlot.type === "differential") {
-            const skipUsed = this.props.templatePlot ? false : true; /*??*/
-            if (!templatePlot.name2)
-                templatePlot.name2 = this.dataNames(skipUsed)[0];
+    componentDidUpdate(_prevProps: Props, prevState: State): void {
+        if (this.state.type !== prevState.type) {
+            if (this.state.type === "area") {
+                if (!this.state.fill) this.setState({ fill: "black" });
+            } else if (this.state.type === "gradientfill") {
+                if (this.state.inverseColor)
+                    this.setState({ inverseColor: "" });
+            } else if (this.state.type === "differential") {
+                if (!this.state.name2) {
+                    const skipUsed = this.props.templatePlot
+                        ? false
+                        : true; /*??*/
+                    this.setState({ name2: this.dataNames(skipUsed)[0] });
+                }
+            }
         }
-        this.props.onOK(templatePlot);
+    }
+
+    onOK(): void {
+        this.props.onOK(this.state);
         this.closeDialog();
     }
 
@@ -230,14 +236,14 @@ export class PlotPropertiesDialog extends Component<
                 <NativeSelect
                     value={value}
                     onChange={(event) => {
-                        const values = new Object() as Record<string, string>;
-                        values[valueName] =
+                        const value =
                             event.currentTarget.value === noneValue
                                 ? ""
                                 : event.currentTarget.value;
-                        this.setState(
-                            values as unknown as PlotPropertiesDialogState
-                        );
+
+                        const values = new Object() as Record<string, string>;
+                        values[valueName] = value;
+                        this.setState(values as unknown as State);
                     }}
                 >
                     {nodes}
@@ -251,7 +257,12 @@ export class PlotPropertiesDialog extends Component<
         const skipUsed = this.props.templatePlot ? false : true; /*??*/
         const colorTables = this.props.wellLogView.props.colorTables;
         return (
-            <Dialog open={this.state.open} maxWidth="sm" fullWidth>
+            <Dialog
+                open={this.state.open}
+                maxWidth="sm"
+                fullWidth
+                onClose={() => this.setState({ open: false })}
+            >
                 <DialogTitle>{title}</DialogTitle>
                 <DialogContent
                     style={{
