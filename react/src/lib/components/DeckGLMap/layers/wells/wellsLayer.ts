@@ -18,7 +18,7 @@ import {
     createPropertyData,
 } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
-import { splineRefine } from "./utils/spline";
+import { flattenPath, splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
@@ -37,6 +37,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
+    is3d: boolean;
 }
 
 export interface LogCurveDataType {
@@ -83,9 +84,17 @@ export default class WellsLayer extends CompositeLayer<
         }
 
         const refine = this.props.refine;
-        const data = refine
+        let data = refine
             ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
             : (this.props.data as FeatureCollection);
+
+        const is3d = this.props.is3d;
+        if (!is3d) {
+            // In 2D flatten wells.
+            data = flattenPath(data);
+        }
+
+        const positionFormat = is3d ? "XYZ" : "XY";
 
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
@@ -93,7 +102,7 @@ export default class WellsLayer extends CompositeLayer<
                 data,
                 pickable: false,
                 stroked: false,
-                positionFormat: "XY",
+                positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale,
@@ -108,7 +117,7 @@ export default class WellsLayer extends CompositeLayer<
                 data,
                 pickable: true,
                 stroked: false,
-                positionFormat: "XY",
+                positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale - 1,
@@ -128,7 +137,7 @@ export default class WellsLayer extends CompositeLayer<
                 ),
                 pickable: false,
                 stroked: false,
-                positionFormat: "XY",
+                positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale + 2,
@@ -142,7 +151,7 @@ export default class WellsLayer extends CompositeLayer<
             this.getSubLayerProps<LogCurveDataType>({
                 id: "log_curve",
                 data: this.props.logData,
-                positionFormat: "XY",
+                positionFormat,
                 pickable: true,
                 widthScale: 10,
                 widthMinPixels: 1,
