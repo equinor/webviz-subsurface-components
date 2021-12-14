@@ -36,6 +36,22 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
     },
+    Map3DLayer: {
+        name: "Map 3D",
+        id: "3D-map-layer",
+        pickable: true,
+        visible: false,
+        // Url to png image for height field.
+        mesh: { type: "string", optional: false },
+        // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
+        meshMaxError: { type: "number", value: 5 },
+        // Url to png image for map properties. (ex, poro or perm values as a texture)
+        propertyTexture: { type: "string", optional: false },
+        // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
+        bounds: { type: "array", value: null, false: true, compare: true },
+        valueRange: { type: "array", value: [0, 1] },
+        rotDeg: 0,
+    },
     GridLayer: {
         name: "Grid",
         pickable: true,
