@@ -32,6 +32,8 @@
         "setup-deckgl-types": "cd ./node_modules/@danmarshall/deckgl-typings/ && indefinitely-typed --folder deck.gl__aggregation-layers --folder deck.gl__core --folder deck.gl__extensions --folder deck.gl__geo-layers --folder deck.gl__google-maps --folder deck.gl__json --folder deck.gl__layers --folder deck.gl__mapbox --folder deck.gl__mesh-layers --folder deck.gl__react --folder deck.gl --folder luma.gl__constants --folder luma.gl__core --folder luma.gl__gltools --folder luma.gl__webgl-state-tracker --folder luma.gl__webgl --folder math.gl__core --folder math.gl",
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook",
+        "test_perf": "jest _performance",
+        "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
         "test": "jest --coverage",
         "test:watch": "npm test -- --watch",
         "build:npm": "rimraf dist && tsc --declaration && npm run copy-files",
@@ -46,8 +48,11 @@
     "dependencies": {
         "@danmarshall/deckgl-typings": "^4.9.0",
         "@equinor/eds-core-react": "^0.12.1",
-        "@equinor/eds-icons": "^0.6.2",
+        "@equinor/eds-icons": "^0.9.1",
         "@equinor/videx-wellog": "^0.4.5",
+        "@loaders.gl/core": "^2.3.13",
+        "@loaders.gl/images": "^2.3.13",
+        "@loaders.gl/terrain": "^3.1.1",
         "@material-ui/core": "^4.11.3",
         "@material-ui/lab": "^4.0.0-alpha.57",
         "@reduxjs/toolkit": "^1.5.0",
@@ -57,7 +62,7 @@
         "@types/react-dom": "^17.0.3",
         "@types/react-redux": "^7.1.15",
         "@types/react-resize-detector": "^5.0.0",
-        "@webviz/core-components": "next",
+        "@webviz/core-components": "^0.5.4",
         "addon-redux": "^2.0.8",
         "ajv": "^7.2.1",
         "clsx": "^1.1.1",
@@ -86,6 +91,7 @@
         "uuid": "^8.3.2"
     },
     "devDependencies": {
+        "@actions/core": "^1.6.0",
         "@babel/core": "^7.13.10",
         "@babel/plugin-proposal-class-properties": "^7.13.0",
         "@babel/preset-env": "^7.13.12",

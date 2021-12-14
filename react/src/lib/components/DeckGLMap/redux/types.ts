@@ -1,15 +1,24 @@
 import { Icon } from "@equinor/eds-core-react";
 import {
+    well,
     brush,
-    color_palette,
+    fault,
     pie_chart,
-    waves,
-    change_history,
-    turbine,
+    grid_layer,
+    hill_shading,
+    surface_layer,
 } from "@equinor/eds-icons";
 
 // (this needs only be done once)
-Icon.add({ brush, color_palette, pie_chart, waves, change_history, turbine });
+Icon.add({
+    well,
+    brush,
+    fault,
+    pie_chart,
+    grid_layer,
+    hill_shading,
+    surface_layer,
+});
 
 export type DrawMode =
     | "view"
@@ -65,12 +74,13 @@ export const NumericTypeProps = [
 ] as const;
 
 export const LayerIcons = {
-    ColormapLayer: "color_palette",
-    Hillshading2DLayer: "change_history",
-    WellsLayer: "turbine",
+    ColormapLayer: "surface_layer",
+    Hillshading2DLayer: "hill_shading",
+    WellsLayer: "well",
+    Map3DLayer: "color_palette",
     PieChartLayer: "pie_chart",
-    GridLayer: "pie_chart",
-    FaultPolygonsLayer: "waves",
+    GridLayer: "grid_layer",
+    FaultPolygonsLayer: "fault",
     DrawingLayer: "brush",
 };
 

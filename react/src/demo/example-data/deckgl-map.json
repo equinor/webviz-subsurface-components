@@ -25,7 +25,9 @@
     },
     "coordinateUnit": "m",
     "resources": {
-      "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png"
+      "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+      "wellsData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+      "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json"
     },
     "bounds": [
       432205,
@@ -34,6 +36,7 @@
       6481113
     ],
     "zoom": -3,
+    "view3D": false,
     "layers": [
       {
         "@@type": "ColormapLayer",
@@ -71,6 +74,20 @@
         "image": "@@#resources.propertyMap"
       },
       {
+        "@@type": "Map3DLayer",
+        "id": "map3d-layer",
+        "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/depthMap.png",
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
+        ],
+        "meshMaxError": 5,
+        "propertyTexture": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+        "rotDeg": 0
+      },
+      {
         "@@type": "GridLayer",
         "id": "grid-layer",
         "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
@@ -78,8 +95,8 @@
       },
       {
         "@@type": "WellsLayer",
-        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-        "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+        "data": "@@#resources.wellsData",
+        "logData": "@@#resources.logData",
         "logrunName": "BLOCKING",
         "logName": "ZONELOG",
         "selectedWell": "@@#editedData.selectedWell"
