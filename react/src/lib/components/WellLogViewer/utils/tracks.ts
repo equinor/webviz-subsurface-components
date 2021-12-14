@@ -39,6 +39,8 @@ import {
     roundLogMinMax,
 } from "./minmax";
 
+import { updateLegendRows } from "./log-viewer";
+
 function indexOfElementByName(array: Named[], name: string): number {
     if (name) {
         const nameUpper = name.toUpperCase();
@@ -219,7 +221,6 @@ export function getPlotType(plot: Plot): string {
     if (plot instanceof DotPlot) return "dot";
     if (plot instanceof DifferentialPlot) return "differential";
     if (plot instanceof LineStepPlot) return "linestep";
-    if (plot instanceof LineStepPlot) return "linestep";
     return "";
 }
 
@@ -249,7 +250,7 @@ function getTemplatePlotProps(
             : { ...templatePlot };
     if (!options.type) options.type = defPlotType;
     if (!isValidPlotType(options.type)) {
-        console.log(
+        console.error(
             "unknown plot type '" +
                 options.type +
                 "': use default type '" +
@@ -440,7 +441,7 @@ function getPlotConfig(
     };
 }
 
-export function addGraphTrackPlot(
+function addGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
     templatePlot: TemplatePlot
@@ -492,6 +493,12 @@ export function addGraphTrackPlot(
                     : -1;
                 curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
                 plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+                if (!curve2)
+                    console.error(
+                        "templatePlot.name2 '" +
+                            templatePlot.name2 +
+                            "' not found"
+                    );
                 checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
                 checkMinMax(minmax, plotData2.minmax);
             }
@@ -536,7 +543,7 @@ export function addGraphTrackPlot(
     return minmaxPrimaryAxis;
 }
 
-export function editGraphTrackPlot(
+function editGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
     plot: Plot,
@@ -588,12 +595,16 @@ export function editGraphTrackPlot(
                     ? indexOfElementByName(curves, templatePlot.name2)
                     : -1;
                 curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
+                if (!curve2)
+                    console.error(
+                        "templatePlot.name2 '" +
+                            templatePlot.name2 +
+                            "' not found"
+                    );
                 plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
                 checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
                 checkMinMax(minmax, plotData2.minmax);
             }
-
-            //console.log(typeof plot.data);
 
             // Make full props
             const templatePlotProps = getTemplatePlotProps(
@@ -636,7 +647,7 @@ export function editGraphTrackPlot(
                 }
 
                 if (!bFound) {
-                    console.log("Error!", "Edited plot not found!");
+                    console.error("Error!", "Edited plot not found!");
                     plots.push(plot);
                 }
 
@@ -647,7 +658,34 @@ export function editGraphTrackPlot(
     return minmaxPrimaryAxis;
 }
 
-export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
+export function addOrEditGraphTrackPlot(
+    wellLogView: WellLogView,
+    track: GraphTrack,
+    plot: Plot | null,
+    templatePlot: TemplatePlot
+): void {
+    const minmaxPrimaryAxis = plot
+        ? editGraphTrackPlot(wellLogView, track, plot, templatePlot)
+        : addGraphTrackPlot(wellLogView, track, templatePlot);
+
+    if (wellLogView.logController) {
+        {
+            const baseDomain =
+                wellLogView.logController.scaleHandler.baseDomain();
+            // update base domain to take into account new plot data range
+            if (baseDomain[0] > minmaxPrimaryAxis[0])
+                baseDomain[0] = minmaxPrimaryAxis[0];
+            if (baseDomain[1] < minmaxPrimaryAxis[1])
+                baseDomain[1] = minmaxPrimaryAxis[1];
+            wellLogView.logController.rescale();
+        }
+
+        updateLegendRows(wellLogView.logController);
+        wellLogView.logController.updateTracks();
+    }
+}
+
+function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
     const plots = track.plots;
 
     let index = 0;
@@ -662,19 +700,15 @@ export function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
 }
 
 export function removeGraphTrackPlot(
-    _wellLogView: WellLogView,
+    wellLogView: WellLogView,
     track: GraphTrack,
     _plot: Plot
 ): void {
-    const plots = track.plots;
+    _removeGraphTrackPlot(track, _plot);
 
-    let index = 0;
-    for (const plot of plots) {
-        if (plot === _plot) {
-            plots.splice(index, 1);
-            break;
-        }
-        index++;
+    if (wellLogView.logController) {
+        updateLegendRows(wellLogView.logController);
+        wellLogView.logController.updateTracks();
     }
 
     track.prepareData();
@@ -901,4 +935,50 @@ export function createTracks(
         }
     }
     return info;
+}
+
+function addTrack(
+    wellLogView: WellLogView,
+    trackNew: Track,
+    trackCurrent: Track,
+    bAfter: boolean
+): void {
+    if (wellLogView.logController) {
+        let order = 0;
+        for (const track of wellLogView.logController.tracks) {
+            track.order = order++;
+            if (trackCurrent == track) {
+                if (bAfter) {
+                    // add after
+                    trackNew.order = order++;
+                } else {
+                    // insert before current
+                    trackNew.order = track.order;
+                    track.order = order++;
+                }
+            }
+        }
+
+        wellLogView.logController.addTrack(trackNew);
+    }
+}
+
+export function addOrEditGraphTrack(
+    wellLogView: WellLogView,
+    track: GraphTrack | null,
+    templateTrack: TemplateTrack,
+    trackCurrent: Track,
+    bAfter: boolean
+): GraphTrack {
+    if (track) {
+        // edit existing track
+        track.options.label = templateTrack.title;
+    } else {
+        track = newGraphTrack(templateTrack.title, [], []);
+        addTrack(wellLogView, track, trackCurrent, bAfter);
+    }
+    if (wellLogView.logController) {
+        wellLogView.logController.updateTracks();
+    }
+    return track;
 }
