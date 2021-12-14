@@ -29,6 +29,7 @@ describe("Test Map component performance", () => {
                     setEditedData={(data: Record<string, unknown>) => data}
                     template={[templateData[0]]}
                     colorTables={[colorTablesData[0]]}
+                    view3D={false}
                 />
             </Profiler>
         );
