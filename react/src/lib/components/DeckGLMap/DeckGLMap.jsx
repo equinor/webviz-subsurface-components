@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { ErrorBoundary } from "react";
+import React from "react";
 import Map from "./components/Map";
 import template from "../../../demo/example-data/welllayer_template.json";
 import colorTables from "../../../demo/example-data/color-tables.json";
@@ -127,11 +127,6 @@ DeckGLMap.propTypes = {
      */
     views: PropTypes.shape({
         /**
-         * If true, displays map in 3D view, default is 2D view
-         */
-        show3D: PropTypes.bool,
-
-        /**
          * Layout for viewport in specified as [row, column]
          */
         layout: PropTypes.arrayOf(PropTypes.number),
@@ -145,6 +140,11 @@ DeckGLMap.propTypes = {
                  * Viewport id
                  */
                 id: PropTypes.string,
+
+                /**
+                 * If true, displays map in 3D view, default is 2D view
+                 */
+                show3D: PropTypes.bool,
 
                 /**
                  * Layers to be displayed on viewport
