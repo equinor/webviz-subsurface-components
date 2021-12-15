@@ -23,11 +23,6 @@ import { LayerProps } from "@deck.gl/core/lib/layer";
 
 export interface ViewsType {
     /**
-     * If true, displays map in 3D view, default is 2D view (false)
-     */
-    show3D: boolean;
-
-    /**
      * Layout for viewport in specified as [row, column]
      */
     layout: [number, number];
@@ -40,6 +35,11 @@ export interface ViewsType {
          * Viewport id
          */
         id: string;
+
+        /**
+         * If true, displays map in 3D view, default is 2D view (false)
+         */
+        show3D: boolean;
 
         /**
          * Layers to be displayed on viewport
@@ -313,10 +313,10 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         // display all the layers if views are not specified correctly
         if (!views || !views.viewports || !views.layout) return true;
 
-        const id_suffix = views.show3D ? "_3D" : "_2D";
-        const cur_view = views.viewports.find(({ id }) => {
-            return id + id_suffix === args.viewport.id;
-        });
+        const cur_view = views.viewports.find(
+            ({ id }) =>
+                args.viewport.id && new RegExp("^" + id).test(args.viewport.id)
+        );
         if (cur_view) {
             const layer_ids = cur_view.layerIds;
             return layer_ids.some((layer_id) => args.layer.id.match(layer_id));
@@ -475,9 +475,6 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
             flipY: false,
         });
     } else {
-        const view_type = views.show3D ? "OrbitView" : "OrthographicView";
-        const id_suffix = views.show3D ? "_3D" : "_2D";
-
         let yPos = 0;
         const [nY, nX] = views.layout;
         for (let y = 1; y <= nY; y++) {
@@ -489,15 +486,22 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                 )
                     return deckgl_views;
 
+                const cur_viewport = views.viewports[deckgl_views.length];
+                const view_type: string = cur_viewport.show3D
+                    ? "OrbitView"
+                    : "OrthographicView";
+                const id_suffix = cur_viewport.show3D ? "_3D" : "_2D";
+                const view_id: string = cur_viewport.id + id_suffix;
+
                 deckgl_views.push({
                     "@@type": view_type,
-                    id: views.viewports[deckgl_views.length].id + id_suffix,
+                    id: view_id,
                     controller: {
                         doubleClickZoom: false,
                     },
                     x: xPos + "%",
                     y: yPos + "%",
-                    width: 100 / nX + "%", // remove -5
+                    width: 100 / nX + "%",
                     height: 100 / nY + "%",
                     flipY: false,
                 });
