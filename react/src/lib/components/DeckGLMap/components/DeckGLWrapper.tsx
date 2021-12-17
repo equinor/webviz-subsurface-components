@@ -11,6 +11,10 @@ import { updateLayerProp } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
+// @ts-ignore
+//import DiscreteColorLegend from "@emerson-eps/color-tables";
+//const DiscreteColorLegend1 = require('@emerson-eps/color-tables');
+//import { DiscreteColorLegend } from "@emerson-eps/color-tables/react-app/src/component/Legend/DiscreteLegend";
 import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
@@ -120,6 +124,8 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     colorTables,
     children,
 }: DeckGLWrapperProps) => {
+    console.log('DiscreteColorLegend', DiscreteColorLegend)
+    //console.log('DiscreteColorLegend1', DiscreteColorLegend1)
     // state for initial views prop (target and zoom) of DeckGL component
     const [initialViewState, setInitialViewState] =
         useState<Record<string, unknown>>();
