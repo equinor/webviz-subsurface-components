@@ -173,7 +173,7 @@ export default class WellsLayer extends CompositeLayer<
                     getColor: [this.props.logName],
                     getWidth: [this.props.logName, this.props.logRadius],
                 },
-                dataComparator: (value: LogCurveDataType[]) => {
+                onDataLoad: (value: LogCurveDataType[]) => {
                     this.setState({
                         legend: getLegendData(value, this.props.logName),
                     });
