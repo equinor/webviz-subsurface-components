@@ -10,8 +10,6 @@ import { GraphTrackOptions } from "@equinor/videx-wellog/dist/tracks/graph/inter
 
 import { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 
-
-
 import { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 import { GradientFillPlotOptions } from "./gradientfill-plot";
 export interface ExtPlotOptions
@@ -360,19 +358,21 @@ function getColorTable(
 function getPlotOptions(
     templatePlotProps: TemplatePlotProps,
     colorTables: ColorTable[], //"gradientfill" plot
-    trackScale: string|undefined, // track scale
+    trackScale: string | undefined, // track scale
     minmax: [number, number],
     curve: WellLogCurve,
     iPlot: number,
     curve2: WellLogCurve | undefined, //"differential" plot
     iPlot2: number //"differential" plot
 ): ExtPlotOptions {
-    const scale = (templatePlotProps.scale || trackScale) || "linear"; //"linear" or "log"
-    const domain=(scale === "log" || 
-      (templatePlotProps.type === "gradientfill" && templatePlotProps.colorScale === "log")
-      ? roundLogMinMax
-      : roundMinMax)
-      (minmax);
+    const scale = templatePlotProps.scale || trackScale || "linear"; //"linear" or "log"
+    const domain = (
+        scale === "log" ||
+            (templatePlotProps.type === "gradientfill" &&
+                templatePlotProps.colorScale === "log")
+            ? roundLogMinMax
+            : roundMinMax
+    )(minmax);
 
     const options: ExtPlotOptions = {
         dataAccessor: curve2
@@ -439,7 +439,7 @@ function getPlotConfig(
     id: string | number,
     templatePlotProps: TemplatePlotProps,
     colorTables: ColorTable[],
-    trackScale: string | undefined, // track scale 
+    trackScale: string | undefined, // track scale
     minmax: [number, number],
     curve: WellLogCurve,
     iPlot: number,
@@ -466,28 +466,26 @@ function getPlotConfig(
  * @param track
  * @param options - options for the first plot of the track
  */
-function updateTrackScale(track: GraphTrack) : void {
-    const track_options=track.options as TrackOptionsEx;
-    const templateTrack= track_options.__template;
-    if(templateTrack) {
-      if(templateTrack.plots.length) {
-        const plotTemplate = templateTrack.plots[0];
-        track.options.scale=plotTemplate.scale;
-        track.options.domain=plotTemplate.domain;
+function updateTrackScale(track: GraphTrack): void {
+    const track_options = track.options as TrackOptionsEx;
+    const templateTrack = track_options.__template;
+    if (templateTrack) {
+        if (templateTrack.plots.length) {
+            const plotTemplate = templateTrack.plots[0];
+            track.options.scale = plotTemplate.scale;
+            track.options.domain = plotTemplate.domain;
 
-        if(!track.options.label) 
-          track.options.label = plotTemplate.name;
-      }
-      if(!track.options.scale)
-        track.options.scale=track_options.__template.scale || "linear";
+            if (!track.options.label) track.options.label = plotTemplate.name;
+        }
+        if (!track.options.scale)
+            track.options.scale = track_options.__template.scale || "linear";
     }
 
     if (track.plots.length) {
-        const plot = track.plots[0]
+        const plot = track.plots[0];
         track.options.domain = plot.options.domain;
     }
 
-   
     if (!track.options.scale) throw Error("Invalid track.options.scale!");
     if (!track.options.domain) throw Error("Invalid track.options.domain!");
     track.trackScale = createScale(track.options.scale, track.options.domain);
@@ -498,7 +496,7 @@ function addGraphTrackPlot(
     track: GraphTrack,
     templatePlot: TemplatePlot
 ): [number, number] {
-    const templateTrack=getTrackTemplate(track);
+    const templateTrack = getTrackTemplate(track);
     const minmaxPrimaryAxis: [number, number] = [
         Number.POSITIVE_INFINITY,
         Number.NEGATIVE_INFINITY,
@@ -603,7 +601,7 @@ function editGraphTrackPlot(
     plot: Plot,
     templatePlot: TemplatePlot
 ): [number, number] {
-    const templateTrack=getTrackTemplate(track);
+    const templateTrack = getTrackTemplate(track);
     const minmaxPrimaryAxis: [number, number] = [
         Number.POSITIVE_INFINITY,
         Number.NEGATIVE_INFINITY,
@@ -697,8 +695,8 @@ function editGraphTrackPlot(
                 const plotNew = createPlot(p, track.trackScale);
                 if (plotNew) {
                     plots[iPlot] = plotNew; // replace plot
-                    templateTrack.plots[iPlot]=templatePlot;
-                    updateTrackScale(track);        
+                    templateTrack.plots[iPlot] = templatePlot;
+                    updateTrackScale(track);
                     track.prepareData();
                 }
             }
@@ -808,28 +806,24 @@ const defaultOptions: GraphTrackOptions = {
     legendConfig: graphLegendConfig,
 };
 
-
 export interface TrackOptionsEx extends TrackOptions {
-    __template: TemplateTrack
+    __template: TemplateTrack;
 }
 
 export function getTrackTemplate(track: Track): TemplateTrack {
-    const options=track.options as TrackOptionsEx;
-    if(options.__template)
-      return options.__template;
+    const options = track.options as TrackOptionsEx;
+    if (options.__template) return options.__template;
     else {
-    console.error("No __template given in track!");
-    const options = (track as GraphTrack).options;
-    return {
-        title: options.label ? options.label : "",
-        scale: options.scale === "log" ? "log" : "linear",
-        //domain: options.domain,
-        plots: [],
-    };
+        console.error("No __template given in track!");
+        const options = (track as GraphTrack).options;
+        return {
+            title: options.label ? options.label : "",
+            scale: options.scale === "log" ? "log" : "linear",
+            //domain: options.domain,
+            plots: [],
+        };
     }
 }
-
-
 
 export function newGraphTrack(
     /* should contains
@@ -1009,11 +1003,11 @@ export function createTracks(
                     plots: plots,
                 };
                 setTrackOptionFromTemplate(options, templateTrack);
-                options.label=makeTrackHeader(welllog, templateTrack);
+                options.label = makeTrackHeader(welllog, templateTrack);
 
                 const track = newGraphTrack(options);
                 updateTrackScale(track);
-                info.tracks.push(track);                
+                info.tracks.push(track);
             }
         }
     }
@@ -1049,7 +1043,7 @@ function addTrack(
 function setTrackOptionFromTemplate(
     options: GraphTrackOptions,
     templateTrack: TemplateTrack
-) : void {
+): void {
     options.label = templateTrack.title;
     {
         if (templateTrack.scale) options.scale = templateTrack.scale;
@@ -1057,7 +1051,7 @@ function setTrackOptionFromTemplate(
     }
     //if (force || templateTrack.domain) options.domain = templateTrack.domain;
 
-    (options as TrackOptionsEx).__template=templateTrack;
+    (options as TrackOptionsEx).__template = templateTrack;
 }
 
 export function addOrEditGraphTrack(

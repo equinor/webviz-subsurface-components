@@ -110,8 +110,9 @@ export function roundLogMinMax(minmax: [number, number]): [number, number] {
     if (r[0] <= 0) {
         // avoid non-positive values
         r[0] = minmax[0];
-        if (r[0] <= 0) { // could not show negative data!
-            console.error("Wrong data range for logarithm scale " + minmax)
+        if (r[0] <= 0) {
+            // could not show negative data!
+            console.error("Wrong data range for logarithm scale " + minmax);
         }
     }
     return [parseFloat(r[0].toPrecision(5)), parseFloat(r[1].toPrecision(5))];
