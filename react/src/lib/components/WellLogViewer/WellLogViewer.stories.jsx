@@ -22,6 +22,16 @@ export default {
             description: "Orientation of the track plots on the screen.",
             defaultValue: false,
         },
+        readoutOptions: {
+            description:
+                "Options for readout panel.<br/>" +
+                "allTracks: boolean — Show not only visible tracks,<br/>" +
+                "grouping: string — How group values.",
+            defaultValue: {
+                allTracks: false,
+                grouping: "by_track",
+            },
+        },
         domain: {
             description: "Initial visible interval of the log data.",
         },

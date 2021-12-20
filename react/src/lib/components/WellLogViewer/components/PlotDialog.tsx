@@ -69,7 +69,7 @@ function _createItems(items: Record<string, string>): ReactNode[] {
 function createTypeItems(): ReactNode[] {
     return _createItems(typeItems);
 }
-function createScaleItems(): ReactNode[] {
+export function createScaleItems(): ReactNode[] {
     return _createItems(scaleItems);
 }
 function createColorItems(): ReactNode[] {
@@ -106,9 +106,10 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         if (names[0]) name2 = name = names[0];
         if (names[1]) name2 = names[1];
 
-        this.state = this.props.templatePlot
+        const templatePlot = this.props.templatePlot;
+        this.state = templatePlot
             ? {
-                  ...this.props.templatePlot,
+                  ...templatePlot,
 
                   open: true,
               }
@@ -118,6 +119,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   name: name, //?? the first data in data selector
                   name2: name2, //? the second data in data selector ??
 
+                  scale: undefined,
                   color: "black", //??
 
                   // for 'area' plot
@@ -125,11 +127,13 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   fillOpacity: 0.25,
                   inverseColor: "",
 
-                  // for 'gradient fill' plot
+                  // for 'gradientfill' plot
                   colorTable: this.props.wellLogView.props.colorTables[0].name,
-                  inverseColorTable: "",
+                  inverseColorTable: undefined,
+                  colorScale: undefined,
+                  inverseColorScale: undefined,
 
-                  // for 'differetial' plot
+                  // for 'differential' plot
                   color2: "black", //??
                   fill2: "green",
 
@@ -221,14 +225,12 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         ];
         if (insertEmpty) {
             if (!value) value = noneValue;
-            // insert at the beginning (reverse order? add to the edn, reverse back)
-            nodes.reverse();
-            nodes.push(
+            // insert at the beginning
+            nodes.unshift(
                 <option key={noneValue} value={noneValue}>
                     {"\u2014"}
                 </option>
             );
-            nodes.reverse();
         }
         return (
             <FormControl fullWidth>
@@ -278,9 +280,18 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                     {this.createSelectControl(
                         "scale",
                         "Scale",
-                        createScaleItems()
+                        createScaleItems(),
+                        true
                     )}
-                    <FormControl fullWidth key="12" />
+                    {this.state.type === "gradientfill"
+                        ? [
+                              this.createSelectControl(
+                                  "colorScale",
+                                  "Color Scale",
+                                  createScaleItems()
+                              ),
+                          ]
+                        : [<FormControl fullWidth key="12" />]}
 
                     {this.createSelectControl(
                         "name",

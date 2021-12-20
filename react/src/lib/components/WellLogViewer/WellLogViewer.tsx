@@ -47,9 +47,8 @@ const axisMnemos: Record<string, string[]> = {
 };
 
 import ReactDOM from "react-dom";
-import { SimpleMenu, editPlots } from "./components/LocalMenus";
-import { editTrack } from "./components/WellLogView";
 import { Plot } from "@equinor/videx-wellog";
+import { SimpleMenu, editPlots } from "./components/LocalMenus";
 
 function onTrackMouseEvent(wellLogView: WellLogView, ev: TrackMouseEvent) {
     const track = ev.track;
@@ -58,7 +57,7 @@ function onTrackMouseEvent(wellLogView: WellLogView, ev: TrackMouseEvent) {
     } else if (ev.type === "dblclick") {
         wellLogView.selectTrack(track, true);
         if (ev.area === "title") {
-            editTrack(ev.element, wellLogView, ev.track);
+            wellLogView.editTrack(ev.element, ev.track);
         } else {
             const plot: Plot | null = ev.plot;
             if (!plot) editPlots(ev.element, wellLogView, ev.track);
@@ -81,12 +80,16 @@ function onTrackMouseEvent(wellLogView: WellLogView, ev: TrackMouseEvent) {
         );
     }
 }
-///////////
+///////////  for Scale Slider
 function valueLabelFormat(value: number /*, index: number*/): string {
     return value.toFixed(Number.isInteger(value) || value > 20 ? 0 : 1);
 }
+///////////
 
-import { Info } from "./components/InfoTypes";
+import { fillInfos } from "./utils/fill-info";
+import { LogViewer } from "@equinor/videx-wellog";
+
+import { Info, InfoOptions } from "./components/InfoTypes";
 
 interface Props {
     welllog: WellLog;
@@ -96,6 +99,8 @@ interface Props {
 
     domain?: [number, number]; //  initial visible range
     selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
+
+    readoutOptions?: InfoOptions; // options for readout
 
     // callbacks
     onContentRescale: () => void;
@@ -114,6 +119,7 @@ class WellLogViewer extends Component<Props, State> {
 
     controller: WellLogController | null;
     scroller: Scroller | null;
+    collapsedTrackIds: (string | number)[];
 
     constructor(props: Props) {
         super(props);
@@ -135,6 +141,8 @@ class WellLogViewer extends Component<Props, State> {
         this.controller = null;
         this.scroller = null;
 
+        this.collapsedTrackIds = [];
+
         this.onCreateController = this.onCreateController.bind(this);
 
         this.onInfo = this.onInfo.bind(this);
@@ -147,6 +155,8 @@ class WellLogViewer extends Component<Props, State> {
         this.onContentRescale = this.onContentRescale.bind(this);
 
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
+
+        this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
     }
 
     componentDidMount(): void {
@@ -215,10 +225,38 @@ class WellLogViewer extends Component<Props, State> {
         ) {
             this.setControllerSelection();
         }
+
+        if (
+            this.props.readoutOptions &&
+            (!prevProps.readoutOptions ||
+                this.props.readoutOptions.allTracks !==
+                    prevProps.readoutOptions.allTracks ||
+                this.props.readoutOptions.grouping !==
+                    prevProps.readoutOptions.grouping)
+        ) {
+            if (this.controller)
+                this.controller.selectContent(
+                    this.controller.getContentSelection()
+                ); // force to update readout panel
+        }
     }
 
     // callback function from WellLogView
-    onInfo(infos: Info[]): void {
+    onInfo(
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ): void {
+        const infos = fillInfos(
+            x,
+            logController,
+            iFrom,
+            iTo,
+            this.collapsedTrackIds,
+            this.props.readoutOptions
+        );
+
         this.setState({
             infos: infos,
         });
@@ -318,6 +356,16 @@ class WellLogViewer extends Component<Props, State> {
         if (this.props.selection)
             this.controller.selectContent(this.props.selection);
     }
+    onInfoGroupClick(trackId: string | number): void {
+        const i = this.collapsedTrackIds.indexOf(trackId);
+        if (i < 0) this.collapsedTrackIds.push(trackId);
+        else delete this.collapsedTrackIds[i];
+
+        if (this.controller)
+            this.controller.selectContent(
+                this.controller.getContentSelection()
+            ); // force to update readout panel
+    }
 
     render(): ReactNode {
         const maxContentZoom = 256;
@@ -345,7 +393,17 @@ class WellLogViewer extends Component<Props, State> {
                         onContentRescale={this.onContentRescale}
                     />
                 </Scroller>
-                <div style={{ flex: "0, 0, 280px" }}>
+                <div
+                    style={{
+                        flex: "0, 0",
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                        width: "255px",
+                        minWidth: "255px",
+                        maxWidth: "255px",
+                    }}
+                >
                     <AxisSelector
                         header="Primary scale"
                         axes={this.state.axes}
@@ -353,7 +411,11 @@ class WellLogViewer extends Component<Props, State> {
                         value={this.state.primaryAxis}
                         onChange={this.onChangePrimaryAxis}
                     />
-                    <InfoPanel header="Readout" infos={this.state.infos} />
+                    <InfoPanel
+                        header="Readout"
+                        onGroupClick={this.onInfoGroupClick}
+                        infos={this.state.infos}
+                    />
                     <br />
                     <div style={{ paddingLeft: "10px", display: "flex" }}>
                         <span>Zoom:</span>
@@ -383,6 +445,19 @@ class WellLogViewer extends Component<Props, State> {
         );
     }
 }
+
+///
+const InfoOptions_propTypes = PropTypes.shape({
+    /**
+     * Show not only visible tracks
+     */
+    allTracks: PropTypes.bool,
+    /**
+     * how group values. "" | "track"
+     */
+    grouping: PropTypes.string,
+});
+
 /*
  */
 WellLogViewer.propTypes = {
@@ -414,14 +489,19 @@ WellLogViewer.propTypes = {
     horizontal: PropTypes.bool,
 
     /**
+     * Options for readout panel
+     */
+    readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
+
+    /**
      * Initial visible interval of the log data
      */
-    domain: PropTypes.array,
+    domain: PropTypes.arrayOf(PropTypes.number),
 
     /**
      * Initial selected interval of the log data
      */
-    selection: PropTypes.array,
+    selection: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default WellLogViewer;

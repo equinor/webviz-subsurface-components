@@ -9,8 +9,6 @@ import {
 import { Track, GraphTrack } from "@equinor/videx-wellog";
 import { Plot } from "@equinor/videx-wellog";
 
-import { ScaleTrackOptions } from "@equinor/videx-wellog/dist/tracks/scale/interfaces";
-
 import {
     OverlayClickEvent,
     OverlayMouseMoveEvent,
@@ -29,9 +27,10 @@ import { Template } from "./WellLogTemplateTypes";
 import { ColorTable } from "./ColorTableTypes";
 
 import { createTracks } from "../utils/tracks";
-import { getScaleTrackNum, isScaleTrack } from "../utils/tracks";
+import { getScaleTrackNum } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
+import { getTrackTemplate } from "../utils/tracks";
 
 import {
     addOrEditGraphTrack,
@@ -189,10 +188,7 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
                 event.target.style.visibility = "visible";
             }
 
-            const x2 = (
-                caller.scaleHandler as InterpolatedScaleHandler
-            ).interpolator.reverse(value);
-            parent.onMouseMove(value, x2);
+            parent.onMouseMove(value);
         },
         onMouseExit: (event: OverlayMouseExitEvent): void => {
             if (event.target) event.target.style.visibility = "hidden";
@@ -289,6 +285,14 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
         .style("position", "absolute");
 }
 
+function initOverlay(instance: LogViewer, parent: WellLogView) {
+    instance.overlay.elm.style("overflow", "hidden"); // to clip content selection
+
+    addReadoutOverlay(instance, parent);
+    addRubberbandOverlay(instance, parent);
+    addPinnedValueOverlay(instance, parent);
+}
+
 function createInterpolator(from: Float32Array, to: Float32Array) {
     // 'from' array could be non monotonous (TVD) so could not use binary search
 
@@ -338,44 +342,6 @@ function createScaleHandler(
             domain.map((v) => primary2secondary(v, true)),
     };
     return new InterpolatedScaleHandler(interpolator);
-}
-
-function getValue(
-    x: number,
-    data: [],
-    type: string
-): number /*|string for discrete?*/ {
-    let v = Number.NaN;
-    if (Number.isFinite(x)) {
-        const n = data.length;
-        for (let i = 0; i < n; i++) {
-            const row = data[i];
-            if (row[0] == null) continue;
-            if (row[1] == null) continue;
-            if (x < row[0]) {
-                if (!i) break;
-                else {
-                    const rowPrev = data[i - 1];
-                    if (rowPrev[0] == null || rowPrev[1] == null) break;
-                    if (type === "linestep") {
-                        v = row[1]; //!! not rowPrev[1] !!
-                    } else {
-                        const d = row[0] - rowPrev[0];
-                        const f = x - rowPrev[0];
-                        if (type === "dot") {
-                            v = f < d * 0.5 ? rowPrev[1] : row[1];
-                        } else {
-                            // "line", "area", "gradientfill"
-                            const mul = d ? (row[1] - rowPrev[1]) / d : 1.0;
-                            v = f * mul + rowPrev[1];
-                        }
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return v;
 }
 
 function setTracksToController(
@@ -475,7 +441,10 @@ function addPlot(
     );
 }
 
-function fillTemplatePlot(plot: Plot): TemplatePlot {
+function fillPlotTemplate(
+    templateTrack: TemplateTrack,
+    plot: Plot
+): TemplatePlot {
     const options = plot.options as ExtPlotOptions;
     const optionsDifferential = plot.options as DifferentialPlotOptions; // DifferentialPlot - 2 series!
     const options1 = optionsDifferential.serie1;
@@ -486,10 +455,13 @@ function fillTemplatePlot(plot: Plot): TemplatePlot {
     const legend1 = legendDifferential.serie1;
     const legend2 = legendDifferential.serie2;
 
+    const scale =
+        templateTrack?.scale !== options.scale ? options.scale : undefined;
+
     return {
-        style: "", // No style for this full Plot options.
+        style: undefined, // No style for this full Plot options.
         type: getPlotType(plot),
-        scale: options.scale,
+        scale: scale == "log" || scale == "linear" ? scale : undefined,
         name: (legend1 && legend1.label ? legend1.label : legend.label) || "",
         name2: legend2 && legend2.label ? legend2.label : "",
         color: (options1 ? options1.color : options.color) || "",
@@ -501,6 +473,8 @@ function fillTemplatePlot(plot: Plot): TemplatePlot {
         inverseColorTable: options.inverseColorTable
             ? options.inverseColorTable.name
             : "",
+        colorScale: options.colorScale,
+        inverseColorScale: options.inverseColorScale,
     };
 }
 
@@ -508,39 +482,29 @@ function editPlot(
     parent: HTMLElement,
     wellLogView: WellLogView,
     track: Track,
-    plot: Plot
+    templatePlot: TemplatePlot,
+    onOK: (templatePlot: TemplatePlot) => void
 ): void {
     const el: HTMLElement = document.createElement("div");
     el.style.width = "10px";
     el.style.height = "13px";
     parent.appendChild(el);
-
-    const templatePlot = fillTemplatePlot(plot);
 
     ReactDOM.render(
         <PlotPropertiesDialog
             templatePlot={templatePlot}
             wellLogView={wellLogView}
             track={track}
-            onOK={wellLogView._editTrackPlot.bind(wellLogView, track, plot)}
+            onOK={onOK}
         />,
         el
     );
 }
 
-function fillTemplateTrack(track: Track): TemplateTrack {
-    const options = track.options;
-
-    return {
-        title: options.label ? options.label : "",
-        plots: [],
-    };
-}
-
 export function addTrack(
     parent: HTMLElement,
     wellLogView: WellLogView,
-    trackCurrent: Track
+    onOK: (templateTrack: TemplateTrack) => void
 ): void {
     const el: HTMLElement = document.createElement("div");
     el.style.width = "10px";
@@ -548,10 +512,7 @@ export function addTrack(
     parent.appendChild(el);
 
     ReactDOM.render(
-        <TrackPropertiesDialog
-            wellLogView={wellLogView}
-            onOK={wellLogView._addTrack.bind(wellLogView, trackCurrent)}
-        />,
+        <TrackPropertiesDialog wellLogView={wellLogView} onOK={onOK} />,
         el
     );
 }
@@ -559,110 +520,22 @@ export function addTrack(
 export function editTrack(
     parent: HTMLElement,
     wellLogView: WellLogView,
-    track: Track
+    templateTrack: TemplateTrack,
+    onOK: (templateTrack: TemplateTrack) => void
 ): void {
     const el: HTMLElement = document.createElement("div");
     el.style.width = "10px";
     el.style.height = "13px";
     parent.appendChild(el);
 
-    const templateTrack = fillTemplateTrack(track);
-
     ReactDOM.render(
         <TrackPropertiesDialog
             templateTrack={templateTrack}
             wellLogView={wellLogView}
-            onOK={wellLogView._editTrack.bind(wellLogView, track)}
+            onOK={onOK}
         />,
         el
     );
-}
-
-function fillInfos(
-    x: number,
-    x2: number,
-    tracks: Track[],
-    iFrom: number,
-    iTo: number
-): Info[] {
-    const infos: Info[] = [];
-    let iPlot = 0;
-    let bSeparatorCreated = false;
-    let iTrack = 0;
-    for (const track of tracks) {
-        const bScaleTrack = isScaleTrack(track);
-        const visible = (iFrom <= iTrack && iTrack < iTo) || bScaleTrack;
-        if (visible) {
-            if (!bScaleTrack) {
-                if (!bSeparatorCreated) {
-                    // Add separator line
-                    infos.push({
-                        color: "", // dummy value
-                        value: Number.NaN, // dummy value
-                        type: "separator",
-                        track_id: track.id,
-                    });
-                    bSeparatorCreated = true;
-                }
-                for (const plot of (track as GraphTrack).plots) {
-                    const type = getPlotType(plot);
-                    let data = plot.data;
-                    if (type === "differential") data = plot.data[0]; // DifferentialPlot has 2 arrays of data pairs
-
-                    const options = plot.options as ExtPlotOptions;
-                    const optionsDifferential =
-                        plot.options as DifferentialPlotOptions; // DifferentialPlot - 2 series!
-                    const options1 = optionsDifferential.serie1;
-                    const options2 = optionsDifferential.serie2;
-
-                    const legend = options.legendInfo();
-                    const legendDifferential =
-                        legend as DifferentialPlotLegendInfo; // DifferentialPlot - 2 series!
-                    const legend1 = legendDifferential.serie1;
-                    const legend2 = legendDifferential.serie2;
-
-                    infos.push({
-                        name: legend1 ? legend1.label : legend.label,
-                        units: legend1 ? legend1.unit : legend.unit,
-                        color:
-                            (options1 ? options1.color : options.color) || "",
-                        value: getValue(x, data, type),
-                        type: type,
-                        track_id: track.id,
-                    });
-                    iPlot++;
-
-                    if (type === "differential") {
-                        data = plot.data[1];
-                        infos.push({
-                            name: legend2.label,
-                            units: legend2.unit,
-                            color:
-                                (options2 ? options2.color : options.color) ||
-                                "",
-                            value: getValue(x, data, type),
-                            type: type,
-                            track_id: "_" + track.id,
-                        });
-                        iPlot++;
-                    }
-                }
-            } else {
-                const _x = iPlot == 0 ? x : x2;
-                infos.push({
-                    name: track.options.abbr,
-                    units: (track.options as ScaleTrackOptions)["units"],
-                    color: iPlot == 0 ? "black" : "grey", //??
-                    value: _x,
-                    type: "", // "scale"
-                    track_id: track.id,
-                });
-                iPlot++;
-            }
-        }
-        if (!bScaleTrack) iTrack++;
-    }
-    return infos;
 }
 
 export interface TrackMouseEvent {
@@ -712,7 +585,12 @@ interface Props {
 
     // callbacks:
     onCreateController?: (controller: WellLogController) => void;
-    onInfo?: (infos: Info[]) => void;
+    onInfo?: (
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ) => void;
 
     onTrackScroll?: () => void; // called when track scrolling are changed
     onContentRescale?: () => void; // called when content zoom and scrolling are changed
@@ -734,6 +612,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     selPinned: number | undefined; // pinned position
     selPersistent: boolean | undefined;
 
+    template: Template;
+
     constructor(props: Props) {
         super(props);
 
@@ -743,6 +623,15 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.selCurrent = undefined;
         this.selPinned = undefined;
         this.selPersistent = undefined;
+
+        this.template = {
+            name: "",
+            scale: {
+                primary: "",
+            },
+            tracks: [],
+            styles: [],
+        };
 
         this.state = {
             infos: [],
@@ -759,6 +648,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     componentDidMount(): void {
         this.createLogViewer();
+        
+        this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
         this.setTracks();
     }
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
@@ -800,6 +691,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.welllog !== prevProps.welllog) {
             shouldSetTracks = true;
         } else if (this.props.template !== prevProps.template) {
+            this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
             shouldSetTracks = true;
         } else if (this.props.colorTables !== prevProps.colorTables) {
             shouldSetTracks = true; // force to repaint
@@ -852,9 +744,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
             this.logController.init(this.container);
 
-            addReadoutOverlay(this.logController, this);
-            addRubberbandOverlay(this.logController, this);
-            addPinnedValueOverlay(this.logController, this);
+            initOverlay(this.logController, this);
         }
         this.setInfo();
     }
@@ -883,12 +773,18 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.logController,
                 axes,
                 this.props.welllog,
-                this.props.template,
+                this.template,
                 this.props.colorTables
             );
         }
         this.onTrackScroll();
         this.setInfo(); // Clear old track information
+    }
+
+    findTrackById(trackId: string | number): Track | undefined {
+        return this.logController?.tracks.find(function (track: Track) {
+            return track.id === trackId;
+        });
     }
 
     /** 
@@ -901,18 +797,19 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (this.props.onTrackScroll) this.props.onTrackScroll();
     }
-    setInfo(x: number = Number.NaN, x2: number = Number.NaN): void {
+    setInfo(x: number = Number.NaN): void {
         if (!this.props.onInfo) return; // no callback is given
         if (!this.logController) return; // not initialized yet
 
+        if (isNaN(x) && this.selCurrent !== undefined) x = this.selCurrent;
+
         const iFrom = this.getTrackScrollPos();
         const iTo = iFrom + this._maxTrackNum();
-        const infos = fillInfos(x, x2, this.logController.tracks, iFrom, iTo);
-        this.props.onInfo(infos);
+        this.props.onInfo(x, this.logController, iFrom, iTo);
     }
 
-    onMouseMove(x: number, x2: number): void {
-        this.setInfo(x, x2);
+    onMouseMove(x: number): void {
+        this.setInfo(x);
 
         this.onContentRescale();
     }
@@ -968,9 +865,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     selectContent(selection: [number | undefined, number | undefined]): void {
         this.selCurrent = selection[0];
         this.selPinned = selection[1];
-        this.selPersistent = true;
+        this.selPersistent = this.selPinned ? true : false;
 
         this.showSelection();
+        this.setInfo(); // reflect new value in this.selCurrent
     }
     getContentBaseDomain(): [number, number] {
         if (this.logController) return getContentBaseDomain(this.logController);
@@ -1134,7 +1032,18 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo();
     }
 
-    _editTrackPlot(track: Track, plot: Plot, templatePlot: TemplatePlot): void {
+    _editTrackPlot(
+        track: Track,
+        plot: Plot,
+        _templatePlot: TemplatePlot
+    ): void {
+        const templatePlot = { ..._templatePlot };
+        /* We have special option for track scale!
+        const templateTrack = getTrackTemplate(track);
+        if (templatePlot.scale === templateTrack.scale)
+            templatePlot.scale = undefined;
+        */
+
         addOrEditGraphTrackPlot(this, track as GraphTrack, plot, templatePlot);
         this.setInfo();
     }
@@ -1146,16 +1055,38 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     // Dialog functions
     addTrack(parent: HTMLElement | null, trackCurrent: Track): void {
-        if (parent) addTrack(parent, this, trackCurrent);
+        if (parent) {
+            addTrack(parent, this, this._addTrack.bind(this, trackCurrent));
+        }
     }
     editTrack(parent: HTMLElement | null, track: Track): void {
-        if (parent) editTrack(parent, this, track);
+        if (parent) {
+            const templateTrack = getTrackTemplate(track);
+            editTrack(
+                parent,
+                this,
+                templateTrack,
+                this._editTrack.bind(this, track)
+            );
+        }
     }
     addPlot(parent: HTMLElement | null, track: Track): void {
-        if (parent) addPlot(parent, this, track);
+        if (parent) {
+            addPlot(parent, this, track);
+        }
     }
     editPlot(parent: HTMLElement | null, track: Track, plot: Plot): void {
-        if (parent) editPlot(parent, this, track, plot);
+        if (parent) {
+            const templateTrack = getTrackTemplate(track);
+            const templatePlot = fillPlotTemplate(templateTrack, plot);
+            editPlot(
+                parent,
+                this,
+                track,
+                templatePlot,
+                this._editTrackPlot.bind(this, track, plot)
+            );
+        }
     }
 
     render(): ReactNode {

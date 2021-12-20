@@ -14,6 +14,11 @@ import {
     TextField,
 } from "@material-ui/core";
 
+import { FormControl, InputLabel, NativeSelect } from "@material-ui/core";
+
+import { createScaleItems } from "./PlotDialog";
+const noneValue = "-";
+
 interface Props {
     templateTrack?: TemplateTrack; // input for editting
     onOK: (templateTrack: TemplateTrack) => void;
@@ -27,15 +32,18 @@ export class TrackPropertiesDialog extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = this.props.templateTrack
+        const templateTrack = this.props.templateTrack;
+        this.state = templateTrack
             ? {
-                  ...this.props.templateTrack,
+                  ...templateTrack,
 
                   open: true,
               }
             : {
-                  // we shold fill every posible state to allow this.setState() to set it
+                  // we should fill every posible state to allow this.setState() to set it
                   title: "New Track",
+                  scale: undefined,
+                  domain: undefined,
 
                   plots: [],
                   open: true,
@@ -57,6 +65,46 @@ export class TrackPropertiesDialog extends Component<Props, State> {
 
     closeDialog(): void {
         this.setState({ open: false });
+    }
+
+    createSelectControl(
+        valueName: string, // use it as "a pointer to member" of an object
+        label: string,
+        nodes: ReactNode[],
+        insertEmpty?: boolean
+    ): ReactNode {
+        let value = (this.state as unknown as Record<string, string>)[
+            valueName
+        ];
+        if (insertEmpty) {
+            if (!value) value = noneValue;
+            // insert at the beginning
+            nodes.unshift(
+                <option key={noneValue} value={noneValue}>
+                    {"\u2014"}
+                </option>
+            );
+        }
+        return (
+            <FormControl fullWidth>
+                <InputLabel>{label}</InputLabel>
+                <NativeSelect
+                    value={value}
+                    onChange={(event) => {
+                        const value =
+                            event.currentTarget.value === noneValue
+                                ? ""
+                                : event.currentTarget.value;
+
+                        const values = new Object() as Record<string, string>;
+                        values[valueName] = value;
+                        this.setState(values as unknown as State);
+                    }}
+                >
+                    {nodes}
+                </NativeSelect>
+            </FormControl>
+        );
     }
 
     render(): ReactNode {
@@ -81,6 +129,13 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                         value={this.state.title}
                         onChange={this.onChange}
                     ></TextField>
+
+                    {this.createSelectControl(
+                        "scale",
+                        "Scale",
+                        createScaleItems(),
+                        true
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button
