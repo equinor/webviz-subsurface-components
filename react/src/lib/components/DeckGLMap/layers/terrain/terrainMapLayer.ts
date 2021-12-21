@@ -1,9 +1,7 @@
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers"; // XXX RENAME LAYER TIL NOE MED MESH??
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import vsShader from "!!raw-loader!./terrainmap.vs.glsl";
 import fsShader from "!!raw-loader!./terrainmap.fs.glsl";
-
 
 const DECODER = {
     rScaler: 256 * 256,
@@ -47,12 +45,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ uniforms }: any): void {
-
-        console.log("contours: ", this.props.contours)
-
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
         const contourInterval = this.props.contours[1] ?? -1.0;
-
 
         super.draw({
             uniforms: {
@@ -71,8 +65,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         return {
             ...parentShaders,
 
-            // Inject this into vertex shader. Vi want to export vertes world poition to
-            // fragmen shader for use in contour lining.
+            // Inject this into vertex shader. Vi want to export vertex world position to
+            // fragment shader for making contour lines.
             inject: {
                 "vs:#decl": `
                   out vec3 worldPos;

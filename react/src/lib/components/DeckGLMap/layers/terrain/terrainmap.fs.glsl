@@ -58,8 +58,6 @@ void main(void) {
       color = vec4(r, g, b, op);
    }
 
-
-   /////////////////////////////////////////////////////////////
    bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
       if (is_contours) {
       float height =  (worldPos.z - contourReferencePoint) / contourInterval;
@@ -67,13 +65,11 @@ void main(void) {
       float f  =  fract(height);
       float df = fwidth(height);
 
-      //float c = smoothstep(df * 1.0, df * 2.0, f); // keep, smootstep from/to no of pixels distance fronm contour line.
-      float c = smoothstep( 0.0, 2.0 * df, f );
+      // keep: float c = smoothstep(df * 1.0, df * 2.0, f); // smootstep from/to no of pixels distance fronm contour line.
+      float c = smoothstep(0.0, df * 2.0, f);
 
       color = color * vec4(c, c, c, 1.0);
    }
-   ///////////////////////////////////////////////////
-
 
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
    fragColor = vec4(lightColor, color.a * opacity);

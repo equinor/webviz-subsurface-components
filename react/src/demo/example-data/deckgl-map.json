@@ -83,9 +83,10 @@
           437720,
           6481113
         ],
-        "meshMaxError": 5,
+        "meshMaxError": 2.0,
         "propertyTexture": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-        "rotDeg": 0
+        "rotDeg": 0,
+        "contours": [0, 100.0]
       },
       {
         "@@type": "GridLayer",
