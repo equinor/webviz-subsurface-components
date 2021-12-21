@@ -38,7 +38,6 @@ function createGradient(
             const fraction = i / nIntervals;
             const y = 1 + fraction * d;
             const v = Math.log(y) / yDelta;
-            console.log(y, v);
             const c = getInterpolatedColorString(colorTable, v);
             lg.append("stop")
                 .attr("offset", fraction * 100.0 + "%")

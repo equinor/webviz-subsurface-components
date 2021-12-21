@@ -477,8 +477,20 @@ function updateTrackScale(track: GraphTrack): void {
 
             if (!track.options.label) track.options.label = plotTemplate.name;
         }
-        if (!track.options.scale)
-            track.options.scale = track_options.__template.scale || "linear";
+        if (track_options.__template.scale) {
+            track.options.scale = track_options.__template.scale;
+        }
+        if (!track.options.scale) track.options.scale = "linear";
+
+        if (track.options.scale === "log" && track.options.domain) {
+            if (track.options.domain[0] < 0) {
+                // could not show negative data!
+                console.error(
+                    "wrong data range for logarithm scale " +
+                        track.options.domain
+                );
+            }
+        }
     }
 
     if (track.plots.length) {

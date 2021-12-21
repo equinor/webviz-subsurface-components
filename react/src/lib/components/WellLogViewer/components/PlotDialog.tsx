@@ -18,6 +18,7 @@ import {
     InputLabel,
     NativeSelect,
 } from "@material-ui/core";
+import { getTrackTemplate } from "../utils/tracks";
 
 const typeItems: Record<string, string> = {
     // language dependent names of plot types
@@ -218,7 +219,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         valueName: string, // use it as "a pointer to member" of an object
         label: string,
         nodes: ReactNode[],
-        insertEmpty?: boolean
+        insertEmpty?: string | boolean
     ): ReactNode {
         let value = (this.state as unknown as Record<string, string>)[
             valueName
@@ -228,7 +229,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
             // insert at the beginning
             nodes.unshift(
                 <option key={noneValue} value={noneValue}>
-                    {"\u2014"}
+                    {insertEmpty == true ? "\u2014" : insertEmpty}
                 </option>
             );
         }
@@ -255,9 +256,11 @@ export class PlotPropertiesDialog extends Component<Props, State> {
     }
 
     render(): ReactNode {
+        const trackTemplate = getTrackTemplate(this.props.track);
         const title = this.props.templatePlot ? "Edit plot" : "Add New Plot";
         const skipUsed = this.props.templatePlot ? false : true; /*??*/
         const colorTables = this.props.wellLogView.props.colorTables;
+        const scale = this.state.scale || trackTemplate.scale;
         return (
             <Dialog
                 open={this.state.open}
@@ -281,9 +284,9 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                         "scale",
                         "Scale",
                         createScaleItems(),
-                        true
+                        "Track scale"
                     )}
-                    {this.state.type === "gradientfill"
+                    {this.state.type === "gradientfill" && scale === "linear"
                         ? [
                               this.createSelectControl(
                                   "colorScale",
