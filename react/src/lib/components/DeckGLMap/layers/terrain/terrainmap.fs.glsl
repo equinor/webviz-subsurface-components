@@ -7,16 +7,20 @@ uniform bool hasTexture;
 uniform sampler2D sampler;
 uniform bool flatShading;
 uniform float opacity;
-uniform float cornerRadius;
+
+uniform float contourReferencePoint;
+uniform float contourInterval;
 
 in vec2 vTexCoord;
 in vec3 cameraPosition;
 in vec3 normals_commonspace;
 in vec4 position_commonspace;
 in vec4 vColor;
+in vec4 positions;
 
 out vec4 fragColor;
 
+in vec3 worldPos; // we export this from vertex shader (by injecting into it).
 
 void main(void) {
    geometry.uv = vTexCoord;
@@ -53,6 +57,23 @@ void main(void) {
       float b = 1.0 * propertyValue;
       color = vec4(r, g, b, op);
    }
+
+
+   /////////////////////////////////////////////////////////////
+   bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
+      if (is_contours) {
+      float height =  (worldPos.z - contourReferencePoint) / contourInterval;
+
+      float f  =  fract(height);
+      float df = fwidth(height);
+
+      //float c = smoothstep(df * 1.0, df * 2.0, f); // keep, smootstep from/to no of pixels distance fronm contour line.
+      float c = smoothstep( 0.0, 2.0 * df, f );
+
+      color = color * vec4(c, c, c, 1.0);
+   }
+   ///////////////////////////////////////////////////
+
 
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
    fragColor = vec4(lightColor, color.a * opacity);

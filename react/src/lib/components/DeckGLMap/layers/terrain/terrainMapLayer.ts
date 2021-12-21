@@ -1,7 +1,9 @@
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers"; // XXX RENAME LAYER TIL NOE MED MESH??
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
+import vsShader from "!!raw-loader!./terrainmap.vs.glsl";
 import fsShader from "!!raw-loader!./terrainmap.fs.glsl";
+
 
 const DECODER = {
     rScaler: 256 * 256,
@@ -18,7 +20,10 @@ export type DataItem = {
 
 export type TerrainMapLayerData = [DataItem?];
 
-export type TerrainMapLayerProps<D> = SimpleMeshLayerProps<D>;
+export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
+    // Contourlines reference point and interval.
+    contours: [number, number];
+}
 
 const defaultProps = {
     data: [{ position: [0, 0], angle: 0, color: [255, 0, 0] }], // dummy data
@@ -26,6 +31,8 @@ const defaultProps = {
     getPosition: (d: DataItem) => d.position,
     getColor: (d: DataItem) => d.color,
     getOrientation: (d: DataItem) => [0, d.angle, 0],
+
+    contours: [-1, -1],
 
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
 };
@@ -40,9 +47,18 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ uniforms }: any): void {
+
+        console.log("contours: ", this.props.contours)
+
+        const contourReferencePoint = this.props.contours[0] ?? -1.0;
+        const contourInterval = this.props.contours[1] ?? -1.0;
+
+
         super.draw({
             uniforms: {
                 ...uniforms,
+                contourReferencePoint,
+                contourInterval,
             },
         });
     }
@@ -51,7 +67,22 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const parentShaders = super.getShaders();
         // Overwrite the default fragment shader with ours.
         parentShaders.fs = fsShader;
-        return parentShaders;
+
+        return {
+            ...parentShaders,
+
+            // Inject this into vertex shader. Vi want to export vertes world poition to
+            // fragmen shader for use in contour lining.
+            inject: {
+                "vs:#decl": `
+                  out vec3 worldPos;
+                `,
+
+                "vs:#main-start": `
+                   worldPos = positions;
+                `,
+            },
+        };
     }
 
     decodePickingColor(): number {
