@@ -70,8 +70,14 @@ export function getModelMatrix(deg: number, x: number, y: number): Matrix4 {
 
 // update layer object to include default props
 export function getLayersWithDefaultProps(
-    deckgl_layers: Record<string, unknown>[]
+    deckgl_layers: Record<string, unknown>[],
+    view3D: boolean
 ): Record<string, unknown>[] {
+    // Inject "is3d" property into all layers and link it to "view3D".
+    deckgl_layers = deckgl_layers.map((e) => {
+        return { ...e, is3d: view3D };
+    });
+
     const layers = deckgl_layers.map((a) => {
         return { ...a };
     });
