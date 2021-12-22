@@ -264,10 +264,9 @@ class WellLogViewer extends Component<Props, State> {
     }
     // callback function from Zoom slider
     onZoomSliderChange(
-        event: React.ChangeEvent<Record<string, unknown>>,
+        _event: React.ChangeEvent<Record<string, unknown>>,
         value: number | number[]
     ): void {
-        event;
         if (this.controller && typeof value === "number") {
             const zoom = 2 ** value;
             this.controller.zoomContent(zoom);
