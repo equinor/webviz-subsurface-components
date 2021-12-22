@@ -107,6 +107,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         if (names[0]) name2 = name = names[0];
         if (names[1]) name2 = names[1];
 
+        const trackTemplate = getTrackTemplate(this.props.track);
         const templatePlot = this.props.templatePlot;
         this.state = templatePlot
             ? {
@@ -116,7 +117,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
               }
             : {
                   // we should fill every posible state to allow this.setState() to set it
-                  type: "line",
+                  type: trackTemplate.scale ? "" : "line",
                   name: name, //?? the first data in data selector
                   name2: name2, //? the second data in data selector ??
 

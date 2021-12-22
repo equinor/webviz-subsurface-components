@@ -1063,7 +1063,9 @@ function setTrackOptionFromTemplate(
     }
     //if (force || templateTrack.domain) options.domain = templateTrack.domain;
 
-    (options as TrackOptionsEx).__template = templateTrack;
+    (options as TrackOptionsEx).__template = JSON.parse(
+        JSON.stringify(templateTrack)
+    );
 }
 
 export function addOrEditGraphTrack(

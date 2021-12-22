@@ -54,6 +54,8 @@ import {
     scrollTracksTo,
     isTrackSelected,
     selectTrack,
+    getSelectTrackIndeces,
+    restoreSelectTracks,
 } from "../utils/log-viewer";
 
 function showSelection(
@@ -563,6 +565,8 @@ export interface WellLogController {
     getTrackScrollPos(): number;
     getTrackScrollPosMax(): number;
     getTrackZoom(): number;
+
+    getTemplate(): Template;
 }
 
 import { Info } from "./InfoTypes";
@@ -577,11 +581,8 @@ interface Props {
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
-    maxTrackNum?: number; // default is horizontal ? 3: 5
+    maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
     maxContentZoom?: number; // default is 256
-
-    // current view position:
-    scrollTrackPos?: number; // the first track number
 
     // callbacks:
     onCreateController?: (controller: WellLogController) => void;
@@ -595,7 +596,8 @@ interface Props {
     onTrackScroll?: () => void; // called when track scrolling are changed
     onContentRescale?: () => void; // called when content zoom and scrolling are changed
 
-    onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
+    onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void; // called when mouse click on a track
+    onTemplateChanged?: () => void; // called when track scrolling are changed
 }
 
 interface State {
@@ -635,7 +637,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         this.state = {
             infos: [],
-            scrollTrackPos: props.scrollTrackPos ? props.scrollTrackPos : 0,
+            scrollTrackPos: 0,
         };
 
         this.onTrackMouseEvent = this.onTrackMouseEvent.bind(this);
@@ -661,8 +663,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.axisTitles !== nextProps.axisTitles) return true;
         if (this.props.axisMnemos !== nextProps.axisMnemos) return true;
 
-        if (this.props.maxTrackNum !== nextProps.maxTrackNum) return true;
-        if (this.props.scrollTrackPos !== nextProps.scrollTrackPos) return true;
+        if (this.props.maxVisibleTrackNum !== nextProps.maxVisibleTrackNum)
+            return true;
         if (this.state.scrollTrackPos !== nextState.scrollTrackPos) return true;
 
         if (this.props.maxContentZoom !== nextProps.maxContentZoom) return true;
@@ -679,11 +681,16 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.props.onCreateController(this);
         }
 
+        let selectedTrackIndeces: number[] = []; // indeces to restore
+        let selection: [number | undefined, number | undefined] | undefined =
+            undefined; // content selection to restore
         let shouldSetTracks = false;
         if (
             this.props.horizontal !== prevProps.horizontal ||
             this.props.maxContentZoom !== prevProps.maxContentZoom
         ) {
+            selection = this.getContentSelection();
+            selectedTrackIndeces = getSelectTrackIndeces(this.logController);
             this.createLogViewer();
             shouldSetTracks = true;
         }
@@ -694,25 +701,28 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
             shouldSetTracks = true;
         } else if (this.props.colorTables !== prevProps.colorTables) {
+            selection = this.getContentSelection();
+            selectedTrackIndeces = getSelectTrackIndeces(this.logController);
             shouldSetTracks = true; // force to repaint
         } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
+            selectedTrackIndeces = getSelectTrackIndeces(this.logController);
             shouldSetTracks = true;
         } else if (
             this.props.axisTitles !== prevProps.axisTitles ||
             this.props.axisMnemos !== prevProps.axisMnemos
         ) {
-            shouldSetTracks = true;
+            selection = this.getContentSelection();
+            selectedTrackIndeces = getSelectTrackIndeces(this.logController);
+            shouldSetTracks = true; //??
         }
 
         if (shouldSetTracks) {
-            this.setTracks();
-        } else if (this.props.scrollTrackPos !== prevProps.scrollTrackPos) {
-            this.scrollTrackTo(
-                this.props.scrollTrackPos ? this.props.scrollTrackPos : 0
-            );
+            this.setTracks(); // use this.template
+            restoreSelectTracks(this.logController, selectedTrackIndeces);
+            if (selection) this.selectContent(selection);
         } else if (
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
-            this.props.maxTrackNum !== prevProps.maxTrackNum
+            this.props.maxVisibleTrackNum !== prevProps.maxVisibleTrackNum
         ) {
             this.onTrackScroll();
             this.setInfo();
@@ -792,7 +802,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
       */
     onTrackScroll(): void {
         const iFrom = this.getTrackScrollPos();
-        const iTo = iFrom + this._maxTrackNum();
+        const iTo = iFrom + this._maxVisibleTrackNum();
         if (this.logController) scrollTracksTo(this.logController, iFrom, iTo);
 
         if (this.props.onTrackScroll) this.props.onTrackScroll();
@@ -804,7 +814,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (isNaN(x) && this.selCurrent !== undefined) x = this.selCurrent;
 
         const iFrom = this.getTrackScrollPos();
-        const iTo = iFrom + this._maxTrackNum();
+        const iTo = iFrom + this._maxVisibleTrackNum();
         this.props.onInfo(x, this.logController, iFrom, iTo);
     }
 
@@ -826,6 +836,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     onTrackMouseEvent(ev: TrackMouseEvent): void {
         if (this.props.onTrackMouseEvent)
             this.props.onTrackMouseEvent(this, ev);
+    }
+
+    onTemplateChanged(): void {
+        this.setInfo();
+
+        this.template = this._generateTemplate(); // save current template
+
+        if (this.props.onTemplateChanged) this.props.onTemplateChanged();
     }
 
     // content
@@ -905,10 +923,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (newPos < 0) newPos = 0;
         return newPos;
     }
-    _maxTrackNum(): number {
-        return this.props.maxTrackNum
-            ? this.props.maxTrackNum
-            : 6 /*some default value*/;
+    _maxVisibleTrackNum(): number {
+        return this.props.maxVisibleTrackNum
+            ? this.props.maxVisibleTrackNum
+            : 5 /*some default value*/;
     }
 
     scrollTrackBy(delta: number): void {
@@ -931,45 +949,41 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     getTrackScrollPosMax(): number {
         // for scrollbar
         const nGraphTracks = this._graphTrackMax();
-        let posMax = nGraphTracks - this._maxTrackNum();
+        let posMax = nGraphTracks - this._maxVisibleTrackNum();
         if (posMax < 0) posMax = 0;
         return posMax;
     }
     getTrackZoom(): number {
-        return this._graphTrackMax() / this._maxTrackNum();
+        return this._graphTrackMax() / this._maxVisibleTrackNum();
+    }
+
+    getTemplate(): Template {
+        return this.template;
+    }
+
+    _generateTemplate(): Template {
+        const template = this.template;
+        const tracks: TemplateTrack[] = [];
+        if (this.logController) {
+            for (const track of this.logController.tracks) {
+                const templateTrack = getTrackTemplate(track);
+                tracks.push(JSON.parse(JSON.stringify(templateTrack)));
+            }
+        }
+        return {
+            name: template.name,
+            scale: {
+                primary: this.props.primaryAxis,
+                allowSecondary: template.scale?.allowSecondary,
+            },
+            tracks: tracks,
+            styles: template.styles,
+        };
     }
 
     // editting
-
-    __addTrack(trackNew: Track, trackCurrent: Track, bAfter: boolean): void {
-        if (this.logController) {
-            let order = 0;
-            for (const track of this.logController.tracks) {
-                track.order = order++;
-                if (trackCurrent == track) {
-                    if (bAfter) {
-                        // add after
-                        trackNew.order = order++;
-                    } else {
-                        // insert before current
-                        trackNew.order = track.order;
-                        track.order = order++;
-                    }
-                }
-            }
-
-            this.logController.addTrack(trackNew);
-            if (bAfter)
-                // force new track to be visible when added after the current
-                this.scrollTrackBy(+1);
-            else {
-                this.onTrackScroll();
-                this.setInfo();
-            }
-        }
-    }
-
     _addTrack(trackCurrent: Track, templateTrack: TemplateTrack): void {
+        templateTrack.required = true; // user's tracks could be empty
         const bAfter = true;
         const trackNew = addOrEditGraphTrack(
             this,
@@ -978,6 +992,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             trackCurrent,
             bAfter
         );
+        this.onTemplateChanged();
 
         if (bAfter)
             // force new track to be visible when added after the current
@@ -997,7 +1012,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             track,
             false
         );
-        this.setInfo();
+        this.onTemplateChanged();
     }
 
     removeTrack(track: Track): void {
@@ -1005,7 +1020,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.logController.removeTrack(track);
 
             this.onTrackScroll();
-            this.setInfo();
+            this.onTemplateChanged();
         }
     }
 
@@ -1029,7 +1044,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     addTrackPlot(track: Track, templatePlot: TemplatePlot): void {
         addOrEditGraphTrackPlot(this, track as GraphTrack, null, templatePlot);
-        this.setInfo();
+        this.onTemplateChanged();
     }
 
     _editTrackPlot(
@@ -1045,12 +1060,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         */
 
         addOrEditGraphTrackPlot(this, track as GraphTrack, plot, templatePlot);
-        this.setInfo();
+        this.onTemplateChanged();
     }
 
     removeTrackPlot(track: Track, plot: Plot): void {
         removeGraphTrackPlot(this, track as GraphTrack, plot);
-        this.setInfo();
+        const templateTrack = getTrackTemplate(track);
+        templateTrack.required = true; // user's tracks could be empty
+        this.onTemplateChanged();
     }
 
     // Dialog functions
