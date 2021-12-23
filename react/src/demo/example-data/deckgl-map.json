@@ -73,6 +73,22 @@
         "image": "@@#resources.propertyMap"
       },
       {
+        "@@type": "Hillshading2DLayer",
+        "id": "hillshading-layer2",
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
+        ],
+        "valueRange": [
+          2782,
+          3513
+        ],
+        "rotDeg": 0,
+        "image": "@@#resources.propertyMap"
+      },
+      {
         "@@type": "Map3DLayer",
         "id": "map3d-layer",
         "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/depthMap.png",
@@ -102,6 +118,17 @@
         "selectedWell": "@@#editedData.selectedWell"
       },
       {
+        "@@type": "WellsLayer",
+        "id": "wells-layer2",
+        "data": "@@#resources.wellsData",
+        "selectedWell": "@@#editedData.selectedWell"
+      },
+      {
+        "@@type": "FaultPolygonsLayer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson"
+      },
+      {
+        "id": "fault-polygons-layer2",
         "@@type": "FaultPolygonsLayer",
         "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson"
       },
@@ -131,7 +158,12 @@
         {
           "id": "view_1",
           "show3D": false,
-          "layerIds": []
+          "layerIds": ["colormap-layer", "hillshading-layer2", "wells-layer2"]
+        },
+        {
+          "id": "view_2",
+          "show3D": false,
+          "layerIds": ["colormap-layer", "wells-layer"]
         }
       ]
     }

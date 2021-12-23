@@ -3,7 +3,7 @@ import DeckGLWrapper, { ViewsType } from "./DeckGLWrapper";
 import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
-import { setLayers } from "../redux/actions";
+import { setSpec } from "../redux/actions";
 import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
 import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
@@ -109,13 +109,13 @@ const Map: React.FC<MapProps> = ({
 }: MapProps) => {
     // create store once with layers data
     const store = React.useMemo(
-        () => createStore(getLayersWithDefaultProps(layers)),
+        () => createStore(PrepareStoreData(layers, views)),
         []
     );
 
     // update store if any of the layer prop is changed
     React.useEffect(() => {
-        const prev_state = store.getState()["layers"];
+        const prev_state = store.getState()["spec"]["layers"];
         const cur_state = layers;
         const patch = jsonpatch.compare(prev_state, cur_state);
         const replace_operations = patch.filter((obj) => obj.op === "replace");
@@ -126,7 +126,9 @@ const Map: React.FC<MapProps> = ({
                 false,
                 false
             ).newDocument;
-            store.dispatch(setLayers(new_state));
+            const spec = { layers: new_state, views: views };
+            console.log(spec);
+            store.dispatch(setSpec(spec));
         }
     }, [layers]);
 
@@ -152,3 +154,15 @@ const Map: React.FC<MapProps> = ({
 };
 
 export default Map;
+
+function PrepareStoreData(
+    layers: Record<string, unknown>[],
+    views: ViewsType | undefined
+): Record<string, unknown> {
+    const layers_data = getLayersWithDefaultProps(layers);
+    const store_data = {
+        layers: layers_data,
+        views: views,
+    };
+    return store_data;
+}

@@ -22,6 +22,7 @@ import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 import { LayerProps } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
+//import { isEmpty } from "lodash";
 
 export interface ViewportType {
     /**
@@ -172,11 +173,16 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     }, [viewsProps]);
 
     // get layers data from store
-    const layersData = useSelector((st: MapState) => st.layers);
-    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
-
+    const spec = useSelector((st: MapState) => st.spec);
+    const [layersData, setLayersData] = useState<LayerProps<unknown>[]>();
     useEffect(() => {
-        if (!layersData.length) {
+        //if (isEmpty(spec) || !("layers" in spec)) return null;
+        setLayersData(spec["layers"] as LayerProps<unknown>[]);
+    }, [spec]);
+
+    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
+    useEffect(() => {
+        if (!layersData || !layersData.length) {
             return;
         }
 
@@ -290,6 +296,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         }
     }, [deckGLLayers]);
 
+    // this causes issue for wells in synced views
     const wellsLayer = useMemo(
         () => getLayer(deckGLLayers, "wells-layer") as WellsLayer,
         [deckGLLayers]
@@ -382,7 +389,34 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                 isLoaded={isLoaded}
                             />
                         )}
-                        <Settings />
+
+                        {legend.visible && legendProps.discrete && (
+                            <DiscreteColorLegend
+                                discreteData={legendProps.metadata}
+                                dataObjectName={legendProps.title}
+                                position={legend.position}
+                                name={legendProps.name}
+                                template={template}
+                                colorTables={colorTables}
+                                horizontal={legend.horizontal}
+                            />
+                        )}
+                        {legendProps.valueRange?.length > 0 &&
+                            legend.visible &&
+                            legendProps && (
+                                <ContinuousLegend
+                                    min={legendProps.valueRange[0]}
+                                    max={legendProps.valueRange[1]}
+                                    dataObjectName={legendProps.title}
+                                    position={legend.position}
+                                    name={legendProps.name}
+                                    template={template}
+                                    colorTables={colorTables}
+                                    horizontal={legend.horizontal}
+                                />
+                            )}
+
+                        <Settings viewportId={view.id as string} />
                     </DeckGLView>
                 ))}
             </DeckGL>
@@ -398,32 +432,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
             ) : null}
 
             {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
-
-            {legend.visible && legendProps.discrete && (
-                <DiscreteColorLegend
-                    discreteData={legendProps.metadata}
-                    dataObjectName={legendProps.title}
-                    position={legend.position}
-                    name={legendProps.name}
-                    template={template}
-                    colorTables={colorTables}
-                    horizontal={legend.horizontal}
-                />
-            )}
-            {legendProps.valueRange?.length > 0 &&
-                legend.visible &&
-                legendProps && (
-                    <ContinuousLegend
-                        min={legendProps.valueRange[0]}
-                        max={legendProps.valueRange[1]}
-                        dataObjectName={legendProps.title}
-                        position={legend.position}
-                        name={legendProps.name}
-                        template={template}
-                        colorTables={colorTables}
-                        horizontal={legend.horizontal}
-                    />
-                )}
         </div>
     );
 };
