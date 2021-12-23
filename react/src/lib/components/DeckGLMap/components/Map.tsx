@@ -109,17 +109,12 @@ const Map: React.FC<MapProps> = ({
 }: MapProps) => {
     // create store once with layers data
     const store = React.useMemo(
-        () => createStore(getLayersWithDefaultProps(layers, view3D)),
+        () => createStore(getLayersWithDefaultProps(layers)),
         []
     );
 
     // update store if any of the layer prop is changed
     React.useEffect(() => {
-        // Inject "is3d" property into all layers and link it to "view3D".
-        layers = layers.map((e) => {
-            return { ...e, is3d: view3D };
-        });
-
         const prev_state = store.getState()["layers"];
         const cur_state = layers;
         const patch = jsonpatch.compare(prev_state, cur_state);
@@ -133,7 +128,7 @@ const Map: React.FC<MapProps> = ({
             ).newDocument;
             store.dispatch(setLayers(new_state));
         }
-    }, [layers, view3D]);
+    }, [layers]);
 
     return (
         <ReduxProvider store={store}>

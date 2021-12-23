@@ -11,6 +11,8 @@ import {
     LineString,
     Position,
     FeatureCollection,
+    GeoJsonProperties,
+    Geometry,
 } from "geojson";
 import {
     LayerPickInfo,
@@ -24,6 +26,7 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { templateArray } from "../../components/WelllayerTemplateTypes";
 import { colorTablesArray } from "../../components/ColorTableTypes";
+import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -37,7 +40,6 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
-    is3d: boolean;
 }
 
 export interface LogCurveDataType {
@@ -78,6 +80,14 @@ export default class WellsLayer extends CompositeLayer<
         return true;
     }
 
+    shouldUpdateState({
+        changeFlags,
+    }: UpdateStateInfo<
+        WellsLayerProps<FeatureCollection<Geometry, GeoJsonProperties>>
+    >): boolean | string | null {
+        return changeFlags.viewportChanged || changeFlags.propsOrDataChanged;
+    }
+
     renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
         if (!(this.props.data as FeatureCollection).features) {
             return [];
@@ -88,7 +98,7 @@ export default class WellsLayer extends CompositeLayer<
             ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
             : (this.props.data as FeatureCollection);
 
-        const is3d = this.props.is3d;
+        const is3d = this.context.viewport.constructor.name === "OrbitViewport";
         if (!is3d) {
             // In 2D flatten wells.
             data = flattenPath(data);

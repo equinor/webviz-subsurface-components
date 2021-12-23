@@ -15,11 +15,30 @@ import DiscreteColorLegend from "../components/DiscreteLegend";
 import ContinuousLegend from "../components/ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
-import { Layer } from "deck.gl";
-import { View, Viewport } from "@deck.gl/core";
+import { Layer, View } from "deck.gl";
+import { DeckGLView } from "./DeckGLView";
+import { Viewport } from "@deck.gl/core";
 import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 import { LayerProps } from "@deck.gl/core/lib/layer";
+import { ViewProps } from "@deck.gl/core/views/view";
+
+export interface ViewportType {
+    /**
+     * Viewport id
+     */
+    id: string;
+
+    /**
+     * If true, displays map in 3D view, default is 2D view (false)
+     */
+    show3D: boolean;
+
+    /**
+     * Layers to be displayed on viewport
+     */
+    layerIds: string[];
+}
 
 export interface ViewsType {
     /**
@@ -30,22 +49,7 @@ export interface ViewsType {
     /**
      * Layers configuration for multiple viewport
      */
-    viewports: {
-        /**
-         * Viewport id
-         */
-        id: string;
-
-        /**
-         * If true, displays map in 3D view, default is 2D view (false)
-         */
-        show3D: boolean;
-
-        /**
-         * Layers to be displayed on viewport
-         */
-        layerIds: string[];
-    }[];
+    viewports: ViewportType[];
 }
 
 export interface DeckGLWrapperProps {
@@ -157,10 +161,15 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     }, [bounds, zoom]);
 
     // state for views prop of DeckGL component
+    const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
+    useEffect(() => {
+        setViewsProps(getViews(views) as ViewProps[]);
+    }, [views]);
+
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
     useEffect(() => {
-        setDeckGLViews(getViewsForDeckGL(views));
-    }, [views]);
+        setDeckGLViews(jsonToObject(viewsProps) as View[]);
+    }, [viewsProps]);
 
     // get layers data from store
     const layersData = useSelector((st: MapState) => st.layers);
@@ -306,24 +315,30 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         });
     }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
-    const layerFilter = (args: {
-        layer: Layer<unknown, LayerProps<unknown>>;
-        viewport: Viewport;
-    }): boolean => {
-        // display all the layers if views are not specified correctly
-        if (!views || !views.viewports || !views.layout) return true;
+    const layerFilter = useCallback(
+        (args: {
+            layer: Layer<unknown, LayerProps<unknown>>;
+            viewport: Viewport;
+        }): boolean => {
+            // display all the layers if views are not specified correctly
+            if (!views || !views.viewports || !views.layout) return true;
 
-        const cur_view = views.viewports.find(
-            ({ id }) =>
-                args.viewport.id && new RegExp("^" + id).test(args.viewport.id)
-        );
-        if (cur_view) {
-            const layer_ids = cur_view.layerIds;
-            return layer_ids.some((layer_id) => args.layer.id.match(layer_id));
-        } else {
-            return true;
-        }
-    };
+            const cur_view = views.viewports.find(
+                ({ id }) =>
+                    args.viewport.id &&
+                    new RegExp("^" + id).test(args.viewport.id)
+            );
+            if (cur_view && cur_view.layerIds.length > 0) {
+                const layer_ids = cur_view.layerIds;
+                return layer_ids.some((layer_id) =>
+                    args.layer.id.match(new RegExp("\\b" + layer_id + "\\b"))
+                );
+            } else {
+                return true;
+            }
+        },
+        [views]
+    );
 
     if (!deckGLViews) return null;
 
@@ -359,8 +374,8 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 onLoad={onLoad}
             >
                 {children}
-                {deckGLViews.map((viewport) => (
-                    <View id={viewport.id} key={viewport.id}>
+                {viewsProps.map((view) => (
+                    <DeckGLView key={view.id} id={view.id}>
                         {deckGLLayers && (
                             <StatusIndicator
                                 layers={deckGLLayers}
@@ -368,7 +383,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                             />
                         )}
                         <Settings />
-                    </View>
+                    </DeckGLView>
                 ))}
             </DeckGL>
 
@@ -420,7 +435,7 @@ export default DeckGLWrapper;
 // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
 // See https://deck.gl/docs/api-reference/json/overview for more details.
 function jsonToObject(
-    data: Record<string, unknown>[] | LayerProps<unknown>[],
+    data: ViewProps[] | LayerProps<unknown>[],
     enums: Record<string, unknown>[] | undefined = undefined
 ): Layer<unknown>[] | View[] {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
@@ -435,11 +450,6 @@ function jsonToObject(
     });
     const jsonConverter = new JSONConverter({ configuration });
     return jsonConverter.convert(data);
-}
-
-// Returns DeckGL specific views object
-function getViewsForDeckGL(views: ViewsType | undefined): View[] {
-    return jsonToObject(getViews(views)) as View[];
 }
 
 // returns initial view state for DeckGL

@@ -70,7 +70,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         logCurves: true,
         refine: true,
         visible: true,
-        is3D: false,
     },
     FaultPolygonsLayer: {
         name: "Fault polygons",

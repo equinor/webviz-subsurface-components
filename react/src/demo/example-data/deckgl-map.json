@@ -126,17 +126,12 @@
       }
     },
     "views": {
-      "layout": [1, 2],
+      "layout": [1, 1],
       "viewports": [
         {
           "id": "view_1",
           "show3D": false,
-          "layerIds": ["colormap-layer", "pie-layer"]
-        },
-        {
-          "id": "view_2",
-          "show3D": false,
-          "layerIds": ["colormap-layer", "wells-layer"]
+          "layerIds": []
         }
       ]
     }

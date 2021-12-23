@@ -23,9 +23,8 @@ DeckGLMap.defaultProps = {
     },
     zoom: -3,
     views: {
-        view3D: false,
         layout: [1, 1],
-        viewport: [{ id: "main-view", layerIds: [] }],
+        viewport: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
     colorTables: colorTables,
     template: template,
