@@ -31,6 +31,7 @@ import { getScaleTrackNum } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
 import { getTrackTemplate } from "../utils/tracks";
+import { isScaleTrack } from "../utils/tracks";
 
 import {
     addOrEditGraphTrack,
@@ -966,6 +967,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         const tracks: TemplateTrack[] = [];
         if (this.logController) {
             for (const track of this.logController.tracks) {
+                if(isScaleTrack(track))
+                   continue;
                 const templateTrack = getTrackTemplate(track);
                 tracks.push(JSON.parse(JSON.stringify(templateTrack)));
             }
