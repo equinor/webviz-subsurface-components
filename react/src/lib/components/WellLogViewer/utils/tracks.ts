@@ -489,6 +489,7 @@ function updateTrackScale(track: GraphTrack): void {
     }
 
     if (!track.options.domain) {
+        // could be on reguired track with missed data
         console.log("Empty track.options.domain!");
         track.options.domain =
             track.options.scale === "log" ? [1, 100] : [0, 100];
