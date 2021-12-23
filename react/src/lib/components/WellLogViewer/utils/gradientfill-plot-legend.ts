@@ -11,11 +11,16 @@ import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicP
 /* End of missed from "@equinor/videx-wellog */
 
 import { ColorTable } from "../components/ColorTableTypes";
+import { getInterpolatedColorString } from "./color-table";
 
 import { color4ToString } from "./color-table";
-let __id = 0;
-function createGradient(g: D3Selection, colorTable: ColorTable): string {
-    const id = "grad" + ++__id; // generate unique id
+let __idGradient = 0;
+function createGradient(
+    g: D3Selection,
+    colorTable: ColorTable,
+    rLogarithmic?: number
+): string {
+    const id = "grad" + ++__idGradient; // generate unique id
     const lg = g
         .append("defs")
         .append("linearGradient")
@@ -25,12 +30,27 @@ function createGradient(g: D3Selection, colorTable: ColorTable): string {
         .attr("y1", "0%")
         .attr("y2", "0%");
     const colors = colorTable.colors;
-    for (let i = 0; i < colors.length; i++) {
-        const color = colors[i];
-        const c = color4ToString(color);
-        lg.append("stop")
-            .attr("offset", color[0] * 100.0 + "%")
-            .style("stop-color", c);
+    if (rLogarithmic !== undefined) {
+        const yDelta = Math.log(rLogarithmic); // log(max/min)
+        const d = rLogarithmic - 1;
+        const nIntervals = 25;
+        for (let i = 0; i <= nIntervals; i++) {
+            const fraction = i / nIntervals;
+            const y = 1 + fraction * d;
+            const v = Math.log(y) / yDelta;
+            const c = getInterpolatedColorString(colorTable, v);
+            lg.append("stop")
+                .attr("offset", fraction * 100.0 + "%")
+                .style("stop-color", c);
+        }
+    } else {
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            const c = color4ToString(color);
+            lg.append("stop")
+                .attr("offset", color[0] * 100.0 + "%")
+                .style("stop-color", c);
+        }
     }
     return id;
 }
@@ -75,7 +95,13 @@ export default function renderGradientFillPlotLegend(
                 ? options.colorTable
                 : options.inverseColorTable;
         if (colorTable) {
-            const id = createGradient(g, colorTable);
+            const id = createGradient(
+                g,
+                colorTable,
+                options.scale === "linear" && options.colorScale === "log"
+                    ? max / min
+                    : undefined
+            );
             fillNrm = "url(#" + id + ")";
         }
         colorTable =
@@ -83,7 +109,14 @@ export default function renderGradientFillPlotLegend(
                 ? options.inverseColorTable
                 : options.colorTable;
         if (colorTable) {
-            const id = createGradient(g, colorTable);
+            const id = createGradient(
+                g,
+                colorTable,
+                options.scale === "linear" &&
+                    (options.inverseColorScale || options.colorScale) === "log"
+                    ? max / min
+                    : undefined
+            );
             fillInv = "url(#" + id + ")";
         }
         /* End GradientFill code */
@@ -110,7 +143,14 @@ export default function renderGradientFillPlotLegend(
         /* Start GradientFill code */
         const colorTable = options.colorTable;
         if (colorTable) {
-            const id = createGradient(g, colorTable);
+            const [min, max] = plot.scale.domain();
+            const id = createGradient(
+                g,
+                colorTable,
+                options.scale === "linear" && options.colorScale === "log"
+                    ? max / min
+                    : undefined
+            );
             fillNrm = "url(#" + id + ")";
         }
         /* End GradientFill code */

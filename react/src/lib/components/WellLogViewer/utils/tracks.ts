@@ -5,8 +5,12 @@ import {
     GraphTrack,
 } from "@equinor/videx-wellog";
 
+import { TrackOptions } from "@equinor/videx-wellog/dist/tracks/interfaces";
+import { GraphTrackOptions } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
+
 import { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 
+import { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 import { GradientFillPlotOptions } from "./gradientfill-plot";
 export interface ExtPlotOptions
     extends GradientFillPlotOptions /*|DifferentialPlotOptions|AreaPlotOptions*/ {
@@ -17,6 +21,9 @@ import WellLogView from "../components/WellLogView";
 
 import { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 import { PlotFactory } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
+
+// missed! import { createScale } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
+import { createScale } from "./graph/factory";
 
 import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
 
@@ -224,7 +231,7 @@ export function getPlotType(plot: Plot): string {
     return "";
 }
 
-function isValidPlotType(plotType: string) {
+function isValidPlotType(plotType: string): boolean {
     return (
         [
             "line",
@@ -351,19 +358,29 @@ function getColorTable(
 function getPlotOptions(
     templatePlotProps: TemplatePlotProps,
     colorTables: ColorTable[], //"gradientfill" plot
-    domain: [number, number],
+    trackScale: string | undefined, // track scale
+    minmax: [number, number],
     curve: WellLogCurve,
     iPlot: number,
     curve2: WellLogCurve | undefined, //"differential" plot
     iPlot2: number //"differential" plot
 ): ExtPlotOptions {
-    const options = {
+    const scale = templatePlotProps.scale || trackScale || "linear"; //"linear" or "log"
+    const domain = (
+        scale === "log" ||
+            (templatePlotProps.type === "gradientfill" &&
+                templatePlotProps.colorScale === "log")
+            ? roundLogMinMax
+            : roundMinMax
+    )(minmax);
+
+    const options: ExtPlotOptions = {
         dataAccessor: curve2
             ? makeDataAccessor2(iPlot, iPlot2)
             : makeDataAccessor(iPlot),
 
-        scale: templatePlotProps.scale || "linear", //"linear" or "log"
-        domain: domain,
+        scale: scale,
+        domain: templatePlotProps.domain || domain,
 
         color: templatePlotProps.color,
         inverseColor: templatePlotProps.inverseColor,
@@ -380,21 +397,8 @@ function getPlotOptions(
             templatePlotProps.inverseColorTable,
             colorTables
         ),
-
-        // DifferentialPlotOptions
-        serie1: {
-            scale: templatePlotProps.scale || "linear", //"linear" or "log"
-            domain: domain,
-            color: templatePlotProps.color,
-            fill: templatePlotProps.fill,
-        },
-        serie2: {
-            // ? =scale2, =domain2 ?
-            scale: templatePlotProps.scale || "linear",
-            domain: domain,
-            color: templatePlotProps.color2,
-            fill: templatePlotProps.fill2,
-        },
+        colorScale: templatePlotProps.colorScale,
+        inverseColorScale: templatePlotProps.inverseColorScale,
 
         legendInfo: () => ({
             label: curve.name,
@@ -413,6 +417,21 @@ function getPlotOptions(
             },
         }),
     };
+
+    (options as DifferentialPlotOptions).serie1 = {
+        scale: scale, //"linear" or "log"
+        domain: domain,
+        color: templatePlotProps.color,
+        fill: templatePlotProps.fill,
+    };
+    (options as DifferentialPlotOptions).serie2 = {
+        // ? =scale2, =domain2 ?
+        scale: scale,
+        domain: domain,
+        color: templatePlotProps.color2,
+        fill: templatePlotProps.fill2,
+    };
+
     return options;
 }
 
@@ -420,7 +439,8 @@ function getPlotConfig(
     id: string | number,
     templatePlotProps: TemplatePlotProps,
     colorTables: ColorTable[],
-    domain: [number, number],
+    trackScale: string | undefined, // track scale
+    minmax: [number, number],
     curve: WellLogCurve,
     iPlot: number,
     curve2: WellLogCurve | undefined,
@@ -432,7 +452,8 @@ function getPlotConfig(
         options: getPlotOptions(
             templatePlotProps,
             colorTables,
-            domain,
+            trackScale,
+            minmax,
             curve,
             iPlot,
             curve2,
@@ -440,12 +461,60 @@ function getPlotConfig(
         ),
     };
 }
+/**
+ * Update Track Scale according to the first plot
+ * @param track
+ * @param options - options for the first plot of the track
+ */
+function updateTrackScale(track: GraphTrack): void {
+    const track_options = track.options as TrackOptionsEx;
+    const templateTrack = track_options.__template;
+    if (templateTrack) {
+        if (templateTrack.plots.length) {
+            const plotTemplate = templateTrack.plots[0];
+            track.options.scale = plotTemplate.scale;
+            track.options.domain = plotTemplate.domain;
+
+            if (!track.options.label) track.options.label = plotTemplate.name;
+        }
+        if (track_options.__template.scale) {
+            track.options.scale = track_options.__template.scale;
+        }
+        if (!track.options.scale) track.options.scale = "linear";
+    }
+
+    if (track.plots.length) {
+        const plot = track.plots[0];
+        track.options.domain = plot.options.domain;
+    }
+
+    if (!track.options.domain) {
+        // could be on reguired track with missed data
+        console.log("Empty track.options.domain!");
+        track.options.domain =
+            track.options.scale === "log" ? [1, 100] : [0, 100];
+    }
+
+    if (track.options.scale === "log" && track.options.domain) {
+        if (track.options.domain[0] < 0) {
+            // could not show negative data!
+            console.error(
+                "wrong data range for logarithm scale " + track.options.domain
+            );
+        }
+    }
+
+    if (!track.options.scale) throw Error("Invalid track.options.scale!");
+    //if (!track.options.domain) throw Error("Invalid track.options.domain!");
+    track.trackScale = createScale(track.options.scale, track.options.domain);
+}
 
 function addGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
     templatePlot: TemplatePlot
 ): [number, number] {
+    const templateTrack = getTrackTemplate(track);
     const minmaxPrimaryAxis: [number, number] = [
         Number.POSITIVE_INFINITY,
         Number.NEGATIVE_INFINITY,
@@ -512,9 +581,8 @@ function addGraphTrackPlot(
                 iCurve,
                 templatePlotProps,
                 colorTables,
-                (templatePlotProps.scale === "log"
-                    ? roundLogMinMax
-                    : roundMinMax)(minmax),
+                templateTrack.scale,
+                minmax,
                 curve,
                 plotDatas.length,
                 curve2,
@@ -532,10 +600,12 @@ function addGraphTrackPlot(
                 throw Error(
                     `No factory function for creating '${p.type}'-plot!`
                 );
+
             const plot = createPlot(p, track.trackScale);
             if (plot) {
                 plots.push(plot);
-
+                templateTrack.plots.push(templatePlot);
+                updateTrackScale(track);
                 track.prepareData();
             }
         }
@@ -549,6 +619,7 @@ function editGraphTrackPlot(
     plot: Plot,
     templatePlot: TemplatePlot
 ): [number, number] {
+    const templateTrack = getTrackTemplate(track);
     const minmaxPrimaryAxis: [number, number] = [
         Number.POSITIVE_INFINITY,
         Number.NEGATIVE_INFINITY,
@@ -615,9 +686,8 @@ function editGraphTrackPlot(
                 iCurve,
                 templatePlotProps,
                 colorTables,
-                (templatePlotProps.scale === "log"
-                    ? roundLogMinMax
-                    : roundMinMax)(minmax),
+                templateTrack.scale,
+                minmax,
                 curve,
                 plotDatas.length,
                 curve2,
@@ -635,23 +705,18 @@ function editGraphTrackPlot(
                 throw Error(
                     `No factory function for creating '${p.type}'-plot!`
                 );
-            const plotNew = createPlot(p, track.trackScale);
-            if (plotNew) {
-                let bFound = false;
-                for (const i in plots) {
-                    if (plot === plots[i]) {
-                        bFound = true;
-                        plots[i] = plotNew; // replace
-                        break;
-                    }
-                }
 
-                if (!bFound) {
-                    console.error("Error!", "Edited plot not found!");
-                    plots.push(plot);
+            const iPlot = plots.indexOf(plot);
+            if (iPlot < 0) {
+                console.error("Error!", "Edited plot not found!");
+            } else {
+                const plotNew = createPlot(p, track.trackScale);
+                if (plotNew) {
+                    plots[iPlot] = plotNew; // replace plot
+                    templateTrack.plots[iPlot] = templatePlot;
+                    updateTrackScale(track);
+                    track.prepareData();
                 }
-
-                track.prepareData();
             }
         }
     }
@@ -686,12 +751,15 @@ export function addOrEditGraphTrackPlot(
 }
 
 function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
+    const template = getTrackTemplate(track);
+
     const plots = track.plots;
 
     let index = 0;
     for (const plot of plots) {
         if (plot === _plot) {
             plots.splice(index, 1);
+            template.plots.splice(index, 1);
             break;
         }
         index++;
@@ -702,9 +770,10 @@ function _removeGraphTrackPlot(track: GraphTrack, _plot: Plot): number {
 export function removeGraphTrackPlot(
     wellLogView: WellLogView,
     track: GraphTrack,
-    _plot: Plot
+    plot: Plot
 ): void {
-    _removeGraphTrackPlot(track, _plot);
+    _removeGraphTrackPlot(track, plot);
+    updateTrackScale(track);
 
     if (wellLogView.logController) {
         updateLegendRows(wellLogView.logController);
@@ -750,17 +819,41 @@ const plotFactory: PlotFactory = {
     gradientfill: createPlotType(GradientFillPlot),
 };
 
+const defaultOptions: GraphTrackOptions = {
+    plotFactory: plotFactory,
+    legendConfig: graphLegendConfig,
+};
+
+export interface TrackOptionsEx extends TrackOptions {
+    __template: TemplateTrack;
+}
+
+export function getTrackTemplate(track: Track): TemplateTrack {
+    const options = track.options as TrackOptionsEx;
+    if (options.__template) return options.__template;
+    else {
+        console.error("No __template given in track!");
+        const options = (track as GraphTrack).options;
+        return {
+            title: options.label ? options.label : "",
+            scale: options.scale === "log" ? "log" : "linear",
+            //domain: options.domain,
+            plots: [],
+        };
+    }
+}
+
 export function newGraphTrack(
+    /* should contains
     title: string,
     data: [number, number][][],
     plots: PlotConfig[]
+    */
+    options: GraphTrackOptions
 ): GraphTrack {
     return new GraphTrack(undefined as unknown as number, {
-        label: title,
-        legendConfig: graphLegendConfig,
-        data: data,
-        plots: plots,
-        plotFactory: plotFactory,
+        ...defaultOptions,
+        ...options,
     });
 }
 
@@ -907,9 +1000,8 @@ export function createTracks(
                     iCurve,
                     templatePlotProps,
                     colorTables,
-                    (templatePlotProps.scale === "log"
-                        ? roundLogMinMax
-                        : roundMinMax)(minmax),
+                    templateTrack.scale,
+                    minmax,
                     curve,
                     plotDatas.length,
                     curve2,
@@ -924,13 +1016,16 @@ export function createTracks(
                 plots.push(p);
             }
             if (plots.length || templateTrack.required) {
-                info.tracks.push(
-                    newGraphTrack(
-                        makeTrackHeader(welllog, templateTrack),
-                        plotDatas,
-                        plots
-                    )
-                );
+                const options: GraphTrackOptions = {
+                    data: plotDatas,
+                    plots: plots,
+                };
+                setTrackOptionFromTemplate(options, templateTrack);
+                options.label = makeTrackHeader(welllog, templateTrack);
+
+                const track = newGraphTrack(options);
+                updateTrackScale(track);
+                info.tracks.push(track);
             }
         }
     }
@@ -963,6 +1058,22 @@ function addTrack(
     }
 }
 
+function setTrackOptionFromTemplate(
+    options: GraphTrackOptions,
+    templateTrack: TemplateTrack
+): void {
+    options.label = templateTrack.title;
+    {
+        if (templateTrack.scale) options.scale = templateTrack.scale;
+        else delete options.scale;
+    }
+    //if (force || templateTrack.domain) options.domain = templateTrack.domain;
+
+    (options as TrackOptionsEx).__template = JSON.parse(
+        JSON.stringify(templateTrack)
+    );
+}
+
 export function addOrEditGraphTrack(
     wellLogView: WellLogView,
     track: GraphTrack | null,
@@ -972,13 +1083,27 @@ export function addOrEditGraphTrack(
 ): GraphTrack {
     if (track) {
         // edit existing track
-        track.options.label = templateTrack.title;
+        setTrackOptionFromTemplate(track.options, templateTrack);
+        updateTrackScale(track);
     } else {
-        track = newGraphTrack(templateTrack.title, [], []);
+        const options: GraphTrackOptions = {
+            plots: [],
+            data: [],
+        };
+        setTrackOptionFromTemplate(options, templateTrack);
+        track = newGraphTrack(options);
         addTrack(wellLogView, track, trackCurrent, bAfter);
     }
     if (wellLogView.logController) {
         wellLogView.logController.updateTracks();
     }
     return track;
+}
+
+export function hasDifferentialPlot(track: GraphTrack): boolean {
+    for (const plot of track.plots) {
+        const type = getPlotType(plot);
+        if (type === "differential") return true;
+    }
+    return false;
 }
