@@ -490,19 +490,18 @@ function updateTrackScale(track: GraphTrack): void {
 
     if (!track.options.domain) {
         console.log("Empty track.options.domain!");
-        track.options.domain = track.options.scale === "log"? [1,100]: [0,100];
+        track.options.domain =
+            track.options.scale === "log" ? [1, 100] : [0, 100];
     }
 
     if (track.options.scale === "log" && track.options.domain) {
         if (track.options.domain[0] < 0) {
             // could not show negative data!
             console.error(
-                "wrong data range for logarithm scale " +
-                    track.options.domain
+                "wrong data range for logarithm scale " + track.options.domain
             );
         }
     }
-
 
     if (!track.options.scale) throw Error("Invalid track.options.scale!");
     //if (!track.options.domain) throw Error("Invalid track.options.domain!");

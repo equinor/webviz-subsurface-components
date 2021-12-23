@@ -967,8 +967,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         const tracks: TemplateTrack[] = [];
         if (this.logController) {
             for (const track of this.logController.tracks) {
-                if(isScaleTrack(track))
-                   continue;
+                if (isScaleTrack(track)) continue;
                 const templateTrack = getTrackTemplate(track);
                 tracks.push(JSON.parse(JSON.stringify(templateTrack)));
             }
