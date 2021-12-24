@@ -821,6 +821,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     onMouseMove(x: number): void {
         this.setInfo(x);
+
         this.onContentRescale();
     }
 

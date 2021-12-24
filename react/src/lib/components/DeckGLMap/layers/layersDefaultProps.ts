@@ -51,6 +51,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         bounds: { type: "array", value: null, false: true, compare: true },
         valueRange: { type: "array", value: [0, 1] },
         rotDeg: 0,
+        contours: [-1.0, -1.0],
     },
     GridLayer: {
         name: "Grid",

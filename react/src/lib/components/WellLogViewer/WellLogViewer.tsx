@@ -54,6 +54,7 @@ function onTrackMouseEvent(wellLogView: WellLogView, ev: TrackMouseEvent) {
         );
     }
 }
+
 ///////////
 
 import { fillInfos } from "./utils/fill-info";
@@ -109,6 +110,8 @@ class WellLogViewer extends Component<Props, State> {
         };
 
         this.controller = null;
+
+        this.collapsedTrackIds = [];
 
         this.collapsedTrackIds = [];
 
@@ -280,7 +283,13 @@ class WellLogViewer extends Component<Props, State> {
         if (i < 0) this.collapsedTrackIds.push(trackId);
         else delete this.collapsedTrackIds[i];
 
+
         this.updateReadoutPanel();
+
+        if (this.controller)
+            this.controller.selectContent(
+                this.controller.getContentSelection()
+            ); // force to update readout panel
     }
 
     render(): ReactNode {
