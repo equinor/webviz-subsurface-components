@@ -33,6 +33,9 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Rotates around 'bounds' upper left corner counterclockwise in degrees.
     rotDeg: number;
+
+    // Contourlines reference point and interval.
+    contours: [number, number];
 }
 export default class Map3DLayer extends CompositeLayer<
     unknown,
@@ -61,6 +64,7 @@ export default class Map3DLayer extends CompositeLayer<
                 texture: load(this.props.propertyTexture, ImageLoader, {}),
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
+                contours: this.props.contours,
             })
         );
         return [layer];

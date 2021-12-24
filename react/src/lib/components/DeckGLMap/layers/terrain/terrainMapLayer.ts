@@ -18,7 +18,10 @@ export type DataItem = {
 
 export type TerrainMapLayerData = [DataItem?];
 
-export type TerrainMapLayerProps<D> = SimpleMeshLayerProps<D>;
+export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
+    // Contourlines reference point and interval.
+    contours: [number, number];
+}
 
 const defaultProps = {
     data: [{ position: [0, 0], angle: 0, color: [255, 0, 0] }], // dummy data
@@ -26,6 +29,8 @@ const defaultProps = {
     getPosition: (d: DataItem) => d.position,
     getColor: (d: DataItem) => d.color,
     getOrientation: (d: DataItem) => [0, d.angle, 0],
+
+    contours: [-1, -1],
 
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
 };
@@ -40,9 +45,14 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ uniforms }: any): void {
+        const contourReferencePoint = this.props.contours[0] ?? -1.0;
+        const contourInterval = this.props.contours[1] ?? -1.0;
+
         super.draw({
             uniforms: {
                 ...uniforms,
+                contourReferencePoint,
+                contourInterval,
             },
         });
     }
@@ -51,7 +61,22 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const parentShaders = super.getShaders();
         // Overwrite the default fragment shader with ours.
         parentShaders.fs = fsShader;
-        return parentShaders;
+
+        return {
+            ...parentShaders,
+
+            // Inject this into vertex shader. Vi want to export vertex world position to
+            // fragment shader for making contour lines.
+            inject: {
+                "vs:#decl": `
+                  out vec3 worldPos;
+                `,
+
+                "vs:#main-start": `
+                   worldPos = positions;
+                `,
+            },
+        };
     }
 
     decodePickingColor(): number {

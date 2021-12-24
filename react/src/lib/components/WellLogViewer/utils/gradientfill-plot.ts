@@ -14,10 +14,12 @@ import { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 export interface GradientFillPlotOptions extends AreaPlotOptions {
     colorTable?: ColorTable;
     inverseColorTable?: ColorTable;
+    colorScale?: "linear" | "log";
+    inverseColorScale?: "linear" | "log";
 }
 
 /*
- Create gradient based on colorTable
+ * Create gradient based on colorTable
  */
 function createGradient(
     ctx: CanvasRenderingContext2D,
@@ -26,7 +28,7 @@ function createGradient(
     plotdata: number[][],
     xscale: Scale,
     colorTable: ColorTable,
-    scale: string | undefined
+    scale: undefined | string // "linear" | "log"
 ): CanvasGradient {
     const dataFrom = plotdata[0];
     const dataTo = plotdata[plotdata.length - 1];
@@ -38,10 +40,11 @@ function createGradient(
         : ctx.createLinearGradient(0, sFrom, 0, sTo);
 
     if (scale === "log") {
+        const [min, max] = xscale.domain();
         const xFrom = dataFrom[0];
         const xDelta = dataTo[0] - xFrom;
-        const yFrom = Math.log(xscale.domain()[0]);
-        const yDelta = Math.log(xscale.domain()[1]) - yFrom;
+        const yFrom = Math.log(min);
+        const yDelta = Math.log(max) - yFrom;
         for (const data of plotdata) {
             const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
@@ -72,7 +75,7 @@ function createGradient(
 }
 
 /**
- * GradientFillPlot plot
+ * GradientFill plot
  */
 export default class GradientFillPlot extends Plot {
     constructor(id: string | number, options: GradientFillPlotOptions = {}) {
@@ -161,7 +164,9 @@ export default class GradientFillPlot extends Plot {
                     plotdata,
                     xscale,
                     colorTable,
-                    options.scale
+                    options.inverseColorScale ||
+                        options.colorScale ||
+                        options.scale
                 );
             /* End GradientFill code */
 
@@ -183,7 +188,7 @@ export default class GradientFillPlot extends Plot {
                 plotdata,
                 xscale,
                 colorTable,
-                options.scale
+                options.colorScale || options.scale
             );
         /* End GradientFill code */
 

@@ -4,5 +4,13 @@ export interface Info {
     color: string;
     value: number /*|string for discrete*/;
     type: string; // "seperator"; "line", "linestep", "area", "dot", ...
-    track_id: number | string;
+    trackId: number | string;
+
+    groupStart?: string; // for category
+    collapsed?: boolean; // group is collapsed
+}
+
+export interface InfoOptions {
+    allTracks?: boolean; // show not only visible tracks
+    grouping?: string; // how group values. "" | "by_track"
 }

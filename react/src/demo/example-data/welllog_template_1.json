@@ -19,6 +19,7 @@
         },
         {
             "title": "Area",
+            "scale": "log",
             "plots": [
                 {
                     "name": "HKLA",
@@ -193,13 +194,13 @@
     "styles": [
         {
             "name": "HKL",
-            "scale": "linear",
             "type": "gradientfill",
             "colorTable": "Physics",
             "color": "green"
         },
         {
             "name": "MD",
+            "scale": "linear",
             "type": "area",
             "color": "blue",
             "fill": "green"

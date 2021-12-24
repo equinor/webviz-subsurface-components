@@ -18,6 +18,7 @@ import {
     InputLabel,
     NativeSelect,
 } from "@material-ui/core";
+import { getTrackTemplate } from "../utils/tracks";
 
 const typeItems: Record<string, string> = {
     // language dependent names of plot types
@@ -69,7 +70,7 @@ function _createItems(items: Record<string, string>): ReactNode[] {
 function createTypeItems(): ReactNode[] {
     return _createItems(typeItems);
 }
-function createScaleItems(): ReactNode[] {
+export function createScaleItems(): ReactNode[] {
     return _createItems(scaleItems);
 }
 function createColorItems(): ReactNode[] {
@@ -106,18 +107,21 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         if (names[0]) name2 = name = names[0];
         if (names[1]) name2 = names[1];
 
-        this.state = this.props.templatePlot
+        const trackTemplate = getTrackTemplate(this.props.track);
+        const templatePlot = this.props.templatePlot;
+        this.state = templatePlot
             ? {
-                  ...this.props.templatePlot,
+                  ...templatePlot,
 
                   open: true,
               }
             : {
                   // we should fill every posible state to allow this.setState() to set it
-                  type: "line",
+                  type: trackTemplate.scale ? "" : "line",
                   name: name, //?? the first data in data selector
                   name2: name2, //? the second data in data selector ??
 
+                  scale: undefined,
                   color: "black", //??
 
                   // for 'area' plot
@@ -125,11 +129,13 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   fillOpacity: 0.25,
                   inverseColor: "",
 
-                  // for 'gradient fill' plot
+                  // for 'gradientfill' plot
                   colorTable: this.props.wellLogView.props.colorTables[0].name,
-                  inverseColorTable: "",
+                  inverseColorTable: undefined,
+                  colorScale: undefined,
+                  inverseColorScale: undefined,
 
-                  // for 'differetial' plot
+                  // for 'differential' plot
                   color2: "black", //??
                   fill2: "green",
 
@@ -214,21 +220,19 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         valueName: string, // use it as "a pointer to member" of an object
         label: string,
         nodes: ReactNode[],
-        insertEmpty?: boolean
+        insertEmpty?: string | boolean
     ): ReactNode {
         let value = (this.state as unknown as Record<string, string>)[
             valueName
         ];
         if (insertEmpty) {
             if (!value) value = noneValue;
-            // insert at the beginning (reverse order? add to the edn, reverse back)
-            nodes.reverse();
-            nodes.push(
+            // insert at the beginning
+            nodes.unshift(
                 <option key={noneValue} value={noneValue}>
-                    {"\u2014"}
+                    {insertEmpty == true ? "\u2014" : insertEmpty}
                 </option>
             );
-            nodes.reverse();
         }
         return (
             <FormControl fullWidth>
@@ -253,9 +257,11 @@ export class PlotPropertiesDialog extends Component<Props, State> {
     }
 
     render(): ReactNode {
+        const trackTemplate = getTrackTemplate(this.props.track);
         const title = this.props.templatePlot ? "Edit plot" : "Add New Plot";
         const skipUsed = this.props.templatePlot ? false : true; /*??*/
         const colorTables = this.props.wellLogView.props.colorTables;
+        const scale = this.state.scale || trackTemplate.scale;
         return (
             <Dialog
                 open={this.state.open}
@@ -278,9 +284,18 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                     {this.createSelectControl(
                         "scale",
                         "Scale",
-                        createScaleItems()
+                        createScaleItems(),
+                        "Track scale"
                     )}
-                    <FormControl fullWidth key="12" />
+                    {this.state.type === "gradientfill" && scale === "linear"
+                        ? [
+                              this.createSelectControl(
+                                  "colorScale",
+                                  "Color Scale",
+                                  createScaleItems()
+                              ),
+                          ]
+                        : [<FormControl fullWidth key="12" />]}
 
                     {this.createSelectControl(
                         "name",
