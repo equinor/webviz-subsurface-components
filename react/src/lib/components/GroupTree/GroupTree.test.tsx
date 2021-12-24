@@ -5,7 +5,7 @@ import React from "react";
 import { Wrapper } from "../GroupTree/test/TestWrapper";
 import GroupTree from "./GroupTree";
 
-describe("Test GroupTreeViewer", () => {
+describe("Test GroupTree Component", () => {
     it("snapshot test", () => {
         const { container } = render(
             Wrapper({
