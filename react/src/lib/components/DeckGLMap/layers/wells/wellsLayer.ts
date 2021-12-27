@@ -172,6 +172,7 @@ export default class WellsLayer extends CompositeLayer<
                 updateTriggers: {
                     getColor: [this.props.logName],
                     getWidth: [this.props.logName, this.props.logRadius],
+                    getPath: [positionFormat],
                 },
                 onDataLoad: (value: LogCurveDataType[]) => {
                     this.setState({
