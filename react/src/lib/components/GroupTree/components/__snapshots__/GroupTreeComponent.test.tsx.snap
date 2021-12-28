@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Test GroupTree Default Component snapshot test 1`] = `
+exports[`Test GroupTree Component snapshot test 1`] = `
 .c3 {
   display: -webkit-box;
   display: -webkit-flex;
