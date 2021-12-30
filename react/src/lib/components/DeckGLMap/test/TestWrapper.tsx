@@ -13,7 +13,7 @@ export const Wrapper = ({
     return <Provider store={testStore}>{children}</Provider>;
 };
 
-export const emptytestStore = createStore([]);
+export const emptytestStore = createStore({});
 emptytestStore.dispatch = jest.fn();
 export const EmptyWrapper = ({
     children,

@@ -7,6 +7,7 @@ import LayerProperty from "./LayerProperty";
 import * as core from "@actions/core";
 import { obj } from "../../../../performanceUtility/onRenderFunction";
 import logTimes from "../../../../performanceUtility/onRenderFunction";
+import { testState } from "../../test/testReduxState";
 
 describe("Test Layer Property", () => {
     it("performance test", () => {
@@ -14,7 +15,11 @@ describe("Test Layer Property", () => {
             Wrapper({
                 children: (
                     <Profiler id="Layer properties" onRender={logTimes}>
-                        <LayerProperty layerId="drawing-layer" />
+                        <LayerProperty
+                            layer={
+                                testState.layers[testState.layers.length - 1]
+                            }
+                        />
                     </Profiler>
                 ),
             })

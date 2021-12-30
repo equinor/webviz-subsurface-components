@@ -1,9 +1,9 @@
 import * as jsonpatch from "fast-json-patch";
-import DeckGLWrapper from "./DeckGLWrapper";
+import DeckGLWrapper, { ViewsType } from "./DeckGLWrapper";
 import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
-import { setLayers } from "../redux/actions";
+import { setSpec } from "../redux/actions";
 import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
 import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
@@ -42,9 +42,10 @@ export interface MapProps {
     zoom: number;
 
     /**
-     * If true, displays map in 3D view, default is 2D view (false)
+     * Views configuration for map. If not specified, all the layers will be
+     * displayed in a single 2D viewport
      */
-    view3D: boolean;
+    views?: ViewsType;
 
     /**
      * Parameters for the InfoCard component
@@ -96,7 +97,7 @@ const Map: React.FC<MapProps> = ({
     layers,
     bounds,
     zoom,
-    view3D,
+    views,
     coords,
     scale,
     coordinateUnit,
@@ -108,18 +109,13 @@ const Map: React.FC<MapProps> = ({
 }: MapProps) => {
     // create store once with layers data
     const store = React.useMemo(
-        () => createStore(getLayersWithDefaultProps(layers, view3D)),
+        () => createStore(PrepareStoreData(layers, views)),
         []
     );
 
     // update store if any of the layer prop is changed
     React.useEffect(() => {
-        // Inject "is3d" property into all layers and link it to "view3D".
-        layers = layers.map((e) => {
-            return { ...e, is3d: view3D };
-        });
-
-        const prev_state = store.getState()["layers"];
+        const prev_state = store.getState()["spec"]["layers"];
         const cur_state = layers;
         const patch = jsonpatch.compare(prev_state, cur_state);
         const replace_operations = patch.filter((obj) => obj.op === "replace");
@@ -130,9 +126,10 @@ const Map: React.FC<MapProps> = ({
                 false,
                 false
             ).newDocument;
-            store.dispatch(setLayers(new_state));
+            const spec = { layers: new_state, views: views };
+            store.dispatch(setSpec(spec));
         }
-    }, [layers, view3D]);
+    }, [layers]);
 
     return (
         <ReduxProvider store={store}>
@@ -141,7 +138,7 @@ const Map: React.FC<MapProps> = ({
                 resources={resources}
                 bounds={bounds}
                 zoom={zoom}
-                view3D={view3D}
+                views={views}
                 coords={coords}
                 scale={scale}
                 coordinateUnit={coordinateUnit}
@@ -156,3 +153,15 @@ const Map: React.FC<MapProps> = ({
 };
 
 export default Map;
+
+function PrepareStoreData(
+    layers: Record<string, unknown>[],
+    views: ViewsType | undefined
+): Record<string, unknown> {
+    const layers_data = getLayersWithDefaultProps(layers);
+    const store_data = {
+        layers: layers_data,
+        views: views,
+    };
+    return store_data;
+}
