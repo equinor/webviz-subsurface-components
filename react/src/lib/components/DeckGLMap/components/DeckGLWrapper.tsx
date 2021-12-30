@@ -335,7 +335,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     args.viewport.id &&
                     new RegExp("^" + id).test(args.viewport.id)
             );
-            if (cur_view && cur_view.layerIds.length > 0) {
+            if (cur_view && cur_view.layerIds?.length > 0) {
                 const layer_ids = cur_view.layerIds;
                 return layer_ids.some((layer_id) =>
                     args.layer.id.match(new RegExp("\\b" + layer_id + "\\b"))
