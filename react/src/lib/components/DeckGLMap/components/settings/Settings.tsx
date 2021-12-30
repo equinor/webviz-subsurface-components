@@ -52,7 +52,7 @@ const Settings: React.FC<SettingsProps> = React.memo(
             const layers_in_viewport = currentView?.layerIds;
             if (layers_in_viewport && layers_in_viewport.length > 0) {
                 const layers_in_view = layers.filter((layer) =>
-                    currentView.layerIds.includes(layer["id"] as string)
+                    layers_in_viewport.includes(layer["id"] as string)
                 );
                 setLayersInView(layers_in_view);
             } else {
