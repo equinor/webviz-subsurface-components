@@ -22,7 +22,7 @@ import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 import { LayerProps } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
-//import { isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 
 export interface ViewportType {
     /**
@@ -176,7 +176,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     const spec = useSelector((st: MapState) => st.spec);
     const [layersData, setLayersData] = useState<LayerProps<unknown>[]>();
     useEffect(() => {
-        //if (isEmpty(spec) || !("layers" in spec)) return null;
+        if (isEmpty(spec) || !("layers" in spec)) return;
         setLayersData(spec["layers"] as LayerProps<unknown>[]);
     }, [spec]);
 

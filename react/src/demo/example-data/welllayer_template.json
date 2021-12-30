@@ -5,12 +5,6 @@
             {
                 "objectName" : "PORO",
                 "colorTable" : "Rainbow",
-                "context" : "wells-layer-2",
-                "scale": "linear"
-            },
-            {
-                "objectName" : "PORO",
-                "colorTable" : "Rainbow",
                 "context" : "wells-layer",
                 "scale": "linear"
             },

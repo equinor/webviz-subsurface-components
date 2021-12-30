@@ -49,7 +49,8 @@ const Settings: React.FC<SettingsProps> = React.memo(
         >([]);
         useEffect(() => {
             const layers = spec["layers"] as Record<string, unknown>[];
-            if (currentView?.layerIds) {
+            const layers_in_viewport = currentView?.layerIds;
+            if (layers_in_viewport && layers_in_viewport.length > 0) {
                 const layers_in_view = layers.filter((layer) =>
                     currentView.layerIds.includes(layer["id"] as string)
                 );
