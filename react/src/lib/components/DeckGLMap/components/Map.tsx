@@ -127,7 +127,6 @@ const Map: React.FC<MapProps> = ({
                 false
             ).newDocument;
             const spec = { layers: new_state, views: views };
-            console.log(spec);
             store.dispatch(setSpec(spec));
         }
     }, [layers]);
