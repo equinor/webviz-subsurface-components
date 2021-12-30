@@ -35,10 +35,10 @@ const Settings: React.FC<SettingsProps> = React.memo(
 
         const [currentView, setCurrentView] = useState<ViewportType>();
         useEffect(() => {
-            if (viewportId === undefined) return;
+            if (viewportId == undefined) return;
 
             const views = spec["views"] as ViewsType;
-            const cur_view = views.viewports.find((view) =>
+            const cur_view = views?.viewports?.find((view) =>
                 new RegExp("^" + view.id).test(viewportId)
             );
             setCurrentView(cur_view);
@@ -59,7 +59,7 @@ const Settings: React.FC<SettingsProps> = React.memo(
             }
         }, [spec["layers"], currentView]);
 
-        if (!layersInView.length) return null;
+        if (!layersInView?.length) return null;
         return (
             <div className={classes.root}>
                 {layersInView.map(
