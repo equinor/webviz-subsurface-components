@@ -58,10 +58,17 @@ export function selectTrack(
     return false; // selection is not changed
 }
 
-export function updateLegendRows(logViewer: LogViewer): void {
-    // access protected member function
-    // eslint-disable-next-line
-    (logViewer as any).updateLegendRows();
+export function getSelectTrackIndeces(logViewer?: LogViewer): number[] {
+    const selectedTrackIndeces: number[] = [];
+    if (logViewer) {
+        let iTrack = 0;
+        for (const track of logViewer.tracks) {
+            if (isTrackSelected(logViewer, track))
+                selectedTrackIndeces.push(iTrack);
+            iTrack++;
+        }
+    }
+    return selectedTrackIndeces;
 }
 
 ///////////////////////
@@ -118,6 +125,8 @@ export function zoomContentTo(
     return false;
 }
 
+////////// utilities
+
 export function getContentBaseDomain(logViewer: LogViewer): [number, number] {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     return [b1, b2];
@@ -158,4 +167,26 @@ export function scrollTracksTo(
     }
     if (visibilityIsChanged) logViewer.updateTracks();
     return visibilityIsChanged;
+}
+
+export function restoreSelectTracks(
+    logViewer: LogViewer | undefined,
+    selectedTrackIndeces: number[]
+): boolean {
+    let changed = false;
+    if (logViewer && selectedTrackIndeces) {
+        let iTrack = 0;
+        for (const track of logViewer.tracks) {
+            const selected = selectedTrackIndeces.indexOf(iTrack) >= 0;
+            if (selectTrack(logViewer, track, selected)) changed = true;
+            iTrack++;
+        }
+    }
+    return changed;
+}
+
+export function updateLegendRows(logViewer: LogViewer): void {
+    // access protected member function
+    // eslint-disable-next-line
+    (logViewer as any).updateLegendRows();
 }

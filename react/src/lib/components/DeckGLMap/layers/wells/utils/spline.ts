@@ -1,4 +1,4 @@
-import { Position2D, Position3D } from "@deck.gl/core/utils/positions";
+import { Position3D } from "@deck.gl/core/utils/positions";
 import { FeatureCollection, GeometryCollection, LineString } from "geojson";
 import { cloneDeep } from "lodash";
 
@@ -218,10 +218,7 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
     return data;
 }
 
-/**
- * Converts 3D well paths to 2D.
- */
-export function convertTo2D(data_in: FeatureCollection): FeatureCollection {
+export function flattenPath(data_in: FeatureCollection): FeatureCollection {
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;
@@ -236,15 +233,15 @@ export function convertTo2D(data_in: FeatureCollection): FeatureCollection {
 
         const coords = lineString.coordinates as Position3D[];
 
-        // Convert to 2D.
-        const coords2D: Position2D[] = coords.map((e: Position3D) => {
-            return [e[0], e[1]] as Position2D;
+        // flatten by setting z value constant.
+        const coords_flat: Position3D[] = coords.map((e: Position3D) => {
+            return [e[0], e[1], 0.0];
         });
 
         (
             (data.features[well_no].geometry as GeometryCollection)
                 .geometries[1] as LineString
-        ).coordinates = coords2D;
+        ).coordinates = coords_flat;
     }
 
     return data;

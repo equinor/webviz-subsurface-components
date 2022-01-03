@@ -102,11 +102,18 @@ export function roundMinMax(minmax: [number, number]): [number, number] {
 }
 
 export function roundLogMinMax(minmax: [number, number]): [number, number] {
-    const a = minmax[0],
-        b = minmax[1];
+    const r = roundMinMax(minmax);
     /* TODO: make Log version
       const ret = roundMinMax([Math.log10(minmax[0]), Math.log10(minmax[1])]);
-      const a=Math.pow(10, ret[0]), b=Math.pow(10, ret[1]);
+      //const a=Math.pow(10, ret[0]), b=Math.pow(10, ret[1]);
       */
-    return [parseFloat(a.toPrecision(5)), parseFloat(b.toPrecision(5))];
+    if (r[0] <= 0) {
+        // avoid non-positive values
+        r[0] = minmax[0];
+        if (r[0] <= 0) {
+            // could not show negative data!
+            console.error("Wrong data range for logarithm scale " + minmax);
+        }
+    }
+    return [parseFloat(r[0].toPrecision(5)), parseFloat(r[1].toPrecision(5))];
 }

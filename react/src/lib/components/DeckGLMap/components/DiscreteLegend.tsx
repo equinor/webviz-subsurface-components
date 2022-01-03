@@ -63,10 +63,17 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
         }
         const ordinalValues = scaleOrdinal().domain(itemName);
         const colorLegend = legendUtil(itemColor).inputScale(ordinalValues);
+        select(legend).select("div").remove();
         select(legend).select("svg").remove();
         const legendLength = itemColor.length;
         const calcLegendHeight = 22 * legendLength + 4 * legendLength;
         const selectedLegend = select(legend);
+        selectedLegend
+            .append("div")
+            .text(dataObjectName)
+            .attr("y", 7)
+            .style("color", "#6F6F6F")
+            .style("margin", "10px 10px");
         if (!horizontal) selectedLegend.style("height", 150 + "px");
         const svgLegend = selectedLegend
             .append("svg")
@@ -93,9 +100,6 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
                 borderRadius: "5px",
             }}
         >
-            <label style={{ color: "#6F6F6F", margin: "10px 10px" }}>
-                {dataObjectName}
-            </label>
             <div id="legend"></div>
         </div>
     );
