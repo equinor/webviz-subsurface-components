@@ -2,7 +2,7 @@ import React from "react";
 import { Icon, TextField, Progress } from "@equinor/eds-core-react";
 import { error_filled, thumbs_up } from "@equinor/eds-icons";
 
-import "../VectorCalculator.css";
+import "!style-loader!css-loader!../VectorCalculator.css";
 
 export enum ExpressionStatus {
     Valid = 1,
