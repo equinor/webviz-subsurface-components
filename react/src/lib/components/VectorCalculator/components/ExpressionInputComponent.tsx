@@ -25,7 +25,7 @@ import {
 } from "../utils/VectorCalculatorHelperFunctions";
 import { getExpressionParseData } from "../utils/ExpressionParser";
 
-import "../VectorCalculator.css";
+import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface ExpressionInputComponent {
     activeExpression: ExpressionType;

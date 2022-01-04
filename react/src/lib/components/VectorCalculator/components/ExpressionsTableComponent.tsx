@@ -13,7 +13,7 @@ import {
     getDefaultExpression,
 } from "../utils/VectorCalculatorHelperFunctions";
 
-import "../VectorCalculator.css";
+import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface ExpressionsTableComponentProps {
     expressions: ExpressionType[];

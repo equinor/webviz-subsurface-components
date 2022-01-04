@@ -13,7 +13,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { VariableVectorMapType } from "../utils/VectorCalculatorTypes";
 import VectorSelector from "../../VectorSelector";
 
-import "../VectorCalculator.css";
+import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface VariablesTableProps {
     variableVectorMap: VariableVectorMapType[];
