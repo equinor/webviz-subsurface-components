@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { VectorCalculatorComponent } from "./components/VectorCalculatorComponent";
 import { string } from "jsverify";
-import "./VectorCalculator.css";
+import "!style-loader!css-loader!./VectorCalculator.css";
 
 /**
  * VectorCalculator is a component that allows to calculate new vectors by creating a mathematical expression
