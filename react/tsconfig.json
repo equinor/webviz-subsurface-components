@@ -20,6 +20,5 @@
         "allowJs": true, // allow a partial TypeScript and JavaScript codebase
         "skipLibCheck": true // don't do typechecking on the node modules
     },
-    "include": ["./src/lib", "./src/custom.d.ts"],
-    "exclude": ["**/storybook/", "**/test/", "**/*.test.tsx"]
+    "include": ["./src/lib", "./src/custom.d.ts"]
 }
