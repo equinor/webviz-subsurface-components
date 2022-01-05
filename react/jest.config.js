@@ -15,4 +15,6 @@ module.exports = {
         ],
     },
     transformIgnorePatterns: ["<rootDir>/node_modules/(?!(@webviz)/)"],
+    testPathIgnorePatterns: ["<rootDir>/node_modules", "<rootDir>/dist"],
+    modulePathIgnorePatterns: ["<rootDir>/dist"],
 };
