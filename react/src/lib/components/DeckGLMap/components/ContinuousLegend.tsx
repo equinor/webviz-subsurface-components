@@ -1,7 +1,6 @@
 import React from "react";
 import { RGBToHex, colorsArray } from "../utils/continuousLegend";
 import { select, scaleLinear, scaleSequential, axisBottom } from "d3";
-import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 
 interface legendProps {
@@ -10,7 +9,7 @@ interface legendProps {
     dataObjectName: string;
     position: number[];
     name: string;
-    template: templateArray;
+    colorName: string;
     colorTables: colorTablesArray;
     horizontal: boolean;
 }
@@ -25,19 +24,18 @@ const ContinuousLegend: React.FC<legendProps> = ({
     max,
     dataObjectName,
     position,
-    name,
-    template,
+    colorName,
     colorTables,
     horizontal,
 }: legendProps) => {
     React.useEffect(() => {
         continuousLegend("#legend");
-    }, [min, max, template, colorTables, horizontal]);
+    }, [min, max, colorName, colorTables, horizontal]);
 
     function continuousLegend(selected_id: string) {
         const itemColor: ItemColor[] = [];
         // Return the matched colors array from color.tables.json file
-        const colorTableColors = colorsArray(name, template, colorTables);
+        const colorTableColors = colorsArray(colorName, colorTables);
         colorTableColors.forEach((value: [number, number, number, number]) => {
             // return the color and offset needed to draw the legend
             itemColor.push({

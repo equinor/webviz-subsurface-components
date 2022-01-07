@@ -99,6 +99,7 @@
         "logData": "@@#resources.logData",
         "logrunName": "BLOCKING",
         "logName": "ZONELOG",
+        "logColor": "Colors_set_2",
         "selectedWell": "@@#editedData.selectedWell"
       },
       {

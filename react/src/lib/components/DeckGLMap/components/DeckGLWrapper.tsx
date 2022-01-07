@@ -18,7 +18,6 @@ import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer, View } from "deck.gl";
 import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
-import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 import { LayerProps } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
@@ -125,8 +124,6 @@ export interface DeckGLWrapperProps {
 
     children?: React.ReactNode;
 
-    template: templateArray;
-
     colorTables: colorTablesArray;
 }
 
@@ -150,7 +147,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     legend,
     editedData,
     setEditedData,
-    template,
     colorTables,
     children,
 }: DeckGLWrapperProps) => {
@@ -278,12 +274,14 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     const [legendProps, setLegendProps] = useState<{
         title: string;
         name: string;
+        colorName: string;
         discrete: boolean;
         metadata: { objects: Record<string, [number[], number]> };
         valueRange: number[];
     }>({
         title: "",
         name: "string",
+        colorName: "string",
         discrete: false,
         metadata: { objects: {} },
         valueRange: [],
@@ -304,11 +302,10 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     const onLoad = useCallback(() => {
         if (wellsLayer) {
             wellsLayer.setState({
-                template: template,
                 colorTables: colorTables,
             });
         }
-    }, [wellsLayer, template, colorTables]);
+    }, [wellsLayer, colorTables]);
     // Get color table for log curves.
     useEffect(() => {
         if (!wellsLayer?.isLoaded || !wellsLayer.props.logData) return;
@@ -316,6 +313,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         setLegendProps({
             title: legend.title,
             name: legend.name,
+            colorName: legend.colorName,
             discrete: legend.discrete,
             metadata: legend.metadata,
             valueRange: legend.valueRange,
@@ -396,7 +394,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                 dataObjectName={legendProps.title}
                                 position={legend.position}
                                 name={legendProps.name}
-                                template={template}
+                                colorName={legendProps.colorName}
                                 colorTables={colorTables}
                                 horizontal={legend.horizontal}
                             />
@@ -410,7 +408,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                     dataObjectName={legendProps.title}
                                     position={legend.position}
                                     name={legendProps.name}
-                                    template={template}
+                                    colorName={legendProps.colorName}
                                     colorTables={colorTables}
                                     horizontal={legend.horizontal}
                                 />

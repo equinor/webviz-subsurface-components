@@ -5,7 +5,6 @@ import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
 import { setSpec } from "../redux/actions";
 import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
-import { templateArray } from "./WelllayerTemplateTypes";
 import { colorTablesArray } from "./ColorTableTypes";
 
 export interface MapProps {
@@ -86,8 +85,6 @@ export interface MapProps {
 
     children?: React.ReactNode;
 
-    template: templateArray;
-
     colorTables: colorTablesArray;
 }
 
@@ -102,7 +99,6 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     legend,
-    template,
     colorTables,
     editedData,
     setEditedData,
@@ -145,7 +141,6 @@ const Map: React.FC<MapProps> = ({
                 legend={legend}
                 editedData={editedData}
                 setEditedData={setEditedData}
-                template={template}
                 colorTables={colorTables}
             />
         </ReduxProvider>

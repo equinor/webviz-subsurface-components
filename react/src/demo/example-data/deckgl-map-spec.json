@@ -72,7 +72,8 @@
         "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
         "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
         "logrunName": "BLOCKING",
-        "logName": "ZONELOG"
+        "logName": "ZONELOG",
+        "logColor": "Colors_set_2"
       },
       {
         "@@type": "FaultPolygonsLayer",

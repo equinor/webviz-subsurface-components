@@ -1,7 +1,6 @@
 import React from "react";
 import legendUtil from "../utils/discreteLegend";
 import { scaleOrdinal, select } from "d3";
-import { templateArray, propertiesObj } from "./WelllayerTemplateTypes";
 import { colorTablesArray, colorTablesObj } from "./ColorTableTypes";
 
 interface ItemColor {
@@ -13,29 +12,27 @@ interface colorLegendProps {
     dataObjectName: string;
     name: string;
     position: number[];
-    template: templateArray;
+    colorName: string;
     colorTables: colorTablesArray;
     horizontal: boolean;
 }
 
 const DiscreteColorLegend: React.FC<colorLegendProps> = ({
     discreteData,
-    name,
     dataObjectName,
     position,
-    template,
+    colorName,
     colorTables,
     horizontal,
 }: colorLegendProps) => {
     React.useEffect(() => {
         discreteLegend("#legend");
-    }, [discreteData, template, colorTables, horizontal]);
+    }, [discreteData, colorName, colorTables, horizontal]);
     function discreteLegend(legend: string) {
         const itemName: string[] = [];
         const itemColor: ItemColor[] = [];
         const colorsArray: [number, number, number, number][] = colorTableData(
-            name,
-            template,
+            colorName,
             colorTables
         );
         Object.keys(discreteData).forEach((key) => {
@@ -107,18 +104,12 @@ const DiscreteColorLegend: React.FC<colorLegendProps> = ({
 
 // Based on name return the colors array from color.tables.json file
 export function colorTableData(
-    name: string,
-    template: templateArray,
+    colorName: string,
     colorTables: colorTablesArray
 ): [number, number, number, number][] {
-    const properties = template[0]["properties"];
-    const propertiesData = properties.filter(
-        (value: propertiesObj) => value.objectName == name
-    );
     const colorTableData = colorTables.filter(
         (value: colorTablesObj) =>
-            value.name.toLowerCase() ==
-            propertiesData[0].colorTable.toLowerCase()
+            value.name.toLowerCase() == colorName.toLowerCase()
     );
     return colorTableData[0].colors;
 }

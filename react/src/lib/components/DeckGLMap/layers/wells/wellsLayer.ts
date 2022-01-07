@@ -24,7 +24,6 @@ import { flattenPath, splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { templateArray } from "../../components/WelllayerTemplateTypes";
 import { colorTablesArray } from "../../components/ColorTableTypes";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 
@@ -36,6 +35,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     selectionEnabled: boolean;
     logData: string | LogCurveDataType;
     logName: string;
+    logColor: string;
     logrunName: string;
     logRadius: number;
     logCurves: boolean;
@@ -173,7 +173,7 @@ export default class WellsLayer extends CompositeLayer<
                         d,
                         this.props.logrunName,
                         this.props.logName,
-                        this.state.template,
+                        this.props.logColor,
                         this.state.colorTables
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
@@ -186,7 +186,11 @@ export default class WellsLayer extends CompositeLayer<
                 },
                 onDataLoad: (value: LogCurveDataType[]) => {
                     this.setState({
-                        legend: getLegendData(value, this.props.logName),
+                        legend: getLegendData(
+                            value,
+                            this.props.logName,
+                            this.props.logColor
+                        ),
                     });
                 },
             })
@@ -360,7 +364,7 @@ function getLogColor(
     d: LogCurveDataType,
     logrun_name: string,
     log_name: string,
-    template: templateArray,
+    logColor: string,
     colorTables: colorTablesArray
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
@@ -374,9 +378,8 @@ function getLogColor(
         const max_delta = max - min;
         log_data.forEach((value) => {
             const rgb = rgbValues(
-                log_name,
                 (value - min) / max_delta,
-                template,
+                logColor,
                 colorTables
             );
             if (rgb != undefined) {
@@ -389,8 +392,7 @@ function getLogColor(
         });
     } else {
         const colorsArray: [number, number, number, number][] = colorTableData(
-            log_name,
-            template,
+            logColor,
             colorTables
         );
 
@@ -613,7 +615,11 @@ function getLogProperty(
 }
 
 // Return data required to build welllayer legend
-function getLegendData(logs: LogCurveDataType[], logName: string) {
+function getLegendData(
+    logs: LogCurveDataType[],
+    logName: string,
+    logColor: string
+) {
     const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
     const title = "Wells / " + logName;
     const legendProps = [];
@@ -623,6 +629,7 @@ function getLegendData(logs: LogCurveDataType[], logName: string) {
         legendProps.push({
             title: title,
             name: logName,
+            colorName: logColor,
             discrete: true,
             metadata: metadataDiscrete,
             valueRange: [],
@@ -639,6 +646,7 @@ function getLegendData(logs: LogCurveDataType[], logName: string) {
         legendProps.push({
             title: title,
             name: logName,
+            colorName: logColor,
             discrete: false,
             metadata: { objects: {} },
             valueRange: [Math.min(...minArray), Math.max(...maxArray)],
