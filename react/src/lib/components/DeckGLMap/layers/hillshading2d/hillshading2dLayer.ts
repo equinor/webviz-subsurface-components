@@ -49,51 +49,49 @@ export default class Hillshading2DLayer extends BitmapLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms }: any): void {
-        if (this.props.image) {
-            const mergedModuleParams = {
-                ...moduleParameters,
-                valueDecoder: {
-                    // The prop objects are not merged with the defaultProps by default.
-                    // See https://github.com/facebook/react/issues/2568
-                    ...defaultProps.valueDecoder,
-                    ...moduleParameters.valueDecoder,
-                },
-                modelMatrix: getModelMatrix(
-                    this.props.rotDeg,
-                    this.props.bounds[0] as number, // Rotate around upper left corner of bounds
-                    this.props.bounds[3] as number
-                ),
-            };
-            super.setModuleParameters(mergedModuleParams);
+        if (!this.isLoaded || !this.props.image) return;
 
-            const valueRangeMin = this.props.valueRange[0] ?? 0.0;
-            const valueRangeMax = this.props.valueRange[1] ?? 1.0;
-            const colorMapRangeMin =
-                this.props.colorMapRange?.[0] ?? valueRangeMin;
-            const colorMapRangeMax =
-                this.props.colorMapRange?.[1] ?? valueRangeMax;
+        const mergedModuleParams = {
+            ...moduleParameters,
+            valueDecoder: {
+                // The prop objects are not merged with the defaultProps by default.
+                // See https://github.com/facebook/react/issues/2568
+                ...defaultProps.valueDecoder,
+                ...moduleParameters.valueDecoder,
+            },
+            modelMatrix: getModelMatrix(
+                this.props.rotDeg,
+                this.props.bounds[0] as number, // Rotate around upper left corner of bounds
+                this.props.bounds[3] as number
+            ),
+        };
+        super.setModuleParameters(mergedModuleParams);
 
-            const [minVal, maxVal] = this.props.valueRange;
-            super.draw({
-                uniforms: {
-                    ...uniforms,
-                    // Send extra uniforms to the shader.
-                    bitmapResolution: [
-                        this.props.image.width,
-                        this.props.image.height,
-                    ],
-                    valueRangeSize: maxVal - minVal,
-                    lightDirection: this.props.lightDirection,
-                    ambientLightIntensity: this.props.ambientLightIntensity,
-                    diffuseLightIntensity: this.props.diffuseLightIntensity,
-                    valueRangeMin,
-                    valueRangeMax,
-                    colorMapRangeMin,
-                    colorMapRangeMax,
-                },
-                moduleParameters: mergedModuleParams,
-            });
-        }
+        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
+        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
+        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+
+        const [minVal, maxVal] = this.props.valueRange;
+        super.draw({
+            uniforms: {
+                ...uniforms,
+                // Send extra uniforms to the shader.
+                bitmapResolution: [
+                    this.props.image.width,
+                    this.props.image.height,
+                ],
+                valueRangeSize: maxVal - minVal,
+                lightDirection: this.props.lightDirection,
+                ambientLightIntensity: this.props.ambientLightIntensity,
+                diffuseLightIntensity: this.props.diffuseLightIntensity,
+                valueRangeMin,
+                valueRangeMax,
+                colorMapRangeMin,
+                colorMapRangeMax,
+            },
+            moduleParameters: mergedModuleParams,
+        });
     }
 
     // Signature from the base class, eslint doesn't like the any type.

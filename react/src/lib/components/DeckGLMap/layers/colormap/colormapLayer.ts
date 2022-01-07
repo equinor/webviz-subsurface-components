@@ -69,6 +69,8 @@ export default class ColormapLayer extends BitmapLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms, context }: any): void {
+        if (!this.isLoaded) return;
+
         const mergedModuleParams = {
             ...moduleParameters,
             valueDecoder: {
