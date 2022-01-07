@@ -47,7 +47,7 @@
     "license": "MPL",
     "dependencies": {
         "@danmarshall/deckgl-typings": "^4.9.0",
-        "@equinor/eds-core-react": "^0.17.0",
+        "@equinor/eds-core-react": "^0.12.1",
         "@equinor/eds-icons": "^0.9.1",
         "@equinor/videx-wellog": "^0.4.5",
         "@material-ui/core": "^4.12.3",
@@ -78,11 +78,14 @@
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-dropdown-tree-select": "^2.5.1",
+        "react-leaflet": "^2.8.0",
+        "react-leaflet-draw": "^0.19.0",
         "react-redux": "^7.2.6",
         "react-resize-detector": "^7.0.0",
         "react-tooltip": "^4.2.21",
         "redux": "^4.0.5",
         "semver": "^7.3.5",
+        "styled-components": "^5.3.3",
         "uuid": "^8.3.2"
     },
     "devDependencies": {
@@ -93,6 +96,7 @@
         "@babel/preset-react": "^7.12.13",
         "@babel/preset-typescript": "^7.13.0",
         "@babel/runtime": "^7.13.10",
+        "@storybook/addon-actions": "^6.4.9",
         "@storybook/addon-essentials": "^6.4.9",
         "@storybook/addon-links": "^6.4.9",
         "@storybook/builder-webpack5": "^6.4.9",
