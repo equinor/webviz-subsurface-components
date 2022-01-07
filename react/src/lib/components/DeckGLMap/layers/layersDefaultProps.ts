@@ -4,7 +4,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         id: "colormap-layer",
         pickable: true,
         visible: true,
-        colormap: { type: "object", value: null, async: true },
         valueRange: { type: "array" },
         colorMapRange: { type: "array" },
         valueDecoder: {
@@ -50,8 +49,9 @@ export const layersDefaultProps: Record<string, unknown> = {
         // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
         bounds: { type: "array", value: null, false: true, compare: true },
         valueRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array", value: [0, 1] },
         rotDeg: 0,
-        contours: [-1.0, -1.0],
+        contours: [-1.0, -1.0]
     },
     GridLayer: {
         name: "Grid",

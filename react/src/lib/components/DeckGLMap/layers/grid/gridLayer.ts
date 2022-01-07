@@ -1,6 +1,6 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps } from "../utils/layerTools";
-import { RGBAColor } from "@deck.gl/core/utils/color";
+import { RGBAColor, RGBColor } from "@deck.gl/core/utils/color";
 import { Position } from "@deck.gl/core/utils/positions";
 import { PolygonLayer } from "@deck.gl/layers";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
@@ -8,6 +8,35 @@ import { Feature } from "geojson";
 import { Position3D } from "@deck.gl/core/utils/positions";
 import { PolygonLayerProps } from "@deck.gl/layers";
 import { layersDefaultProps } from "../layersDefaultProps";
+import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
+import { colorTablesArray } from "../../components/ColorTableTypes";
+import { rgbValues } from "../../utils/continuousLegend";
+import { templateArray } from "../../components/WelllayerTemplateTypes";
+
+function getColorMapColors(
+    colorMapName: string,
+    colorTables: colorTablesArray,
+    template: templateArray
+): RGBColor[] {
+    const colors: RGBColor[] = [];
+
+    for (let i = 0; i < 256; i++) {
+        const value = i / 255.0;
+        const rgb = rgbValues(colorMapName, value, template, colorTables);
+        let color: RGBColor = [155, 255, 255];
+        if (rgb != undefined) {
+            if (Array.isArray(rgb)) {
+                color = rgb;
+            } else {
+                color = [rgb.r, rgb.g, rgb.b];
+            }
+        }
+
+        colors.push(color);
+    }
+
+    return colors;
+}
 
 // These are the data GridLayer expects.
 type CellData = {
@@ -31,8 +60,10 @@ interface PolygonData {
     polygon: Position[];
     properties: CellProperties;
 }
-
-export type GridLayerProps<D> = ExtendedLayerProps<D>;
+export interface GridLayerProps<D> extends ExtendedLayerProps<D> {
+    // Name of color map.
+    colorMapName: string;
+}
 
 export default class GridLayer extends CompositeLayer<
     GridData,
@@ -91,10 +122,15 @@ export default class GridLayer extends CompositeLayer<
                 ti: 0,
             });
         }
+        const colors = getColorMapColors(
+            this.props.colorMapName,
+            (this.context as DeckGLLayerContext).userData.colorTables,
+            (this.context as DeckGLLayerContext).userData.template
+        );
 
         const layer = new PolygonLayer<PolygonData>(
             this.getSubLayerProps<PolygonData, PolygonLayerProps<PolygonData>>({
-                data: makeLayerData(data, this.state.ti),
+                data: makeLayerData(data, this.state.ti, colors),
                 id: "grid-layer",
                 getFillColor: (d: PolygonData) => d.properties.color,
                 getLineColor: [0, 0, 0, 255],
@@ -117,21 +153,30 @@ GridLayer.defaultProps = layersDefaultProps[
 ] as GridLayerProps<GridData>;
 
 //================= Local help functions. ==================
-function makeLayerData(data: GridData, ti: number): PolygonData[] {
+function makeLayerData(
+    data: GridData,
+    ti: number,
+    colors: RGBColor[]
+): PolygonData[] {
     const polygons: PolygonData[] = data.map(function (
         cell: CellData
     ): PolygonData {
         const v = cell.vs[ti];
 
-        // temporary hardcoded colors.
+        // console.log("colors: ", colors)
+        //console.log("v: ", v)
+
+        // // temporary hardcoded colors.
         const r = 255 - v * 100;
         const g = 255 - v * 100;
         const b = 255 * v;
 
+        //const color = colors[v * 255];
+
         return {
             polygon: cell.cs, // 4 corners
             properties: {
-                color: [r, g, b],
+                color,
                 i: cell.i,
                 j: cell.j,
                 depth: cell.z,
