@@ -26,6 +26,7 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { colorTablesArray } from "../../components/ColorTableTypes";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
+import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -85,7 +86,11 @@ export default class WellsLayer extends CompositeLayer<
     }: UpdateStateInfo<
         WellsLayerProps<FeatureCollection<Geometry, GeoJsonProperties>>
     >): boolean | string | null {
-        return changeFlags.viewportChanged || changeFlags.propsOrDataChanged;
+        return (
+            changeFlags.viewportChanged ||
+            changeFlags.propsOrDataChanged ||
+            changeFlags.updateTriggersChanged
+        );
     }
 
     renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
@@ -174,14 +179,24 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logrunName,
                         this.props.logName,
                         this.props.logColor,
-                        this.state.colorTables
+                        (this.context as DeckGLLayerContext).userData
+                            .colorTables
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
                     getLogWidth(d, this.props.logrunName, this.props.logName),
                 updateTriggers: {
-                    getColor: [this.props.logName],
-                    getWidth: [this.props.logName, this.props.logRadius],
+                    getColor: [
+                        this.props.logrunName,
+                        this.props.logName,
+                        (this.context as DeckGLLayerContext).userData
+                            .colorTables,
+                    ],
+                    getWidth: [
+                        this.props.logrunName,
+                        this.props.logName,
+                        this.props.logRadius,
+                    ],
                     getPath: [positionFormat],
                 },
                 onDataLoad: (value: LogCurveDataType[]) => {
