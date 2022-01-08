@@ -1,5 +1,5 @@
 import React from "react";
-import ContinuousLegend from "../../../components/ContinuousLegend";
+import { ContinuousLegend } from "@emerson-eps/color-tables";
 export default {
     component: ContinuousLegend,
     title: "DeckGLMap/Components/ColorLegends/ContinuousLegend",
