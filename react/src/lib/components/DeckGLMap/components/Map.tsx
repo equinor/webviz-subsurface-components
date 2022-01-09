@@ -6,7 +6,7 @@ import { createStore } from "../redux/store";
 import { setSpec } from "../redux/actions";
 import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
 import { templateArray } from "./WelllayerTemplateTypes";
-import { colorTablesArray } from "./ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables";
 
 export interface MapProps {
     /**

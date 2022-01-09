@@ -2,7 +2,7 @@ import React from "react";
 import { RGBToHex, colorsArray } from "../utils/continuousLegend";
 import { select, scaleLinear, scaleSequential, axisBottom } from "d3";
 import { templateArray } from "./WelllayerTemplateTypes";
-import { colorTablesArray } from "./ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables";
 
 interface legendProps {
     min: number;

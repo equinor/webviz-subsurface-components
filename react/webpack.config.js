@@ -117,10 +117,10 @@ module.exports = (env, argv) => {
                     test: /\.(fs|vs).glsl$/i,
                     use: ["raw-loader"],
                 },
-                {
-                    test: /\.tsx$/,
-                    loader: ['babel-loader', 'typescript-loader'],
-                },
+                // {
+                //     test: /\.tsx$/,
+                //     loader: ['babel-loader', 'typescript-loader'],
+                // },
             ],
         },
         devtool,

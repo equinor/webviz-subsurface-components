@@ -3,7 +3,7 @@ import { interpolateRgb } from "d3-interpolate";
 import {
     colorTablesArray,
     colorTablesObj,
-} from "../components/ColorTableTypes";
+} from "@emerson-eps/color-tables";
 import {
     templateArray,
     propertiesObj,

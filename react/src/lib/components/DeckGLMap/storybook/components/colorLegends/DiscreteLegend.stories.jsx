@@ -1,5 +1,5 @@
 import React from "react";
-import {DiscreteColorLegend} from "@emerson-eps/color-tables";
+import { DiscreteColorLegend } from "@emerson-eps/color-tables";
 import template from "../../../../../../demo/example-data/welllayer_template.json";
 import colorTables from "../../../../../../demo/example-data/color-tables.json";
 

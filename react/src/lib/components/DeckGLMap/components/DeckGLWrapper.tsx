@@ -154,7 +154,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     colorTables,
     children,
 }: DeckGLWrapperProps) => {
-    console.log('DiscreteColorLegend', DiscreteColorLegend)
     //console.log('DiscreteColorLegend1', DiscreteColorLegend1)
     // state for initial views prop (target and zoom) of DeckGL component
     const [initialViewState, setInitialViewState] =
@@ -304,6 +303,8 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         [deckGLLayers]
     );
     const onLoad = useCallback(() => {
+        console.log('template::', template)
+        console.log('colorTables::', colorTables)
         if (wellsLayer) {
             wellsLayer.setState({
                 template: template,

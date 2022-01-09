@@ -3,8 +3,8 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { rgbValues } from "../../utils/continuousLegend";
-import { colorTableData } from "../../components/DiscreteLegend";
+import { rgbValues } from "@emerson-eps/color-tables";
+import { colorTableData } from "@emerson-eps/color-tables";
 import {
     Feature,
     GeometryCollection,
@@ -25,7 +25,7 @@ import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { templateArray } from "../../components/WelllayerTemplateTypes";
-import { colorTablesArray } from "../../components/ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
