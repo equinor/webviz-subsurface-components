@@ -1,9 +1,6 @@
 import { color } from "d3-color";
 import { interpolateRgb } from "d3-interpolate";
-import {
-    colorTablesArray,
-    colorTablesObj,
-} from "@emerson-eps/color-tables";
+import { colorTablesArray, colorTablesObj } from "@emerson-eps/color-tables";
 import {
     templateArray,
     propertiesObj,
