@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import Map from "./components/Map";
 import template from "../../../demo/example-data/welllayer_template.json";
-import colorTables from "../../../demo/example-data/color-tables.json";
+import colorTables from "@emerson-eps/color-tables";
 
 DeckGLMap.defaultProps = {
     coords: {

@@ -19,8 +19,8 @@ import { Layer, View } from "deck.gl";
 import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
 import { templateArray } from "./WelllayerTemplateTypes";
-import { colorTablesArray } from "./ColorTableTypes";
-import { LayerProps } from "@deck.gl/core/lib/layer";
+import { colorTablesArray } from "@emerson-eps/color-tables";
+import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
 
@@ -51,6 +51,14 @@ export interface ViewsType {
      * Layers configuration for multiple viewport
      */
     viewports: ViewportType[];
+}
+
+export interface DeckGLLayerContext extends LayerContext {
+    userData: {
+        setEditedData: (data: Record<string, unknown>) => void;
+        template: templateArray;
+        colorTables: colorTablesArray;
+    };
 }
 
 export interface DeckGLWrapperProps {
@@ -248,11 +256,13 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         ) => {
                             setEditedData?.(updated_prop);
                         },
+                        template: template,
+                        colorTables: colorTables,
                     },
                 });
             }
         },
-        [setEditedData]
+        [setEditedData, template, colorTables]
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -302,16 +312,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         () => getLayer(deckGLLayers, "wells-layer") as WellsLayer,
         [deckGLLayers]
     );
-    const onLoad = useCallback(() => {
-        console.log('template::', template)
-        console.log('colorTables::', colorTables)
-        if (wellsLayer) {
-            wellsLayer.setState({
-                template: template,
-                colorTables: colorTables,
-            });
-        }
-    }, [wellsLayer, template, colorTables]);
     // Get color table for log curves.
     useEffect(() => {
         if (!wellsLayer?.isLoaded || !wellsLayer.props.logData) return;
@@ -381,7 +381,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     setViewState(viewport.viewState)
                 }
                 onAfterRender={onAfterRender}
-                onLoad={onLoad}
             >
                 {children}
                 {viewsProps.map((view) => (

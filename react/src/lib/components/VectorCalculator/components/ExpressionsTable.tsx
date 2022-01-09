@@ -14,7 +14,7 @@ import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import { BlinkingTableRow } from "../utils/BlinkingTableRow";
 import { EnhancedTableHead } from "../utils/EnhancedTableHead";
 
-import "../VectorCalculator.css";
+import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface ExpressionsTableProps {
     expressions: ExpressionType[];
