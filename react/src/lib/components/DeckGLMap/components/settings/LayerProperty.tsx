@@ -1,7 +1,6 @@
 import React, { ChangeEvent, FormEvent, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateLayerProp } from "../../redux/actions";
-import { MapState } from "../../redux/store";
 import DrawModeSelector from "./DrawModeSelector";
 import NumericInput from "./NumericInput";
 import ToggleButton from "./ToggleButton";
@@ -12,24 +11,14 @@ import {
     MenuTypeProps,
     NumericTypeProps,
 } from "../../redux/types";
-import { getLayerProps } from "../../utils/specExtractor";
 
 interface Props {
-    layerId: string;
+    layer: Record<string, unknown>;
 }
 
-const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
+const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
     // Redux
     const dispatch = useDispatch();
-    const layers = useSelector((st: MapState) => st.layers);
-
-    // states
-    const [layerProps, setLayerProps] =
-        React.useState<Record<string, unknown> | null>(null);
-
-    React.useEffect(() => {
-        setLayerProps(getLayerProps(layers, layerId));
-    }, [layers, layerId]);
 
     // handlers
     const updateProp = useCallback(
@@ -42,15 +31,15 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
         propId: string,
         dependentOnProp: string | undefined
     ): boolean => {
-        if (!layerProps) return false;
+        if (!layer) return false;
 
         return dependentOnProp
-            ? dependentOnProp in layerProps && propId in layerProps
-            : propId in layerProps;
+            ? dependentOnProp in layer && propId in layer
+            : propId in layer;
     };
 
     return (
-        layerProps && (
+        layer && (
             <>
                 {
                     // first render all boolean properties
@@ -59,17 +48,17 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
                             isControlDisplayable(id, dependentOnProp) && (
                                 <ToggleButton
                                     label={displayName}
-                                    checked={layerProps[id] as boolean}
+                                    checked={layer[id] as boolean}
                                     onChange={(
                                         e: ChangeEvent<HTMLInputElement>
                                     ) => {
                                         updateProp(
-                                            layerId,
+                                            layer["id"],
                                             id,
                                             e.target.checked
                                         );
                                     }}
-                                    key={`prop-toggle-${layerId}-${id}`}
+                                    key={`prop-toggle-${layer["id"]}-${id}`}
                                 />
                             )
                     )
@@ -82,17 +71,17 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
                             isControlDisplayable(id, dependentOnProp) && (
                                 <NumericInput
                                     label={displayName}
-                                    value={layerProps[id] as number}
+                                    value={layer[id] as number}
                                     onChange={(
                                         e: ChangeEvent<HTMLInputElement>
                                     ) => {
                                         updateProp(
-                                            layerId,
+                                            layer["id"],
                                             id,
                                             Number(e.target.value)
                                         );
                                     }}
-                                    key={`prop-numeric-input-${layerId}-${id}`}
+                                    key={`prop-numeric-input-${layer["id"]}-${id}`}
                                 />
                             )
                     )
@@ -115,18 +104,18 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
                                     min={min}
                                     max={max}
                                     step={step}
-                                    value={layerProps[id] as number}
+                                    value={layer[id] as number}
                                     onChange={(
                                         _: FormEvent<HTMLDivElement>,
                                         value: number | number[]
                                     ) => {
                                         updateProp(
-                                            layerId,
+                                            layer["id"],
                                             id,
                                             (value as number) / 100
                                         );
                                     }}
-                                    key={`prop-slider-${layerId}-${id}`}
+                                    key={`prop-slider-${layer["id"]}-${id}`}
                                 />
                             )
                     )
@@ -138,10 +127,10 @@ const LayerProperty: React.FC<Props> = React.memo(({ layerId }: Props) => {
                         ({ id, displayName, dependentOnProp }) =>
                             isControlDisplayable(id, dependentOnProp) && (
                                 <DrawModeSelector
-                                    layerId={layerId}
+                                    layerId={layer["id"] as string}
                                     label={displayName}
-                                    value={layerProps[id] as string}
-                                    key={`prop-menu-${layerId}-${id}`}
+                                    value={layer[id] as string}
+                                    key={`prop-menu-${layer["id"]}-${id}`}
                                 />
                             )
                     )

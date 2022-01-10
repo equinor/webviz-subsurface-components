@@ -36,7 +36,6 @@
       6481113
     ],
     "zoom": -3,
-    "view3D": false,
     "layers": [
       {
         "@@type": "ColormapLayer",
@@ -125,6 +124,16 @@
           "type": "FeatureCollection",
           "features": []
       }
+    },
+    "views": {
+      "layout": [1, 1],
+      "viewports": [
+        {
+          "id": "view_1",
+          "show3D": false,
+          "layerIds": []
+        }
+      ]
     }
   }
 ]

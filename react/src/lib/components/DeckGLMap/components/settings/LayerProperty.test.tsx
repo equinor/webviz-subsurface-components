@@ -5,12 +5,17 @@ import React from "react";
 import userEvent from "@testing-library/user-event";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import LayerProperty from "./LayerProperty";
+import { testState } from "../../test/testReduxState";
 
 describe("Test Layer Property", () => {
     it("snapshot test", () => {
         const { container } = render(
             Wrapper({
-                children: <LayerProperty layerId="drawing-layer" />,
+                children: (
+                    <LayerProperty
+                        layer={testState.layers[testState.layers.length - 1]}
+                    />
+                ),
             })
         );
         expect(container.firstChild).toMatchSnapshot();
@@ -18,7 +23,11 @@ describe("Test Layer Property", () => {
     it("select option to dispatch redux action", async () => {
         render(
             Wrapper({
-                children: <LayerProperty layerId="drawing-layer" />,
+                children: (
+                    <LayerProperty
+                        layer={testState.layers[testState.layers.length - 1]}
+                    />
+                ),
             })
         );
         userEvent.selectOptions(
@@ -28,7 +37,7 @@ describe("Test Layer Property", () => {
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["drawing-layer", "view"],
-            type: "layers/updateDrawingMode",
+            type: "spec/updateDrawingMode",
         });
     });
 });

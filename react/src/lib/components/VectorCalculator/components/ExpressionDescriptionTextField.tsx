@@ -2,7 +2,7 @@ import React from "react";
 
 import { MaxLengthTextField } from "./MaxLengthTextField";
 
-import "../VectorCalculator.css";
+import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface ExpressionDescriptionTextFieldProps {
     maxLength: number;

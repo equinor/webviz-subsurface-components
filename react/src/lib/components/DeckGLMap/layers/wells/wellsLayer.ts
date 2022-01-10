@@ -11,6 +11,8 @@ import {
     LineString,
     Position,
     FeatureCollection,
+    GeoJsonProperties,
+    Geometry,
 } from "geojson";
 import {
     LayerPickInfo,
@@ -24,6 +26,8 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { templateArray } from "../../components/WelllayerTemplateTypes";
 import { colorTablesArray } from "../../components/ColorTableTypes";
+import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
+import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -37,7 +41,6 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
-    is3d: boolean;
 }
 
 export interface LogCurveDataType {
@@ -78,6 +81,18 @@ export default class WellsLayer extends CompositeLayer<
         return true;
     }
 
+    shouldUpdateState({
+        changeFlags,
+    }: UpdateStateInfo<
+        WellsLayerProps<FeatureCollection<Geometry, GeoJsonProperties>>
+    >): boolean | string | null {
+        return (
+            changeFlags.viewportChanged ||
+            changeFlags.propsOrDataChanged ||
+            changeFlags.updateTriggersChanged
+        );
+    }
+
     renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
         if (!(this.props.data as FeatureCollection).features) {
             return [];
@@ -88,7 +103,7 @@ export default class WellsLayer extends CompositeLayer<
             ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
             : (this.props.data as FeatureCollection);
 
-        const is3d = this.props.is3d;
+        const is3d = this.context.viewport.constructor.name === "OrbitViewport";
         if (!is3d) {
             // In 2D flatten wells.
             data = flattenPath(data);
@@ -163,15 +178,27 @@ export default class WellsLayer extends CompositeLayer<
                         d,
                         this.props.logrunName,
                         this.props.logName,
-                        this.state.template,
-                        this.state.colorTables
+                        (this.context as DeckGLLayerContext).userData.template,
+                        (this.context as DeckGLLayerContext).userData
+                            .colorTables
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
                     getLogWidth(d, this.props.logrunName, this.props.logName),
                 updateTriggers: {
-                    getColor: [this.props.logName],
-                    getWidth: [this.props.logName, this.props.logRadius],
+                    getColor: [
+                        this.props.logrunName,
+                        this.props.logName,
+                        (this.context as DeckGLLayerContext).userData.template,
+                        (this.context as DeckGLLayerContext).userData
+                            .colorTables,
+                    ],
+                    getWidth: [
+                        this.props.logrunName,
+                        this.props.logName,
+                        this.props.logRadius,
+                    ],
+                    getPath: [positionFormat],
                 },
                 onDataLoad: (value: LogCurveDataType[]) => {
                     this.setState({

@@ -44,7 +44,7 @@ describe("Test draw-mode menu", () => {
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["drawing-layer", "view"],
-            type: "layers/updateDrawingMode",
+            type: "spec/updateDrawingMode",
         });
     });
 });
