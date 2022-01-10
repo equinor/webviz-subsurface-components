@@ -14,7 +14,6 @@ const discreteData = {
     BELOW: [[73, 255, 35, 255], 14],
     H3: [[255, 144, 1, 255], 11],
 };
-const name = "ZONELOG";
 const colorName = "Colors_Set_1";
 const dataObjectName = "Wells / ZONELOG";
 const position = [16, 10];
@@ -27,10 +26,9 @@ const Template = (args) => {
 export const DiscreteTemplate = Template.bind({});
 DiscreteTemplate.args = {
     discreteData,
-    name,
-    colorName,
     dataObjectName,
     position,
+    colorName,
     colorTables,
     horizontal,
 };

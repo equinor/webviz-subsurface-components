@@ -313,13 +313,18 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         const legend = wellsLayer.state.legend[0];
         setLegendProps({
             title: legend.title,
-            name: legend.name,
-            colorName: legend.colorName,
+            name: wellsLayer?.props?.logName,
+            colorName: wellsLayer?.props?.logColor,
             discrete: legend.discrete,
             metadata: legend.metadata,
             valueRange: legend.valueRange,
         });
-    }, [isLoaded, legend, wellsLayer?.props?.logName]);
+    }, [
+        isLoaded,
+        legend,
+        wellsLayer?.props?.logName,
+        wellsLayer?.props?.logColor,
+    ]);
 
     const layerFilter = useCallback(
         (args: {
@@ -393,7 +398,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                 discreteData={legendProps.metadata}
                                 dataObjectName={legendProps.title}
                                 position={legend.position}
-                                name={legendProps.name}
                                 colorName={legendProps.colorName}
                                 colorTables={colorTables}
                                 horizontal={legend.horizontal}

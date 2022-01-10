@@ -191,6 +191,8 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logName,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
+                        this.props.logName,
+                        this.props.logColor,
                     ],
                     getWidth: [
                         this.props.logrunName,
@@ -643,7 +645,6 @@ function getLegendData(
         const metadataDiscrete = meta[logName].objects;
         legendProps.push({
             title: title,
-            name: logName,
             colorName: logColor,
             discrete: true,
             metadata: metadataDiscrete,

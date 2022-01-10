@@ -10,7 +10,6 @@ interface ItemColor {
 interface colorLegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
     dataObjectName: string;
-    name: string;
     position: number[];
     colorName: string;
     colorTables: colorTablesArray;
