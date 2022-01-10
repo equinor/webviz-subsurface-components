@@ -38,10 +38,10 @@
     ],
     "zoom": -3,
     "layers": [
+
       {
         "@@type": "ColormapLayer",
         "image": "@@#resources.propertyMap",
-        "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
         "rotDeg": 0,
         "bounds": [
           432205,
@@ -49,6 +49,7 @@
           437720,
           6481113
         ],
+        "colorMapName": "Rainbow",
         "valueRange": [
           2782,
           3513
@@ -74,6 +75,21 @@
         "image": "@@#resources.depthMap"
       },
       {
+        "@@type": "GridLayer",
+        "id": "grid-layer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
+        "colorMapName": "Rainbow",
+        "valueRange": [
+          0,
+          1
+        ],
+        "colorMapRange": [
+          0,
+          1
+        ],
+        "visible": true
+      },
+      {
         "@@type": "Map3DLayer",
         "id": "map3d-layer",
         "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/depthMap.png",
@@ -86,12 +102,16 @@
         "meshMaxError": 2.0,
         "propertyTexture": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
         "rotDeg": 0,
-        "contours": [0, 100.0]
-      },
-      {
-        "@@type": "GridLayer",
-        "id": "grid-layer",
-        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
+        "contours": [0, 100.0],
+        "colorMapName": "Physics",
+        "valueRange": [
+          2782,
+          3513
+        ],
+        "colorMapRange": [
+          2782,
+          3513
+        ],
         "visible": false
       },
       {

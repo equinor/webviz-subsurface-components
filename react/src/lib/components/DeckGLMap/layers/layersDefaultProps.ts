@@ -51,11 +51,13 @@ export const layersDefaultProps: Record<string, unknown> = {
         valueRange: { type: "array", value: [0, 1] },
         colorMapRange: { type: "array", value: [0, 1] },
         rotDeg: 0,
-        contours: [-1.0, -1.0]
+        contours: [-1.0, -1.0],
     },
     GridLayer: {
         name: "Grid",
         pickable: true,
+        valueRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array", value: [0, 1] },
     },
     WellsLayer: {
         name: "Wells",

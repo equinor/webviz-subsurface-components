@@ -7,7 +7,6 @@ import { Texture2D } from "@luma.gl/core";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 import { colorTablesArray } from "../../components/ColorTableTypes";
 import { rgbValues } from "../../utils/continuousLegend";
-import { templateArray } from "../../components/WelllayerTemplateTypes";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -23,16 +22,12 @@ const DECODER = {
     offset: 0,
 };
 
-function getImageData(
-    colorMapName: string,
-    colorTables: colorTablesArray,
-    template: templateArray
-) {
+function getImageData(colorMapName: string, _colorTables: colorTablesArray) {
     const data = new Uint8Array(256 * 3);
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-        const rgb = rgbValues(colorMapName, value, template, colorTables);
+        const rgb = rgbValues(value, colorMapName, _colorTables);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -97,7 +92,6 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ uniforms, context }: any): void {
-
         const valueRangeMin = this.props.valueRange[0] ?? 0.0;
         const valueRangeMax = this.props.valueRange[1] ?? 1.0;
 
@@ -118,8 +112,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                     data: getImageData(
                         this.props.colorMapName,
                         (this.context as DeckGLLayerContext).userData
-                            .colorTables,
-                        (this.context as DeckGLLayerContext).userData.template
+                            .colorTables
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),

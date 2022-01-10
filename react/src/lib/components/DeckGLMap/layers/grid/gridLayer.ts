@@ -11,22 +11,20 @@ import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 import { colorTablesArray } from "../../components/ColorTableTypes";
 import { rgbValues } from "../../utils/continuousLegend";
-import { templateArray } from "../../components/WelllayerTemplateTypes";
 
 function getColorMapColors(
     colorMapName: string,
-    colorTables: colorTablesArray,
-    template: templateArray
+    colorTables: colorTablesArray
 ): RGBColor[] {
     const colors: RGBColor[] = [];
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-        const rgb = rgbValues(colorMapName, value, template, colorTables);
+        const rgb = rgbValues(value, colorMapName, colorTables);
         let color: RGBColor = [155, 255, 255];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
-                color = rgb;
+                color = [rgb[0], rgb[1], rgb[2]];
             } else {
                 color = [rgb.r, rgb.g, rgb.b];
             }
@@ -63,6 +61,12 @@ interface PolygonData {
 export interface GridLayerProps<D> extends ExtendedLayerProps<D> {
     // Name of color map.
     colorMapName: string;
+
+    // Min and max property values.
+    valueRange: [number, number];
+
+    // Use color map in this range.
+    colorMapRange: [number, number];
 }
 
 export default class GridLayer extends CompositeLayer<
@@ -82,7 +86,7 @@ export default class GridLayer extends CompositeLayer<
         };
 
         // For now just cycle over the timesteps.
-        setInterval(updateTimeStepNo, 2500);
+        setInterval(updateTimeStepNo, 500);
     }
 
     // For now, use `any` for the picking types because this function should
@@ -124,13 +128,18 @@ export default class GridLayer extends CompositeLayer<
         }
         const colors = getColorMapColors(
             this.props.colorMapName,
-            (this.context as DeckGLLayerContext).userData.colorTables,
-            (this.context as DeckGLLayerContext).userData.template
+            (this.context as DeckGLLayerContext).userData.colorTables
         );
 
         const layer = new PolygonLayer<PolygonData>(
             this.getSubLayerProps<PolygonData, PolygonLayerProps<PolygonData>>({
-                data: makeLayerData(data, this.state.ti, colors),
+                data: makeLayerData(
+                    data,
+                    this.state.ti,
+                    colors,
+                    this.props.valueRange,
+                    this.props.colorMapRange
+                ),
                 id: "grid-layer",
                 getFillColor: (d: PolygonData) => d.properties.color,
                 getLineColor: [0, 0, 0, 255],
@@ -156,22 +165,38 @@ GridLayer.defaultProps = layersDefaultProps[
 function makeLayerData(
     data: GridData,
     ti: number,
-    colors: RGBColor[]
+    colors: RGBColor[],
+    valueRange: [number, number],
+    colorMapRange: [number, number]
 ): PolygonData[] {
     const polygons: PolygonData[] = data.map(function (
         cell: CellData
     ): PolygonData {
-        const v = cell.vs[ti];
+        const propertyValue = cell.vs[ti];
 
         // console.log("colors: ", colors)
         //console.log("v: ", v)
 
         // // temporary hardcoded colors.
-        const r = 255 - v * 100;
-        const g = 255 - v * 100;
-        const b = 255 * v;
+        // const r = 255 - propertyValue * 100;
+        // const g = 255 - propertyValue * 100;
+        // const b = 255 * propertyValue;
 
         //const color = colors[v * 255];
+
+        const valueRangeMin = valueRange[0] ?? 0.0;
+        const valueRangeMax = valueRange[1] ?? 1.0;
+
+        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // Otherwise it will extend from valueRangeMin to valueRangeMax.
+        const colorMapRangeMin = colorMapRange?.[0] ?? valueRangeMin;
+        const colorMapRangeMax = colorMapRange?.[1] ?? valueRangeMax;
+        let x = propertyValue * (valueRangeMax - valueRangeMin) + valueRangeMin;
+        x = (x - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
+        x = Math.max(0.0, x);
+        x = Math.min(1.0, x);
+
+        const color = colors[Math.floor(x * 255)];
 
         return {
             polygon: cell.cs, // 4 corners

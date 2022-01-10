@@ -16,7 +16,6 @@ import fsColormap from "!!raw-loader!./colormap.fs.glsl";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 import { colorTablesArray } from "../../components/ColorTableTypes";
 import { rgbValues } from "../../utils/continuousLegend";
-import { templateArray } from "../../components/WelllayerTemplateTypes";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -25,16 +24,12 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
-function getImageData(
-    colorMapName: string,
-    colorTables: colorTablesArray,
-    template: templateArray
-) {
+function getImageData(colorMapName: string, colorTables: colorTablesArray) {
     const data = new Uint8Array(256 * 3);
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-        const rgb = rgbValues(colorMapName, value, template, colorTables);
+        const rgb = rgbValues(value, colorMapName, colorTables);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -133,8 +128,7 @@ export default class ColormapLayer extends BitmapLayer<
                     data: getImageData(
                         this.props.colorMapName,
                         (this.context as DeckGLLayerContext).userData
-                            .colorTables,
-                        (this.context as DeckGLLayerContext).userData.template
+                            .colorTables
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
