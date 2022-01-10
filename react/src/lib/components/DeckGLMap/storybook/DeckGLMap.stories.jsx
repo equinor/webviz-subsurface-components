@@ -1,7 +1,6 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import template from "../../../../demo/example-data/welllayer_template.json";
 import colorTables from "../../../../demo/example-data/color-tables.json";
 
 export default {
@@ -116,7 +115,6 @@ const layersData2 = [
 export const Default = Template.bind({});
 Default.args = {
     ...exampleData[0],
-    template: template,
     colorTables: colorTables,
 };
 
