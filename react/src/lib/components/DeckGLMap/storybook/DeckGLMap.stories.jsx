@@ -130,19 +130,20 @@ KhMapFlat.args = {
     },
     colorTables: colorTables,
     layers: [
-            {
-                    ...colormapLayer,
-                    valueRange: [-3071, 41048],
-                    colorMapRange: [-3071, 41048],
-                    bounds: [432150, 6475800, 439400, 6481500],
-                    colormap: "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/colormaps/gist_rainbow.png",
-            },
-            {
-                    ...hillshadingLayer,
-                    valueRange: [-3071, 41048],
-                    bounds: [432150, 6475800, 439400, 6481500],
-                    opacity: 0.6,
-            },
+        {
+            ...colormapLayer,
+            valueRange: [-3071, 41048],
+            colorMapRange: [-3071, 41048],
+            bounds: [432150, 6475800, 439400, 6481500],
+            colormap:
+                "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/colormaps/gist_rainbow.png",
+        },
+        {
+            ...hillshadingLayer,
+            valueRange: [-3071, 41048],
+            bounds: [432150, 6475800, 439400, 6481500],
+            opacity: 0.6,
+        },
     ],
 };
 
