@@ -118,6 +118,19 @@ Default.args = {
     colorTables: colorTables,
 };
 
+// Volve kh netmap data
+export const Kh = Template.bind({});
+Kh.args = {
+    ...exampleData[0],
+    resources: {
+        propertyMap: "/volve_property_normalized.png",
+        depthMap: "/volve_hugin_depth_normalized.png",
+        wellsData: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+        logData: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json"
+    },
+    colorTables: colorTables,
+};
+
 // Storybook example 2
 export const UserDefinedLayer1 = Template.bind({});
 UserDefinedLayer1.args = {
