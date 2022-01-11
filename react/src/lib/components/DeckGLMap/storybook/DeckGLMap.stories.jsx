@@ -111,11 +111,40 @@ const layersData2 = [
     customLayerWithTextData,
 ];
 
+const hillshadingLayer = exampleData[0].layers[1];
+
 // Storybook example 1
 export const Default = Template.bind({});
 Default.args = {
     ...exampleData[0],
     colorTables: colorTables,
+};
+
+// Volve kh netmap data, flat surface
+export const KhMapFlat = Template.bind({});
+KhMapFlat.args = {
+    ...exampleData[0],
+    resources: {
+        propertyMap: "/volve_property_normalized.png",
+        depthMap: "/volve_hugin_depth_normalized.png",
+    },
+    colorTables: colorTables,
+    layers: [
+        {
+            ...colormapLayer,
+            valueRange: [-3071, 41048],
+            colorMapRange: [-3071, 41048],
+            bounds: [432150, 6475800, 439400, 6481500],
+            colormap:
+                "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/colormaps/gist_rainbow.png",
+        },
+        {
+            ...hillshadingLayer,
+            valueRange: [-3071, 41048],
+            bounds: [432150, 6475800, 439400, 6481500],
+            opacity: 0.6,
+        },
+    ],
 };
 
 // Storybook example 2
