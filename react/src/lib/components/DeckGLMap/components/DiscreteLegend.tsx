@@ -110,7 +110,7 @@ export function colorTableData(
         (value: colorTablesObj) =>
             value.name.toLowerCase() == colorName.toLowerCase()
     );
-    return colorTableData[0].colors;
+    return colorTableData.length > 0 ? colorTableData[0].colors : [];
 }
 
 DiscreteColorLegend.defaultProps = {
