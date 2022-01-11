@@ -81,4 +81,5 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
     }
 );
 
+WellCompletionsPlot.displayName = "WellCompletionsPlot";
 export default WellCompletionsPlot;
