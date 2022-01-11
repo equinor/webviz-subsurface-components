@@ -41,7 +41,7 @@ export const layersDefaultProps: Record<string, unknown> = {
     Map3DLayer: {
         "@@type": "Map3DLayer",
         name: "Map 3D",
-        id: "3D-map-layer",
+        id: "map3d-layer",
         pickable: true,
         visible: false,
         // Url to png image for height field.
@@ -58,6 +58,7 @@ export const layersDefaultProps: Record<string, unknown> = {
     },
     GridLayer: {
         "@@type": "GridLayer",
+        id: "grid-layer",
         name: "Grid",
         pickable: true,
     },
