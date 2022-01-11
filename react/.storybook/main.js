@@ -39,4 +39,5 @@ module.exports = {
             },
         };
     },
+    staticDirs: ["../src/demo/example-data"],
 };

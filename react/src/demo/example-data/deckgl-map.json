@@ -25,8 +25,8 @@
     },
     "coordinateUnit": "m",
     "resources": {
-      "propertyMap": "/volve_property_normalized.png",
-      "depthMap": "/volve_hugin_depth_normalized.png",
+      "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+      "depthMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
       "wellsData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
       "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json"
     },
@@ -50,12 +50,12 @@
           6481113
         ],
         "valueRange": [
-          -3071,
-          41048
+          2782,
+          3513
         ],
         "colorMapRange": [
-          -3071,
-          41048
+          2782,
+          3513
         ]
       },
       {
