@@ -119,7 +119,7 @@
         "logData": "@@#resources.logData",
         "logrunName": "BLOCKING",
         "logName": "ZONELOG",
-        "logColor": "Colors_set_1",
+        "logColor": "Stratigraphy",
         "selectedWell": "@@#editedData.selectedWell"
       },
       {
