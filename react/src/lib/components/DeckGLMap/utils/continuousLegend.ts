@@ -46,10 +46,13 @@ export function rgbValues(
         const secondColorArray = colorTableColors[index];
 
         if ((firstColorArray || secondColorArray) != undefined) {
+            const t0 = firstColorArray[0];
+            const t1 = secondColorArray[0];
+            const t = (point - t0) / (t1 - t0); // t = 0.0 gives first color, t = 1.0 gives second color.
             const interpolatedValues = interpolateRgb(
                 RGBToHex(firstColorArray).color,
                 RGBToHex(secondColorArray).color
-            )(point);
+            )(t);
             return color(interpolatedValues)?.rgb();
         }
         return undefined;

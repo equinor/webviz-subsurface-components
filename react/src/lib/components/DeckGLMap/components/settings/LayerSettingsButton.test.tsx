@@ -39,7 +39,7 @@ describe("test layers settings button", () => {
             screen.getByRole("combobox", { name: /draw mode/i }),
             "View"
         );
-        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
+        expect(testStore.dispatch).toHaveBeenCalledTimes(2);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["drawing-layer", "view"],
             type: "spec/updateDrawingMode",
