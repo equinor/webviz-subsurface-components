@@ -1,10 +1,12 @@
-import * as jsonpatch from "fast-json-patch";
 import DeckGLWrapper, { ViewsType } from "./DeckGLWrapper";
 import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
 import { setSpec } from "../redux/actions";
-import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
+import {
+    applyPropsOnLayers,
+    getLayersWithDefaultProps,
+} from "../layers/utils/layerTools";
 import { colorTablesArray } from "./ColorTableTypes";
 
 export interface MapProps {
@@ -104,27 +106,20 @@ const Map: React.FC<MapProps> = ({
     setEditedData,
 }: MapProps) => {
     // create store once with layers data
-    const store = React.useMemo(
-        () => createStore(PrepareStoreData(layers, views)),
-        []
-    );
+    const store = React.useMemo(() => {
+        return createStore({
+            layers: getLayersWithDefaultProps(layers),
+            views: views,
+        });
+    }, []);
 
     // update store if any of the layer prop is changed
     React.useEffect(() => {
-        const prev_state = store.getState()["spec"]["layers"];
-        const cur_state = layers;
-        const patch = jsonpatch.compare(prev_state, cur_state);
-        const replace_operations = patch.filter((obj) => obj.op === "replace");
-        if (replace_operations.length > 0) {
-            const new_state = jsonpatch.applyPatch(
-                prev_state,
-                replace_operations,
-                false,
-                false
-            ).newDocument;
-            const spec = { layers: new_state, views: views };
-            store.dispatch(setSpec(spec));
-        }
+        const prev_layers_in_redux = store.getState()["spec"]["layers"];
+        const layers_store = applyPropsOnLayers(prev_layers_in_redux, layers);
+        const layers_default = getLayersWithDefaultProps(layers_store);
+        const spec = { layers: layers_default, views: views };
+        store.dispatch(setSpec(spec));
     }, [layers]);
 
     return (
@@ -148,15 +143,3 @@ const Map: React.FC<MapProps> = ({
 };
 
 export default Map;
-
-function PrepareStoreData(
-    layers: Record<string, unknown>[],
-    views: ViewsType | undefined
-): Record<string, unknown> {
-    const layers_data = getLayersWithDefaultProps(layers);
-    const store_data = {
-        layers: layers_data,
-        views: views,
-    };
-    return store_data;
-}
