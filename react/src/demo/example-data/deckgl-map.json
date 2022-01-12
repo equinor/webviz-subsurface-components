@@ -87,7 +87,7 @@
           0,
           1
         ],
-        "visible": true
+        "visible": false
       },
       {
         "@@type": "Map3DLayer",

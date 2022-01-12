@@ -174,16 +174,6 @@ function makeLayerData(
     ): PolygonData {
         const propertyValue = cell.vs[ti];
 
-        // console.log("colors: ", colors)
-        //console.log("v: ", v)
-
-        // // temporary hardcoded colors.
-        // const r = 255 - propertyValue * 100;
-        // const g = 255 - propertyValue * 100;
-        // const b = 255 * propertyValue;
-
-        //const color = colors[v * 255];
-
         const valueRangeMin = valueRange[0] ?? 0.0;
         const valueRangeMax = valueRange[1] ?? 1.0;
 
