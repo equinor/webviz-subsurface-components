@@ -36,6 +36,15 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Contourlines reference point and interval.
     contours: [number, number];
+
+    // Name of color map. E.g "PORO"
+    colorMapName: string;
+
+    // Min and max property values.
+    valueRange: [number, number];
+
+    // Use color map in this range.
+    colorMapRange: [number, number];
 }
 export default class Map3DLayer extends CompositeLayer<
     unknown,
@@ -65,6 +74,9 @@ export default class Map3DLayer extends CompositeLayer<
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
+                colorMapName: this.props.colorMapName,
+                valueRange: this.props.valueRange,
+                colorMapRange: this.props.colorMapRange,
             })
         );
         return [layer];
