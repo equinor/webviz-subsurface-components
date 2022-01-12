@@ -68,7 +68,7 @@ const Settings: React.FC<SettingsProps> = React.memo(
                         layer && (
                             <LayerSettingsButton
                                 layer={layer}
-                                key={`settings-button-${layer["id"]}-${currentView?.id}`}
+                                key={`layer-settings-button-${layer["id"]}-${currentView?.id}`}
                             />
                         )
                 )}

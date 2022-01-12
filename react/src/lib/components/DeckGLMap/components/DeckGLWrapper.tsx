@@ -137,7 +137,7 @@ export interface DeckGLWrapperProps {
 function getLayer(layers: Layer<unknown>[] | undefined, id: string) {
     if (!layers) return;
     const layer = layers.filter(
-        (item) => item.id?.toLowerCase() == id.toLowerCase()
+        (item) => item.id?.toLowerCase() == id?.toLowerCase()
     );
     return layer[0];
 }
@@ -459,7 +459,12 @@ function jsonToObject(
         }
     });
     const jsonConverter = new JSONConverter({ configuration });
-    return jsonConverter.convert(data);
+
+    // remove empty data/layer object
+    const filtered_data = (data as Record<string, unknown>[]).filter(
+        (value) => Object.keys(value).length !== 0
+    );
+    return jsonConverter.convert(filtered_data);
 }
 
 // returns initial view state for DeckGL
