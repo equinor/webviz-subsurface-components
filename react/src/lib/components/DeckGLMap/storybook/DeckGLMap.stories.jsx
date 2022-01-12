@@ -128,8 +128,8 @@ export const KhMapFlat = Template.bind({});
 KhMapFlat.args = {
     ...exampleData[0],
     resources: {
-        propertyMap: "/volve_property_normalized.png",
-        depthMap: "/volve_hugin_depth_normalized.png",
+        propertyMap: "./volve_property_normalized.png",
+        depthMap: "./volve_hugin_depth_normalized.png",
     },
     colorTables: colorTables,
     layers: [
@@ -143,7 +143,7 @@ KhMapFlat.args = {
         },
         {
             ...hillshadingLayer,
-            valueRange: [-3071, 41048],
+            valueRange: [2725, 3397],
             bounds: [432150, 6475800, 439400, 6481500],
             opacity: 0.6,
         },
