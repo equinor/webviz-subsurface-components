@@ -112,7 +112,6 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
         const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
-
         super.draw({
             uniforms: {
                 ...uniforms,

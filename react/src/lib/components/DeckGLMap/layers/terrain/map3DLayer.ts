@@ -25,12 +25,12 @@ function add_normals(resolved_mesh) {
 
     //Calculate one normal pr triangle. And record the triangles each vertex' belongs to.
     const no_unique_vertexes = vertexs.length / 3;
-    const vertex_triangles = Array(no_unique_vertexes);  // for each vertex a list of triangles it belogs to.
+    const vertex_triangles = Array(no_unique_vertexes); // for each vertex a list of triangles it belogs to.
     for (let i = 0; i < no_unique_vertexes; i++) {
         vertex_triangles[i] = new Set();
     }
 
-    const triangle_normals = Array(ntriangles); 
+    const triangle_normals = Array(ntriangles);
     for (let t = 0; t < ntriangles; t++) {
         const i0 = indices[t * 3 + 0];
         const i1 = indices[t * 3 + 1];
@@ -127,7 +127,6 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Will calculate normals and enable phong shading.
     enableSmoothShading: boolean;
-
 }
 
 export default class Map3DLayer extends CompositeLayer<
@@ -135,7 +134,7 @@ export default class Map3DLayer extends CompositeLayer<
     Map3DLayerProps<unknown>
 > {
     renderLayers(): [TerrainMapLayer] {
-        let mesh = load(this.props.mesh, TerrainLoader, {  // Note: mesh contains a bounding box. No normals.
+        let mesh = load(this.props.mesh, TerrainLoader, {
             terrain: {
                 elevationDecoder: ELEVATION_DECODER,
                 bounds: this.props.bounds,
@@ -144,6 +143,7 @@ export default class Map3DLayer extends CompositeLayer<
             },
         });
 
+        // Note: mesh contains triangles. No normals.
         if (this.props.enableSmoothShading) {
             mesh = mesh.then(add_normals);
         }
