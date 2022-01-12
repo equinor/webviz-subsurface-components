@@ -91,7 +91,6 @@
       },
       {
         "@@type": "Map3DLayer",
-        "id": "map3d-layer",
         "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/depthMap.png",
         "bounds": [
           432205,

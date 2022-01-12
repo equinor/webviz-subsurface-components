@@ -1,5 +1,6 @@
 export const layersDefaultProps: Record<string, unknown> = {
     ColormapLayer: {
+        "@@type": "ColormapLayer",
         name: "Property map",
         id: "colormap-layer",
         pickable: true,
@@ -16,6 +17,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         rotDeg: 0,
     },
     Hillshading2DLayer: {
+        "@@type": "Hillshading2DLayer",
         name: "Hill shading",
         id: "hillshading-layer",
         opacity: 1.0,
@@ -36,8 +38,9 @@ export const layersDefaultProps: Record<string, unknown> = {
         },
     },
     Map3DLayer: {
+        "@@type": "Map3DLayer",
         name: "Map 3D",
-        id: "3D-map-layer",
+        id: "map3d-layer",
         pickable: true,
         visible: false,
         // Url to png image for height field.
@@ -54,12 +57,15 @@ export const layersDefaultProps: Record<string, unknown> = {
         contours: [-1.0, -1.0],
     },
     GridLayer: {
+        "@@type": "GridLayer",
+        id: "grid-layer",
         name: "Grid",
         pickable: true,
         valueRange: { type: "array", value: [0, 1] },
         colorMapRange: { type: "array", value: [0, 1] },
     },
     WellsLayer: {
+        "@@type": "WellsLayer",
         name: "Wells",
         id: "wells-layer",
         autoHighlight: true,
@@ -74,6 +80,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         visible: true,
     },
     FaultPolygonsLayer: {
+        "@@type": "FaultPolygonsLayer",
         name: "Fault polygons",
         id: "fault-polygons-layer",
         pickable: true,
@@ -82,6 +89,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         lineWidthMinPixels: 2,
     },
     PieChartLayer: {
+        "@@type": "PieChartLayer",
         name: "Pie chart",
         id: "pie-layer",
         pickable: true,
@@ -89,6 +97,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         selectionEnabled: true,
     },
     DrawingLayer: {
+        "@@type": "DrawingLayer",
         name: "Drawing",
         id: "drawing-layer",
         pickable: true,
