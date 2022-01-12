@@ -18,7 +18,15 @@ const ELEVATION_DECODER = {
     offset: 0,
 };
 
-function add_normals(resolved_mesh) {
+type MeshType = {
+    attributes: {
+        POSITION: { value: number[] };
+        normals: { value: Float32Array; size: number };
+    };
+    indices: { value: number[] };
+};
+
+function add_normals(resolved_mesh: MeshType) {
     const vertexs = resolved_mesh.attributes.POSITION.value;
     const indices = resolved_mesh.indices.value;
     const ntriangles = indices.length / 3;
@@ -64,7 +72,7 @@ function add_normals(resolved_mesh) {
         triangle_normals[t] = normal;
     }
 
-    // Calculate normals. The vertex normal will be the mean of the normals of every truangle the vertex
+    // Calculate normals. The vertex normal will be the mean of the normals of every triangle the vertex
     // belongs to.
     const normals = Array(vertexs.length).fill(0.0);
 
