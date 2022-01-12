@@ -1,6 +1,6 @@
 import React from "react";
 import Map from "../../components/Map";
-import colorTables from "../../../../../demo/example-data/color-tables.json";
+import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 const exampleData = require("../../../../../demo/example-data/deckgl-map.json");
 export default {

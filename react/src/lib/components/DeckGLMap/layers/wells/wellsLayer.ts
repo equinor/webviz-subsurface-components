@@ -24,7 +24,7 @@ import { flattenPath, splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { colorTablesArray } from "../../components/ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 

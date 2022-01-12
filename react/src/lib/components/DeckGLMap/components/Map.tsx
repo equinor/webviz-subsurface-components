@@ -7,7 +7,7 @@ import {
     applyPropsOnLayers,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
-import { colorTablesArray } from "./ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables";
 
 export interface MapProps {
     /**
