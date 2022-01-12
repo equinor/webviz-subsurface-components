@@ -2,7 +2,7 @@ import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
 import { createStyles, Fab, makeStyles } from "@material-ui/core";
 import React, { ChangeEvent, useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { updateVisibleLayers } from "../../redux/actions";
+import { updateLayerProp, updateVisibleLayers } from "../../redux/actions";
 import ToggleButton from "./ToggleButton";
 
 const useStyles = makeStyles(() =>
@@ -31,6 +31,9 @@ const LayersButton: React.FC<LayersButtonProps> = React.memo(
         // handlers
         const handleClick = useCallback(
             (event: React.MouseEvent<HTMLButtonElement>) => {
+                // hack to disable click propagation on drawing layer
+                dispatch(updateLayerProp(["drawing-layer", "mode", "view"]));
+
                 setAnchorEl(anchorEl ? null : event.currentTarget);
             },
             [anchorEl]
