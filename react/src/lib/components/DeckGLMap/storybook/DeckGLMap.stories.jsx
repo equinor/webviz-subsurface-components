@@ -28,6 +28,7 @@ const Template = (args) => {
 const customLayerWithPolylineData = {
     "@@type": "GeoJsonLayer",
     id: "geojson-line-layer",
+    name: "Line",
     data: {
         type: "FeatureCollection",
         features: [
@@ -52,6 +53,7 @@ const customLayerWithPolylineData = {
 const customLayerWithPolygonData = {
     "@@type": "GeoJsonLayer",
     id: "geojson-layer",
+    name: "Polygon",
     data: {
         type: "Feature",
         properties: {},
@@ -79,6 +81,7 @@ const customLayerWithPolygonData = {
 const customLayerWithTextData = {
     "@@type": "TextLayer",
     id: "text-layer",
+    name: "Text",
     data: [
         {
             name: "Custom GeoJson layer",
@@ -147,7 +150,7 @@ KhMapFlat.args = {
     ],
 };
 
-// Storybook example 2
+// custom layer example
 export const UserDefinedLayer1 = Template.bind({});
 UserDefinedLayer1.args = {
     id: exampleData[0].id,
@@ -155,11 +158,53 @@ UserDefinedLayer1.args = {
     layers: layersData1,
 };
 
-// Storybook example 3
+// custom layer with colormap
 export const UserDefinedLayer2 = Template.bind({});
 UserDefinedLayer2.args = {
     id: exampleData[0].id,
     resources: exampleData[0].resources,
     bounds: exampleData[0].bounds,
     layers: layersData2,
+};
+
+// multiple synced view
+export const MultiView = Template.bind({});
+MultiView.args = {
+    ...exampleData[0],
+    colorTables: colorTables,
+    legend: {
+        visible: false,
+    },
+    zoom: -5,
+    layers: [
+        ...exampleData[0].layers,
+        customLayerWithPolylineData,
+        customLayerWithPolygonData,
+        customLayerWithTextData,
+    ],
+    views: {
+        layout: [2, 2],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: ["colormap-layer"],
+            },
+            {
+                id: "view_2",
+                show3D: false,
+                layerIds: ["hillshading-layer"],
+            },
+            {
+                id: "view_3",
+                show3D: false,
+                layerIds: [],
+            },
+            {
+                id: "view_4",
+                show3D: false,
+                layerIds: ["geojson-line-layer", "geojson-layer", "text-layer"],
+            },
+        ],
+    },
 };
