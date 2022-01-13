@@ -87,9 +87,14 @@ export function applyPropsOnLayers(
                 if (
                     ["string", "boolean", "number", "array"].includes(prop_type)
                 ) {
-                    if (layer[prop] === undefined) layer[prop] = value;
+                    if (layer[prop] == undefined) layer[prop] = value;
                 }
             });
+        } else {
+            // if it's a user defined layer and its name and visibility are not specified
+            // set layer id as its default name
+            if (layer["name"] == undefined) layer["name"] = layer["id"];
+            if (layer["visible"] == undefined) layer["visible"] = true;
         }
     });
     return result;
