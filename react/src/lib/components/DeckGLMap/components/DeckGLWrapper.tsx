@@ -11,11 +11,8 @@ import { updateLayerProp } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
-//import DiscreteColorLegend from "../components/DiscreteLegend";
-//import {DiscreteColorLegend} from "@emerson-eps/color-tables/src/component/Legend/DiscreteLegend";
-//import ColorScale from "../components/ContinuousLegend";
-//}  from "@emerson-eps/color-tables/src/component/Legend/DiscreteLegend";
-//import {ContinuousLegend} from "@emerson-eps/color-tables/src/component/Legend/ContinuousLegend";
+import { DiscreteColorLegend } from "@emerson-eps/color-tables";
+import ContinuousLegend from "../components//ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer, View } from "deck.gl";
@@ -160,7 +157,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     colorTables,
     children,
 }: DeckGLWrapperProps) => {
-    //console.log('---DiscreteColorLegend--', DiscreteColorLegend)
     // state for initial views prop (target and zoom) of DeckGL component
     const [initialViewState, setInitialViewState] =
         useState<Record<string, unknown>>();
@@ -396,17 +392,17 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                 isLoaded={isLoaded}
                             />
                         )}
-                        {/* {legend.visible && legendProps.discrete && (
+                        {legend.visible && legendProps.discrete && (
                             <DiscreteColorLegend
                                 discreteData={legendProps.metadata}
                                 dataObjectName={legendProps.title}
                                 position={legend.position}
-                                //colorName={legendProps.colorName}
+                                colorName={legendProps.colorName}
                                 colorTables={colorTables}
                                 horizontal={legend.horizontal}
                             />
-                        )} */}
-                        {/* {legendProps.valueRange?.length > 0 &&
+                        )}
+                        {legendProps.valueRange?.length > 0 &&
                             legend.visible &&
                             legendProps && (
                                 <ContinuousLegend
@@ -415,12 +411,11 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                     dataObjectName={legendProps.title}
                                     position={legend.position}
                                     name={legendProps.name}
-                                    //colorName={legendProps.colorName}
+                                    colorName={legendProps.colorName}
                                     colorTables={colorTables}
                                     horizontal={legend.horizontal}
                                 />
-                            )} */}
-
+                            )}
                         <Settings viewportId={view.id as string} />
                     </DeckGLView>
                 ))}
