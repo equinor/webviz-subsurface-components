@@ -150,6 +150,7 @@
         "source-map-loader": "^3.0.0",
         "terser-webpack-plugin": "^5.1.1",
         "trim": ">=0.0.3",
+        "ts-loader": "^9.2.6",
         "typescript": "4.3.2",
         "url-loader": "^4.1.1",
         "vue-style-loader": "^4.1.3",
