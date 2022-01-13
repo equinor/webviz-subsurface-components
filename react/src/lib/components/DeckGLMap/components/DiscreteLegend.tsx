@@ -1,7 +1,7 @@
 import React from "react";
 import legendUtil from "../utils/discreteLegend";
 import { scaleOrdinal, select } from "d3";
-import { colorTablesArray, colorTablesObj } from "./ColorTableTypes";
+import { colorTablesArray, colorTablesObj } from "@emerson-eps/color-tables/";
 
 interface ItemColor {
     color: string;
