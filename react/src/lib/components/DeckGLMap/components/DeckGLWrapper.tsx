@@ -16,9 +16,48 @@ import ContinuousLegend from "../components/ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer, View } from "deck.gl";
-import { templateArray } from "./WelllayerTemplateTypes";
-import { colorTablesArray } from "./ColorTableTypes";
-import { LayerProps } from "@deck.gl/core/lib/layer";
+import { DeckGLView } from "./DeckGLView";
+import { Viewport } from "@deck.gl/core";
+import { colorTablesArray } from "@emerson-eps/color-tables";
+import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
+import { ViewProps } from "@deck.gl/core/views/view";
+import { isEmpty } from "lodash";
+
+export interface ViewportType {
+    /**
+     * Viewport id
+     */
+    id: string;
+
+    /**
+     * If true, displays map in 3D view, default is 2D view (false)
+     */
+    show3D: boolean;
+
+    /**
+     * Layers to be displayed on viewport
+     */
+    layerIds: string[];
+}
+
+export interface ViewsType {
+    /**
+     * Layout for viewport in specified as [row, column]
+     */
+    layout: [number, number];
+
+    /**
+     * Layers configuration for multiple viewport
+     */
+    viewports: ViewportType[];
+}
+
+export interface DeckGLLayerContext extends LayerContext {
+    userData: {
+        setEditedData: (data: Record<string, unknown>) => void;
+        colorTables: colorTablesArray;
+    };
+}
 
 export interface DeckGLWrapperProps {
     /**
@@ -48,9 +87,10 @@ export interface DeckGLWrapperProps {
     zoom: number;
 
     /**
-     * If true, displays map in 3D view, default is 2D view
+     * Views configuration for map. If not specified, all the layers will be
+     * displayed in a single 2D viewport
      */
-    view3D: boolean;
+    views?: ViewsType;
 
     /**
      * Parameters for the InfoCard component
@@ -91,15 +131,13 @@ export interface DeckGLWrapperProps {
 
     children?: React.ReactNode;
 
-    template: templateArray;
-
     colorTables: colorTablesArray;
 }
 
 function getLayer(layers: Layer<unknown>[] | undefined, id: string) {
     if (!layers) return;
     const layer = layers.filter(
-        (item) => item.id?.toLowerCase() == id.toLowerCase()
+        (item) => item.id?.toLowerCase() == id?.toLowerCase()
     );
     return layer[0];
 }
@@ -109,14 +147,13 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     resources,
     bounds,
     zoom,
-    view3D,
+    views,
     coords,
     scale,
     coordinateUnit,
     legend,
     editedData,
     setEditedData,
-    template,
     colorTables,
     children,
 }: DeckGLWrapperProps) => {
@@ -128,17 +165,27 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     }, [bounds, zoom]);
 
     // state for views prop of DeckGL component
+    const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
+    useEffect(() => {
+        setViewsProps(getViews(views) as ViewProps[]);
+    }, [views]);
+
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
     useEffect(() => {
-        setDeckGLViews(getViewsForDeckGL(view3D));
-    }, [view3D]);
+        setDeckGLViews(jsonToObject(viewsProps) as View[]);
+    }, [viewsProps]);
 
     // get layers data from store
-    const layersData = useSelector((st: MapState) => st.layers);
-    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
-
+    const spec = useSelector((st: MapState) => st.spec);
+    const [layersData, setLayersData] = useState<LayerProps<unknown>[]>();
     useEffect(() => {
-        if (!layersData.length) {
+        if (isEmpty(spec) || !("layers" in spec)) return;
+        setLayersData(spec["layers"] as LayerProps<unknown>[]);
+    }, [spec]);
+
+    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
+    useEffect(() => {
+        if (!layersData || !layersData.length) {
             return;
         }
 
@@ -185,6 +232,9 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         }
     }, [drawingLayer?.props.mode, dispatch]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [viewState, setViewState] = useState<any>();
+
     const refCb = useCallback(
         (deckRef) => {
             if (deckRef && deckRef.deck) {
@@ -200,11 +250,12 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         ) => {
                             setEditedData?.(updated_prop);
                         },
+                        colorTables: colorTables,
                     },
                 });
             }
         },
-        [setEditedData]
+        [setEditedData, colorTables]
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -231,12 +282,14 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     const [legendProps, setLegendProps] = useState<{
         title: string;
         name: string;
+        colorName: string;
         discrete: boolean;
         metadata: { objects: Record<string, [number[], number]> };
         valueRange: number[];
     }>({
         title: "",
         name: "string",
+        colorName: "string",
         discrete: false,
         metadata: { objects: {} },
         valueRange: [],
@@ -249,33 +302,54 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         }
     }, [deckGLLayers]);
 
+    // this causes issue for wells in synced views
     const wellsLayer = useMemo(
         () => getLayer(deckGLLayers, "wells-layer") as WellsLayer,
         [deckGLLayers]
     );
-    const onLoad = useCallback(() => {
-        if (wellsLayer) {
-            wellsLayer.setState({
-                template: template,
-                colorTables: colorTables,
-            });
-        }
-    }, [wellsLayer, template, colorTables]);
     // Get color table for log curves.
     useEffect(() => {
         if (!wellsLayer?.isLoaded || !wellsLayer.props.logData) return;
         const legend = wellsLayer.state.legend[0];
         setLegendProps({
             title: legend.title,
-            name: legend.name,
+            name: wellsLayer?.props?.logName,
+            colorName: wellsLayer?.props?.logColor,
             discrete: legend.discrete,
             metadata: legend.metadata,
             valueRange: legend.valueRange,
         });
-    }, [isLoaded, legend, wellsLayer?.props?.logName]);
+    }, [
+        isLoaded,
+        legend,
+        wellsLayer?.props?.logName,
+        wellsLayer?.props?.logColor,
+    ]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [viewState, setViewState] = useState<any>();
+    const layerFilter = useCallback(
+        (args: {
+            layer: Layer<unknown, LayerProps<unknown>>;
+            viewport: Viewport;
+        }): boolean => {
+            // display all the layers if views are not specified correctly
+            if (!views || !views.viewports || !views.layout) return true;
+
+            const cur_view = views.viewports.find(
+                ({ id }) =>
+                    args.viewport.id &&
+                    new RegExp("^" + id).test(args.viewport.id)
+            );
+            if (cur_view && cur_view.layerIds?.length > 0) {
+                const layer_ids = cur_view.layerIds;
+                return layer_ids.some((layer_id) =>
+                    args.layer.id.match(new RegExp("\\b" + layer_id + "\\b"))
+                );
+            } else {
+                return true;
+            }
+        },
+        [views]
+    );
 
     if (!deckGLViews) return null;
 
@@ -283,8 +357,10 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         <div>
             <DeckGL
                 id={id}
+                viewState={viewState}
                 initialViewState={initialViewState}
                 views={deckGLViews}
+                layerFilter={layerFilter}
                 layers={deckGLLayers}
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
@@ -302,14 +378,51 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                 }}
                 ref={refCb}
                 onHover={onHover}
-                onViewStateChange={({ viewState }) => setViewState(viewState)}
+                onViewStateChange={(viewport) =>
+                    setViewState(viewport.viewState)
+                }
                 onAfterRender={onAfterRender}
-                onLoad={onLoad}
             >
                 {children}
+                {viewsProps.map((view) => (
+                    <DeckGLView key={view.id} id={view.id}>
+                        {deckGLLayers && (
+                            <StatusIndicator
+                                layers={deckGLLayers}
+                                isLoaded={isLoaded}
+                            />
+                        )}
+
+                        {legend.visible && legendProps.discrete && (
+                            <DiscreteColorLegend
+                                discreteData={legendProps.metadata}
+                                dataObjectName={legendProps.title}
+                                position={legend.position}
+                                colorName={legendProps.colorName}
+                                colorTables={colorTables}
+                                horizontal={legend.horizontal}
+                            />
+                        )}
+                        {legendProps.valueRange?.length > 0 &&
+                            legend.visible &&
+                            legendProps && (
+                                <ContinuousLegend
+                                    min={legendProps.valueRange[0]}
+                                    max={legendProps.valueRange[1]}
+                                    dataObjectName={legendProps.title}
+                                    position={legend.position}
+                                    name={legendProps.name}
+                                    colorName={legendProps.colorName}
+                                    colorTables={colorTables}
+                                    horizontal={legend.horizontal}
+                                />
+                            )}
+
+                        <Settings viewportId={view.id as string} />
+                    </DeckGLView>
+                ))}
             </DeckGL>
-            {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
-            <Settings />
+
             {viewState && scale.visible ? (
                 <DistanceScale
                     zoom={viewState.zoom}
@@ -319,34 +432,8 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
-            {legend.visible && legendProps.discrete && (
-                <DiscreteColorLegend
-                    discreteData={legendProps.metadata}
-                    dataObjectName={legendProps.title}
-                    position={legend.position}
-                    name={legendProps.name}
-                    template={template}
-                    colorTables={colorTables}
-                    horizontal={legend.horizontal}
-                />
-            )}
-            {legendProps.valueRange?.length > 0 &&
-                legend.visible &&
-                legendProps && (
-                    <ContinuousLegend
-                        min={legendProps.valueRange[0]}
-                        max={legendProps.valueRange[1]}
-                        dataObjectName={legendProps.title}
-                        position={legend.position}
-                        name={legendProps.name}
-                        template={template}
-                        colorTables={colorTables}
-                        horizontal={legend.horizontal}
-                    />
-                )}
-            {deckGLLayers && (
-                <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
-            )}
+
+            {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
         </div>
     );
 };
@@ -354,10 +441,11 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 export default DeckGLWrapper;
 
 // ------------- Helper functions ---------- //
+
 // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
 // See https://deck.gl/docs/api-reference/json/overview for more details.
 function jsonToObject(
-    data: Record<string, unknown>[] | LayerProps<unknown>[],
+    data: ViewProps[] | LayerProps<unknown>[],
     enums: Record<string, unknown>[] | undefined = undefined
 ): Layer<unknown>[] | View[] {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
@@ -371,12 +459,12 @@ function jsonToObject(
         }
     });
     const jsonConverter = new JSONConverter({ configuration });
-    return jsonConverter.convert(data);
-}
 
-// Returns DeckGL specific views object
-function getViewsForDeckGL(view3D: boolean): View[] {
-    return jsonToObject(getViews(view3D)) as View[];
+    // remove empty data/layer object
+    const filtered_data = (data as Record<string, unknown>[]).filter(
+        (value) => Object.keys(value).length !== 0
+    );
+    return jsonConverter.convert(filtered_data);
 }
 
 // returns initial view state for DeckGL
@@ -397,22 +485,55 @@ function getInitialViewState(
 }
 
 // construct views object for DeckGL component
-function getViews(view3D: boolean): Record<string, unknown>[] {
-    const view_type = view3D ? "OrbitView" : "OrthographicView";
-    const id = view3D ? "main3D" : "main2D";
-    const deckgl_views = [
-        {
-            "@@type": view_type,
-            id: id,
-            controller: {
-                doubleClickZoom: false,
-            },
+function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
+    const deckgl_views = [];
+    // if props for multiple viewport are not proper, return 2d view
+    if (!views || !views.viewports || !views.layout) {
+        deckgl_views.push({
+            "@@type": "OrthographicView",
+            id: "main",
+            controller: { doubleClickZoom: false },
             x: "0%",
             y: "0%",
             width: "100%",
             height: "100%",
             flipY: false,
-        },
-    ];
+        });
+    } else {
+        let yPos = 0;
+        const [nY, nX] = views.layout;
+        for (let y = 1; y <= nY; y++) {
+            let xPos = 0;
+            for (let x = 1; x <= nX; x++) {
+                if (
+                    views.viewports == undefined ||
+                    deckgl_views.length >= views.viewports.length
+                )
+                    return deckgl_views;
+
+                const cur_viewport = views.viewports[deckgl_views.length];
+                const view_type: string = cur_viewport.show3D
+                    ? "OrbitView"
+                    : "OrthographicView";
+                const id_suffix = cur_viewport.show3D ? "_3D" : "_2D";
+                const view_id: string = cur_viewport.id + id_suffix;
+
+                deckgl_views.push({
+                    "@@type": view_type,
+                    id: view_id,
+                    controller: {
+                        doubleClickZoom: false,
+                    },
+                    x: xPos + "%",
+                    y: yPos + "%",
+                    width: 100 / nX + "%",
+                    height: 100 / nY + "%",
+                    flipY: false,
+                });
+                xPos = xPos + 100 / nX;
+            }
+            yPos = yPos + 100 / nY;
+        }
+    }
     return deckgl_views;
 }

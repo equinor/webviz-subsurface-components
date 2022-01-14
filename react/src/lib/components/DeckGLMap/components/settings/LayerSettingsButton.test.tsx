@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import LayerSettingsButton from "./LayerSettingsButton";
+import { testState } from "../../test/testReduxState";
 
 describe("test layers settings button", () => {
     it("snapshot test", () => {
@@ -12,9 +13,7 @@ describe("test layers settings button", () => {
             Wrapper({
                 children: (
                     <LayerSettingsButton
-                        layerId="drawing-layer"
-                        layerType="DrawingLayer"
-                        name="Drawing"
+                        layer={testState.layers[testState.layers.length - 1]}
                     />
                 ),
             })
@@ -26,9 +25,7 @@ describe("test layers settings button", () => {
             Wrapper({
                 children: (
                     <LayerSettingsButton
-                        layerId="drawing-layer"
-                        layerType="DrawingLayer"
-                        name="Drawing"
+                        layer={testState.layers[testState.layers.length - 1]}
                     />
                 ),
             })
@@ -42,10 +39,10 @@ describe("test layers settings button", () => {
             screen.getByRole("combobox", { name: /draw mode/i }),
             "View"
         );
-        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
+        expect(testStore.dispatch).toHaveBeenCalledTimes(2);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["drawing-layer", "view"],
-            type: "layers/updateDrawingMode",
+            type: "spec/updateDrawingMode",
         });
     });
     it("should close menu when clicked on backdrop", async () => {
@@ -53,9 +50,7 @@ describe("test layers settings button", () => {
             Wrapper({
                 children: (
                     <LayerSettingsButton
-                        layerId="drawing-layer"
-                        layerType="DrawingLayer"
-                        name="Drawing"
+                        layer={testState.layers[testState.layers.length - 1]}
                     />
                 ),
             })
@@ -71,9 +66,7 @@ describe("test layers settings button", () => {
             Wrapper({
                 children: (
                     <LayerSettingsButton
-                        layerId="drawing-layer"
-                        layerType="DrawingLayer"
-                        name="Drawing"
+                        layer={testState.layers[testState.layers.length - 1]}
                     />
                 ),
             })

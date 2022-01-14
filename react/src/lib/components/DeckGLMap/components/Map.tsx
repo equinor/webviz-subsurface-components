@@ -1,12 +1,13 @@
-import * as jsonpatch from "fast-json-patch";
-import DeckGLWrapper from "./DeckGLWrapper";
+import DeckGLWrapper, { ViewsType } from "./DeckGLWrapper";
 import React from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "../redux/store";
-import { setLayers } from "../redux/actions";
-import { getLayersWithDefaultProps } from "../layers/utils/layerTools";
-import { templateArray } from "./WelllayerTemplateTypes";
-import { colorTablesArray } from "./ColorTableTypes";
+import { setSpec } from "../redux/actions";
+import {
+    applyPropsOnLayers,
+    getLayersWithDefaultProps,
+} from "../layers/utils/layerTools";
+import { colorTablesArray } from "@emerson-eps/color-tables";
 
 export interface MapProps {
     /**
@@ -42,9 +43,10 @@ export interface MapProps {
     zoom: number;
 
     /**
-     * If true, displays map in 3D view, default is 2D view (false)
+     * Views configuration for map. If not specified, all the layers will be
+     * displayed in a single 2D viewport
      */
-    view3D: boolean;
+    views?: ViewsType;
 
     /**
      * Parameters for the InfoCard component
@@ -85,8 +87,6 @@ export interface MapProps {
 
     children?: React.ReactNode;
 
-    template: templateArray;
-
     colorTables: colorTablesArray;
 }
 
@@ -96,43 +96,31 @@ const Map: React.FC<MapProps> = ({
     layers,
     bounds,
     zoom,
-    view3D,
+    views,
     coords,
     scale,
     coordinateUnit,
     legend,
-    template,
     colorTables,
     editedData,
     setEditedData,
 }: MapProps) => {
     // create store once with layers data
-    const store = React.useMemo(
-        () => createStore(getLayersWithDefaultProps(layers, view3D)),
-        []
-    );
+    const store = React.useMemo(() => {
+        return createStore({
+            layers: getLayersWithDefaultProps(layers),
+            views: views,
+        });
+    }, []);
 
     // update store if any of the layer prop is changed
     React.useEffect(() => {
-        // Inject "is3d" property into all layers and link it to "view3D".
-        layers = layers.map((e) => {
-            return { ...e, is3d: view3D };
-        });
-
-        const prev_state = store.getState()["layers"];
-        const cur_state = layers;
-        const patch = jsonpatch.compare(prev_state, cur_state);
-        const replace_operations = patch.filter((obj) => obj.op === "replace");
-        if (replace_operations.length > 0) {
-            const new_state = jsonpatch.applyPatch(
-                prev_state,
-                replace_operations,
-                false,
-                false
-            ).newDocument;
-            store.dispatch(setLayers(new_state));
-        }
-    }, [layers, view3D]);
+        const prev_layers_in_redux = store.getState()["spec"]["layers"];
+        const layers_store = applyPropsOnLayers(prev_layers_in_redux, layers);
+        const layers_default = getLayersWithDefaultProps(layers_store);
+        const spec = { layers: layers_default, views: views };
+        store.dispatch(setSpec(spec));
+    }, [layers]);
 
     return (
         <ReduxProvider store={store}>
@@ -141,14 +129,13 @@ const Map: React.FC<MapProps> = ({
                 resources={resources}
                 bounds={bounds}
                 zoom={zoom}
-                view3D={view3D}
+                views={views}
                 coords={coords}
                 scale={scale}
                 coordinateUnit={coordinateUnit}
                 legend={legend}
                 editedData={editedData}
                 setEditedData={setEditedData}
-                template={template}
                 colorTables={colorTables}
             />
         </ReduxProvider>

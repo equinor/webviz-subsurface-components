@@ -6,7 +6,7 @@ import { getLayersWithDefaultProps } from "../../../../DeckGLMap/layers/utils/la
 
 const exampleData = require("../../../../../../demo/example-data/deckgl-map.json");
 const layers = getLayersWithDefaultProps(exampleData[0].layers);
-const store = createStore(layers);
+const store = createStore({ layers: layers });
 
 export default {
     component: Settings,

@@ -16,7 +16,7 @@ import {
     OverlayRescaleEvent,
 } from "@equinor/videx-wellog/dist/ui/interfaces";
 
-import "./styles.scss";
+import "!vue-style-loader!css-loader!sass-loader!./styles.scss";
 
 import { select } from "d3";
 

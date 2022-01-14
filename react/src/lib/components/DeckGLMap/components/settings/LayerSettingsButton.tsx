@@ -1,11 +1,11 @@
 import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
 import { createStyles, Fab, makeStyles, Theme } from "@material-ui/core";
 import React, { useCallback, useMemo } from "react";
-import { useSelector } from "react-redux";
-import { MapState } from "../../redux/store";
 import { LayerIcons, LayerType } from "../../redux/types";
-import { getLayerProps, getPropVisibility } from "../../utils/specExtractor";
+import { getPropVisibility } from "../../utils/specExtractor";
 import LayerProperty from "./LayerProperty";
+import { useDispatch } from "react-redux";
+import { updateLayerProp } from "../../redux/actions";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -20,87 +20,69 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface Props {
-    /**
-     * Layer type defines the icon that should be displayed on the layer settings button.
-     */
-    layerType: LayerType;
-    /**
-     * It defines setting options that should be made available based on
-     * the unique layer ID, on clicking layer setting button.
-     */
-    layerId: string;
-    /**
-     * Layer display name.
-     */
-    name: string;
+    layer: Record<string, unknown>;
 }
 
-const LayerSettingsButton: React.FC<Props> = React.memo(
-    ({ layerId, layerType, name }: Props) => {
-        const classes = useStyles();
-        const layers = useSelector((st: MapState) => st.layers);
-        const layerProps = useMemo(
-            () => getLayerProps(layers, layerId),
-            [layers, layerId]
-        );
-        const propVisibility = useMemo(
-            () => getPropVisibility(layers, layerId),
-            [layers, layerId]
-        );
-        const [anchorEl, setAnchorEl] =
-            React.useState<null | HTMLElement>(null);
+const LayerSettingsButton: React.FC<Props> = React.memo(({ layer }: Props) => {
+    const classes = useStyles();
 
-        // handlers
-        const handleClick = useCallback(
-            (event: React.MouseEvent<HTMLButtonElement>) => {
-                setAnchorEl(anchorEl ? null : event.currentTarget);
-            },
-            [anchorEl]
-        );
+    const dispatch = useDispatch();
 
-        const handleClose = useCallback(() => {
-            setAnchorEl(null);
-        }, []);
+    // handlers
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const handleClick = useCallback(
+        (event: React.MouseEvent<HTMLButtonElement>) => {
+            // hack to disable click propagation on drawing layer
+            dispatch(updateLayerProp(["drawing-layer", "mode", "view"]));
 
-        if (
-            !LayerIcons[layerType] ||
-            !layerProps?.["visible"] ||
-            !propVisibility
-        )
-            return null;
+            setAnchorEl(anchorEl ? null : event.currentTarget);
+        },
+        [anchorEl]
+    );
 
-        return (
-            <>
-                <Fab
-                    id={`${layerId}-button`}
-                    size="medium"
-                    onClick={handleClick}
-                    className={classes.root}
-                >
-                    <Tooltip title={name}>
-                        <Icon
-                            color="currentColor"
-                            name={LayerIcons[layerType]}
-                        />
-                    </Tooltip>
-                </Fab>
-                <Menu
-                    className={classes.menu}
-                    anchorEl={anchorEl}
-                    aria-labelledby={`${layerId}-button`}
-                    onClose={handleClose}
-                    placement="left"
-                    open={Boolean(anchorEl)}
-                >
-                    <LayerProperty
-                        layerId={layerId}
-                        key={`layer-property-${layerId}`}
+    const handleClose = useCallback(() => {
+        setAnchorEl(null);
+    }, []);
+
+    const propVisibility = useMemo(() => getPropVisibility(layer), [layer]);
+    if (
+        !LayerIcons[layer["@@type"] as LayerType] ||
+        !layer["visible"] ||
+        !propVisibility
+    )
+        return null;
+
+    return (
+        <>
+            <Fab
+                id={`${layer["id"]}-button`}
+                size="medium"
+                onClick={handleClick}
+                className={classes.root}
+            >
+                <Tooltip title={layer["name"] as string}>
+                    <Icon
+                        color="currentColor"
+                        name={LayerIcons[layer["@@type"] as LayerType]}
                     />
-                </Menu>
-            </>
-        );
-    }
-);
+                </Tooltip>
+            </Fab>
+            <Menu
+                className={classes.menu}
+                anchorEl={anchorEl}
+                aria-labelledby={`${layer["id"]}-button`}
+                onClose={handleClose}
+                placement="left"
+                open={Boolean(anchorEl)}
+            >
+                <LayerProperty
+                    layer={layer}
+                    key={`layer-property-${layer["id"]}`}
+                />
+            </Menu>
+        </>
+    );
+});
 
 LayerSettingsButton.displayName = "LayerSettingsButton";
 export default LayerSettingsButton;

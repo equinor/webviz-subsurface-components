@@ -86,11 +86,6 @@ module.exports = (env, argv) => {
                     loader: "babel-loader",
                 },
                 {
-                    test: /\.scss$/,
-                    use: ["vue-style-loader", "css-loader", "sass-loader"],
-                },
-
-                {
                     test: /\.css$/,
                     use: [
                         {
@@ -112,10 +107,6 @@ module.exports = (env, argv) => {
                     test: /\.js$/,
                     exclude: /node_modules/,
                     loader: "source-map-loader",
-                },
-                {
-                    test: /\.(fs|vs).glsl$/i,
-                    use: ["raw-loader"],
                 },
             ],
         },
