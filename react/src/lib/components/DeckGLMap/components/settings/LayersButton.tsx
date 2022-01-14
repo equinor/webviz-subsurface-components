@@ -24,9 +24,8 @@ const LayersButton: React.FC<LayersButtonProps> = React.memo(
         const classes = useStyles();
         // Redux
         const dispatch = useDispatch();
-        const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(
-            null
-        );
+        const [anchorEl, setAnchorEl] =
+            React.useState<null | HTMLElement>(null);
 
         // handlers
         const handleClick = useCallback(
