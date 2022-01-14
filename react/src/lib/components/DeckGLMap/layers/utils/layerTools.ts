@@ -3,6 +3,7 @@ import { PickInfo } from "@deck.gl/core/lib/deck";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { Matrix4 } from "math.gl";
+import { cloneDeep } from "lodash";
 import { layersDefaultProps } from "../layersDefaultProps";
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
@@ -68,28 +69,42 @@ export function getModelMatrix(deg: number, x: number, y: number): Matrix4 {
     return m2mRotm1;
 }
 
-// update layer object to include default props
-export function getLayersWithDefaultProps(
-    deckgl_layers: Record<string, unknown>[]
+// update layer object to include additional props
+export function applyPropsOnLayers(
+    layer_props: Record<string, unknown>[],
+    layers: Record<string, unknown>[]
 ): Record<string, unknown>[] {
-    const layers = deckgl_layers.map((a) => {
-        return { ...a };
-    });
+    const result = cloneDeep(layers);
 
-    layers?.forEach((layer) => {
-        const default_props = layersDefaultProps[
-            layer["@@type"] as string
-        ] as Record<string, unknown>;
-        if (default_props) {
-            Object.entries(default_props).forEach(([prop, value]) => {
+    result?.forEach((layer) => {
+        const props = layer_props.find((l) => {
+            if (layer["id"]) return l["id"] === layer["id"];
+            else return l["@@type"] === layer["@@type"];
+        });
+        if (props) {
+            Object.entries(props).forEach(([prop, value]) => {
                 const prop_type = typeof value;
                 if (
                     ["string", "boolean", "number", "array"].includes(prop_type)
                 ) {
-                    if (layer[prop] === undefined) layer[prop] = value;
+                    if (layer[prop] == undefined) layer[prop] = value;
                 }
             });
+        } else {
+            // if it's a user defined layer and its name and visibility are not specified
+            // set layer id as its default name
+            if (layer["name"] == undefined) layer["name"] = layer["id"];
+            if (layer["visible"] == undefined) layer["visible"] = true;
         }
     });
-    return layers;
+    return result;
+}
+
+export function getLayersWithDefaultProps(
+    layers: Record<string, unknown>[]
+): Record<string, unknown>[] {
+    return applyPropsOnLayers(
+        Object.values(layersDefaultProps) as Record<string, unknown>[],
+        layers
+    );
 }

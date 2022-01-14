@@ -4,37 +4,26 @@ import {
     colorTablesArray,
     colorTablesObj,
 } from "../components/ColorTableTypes";
-import {
-    templateArray,
-    propertiesObj,
-} from "../components/WelllayerTemplateTypes";
 
 // Based on objectName return the colors array from color.tables.json file
 export function colorsArray(
-    objectName: string,
-    template: templateArray,
+    colorName: string,
     colorTables: colorTablesArray
 ): [number, number, number, number][] {
-    const properties = template[0]["properties"];
-    const propertiesData = properties.filter(
-        (value: propertiesObj) => value.objectName == objectName
-    );
     const colorTableData = colorTables.filter(
         (value: colorTablesObj) =>
-            value.name.toLowerCase() ==
-            propertiesData[0].colorTable.toLowerCase()
+            value.name.toLowerCase() == colorName.toLowerCase()
     );
-    return colorTableData[0].colors;
+    return colorTableData.length > 0 ? colorTableData[0].colors : [];
 }
 
 // return the colors based on the point
 export function rgbValues(
-    objectName: string,
     point: number,
-    template: templateArray,
+    colorName: string,
     colorTables: colorTablesArray
 ): number[] | { r: number; g: number; b: number; opacity: number } | undefined {
-    const colorTableColors = colorsArray(objectName, template, colorTables);
+    const colorTableColors = colorsArray(colorName, colorTables);
     // compare the point and first value from colorTableColors
     const colorArrays = colorTableColors.find(
         (value: [number, number, number, number]) => {
@@ -57,10 +46,13 @@ export function rgbValues(
         const secondColorArray = colorTableColors[index];
 
         if ((firstColorArray || secondColorArray) != undefined) {
+            const t0 = firstColorArray[0];
+            const t1 = secondColorArray[0];
+            const t = (point - t0) / (t1 - t0); // t = 0.0 gives first color, t = 1.0 gives second color.
             const interpolatedValues = interpolateRgb(
                 RGBToHex(firstColorArray).color,
                 RGBToHex(secondColorArray).color
-            )(point);
+            )(t);
             return color(interpolatedValues)?.rgb();
         }
         return undefined;

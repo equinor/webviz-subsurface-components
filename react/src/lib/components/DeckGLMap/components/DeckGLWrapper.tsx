@@ -18,8 +18,7 @@ import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer, View } from "deck.gl";
 import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
-import { templateArray } from "./WelllayerTemplateTypes";
-import { colorTablesArray } from "./ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables";
 import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
@@ -56,7 +55,6 @@ export interface ViewsType {
 export interface DeckGLLayerContext extends LayerContext {
     userData: {
         setEditedData: (data: Record<string, unknown>) => void;
-        template: templateArray;
         colorTables: colorTablesArray;
     };
 }
@@ -133,15 +131,13 @@ export interface DeckGLWrapperProps {
 
     children?: React.ReactNode;
 
-    template: templateArray;
-
     colorTables: colorTablesArray;
 }
 
 function getLayer(layers: Layer<unknown>[] | undefined, id: string) {
     if (!layers) return;
     const layer = layers.filter(
-        (item) => item.id?.toLowerCase() == id.toLowerCase()
+        (item) => item.id?.toLowerCase() == id?.toLowerCase()
     );
     return layer[0];
 }
@@ -158,7 +154,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     legend,
     editedData,
     setEditedData,
-    template,
     colorTables,
     children,
 }: DeckGLWrapperProps) => {
@@ -255,13 +250,12 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         ) => {
                             setEditedData?.(updated_prop);
                         },
-                        template: template,
                         colorTables: colorTables,
                     },
                 });
             }
         },
-        [setEditedData, template, colorTables]
+        [setEditedData, colorTables]
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -288,12 +282,14 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     const [legendProps, setLegendProps] = useState<{
         title: string;
         name: string;
+        colorName: string;
         discrete: boolean;
         metadata: { objects: Record<string, [number[], number]> };
         valueRange: number[];
     }>({
         title: "",
         name: "string",
+        colorName: "string",
         discrete: false,
         metadata: { objects: {} },
         valueRange: [],
@@ -311,19 +307,24 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         () => getLayer(deckGLLayers, "wells-layer") as WellsLayer,
         [deckGLLayers]
     );
-
     // Get color table for log curves.
     useEffect(() => {
         if (!wellsLayer?.isLoaded || !wellsLayer.props.logData) return;
         const legend = wellsLayer.state.legend[0];
         setLegendProps({
             title: legend.title,
-            name: legend.name,
+            name: wellsLayer?.props?.logName,
+            colorName: wellsLayer?.props?.logColor,
             discrete: legend.discrete,
             metadata: legend.metadata,
             valueRange: legend.valueRange,
         });
-    }, [isLoaded, legend, wellsLayer?.props?.logName]);
+    }, [
+        isLoaded,
+        legend,
+        wellsLayer?.props?.logName,
+        wellsLayer?.props?.logColor,
+    ]);
 
     const layerFilter = useCallback(
         (args: {
@@ -397,8 +398,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                 discreteData={legendProps.metadata}
                                 dataObjectName={legendProps.title}
                                 position={legend.position}
-                                name={legendProps.name}
-                                template={template}
+                                colorName={legendProps.colorName}
                                 colorTables={colorTables}
                                 horizontal={legend.horizontal}
                             />
@@ -412,7 +412,7 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                     dataObjectName={legendProps.title}
                                     position={legend.position}
                                     name={legendProps.name}
-                                    template={template}
+                                    colorName={legendProps.colorName}
                                     colorTables={colorTables}
                                     horizontal={legend.horizontal}
                                 />
@@ -459,7 +459,12 @@ function jsonToObject(
         }
     });
     const jsonConverter = new JSONConverter({ configuration });
-    return jsonConverter.convert(data);
+
+    // remove empty data/layer object
+    const filtered_data = (data as Record<string, unknown>[]).filter(
+        (value) => Object.keys(value).length !== 0
+    );
+    return jsonConverter.convert(filtered_data);
 }
 
 // returns initial view state for DeckGL
