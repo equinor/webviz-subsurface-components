@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom/extend-expect";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
-import { testStore, Wrapper } from "../test/TestWrapper";
+import { Wrapper } from "../test/TestWrapper";
 import WellCompletionsViewer from "./WellCompletionsViewer";
 
 window.ResizeObserver =
@@ -18,10 +18,6 @@ describe("Test Well Completions viewer", () => {
         const { container } = render(
             Wrapper({ children: <WellCompletionsViewer /> })
         );
-        expect(container.firstChild).toMatchSnapshot();
-    });
-    it("snapshot test without data", () => {
-        const { container } = render(<WellCompletionsViewer />);
         expect(container.firstChild).toMatchSnapshot();
     });
 });

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Test Well Completions viewer snapshot test with data 1`] = `
+exports[`Test Well Completion Component snapshot test 1`] = `
 .c8 {
   display: grid;
   grid-gap: 8px;
@@ -516,14 +516,14 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
             />
             <span
               class="MuiSlider-track"
-              style="left: 0%; width: 100%;"
+              style="left: 0%; width: 0%;"
             />
             <input
               type="hidden"
-              value="9"
+              value="0"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark MuiSlider-markActive"
               data-index="0"
               style="left: 0%;"
             />
@@ -568,7 +568,7 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
               style="left: 88.88888888888889%;"
             />
             <span
-              class="MuiSlider-mark MuiSlider-markActive"
+              class="MuiSlider-mark"
               data-index="9"
               style="left: 100%;"
             />
@@ -577,11 +577,11 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
               aria-orientation="horizontal"
               aria-valuemax="9"
               aria-valuemin="0"
-              aria-valuenow="9"
+              aria-valuenow="0"
               class="MuiSlider-thumb MuiSlider-thumbColorPrimary PrivateValueLabel-open-17 PrivateValueLabel-thumb-16"
               data-index="0"
               role="slider"
-              style="left: 100%;"
+              style="left: 0%;"
               tabindex="0"
             >
               <span
@@ -593,7 +593,7 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
                   <span
                     class="PrivateValueLabel-label-20"
                   >
-                    2002-10-01
+                    2000-02-01
                   </span>
                 </span>
               </span>
@@ -821,7 +821,7 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
         </nav>
       </div>
       <div
-        style="min-width: 220px; min-height: 0px; height: 100%;"
+        style="min-width: 220px; min-height: 280px; height: 100%;"
       >
         <div
           class="makeStyles-root-25"
@@ -830,7 +830,7 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
           data-tip="true"
         />
         <div
-          class="__react_component_tooltip te377024c-eb83-4fbc-93c6-f97323dedb34 place-top type-dark"
+          class="__react_component_tooltip tda5a4358-9ec0-4d4c-9669-50b7e6219916 place-top type-dark"
           data-id="tooltip"
           id="plot-tooltip"
         >
@@ -838,19 +838,19 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
             aria-hidden="true"
           >
             
-  	.te377024c-eb83-4fbc-93c6-f97323dedb34 {
+  	.tda5a4358-9ec0-4d4c-9669-50b7e6219916 {
 	    color: #fff;
 	    background: #222;
 	    border: 1px solid transparent;
   	}
 
-  	.te377024c-eb83-4fbc-93c6-f97323dedb34.place-top {
+  	.tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-top {
         margin-top: -10px;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-top::before {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-top::before {
         border-top: 8px solid transparent;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-top::after {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-top::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         bottom: -6px;
@@ -861,13 +861,13 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
         border-top-width: 6px;
     }
 
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-bottom {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-bottom {
         margin-top: 10px;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-bottom::before {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-bottom::before {
         border-bottom: 8px solid transparent;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-bottom::after {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-bottom::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         top: -6px;
@@ -878,13 +878,13 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
         border-bottom-width: 6px;
     }
 
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-left {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-left {
         margin-left: -10px;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-left::before {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-left::before {
         border-left: 8px solid transparent;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-left::after {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-left::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         right: -6px;
@@ -895,13 +895,13 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
         border-left-width: 6px;
     }
 
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-right {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-right {
         margin-left: 10px;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-right::before {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-right::before {
         border-right: 8px solid transparent;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-right::after {
+    .tda5a4358-9ec0-4d4c-9669-50b7e6219916.place-right::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         left: -6px;
@@ -1138,5 +1138,29 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
       </div>
     </div>
   </div>
+</div>
+`;
+
+exports[`Test Well Completion Component snapshot test with incorrect version number 1`] = `
+.c0 {
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.250em;
+  text-align: left;
+  color: var(--eds_interactive_secondary__resting,rgba(36,55,70,1));
+}
+
+<div
+  class="makeStyles-root-33"
+>
+  <p
+    class="c0"
+    color="secondary"
+  >
+     is not a valid version
+  </p>
 </div>
 `;
