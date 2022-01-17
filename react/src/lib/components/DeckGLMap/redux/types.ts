@@ -48,6 +48,11 @@ export const SliderTypeProps = [
 
 export const ToggleTypeProps = [
     { id: "logCurves", displayName: "Log curves", dependentOnProp: "logData" },
+    {
+        id: "isReadoutDepth",
+        displayName: "Depth readout",
+        dependentOnProp: undefined,
+    },
 ] as const;
 
 export const MenuTypeProps = [
@@ -77,7 +82,7 @@ export const LayerIcons = {
     ColormapLayer: "surface_layer",
     Hillshading2DLayer: "hill_shading",
     WellsLayer: "well",
-    Map3DLayer: "color_palette",
+    Map3DLayer: "fault",
     PieChartLayer: "pie_chart",
     GridLayer: "grid_layer",
     FaultPolygonsLayer: "fault",

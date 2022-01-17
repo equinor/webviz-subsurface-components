@@ -8,10 +8,10 @@ uniform sampler2D sampler;
 uniform bool flatShading;
 uniform float opacity;
 
+uniform bool isReadoutDepth;
+
 uniform float contourReferencePoint;
 uniform float contourInterval;
-
-uniform bool isHillShadingIn2d;
 
 in vec2 vTexCoord;
 in vec3 cameraPosition;
@@ -36,7 +36,7 @@ void main(void) {
    geometry.uv = vTexCoord;
 
    vec3 normal;
-   if (flatShading) { // denne er true
+   if (flatShading) {
 #ifdef DERIVATIVES_AVAILABLE
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
 #else
@@ -48,9 +48,36 @@ void main(void) {
 
    vec4 color = hasTexture ? texture(sampler, vTexCoord) : vColor;
 
-   // If it's a picking pass, we just return the raw texture value.
+   // Picking pass.
    if (picking_uActive) {
-      fragColor = color;
+      if (isReadoutDepth) {
+         // Readout should not be the surface property but the surface height (z value).
+         float depth = abs(worldPos.z);
+         
+         // Express in 255 system.
+         float r = 0.0;
+         float g = 0.0;
+         float b = 0.0;
+
+         if (depth >= (256.0 * 256.0) - 1.0) {
+            r = floor(depth / (256.0 * 256.0));
+            depth -= r * (256.0 * 256.0);
+         }
+
+         if (depth >= 256.0 - 1.0) {
+            g = floor(depth / 256.0);
+            depth -= g * 256.0;
+         }
+
+         b = floor(depth);
+
+         fragColor = vec4(r / 255.0, g / 255.0, b / 255.0,  1.0);
+      }
+      else {
+         // Readout is the surface property, i.e. the raw texture value.
+         fragColor = color;
+      }
+
       return;
    }
 
@@ -73,10 +100,10 @@ void main(void) {
 
    bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
    if (is_contours) {
-      float height =  (worldPos.z - contourReferencePoint) / contourInterval;
+      float depth =  (abs(worldPos.z) - contourReferencePoint) / contourInterval;
 
-      float f  =  fract(height);
-      float df = fwidth(height);
+      float f  =  fract(depth);
+      float df = fwidth(depth);
 
       // keep: float c = smoothstep(df * 1.0, df * 2.0, f); // smootstep from/to no of pixels distance fronm contour line.
       float c = smoothstep(0.0, df * 2.0, f);
