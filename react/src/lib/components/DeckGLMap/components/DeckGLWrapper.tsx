@@ -18,7 +18,7 @@ import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer, View } from "deck.gl";
 import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
-import {colorTablesArray} from "@emerson-eps/color-tables/";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";

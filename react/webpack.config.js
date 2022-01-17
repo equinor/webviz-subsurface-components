@@ -111,9 +111,9 @@ module.exports = (env, argv) => {
                 {
                     test: /\.(ts|tsx)?$/,
                     use: {
-                      loader: 'awesome-typescript-loader'
+                        loader: "awesome-typescript-loader",
                     },
-                    exclude: /node_modules/
+                    exclude: /node_modules/,
                 },
                 {
                     test: /\.(fs|vs).glsl$/i,

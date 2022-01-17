@@ -6,4 +6,4 @@ declare module "*.svg" {
 }
 declare module "addon-redux/withRedux";
 declare module "addon-redux/enhancer";
-declare module '@emerson-eps/color-tables';
+declare module "@emerson-eps/color-tables";
