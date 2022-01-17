@@ -108,17 +108,6 @@ module.exports = (env, argv) => {
                     exclude: /node_modules/,
                     loader: "source-map-loader",
                 },
-                {
-                    test: /\.(ts|tsx)?$/,
-                    use: {
-                        loader: "awesome-typescript-loader",
-                    },
-                    exclude: /node_modules/,
-                },
-                {
-                    test: /\.(fs|vs).glsl$/i,
-                    use: ["raw-loader"],
-                },
             ],
         },
         devtool,
