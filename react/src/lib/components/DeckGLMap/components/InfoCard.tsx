@@ -190,7 +190,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
 
             // collecting card data for 1st type
             const zValue = (info as PropertyMapPickInfo).propertyValue;
-            if (zValue) {
+            if (typeof zValue !== "undefined") {
                 const property = xy_properties.find(
                     (item) => item.name === layer_name
                 );
