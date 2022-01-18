@@ -3,8 +3,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { rgbValues } from "@emerson-eps/color-tables/";
-import { colorTableData } from "@emerson-eps/color-tables/";
+import { rgbValues, colorTableData, colorTablesArray } from "@emerson-eps/color-tables/";
 import {
     Feature,
     GeometryCollection,
@@ -24,7 +23,6 @@ import { flattenPath, splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 

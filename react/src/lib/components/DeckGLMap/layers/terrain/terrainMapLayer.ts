@@ -5,8 +5,7 @@ import fsShader from "!!raw-loader!./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
-import { rgbValues } from "@emerson-eps/color-tables/";
+import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
