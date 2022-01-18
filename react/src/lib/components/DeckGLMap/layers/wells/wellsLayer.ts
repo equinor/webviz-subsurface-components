@@ -3,7 +3,11 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { rgbValues, colorTableData, colorTablesArray } from "@emerson-eps/color-tables/";
+import {
+    rgbValues,
+    colorTableData,
+    colorTablesArray,
+} from "@emerson-eps/color-tables/";
 import {
     Feature,
     GeometryCollection,
