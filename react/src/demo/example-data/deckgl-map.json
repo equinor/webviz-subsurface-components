@@ -118,8 +118,8 @@
         "data": "@@#resources.wellsData",
         "logData": "@@#resources.logData",
         "logrunName": "BLOCKING",
-        "logName": "PORO",
-        "logColor": "POROSITY",
+        "logName": "ZONELOG",
+        "logColor": "Stratigraphy",
         "selectedWell": "@@#editedData.selectedWell"
       },
       {
