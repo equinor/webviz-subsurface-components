@@ -726,7 +726,7 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
               <path
                 class=""
                 clip-rule="evenodd"
-                d="M7 6h10l-5.01 6.3L7 6zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0018.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
+                d="M7 6h10l-5.01 6.3L7 6zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0 0 18.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
                 data-testid="eds-icon-path"
                 fill-rule="evenodd"
                 height="24"
@@ -830,7 +830,7 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
           data-tip="true"
         />
         <div
-          class="__react_component_tooltip te377024c-eb83-4fbc-93c6-f97323dedb34 place-top type-dark"
+          class="__react_component_tooltip t660d33b7-3f97-4af2-aa70-94eda51a0102 place-top type-dark"
           data-id="tooltip"
           id="plot-tooltip"
         >
@@ -838,19 +838,19 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
             aria-hidden="true"
           >
             
-  	.te377024c-eb83-4fbc-93c6-f97323dedb34 {
+  	.t660d33b7-3f97-4af2-aa70-94eda51a0102 {
 	    color: #fff;
 	    background: #222;
 	    border: 1px solid transparent;
   	}
 
-  	.te377024c-eb83-4fbc-93c6-f97323dedb34.place-top {
+  	.t660d33b7-3f97-4af2-aa70-94eda51a0102.place-top {
         margin-top: -10px;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-top::before {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-top::before {
         border-top: 8px solid transparent;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-top::after {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-top::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         bottom: -6px;
@@ -861,13 +861,13 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
         border-top-width: 6px;
     }
 
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-bottom {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-bottom {
         margin-top: 10px;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-bottom::before {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-bottom::before {
         border-bottom: 8px solid transparent;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-bottom::after {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-bottom::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         top: -6px;
@@ -878,13 +878,13 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
         border-bottom-width: 6px;
     }
 
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-left {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-left {
         margin-left: -10px;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-left::before {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-left::before {
         border-left: 8px solid transparent;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-left::after {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-left::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         right: -6px;
@@ -895,13 +895,13 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
         border-left-width: 6px;
     }
 
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-right {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-right {
         margin-left: 10px;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-right::before {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-right::before {
         border-right: 8px solid transparent;
     }
-    .te377024c-eb83-4fbc-93c6-f97323dedb34.place-right::after {
+    .t660d33b7-3f97-4af2-aa70-94eda51a0102.place-right::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         left: -6px;
