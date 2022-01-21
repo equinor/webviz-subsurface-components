@@ -150,6 +150,55 @@ KhMapFlat.args = {
     ],
 };
 
+// Map3DLayer.
+const map3DLayer = exampleData[0].layers[3];
+export const Map3DLayer = Template.bind({});
+Map3DLayer.args = {
+    ...exampleData[0],
+    colorTables: colorTables,
+    layers: [
+        {
+            ...map3DLayer,
+            meshMaxError: 5.0,
+            visible: true,
+        },
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
+// GridLayer.
+const gridLayer = exampleData[0].layers[2];
+export const GridLayer = Template.bind({});
+GridLayer.args = {
+    ...exampleData[0],
+    colorTables: colorTables,
+    layers: [
+        {
+            ...gridLayer,
+            visible: true,
+        },
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
 // custom layer example
 export const UserDefinedLayer1 = Template.bind({});
 UserDefinedLayer1.args = {
