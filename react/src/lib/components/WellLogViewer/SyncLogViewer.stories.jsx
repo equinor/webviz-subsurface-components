@@ -1,19 +1,32 @@
 import React from "react";
-import WellLogViewer from "./WellLogViewer";
+import SyncLogViewer from "./SyncLogViewer";
 
 export default {
-    component: WellLogViewer,
-    title: "WellLogViewer/Demo/WellLogViewer",
+    component: SyncLogViewer,
+    title: "WellLogViewer/Demo/ SyncLogViewer",
     argTypes: {
+        syncTrackPos: {
+            description: "Synchronize first visible track",
+            defaultValue: false,
+        },
+        syncContentDomain: {
+            description: "Synchronize visible content domain",
+            defaultValue: true,
+        },
+        syncContentSelection: {
+            description: "Synchronize content selection",
+            defaultValue: false,
+        },
+
         id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
         },
-        welllog: {
+        welllogs: {
             description: "Array of JSON objects describing well log data.",
         },
-        template: {
-            description: "Prop containing track template data.",
+        templates: {
+            description: "Array of track template data.",
         },
         colorTables: {
             description: "Prop containing color table data.",
@@ -51,6 +64,7 @@ const Template = (args) => {
         [controller]
     );
     const onContentRescale = React.useCallback(() => {
+        return;
         if (!controller) {
             setInfo("-");
             return;
@@ -81,6 +95,7 @@ const Template = (args) => {
     }, [controller]);
 
     const onContentSelection = React.useCallback(() => {
+        return;
         if (!controller) {
             setInfo("-");
             return;
@@ -115,8 +130,8 @@ const Template = (args) => {
             style={{ height: "92vh", display: "flex", flexDirection: "column" }}
         >
             <div style={{ width: "100%", height: "100%", flex: 1 }}>
-                <WellLogViewer
-                    id="WellLogViewer"
+                <SyncLogViewer
+                    id="SyncLogViewer"
                     {...args}
                     onCreateController={onCreateController}
                     onContentRescale={onContentRescale}
@@ -128,29 +143,17 @@ const Template = (args) => {
     );
 };
 
-export const Example1Vertical = Template.bind({});
-Example1Vertical.args = {
-    id: "Well-Log-Viewer",
+export const Default = Template.bind({});
+Default.args = {
+    id: "Sync-Log-Viewer",
     horizontal: false,
-    welllog: require("../../../demo/example-data/L898MUD.json"),
-    template: require("../../../demo/example-data/welllog_template_1.json"),
-    colorTables: require("../../../demo/example-data/color-tables.json"),
-};
-
-export const Example1Template2 = Template.bind({});
-Example1Template2.args = {
-    id: "Well-Log-Viewer2",
-    horizontal: true,
-    welllog: require("../../../demo/example-data/L898MUD.json"),
-    template: require("../../../demo/example-data/welllog_template_2.json"),
-    colorTables: require("../../../demo/example-data/color-tables.json"),
-};
-
-export const Example2Vertical = Template.bind({});
-Example2Vertical.args = {
-    id: "Well-Log-Viewer3",
-    horizontal: false,
-    welllog: require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json"),
-    template: require("../../../demo/example-data/welllog_template_1.json"),
+    welllogs: [
+        require("../../../demo/example-data/L898MUD.json"),
+        require("../../../demo/example-data/L916MUD.json"),
+    ],
+    templates: [
+        require("../../../demo/example-data/synclog_template.json"),
+        require("../../../demo/example-data/synclog_template.json"),
+    ],
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };

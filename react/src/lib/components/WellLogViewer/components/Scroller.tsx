@@ -59,22 +59,30 @@ class Scroller extends Component<Props> {
         if (this.scroller) this.resizeObserver.unobserve(this.scroller);
     }
 
+    getScrollX(): number {
+        const elOuter = this.scroller;
+        if (!elOuter) return 0;
+        const scrollWidth = elOuter.scrollWidth - elOuter.clientWidth;
+        return scrollWidth ? elOuter.scrollLeft / scrollWidth : 0;
+    }
+    getScrollY(): number {
+        const elOuter = this.scroller;
+        if (!elOuter) return 0;
+        const scrollHeight = elOuter.scrollHeight - elOuter.clientHeight;
+        return scrollHeight ? elOuter.scrollTop / scrollHeight : 0;
+    }
+    getScrollPos(vertical: boolean | undefined): number {
+        return vertical ? this.getScrollY() : this.getScrollX();
+    }
+
     /* 
       callback from HTML element
      */
     onScroll(): void {
         const elOuter = this.scroller;
         if (!elOuter) return;
-
-        const scrollTop = elOuter.scrollTop;
-        const scrollHeight = elOuter.scrollHeight - elOuter.clientHeight;
-        const scrollLeft = elOuter.scrollLeft;
-        const scrollWidth = elOuter.scrollWidth - elOuter.clientWidth;
-
-        // compute fractions
-        const x = scrollWidth ? scrollLeft / scrollWidth : 0;
-        const y = scrollHeight ? scrollTop / scrollHeight : 0;
-        this.props.onScroll(x, y); // notify parent
+        // notify parent
+        this.props.onScroll(this.getScrollX(), this.getScrollY());
     }
 
     scrollTo(x: number, y: number): boolean {
@@ -85,6 +93,13 @@ class Scroller extends Component<Props> {
 
         const elOuter = this.scroller;
         if (!elOuter) return false;
+
+        //const scrollHeight = elOuter.scrollHeight - elOuter.clientHeight;
+        //const scrollWidth = elOuter.scrollWidth - elOuter.clientWidth;
+        //const _x = scrollWidth ? elOuter.scrollLeft / scrollWidth : 0;
+        //const _y = scrollHeight ? elOuter.scrollTop / scrollHeight : 0;
+        console.log("Nscroll=", "(" + x + "," + y + ")");
+        //console.log("_scroll=", "("+_x+","+_y+")");
 
         const scrollLeft = Math.round(
             x * (elOuter.scrollWidth - elOuter.clientWidth)
@@ -116,6 +131,7 @@ class Scroller extends Component<Props> {
             elInner.style.width !== widthInner ||
             elInner.style.height !== heightInner
         ) {
+            console.log("Nzoom=", "(" + widthInner + "," + heightInner + ")");
             elInner.style.width = widthInner;
             elInner.style.height = heightInner;
             return true;

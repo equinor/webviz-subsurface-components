@@ -58,7 +58,7 @@ export function selectTrack(
     return false; // selection is not changed
 }
 
-export function getSelectTrackIndeces(logViewer?: LogViewer): number[] {
+export function getSelectedTrackIndeces(logViewer?: LogViewer): number[] {
     const selectedTrackIndeces: number[] = [];
     if (logViewer) {
         let iTrack = 0;
@@ -125,6 +125,18 @@ export function zoomContentTo(
     return false;
 }
 
+export function setContentBaseDomain(
+    logViewer: LogViewer,
+    domain: [number, number]
+): void {
+    const [b1, b2] = logViewer.scaleHandler.baseDomain();
+    if (b1 !== domain[0] || b2 !== domain[1]) {
+        logViewer.domain = domain;
+        //logViewer.scaleHandler.baseDomain(domain);
+        //logViewer.rescale();
+    }
+}
+
 ////////// utilities
 
 export function getContentBaseDomain(logViewer: LogViewer): [number, number] {
@@ -137,12 +149,6 @@ export function getContentDomain(logViewer: LogViewer): [number, number] {
     return [d1, d2];
 }
 
-export function getContentScrollPos(logViewer: LogViewer): number /*fraction*/ {
-    const [b1, b2] = logViewer.scaleHandler.baseDomain();
-    const [d1, d2] = logViewer.domain;
-    const w = b2 - b1 - (d2 - d1);
-    return w ? (d1 - b1) / w : 0;
-}
 export function getContentZoom(logViewer: LogViewer): number /*fraction*/ {
     // see also zoomContent(logViewer)
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
@@ -167,6 +173,17 @@ export function scrollTracksTo(
     }
     if (visibilityIsChanged) logViewer.updateTracks();
     return visibilityIsChanged;
+}
+
+export function getFirstVisibleTrack(logViewer: LogViewer): number {
+    let iTrack = 0; // non-scale (graph) tracks counter
+    for (const track of logViewer.tracks) {
+        if (isScaleTrack(track)) continue; // skip scales
+
+        if (isTrackVisible(track)) return iTrack;
+        iTrack++;
+    }
+    return -1;
 }
 
 export function restoreSelectTracks(

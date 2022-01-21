@@ -1,11 +1,11 @@
 import React from "react";
-import WellLogView from "./WellLogView";
+import WellLogViewWithScroller from "./WellLogViewWithScroller";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
 
 export default {
-    component: WellLogView,
-    title: "WellLogViewer/Components/WellLogView",
+    component: WellLogViewWithScroller,
+    title: "WellLogViewer/Components/WellLogViewWithScroller",
     argTypes: {
         id: {
             description:
@@ -49,18 +49,13 @@ export default {
 
 const Template = (args) => {
     return (
-        <div style={{ height: "92vh" }}>
+        <div
+            style={{ height: "92vh", display: "flex", flexDirection: "column" }}
+        >
             <div style={{ width: "100%", height: "100%" }}>
-                <WellLogView
-                    id="WellLogView"
+                <WellLogViewWithScroller
+                    id="WellLogViewWithScroller"
                     {...args}
-                    /*
-                        onInfo={this.onInfo}
-                        onCreateController={this.onCreateController}
-                        onTrackMouseEvent={onTrackMouseEvent}
-                        onTrackScroll={this.onTrackScroll}
-                        onContentRescale={this.onContentRescale}
-                     */
                 />
             </div>
         </div>
