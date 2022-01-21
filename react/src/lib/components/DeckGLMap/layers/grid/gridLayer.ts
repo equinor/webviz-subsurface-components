@@ -9,8 +9,7 @@ import { Position3D } from "@deck.gl/core/utils/positions";
 import { PolygonLayerProps } from "@deck.gl/layers";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
-import { colorTablesArray } from "../../components/ColorTableTypes";
-import { rgbValues } from "../../utils/continuousLegend";
+import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 
 function getColorMapColors(
     colorMapName: string,

@@ -11,8 +11,10 @@ import { updateLayerProp } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
-import { DiscreteColorLegend } from "@emerson-eps/color-tables";
-import ContinuousLegend from "../components/ContinuousLegend";
+import {
+    DiscreteColorLegend,
+    ContinuousLegend,
+} from "@emerson-eps/color-tables";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer, View } from "deck.gl";
