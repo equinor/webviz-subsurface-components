@@ -11,14 +11,16 @@ import { updateLayerProp } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
-import DiscreteColorLegend from "../components/DiscreteLegend";
-import ContinuousLegend from "../components/ContinuousLegend";
+import {
+    DiscreteColorLegend,
+    ContinuousLegend,
+} from "@emerson-eps/color-tables";
 import StatusIndicator from "./StatusIndicator";
 import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer, View } from "deck.gl";
 import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
-import { colorTablesArray } from "@emerson-eps/color-tables";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
@@ -392,7 +394,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                 isLoaded={isLoaded}
                             />
                         )}
-
                         {legend.visible && legendProps.discrete && (
                             <DiscreteColorLegend
                                 discreteData={legendProps.metadata}
@@ -417,7 +418,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                                     horizontal={legend.horizontal}
                                 />
                             )}
-
                         <Settings viewportId={view.id as string} />
                     </DeckGLView>
                 ))}

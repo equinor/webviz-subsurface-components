@@ -55,6 +55,9 @@ export const layersDefaultProps: Record<string, unknown> = {
         colorMapRange: { type: "array", value: [0, 1] },
         rotDeg: 0,
         contours: [-1.0, -1.0],
+        // readout is default property value but if set to true it will be depth/z-value.
+        isReadoutDepth: false,
+        enableSmoothShading: true,
     },
     GridLayer: {
         "@@type": "GridLayer",

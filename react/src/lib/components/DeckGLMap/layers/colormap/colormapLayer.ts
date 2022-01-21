@@ -14,8 +14,7 @@ import { getModelMatrix } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import fsColormap from "!!raw-loader!./colormap.fs.glsl";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
-import { colorTablesArray } from "../../components/ColorTableTypes";
-import { rgbValues } from "../../utils/continuousLegend";
+import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,

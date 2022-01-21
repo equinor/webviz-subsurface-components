@@ -5,8 +5,7 @@ import fsShader from "!!raw-loader!./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
-import { colorTablesArray } from "../../components/ColorTableTypes";
-import { rgbValues } from "../../utils/continuousLegend";
+import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -65,6 +64,9 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
 
     // Use color map in this range.
     colorMapRange: [number, number];
+
+    //If true readout will be z value (depth). Otherwise it is the texture property value.
+    isReadoutDepth: boolean;
 }
 
 const defaultProps = {
@@ -74,12 +76,17 @@ const defaultProps = {
     getColor: (d: DataItem) => d.color,
     getOrientation: (d: DataItem) => [0, d.angle, 0],
     contours: [-1, -1],
-
     colorMapName: "",
     valueRange: [0.0, 1.0],
     colorMapRange: [0.0, 1.0],
-
+    isReadoutDepth: false,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+    material: {
+        ambient: 0.35,
+        diffuse: 0.6,
+        shininess: 600,
+        specularColor: [255, 255, 255],
+    },
 };
 
 // This is a private layer used only by the composite Map3DLayer.
@@ -92,6 +99,10 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ uniforms, context }: any): void {
+        const contourReferencePoint = this.props.contours[0] ?? -1.0;
+        const contourInterval = this.props.contours[1] ?? -1.0;
+        const isReadoutDepth = this.props.isReadoutDepth;
+
         const valueRangeMin = this.props.valueRange[0] ?? 0.0;
         const valueRangeMax = this.props.valueRange[1] ?? 1.0;
 
@@ -103,8 +114,6 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         super.draw({
             uniforms: {
                 ...uniforms,
-                contourReferencePoint: this.props.contours[0] ?? -1.0,
-                contourInterval: this.props.contours[1] ?? -1.0,
                 colormap: new Texture2D(context.gl, {
                     width: 256,
                     height: 1,
@@ -120,6 +129,9 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                 valueRangeMax,
                 colorMapRangeMin,
                 colorMapRangeMax,
+                contourReferencePoint,
+                contourInterval,
+                isReadoutDepth,
             },
         });
     }
@@ -157,21 +169,28 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
             return info;
         }
 
+        // Note these colors are in the  0-255 range.
         const r = info.color[0] * DECODER.rScaler;
         const g = info.color[1] * DECODER.gScaler;
         const b = info.color[2] * DECODER.bScaler;
 
         const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
 
-        const value = (r + g + b) * floatScaler;
+        const isPropertyReadout = !this.props.isReadoutDepth; // Either map properties or map depths are encoded here.
+        let value = (r + g + b) * (isPropertyReadout ? floatScaler : 1.0);
 
-        // Remap the [0, 1] decoded value to colorMapRange.
-        const [min, max] = this.props.colorMapRange;
-        const decodedValue = value * (max - min) + min;
+        if (isPropertyReadout) {
+            // Remap the [0, 1] decoded value to colorMapRange.
+            const [min, max] = this.props.colorMapRange;
+            value = value * (max - min) + min;
+        }
+
+        const valueString =
+            (isPropertyReadout ? "Property: " : "Depth: ") + value.toFixed(1);
 
         return {
             ...info,
-            propertyValue: decodedValue,
+            propertyValue: valueString,
         };
     }
 }
