@@ -35,7 +35,6 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedWell: string;
-    selectionEnabled: boolean;
     logData: string | LogCurveDataType;
     logName: string;
     logColor: string;
@@ -73,7 +72,12 @@ export default class WellsLayer extends CompositeLayer<
     WellsLayerProps<FeatureCollection>
 > {
     onClick(info: WellsPickInfo): boolean {
-        if (!this.props.selectionEnabled) {
+        // Disable selection when drawing is enabled
+        if (
+            this.context.layerManager.getLayers({
+                layerIds: ["drawing-layer"],
+            })?.[0].props.mode != "view"
+        ) {
             return false;
         }
 
