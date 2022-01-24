@@ -72,7 +72,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "Wells",
         id: "wells-layer",
         autoHighlight: true,
-        selectionEnabled: true,
         opacity: 1,
         lineWidthScale: 5,
         pointRadiusScale: 8,
@@ -97,7 +96,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         id: "pie-layer",
         pickable: true,
         visible: true,
-        selectionEnabled: true,
     },
     DrawingLayer: {
         "@@type": "DrawingLayer",
