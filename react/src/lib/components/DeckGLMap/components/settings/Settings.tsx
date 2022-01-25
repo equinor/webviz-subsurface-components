@@ -7,7 +7,7 @@ import { MapState } from "../../redux/store";
 import LayersButton from "./LayersButton";
 import LayerSettingsButton from "./LayerSettingsButton";
 import { getLayersInViewport } from "../../layers/utils/layerTools";
-import { ViewsType } from "../DeckGLWrapper";
+import { ViewsType } from "../Map";
 
 Icon.add({ layers }); // (this needs only be done once)
 

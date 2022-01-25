@@ -5,7 +5,7 @@ import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { Matrix4 } from "math.gl";
 import { cloneDeep } from "lodash";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { ViewsType } from "../../components/DeckGLWrapper";
+import { ViewsType } from "../../components/Map";
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
     name: string;

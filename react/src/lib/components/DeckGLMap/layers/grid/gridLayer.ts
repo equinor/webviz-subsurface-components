@@ -8,7 +8,7 @@ import { Feature } from "geojson";
 import { Position3D } from "@deck.gl/core/utils/positions";
 import { PolygonLayerProps } from "@deck.gl/layers";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
+import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 
 function getColorMapColors(
