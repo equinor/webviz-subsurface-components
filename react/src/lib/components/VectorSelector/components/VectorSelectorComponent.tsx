@@ -55,11 +55,9 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
         if (props.customVectorDefinitions) {
             Object.keys(props.customVectorDefinitions).forEach(
                 (vectorName: string) => {
-                    if (vectorName in VectorData === false) {
-                        this.vectorDefinitions[vectorName] = (
-                            props.customVectorDefinitions as VectorDefinitions
-                        )[vectorName];
-                    }
+                    this.vectorDefinitions[vectorName] = (
+                        props.customVectorDefinitions as VectorDefinitions
+                    )[vectorName];
                 }
             );
         }
@@ -120,12 +118,9 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             this.vectorDefinitions = VectorData;
             Object.keys(this.props.customVectorDefinitions).forEach(
                 (vectorName: string) => {
-                    if (vectorName in VectorData === false) {
-                        this.vectorDefinitions[vectorName] = (
-                            this.props
-                                .customVectorDefinitions as VectorDefinitions
-                        )[vectorName];
-                    }
+                    this.vectorDefinitions[vectorName] = (
+                        this.props.customVectorDefinitions as VectorDefinitions
+                    )[vectorName];
                 }
             );
         }
@@ -257,6 +252,12 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                     if (!(type in types)) {
                         types[type] = [];
                     }
+
+                    if (!data[i].description) {
+                        data[i].description =
+                            vectorDefinitions[data[i].name].description || "";
+                    }
+
                     types[type].push(data[i]);
                 }
                 for (const type in types) {
