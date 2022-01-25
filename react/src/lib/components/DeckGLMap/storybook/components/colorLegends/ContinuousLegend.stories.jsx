@@ -1,10 +1,10 @@
 import React from "react";
-import ContinuousLegend from "../../../components/ContinuousLegend";
+import { ContinuousLegend } from "@emerson-eps/color-tables";
 export default {
     component: ContinuousLegend,
     title: "DeckGLMap/Components/ColorLegends/ContinuousLegend",
 };
-import colorTables from "../../../../../../demo/example-data/color-tables.json";
+import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 const min = 0;
 const max = 0.35;

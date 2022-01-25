@@ -3,8 +3,11 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { rgbValues } from "../../utils/continuousLegend";
-import { colorTableData } from "../../components/DiscreteLegend";
+import {
+    rgbValues,
+    colorTableData,
+    colorTablesArray,
+} from "@emerson-eps/color-tables/";
 import {
     Feature,
     GeometryCollection,
@@ -24,7 +27,6 @@ import { flattenPath, splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { colorTablesArray } from "../../components/ColorTableTypes";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 
@@ -33,7 +35,6 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedWell: string;
-    selectionEnabled: boolean;
     logData: string | LogCurveDataType;
     logName: string;
     logColor: string;
@@ -71,7 +72,12 @@ export default class WellsLayer extends CompositeLayer<
     WellsLayerProps<FeatureCollection>
 > {
     onClick(info: WellsPickInfo): boolean {
-        if (!this.props.selectionEnabled) {
+        // Disable selection when drawing is enabled
+        if (
+            this.context.layerManager.getLayers({
+                layerIds: ["drawing-layer"],
+            })?.[0].props.mode != "view"
+        ) {
             return false;
         }
 

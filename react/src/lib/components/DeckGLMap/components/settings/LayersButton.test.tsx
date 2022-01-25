@@ -42,7 +42,7 @@ describe("test 'layers' button", () => {
             name: "Property map",
         })[0];
         userEvent.click(property_map_checkbox);
-        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
+        expect(testStore.dispatch).toHaveBeenCalledTimes(2);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["colormap-layer", false],
             type: "spec/updateVisibleLayers",

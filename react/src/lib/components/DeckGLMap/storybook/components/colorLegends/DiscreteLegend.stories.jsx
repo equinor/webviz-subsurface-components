@@ -1,6 +1,6 @@
 import React from "react";
-import DiscreteColorLegend from "../../../components/DiscreteLegend";
-import colorTables from "../../../../../../demo/example-data/color-tables.json";
+import { DiscreteColorLegend } from "@emerson-eps/color-tables";
+import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 export default {
     component: DiscreteColorLegend,
@@ -14,7 +14,7 @@ const discreteData = {
     BELOW: [[73, 255, 35, 255], 14],
     H3: [[255, 144, 1, 255], 11],
 };
-const colorName = "Colors_Set_1";
+const colorName = "Stratigraphy";
 const dataObjectName = "Wells / ZONELOG";
 const position = [16, 10];
 const horizontal = true;
