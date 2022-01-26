@@ -253,7 +253,10 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
                         types[type] = [];
                     }
 
-                    if (!data[i].description) {
+                    if (
+                        !data[i].description &&
+                        data[i].name in vectorDefinitions
+                    ) {
                         data[i].description =
                             vectorDefinitions[data[i].name].description || "";
                     }
