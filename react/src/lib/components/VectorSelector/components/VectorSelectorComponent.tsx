@@ -16,7 +16,6 @@ import {
     Direction,
 } from "@webviz/core-components/dist/components/SmartNodeSelector/components/SmartNodeSelectorComponent";
 import VectorSelection from "../utils/VectorSelection";
-import VectorData from "../utils/VectorData";
 import aquifer from "./images/aquifer.svg";
 import block from "./images/block.svg";
 import field from "./images/field.svg";
@@ -31,12 +30,15 @@ import well from "./images/well.svg";
 import well_completion from "./images/well-completion.svg";
 import calculated from "./images/calculated.svg";
 
-type VectorDefinitions = {
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const vectorDefinitions = require("../../../assets/VectorDefinitions.json");
+
+type VectorDefinitionsType = {
     [key: string]: { type: string; description: string };
 };
 
 type VectorSelectorPropsType = SmartNodeSelectorPropsType & {
-    customVectorDefinitions?: VectorDefinitions;
+    customVectorDefinitions?: VectorDefinitionsType;
 };
 
 /**
@@ -45,18 +47,18 @@ type VectorSelectorPropsType = SmartNodeSelectorPropsType & {
  */
 export default class VectorSelectorComponent extends SmartNodeSelectorComponent {
     public props: VectorSelectorPropsType;
-    protected vectorDefinitions: VectorDefinitions;
+    protected vectorDefinitions: VectorDefinitionsType;
 
     constructor(props: VectorSelectorPropsType) {
         super(props);
         this.props = props;
 
-        this.vectorDefinitions = VectorData;
+        this.vectorDefinitions = vectorDefinitions;
         if (props.customVectorDefinitions) {
             Object.keys(props.customVectorDefinitions).forEach(
                 (vectorName: string) => {
                     this.vectorDefinitions[vectorName] = (
-                        props.customVectorDefinitions as VectorDefinitions
+                        props.customVectorDefinitions as VectorDefinitionsType
                     )[vectorName];
                 }
             );
@@ -115,11 +117,12 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
             JSON.stringify(this.props.customVectorDefinitions) !==
                 JSON.stringify(prevProps.customVectorDefinitions)
         ) {
-            this.vectorDefinitions = VectorData;
+            this.vectorDefinitions = vectorDefinitions;
             Object.keys(this.props.customVectorDefinitions).forEach(
                 (vectorName: string) => {
                     this.vectorDefinitions[vectorName] = (
-                        this.props.customVectorDefinitions as VectorDefinitions
+                        this.props
+                            .customVectorDefinitions as VectorDefinitionsType
                     )[vectorName];
                 }
             );
@@ -218,7 +221,7 @@ export default class VectorSelectorComponent extends SmartNodeSelectorComponent 
     modifyTreeData(
         treeData: TreeDataNode[],
         numMetaNodes: number,
-        vectorDefinitions: VectorDefinitions
+        vectorDefinitions: VectorDefinitionsType
     ): TreeDataNode[] {
         const typeIcons: Record<string, string> = {
             aquifer: aquifer,

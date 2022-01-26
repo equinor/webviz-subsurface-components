@@ -23,7 +23,7 @@
         "build:js": "webpack --mode production",
         "build:js-dev": "webpack --mode development",
         "build:js-demo": "webpack --mode production --entry ./src/demo/index.js",
-        "build:py": "npm run transpile:dash && copyfiles -a ../webviz_subsurface_components/. ./webviz_subsurface_components/ && copyfiles ./package.json ./webviz_subsurface_components/ && dash-generate-components ./dist/components webviz_subsurface_components -p package.json --ignore '(^index.js|.stories.js)$' && copyfiles -a -f ./webviz_subsurface_components/* ../webviz_subsurface_components/",
+        "build:py": "npm run transpile:dash && copyfiles -a ../webviz_subsurface_components/. ./webviz_subsurface_components/ && copyfiles ./package.json ./webviz_subsurface_components/ && copyfiles -f ./src/lib/assets/VectorDefinitions.json ./webviz_subsurface_components/ && dash-generate-components ./dist/components webviz_subsurface_components -p package.json --ignore '(^index.js|.stories.js)$' && copyfiles -a -f ./webviz_subsurface_components/* ../webviz_subsurface_components/",
         "build": "npm run transpile && npm run build:js && npm run build:js-dev && npm run tidy-up && npm run build:py && npm run tidy-up",
         "typecheck": "tsc --noEmit",
         "format": "eslint --fix *.js *json \"src/**/*.+(ts|tsx|js|jsx|json|css)\"",
