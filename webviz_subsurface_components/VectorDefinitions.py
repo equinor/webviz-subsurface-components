@@ -10,13 +10,11 @@ else:
 
 
 class VectorDefinition(TypedDict):
-    
+
     description: str
     type: str
 
 
-VectorDefinitions: Dict[str, VectorDefinition] = {}
-with open(
-    pathlib.Path(__file__).parent.joinpath("VectorDefinitions.json").absolute(), "rt"
-) as file:
-    VectorDefinitions = json.load(file)
+VectorDefinitions: Dict[str, VectorDefinition] = json.loads(
+    (pathlib.Path(__file__).parent / "VectorDefinitions.json").read_text()
+)
