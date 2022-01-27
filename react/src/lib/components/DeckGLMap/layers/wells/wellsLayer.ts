@@ -469,12 +469,12 @@ function distToSegmentSquared(v: Position, w: Position, p: Position): number {
 
 // Interpolates point closest to the coords on trajectory
 function interpolateDataOnTrajectory(
-    coord: Position2D,
+    coord: Position,
     data: number[],
-    trajectory2D: Position[]
+    trajectory: Position[]
 ): number {
     // Identify closest well path leg to coord.
-    const segment_index = getSegmentIndex(coord, trajectory2D);
+    const segment_index = getSegmentIndex(coord, trajectory);
 
     const index0 = segment_index;
     const index1 = index0 + 1;
@@ -484,8 +484,8 @@ function interpolateDataOnTrajectory(
     const data1 = data[index1];
 
     // Get the nearest survey points.
-    const survey0 = trajectory2D[index0];
-    const survey1 = trajectory2D[index1];
+    const survey0 = trajectory[index0];
+    const survey1 = trajectory[index1];
 
     const dv = distance(survey0, survey1) as number;
     if (dv === 0) {
@@ -504,22 +504,31 @@ function interpolateDataOnTrajectory(
     return data0 * (1.0 - scalar_projection) + data1 * scalar_projection;
 }
 
-function getMd(coord: Position2D, feature: Feature): number | null {
+function getMd(coord: Position, feature: Feature): number | null {
     if (!feature.properties || !feature.geometry) return null;
 
     const measured_depths = feature.properties["md"][0] as number[];
 
     const gc = feature.geometry as GeometryCollection;
     const trajectory3D = (gc.geometries[1] as LineString).coordinates;
-    const trajectory2D = trajectory3D.map((v) => {
-        return v.slice(0, 2);
-    }) as Position[];
 
-    return interpolateDataOnTrajectory(coord, measured_depths, trajectory2D);
+    let trajectory;
+    // In 2D view coord is of type Position2D and in 3D view it's Position3D,
+    // so use apropriate trajectory for interpolation
+    if (coord.length == 2) {
+        const trajectory2D = trajectory3D.map((v) => {
+            return v.slice(0, 2);
+        }) as Position[];
+        trajectory = trajectory2D;
+    } else {
+        trajectory = trajectory3D;
+    }
+
+    return interpolateDataOnTrajectory(coord, measured_depths, trajectory);
 }
 
 function getMdProperty(
-    coord: Position2D,
+    coord: Position,
     feature: Feature
 ): PropertyDataType | null {
     const md = getMd(coord, feature);
@@ -530,23 +539,30 @@ function getMdProperty(
     return null;
 }
 
-function getTvd(coord: Position2D, feature: Feature): number | null {
+function getTvd(coord: Position, feature: Feature): number | null {
     const trajectory3D = getWellCoordinates(feature);
     if (trajectory3D == undefined) return null;
 
-    const trajectory2D = trajectory3D?.map((v) => {
-        return v.slice(0, 2);
-    }) as Position[];
+    let trajectory;
+    // For 2D view coord is Position2D and for 3D view it's Position3D
+    if (coord.length == 2) {
+        const trajectory2D = trajectory3D?.map((v) => {
+            return v.slice(0, 2);
+        }) as Position[];
+        trajectory = trajectory2D;
+    } else {
+        trajectory = trajectory3D;
+    }
 
     const tvds = trajectory3D.map((v) => {
         return v[2];
     }) as number[];
 
-    return interpolateDataOnTrajectory(coord, tvds, trajectory2D);
+    return interpolateDataOnTrajectory(coord, tvds, trajectory);
 }
 
 function getTvdProperty(
-    coord: Position2D,
+    coord: Position,
     feature: Feature
 ): PropertyDataType | null {
     const tvd = getTvd(coord, feature);
@@ -562,7 +578,7 @@ function getTvdProperty(
 }
 
 // Identify closest path leg to coord.
-function getSegmentIndex(coord: Position2D, path: Position[]): number {
+function getSegmentIndex(coord: Position, path: Position[]): number {
     let min_d = Number.MAX_VALUE;
     let segment_index = 0;
     for (let i = 0; i < path?.length - 1; i++) {
