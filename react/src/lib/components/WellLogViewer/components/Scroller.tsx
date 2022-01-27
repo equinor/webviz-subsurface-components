@@ -94,13 +94,6 @@ class Scroller extends Component<Props> {
         const elOuter = this.scroller;
         if (!elOuter) return false;
 
-        //const scrollHeight = elOuter.scrollHeight - elOuter.clientHeight;
-        //const scrollWidth = elOuter.scrollWidth - elOuter.clientWidth;
-        //const _x = scrollWidth ? elOuter.scrollLeft / scrollWidth : 0;
-        //const _y = scrollHeight ? elOuter.scrollTop / scrollHeight : 0;
-        console.log("Nscroll=", "(" + x + "," + y + ")");
-        //console.log("_scroll=", "("+_x+","+_y+")");
-
         const scrollLeft = Math.round(
             x * (elOuter.scrollWidth - elOuter.clientWidth)
         );

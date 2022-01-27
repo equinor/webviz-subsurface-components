@@ -82,8 +82,10 @@ interface Props {
     readoutOptions?: InfoOptions; // options for readout
 
     // callbacks
-    onContentRescale: () => void;
-    onContentSelection: () => void;
+    onContentRescale?: () => void;
+    onContentSelection?: () => void;
+    onTemplateChanged?: () => void;
+
     onCreateController?: (controller: WellLogController) => void;
 }
 interface State {
@@ -114,6 +116,7 @@ class SyncLogViewer extends Component<Props, State> {
     onTrackScrollBind: (() => void)[];
     onContentRescaleBind: (() => void)[];
     onContentSelectionBind: (() => void)[];
+    onTemplateChangedBind: (() => void)[];
 
     constructor(props: Props) {
         super(props);
@@ -172,6 +175,10 @@ class SyncLogViewer extends Component<Props, State> {
         this.onContentSelectionBind = [
             this.onContentSelection.bind(this, 0),
             this.onContentSelection.bind(this, 1),
+        ];
+        this.onTemplateChangedBind = [
+            this.onTemplateChanged.bind(this, 0),
+            this.onTemplateChanged.bind(this, 1),
         ];
 
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
@@ -328,7 +335,9 @@ class SyncLogViewer extends Component<Props, State> {
         this.setSliderValue();
         if (this.props.onContentRescale) {
             // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => this.props.onContentRescale());
+            this.debounce(() => {
+                if (this.props.onContentRescale) this.props.onContentRescale();
+            });
         }
     }
     // callback function from WellLogView
@@ -337,7 +346,22 @@ class SyncLogViewer extends Component<Props, State> {
 
         if (this.props.onContentSelection) {
             // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => this.props.onContentSelection());
+            this.debounce(() => {
+                if (this.props.onContentSelection)
+                    this.props.onContentSelection();
+            });
+        }
+    }
+    // callback function from WellLogView
+    onTemplateChanged(iView: number): void {
+        this.syncTemplate(iView);
+
+        if (this.props.onTemplateChanged) {
+            // use debouncer to prevent too frequent notifications while animation
+            this.debounce(() => {
+                if (this.props.onTemplateChanged)
+                    this.props.onTemplateChanged();
+            });
         }
     }
     // callback function from Axis selector
@@ -461,6 +485,19 @@ class SyncLogViewer extends Component<Props, State> {
         }
     }
 
+    syncTemplate(iView: number): void {
+        const controller = this.controllers[iView];
+        if (controller) {
+            const template = controller.getTemplate();
+            for (const _controller of this.controllers) {
+                if (!_controller || _controller == controller) continue;
+                if (this.props.syncTrackPos) {
+                    _controller.setTemplate(template);
+                }
+            }
+        }
+    }
+
     setControllersZoom(): void {
         for (const controller of this.controllers) {
             if (!controller) continue;
@@ -503,6 +540,7 @@ class SyncLogViewer extends Component<Props, State> {
                     onTrackScroll={this.onTrackScrollBind[0]}
                     onContentRescale={this.onContentRescaleBind[0]}
                     onContentSelection={this.onContentSelectionBind[0]}
+                    onTemplateChanged={this.onTemplateChangedBind[0]}
                 />
                 <WellLogViewWithScroller
                     welllog={this.props.welllogs[1]}
@@ -520,6 +558,7 @@ class SyncLogViewer extends Component<Props, State> {
                     onTrackScroll={this.onTrackScrollBind[1]}
                     onContentRescale={this.onContentRescaleBind[1]}
                     onContentSelection={this.onContentSelectionBind[1]}
+                    onTemplateChanged={this.onTemplateChangedBind[1]}
                 />
                 <div
                     style={{

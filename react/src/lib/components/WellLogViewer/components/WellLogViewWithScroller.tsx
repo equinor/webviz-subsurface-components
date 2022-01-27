@@ -67,7 +67,7 @@ class WellLogViewWithScroller extends Component<Props> {
     }
 
     shouldComponentUpdate(nextProps: Props): boolean {
-        console.log("is=", Object.is(this.props, nextProps));
+        //console.log("is=", Object.is(this.props, nextProps));
         /*
             //compare (Object.keys(nextProps), Object.keys(this.props))
             for (const p in nextProps) {

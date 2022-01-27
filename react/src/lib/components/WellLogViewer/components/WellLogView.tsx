@@ -309,7 +309,7 @@ function createInterpolator(from: Float32Array, to: Float32Array) {
         }
     }
 
-    return (x: number, expand: boolean) => {
+    return (x: number, expand: boolean): number => {
         for (let i = 0; i < n; i++) {
             if (x < from[i]) {
                 if (!i) return expand ? to[0] : Number.NaN;
@@ -338,9 +338,9 @@ function createScaleHandler(
     const interpolator: ScaleInterpolator = {
         forward,
         reverse,
-        forwardInterpolatedDomain: (domain) =>
+        forwardInterpolatedDomain: (domain: number[]) =>
             domain.map((v) => secondary2primary(v, true)),
-        reverseInterpolatedDomain: (domain) =>
+        reverseInterpolatedDomain: (domain: number[]) =>
             domain.map((v) => primary2secondary(v, true)),
     };
     return new InterpolatedScaleHandler(interpolator);
@@ -567,6 +567,7 @@ export interface WellLogController {
     getTrackZoom(): number;
 
     getTemplate(): Template;
+    setTemplate(template: Template): void;
 }
 
 import { Info } from "./InfoTypes";
@@ -593,12 +594,12 @@ interface Props {
         iTo: number
     ) => void;
 
-    onTrackScroll?: () => void; // called when track scrolling are changed
+    onTrackScroll?: () => void; // called when track scrolling is changed
     onContentRescale?: () => void; // called when content zoom and scrolling are changed
     onContentSelection?: () => void; // called when content zoom and scrolling are changed
 
     onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void; // called when mouse click on a track
-    onTemplateChanged?: () => void; // called when track scrolling are changed
+    onTemplateChanged?: () => void; // called when template is changed
 }
 
 interface State {
@@ -936,7 +937,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setState((state: Readonly<State>) => {
             const newPos = this._newTrackScrollPos(pos);
             if (state.scrollTrackPos === newPos) {
-                console.log("return null");
                 return null;
             }
             return { scrollTrackPos: newPos };
@@ -958,6 +958,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     getTemplate(): Template {
         return this.template;
+    }
+    setTemplate(template: Template): void {
+        const tNew = JSON.stringify(template);
+        const t = JSON.stringify(this.template);
+        if (t !== tNew) {
+            this.template = JSON.parse(tNew); // save external template content to current
+            this.setTracks();
+        }
     }
 
     _generateTemplate(): Template {

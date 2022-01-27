@@ -76,8 +76,10 @@ interface Props {
     readoutOptions?: InfoOptions; // options for readout
 
     // callbacks
-    onContentRescale: () => void;
-    onContentSelection: () => void;
+    onContentRescale?: () => void;
+    onContentSelection?: () => void;
+    onTemplateChanged?: () => void;
+
     onCreateController?: (controller: WellLogController) => void;
 }
 interface State {
@@ -130,6 +132,7 @@ class WellLogViewer extends Component<Props, State> {
 
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
+        this.onTemplateChanged = this.onTemplateChanged.bind(this);
 
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
 
@@ -258,7 +261,9 @@ class WellLogViewer extends Component<Props, State> {
         this.setSliderValue();
         if (this.props.onContentRescale) {
             // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => this.props.onContentRescale());
+            this.debounce(() => {
+                if (this.props.onContentRescale) this.props.onContentRescale();
+            });
         }
     }
     // callback function from WellLogView
@@ -266,7 +271,19 @@ class WellLogViewer extends Component<Props, State> {
         this.setSliderValue();
         if (this.props.onContentSelection) {
             // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => this.props.onContentSelection());
+            this.debounce(() => {
+                if (this.props.onContentSelection)
+                    this.props.onContentSelection();
+            });
+        }
+    }
+    onTemplateChanged(): void {
+        if (this.props.onTemplateChanged) {
+            // use debouncer to prevent too frequent notifications while animation
+            this.debounce(() => {
+                if (this.props.onTemplateChanged)
+                    this.props.onTemplateChanged();
+            });
         }
     }
 
@@ -334,6 +351,7 @@ class WellLogViewer extends Component<Props, State> {
                     onTrackMouseEvent={onTrackMouseEvent}
                     onContentRescale={this.onContentRescale}
                     onContentSelection={this.onContentSelection}
+                    onTemplateChanged={this.onTemplateChanged}
                 />
                 <div
                     style={{
