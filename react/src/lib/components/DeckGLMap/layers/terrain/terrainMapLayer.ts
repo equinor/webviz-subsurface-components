@@ -21,12 +21,12 @@ const DECODER = {
     offset: 0,
 };
 
-function getImageData(colorMapName: string, _colorTables: colorTablesArray) {
+function getImageData(colorMapName: string, colorTables: colorTablesArray) {
     const data = new Uint8Array(256 * 3);
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-        const rgb = rgbValues(value, colorMapName, _colorTables);
+        const rgb = rgbValues(value, colorMapName, colorTables);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -35,7 +35,6 @@ function getImageData(colorMapName: string, _colorTables: colorTablesArray) {
                 color = [rgb.r, rgb.g, rgb.b];
             }
         }
-        //console.log(color)
         data[3 * i + 0] = color[0];
         data[3 * i + 1] = color[1];
         data[3 * i + 2] = color[2];

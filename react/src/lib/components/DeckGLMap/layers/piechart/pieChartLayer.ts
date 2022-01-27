@@ -34,7 +34,6 @@ interface PolygonData {
 
 export interface PieChartLayerProps<D> extends ExtendedLayerProps<D> {
     selectedPie: PieData;
-    selectionEnabled: boolean;
 }
 
 export default class PieChartLayer extends CompositeLayer<
@@ -42,7 +41,12 @@ export default class PieChartLayer extends CompositeLayer<
     PieChartLayerProps<PiesData>
 > {
     onClick(info: PickInfo<PolygonData>): boolean {
-        if (!this.props.selectionEnabled) {
+        // Disable selection when drawing is enabled
+        if (
+            this.context.layerManager.getLayers({
+                layerIds: ["drawing-layer"],
+            })?.[0].props.mode != "view"
+        ) {
             return false;
         }
 

@@ -99,7 +99,7 @@
           6481113
         ],
         "meshMaxError": 2.0,
-        "propertyTexture": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+        "propertyTexture": "./property_margin_10pt.png",
         "rotDeg": 0,
         "contours": [0, 100.0],
         "colorMapName": "Physics",
