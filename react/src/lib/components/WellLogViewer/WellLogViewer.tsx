@@ -141,24 +141,29 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-        {
+        /*
             //compare (Object.keys(nextProps), Object.keys(this.props))
             for (const p in nextProps) {
                 // eslint-disable-next-line
                 if ((nextProps as any)[p] !== (this.props as any)[p]) {
-                    //console.log(p /*, nextProps[p], this.props[p]*/);
+                    //console.log(p /*, nextProps[p], this.props[p]* /);
                     return true;
                 }
             }
             for (const s in nextState) {
                 // eslint-disable-next-line
                 if ((nextState as any)[s] !== (this.state as any)[s]) {
-                    //console.log(s /*, nextState[s], this.state[s]*/);
+                    //console.log(s /*, nextState[s], this.state[s]* /);
                     return true;
                 }
             }
-        }
+        
         return false;
+        */
+        return (
+            !Object.is(this.props, nextProps) ||
+            !Object.is(this.state, nextState)
+        );
     }
 
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
@@ -247,16 +252,13 @@ class WellLogViewer extends Component<Props, State> {
             this.props.onCreateController(controller);
 
         this.setControllerZoom();
-        //this.setSliderValue();
     }
     // callback function from WellLogView
     onContentRescale(): void {
         this.setSliderValue();
         if (this.props.onContentRescale) {
             // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => {
-                this.props.onContentRescale();
-            });
+            this.debounce(() => this.props.onContentRescale());
         }
     }
     // callback function from WellLogView
@@ -264,9 +266,7 @@ class WellLogViewer extends Component<Props, State> {
         this.setSliderValue();
         if (this.props.onContentSelection) {
             // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => {
-                this.props.onContentSelection();
-            });
+            this.debounce(() => this.props.onContentSelection());
         }
     }
 
@@ -284,10 +284,10 @@ class WellLogViewer extends Component<Props, State> {
 
     // set zoom value to slider
     setSliderValue(): void {
-        this.setState((prevState: Readonly<State>) => {
+        this.setState((state: Readonly<State>) => {
             if (!this.controller) return null;
             const zoom = this.controller.getContentZoom();
-            if (Math.abs(Math.log(prevState.sliderValue / zoom)) < 0.01)
+            if (Math.abs(Math.log(state.sliderValue / zoom)) < 0.01)
                 return null;
             return { sliderValue: zoom };
         });

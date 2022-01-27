@@ -131,7 +131,6 @@ class Scroller extends Component<Props> {
             elInner.style.width !== widthInner ||
             elInner.style.height !== heightInner
         ) {
-            console.log("Nzoom=", "(" + widthInner + "," + heightInner + ")");
             elInner.style.width = widthInner;
             elInner.style.height = heightInner;
             return true;

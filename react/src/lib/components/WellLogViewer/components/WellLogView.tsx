@@ -925,17 +925,20 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     scrollTrackBy(delta: number): void {
-        this.setState((prevState: Readonly<State>) => ({
+        this.setState((state: Readonly<State>) => ({
             scrollTrackPos: this._newTrackScrollPos(
-                prevState.scrollTrackPos + delta
+                state.scrollTrackPos + delta
             ),
         }));
     }
 
     scrollTrackTo(pos: number): void {
-        this.setState((prevState: Readonly<State>) => {
+        this.setState((state: Readonly<State>) => {
             const newPos = this._newTrackScrollPos(pos);
-            if (prevState.scrollTrackPos === newPos) return null;
+            if (state.scrollTrackPos === newPos) {
+                console.log("return null");
+                return null;
+            }
             return { scrollTrackPos: newPos };
         });
     }

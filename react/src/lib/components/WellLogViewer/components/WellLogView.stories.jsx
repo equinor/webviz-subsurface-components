@@ -51,17 +51,7 @@ const Template = (args) => {
     return (
         <div style={{ height: "92vh" }}>
             <div style={{ width: "100%", height: "100%" }}>
-                <WellLogView
-                    id="WellLogView"
-                    {...args}
-                    /*
-                        onInfo={this.onInfo}
-                        onCreateController={this.onCreateController}
-                        onTrackMouseEvent={onTrackMouseEvent}
-                        onTrackScroll={this.onTrackScroll}
-                        onContentRescale={this.onContentRescale}
-                     */
-                />
+                <WellLogView id="WellLogView" {...args} />
             </div>
         </div>
     );

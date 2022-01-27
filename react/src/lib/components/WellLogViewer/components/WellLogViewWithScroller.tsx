@@ -67,17 +67,18 @@ class WellLogViewWithScroller extends Component<Props> {
     }
 
     shouldComponentUpdate(nextProps: Props): boolean {
-        {
+        console.log("is=", Object.is(this.props, nextProps));
+        /*
             //compare (Object.keys(nextProps), Object.keys(this.props))
             for (const p in nextProps) {
                 // eslint-disable-next-line
                 if ((nextProps as any)[p] !== (this.props as any)[p]) {
-                    //console.log(p /*, nextProps[p], this.props[p]*/);
+                    console.log(p /*, nextProps[p], this.props[p]* /);
                     return true;
                 }
             }
-        }
-        return false;
+        return false;*/
+        return !Object.is(this.props, nextProps);
     }
 
     updateReadoutPanel(): void {
@@ -182,7 +183,7 @@ class WellLogViewWithScroller extends Component<Props> {
             }
             const _fContent = this.props.horizontal ? _x : _y;
             const fContent = this.props.horizontal ? x : y;
-            if (Math.abs(fContent - _fContent) < 0.01) {
+            if (Math.abs(fContent - _fContent) < 0.001) {
                 shouldUpdateScroller--;
                 this.props.horizontal ? (x = _x) : (y = _y);
             }
@@ -193,7 +194,6 @@ class WellLogViewWithScroller extends Component<Props> {
     render(): ReactNode {
         return (
             <Scroller
-                //style={{ height: "100%", flex: "1 1 auto" }}
                 ref={(el) => (this.scroller = el as Scroller)}
                 onScroll={this.onScrollerScroll}
             >
@@ -210,6 +210,7 @@ class WellLogViewWithScroller extends Component<Props> {
                     onInfo={this.props.onInfo}
                     onCreateController={this.onCreateController}
                     onTrackMouseEvent={this.props.onTrackMouseEvent}
+                    onTemplateChanged={this.props.onTemplateChanged}
                     onTrackScroll={this.onTrackScroll}
                     onContentRescale={this.onContentRescale}
                     onContentSelection={this.onContentSelection}

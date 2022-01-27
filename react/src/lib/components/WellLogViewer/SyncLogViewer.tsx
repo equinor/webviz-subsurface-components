@@ -20,6 +20,11 @@ import { WellLogController } from "./components/WellLogView";
 import { getAvailableAxes } from "./utils/tracks";
 
 import { axisTitles, axisMnemos } from "./utils/axes";
+import { checkMinMax } from "./utils/minmax";
+function isEqDomains(d1: [number, number], d2: [number, number]): boolean {
+    const eps: number = Math.abs(d1[1] - d1[0] + (d2[1] - d2[0])) * 0.00001;
+    return Math.abs(d1[0] - d2[0]) < eps && Math.abs(d1[1] - d2[1]) < eps;
+}
 
 import ReactDOM from "react-dom";
 import { Plot } from "@equinor/videx-wellog";
@@ -63,14 +68,13 @@ import { LogViewer } from "@equinor/videx-wellog";
 import { Info, InfoOptions } from "./components/InfoTypes";
 
 interface Props {
-    syncTrackPos?: boolean;
-    syncContentDomain?: boolean;
-    syncContentSelection?: boolean;
-
     welllogs: WellLog[];
     templates: Template[];
     colorTables: ColorTable[];
     horizontal?: boolean;
+    syncTrackPos?: boolean;
+    syncContentDomain?: boolean;
+    syncContentSelection?: boolean;
 
     domain?: [number, number]; //  initial visible range
     selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
@@ -178,28 +182,32 @@ class SyncLogViewer extends Component<Props, State> {
     componentDidMount(): void {
         this.syncTrackScrollPos(0);
         this.syncContentScrollPos(0);
+        this.syncContentSelection(0);
         this.setSliderValue();
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-        {
+        /*
             //compare (Object.keys(nextProps), Object.keys(this.props))
             for (const p in nextProps) {
                 // eslint-disable-next-line
                 if ((nextProps as any)[p] !== (this.props as any)[p]) {
-                    //console.log(p /*, nextProps[p], this.props[p]*/);
+                    console.log(p /*, nextProps[p], this.props[p]* / );
                     return true;
                 }
             }
             for (const s in nextState) {
                 // eslint-disable-next-line
                 if ((nextState as any)[s] !== (this.state as any)[s]) {
-                    //console.log(s /*, nextState[s], this.state[s]*/);
+                    console.log(s /*, nextState[s], this.state[s]* /);
                     return true;
                 }
             }
-        }
-        return false;
+        return false;*/
+        return (
+            !Object.is(this.props, nextProps) ||
+            !Object.is(this.state, nextState)
+        );
     }
 
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
@@ -286,11 +294,11 @@ class SyncLogViewer extends Component<Props, State> {
             this.props.readoutOptions
         );
 
-        this.setState((prevState: Readonly<State>) => {
+        this.setState((state: Readonly<State>) => {
             return {
                 infos: [
-                    iView == 0 ? infos : prevState.infos[0],
-                    iView == 1 ? infos : prevState.infos[1],
+                    iView == 0 ? infos : state.infos[0],
+                    iView == 1 ? infos : state.infos[1],
                 ],
             };
         });
@@ -305,7 +313,7 @@ class SyncLogViewer extends Component<Props, State> {
         this.setControllersZoom();
         this.syncTrackScrollPos(iView);
         this.syncContentScrollPos(iView);
-        //this.setSliderValue();
+        this.syncContentSelection(iView);
     }
     // callback function from WellLogView
     onTrackScroll(iView: number): void {
@@ -320,9 +328,7 @@ class SyncLogViewer extends Component<Props, State> {
         this.setSliderValue();
         if (this.props.onContentRescale) {
             // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => {
-                this.props.onContentRescale();
-            });
+            this.debounce(() => this.props.onContentRescale());
         }
     }
     // callback function from WellLogView
@@ -331,9 +337,7 @@ class SyncLogViewer extends Component<Props, State> {
 
         if (this.props.onContentSelection) {
             // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => {
-                this.props.onContentSelection();
-            });
+            this.debounce(() => this.props.onContentSelection());
         }
     }
     // callback function from Axis selector
@@ -360,12 +364,15 @@ class SyncLogViewer extends Component<Props, State> {
 
             const fContent = this.props.horizontal ? x : y; // fraction
             controller.scrollContentTo(fContent);
-            const domain = controller.getContentDomain();
 
+            const domain = controller.getContentDomain();
             for (const _controller of this.controllers) {
                 if (!_controller || _controller == controller) continue;
-                if (this.props.syncContentDomain)
-                    _controller.zoomContentTo(domain);
+                if (this.props.syncContentDomain) {
+                    const _domain = _controller.getContentDomain();
+                    if (!isEqDomains(_domain, domain))
+                        _controller.zoomContentTo(domain);
+                }
                 if (this.props.syncTrackPos)
                     _controller.scrollTrackTo(posTrack);
             }
@@ -374,61 +381,64 @@ class SyncLogViewer extends Component<Props, State> {
 
     // set zoom value to slider
     setSliderValue(): void {
-        this.setState((prevState: Readonly<State>) => {
+        this.setState((state: Readonly<State>) => {
             if (!this.controllers[0]) return null;
             const zoom = this.controllers[0].getContentZoom();
-            if (Math.abs(Math.log(prevState.sliderValue / zoom)) < 0.01)
+            if (Math.abs(Math.log(state.sliderValue / zoom)) < 0.01)
                 return null;
             return { sliderValue: zoom };
         });
     }
 
     syncTrackScrollPos(iView: number): void {
-        /*for (let iView = 0; iView < this.controller.length; iView++)*/ {
-            const controller = this.controllers[iView];
-            if (controller) {
-                const trackPos = controller.getTrackScrollPos();
-                for (const _controller of this.controllers) {
-                    if (!_controller || _controller == controller) continue;
-                    if (this.props.syncTrackPos) {
-                        const _trackPos = _controller.getTrackScrollPos();
-                        if (_trackPos !== trackPos)
-                            _controller.scrollTrackTo(trackPos);
-                    }
-                }
+        const controller = this.controllers[iView];
+        if (controller) {
+            const trackPos = controller.getTrackScrollPos();
+            for (const _controller of this.controllers) {
+                if (!_controller || _controller == controller) continue;
+                if (this.props.syncTrackPos)
+                    _controller.scrollTrackTo(trackPos);
             }
         }
     }
 
+    getCommonContentBaseDomain(): [number, number] {
+        const commonBaseDomain: [number, number] = [
+            Number.POSITIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+        ];
+        for (const controller of this.controllers) {
+            if (!controller) continue;
+            checkMinMax(commonBaseDomain, controller.getContentBaseDomain());
+        }
+        return commonBaseDomain;
+    }
+
+    syncContentBaseDomain(): void {
+        const commonBaseDomain: [number, number] =
+            this.getCommonContentBaseDomain();
+        for (const controller of this.controllers) {
+            if (!controller) continue;
+            const baseDomain = controller.getContentBaseDomain();
+            if (!isEqDomains(baseDomain, commonBaseDomain))
+                controller.setContentBaseDomain(commonBaseDomain);
+        }
+    }
+
     syncContentScrollPos(iView: number): void {
-        /*for (let iView = 0; iView < this.controller.length; iView++)*/ {
-            const controller = this.controllers[iView];
-            if (controller) {
-                const baseDomain = controller.getContentBaseDomain();
-                const domain = controller.getContentDomain();
-                console.log("+syncContentScrollPos(" + iView + ")", domain);
-                for (const _controller of this.controllers) {
-                    if (!_controller || _controller == controller) continue;
-                    if (this.props.syncContentDomain) {
-                        if (!iView) {
-                            const _baseDomain =
-                                controller.getContentBaseDomain();
-                            if (
-                                _baseDomain[0] !== baseDomain[0] ||
-                                _baseDomain[1] !== baseDomain[1]
-                            ) {
-                                _controller.setContentBaseDomain(baseDomain);
-                            }
-                        }
-                        const _domain = _controller.getContentDomain();
-                        if (
-                            _domain[0] !== domain[0] ||
-                            _domain[1] !== domain[1]
-                        )
-                            _controller.zoomContentTo(domain);
-                    }
+        if (this.props.syncContentDomain)
+            // synchronize base domains
+            this.syncContentBaseDomain();
+        const controller = this.controllers[iView];
+        if (controller) {
+            const domain = controller.getContentDomain();
+            for (const _controller of this.controllers) {
+                if (!_controller || _controller == controller) continue;
+                if (this.props.syncContentDomain) {
+                    const _domain = _controller.getContentDomain();
+                    if (!isEqDomains(_domain, domain))
+                        _controller.zoomContentTo(domain);
                 }
-                console.log("-syncContentScrollPos(" + iView + ")");
             }
         }
     }
@@ -577,10 +587,6 @@ const InfoOptions_propTypes = PropTypes.shape({
 /*
  */
 SyncLogViewer.propTypes = {
-    syncTrackPos: PropTypes.bool,
-    syncContentDomain: PropTypes.bool,
-    syncContentSelection: PropTypes.bool,
-
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
@@ -607,6 +613,21 @@ SyncLogViewer.propTypes = {
      * Orientation of the track plots on the screen. Default is false
      */
     horizontal: PropTypes.bool,
+
+    /**
+     * Synchronize the first visible track number in views
+     */
+    syncTrackPos: PropTypes.bool,
+
+    /**
+     * Synchronize the visible area in views
+     */
+    syncContentDomain: PropTypes.bool,
+
+    /**
+     * Synchronize the selection (current mouse hover) in views
+     */
+    syncContentSelection: PropTypes.bool,
 
     /**
      * Options for readout panel

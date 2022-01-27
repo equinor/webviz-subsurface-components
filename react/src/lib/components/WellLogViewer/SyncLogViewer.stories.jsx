@@ -5,19 +5,6 @@ export default {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/ SyncLogViewer",
     argTypes: {
-        syncTrackPos: {
-            description: "Synchronize first visible track",
-            defaultValue: false,
-        },
-        syncContentDomain: {
-            description: "Synchronize visible content domain",
-            defaultValue: true,
-        },
-        syncContentSelection: {
-            description: "Synchronize content selection",
-            defaultValue: false,
-        },
-
         id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
@@ -33,6 +20,18 @@ export default {
         },
         horizontal: {
             description: "Orientation of the track plots on the screen.",
+            defaultValue: false,
+        },
+        syncTrackPos: {
+            description: "Synchronize first visible track",
+            defaultValue: false,
+        },
+        syncContentDomain: {
+            description: "Synchronize visible content domain",
+            defaultValue: false,
+        },
+        syncContentSelection: {
+            description: "Synchronize content selection",
             defaultValue: false,
         },
         readoutOptions: {
@@ -54,6 +53,33 @@ export default {
     },
 };
 
+function fillInfo(state, controller) {
+    if (!controller) return "-";
+    const baseDomain = controller.getContentBaseDomain();
+    const domain = controller.getContentDomain();
+    const selection = controller.getContentSelection();
+    return (
+        "total: [" +
+        baseDomain[0].toFixed(0) +
+        ", " +
+        baseDomain[1].toFixed(0) +
+        "], " +
+        "visible: [" +
+        domain[0].toFixed(0) +
+        ", " +
+        domain[1].toFixed(0) +
+        "]" +
+        (selection[0] !== undefined
+            ? ", selected: [" +
+              selection[0].toFixed(0) +
+              (selection[1] !== undefined
+                  ? ", " + selection[1].toFixed(0)
+                  : "") +
+              "]"
+            : "")
+    );
+}
+
 const Template = (args) => {
     const [controller, setController] = React.useState(null);
     const [info, setInfo] = React.useState("");
@@ -64,65 +90,11 @@ const Template = (args) => {
         [controller]
     );
     const onContentRescale = React.useCallback(() => {
-        return;
-        if (!controller) {
-            setInfo("-");
-            return;
-        }
-        const baseDomain = controller.getContentBaseDomain();
-        const domain = controller.getContentDomain();
-        const selection = controller.getContentSelection();
-        setInfo(
-            "total: [" +
-                baseDomain[0].toFixed(0) +
-                ", " +
-                baseDomain[1].toFixed(0) +
-                "], " +
-                "visible: [" +
-                domain[0].toFixed(0) +
-                ", " +
-                domain[1].toFixed(0) +
-                "]" +
-                (selection[0] !== undefined
-                    ? ", selected: [" +
-                      selection[0].toFixed(0) +
-                      (selection[1] !== undefined
-                          ? ", " + selection[1].toFixed(0)
-                          : "") +
-                      "]"
-                    : "")
-        );
+        setInfo((state) => fillInfo(state, controller));
     }, [controller]);
 
     const onContentSelection = React.useCallback(() => {
-        return;
-        if (!controller) {
-            setInfo("-");
-            return;
-        }
-        const baseDomain = controller.getContentBaseDomain();
-        const domain = controller.getContentDomain();
-        const selection = controller.getContentSelection();
-        setInfo(
-            "total: [" +
-                baseDomain[0].toFixed(0) +
-                ", " +
-                baseDomain[1].toFixed(0) +
-                "], " +
-                "visible: [" +
-                domain[0].toFixed(0) +
-                ", " +
-                domain[1].toFixed(0) +
-                "]" +
-                (selection[0] !== undefined
-                    ? ", selected: [" +
-                      selection[0].toFixed(0) +
-                      (selection[1] !== undefined
-                          ? ", " + selection[1].toFixed(0)
-                          : "") +
-                      "]"
-                    : "")
-        );
+        setInfo((state) => fillInfo(state, controller));
     }, [controller]);
 
     return (
@@ -146,7 +118,11 @@ const Template = (args) => {
 export const Default = Template.bind({});
 Default.args = {
     id: "Sync-Log-Viewer",
+    syncTrackPos: true,
+    syncContentDomain: true,
+    syncContentSelection: true,
     horizontal: false,
+
     welllogs: [
         require("../../../demo/example-data/L898MUD.json"),
         require("../../../demo/example-data/L916MUD.json"),
