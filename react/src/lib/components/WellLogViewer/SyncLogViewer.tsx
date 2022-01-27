@@ -447,7 +447,7 @@ class SyncLogViewer extends Component<Props, State> {
             for (const _controller of this.controllers) {
                 if (!_controller || _controller == controller) continue;
                 if (this.props.syncTemplate)
-                    _controller.setTrackSelection(trackSelection);
+                    _controller.setSelectedTrackIndeces(trackSelection);
             }
         }
     }
