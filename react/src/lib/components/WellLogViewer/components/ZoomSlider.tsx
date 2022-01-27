@@ -39,8 +39,13 @@ class ZoomSlider extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props): void {
-        if (this.props.value !== prevProps.value)
-            this.setState({ level: convertValueToLevel(this.props.value) });
+        if (this.props.value !== prevProps.value) {
+            this.setState((state: Readonly<State>) => {
+                const level = convertValueToLevel(this.props.value);
+                if (state.level == level) return null;
+                return { level: level };
+            });
+        }
     }
 
     // callback function from Zoom slider
