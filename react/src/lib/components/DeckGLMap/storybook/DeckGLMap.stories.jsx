@@ -257,29 +257,3 @@ MultiView.args = {
         ],
     },
 };
-
-// 3d view
-export const View3D = Template.bind({});
-View3D.args = {
-    ...exampleData[0],
-    colorTables: colorTables,
-    legend: {
-        visible: false,
-    },
-    zoom: -4,
-    views: {
-        layout: [1, 2],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: false,
-                layerIds: [],
-            },
-            {
-                id: "view_2",
-                show3D: true,
-                layerIds: [],
-            },
-        ],
-    },
-};
