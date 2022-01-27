@@ -75,6 +75,7 @@ interface Props {
     syncTrackPos?: boolean;
     syncContentDomain?: boolean;
     syncContentSelection?: boolean;
+    syncTemplate?: boolean;
 
     domain?: [number, number]; //  initial visible range
     selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
@@ -114,6 +115,7 @@ class SyncLogViewer extends Component<Props, State> {
     ) => void)[];
 
     onTrackScrollBind: (() => void)[];
+    onTrackSelectionBind: (() => void)[];
     onContentRescaleBind: (() => void)[];
     onContentSelectionBind: (() => void)[];
     onTemplateChangedBind: (() => void)[];
@@ -165,6 +167,11 @@ class SyncLogViewer extends Component<Props, State> {
         this.onTrackScrollBind = [
             this.onTrackScroll.bind(this, 0),
             this.onTrackScroll.bind(this, 1),
+        ];
+
+        this.onTrackSelectionBind = [
+            this.onTrackSelection.bind(this, 0),
+            this.onTrackSelection.bind(this, 1),
         ];
 
         this.onContentRescaleBind = [
@@ -265,6 +272,10 @@ class SyncLogViewer extends Component<Props, State> {
             this.setControllersSelection();
         }
 
+        if (this.props.syncContentSelection !== prevProps.selection) {
+            this.syncContentSelection(0);
+        }
+
         if (
             this.props.readoutOptions &&
             (!prevProps.readoutOptions ||
@@ -325,6 +336,10 @@ class SyncLogViewer extends Component<Props, State> {
     // callback function from WellLogView
     onTrackScroll(iView: number): void {
         this.syncTrackScrollPos(iView);
+    }
+    // callback function from WellLogView
+    onTrackSelection(iView: number): void {
+        this.syncTrackSelection(iView);
     }
     // callback function from WellLogView
     onContentRescale(iView: number): void {
@@ -425,6 +440,17 @@ class SyncLogViewer extends Component<Props, State> {
             }
         }
     }
+    syncTrackSelection(iView: number): void {
+        const controller = this.controllers[iView];
+        if (controller) {
+            const trackSelection = controller.getSelectedTrackIndeces();
+            for (const _controller of this.controllers) {
+                if (!_controller || _controller == controller) continue;
+                if (this.props.syncTemplate)
+                    _controller.setTrackSelection(trackSelection);
+            }
+        }
+    }
 
     getCommonContentBaseDomain(): [number, number] {
         const commonBaseDomain: [number, number] = [
@@ -491,9 +517,7 @@ class SyncLogViewer extends Component<Props, State> {
             const template = controller.getTemplate();
             for (const _controller of this.controllers) {
                 if (!_controller || _controller == controller) continue;
-                if (this.props.syncTrackPos) {
-                    _controller.setTemplate(template);
-                }
+                if (this.props.syncTemplate) _controller.setTemplate(template);
             }
         }
     }
@@ -538,6 +562,7 @@ class SyncLogViewer extends Component<Props, State> {
                     onCreateController={this.onCreateControllerBind[0]}
                     onTrackMouseEvent={onTrackMouseEvent}
                     onTrackScroll={this.onTrackScrollBind[0]}
+                    onTrackSelection={this.onTrackSelectionBind[0]}
                     onContentRescale={this.onContentRescaleBind[0]}
                     onContentSelection={this.onContentSelectionBind[0]}
                     onTemplateChanged={this.onTemplateChangedBind[0]}
@@ -556,6 +581,7 @@ class SyncLogViewer extends Component<Props, State> {
                     onCreateController={this.onCreateControllerBind[1]}
                     onTrackMouseEvent={onTrackMouseEvent}
                     onTrackScroll={this.onTrackScrollBind[1]}
+                    onTrackSelection={this.onTrackSelectionBind[1]}
                     onContentRescale={this.onContentRescaleBind[1]}
                     onContentSelection={this.onContentSelectionBind[1]}
                     onTemplateChanged={this.onTemplateChangedBind[1]}
@@ -667,6 +693,11 @@ SyncLogViewer.propTypes = {
      * Synchronize the selection (current mouse hover) in views
      */
     syncContentSelection: PropTypes.bool,
+
+    /**
+     * Synchronize templates in views
+     */
+    syncTemplate: PropTypes.bool,
 
     /**
      * Options for readout panel

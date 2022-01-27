@@ -34,6 +34,10 @@ export default {
             description: "Synchronize content selection",
             defaultValue: false,
         },
+        syncTemplate: {
+            description: "Synchronize templates in the views",
+            defaultValue: false,
+        },
         readoutOptions: {
             description:
                 "Options for readout panel.<br/>" +
@@ -121,6 +125,7 @@ Default.args = {
     syncTrackPos: true,
     syncContentDomain: true,
     syncContentSelection: true,
+    syncTemplate: true,
     horizontal: false,
 
     welllogs: [

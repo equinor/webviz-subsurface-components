@@ -54,7 +54,7 @@ import {
     isTrackSelected,
     selectTrack,
     getSelectedTrackIndeces,
-    restoreSelectTracks,
+    setSelectedTrackIndeces,
 } from "../utils/log-viewer";
 
 function showSelection(
@@ -566,8 +566,11 @@ export interface WellLogController {
     getTrackScrollPosMax(): number;
     getTrackZoom(): number;
 
-    getTemplate(): Template;
+    setSelectedTrackIndeces(selection: number[]): boolean;
+    getSelectedTrackIndeces(): number[];
+
     setTemplate(template: Template): void;
+    getTemplate(): Template;
 }
 
 import { Info } from "./InfoTypes";
@@ -595,6 +598,7 @@ interface Props {
     ) => void;
 
     onTrackScroll?: () => void; // called when track scrolling is changed
+    onTrackSelection?: () => void; // called when track selection is changed
     onContentRescale?: () => void; // called when content zoom and scrolling are changed
     onContentSelection?: () => void; // called when content zoom and scrolling are changed
 
@@ -688,7 +692,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.props.maxContentZoom !== prevProps.maxContentZoom
         ) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = getSelectedTrackIndeces(this.logController);
+            selectedTrackIndeces = this.getSelectedTrackIndeces();
             this.createLogViewer();
             shouldSetTracks = true;
         }
@@ -700,29 +704,30 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             shouldSetTracks = true;
         } else if (this.props.colorTables !== prevProps.colorTables) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = getSelectedTrackIndeces(this.logController);
+            selectedTrackIndeces = this.getSelectedTrackIndeces();
             shouldSetTracks = true; // force to repaint
         } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
-            selectedTrackIndeces = getSelectedTrackIndeces(this.logController);
+            selectedTrackIndeces = this.getSelectedTrackIndeces();
             shouldSetTracks = true;
         } else if (
             this.props.axisTitles !== prevProps.axisTitles ||
             this.props.axisMnemos !== prevProps.axisMnemos
         ) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = getSelectedTrackIndeces(this.logController);
+            selectedTrackIndeces = this.getSelectedTrackIndeces();
             shouldSetTracks = true; //??
         }
 
         if (shouldSetTracks) {
             this.setTracks(); // use this.template
-            restoreSelectTracks(this.logController, selectedTrackIndeces);
+            setSelectedTrackIndeces(this.logController, selectedTrackIndeces);
             if (selection) this.selectContent(selection);
         } else if (
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
             this.props.maxVisibleTrackNum !== prevProps.maxVisibleTrackNum
         ) {
             this.onTrackScroll();
+            this.onTrackSelection();
             this.setInfo();
         }
     }
@@ -786,6 +791,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             );
         }
         this.onTrackScroll();
+        this.onTrackSelection();
         this.setInfo(); // Clear old track information
     }
 
@@ -805,6 +811,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (this.props.onTrackScroll) this.props.onTrackScroll();
     }
+    onTrackSelection(): void {
+        if (this.props.onTrackSelection) this.props.onTrackSelection();
+    }
+
     setInfo(x: number = Number.NaN): void {
         if (!this.props.onInfo) return; // no callback is given
         if (!this.logController) return; // not initialized yet
@@ -956,6 +966,15 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this._graphTrackMax() / this._maxVisibleTrackNum();
     }
 
+    getSelectedTrackIndeces(): number[] {
+        return getSelectedTrackIndeces(this.logController);
+    }
+    setSelectedTrackIndeces(selection: number[]): boolean {
+        const changed = setSelectedTrackIndeces(this.logController, selection);
+        if (changed) this.onTrackSelection();
+        return changed;
+    }
+
     getTemplate(): Template {
         return this.template;
     }
@@ -965,6 +984,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (t !== tNew) {
             this.template = JSON.parse(tNew); // save external template content to current
             this.setTracks();
+            /* not sure */ this.onTemplateChanged();
         }
     }
 
@@ -1028,6 +1048,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.logController.removeTrack(track);
 
             this.onTrackScroll();
+            this.onTrackSelection();
             this.onTemplateChanged();
         }
     }
@@ -1038,16 +1059,23 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         );
     }
 
-    selectTrack(track: Track, selected: boolean): void {
+    selectTrack(track: Track, selected: boolean): boolean {
+        let changed = false;
         if (this.logController)
             for (const _track of this.logController.tracks) {
                 // single selection: remove selection from another tracks
-                selectTrack(
-                    this.logController,
-                    _track,
-                    selected && track === _track
-                );
+                if (
+                    selectTrack(
+                        this.logController,
+                        _track,
+                        selected && track === _track
+                    )
+                )
+                    changed = true;
             }
+        if (changed) this.onTrackSelection();
+
+        return changed;
     }
 
     addTrackPlot(track: Track, templatePlot: TemplatePlot): void {

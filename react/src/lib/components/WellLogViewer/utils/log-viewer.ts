@@ -186,7 +186,7 @@ export function getFirstVisibleTrack(logViewer: LogViewer): number {
     return -1;
 }
 
-export function restoreSelectTracks(
+export function setSelectedTrackIndeces(
     logViewer: LogViewer | undefined,
     selectedTrackIndeces: number[]
 ): boolean {

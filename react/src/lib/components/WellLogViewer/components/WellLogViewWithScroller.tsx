@@ -36,6 +36,7 @@ interface Props {
     ) => void;
 
     onTrackScroll?: () => void; // called when track scrolling are changed
+    onTrackSelection?: () => void; // called when trackselection is changed
     onContentRescale?: () => void; // called when content zoom and scrolling are changed
     onContentSelection?: () => void; // called when content zoom and scrolling are changed
 
@@ -57,6 +58,7 @@ class WellLogViewWithScroller extends Component<Props> {
 
         this.onScrollerScroll = this.onScrollerScroll.bind(this);
         this.onTrackScroll = this.onTrackScroll.bind(this);
+        this.onTrackSelection = this.onTrackSelection.bind(this);
 
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
@@ -98,6 +100,11 @@ class WellLogViewWithScroller extends Component<Props> {
     onTrackScroll(): void {
         this.setScrollerPosAndZoom();
         if (this.props.onTrackScroll) this.props.onTrackScroll();
+    }
+    // callback function from WellLogView
+    onTrackSelection(): void {
+        //?? this.setScrollerPosAndZoom();
+        if (this.props.onTrackSelection) this.props.onTrackSelection();
     }
     // callback function from WellLogView
     onContentRescale(): void {
@@ -212,6 +219,7 @@ class WellLogViewWithScroller extends Component<Props> {
                     onTrackMouseEvent={this.props.onTrackMouseEvent}
                     onTemplateChanged={this.props.onTemplateChanged}
                     onTrackScroll={this.onTrackScroll}
+                    onTrackSelection={this.onTrackSelection}
                     onContentRescale={this.onContentRescale}
                     onContentSelection={this.onContentSelection}
                 />
