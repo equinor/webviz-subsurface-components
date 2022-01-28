@@ -15,13 +15,15 @@ export interface PrivateMeshLayerProps<D> extends SimpleMeshLayerProps<D> {
     // Contourlines reference point and interval.
     contours: [number, number];
 
+    // Property values in a ImageData structure.
+    propertyValuesImageData: ImageData;
+
     //If true readout will be z value (depth). Otherwise it is the texture property value.
     isReadoutDepth: boolean;
 }
 
 const defaultProps = {
-    data: [{ position: [0, 0], angle: 0, color: [255, 0, 0] }], // dummy data [255, 0, 0, 99]
-    //propertyValuesImageData: {type: 'image', value: null, async: true},
+    data: [{ position: [0, 0], angle: 0, color: [255, 0, 0] }],
     propertyValuesImageData: { value: null, type: "object", async: true },
     getPosition: (d: DataItem) => d.position,
     getColor: (d: DataItem) => d.color,
