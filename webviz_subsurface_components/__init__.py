@@ -6,26 +6,24 @@
 
 from __future__ import print_function as _
 
+import json
 import os as _os
 import sys as _sys
-import json
 import warnings
 
-from pkg_resources import get_distribution, DistributionNotFound
-
 import dash as _dash
+from pkg_resources import DistributionNotFound, get_distribution
 
 from ._imports_ import *
 from ._imports_ import __all__
-
 from .py_expression_eval import Parser
-from .VectorCalculatorWrapper import VectorCalculatorWrapper as VectorCalculator
 from .VectorCalculatorWrapper import (
     ExpressionInfo,
     ExternalParseData,
     VariableVectorMapInfo,
 )
-
+from .VectorCalculatorWrapper import VectorCalculatorWrapper as VectorCalculator
+from .VectorDefinitions import VectorDefinition, VectorDefinitions
 
 try:
     __version__ = get_distribution(__name__).version
