@@ -52,8 +52,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         propertyTexture: { type: "string", optional: false },
         // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
         bounds: { type: "array", value: null, false: true, compare: true },
-        propertyValueRange: { type: "array", value: [0, 1] },
-        colorMapRange: { type: "array", value: [0, 1] },
+        propertyValueRange: { type: "array" },
+        colorMapRange: { type: "array" },
         rotDeg: 0,
         contours: [-1.0, -1.0],
         // readout is default property value but if set to true it will be depth/z-value.
