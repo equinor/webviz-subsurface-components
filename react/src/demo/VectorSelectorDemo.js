@@ -26,7 +26,19 @@ class WellCompletionsDemo extends Component {
                     selectedTags={["iter-0:WGOR:OP_1"]}
                     numMetaNodes={1}
                     customVectorDefinitions={{
-                        Test: { type: "calculated", description: "Test" },
+                        Test: {
+                            type: "calculated",
+                            description: "Test Custom description",
+                        },
+                        WGOR: {
+                            type: "field",
+                            description: "Gas-Oil Ratio Custom description",
+                        },
+                        WOPR: {
+                            type: "well",
+                            description:
+                                "Oil Production Rate Custom description",
+                        },
                     }}
                     label="Select a vector"
                     data={[
@@ -39,7 +51,8 @@ class WellCompletionsDemo extends Component {
                                 {
                                     id: "0-0",
                                     name: "WGOR",
-                                    description: "Gas-Oil Ratio",
+                                    description:
+                                        "Gas-Oil Ratio Tree data description",
                                     children: [
                                         {
                                             id: "0-0-0",
@@ -49,11 +62,54 @@ class WellCompletionsDemo extends Component {
                                 },
                                 {
                                     id: "0-1",
-                                    name: "Test",
-                                    description: "Test",
+                                    name: "WOPT",
                                     children: [
                                         {
-                                            id: "0-0-0",
+                                            id: "0-1-0",
+                                            name: "OP_1",
+                                        },
+                                    ],
+                                },
+                                {
+                                    id: "0-2",
+                                    name: "WOPR",
+                                    children: [
+                                        {
+                                            id: "0-2-0",
+                                            name: "OP_1",
+                                        },
+                                    ],
+                                },
+                                {
+                                    id: "0-3",
+                                    name: "Test",
+                                    description:
+                                        "First Test Tree data description",
+                                    children: [
+                                        {
+                                            id: "0-3-0",
+                                            name: "OP_1",
+                                        },
+                                    ],
+                                },
+                                {
+                                    id: "0-4",
+                                    name: "Test2",
+                                    description: "Test2 Tree data description",
+                                    children: [
+                                        {
+                                            id: "0-4-0",
+                                            name: "OP_1",
+                                        },
+                                    ],
+                                },
+                                {
+                                    id: "0-5",
+                                    name: "Test3",
+                                    description: "Test3 Tree data description",
+                                    children: [
+                                        {
+                                            id: "0-5-0",
                                             name: "OP_1",
                                         },
                                     ],
