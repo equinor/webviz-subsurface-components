@@ -117,19 +117,20 @@
           437720,
           6481113
         ],
-        "meshMaxError": 50000.0,
-        "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/hugin_depth_25_m_normalized_margin.png",
+        "meshMaxError": 5.0,
+        "mesh": "hugin_depth_25_m_normalized_margin.png",
         "meshValueRange": [
           2782,
           3513
         ],
-        "propertyTexture": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/kh_netmap_25_m_normalized_margin.png",
+        "propertyTexture": "kh_netmap_25_m_normalized_margin.png",
         "propertyValueRange": [
           2782,
           3513
         ],
         "rotDeg": 0,
         "contours": [0, 50.0],
+        "isContoursDepth": true,
         "colorMapName": "Physics",
         "colorMapRange": [
           2782,
@@ -155,6 +156,17 @@
       },
       {
         "@@type": "DrawingLayer"
+      },
+      {
+        "@@type": "AxesLayer",
+        "bounds": [
+          432205,
+          6475078,
+          -3500,
+          437720,
+          6481113,
+          0
+        ]
       }
     ],
     "editedData": {},

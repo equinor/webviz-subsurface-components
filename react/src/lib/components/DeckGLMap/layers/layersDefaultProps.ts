@@ -78,6 +78,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         colorMapRange: { type: "array", value: [0, 1] },
         rotDeg: 0,
         contours: [-1.0, -1.0],
+        // If contour lines should follow depth or properties.
+        isContoursDepth: true,
         // readout is default property value but if set to true it will be depth/z-value.
         isReadoutDepth: false,
         enableSmoothShading: true,
@@ -121,6 +123,12 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         visible: true,
         selectedPie: "@@editedData.selectedPie", // used to get data from deckgl layer
+    },
+    AxesLayer: {
+        "@@type": "AxesLayer",
+        name: "Axes",
+        id: "axes-layer",
+        visible: false,
     },
     DrawingLayer: {
         "@@type": "DrawingLayer",
