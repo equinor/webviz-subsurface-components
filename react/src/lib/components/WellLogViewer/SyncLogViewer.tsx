@@ -201,23 +201,6 @@ class SyncLogViewer extends Component<Props, State> {
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-        /*
-            //compare (Object.keys(nextProps), Object.keys(this.props))
-            for (const p in nextProps) {
-                // eslint-disable-next-line
-                if ((nextProps as any)[p] !== (this.props as any)[p]) {
-                    console.log(p /*, nextProps[p], this.props[p]* / );
-                    return true;
-                }
-            }
-            for (const s in nextState) {
-                // eslint-disable-next-line
-                if ((nextState as any)[s] !== (this.state as any)[s]) {
-                    console.log(s /*, nextState[s], this.state[s]* /);
-                    return true;
-                }
-            }
-        return false;*/
         return (
             !Object.is(this.props, nextProps) ||
             !Object.is(this.state, nextState)

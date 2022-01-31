@@ -103,7 +103,6 @@ class WellLogViewWithScroller extends Component<Props> {
     }
     // callback function from WellLogView
     onTrackSelection(): void {
-        //?? this.setScrollerPosAndZoom();
         if (this.props.onTrackSelection) this.props.onTrackSelection();
     }
     // callback function from WellLogView
