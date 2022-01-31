@@ -23,7 +23,7 @@ import {
     createPropertyData,
 } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
-import { flattenPath, splineRefine } from "./utils/spline";
+import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
@@ -105,16 +105,11 @@ export default class WellsLayer extends CompositeLayer<
         }
 
         const refine = this.props.refine;
-        let data = refine
+        const data = refine
             ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
             : (this.props.data as FeatureCollection);
 
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
-        if (!is3d) {
-            // In 2D flatten wells.
-            data = flattenPath(data);
-        }
-
         const positionFormat = is3d ? "XYZ" : "XY";
 
         const outline = new GeoJsonLayer<Feature>(
