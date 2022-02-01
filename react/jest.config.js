@@ -16,7 +16,7 @@ module.exports = {
         ],
     },
     transformIgnorePatterns: [
-        "<rootDir>/node_modules/(?!(@webviz|@emerson-eps)|d3-delaunay|delaunator|robust-predicates/)",
+        "<rootDir>/node_modules/(?!(@webviz|@emerson-eps|d3-delaunay|delaunator|robust-predicates)/)",
     ],
     testPathIgnorePatterns: ["<rootDir>/node_modules", "<rootDir>/dist"],
     modulePathIgnorePatterns: ["<rootDir>/dist"],
