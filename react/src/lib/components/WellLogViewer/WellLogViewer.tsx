@@ -1,21 +1,22 @@
 import React, { Component, ReactNode } from "react";
 
+import { debouncer, DebounceFunction } from "@equinor/videx-wellog";
+
 import PropTypes from "prop-types";
 
-import WellLogView from "./components/WellLogView";
+import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { TrackMouseEvent } from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
-import Slider from "@material-ui/core/Slider"; // for Zoom value selector
+import ZoomSlider from "./components/ZoomSlider";
 
 import { WellLog } from "./components/WellLogTypes";
 import { Template } from "./components/WellLogTemplateTypes";
 import { ColorTable } from "./components/ColorTableTypes";
 
 import { WellLogController } from "./components/WellLogView";
-
-import Scroller from "./components/Scroller";
+import WellLogView from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
 
@@ -55,10 +56,7 @@ function onTrackMouseEvent(wellLogView: WellLogView, ev: TrackMouseEvent) {
         );
     }
 }
-///////////  for Scale Slider
-function valueLabelFormat(value: number /*, index: number*/): string {
-    return value.toFixed(Number.isInteger(value) || value > 20 ? 0 : 1);
-}
+
 ///////////
 
 import { fillInfos } from "./utils/fill-info";
@@ -78,7 +76,10 @@ interface Props {
     readoutOptions?: InfoOptions; // options for readout
 
     // callbacks
-    onContentRescale: () => void;
+    onContentRescale?: () => void;
+    onContentSelection?: () => void;
+    onTemplateChanged?: () => void;
+
     onCreateController?: (controller: WellLogController) => void;
 }
 interface State {
@@ -86,14 +87,16 @@ interface State {
     primaryAxis: string;
     infos: Info[];
 
-    contentZoom: number; // value for zoom slider
+    sliderValue: number; // value for zoom slider
 }
 
 class WellLogViewer extends Component<Props, State> {
     public static propTypes: Record<string, unknown>;
 
     controller: WellLogController | null;
-    scroller: Scroller | null;
+
+    debounce: DebounceFunction;
+
     collapsedTrackIds: (string | number)[];
 
     constructor(props: Props) {
@@ -110,11 +113,14 @@ class WellLogViewer extends Component<Props, State> {
             axes: axes, //["md", "tvd"]
             infos: [],
 
-            contentZoom: 4.0,
+            sliderValue: 4.0,
         };
 
         this.controller = null;
-        this.scroller = null;
+
+        this.debounce = debouncer(150);
+
+        this.collapsedTrackIds = [];
 
         this.collapsedTrackIds = [];
 
@@ -124,10 +130,9 @@ class WellLogViewer extends Component<Props, State> {
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
 
-        this.onScrollerScroll = this.onScrollerScroll.bind(this);
-        this.onTrackScroll = this.onTrackScroll.bind(this);
-
         this.onContentRescale = this.onContentRescale.bind(this);
+        this.onContentSelection = this.onContentSelection.bind(this);
+        this.onTemplateChanged = this.onTemplateChanged.bind(this);
 
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
 
@@ -135,37 +140,21 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.setScrollerPosAndZoom();
-        this.setSliderZoom();
+        this.setSliderValue();
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-        {
-            //compare (Object.keys(nextProps), Object.keys(this.props))
-            for (const p in nextProps) {
-                // eslint-disable-next-line
-                if ((nextProps as any)[p] !== (this.props as any)[p]) {
-                    //console.log(p /*, nextProps[p], this.props[p]*/);
-                    return true;
-                }
-            }
-            for (const s in nextState) {
-                // eslint-disable-next-line
-                if ((nextState as any)[s] !== (this.state as any)[s]) {
-                    //console.log(s /*, nextState[s], this.state[s]*/);
-                    return true;
-                }
-            }
-        }
-        //return true;
-        return false;
+        return (
+            !Object.is(this.props, nextProps) ||
+            !Object.is(this.state, nextState)
+        );
     }
 
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
         if (
             this.props.welllog !== prevProps.welllog ||
-            this.props.template !== prevProps.template ||
-            this.props.colorTables !== prevProps.colorTables
+            this.props.template !== prevProps.template /*||
+            this.props.colorTables !== prevProps.colorTables*/
         ) {
             const axes = getAvailableAxes(this.props.welllog, axisMnemos);
             let primaryAxis = axes[0];
@@ -209,11 +198,14 @@ class WellLogViewer extends Component<Props, State> {
                 this.props.readoutOptions.grouping !==
                     prevProps.readoutOptions.grouping)
         ) {
-            if (this.controller)
-                this.controller.selectContent(
-                    this.controller.getContentSelection()
-                ); // force to update readout panel
+            this.updateReadoutPanel();
         }
+    }
+
+    updateReadoutPanel(): void {
+        const controller = this.controller;
+        if (controller)
+            controller.selectContent(controller.getContentSelection()); // force to update readout panel
     }
 
     // callback function from WellLogView
@@ -244,18 +236,36 @@ class WellLogViewer extends Component<Props, State> {
             this.props.onCreateController(controller);
 
         this.setControllerZoom();
-        this.setScrollerPosAndZoom();
-        //this.setSliderZoom();
-    }
-    // callback function from WellLogView
-    onTrackScroll(): void {
-        this.setScrollerPosAndZoom();
     }
     // callback function from WellLogView
     onContentRescale(): void {
-        this.setScrollerPosAndZoom();
-        this.setSliderZoom();
-        if (this.props.onContentRescale) this.props.onContentRescale();
+        this.setSliderValue();
+        if (this.props.onContentRescale) {
+            // use debouncer to prevent too frequent notifications while animation
+            this.debounce(() => {
+                if (this.props.onContentRescale) this.props.onContentRescale();
+            });
+        }
+    }
+    // callback function from WellLogView
+    onContentSelection(): void {
+        this.setSliderValue();
+        if (this.props.onContentSelection) {
+            // use debouncer to prevent too frequent notifications while animation
+            this.debounce(() => {
+                if (this.props.onContentSelection)
+                    this.props.onContentSelection();
+            });
+        }
+    }
+    onTemplateChanged(): void {
+        if (this.props.onTemplateChanged) {
+            // use debouncer to prevent too frequent notifications while animation
+            this.debounce(() => {
+                if (this.props.onTemplateChanged)
+                    this.props.onTemplateChanged();
+            });
+        }
     }
 
     // callback function from Axis selector
@@ -263,62 +273,22 @@ class WellLogViewer extends Component<Props, State> {
         this.setState({ primaryAxis: value });
     }
     // callback function from Zoom slider
-    onZoomSliderChange(
-        _event: React.ChangeEvent<Record<string, unknown>>,
-        value: number | number[]
-    ): void {
-        if (this.controller && typeof value === "number") {
-            const zoom = 2 ** value;
-            this.controller.zoomContent(zoom);
-        }
-    }
-    // callback function from Scroller
-    onScrollerScroll(x: number, y: number): void {
-        if (this.controller) {
-            const fContent = this.props.horizontal ? x : y; // fraction
-            this.controller.scrollContentTo(fContent);
-
-            const posMax = this.controller.getTrackScrollPosMax();
-            let posTrack = (this.props.horizontal ? y : x) * posMax;
-            posTrack = Math.round(posTrack);
-            this.controller.scrollTrackTo(posTrack);
+    onZoomSliderChange(value: number): void {
+        const controller = this.controller;
+        if (controller) {
+            controller.zoomContent(value);
         }
     }
 
-    setSliderZoom(): void {
-        if (!this.controller) return;
-        const zoom = this.controller.getContentZoom();
-
-        if (Math.abs(Math.log(this.state.contentZoom / zoom)) > 0.01) {
-            this.setState({ contentZoom: zoom }); // for Zoom slider
-        }
-    }
-
-    setScrollerPosAndZoom(): void {
-        if (!this.scroller) return;
-
-        let x, y;
-        let xZoom, yZoom;
-        if (!this.controller) {
-            x = y = 0.0;
-            xZoom = yZoom = 1.0;
-        } else {
-            const fContent = this.controller.getContentScrollPos(); // fraction
-            const fTrack = this.controller.getTrackScrollPosMax()
-                ? this.controller.getTrackScrollPos() /
-                  this.controller.getTrackScrollPosMax()
-                : 0.0; // fraction
-            x = this.props.horizontal ? fContent : fTrack;
-            y = this.props.horizontal ? fTrack : fContent;
-
-            const contentZoom = this.controller.getContentZoom();
-            const trackZoom = this.controller.getTrackZoom();
-            xZoom = this.props.horizontal ? contentZoom : trackZoom;
-            yZoom = this.props.horizontal ? trackZoom : contentZoom;
-        }
-
-        this.scroller.zoom(xZoom, yZoom);
-        this.scroller.scrollTo(x, y);
+    // set zoom value to slider
+    setSliderValue(): void {
+        this.setState((state: Readonly<State>) => {
+            if (!this.controller) return null;
+            const zoom = this.controller.getContentZoom();
+            if (Math.abs(Math.log(state.sliderValue / zoom)) < 0.01)
+                return null;
+            return { sliderValue: zoom };
+        });
     }
 
     setControllerZoom(): void {
@@ -335,6 +305,8 @@ class WellLogViewer extends Component<Props, State> {
         if (i < 0) this.collapsedTrackIds.push(trackId);
         else delete this.collapsedTrackIds[i];
 
+        this.updateReadoutPanel();
+
         if (this.controller)
             this.controller.selectContent(
                 this.controller.getContentSelection()
@@ -345,28 +317,23 @@ class WellLogViewer extends Component<Props, State> {
         const maxContentZoom = 256;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
-                <Scroller
-                    //style={{ height: "100%", flex: "1 1 auto" }}
-                    ref={(el) => (this.scroller = el as Scroller)}
-                    onScroll={this.onScrollerScroll}
-                >
-                    <WellLogView
-                        welllog={this.props.welllog}
-                        template={this.props.template}
-                        colorTables={this.props.colorTables}
-                        horizontal={this.props.horizontal}
-                        maxVisibleTrackNum={this.props.horizontal ? 3 : 5}
-                        maxContentZoom={maxContentZoom}
-                        primaryAxis={this.state.primaryAxis}
-                        axisTitles={axisTitles}
-                        axisMnemos={axisMnemos}
-                        onInfo={this.onInfo}
-                        onCreateController={this.onCreateController}
-                        onTrackMouseEvent={onTrackMouseEvent}
-                        onTrackScroll={this.onTrackScroll}
-                        onContentRescale={this.onContentRescale}
-                    />
-                </Scroller>
+                <WellLogViewWithScroller
+                    welllog={this.props.welllog}
+                    template={this.props.template}
+                    colorTables={this.props.colorTables}
+                    horizontal={this.props.horizontal}
+                    maxVisibleTrackNum={this.props.horizontal ? 3 : 5}
+                    maxContentZoom={maxContentZoom}
+                    primaryAxis={this.state.primaryAxis}
+                    axisTitles={axisTitles}
+                    axisMnemos={axisMnemos}
+                    onInfo={this.onInfo}
+                    onCreateController={this.onCreateController}
+                    onTrackMouseEvent={onTrackMouseEvent}
+                    onContentRescale={this.onContentRescale}
+                    onContentSelection={this.onContentSelection}
+                    onTemplateChanged={this.onTemplateChanged}
+                />
                 <div
                     style={{
                         flex: "0, 0",
@@ -399,18 +366,10 @@ class WellLogViewer extends Component<Props, State> {
                                 padding: "0 20px 0 10px",
                             }}
                         >
-                            <Slider
-                                value={Math.log2(this.state.contentZoom)}
-                                min={0}
-                                step={0.5}
-                                max={Math.log2(maxContentZoom)}
-                                scale={(x) => 2 ** x}
-                                defaultValue={0}
+                            <ZoomSlider
+                                value={this.state.sliderValue}
+                                max={maxContentZoom}
                                 onChange={this.onZoomSliderChange}
-                                valueLabelDisplay="auto"
-                                aria-labelledby="non-linear-slider"
-                                getAriaValueText={valueLabelFormat}
-                                valueLabelFormat={valueLabelFormat}
                             />
                         </span>
                     </div>

@@ -505,7 +505,6 @@ function updateTrackScale(track: GraphTrack): void {
     }
 
     if (!track.options.scale) throw Error("Invalid track.options.scale!");
-    //if (!track.options.domain) throw Error("Invalid track.options.domain!");
     track.trackScale = createScale(track.options.scale, track.options.domain);
 }
 
@@ -858,8 +857,7 @@ export function newGraphTrack(
 }
 
 export function isScaleTrack(track: Track): boolean {
-    if ((track as ScaleTrack).xscale) return true;
-    //if ((track as DualScaleTrack).xscale) return true;
+    if ((track as ScaleTrack).xscale) return true; // Both ScaleTrack and DualScaleTrack has .xscale
     return false;
 }
 export function getScaleTrackNum(tracks: Track[]): number {

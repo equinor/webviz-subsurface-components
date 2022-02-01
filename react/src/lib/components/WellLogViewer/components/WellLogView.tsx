@@ -20,8 +20,6 @@ import "!vue-style-loader!css-loader!sass-loader!./styles.scss";
 
 import { select } from "d3";
 
-import { debouncer, DebounceFunction } from "@equinor/videx-wellog";
-
 import { WellLog } from "./WellLogTypes";
 import { Template } from "./WellLogTemplateTypes";
 import { ColorTable } from "./ColorTableTypes";
@@ -48,15 +46,15 @@ import {
     zoomContent,
     scrollContentTo,
     zoomContentTo,
+    setContentBaseDomain,
     getContentBaseDomain,
     getContentDomain,
-    getContentScrollPos,
     getContentZoom,
     scrollTracksTo,
     isTrackSelected,
     selectTrack,
-    getSelectTrackIndeces,
-    restoreSelectTracks,
+    getSelectedTrackIndeces,
+    setSelectedTrackIndeces,
 } from "../utils/log-viewer";
 
 function showSelection(
@@ -191,7 +189,8 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
                 event.target.style.visibility = "visible";
             }
 
-            parent.onMouseMove(value);
+            parent.setInfo(value);
+            parent.onContentSelection();
         },
         onMouseExit: (event: OverlayMouseExitEvent): void => {
             if (event.target) event.target.style.visibility = "hidden";
@@ -241,7 +240,7 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
 
                         pinelm.style.visibility = "hidden";
                         parent.selPinned = undefined;
-                        parent.onContentRescale();
+                        parent.onContentSelection();
                     }
                 } else {
                     parent.selPinned = instance.scale.invert(v);
@@ -310,7 +309,7 @@ function createInterpolator(from: Float32Array, to: Float32Array) {
         }
     }
 
-    return (x: number, expand: boolean) => {
+    return (x: number, expand: boolean): number => {
         for (let i = 0; i < n; i++) {
             if (x < from[i]) {
                 if (!i) return expand ? to[0] : Number.NaN;
@@ -339,9 +338,9 @@ function createScaleHandler(
     const interpolator: ScaleInterpolator = {
         forward,
         reverse,
-        forwardInterpolatedDomain: (domain) =>
+        forwardInterpolatedDomain: (domain: number[]) =>
             domain.map((v) => secondary2primary(v, true)),
-        reverseInterpolatedDomain: (domain) =>
+        reverseInterpolatedDomain: (domain: number[]) =>
             domain.map((v) => primary2secondary(v, true)),
     };
     return new InterpolatedScaleHandler(interpolator);
@@ -555,18 +554,22 @@ export interface WellLogController {
     scrollContentTo(f: number): boolean; // fraction of content
     zoomContent(zoom: number): void;
     selectContent(selection: [number | undefined, number | undefined]): void;
+    setContentBaseDomain(domain: [number, number]): void;
     getContentBaseDomain(): [number, number]; // full scale range
     getContentDomain(): [number, number]; // visible range
-    getContentScrollPos(): number; // fraction of content
     getContentZoom(): number;
     getContentSelection(): [number | undefined, number | undefined]; // [current, pinned]
 
-    scrollTrackTo(pos: number): boolean;
+    scrollTrackTo(pos: number): void;
     scrollTrackBy(delta: number): void;
     getTrackScrollPos(): number;
     getTrackScrollPosMax(): number;
     getTrackZoom(): number;
 
+    setSelectedTrackIndeces(selection: number[]): boolean;
+    getSelectedTrackIndeces(): number[];
+
+    setTemplate(template: Template): void;
     getTemplate(): Template;
 }
 
@@ -594,11 +597,13 @@ interface Props {
         iTo: number
     ) => void;
 
-    onTrackScroll?: () => void; // called when track scrolling are changed
+    onTrackScroll?: () => void; // called when track scrolling is changed
+    onTrackSelection?: () => void; // called when track selection is changed
     onContentRescale?: () => void; // called when content zoom and scrolling are changed
+    onContentSelection?: () => void; // called when content zoom and scrolling are changed
 
     onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void; // called when mouse click on a track
-    onTemplateChanged?: () => void; // called when track scrolling are changed
+    onTemplateChanged?: () => void; // called when template is changed
 }
 
 interface State {
@@ -610,7 +615,6 @@ interface State {
 class WellLogView extends Component<Props, State> implements WellLogController {
     container?: HTMLElement;
     logController?: LogViewer;
-    debounce: DebounceFunction;
     selCurrent: number | undefined; // current mouse position
     selPinned: number | undefined; // pinned position
     selPersistent: boolean | undefined;
@@ -622,7 +626,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         this.container = undefined;
         this.logController = undefined;
-        this.debounce = debouncer(50);
         this.selCurrent = undefined;
         this.selPinned = undefined;
         this.selPersistent = undefined;
@@ -643,10 +646,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         this.onTrackMouseEvent = this.onTrackMouseEvent.bind(this);
 
-        if (this.props.onCreateController) {
-            // set callback to component's caller
-            this.props.onCreateController(this);
-        }
+        // set callback to component's caller
+        if (this.props.onCreateController) this.props.onCreateController(this);
     }
 
     componentDidMount(): void {
@@ -677,8 +678,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     componentDidUpdate(prevProps: Props, prevState: State): void {
         // Typical usage (don't forget to compare props):
         if (this.props.onCreateController !== prevProps.onCreateController) {
+            // update callback to component's caller
             if (this.props.onCreateController)
-                // update callback to component's caller
                 this.props.onCreateController(this);
         }
 
@@ -691,7 +692,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.props.maxContentZoom !== prevProps.maxContentZoom
         ) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = getSelectTrackIndeces(this.logController);
+            selectedTrackIndeces = this.getSelectedTrackIndeces();
             this.createLogViewer();
             shouldSetTracks = true;
         }
@@ -703,29 +704,30 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             shouldSetTracks = true;
         } else if (this.props.colorTables !== prevProps.colorTables) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = getSelectTrackIndeces(this.logController);
+            selectedTrackIndeces = this.getSelectedTrackIndeces();
             shouldSetTracks = true; // force to repaint
         } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
-            selectedTrackIndeces = getSelectTrackIndeces(this.logController);
+            selectedTrackIndeces = this.getSelectedTrackIndeces();
             shouldSetTracks = true;
         } else if (
             this.props.axisTitles !== prevProps.axisTitles ||
             this.props.axisMnemos !== prevProps.axisMnemos
         ) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = getSelectTrackIndeces(this.logController);
+            selectedTrackIndeces = this.getSelectedTrackIndeces();
             shouldSetTracks = true; //??
         }
 
         if (shouldSetTracks) {
             this.setTracks(); // use this.template
-            restoreSelectTracks(this.logController, selectedTrackIndeces);
+            setSelectedTrackIndeces(this.logController, selectedTrackIndeces);
             if (selection) this.selectContent(selection);
         } else if (
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
             this.props.maxVisibleTrackNum !== prevProps.maxVisibleTrackNum
         ) {
             this.onTrackScroll();
+            this.onTrackSelection();
             this.setInfo();
         }
     }
@@ -789,6 +791,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             );
         }
         this.onTrackScroll();
+        this.onTrackSelection();
         this.setInfo(); // Clear old track information
     }
 
@@ -808,6 +811,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (this.props.onTrackScroll) this.props.onTrackScroll();
     }
+    onTrackSelection(): void {
+        if (this.props.onTrackSelection) this.props.onTrackSelection();
+    }
+
     setInfo(x: number = Number.NaN): void {
         if (!this.props.onInfo) return; // no callback is given
         if (!this.logController) return; // not initialized yet
@@ -819,19 +826,16 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.props.onInfo(x, this.logController, iFrom, iTo);
     }
 
-    onMouseMove(x: number): void {
-        this.setInfo(x);
-
-        this.onContentRescale();
-    }
-
     onContentRescale(): void {
         this.showSelection();
 
-        // use debouncer to prevent too frequent notifications while animation
-        this.debounce(() => {
-            if (this.props.onContentRescale) this.props.onContentRescale();
-        });
+        if (this.props.onContentRescale) this.props.onContentRescale();
+    }
+
+    onContentSelection(): void {
+        this.showSelection();
+
+        if (this.props.onContentSelection) this.props.onContentSelection();
     }
 
     onTrackMouseEvent(ev: TrackMouseEvent): void {
@@ -889,6 +893,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.showSelection();
         this.setInfo(); // reflect new value in this.selCurrent
     }
+
+    setContentBaseDomain(domain: [number, number]): void {
+        if (this.logController)
+            return setContentBaseDomain(this.logController, domain);
+    }
     getContentBaseDomain(): [number, number] {
         if (this.logController) return getContentBaseDomain(this.logController);
         return [0.0, 0.0];
@@ -896,10 +905,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     getContentDomain(): [number, number] {
         if (this.logController) return getContentDomain(this.logController);
         return [0.0, 0.0];
-    }
-    getContentScrollPos(): number {
-        if (this.logController) return getContentScrollPos(this.logController);
-        return 0.0;
     }
     getContentZoom(): number {
         if (this.logController) return getContentZoom(this.logController);
@@ -931,18 +936,21 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     scrollTrackBy(delta: number): void {
-        this.setState((prevState: State) => ({
+        this.setState((state: Readonly<State>) => ({
             scrollTrackPos: this._newTrackScrollPos(
-                prevState.scrollTrackPos + delta
+                state.scrollTrackPos + delta
             ),
         }));
     }
 
-    scrollTrackTo(pos: number): boolean {
-        const newPos = this._newTrackScrollPos(pos);
-        if (this.state.scrollTrackPos == newPos) return false;
-        this.setState({ scrollTrackPos: newPos });
-        return true;
+    scrollTrackTo(pos: number): void {
+        this.setState((state: Readonly<State>) => {
+            const newPos = this._newTrackScrollPos(pos);
+            if (state.scrollTrackPos === newPos) {
+                return null;
+            }
+            return { scrollTrackPos: newPos };
+        });
     }
     getTrackScrollPos(): number {
         return this.state.scrollTrackPos;
@@ -958,8 +966,26 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this._graphTrackMax() / this._maxVisibleTrackNum();
     }
 
+    getSelectedTrackIndeces(): number[] {
+        return getSelectedTrackIndeces(this.logController);
+    }
+    setSelectedTrackIndeces(selection: number[]): boolean {
+        const changed = setSelectedTrackIndeces(this.logController, selection);
+        if (changed) this.onTrackSelection();
+        return changed;
+    }
+
     getTemplate(): Template {
         return this.template;
+    }
+    setTemplate(template: Template): void {
+        const tNew = JSON.stringify(template);
+        const t = JSON.stringify(this.template);
+        if (t !== tNew) {
+            this.template = JSON.parse(tNew); // save external template content to current
+            this.setTracks();
+            /* not sure */ this.onTemplateChanged();
+        }
     }
 
     _generateTemplate(): Template {
@@ -1022,6 +1048,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.logController.removeTrack(track);
 
             this.onTrackScroll();
+            this.onTrackSelection();
             this.onTemplateChanged();
         }
     }
@@ -1032,16 +1059,23 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         );
     }
 
-    selectTrack(track: Track, selected: boolean): void {
+    selectTrack(track: Track, selected: boolean): boolean {
+        let changed = false;
         if (this.logController)
             for (const _track of this.logController.tracks) {
                 // single selection: remove selection from another tracks
-                selectTrack(
-                    this.logController,
-                    _track,
-                    selected && track === _track
-                );
+                if (
+                    selectTrack(
+                        this.logController,
+                        _track,
+                        selected && track === _track
+                    )
+                )
+                    changed = true;
             }
+        if (changed) this.onTrackSelection();
+
+        return changed;
     }
 
     addTrackPlot(track: Track, templatePlot: TemplatePlot): void {
