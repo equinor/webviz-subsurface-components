@@ -318,16 +318,16 @@ function getWellObjectByName(
     );
 }
 
-function getWellCoordinates(well_object: Feature): Position[] {
+function getWellCoordinates(well_object?: Feature): Position[] {
     return (
-        (well_object.geometry as GeometryCollection)?.geometries.find(
+        (well_object?.geometry as GeometryCollection)?.geometries.find(
             (item) => item.type == "LineString"
         ) as LineString
     )?.coordinates;
 }
 
-function getWellMds(well_object: Feature): number[] {
-    return well_object.properties?.["md"][0];
+function getWellMds(well_object?: Feature): number[] {
+    return well_object?.properties?.["md"][0];
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
@@ -341,11 +341,16 @@ function getLogPath(
     logrun_name: string
 ): Position[] {
     const well_object = getWellObjectByName(wells_data, d.header.well);
-    if (well_object == undefined) return [];
-
     const well_xyz = getWellCoordinates(well_object);
     const well_mds = getWellMds(well_object);
-    if (well_xyz.length == 0 || well_mds.length == 0) return [];
+
+    if (
+        well_xyz == undefined ||
+        well_mds == undefined ||
+        well_xyz.length == 0 ||
+        well_mds.length == 0
+    )
+        return [];
 
     const log_xyz: Position[] = [];
     const log_mds = getLogMd(d, logrun_name);
@@ -473,6 +478,10 @@ function interpolateDataOnTrajectory(
     data: number[],
     trajectory: Position[]
 ): number {
+    // if number of data points in less than 1 or
+    // length of data and trajectory are different we cannot interpolate.
+    if (data.length <= 1 || data.length != trajectory.length) return -1;
+
     // Identify closest well path leg to coord.
     const segment_index = getSegmentIndex(coord, trajectory);
 
@@ -508,9 +517,9 @@ function getMd(coord: Position, feature: Feature): number | null {
     if (!feature.properties || !feature.geometry) return null;
 
     const measured_depths = feature.properties["md"][0] as number[];
+    const trajectory3D = getWellCoordinates(feature);
 
-    const gc = feature.geometry as GeometryCollection;
-    const trajectory3D = (gc.geometries[1] as LineString).coordinates;
+    if (trajectory3D == undefined) return null;
 
     let trajectory;
     // In 2D view coord is of type Position2D and in 3D view it's Position3D,
