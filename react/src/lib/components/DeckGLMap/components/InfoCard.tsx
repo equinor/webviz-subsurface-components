@@ -74,6 +74,7 @@ function Row(props: { layer_data: InfoCardDataType }) {
     const [open, setOpen] = React.useState(true);
     const classes = useStyles();
 
+    if (layer_data.properties?.length == 0) return null;
     return (
         <React.Fragment>
             <TableRow className={classes.table_row}>
@@ -150,8 +151,9 @@ function Row(props: { layer_data: InfoCardDataType }) {
 }
 
 const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
-    const [infoCardData, setInfoCardData] =
-        React.useState<InfoCardDataType[] | null>(null);
+    const [infoCardData, setInfoCardData] = React.useState<
+        InfoCardDataType[] | null
+    >(null);
 
     React.useEffect(() => {
         if (props.pickInfos.length === 0) {
@@ -189,7 +191,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
 
             // collecting card data for 1st type
             const zValue = (info as PropertyMapPickInfo).propertyValue;
-            if (zValue) {
+            if (typeof zValue !== "undefined") {
                 const property = xy_properties.find(
                     (item) => item.name === layer_name
                 );

@@ -3,8 +3,11 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
-import { rgbValues } from "../../utils/continuousLegend";
-import { colorTableData } from "../../components/DiscreteLegend";
+import {
+    rgbValues,
+    colorTableData,
+    colorTablesArray,
+} from "@emerson-eps/color-tables/";
 import {
     Feature,
     GeometryCollection,
@@ -20,22 +23,21 @@ import {
     createPropertyData,
 } from "../utils/layerTools";
 import { patchLayerProps } from "../utils/layerTools";
-import { flattenPath, splineRefine } from "./utils/spline";
+import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { templateArray } from "../../components/WelllayerTemplateTypes";
-import { colorTablesArray } from "../../components/ColorTableTypes";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
+import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
     selectedWell: string;
-    selectionEnabled: boolean;
     logData: string | LogCurveDataType;
     logName: string;
+    logColor: string;
     logrunName: string;
     logRadius: number;
     logCurves: boolean;
@@ -70,7 +72,12 @@ export default class WellsLayer extends CompositeLayer<
     WellsLayerProps<FeatureCollection>
 > {
     onClick(info: WellsPickInfo): boolean {
-        if (!this.props.selectionEnabled) {
+        // Disable selection when drawing is enabled
+        if (
+            this.context.layerManager.getLayers({
+                layerIds: ["drawing-layer"],
+            })?.[0].props.mode != "view"
+        ) {
             return false;
         }
 
@@ -85,7 +92,11 @@ export default class WellsLayer extends CompositeLayer<
     }: UpdateStateInfo<
         WellsLayerProps<FeatureCollection<Geometry, GeoJsonProperties>>
     >): boolean | string | null {
-        return changeFlags.viewportChanged || changeFlags.propsOrDataChanged;
+        return (
+            changeFlags.viewportChanged ||
+            changeFlags.propsOrDataChanged ||
+            changeFlags.updateTriggersChanged
+        );
     }
 
     renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
@@ -94,16 +105,11 @@ export default class WellsLayer extends CompositeLayer<
         }
 
         const refine = this.props.refine;
-        let data = refine
+        const data = refine
             ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
             : (this.props.data as FeatureCollection);
 
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
-        if (!is3d) {
-            // In 2D flatten wells.
-            data = flattenPath(data);
-        }
-
         const positionFormat = is3d ? "XYZ" : "XY";
 
         const outline = new GeoJsonLayer<Feature>(
@@ -173,20 +179,36 @@ export default class WellsLayer extends CompositeLayer<
                         d,
                         this.props.logrunName,
                         this.props.logName,
-                        this.state.template,
-                        this.state.colorTables
+                        this.props.logColor,
+                        (this.context as DeckGLLayerContext).userData
+                            .colorTables
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
                     getLogWidth(d, this.props.logrunName, this.props.logName),
                 updateTriggers: {
-                    getColor: [this.props.logName],
-                    getWidth: [this.props.logName, this.props.logRadius],
+                    getColor: [
+                        this.props.logrunName,
+                        this.props.logName,
+                        (this.context as DeckGLLayerContext).userData
+                            .colorTables,
+                        this.props.logName,
+                        this.props.logColor,
+                    ],
+                    getWidth: [
+                        this.props.logrunName,
+                        this.props.logName,
+                        this.props.logRadius,
+                    ],
                     getPath: [positionFormat],
                 },
                 onDataLoad: (value: LogCurveDataType[]) => {
                     this.setState({
-                        legend: getLegendData(value, this.props.logName),
+                        legend: getLegendData(
+                            value,
+                            this.props.logName,
+                            this.props.logColor
+                        ),
                     });
                 },
             })
@@ -296,16 +318,16 @@ function getWellObjectByName(
     );
 }
 
-function getWellCoordinates(well_object: Feature): Position[] {
+function getWellCoordinates(well_object?: Feature): Position[] {
     return (
-        (well_object.geometry as GeometryCollection)?.geometries.find(
+        (well_object?.geometry as GeometryCollection)?.geometries.find(
             (item) => item.type == "LineString"
         ) as LineString
     )?.coordinates;
 }
 
-function getWellMds(well_object: Feature): number[] {
-    return well_object.properties?.["md"][0];
+function getWellMds(well_object?: Feature): number[] {
+    return well_object?.properties?.["md"][0];
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
@@ -319,11 +341,16 @@ function getLogPath(
     logrun_name: string
 ): Position[] {
     const well_object = getWellObjectByName(wells_data, d.header.well);
-    if (well_object == undefined) return [];
-
     const well_xyz = getWellCoordinates(well_object);
     const well_mds = getWellMds(well_object);
-    if (well_xyz.length == 0 || well_mds.length == 0) return [];
+
+    if (
+        well_xyz == undefined ||
+        well_mds == undefined ||
+        well_xyz.length == 0 ||
+        well_mds.length == 0
+    )
+        return [];
 
     const log_xyz: Position[] = [];
     const log_mds = getLogMd(d, logrun_name);
@@ -360,7 +387,7 @@ function getLogColor(
     d: LogCurveDataType,
     logrun_name: string,
     log_name: string,
-    template: templateArray,
+    logColor: string,
     colorTables: colorTablesArray
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
@@ -374,9 +401,8 @@ function getLogColor(
         const max_delta = max - min;
         log_data.forEach((value) => {
             const rgb = rgbValues(
-                log_name,
                 (value - min) / max_delta,
-                template,
+                logColor,
                 colorTables
             );
             if (rgb != undefined) {
@@ -389,8 +415,7 @@ function getLogColor(
         });
     } else {
         const colorsArray: [number, number, number, number][] = colorTableData(
-            log_name,
-            template,
+            logColor,
             colorTables
         );
 
@@ -449,12 +474,16 @@ function distToSegmentSquared(v: Position, w: Position, p: Position): number {
 
 // Interpolates point closest to the coords on trajectory
 function interpolateDataOnTrajectory(
-    coord: Position2D,
+    coord: Position,
     data: number[],
-    trajectory2D: Position[]
+    trajectory: Position[]
 ): number {
+    // if number of data points in less than 1 or
+    // length of data and trajectory are different we cannot interpolate.
+    if (data.length <= 1 || data.length != trajectory.length) return -1;
+
     // Identify closest well path leg to coord.
-    const segment_index = getSegmentIndex(coord, trajectory2D);
+    const segment_index = getSegmentIndex(coord, trajectory);
 
     const index0 = segment_index;
     const index1 = index0 + 1;
@@ -464,8 +493,8 @@ function interpolateDataOnTrajectory(
     const data1 = data[index1];
 
     // Get the nearest survey points.
-    const survey0 = trajectory2D[index0];
-    const survey1 = trajectory2D[index1];
+    const survey0 = trajectory[index0];
+    const survey1 = trajectory[index1];
 
     const dv = distance(survey0, survey1) as number;
     if (dv === 0) {
@@ -484,22 +513,31 @@ function interpolateDataOnTrajectory(
     return data0 * (1.0 - scalar_projection) + data1 * scalar_projection;
 }
 
-function getMd(coord: Position2D, feature: Feature): number | null {
+function getMd(coord: Position, feature: Feature): number | null {
     if (!feature.properties || !feature.geometry) return null;
 
     const measured_depths = feature.properties["md"][0] as number[];
+    const trajectory3D = getWellCoordinates(feature);
 
-    const gc = feature.geometry as GeometryCollection;
-    const trajectory3D = (gc.geometries[1] as LineString).coordinates;
-    const trajectory2D = trajectory3D.map((v) => {
-        return v.slice(0, 2);
-    }) as Position[];
+    if (trajectory3D == undefined) return null;
 
-    return interpolateDataOnTrajectory(coord, measured_depths, trajectory2D);
+    let trajectory;
+    // In 2D view coord is of type Position2D and in 3D view it's Position3D,
+    // so use apropriate trajectory for interpolation
+    if (coord.length == 2) {
+        const trajectory2D = trajectory3D.map((v) => {
+            return v.slice(0, 2);
+        }) as Position[];
+        trajectory = trajectory2D;
+    } else {
+        trajectory = trajectory3D;
+    }
+
+    return interpolateDataOnTrajectory(coord, measured_depths, trajectory);
 }
 
 function getMdProperty(
-    coord: Position2D,
+    coord: Position,
     feature: Feature
 ): PropertyDataType | null {
     const md = getMd(coord, feature);
@@ -510,23 +548,30 @@ function getMdProperty(
     return null;
 }
 
-function getTvd(coord: Position2D, feature: Feature): number | null {
+function getTvd(coord: Position, feature: Feature): number | null {
     const trajectory3D = getWellCoordinates(feature);
     if (trajectory3D == undefined) return null;
 
-    const trajectory2D = trajectory3D?.map((v) => {
-        return v.slice(0, 2);
-    }) as Position[];
+    let trajectory;
+    // For 2D view coord is Position2D and for 3D view it's Position3D
+    if (coord.length == 2) {
+        const trajectory2D = trajectory3D?.map((v) => {
+            return v.slice(0, 2);
+        }) as Position[];
+        trajectory = trajectory2D;
+    } else {
+        trajectory = trajectory3D;
+    }
 
     const tvds = trajectory3D.map((v) => {
         return v[2];
     }) as number[];
 
-    return interpolateDataOnTrajectory(coord, tvds, trajectory2D);
+    return interpolateDataOnTrajectory(coord, tvds, trajectory);
 }
 
 function getTvdProperty(
-    coord: Position2D,
+    coord: Position,
     feature: Feature
 ): PropertyDataType | null {
     const tvd = getTvd(coord, feature);
@@ -542,7 +587,7 @@ function getTvdProperty(
 }
 
 // Identify closest path leg to coord.
-function getSegmentIndex(coord: Position2D, path: Position[]): number {
+function getSegmentIndex(coord: Position, path: Position[]): number {
     let min_d = Number.MAX_VALUE;
     let segment_index = 0;
     for (let i = 0; i < path?.length - 1; i++) {
@@ -613,7 +658,11 @@ function getLogProperty(
 }
 
 // Return data required to build welllayer legend
-function getLegendData(logs: LogCurveDataType[], logName: string) {
+function getLegendData(
+    logs: LogCurveDataType[],
+    logName: string,
+    logColor: string
+) {
     const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
     const title = "Wells / " + logName;
     const legendProps = [];
@@ -622,7 +671,7 @@ function getLegendData(logs: LogCurveDataType[], logName: string) {
         const metadataDiscrete = meta[logName].objects;
         legendProps.push({
             title: title,
-            name: logName,
+            colorName: logColor,
             discrete: true,
             metadata: metadataDiscrete,
             valueRange: [],
@@ -639,6 +688,7 @@ function getLegendData(logs: LogCurveDataType[], logName: string) {
         legendProps.push({
             title: title,
             name: logName,
+            colorName: logColor,
             discrete: false,
             metadata: { objects: {} },
             valueRange: [Math.min(...minArray), Math.max(...maxArray)],

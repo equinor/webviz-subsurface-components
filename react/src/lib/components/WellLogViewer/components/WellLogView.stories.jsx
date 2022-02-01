@@ -49,21 +49,9 @@ export default {
 
 const Template = (args) => {
     return (
-        <div
-            style={{ height: "92vh", display: "flex", flexDirection: "column" }}
-        >
-            <div style={{ width: "100%", height: "100%", flex: 1 }}>
-                <WellLogView
-                    id="WellLogView"
-                    {...args}
-                    /*
-                        onInfo={this.onInfo}
-                        onCreateController={this.onCreateController}
-                        onTrackMouseEvent={onTrackMouseEvent}
-                        onTrackScroll={this.onTrackScroll}
-                        onContentRescale={this.onContentRescale}
-                     */
-                />
+        <div style={{ height: "92vh" }}>
+            <div style={{ width: "100%", height: "100%" }}>
+                <WellLogView id="WellLogView" {...args} />
             </div>
         </div>
     );

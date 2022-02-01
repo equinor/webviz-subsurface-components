@@ -24,6 +24,7 @@ interface Props {
 }
 
 const padding: Padding = { left: 80, right: 50, top: 70, bottom: 50 };
+/* eslint-disable react/display-name */
 /* eslint-disable react/prop-types */
 const WellCompletionsPlot: React.FC<Props> = React.memo(
     ({ timeSteps, plotData }) => {
@@ -80,4 +81,5 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
     }
 );
 
+WellCompletionsPlot.displayName = "WellCompletionsPlot";
 export default WellCompletionsPlot;

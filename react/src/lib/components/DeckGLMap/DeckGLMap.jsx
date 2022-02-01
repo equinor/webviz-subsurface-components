@@ -1,8 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import Map from "./components/Map";
-import template from "../../../demo/example-data/welllayer_template.json";
-import colorTables from "../../../demo/example-data/color-tables.json";
+import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 DeckGLMap.defaultProps = {
     coords: {
@@ -27,7 +26,6 @@ DeckGLMap.defaultProps = {
         viewport: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
     colorTables: colorTables,
-    template: template,
 };
 
 function DeckGLMap({
@@ -40,7 +38,6 @@ function DeckGLMap({
     coords,
     scale,
     legend,
-    template,
     colorTables,
     coordinateUnit,
     editedData,
@@ -84,7 +81,6 @@ function DeckGLMap({
             coords={coords}
             scale={scale}
             legend={legend}
-            template={template}
             colorTables={colorTables}
             coordinateUnit={coordinateUnit}
             editedData={layerEditedData}
@@ -241,10 +237,6 @@ DeckGLMap.propTypes = {
      * Prop containing color table data
      */
     colorTables: PropTypes.arrayOf(PropTypes.object),
-    /**
-     * Prop containing color template data
-     */
-    template: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default DeckGLMap;

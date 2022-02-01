@@ -2,27 +2,24 @@ import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 import { PickInfo } from "deck.gl";
 import { Feature } from "geojson";
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
-import { useDispatch, useSelector } from "react-redux";
-import { updateLayerProp } from "../redux/actions";
+import { useSelector } from "react-redux";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "../components/DistanceScale";
-import DiscreteColorLegend from "../components/DiscreteLegend";
-import ContinuousLegend from "../components/ContinuousLegend";
 import StatusIndicator from "./StatusIndicator";
-import { DrawingLayer, WellsLayer, PieChartLayer } from "../layers";
 import { Layer, View } from "deck.gl";
 import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
-import { templateArray } from "./WelllayerTemplateTypes";
-import { colorTablesArray } from "./ColorTableTypes";
-import { LayerProps } from "@deck.gl/core/lib/layer";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
+import ColorLegend from "./ColorLegend";
+import { getLayersInViewport } from "../layers/utils/layerTools";
 
 export interface ViewportType {
     /**
@@ -51,6 +48,13 @@ export interface ViewsType {
      * Layers configuration for multiple viewport
      */
     viewports: ViewportType[];
+}
+
+export interface DeckGLLayerContext extends LayerContext {
+    userData: {
+        setEditedData: (data: Record<string, unknown>) => void;
+        colorTables: colorTablesArray;
+    };
 }
 
 export interface DeckGLWrapperProps {
@@ -125,17 +129,7 @@ export interface DeckGLWrapperProps {
 
     children?: React.ReactNode;
 
-    template: templateArray;
-
     colorTables: colorTablesArray;
-}
-
-function getLayer(layers: Layer<unknown>[] | undefined, id: string) {
-    if (!layers) return;
-    const layer = layers.filter(
-        (item) => item.id?.toLowerCase() == id.toLowerCase()
-    );
-    return layer[0];
 }
 
 const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
@@ -150,7 +144,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
     legend,
     editedData,
     setEditedData,
-    template,
     colorTables,
     children,
 }: DeckGLWrapperProps) => {
@@ -195,40 +188,6 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
         );
     }, [layersData, resources, editedData]);
 
-    // Hacky way of disabling well selection when drawing.
-    const drawingLayer = useMemo(
-        () => getLayer(deckGLLayers, "drawing-layer") as DrawingLayer,
-        [deckGLLayers]
-    );
-
-    const dispatch = useDispatch();
-    useEffect(() => {
-        if (!drawingLayer) return;
-
-        const wellsLayer = getLayer(deckGLLayers, "wells-layer") as WellsLayer;
-        const drawingEnabled = drawingLayer.props.mode != "view";
-        if (wellsLayer) {
-            dispatch(
-                updateLayerProp([
-                    "wells-layer",
-                    "selectionEnabled",
-                    !drawingEnabled,
-                ])
-            );
-        }
-
-        const pieLayer = getLayer(deckGLLayers, "pie-layer") as PieChartLayer;
-        if (pieLayer) {
-            dispatch(
-                updateLayerProp([
-                    "pie-layer",
-                    "selectionEnabled",
-                    !drawingEnabled,
-                ])
-            );
-        }
-    }, [drawingLayer?.props.mode, dispatch]);
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [viewState, setViewState] = useState<any>();
 
@@ -247,11 +206,12 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                         ) => {
                             setEditedData?.(updated_prop);
                         },
+                        colorTables: colorTables,
                     },
                 });
             }
         },
-        [setEditedData]
+        [setEditedData, colorTables]
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -275,52 +235,12 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-    const [legendProps, setLegendProps] = useState<{
-        title: string;
-        name: string;
-        discrete: boolean;
-        metadata: { objects: Record<string, [number[], number]> };
-        valueRange: number[];
-    }>({
-        title: "",
-        name: "string",
-        discrete: false,
-        metadata: { objects: {} },
-        valueRange: [],
-    });
-
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
             const state = deckGLLayers.every((layer) => layer.isLoaded);
             setIsLoaded(state);
         }
     }, [deckGLLayers]);
-
-    // this causes issue for wells in synced views
-    const wellsLayer = useMemo(
-        () => getLayer(deckGLLayers, "wells-layer") as WellsLayer,
-        [deckGLLayers]
-    );
-    const onLoad = useCallback(() => {
-        if (wellsLayer) {
-            wellsLayer.setState({
-                template: template,
-                colorTables: colorTables,
-            });
-        }
-    }, [wellsLayer, template, colorTables]);
-    // Get color table for log curves.
-    useEffect(() => {
-        if (!wellsLayer?.isLoaded || !wellsLayer.props.logData) return;
-        const legend = wellsLayer.state.legend[0];
-        setLegendProps({
-            title: legend.title,
-            name: legend.name,
-            discrete: legend.discrete,
-            metadata: legend.metadata,
-            valueRange: legend.valueRange,
-        });
-    }, [isLoaded, legend, wellsLayer?.props?.logName]);
 
     const layerFilter = useCallback(
         (args: {
@@ -378,44 +298,21 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     setViewState(viewport.viewState)
                 }
                 onAfterRender={onAfterRender}
-                onLoad={onLoad}
             >
                 {children}
                 {viewsProps.map((view) => (
                     <DeckGLView key={view.id} id={view.id}>
-                        {deckGLLayers && (
-                            <StatusIndicator
-                                layers={deckGLLayers}
-                                isLoaded={isLoaded}
-                            />
-                        )}
-
-                        {legend.visible && legendProps.discrete && (
-                            <DiscreteColorLegend
-                                discreteData={legendProps.metadata}
-                                dataObjectName={legendProps.title}
-                                position={legend.position}
-                                name={legendProps.name}
-                                template={template}
-                                colorTables={colorTables}
-                                horizontal={legend.horizontal}
-                            />
-                        )}
-                        {legendProps.valueRange?.length > 0 &&
-                            legend.visible &&
-                            legendProps && (
-                                <ContinuousLegend
-                                    min={legendProps.valueRange[0]}
-                                    max={legendProps.valueRange[1]}
-                                    dataObjectName={legendProps.title}
-                                    position={legend.position}
-                                    name={legendProps.name}
-                                    template={template}
-                                    colorTables={colorTables}
-                                    horizontal={legend.horizontal}
-                                />
-                            )}
-
+                        <ColorLegend
+                            {...legend}
+                            layers={
+                                getLayersInViewport(
+                                    deckGLLayers,
+                                    views,
+                                    view.id
+                                ) as Layer<unknown>[]
+                            }
+                            colorTables={colorTables}
+                        />
                         <Settings viewportId={view.id as string} />
                     </DeckGLView>
                 ))}
@@ -430,6 +327,8 @@ const DeckGLWrapper: React.FC<DeckGLWrapperProps> = ({
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
+
+            <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
 
             {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
         </div>
@@ -457,7 +356,12 @@ function jsonToObject(
         }
     });
     const jsonConverter = new JSONConverter({ configuration });
-    return jsonConverter.convert(data);
+
+    // remove empty data/layer object
+    const filtered_data = (data as Record<string, unknown>[]).filter(
+        (value) => Object.keys(value).length !== 0
+    );
+    return jsonConverter.convert(filtered_data);
 }
 
 // returns initial view state for DeckGL

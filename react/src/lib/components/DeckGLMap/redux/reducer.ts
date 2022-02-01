@@ -15,7 +15,7 @@ export const specSlice = createSlice({
             const layer = (state["layers"] as any[]).find(
                 (layer) => layer.id === action.payload[0]
             );
-            layer.visible = action.payload[1];
+            if (layer) layer.visible = action.payload[1];
         },
         updateDrawingMode: (
             state,
@@ -24,7 +24,7 @@ export const specSlice = createSlice({
             const layer = (state["layers"] as any[]).find(
                 (layer) => layer.id === action.payload[0]
             );
-            if (layer["@@type"] === "DrawingLayer")
+            if (layer && layer["@@type"] === "DrawingLayer")
                 layer.mode = action.payload[1];
         },
         updateLayerProp: (
@@ -34,7 +34,7 @@ export const specSlice = createSlice({
             const layer = (state["layers"] as any[]).find(
                 (layer) => layer.id === action.payload[0]
             );
-            layer[action.payload[1]] = action.payload[2];
+            if (layer) layer[action.payload[1]] = action.payload[2];
         },
     },
 });

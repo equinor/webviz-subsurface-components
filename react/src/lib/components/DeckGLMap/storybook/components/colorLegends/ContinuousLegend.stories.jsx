@@ -1,11 +1,10 @@
 import React from "react";
-import ContinuousLegend from "../../../components/ContinuousLegend";
+import { ContinuousLegend } from "@emerson-eps/color-tables";
 export default {
     component: ContinuousLegend,
     title: "DeckGLMap/Components/ColorLegends/ContinuousLegend",
 };
-import template from "../../../../../../demo/example-data/welllayer_template.json";
-import colorTables from "../../../../../../demo/example-data/color-tables.json";
+import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 const min = 0;
 const max = 0.35;
@@ -13,6 +12,7 @@ const dataObjectName = "Wells / PORO";
 const position = [16, 10];
 const name = "PORO";
 const horizontal = true;
+const colorName = "Rainbow";
 
 const Template = (args) => {
     return <ContinuousLegend {...args} />;
@@ -25,7 +25,7 @@ ContinuousTemplate.args = {
     dataObjectName,
     position,
     name,
-    template,
+    colorName,
     colorTables,
     horizontal,
 };

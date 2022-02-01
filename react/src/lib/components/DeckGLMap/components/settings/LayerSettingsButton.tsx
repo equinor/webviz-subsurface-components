@@ -4,6 +4,8 @@ import React, { useCallback, useMemo } from "react";
 import { LayerIcons, LayerType } from "../../redux/types";
 import { getPropVisibility } from "../../utils/specExtractor";
 import LayerProperty from "./LayerProperty";
+import { useDispatch } from "react-redux";
+import { updateLayerProp } from "../../redux/actions";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -24,10 +26,15 @@ interface Props {
 const LayerSettingsButton: React.FC<Props> = React.memo(({ layer }: Props) => {
     const classes = useStyles();
 
+    const dispatch = useDispatch();
+
     // handlers
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const handleClick = useCallback(
         (event: React.MouseEvent<HTMLButtonElement>) => {
+            // hack to disable click propagation on drawing layer
+            dispatch(updateLayerProp(["drawing-layer", "mode", "view"]));
+
             setAnchorEl(anchorEl ? null : event.currentTarget);
         },
         [anchorEl]

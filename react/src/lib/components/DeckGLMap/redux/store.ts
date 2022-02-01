@@ -10,4 +10,15 @@ export const createStore: (
         reducer: rootReducer,
         preloadedState: { spec: initialState },
         enhancers: [enhancer],
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware({
+                serializableCheck: {
+                    ignoredActions: [
+                        "spec/setSpec",
+                        "spec/updateLayerProp",
+                        "spec/updateVisibleLayers",
+                        "spec/updateDrawingMode",
+                    ],
+                },
+            }),
     });

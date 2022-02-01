@@ -1,8 +1,7 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import template from "../../../../demo/example-data/welllayer_template.json";
-import colorTables from "../../../../demo/example-data/color-tables.json";
+import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 export default {
     component: DeckGLMap,
@@ -29,6 +28,7 @@ const Template = (args) => {
 const customLayerWithPolylineData = {
     "@@type": "GeoJsonLayer",
     id: "geojson-line-layer",
+    name: "Line",
     data: {
         type: "FeatureCollection",
         features: [
@@ -53,6 +53,7 @@ const customLayerWithPolylineData = {
 const customLayerWithPolygonData = {
     "@@type": "GeoJsonLayer",
     id: "geojson-layer",
+    name: "Polygon",
     data: {
         type: "Feature",
         properties: {},
@@ -80,6 +81,7 @@ const customLayerWithPolygonData = {
 const customLayerWithTextData = {
     "@@type": "TextLayer",
     id: "text-layer",
+    name: "Text",
     data: [
         {
             name: "Custom GeoJson layer",
@@ -112,15 +114,92 @@ const layersData2 = [
     customLayerWithTextData,
 ];
 
+const hillshadingLayer = exampleData[0].layers[1];
+
 // Storybook example 1
 export const Default = Template.bind({});
 Default.args = {
     ...exampleData[0],
-    template: template,
     colorTables: colorTables,
 };
 
-// Storybook example 2
+// Volve kh netmap data, flat surface
+export const KhMapFlat = Template.bind({});
+KhMapFlat.args = {
+    ...exampleData[0],
+    resources: {
+        propertyMap: "./volve_property_normalized.png",
+        depthMap: "./volve_hugin_depth_normalized.png",
+    },
+    colorTables: colorTables,
+    layers: [
+        {
+            ...colormapLayer,
+            valueRange: [-3071, 41048],
+            colorMapRange: [-3071, 41048],
+            bounds: [432150, 6475800, 439400, 6481500],
+            colormap:
+                "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/colormaps/gist_rainbow.png",
+        },
+        {
+            ...hillshadingLayer,
+            valueRange: [2725, 3397],
+            bounds: [432150, 6475800, 439400, 6481500],
+            opacity: 0.6,
+        },
+    ],
+};
+
+// Map3DLayer.
+const map3DLayer = exampleData[0].layers[3];
+export const Map3DLayer = Template.bind({});
+Map3DLayer.args = {
+    ...exampleData[0],
+    colorTables: colorTables,
+    layers: [
+        {
+            ...map3DLayer,
+            meshMaxError: 5.0,
+            visible: true,
+        },
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
+// GridLayer.
+const gridLayer = exampleData[0].layers[2];
+export const GridLayer = Template.bind({});
+GridLayer.args = {
+    ...exampleData[0],
+    colorTables: colorTables,
+    layers: [
+        {
+            ...gridLayer,
+            visible: true,
+        },
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
+// custom layer example
 export const UserDefinedLayer1 = Template.bind({});
 UserDefinedLayer1.args = {
     id: exampleData[0].id,
@@ -128,11 +207,53 @@ UserDefinedLayer1.args = {
     layers: layersData1,
 };
 
-// Storybook example 3
+// custom layer with colormap
 export const UserDefinedLayer2 = Template.bind({});
 UserDefinedLayer2.args = {
     id: exampleData[0].id,
     resources: exampleData[0].resources,
     bounds: exampleData[0].bounds,
     layers: layersData2,
+};
+
+// multiple synced view
+export const MultiView = Template.bind({});
+MultiView.args = {
+    ...exampleData[0],
+    colorTables: colorTables,
+    legend: {
+        visible: false,
+    },
+    zoom: -5,
+    layers: [
+        ...exampleData[0].layers,
+        customLayerWithPolylineData,
+        customLayerWithPolygonData,
+        customLayerWithTextData,
+    ],
+    views: {
+        layout: [2, 2],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: ["colormap-layer"],
+            },
+            {
+                id: "view_2",
+                show3D: false,
+                layerIds: ["hillshading-layer"],
+            },
+            {
+                id: "view_3",
+                show3D: false,
+                layerIds: [],
+            },
+            {
+                id: "view_4",
+                show3D: false,
+                layerIds: ["geojson-line-layer", "geojson-layer", "text-layer"],
+            },
+        ],
+    },
 };

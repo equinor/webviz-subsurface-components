@@ -3,7 +3,9 @@ import { PickInfo } from "@deck.gl/core/lib/deck";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { Matrix4 } from "math.gl";
+import { cloneDeep } from "lodash";
 import { layersDefaultProps } from "../layersDefaultProps";
+import { ViewsType } from "../../components/DeckGLWrapper";
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
     name: string;
@@ -68,28 +70,71 @@ export function getModelMatrix(deg: number, x: number, y: number): Matrix4 {
     return m2mRotm1;
 }
 
-// update layer object to include default props
-export function getLayersWithDefaultProps(
-    deckgl_layers: Record<string, unknown>[]
+// update layer object to include additional props
+export function applyPropsOnLayers(
+    layer_props: Record<string, unknown>[],
+    layers: Record<string, unknown>[]
 ): Record<string, unknown>[] {
-    const layers = deckgl_layers.map((a) => {
-        return { ...a };
-    });
+    const result = cloneDeep(layers);
 
-    layers?.forEach((layer) => {
-        const default_props = layersDefaultProps[
-            layer["@@type"] as string
-        ] as Record<string, unknown>;
-        if (default_props) {
-            Object.entries(default_props).forEach(([prop, value]) => {
+    result?.forEach((layer) => {
+        const props = layer_props.find((l) => {
+            if (layer["id"]) return l["id"] === layer["id"];
+            else return l["@@type"] === layer["@@type"];
+        });
+        if (props) {
+            Object.entries(props).forEach(([prop, value]) => {
                 const prop_type = typeof value;
                 if (
                     ["string", "boolean", "number", "array"].includes(prop_type)
                 ) {
-                    if (layer[prop] === undefined) layer[prop] = value;
+                    if (layer[prop] == undefined) layer[prop] = value;
                 }
             });
+        } else {
+            // if it's a user defined layer and its name and visibility are not specified
+            // set layer id as its default name
+            if (layer["name"] == undefined) layer["name"] = layer["id"];
+            if (layer["visible"] == undefined) layer["visible"] = true;
         }
     });
-    return layers;
+    return result;
+}
+
+export function getLayersWithDefaultProps(
+    layers: Record<string, unknown>[]
+): Record<string, unknown>[] {
+    return applyPropsOnLayers(
+        Object.values(layersDefaultProps) as Record<string, unknown>[],
+        layers
+    );
+}
+
+export function getLayersInViewport(
+    layers: Record<string, unknown>[] | Layer<unknown>[],
+    views: ViewsType | undefined,
+    viewportId: string | undefined
+): Record<string, unknown>[] | Layer<unknown>[] {
+    if (views == undefined || viewportId == undefined) return layers;
+
+    const current_view = views.viewports?.find((view) =>
+        new RegExp("^" + view.id).test(viewportId)
+    );
+    const layers_in_viewport = current_view?.layerIds;
+    if (layers_in_viewport && layers_in_viewport?.length > 0) {
+        const layers_in_view = (layers as never[]).filter((layer) =>
+            layers_in_viewport.includes(layer["id"] as string)
+        );
+        return layers_in_view;
+    } else {
+        return layers;
+    }
+}
+
+export function getLayersByType(
+    layers: Layer<unknown>[] | undefined,
+    type: string
+): Layer<unknown>[] {
+    if (!layers) return [];
+    return layers.filter((l) => l.constructor.name === type);
 }
