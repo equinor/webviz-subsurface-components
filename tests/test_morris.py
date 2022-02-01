@@ -16,7 +16,7 @@ import webviz_subsurface_components
 # Basic test for the component rendering.
 def test_render(dash_duo):
 
-    data = json.loads(Path("tests/data/morris_data.json").read_text())
+    data = json.loads(Path("tests/data/morris_data.json").read_text(encoding="utf8"))
 
     app = dash.Dash(__name__)
     app.layout = html.Div(

@@ -20,10 +20,10 @@ import webviz_subsurface_components as wsc
 # Helper class for dealing with map patches.
 class MapSpec:
     # Initialize the class from a base spec + a patch that is applied to the base spec.
-    def __init__(self, initialSpec=None, initialPatch=None):
-        self._spec = initialSpec
-        if initialPatch:
-            self.apply_patch(initialPatch)
+    def __init__(self, initial_spec=None, initial_patch=None):
+        self._spec = initial_spec
+        if initial_patch:
+            self.apply_patch(initial_patch)
 
     def get_spec(self):
         return self._spec
