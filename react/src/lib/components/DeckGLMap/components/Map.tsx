@@ -21,6 +21,9 @@ import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
 import { getLayersInViewport } from "../layers/utils/layerTools";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
+
 export interface ViewportType {
     /**
      * Viewport id
@@ -72,17 +75,17 @@ export interface MapProps {
      * see the DeckGL documentation on enums in the json spec:
      * https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix
      */
-    resources: Record<string, unknown>;
+    resources?: Record<string, unknown>;
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
-    bounds: [number, number, number, number];
+    bounds?: [number, number, number, number];
 
     /**
      * Zoom level for the view.
      */
-    zoom: number;
+    zoom?: number;
 
     /**
      * Views configuration for map. If not specified, all the layers will be
@@ -93,43 +96,41 @@ export interface MapProps {
     /**
      * Parameters for the InfoCard component
      */
-    coords: {
-        visible: boolean;
-        multiPicking: boolean;
-        pickDepth: number;
+    coords?: {
+        visible?: boolean | null;
+        multiPicking?: boolean | null;
+        pickDepth?: number | null;
     };
 
     /**
      * Parameters for the Distance Scale component
      */
-    scale: {
-        visible: boolean;
-        incrementValue: number;
-        widthPerUnit: number;
-        position: number[];
+    scale?: {
+        visible?: boolean | null;
+        incrementValue?: number | null;
+        widthPerUnit?: number | null;
+        position?: number[] | null;
     };
 
-    coordinateUnit: string;
+    coordinateUnit?: string;
 
-    legend: {
-        visible: boolean;
-        position: number[];
-        horizontal: boolean;
+    legend?: {
+        visible?: boolean | null;
+        position?: number[] | null;
+        horizontal?: boolean | null;
     };
 
     /**
      * Prop containing edited data from layers
      */
-    editedData: Record<string, unknown>;
+    editedData?: Record<string, unknown>;
 
     /**
      * For reacting to prop changes
      */
-    setEditedData: (data: Record<string, unknown>) => void;
+    setEditedData?: (data: Record<string, unknown>) => void;
 
     children?: React.ReactNode;
-
-    colorTables: colorTablesArray;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -144,13 +145,13 @@ const Map: React.FC<MapProps> = ({
     legend,
     editedData,
     setEditedData,
-    colorTables,
     children,
 }: MapProps) => {
     // state for initial views prop (target and zoom) of DeckGL component
     const [initialViewState, setInitialViewState] =
         useState<Record<string, unknown>>();
     useEffect(() => {
+        if (bounds == undefined || zoom == undefined) return;
         setInitialViewState(getInitialViewState(bounds, zoom));
     }, [bounds, zoom]);
 
@@ -218,7 +219,7 @@ const Map: React.FC<MapProps> = ({
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
         (pickInfo, event) => {
-            if (coords.multiPicking && pickInfo.layer) {
+            if (coords?.multiPicking && pickInfo.layer) {
                 const infos = pickInfo.layer.context.deck.pickMultipleObjects({
                     x: event.offsetCenter.x,
                     y: event.offsetCenter.y,
@@ -267,7 +268,8 @@ const Map: React.FC<MapProps> = ({
         [views]
     );
 
-    if (!deckGLViews) return null;
+    if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
+        return null;
 
     return (
         <div>
@@ -278,6 +280,7 @@ const Map: React.FC<MapProps> = ({
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
+                userData={{ colorTables: colorTables }}
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
                 }
@@ -318,7 +321,7 @@ const Map: React.FC<MapProps> = ({
                 ))}
             </DeckGL>
 
-            {viewState && scale.visible ? (
+            {viewState && scale?.visible ? (
                 <DistanceScale
                     zoom={viewState.zoom}
                     incrementValue={scale.incrementValue}
@@ -330,9 +333,34 @@ const Map: React.FC<MapProps> = ({
 
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
 
-            {coords.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
+            {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
         </div>
     );
+};
+
+Map.defaultProps = {
+    coords: {
+        visible: true,
+        multiPicking: true,
+        pickDepth: 10,
+    },
+    scale: {
+        visible: true,
+        incrementValue: 100,
+        widthPerUnit: 100,
+        position: [10, 10],
+    },
+    legend: {
+        visible: true,
+        position: [5, 10],
+        horizontal: true,
+    },
+    coordinateUnit: "m",
+    zoom: -3,
+    views: {
+        layout: [1, 1],
+        viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
+    },
 };
 
 export default Map;
