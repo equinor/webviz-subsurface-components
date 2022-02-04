@@ -22,6 +22,14 @@ export default {
             description: "Orientation of the track plots on the screen.",
             defaultValue: false,
         },
+        hideTitles: {
+            description: "Hide titles on the tracks.",
+            defaultValue: false,
+        },
+        hideLegend: {
+            description: "Hide legends on the tracks.",
+            defaultValue: false,
+        },
         readoutOptions: {
             description:
                 "Options for readout panel.<br/>" +
@@ -132,6 +140,8 @@ export const Example1Vertical = Template.bind({});
 Example1Vertical.args = {
     id: "Well-Log-Viewer",
     horizontal: false,
+    hideTitles: false,
+    hideLegend: false,
     welllog: require("../../../demo/example-data/L898MUD.json"),
     template: require("../../../demo/example-data/welllog_template_1.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
