@@ -1,7 +1,7 @@
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import fsShader from "!!raw-loader!./terrainmap.fs.glsl";
+import fsShader from "!!raw-loader!./map.fs.glsl";
 
 export type DataItem = {
     position: [number, number];
@@ -39,7 +39,7 @@ const defaultProps = {
     },
 };
 
-// This is a private layer used only by the composite Map3DLayer.
+// This is a private layer used only by the composite MapLayer.
 // It is an extension of SimpleMeshLayer but with modified fragment shader
 // so that the texture pixel values can be used as lookup in  a supplied color map.
 export default class PrivateMeshLayer extends SimpleMeshLayer<
