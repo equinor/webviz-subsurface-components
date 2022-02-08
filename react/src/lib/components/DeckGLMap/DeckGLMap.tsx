@@ -69,7 +69,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     const setEditedData = React.useCallback(
         (data) => {
             if (setProps == undefined) return;
-
             setProps({
                 editedData: {
                     ...layerEditedData,

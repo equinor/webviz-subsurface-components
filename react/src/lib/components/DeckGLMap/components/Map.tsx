@@ -192,28 +192,12 @@ const Map: React.FC<MapProps> = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [viewState, setViewState] = useState<any>();
 
-    const refCb = useCallback(
-        (deckRef) => {
-            if (deckRef && deckRef.deck) {
-                // Needed to initialize the viewState on first load
-                setViewState(deckRef.deck.viewState);
-                deckRef.deck.setProps({
-                    // userData is undocumented and it doesn't appear in the
-                    // deckProps type, but it is used by the layersManager
-                    // and forwarded though the context to all the layers.
-                    userData: {
-                        setEditedData: (
-                            updated_prop: Record<string, unknown>
-                        ) => {
-                            setEditedData?.(updated_prop);
-                        },
-                        colorTables: colorTables,
-                    },
-                });
-            }
-        },
-        [setEditedData, colorTables]
-    );
+    const refCb = useCallback((deckRef) => {
+        if (deckRef && deckRef.deck) {
+            // Needed to initialize the viewState on first load
+            setViewState(deckRef.deck.viewState);
+        }
+    }, []);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
@@ -280,7 +264,12 @@ const Map: React.FC<MapProps> = ({
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
-                userData={{ colorTables: colorTables }}
+                userData={{
+                    setEditedData: (updated_prop: Record<string, unknown>) => {
+                        setEditedData?.(updated_prop);
+                    },
+                    colorTables: colorTables,
+                }}
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
                 }
