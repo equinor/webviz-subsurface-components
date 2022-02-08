@@ -22,6 +22,14 @@ export default {
             description: "Orientation of the track plots on the screen.",
             defaultValue: false,
         },
+        hideTitles: {
+            description: "Hide titles on the tracks.",
+            defaultValue: false,
+        },
+        hideLegend: {
+            description: "Hide legends on the tracks.",
+            defaultValue: false,
+        },
         syncTrackPos: {
             description: "Synchronize first visible track",
             defaultValue: false,
@@ -128,6 +136,8 @@ Default.args = {
     syncTemplate: true,
     horizontal: false,
 
+    hideTitles: false,
+    hideLegend: false,
     welllogs: [
         require("../../../demo/example-data/L898MUD.json"),
         require("../../../demo/example-data/L916MUD.json"),
