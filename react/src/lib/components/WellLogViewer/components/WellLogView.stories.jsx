@@ -36,6 +36,14 @@ export default {
             description: "maxContentZoom",
             defaultValue: 256,
         },
+        hideTitles: {
+            description: "Show Titles on the tracks",
+            defaultValue: false,
+        },
+        hideLegend: {
+            description: "Show Legends on the tracks",
+            defaultValue: false,
+        },
         axisMnemos: {
             description: "axisMnemos",
             defaultValue: axisMnemos,
