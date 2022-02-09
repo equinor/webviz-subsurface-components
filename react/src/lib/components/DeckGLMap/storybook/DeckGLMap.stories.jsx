@@ -7,7 +7,8 @@ export default {
     title: "DeckGLMap",
 };
 
-const Template = (args) => {
+// Template for when edited data needs to be captured.
+const EditDataTemplate = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
     React.useEffect(() => {
         setEditedData(args.editedData);
@@ -21,6 +22,11 @@ const Template = (args) => {
             }}
         />
     );
+};
+
+// Blank template.
+const MinimalTemplate = (args) => {
+    return <DeckGLMap {...args} />;
 };
 
 // Data for custome geojson layer with polyline data
@@ -116,27 +122,38 @@ const layersData2 = [
 const hillshadingLayer = exampleData[0].layers[1];
 
 // Storybook example 1
-export const Default = Template.bind({});
+export const Default = EditDataTemplate.bind({});
 Default.args = {
     ...exampleData[0],
 };
 
+// Minimal map example.
+export const Minimal = () => (
+    <DeckGLMap id={"deckgl-map"} bounds={[0, 0, 1, 1]} />
+);
+Minimal.parameters = {
+    docs: {
+        description: {
+            story: "An example showing the minimal required arguments, which will give an empty map viewer.",
+        },
+    },
+};
+
 // Volve kh netmap data, flat surface
-export const KhMapFlat = Template.bind({});
+export const KhMapFlat = MinimalTemplate.bind({});
 KhMapFlat.args = {
-    ...exampleData[0],
+    id: "kh-map-flat",
     resources: {
         propertyMap: "./volve_property_normalized.png",
         depthMap: "./volve_hugin_depth_normalized.png",
     },
+    bounds: [432150, 6475800, 439400, 6481500],
     layers: [
         {
             ...colormapLayer,
             valueRange: [-3071, 41048],
             colorMapRange: [-3071, 41048],
             bounds: [432150, 6475800, 439400, 6481500],
-            colormap:
-                "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/colormaps/gist_rainbow.png",
         },
         {
             ...hillshadingLayer,
@@ -146,10 +163,19 @@ KhMapFlat.args = {
         },
     ],
 };
+KhMapFlat.parameters = {
+    docs: {
+        description: {
+            story: "An example showing a kh property layer and a depth map hillshading layer.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
 
 // Map3DLayer.
 const map3DLayer = exampleData[0].layers[3];
-export const Map3DLayer = Template.bind({});
+export const Map3DLayer = EditDataTemplate.bind({});
 Map3DLayer.args = {
     ...exampleData[0],
     layers: [
@@ -173,7 +199,7 @@ Map3DLayer.args = {
 
 // GridLayer.
 const gridLayer = exampleData[0].layers[2];
-export const GridLayer = Template.bind({});
+export const GridLayer = EditDataTemplate.bind({});
 GridLayer.args = {
     ...exampleData[0],
     layers: [
@@ -195,7 +221,7 @@ GridLayer.args = {
 };
 
 // custom layer example
-export const UserDefinedLayer1 = Template.bind({});
+export const UserDefinedLayer1 = EditDataTemplate.bind({});
 UserDefinedLayer1.args = {
     id: exampleData[0].id,
     bounds: exampleData[0].bounds,
@@ -203,7 +229,7 @@ UserDefinedLayer1.args = {
 };
 
 // custom layer with colormap
-export const UserDefinedLayer2 = Template.bind({});
+export const UserDefinedLayer2 = EditDataTemplate.bind({});
 UserDefinedLayer2.args = {
     id: exampleData[0].id,
     resources: exampleData[0].resources,
@@ -212,7 +238,7 @@ UserDefinedLayer2.args = {
 };
 
 // multiple synced view
-export const MultiView = Template.bind({});
+export const MultiView = EditDataTemplate.bind({});
 MultiView.args = {
     ...exampleData[0],
     legend: {
