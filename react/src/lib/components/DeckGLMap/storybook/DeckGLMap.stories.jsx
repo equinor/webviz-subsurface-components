@@ -1,7 +1,6 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 export default {
     component: DeckGLMap,
@@ -120,7 +119,6 @@ const hillshadingLayer = exampleData[0].layers[1];
 export const Default = Template.bind({});
 Default.args = {
     ...exampleData[0],
-    colorTables: colorTables,
 };
 
 // Volve kh netmap data, flat surface
@@ -131,7 +129,6 @@ KhMapFlat.args = {
         propertyMap: "./volve_property_normalized.png",
         depthMap: "./volve_hugin_depth_normalized.png",
     },
-    colorTables: colorTables,
     layers: [
         {
             ...colormapLayer,
@@ -155,7 +152,6 @@ const map3DLayer = exampleData[0].layers[3];
 export const Map3DLayer = Template.bind({});
 Map3DLayer.args = {
     ...exampleData[0],
-    colorTables: colorTables,
     layers: [
         {
             ...map3DLayer,
@@ -180,7 +176,6 @@ const gridLayer = exampleData[0].layers[2];
 export const GridLayer = Template.bind({});
 GridLayer.args = {
     ...exampleData[0],
-    colorTables: colorTables,
     layers: [
         {
             ...gridLayer,
@@ -220,7 +215,6 @@ UserDefinedLayer2.args = {
 export const MultiView = Template.bind({});
 MultiView.args = {
     ...exampleData[0],
-    colorTables: colorTables,
     legend: {
         visible: false,
     },
