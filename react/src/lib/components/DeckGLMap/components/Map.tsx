@@ -54,6 +54,11 @@ export interface ViewsType {
     layout: [number, number];
 
     /**
+     * Show views label
+     */
+    showLabel?: boolean;
+
+    /**
      * Layers configuration for multiple viewport
      */
     viewports: ViewportType[];
@@ -326,7 +331,9 @@ const Map: React.FC<MapProps> = ({
                                 viewportId={view.id}
                                 layerIds={view.layerIds}
                             />
-                            {view.name && <ViewFooter>{view.name}</ViewFooter>}
+                            {views.showLabel && view.name && (
+                                <ViewFooter>{view.name}</ViewFooter>
+                            )}
                         </DeckGLView>
                     ))}
             </DeckGL>
@@ -369,6 +376,7 @@ Map.defaultProps = {
     zoom: -3,
     views: {
         layout: [1, 1],
+        showLabel: false,
         viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
     colorTables: colorTables,

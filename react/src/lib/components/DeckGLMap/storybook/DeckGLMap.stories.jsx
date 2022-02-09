@@ -227,6 +227,7 @@ MultiView.args = {
     ],
     views: {
         layout: [2, 2],
+        showLabel: true,
         viewports: [
             {
                 id: "view_1",
