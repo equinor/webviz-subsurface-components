@@ -35,24 +35,6 @@ export function createPropertyData(
     };
 }
 
-// Generate a patch from a layer and it's new props and call setSpecPatch with it,
-// to update the map parent from the layers.
-// Usually this would be called from a layer,
-// e.g.: patchLayerProps(this, {...this.props, updatedProp: newValue});
-export function patchLayerProps<
-    D,
-    P extends LayerProps<D> = LayerProps<D>,
-    L extends Layer<D, P> = Layer<D, P>
->(layer: L, newProps: P): void {
-    // userData is undocumented and it doesn't appear in the
-    // deckProps type, but it is used by the layersManager
-    // and forwarded though the context to all the layers.
-    //
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: TS2339
-    layer.context.userData.setEditedData(newProps);
-}
-
 // Return a model matrix representing a rotation of "deg" degrees around the point x, y
 export function getModelMatrix(deg: number, x: number, y: number): Matrix4 {
     const rad = deg * 0.017453;

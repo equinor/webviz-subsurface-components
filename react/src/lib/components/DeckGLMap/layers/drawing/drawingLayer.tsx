@@ -16,8 +16,8 @@ import {
 } from "@nebula.gl/edit-modes";
 import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 import { CompositeLayer, PickInfo } from "deck.gl";
-import { patchLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
+import { DeckGLLayerContext } from "../../components/Map";
 
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {
@@ -84,9 +84,9 @@ export default class DrawingLayer extends CompositeLayer<
         if (this.props.mode === "view" || this.props.mode === "modify") {
             const featureIndex = this.state.data.features.indexOf(info.object);
             if (featureIndex >= 0) {
-                patchLayerProps<FeatureCollection>(this, {
+                (this.context as DeckGLLayerContext).userData.setEditedData({
                     selectedFeatureIndexes: [info.index],
-                } as DrawingLayerProps<FeatureCollection>);
+                });
                 return true;
             }
         }
@@ -99,26 +99,26 @@ export default class DrawingLayer extends CompositeLayer<
     _onEdit(editAction: EditAction<FeatureCollection>): void {
         switch (editAction.editType) {
             case "addFeature":
-                patchLayerProps<FeatureCollection>(this, {
+                (this.context as DeckGLLayerContext).userData.setEditedData({
                     data: editAction.updatedData,
                     selectedFeatureIndexes:
                         editAction.editContext.featureIndexes,
-                } as DrawingLayerProps<FeatureCollection>);
+                });
                 break;
             case "removeFeature":
-                patchLayerProps<FeatureCollection>(this, {
+                (this.context as DeckGLLayerContext).userData.setEditedData({
                     data: editAction.updatedData,
                     selectedFeatureIndexes: [] as number[],
-                } as DrawingLayerProps<FeatureCollection>);
+                });
                 break;
             case "removePosition":
             case "finishMovePosition":
-                patchLayerProps<FeatureCollection>(this, {
+                (this.context as DeckGLLayerContext).userData.setEditedData({
                     data: editAction.updatedData,
-                } as DrawingLayerProps<FeatureCollection>);
+                });
                 break;
             case "movePosition":
-                // Don't use patchLayerProps to avoid an expensive roundtrip,
+                // Don't use setEditedData to avoid an expensive roundtrip,
                 // since this is done on every mouse move when editing.
                 this.setState({ data: editAction.updatedData });
                 break;
