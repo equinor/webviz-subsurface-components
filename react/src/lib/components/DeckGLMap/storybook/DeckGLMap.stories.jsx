@@ -230,21 +230,25 @@ MultiView.args = {
         viewports: [
             {
                 id: "view_1",
+                name: "Colormap layer",
                 show3D: false,
                 layerIds: ["colormap-layer"],
             },
             {
                 id: "view_2",
+                name: "Hill-shading layer",
                 show3D: false,
                 layerIds: ["hillshading-layer"],
             },
             {
                 id: "view_3",
+                name: "All layers",
                 show3D: false,
                 layerIds: [],
             },
             {
                 id: "view_4",
+                name: "Custom layer",
                 show3D: false,
                 layerIds: ["geojson-line-layer", "geojson-layer", "text-layer"],
             },

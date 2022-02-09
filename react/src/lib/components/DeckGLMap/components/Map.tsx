@@ -20,6 +20,7 @@ import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
 import { getLayersInViewport } from "../layers/utils/layerTools";
+import ViewFooter from "./ViewFooter";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
@@ -31,14 +32,19 @@ export interface ViewportType {
     id: string;
 
     /**
+     * Viewport name
+     */
+    name?: string;
+
+    /**
      * If true, displays map in 3D view, default is 2D view (false)
      */
-    show3D: boolean;
+    show3D?: boolean;
 
     /**
      * Layers to be displayed on viewport
      */
-    layerIds: string[];
+    layerIds?: string[];
 }
 
 export interface ViewsType {
@@ -246,7 +252,7 @@ const Map: React.FC<MapProps> = ({
                     args.viewport.id &&
                     new RegExp("^" + id).test(args.viewport.id)
             );
-            if (cur_view && cur_view.layerIds?.length > 0) {
+            if (cur_view?.layerIds && cur_view.layerIds.length > 0) {
                 const layer_ids = cur_view.layerIds;
                 return layer_ids.some((layer_id) =>
                     args.layer.id.match(new RegExp("\\b" + layer_id + "\\b"))
@@ -298,24 +304,31 @@ const Map: React.FC<MapProps> = ({
                 onAfterRender={onAfterRender}
             >
                 {children}
-                {viewsProps.map((view) => (
-                    <DeckGLView key={view.id} id={view.id}>
-                        {colorTables && (
-                            <ColorLegend
-                                {...legend}
-                                layers={
-                                    getLayersInViewport(
-                                        deckGLLayers,
-                                        views,
-                                        view.id
-                                    ) as Layer<unknown>[]
-                                }
-                                colorTables={colorTables}
+                {views?.viewports &&
+                    views.viewports.map((view) => (
+                        <DeckGLView
+                            key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
+                            id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
+                        >
+                            {colorTables && (
+                                <ColorLegend
+                                    {...legend}
+                                    layers={
+                                        getLayersInViewport(
+                                            deckGLLayers,
+                                            view.layerIds
+                                        ) as Layer<unknown>[]
+                                    }
+                                    colorTables={colorTables}
+                                />
+                            )}
+                            <Settings
+                                viewportId={view.id}
+                                layerIds={view.layerIds}
                             />
-                        )}
-                        <Settings viewportId={view.id as string} />
-                    </DeckGLView>
-                ))}
+                            {view.name && <ViewFooter>{view.name}</ViewFooter>}
+                        </DeckGLView>
+                    ))}
             </DeckGL>
 
             {viewState && scale?.visible ? (

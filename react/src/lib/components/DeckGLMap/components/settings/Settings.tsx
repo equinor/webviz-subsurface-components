@@ -7,7 +7,6 @@ import { MapState } from "../../redux/store";
 import LayersButton from "./LayersButton";
 import LayerSettingsButton from "./LayerSettingsButton";
 import { getLayersInViewport } from "../../layers/utils/layerTools";
-import { ViewsType } from "../Map";
 
 Icon.add({ layers }); // (this needs only be done once)
 
@@ -15,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             position: "absolute",
-            bottom: theme.spacing(2),
+            bottom: theme.spacing(4),
             right: theme.spacing(2),
             display: "flex",
             flexDirection: "column",
@@ -26,10 +25,11 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export interface SettingsProps {
     viewportId?: string;
+    layerIds?: string[];
 }
 
 const Settings: React.FC<SettingsProps> = React.memo(
-    ({ viewportId }: SettingsProps) => {
+    ({ viewportId, layerIds }: SettingsProps) => {
         const classes = useStyles();
 
         const spec = useSelector((st: MapState) => st.spec);
@@ -37,15 +37,12 @@ const Settings: React.FC<SettingsProps> = React.memo(
             Record<string, unknown>[]
         >([]);
         useEffect(() => {
-            if (viewportId == undefined) return;
-
             const layers_in_viewport = getLayersInViewport(
                 spec["layers"] as Record<string, unknown>[],
-                spec["views"] as ViewsType,
-                viewportId
+                layerIds
             ) as Record<string, unknown>[];
             setLayersInView(layers_in_viewport);
-        }, [spec, viewportId]);
+        }, [spec, layerIds]);
 
         if (!layersInView?.length) return null;
         return (
