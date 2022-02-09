@@ -139,7 +139,6 @@ const arrayOfLength_propTypes = (
     componentName: string
 ) => {
     if (
-        !props[propName] ||
         !Array.isArray(props[propName]) ||
         props[propName].length != expectedLength ||
         !props[propName].every(Number.isInteger)
