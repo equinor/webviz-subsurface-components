@@ -310,7 +310,7 @@ const Map: React.FC<MapProps> = ({
             >
                 {children}
                 {views?.viewports &&
-                    views.viewports.map((view) => (
+                    views.viewports.map((view, index) => (
                         <DeckGLView
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
@@ -331,8 +331,14 @@ const Map: React.FC<MapProps> = ({
                                 viewportId={view.id}
                                 layerIds={view.layerIds}
                             />
-                            {views.showLabel && view.name && (
-                                <ViewFooter>{view.name}</ViewFooter>
+                            {views.showLabel && (
+                                <ViewFooter>
+                                    {`${
+                                        view.name
+                                            ? view.name
+                                            : `View_${index + 1}`
+                                    } `}
+                                </ViewFooter>
                             )}
                         </DeckGLView>
                     ))}
