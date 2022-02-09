@@ -127,6 +127,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
 DeckGLMap.defaultProps = {
     views: {
         layout: [1, 1],
+        showLabel: false,
         viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
 };
@@ -189,6 +190,7 @@ DeckGLMap.propTypes = {
      * Example:
      *      views = {
      *          "layout": [1, 1],
+     *          "showLabel": false,
      *          "viewports": [
      *              {
      *                  "id": "view_1",

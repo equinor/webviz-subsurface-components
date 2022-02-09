@@ -49,10 +49,10 @@ const useStyles = makeStyles({
     table: {
         "& > *": {
             backgroundColor: "#ffffffcc",
+            color: "#000000ff",
             border: "2px solid #ccc",
             padding: "0px",
             borderRadius: "5px",
-
             position: "absolute",
             bottom: 0,
         },
