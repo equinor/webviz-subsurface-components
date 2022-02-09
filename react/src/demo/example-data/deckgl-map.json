@@ -148,7 +148,7 @@
     },
     "views": {
       "layout": [1, 1],
-      "showLabel": true,
+      "showLabel": false,
       "viewports": [
         {
           "id": "view_1",
