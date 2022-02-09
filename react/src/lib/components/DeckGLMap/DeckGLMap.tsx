@@ -8,6 +8,7 @@ import {
     applyPropsOnLayers,
     getLayersWithDefaultProps,
 } from "./layers/utils/layerTools";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface DeckGLMapProps {
     id: string;
@@ -33,6 +34,7 @@ interface DeckGLMapProps {
         position?: number[] | null;
         horizontal?: boolean | null;
     };
+    colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
 }
@@ -48,6 +50,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     scale,
     coordinateUnit,
     legend,
+    colorTables,
     editedData,
     setProps,
 }: DeckGLMapProps) => {
@@ -113,6 +116,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 scale={scale}
                 coordinateUnit={coordinateUnit}
                 legend={legend}
+                colorTables={colorTables}
                 editedData={editedData}
                 setEditedData={setEditedData}
             />
@@ -135,6 +139,7 @@ const arrayOfLength_propTypes = (
     componentName: string
 ) => {
     if (
+        !props[propName] ||
         !Array.isArray(props[propName]) ||
         props[propName].length != expectedLength ||
         !props[propName].every(Number.isInteger)
@@ -263,6 +268,11 @@ DeckGLMap.propTypes = {
          */
         horizontal: PropTypes.bool,
     }),
+
+    /**
+     * Prop containing color table data
+     */
+    colorTables: PropTypes.array,
 
     /**
      * Prop containing edited data from layers

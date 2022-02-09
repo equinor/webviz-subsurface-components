@@ -121,6 +121,11 @@ export interface MapProps {
     };
 
     /**
+     * Prop containing color table data
+     */
+    colorTables?: colorTablesArray;
+
+    /**
      * Prop containing edited data from layers
      */
     editedData?: Record<string, unknown>;
@@ -143,6 +148,7 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     legend,
+    colorTables,
     editedData,
     setEditedData,
     children,
@@ -294,17 +300,19 @@ const Map: React.FC<MapProps> = ({
                 {children}
                 {viewsProps.map((view) => (
                     <DeckGLView key={view.id} id={view.id}>
-                        <ColorLegend
-                            {...legend}
-                            layers={
-                                getLayersInViewport(
-                                    deckGLLayers,
-                                    views,
-                                    view.id
-                                ) as Layer<unknown>[]
-                            }
-                            colorTables={colorTables}
-                        />
+                        {colorTables && (
+                            <ColorLegend
+                                {...legend}
+                                layers={
+                                    getLayersInViewport(
+                                        deckGLLayers,
+                                        views,
+                                        view.id
+                                    ) as Layer<unknown>[]
+                                }
+                                colorTables={colorTables}
+                            />
+                        )}
                         <Settings viewportId={view.id as string} />
                     </DeckGLView>
                 ))}
@@ -350,6 +358,7 @@ Map.defaultProps = {
         layout: [1, 1],
         viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
+    colorTables: colorTables,
 };
 
 export default Map;
