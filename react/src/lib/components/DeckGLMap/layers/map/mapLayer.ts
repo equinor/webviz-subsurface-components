@@ -122,7 +122,7 @@ function applyColorMap(
     // Precalculate colors to save time.
     const colors = [];
     for (let i = 0; i < 256; i++) {
-        const rgb = rgbValues(i / 255.0, colorMapName, colorTables); // Note: The call to rgbValues is very slow"
+        const rgb = rgbValues(i / 255.0, colorMapName, colorTables); // Note: The call to rgbValues is very slow.
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -244,7 +244,7 @@ export default class MapLayer extends CompositeLayer<
     MapLayerProps<unknown>
 > {
     renderLayers(): [PrivateMeshLayer] {
-        let mesh = load(this.props.mesh, TerrainLoader, {
+        let meshPromise = load(this.props.mesh, TerrainLoader, {
             terrain: {
                 elevationDecoder: ELEVATION_DECODER,
                 bounds: this.props.bounds,
@@ -255,48 +255,15 @@ export default class MapLayer extends CompositeLayer<
 
         // Note: mesh contains triangles. No normals.
         if (this.props.enableSmoothShading) {
-            mesh = mesh.then(add_normals);
+            meshPromise = meshPromise.then(add_normals);
         }
 
-        // Download texture and apply colormap to it. Texture image is encoded Float32 for each pixel.
+        // Download texture (as an ImageData structure) and apply colormap to it. Texture image is encoded Float32 for each pixel.
         // Note: Using ImageLoader in this case does not work as the pixel values are not always exact.
         // To decode png with exact values we can use a separate library like
         // https://github.com/arian/pngjs (which ImagaLoader uses when not in a browser (node.js)) or this
         // https://github.com/vivaxy/png
-        const texture = fetch(this.props.propertyTexture)
-            .then((response) => {
-                return response.blob();
-            })
-            .then((blob) => {
-                return new Promise((resolve) => {
-                    const fileReader = new FileReader();
-                    fileReader.readAsArrayBuffer(blob);
-                    fileReader.onload = () => {
-                        const arrayBuffer = fileReader.result;
-                        const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                        const data = new Uint8ClampedArray(imgData.data);
-                        let imageData = new ImageData(
-                            data,
-                            imgData.width,
-                            imgData.height
-                        );
-                        imageData = applyColorMap(
-                            imageData,
-                            this.props.colorMapRange,
-                            this.props.colorMapName,
-                            this.props.valueRange,
-                            (this.context as DeckGLLayerContext).userData
-                                .colorTables
-                        );
-                        resolve(imageData);
-                    };
-                });
-            });
-
-        // Same as textur above. However this will not have colormap applied
-        // to it an will contain the property vaules directly (in Float32)
-        // May be more efficient methods to do this.
-        const propertyValuesImageData = fetch(this.props.propertyTexture)
+        const imageDataPromise = fetch(this.props.propertyTexture)
             .then((response) => {
                 return response.blob();
             })
@@ -316,7 +283,24 @@ export default class MapLayer extends CompositeLayer<
                         resolve(imageData);
                     };
                 });
+            })
+            .then((imageData) => {
+                return Promise.resolve(imageData);
             });
+
+        // Apply colormap to the pixels to generate color texture.
+        const texturePromise = imageDataPromise.then((imageData) => {
+            // Note: take copy here? "structuredClone()"
+            imageData = applyColorMap(
+                imageData,
+                this.props.colorMapRange,
+                this.props.colorMapName,
+                this.props.valueRange,
+                (this.context as DeckGLLayerContext).userData.colorTables
+            );
+
+            return Promise.resolve(imageData);
+        });
 
         const rotatingModelMatrix = getModelMatrix(
             this.props.rotDeg,
@@ -329,9 +313,9 @@ export default class MapLayer extends CompositeLayer<
                 PrivateMeshLayerData,
                 PrivateMeshLayerProps<PrivateMeshLayerData>
             >({
-                mesh,
-                texture,
-                propertyValuesImageData,
+                mesh: meshPromise,
+                texture: texturePromise,
+                propertyValuesImageData: imageDataPromise,
                 textureParameters: DEFAULT_TEXTURE_PARAMETERS,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
