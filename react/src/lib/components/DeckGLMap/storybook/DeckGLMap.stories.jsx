@@ -270,7 +270,6 @@ const mapLayer = exampleData[0].layers[3];
 export const MapLayerFloat32Properties = EditDataTemplate.bind({});
 MapLayerFloat32Properties.args = {
     ...exampleData[0],
-    colorTables: colorTables,
     layers: [
         {
             ...mapLayer,
@@ -292,7 +291,7 @@ MapLayerFloat32Properties.args = {
 
 // Map3DLayer. Old version. Properties encoded in RGB.
 const map3DLayer = exampleData[0].layers[4];
-export const MapLayerRGBEncodedProperties = Template.bind({});
+export const MapLayerRGBEncodedProperties = EditDataTemplate.bind({});
 MapLayerRGBEncodedProperties.args = {
     ...exampleData[0],
     layers: [
