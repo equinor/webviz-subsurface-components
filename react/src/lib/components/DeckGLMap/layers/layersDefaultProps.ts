@@ -15,6 +15,7 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
         rotDeg: 0,
+        colorMapName: "Rainbow",
     },
     Hillshading2DLayer: {
         "@@type": "Hillshading2DLayer",

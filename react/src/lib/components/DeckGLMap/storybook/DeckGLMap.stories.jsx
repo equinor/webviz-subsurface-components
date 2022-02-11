@@ -1,5 +1,6 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
+import ColormapLayer from "../layers/colormap/colormapLayer";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 
 export default {
@@ -242,10 +243,11 @@ KhMapFlat.args = {
     bounds: [432150, 6475800, 439400, 6481500],
     layers: [
         {
-            ...colormapLayer,
+            "@@type": "ColormapLayer",
+            id: "property_map",
             valueRange: [-3071, 41048],
-            colorMapRange: [-3071, 41048],
             bounds: [432150, 6475800, 439400, 6481500],
+            image: "@@#resources.propertyMap",
         },
         {
             ...hillshadingLayer,
@@ -260,7 +262,7 @@ KhMapFlat.parameters = {
         description: {
             story: "An example showing a kh property layer and a depth map hillshading layer.",
         },
-        inlineStories: false,
+        inlineStories: true,
         iframeHeight: 500,
     },
 };
