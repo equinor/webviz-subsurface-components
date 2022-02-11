@@ -38,8 +38,32 @@ type MeshType = {
 
 function add_normals(resolved_mesh: MeshType) {
     const vertexs = resolved_mesh.attributes.POSITION.value;
-    const indices = resolved_mesh.indices.value;
-    const ntriangles = indices.length / 3;
+    let indices = resolved_mesh.indices.value;
+    let ntriangles = indices.length / 3;
+
+    // Remove all triangles that are in undefined areas. That is triangles which
+    // have one or more corner at zero depth.
+    const indices_reduced = [];
+    for (let t = 0; t < ntriangles; t++) {
+        const i0 = indices[t * 3 + 0];
+        const i1 = indices[t * 3 + 1];
+        const i2 = indices[t * 3 + 2];
+
+        // Triangles' three corner's z values.
+        const v0Z = vertexs[i0 * 3 + 2];
+        const v1Z = vertexs[i1 * 3 + 2];
+        const v2Z = vertexs[i2 * 3 + 2];
+
+        if (v0Z !== 0 && v1Z !== 0 && v2Z !== 0) {
+            indices_reduced.push(i0);
+            indices_reduced.push(i1);
+            indices_reduced.push(i2);
+        }
+    }
+
+    resolved_mesh.indices.value = new Uint32Array(indices_reduced);
+    indices = resolved_mesh.indices.value;
+    ntriangles = indices.length / 3;
 
     //Calculate one normal pr triangle. And record the triangles each vertex' belongs to.
     const no_unique_vertexes = vertexs.length / 3;
