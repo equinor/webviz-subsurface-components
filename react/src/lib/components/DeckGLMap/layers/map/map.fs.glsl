@@ -42,7 +42,7 @@ void main(void) {
    vec4 color = hasTexture ? texture(sampler, vTexCoord) : vColor;
 
    // Discard transparent pixels.
-   if (!picking_uActive && color.w < 1.0) {
+   if (!picking_uActive && color.w < 0.99) {
          discard;
          return;
    }
