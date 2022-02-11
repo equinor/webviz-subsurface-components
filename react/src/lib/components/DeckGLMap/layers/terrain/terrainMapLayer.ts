@@ -4,7 +4,7 @@ import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import fsShader from "!!raw-loader!./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
-import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
+import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
