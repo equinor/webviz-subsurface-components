@@ -13,7 +13,8 @@ import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import GL from "@luma.gl/constants";
 import * as png from "@vivaxy/png";
 import { DeckGLLayerContext } from "../../components/Map";
-import structuredClone from '@ungap/structured-clone';
+import structuredClone from "@ungap/structured-clone";
+import { isEqual } from "lodash";
 
 const ELEVATION_DECODER = {
     rScaler: -255 * 255, // minus signs -> easy way to invert z-axis.
@@ -228,6 +229,58 @@ function applyColorMap(
     return resolved_image;
 }
 
+async function load_mesh(
+    mesh_name: string,
+    bounds: [number, number, number, number],
+    meshMaxError: number,
+    enableSmoothShading: boolean
+) {
+    let mesh = await load(mesh_name, TerrainLoader, {
+        terrain: {
+            elevationDecoder: ELEVATION_DECODER,
+            bounds,
+            meshMaxError,
+            skirtHeight: 0.0,
+        },
+    });
+
+    // Note: mesh contains triangles. No normals they must be added.
+    if (enableSmoothShading) {
+        mesh = add_normals(mesh);
+    }
+
+    return mesh;
+}
+
+function load_texture(texture_name: string) {
+    const imageData = fetch(texture_name)
+        .then((response) => {
+            return response.blob();
+        })
+        .then((blob) => {
+            return new Promise((resolve) => {
+                const fileReader = new FileReader();
+                fileReader.readAsArrayBuffer(blob);
+                fileReader.onload = () => {
+                    const arrayBuffer = fileReader.result;
+                    const imgData = png.decode(arrayBuffer as ArrayBuffer);
+                    const data = new Uint8ClampedArray(imgData.data);
+                    const imageData = new ImageData(
+                        data,
+                        imgData.width,
+                        imgData.height
+                    );
+                    resolve(imageData);
+                };
+            });
+        })
+        .then((imageData) => {
+            return Promise.resolve(imageData);
+        });
+
+    return imageData;
+}
+
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image representing the height mesh.
     mesh: string;
@@ -267,53 +320,19 @@ export default class MapLayer extends CompositeLayer<
     unknown,
     MapLayerProps<unknown>
 > {
-    renderLayers(): [PrivateMeshLayer] {
-        let meshPromise = load(this.props.mesh, TerrainLoader, {
-            terrain: {
-                elevationDecoder: ELEVATION_DECODER,
-                bounds: this.props.bounds,
-                meshMaxError: this.props.meshMaxError,
-                skirtHeight: 0.0,
-            },
-        });
+    initializeState(): void {
+        // Load mesh and texture and store in state.
+        const mesh = load_mesh(
+            this.props.mesh,
+            this.props.bounds,
+            this.props.meshMaxError,
+            this.props.enableSmoothShading
+        );
 
-        // Note: mesh contains triangles. No normals.
-        if (this.props.enableSmoothShading) {
-            meshPromise = meshPromise.then(add_normals);
-        }
-
-        // Download texture (as an ImageData structure) and apply colormap to it. Texture image is encoded Float32 for each pixel.
-        // Note: Using ImageLoader in this case does not work as the pixel values are not always exact.
-        // To decode png with exact values we can use a separate library like
-        // https://github.com/arian/pngjs (which ImagaLoader uses when not in a browser (node.js)) or this
-        // https://github.com/vivaxy/png
-        const imageDataPromise = fetch(this.props.propertyTexture)
-            .then((response) => {
-                return response.blob();
-            })
-            .then((blob) => {
-                return new Promise((resolve) => {
-                    const fileReader = new FileReader();
-                    fileReader.readAsArrayBuffer(blob);
-                    fileReader.onload = () => {
-                        const arrayBuffer = fileReader.result;
-                        const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                        const data = new Uint8ClampedArray(imgData.data);
-                        const imageData = new ImageData(
-                            data,
-                            imgData.width,
-                            imgData.height
-                        );
-                        resolve(imageData);
-                    };
-                });
-            })
-            .then((imageData) => {
-                return Promise.resolve(imageData);
-            });
+        const texture = load_texture(this.props.propertyTexture);
 
         // Apply colormap to the pixels to generate color texture.
-        const texturePromise = imageDataPromise.then((imageData) => {
+        const color_texture = texture.then((imageData) => {
             // Need to take a copy so not to destroy original data.
             imageData = structuredClone(imageData);
             imageData = applyColorMap(
@@ -327,6 +346,34 @@ export default class MapLayer extends CompositeLayer<
             return Promise.resolve(imageData);
         });
 
+        this.setState({
+            mesh,
+            texture,
+            color_texture,
+        });
+    }
+
+    updateState({
+        props,
+        oldProps,
+    }: {
+        props: MapLayerProps<unknown>;
+        oldProps: MapLayerProps<unknown>;
+    }): void {
+        const needs_reload =
+            !isEqual(props.mesh, oldProps.mesh) ||
+            !isEqual(props.bounds, oldProps.bounds) ||
+            !isEqual(props.meshMaxError, oldProps.meshMaxError) ||
+            !isEqual(props.enableSmoothShading, oldProps.enableSmoothShading) ||
+            !isEqual(props.propertyTexture, oldProps.propertyTexture);
+
+        if (needs_reload) {
+            // Reload mesh and texture.
+            this.initializeState();
+        }
+    }
+
+    renderLayers(): [PrivateMeshLayer] {
         const rotatingModelMatrix = getModelMatrix(
             this.props.rotDeg,
             this.props.bounds[0] as number, // Rotate around upper left corner of bounds
@@ -338,9 +385,9 @@ export default class MapLayer extends CompositeLayer<
                 PrivateMeshLayerData,
                 PrivateMeshLayerProps<PrivateMeshLayerData>
             >({
-                mesh: meshPromise,
-                texture: texturePromise,
-                propertyValuesImageData: imageDataPromise,
+                mesh: this.state.mesh,
+                texture: this.state.color_texture,
+                propertyValuesImageData: this.state.texture,
                 textureParameters: DEFAULT_TEXTURE_PARAMETERS,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
