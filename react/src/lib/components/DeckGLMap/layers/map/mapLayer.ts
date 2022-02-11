@@ -12,6 +12,7 @@ import { Vector3 } from "@math.gl/core";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import GL from "@luma.gl/constants";
 import * as png from "@vivaxy/png";
+import { DeckGLLayerContext } from "../../components/Map";
 
 const ELEVATION_DECODER = {
     rScaler: -255 * 255, // minus signs -> easy way to invert z-axis.
