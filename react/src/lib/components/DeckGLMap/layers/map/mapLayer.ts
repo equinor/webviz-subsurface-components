@@ -314,7 +314,8 @@ export default class MapLayer extends CompositeLayer<
 
         // Apply colormap to the pixels to generate color texture.
         const texturePromise = imageDataPromise.then((imageData) => {
-            // Note: take copy here? "structuredClone()"
+            // Need to take a copy so not to destroy original data.
+            imageData = structuredClone(imageData);
             imageData = applyColorMap(
                 imageData as ImageData,
                 this.props.colorMapRange,
