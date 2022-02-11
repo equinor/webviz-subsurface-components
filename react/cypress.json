@@ -1,4 +1,4 @@
 {
-    "baseUrl": "https://equinor.github.io/webviz-subsurface-components/storybook-static/?path=/story/deckglmap--default",
+    "baseUrl": "http://localhost:6006",
     "video": true
 }

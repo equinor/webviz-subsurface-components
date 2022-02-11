@@ -92,6 +92,7 @@ jobs:
         if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
         run: |
           npm run test_correctness --prefix ./react
+          npm run test-cypress --prefix ./react
           pytest ./tests --headless
 
       - name: Upload coverage to Codecov

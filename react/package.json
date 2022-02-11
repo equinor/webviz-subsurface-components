@@ -42,7 +42,9 @@
         "postpack": "npm run tidy-up",
         "prepublishOnly": "npm test && npm run lint",
         "preversion": "npm run lint",
-        "cy:run": "npx cypress run"
+        "test-cypress": "concurrently 'npm run storybook' 'npm run cypress:test' -k -s first",
+        "cypress:test": "wait-on http://localhost:6006 && cypress run",
+        "cypress:run": "cypress run"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
@@ -108,6 +110,7 @@
         "@testing-library/jest-dom": "^5.11.9",
         "@testing-library/react": "^12.1.2",
         "@testing-library/user-event": "^13.1.9",
+        "@types/cypress-image-snapshot": "^3.1.6",
         "@types/d3-color": "^3.0.2",
         "@types/d3-interpolate": "^3.0.1",
         "@types/jest": "^26.0.20",
@@ -126,6 +129,7 @@
         "css-minimizer-webpack-plugin": "^3.0.1",
         "cssnano": "^5.0.5",
         "cypress": "^9.4.1",
+        "cypress-image-snapshot": "^4.0.1",
         "dotenv-webpack": "^7.0.2",
         "eslint": "^7.0.0",
         "eslint-config-prettier": "^8.1.0",
