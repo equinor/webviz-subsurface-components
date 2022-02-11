@@ -33,7 +33,7 @@ type MeshType = {
         POSITION: { value: number[] };
         normals: { value: Float32Array; size: number };
     };
-    indices: { value: number[] };
+    indices: { value: Uint32Array };
 };
 
 function add_normals(resolved_mesh: MeshType) {
