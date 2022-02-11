@@ -10,10 +10,7 @@ import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
-<<<<<<< HEAD
 import { isEqual } from "lodash";
-=======
->>>>>>> d7ab767 (Split Map3D layer into two. One for float32 resolution and one for RGB encoded resolution for properties.)
 
 const ELEVATION_DECODER = {
     rScaler: 255 * 255,
@@ -125,7 +122,6 @@ function add_normals(resolved_mesh: MeshType) {
     return resolved_mesh;
 }
 
-<<<<<<< HEAD
 function load_mesh(
     mesh_name: string,
     bounds: [number, number, number, number],
@@ -152,9 +148,6 @@ function load_mesh(
 
     return mesh;
 }
-
-=======
->>>>>>> d7ab767 (Split Map3D layer into two. One for float32 resolution and one for RGB encoded resolution for properties.)
 export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image representing the height mesh.
     mesh: string;
@@ -177,16 +170,11 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Name of color map. E.g "PORO"
     colorMapName: string;
 
-<<<<<<< HEAD
     // Min and max of map height values values.
     meshValueRange: [number, number];
 
     // Min and max property values.
     propertyValueRange: [number, number];
-=======
-    // Min and max property values.
-    valueRange: [number, number];
->>>>>>> d7ab767 (Split Map3D layer into two. One for float32 resolution and one for RGB encoded resolution for properties.)
 
     // Use color map in this range.
     colorMapRange: [number, number];
@@ -202,7 +190,6 @@ export default class Map3DLayer extends CompositeLayer<
     unknown,
     Map3DLayerProps<unknown>
 > {
-<<<<<<< HEAD
     initializeState(): void {
         // Load mesh and texture and stare in state.
         const mesh = load_mesh(
@@ -218,16 +205,6 @@ export default class Map3DLayer extends CompositeLayer<
         this.setState({
             mesh,
             texture,
-=======
-    renderLayers(): [TerrainMapLayer] {
-        let mesh = load(this.props.mesh, TerrainLoader, {
-            terrain: {
-                elevationDecoder: ELEVATION_DECODER,
-                bounds: this.props.bounds,
-                meshMaxError: this.props.meshMaxError,
-                skirtHeight: 0.0,
-            },
->>>>>>> d7ab767 (Split Map3D layer into two. One for float32 resolution and one for RGB encoded resolution for properties.)
         });
     }
 
@@ -252,10 +229,7 @@ export default class Map3DLayer extends CompositeLayer<
         }
     }
 
-<<<<<<< HEAD
     renderLayers(): [TerrainMapLayer] {
-=======
->>>>>>> d7ab767 (Split Map3D layer into two. One for float32 resolution and one for RGB encoded resolution for properties.)
         const rotatingModelMatrix = getModelMatrix(
             this.props.rotDeg,
             this.props.bounds[0] as number, // Rotate around upper left corner of bounds
@@ -267,22 +241,13 @@ export default class Map3DLayer extends CompositeLayer<
                 TerrainMapLayerData,
                 TerrainMapLayerProps<TerrainMapLayerData>
             >({
-<<<<<<< HEAD
                 mesh: this.state.mesh,
                 texture: this.state.texture,
-=======
-                mesh,
-                texture: load(this.props.propertyTexture, ImageLoader, {}),
->>>>>>> d7ab767 (Split Map3D layer into two. One for float32 resolution and one for RGB encoded resolution for properties.)
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
                 colorMapName: this.props.colorMapName,
-<<<<<<< HEAD
                 propertyValueRange: this.props.propertyValueRange,
-=======
-                valueRange: this.props.valueRange,
->>>>>>> d7ab767 (Split Map3D layer into two. One for float32 resolution and one for RGB encoded resolution for properties.)
                 colorMapRange: this.props.colorMapRange,
                 isReadoutDepth: this.props.isReadoutDepth,
             })
