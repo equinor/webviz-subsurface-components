@@ -6,7 +6,6 @@ import PrivateMeshLayer, {
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { getModelMatrix } from "../utils/layerTools";
-import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
@@ -292,7 +291,7 @@ export default class MapLayer extends CompositeLayer<
         const texturePromise = imageDataPromise.then((imageData) => {
             // Note: take copy here? "structuredClone()"
             imageData = applyColorMap(
-                imageData,
+                imageData as ImageData,
                 this.props.colorMapRange,
                 this.props.colorMapName,
                 this.props.valueRange,
