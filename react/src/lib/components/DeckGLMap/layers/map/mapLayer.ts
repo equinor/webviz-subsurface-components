@@ -13,6 +13,7 @@ import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import GL from "@luma.gl/constants";
 import * as png from "@vivaxy/png";
 import { DeckGLLayerContext } from "../../components/Map";
+import structuredClone from '@ungap/structured-clone';
 
 const ELEVATION_DECODER = {
     rScaler: -255 * 255, // minus signs -> easy way to invert z-axis.
@@ -176,7 +177,6 @@ function applyColorMap(
                 propertyValue === 0
             );
             if (defined) {
-                //no_defined += 1;
                 valueRangeMin =
                     propertyValue < valueRangeMin
                         ? propertyValue
