@@ -438,6 +438,7 @@ function getInitialViewState(
 function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
+    const far = 9999.9;
     if (!views || !views.viewports || !views.layout) {
         deckgl_views.push({
             "@@type": "OrthographicView",
@@ -448,6 +449,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
             width: "100%",
             height: "100%",
             flipY: false,
+            far,
         });
     } else {
         let yPos = 0;
@@ -479,6 +481,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     width: 100 / nX + "%",
                     height: 100 / nY + "%",
                     flipY: false,
+                    far,
                 });
                 xPos = xPos + 100 / nX;
             }
