@@ -65,12 +65,7 @@ export function applyPropsOnLayers(
         });
         if (props) {
             Object.entries(props).forEach(([prop, value]) => {
-                const prop_type = typeof value;
-                if (
-                    ["string", "boolean", "number", "array"].includes(prop_type)
-                ) {
-                    if (layer[prop] == undefined) layer[prop] = value;
-                }
+                if (layer[prop] == undefined) layer[prop] = value;
             });
         } else {
             // if it's a user defined layer and its name and visibility are not specified

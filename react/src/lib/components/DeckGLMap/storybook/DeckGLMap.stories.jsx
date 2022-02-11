@@ -108,10 +108,11 @@ const EditDataTemplate = (args) => {
     return (
         <DeckGLMap
             {...args}
-            editedData={editedData}
-            setProps={(updatedProps) => {
-                setEditedData(updatedProps.editedData);
-            }}
+            //editedData={editedData}
+            //setProps={(updatedProps) => {
+            //    console.log(updatedProps);
+            //    setEditedData(updatedProps.editedData);
+            //}}
         />
     );
 };

@@ -26,9 +26,9 @@ export const layersDefaultProps: Record<string, unknown> = {
         rotDeg: 0,
         valueRange: { type: "array" },
         colorMapRange: { type: "array" },
-        lightDirection: { type: "array", value: [1, 1, 1] },
-        ambientLightIntensity: { type: "number", value: 0.5 },
-        diffuseLightIntensity: { type: "number", value: 0.5 },
+        lightDirection: [1, 1, 1],
+        ambientLightIntensity: 0.5,
+        diffuseLightIntensity: 0.5,
         valueDecoder: {
             rgbScaler: [1, 1, 1],
             // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
@@ -80,6 +80,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         logCurves: true,
         refine: true,
         visible: true,
+        selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     },
     FaultPolygonsLayer: {
         "@@type": "FaultPolygonsLayer",
@@ -96,6 +97,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         id: "pie-layer",
         pickable: true,
         visible: true,
+        selectedPie: "@@editedData.selectedPie", // used to get data from deckgl layer
     },
     DrawingLayer: {
         "@@type": "DrawingLayer",
@@ -105,7 +107,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         visible: true,
         mode: "drawLineString",
 
-        // Props mainly used to make the information available to the Map parent comp.
+        // Props used to get/set data in the drawing layer.
         selectedFeatureIndexes: [] as number[],
         data: {
             type: "FeatureCollection",
