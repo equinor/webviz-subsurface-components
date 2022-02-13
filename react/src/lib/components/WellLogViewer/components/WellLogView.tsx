@@ -582,6 +582,9 @@ interface Props {
     horizontal?: boolean;
     primaryAxis: string;
 
+    hideTitles?: boolean;
+    hideLegend?: boolean;
+
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
@@ -658,6 +661,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
         if (this.props.horizontal !== nextProps.horizontal) return true;
+        if (this.props.hideTitles !== nextProps.hideTitles) return true;
+        if (this.props.hideLegend !== nextProps.hideLegend) return true;
+
         if (this.props.welllog !== nextProps.welllog) return true;
         if (this.props.template !== nextProps.template) return true;
         if (this.props.colorTables !== nextProps.colorTables) return true;
@@ -689,6 +695,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         let shouldSetTracks = false;
         if (
             this.props.horizontal !== prevProps.horizontal ||
+            this.props.hideTitles !== prevProps.hideTitles ||
+            this.props.hideLegend !== prevProps.hideLegend ||
             this.props.maxContentZoom !== prevProps.maxContentZoom
         ) {
             selection = this.getContentSelection();
@@ -744,8 +752,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.container) {
             // create new LogViewer
             this.logController = new LogViewer({
-                showLegend: true,
                 horizontal: this.props.horizontal,
+                showTitles: !this.props.hideTitles,
+                showLegend: !this.props.hideLegend,
                 maxZoom: this.props.maxContentZoom,
                 onTrackEnter: (elm: HTMLElement, track: Track) =>
                     addTrackMouseEventHandlers(

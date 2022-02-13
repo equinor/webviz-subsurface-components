@@ -77,6 +77,9 @@ interface Props {
     syncContentSelection?: boolean;
     syncTemplate?: boolean;
 
+    hideTitles?: boolean;
+    hideLegend?: boolean;
+
     domain?: [number, number]; //  initial visible range
     selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
 
@@ -536,6 +539,8 @@ class SyncLogViewer extends Component<Props, State> {
                     template={this.props.templates[0]}
                     colorTables={this.props.colorTables}
                     horizontal={this.props.horizontal}
+                    hideTitles={this.props.hideTitles}
+                    hideLegend={this.props.hideLegend}
                     maxVisibleTrackNum={maxVisibleTrackNum}
                     maxContentZoom={maxContentZoom}
                     primaryAxis={this.state.primaryAxis}
@@ -555,6 +560,8 @@ class SyncLogViewer extends Component<Props, State> {
                     template={this.props.templates[1]}
                     colorTables={this.props.colorTables}
                     horizontal={this.props.horizontal}
+                    hideTitles={this.props.hideTitles}
+                    hideLegend={this.props.hideLegend}
                     maxVisibleTrackNum={maxVisibleTrackNum}
                     maxContentZoom={maxContentZoom}
                     primaryAxis={this.state.primaryAxis}
@@ -661,6 +668,16 @@ SyncLogViewer.propTypes = {
      * Orientation of the track plots on the screen. Default is false
      */
     horizontal: PropTypes.bool,
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTitles: PropTypes.bool,
+
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideLegend: PropTypes.bool,
 
     /**
      * Synchronize the first visible track number in views

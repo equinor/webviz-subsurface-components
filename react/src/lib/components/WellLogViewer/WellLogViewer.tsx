@@ -70,6 +70,9 @@ interface Props {
     colorTables: ColorTable[];
     horizontal?: boolean;
 
+    hideTitles?: boolean;
+    hideLegend?: boolean;
+
     domain?: [number, number]; //  initial visible range
     selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
 
@@ -322,6 +325,8 @@ class WellLogViewer extends Component<Props, State> {
                     template={this.props.template}
                     colorTables={this.props.colorTables}
                     horizontal={this.props.horizontal}
+                    hideTitles={this.props.hideTitles}
+                    hideLegend={this.props.hideLegend}
                     maxVisibleTrackNum={this.props.horizontal ? 3 : 5}
                     maxContentZoom={maxContentZoom}
                     primaryAxis={this.state.primaryAxis}
@@ -420,6 +425,16 @@ WellLogViewer.propTypes = {
      * Orientation of the track plots on the screen. Default is false
      */
     horizontal: PropTypes.bool,
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTitles: PropTypes.bool,
+
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideLegend: PropTypes.bool,
 
     /**
      * Options for readout panel

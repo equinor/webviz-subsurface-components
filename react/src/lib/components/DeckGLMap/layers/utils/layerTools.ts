@@ -5,7 +5,6 @@ import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { Matrix4 } from "math.gl";
 import { cloneDeep } from "lodash";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { ViewsType } from "../../components/DeckGLWrapper";
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
     name: string;
@@ -112,18 +111,11 @@ export function getLayersWithDefaultProps(
 
 export function getLayersInViewport(
     layers: Record<string, unknown>[] | Layer<unknown>[],
-    views: ViewsType | undefined,
-    viewportId: string | undefined
+    layerIds: string[] | undefined
 ): Record<string, unknown>[] | Layer<unknown>[] {
-    if (views == undefined || viewportId == undefined) return layers;
-
-    const current_view = views.viewports?.find((view) =>
-        new RegExp("^" + view.id).test(viewportId)
-    );
-    const layers_in_viewport = current_view?.layerIds;
-    if (layers_in_viewport && layers_in_viewport?.length > 0) {
+    if (layerIds && layerIds.length > 0) {
         const layers_in_view = (layers as never[]).filter((layer) =>
-            layers_in_viewport.includes(layer["id"] as string)
+            layerIds.includes(layer["id"] as string)
         );
         return layers_in_view;
     } else {

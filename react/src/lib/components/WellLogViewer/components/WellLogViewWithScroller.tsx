@@ -20,6 +20,9 @@ interface Props {
     horizontal?: boolean;
     primaryAxis: string;
 
+    hideTitles?: boolean;
+    hideLegend?: boolean;
+
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
@@ -208,6 +211,8 @@ class WellLogViewWithScroller extends Component<Props> {
                     template={this.props.template}
                     colorTables={this.props.colorTables}
                     horizontal={this.props.horizontal}
+                    hideTitles={this.props.hideTitles}
+                    hideLegend={this.props.hideLegend}
                     maxVisibleTrackNum={this.props.maxVisibleTrackNum}
                     maxContentZoom={this.props.maxContentZoom}
                     primaryAxis={this.props.primaryAxis}
