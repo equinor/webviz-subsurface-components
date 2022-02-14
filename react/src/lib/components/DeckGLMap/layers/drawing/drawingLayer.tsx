@@ -65,7 +65,7 @@ export default class DrawingLayer extends CompositeLayer<
     FeatureCollection,
     DrawingLayerProps<FeatureCollection>
 > {
-    initializeState(params?: any): void {
+    initializeState(params?: PickInfo<FeatureCollection>): void {
         super.initializeState(params);
 
         this.setState({
