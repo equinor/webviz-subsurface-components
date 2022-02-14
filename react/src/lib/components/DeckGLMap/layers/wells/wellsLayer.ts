@@ -22,7 +22,6 @@ import {
     PropertyDataType,
     createPropertyData,
 } from "../utils/layerTools";
-import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
@@ -81,9 +80,9 @@ export default class WellsLayer extends CompositeLayer<
             return false;
         }
 
-        patchLayerProps<FeatureCollection>(this, {
+        (this.context as DeckGLLayerContext).userData.setEditedData({
             selectedWell: (info.object as Feature).properties?.["name"],
-        } as WellsLayerProps<FeatureCollection>);
+        });
         return true;
     }
 
