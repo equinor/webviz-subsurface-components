@@ -1,5 +1,4 @@
 import { COORDINATE_SYSTEM, RGBAColor } from "@deck.gl/core";
-import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import {
     DrawLineStringMode,
@@ -16,8 +15,8 @@ import {
 } from "@nebula.gl/edit-modes";
 import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 import { CompositeLayer, PickInfo } from "deck.gl";
-import { patchLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
+import { DeckGLLayerContext } from "../../components/Map";
 
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {
@@ -66,29 +65,27 @@ export default class DrawingLayer extends CompositeLayer<
     FeatureCollection,
     DrawingLayerProps<FeatureCollection>
 > {
-    updateState(
-        info: UpdateStateInfo<DrawingLayerProps<FeatureCollection>>
-    ): void {
-        super.updateState(info);
+    initializeState(params?: PickInfo<FeatureCollection>): void {
+        super.initializeState(params);
 
-        if (info.changeFlags.dataChanged) {
-            this.setState({
-                data: this.props.data,
-            });
-        }
+        this.setState({
+            data: this.props.data,
+            selectedFeatureIndexes: this.props.selectedFeatureIndexes,
+        });
     }
 
     // Select features when clicking on them if in view or modify modes.
-    // The selection is sent to the map component parent as a patch.
+    // The selection is used to set current selected drawing, and
+    // is sent to the map component parent via setEditedData.
     onClick(info: PickInfo<FeatureCollection>): boolean {
         if (this.props.mode === "view" || this.props.mode === "modify") {
-            const featureIndex = this.state.data.features.indexOf(info.object);
-            if (featureIndex >= 0) {
-                patchLayerProps<FeatureCollection>(this, {
-                    selectedFeatureIndexes: [info.index],
-                } as DrawingLayerProps<FeatureCollection>);
-                return true;
-            }
+            this.setState({
+                selectedFeatureIndexes: [info.index],
+            });
+            (this.context as DeckGLLayerContext).userData.setEditedData({
+                selectedFeatureIndexes: [info.index],
+            });
+            return true;
         }
 
         return false;
@@ -99,26 +96,38 @@ export default class DrawingLayer extends CompositeLayer<
     _onEdit(editAction: EditAction<FeatureCollection>): void {
         switch (editAction.editType) {
             case "addFeature":
-                patchLayerProps<FeatureCollection>(this, {
+                this.setState({
                     data: editAction.updatedData,
                     selectedFeatureIndexes:
                         editAction.editContext.featureIndexes,
-                } as DrawingLayerProps<FeatureCollection>);
+                });
+                (this.context as DeckGLLayerContext).userData.setEditedData({
+                    data: editAction.updatedData,
+                    selectedFeatureIndexes:
+                        editAction.editContext.featureIndexes,
+                });
                 break;
             case "removeFeature":
-                patchLayerProps<FeatureCollection>(this, {
+                this.setState({
+                    data: editAction.updatedData,
+                    selectedFeatureIndexes: [],
+                });
+                (this.context as DeckGLLayerContext).userData.setEditedData({
                     data: editAction.updatedData,
                     selectedFeatureIndexes: [] as number[],
-                } as DrawingLayerProps<FeatureCollection>);
+                });
                 break;
             case "removePosition":
             case "finishMovePosition":
-                patchLayerProps<FeatureCollection>(this, {
+                this.setState({
                     data: editAction.updatedData,
-                } as DrawingLayerProps<FeatureCollection>);
+                });
+                (this.context as DeckGLLayerContext).userData.setEditedData({
+                    data: editAction.updatedData,
+                });
                 break;
             case "movePosition":
-                // Don't use patchLayerProps to avoid an expensive roundtrip,
+                // Don't use setEditedData to avoid an expensive roundtrip,
                 // since this is done on every mouse move when editing.
                 this.setState({ data: editAction.updatedData });
                 break;
@@ -128,8 +137,8 @@ export default class DrawingLayer extends CompositeLayer<
     // Return the line color based on the selection status.
     // The same can be done for other features (polygons, points etc).
     _getLineColor(feature: Feature): RGBAColor {
-        const is_feature_selected = this.props.selectedFeatureIndexes.some(
-            (i) => this.state.data.features[i] === feature
+        const is_feature_selected = this.state.selectedFeatureIndexes.some(
+            (i: number) => this.state.data.features[i] === feature
         );
         if (is_feature_selected) {
             return SELECTED_LINE_COLOR;
@@ -150,7 +159,7 @@ export default class DrawingLayer extends CompositeLayer<
                     modeConfig: {
                         viewport: this.context.viewport,
                     },
-                    selectedFeatureIndexes: this.props.selectedFeatureIndexes,
+                    selectedFeatureIndexes: this.state.selectedFeatureIndexes,
                     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
                     onEdit: (editAction: EditAction<FeatureCollection>) =>
                         this._onEdit(editAction),
