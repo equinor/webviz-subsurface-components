@@ -1,6 +1,5 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
-import ColormapLayer from "../layers/colormap/colormapLayer";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 
 export default {
@@ -262,7 +261,7 @@ KhMapFlat.parameters = {
         description: {
             story: "An example showing a kh property layer and a depth map hillshading layer.",
         },
-        inlineStories: true,
+        inlineStories: false,
         iframeHeight: 500,
     },
 };
