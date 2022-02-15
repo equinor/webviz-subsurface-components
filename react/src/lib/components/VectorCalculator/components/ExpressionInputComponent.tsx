@@ -3,7 +3,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { Button, Icon } from "@equinor/eds-core-react";
 import { Grid, Paper } from "@material-ui/core";
 import { clear, save, sync } from "@equinor/eds-icons";
-import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
+import { TreeDataNode } from "@webviz/core-components";
 
 import { VariablesTable } from "./VariablesTable";
 import { ExpressionDescriptionTextField } from "./ExpressionDescriptionTextField";

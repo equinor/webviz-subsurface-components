@@ -50,8 +50,13 @@
 }
 
 .VectorCalculator .VariablesTableContainer {
-    overflow: visible;
     position: relative;
+    max-height: 450px;
+    max-width: 100%;
+}
+
+.VectorCalculator .VariablesTableContainer table {
+    table-layout: fixed;
 }
 
 .VectorCalculator .DisableOverlay {

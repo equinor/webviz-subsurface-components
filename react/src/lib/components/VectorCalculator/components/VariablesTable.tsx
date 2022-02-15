@@ -7,7 +7,7 @@ import {
     TableBody,
     TableCell,
 } from "@material-ui/core";
-import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
+import { TreeDataNode } from "@webviz/core-components";
 import cloneDeep from "lodash/cloneDeep";
 
 import { VariableVectorMapType } from "../utils/VectorCalculatorTypes";
@@ -84,7 +84,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
                                         numMetaNodes={0}
                                         maxNumSelectedNodes={1}
                                         numSecondsUntilSuggestionsAreShown={0}
-                                        placeholder="Select a vector"
+                                        placeholder="Add new vector..."
                                         data={vectorData}
                                     />
                                 </TableCell>

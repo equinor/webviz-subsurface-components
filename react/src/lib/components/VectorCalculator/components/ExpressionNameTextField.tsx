@@ -1,7 +1,7 @@
 import React from "react";
 import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
 import { TextField, Icon } from "@equinor/eds-core-react";
-import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
+import { TreeDataNode } from "@webviz/core-components";
 
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import {

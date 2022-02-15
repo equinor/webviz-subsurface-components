@@ -7,7 +7,7 @@ import {
 } from "../utils/VectorCalculatorTypes";
 import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
 import { ExpressionInputComponent } from "./ExpressionInputComponent";
-import { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector/utils/TreeDataNodeTypes";
+import { TreeDataNode } from "@webviz/core-components";
 
 interface ParentProps {
     expressions?: ExpressionType[];
