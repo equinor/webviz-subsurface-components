@@ -119,8 +119,7 @@
         "logData": "@@#resources.logData",
         "logrunName": "BLOCKING",
         "logName": "ZONELOG",
-        "logColor": "Stratigraphy",
-        "selectedWell": "@@#editedData.selectedWell"
+        "logColor": "Stratigraphy"
       },
       {
         "@@type": "FaultPolygonsLayer",
@@ -128,24 +127,13 @@
       },
       {
         "@@type": "PieChartLayer",
-        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json",
-        "selectedPie": "@@#editedData.selectedPie"
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
       },
       {
-        "@@type": "DrawingLayer",
-        "data": "@@#editedData.data",
-        "selectedFeatureIndexes": "@@#editedData.selectedFeatureIndexes"
+        "@@type": "DrawingLayer"
       }
     ],
-    "editedData": {
-      "selectedWell": "",
-      "selectedPie": {},
-      "selectedFeatureIndexes": [],
-      "data": {
-          "type": "FeatureCollection",
-          "features": []
-      }
-    },
+    "editedData": {},
     "views": {
       "layout": [1, 1],
       "showLabel": false,

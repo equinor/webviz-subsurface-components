@@ -196,11 +196,11 @@ const Map: React.FC<MapProps> = ({
         if (!layersData || !layersData.length) {
             return;
         }
+        const enumerations = [];
+        if (resources) enumerations.push({ resources: resources });
+        if (editedData) enumerations.push({ editedData: editedData });
+        else enumerations.push({ editedData: {} });
 
-        const enumerations = [
-            { resources: resources },
-            { editedData: editedData },
-        ];
         setDeckGLLayers(
             jsonToObject(layersData, enumerations) as Layer<unknown>[]
         );
@@ -344,9 +344,13 @@ const Map: React.FC<MapProps> = ({
                     ))}
             </DeckGL>
 
-            {viewState && scale?.visible ? (
+            {scale?.visible ? (
                 <DistanceScale
-                    zoom={viewState.zoom}
+                    zoom={
+                        viewState?.zoom
+                            ? viewState.zoom
+                            : initialViewState?.["zoom"]
+                    }
                     incrementValue={scale.incrementValue}
                     widthPerUnit={scale.widthPerUnit}
                     position={scale.position}

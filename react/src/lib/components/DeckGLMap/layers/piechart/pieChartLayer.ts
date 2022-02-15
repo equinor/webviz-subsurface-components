@@ -3,9 +3,9 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { Position } from "@deck.gl/core/utils/positions";
 import { SolidPolygonLayer } from "@deck.gl/layers";
-import { patchLayerProps } from "../utils/layerTools";
 import { PickInfo } from "deck.gl";
 import { layersDefaultProps } from "../layersDefaultProps";
+import { DeckGLLayerContext } from "../../components/Map";
 
 type PieProperties = [{ color: RGBAColor; label: string }];
 
@@ -51,9 +51,9 @@ export default class PieChartLayer extends CompositeLayer<
         }
 
         const pie_idx = (info.object as PolygonData)?.properties.pieIndex;
-        patchLayerProps<PiesData>(this, {
+        (this.context as DeckGLLayerContext).userData.setEditedData({
             selectedPie: (this.props.data as PiesData)?.pies[pie_idx],
-        } as PieChartLayerProps<PiesData>);
+        });
         return true;
     }
 
