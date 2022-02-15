@@ -30,4 +30,16 @@ describe("Map component", () => {
         cy.wait(2000);
         cy.matchImageSnapshot();
     });
+
+    it("performance metrics", () => {
+        cy.get("body").type("s");
+        cy.get("#tabbutton-performance").click();
+        cy.get("#storybook-addon-performance-start-all-button").click();
+        cy.wait(5000);
+        cy.get(
+            "#storybook-addon-performance-panel > div.css-cmzobt > div:nth-child(2) > div:nth-child(7) > button > code.css-185kqdd"
+        )
+            .invoke("text")
+            .then((sometext) => cy.log(sometext));
+    });
 });
