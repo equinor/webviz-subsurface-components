@@ -26,7 +26,8 @@ type MeshType = {
     indices: { value: Uint32Array };
 };
 
-function mapToRange(resolved_mesh: MeshType) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapToRange(this: any, resolved_mesh: MeshType) {
     const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
     const [min, max] = this.meshValueRange;
     const delta = max - min;

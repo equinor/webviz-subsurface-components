@@ -59,7 +59,7 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
     colorMapName: string;
 
     // Min and max property values.
-    valueRange: [number, number];
+    propertyValueRange: [number, number];
 
     // Use color map in this range.
     colorMapRange: [number, number];
