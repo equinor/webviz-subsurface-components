@@ -72,3 +72,11 @@ Default.args = {
     template: require("../../../../demo/example-data/welllog_template_1.json"),
     colorTables: require("../../../../demo/example-data/color-tables.json"),
 };
+
+export const Discrete = Template.bind({});
+Discrete.args = {
+    horizontal: false,
+    welllog: require("../../../../demo/example-data/volve_logs.json"),
+    template: require("../../../../demo/example-data/welllog_template_2.json"),
+    colorTables: require("../../../../demo/example-data/color-tables.json"),
+};

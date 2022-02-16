@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from "react";
 
-import { TemplateTrack } from "./WellLogTemplateTypes";
+import { TemplateTrack, TemplatePlot } from "./WellLogTemplateTypes";
 
 import WellLogView from "./WellLogView";
 
@@ -16,7 +16,10 @@ import {
 
 import { FormControl, InputLabel, NativeSelect } from "@material-ui/core";
 
+import { createDataItems, dataNames } from "./PlotDialog";
 import { createScaleItems } from "./PlotDialog";
+import { _createItems } from "./PlotDialog";
+
 const noneValue = "-";
 
 interface Props {
@@ -25,18 +28,35 @@ interface Props {
     wellLogView: WellLogView;
 }
 interface State extends TemplateTrack {
+    stacked: string;
+    stackedName?: string; // data name
     open: boolean;
 }
 
 export class TrackPropertiesDialog extends Component<Props, State> {
+    bStacked: boolean;
     constructor(props: Props) {
         super(props);
+        let name = "";
+        const names = dataNames(
+            this.props.wellLogView.props.welllog,
+            null,
+            true
+        );
+        if (names[0]) name = names[0];
 
         const templateTrack = this.props.templateTrack;
+        this.bStacked =
+            templateTrack &&
+            templateTrack.plots &&
+            templateTrack.plots[0] &&
+            templateTrack.plots[0].type === "stacked";
         this.state = templateTrack
             ? {
                   ...templateTrack,
 
+                  stacked: this.bStacked ? "1" : "0",
+                  stackedName: templateTrack.plots[0]?.name,
                   open: true,
               }
             : {
@@ -46,21 +66,37 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                   domain: undefined,
 
                   plots: [],
+
+                  stacked: "0",
+                  stackedName: name,
                   open: true,
               };
 
         this.closeDialog = this.closeDialog.bind(this);
         this.onOK = this.onOK.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.onChangeChecked = this.onChangeChecked.bind(this);
     }
 
     onOK(): void {
+        if (parseInt(this.state.stacked)) {
+            this.state.plots.splice(0, this.state.plots.length); // clear array
+            const plot: TemplatePlot = {
+                type: "stacked",
+                name: this.state.stackedName,
+                color: "not used", // not used in stacked
+            };
+            this.state.plots.push(plot);
+        }
         this.props.onOK(this.state);
         this.closeDialog();
     }
 
     onChange(e: React.ChangeEvent<HTMLInputElement>): void {
         this.setState({ [e.target.id]: e.target.value } as unknown as State);
+    }
+    onChangeChecked(e: React.ChangeEvent<HTMLInputElement>): void {
+        this.setState({ [e.target.id]: e.target.checked } as unknown as State);
     }
 
     closeDialog(): void {
@@ -108,7 +144,8 @@ export class TrackPropertiesDialog extends Component<Props, State> {
     }
 
     render(): ReactNode {
-        const title = this.props.templateTrack ? "Edit track" : "Add New Track";
+        const templateTrack = this.props.templateTrack;
+        const title = templateTrack ? "Edit track" : "Add New Track";
         return (
             <Dialog
                 open={this.state.open}
@@ -130,12 +167,33 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                         onChange={this.onChange}
                     ></TextField>
 
-                    {this.createSelectControl(
-                        "scale",
-                        "Scale",
-                        createScaleItems(),
-                        true
+                    {templateTrack ? (
+                        <></>
+                    ) : (
+                        this.createSelectControl(
+                            "stacked",
+                            "Type",
+                            _createItems({ "0": "Graph", "1": "Stacked" }),
+                            false
+                        )
                     )}
+
+                    {parseInt(this.state.stacked)
+                        ? this.createSelectControl(
+                              "stackedName", // data
+                              "Data",
+                              createDataItems(
+                                  this.props.wellLogView.props.welllog,
+                                  null,
+                                  true
+                              )
+                          )
+                        : this.createSelectControl(
+                              "scale",
+                              "Scale",
+                              createScaleItems(),
+                              true
+                          )}
                 </DialogContent>
                 <DialogActions>
                     <Button

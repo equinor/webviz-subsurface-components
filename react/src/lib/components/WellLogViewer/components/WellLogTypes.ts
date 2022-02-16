@@ -20,8 +20,18 @@ export type WellLogCurve = {
 }; // a part of JSON
 export type WellLogDataRow = number[];
 
+export type WellLogMetadataDiscreteObjects = {
+    string: [];
+};
+export type WellLogMetadataDiscrete = {
+    attributes: string[] /* ["color", "code" ] */;
+    objects: WellLogMetadataDiscreteObjects;
+}; // a part of JSON
+
 export type WellLog = {
     header: WellLogHeader;
     curves: WellLogCurve[];
     data: WellLogDataRow[];
+
+    metadata_discrete?: { string: WellLogMetadataDiscrete };
 }[]; // JSON object from a file

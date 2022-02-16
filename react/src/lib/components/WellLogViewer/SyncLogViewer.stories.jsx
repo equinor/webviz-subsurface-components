@@ -65,7 +65,7 @@ export default {
     },
 };
 
-function fillInfo(state, controller) {
+function fillInfo(controller) {
     if (!controller) return "-";
     const baseDomain = controller.getContentBaseDomain();
     const domain = controller.getContentDomain();
@@ -93,8 +93,11 @@ function fillInfo(state, controller) {
 }
 
 const Template = (args) => {
+    const infoRef = React.useRef();
+    const setInfo = function (info) {
+        if (infoRef.current) infoRef.current.innerHTML = info;
+    };
     const [controller, setController] = React.useState(null);
-    const [info, setInfo] = React.useState("");
     const onCreateController = React.useCallback(
         (controller) => {
             setController(controller);
@@ -102,11 +105,10 @@ const Template = (args) => {
         [controller]
     );
     const onContentRescale = React.useCallback(() => {
-        setInfo((state) => fillInfo(state, controller));
+        setInfo(fillInfo(controller));
     }, [controller]);
-
     const onContentSelection = React.useCallback(() => {
-        setInfo((state) => fillInfo(state, controller));
+        setInfo(fillInfo(controller));
     }, [controller]);
 
     return (
@@ -122,7 +124,7 @@ const Template = (args) => {
                     onContentSelection={onContentSelection}
                 />
             </div>
-            <div style={{ width: "100%", flex: 0 }}>{info}</div>
+            <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
         </div>
     );
 };
