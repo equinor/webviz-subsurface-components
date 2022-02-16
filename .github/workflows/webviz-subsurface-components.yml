@@ -92,8 +92,14 @@ jobs:
         if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
         run: |
           npm run test_correctness --prefix ./react
-          npm run test-cypress --prefix ./react
           pytest ./tests --headless
+
+      # Run cypress tests on Chrome browser
+      - name: E2E on Chrome
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+        run: npm run test-cypress --prefix ./react
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
