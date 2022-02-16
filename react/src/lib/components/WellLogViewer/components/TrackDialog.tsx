@@ -29,12 +29,12 @@ interface Props {
 }
 interface State extends TemplateTrack {
     stacked: string;
-    stackedName?: string; // data name
+    stackedName: string; // data name
     open: boolean;
 }
 
 export class TrackPropertiesDialog extends Component<Props, State> {
-    bStacked: boolean;
+    bStacked: boolean | undefined;
     constructor(props: Props) {
         super(props);
         let name = "";

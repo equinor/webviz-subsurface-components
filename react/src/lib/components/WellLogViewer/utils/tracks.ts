@@ -80,7 +80,7 @@ function indexOfElementByNames(array: Named[], names: string[]): number {
     return -1;
 }
 
-function elementByKeyName<T>(meta: { string: T }, name: string): T | null {
+function elementByKeyName<T>(meta: Record<string, T>, name: string): T | null {
     name = name.toUpperCase();
     for (const key in meta) {
         if (key.toUpperCase() === name)
@@ -481,6 +481,8 @@ function getPlotConfig(
         ),
     };
 }
+
+import { Domain } from "@equinor/videx-wellog/dist/common/interfaces";
 /**
  * Update Graph-Track Scale according to the first plot
  */
@@ -503,7 +505,7 @@ function updateGraphTrackScale(track: GraphTrack): void {
 
     if (track.plots.length) {
         const plot = track.plots[0];
-        track.options.domain = plot.options.domain;
+        track.options.domain = plot.options.domain as Domain;
     }
 
     if (!track.options.domain) {
@@ -866,42 +868,56 @@ function newScaleTrack(title: string, abbr: string, units: string): ScaleTrack {
 }
 
 //////////////////
-class DiscreteMeta {
+interface DiscreteMeta {
     iCode: number;
     iColor: number;
     objects: WellLogMetadataDiscreteObjects;
 }
 
 function createAreaData(
-    meta: DiscreteMeta,
+    meta: DiscreteMeta | null,
     from: number,
     to: number,
     value: number
-): AreaData {
-    const { objects, iColor, iCode } = meta;
-    for (const t in objects) {
-        const object = objects[t];
-        if (value === object[iCode]) {
-            const color = object[iColor];
-            return {
-                from: from,
-                to: to,
-                name: t,
-                color: {
-                    r: color[0],
-                    g: color[1],
-                    b: color[2],
-                    a: color[3] /*1*/,
-                },
-            };
+): AreaData | null {
+    if (meta) { // use discrete metadate from WellLog JSON file
+        const { objects, iColor, iCode } = meta;
+        for (const t in objects) {
+            const object = objects[t];
+            if (value === object[iCode]) {
+                const color = object[iColor];
+                return {
+                    from: from,
+                    to: to,
+                    name: t,
+                    color: {
+                        r: color[0],
+                        g: color[1],
+                        b: color[2],
+                        a: color[3] /*1*/,
+                    },
+                };
+            }
         }
+    } else {
+        return {
+            from: from,
+            to: to,
+            name: value.toString(),
+            color: {
+                r: 224,
+                g: 224,
+                b: 224,
+                a: 1 /*1*/,
+            },
+        };
     }
     return null;
 }
 
 const createStackData = async (
     data: [number, number][],
-    meta: DiscreteMeta
+    meta: DiscreteMeta | null
 ) => {
     const arr = [];
     let prev = null;
@@ -940,11 +956,14 @@ function newStackedTrack(options: StackedTrackOptions): StackedTrack {
 }
 
 function getDiscreteMeta(welllog: WellLog, name: string): DiscreteMeta | null {
-    const meta: { string: WellLogMetadataDiscrete } =
-        welllog[0].metadata_discrete;
+    const meta = welllog[0].metadata_discrete;
     if (meta) {
+        // File has metadata for discrete log
         //const table=meta[name.toUpperCase()]; // search case insensitive!
-        const table: WellLogMetadataDiscrete = elementByKeyName(meta, name);
+        const table: WellLogMetadataDiscrete | null = elementByKeyName(
+            meta,
+            name
+        );
         if (table) {
             // there is a metadata for given log name
             const attributes = table.attributes; // ["color", "code"]
@@ -1184,7 +1203,6 @@ function addStackedTrack(
     welllog: WellLog,
     templateTrack: TemplateTrack,
     templateStyles: TemplateStyle[],
-    colorTables: ColorTable[],
     curves: WellLogCurve[],
     data: WellLogDataRow[],
     iPrimaryAxis: number
@@ -1219,23 +1237,20 @@ function addStackedTrack(
     //"valueType": "integer"
     const name = templatePlot.name;
     const meta = getDiscreteMeta(welllog, name);
-    if (meta) {
-        // all meta information are good
-        const data = plotData.data;
+    if (!meta) console.log("Discrete meta information not found. Use default");
 
-        const showLines = true;
-        const options: StackedTrackOptions = {
-            abbr: name, // name of the only plot
-            legendConfig: stackLegendConfig,
-            data: createStackData.bind(null, data, meta),
-            showLabels: true,
-            showLines: showLines,
-        };
-        setStackedTrackOptionFromTemplate(options, templateTrackFullPlot);
-        const track = newStackedTrack(options);
-        updateStackedTrackScale(track);
-        info.tracks.push(track);
-    }
+    const showLines = true;
+    const options: StackedTrackOptions = {
+        abbr: name, // name of the only plot
+        legendConfig: stackLegendConfig,
+        data: createStackData.bind(null, plotData.data, meta),
+        showLabels: true,
+        showLines: showLines,
+    };
+    setStackedTrackOptionFromTemplate(options, templateTrackFullPlot);
+    const track = newStackedTrack(options);
+    updateStackedTrackScale(track);
+    info.tracks.push(track);
 }
 
 function isStackedTemplateTrack(
@@ -1280,7 +1295,6 @@ export function createTracks(
                     welllog,
                     templateTrack,
                     templateStyles,
-                    colorTables,
                     curves,
                     data,
                     iPrimaryAxis
@@ -1386,43 +1400,28 @@ export function addOrEditStackedTrack(
     trackCurrent: Track,
     bAfter: boolean
 ): StackedTrack {
+    const welllog = wellLogView.props.welllog;
+    const templatePlot = templateTrack.plots[0];
+    const name = templatePlot.name;
+    const meta = getDiscreteMeta(welllog, name);
+    const data = welllog[0].data;
+    const curves = welllog[0].curves;
+    const iCurve = indexOfElementByName(curves, templatePlot.name);
+    const axes = wellLogView.getAxesInfo();
+    const iPrimaryAxis = indexOfElementByNames(
+        curves,
+        axes.mnemos[axes.primaryAxis]
+    );
+    const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
     if (track) {
-        const welllog = wellLogView.props.welllog;
-        const templatePlot = templateTrack.plots[0];
-        const name = templatePlot.name;
-        const meta = getDiscreteMeta(welllog, name);
-        const data = welllog[0].data;
-        const curves = welllog[0].curves;
-        const iCurve = indexOfElementByName(curves, templatePlot.name);
-        const axes = wellLogView.getAxesInfo();
-        const iPrimaryAxis = indexOfElementByNames(
-            curves,
-            axes.mnemos[axes.primaryAxis]
-        );
-        const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
-
         // edit existing track
         track.options.abbr = name; // name of the only plot
         track.options.data = createStackData.bind(null, plotData.data, meta);
         track.data = track.options.data;
         setStackedTrackOptionFromTemplate(track.options, templateTrack);
         updateStackedTrackScale(track);
-        //updateLegendRows(wellLogView.logController);
-        wellLogView.logController.refresh();
+        if (wellLogView.logController) wellLogView.logController.refresh();
     } else {
-        const welllog = wellLogView.props.welllog;
-        const templatePlot = templateTrack.plots[0];
-        const name = templatePlot.name;
-        const meta = getDiscreteMeta(welllog, name);
-        const data = welllog[0].data;
-        const curves = welllog[0].curves;
-        const iCurve = indexOfElementByName(curves, templatePlot.name);
-        const axes = wellLogView.getAxesInfo();
-        const iPrimaryAxis = indexOfElementByNames(
-            curves,
-            axes.mnemos[axes.primaryAxis]
-        );
-        const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
         const showLines = true;
         const options: StackedTrackOptions = {
             abbr: name, // name of the only plot

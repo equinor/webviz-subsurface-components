@@ -285,7 +285,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
 }
 
 export function editPlots(
-    parent: HTMLElement,
+    parent: HTMLElement | null,
     wellLogView: WellLogView,
     track: Track
 ): void {
@@ -298,7 +298,7 @@ export function editPlots(
     const el: HTMLElement = document.createElement("div");
     el.style.width = "10px";
     el.style.height = "13px";
-    parent.appendChild(el);
+    if (parent) parent.appendChild(el);
     ReactDOM.render(
         <SimpleMenu
             type="editPlots"
@@ -311,7 +311,7 @@ export function editPlots(
 }
 
 export function removePlots(
-    parent: HTMLElement,
+    parent: HTMLElement | null,
     wellLogView: WellLogView,
     track: Track
 ): void {
@@ -324,7 +324,7 @@ export function removePlots(
     const el: HTMLElement = document.createElement("div");
     el.style.width = "10px";
     el.style.height = "13px";
-    parent.appendChild(el);
+    if (parent) parent.appendChild(el);
     ReactDOM.render(
         <SimpleMenu
             type="removePlots"

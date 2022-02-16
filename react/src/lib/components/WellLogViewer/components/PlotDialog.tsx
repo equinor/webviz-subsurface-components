@@ -99,7 +99,7 @@ function createDataItem(item: string): ReactNode {
 
 export function dataNames(
     welllog: WellLog,
-    track: Track,
+    track: Track | null,
     discrete?: boolean
 ): string[] {
     const names: string[] = [];
@@ -134,7 +134,7 @@ export function dataNames(
 
 export function createDataItems(
     welllog: WellLog,
-    track: Track,
+    track: Track | null,
     discrete?: boolean
 ): ReactNode[] {
     const names = dataNames(welllog, track, discrete);

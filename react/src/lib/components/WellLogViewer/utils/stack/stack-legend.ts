@@ -51,7 +51,7 @@ function onUpdateLegend(
         "font-size": `${textSize}px`,
         fill: "black",
     });
-    lbl.text(abbr || label);
+    lbl.text(abbr || label || "???");
 
     const val = g.select("text.scale-range");
     setAttrs(val, {
