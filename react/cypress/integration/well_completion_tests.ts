@@ -1,17 +1,25 @@
-describe("Go to Well Completions", () => {
+describe("Well Completions", () => {
     const slider =
         "#root > div > header > div:nth-child(1) > div > div:nth-child(1) > span:nth-child(2) > span:nth-child(14)";
     before(() => {
         cy.visit("/");
         cy.wait(5000);
-        cy.get("body").type("s");
+        cy.get("body").then(($body) => {
+            if ($body.find("#root > div > div.css-1q7pov5 > nav").length == 0) {
+                cy.get("body").type("s");
+            }
+            if (
+                $body.find("#root > div > div.react-draggable.css-p5zfqk")
+                    .length > 0
+            ) {
+                cy.get("body").type("a");
+            }
+        });
         cy.get('[id="wellcompletions-demo"]').click();
     });
 
     it("Open Well completions Page from drop-down", () => {
         cy.getIframeBody().find(slider).should("be.visible");
-        //cy.get('.MuiSlider-root').matchImageSnapshot('slider-image')
-        //cy.matchImageSnapshot('blacked-image',{ blackout:['.jss26'] });
     });
 
     it("test slider", () => {
@@ -19,9 +27,7 @@ describe("Go to Well Completions", () => {
         cy.getIframeBody().find(slider).type("{rightarrow}".repeat(1));
         cy.getIframeBody().find(slider).should("have.attr", "aria-valuenow", 1);
         cy.getIframeBody().find(slider).should("have.text", "2000-06-01");
-        cy.getIframeBody()
-            .find("#svg-context")
-            .matchImageSnapshot("updated graph");
+        cy.getIframeBody().matchImageSnapshot("updated graph");
     });
 
     it("test wells per page", () => {

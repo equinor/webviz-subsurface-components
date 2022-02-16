@@ -2,11 +2,20 @@ describe("Map component", () => {
     beforeEach(() => {
         cy.visit("/");
         cy.wait(5000);
+        cy.get("body").then(($body) => {
+            if ($body.find("#root > div > div.css-1q7pov5 > nav").length > 0) {
+                cy.get("body").type("s");
+            }
+            if (
+                $body.find("#root > div > div.react-draggable.css-p5zfqk")
+                    .length > 0
+            ) {
+                cy.get("body").type("a");
+            }
+        });
     });
 
     it("Should hide pie charts", () => {
-        cy.get("body").type("s");
-        cy.get('[title="Hide addons [A]"]').click();
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.getIframeBody()
             .find("[id='Pie chart-switch']")
@@ -29,17 +38,5 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(2000);
         cy.matchImageSnapshot();
-    });
-
-    it("performance metrics", () => {
-        cy.get("body").type("s");
-        cy.get("#tabbutton-performance").click();
-        cy.get("#storybook-addon-performance-start-all-button").click();
-        cy.wait(5000);
-        cy.get(
-            "#storybook-addon-performance-panel > div.css-cmzobt > div:nth-child(2) > div:nth-child(7) > button > code.css-185kqdd"
-        )
-            .invoke("text")
-            .then((sometext) => cy.log(sometext));
     });
 });
