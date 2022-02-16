@@ -91,22 +91,26 @@
       },
       {
         "@@type": "Map3DLayer",
-        "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/depthMap.png",
         "bounds": [
           432205,
           6475078,
           437720,
           6481113
         ],
-        "meshMaxError": 2.0,
-        "propertyTexture": "./property_margin_10pt.png",
-        "rotDeg": 0,
-        "contours": [0, 100.0],
-        "colorMapName": "Physics",
-        "valueRange": [
+        "meshMaxError": 20.0,
+        "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_hugin_depth_normalized.png",
+        "meshValueRange": [
           2782,
           3513
         ],
+        "propertyTexture": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_hugin_depth_normalized.png",
+        "propertyValueRange": [
+          2782,
+          3513
+        ],
+        "rotDeg": 0,
+        "contours": [0, 100.0],
+        "colorMapName": "Physics",
         "colorMapRange": [
           2782,
           3513
