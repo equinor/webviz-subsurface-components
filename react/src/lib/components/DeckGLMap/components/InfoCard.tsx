@@ -49,10 +49,10 @@ const useStyles = makeStyles({
     table: {
         "& > *": {
             backgroundColor: "#ffffffcc",
+            color: "#000000ff",
             border: "2px solid #ccc",
             padding: "0px",
             borderRadius: "5px",
-
             position: "absolute",
             bottom: 0,
         },
@@ -74,6 +74,7 @@ function Row(props: { layer_data: InfoCardDataType }) {
     const [open, setOpen] = React.useState(true);
     const classes = useStyles();
 
+    if (layer_data.properties?.length == 0) return null;
     return (
         <React.Fragment>
             <TableRow className={classes.table_row}>

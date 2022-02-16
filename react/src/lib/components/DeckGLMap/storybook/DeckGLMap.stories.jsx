@@ -1,14 +1,106 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 export default {
     component: DeckGLMap,
     title: "DeckGLMap",
+    argTypes: {
+        id: {
+            description:
+                "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
+        },
+
+        resources: {
+            description:
+                "Resource dictionary made available in the DeckGL specification as an enum. \
+            The values can be accessed like this: `@@#resources.resourceId`, where \
+            `resourceId` is the key in the `resources` dict. For more information, \
+            see the DeckGL documentation on enums in the json spec: \
+            https://deck.gl/docs/api-reference/json/conversion-reference#enumerations-and-using-the--prefix",
+        },
+
+        layers: {
+            description:
+                "List of JSON object containing layer specific data. \
+            Each JSON object will consist of layer type with key as `@@type` and layer specific data, if any.",
+        },
+
+        bounds: {
+            description:
+                "Coordinate boundary for the view defined as [left, bottom, right, top].",
+        },
+
+        zoom: {
+            description: "Zoom level for the view",
+        },
+
+        views: {
+            description:
+                "Views configuration for map. If not specified, all the layers will be displayed in a single 2D viewport.<br/>" +
+                "Options:<br/>" +
+                "layout: [number, number] — Layout for viewport in specified as [row, column],<br/>" +
+                "viewports: [`ViewportType`] — Layers configuration for multiple viewport,<br/><br/>" +
+                "`ViewportType` options: <br/>" +
+                "id: string — Viewport id <br>" +
+                "name: string — Viewport name <br>" +
+                "show3D: boolean — Toggle 3D view <br>" +
+                "layerIds: [string] — Layer ids to be displayed on viewport.",
+        },
+
+        coords: {
+            description:
+                "Options for readout panel.<br/>" +
+                "visible: boolean — Show/hide readout,<br/>" +
+                "multipicking: boolean — Enable or disable multi picking,<br/>" +
+                "pickDepth: number — Number of objects to pick.",
+        },
+
+        scale: {
+            description:
+                "Options for distance scale component.<br/>" +
+                "visible: boolean — Show/hide scale bar,<br/>" +
+                "incrementValue: number — Increment value for the scale,<br/>" +
+                "widthPerUnit: number — Scale bar width in pixels per unit value,<br/>" +
+                "position: [number, number] — Scale bar position in pixels.",
+        },
+
+        coordinateUnit: {
+            description: "Unit for the scale ruler",
+        },
+
+        legend: {
+            description:
+                "Options for color legend.<br/>" +
+                "visible: boolean — Show/hide color legend,<br/>" +
+                "position: [number, number] — Legend position in pixels,<br/>" +
+                "horizontal: boolean — Orientation of color legend.",
+        },
+
+        colorTables: {
+            description:
+                "Prop containing color table data." +
+                "See colorTables repo for reference:<br/>" +
+                "https://github.com/emerson-eps/color-tables/blob/main/react-app/src/component/color-tables.json",
+        },
+
+        editedData: {
+            description:
+                "Map data returned via editedData prop.<br/>" +
+                "selectedWell: string — Selected well name,<br/>" +
+                "selectedPie: object — Selected pie chart data,<br/>" +
+                "selectedFeatureIndexes: [number] — Drawing layer data index,<br/>" +
+                "data: object — Drawing layer data, indexed from selectedFeatureIndexes.",
+        },
+
+        setProps: {
+            description: "For reacting to prop changes",
+        },
+    },
 };
 
-const Template = (args) => {
+// Template for when edited data needs to be captured.
+const EditDataTemplate = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
     React.useEffect(() => {
         setEditedData(args.editedData);
@@ -22,6 +114,11 @@ const Template = (args) => {
             }}
         />
     );
+};
+
+// Blank template.
+const MinimalTemplate = (args) => {
+    return <DeckGLMap {...args} />;
 };
 
 // Data for custome geojson layer with polyline data
@@ -117,29 +214,38 @@ const layersData2 = [
 const hillshadingLayer = exampleData[0].layers[1];
 
 // Storybook example 1
-export const Default = Template.bind({});
+export const Default = EditDataTemplate.bind({});
 Default.args = {
     ...exampleData[0],
-    colorTables: colorTables,
+};
+
+// Minimal map example.
+export const Minimal = () => (
+    <DeckGLMap id={"deckgl-map"} bounds={[0, 0, 1, 1]} />
+);
+Minimal.parameters = {
+    docs: {
+        description: {
+            story: "An example showing the minimal required arguments, which will give an empty map viewer.",
+        },
+    },
 };
 
 // Volve kh netmap data, flat surface
-export const KhMapFlat = Template.bind({});
+export const KhMapFlat = MinimalTemplate.bind({});
 KhMapFlat.args = {
-    ...exampleData[0],
+    id: "kh-map-flat",
     resources: {
         propertyMap: "./volve_property_normalized.png",
         depthMap: "./volve_hugin_depth_normalized.png",
     },
-    colorTables: colorTables,
+    bounds: [432150, 6475800, 439400, 6481500],
     layers: [
         {
             ...colormapLayer,
             valueRange: [-3071, 41048],
             colorMapRange: [-3071, 41048],
             bounds: [432150, 6475800, 439400, 6481500],
-            colormap:
-                "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster@0.3.1/assets/colormaps/gist_rainbow.png",
         },
         {
             ...hillshadingLayer,
@@ -149,13 +255,21 @@ KhMapFlat.args = {
         },
     ],
 };
+KhMapFlat.parameters = {
+    docs: {
+        description: {
+            story: "An example showing a kh property layer and a depth map hillshading layer.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
 
 // Map3DLayer.
 const map3DLayer = exampleData[0].layers[3];
-export const Map3DLayer = Template.bind({});
+export const Map3DLayer = EditDataTemplate.bind({});
 Map3DLayer.args = {
     ...exampleData[0],
-    colorTables: colorTables,
     layers: [
         {
             ...map3DLayer,
@@ -177,10 +291,9 @@ Map3DLayer.args = {
 
 // GridLayer.
 const gridLayer = exampleData[0].layers[2];
-export const GridLayer = Template.bind({});
+export const GridLayer = EditDataTemplate.bind({});
 GridLayer.args = {
     ...exampleData[0],
-    colorTables: colorTables,
     layers: [
         {
             ...gridLayer,
@@ -200,7 +313,7 @@ GridLayer.args = {
 };
 
 // custom layer example
-export const UserDefinedLayer1 = Template.bind({});
+export const UserDefinedLayer1 = EditDataTemplate.bind({});
 UserDefinedLayer1.args = {
     id: exampleData[0].id,
     bounds: exampleData[0].bounds,
@@ -208,7 +321,7 @@ UserDefinedLayer1.args = {
 };
 
 // custom layer with colormap
-export const UserDefinedLayer2 = Template.bind({});
+export const UserDefinedLayer2 = EditDataTemplate.bind({});
 UserDefinedLayer2.args = {
     id: exampleData[0].id,
     resources: exampleData[0].resources,
@@ -217,10 +330,9 @@ UserDefinedLayer2.args = {
 };
 
 // multiple synced view
-export const MultiView = Template.bind({});
+export const MultiView = EditDataTemplate.bind({});
 MultiView.args = {
     ...exampleData[0],
-    colorTables: colorTables,
     legend: {
         visible: false,
     },
@@ -233,52 +345,31 @@ MultiView.args = {
     ],
     views: {
         layout: [2, 2],
+        showLabel: true,
         viewports: [
             {
                 id: "view_1",
+                name: "Colormap layer",
                 show3D: false,
                 layerIds: ["colormap-layer"],
             },
             {
                 id: "view_2",
+                name: "Hill-shading layer",
                 show3D: false,
                 layerIds: ["hillshading-layer"],
             },
             {
                 id: "view_3",
+                name: "All layers",
                 show3D: false,
                 layerIds: [],
             },
             {
                 id: "view_4",
+                name: "Custom layer",
                 show3D: false,
                 layerIds: ["geojson-line-layer", "geojson-layer", "text-layer"],
-            },
-        ],
-    },
-};
-
-// 3d view
-export const View3D = Template.bind({});
-View3D.args = {
-    ...exampleData[0],
-    colorTables: colorTables,
-    legend: {
-        visible: false,
-    },
-    zoom: -4,
-    views: {
-        layout: [1, 2],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: false,
-                layerIds: [],
-            },
-            {
-                id: "view_2",
-                show3D: true,
-                layerIds: [],
             },
         ],
     },

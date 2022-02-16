@@ -12,9 +12,9 @@ import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 
 const ELEVATION_DECODER = {
-    rScaler: -255 * 255, // minus signs -> easy way to invert z-axis.
-    gScaler: -255,
-    bScaler: -1,
+    rScaler: 255 * 255,
+    gScaler: 255,
+    bScaler: 1,
     offset: 0,
 };
 
@@ -23,8 +23,27 @@ type MeshType = {
         POSITION: { value: number[] };
         normals: { value: Float32Array; size: number };
     };
-    indices: { value: number[] };
+    indices: { value: Uint32Array };
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapToRange(this: any, resolved_mesh: MeshType) {
+    const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
+    const [min, max] = this.meshValueRange;
+    const delta = max - min;
+
+    const vertexs = resolved_mesh.attributes.POSITION.value;
+    const nvertexs = vertexs.length / 3;
+
+    for (let i = 0; i < nvertexs; i++) {
+        let Z = vertexs[i * 3 + 2];
+        Z = Z * floatScaler; // maps to [0-1]
+        Z = Z * delta + min;
+        vertexs[i * 3 + 2] = -Z; // depths are positive along negative z axis.
+    }
+
+    return resolved_mesh;
+}
 
 function add_normals(resolved_mesh: MeshType) {
     const vertexs = resolved_mesh.attributes.POSITION.value;
@@ -124,8 +143,11 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Name of color map. E.g "PORO"
     colorMapName: string;
 
+    // Min and max of map height values values.
+    meshValueRange: [number, number];
+
     // Min and max property values.
-    valueRange: [number, number];
+    propertyValueRange: [number, number];
 
     // Use color map in this range.
     colorMapRange: [number, number];
@@ -151,7 +173,12 @@ export default class Map3DLayer extends CompositeLayer<
             },
         });
 
-        // Note: mesh contains triangles. No normals.
+        // Remap height to meshValueRange
+        mesh = mesh.then(
+            mapToRange.bind({ meshValueRange: this.props.meshValueRange })
+        );
+
+        // Note: mesh contains triangles. No normals they must be added.
         if (this.props.enableSmoothShading) {
             mesh = mesh.then(add_normals);
         }
@@ -173,7 +200,7 @@ export default class Map3DLayer extends CompositeLayer<
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
                 colorMapName: this.props.colorMapName,
-                valueRange: this.props.valueRange,
+                propertyValueRange: this.props.propertyValueRange,
                 colorMapRange: this.props.colorMapRange,
                 isReadoutDepth: this.props.isReadoutDepth,
             })

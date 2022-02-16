@@ -59,7 +59,7 @@ class Token:
     def to_string(self):
         if self.type_ == TNUMBER:
             return self.number_
-        if self.type_ == TOP1 or self.type_ == TOP2 or self.type_ == TVAR:
+        if self.type_ in (TOP1, TOP2, TVAR):
             return self.index_
         if self.type_ == TFUNCALL:
             return "CALL"
