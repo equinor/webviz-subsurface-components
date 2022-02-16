@@ -1,11 +1,10 @@
-import Layer, { LayerProps } from "@deck.gl/core/lib/layer";
+import Layer from "@deck.gl/core/lib/layer";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
 import { Matrix4 } from "math.gl";
 import { cloneDeep } from "lodash";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { ViewsType } from "../../components/DeckGLWrapper";
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
     name: string;
@@ -34,24 +33,6 @@ export function createPropertyData(
         value: value,
         color: color,
     };
-}
-
-// Generate a patch from a layer and it's new props and call setSpecPatch with it,
-// to update the map parent from the layers.
-// Usually this would be called from a layer,
-// e.g.: patchLayerProps(this, {...this.props, updatedProp: newValue});
-export function patchLayerProps<
-    D,
-    P extends LayerProps<D> = LayerProps<D>,
-    L extends Layer<D, P> = Layer<D, P>
->(layer: L, newProps: P): void {
-    // userData is undocumented and it doesn't appear in the
-    // deckProps type, but it is used by the layersManager
-    // and forwarded though the context to all the layers.
-    //
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: TS2339
-    layer.context.userData.setEditedData(newProps);
 }
 
 // Return a model matrix representing a rotation of "deg" degrees around the point x, y
@@ -84,12 +65,7 @@ export function applyPropsOnLayers(
         });
         if (props) {
             Object.entries(props).forEach(([prop, value]) => {
-                const prop_type = typeof value;
-                if (
-                    ["string", "boolean", "number", "array"].includes(prop_type)
-                ) {
-                    if (layer[prop] == undefined) layer[prop] = value;
-                }
+                if (layer[prop] == undefined) layer[prop] = value;
             });
         } else {
             // if it's a user defined layer and its name and visibility are not specified
@@ -112,18 +88,11 @@ export function getLayersWithDefaultProps(
 
 export function getLayersInViewport(
     layers: Record<string, unknown>[] | Layer<unknown>[],
-    views: ViewsType | undefined,
-    viewportId: string | undefined
+    layerIds: string[] | undefined
 ): Record<string, unknown>[] | Layer<unknown>[] {
-    if (views == undefined || viewportId == undefined) return layers;
-
-    const current_view = views.viewports?.find((view) =>
-        new RegExp("^" + view.id).test(viewportId)
-    );
-    const layers_in_viewport = current_view?.layerIds;
-    if (layers_in_viewport && layers_in_viewport?.length > 0) {
+    if (layerIds && layerIds.length > 0) {
         const layers_in_view = (layers as never[]).filter((layer) =>
-            layers_in_viewport.includes(layer["id"] as string)
+            layerIds.includes(layer["id"] as string)
         );
         return layers_in_view;
     } else {
