@@ -45,13 +45,14 @@ export const layersDefaultProps: Record<string, unknown> = {
         visible: false,
         // Url to png image for height field.
         mesh: { type: "string", optional: false },
+        meshValueRange: { type: "array", value: [0, 1] },
         // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
         meshMaxError: { type: "number", value: 5 },
         // Url to png image for map properties. (ex, poro or perm values as a texture)
         propertyTexture: { type: "string", optional: false },
         // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
         bounds: { type: "array", value: null, false: true, compare: true },
-        valueRange: { type: "array", value: [0, 1] },
+        propertyValueRange: { type: "array", value: [0, 1] },
         colorMapRange: { type: "array", value: [0, 1] },
         rotDeg: 0,
         contours: [-1.0, -1.0],
