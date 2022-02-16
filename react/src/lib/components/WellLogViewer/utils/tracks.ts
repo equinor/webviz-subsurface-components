@@ -880,7 +880,8 @@ function createAreaData(
     to: number,
     value: number
 ): AreaData | null {
-    if (meta) { // use discrete metadate from WellLog JSON file
+    if (meta) {
+        // use discrete metadate from WellLog JSON file
         const { objects, iColor, iCode } = meta;
         for (const t in objects) {
             const object = objects[t];
