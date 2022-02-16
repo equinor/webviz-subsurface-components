@@ -13,7 +13,7 @@ import {
 import { getModelMatrix } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import fsColormap from "!!raw-loader!./colormap.fs.glsl";
-import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
+import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 
 const DEFAULT_TEXTURE_PARAMETERS = {

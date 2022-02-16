@@ -22,13 +22,12 @@ import {
     PropertyDataType,
     createPropertyData,
 } from "../utils/layerTools";
-import { patchLayerProps } from "../utils/layerTools";
 import { splineRefine } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
-import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
+import { DeckGLLayerContext } from "../../components/Map";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -81,9 +80,9 @@ export default class WellsLayer extends CompositeLayer<
             return false;
         }
 
-        patchLayerProps<FeatureCollection>(this, {
+        (this.context as DeckGLLayerContext).userData.setEditedData({
             selectedWell: (info.object as Feature).properties?.["name"],
-        } as WellsLayerProps<FeatureCollection>);
+        });
         return true;
     }
 
