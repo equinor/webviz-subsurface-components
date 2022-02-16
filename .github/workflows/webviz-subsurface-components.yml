@@ -99,7 +99,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           browser: chrome
-        run: npm run test-cypress --prefix ./react
+      - run: npm run test-cypress --prefix ./react
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
