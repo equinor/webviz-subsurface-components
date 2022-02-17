@@ -1,11 +1,8 @@
 import React, { Component, ReactNode } from "react";
 
-import { debouncer, DebounceFunction } from "@equinor/videx-wellog";
-
 import PropTypes from "prop-types";
 
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
-import { TrackMouseEvent } from "./components/WellLogView";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
@@ -16,49 +13,12 @@ import { Template } from "./components/WellLogTemplateTypes";
 import { ColorTable } from "./components/ColorTableTypes";
 
 import { WellLogController } from "./components/WellLogView";
-import WellLogView from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
 
 import { axisTitles, axisMnemos } from "./utils/axes";
 
-import ReactDOM from "react-dom";
-import { Plot } from "@equinor/videx-wellog";
-import { SimpleMenu, editPlots } from "./components/LocalMenus";
-
-function onTrackMouseEvent(wellLogView: WellLogView, ev: TrackMouseEvent) {
-    const track = ev.track;
-    if (ev.type === "click") {
-        wellLogView.selectTrack(track, !wellLogView.isTrackSelected(track)); // toggle selection
-    } else if (ev.type === "dblclick") {
-        wellLogView.selectTrack(track, true);
-        if (ev.area === "title") {
-            wellLogView.editTrack(ev.element, ev.track);
-        } else {
-            const plot: Plot | null = ev.plot;
-            if (!plot) editPlots(ev.element, wellLogView, ev.track);
-            else wellLogView.editPlot(ev.element, ev.track, plot);
-        }
-    } else if (ev.type === "contextmenu") {
-        wellLogView.selectTrack(track, true);
-        const el: HTMLElement = document.createElement("div");
-        el.style.width = "10px";
-        el.style.height = "3px";
-        ev.element.appendChild(el);
-        ReactDOM.render(
-            <SimpleMenu
-                type={ev.area}
-                anchorEl={el}
-                wellLogView={wellLogView}
-                track={track}
-            />,
-            el
-        );
-    }
-}
-
-///////////
-
+import { onTrackMouseEvent } from "./utils/edit-track";
 import { fillInfos } from "./utils/fill-info";
 import { LogViewer } from "@equinor/videx-wellog";
 
@@ -98,8 +58,6 @@ class WellLogViewer extends Component<Props, State> {
 
     controller: WellLogController | null;
 
-    debounce: DebounceFunction;
-
     collapsedTrackIds: (string | number)[];
 
     constructor(props: Props) {
@@ -120,8 +78,6 @@ class WellLogViewer extends Component<Props, State> {
         };
 
         this.controller = null;
-
-        this.debounce = debouncer(150);
 
         this.collapsedTrackIds = [];
 
@@ -243,31 +199,16 @@ class WellLogViewer extends Component<Props, State> {
     // callback function from WellLogView
     onContentRescale(): void {
         this.setSliderValue();
-        if (this.props.onContentRescale) {
-            // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => {
-                if (this.props.onContentRescale) this.props.onContentRescale();
-            });
-        }
+        if (this.props.onContentRescale) this.props.onContentRescale();
     }
     // callback function from WellLogView
     onContentSelection(): void {
         this.setSliderValue();
-        if (this.props.onContentSelection) {
-            // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => {
-                if (this.props.onContentSelection)
-                    this.props.onContentSelection();
-            });
-        }
+        if (this.props.onContentSelection) this.props.onContentSelection();
     }
     onTemplateChanged(): void {
         if (this.props.onTemplateChanged) {
-            // use debouncer to prevent too frequent notifications while animation
-            this.debounce(() => {
-                if (this.props.onTemplateChanged)
-                    this.props.onTemplateChanged();
-            });
+            if (this.props.onTemplateChanged) this.props.onTemplateChanged();
         }
     }
 
