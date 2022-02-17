@@ -142,26 +142,33 @@ export const ExpressionsTableComponent: React.FC<
     }, [expressions, addNewExpressions, getAvailableName]);
 
     return (
-        <Paper className="ExpressionTableComponent">
-            <Grid container item xs={12} spacing={3} direction="column">
-                <Grid item>
-                    <ExpressionsTable
-                        expressions={expressions}
-                        blinkingExpressions={blinkingTableExpressions}
-                        onExpressionsSelect={handleExpressionsSelect}
-                        onActiveExpressionSelect={handleActiveExpressionSelect}
-                    />
-                </Grid>
-                <Grid item>
-                    {blinkingTableExpressions.length !== 0 && (
-                        <Alert variant="filled" severity="error">
-                            {blinkingTableExpressions.length > 1
-                                ? "Expressions not deletable!"
-                                : "Expression not deletable!"}
-                        </Alert>
-                    )}
-                </Grid>
+        <Grid
+            container
+            item
+            component={Paper}
+            className="ExpressionTableComponent"
+            xs={12}
+            spacing={3}
+            direction="column"
+        >
+            <Grid item>
+                <ExpressionsTable
+                    expressions={expressions}
+                    blinkingExpressions={blinkingTableExpressions}
+                    onExpressionsSelect={handleExpressionsSelect}
+                    onActiveExpressionSelect={handleActiveExpressionSelect}
+                />
             </Grid>
+            <Grid item>
+                {blinkingTableExpressions.length !== 0 && (
+                    <Alert variant="filled" severity="error">
+                        {blinkingTableExpressions.length > 1
+                            ? "Expressions not deletable!"
+                            : "Expression not deletable!"}
+                    </Alert>
+                )}
+            </Grid>
+
             <Grid container item xs={12}>
                 <Grid container item xs={8} spacing={2}>
                     <Grid item>
@@ -187,7 +194,7 @@ export const ExpressionsTableComponent: React.FC<
                         </Button>
                     </Grid>
                 </Grid>
-                <Grid container item xs={4} spacing={1} justify="flex-end">
+                <Grid container item xs={4} justifyContent="flex-end">
                     <Grid item>
                         <Button onClick={handleNewClick}>
                             <Icon key="new" name="add" />
@@ -196,6 +203,6 @@ export const ExpressionsTableComponent: React.FC<
                     </Grid>
                 </Grid>
             </Grid>
-        </Paper>
+        </Grid>
     );
 };

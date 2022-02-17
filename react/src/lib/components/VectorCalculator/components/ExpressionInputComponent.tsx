@@ -385,9 +385,9 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     return (
         <Grid
             container
-            className="ExpressionInputComponent"
-            component={Paper}
             item
+            component={Paper}
+            className="ExpressionInputComponent"
             xs={12}
             spacing={3}
             direction="column"

@@ -1,7 +1,8 @@
 .VectorCalculator {
     display: block;
-    padding: 5px;
+    padding: 10px;
     flex-grow: 1;
+    margin-top: 5px;
 }
 
 .VectorCalculator .ExpressionInputComponent {
