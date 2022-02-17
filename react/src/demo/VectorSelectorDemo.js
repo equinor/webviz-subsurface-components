@@ -23,6 +23,8 @@ class WellCompletionsDemo extends Component {
                 <VectorSelector
                     id="vector_selector"
                     delimiter=":"
+                    caseInsensitiveMatching={true}
+                    useBetaFeatures={true}
                     selectedTags={["iter-0:WGOR:OP_1"]}
                     numMetaNodes={1}
                     customVectorDefinitions={{
