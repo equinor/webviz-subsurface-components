@@ -86,6 +86,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
                                         numSecondsUntilSuggestionsAreShown={0}
                                         placeholder="Add new vector..."
                                         data={vectorData}
+                                        caseInsensitiveMatching={true}
                                     />
                                 </TableCell>
                             </TableRow>
