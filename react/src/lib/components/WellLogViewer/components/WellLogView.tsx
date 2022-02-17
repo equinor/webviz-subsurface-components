@@ -6,7 +6,7 @@ import {
     ScaleInterpolator,
 } from "@equinor/videx-wellog";
 
-import { Track, GraphTrack } from "@equinor/videx-wellog";
+import { Track, GraphTrack, StackedTrack } from "@equinor/videx-wellog";
 import { Plot } from "@equinor/videx-wellog";
 
 import {
@@ -34,6 +34,7 @@ import { isScaleTrack } from "../utils/tracks";
 import {
     addOrEditGraphTrack,
     addOrEditGraphTrackPlot,
+    addOrEditStackedTrack,
     removeGraphTrackPlot,
 } from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
@@ -612,7 +613,7 @@ interface Props {
 interface State {
     infos: Info[];
 
-    scrollTrackPos: number; // the first visible graph track number
+    scrollTrackPos: number; // the first visible non-scale track number
 }
 
 class WellLogView extends Component<Props, State> implements WellLogController {
@@ -659,6 +660,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
         this.setTracks();
     }
+
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
         if (this.props.horizontal !== nextProps.horizontal) return true;
         if (this.props.hideTitles !== nextProps.hideTitles) return true;
@@ -843,7 +845,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     onContentSelection(): void {
         this.showSelection();
-
         if (this.props.onContentSelection) this.props.onContentSelection();
     }
 
@@ -1022,13 +1023,29 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     _addTrack(trackCurrent: Track, templateTrack: TemplateTrack): void {
         templateTrack.required = true; // user's tracks could be empty
         const bAfter = true;
-        const trackNew = addOrEditGraphTrack(
-            this,
-            null,
-            templateTrack,
-            trackCurrent,
-            bAfter
-        );
+
+        let trackNew: Track;
+        if (
+            templateTrack.plots &&
+            templateTrack.plots[0] &&
+            templateTrack.plots[0].type === "stacked"
+        ) {
+            trackNew = addOrEditStackedTrack(
+                this,
+                null,
+                templateTrack,
+                trackCurrent,
+                bAfter
+            );
+        } else {
+            trackNew = addOrEditGraphTrack(
+                this,
+                null,
+                templateTrack,
+                trackCurrent,
+                bAfter
+            );
+        }
         this.onTemplateChanged();
 
         if (bAfter)
@@ -1042,13 +1059,23 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     _editTrack(track: Track, templateTrack: TemplateTrack): void {
-        addOrEditGraphTrack(
-            this,
-            track as GraphTrack,
-            templateTrack,
-            track,
-            false
-        );
+        if (templateTrack.plots && templateTrack.plots[0].type === "stacked") {
+            addOrEditStackedTrack(
+                this,
+                track as StackedTrack,
+                templateTrack,
+                track,
+                false
+            );
+        } else {
+            addOrEditGraphTrack(
+                this,
+                track as GraphTrack,
+                templateTrack,
+                track,
+                false
+            );
+        }
         this.onTemplateChanged();
     }
 

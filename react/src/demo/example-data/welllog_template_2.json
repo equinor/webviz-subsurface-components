@@ -16,6 +16,12 @@
       "plots": [
         {
           "name": "NTG"
+        },
+        {
+          "name": "SW"
+        },
+        {
+          "name": "PORO"
         }
       ]
     },
@@ -23,6 +29,38 @@
       "plots": [
         {
           "name": "FAULT_PROXIMITY_FLAG",
+          "style": "discrete"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "RDE_ORIG",
+          "style": "discrete"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "FACIES",
+          "style": "discrete"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "ZONE_MAIN",
+          "style": "discrete"
+        }
+      ]
+    },
+    {
+      "plots": [
+        {
+          "name": "FaultDistance_HUM",
           "style": "discrete"
         }
       ]
@@ -151,7 +189,7 @@
   "styles": [
     {
       "name": "discrete",
-      "type": "linestep"
+      "type": "stacked"
     }
   ]
 }
