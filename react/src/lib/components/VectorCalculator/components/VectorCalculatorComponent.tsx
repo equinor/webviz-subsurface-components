@@ -1,10 +1,12 @@
 import React from "react";
 import Grid from "@material-ui/core/Grid";
+import { Button } from "@equinor/eds-core-react";
 
 import {
     ExpressionType,
     ExternalParseData,
 } from "../utils/VectorCalculatorTypes";
+import { SaveDialog } from "./SaveDialog";
 import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
 import { ExpressionInputComponent } from "./ExpressionInputComponent";
 import { TreeDataNode } from "@webviz/core-components";
@@ -42,6 +44,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
         });
     const [disabledInputComponent, setDisabledInputComponent] =
         React.useState<boolean>(true);
+    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
     React.useEffect(() => {
         setExpressions(props.expressions);
@@ -108,32 +111,53 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
         [props.setProps]
     );
 
+    const handleOpenClick = React.useCallback(() => {
+        console.log("Open pushed!");
+        setIsDialogOpen(true);
+    }, [setIsDialogOpen]);
+    const handleOnSave = () => {
+        setIsDialogOpen(false);
+        console.log("Save pushed");
+    };
+    const handleOnClose = () => {
+        setIsDialogOpen(false);
+        console.log("Closed dialog");
+    };
+
     return (
-        <Grid container spacing={2}>
-            <Grid item xs={6}>
-                <ExpressionsTableComponent
-                    expressions={expressions}
-                    onActiveExpressionChange={handleActiveExpressionChange}
-                    onExpressionsChange={handleExpressionsChange}
-                />
+        <div>
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                    <ExpressionsTableComponent
+                        expressions={expressions}
+                        onActiveExpressionChange={handleActiveExpressionChange}
+                        onExpressionsChange={handleExpressionsChange}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <ExpressionInputComponent
+                        activeExpression={activeExpression}
+                        expressions={expressions}
+                        vectors={props.vectors}
+                        externalParsing={isDashControlled}
+                        externalParseData={props.externalParseData}
+                        maxExpressionDescriptionLength={
+                            props.maxExpressionDescriptionLength
+                        }
+                        disabled={disabledInputComponent}
+                        onExpressionChange={handleActiveExpressionEdit}
+                        onExternalExpressionParsing={
+                            handleExternalExpressionParsing
+                        }
+                    />
+                </Grid>
             </Grid>
-            <Grid item xs={6}>
-                <ExpressionInputComponent
-                    activeExpression={activeExpression}
-                    expressions={expressions}
-                    vectors={props.vectors}
-                    externalParsing={isDashControlled}
-                    externalParseData={props.externalParseData}
-                    maxExpressionDescriptionLength={
-                        props.maxExpressionDescriptionLength
-                    }
-                    disabled={disabledInputComponent}
-                    onExpressionChange={handleActiveExpressionEdit}
-                    onExternalExpressionParsing={
-                        handleExternalExpressionParsing
-                    }
-                />
-            </Grid>
-        </Grid>
+            <Button onClick={handleOpenClick}>Open</Button>
+            <SaveDialog
+                open={isDialogOpen}
+                onSave={handleOnSave}
+                onClose={handleOnClose}
+            />
+        </div>
     );
 };
