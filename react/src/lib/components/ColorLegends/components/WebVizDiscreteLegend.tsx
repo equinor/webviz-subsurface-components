@@ -1,5 +1,6 @@
 import React, { ReactElement } from "react";
 import { DiscreteColorLegend } from "@emerson-eps/color-tables";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
 
 const DiscreteLegendWrapper: React.FC = (): ReactElement => {
