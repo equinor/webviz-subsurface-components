@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { DiscreteColorLegend } from "../DeckGLMap/components/DiscreteLegend";
+import { DiscreteColorLegend } from "@emerson-eps/color-tables";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
 
@@ -15,7 +15,7 @@ const DiscreteLegendWrapper: React.FC = (props): ReactElement => {
     const dataObjectName = "Wells / ZONELOG";
     const position = [16, 10];
     const horizontal = true;
-    console.log('props', props);
+    console.log("props", props);
     return (
         <DiscreteColorLegend
             discreteData={discreteData}
