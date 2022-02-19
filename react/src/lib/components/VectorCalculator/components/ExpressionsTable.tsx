@@ -6,8 +6,8 @@ import {
     TableBody,
     TableCell,
     TableContainer,
+    Tooltip,
 } from "@material-ui/core";
-import { Tooltip } from "@equinor/eds-core-react";
 
 import { getDetailedExpression } from "../utils/VectorCalculatorHelperFunctions";
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
@@ -170,8 +170,13 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                     <Tooltip
                                         key={row.name}
                                         placement="top"
-                                        title={row.description}
+                                        title={
+                                            row.description
+                                                ? row.description
+                                                : ""
+                                        }
                                         enterDelay={1000}
+                                        enterNextDelay={1000}
                                         hidden={
                                             !row.description ||
                                             row.description.length <= 0
@@ -191,6 +196,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                         placement="top"
                                         title={expressionFromMap}
                                         enterDelay={1000}
+                                        enterNextDelay={1000}
                                     >
                                         <div className={"ExpressionsTableCell"}>
                                             {expressionFromMap}

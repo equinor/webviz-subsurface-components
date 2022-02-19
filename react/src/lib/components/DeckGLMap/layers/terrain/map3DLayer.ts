@@ -10,11 +10,12 @@ import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
+import { isEqual } from "lodash";
 
 const ELEVATION_DECODER = {
-    rScaler: -255 * 255, // minus signs -> easy way to invert z-axis.
-    gScaler: -255,
-    bScaler: -1,
+    rScaler: 255 * 255,
+    gScaler: 255,
+    bScaler: 1,
     offset: 0,
 };
 
@@ -23,8 +24,27 @@ type MeshType = {
         POSITION: { value: number[] };
         normals: { value: Float32Array; size: number };
     };
-    indices: { value: number[] };
+    indices: { value: Uint32Array };
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapToRange(this: any, resolved_mesh: MeshType) {
+    const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
+    const [min, max] = this.meshValueRange;
+    const delta = max - min;
+
+    const vertexs = resolved_mesh.attributes.POSITION.value;
+    const nvertexs = vertexs.length / 3;
+
+    for (let i = 0; i < nvertexs; i++) {
+        let Z = vertexs[i * 3 + 2];
+        Z = Z * floatScaler; // maps to [0-1]
+        Z = Z * delta + min;
+        vertexs[i * 3 + 2] = -Z; // depths are positive along negative z axis.
+    }
+
+    return resolved_mesh;
+}
 
 function add_normals(resolved_mesh: MeshType) {
     const vertexs = resolved_mesh.attributes.POSITION.value;
@@ -102,6 +122,33 @@ function add_normals(resolved_mesh: MeshType) {
     return resolved_mesh;
 }
 
+function load_mesh(
+    mesh_name: string,
+    bounds: [number, number, number, number],
+    meshMaxError: number,
+    meshValueRange: [number, number],
+    enableSmoothShading: boolean
+) {
+    let mesh = load(mesh_name, TerrainLoader, {
+        terrain: {
+            elevationDecoder: ELEVATION_DECODER,
+            bounds,
+            meshMaxError,
+            skirtHeight: 0.0,
+        },
+    });
+
+    // Remap height to meshValueRange
+    mesh = mesh.then(mapToRange.bind({ meshValueRange }));
+
+    // Note: mesh contains triangles. No normals they must be added.
+    if (enableSmoothShading) {
+        mesh = mesh.then(add_normals);
+    }
+
+    return mesh;
+}
+
 export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image representing the height mesh.
     mesh: string;
@@ -124,8 +171,11 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Name of color map. E.g "PORO"
     colorMapName: string;
 
+    // Min and max of map height values values.
+    meshValueRange: [number, number];
+
     // Min and max property values.
-    valueRange: [number, number];
+    propertyValueRange: [number, number];
 
     // Use color map in this range.
     colorMapRange: [number, number];
@@ -141,21 +191,46 @@ export default class Map3DLayer extends CompositeLayer<
     unknown,
     Map3DLayerProps<unknown>
 > {
-    renderLayers(): [TerrainMapLayer] {
-        let mesh = load(this.props.mesh, TerrainLoader, {
-            terrain: {
-                elevationDecoder: ELEVATION_DECODER,
-                bounds: this.props.bounds,
-                meshMaxError: this.props.meshMaxError,
-                skirtHeight: 0.0,
-            },
+    initializeState(): void {
+        // Load mesh and texture and stare in state.
+        const mesh = load_mesh(
+            this.props.mesh,
+            this.props.bounds,
+            this.props.meshMaxError,
+            this.props.meshValueRange,
+            this.props.enableSmoothShading
+        );
+
+        const texture = load(this.props.propertyTexture, ImageLoader, {});
+
+        this.setState({
+            mesh,
+            texture,
         });
+    }
 
-        // Note: mesh contains triangles. No normals.
-        if (this.props.enableSmoothShading) {
-            mesh = mesh.then(add_normals);
+    updateState({
+        props,
+        oldProps,
+    }: {
+        props: Map3DLayerProps<unknown>;
+        oldProps: Map3DLayerProps<unknown>;
+    }): void {
+        const needs_reload =
+            !isEqual(props.mesh, oldProps.mesh) ||
+            !isEqual(props.bounds, oldProps.bounds) ||
+            !isEqual(props.meshMaxError, oldProps.meshMaxError) ||
+            !isEqual(props.meshValueRange, oldProps.meshValueRange) ||
+            !isEqual(props.enableSmoothShading, oldProps.enableSmoothShading) ||
+            !isEqual(props.propertyTexture, oldProps.propertyTexture);
+
+        if (needs_reload) {
+            // Reload mesh and texture.
+            this.initializeState();
         }
+    }
 
+    renderLayers(): [TerrainMapLayer] {
         const rotatingModelMatrix = getModelMatrix(
             this.props.rotDeg,
             this.props.bounds[0] as number, // Rotate around upper left corner of bounds
@@ -167,13 +242,13 @@ export default class Map3DLayer extends CompositeLayer<
                 TerrainMapLayerData,
                 TerrainMapLayerProps<TerrainMapLayerData>
             >({
-                mesh,
-                texture: load(this.props.propertyTexture, ImageLoader, {}),
+                mesh: this.state.mesh,
+                texture: this.state.texture,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
                 colorMapName: this.props.colorMapName,
-                valueRange: this.props.valueRange,
+                propertyValueRange: this.props.propertyValueRange,
                 colorMapRange: this.props.colorMapRange,
                 isReadoutDepth: this.props.isReadoutDepth,
             })

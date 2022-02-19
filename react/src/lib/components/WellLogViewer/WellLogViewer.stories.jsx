@@ -49,9 +49,39 @@ export default {
     },
 };
 
+function fillInfo(controller) {
+    if (!controller) return "-";
+    const baseDomain = controller.getContentBaseDomain();
+    const domain = controller.getContentDomain();
+    const selection = controller.getContentSelection();
+    return (
+        "total: [" +
+        baseDomain[0].toFixed(0) +
+        ", " +
+        baseDomain[1].toFixed(0) +
+        "], " +
+        "visible: [" +
+        domain[0].toFixed(0) +
+        ", " +
+        domain[1].toFixed(0) +
+        "]" +
+        (selection[0] !== undefined
+            ? ", selected: [" +
+              selection[0].toFixed(0) +
+              (selection[1] !== undefined
+                  ? ", " + selection[1].toFixed(0)
+                  : "") +
+              "]"
+            : "")
+    );
+}
+
 const Template = (args) => {
+    const infoRef = React.useRef();
+    const setInfo = function (info) {
+        if (infoRef.current) infoRef.current.innerHTML = info;
+    };
     const [controller, setController] = React.useState(null);
-    const [info, setInfo] = React.useState("");
     const onCreateController = React.useCallback(
         (controller) => {
             setController(controller);
@@ -59,63 +89,10 @@ const Template = (args) => {
         [controller]
     );
     const onContentRescale = React.useCallback(() => {
-        if (!controller) {
-            setInfo("-");
-            return;
-        }
-        const baseDomain = controller.getContentBaseDomain();
-        const domain = controller.getContentDomain();
-        const selection = controller.getContentSelection();
-        setInfo(
-            "total: [" +
-                baseDomain[0].toFixed(0) +
-                ", " +
-                baseDomain[1].toFixed(0) +
-                "], " +
-                "visible: [" +
-                domain[0].toFixed(0) +
-                ", " +
-                domain[1].toFixed(0) +
-                "]" +
-                (selection[0] !== undefined
-                    ? ", selected: [" +
-                      selection[0].toFixed(0) +
-                      (selection[1] !== undefined
-                          ? ", " + selection[1].toFixed(0)
-                          : "") +
-                      "]"
-                    : "")
-        );
+        setInfo(fillInfo(controller));
     }, [controller]);
-
     const onContentSelection = React.useCallback(() => {
-        if (!controller) {
-            setInfo("-");
-            return;
-        }
-        const baseDomain = controller.getContentBaseDomain();
-        const domain = controller.getContentDomain();
-        const selection = controller.getContentSelection();
-        setInfo(
-            "total: [" +
-                baseDomain[0].toFixed(0) +
-                ", " +
-                baseDomain[1].toFixed(0) +
-                "], " +
-                "visible: [" +
-                domain[0].toFixed(0) +
-                ", " +
-                domain[1].toFixed(0) +
-                "]" +
-                (selection[0] !== undefined
-                    ? ", selected: [" +
-                      selection[0].toFixed(0) +
-                      (selection[1] !== undefined
-                          ? ", " + selection[1].toFixed(0)
-                          : "") +
-                      "]"
-                    : "")
-        );
+        setInfo(fillInfo(controller));
     }, [controller]);
 
     return (
@@ -131,7 +108,7 @@ const Template = (args) => {
                     onContentSelection={onContentSelection}
                 />
             </div>
-            <div style={{ width: "100%", flex: 0 }}>{info}</div>
+            <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
         </div>
     );
 };
@@ -147,20 +124,20 @@ Example1Vertical.args = {
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
 
-export const Example1Template2 = Template.bind({});
-Example1Template2.args = {
+export const Example2Horizontal = Template.bind({});
+Example2Horizontal.args = {
     id: "Well-Log-Viewer2",
     horizontal: true,
-    welllog: require("../../../demo/example-data/L898MUD.json"),
+    welllog: require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json"),
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
 
-export const Example2Vertical = Template.bind({});
-Example2Vertical.args = {
+export const Discrete = Template.bind({});
+Discrete.args = {
     id: "Well-Log-Viewer3",
     horizontal: false,
-    welllog: require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json"),
-    template: require("../../../demo/example-data/welllog_template_1.json"),
+    welllog: require("../../../demo/example-data/volve_logs.json"),
+    template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
