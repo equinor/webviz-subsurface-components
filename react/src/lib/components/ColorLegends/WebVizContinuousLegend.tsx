@@ -1,7 +1,6 @@
 import React, { ReactElement } from "react";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
+import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 const ContinuousLegendWrapper: React.FC = (): ReactElement => {
     const min = 0;
