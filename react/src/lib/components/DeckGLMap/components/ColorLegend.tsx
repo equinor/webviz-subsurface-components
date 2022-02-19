@@ -92,7 +92,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     max={legendProps.valueRange[1]}
                     dataObjectName={legendProps.title}
                     position={position}
-                    name={legendProps.name}
                     colorName={legendProps.colorName}
                     colorTables={colorTables}
                     horizontal={horizontal}
