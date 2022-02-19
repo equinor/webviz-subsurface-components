@@ -1,4 +1,4 @@
-import ContinuousLegendWrapper from "./components/WebVizContinuousLegend";
-import DiscreteLegendWrapper from "./components/WebVizDiscreteLegend";
+import ContinuousLegendWrapper from "./WebVizContinuousLegend";
+import DiscreteLegendWrapper from "./WebVizDiscreteLegend";
 
 export { ContinuousLegendWrapper, DiscreteLegendWrapper };
