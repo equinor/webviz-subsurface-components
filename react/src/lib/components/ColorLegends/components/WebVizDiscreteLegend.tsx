@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 import { DiscreteColorLegend } from "@emerson-eps/color-tables";
-import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
+const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
 
 const DiscreteLegendWrapper: React.FC = (): ReactElement => {
     const discreteData = {
