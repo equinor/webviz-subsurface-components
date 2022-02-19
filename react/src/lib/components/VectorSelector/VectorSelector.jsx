@@ -84,6 +84,16 @@ VectorSelector.propTypes = {
     lineBreakAfterTag: PropTypes.bool,
 
     /**
+     * Set to true if case-wise incorrect values should be accepted anyways.
+     */
+    caseInsensitiveMatching: PropTypes.bool,
+
+    /**
+     * Set to true to enable beta features.
+     */
+    useBetaFeatures: PropTypes.bool,
+
+    /**
      * An object containing custom vector type definitions.
      */
     customVectorDefinitions: PropTypes.objectOf(

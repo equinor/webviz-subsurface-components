@@ -1,5 +1,15 @@
+export type TemplatePlotTypes =
+    | ""
+    | "line"
+    | "linestep"
+    | "dot"
+    | "area"
+    | "differential"
+    | "gradientfill"
+    | "stacked";
+
 export type TemplatePlotProps = {
-    type: string;
+    type: TemplatePlotTypes;
     scale?: "linear" | "log"; // 'linear' or 'log', default 'linear'
     domain?: [number, number]; // min, max values
 
