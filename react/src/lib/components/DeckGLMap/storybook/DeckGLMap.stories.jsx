@@ -265,32 +265,8 @@ KhMapFlat.parameters = {
     },
 };
 
-// MapLayer. This is never Float32 resolution for properties.
-const mapLayer = exampleData[0].layers[3];
-export const MapLayerFloat32Properties = EditDataTemplate.bind({});
-MapLayerFloat32Properties.args = {
-    ...exampleData[0],
-    layers: [
-        {
-            ...mapLayer,
-            meshMaxError: 5.0,
-            visible: true,
-        },
-    ],
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-                layerIds: [],
-            },
-        ],
-    },
-};
-
 // Map3DLayer. Old version. Properties encoded in RGB.
-const map3DLayer = exampleData[0].layers[4];
+const map3DLayer = exampleData[0].layers[3];
 export const MapLayerRGBEncodedProperties = EditDataTemplate.bind({});
 MapLayerRGBEncodedProperties.args = {
     ...exampleData[0],
