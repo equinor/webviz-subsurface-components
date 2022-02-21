@@ -27,10 +27,9 @@ type MeshType = {
     indices: { value: Uint32Array };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapToRange(this: any, resolved_mesh: MeshType) {
+function mapToRange(resolved_mesh: MeshType, meshValueRange: [number, number]) {
     const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
-    const [min, max] = this.meshValueRange;
+    const [min, max] = meshValueRange;
     const delta = max - min;
 
     const vertexs = resolved_mesh.attributes.POSITION.value;
@@ -122,14 +121,14 @@ function add_normals(resolved_mesh: MeshType) {
     return resolved_mesh;
 }
 
-function load_mesh(
+async function load_mesh(
     mesh_name: string,
     bounds: [number, number, number, number],
     meshMaxError: number,
     meshValueRange: [number, number],
     enableSmoothShading: boolean
 ) {
-    let mesh = load(mesh_name, TerrainLoader, {
+    let mesh = await load(mesh_name, TerrainLoader, {
         terrain: {
             elevationDecoder: ELEVATION_DECODER,
             bounds,
@@ -139,11 +138,11 @@ function load_mesh(
     });
 
     // Remap height to meshValueRange
-    mesh = mesh.then(mapToRange.bind({ meshValueRange }));
+    mesh = mapToRange(mesh, meshValueRange);
 
     // Note: mesh contains triangles. No normals they must be added.
     if (enableSmoothShading) {
-        mesh = mesh.then(add_normals);
+        mesh = add_normals(mesh);
     }
 
     return mesh;
@@ -192,7 +191,7 @@ export default class Map3DLayer extends CompositeLayer<
     Map3DLayerProps<unknown>
 > {
     initializeState(): void {
-        // Load mesh and texture and stare in state.
+        // Load mesh and texture and store in state.
         const mesh = load_mesh(
             this.props.mesh,
             this.props.bounds,

@@ -265,10 +265,10 @@ KhMapFlat.parameters = {
     },
 };
 
-// Map3DLayer.
+// Map3DLayer. Old version. Properties encoded in RGB.
 const map3DLayer = exampleData[0].layers[3];
-export const Map3DLayer = EditDataTemplate.bind({});
-Map3DLayer.args = {
+export const MapLayerRGBEncodedProperties = EditDataTemplate.bind({});
+MapLayerRGBEncodedProperties.args = {
     ...exampleData[0],
     layers: [
         {
