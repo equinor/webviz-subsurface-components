@@ -42,7 +42,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "Map",
         id: "map3d-layer-float32",
         pickable: true,
-        visible: false,
+        visible: true,
         // Url to png image for height field.
         mesh: { type: "string", optional: false },
         // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
@@ -63,7 +63,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "Map 3D",
         id: "map3d-layer",
         pickable: true,
-        visible: false,
+        visible: true,
         // Url to png image for height field.
         mesh: { type: "string", optional: false },
         meshValueRange: { type: "array", value: [0, 1] },
