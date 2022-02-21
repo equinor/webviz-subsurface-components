@@ -6,7 +6,7 @@
 
 $scale_slave_scale_bg: #ff0000;
 
-.welllogview { // log-controller
+.welllogview { // for videx-wellog log-controller
   height: inherit;
   .track {
     .track-title {
@@ -25,4 +25,8 @@ $scale_slave_scale_bg: #ff0000;
   .track-container { 
     pointer-events: all; // to allow mouse events handling
   }
+}
+.welllogview-error {
+  color: rgb(255, 64, 64);
+  background-color: rgb(255, 255, 192)
 }
