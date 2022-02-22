@@ -129,6 +129,13 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             setTextFieldStyleDataState(
                 getTextFieldStyleData(store.state.editableExpression.name)
             );
+            store.dispatch({
+                type: StoreActions.SetName,
+                payload: { 
+                    name: store.state.editableExpression.name, 
+                    status: isValidName(store.state.editableExpression.name) 
+                },
+            });
         }
     }, [store.state.editableExpression.name, getTextFieldStyleData]);
 

@@ -73,7 +73,7 @@ export const ExpressionInputTextField: React.FC<
         }
     }, [store.state.editableExpressionStatus, store.state.parseMessage]);
 
-    React.useEffect(() => {
+    const dispatchParseActions = React.useCallback((expression:string):void=>{
         if (store.state.externalParsing) {
             store.dispatch({
                 type: StoreActions.SetEditableExpressionStatus,
@@ -84,9 +84,7 @@ export const ExpressionInputTextField: React.FC<
                 payload: { message: "" },
             });
         } else {
-            const parseData = getExpressionParseData(
-                store.state.activeExpression.expression
-            );
+            const parseData = getExpressionParseData(expression);
             store.dispatch({
                 type: StoreActions.SetEditableExpressionStatus,
                 payload: {
@@ -100,6 +98,10 @@ export const ExpressionInputTextField: React.FC<
                 payload: { message: parseData.parsingMessage },
             });
         }
+    }, [store.state.externalParsing, getExpressionParseData]);
+
+    React.useEffect(() => {
+        dispatchParseActions(store.state.activeExpression.expression);
     }, [store.state.activeExpression.expression]);
 
     const handleInputChange = (
@@ -112,30 +114,7 @@ export const ExpressionInputTextField: React.FC<
         });
 
         // Perform parsing
-        if (store.state.externalParsing) {
-            store.dispatch({
-                type: StoreActions.SetEditableExpressionStatus,
-                payload: { status: ExpressionStatus.Evaluating },
-            });
-            store.dispatch({
-                type: StoreActions.SetParseMessage,
-                payload: { message: "" },
-            });
-        } else {
-            const parseData = getExpressionParseData(newExpression);
-            store.dispatch({
-                type: StoreActions.SetEditableExpressionStatus,
-                payload: {
-                    status: parseData.isValid
-                        ? ExpressionStatus.Valid
-                        : ExpressionStatus.Invalid,
-                },
-            });
-            store.dispatch({
-                type: StoreActions.SetParseMessage,
-                payload: { message: parseData.parsingMessage },
-            });
-        }
+        dispatchParseActions(newExpression);
     };
 
     return (
