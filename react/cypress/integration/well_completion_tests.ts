@@ -3,7 +3,7 @@ describe("Well Completions", () => {
         "#root > div > header > div:nth-child(1) > div > div:nth-child(1) > span:nth-child(2) > span:nth-child(14)";
     before(() => {
         cy.visit("/");
-        cy.wait(5000);
+        cy.wait(10000);
         cy.get("body").then(($body) => {
             if ($body.find("#root > div > div.css-1q7pov5 > nav").length == 0) {
                 cy.get("body").type("s");

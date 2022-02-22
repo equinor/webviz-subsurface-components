@@ -28,8 +28,9 @@ jobs:
             run-performance-tests: false
           - python-version: 3.9
             run-performance-tests: false
-          - python-version: 3.9 # This particular job in the matrix is allowed to fail(for performance test)
+          - python-version: 3.9 # This particular job in the matrix is allowed to fail(for performance and cypress test)
             run-performance-tests: true
+            e2e-on-firefox: true
 
     steps:
       - name: 📖 Checkout commit locally
@@ -94,12 +95,15 @@ jobs:
           npm run test_correctness --prefix ./react
           pytest ./tests --headless
 
-      # Run cypress tests on Chrome browser
-      - name: E2E on Chrome
+      # Run cypress tests on firefox browser
+      - name: E2E on firefox
+        if: github.event_name != 'release' && matrix.e2e-on-firefox
         uses: cypress-io/github-action@v2
         with:
-          browser: chrome
-      - run: npm run test-cypress --prefix ./react
+          browser: firefox
+          working-directory: ./react
+          start: npm run storybook
+          wait-on: "http://localhost:6006"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

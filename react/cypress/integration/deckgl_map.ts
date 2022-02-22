@@ -1,7 +1,7 @@
 describe("Map component", () => {
     beforeEach(() => {
         cy.visit("/");
-        cy.wait(5000);
+        cy.wait(10000);
         cy.get("body").then(($body) => {
             if ($body.find("#root > div > div.css-1q7pov5 > nav").length > 0) {
                 cy.get("body").type("s");
