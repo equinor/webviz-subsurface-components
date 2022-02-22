@@ -135,6 +135,7 @@ async function load_mesh(
             meshMaxError,
             skirtHeight: 0.0,
         },
+        worker: false,
     });
 
     // Remap height to meshValueRange
