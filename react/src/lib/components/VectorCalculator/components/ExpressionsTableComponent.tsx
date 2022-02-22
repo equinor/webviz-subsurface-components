@@ -6,6 +6,7 @@ import { add, copy, delete_forever } from "@equinor/eds-icons";
 import { v4 as uuidv4 } from "uuid";
 import { cloneDeep } from "lodash";
 
+import { StoreActions, useStore } from "./ExpressionsStore";
 import { ExpressionsTable } from "./ExpressionsTable";
 import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import {
@@ -15,19 +16,11 @@ import {
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
-interface ExpressionsTableComponentProps {
-    expressions: ExpressionType[];
-    onActiveExpressionChange: (expression: ExpressionType | undefined) => void;
-    onExpressionsChange: (expressions: ExpressionType[]) => void;
-}
-
-export const ExpressionsTableComponent: React.FC<
-    ExpressionsTableComponentProps
-> = (props: ExpressionsTableComponentProps) => {
-    const { expressions } = props;
-    const [activeExpression, setActiveExpression] = React.useState<
-        ExpressionType | undefined
-    >(undefined);
+export const ExpressionsTableComponent: React.FC = () => {
+    const store = useStore();
+    const [expressions, setExpressions] = React.useState<ExpressionType[]>(
+        store.state.expressions
+    );
     const [selectedExpressions, setSelectedExpressions] = React.useState<
         ExpressionType[]
     >([]);
@@ -48,6 +41,10 @@ export const ExpressionsTableComponent: React.FC<
     }, []);
 
     React.useEffect(() => {
+        setExpressions(store.state.expressions);
+    }, [store.state.expressions]);
+
+    React.useEffect(() => {
         // Disable delete when all expressions are non-deletable
         setDisableDelete(
             selectedExpressions.length <= 0
@@ -56,24 +53,8 @@ export const ExpressionsTableComponent: React.FC<
         );
     }, [selectedExpressions]);
 
-    const addNewExpressions = React.useCallback(
-        (newExpressions: ExpressionType[]): void => {
-            const newExpressionsList = cloneDeep(expressions);
-            for (const elm of newExpressions) {
-                newExpressionsList.push(elm);
-            }
-            props.onExpressionsChange(newExpressionsList);
-        },
-        [expressions]
-    );
-
     const handleExpressionsSelect = (expressions: ExpressionType[]): void => {
         setSelectedExpressions(expressions);
-    };
-
-    const handleActiveExpressionSelect = (expression: ExpressionType): void => {
-        setActiveExpression(expression);
-        props.onActiveExpressionChange(expression);
     };
 
     const handleCloneClick = React.useCallback((): void => {
@@ -89,14 +70,16 @@ export const ExpressionsTableComponent: React.FC<
             cloneExpr.isDeletable = true;
             newExpressions.push(cloneExpr);
         }
-        addNewExpressions(newExpressions);
-    }, [selectedExpressions, addNewExpressions, getAvailableName]);
+        store.dispatch({
+            type: StoreActions.AddExpressions,
+            payload: { expressions: newExpressions },
+        });
+    }, [expressions, selectedExpressions, getAvailableName]);
 
     const handleDeleteClick = React.useCallback((): void => {
         const nonDeletableExpressions = selectedExpressions.filter((elm) => {
             return !elm.isDeletable;
         });
-        setSelectedExpressions(nonDeletableExpressions);
 
         // Handle blinking in table
         setBlinkingTableExpressions(nonDeletableExpressions);
@@ -108,28 +91,19 @@ export const ExpressionsTableComponent: React.FC<
         const deletableExpressions = selectedExpressions.filter((elm) => {
             return elm.isDeletable;
         });
-        const newExpressionsList = expressions.filter((elm) => {
-            return deletableExpressions.indexOf(elm) === -1;
-        });
-        props.onExpressionsChange(newExpressionsList);
+        const deletableExpressionIds = deletableExpressions.map(
+            (elm) => elm.id
+        );
 
-        if (
-            activeExpression !== undefined &&
-            !newExpressionsList.some((el) => el.id === activeExpression.id)
-        ) {
-            setActiveExpression(undefined);
-            props.onActiveExpressionChange(undefined);
-        }
+        store.dispatch({
+            type: StoreActions.DeleteExpressions,
+            payload: { ids: deletableExpressionIds },
+        });
     }, [
-        activeExpression,
         blinkingTimer,
-        expressions,
         selectedExpressions,
-        setActiveExpression,
         setBlinkingTableExpressions,
         setSelectedExpressions,
-        props.onActiveExpressionChange,
-        props.onExpressionsChange,
     ]);
 
     const handleNewClick = React.useCallback((): void => {
@@ -138,8 +112,11 @@ export const ExpressionsTableComponent: React.FC<
             ...getDefaultExpression(),
             name: newName,
         };
-        addNewExpressions([newExpression]);
-    }, [expressions, addNewExpressions, getAvailableName]);
+        store.dispatch({
+            type: StoreActions.AddExpressions,
+            payload: { expressions: [newExpression] },
+        });
+    }, [expressions, getAvailableName]);
 
     return (
         <Grid
@@ -153,10 +130,8 @@ export const ExpressionsTableComponent: React.FC<
         >
             <Grid item>
                 <ExpressionsTable
-                    expressions={expressions}
                     blinkingExpressions={blinkingTableExpressions}
                     onExpressionsSelect={handleExpressionsSelect}
-                    onActiveExpressionSelect={handleActiveExpressionSelect}
                 />
             </Grid>
             <Grid item>

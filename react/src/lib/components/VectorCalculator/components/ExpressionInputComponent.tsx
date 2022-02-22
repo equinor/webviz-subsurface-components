@@ -8,71 +8,45 @@ import { TreeDataNode } from "@webviz/core-components";
 import { VariablesTable } from "./VariablesTable";
 import { ExpressionDescriptionTextField } from "./ExpressionDescriptionTextField";
 import { ExpressionNameTextField } from "./ExpressionNameTextField";
-import {
-    ExpressionInputTextField,
-    ExpressionStatus,
-} from "./ExpressionInputTextField";
+import { ExpressionInputTextField } from "./ExpressionInputTextField";
+
+import { areVariableVectorMapsEqual } from "../utils/VectorCalculatorHelperFunctions";
+
+import { StoreActions, useStore, ExpressionStatus } from "./ExpressionsStore";
 
 import {
     ExpressionType,
-    ExternalParseData,
     VariableVectorMapType,
 } from "../utils/VectorCalculatorTypes";
-import {
-    areVariableVectorMapsEqual,
-    isVariableVectorMapValid,
-    isExpressionNameValidAndNotOccupiedByVectors,
-} from "../utils/VectorCalculatorHelperFunctions";
 import { getExpressionParseData } from "../utils/ExpressionParser";
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface ExpressionInputComponent {
-    activeExpression: ExpressionType;
-    expressions: ExpressionType[];
     vectors: TreeDataNode[];
-    externalParsing: boolean;
     maxExpressionDescriptionLength: number;
-    externalParseData?: ExternalParseData;
-    disabled?: boolean;
-    onExpressionChange: (expression: ExpressionType) => void;
-    onExternalExpressionParsing: (expression: ExpressionType) => void;
 }
 
 export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     props: ExpressionInputComponent
 ) => {
-    const { activeExpression, expressions, externalParsing, disabled } = props;
-    const [isExpressionNameValid, setIsExpressionNameValid] =
-        React.useState<boolean>(
-            isExpressionNameValidAndNotOccupiedByVectors(
-                activeExpression.name,
-                props.vectors
-            )
-        );
+    const store = useStore();
+    const [activeExpression, setActiveExpression] =
+        React.useState<ExpressionType>(store.state.activeExpression);
+
+    const [disabled, setDisabled] = React.useState<boolean>(
+        store.state.activeExpression.id === ""
+    );
     const [expressionStatus, setExpressionStatus] =
         React.useState<ExpressionStatus>(ExpressionStatus.Invalid);
-    const [isValidVariableVectorMap, setIsValidVariableVectorMap] =
-        React.useState<boolean>(
-            isVariableVectorMapValid(
-                activeExpression.variableVectorMap,
-                ":",
-                props.vectors
-            )
-        );
-    const [isValid, setIsValid] = React.useState<boolean>(
-        isExpressionNameValid &&
-            expressionStatus === ExpressionStatus.Valid &&
-            isValidVariableVectorMap
+    const [isExpressionEdited, setIsExpressionEdited] = React.useState<boolean>(
+        store.state.activeExpression !== store.state.editableExpression
     );
-    const [isExpressionEdited, setIsExpressionEdited] =
-        React.useState<boolean>(false);
 
     const [editableExpression, setEditableExpression] =
-        React.useState<ExpressionType>(activeExpression);
+        React.useState<ExpressionType>(store.state.editableExpression);
     const [cachedVariableVectorMap, setCachedVariableVectorMap] =
         React.useState<VariableVectorMapType[]>([]);
-    const [parsingMessage, setParsingMessage] = React.useState<string>("");
 
     Icon.add({ clear, save, sync });
 
@@ -134,253 +108,67 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         [cachedVariableVectorMap]
     );
 
-    React.useEffect(() => {
-        setIsValid(
-            isExpressionNameValid &&
-                expressionStatus === ExpressionStatus.Valid &&
-                isValidVariableVectorMap
-        );
-    }, [isExpressionNameValid, expressionStatus, isValidVariableVectorMap]);
+    const areExpressionsEqual = React.useCallback(
+        (first: ExpressionType, second: ExpressionType): boolean => {
+            const areIdsEqual = first.id === second.id;
+            const areNamesEqual = first.name === second.name;
+            const areExpressionsEqual = first.expression === second.expression;
+            const areDescriptionsEqual =
+                first.description === second.description;
+
+            return (
+                areIdsEqual &&
+                areNamesEqual &&
+                areExpressionsEqual &&
+                areDescriptionsEqual &&
+                areVariableVectorMapsEqual(
+                    first.variableVectorMap,
+                    second.variableVectorMap
+                )
+            );
+        },
+        [areVariableVectorMapsEqual]
+    );
 
     React.useEffect(() => {
-        const isNameEdited = activeExpression.name !== editableExpression.name;
-        const isExpressionEdited =
-            activeExpression.expression !== editableExpression.expression;
-        const isVariableVectorMapEdited = !areVariableVectorMapsEqual(
-            activeExpression.variableVectorMap,
-            editableExpression.variableVectorMap
-        );
-        const isDescriptionEdited =
-            activeExpression.description !== editableExpression.description;
-        const isEdited =
-            activeExpression.id === editableExpression.id &&
-            (isNameEdited ||
-                isExpressionEdited ||
-                isVariableVectorMapEdited ||
-                isDescriptionEdited);
-
-        setIsExpressionEdited(isEdited);
-    }, [editableExpression]);
-
-    React.useEffect(() => {
-        if (!props.externalParseData) {
-            return;
+        if (activeExpression !== store.state.activeExpression) {
+            setActiveExpression(store.state.activeExpression);
         }
-
-        // Ensure evaluated expression is equal current editable expression
-        if (
-            props.externalParseData.id !== editableExpression.id ||
-            props.externalParseData.expression !== editableExpression.expression
-        ) {
-            return;
+        if (editableExpression !== store.state.editableExpression) {
+            setEditableExpression(store.state.editableExpression);
         }
-
-        const newEditableExpression = cloneDeep(editableExpression);
-
-        setParsingMessage(props.externalParseData.message);
-        setExpressionStatus(
-            props.externalParseData.isValid
-                ? ExpressionStatus.Valid
-                : ExpressionStatus.Invalid
-        );
-
-        // Update variable vector map when valid expression
-        if (props.externalParseData.isValid) {
-            newEditableExpression.variableVectorMap =
-                getVariableVectorMapFromVariables(
-                    props.externalParseData.variables
-                );
+        if (disabled !== (store.state.activeExpression.id === "")) {
+            setDisabled(store.state.activeExpression.id === "");
         }
-
-        setEditableExpression(newEditableExpression);
-        setIsValidVariableVectorMap(
-            isVariableVectorMapValid(
-                newEditableExpression.variableVectorMap,
-                ":",
-                props.vectors
+        setIsExpressionEdited(
+            !areExpressionsEqual(
+                store.state.activeExpression,
+                store.state.editableExpression
             )
         );
     }, [
-        props.externalParseData,
-        props.vectors,
-        getVariableVectorMapFromVariables,
-        isVariableVectorMapValid,
-    ]);
-
-    React.useEffect(() => {
-        const activeExpressionClone = cloneDeep(activeExpression);
-        const variableVectorMapClone = cloneDeep(
-            activeExpression.variableVectorMap
-        );
-        setEditableExpression(activeExpressionClone);
-        setCachedVariableVectorMap(variableVectorMapClone);
-
-        setIsExpressionNameValid(
-            isExpressionNameValidAndNotOccupiedByVectors(
-                activeExpressionClone.name,
-                props.vectors
-            )
-        );
-        setIsValidVariableVectorMap(
-            isVariableVectorMapValid(
-                activeExpressionClone.variableVectorMap,
-                ":",
-                props.vectors
-            )
-        );
-
-        if (externalParsing) {
-            props.onExternalExpressionParsing(activeExpressionClone);
-        } else {
-            const parseData = getExpressionParseData(
-                activeExpressionClone.expression
-            );
-            setExpressionStatus(
-                parseData.isValid
-                    ? ExpressionStatus.Valid
-                    : ExpressionStatus.Invalid
-            );
-            getExpressionParseData(activeExpressionClone.expression)
-                .parsingMessage;
-            setParsingMessage(parseData.parsingMessage);
-        }
-    }, [
-        activeExpression,
-        externalParsing,
-        props.vectors,
-        props.onExternalExpressionParsing,
-        getExpressionParseData,
-        isExpressionNameValidAndNotOccupiedByVectors,
-        isVariableVectorMapValid,
+        store.state.activeExpression,
+        store.state.editableExpression,
+        areExpressionsEqual,
     ]);
 
     const handleSaveClick = React.useCallback((): void => {
-        if (!isValid) {
+        if (!store.state.editableExpression.isValid) {
             return;
         }
 
-        const newExpression: ExpressionType = {
-            ...editableExpression,
-            isValid: isValid,
-        };
-        props.onExpressionChange(newExpression);
-    }, [editableExpression, isValid, props.onExpressionChange]);
+        store.dispatch({
+            type: StoreActions.SaveEditableExpression,
+            payload: {},
+        });
+    }, [store.state.editableExpression.isValid]);
 
     const handleCancelClick = React.useCallback((): void => {
-        setEditableExpression(activeExpression);
-
-        if (externalParsing) {
-            props.onExternalExpressionParsing(activeExpression);
-        } else {
-            setExpressionStatus(
-                getExpressionParseData(activeExpression.expression).isValid
-                    ? ExpressionStatus.Valid
-                    : ExpressionStatus.Invalid
-            );
-            setParsingMessage("");
-        }
-    }, [
-        activeExpression,
-        externalParsing,
-        setEditableExpression,
-        setExpressionStatus,
-        setParsingMessage,
-        props.onExternalExpressionParsing,
-        getExpressionParseData,
-    ]);
-
-    const handleExpressionNameChange = (newName: string): void => {
-        setEditableExpression({ ...editableExpression, name: newName });
-    };
-
-    const handleIsExpressionNameValidChange = (isValid: boolean): void => {
-        setIsExpressionNameValid(isValid);
-    };
-
-    const handleExpressionDescriptionChange = (
-        newDescription: string
-    ): void => {
-        setEditableExpression({
-            ...editableExpression,
-            description: newDescription,
+        store.dispatch({
+            type: StoreActions.ResetEditableExpression,
+            payload: {},
         });
-    };
-
-    const handleExpressionChange = React.useCallback(
-        (newExpression: string): void => {
-            const updatedExpression = {
-                ...editableExpression,
-                expression: newExpression,
-            };
-
-            // Handle parsing externally
-            if (externalParsing) {
-                setEditableExpression(updatedExpression);
-                setExpressionStatus(ExpressionStatus.Evaluating);
-                setParsingMessage("");
-                props.onExternalExpressionParsing(updatedExpression);
-            } else {
-                const newMap =
-                    makeVariableVectorMapFromExpression(updatedExpression);
-                updatedExpression.variableVectorMap = newMap;
-
-                setIsValidVariableVectorMap(
-                    isVariableVectorMapValid(newMap, ":", props.vectors)
-                );
-                const parseData = getExpressionParseData(
-                    updatedExpression.expression
-                );
-                setExpressionStatus(
-                    parseData.isValid
-                        ? ExpressionStatus.Valid
-                        : ExpressionStatus.Invalid
-                );
-                setParsingMessage(parseData.parsingMessage);
-                setEditableExpression(updatedExpression);
-            }
-        },
-        [
-            editableExpression,
-            externalParsing,
-            setEditableExpression,
-            setExpressionStatus,
-            setParsingMessage,
-            setIsValidVariableVectorMap,
-            isVariableVectorMapValid,
-            getExpressionParseData,
-            props.onExternalExpressionParsing,
-            makeVariableVectorMapFromExpression,
-        ]
-    );
-
-    const handleVariableVectorMapChange = React.useCallback(
-        (newVariableVectorMap: VariableVectorMapType[]): void => {
-            setCachedVariableVectorMap(
-                getUpdatedCachedVariableVectorMap(newVariableVectorMap)
-            );
-
-            setIsValidVariableVectorMap(
-                isVariableVectorMapValid(
-                    newVariableVectorMap,
-                    ":",
-                    props.vectors
-                )
-            );
-
-            setEditableExpression({
-                ...editableExpression,
-                variableVectorMap: newVariableVectorMap,
-            });
-        },
-        [
-            editableExpression,
-            isVariableVectorMapValid,
-            getUpdatedCachedVariableVectorMap,
-            setCachedVariableVectorMap,
-            setEditableExpression,
-            setIsValidVariableVectorMap,
-        ]
-    );
+    }, [store]);
 
     return (
         <Grid
@@ -394,41 +182,26 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         >
             <Grid item>
                 <ExpressionNameTextField
-                    initialName={activeExpression.name}
-                    currentName={editableExpression.name}
-                    existingExpressions={expressions}
                     vectors={props.vectors}
                     disabled={disabled}
-                    onNameChange={handleExpressionNameChange}
-                    onValidChange={handleIsExpressionNameValidChange}
                 />
             </Grid>
             <Grid item>
-                <ExpressionInputTextField
-                    expression={editableExpression.expression}
-                    status={expressionStatus}
-                    helperText={parsingMessage}
-                    disabled={disabled}
-                    onExpressionChange={handleExpressionChange}
-                />
+                <ExpressionInputTextField disabled={disabled} />
             </Grid>
             <Grid item>
                 <ExpressionDescriptionTextField
-                    description={editableExpression.description}
                     disabled={disabled}
                     maxLength={props.maxExpressionDescriptionLength}
-                    onDescriptionChange={handleExpressionDescriptionChange}
                 />
             </Grid>
             <Grid container item xs={12} spacing={0}>
                 <VariablesTable
-                    variableVectorMap={editableExpression.variableVectorMap}
                     vectorData={props.vectors}
                     disabled={
                         disabled ||
                         expressionStatus === ExpressionStatus.Evaluating
                     }
-                    onMapChange={handleVariableVectorMapChange}
                 />
             </Grid>
             <Grid container item spacing={2} justify="flex-end">
@@ -445,7 +218,11 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 <Grid item>
                     <Button
                         onClick={handleSaveClick}
-                        disabled={disabled || !isValid || !isExpressionEdited}
+                        disabled={
+                            disabled ||
+                            !store.state.editableExpression.isValid ||
+                            !isExpressionEdited
+                        }
                     >
                         <Icon key="save" name="save" />
                         Save

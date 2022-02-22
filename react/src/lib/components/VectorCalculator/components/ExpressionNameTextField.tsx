@@ -3,7 +3,7 @@ import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
 import { TextField, Icon } from "@equinor/eds-core-react";
 import { TreeDataNode } from "@webviz/core-components";
 
-import { ExpressionType } from "../utils/VectorCalculatorTypes";
+import { StoreActions, useStore } from "./ExpressionsStore";
 import {
     isNameOccupiedByVectors,
     doesNameExistInExpressionList,
@@ -26,21 +26,16 @@ type ExpressionNameTextFieldStyleData = {
 };
 
 interface ExpressionNameTextFieldProps {
-    initialName: string;
-    currentName: string;
-    existingExpressions: ExpressionType[];
     vectors: TreeDataNode[];
     disabled?: boolean;
-    onNameChange: (name: string) => void;
-    onValidChange: (isValid: boolean) => void;
 }
 
 export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     props: ExpressionNameTextFieldProps
 ) => {
-    const { currentName, initialName, existingExpressions, vectors, disabled } =
-        props;
-    const [name, setName] = React.useState(initialName);
+    const { vectors, disabled } = props;
+    const store = useStore();
+    const [name, setName] = React.useState(store.state.editableExpression.name);
     const [textFieldStyleDataState, setTextFieldStyleDataState] =
         React.useState<ExpressionNameTextFieldStyleData>({
             variant: "success",
@@ -52,6 +47,8 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
 
     const getTextFieldStyleData = React.useCallback(
         (name: string): ExpressionNameTextFieldStyleData => {
+            const initialName = store.state.activeExpression.name;
+
             if (disabled) {
                 return { variant: "default", icon: [], helperText: "" };
             }
@@ -71,7 +68,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 };
             }
             if (
-                doesNameExistInExpressionList(name, existingExpressions) &&
+                doesNameExistInExpressionList(name, store.state.expressions) &&
                 name !== initialName
             ) {
                 return {
@@ -92,21 +89,16 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             isNameOccupiedByVectors,
             doesNameExistInExpressionList,
             disabled,
-            existingExpressions,
-            initialName,
+            store.state.expressions,
+            store.state.activeExpression,
             vectors,
         ]
     );
 
-    React.useEffect(() => {
-        if (currentName === initialName) {
-            setName(currentName);
-            setTextFieldStyleDataState(getTextFieldStyleData(currentName));
-        }
-    }, [currentName, initialName, getTextFieldStyleData]);
-
-    const validateName = React.useCallback(
+    const isValidName = React.useCallback(
         (name: string): boolean => {
+            const initialName = store.state.activeExpression.name;
+
             if (!isValidExpressionNameString(name)) {
                 return false;
             }
@@ -116,7 +108,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             if (name === initialName) {
                 return true;
             }
-            if (doesNameExistInExpressionList(name, existingExpressions)) {
+            if (doesNameExistInExpressionList(name, store.state.expressions)) {
                 return false;
             }
             return true;
@@ -125,33 +117,32 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             isValidExpressionNameString,
             doesNameExistInExpressionList,
             isNameOccupiedByVectors,
-            existingExpressions,
-            initialName,
+            store.state.activeExpression,
+            store.state.expressions,
             vectors,
         ]
     );
+
+    React.useEffect(() => {
+        if (name !== store.state.editableExpression.name) {
+            setName(store.state.editableExpression.name);
+            setTextFieldStyleDataState(
+                getTextFieldStyleData(store.state.editableExpression.name)
+            );
+        }
+    }, [store.state.editableExpression.name, getTextFieldStyleData]);
 
     const handleInputChange = React.useCallback(
         (
             e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
         ): void => {
             const newName: string = e.target.value;
-            const isValid = validateName(newName);
-
-            setName(newName);
-            setTextFieldStyleDataState(getTextFieldStyleData(newName));
-
-            props.onNameChange(newName);
-            props.onValidChange(isValid);
+            store.dispatch({
+                type: StoreActions.SetName,
+                payload: { name: newName, status: isValidName(newName) },
+            });
         },
-        [
-            validateName,
-            setName,
-            setTextFieldStyleDataState,
-            getTextFieldStyleData,
-            props.onNameChange,
-            props.onValidChange,
-        ]
+        [isValidName]
     );
 
     return (
@@ -161,7 +152,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 label="Name"
                 placeholder="New name"
                 onChange={handleInputChange}
-                value={name}
+                value={store.state.editableExpression.name}
                 variant={textFieldStyleDataState.variant}
                 inputIcon={textFieldStyleDataState.icon}
                 helperText={textFieldStyleDataState.helperText}

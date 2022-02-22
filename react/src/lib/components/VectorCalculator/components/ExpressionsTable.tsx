@@ -14,38 +14,32 @@ import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import { BlinkingTableRow } from "../utils/BlinkingTableRow";
 import { EnhancedTableHead } from "../utils/EnhancedTableHead";
 
+import { StoreActions, useStore } from "./ExpressionsStore";
+
 import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface ExpressionsTableProps {
-    expressions: ExpressionType[];
     blinkingExpressions: ExpressionType[];
     onExpressionsSelect: (expressions: ExpressionType[]) => void;
-    onActiveExpressionSelect: (expression: ExpressionType) => void;
 }
 
 export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     props: ExpressionsTableProps
 ) => {
-    const { expressions } = props;
+    const store = useStore();
+    const [expressions, setExpressions] = React.useState<ExpressionType[]>(
+        store.state.expressions
+    );
     const [selectedExpressions, setSelectedExpressions] = React.useState<
         ExpressionType[]
     >([]);
-    const [activeExpression, setActiveExpression] =
-        React.useState<ExpressionType>({
-            name: "",
-            expression: "",
-            id: "",
-            variableVectorMap: [],
-            isValid: false,
-            isDeletable: true,
-        });
 
     React.useEffect(() => {
-        updateSelectedExpressions();
-        updateActiveExpression();
-    }, [expressions]);
+        setExpressions(store.state.expressions);
+    }, [store.state.expressions]);
 
-    const updateSelectedExpressions = React.useCallback((): void => {
+    React.useEffect(() => {
+        // Update selected expressions
         const newSelectedExpressions = expressions.filter((expr) => {
             for (const elm of selectedExpressions) {
                 if (elm.id === expr.id) {
@@ -59,24 +53,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
             setSelectedExpressions(newSelectedExpressions);
             props.onExpressionsSelect(newSelectedExpressions);
         }
-    }, [expressions, selectedExpressions, setSelectedExpressions]);
-
-    const updateActiveExpression = React.useCallback((): void => {
-        let newActiveExpression = expressions.find(
-            (elm) => elm.id === activeExpression.id
-        );
-        if (newActiveExpression === undefined) {
-            newActiveExpression = {
-                name: "",
-                expression: "",
-                id: "",
-                variableVectorMap: [],
-                isValid: false,
-                isDeletable: true,
-            };
-        }
-        setActiveExpression(newActiveExpression);
-    }, [expressions, activeExpression, setActiveExpression]);
+    }, [expressions]);
 
     const handleCheckBoxClick = React.useCallback(
         (expression: ExpressionType): void => {
@@ -108,8 +85,10 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     );
 
     const handleRowClick = (expression: ExpressionType): void => {
-        setActiveExpression(expression);
-        props.onActiveExpressionSelect(expression);
+        store.dispatch({
+            type: StoreActions.SetActiveExpression,
+            payload: { expression: expression },
+        });
     };
 
     const isExpressionSelected = (expression: ExpressionType): boolean => {
@@ -141,7 +120,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                 <TableBody>
                     {expressions.map((row) => {
                         const isSelected = isExpressionSelected(row);
-                        const isActive = activeExpression === row;
+                        const isActive = store.state.activeExpression === row;
                         const expressionFromMap = getDetailedExpression(row);
                         const isBlinking = props.blinkingExpressions.some(
                             (elm) => elm.id == row.id

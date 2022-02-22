@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import { VectorCalculatorComponent } from "./components/VectorCalculatorComponent";
+import { StoreProvider } from "./components/ExpressionsStore";
 import { string } from "jsverify";
 import "!style-loader!css-loader!./VectorCalculator.css";
 
@@ -9,7 +10,7 @@ import "!style-loader!css-loader!./VectorCalculator.css";
  * VectorCalculator is a component that allows to calculate new vectors by creating a mathematical expression
  * based existing vectors.
  *
- * New calcualted vectors are created by writing a mathematical equation with single character variables,
+ * New calculated vectors are created by writing a mathematical equation with single character variables,
  * where each variable is assigned a vector from the set of existing vectors.
  *
  * The component provides a list of valid expressions which can be used externally to calculate the wanted
@@ -21,7 +22,12 @@ import "!style-loader!css-loader!./VectorCalculator.css";
 export const VectorCalculator = (props) => {
     return (
         <div className={"VectorCalculator"}>
-            <VectorCalculatorComponent {...props} />
+            <StoreProvider
+                initialExpressions={props.expressions}
+                externalParsing={props.isDashControlled}
+            >
+                <VectorCalculatorComponent {...props} />
+            </StoreProvider>
         </div>
     );
 };

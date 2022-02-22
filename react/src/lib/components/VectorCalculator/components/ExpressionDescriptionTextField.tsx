@@ -2,29 +2,41 @@ import React from "react";
 
 import { MaxLengthTextField } from "./MaxLengthTextField";
 
+import { StoreActions, useStore } from "./ExpressionsStore";
+
 import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface ExpressionDescriptionTextFieldProps {
     maxLength: number;
-    description?: string;
     disabled?: boolean;
-    onDescriptionChange: (description: string) => void;
 }
 
 export const ExpressionDescriptionTextField: React.FC<
     ExpressionDescriptionTextFieldProps
 > = (props: ExpressionDescriptionTextFieldProps) => {
-    const [description, setDescription] = React.useState<string>("");
+    const store = useStore();
+    // const [description, setDescription] = React.useState<string>(
+    //     store.state.editableExpression.description
+    //         ? store.state.editableExpression.description
+    //         : ""
+    // );
 
-    React.useEffect(() => {
-        setDescription(props.description ? props.description : "");
-    }, [props.description]);
+    // React.useEffect(() => {
+    //     setDescription(
+    //         store.state.editableExpression.description
+    //             ? store.state.editableExpression.description
+    //             : ""
+    //     );
+    // }, [store.state.editableExpression.description]);
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
     ): void => {
         const newDescription: string = e.target.value;
-        props.onDescriptionChange(newDescription);
+        store.dispatch({
+            type: StoreActions.SetDescription,
+            payload: { description: newDescription },
+        });
     };
 
     return (
@@ -35,7 +47,11 @@ export const ExpressionDescriptionTextField: React.FC<
                 label="Description"
                 placeholder="Description (optional)"
                 onChange={handleInputChange}
-                value={description}
+                value={
+                    store.state.editableExpression.description
+                        ? store.state.editableExpression.description
+                        : ""
+                }
                 disabled={props.disabled}
             />
         </div>

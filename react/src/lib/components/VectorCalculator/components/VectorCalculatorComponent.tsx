@@ -11,6 +11,8 @@ import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
 import { ExpressionInputComponent } from "./ExpressionInputComponent";
 import { TreeDataNode } from "@webviz/core-components";
 
+import { ExpressionStatus, StoreActions, useStore } from "./ExpressionsStore";
+
 interface ParentProps {
     expressions?: ExpressionType[];
     externalParseExpression?: ExpressionType;
@@ -29,28 +31,45 @@ interface VectorCalculatorProps {
 export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     props: VectorCalculatorProps
 ) => {
-    const { isDashControlled } = props;
-    const [expressions, setExpressions] = React.useState<ExpressionType[]>(
-        props.expressions
-    );
-    const [activeExpression, setActiveExpression] =
-        React.useState<ExpressionType>({
-            name: "",
-            expression: "",
-            id: "",
-            variableVectorMap: [],
-            isValid: false,
-            isDeletable: true,
-        });
-    const [disabledInputComponent, setDisabledInputComponent] =
-        React.useState<boolean>(true);
+    const store = useStore();
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
     React.useEffect(() => {
-        setExpressions(props.expressions);
-    }, [props.expressions]);
+        /// Ensure external parsing for editable expression
+        if (
+            !props.externalParseData ||
+            store.state.externalParsing ||
+            props.externalParseData.id !== store.state.editableExpression.id
+        ) {
+            return;
+        }
+
+        const status = props.externalParseData.isValid
+            ? ExpressionStatus.Valid
+            : ExpressionStatus.Invalid;
+
+        store.dispatch({
+            type: StoreActions.SetEditableExpressionStatus,
+            payload: {
+                status: status,
+            },
+        });
+        store.dispatch({
+            type: StoreActions.SetParseMessage,
+            payload: { message: props.externalParseData.message },
+        });
+        // TODO: Update variable vector map with variables from parsing when valid!
+        if (status === ExpressionStatus.Valid) {
+            // TODO: Update variable vector map
+            // store.dispatch({
+            //     type: StoreActions.SetVariableVectorMap,
+            //     payload: {variableVectorMap:props.externalParseData.}
+            // })
+        }
+    }, [props.externalParseData]);
 
     React.useEffect(() => {
+        const expressions = store.state.expressions;
         // Only send valid expressions
         const outputExpressions = expressions.filter(
             (expression) => expression.isValid
@@ -59,57 +78,15 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
         if (outputExpressions !== props.expressions) {
             props.setProps({ expressions: outputExpressions });
         }
-    }, [expressions, props.setProps]);
+    }, [store.state.expressions, props.setProps]);
 
-    const handleActiveExpressionChange = React.useCallback(
-        (expression: ExpressionType | undefined) => {
-            setDisabledInputComponent(expression === undefined);
-
-            if (expression === undefined) {
-                setActiveExpression({
-                    name: "",
-                    expression: "",
-                    id: "",
-                    variableVectorMap: [],
-                    isValid: false,
-                    isDeletable: true,
-                });
-            } else {
-                setActiveExpression(expression);
-            }
-        },
-        [setActiveExpression, setDisabledInputComponent]
-    );
-
-    const handleExpressionsChange = (expressions: ExpressionType[]) => {
-        setExpressions(expressions);
-    };
-
-    const handleActiveExpressionEdit = React.useCallback(
-        (expression: ExpressionType): void => {
-            if (activeExpression === undefined) {
-                return;
-            }
-
-            const newExpressions = expressions.map((elm) => {
-                if (elm.id === activeExpression.id) {
-                    const editedExpression = expression;
-                    setActiveExpression(editedExpression);
-                    return editedExpression;
-                }
-                return elm;
+    React.useEffect(() => {
+        if (store.state.externalParsing) {
+            props.setProps({
+                externalParseExpression: store.state.editableExpression,
             });
-            setExpressions(newExpressions);
-        },
-        [activeExpression, expressions, setActiveExpression, setExpressions]
-    );
-
-    const handleExternalExpressionParsing = React.useCallback(
-        (expression: ExpressionType): void => {
-            props.setProps({ externalParseExpression: expression });
-        },
-        [props.setProps]
-    );
+        }
+    }, [store.state.editableExpression.expression]);
 
     const handleOpenClick = React.useCallback(() => {
         console.log("Open pushed!");
@@ -128,26 +105,13 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
         <div>
             <Grid container spacing={2}>
                 <Grid item xs={6}>
-                    <ExpressionsTableComponent
-                        expressions={expressions}
-                        onActiveExpressionChange={handleActiveExpressionChange}
-                        onExpressionsChange={handleExpressionsChange}
-                    />
+                    <ExpressionsTableComponent />
                 </Grid>
                 <Grid item xs={6}>
                     <ExpressionInputComponent
-                        activeExpression={activeExpression}
-                        expressions={expressions}
                         vectors={props.vectors}
-                        externalParsing={isDashControlled}
-                        externalParseData={props.externalParseData}
                         maxExpressionDescriptionLength={
                             props.maxExpressionDescriptionLength
-                        }
-                        disabled={disabledInputComponent}
-                        onExpressionChange={handleActiveExpressionEdit}
-                        onExternalExpressionParsing={
-                            handleExternalExpressionParsing
                         }
                     />
                 </Grid>

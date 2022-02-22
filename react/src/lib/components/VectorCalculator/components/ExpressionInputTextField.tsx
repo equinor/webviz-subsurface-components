@@ -2,13 +2,10 @@ import React from "react";
 import { Icon, TextField, Progress } from "@equinor/eds-core-react";
 import { error_filled, thumbs_up } from "@equinor/eds-icons";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
+import { ExpressionStatus, StoreActions, useStore } from "./ExpressionsStore";
 
-export enum ExpressionStatus {
-    Valid = 1,
-    Invalid = 2,
-    Evaluating = 3,
-}
+import "!style-loader!css-loader!../VectorCalculator.css";
+import { getExpressionParseData } from "../utils/ExpressionParser";
 
 type ExpressionInputTextFieldVariantType = "success" | "error" | "default";
 
@@ -18,18 +15,20 @@ type ExpressionInputTextFieldStyleData = {
 };
 
 interface ExpressionInputTextFieldProps {
-    expression: string;
-    status: ExpressionStatus;
-    helperText: string;
     disabled?: boolean;
-    onExpressionChange: (expression: string) => void;
 }
 
 export const ExpressionInputTextField: React.FC<
     ExpressionInputTextFieldProps
 > = (props: ExpressionInputTextFieldProps) => {
-    const { expression, status, helperText, disabled } = props;
-
+    const { disabled } = props;
+    const store = useStore();
+    const [status, setStatus] = React.useState<ExpressionStatus>(
+        store.state.editableExpressionStatus
+    );
+    const [helperText, setHelperText] = React.useState<string>(
+        store.state.parseMessage
+    );
     const [textFieldStyleDataState, setTextFieldStyleDataState] =
         React.useState<ExpressionInputTextFieldStyleData>({
             variant: "default",
@@ -65,11 +64,78 @@ export const ExpressionInputTextField: React.FC<
         setTextFieldStyleDataState(getTextFieldStyleData());
     }, [status]);
 
+    React.useEffect(() => {
+        if (status !== store.state.editableExpressionStatus) {
+            setStatus(store.state.editableExpressionStatus);
+        }
+        if (helperText !== store.state.parseMessage) {
+            setHelperText(store.state.parseMessage);
+        }
+    }, [store.state.editableExpressionStatus, store.state.parseMessage]);
+
+    React.useEffect(() => {
+        if (store.state.externalParsing) {
+            store.dispatch({
+                type: StoreActions.SetEditableExpressionStatus,
+                payload: { status: ExpressionStatus.Evaluating },
+            });
+            store.dispatch({
+                type: StoreActions.SetParseMessage,
+                payload: { message: "" },
+            });
+        } else {
+            const parseData = getExpressionParseData(
+                store.state.activeExpression.expression
+            );
+            store.dispatch({
+                type: StoreActions.SetEditableExpressionStatus,
+                payload: {
+                    status: parseData.isValid
+                        ? ExpressionStatus.Valid
+                        : ExpressionStatus.Invalid,
+                },
+            });
+            store.dispatch({
+                type: StoreActions.SetParseMessage,
+                payload: { message: parseData.parsingMessage },
+            });
+        }
+    }, [store.state.activeExpression.expression]);
+
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
     ): void => {
         const newExpression: string = e.target.value;
-        props.onExpressionChange(newExpression);
+        store.dispatch({
+            type: StoreActions.SetExpression,
+            payload: { expression: newExpression },
+        });
+
+        // Perform parsing
+        if (store.state.externalParsing) {
+            store.dispatch({
+                type: StoreActions.SetEditableExpressionStatus,
+                payload: { status: ExpressionStatus.Evaluating },
+            });
+            store.dispatch({
+                type: StoreActions.SetParseMessage,
+                payload: { message: "" },
+            });
+        } else {
+            const parseData = getExpressionParseData(newExpression);
+            store.dispatch({
+                type: StoreActions.SetEditableExpressionStatus,
+                payload: {
+                    status: parseData.isValid
+                        ? ExpressionStatus.Valid
+                        : ExpressionStatus.Invalid,
+                },
+            });
+            store.dispatch({
+                type: StoreActions.SetParseMessage,
+                payload: { message: parseData.parsingMessage },
+            });
+        }
     };
 
     return (
@@ -79,7 +145,7 @@ export const ExpressionInputTextField: React.FC<
                 label="Expression"
                 placeholder="New expression"
                 onChange={handleInputChange}
-                value={expression}
+                value={store.state.editableExpression.expression}
                 disabled={disabled}
                 variant={textFieldStyleDataState.variant}
                 inputIcon={textFieldStyleDataState.icon}

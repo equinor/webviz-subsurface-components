@@ -10,16 +10,20 @@ import {
 import { TreeDataNode } from "@webviz/core-components";
 import cloneDeep from "lodash/cloneDeep";
 
+import { ExpressionStatus, StoreActions, useStore } from "./ExpressionsStore";
 import { VariableVectorMapType } from "../utils/VectorCalculatorTypes";
+import { isVariableVectorMapValid } from "../utils/VectorCalculatorHelperFunctions";
 import VectorSelector from "../../VectorSelector";
+
+import { getExpressionParseData } from "../utils/ExpressionParser";
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface VariablesTableProps {
-    variableVectorMap: VariableVectorMapType[];
+    // variableVectorMap: VariableVectorMapType[];
     vectorData: TreeDataNode[];
     disabled?: boolean;
-    onMapChange: (variableVectorMap: VariableVectorMapType[]) => void;
+    // onMapChange: (variableVectorMap: VariableVectorMapType[]) => void;
 }
 
 type VectorSelectorParentProps = {
@@ -32,23 +36,159 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
     props: VariablesTableProps
 ) => {
     const { vectorData } = props;
+    const store = useStore();
+    const [variableVectorMap, setVariableVectorMap] = React.useState<
+        VariableVectorMapType[]
+    >(store.state.editableExpression.variableVectorMap);
+    const [cachedVariableVectorMap, setCachedVariableVectorMap] =
+        React.useState<VariableVectorMapType[]>(variableVectorMap);
     const disabled = props.disabled || false;
+
+    const getVariableVectorMapFromVariables = React.useCallback(
+        (variables: string[]): VariableVectorMapType[] => {
+            const map: VariableVectorMapType[] = [];
+            for (const variable of variables) {
+                const cachedElm = cachedVariableVectorMap.find(
+                    (elm) => elm.variableName === variable
+                );
+                if (!cachedElm) {
+                    map.push({ variableName: variable, vectorName: [] });
+                } else {
+                    map.push(cachedElm);
+                }
+            }
+            return map;
+        },
+        [cachedVariableVectorMap]
+    );
+    const makeVariableVectorMapFromExpression = React.useCallback(
+        (expression: string): VariableVectorMapType[] => {
+            if (expression.length === 0) {
+                return [];
+            }
+
+            const parseData = getExpressionParseData(expression);
+            if (!parseData.isValid) {
+                return cloneDeep(
+                    store.state.editableExpression.variableVectorMap
+                );
+            }
+            return getVariableVectorMapFromVariables(parseData.variables);
+        },
+        [
+            store.state.editableExpression.variableVectorMap,
+            getExpressionParseData,
+            getVariableVectorMapFromVariables,
+        ]
+    );
+    React.useEffect(() => {
+        if (
+            variableVectorMap !== store.state.activeExpression.variableVectorMap
+        ) {
+            setVariableVectorMap(
+                store.state.activeExpression.variableVectorMap
+            );
+            setCachedVariableVectorMap(
+                store.state.activeExpression.variableVectorMap
+            );
+        }
+    }, [store.state.activeExpression]);
+
+    const getUpdatedCachedVariableVectorMap = React.useCallback(
+        (newMap: VariableVectorMapType[]): VariableVectorMapType[] => {
+            const newCachedVariableVectorMap = cloneDeep(
+                cachedVariableVectorMap
+            );
+            for (const elm of newMap) {
+                const cachedElm = newCachedVariableVectorMap.find(
+                    (cachedElm) => cachedElm.variableName === elm.variableName
+                );
+                if (!cachedElm) {
+                    newCachedVariableVectorMap.push(elm);
+                } else {
+                    cachedElm.vectorName = elm.vectorName;
+                    newCachedVariableVectorMap.push(cachedElm);
+                }
+            }
+            return newCachedVariableVectorMap;
+        },
+        [cachedVariableVectorMap]
+    );
+
+    React.useEffect(() => {
+        if (
+            variableVectorMap !==
+            store.state.editableExpression.variableVectorMap
+        ) {
+            setVariableVectorMap(
+                store.state.editableExpression.variableVectorMap
+            );
+            setCachedVariableVectorMap(
+                getUpdatedCachedVariableVectorMap(
+                    store.state.editableExpression.variableVectorMap
+                )
+            );
+        }
+    }, [
+        store.state.editableExpression.variableVectorMap,
+        getUpdatedCachedVariableVectorMap,
+    ]);
+
+    React.useEffect(() => {
+        if (store.state.externalParsing) {
+            return;
+        }
+        if (store.state.editableExpressionStatus !== ExpressionStatus.Valid) {
+            return;
+        }
+
+        const newVariableVectorMap = makeVariableVectorMapFromExpression(
+            store.state.editableExpression.expression
+        );
+        const mapStatus = isVariableVectorMapValid(
+            newVariableVectorMap,
+            ":",
+            vectorData
+        );
+        store.dispatch({
+            type: StoreActions.SetVariableVectorMap,
+            payload: {
+                variableVectorMap: newVariableVectorMap,
+                status: mapStatus,
+            },
+        });
+    }, [
+        store.state.editableExpression.expression,
+        store.state.editableExpressionStatus,
+    ]);
 
     const updateProps = React.useCallback(
         (
             vectorSelectorProps: VectorSelectorParentProps,
             index: number
         ): void => {
-            const newVariableVectorMap = cloneDeep(props.variableVectorMap);
+            const newVariableVectorMap = cloneDeep(variableVectorMap);
             if (vectorSelectorProps.selectedTags.length < 1) {
                 newVariableVectorMap[index].vectorName = [];
             } else {
                 newVariableVectorMap[index].vectorName[0] =
                     vectorSelectorProps.selectedTags[0];
             }
-            props.onMapChange(newVariableVectorMap);
+
+            const mapStatus = isVariableVectorMapValid(
+                newVariableVectorMap,
+                ":",
+                vectorData
+            );
+            store.dispatch({
+                type: StoreActions.SetVariableVectorMap,
+                payload: {
+                    variableVectorMap: newVariableVectorMap,
+                    status: mapStatus,
+                },
+            });
         },
-        [props.variableVectorMap, props.onMapChange]
+        [variableVectorMap]
     );
 
     return (
@@ -56,7 +196,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
             {disabled && <div className="DisableOverlay" />}
             <Table>
                 <TableBody>
-                    {props.variableVectorMap.map((row, index) => {
+                    {variableVectorMap.map((row, index) => {
                         return (
                             <TableRow
                                 tabIndex={-1}
