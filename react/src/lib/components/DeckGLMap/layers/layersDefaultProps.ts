@@ -37,12 +37,33 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
     },
+    MapLayer: {
+        "@@type": "MapLayer",
+        name: "Map",
+        id: "map3d-layer-float32",
+        pickable: true,
+        visible: true,
+        // Url to png image for height field.
+        mesh: { type: "string", optional: false },
+        // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
+        meshMaxError: { type: "number", value: 5 },
+        // Url to png image for map properties. (ex, poro or perm values as a texture)
+        propertyTexture: { type: "string", optional: false },
+        // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
+        bounds: { type: "array", value: null, false: true, compare: true },
+        colorMapRange: { type: "array" },
+        rotDeg: 0,
+        contours: [-1.0, -1.0],
+        // readout is default property value but if set to true it will be depth/z-value.
+        isReadoutDepth: false,
+        enableSmoothShading: true,
+    },
     Map3DLayer: {
         "@@type": "Map3DLayer",
         name: "Map 3D",
         id: "map3d-layer",
         pickable: true,
-        visible: false,
+        visible: true,
         // Url to png image for height field.
         mesh: { type: "string", optional: false },
         meshValueRange: { type: "array", value: [0, 1] },

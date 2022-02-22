@@ -18,6 +18,20 @@ import {
 
 import "!vue-style-loader!css-loader!sass-loader!./styles.scss";
 
+import Ajv from "ajv";
+import { ValidateFunction } from "ajv/dist/types/index";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const inputSchema = require("../../../inputSchema/WellLogTemplate.json");
+const ajv = new Ajv();
+let schemaError = "";
+let validate: ValidateFunction<unknown> | null = null;
+try {
+    validate = ajv.compile(inputSchema);
+} catch (e) {
+    schemaError = "Wrong JSON schema for WellLogTemplate. " + String(e);
+    console.error(schemaError);
+}
+
 import { select } from "d3";
 
 import { WellLog } from "./WellLogTypes";
@@ -614,6 +628,7 @@ interface State {
     infos: Info[];
 
     scrollTrackPos: number; // the first visible non-scale track number
+    errorText?: string;
 }
 
 class WellLogView extends Component<Props, State> implements WellLogController {
@@ -676,6 +691,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.maxVisibleTrackNum !== nextProps.maxVisibleTrackNum)
             return true;
         if (this.state.scrollTrackPos !== nextState.scrollTrackPos) return true;
+        if (this.state.errorText !== nextState.errorText) return true;
 
         if (this.props.maxContentZoom !== nextProps.maxContentZoom) return true;
 
@@ -788,8 +804,22 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         };
     }
 
-    setTracks(): void {
+    setTracks(checkSchema?: boolean): void {
         this.selCurrent = this.selPinned = undefined; // clear old selection (primary scale could be changed)
+
+        if (checkSchema) {
+            //check against the json schema
+            let errorText = "";
+            if (!validate) errorText = schemaError;
+            else if (!validate(this.template))
+                errorText =
+                    validate.errors && validate.errors[0]
+                        ? validate.errors[0].dataPath +
+                          ": " +
+                          validate.errors[0].message
+                        : "JSON schema validation failed";
+            this.setState({ errorText: errorText });
+        }
 
         if (this.logController) {
             const axes = this.getAxesInfo();
@@ -993,7 +1023,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         const t = JSON.stringify(this.template);
         if (t !== tNew) {
             this.template = JSON.parse(tNew); // save external template content to current
-            this.setTracks();
+            this.setTracks(true);
             /* not sure */ this.onTemplateChanged();
         }
     }
@@ -1180,13 +1210,28 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     render(): ReactNode {
         return (
-            <div style={{ width: "100%", height: "100%" }}>
+            <div
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
                 <div
+                    style={{ flex: "1, 1" }}
                     className="welllogview"
                     ref={(el) => {
                         this.container = el as HTMLElement;
                     }}
                 />
+                {this.state.errorText ? (
+                    <div style={{ flex: "0, 0" }} className="welllogview-error">
+                        {this.state.errorText}
+                    </div>
+                ) : (
+                    <></>
+                )}
             </div>
         );
     }
