@@ -10,6 +10,7 @@ import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
+import { isEqual } from "lodash";
 
 const ELEVATION_DECODER = {
     rScaler: 255 * 255,
@@ -26,10 +27,9 @@ type MeshType = {
     indices: { value: Uint32Array };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapToRange(this: any, resolved_mesh: MeshType) {
+function mapToRange(resolved_mesh: MeshType, meshValueRange: [number, number]) {
     const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
-    const [min, max] = this.meshValueRange;
+    const [min, max] = meshValueRange;
     const delta = max - min;
 
     const vertexs = resolved_mesh.attributes.POSITION.value;
@@ -121,6 +121,34 @@ function add_normals(resolved_mesh: MeshType) {
     return resolved_mesh;
 }
 
+async function load_mesh(
+    mesh_name: string,
+    bounds: [number, number, number, number],
+    meshMaxError: number,
+    meshValueRange: [number, number],
+    enableSmoothShading: boolean
+) {
+    let mesh = await load(mesh_name, TerrainLoader, {
+        terrain: {
+            elevationDecoder: ELEVATION_DECODER,
+            bounds,
+            meshMaxError,
+            skirtHeight: 0.0,
+        },
+        worker: false,
+    });
+
+    // Remap height to meshValueRange
+    mesh = mapToRange(mesh, meshValueRange);
+
+    // Note: mesh contains triangles. No normals they must be added.
+    if (enableSmoothShading) {
+        mesh = add_normals(mesh);
+    }
+
+    return mesh;
+}
+
 export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image representing the height mesh.
     mesh: string;
@@ -163,26 +191,46 @@ export default class Map3DLayer extends CompositeLayer<
     unknown,
     Map3DLayerProps<unknown>
 > {
-    renderLayers(): [TerrainMapLayer] {
-        let mesh = load(this.props.mesh, TerrainLoader, {
-            terrain: {
-                elevationDecoder: ELEVATION_DECODER,
-                bounds: this.props.bounds,
-                meshMaxError: this.props.meshMaxError,
-                skirtHeight: 0.0,
-            },
-        });
-
-        // Remap height to meshValueRange
-        mesh = mesh.then(
-            mapToRange.bind({ meshValueRange: this.props.meshValueRange })
+    initializeState(): void {
+        // Load mesh and texture and store in state.
+        const mesh = load_mesh(
+            this.props.mesh,
+            this.props.bounds,
+            this.props.meshMaxError,
+            this.props.meshValueRange,
+            this.props.enableSmoothShading
         );
 
-        // Note: mesh contains triangles. No normals they must be added.
-        if (this.props.enableSmoothShading) {
-            mesh = mesh.then(add_normals);
-        }
+        const texture = load(this.props.propertyTexture, ImageLoader, {});
 
+        this.setState({
+            mesh,
+            texture,
+        });
+    }
+
+    updateState({
+        props,
+        oldProps,
+    }: {
+        props: Map3DLayerProps<unknown>;
+        oldProps: Map3DLayerProps<unknown>;
+    }): void {
+        const needs_reload =
+            !isEqual(props.mesh, oldProps.mesh) ||
+            !isEqual(props.bounds, oldProps.bounds) ||
+            !isEqual(props.meshMaxError, oldProps.meshMaxError) ||
+            !isEqual(props.meshValueRange, oldProps.meshValueRange) ||
+            !isEqual(props.enableSmoothShading, oldProps.enableSmoothShading) ||
+            !isEqual(props.propertyTexture, oldProps.propertyTexture);
+
+        if (needs_reload) {
+            // Reload mesh and texture.
+            this.initializeState();
+        }
+    }
+
+    renderLayers(): [TerrainMapLayer] {
         const rotatingModelMatrix = getModelMatrix(
             this.props.rotDeg,
             this.props.bounds[0] as number, // Rotate around upper left corner of bounds
@@ -194,8 +242,8 @@ export default class Map3DLayer extends CompositeLayer<
                 TerrainMapLayerData,
                 TerrainMapLayerProps<TerrainMapLayerData>
             >({
-                mesh,
-                texture: load(this.props.propertyTexture, ImageLoader, {}),
+                mesh: this.state.mesh,
+                texture: this.state.texture,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,

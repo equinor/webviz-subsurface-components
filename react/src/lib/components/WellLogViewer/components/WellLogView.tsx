@@ -6,7 +6,7 @@ import {
     ScaleInterpolator,
 } from "@equinor/videx-wellog";
 
-import { Track, GraphTrack } from "@equinor/videx-wellog";
+import { Track, GraphTrack, StackedTrack } from "@equinor/videx-wellog";
 import { Plot } from "@equinor/videx-wellog";
 
 import {
@@ -17,6 +17,20 @@ import {
 } from "@equinor/videx-wellog/dist/ui/interfaces";
 
 import "!vue-style-loader!css-loader!sass-loader!./styles.scss";
+
+import Ajv from "ajv";
+import { ValidateFunction } from "ajv/dist/types/index";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const inputSchema = require("../../../inputSchema/WellLogTemplate.json");
+const ajv = new Ajv();
+let schemaError = "";
+let validate: ValidateFunction<unknown> | null = null;
+try {
+    validate = ajv.compile(inputSchema);
+} catch (e) {
+    schemaError = "Wrong JSON schema for WellLogTemplate. " + String(e);
+    console.error(schemaError);
+}
 
 import { select } from "d3";
 
@@ -34,6 +48,7 @@ import { isScaleTrack } from "../utils/tracks";
 import {
     addOrEditGraphTrack,
     addOrEditGraphTrackPlot,
+    addOrEditStackedTrack,
     removeGraphTrackPlot,
 } from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
@@ -612,7 +627,8 @@ interface Props {
 interface State {
     infos: Info[];
 
-    scrollTrackPos: number; // the first visible graph track number
+    scrollTrackPos: number; // the first visible non-scale track number
+    errorText?: string;
 }
 
 class WellLogView extends Component<Props, State> implements WellLogController {
@@ -659,6 +675,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
         this.setTracks();
     }
+
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
         if (this.props.horizontal !== nextProps.horizontal) return true;
         if (this.props.hideTitles !== nextProps.hideTitles) return true;
@@ -674,6 +691,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.maxVisibleTrackNum !== nextProps.maxVisibleTrackNum)
             return true;
         if (this.state.scrollTrackPos !== nextState.scrollTrackPos) return true;
+        if (this.state.errorText !== nextState.errorText) return true;
 
         if (this.props.maxContentZoom !== nextProps.maxContentZoom) return true;
 
@@ -786,8 +804,22 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         };
     }
 
-    setTracks(): void {
+    setTracks(checkSchema?: boolean): void {
         this.selCurrent = this.selPinned = undefined; // clear old selection (primary scale could be changed)
+
+        if (checkSchema) {
+            //check against the json schema
+            let errorText = "";
+            if (!validate) errorText = schemaError;
+            else if (!validate(this.template))
+                errorText =
+                    validate.errors && validate.errors[0]
+                        ? validate.errors[0].dataPath +
+                          ": " +
+                          validate.errors[0].message
+                        : "JSON schema validation failed";
+            this.setState({ errorText: errorText });
+        }
 
         if (this.logController) {
             const axes = this.getAxesInfo();
@@ -843,7 +875,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     onContentSelection(): void {
         this.showSelection();
-
         if (this.props.onContentSelection) this.props.onContentSelection();
     }
 
@@ -992,7 +1023,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         const t = JSON.stringify(this.template);
         if (t !== tNew) {
             this.template = JSON.parse(tNew); // save external template content to current
-            this.setTracks();
+            this.setTracks(true);
             /* not sure */ this.onTemplateChanged();
         }
     }
@@ -1022,13 +1053,29 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     _addTrack(trackCurrent: Track, templateTrack: TemplateTrack): void {
         templateTrack.required = true; // user's tracks could be empty
         const bAfter = true;
-        const trackNew = addOrEditGraphTrack(
-            this,
-            null,
-            templateTrack,
-            trackCurrent,
-            bAfter
-        );
+
+        let trackNew: Track;
+        if (
+            templateTrack.plots &&
+            templateTrack.plots[0] &&
+            templateTrack.plots[0].type === "stacked"
+        ) {
+            trackNew = addOrEditStackedTrack(
+                this,
+                null,
+                templateTrack,
+                trackCurrent,
+                bAfter
+            );
+        } else {
+            trackNew = addOrEditGraphTrack(
+                this,
+                null,
+                templateTrack,
+                trackCurrent,
+                bAfter
+            );
+        }
         this.onTemplateChanged();
 
         if (bAfter)
@@ -1042,13 +1089,23 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     }
 
     _editTrack(track: Track, templateTrack: TemplateTrack): void {
-        addOrEditGraphTrack(
-            this,
-            track as GraphTrack,
-            templateTrack,
-            track,
-            false
-        );
+        if (templateTrack.plots && templateTrack.plots[0].type === "stacked") {
+            addOrEditStackedTrack(
+                this,
+                track as StackedTrack,
+                templateTrack,
+                track,
+                false
+            );
+        } else {
+            addOrEditGraphTrack(
+                this,
+                track as GraphTrack,
+                templateTrack,
+                track,
+                false
+            );
+        }
         this.onTemplateChanged();
     }
 
@@ -1153,13 +1210,28 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     render(): ReactNode {
         return (
-            <div style={{ width: "100%", height: "100%" }}>
+            <div
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
                 <div
+                    style={{ flex: "1, 1" }}
                     className="welllogview"
                     ref={(el) => {
                         this.container = el as HTMLElement;
                     }}
                 />
+                {this.state.errorText ? (
+                    <div style={{ flex: "0, 0" }} className="welllogview-error">
+                        {this.state.errorText}
+                    </div>
+                ) : (
+                    <></>
+                )}
             </div>
         );
     }
