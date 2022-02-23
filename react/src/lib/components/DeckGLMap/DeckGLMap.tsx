@@ -141,8 +141,7 @@ const arrayOfLength_propTypes = (
 ) => {
     if (
         !Array.isArray(props[propName]) ||
-        props[propName].length != expectedLength ||
-        !props[propName].every(Number.isInteger)
+        props[propName].length != expectedLength
     ) {
         return new Error(
             `Prop ${propName} supplied to ${componentName} should be an array of length ${expectedLength}. Validation failed.`
