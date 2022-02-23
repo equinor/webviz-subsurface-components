@@ -92,7 +92,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     max={legendProps.valueRange[1]}
                     dataObjectName={legendProps.title}
                     position={position}
-                    name={legendProps.name}
                     colorName={legendProps.colorName}
                     colorTables={colorTables}
                     horizontal={horizontal}
@@ -105,7 +104,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
 ColorLegend.defaultProps = {
     visible: true,
     position: [5, 10],
-    horizontal: true,
+    horizontal: false,
 };
 
 export default ColorLegend;
