@@ -21,7 +21,7 @@
         5,
         10
       ],
-      "horizontal": true
+      "horizontal": false
     },
     "coordinateUnit": "m",
     "resources": {
