@@ -11,7 +11,7 @@ const max = 0.35;
 const dataObjectName = "Wells / PORO";
 const position = [16, 10];
 const name = "PORO";
-const horizontal = true;
+const horizontal = false;
 const colorName = "Rainbow";
 
 const Template = (args) => {
