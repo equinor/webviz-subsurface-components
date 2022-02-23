@@ -44,18 +44,18 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         visible: true,
         // Url to png image for height field.
-        mesh: { type: "string", optional: false },
+        mesh: "",
         // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
         meshMaxError: { type: "number", value: 5 },
         // Url to png image for map properties. (ex, poro or perm values as a texture)
-        propertyTexture: { type: "string", optional: false },
+        propertyTexture: "",
         // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
         bounds: { type: "array", value: null, false: true, compare: true },
         colorMapRange: { type: "array" },
         rotDeg: 0,
         contours: [-1.0, -1.0],
         // readout is default property value but if set to true it will be depth/z-value.
-        isReadoutDepth: false,
+        isReadoutDepth: true,
         enableSmoothShading: true,
     },
     Map3DLayer: {
