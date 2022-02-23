@@ -1,5 +1,4 @@
 import React from "react";
-import cloneDeep from "lodash/cloneDeep";
 import { Button, Icon } from "@equinor/eds-core-react";
 import { Grid, Paper } from "@material-ui/core";
 import { clear, save, sync } from "@equinor/eds-icons";
@@ -14,11 +13,7 @@ import { areVariableVectorMapsEqual } from "../utils/VectorCalculatorHelperFunct
 
 import { StoreActions, useStore, ExpressionStatus } from "./ExpressionsStore";
 
-import {
-    ExpressionType,
-    VariableVectorMapType,
-} from "../utils/VectorCalculatorTypes";
-import { getExpressionParseData } from "../utils/ExpressionParser";
+import { ExpressionType } from "../utils/VectorCalculatorTypes";
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
@@ -31,82 +26,14 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     props: ExpressionInputComponent
 ) => {
     const store = useStore();
-    const [activeExpression, setActiveExpression] =
-        React.useState<ExpressionType>(store.state.activeExpression);
-
     const [disabled, setDisabled] = React.useState<boolean>(
         store.state.activeExpression.id === ""
     );
-    const [expressionStatus, setExpressionStatus] =
-        React.useState<ExpressionStatus>(ExpressionStatus.Invalid);
     const [isExpressionEdited, setIsExpressionEdited] = React.useState<boolean>(
         store.state.activeExpression !== store.state.editableExpression
     );
 
-    const [editableExpression, setEditableExpression] =
-        React.useState<ExpressionType>(store.state.editableExpression);
-    const [cachedVariableVectorMap, setCachedVariableVectorMap] =
-        React.useState<VariableVectorMapType[]>([]);
-
     Icon.add({ clear, save, sync });
-
-    const getVariableVectorMapFromVariables = React.useCallback(
-        (variables: string[]): VariableVectorMapType[] => {
-            const map: VariableVectorMapType[] = [];
-            for (const variable of variables) {
-                const cachedElm = cachedVariableVectorMap.find(
-                    (elm) => elm.variableName === variable
-                );
-                if (!cachedElm) {
-                    map.push({ variableName: variable, vectorName: [] });
-                } else {
-                    map.push(cachedElm);
-                }
-            }
-            return map;
-        },
-        [cachedVariableVectorMap]
-    );
-
-    const makeVariableVectorMapFromExpression = React.useCallback(
-        (expression: ExpressionType): VariableVectorMapType[] => {
-            if (expression.expression.length === 0) {
-                return [];
-            }
-
-            const parseData = getExpressionParseData(expression.expression);
-            if (!parseData.isValid) {
-                return cloneDeep(editableExpression.variableVectorMap);
-            }
-            return getVariableVectorMapFromVariables(parseData.variables);
-        },
-        [
-            editableExpression,
-            getExpressionParseData,
-            getVariableVectorMapFromVariables,
-        ]
-    );
-
-    const getUpdatedCachedVariableVectorMap = React.useCallback(
-        (newMap: VariableVectorMapType[]): VariableVectorMapType[] => {
-            const newCachedVariableVectorMap = cloneDeep(
-                cachedVariableVectorMap
-            );
-            for (const elm of newMap) {
-                const cachedElm = newCachedVariableVectorMap.find(
-                    (cachedElm) => cachedElm.variableName === elm.variableName
-                );
-                if (!cachedElm) {
-                    newCachedVariableVectorMap.push(elm);
-                } else {
-                    cachedElm.vectorName = elm.vectorName;
-                    newCachedVariableVectorMap.push(cachedElm);
-                }
-            }
-            return newCachedVariableVectorMap;
-        },
-        [cachedVariableVectorMap]
-    );
 
     const areExpressionsEqual = React.useCallback(
         (first: ExpressionType, second: ExpressionType): boolean => {
@@ -115,12 +42,17 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             const areExpressionsEqual = first.expression === second.expression;
             const areDescriptionsEqual =
                 first.description === second.description;
+            const areIsValidsEqual = first.isValid === second.isValid;
+            const areIsDeletableEqual =
+                first.isDeletable === second.isDeletable;
 
             return (
                 areIdsEqual &&
                 areNamesEqual &&
                 areExpressionsEqual &&
                 areDescriptionsEqual &&
+                areIsValidsEqual &&
+                areIsDeletableEqual &&
                 areVariableVectorMapsEqual(
                     first.variableVectorMap,
                     second.variableVectorMap
@@ -131,12 +63,6 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     );
 
     React.useEffect(() => {
-        if (activeExpression !== store.state.activeExpression) {
-            setActiveExpression(store.state.activeExpression);
-        }
-        if (editableExpression !== store.state.editableExpression) {
-            setEditableExpression(store.state.editableExpression);
-        }
         if (disabled !== (store.state.activeExpression.id === "")) {
             setDisabled(store.state.activeExpression.id === "");
         }
@@ -200,7 +126,8 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                     vectorData={props.vectors}
                     disabled={
                         disabled ||
-                        expressionStatus === ExpressionStatus.Evaluating
+                        store.state.editableExpressionStatus ===
+                            ExpressionStatus.Evaluating
                     }
                 />
             </Grid>

@@ -49,9 +49,6 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
         (name: string): ExpressionNameTextFieldStyleData => {
             const initialName = store.state.activeExpression.name;
 
-            if (disabled) {
-                return { variant: "default", icon: [], helperText: "" };
-            }
             if (!isValidExpressionNameString(name)) {
                 return {
                     variant: "error",
@@ -124,6 +121,20 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     );
 
     React.useEffect(() => {
+        if (disabled) {
+            setTextFieldStyleDataState({
+                variant: "default",
+                icon: [],
+                helperText: "",
+            });
+        } else {
+            setTextFieldStyleDataState(
+                getTextFieldStyleData(store.state.editableExpression.name)
+            );
+        }
+    }, [disabled]);
+
+    React.useEffect(() => {
         if (name !== store.state.editableExpression.name) {
             setName(store.state.editableExpression.name);
             setTextFieldStyleDataState(
@@ -131,9 +142,9 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             );
             store.dispatch({
                 type: StoreActions.SetName,
-                payload: { 
-                    name: store.state.editableExpression.name, 
-                    status: isValidName(store.state.editableExpression.name) 
+                payload: {
+                    name: store.state.editableExpression.name,
+                    status: isValidName(store.state.editableExpression.name),
                 },
             });
         }

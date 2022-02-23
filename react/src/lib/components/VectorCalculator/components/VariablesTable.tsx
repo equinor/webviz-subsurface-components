@@ -12,20 +12,20 @@ import cloneDeep from "lodash/cloneDeep";
 
 import { ExpressionStatus, StoreActions, useStore } from "./ExpressionsStore";
 import { VariableVectorMapType } from "../utils/VectorCalculatorTypes";
-import { isVariableVectorMapValid } from "../utils/VectorCalculatorHelperFunctions";
+import {
+    createVariableVectorMapFromVariables,
+    isVariableVectorMapValid,
+} from "../utils/VectorCalculatorHelperFunctions";
 import VectorSelector from "../../VectorSelector";
 
 import { getExpressionParseData } from "../utils/ExpressionParser";
 import { areVariableVectorMapsEqual } from "../utils/VectorCalculatorHelperFunctions";
 
-
 import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface VariablesTableProps {
-    // variableVectorMap: VariableVectorMapType[];
     vectorData: TreeDataNode[];
     disabled?: boolean;
-    // onMapChange: (variableVectorMap: VariableVectorMapType[]) => void;
 }
 
 type VectorSelectorParentProps = {
@@ -43,26 +43,11 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
         VariableVectorMapType[]
     >(store.state.editableExpression.variableVectorMap);
     const [cachedVariableVectorMap, setCachedVariableVectorMap] =
-        React.useState<VariableVectorMapType[]>(store.state.editableExpression.variableVectorMap);
+        React.useState<VariableVectorMapType[]>(
+            store.state.editableExpression.variableVectorMap
+        );
     const disabled = props.disabled || false;
 
-    const getVariableVectorMapFromVariables = React.useCallback(
-        (variables: string[]): VariableVectorMapType[] => {
-            const map: VariableVectorMapType[] = [];
-            for (const variable of variables) {
-                const cachedElm = cachedVariableVectorMap.find(
-                    (elm) => elm.variableName === variable
-                );
-                if (!cachedElm) {
-                    map.push({ variableName: variable, vectorName: [] });
-                } else {
-                    map.push(cachedElm);
-                }
-            }
-            return map;
-        },
-        [cachedVariableVectorMap]
-    );
     const makeVariableVectorMapFromExpression = React.useCallback(
         (expression: string): VariableVectorMapType[] => {
             if (expression.length === 0) {
@@ -73,12 +58,16 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
             if (!parseData.isValid) {
                 return cloneDeep(variableVectorMap);
             }
-            return getVariableVectorMapFromVariables(parseData.variables);
+            return createVariableVectorMapFromVariables(
+                parseData.variables,
+                cachedVariableVectorMap
+            );
         },
         [
             variableVectorMap,
+            cachedVariableVectorMap,
             getExpressionParseData,
-            getVariableVectorMapFromVariables,
+            createVariableVectorMapFromVariables,
         ]
     );
 
@@ -86,14 +75,18 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
         const newVariableVectorMap = cloneDeep(
             store.state.activeExpression.variableVectorMap
         );
-        if(!areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)) {
+        if (
+            !areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)
+        ) {
             setVariableVectorMap(newVariableVectorMap);
             setCachedVariableVectorMap(newVariableVectorMap);
         }
     }, [store.state.activeExpression.variableVectorMap]);
 
     const updatedCachedVariableVectorMap = React.useCallback(
-        (variableVectorMap: VariableVectorMapType[]): VariableVectorMapType[] => {
+        (
+            variableVectorMap: VariableVectorMapType[]
+        ): VariableVectorMapType[] => {
             const newCachedVariableVectorMap = cloneDeep(
                 cachedVariableVectorMap
             );
@@ -105,7 +98,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
                 if (!cachedElm) {
                     newCachedVariableVectorMap.push(elm);
                 } else {
-                    // Update cachedElm reference 
+                    // Update cachedElm reference
                     cachedElm.vectorName = elm.vectorName;
                 }
             }
@@ -118,15 +111,22 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
         const newVariableVectorMap = cloneDeep(
             store.state.editableExpression.variableVectorMap
         );
-        
+
         // Update map when expression string is reset
-        if(areVariableVectorMapsEqual(store.state.activeExpression.variableVectorMap, newVariableVectorMap)){
+        if (
+            areVariableVectorMapsEqual(
+                store.state.activeExpression.variableVectorMap,
+                newVariableVectorMap
+            )
+        ) {
             setVariableVectorMap(newVariableVectorMap);
             return;
         }
 
         // Update cache during editing
-        if(!areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)) {
+        if (
+            !areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)
+        ) {
             setVariableVectorMap(newVariableVectorMap);
             setCachedVariableVectorMap(
                 updatedCachedVariableVectorMap(newVariableVectorMap)

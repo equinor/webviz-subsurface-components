@@ -11,6 +11,11 @@ import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
 import { ExpressionInputComponent } from "./ExpressionInputComponent";
 import { TreeDataNode } from "@webviz/core-components";
 
+import {
+    createVariableVectorMapFromVariables,
+    isVariableVectorMapValid,
+} from "../utils/VectorCalculatorHelperFunctions";
+
 import { ExpressionStatus, StoreActions, useStore } from "./ExpressionsStore";
 
 interface ParentProps {
@@ -60,11 +65,24 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
         });
         // TODO: Update variable vector map with variables from parsing when valid!
         if (status === ExpressionStatus.Valid) {
-            // TODO: Update variable vector map
-            // store.dispatch({
-            //     type: StoreActions.SetVariableVectorMap,
-            //     payload: {variableVectorMap:props.externalParseData.}
-            // })
+            // Create map with editable expression map
+            const newVariableVectorMap = createVariableVectorMapFromVariables(
+                props.externalParseData.variables,
+                store.state.editableExpression.variableVectorMap
+            );
+            const newStatus = isVariableVectorMapValid(
+                newVariableVectorMap,
+                ":",
+                props.vectors
+            );
+            // TODO: Ensure external parsing map logic is working
+            store.dispatch({
+                type: StoreActions.SetVariableVectorMap,
+                payload: {
+                    variableVectorMap: newVariableVectorMap,
+                    status: newStatus,
+                },
+            });
         }
     }, [props.externalParseData]);
 

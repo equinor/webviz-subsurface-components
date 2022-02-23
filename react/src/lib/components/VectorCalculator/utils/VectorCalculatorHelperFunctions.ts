@@ -233,3 +233,21 @@ export const isVectorNameValid = (
 
     return metaNodes !== null;
 };
+
+export const createVariableVectorMapFromVariables = (
+    variables: string[],
+    variableVectorMap: VariableVectorMapType[]
+): VariableVectorMapType[] => {
+    const map: VariableVectorMapType[] = [];
+    for (const variable of variables) {
+        const mapElm = variableVectorMap.find(
+            (elm) => elm.variableName === variable
+        );
+        if (!mapElm) {
+            map.push({ variableName: variable, vectorName: [] });
+        } else {
+            map.push(mapElm);
+        }
+    }
+    return map;
+};
