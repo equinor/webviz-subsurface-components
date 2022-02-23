@@ -513,7 +513,7 @@ function interpolateDataOnTrajectory(
 }
 
 function getMd(coord: Position, feature: Feature): number | null {
-    if (!feature.properties || !feature.geometry) return null;
+    if (!feature.properties?.["md"]?.[0] || !feature.geometry) return null;
 
     const measured_depths = feature.properties["md"][0] as number[];
     const trajectory3D = getWellCoordinates(feature);
