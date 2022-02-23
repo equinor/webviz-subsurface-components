@@ -64,6 +64,36 @@ export const ExpressionInputTextField: React.FC<
         setTextFieldStyleDataState(getTextFieldStyleData());
     }, [status]);
 
+    const dispatchParseActions = React.useCallback(
+        (expression: string): void => {
+            if (store.state.externalParsing) {
+                store.dispatch({
+                    type: StoreActions.SetEditableExpressionStatus,
+                    payload: { status: ExpressionStatus.Evaluating },
+                });
+                store.dispatch({
+                    type: StoreActions.SetParseMessage,
+                    payload: { message: "" },
+                });
+            } else {
+                const parseData = getExpressionParseData(expression);
+                store.dispatch({
+                    type: StoreActions.SetEditableExpressionStatus,
+                    payload: {
+                        status: parseData.isValid
+                            ? ExpressionStatus.Valid
+                            : ExpressionStatus.Invalid,
+                    },
+                });
+                store.dispatch({
+                    type: StoreActions.SetParseMessage,
+                    payload: { message: parseData.parsingMessage },
+                });
+            }
+        },
+        [store.state.externalParsing, getExpressionParseData]
+    );
+
     React.useEffect(() => {
         if (status !== store.state.editableExpressionStatus) {
             setStatus(store.state.editableExpressionStatus);
@@ -71,34 +101,13 @@ export const ExpressionInputTextField: React.FC<
         if (helperText !== store.state.parseMessage) {
             setHelperText(store.state.parseMessage);
         }
-    }, [store.state.editableExpressionStatus, store.state.parseMessage]);
 
-    const dispatchParseActions = React.useCallback((expression:string):void=>{
-        if (store.state.externalParsing) {
-            store.dispatch({
-                type: StoreActions.SetEditableExpressionStatus,
-                payload: { status: ExpressionStatus.Evaluating },
-            });
-            store.dispatch({
-                type: StoreActions.SetParseMessage,
-                payload: { message: "" },
-            });
-        } else {
-            const parseData = getExpressionParseData(expression);
-            store.dispatch({
-                type: StoreActions.SetEditableExpressionStatus,
-                payload: {
-                    status: parseData.isValid
-                        ? ExpressionStatus.Valid
-                        : ExpressionStatus.Invalid,
-                },
-            });
-            store.dispatch({
-                type: StoreActions.SetParseMessage,
-                payload: { message: parseData.parsingMessage },
-            });
+        if (
+            store.state.editableExpressionStatus === ExpressionStatus.Evaluating
+        ) {
+            dispatchParseActions(store.state.editableExpression);
         }
-    }, [store.state.externalParsing, getExpressionParseData]);
+    }, [store.state.editableExpressionStatus, store.state.parseMessage]);
 
     React.useEffect(() => {
         dispatchParseActions(store.state.activeExpression.expression);
@@ -124,7 +133,7 @@ export const ExpressionInputTextField: React.FC<
                 label="Expression"
                 placeholder="New expression"
                 onChange={handleInputChange}
-                value={store.state.editableExpression.expression}
+                value={store.state.editableExpression}
                 disabled={disabled}
                 variant={textFieldStyleDataState.variant}
                 inputIcon={textFieldStyleDataState.icon}

@@ -29,9 +29,8 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     const [disabled, setDisabled] = React.useState<boolean>(
         store.state.activeExpression.id === ""
     );
-    const [isExpressionEdited, setIsExpressionEdited] = React.useState<boolean>(
-        store.state.activeExpression !== store.state.editableExpression
-    );
+    const [isExpressionEdited, setIsExpressionEdited] =
+        React.useState<boolean>(false);
 
     Icon.add({ clear, save, sync });
 
@@ -66,20 +65,29 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         if (disabled !== (store.state.activeExpression.id === "")) {
             setDisabled(store.state.activeExpression.id === "");
         }
-        setIsExpressionEdited(
-            !areExpressionsEqual(
-                store.state.activeExpression,
-                store.state.editableExpression
-            )
-        );
+
+        const areEqual =
+            store.state.activeExpression.name === store.state.editableName &&
+            store.state.activeExpression.expression ===
+                store.state.editableExpression &&
+            store.state.activeExpression.description ===
+                store.state.editableDescription &&
+            areVariableVectorMapsEqual(
+                store.state.activeExpression.variableVectorMap,
+                store.state.editableVariableVectorMap
+            );
+        setIsExpressionEdited(!areEqual);
     }, [
         store.state.activeExpression,
         store.state.editableExpression,
+        store.state.editableName,
+        store.state.editableDescription,
+        store.state.editableVariableVectorMap,
         areExpressionsEqual,
     ]);
 
     const handleSaveClick = React.useCallback((): void => {
-        if (!store.state.editableExpression.isValid) {
+        if (!store.state.editableDataIsValid) {
             return;
         }
 
@@ -87,7 +95,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             type: StoreActions.SaveEditableExpression,
             payload: {},
         });
-    }, [store.state.editableExpression.isValid]);
+    }, [store.state.editableDataIsValid]);
 
     const handleCancelClick = React.useCallback((): void => {
         store.dispatch({
@@ -147,7 +155,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                         onClick={handleSaveClick}
                         disabled={
                             disabled ||
-                            !store.state.editableExpression.isValid ||
+                            !store.state.editableDataIsValid ||
                             !isExpressionEdited
                         }
                     >

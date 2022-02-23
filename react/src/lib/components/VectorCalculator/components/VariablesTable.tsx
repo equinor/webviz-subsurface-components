@@ -19,7 +19,6 @@ import {
 import VectorSelector from "../../VectorSelector";
 
 import { getExpressionParseData } from "../utils/ExpressionParser";
-import { areVariableVectorMapsEqual } from "../utils/VectorCalculatorHelperFunctions";
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
@@ -41,11 +40,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
     const store = useStore();
     const [variableVectorMap, setVariableVectorMap] = React.useState<
         VariableVectorMapType[]
-    >(store.state.editableExpression.variableVectorMap);
-    const [cachedVariableVectorMap, setCachedVariableVectorMap] =
-        React.useState<VariableVectorMapType[]>(
-            store.state.editableExpression.variableVectorMap
-        );
+    >(store.state.editableVariableVectorMap);
     const disabled = props.disabled || false;
 
     const makeVariableVectorMapFromExpression = React.useCallback(
@@ -60,79 +55,20 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
             }
             return createVariableVectorMapFromVariables(
                 parseData.variables,
-                cachedVariableVectorMap
+                store.state.cachedVariableVectorMap
             );
         },
         [
             variableVectorMap,
-            cachedVariableVectorMap,
+            store.state.cachedVariableVectorMap,
             getExpressionParseData,
             createVariableVectorMapFromVariables,
         ]
     );
 
     React.useEffect(() => {
-        const newVariableVectorMap = cloneDeep(
-            store.state.activeExpression.variableVectorMap
-        );
-        if (
-            !areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)
-        ) {
-            setVariableVectorMap(newVariableVectorMap);
-            setCachedVariableVectorMap(newVariableVectorMap);
-        }
-    }, [store.state.activeExpression.variableVectorMap]);
-
-    const updatedCachedVariableVectorMap = React.useCallback(
-        (
-            variableVectorMap: VariableVectorMapType[]
-        ): VariableVectorMapType[] => {
-            const newCachedVariableVectorMap = cloneDeep(
-                cachedVariableVectorMap
-            );
-            for (const elm of variableVectorMap) {
-                // Find cachedElm reference object
-                let cachedElm = newCachedVariableVectorMap.find(
-                    (cachedElm) => cachedElm.variableName === elm.variableName
-                );
-                if (!cachedElm) {
-                    newCachedVariableVectorMap.push(elm);
-                } else {
-                    // Update cachedElm reference
-                    cachedElm.vectorName = elm.vectorName;
-                }
-            }
-            return newCachedVariableVectorMap;
-        },
-        [cachedVariableVectorMap]
-    );
-
-    React.useEffect(() => {
-        const newVariableVectorMap = cloneDeep(
-            store.state.editableExpression.variableVectorMap
-        );
-
-        // Update map when expression string is reset
-        if (
-            areVariableVectorMapsEqual(
-                store.state.activeExpression.variableVectorMap,
-                newVariableVectorMap
-            )
-        ) {
-            setVariableVectorMap(newVariableVectorMap);
-            return;
-        }
-
-        // Update cache during editing
-        if (
-            !areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)
-        ) {
-            setVariableVectorMap(newVariableVectorMap);
-            setCachedVariableVectorMap(
-                updatedCachedVariableVectorMap(newVariableVectorMap)
-            );
-        }
-    }, [store.state.editableExpression.variableVectorMap]);
+        setVariableVectorMap(store.state.editableVariableVectorMap);
+    }, [store.state.editableVariableVectorMap]);
 
     React.useEffect(() => {
         if (store.state.externalParsing) {
@@ -143,7 +79,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
         }
 
         const newVariableVectorMap = makeVariableVectorMapFromExpression(
-            store.state.editableExpression.expression
+            store.state.editableExpression
         );
         const mapStatus = isVariableVectorMapValid(
             newVariableVectorMap,
@@ -157,10 +93,7 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
                 status: mapStatus,
             },
         });
-    }, [
-        store.state.editableExpression.expression,
-        store.state.editableExpressionStatus,
-    ]);
+    }, [store.state.editableExpression, store.state.editableExpressionStatus]);
 
     const updateProps = React.useCallback(
         (

@@ -16,7 +16,12 @@ import {
     isVariableVectorMapValid,
 } from "../utils/VectorCalculatorHelperFunctions";
 
-import { ExpressionStatus, StoreActions, useStore } from "./ExpressionsStore";
+import {
+    ExpressionStatus,
+    createExpressionTypeFromEditableData,
+    StoreActions,
+    useStore,
+} from "./ExpressionsStore";
 
 interface ParentProps {
     expressions?: ExpressionType[];
@@ -40,11 +45,11 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
     React.useEffect(() => {
-        /// Ensure external parsing for editable expression
+        /// Ensure external parsing for active expression
         if (
             !props.externalParseData ||
-            store.state.externalParsing ||
-            props.externalParseData.id !== store.state.editableExpression.id
+            !store.state.externalParsing ||
+            props.externalParseData.id !== store.state.activeExpression.id
         ) {
             return;
         }
@@ -63,19 +68,18 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
             type: StoreActions.SetParseMessage,
             payload: { message: props.externalParseData.message },
         });
-        // TODO: Update variable vector map with variables from parsing when valid!
+
         if (status === ExpressionStatus.Valid) {
-            // Create map with editable expression map
+            // Create map with cached map
             const newVariableVectorMap = createVariableVectorMapFromVariables(
                 props.externalParseData.variables,
-                store.state.editableExpression.variableVectorMap
+                store.state.cachedVariableVectorMap
             );
             const newStatus = isVariableVectorMapValid(
                 newVariableVectorMap,
                 ":",
                 props.vectors
             );
-            // TODO: Ensure external parsing map logic is working
             store.dispatch({
                 type: StoreActions.SetVariableVectorMap,
                 payload: {
@@ -100,11 +104,15 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
 
     React.useEffect(() => {
         if (store.state.externalParsing) {
+            // Build expression:
+            const externalParsingExpression =
+                createExpressionTypeFromEditableData(store.state);
+
             props.setProps({
-                externalParseExpression: store.state.editableExpression,
+                externalParseExpression: externalParsingExpression,
             });
         }
-    }, [store.state.editableExpression.expression]);
+    }, [store.state.editableExpression]);
 
     const handleOpenClick = React.useCallback(() => {
         console.log("Open pushed!");

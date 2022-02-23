@@ -35,7 +35,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
 ) => {
     const { vectors, disabled } = props;
     const store = useStore();
-    const [name, setName] = React.useState(store.state.editableExpression.name);
+    const [name, setName] = React.useState(store.state.editableName);
     const [textFieldStyleDataState, setTextFieldStyleDataState] =
         React.useState<ExpressionNameTextFieldStyleData>({
             variant: "success",
@@ -129,26 +129,26 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             });
         } else {
             setTextFieldStyleDataState(
-                getTextFieldStyleData(store.state.editableExpression.name)
+                getTextFieldStyleData(store.state.editableName)
             );
         }
     }, [disabled]);
 
     React.useEffect(() => {
-        if (name !== store.state.editableExpression.name) {
-            setName(store.state.editableExpression.name);
+        if (name !== store.state.editableName) {
+            setName(store.state.editableName);
             setTextFieldStyleDataState(
-                getTextFieldStyleData(store.state.editableExpression.name)
+                getTextFieldStyleData(store.state.editableName)
             );
             store.dispatch({
                 type: StoreActions.SetName,
                 payload: {
-                    name: store.state.editableExpression.name,
-                    status: isValidName(store.state.editableExpression.name),
+                    name: store.state.editableName,
+                    status: isValidName(store.state.editableName),
                 },
             });
         }
-    }, [store.state.editableExpression.name, getTextFieldStyleData]);
+    }, [store.state.editableName, getTextFieldStyleData]);
 
     const handleInputChange = React.useCallback(
         (
@@ -170,7 +170,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 label="Name"
                 placeholder="New name"
                 onChange={handleInputChange}
-                value={store.state.editableExpression.name}
+                value={store.state.editableName}
                 variant={textFieldStyleDataState.variant}
                 inputIcon={textFieldStyleDataState.icon}
                 helperText={textFieldStyleDataState.helperText}

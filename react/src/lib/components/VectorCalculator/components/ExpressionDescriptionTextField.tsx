@@ -15,19 +15,6 @@ export const ExpressionDescriptionTextField: React.FC<
     ExpressionDescriptionTextFieldProps
 > = (props: ExpressionDescriptionTextFieldProps) => {
     const store = useStore();
-    // const [description, setDescription] = React.useState<string>(
-    //     store.state.editableExpression.description
-    //         ? store.state.editableExpression.description
-    //         : ""
-    // );
-
-    // React.useEffect(() => {
-    //     setDescription(
-    //         store.state.editableExpression.description
-    //             ? store.state.editableExpression.description
-    //             : ""
-    //     );
-    // }, [store.state.editableExpression.description]);
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
@@ -48,8 +35,8 @@ export const ExpressionDescriptionTextField: React.FC<
                 placeholder="Description (optional)"
                 onChange={handleInputChange}
                 value={
-                    store.state.editableExpression.description
-                        ? store.state.editableExpression.description
+                    store.state.editableDescription
+                        ? store.state.editableDescription
                         : ""
                 }
                 disabled={props.disabled}
