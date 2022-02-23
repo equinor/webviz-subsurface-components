@@ -134,15 +134,16 @@ DeckGLMap.defaultProps = {
 
 const arrayOfLength_propTypes = (
     expectedLength: number,
+    optional: boolean,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     props: { [key: string]: any },
     propName: string,
     componentName: string
 ) => {
+    if (optional && props[propName] == undefined) return null;
     if (
         !Array.isArray(props[propName]) ||
-        props[propName].length != expectedLength ||
-        !props[propName].every(Number.isInteger)
+        props[propName].length != expectedLength
     ) {
         return new Error(
             `Prop ${propName} supplied to ${componentName} should be an array of length ${expectedLength}. Validation failed.`
@@ -177,7 +178,7 @@ DeckGLMap.propTypes = {
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
-    bounds: arrayOfLength_propTypes.bind(null, 4),
+    bounds: arrayOfLength_propTypes.bind(null, 4, true),
 
     /**
      * Zoom level for the view.
