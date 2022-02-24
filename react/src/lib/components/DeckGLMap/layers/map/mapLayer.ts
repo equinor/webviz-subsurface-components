@@ -7,6 +7,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { getModelMatrix } from "../utils/layerTools";
 import { TerrainLoader } from "@loaders.gl/terrain";
+// XXX import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
@@ -16,9 +17,9 @@ import { DeckGLLayerContext } from "../../components/Map";
 import structuredClone from "@ungap/structured-clone";
 import { isEqual } from "lodash";
 
-const ELEVATION_DECODER = {
-    rScaler: -255 * 255, // minus signs -> easy way to invert z-axis.
-    gScaler: -255,
+const DECODER = {
+    rScaler: -256 * 256, // minus signs -> easy way to invert z-axis.
+    gScaler: -256,
     bScaler: -1,
     offset: 0,
 };
@@ -32,10 +33,11 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 
 type MeshType = {
     attributes: {
-        POSITION: { value: number[] };
-        normals: { value: Float32Array; size: number };
+        POSITION: { value: Float32Array; size: number };
+        TEXCOORD_0: { value: Float32Array; size: number };
+        normals?: { value: Float32Array; size: number };
     };
-    indices: { value: Uint32Array };
+    indices: { value: Uint32Array; size: number };
 };
 
 function add_normals(resolved_mesh: MeshType) {
@@ -69,7 +71,7 @@ function add_normals(resolved_mesh: MeshType) {
 
     //Calculate one normal pr triangle. And record the triangles each vertex' belongs to.
     const no_unique_vertexes = vertexs.length / 3;
-    const vertex_triangles = Array(no_unique_vertexes); // for each vertex a list of triangles it belogs to.
+    const vertex_triangles = Array(no_unique_vertexes); // for each vertex a list of triangles it belongs to.
     for (let i = 0; i < no_unique_vertexes; i++) {
         vertex_triangles[i] = new Set();
     }
@@ -229,29 +231,6 @@ function applyColorMap(
     return resolved_image;
 }
 
-async function load_mesh(
-    mesh_name: string,
-    bounds: [number, number, number, number],
-    meshMaxError: number,
-    enableSmoothShading: boolean
-) {
-    let mesh = await load(mesh_name, TerrainLoader, {
-        terrain: {
-            elevationDecoder: ELEVATION_DECODER,
-            bounds,
-            meshMaxError,
-            skirtHeight: 0.0,
-        },
-    });
-
-    // Note: mesh contains triangles. No normals they must be added.
-    if (enableSmoothShading) {
-        mesh = add_normals(mesh);
-    }
-
-    return mesh;
-}
-
 function load_texture(texture_name: string) {
     const imageData = fetch(texture_name)
         .then((response) => {
@@ -279,6 +258,65 @@ function load_texture(texture_name: string) {
         });
 
     return imageData;
+}
+
+async function load_mesh_and_texture(
+    mesh_name: string,
+    bounds: [number, number, number, number],
+    meshMaxError: number,
+    enableSmoothShading: boolean,
+    texture_name: string
+) {
+    const isMesh = mesh_name !== "";
+    const isTexture = texture_name !== "";
+
+    if (!isMesh && !isTexture) {
+        console.log("Error. One or both of texture and mesh must be given!");
+    }
+
+    let mesh: MeshType;
+    if (isMesh) {
+        mesh = await load(mesh_name, TerrainLoader, {
+            terrain: {
+                elevationDecoder: DECODER,
+                bounds,
+                meshMaxError,
+                skirtHeight: 0.0,
+            },
+            worker: false,
+        });
+
+        // Note: mesh contains triangles. No normals they must be added.
+        if (enableSmoothShading) {
+            mesh = add_normals(mesh);
+        }
+    } else {
+        // Mesh data is missing.
+        // Make a flat square size of bounds using two triangles.  z = 0.
+        const left = bounds[0];
+        const bottom = bounds[1];
+        const right = bounds[2];
+        const top = bounds[3];
+        const p0 = [left, bottom, 0.0];
+        const p1 = [left, top, 0.0];
+        const p2 = [right, top, 0.0];
+        const p3 = [right, bottom, 0.0];
+        const vertexes = [...p0, ...p1, ...p2, ...p3];
+        const texture_coord = [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0];
+
+        mesh = {
+            attributes: {
+                POSITION: { value: new Float32Array(vertexes), size: 3 },
+                TEXCOORD_0: { value: new Float32Array(texture_coord), size: 2 },
+            },
+            indices: { value: new Uint32Array([0, 1, 3, 1, 3, 2]), size: 1 },
+        };
+    }
+
+    const image_name = isTexture ? texture_name : mesh_name;
+    const texture = await load_texture(image_name); // load texture as ImageData structure.
+
+    return Promise.all([mesh, texture]);
 }
 
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
@@ -322,34 +360,30 @@ export default class MapLayer extends CompositeLayer<
 > {
     initializeState(): void {
         // Load mesh and texture and store in state.
-        const mesh = load_mesh(
+        const p = load_mesh_and_texture(
             this.props.mesh,
             this.props.bounds,
             this.props.meshMaxError,
-            this.props.enableSmoothShading
+            this.props.enableSmoothShading,
+            this.props.propertyTexture
         );
 
-        const texture = load_texture(this.props.propertyTexture);
-
-        // Apply colormap to the pixels to generate color texture.
-        const color_texture = texture.then((imageData) => {
+        p.then(([mesh, texture]) => {
+            // Apply colormap to the pixels to generate color texture.
             // Need to take a copy so not to destroy original data.
-            imageData = structuredClone(imageData);
-            imageData = applyColorMap(
-                imageData as ImageData,
+            let color_texture = structuredClone(texture); // XXX check if this is still neccessary.
+            color_texture = applyColorMap(
+                color_texture as ImageData,
                 this.props.colorMapRange,
                 this.props.colorMapName,
                 this.props.valueRange,
                 (this.context as DeckGLLayerContext).userData.colorTables
             );
 
-            return Promise.resolve(imageData);
-        });
-
-        this.setState({
-            mesh,
-            texture,
-            color_texture,
+            this.setState({
+                mesh,
+                color_texture,
+            });
         });
     }
 
@@ -380,6 +414,9 @@ export default class MapLayer extends CompositeLayer<
             this.props.bounds[3] as number
         );
 
+        const isMesh =
+            typeof this.props.mesh !== "undefined" && this.props.mesh !== "";
+
         const layer = new PrivateMeshLayer(
             this.getSubLayerProps<
                 PrivateMeshLayerData,
@@ -395,6 +432,7 @@ export default class MapLayer extends CompositeLayer<
                 colorMapName: this.props.colorMapName,
                 colorMapRange: this.props.colorMapRange,
                 isReadoutDepth: this.props.isReadoutDepth,
+                isContoursDepth: isMesh,
             })
         );
         return [layer];
