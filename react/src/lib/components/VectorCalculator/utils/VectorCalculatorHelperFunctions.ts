@@ -251,3 +251,13 @@ export const createVariableVectorMapFromVariables = (
     }
     return map;
 };
+
+export const getVariablesFromMap = (
+    variableVectorMap: VariableVectorMapType[]
+): string[] => {
+    let variables = [];
+    for (const elm of variableVectorMap) {
+        variables.push(elm.variableName);
+    }
+    return variables;
+};

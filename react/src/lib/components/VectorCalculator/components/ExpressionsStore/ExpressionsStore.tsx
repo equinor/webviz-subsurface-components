@@ -3,18 +3,22 @@ import React from "react";
 import { cloneDeep } from "lodash";
 
 import {
+    ExpressionParsingData,
     ExpressionType,
     VariableVectorMapType,
 } from "../../utils/VectorCalculatorTypes";
+
+import { getVariablesFromMap } from "../../utils/VectorCalculatorHelperFunctions";
 
 type ActionMap<
     M extends {
         [index: string]: {
             [key: string]:
                 | boolean
+                | number
                 | string
                 | string[]
-                | ExpressionStatus
+                | ExpressionParsingData
                 | ExpressionType
                 | ExpressionType[]
                 | VariableVectorMapType[];
@@ -44,11 +48,10 @@ export enum StoreActions {
     SaveEditableExpression = "SAVE_EDITABLE_EXPRESSION",
     ResetEditableExpression = "RESET_EDITABLE_EXPRESSION",
     SetExpression = "SET_EXPRESSION",
-    SetEditableExpressionStatus = "SET_EDITABLE_EXPRESSION_STATUS",
     SetName = "SET_NAME",
     SetDescription = "SET_DESCRIPTION",
     SetVariableVectorMap = "SET_VARIABLE_VECTOR_MAP",
-    SetParseMessage = "SET_PARSE_MESSAGE",
+    SetParsingData = "SET_PARSING_DATA",
 }
 
 type StoreState = {
@@ -56,21 +59,15 @@ type StoreState = {
     activeExpression: ExpressionType;
 
     editableExpression: string;
-    editableExpressionStatus: ExpressionStatus;
-
     editableName: string;
-    editableNameStatus: boolean;
-
     editableDescription?: string;
-
-    cachedVariableVectorMap: VariableVectorMapType[];
     editableVariableVectorMap: VariableVectorMapType[];
-    editableVariableVectorMapStatus: boolean;
 
-    editableDataIsValid: boolean;
+    parseData: ExpressionParsingData;
 
-    externalParsing: boolean;
-    parseMessage: string;
+    resetActionCounter: number;
+
+    externalParsing: boolean; // TODO: Drop having as store state? Pass as arg for components
 };
 
 type Payload = {
@@ -83,14 +80,10 @@ type Payload = {
     [StoreActions.SetActiveExpression]: {
         expression: ExpressionType;
     };
-    [StoreActions.SetEditableExpressionStatus]: {
-        status: ExpressionStatus;
-    };
     [StoreActions.SaveEditableExpression]: {};
     [StoreActions.ResetEditableExpression]: {};
     [StoreActions.SetName]: {
         name: string;
-        status: boolean;
     };
     [StoreActions.SetExpression]: {
         expression: string;
@@ -100,10 +93,9 @@ type Payload = {
     };
     [StoreActions.SetVariableVectorMap]: {
         variableVectorMap: VariableVectorMapType[];
-        status: boolean;
     };
-    [StoreActions.SetParseMessage]: {
-        message: string;
+    [StoreActions.SetParsingData]: {
+        data: ExpressionParsingData;
     };
 };
 
@@ -116,24 +108,6 @@ const initialEditableExpression: ExpressionType = {
     variableVectorMap: [],
     isValid: false,
     isDeletable: true,
-};
-
-const updateCachedVariableVectorMap = (
-    newVariableVectorMap: VariableVectorMapType[],
-    cachedVariableVectorMap: VariableVectorMapType[]
-): void => {
-    for (const elm of newVariableVectorMap) {
-        // Find cachedElm reference object
-        let cachedElm = cachedVariableVectorMap.find(
-            (cachedElm) => cachedElm.variableName === elm.variableName
-        );
-        if (!cachedElm) {
-            cachedVariableVectorMap.push(elm);
-        } else {
-            // Update cachedElm reference
-            cachedElm.vectorName = elm.vectorName;
-        }
-    }
 };
 
 export const createExpressionTypeFromEditableData = (
@@ -154,32 +128,22 @@ const initializeStore = (initializerArg: StoreProviderProps): StoreState => {
         activeExpression: cloneDeep(initialEditableExpression),
 
         editableExpression: initialEditableExpression.expression,
-        editableExpressionStatus: ExpressionStatus.Invalid,
-
         editableName: initialEditableExpression.name,
-        editableNameStatus: false,
-
         editableDescription: initialEditableExpression.description,
-
-        cachedVariableVectorMap: cloneDeep(
-            initialEditableExpression.variableVectorMap
-        ),
         editableVariableVectorMap: cloneDeep(
             initialEditableExpression.variableVectorMap
         ),
-        editableVariableVectorMapStatus: false,
+        parseData: { isValid: false, parsingMessage: "", variables: [] },
 
-        editableDataIsValid: false,
+        resetActionCounter: 0,
 
         externalParsing: initializerArg.externalParsing,
-        parseMessage: "",
     };
 };
 
 const StoreReducer = (state: StoreState, action: Actions): StoreState => {
     switch (action.type) {
         case StoreActions.AddExpressions: {
-            // TODO: Ensure no duplicate ids?
             const newExpressions = cloneDeep(state.expressions);
             for (const elm of action.payload.expressions) {
                 newExpressions.push(elm);
@@ -214,28 +178,23 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
             return {
                 ...state,
                 activeExpression: action.payload.expression,
-                editableExpression: action.payload.expression.expression,
-                editableExpressionStatus: ExpressionStatus.Evaluating,
-                editableName: action.payload.expression.name,
-                editableNameStatus: false,
-                editableDescription: action.payload.expression.description,
-                cachedVariableVectorMap: cloneDeep(
-                    action.payload.expression.variableVectorMap
-                ),
-                editableVariableVectorMap: cloneDeep(
-                    action.payload.expression.variableVectorMap
-                ),
-                editableVariableVectorMapStatus: false,
-                editableDataIsValid: false,
-                parseMessage: "",
+                // editableExpression: action.payload.expression.expression,
+                // editableName: action.payload.expression.name,
+                // editableDescription: action.payload.expression.description,
+                // editableVariableVectorMap: cloneDeep(
+                //     action.payload.expression.variableVectorMap
+                // ),
+                // parseData: {
+                //     isValid: true,
+                //     parsingMessage: "",
+                //     variables: getVariablesFromMap(
+                //         action.payload.expression.variableVectorMap
+                //     ),
+                // },
             };
         }
 
         case StoreActions.SaveEditableExpression: {
-            if (!state.editableDataIsValid) {
-                return { ...state };
-            }
-
             // Create expression with editable data
             const newActiveExpression = {
                 ...state.activeExpression,
@@ -243,7 +202,7 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
                 expression: state.editableExpression,
                 description: state.editableDescription,
                 variableVectorMap: state.editableVariableVectorMap,
-                isValid: state.editableDataIsValid,
+                isValid: true,
             };
 
             // TODO: Replace .map() with .find() and edit reference?
@@ -258,26 +217,24 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
                 ...state,
                 expressions: newExpressions,
                 activeExpression: newActiveExpression,
-                editableExpressionStatus: ExpressionStatus.Valid,
             };
         }
         case StoreActions.ResetEditableExpression: {
-            updateCachedVariableVectorMap(
-                state.activeExpression.variableVectorMap,
-                state.cachedVariableVectorMap
-            );
             return {
                 ...state,
                 editableExpression: state.activeExpression.expression,
-                editableExpressionStatus: ExpressionStatus.Evaluating,
                 editableName: state.activeExpression.name,
-                editableNameStatus: false,
                 editableDescription: state.activeExpression.description,
-                editableVariableVectorMap:
-                    state.activeExpression.variableVectorMap,
-                editableVariableVectorMapStatus: false,
-                editableDataIsValid: false,
-                parseMessage: "",
+                editableVariableVectorMap: cloneDeep(
+                    state.activeExpression.variableVectorMap
+                ),
+                parseData: {
+                    isValid: true,
+                    parsingMessage: "",
+                    variables: getVariablesFromMap(
+                        state.activeExpression.variableVectorMap
+                    ),
+                },
             };
         }
 
@@ -288,57 +245,25 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
             };
         }
         case StoreActions.SetName: {
-            const newEditableDataIsValid =
-                action.payload.status &&
-                state.editableExpressionStatus === ExpressionStatus.Valid &&
-                state.editableVariableVectorMapStatus;
             return {
                 ...state,
                 editableName: action.payload.name,
-                editableNameStatus: action.payload.status,
-                editableDataIsValid: newEditableDataIsValid,
             };
         }
         case StoreActions.SetExpression: {
-            // If external parsing is used - evaluating state is set
-            if (state.externalParsing) {
-                return {
-                    ...state,
-                    editableExpression: action.payload.expression,
-                    editableExpressionStatus: ExpressionStatus.Evaluating,
-                };
-            }
-            return { ...state, editableExpression: action.payload.expression };
-        }
-        case StoreActions.SetEditableExpressionStatus: {
-            const newEditableDataIsValid =
-                action.payload.status === ExpressionStatus.Valid &&
-                state.editableVariableVectorMapStatus &&
-                state.editableNameStatus;
             return {
                 ...state,
-                editableExpressionStatus: action.payload.status,
-                editableDataIsValid: newEditableDataIsValid,
+                editableExpression: action.payload.expression,
             };
         }
         case StoreActions.SetVariableVectorMap: {
-            updateCachedVariableVectorMap(
-                action.payload.variableVectorMap,
-                state.cachedVariableVectorMap
-            );
-            const newEditableDataIsValid =
-                action.payload.status &&
-                state.editableExpressionStatus === ExpressionStatus.Valid &&
-                state.editableNameStatus;
             return {
                 ...state,
                 editableVariableVectorMap: action.payload.variableVectorMap,
-                editableVariableVectorMapStatus: action.payload.status,
-                editableDataIsValid: newEditableDataIsValid,
             };
         }
-        case StoreActions.SetParseMessage: {
-            return { ...state, parseMessage: action.payload.message };
+        case StoreActions.SetParsingData: {
+            return { ...state, parseData: action.payload.data };
         }
     }
 };

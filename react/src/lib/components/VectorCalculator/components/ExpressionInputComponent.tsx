@@ -1,4 +1,7 @@
 import React from "react";
+
+import { cloneDeep } from "lodash";
+
 import { Button, Icon } from "@equinor/eds-core-react";
 import { Grid, Paper } from "@material-ui/core";
 import { clear, save, sync } from "@equinor/eds-icons";
@@ -9,7 +12,10 @@ import { ExpressionDescriptionTextField } from "./ExpressionDescriptionTextField
 import { ExpressionNameTextField } from "./ExpressionNameTextField";
 import { ExpressionInputTextField } from "./ExpressionInputTextField";
 
-import { areVariableVectorMapsEqual } from "../utils/VectorCalculatorHelperFunctions";
+import {
+    areVariableVectorMapsEqual,
+    getVariablesFromMap,
+} from "../utils/VectorCalculatorHelperFunctions";
 
 import { StoreActions, useStore, ExpressionStatus } from "./ExpressionsStore";
 
@@ -30,6 +36,14 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         store.state.activeExpression.id === ""
     );
     const [isExpressionEdited, setIsExpressionEdited] =
+        React.useState<boolean>(false);
+
+    const [expressionStatus, setExpressionStatus] =
+        React.useState<ExpressionStatus>(ExpressionStatus.Evaluating);
+    const [nameValid, setNameValid] = React.useState<boolean>(false);
+    const [variableVectorMapValid, setVariableVectorMapValid] =
+        React.useState<boolean>(false);
+    const [expressionTypeValid, setExpressionTypeValid] =
         React.useState<boolean>(false);
 
     Icon.add({ clear, save, sync });
@@ -83,11 +97,10 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         store.state.editableName,
         store.state.editableDescription,
         store.state.editableVariableVectorMap,
-        areExpressionsEqual,
     ]);
 
     const handleSaveClick = React.useCallback((): void => {
-        if (!store.state.editableDataIsValid) {
+        if (!expressionTypeValid) {
             return;
         }
 
@@ -95,14 +108,76 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             type: StoreActions.SaveEditableExpression,
             payload: {},
         });
-    }, [store.state.editableDataIsValid]);
+    }, [expressionTypeValid]);
 
     const handleCancelClick = React.useCallback((): void => {
+        // store.dispatch({
+        //     type: StoreActions.ResetEditableExpression,
+        //     payload: {},
+        // });
+
         store.dispatch({
-            type: StoreActions.ResetEditableExpression,
-            payload: {},
+            type: StoreActions.SetExpression,
+            payload: { expression: store.state.activeExpression.expression },
+        });
+        store.dispatch({
+            type: StoreActions.SetName,
+            payload: { name: store.state.activeExpression.name },
+        });
+        store.dispatch({
+            type: StoreActions.SetDescription,
+            payload: {
+                description: store.state.activeExpression.description
+                    ? store.state.activeExpression.description
+                    : "",
+            },
+        });
+        store.dispatch({
+            type: StoreActions.SetVariableVectorMap,
+            payload: {
+                variableVectorMap: cloneDeep(
+                    store.state.activeExpression.variableVectorMap
+                ),
+            },
+        });
+        store.dispatch({
+            type: StoreActions.SetParsingData,
+            payload: {
+                data: {
+                    isValid: true,
+                    parsingMessage: "",
+                    variables: getVariablesFromMap(
+                        store.state.activeExpression.variableVectorMap
+                    ),
+                },
+            },
         });
     }, [store]);
+
+    const handleNameValidChange = (isValid: boolean): void => {
+        setExpressionTypeValid(
+            isValid &&
+                variableVectorMapValid &&
+                expressionStatus === ExpressionStatus.Valid
+        );
+        setNameValid(isValid);
+    };
+
+    const handleExpressionStatusChanged = (status: ExpressionStatus): void => {
+        setExpressionTypeValid(
+            status === ExpressionStatus.Valid &&
+                variableVectorMapValid &&
+                nameValid
+        );
+        setExpressionStatus(status);
+    };
+
+    const handleVariableVectorMapValidChanged = (isValid: boolean): void => {
+        setExpressionTypeValid(
+            isValid && nameValid && expressionStatus === ExpressionStatus.Valid
+        );
+        setVariableVectorMapValid(isValid);
+    };
 
     return (
         <Grid
@@ -118,10 +193,14 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 <ExpressionNameTextField
                     vectors={props.vectors}
                     disabled={disabled}
+                    onValidChanged={handleNameValidChange}
                 />
             </Grid>
             <Grid item>
-                <ExpressionInputTextField disabled={disabled} />
+                <ExpressionInputTextField
+                    disabled={disabled}
+                    onStatusChanged={handleExpressionStatusChanged}
+                />
             </Grid>
             <Grid item>
                 <ExpressionDescriptionTextField
@@ -134,9 +213,9 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                     vectorData={props.vectors}
                     disabled={
                         disabled ||
-                        store.state.editableExpressionStatus ===
-                            ExpressionStatus.Evaluating
+                        expressionStatus === ExpressionStatus.Evaluating
                     }
+                    onValidChanged={handleVariableVectorMapValidChanged}
                 />
             </Grid>
             <Grid container item spacing={2} justify="flex-end">
@@ -155,7 +234,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                         onClick={handleSaveClick}
                         disabled={
                             disabled ||
-                            !store.state.editableDataIsValid ||
+                            !expressionTypeValid ||
                             !isExpressionEdited
                         }
                     >

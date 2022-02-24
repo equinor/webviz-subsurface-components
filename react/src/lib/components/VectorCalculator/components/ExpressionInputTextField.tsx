@@ -16,6 +16,7 @@ type ExpressionInputTextFieldStyleData = {
 
 interface ExpressionInputTextFieldProps {
     disabled?: boolean;
+    onStatusChanged: (status: ExpressionStatus) => void;
 }
 
 export const ExpressionInputTextField: React.FC<
@@ -24,10 +25,10 @@ export const ExpressionInputTextField: React.FC<
     const { disabled } = props;
     const store = useStore();
     const [status, setStatus] = React.useState<ExpressionStatus>(
-        store.state.editableExpressionStatus
+        ExpressionStatus.Valid
     );
     const [helperText, setHelperText] = React.useState<string>(
-        store.state.parseMessage
+        store.state.parseData.parsingMessage
     );
     const [textFieldStyleDataState, setTextFieldStyleDataState] =
         React.useState<ExpressionInputTextFieldStyleData>({
@@ -62,32 +63,53 @@ export const ExpressionInputTextField: React.FC<
 
     React.useEffect(() => {
         setTextFieldStyleDataState(getTextFieldStyleData());
+        props.onStatusChanged(status);
     }, [status]);
+
+    React.useEffect(() => {
+        if (helperText !== store.state.parseData.parsingMessage) {
+            setHelperText(store.state.parseData.parsingMessage);
+        }
+    }, [store.state.parseData.parsingMessage]);
 
     const dispatchParseActions = React.useCallback(
         (expression: string): void => {
             if (store.state.externalParsing) {
+                setStatus(ExpressionStatus.Evaluating);
+
+                // Clear parsing message
                 store.dispatch({
-                    type: StoreActions.SetEditableExpressionStatus,
-                    payload: { status: ExpressionStatus.Evaluating },
-                });
-                store.dispatch({
-                    type: StoreActions.SetParseMessage,
-                    payload: { message: "" },
+                    type: StoreActions.SetParsingData,
+                    payload: {
+                        data: {
+                            isValid: store.state.parseData.isValid,
+                            parsingMessage: "",
+                            variables: store.state.parseData.variables,
+                        },
+                    },
                 });
             } else {
                 const parseData = getExpressionParseData(expression);
+                setStatus(
+                    parseData.isValid
+                        ? ExpressionStatus.Valid
+                        : ExpressionStatus.Invalid
+                );
                 store.dispatch({
-                    type: StoreActions.SetEditableExpressionStatus,
+                    type: StoreActions.SetExpression,
                     payload: {
-                        status: parseData.isValid
-                            ? ExpressionStatus.Valid
-                            : ExpressionStatus.Invalid,
+                        expression: expression,
                     },
                 });
                 store.dispatch({
-                    type: StoreActions.SetParseMessage,
-                    payload: { message: parseData.parsingMessage },
+                    type: StoreActions.SetParsingData,
+                    payload: {
+                        data: {
+                            isValid: parseData.isValid,
+                            parsingMessage: parseData.parsingMessage,
+                            variables: parseData.variables,
+                        },
+                    },
                 });
             }
         },
@@ -95,35 +117,29 @@ export const ExpressionInputTextField: React.FC<
     );
 
     React.useEffect(() => {
-        if (status !== store.state.editableExpressionStatus) {
-            setStatus(store.state.editableExpressionStatus);
-        }
-        if (helperText !== store.state.parseMessage) {
-            setHelperText(store.state.parseMessage);
-        }
-
-        if (
-            store.state.editableExpressionStatus === ExpressionStatus.Evaluating
-        ) {
-            dispatchParseActions(store.state.editableExpression);
-        }
-    }, [store.state.editableExpressionStatus, store.state.parseMessage]);
+        dispatchParseActions(store.state.editableExpression);
+    }, [store.state.editableExpression]);
 
     React.useEffect(() => {
-        dispatchParseActions(store.state.activeExpression.expression);
+        store.dispatch({
+            type: StoreActions.SetExpression,
+            payload: {
+                expression: store.state.activeExpression.expression,
+            },
+        });
     }, [store.state.activeExpression.expression]);
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
     ): void => {
         const newExpression: string = e.target.value;
+
         store.dispatch({
             type: StoreActions.SetExpression,
-            payload: { expression: newExpression },
+            payload: {
+                expression: newExpression,
+            },
         });
-
-        // Perform parsing
-        dispatchParseActions(newExpression);
     };
 
     return (

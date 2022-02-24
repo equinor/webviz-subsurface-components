@@ -16,6 +16,18 @@ export const ExpressionDescriptionTextField: React.FC<
 > = (props: ExpressionDescriptionTextFieldProps) => {
     const store = useStore();
 
+    React.useEffect(() => {
+        const newDescription = store.state.activeExpression.description
+            ? store.state.activeExpression.description
+            : "";
+        store.dispatch({
+            type: StoreActions.SetDescription,
+            payload: {
+                description: newDescription,
+            },
+        });
+    }, [store.state.activeExpression.description]);
+
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
     ): void => {

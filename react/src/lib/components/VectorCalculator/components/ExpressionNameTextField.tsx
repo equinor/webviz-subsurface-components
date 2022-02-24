@@ -28,6 +28,7 @@ type ExpressionNameTextFieldStyleData = {
 interface ExpressionNameTextFieldProps {
     vectors: TreeDataNode[];
     disabled?: boolean;
+    onValidChanged: (isValid: boolean) => void;
 }
 
 export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
@@ -35,7 +36,10 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
 ) => {
     const { vectors, disabled } = props;
     const store = useStore();
-    const [name, setName] = React.useState(store.state.editableName);
+    const [isValid, setIsValid] = React.useState<boolean>(
+        // isValidName(store.state.editableName)
+        false
+    );
     const [textFieldStyleDataState, setTextFieldStyleDataState] =
         React.useState<ExpressionNameTextFieldStyleData>({
             variant: "success",
@@ -135,29 +139,36 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     }, [disabled]);
 
     React.useEffect(() => {
-        if (name !== store.state.editableName) {
-            setName(store.state.editableName);
-            setTextFieldStyleDataState(
-                getTextFieldStyleData(store.state.editableName)
-            );
-            store.dispatch({
-                type: StoreActions.SetName,
-                payload: {
-                    name: store.state.editableName,
-                    status: isValidName(store.state.editableName),
-                },
-            });
-        }
+        props.onValidChanged(isValid);
+    }, [isValid]);
+
+    React.useEffect(() => {
+        setIsValid(isValidName(store.state.editableName));
+        setTextFieldStyleDataState(
+            getTextFieldStyleData(store.state.editableName)
+        );
     }, [store.state.editableName, getTextFieldStyleData]);
+
+    React.useEffect(() => {
+        // setIsValid(isValidName(store.state.activeExpression.name));
+        // setTextFieldStyleDataState(
+        //     getTextFieldStyleData(store.state.activeExpression.name)
+        // );
+        store.dispatch({
+            type: StoreActions.SetName,
+            payload: { name: store.state.activeExpression.name },
+        });
+    }, [store.state.activeExpression, getTextFieldStyleData]);
 
     const handleInputChange = React.useCallback(
         (
             e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
         ): void => {
             const newName: string = e.target.value;
+            setIsValid(isValidName(newName));
             store.dispatch({
                 type: StoreActions.SetName,
-                payload: { name: newName, status: isValidName(newName) },
+                payload: { name: newName },
             });
         },
         [isValidName]

@@ -10,21 +10,21 @@ import {
 import { TreeDataNode } from "@webviz/core-components";
 import cloneDeep from "lodash/cloneDeep";
 
-import { ExpressionStatus, StoreActions, useStore } from "./ExpressionsStore";
+import { StoreActions, useStore } from "./ExpressionsStore";
 import { VariableVectorMapType } from "../utils/VectorCalculatorTypes";
 import {
+    areVariableVectorMapsEqual,
     createVariableVectorMapFromVariables,
     isVariableVectorMapValid,
 } from "../utils/VectorCalculatorHelperFunctions";
 import VectorSelector from "../../VectorSelector";
-
-import { getExpressionParseData } from "../utils/ExpressionParser";
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface VariablesTableProps {
     vectorData: TreeDataNode[];
     disabled?: boolean;
+    onValidChanged: (isValid: boolean) => void;
 }
 
 type VectorSelectorParentProps = {
@@ -38,62 +38,129 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
 ) => {
     const { vectorData } = props;
     const store = useStore();
+    const [isValid, setIsValid] = React.useState<boolean>(
+        isVariableVectorMapValid(
+            store.state.editableVariableVectorMap,
+            ":",
+            vectorData
+        )
+    );
     const [variableVectorMap, setVariableVectorMap] = React.useState<
         VariableVectorMapType[]
     >(store.state.editableVariableVectorMap);
+    const [cachedVariableVectorMap, setCachedVariableVectorMap] =
+        React.useState<VariableVectorMapType[]>(
+            store.state.editableVariableVectorMap
+        );
+
     const disabled = props.disabled || false;
 
-    const makeVariableVectorMapFromExpression = React.useCallback(
-        (expression: string): VariableVectorMapType[] => {
-            if (expression.length === 0) {
-                return [];
-            }
-
-            const parseData = getExpressionParseData(expression);
-            if (!parseData.isValid) {
-                return cloneDeep(variableVectorMap);
-            }
-            return createVariableVectorMapFromVariables(
-                parseData.variables,
-                store.state.cachedVariableVectorMap
+    const createUpdatedCachedVariableVectorMap = React.useCallback(
+        (newMap: VariableVectorMapType[]): VariableVectorMapType[] => {
+            const newCachedVariableVectorMap = cloneDeep(
+                cachedVariableVectorMap
             );
+            for (const elm of newMap) {
+                // Find reference to cached object
+                const cachedElm = newCachedVariableVectorMap.find(
+                    (cachedElm) => cachedElm.variableName === elm.variableName
+                );
+                if (!cachedElm) {
+                    // Add to cache
+                    newCachedVariableVectorMap.push(elm);
+                } else {
+                    // Update existing cache
+                    cachedElm.vectorName = elm.vectorName;
+                }
+            }
+            return newCachedVariableVectorMap;
         },
-        [
-            variableVectorMap,
-            store.state.cachedVariableVectorMap,
-            getExpressionParseData,
-            createVariableVectorMapFromVariables,
-        ]
+        [cachedVariableVectorMap]
     );
 
     React.useEffect(() => {
-        setVariableVectorMap(store.state.editableVariableVectorMap);
+        props.onValidChanged(isValid);
+    }, [isValid]);
+
+    React.useEffect(() => {
+        const newVariableVectorMap = cloneDeep(
+            store.state.editableVariableVectorMap
+        );
+
+        console.log(cachedVariableVectorMap);
+        console.log(newVariableVectorMap);
+
+        setVariableVectorMap(newVariableVectorMap);
+        setIsValid(
+            isVariableVectorMapValid(newVariableVectorMap, ":", vectorData)
+        );
     }, [store.state.editableVariableVectorMap]);
 
     React.useEffect(() => {
-        if (store.state.externalParsing) {
-            return;
+        // Update map when new active expression
+        const newVariableVectorMap = cloneDeep(
+            store.state.activeExpression.variableVectorMap
+        );
+        if (
+            !areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)
+        ) {
+            setCachedVariableVectorMap(newVariableVectorMap);
+            store.dispatch({
+                type: StoreActions.SetVariableVectorMap,
+                payload: { variableVectorMap: newVariableVectorMap },
+            });
         }
-        if (store.state.editableExpressionStatus !== ExpressionStatus.Valid) {
+        // setCachedVariableVectorMap(
+        //     store.state.activeExpression.variableVectorMap
+        // );
+        // store.dispatch({
+        //     type: StoreActions.SetVariableVectorMap,
+        //     payload: {
+        //         variableVectorMap:
+        //             store.state.activeExpression.variableVectorMap,
+        //     },
+        // });
+    }, [store.state.activeExpression.variableVectorMap]);
+
+    React.useEffect(() => {
+        // Create map from expression parse data
+        if (!store.state.parseData.isValid) {
             return;
         }
 
-        const newVariableVectorMap = makeVariableVectorMapFromExpression(
-            store.state.editableExpression
+        const newVariableVectorMap = createVariableVectorMapFromVariables(
+            store.state.parseData.variables,
+            cachedVariableVectorMap
         );
-        const mapStatus = isVariableVectorMapValid(
-            newVariableVectorMap,
-            ":",
-            vectorData
-        );
-        store.dispatch({
-            type: StoreActions.SetVariableVectorMap,
-            payload: {
-                variableVectorMap: newVariableVectorMap,
-                status: mapStatus,
-            },
-        });
-    }, [store.state.editableExpression, store.state.editableExpressionStatus]);
+
+        if (
+            !areVariableVectorMapsEqual(
+                newVariableVectorMap,
+                store.state.editableVariableVectorMap
+            )
+        ) {
+            store.dispatch({
+                type: StoreActions.SetVariableVectorMap,
+                payload: {
+                    variableVectorMap: newVariableVectorMap,
+                },
+            });
+        }
+    }, [store.state.parseData]);
+
+    // React.useEffect(() => {
+    //     const newVariableVectorMap = cloneDeep(
+    //         store.state.editableVariableVectorMap
+    //     );
+    //     if (
+    //         !areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)
+    //     ) {
+    //         setVariableVectorMap(newVariableVectorMap);
+    //         setIsValid(
+    //             isVariableVectorMapValid(newVariableVectorMap, ":", vectorData)
+    //         );
+    //     }
+    // }, [store.state.editableVariableVectorMap]);
 
     const updateProps = React.useCallback(
         (
@@ -108,20 +175,26 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
                     vectorSelectorProps.selectedTags[0];
             }
 
-            const mapStatus = isVariableVectorMapValid(
-                newVariableVectorMap,
-                ":",
-                vectorData
+            // setVariableVectorMap(newVariableVectorMap);
+            setCachedVariableVectorMap(
+                createUpdatedCachedVariableVectorMap(newVariableVectorMap)
             );
+            // setIsValid(
+            //     isVariableVectorMapValid(newVariableVectorMap, ":", vectorData)
+            // );
             store.dispatch({
                 type: StoreActions.SetVariableVectorMap,
                 payload: {
                     variableVectorMap: newVariableVectorMap,
-                    status: mapStatus,
                 },
             });
         },
-        [variableVectorMap]
+        [
+            variableVectorMap,
+            createUpdatedCachedVariableVectorMap,
+            setCachedVariableVectorMap,
+            setIsValid,
+        ]
     );
 
     return (

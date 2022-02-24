@@ -12,12 +12,6 @@ import { ExpressionInputComponent } from "./ExpressionInputComponent";
 import { TreeDataNode } from "@webviz/core-components";
 
 import {
-    createVariableVectorMapFromVariables,
-    isVariableVectorMapValid,
-} from "../utils/VectorCalculatorHelperFunctions";
-
-import {
-    ExpressionStatus,
     createExpressionTypeFromEditableData,
     StoreActions,
     useStore,
@@ -45,6 +39,15 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
     React.useEffect(() => {
+        console.log("*** External parse data received ***");
+        console.log(`Active expression id: ${store.state.activeExpression.id}`);
+        console.log(
+            `External parse data id: ${
+                props.externalParseData
+                    ? props.externalParseData.id
+                    : "undefined external parse data"
+            }`
+        );
         /// Ensure external parsing for active expression
         if (
             !props.externalParseData ||
@@ -54,40 +57,16 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
             return;
         }
 
-        const status = props.externalParseData.isValid
-            ? ExpressionStatus.Valid
-            : ExpressionStatus.Invalid;
-
         store.dispatch({
-            type: StoreActions.SetEditableExpressionStatus,
+            type: StoreActions.SetParsingData,
             payload: {
-                status: status,
+                data: {
+                    isValid: props.externalParseData.isValid,
+                    parsingMessage: props.externalParseData.message,
+                    variables: props.externalParseData.variables,
+                },
             },
         });
-        store.dispatch({
-            type: StoreActions.SetParseMessage,
-            payload: { message: props.externalParseData.message },
-        });
-
-        if (status === ExpressionStatus.Valid) {
-            // Create map with cached map
-            const newVariableVectorMap = createVariableVectorMapFromVariables(
-                props.externalParseData.variables,
-                store.state.cachedVariableVectorMap
-            );
-            const newStatus = isVariableVectorMapValid(
-                newVariableVectorMap,
-                ":",
-                props.vectors
-            );
-            store.dispatch({
-                type: StoreActions.SetVariableVectorMap,
-                payload: {
-                    variableVectorMap: newVariableVectorMap,
-                    status: newStatus,
-                },
-            });
-        }
     }, [props.externalParseData]);
 
     React.useEffect(() => {
@@ -104,9 +83,14 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
 
     React.useEffect(() => {
         if (store.state.externalParsing) {
+            console.log("*** Send expression external parsing ***");
+            console.log(`Expression status: ${store.state.editableExpression}`);
+
             // Build expression:
             const externalParsingExpression =
                 createExpressionTypeFromEditableData(store.state);
+
+            console.log(`Expression: ${externalParsingExpression}`);
 
             props.setProps({
                 externalParseExpression: externalParsingExpression,
