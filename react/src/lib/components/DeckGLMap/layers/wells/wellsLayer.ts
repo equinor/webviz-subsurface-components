@@ -12,6 +12,7 @@ import {
     Feature,
     GeometryCollection,
     LineString,
+    Point,
     Position,
     FeatureCollection,
     GeoJsonProperties,
@@ -324,6 +325,14 @@ function getWellObjectByName(
     );
 }
 
+function getWellHeadCoordinates(well_object?: Feature): Position {
+    return (
+        (well_object?.geometry as GeometryCollection)?.geometries.find(
+            (item) => item.type == "Point"
+        ) as Point
+    )?.coordinates;
+}
+
 function getWellCoordinates(well_object?: Feature): Position[] {
     return (
         (well_object?.geometry as GeometryCollection)?.geometries.find(
@@ -556,8 +565,12 @@ function getMdProperty(
 
 function getTvd(coord: Position, feature: Feature): number | null {
     const trajectory3D = getWellCoordinates(feature);
-    if (trajectory3D == undefined) return null;
 
+    // if trajectory is not found or if it has a data single point then get tvd from well head
+    if (trajectory3D == undefined || trajectory3D?.length <= 1) {
+        const wellhead_xyz = getWellHeadCoordinates(feature);
+        return wellhead_xyz?.[2] ?? -1;
+    }
     let trajectory;
     // For 2D view coord is Position2D and for 3D view it's Position3D
     if (coord.length == 2) {
