@@ -273,7 +273,6 @@ MapLayerRGBEncodedProperties.args = {
     layers: [
         {
             ...map3DLayer,
-            meshMaxError: 5.0,
             visible: true,
         },
     ],
