@@ -3,9 +3,20 @@ describe("Well Completions", () => {
         "#root > div > header > div:nth-child(1) > div > div:nth-child(1) > span:nth-child(2) > span:nth-child(14)";
     before(() => {
         cy.visit("/");
-        cy.wait(10000);
+        cy.getIframeBody().find(
+            "#root > div > div:nth-child(3) > svg[role='progressbar']",
+            {
+                timeout: 20000,
+            }
+        );
         cy.get("body").then(($body) => {
-            if ($body.find("#root > div > div.css-1q7pov5 > nav").length == 0) {
+            if ($body.find("#root > div > div.css-1q7pov5 > nav").length <= 0) {
+                cy.get("body").type("s");
+            }
+        });
+        cy.get('[id="wellcompletions-demo"]').click();
+        cy.get("body").then(($body) => {
+            if ($body.find("#root > div > div.css-1q7pov5 > nav").length > 0) {
                 cy.get("body").type("s");
             }
             if (
@@ -15,7 +26,11 @@ describe("Well Completions", () => {
                 cy.get("body").type("a");
             }
         });
-        cy.get('[id="wellcompletions-demo"]').click();
+        cy.getIframeBody()
+            .find("#root > div > div:nth-child(3) > svg[role='progressbar']", {
+                timeout: 20000,
+            })
+            .should("not.exist");
     });
 
     it("Open Well completions Page from drop-down", () => {
@@ -27,7 +42,7 @@ describe("Well Completions", () => {
         cy.getIframeBody().find(slider).type("{rightarrow}".repeat(1));
         cy.getIframeBody().find(slider).should("have.attr", "aria-valuenow", 1);
         cy.getIframeBody().find(slider).should("have.text", "2000-06-01");
-        cy.getIframeBody().matchImageSnapshot("updated graph");
+        cy.matchImageSnapshot("updated graph");
     });
 
     it("test wells per page", () => {
