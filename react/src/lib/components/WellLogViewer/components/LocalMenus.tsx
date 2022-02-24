@@ -4,12 +4,13 @@ import ReactDOM from "react-dom";
 
 import { Track, GraphTrack } from "@equinor/videx-wellog";
 
-import WellLogView from "./WellLogView";
-
 import { Plot } from "@equinor/videx-wellog";
 import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 
+import WellLogView from "./WellLogView";
+
 import { ExtPlotOptions } from "../utils/tracks";
+import { isScaleTrack } from "../utils/tracks";
 
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -42,13 +43,51 @@ function getPlotTitle(plot: Plot): string {
 }
 
 export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
+    addTrack: () => void;
+    editTrack: () => void;
+    removeTrack: () => void;
+
+    addPlot: () => void;
+    editPlots: () => void;
+    removePlots: () => void;
+
     constructor(props: SimpleMenuProps) {
         super(props);
         this.state = { anchorEl: this.props.anchorEl };
 
-        this.addTrack = this.addTrack.bind(this);
-        this.editTrack = this.editTrack.bind(this);
-        this.removeTrack = this.removeTrack.bind(this);
+        const wellLogView = this.props.wellLogView;
+        this.addTrack = wellLogView.addTrack.bind(
+            wellLogView,
+            this.state.anchorEl,
+            this.props.track
+        );
+        this.editTrack = wellLogView.editTrack.bind(
+            wellLogView,
+            this.state.anchorEl,
+            this.props.track
+        );
+        this.removeTrack = wellLogView.removeTrack.bind(
+            wellLogView,
+            this.props.track
+        );
+
+        this.addPlot = wellLogView.addPlot.bind(
+            wellLogView,
+            this.state.anchorEl,
+            this.props.track
+        );
+        this.editPlots = editPlots.bind(
+            null,
+            this.state.anchorEl,
+            wellLogView,
+            this.props.track
+        );
+        this.removePlots = removePlots.bind(
+            null,
+            this.state.anchorEl,
+            wellLogView,
+            this.props.track
+        );
     }
     componentDidUpdate(prevProps: SimpleMenuProps): void {
         if (this.props.anchorEl !== prevProps.anchorEl) {
@@ -151,24 +190,6 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         return nodes;
     }
 
-    removePlots(parent: HTMLElement | null): void {
-        if (parent)
-            removePlots(parent, this.props.wellLogView, this.props.track);
-    }
-    editPlots(parent: HTMLElement | null): void {
-        if (parent) editPlots(parent, this.props.wellLogView, this.props.track);
-    }
-
-    addTrack(): void {
-        this.props.wellLogView.addTrack(this.state.anchorEl, this.props.track);
-    }
-    editTrack(): void {
-        this.props.wellLogView.editTrack(this.state.anchorEl, this.props.track);
-    }
-    removeTrack(): void {
-        this.props.wellLogView.removeTrack(this.props.track);
-    }
-
     createMenuItem(title: string, action?: () => void): ReactNode {
         return (
             <MenuItem key={title} onClick={() => this.handleClickItem(action)}>
@@ -243,57 +264,20 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                     onClose={this.handleCloseMenu.bind(this)}
                     onContextMenu={this.handleContextMenu.bind(this)}
                 >
-                    {!(track as GraphTrack).options.plotFactory
-                        ? []
-                        : [
-                              <MenuItem
-                                  key="333"
-                                  onClick={this.handleClickItem.bind(
-                                      this,
-                                      this.props.wellLogView.addPlot.bind(
-                                          this.props.wellLogView,
-                                          this.state.anchorEl,
-                                          track
-                                      )
-                                  )}
-                              >
-                                  {"Add plot"}
-                              </MenuItem>,
-                          ]}
-
-                    {!plots || !plots.length
-                        ? []
-                        : [
-                              <MenuItem
-                                  key="222"
-                                  onClick={this.handleClickItem.bind(
-                                      this,
-                                      this.editPlots.bind(
-                                          this,
-                                          this.state.anchorEl
-                                      )
-                                  )}
-                              >
-                                  {"Edit plot"}
-                              </MenuItem>,
-                          ]}
-
-                    {!plots || !plots.length
-                        ? []
-                        : [
-                              <MenuItem
-                                  key="111"
-                                  onClick={this.handleClickItem.bind(
-                                      this,
-                                      this.removePlots.bind(
-                                          this,
-                                          this.state.anchorEl
-                                      )
-                                  )}
-                              >
-                                  {"Remove plot"}
-                              </MenuItem>,
-                          ]}
+                    {(track as GraphTrack).options.plotFactory
+                        ? [this.createMenuItem("Add plot", this.addPlot)]
+                        : !isScaleTrack(track)
+                        ? [this.createMenuItem("Edit track", this.editTrack)]
+                        : []}
+                    {plots && plots.length
+                        ? [
+                              this.createMenuItem("Edit plot", this.editPlots),
+                              this.createMenuItem(
+                                  "Remove plot",
+                                  this.removePlots
+                              ),
+                          ]
+                        : []}
                 </Menu>
             </div>
         );
@@ -301,7 +285,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
 }
 
 export function editPlots(
-    parent: HTMLElement,
+    parent: HTMLElement | null,
     wellLogView: WellLogView,
     track: Track
 ): void {
@@ -314,7 +298,7 @@ export function editPlots(
     const el: HTMLElement = document.createElement("div");
     el.style.width = "10px";
     el.style.height = "13px";
-    parent.appendChild(el);
+    if (parent) parent.appendChild(el);
     ReactDOM.render(
         <SimpleMenu
             type="editPlots"
@@ -327,7 +311,7 @@ export function editPlots(
 }
 
 export function removePlots(
-    parent: HTMLElement,
+    parent: HTMLElement | null,
     wellLogView: WellLogView,
     track: Track
 ): void {
@@ -340,7 +324,7 @@ export function removePlots(
     const el: HTMLElement = document.createElement("div");
     el.style.width = "10px";
     el.style.height = "13px";
-    parent.appendChild(el);
+    if (parent) parent.appendChild(el);
     ReactDOM.render(
         <SimpleMenu
             type="removePlots"

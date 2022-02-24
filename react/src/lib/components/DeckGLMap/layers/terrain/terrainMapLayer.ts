@@ -59,7 +59,7 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
     colorMapName: string;
 
     // Min and max property values.
-    valueRange: [number, number];
+    propertyValueRange: [number, number];
 
     // Use color map in this range.
     colorMapRange: [number, number];
@@ -76,7 +76,7 @@ const defaultProps = {
     getOrientation: (d: DataItem) => [0, d.angle, 0],
     contours: [-1, -1],
     colorMapName: "",
-    valueRange: [0.0, 1.0],
+    propertyValueRange: [0.0, 1.0],
     colorMapRange: [0.0, 1.0],
     isReadoutDepth: false,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -102,8 +102,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isReadoutDepth = this.props.isReadoutDepth;
 
-        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
-        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
+        const valueRangeMin = this.props.propertyValueRange[0] ?? 0.0;
+        const valueRangeMax = this.props.propertyValueRange[1] ?? 1.0;
 
         // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
