@@ -241,9 +241,16 @@ export default class WellsLayer extends CompositeLayer<
             this.props.logName
         );
 
+        // Patch for inverting tvd readout to fix issue #830,
+        // should make proper fix when handling z increase direction - issue #842
+        const inverted_tvd_property = tvd_property && {
+            ...tvd_property,
+            value: (tvd_property?.value as number) * -1,
+        };
+
         const layer_properties: PropertyDataType[] = [];
         if (md_property) layer_properties.push(md_property);
-        if (tvd_property) layer_properties.push(tvd_property);
+        if (inverted_tvd_property) layer_properties.push(inverted_tvd_property);
         if (log_property) layer_properties.push(log_property);
 
         return {
