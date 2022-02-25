@@ -2,9 +2,9 @@ import React from "react";
 import { Layer } from "deck.gl";
 import { WellsLayer } from "../layers";
 import {
-    ContinuousLegend,
     DiscreteColorLegend,
 } from "@emerson-eps/color-tables";
+import { ContinuousLegend } from "./ContinuousLegend";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getLayersByType } from "../layers/utils/layerTools";
 
@@ -92,7 +92,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     max={legendProps.valueRange[1]}
                     dataObjectName={legendProps.title}
                     position={position}
-                    name={legendProps.name}
                     colorName={legendProps.colorName}
                     colorTables={colorTables}
                     horizontal={horizontal}

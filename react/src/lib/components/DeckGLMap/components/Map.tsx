@@ -361,6 +361,7 @@ const Map: React.FC<MapProps> = ({
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
 
             {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
+            
         </div>
     );
 };
