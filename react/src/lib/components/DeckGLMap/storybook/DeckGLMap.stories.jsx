@@ -242,10 +242,11 @@ KhMapFlat.args = {
     bounds: [432150, 6475800, 439400, 6481500],
     layers: [
         {
-            ...colormapLayer,
+            "@@type": "ColormapLayer",
+            id: "property_map",
             valueRange: [-3071, 41048],
-            colorMapRange: [-3071, 41048],
             bounds: [432150, 6475800, 439400, 6481500],
+            image: "@@#resources.propertyMap",
         },
         {
             ...hillshadingLayer,

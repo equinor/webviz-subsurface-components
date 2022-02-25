@@ -5,8 +5,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         id: "colormap-layer",
         pickable: true,
         visible: true,
-        valueRange: { type: "array" },
-        colorMapRange: { type: "array" },
+        valueRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array", value: [0, 1] },
         valueDecoder: {
             rgbScaler: [1, 1, 1],
             // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
@@ -15,6 +15,7 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
         rotDeg: 0,
+        colorMapName: "Rainbow",
     },
     Hillshading2DLayer: {
         "@@type": "Hillshading2DLayer",
@@ -24,8 +25,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         visible: true,
         rotDeg: 0,
-        valueRange: { type: "array" },
-        colorMapRange: { type: "array" },
+        valueRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array", value: [0, 1] },
         lightDirection: [1, 1, 1],
         ambientLightIntensity: 0.5,
         diffuseLightIntensity: 0.5,
