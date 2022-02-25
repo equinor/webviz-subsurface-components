@@ -2,6 +2,7 @@ import { CompositeLayer } from "@deck.gl/core";
 import TerrainMapLayer, {
     TerrainMapLayerProps,
     TerrainMapLayerData,
+    DECODER,
 } from "./terrainMapLayer";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
@@ -12,19 +13,13 @@ import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
 
-const ELEVATION_DECODER = {
-    rScaler: 255 * 255,
-    gScaler: 255,
-    bScaler: 1,
-    offset: 0,
-};
-
 type MeshType = {
     attributes: {
-        POSITION: { value: number[] };
-        normals: { value: Float32Array; size: number };
+        POSITION: { value: Float32Array; size: number };
+        TEXCOORD_0: { value: Float32Array; size: number };
+        normals?: { value: Float32Array; size: number };
     };
-    indices: { value: Uint32Array };
+    indices: { value: Uint32Array; size: number };
 };
 
 function mapToRange(resolved_mesh: MeshType, meshValueRange: [number, number]) {
@@ -52,7 +47,7 @@ function add_normals(resolved_mesh: MeshType) {
 
     //Calculate one normal pr triangle. And record the triangles each vertex' belongs to.
     const no_unique_vertexes = vertexs.length / 3;
-    const vertex_triangles = Array(no_unique_vertexes); // for each vertex a list of triangles it belogs to.
+    const vertex_triangles = Array(no_unique_vertexes); // for each vertex a list of triangles it belongs to.
     for (let i = 0; i < no_unique_vertexes; i++) {
         vertex_triangles[i] = new Set();
     }
@@ -121,32 +116,67 @@ function add_normals(resolved_mesh: MeshType) {
     return resolved_mesh;
 }
 
-async function load_mesh(
+async function load_mesh_and_texture(
     mesh_name: string,
     bounds: [number, number, number, number],
     meshMaxError: number,
     meshValueRange: [number, number],
-    enableSmoothShading: boolean
+    enableSmoothShading: boolean,
+    texture_name: string
 ) {
-    let mesh = await load(mesh_name, TerrainLoader, {
-        terrain: {
-            elevationDecoder: ELEVATION_DECODER,
-            bounds,
-            meshMaxError,
-            skirtHeight: 0.0,
-        },
-        worker: false,
-    });
+    const isMesh = mesh_name !== "";
+    const isTexture = texture_name !== "";
 
-    // Remap height to meshValueRange
-    mesh = mapToRange(mesh, meshValueRange);
-
-    // Note: mesh contains triangles. No normals they must be added.
-    if (enableSmoothShading) {
-        mesh = add_normals(mesh);
+    if (!isMesh && !isTexture) {
+        console.log("Error. One or both of texture and mesh must be given!");
     }
 
-    return mesh;
+    let mesh: MeshType;
+    if (isMesh) {
+        mesh = await load(mesh_name, TerrainLoader, {
+            terrain: {
+                elevationDecoder: DECODER,
+                bounds,
+                meshMaxError,
+                skirtHeight: 0.0,
+            },
+            worker: false,
+        });
+
+        // Remap height to meshValueRange
+        mesh = mapToRange(mesh, meshValueRange);
+
+        // Note: mesh contains triangles. No normals they must be added.
+        if (enableSmoothShading) {
+            mesh = add_normals(mesh);
+        }
+    } else {
+        // Mesh data is missing.
+        // Make a flat square size of bounds using two triangles.  z = 0.
+        const left = bounds[0];
+        const bottom = bounds[1];
+        const right = bounds[2];
+        const top = bounds[3];
+        const p0 = [left, bottom, 0.0];
+        const p1 = [left, top, 0.0];
+        const p2 = [right, top, 0.0];
+        const p3 = [right, bottom, 0.0];
+        const vertexes = [...p0, ...p1, ...p2, ...p3];
+        const texture_coord = [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0];
+
+        mesh = {
+            attributes: {
+                POSITION: { value: new Float32Array(vertexes), size: 3 },
+                TEXCOORD_0: { value: new Float32Array(texture_coord), size: 2 },
+            },
+            indices: { value: new Uint32Array([0, 1, 3, 1, 3, 2]), size: 1 },
+        };
+    }
+
+    const image_name = isTexture ? texture_name : mesh_name;
+    const texture = await load(image_name, ImageLoader, {});
+
+    return Promise.all([mesh, texture]);
 }
 
 export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
@@ -193,19 +223,20 @@ export default class Map3DLayer extends CompositeLayer<
 > {
     initializeState(): void {
         // Load mesh and texture and store in state.
-        const mesh = load_mesh(
+        const p = load_mesh_and_texture(
             this.props.mesh,
             this.props.bounds,
             this.props.meshMaxError,
             this.props.meshValueRange,
-            this.props.enableSmoothShading
+            this.props.enableSmoothShading,
+            this.props.propertyTexture
         );
 
-        const texture = load(this.props.propertyTexture, ImageLoader, {});
-
-        this.setState({
-            mesh,
-            texture,
+        p.then(([mesh, texture]) => {
+            this.setState({
+                mesh,
+                texture,
+            });
         });
     }
 
@@ -237,6 +268,9 @@ export default class Map3DLayer extends CompositeLayer<
             this.props.bounds[3] as number
         );
 
+        const isMesh =
+            typeof this.props.mesh !== "undefined" && this.props.mesh !== "";
+
         const layer = new TerrainMapLayer(
             this.getSubLayerProps<
                 TerrainMapLayerData,
@@ -251,6 +285,7 @@ export default class Map3DLayer extends CompositeLayer<
                 propertyValueRange: this.props.propertyValueRange,
                 colorMapRange: this.props.colorMapRange,
                 isReadoutDepth: this.props.isReadoutDepth,
+                isContoursDepth: isMesh,
             })
         );
         return [layer];
