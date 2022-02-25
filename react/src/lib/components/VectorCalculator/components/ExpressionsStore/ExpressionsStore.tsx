@@ -8,8 +8,6 @@ import {
     VariableVectorMapType,
 } from "../../utils/VectorCalculatorTypes";
 
-import { getVariablesFromMap } from "../../utils/VectorCalculatorHelperFunctions";
-
 type ActionMap<
     M extends {
         [index: string]: {
@@ -65,9 +63,8 @@ type StoreState = {
 
     parseData: ExpressionParsingData;
 
+    // Reset counter is needed as variableVectorMap is dependent of editableExpression
     resetActionCounter: number;
-
-    externalParsing: boolean; // TODO: Drop having as store state? Pass as arg for components
 };
 
 type Payload = {
@@ -89,7 +86,7 @@ type Payload = {
         expression: string;
     };
     [StoreActions.SetDescription]: {
-        description: string;
+        description?: string;
     };
     [StoreActions.SetVariableVectorMap]: {
         variableVectorMap: VariableVectorMapType[];
@@ -136,8 +133,6 @@ const initializeStore = (initializerArg: StoreProviderProps): StoreState => {
         parseData: { isValid: false, parsingMessage: "", variables: [] },
 
         resetActionCounter: 0,
-
-        externalParsing: initializerArg.externalParsing,
     };
 };
 
@@ -163,8 +158,8 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
             if (action.payload.ids.includes(state.activeExpression.id)) {
                 const initializeArgs = {
                     initialExpressions: newExpressions,
-                    externalParsing: state.externalParsing,
                 };
+                // TODO: Prevent reset of reset counter?
                 return initializeStore(initializeArgs);
             }
 
@@ -173,24 +168,11 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
 
         case StoreActions.SetActiveExpression: {
             if (!state.expressions.includes(action.payload.expression)) {
-                return { ...state };
+                return state;
             }
             return {
                 ...state,
                 activeExpression: action.payload.expression,
-                // editableExpression: action.payload.expression.expression,
-                // editableName: action.payload.expression.name,
-                // editableDescription: action.payload.expression.description,
-                // editableVariableVectorMap: cloneDeep(
-                //     action.payload.expression.variableVectorMap
-                // ),
-                // parseData: {
-                //     isValid: true,
-                //     parsingMessage: "",
-                //     variables: getVariablesFromMap(
-                //         action.payload.expression.variableVectorMap
-                //     ),
-                // },
             };
         }
 
@@ -205,7 +187,6 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
                 isValid: true,
             };
 
-            // TODO: Replace .map() with .find() and edit reference?
             const newExpressions = state.expressions.map((elm) => {
                 if (elm.id === newActiveExpression.id) {
                     return newActiveExpression;
@@ -222,19 +203,7 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
         case StoreActions.ResetEditableExpression: {
             return {
                 ...state,
-                editableExpression: state.activeExpression.expression,
-                editableName: state.activeExpression.name,
-                editableDescription: state.activeExpression.description,
-                editableVariableVectorMap: cloneDeep(
-                    state.activeExpression.variableVectorMap
-                ),
-                parseData: {
-                    isValid: true,
-                    parsingMessage: "",
-                    variables: getVariablesFromMap(
-                        state.activeExpression.variableVectorMap
-                    ),
-                },
+                resetActionCounter: state.resetActionCounter + 1,
             };
         }
 
@@ -277,7 +246,6 @@ const StoreContext = React.createContext<Context | undefined>(undefined);
 
 interface StoreProviderProps {
     initialExpressions: ExpressionType[];
-    externalParsing: boolean;
 }
 
 export const StoreProvider: React.FC<StoreProviderProps> = (props) => {

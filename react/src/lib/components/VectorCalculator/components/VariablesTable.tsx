@@ -87,9 +87,6 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
             store.state.editableVariableVectorMap
         );
 
-        console.log(cachedVariableVectorMap);
-        console.log(newVariableVectorMap);
-
         setVariableVectorMap(newVariableVectorMap);
         setIsValid(
             isVariableVectorMapValid(newVariableVectorMap, ":", vectorData)
@@ -97,29 +94,30 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
     }, [store.state.editableVariableVectorMap]);
 
     React.useEffect(() => {
+        store.dispatch({
+            type: StoreActions.SetVariableVectorMap,
+            payload: {
+                variableVectorMap:
+                    store.state.activeExpression.variableVectorMap,
+            },
+        });
+    }, [store.state.resetActionCounter]);
+
+    React.useEffect(() => {
         // Update map when new active expression
         const newVariableVectorMap = cloneDeep(
             store.state.activeExpression.variableVectorMap
         );
+
         if (
             !areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)
         ) {
-            setCachedVariableVectorMap(newVariableVectorMap);
             store.dispatch({
                 type: StoreActions.SetVariableVectorMap,
                 payload: { variableVectorMap: newVariableVectorMap },
             });
         }
-        // setCachedVariableVectorMap(
-        //     store.state.activeExpression.variableVectorMap
-        // );
-        // store.dispatch({
-        //     type: StoreActions.SetVariableVectorMap,
-        //     payload: {
-        //         variableVectorMap:
-        //             store.state.activeExpression.variableVectorMap,
-        //     },
-        // });
+        setCachedVariableVectorMap(newVariableVectorMap);
     }, [store.state.activeExpression.variableVectorMap]);
 
     React.useEffect(() => {
@@ -148,20 +146,6 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
         }
     }, [store.state.parseData]);
 
-    // React.useEffect(() => {
-    //     const newVariableVectorMap = cloneDeep(
-    //         store.state.editableVariableVectorMap
-    //     );
-    //     if (
-    //         !areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)
-    //     ) {
-    //         setVariableVectorMap(newVariableVectorMap);
-    //         setIsValid(
-    //             isVariableVectorMapValid(newVariableVectorMap, ":", vectorData)
-    //         );
-    //     }
-    // }, [store.state.editableVariableVectorMap]);
-
     const updateProps = React.useCallback(
         (
             vectorSelectorProps: VectorSelectorParentProps,
@@ -175,13 +159,9 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
                     vectorSelectorProps.selectedTags[0];
             }
 
-            // setVariableVectorMap(newVariableVectorMap);
             setCachedVariableVectorMap(
                 createUpdatedCachedVariableVectorMap(newVariableVectorMap)
             );
-            // setIsValid(
-            //     isVariableVectorMapValid(newVariableVectorMap, ":", vectorData)
-            // );
             store.dispatch({
                 type: StoreActions.SetVariableVectorMap,
                 payload: {

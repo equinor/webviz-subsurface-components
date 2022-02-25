@@ -22,10 +22,7 @@ import "!style-loader!css-loader!./VectorCalculator.css";
 export const VectorCalculator = (props) => {
     return (
         <div className={"VectorCalculator"}>
-            <StoreProvider
-                initialExpressions={props.expressions}
-                externalParsing={props.isDashControlled}
-            >
+            <StoreProvider initialExpressions={props.expressions}>
                 <VectorCalculatorComponent {...props} />
             </StoreProvider>
         </div>

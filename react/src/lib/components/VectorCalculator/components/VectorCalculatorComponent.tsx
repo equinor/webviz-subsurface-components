@@ -39,19 +39,10 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
     React.useEffect(() => {
-        console.log("*** External parse data received ***");
-        console.log(`Active expression id: ${store.state.activeExpression.id}`);
-        console.log(
-            `External parse data id: ${
-                props.externalParseData
-                    ? props.externalParseData.id
-                    : "undefined external parse data"
-            }`
-        );
         /// Ensure external parsing for active expression
         if (
             !props.externalParseData ||
-            !store.state.externalParsing ||
+            !props.isDashControlled ||
             props.externalParseData.id !== store.state.activeExpression.id
         ) {
             return;
@@ -82,16 +73,10 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     }, [store.state.expressions, props.setProps]);
 
     React.useEffect(() => {
-        if (store.state.externalParsing) {
-            console.log("*** Send expression external parsing ***");
-            console.log(`Expression status: ${store.state.editableExpression}`);
-
+        if (props.isDashControlled) {
             // Build expression:
             const externalParsingExpression =
                 createExpressionTypeFromEditableData(store.state);
-
-            console.log(`Expression: ${externalParsingExpression}`);
-
             props.setProps({
                 externalParseExpression: externalParsingExpression,
             });
@@ -120,6 +105,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
                 <Grid item xs={6}>
                     <ExpressionInputComponent
                         vectors={props.vectors}
+                        externalParsing={props.isDashControlled}
                         maxExpressionDescriptionLength={
                             props.maxExpressionDescriptionLength
                         }

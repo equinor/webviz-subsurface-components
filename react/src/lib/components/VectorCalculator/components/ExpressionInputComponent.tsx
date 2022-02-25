@@ -1,7 +1,5 @@
 import React from "react";
 
-import { cloneDeep } from "lodash";
-
 import { Button, Icon } from "@equinor/eds-core-react";
 import { Grid, Paper } from "@material-ui/core";
 import { clear, save, sync } from "@equinor/eds-icons";
@@ -12,19 +10,15 @@ import { ExpressionDescriptionTextField } from "./ExpressionDescriptionTextField
 import { ExpressionNameTextField } from "./ExpressionNameTextField";
 import { ExpressionInputTextField } from "./ExpressionInputTextField";
 
-import {
-    areVariableVectorMapsEqual,
-    getVariablesFromMap,
-} from "../utils/VectorCalculatorHelperFunctions";
+import { areVariableVectorMapsEqual } from "../utils/VectorCalculatorHelperFunctions";
 
 import { StoreActions, useStore, ExpressionStatus } from "./ExpressionsStore";
-
-import { ExpressionType } from "../utils/VectorCalculatorTypes";
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface ExpressionInputComponent {
     vectors: TreeDataNode[];
+    externalParsing: boolean;
     maxExpressionDescriptionLength: number;
 }
 
@@ -47,33 +41,6 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
         React.useState<boolean>(false);
 
     Icon.add({ clear, save, sync });
-
-    const areExpressionsEqual = React.useCallback(
-        (first: ExpressionType, second: ExpressionType): boolean => {
-            const areIdsEqual = first.id === second.id;
-            const areNamesEqual = first.name === second.name;
-            const areExpressionsEqual = first.expression === second.expression;
-            const areDescriptionsEqual =
-                first.description === second.description;
-            const areIsValidsEqual = first.isValid === second.isValid;
-            const areIsDeletableEqual =
-                first.isDeletable === second.isDeletable;
-
-            return (
-                areIdsEqual &&
-                areNamesEqual &&
-                areExpressionsEqual &&
-                areDescriptionsEqual &&
-                areIsValidsEqual &&
-                areIsDeletableEqual &&
-                areVariableVectorMapsEqual(
-                    first.variableVectorMap,
-                    second.variableVectorMap
-                )
-            );
-        },
-        [areVariableVectorMapsEqual]
-    );
 
     React.useEffect(() => {
         if (disabled !== (store.state.activeExpression.id === "")) {
@@ -111,71 +78,29 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     }, [expressionTypeValid]);
 
     const handleCancelClick = React.useCallback((): void => {
-        // store.dispatch({
-        //     type: StoreActions.ResetEditableExpression,
-        //     payload: {},
-        // });
-
         store.dispatch({
-            type: StoreActions.SetExpression,
-            payload: { expression: store.state.activeExpression.expression },
-        });
-        store.dispatch({
-            type: StoreActions.SetName,
-            payload: { name: store.state.activeExpression.name },
-        });
-        store.dispatch({
-            type: StoreActions.SetDescription,
-            payload: {
-                description: store.state.activeExpression.description
-                    ? store.state.activeExpression.description
-                    : "",
-            },
-        });
-        store.dispatch({
-            type: StoreActions.SetVariableVectorMap,
-            payload: {
-                variableVectorMap: cloneDeep(
-                    store.state.activeExpression.variableVectorMap
-                ),
-            },
-        });
-        store.dispatch({
-            type: StoreActions.SetParsingData,
-            payload: {
-                data: {
-                    isValid: true,
-                    parsingMessage: "",
-                    variables: getVariablesFromMap(
-                        store.state.activeExpression.variableVectorMap
-                    ),
-                },
-            },
+            type: StoreActions.ResetEditableExpression,
+            payload: {},
         });
     }, [store]);
 
-    const handleNameValidChange = (isValid: boolean): void => {
+    React.useEffect(() => {
         setExpressionTypeValid(
-            isValid &&
+            nameValid &&
                 variableVectorMapValid &&
                 expressionStatus === ExpressionStatus.Valid
         );
+    }, [nameValid, expressionStatus, variableVectorMapValid]);
+
+    const handleNameValidChange = (isValid: boolean): void => {
         setNameValid(isValid);
     };
 
     const handleExpressionStatusChanged = (status: ExpressionStatus): void => {
-        setExpressionTypeValid(
-            status === ExpressionStatus.Valid &&
-                variableVectorMapValid &&
-                nameValid
-        );
         setExpressionStatus(status);
     };
 
     const handleVariableVectorMapValidChanged = (isValid: boolean): void => {
-        setExpressionTypeValid(
-            isValid && nameValid && expressionStatus === ExpressionStatus.Valid
-        );
         setVariableVectorMapValid(isValid);
     };
 
@@ -198,6 +123,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             </Grid>
             <Grid item>
                 <ExpressionInputTextField
+                    externalParsing={props.externalParsing}
                     disabled={disabled}
                     onStatusChanged={handleExpressionStatusChanged}
                 />

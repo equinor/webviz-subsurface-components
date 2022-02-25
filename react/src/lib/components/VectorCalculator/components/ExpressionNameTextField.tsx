@@ -36,10 +36,7 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
 ) => {
     const { vectors, disabled } = props;
     const store = useStore();
-    const [isValid, setIsValid] = React.useState<boolean>(
-        // isValidName(store.state.editableName)
-        false
-    );
+    const [isValid, setIsValid] = React.useState<boolean>(false);
     const [textFieldStyleDataState, setTextFieldStyleDataState] =
         React.useState<ExpressionNameTextFieldStyleData>({
             variant: "success",
@@ -150,22 +147,17 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
     }, [store.state.editableName, getTextFieldStyleData]);
 
     React.useEffect(() => {
-        // setIsValid(isValidName(store.state.activeExpression.name));
-        // setTextFieldStyleDataState(
-        //     getTextFieldStyleData(store.state.activeExpression.name)
-        // );
         store.dispatch({
             type: StoreActions.SetName,
             payload: { name: store.state.activeExpression.name },
         });
-    }, [store.state.activeExpression, getTextFieldStyleData]);
+    }, [store.state.activeExpression.name, store.state.resetActionCounter]);
 
     const handleInputChange = React.useCallback(
         (
             e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
         ): void => {
             const newName: string = e.target.value;
-            setIsValid(isValidName(newName));
             store.dispatch({
                 type: StoreActions.SetName,
                 payload: { name: newName },
