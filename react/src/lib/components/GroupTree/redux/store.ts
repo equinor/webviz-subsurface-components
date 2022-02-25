@@ -1,15 +1,6 @@
 import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
+import { enhancer } from "addon-redux";
 import { rootReducer } from "./reducer";
-
-const createEnhancer = () => {
-    const enhancers = [];
-    if (process.env["NODE_ENV"] !== "production") {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const enhancer = require("addon-redux").enhancer;
-        enhancers.push(enhancer);
-    }
-    return enhancers;
-};
 
 export type GroupTreeState = ReturnType<typeof rootReducer>;
 export const createReduxStore = (
@@ -18,5 +9,5 @@ export const createReduxStore = (
     configureStore({
         reducer: rootReducer,
         preloadedState,
-        enhancers: createEnhancer(),
+        enhancers: [enhancer],
     });
