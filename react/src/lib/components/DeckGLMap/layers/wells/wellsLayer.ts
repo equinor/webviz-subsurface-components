@@ -569,7 +569,7 @@ function getTvd(coord: Position, feature: Feature): number | null {
     // if trajectory is not found or if it has a data single point then get tvd from well head
     if (trajectory3D == undefined || trajectory3D?.length <= 1) {
         const wellhead_xyz = getWellHeadCoordinates(feature);
-        return wellhead_xyz?.[2] ?? -1;
+        return wellhead_xyz?.[2] ?? null;
     }
     let trajectory;
     // For 2D view coord is Position2D and for 3D view it's Position3D
