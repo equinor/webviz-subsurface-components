@@ -1,13 +1,15 @@
 import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
 import { rootReducer } from "./reducer";
 
+// #if process.env.NODE_ENV !== "production"
+import { enhancer } from "addon-redux";
+// #endif
+
 const createEnhancer = () => {
     const enhancers = [];
-    if (process.env["NODE_ENV"] !== "production") {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const enhancer = require("addon-redux").enhancer;
-        enhancers.push(enhancer);
-    }
+    // #if process.env["NODE_ENV"] !== "production"
+    enhancers.push(enhancer);
+    // #endif
     return enhancers;
 };
 
