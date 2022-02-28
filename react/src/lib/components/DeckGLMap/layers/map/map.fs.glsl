@@ -25,13 +25,6 @@ out vec4 fragColor;
 
 in vec3 worldPos; // we export this from vertex shader (by injecting into it).
 
-uniform sampler2D colormap;
-
-uniform float valueRangeMin;
-uniform float valueRangeMax;
-uniform float colorMapRangeMin;
-uniform float colorMapRangeMax;
-
 
 void main(void) {
    geometry.uv = vTexCoord;
@@ -49,8 +42,10 @@ void main(void) {
 
    vec4 color = hasTexture ? texture(sampler, vTexCoord) : vColor;
 
+   float propertyValue = 0.0; // XXX this must be fixed.
+
    // Discard transparent pixels.
-   if (!picking_uActive && color.w < 1.0) {
+   if (!picking_uActive && color.w < 0.99) {
          discard;
          return;
    }
@@ -58,7 +53,7 @@ void main(void) {
    // Picking pass.
    if (picking_uActive) {
       if (isReadoutDepth) {
-         // Readout should not be the surface property but the surface height (z value).
+         // Readout should not be surface height (z value).
          float depth = abs(worldPos.z);
          
          // Express in 255 system.
@@ -81,36 +76,22 @@ void main(void) {
          fragColor = vec4(r / 255.0, g / 255.0, b / 255.0,  1.0);
       }
       else {
-         // Readout is the surface property, i.e. the raw texture value.
-         fragColor = color;
+         // Readout should be surface property.
+         // Send texture coordinates.
+         float s = vTexCoord.x;
+         float t = vTexCoord.y;
+
+         fragColor = vec4(s, t, 0.0, 1.0);
       }
 
       return;
    }
 
-   float propertyValue = 0.0;
-   if (hasTexture) {
-      float opcacity = color.w;
-      float floatScaler =  1.0 / (256.0 * 256.0 * 256.0 - 1.0);
-      vec3 rgb = color.rgb;
-      rgb *= vec3(16711680.0, 65280.0, 255.0); //255*256*256, 255*256, 255
-      float propertyValue_norm = (rgb.r + rgb.g + rgb.b) * floatScaler; // propertyValue_norm will be in range [0-1]
-
-      // If colorMapRangeMin/Max specified, color map will span this interval.
-      propertyValue  = propertyValue_norm * (valueRangeMax - valueRangeMin) + valueRangeMin;
-      float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-      x = max(0.0, x);
-      x = min(1.0, x);
-
-      color = texture2D(colormap, vec2(x, 0.5));
-      color.a = opcacity;
-   }
-
    bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
    if (is_contours) {
       // Contours are made of either depths or properties.
-      float val =  (hasTexture && !isContoursDepth) ? (propertyValue - contourReferencePoint) / contourInterval
-                                                    : (abs(worldPos.z) - contourReferencePoint) / contourInterval;
+      float val = isContoursDepth ? (abs(worldPos.z) - contourReferencePoint) / contourInterval
+                                  : (propertyValue - contourReferencePoint) / contourInterval;
 
       float f  = fract(val);
       float df = fwidth(val);

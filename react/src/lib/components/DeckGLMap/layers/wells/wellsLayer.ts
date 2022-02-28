@@ -12,6 +12,7 @@ import {
     Feature,
     GeometryCollection,
     LineString,
+    Point,
     Position,
     FeatureCollection,
     GeoJsonProperties,
@@ -241,9 +242,16 @@ export default class WellsLayer extends CompositeLayer<
             this.props.logName
         );
 
+        // Patch for inverting tvd readout to fix issue #830,
+        // should make proper fix when handling z increase direction - issue #842
+        const inverted_tvd_property = tvd_property && {
+            ...tvd_property,
+            value: (tvd_property?.value as number) * -1,
+        };
+
         const layer_properties: PropertyDataType[] = [];
         if (md_property) layer_properties.push(md_property);
-        if (tvd_property) layer_properties.push(tvd_property);
+        if (inverted_tvd_property) layer_properties.push(inverted_tvd_property);
         if (log_property) layer_properties.push(log_property);
 
         return {
@@ -315,6 +323,14 @@ function getWellObjectByName(
         (item) =>
             item.properties?.["name"]?.toLowerCase() === name?.toLowerCase()
     );
+}
+
+function getWellHeadCoordinates(well_object?: Feature): Position {
+    return (
+        (well_object?.geometry as GeometryCollection)?.geometries.find(
+            (item) => item.type == "Point"
+        ) as Point
+    )?.coordinates;
 }
 
 function getWellCoordinates(well_object?: Feature): Position[] {
@@ -513,7 +529,7 @@ function interpolateDataOnTrajectory(
 }
 
 function getMd(coord: Position, feature: Feature): number | null {
-    if (!feature.properties || !feature.geometry) return null;
+    if (!feature.properties?.["md"]?.[0] || !feature.geometry) return null;
 
     const measured_depths = feature.properties["md"][0] as number[];
     const trajectory3D = getWellCoordinates(feature);
@@ -549,8 +565,12 @@ function getMdProperty(
 
 function getTvd(coord: Position, feature: Feature): number | null {
     const trajectory3D = getWellCoordinates(feature);
-    if (trajectory3D == undefined) return null;
 
+    // if trajectory is not found or if it has a data single point then get tvd from well head
+    if (trajectory3D == undefined || trajectory3D?.length <= 1) {
+        const wellhead_xyz = getWellHeadCoordinates(feature);
+        return wellhead_xyz?.[2] ?? -1;
+    }
     let trajectory;
     // For 2D view coord is Position2D and for 3D view it's Position3D
     if (coord.length == 2) {

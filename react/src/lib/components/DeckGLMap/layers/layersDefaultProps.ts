@@ -5,8 +5,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         id: "colormap-layer",
         pickable: true,
         visible: true,
-        valueRange: { type: "array" },
-        colorMapRange: { type: "array" },
+        valueRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array", value: [0, 1] },
         valueDecoder: {
             rgbScaler: [1, 1, 1],
             // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
@@ -15,6 +15,7 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
         rotDeg: 0,
+        colorMapName: "Rainbow",
     },
     Hillshading2DLayer: {
         "@@type": "Hillshading2DLayer",
@@ -24,8 +25,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         visible: true,
         rotDeg: 0,
-        valueRange: { type: "array" },
-        colorMapRange: { type: "array" },
+        valueRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array", value: [0, 1] },
         lightDirection: [1, 1, 1],
         ambientLightIntensity: 0.5,
         diffuseLightIntensity: 0.5,
@@ -37,19 +38,40 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
     },
+    MapLayer: {
+        "@@type": "MapLayer",
+        name: "Map",
+        id: "map3d-layer-float32",
+        pickable: true,
+        visible: true,
+        // Url to png image for height field.
+        mesh: "",
+        // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
+        meshMaxError: { type: "number", value: 5 },
+        // Url to png image for map properties. (ex, poro or perm values as a texture)
+        propertyTexture: "",
+        // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
+        bounds: { type: "array", value: null, false: true, compare: true },
+        colorMapRange: { type: "array" },
+        rotDeg: 0,
+        contours: [-1.0, -1.0],
+        // readout is default property value but if set to true it will be depth/z-value.
+        isReadoutDepth: true,
+        enableSmoothShading: true,
+    },
     Map3DLayer: {
         "@@type": "Map3DLayer",
         name: "Map 3D",
         id: "map3d-layer",
         pickable: true,
-        visible: false,
+        visible: true,
         // Url to png image for height field.
-        mesh: { type: "string", optional: false },
+        mesh: "",
         meshValueRange: { type: "array", value: [0, 1] },
         // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
         meshMaxError: { type: "number", value: 5 },
         // Url to png image for map properties. (ex, poro or perm values as a texture)
-        propertyTexture: { type: "string", optional: false },
+        propertyTexture: "",
         // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
         bounds: { type: "array", value: null, false: true, compare: true },
         propertyValueRange: { type: "array", value: [0, 1] },
