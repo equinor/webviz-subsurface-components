@@ -110,7 +110,12 @@ export function dataNames(
     const curves = welllog.curves;
     let iCurve = 0;
     for (const curve of curves) {
-        if (discrete && curve.valueType !== "integer") continue;
+        if (
+            discrete &&
+            curve.valueType !== "string" &&
+            curve.valueType !== "integer"
+        )
+            continue;
 
         let bUsed = false;
         if (plots) {

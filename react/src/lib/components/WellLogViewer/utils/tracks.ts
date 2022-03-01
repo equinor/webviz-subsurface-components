@@ -870,7 +870,7 @@ function createAreaData(
     meta: DiscreteMeta | null,
     from: number,
     to: number,
-    value: number
+    value: number | string
 ): AreaData | null {
     if (meta) {
         // use discrete metadate from WellLog JSON file
@@ -929,11 +929,7 @@ const createStackData = async (
                     arr.push(area);
                     area = null; //  wait for a new non-null value
                 }
-                if (
-                    value !== null &&
-                    value !== undefined &&
-                    typeof value == "number"
-                ) {
+                if (value !== null && value !== undefined) {
                     // new value is not null
                     // create new interval colored and labeled for the value
                     area = createAreaData(meta, prev[0], p[0], value);
@@ -1209,13 +1205,13 @@ function addStackedTrack(
     templateStyles?: TemplateStyle[]
 ): void {
     const templatePlot = templateTrack.plots[0];
+    const name = templatePlot.name;
 
-    const iCurve = indexOfElementByName(curves, templatePlot.name);
+    const iCurve = indexOfElementByName(curves, name);
     if (iCurve < 0) return; // curve not found
     const curve = curves[iCurve];
 
     if (curve.dimensions !== 1) return;
-    if (curve.valueType === "string") return;
 
     const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
     checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
@@ -1233,12 +1229,14 @@ function addStackedTrack(
     templateTrackFullPlot.title = label;
     templateTrackFullPlot.plots[0].type = templatePlotProps.type;
 
-    //"quantity": "DISC",
-    //"unit": "DISC",
-    //"valueType": "integer"
-    const name = templatePlot.name;
+    // curve.valueType === "integer", "string"
     const meta = getDiscreteMeta(welllog, name);
-    if (!meta) console.log("Discrete meta information not found. Use default");
+    if (!meta && curve.valueType == "integer")
+        console.log(
+            "Discrete meta information for '" +
+                name +
+                "' not found. Use default"
+        );
 
     const showLines = true;
     const options: StackedTrackOptions = {

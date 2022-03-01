@@ -1,4 +1,8 @@
 // See https://github.com/JSONWellLogFormat/JSONWellLogFormat
+export type integer = number;
+export type float = number;
+export type datetime = string;
+
 export type WellLogHeader = {
     name?: string; // Log name
     description?: string; // Log description
@@ -7,11 +11,11 @@ export type WellLogHeader = {
     wellbore?: string; // Wellbore name
     filed?: string; // Field name
     country?: string; // Country of operation
-    date?: string /*datetime*/; // Logging date
+    date?: datetime; // Logging date
     operator?: string; // Operator company name
     serviceCompany?: string; // Service company name
     runNumber?: string; // Run number
-    elevation?: number /*float*/; // Vertical distance between measured depth 0.0 and mean sea level in SI unit (meters)
+    elevation?: float; // Vertical distance between measured depth 0.0 and mean sea level in SI unit (meters)
     source?: string; // Source system or process of this log
     startIndex?: number /*According to index value type*/; // Value of the first index. Unit according to index curve.
     endIndex?: number /*According to index value type*/; // Value of the last index. Unit according to index curve.
@@ -20,13 +24,15 @@ export type WellLogHeader = {
     //...
 }; // a part of JSON
 export type WellLogCurve = {
-    name: string;
-    description?: string | null;
-    quantity?: string | null;
-    unit?: string | null;
-    valueType?: string | null;
-    dimensions?: number;
-    //...
+    name: string; // Curve name or mnemonic. Mandatory. Non-null.
+    description?: string | null; // Curve description. Optional.
+    quantity?: string | null; // Curve quantity such as length, pressure, force etc. Optional.
+    unit?: string | null; // Unit of measurement such as m, ft, bar, etc. Optional.
+    valueType?: string | null; // Curve value type: float, integer, string, datetime or boolean. Non-null. Optional. float assumed if not present.
+    dimensions?: integer; //  	Number of dimensions. [1,>. Non-null. Optional. 1 assumed if not present.
+    // Not supported yet:
+    //axis?: 	array of curve definition; 	// A detailed description of the multi-dimensional structure of the curve in case this spans multiple axes. One element per axis. The combined product of the axis diemsnsions elements must equal the dimensions of the curve. Optional.
+    //maxSize?: integer; 	// Maximum storage size (number of bytes) for UTF-8 string data. Used with binary storage in order to align the curve data. [0,>. Optional. 20 assumed if not present. Ignored for curves where valueType is other than string.
 }; // a part of JSON
 export type WellLogDataRow = (number | string)[];
 
