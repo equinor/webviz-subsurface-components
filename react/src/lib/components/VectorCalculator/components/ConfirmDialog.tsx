@@ -10,6 +10,7 @@ interface ConfirmDialogProps {
     id: string;
     open: boolean;
     text: string;
+    containerRef: React.RefObject<HTMLDivElement | null>;
     onYes: () => void;
     onNo: () => void;
 }
@@ -39,6 +40,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = (
             open={isOpen}
             id={props.id}
             aria-describedby={`${props.id}-description`}
+            container={props.containerRef.current}
         >
             <DialogContent>
                 <DialogContentText id={`${props.id}-content-text`}>

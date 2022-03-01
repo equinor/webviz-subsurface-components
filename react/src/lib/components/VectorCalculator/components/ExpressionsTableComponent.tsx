@@ -16,7 +16,13 @@ import {
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
-export const ExpressionsTableComponent: React.FC = () => {
+interface ExpressionsTableComponentProps {
+    containerRef: React.RefObject<HTMLDivElement | null>;
+}
+
+export const ExpressionsTableComponent: React.FC<
+    ExpressionsTableComponentProps
+> = (props: ExpressionsTableComponentProps) => {
     const store = useStore();
     const [expressions, setExpressions] = React.useState<ExpressionType[]>(
         store.state.expressions
@@ -130,6 +136,7 @@ export const ExpressionsTableComponent: React.FC = () => {
         >
             <Grid item>
                 <ExpressionsTable
+                    containerRef={props.containerRef}
                     blinkingExpressions={blinkingTableExpressions}
                     onExpressionsSelect={handleExpressionsSelect}
                 />

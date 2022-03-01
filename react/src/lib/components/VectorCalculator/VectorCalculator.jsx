@@ -49,7 +49,7 @@ VectorCalculator.propTypes = {
     /**
      * Pre-defined vector calculator expressions.
      * Each expression consist of an expression name, mathematical expression string with variables
-     * and a map of characther variables and the corresponding vector name.
+     * and a map of character variables and the corresponding vector name.
      */
     expressions: PropTypes.arrayOf(
         PropTypes.shape({

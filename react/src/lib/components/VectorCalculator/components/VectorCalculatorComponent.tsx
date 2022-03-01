@@ -34,6 +34,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     props: VectorCalculatorProps
 ) => {
     const store = useStore();
+    const vectorCalculatorRef = React.useRef<HTMLDivElement | null>(null);
 
     React.useEffect(() => {
         /// Ensure external parsing for active expression
@@ -80,10 +81,12 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     }, [store.state.editableExpression]);
 
     return (
-        <div>
+        <div ref={vectorCalculatorRef}>
             <Grid container spacing={2}>
                 <Grid item xs={6}>
-                    <ExpressionsTableComponent />
+                    <ExpressionsTableComponent
+                        containerRef={vectorCalculatorRef}
+                    />
                 </Grid>
                 <Grid item xs={6}>
                     <ExpressionInputComponent

@@ -21,6 +21,7 @@ import "!style-loader!css-loader!../VectorCalculator.css";
 
 interface ExpressionsTableProps {
     blinkingExpressions: ExpressionType[];
+    containerRef: React.RefObject<HTMLDivElement | null>;
     onExpressionsSelect: (expressions: ExpressionType[]) => void;
 }
 
@@ -282,6 +283,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
             <ConfirmDialog
                 id={"SaveDialog"}
                 open={isSaveDialogOpen}
+                containerRef={props.containerRef}
                 text={"Do you want to save changes?"}
                 onYes={handleOnSave}
                 onNo={handleOnNotSave}
@@ -289,6 +291,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
             <ConfirmDialog
                 id={"DiscardDialog"}
                 open={isDiscardDialogOpen}
+                containerRef={props.containerRef}
                 text={
                     "Edited input is not valid, do you want to discard changes?"
                 }

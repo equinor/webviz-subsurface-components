@@ -19,15 +19,15 @@ import {
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
-interface ExpressionInputComponent {
+interface ExpressionInputComponentProps {
     vectors: TreeDataNode[];
     externalParsing: boolean;
     maxExpressionDescriptionLength: number;
 }
 
-export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
-    props: ExpressionInputComponent
-) => {
+export const ExpressionInputComponent: React.FC<
+    ExpressionInputComponentProps
+> = (props: ExpressionInputComponentProps) => {
     const store = useStore();
     const [disabled, setDisabled] = React.useState<boolean>(
         store.state.activeExpression.id === ""
