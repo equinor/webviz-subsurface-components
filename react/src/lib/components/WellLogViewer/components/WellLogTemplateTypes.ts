@@ -14,7 +14,6 @@ export type CSSColor = string;
 // rgbhexcolor pattern: "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$"
 // rgbcolor pattern:  "^rgb\\((25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?|[0-9]), ?(25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?|[0-9]), ?(25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?|[0-9])\\)$"
 
-
 export type TemplatePlotProps = {
     type: TemplatePlotTypes;
     scale?: TemplatePlotScaleTypes; // 'linear' or 'log', default 'linear'
