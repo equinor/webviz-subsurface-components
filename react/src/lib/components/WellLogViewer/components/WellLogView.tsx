@@ -21,14 +21,23 @@ import "!vue-style-loader!css-loader!sass-loader!./styles.scss";
 import Ajv from "ajv";
 import { ValidateFunction } from "ajv/dist/types/index";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const inputSchema = require("../../../inputSchema/WellLogTemplate.json");
+const inputSchema = require("../../../inputSchema/WellLog.json");
+const inputTemplateSchema = require("../../../inputSchema/WellLogTemplate.json");
 const ajv = new Ajv();
+let schemaErrorTemplate = "";
+let validateTemplate: ValidateFunction<unknown> | null = null;
+try {
+    validateTemplate = ajv.compile(inputTemplateSchema);
+} catch (e) {
+    schemaErrorTemplate = "Wrong JSON schema for WellLogTemplate. " + String(e);
+    console.error(schemaErrorTemplate);
+}
 let schemaError = "";
 let validate: ValidateFunction<unknown> | null = null;
 try {
     validate = ajv.compile(inputSchema);
 } catch (e) {
-    schemaError = "Wrong JSON schema for WellLogTemplate. " + String(e);
+    schemaError = "Wrong JSON schema for WellLog. " + String(e);
     console.error(schemaError);
 }
 
@@ -673,7 +682,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.createLogViewer();
 
         this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
-        this.setTracks();
+        this.setTracks(true);
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
@@ -809,16 +818,35 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (checkSchema) {
             //check against the json schema
-            let errorText = "";
-            if (!validate) errorText = schemaError;
-            else if (!validate(this.template))
-                errorText =
-                    validate.errors && validate.errors[0]
-                        ? validate.errors[0].dataPath +
+            let errorTextTemplate = "";
+            if (!validateTemplate) errorTextTemplate = schemaErrorTemplate;
+            else if (!validateTemplate(this.template))
+                errorTextTemplate =
+                validateTemplate.errors && validateTemplate.errors[0]
+                        ? validateTemplate.errors[0].dataPath +
                           ": " +
-                          validate.errors[0].message
+                          validateTemplate.errors[0].message
                         : "JSON schema validation failed";
-            this.setState({ errorText: errorText });
+
+            if(this.props.welllog) {
+                let errorText = "";
+                if (!validate) errorText = schemaError;
+                else if (!validate(this.props.welllog))
+                    errorText =
+                    validate.errors && validate.errors[0]
+                            ? validate.errors[0].dataPath +
+                            ": " +
+                            validate.errors[0].message
+                            : "JSON schema validation failed";
+
+                if(errorText) {
+                    if(errorTextTemplate)
+                      errorTextTemplate+="; ";
+                  errorTextTemplate += errorText;
+                }
+            }
+                        
+            this.setState({ errorText: errorTextTemplate });
         }
 
         if (this.logController) {

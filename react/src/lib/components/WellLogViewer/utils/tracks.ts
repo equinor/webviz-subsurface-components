@@ -55,11 +55,11 @@ import {
 import { updateLegendRows } from "./log-viewer";
 
 function indexOfElementByName(array: Named[], name: string): number {
-    if (name) {
+    if (array && name) {
         const nameUpper = name.toUpperCase();
         let i = 0;
         for (const element of array) {
-            if (element.name.toUpperCase() == nameUpper) {
+            if (element.name && element.name.toUpperCase() == nameUpper) {
                 return i;
             }
             i++;
@@ -69,11 +69,11 @@ function indexOfElementByName(array: Named[], name: string): number {
 }
 
 function indexOfElementByNames(array: Named[], names: string[]): number {
-    if (names) {
+    if (array && names) {
         /* names should be already in upper case */
         let i = 0;
         for (const element of array) {
-            if (names.indexOf(element.name.toUpperCase()) >= 0) return i;
+            if (element.name && names.indexOf(element.name.toUpperCase()) >= 0) return i;
             i++;
         }
     }
@@ -117,7 +117,7 @@ const defPlotType = "line";
 class PlotData {
     minmax: [number, number];
     minmaxPrimaryAxis: [number, number];
-    data: [number, number][];
+    data: [number, number|string][];
 
     constructor() {
         this.minmax = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
@@ -137,9 +137,10 @@ function preparePlotData(
     const plot = new PlotData();
     let i = 0;
     for (const row of data) {
-        const value: number = row[iCurve];
-        checkMinMaxValue(plot.minmax, value);
-        const primary: number = iPrimaryAxis >= 0 ? row[iPrimaryAxis] : i++;
+        const value = row[iCurve];
+        if(typeof value=="number")
+            checkMinMaxValue(plot.minmax, value);
+        const primary: number = iPrimaryAxis >= 0 ? row[iPrimaryAxis] as number : i++;
         checkMinMaxValue(plot.minmaxPrimaryAxis, primary);
         plot.data.push([primary, value]);
     }
@@ -1090,11 +1091,11 @@ function addScaleTracks(
         {
             let count = 0;
             for (const row of data) {
-                const secondary: number = row[iSecondaryAxis];
+                const secondary: number = row[iSecondaryAxis] as number;
                 checkMinMaxValue(info.minmaxSecondaryAxis, secondary);
 
                 if (secondary !== null) {
-                    const primary: number = row[iPrimaryAxis];
+                    const primary: number = row[iPrimaryAxis] as number;
                     if (primary !== null) {
                         info.secondaries[count] = secondary;
                         info.primaries[count] = primary;
@@ -1129,8 +1130,9 @@ function addGraphTrack(
     data: WellLogDataRow[],
     iPrimaryAxis: number
 ): void {
-    const plotDatas: [number, number][][] = [];
+    const plotDatas: [number, number|string][][] = [];
     const plots: PlotConfig[] = [];
+    if(templateTrack.plots)
     for (const templatePlot of templateTrack.plots) {
         // see also addGraphTrackPlot(wellLogView, track, templatePlot);
 
@@ -1289,6 +1291,7 @@ export function createTracks(
             // scale tracks are needed
             addScaleTracks(info, axes, curves, data, iPrimaryAxis);
 
+        if(templateTracks)
         for (const templateTrack of templateTracks) {
             if (isStackedTemplateTrack(templateTrack, templateStyles)) {
                 addStackedTrack(

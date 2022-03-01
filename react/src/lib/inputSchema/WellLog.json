@@ -1,0 +1,73 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "header": { "$ref": "#/definitions/header" },
+            "curves": { 
+                "type": "array",
+                "items": { "$ref": "#/definitions/curve" }
+            },
+            "data": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/data_row" }
+            },
+            "metadata_discrete": {
+                "type": "object"
+            }
+        },
+        "required": [
+            "curves",
+            "data",
+            "header"
+        ]
+    },
+    "definitions": {
+        "header": {
+            "type": "object",
+            "properties": {
+                "name": { "type": "string", "description": "Log name" },
+                "description": { "type": "string", "description": "Log description" },
+                "externalIds": { "type": "object", "description": "Record<string,string>; IDs within external storage, key being the storage name, and value being the ID." },
+                "well": { "type": "string", "description": "Well name"}, 
+                "wellbore": { "type": "string", "description": "wellbore name"}, 
+                "field": { "type": "string", "description": "Field name"}, 
+                "country": { "type": "string", "description": "Country of operation"}, 
+                "date": { "type": "string", "description": "datetime; Logging date"}, 
+                "operator": { "type": "string", "description": "Operator company name"}, 
+                "serviceCompany": { "type": "string", "description": "Service company name"}, 
+                "source": { "type": "string", "description": "Source system or process of this log"}, 
+                "runNumber": { "type": "string", "description": "Run number"},
+                "elevation": { "type": "number", "description": "float; Vertical distance between measured depth 0.0 and mean sea level in SI unit (meters)"},
+                "startIndex": { "type": "number", "description": "Value of the first index. Unit according to index curve"}, 
+                "endIndex": { "type": "number", "description": "Value of the last index. Unit according to index curve"}, 
+                "step": { "type": "number", "description": "Distance between indices if regularly sampled. Unit according to index curve. If log is time based, milliseconds assumed"}, 
+                "dataUri": { "type": "string", "description": "Point to data source in case this is kept separate. Can be absolute or relative according to the URI specification" }
+            }
+        },
+        "curve": {
+            "type": "object",
+            "properties": {
+                "name": { "type": "string" },
+                "description": { "type": [ "string", "null" ] },
+                "dimensions": { "type": "number" },
+                "quantity": { "type": [ "string", "null" ] },
+                "unit": { "type": [ "string", "null" ] },
+                "valueType": { "type": [ "string", "null" ] }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "data_row": {
+            "type": "array",
+            "items": {
+                "type": ["number", "string", "null" ]
+            }
+        }, 
+        "metadata_discrete": {
+            "type": "object"
+        }
+    }
+}
+
