@@ -11,7 +11,7 @@ interface legendProps {
     legendColorName: string;
     useContColorTable?: boolean;
     valueIndex?: any;
-    parentCallback?: any;
+    parentFunc: any;
 }
 
 interface ItemColor {
@@ -26,12 +26,15 @@ export const LegendContinous: React.FC<legendProps> = ({
     legendColorName,
     useContColorTable,
     valueIndex,
-    parentCallback
+    parentFunc
 }: legendProps) => {
 
-    function onTrigger() {
-        console.log('event', event)
-    }
+    const handleChange = React.useCallback(() => {
+        //console.log('colorArray--in', colorArray)
+        parentFunc(colorArray);
+        //setIsParent(childData);
+    }, []);
+
     const divRef = useRef<HTMLDivElement>(null);
     React.useEffect(() => {
         // colortable colors
@@ -107,64 +110,64 @@ export const LegendContinous: React.FC<legendProps> = ({
     }
 
     // continuous legend using d3 color scale (linear gradiend code)
-    function d3colorLegend(colorscale: any) {
+    // function d3colorLegend(colorscale: any) {
 
-        const itemColor: any = [];
+    //     const itemColor: any = [];
 
-        colorscale.forEach((value: any) => {
-            // return the color and offset needed to draw the legend
-            itemColor.push(value.colors);
-        });
+    //     colorscale.forEach((value: any) => {
+    //         // return the color and offset needed to draw the legend
+    //         itemColor.push(value.colors);
+    //     });
 
-        // create an array of steps based on the color scale
-        // returns an array of evenly-spaced numbers. Returns the integers from zero to the specified end minus one.
-        // d3.range(start, stop, step)
-        var data = d3.range(10).map(d=> ({color:legendColor(d/10), value:d}))
-        // get the array's min and max value
-        var extent: any = d3.extent(data, d => d.value); 
+    //     // create an array of steps based on the color scale
+    //     // returns an array of evenly-spaced numbers. Returns the integers from zero to the specified end minus one.
+    //     // d3.range(start, stop, step)
+    //     var data = d3.range(10).map(d=> ({color:legendColor(d/10), value:d}))
+    //     // get the array's min and max value
+    //     var extent: any = d3.extent(data, d => d.value); 
 
-        // append a defs (for definition) element to your SVG
-        const svgLegend = d3.select(divRef.current)
-            .append("svg")
-            .style("height", "50px")
-            .style("display", "flex")
+    //     // append a defs (for definition) element to your SVG
+    //     const svgLegend = d3.select(divRef.current)
+    //         .append("svg")
+    //         .style("height", "50px")
+    //         .style("display", "flex")
 
-        const defs = svgLegend.append("defs");
-        let currentIndex = "linear-gradient-" + valueIndex;
-        // append a linearGradient element to the defs and give it a unique id
-        const linearGradient = defs
-            .append("linearGradient")
-            .attr("id", currentIndex)
-            .attr("x1", "0%")
-            .attr("x2", "100%") //since it's a horizontal linear gradient
-            .attr("y1", "0%")
-            .attr("y2", "0%");
+    //     const defs = svgLegend.append("defs");
+    //     let currentIndex = "linear-gradient-" + valueIndex;
+    //     // append a linearGradient element to the defs and give it a unique id
+    //     const linearGradient = defs
+    //         .append("linearGradient")
+    //         .attr("id", currentIndex)
+    //         .attr("x1", "0%")
+    //         .attr("x2", "100%") //since it's a horizontal linear gradient
+    //         .attr("y1", "0%")
+    //         .attr("y2", "0%");
 
-        // append multiple color stops by using D3's data/enter step
-        linearGradient.selectAll("stop")
-            .data(data)
-            .enter().append("stop")
-            .attr("offset", d => ((d.value - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
-            .attr("stop-color", d => d.color);
+    //     // append multiple color stops by using D3's data/enter step
+    //     linearGradient.selectAll("stop")
+    //         .data(data)
+    //         .enter().append("stop")
+    //         .attr("offset", d => ((d.value - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
+    //         .attr("stop-color", d => d.color);
 
-        // append title
-        svgLegend
-            .append("text")
-            .attr("class", "legendTitle")
-            .attr("x", 0)
-            .attr("y", 43)
-            .style("text-anchor", "left")
-            .text(legendColorName);
+    //     // append title
+    //     svgLegend
+    //         .append("text")
+    //         .attr("class", "legendTitle")
+    //         .attr("x", 0)
+    //         .attr("y", 43)
+    //         .style("text-anchor", "left")
+    //         .text(legendColorName);
 
-        // draw the rectangle and fill with gradient
-        svgLegend
-            .append("rect")
-            .attr("x", 180)
-            .attr("y", 30)
-            .attr("width", 150)
-            .attr("height", 25)
-            .style("fill", "url(#"+currentIndex+")");
-    }
+    //     // draw the rectangle and fill with gradient
+    //     svgLegend
+    //         .append("rect")
+    //         .attr("x", 180)
+    //         .attr("y", 30)
+    //         .attr("width", 150)
+    //         .attr("height", 25)
+    //         .style("fill", "url(#"+currentIndex+")");
+    // }
 
     return (
         <div
@@ -173,11 +176,11 @@ export const LegendContinous: React.FC<legendProps> = ({
                 top: position ? position[1] : ' ',
             }}
         >
-            {/* {useContColorTable ?  */}
-            <div className="colortableLegend" ref={divRef} onClick={onTrigger}></div> 
-            {/* :  */}
-            {/* <div className="d3colorLegend" ref={divRef} onClick={onTrigger} ></div> */}
-            {/* } */}
+            {useContColorTable ?
+            <div className="colortableLegend" ref={divRef} onClick={handleChange}></div> 
+            :
+            <div className="d3colorLegend" ref={divRef} onClick={handleChange} ></div>
+            }
         </div>
     );
 };

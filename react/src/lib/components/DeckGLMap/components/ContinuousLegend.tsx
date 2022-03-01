@@ -6,7 +6,6 @@ import { select, scaleLinear, scaleSequential, axisBottom } from "d3";
 import { colorTablesArray } from "../ColorTableTypes";
 //import {ColorSelectorWrapper} from "@emerson-eps/color-tables/src/component/ColorSelector/ColorTableSelectorWrapper"
 import {ColorSelectorWrapper} from "./ColorTableSelectorWrapper"
-import {LegendContinous} from "./legendContinous"
 
 declare type legendProps = {
     min: number;
@@ -16,6 +15,7 @@ declare type legendProps = {
     colorName: string;
     colorTables: colorTablesArray;
     horizontal?: boolean | null;
+    //parentdata: any
 }
 
 declare type ItemColor = {
@@ -30,9 +30,16 @@ export const ContinuousLegend: React.FC<legendProps> = ({
     position,
     colorName,
     colorTables,
-    horizontal
+    horizontal,
+    //parentdata
 }: legendProps) => {
     const divRef = useRef<HTMLDivElement>(null);
+    const [parent, setIsParent] = React.useState();
+
+    const parent_data = React.useCallback((parent_data: any) => {
+        setIsParent(parent_data);
+    }, []);
+
     React.useEffect(() => {
         if (divRef.current) {
             continuousLegend();
@@ -40,24 +47,36 @@ export const ContinuousLegend: React.FC<legendProps> = ({
         return function cleanup() {
             select(divRef.current).select("svg").remove();
         };
-    }, [min, max, colorName, colorTables, horizontal]);
+    }, [min, max, colorName, colorTables, horizontal, parent]);
 
     const [isToggled, setIsToggled] = React.useState(false);
-    const [parent, setIsParent] = React.useState(false);
 
-    const handleCallback = useCallback((childData) => {
-        setIsParent(childData) 
+    const handleClick = useCallback(() => {
+        setIsToggled(true);
     }, []);
 
-    // can be used callback function
-    function handleClick () {
-        return setIsToggled(true)
-    }
 
     function continuousLegend() {
+        console.log('typeof', colorTables[0].name)
         const itemColor: ItemColor[] = [];
         // Return the matched colors array from color.tables.json file
-        const colorTableColors = colorsArray(colorName, colorTables);
+        let colorTableColors = colorsArray(colorName, colorTables);
+        //let colorTableColors; 
+
+        // if (colorTables[0].name) {
+        //     colorTableColors = colorsArray(colorName, colorTables);
+        // } else {
+        //     colorTableColors = colorTables;
+        // } 
+
+        
+        
+        if (parent) {
+            colorTableColors = parent.color;
+        } else {
+            colorTableColors;
+        }
+
         colorTableColors.forEach((value: [number, number, number, number]) => {
             // return the color and offset needed to draw the legend
             itemColor.push({
@@ -65,6 +84,8 @@ export const ContinuousLegend: React.FC<legendProps> = ({
                 color: RGBToHex(value).color,
             });
         });
+        
+        
         const colorScale = scaleSequential().domain([min, max]);
         // append a defs (for definition) element to your SVG
         const svgLegend = select(divRef.current)
@@ -140,7 +161,7 @@ export const ContinuousLegend: React.FC<legendProps> = ({
         >
             <div id="legend" ref={divRef} onClick={handleClick}></div>
             {isToggled && (
-                <ColorSelectorWrapper />
+                <ColorSelectorWrapper parentdata={parent_data} />
             )}
         </div>
     );

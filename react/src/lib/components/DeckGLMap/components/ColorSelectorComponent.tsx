@@ -3,6 +3,7 @@ import { LegendContinous } from "./legendContinous";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
 import {colorScalesCont} from "@emerson-eps/color-tables/src/component/Utils/d3ColorScale"
+import { ColorSelectorWrapper } from "./ColorTableSelectorWrapper"
 
 const position = [16, 206];
 const continuosColorData: any = []
@@ -11,6 +12,7 @@ const continuosD3ColorData: any = []
 declare type legendProps = {
     useColorTableColors: boolean
     useD3Colors: boolean
+    parentdata: any;
 }
 
 // code is for color table continuous data
@@ -33,9 +35,17 @@ colorTableContinuousData.forEach((element: any) => {
 
 export const ColorSelector: React.FC<legendProps> = ({
     useColorTableColors,
+    parentdata,
     //useD3Colors,
 }: legendProps) => {
     let continuousLegend;
+
+    const [parent, setIsParent] = React.useState();
+    // const parent_data = React.useCallback((parent_data: any) => {
+    //     console.log('colorselectorcomponent---', parent_data)
+    //     setIsParent(parent_data);
+    // }, []);
+
     if (useColorTableColors) {
         continuousLegend =  continuosColorData.map((value: any, key: any) => {
             return <LegendContinous 
@@ -45,6 +55,7 @@ export const ColorSelector: React.FC<legendProps> = ({
                         legendColorName={''} 
                         useContColorTable={true}
                         valueIndex={key}
+                        parentFunc={parentdata}
             />
         });
     } 

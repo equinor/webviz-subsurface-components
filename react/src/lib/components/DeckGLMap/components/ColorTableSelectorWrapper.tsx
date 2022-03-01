@@ -3,7 +3,7 @@ import { Accordion  } from "@equinor/eds-core-react";
 import {ColorSelector} from "./ColorSelectorComponent"
 
 //export const ColorSelectorWrapper = () => {
-export const ColorSelectorWrapper: React.FC = () => {
+export const ColorSelectorWrapper: React.FC = (props) => {
     return (
         <div style={{width: "360px", zIndex:"999", float:"right"}}>
             <Accordion >
@@ -18,7 +18,12 @@ export const ColorSelectorWrapper: React.FC = () => {
                                     Geologic Color Scale
                                 </Accordion.Header>
                                 <Accordion.Panel>
-                                    <ColorSelector useColorTableColors={true} useD3Colors={false} key={1}/>
+                                    <ColorSelector 
+                                        useColorTableColors={true} 
+                                        useD3Colors={false} 
+                                        key={1}
+                                        parentdata={props.parentdata}
+                                    />
                                 </Accordion.Panel>
                             </Accordion.Item>
                         </Accordion>

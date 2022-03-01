@@ -46,6 +46,12 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         [layers]
     );
 
+    const [parent, setIsParent] = React.useState();
+
+    const parent_data = React.useCallback((parent_data: any) => {
+        setIsParent(parent_data);
+    }, []);
+
     // Get color table for log curves.
     React.useEffect(() => {
         if (!wellsLayer?.isLoaded || !wellsLayer.props.logData) return;
@@ -63,6 +69,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         wellsLayer?.isLoaded,
         wellsLayer?.props?.logName,
         wellsLayer?.props?.logColor,
+        parent
     ]);
 
     const [showLegend, setShowLegend] = React.useState<boolean | null>();
@@ -71,7 +78,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         setShowLegend(
             visible && wellsLayer?.props.visible && wellsLayer?.props.logCurves
         );
-    }, [visible, wellsLayer?.props.visible, wellsLayer?.props.logCurves]);
+    }, [visible, wellsLayer?.props.visible, wellsLayer?.props.logCurves, parent]);
 
     if (!showLegend) return null;
     return (
@@ -93,8 +100,10 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     dataObjectName={legendProps.title}
                     position={position}
                     colorName={legendProps.colorName}
+                    // colorTables={parent ? parent.color : colorTables}
                     colorTables={colorTables}
                     horizontal={horizontal}
+                    // parentdata={parent_data}
                 />
             )}
         </div>
