@@ -255,7 +255,7 @@ export const createVariableVectorMapFromVariables = (
 export const getVariablesFromMap = (
     variableVectorMap: VariableVectorMapType[]
 ): string[] => {
-    let variables = [];
+    const variables = [];
     for (const elm of variableVectorMap) {
         variables.push(elm.variableName);
     }

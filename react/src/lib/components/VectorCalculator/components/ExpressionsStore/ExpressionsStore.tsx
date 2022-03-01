@@ -17,6 +17,7 @@ type ActionMap<
                 | number
                 | string
                 | string[]
+                | object
                 | ExpressionParsingData
                 | ExpressionType
                 | ExpressionType[]
