@@ -259,6 +259,7 @@ class WellLogViewer extends Component<Props, State> {
 
     render(): ReactNode {
         const maxContentZoom = 256;
+        const checkDatafileSchema = true;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <WellLogViewWithScroller
@@ -270,6 +271,7 @@ class WellLogViewer extends Component<Props, State> {
                     hideLegend={this.props.hideLegend}
                     maxVisibleTrackNum={this.props.horizontal ? 3 : 5}
                     maxContentZoom={maxContentZoom}
+                    checkDatafileSchema={checkDatafileSchema}
                     primaryAxis={this.state.primaryAxis}
                     axisTitles={axisTitles}
                     axisMnemos={axisMnemos}

@@ -21,14 +21,24 @@ import "!vue-style-loader!css-loader!sass-loader!./styles.scss";
 import Ajv from "ajv";
 import { ValidateFunction } from "ajv/dist/types/index";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const inputSchema = require("../../../inputSchema/WellLogTemplate.json");
+const inputSchema = require("../../../inputSchema/WellLog.json");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const inputTemplateSchema = require("../../../inputSchema/WellLogTemplate.json");
 const ajv = new Ajv();
+let schemaErrorTemplate = "";
+let validateTemplate: ValidateFunction<unknown> | null = null;
+try {
+    validateTemplate = ajv.compile(inputTemplateSchema);
+} catch (e) {
+    schemaErrorTemplate = "Wrong JSON schema for WellLogTemplate. " + String(e);
+    console.error(schemaErrorTemplate);
+}
 let schemaError = "";
 let validate: ValidateFunction<unknown> | null = null;
 try {
     validate = ajv.compile(inputSchema);
 } catch (e) {
-    schemaError = "Wrong JSON schema for WellLogTemplate. " + String(e);
+    schemaError = "Wrong JSON schema for WellLog. " + String(e);
     console.error(schemaError);
 }
 
@@ -555,6 +565,15 @@ export function editTrack(
     );
 }
 
+function formatSchemaError(validate: ValidateFunction<unknown>): string {
+    const errors = validate.errors;
+    if (!errors || !errors[0]) return "JSON schema validation failed";
+    return (
+        (errors[0].dataPath ? errors[0].dataPath + ": " : "") +
+        errors[0].message
+    );
+}
+
 export interface TrackMouseEvent {
     track: Track;
     type: /*string, */ "click" | "contextmenu" | "dblclick";
@@ -606,6 +625,8 @@ interface Props {
     maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
     maxContentZoom?: number; // default is 256
 
+    checkDatafileSchema?: boolean;
+
     // callbacks:
     onCreateController?: (controller: WellLogController) => void;
     onInfo?: (
@@ -643,6 +664,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     constructor(props: Props) {
         super(props);
 
+        if (!props.welllog)
+            throw "No props.welllog given in wellLogView component";
+
         this.container = undefined;
         this.logController = undefined;
         this.selCurrent = undefined;
@@ -673,7 +697,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.createLogViewer();
 
         this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
-        this.setTracks();
+        this.setTracks(true);
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
@@ -694,6 +718,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.state.errorText !== nextState.errorText) return true;
 
         if (this.props.maxContentZoom !== nextProps.maxContentZoom) return true;
+        if (this.props.checkDatafileSchema !== nextProps.checkDatafileSchema)
+            return true;
 
         // callbacks
 
@@ -711,6 +737,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         let selection: [number | undefined, number | undefined] | undefined =
             undefined; // content selection to restore
         let shouldSetTracks = false;
+        let checkSchema = false;
         if (
             this.props.horizontal !== prevProps.horizontal ||
             this.props.hideTitles !== prevProps.hideTitles ||
@@ -723,11 +750,16 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             shouldSetTracks = true;
         }
 
-        if (this.props.welllog !== prevProps.welllog) {
+        if (
+            this.props.welllog !== prevProps.welllog ||
+            this.props.checkDatafileSchema !== prevProps.checkDatafileSchema
+        ) {
             shouldSetTracks = true;
+            checkSchema = true;
         } else if (this.props.template !== prevProps.template) {
             this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
             shouldSetTracks = true;
+            checkSchema = true;
         } else if (this.props.colorTables !== prevProps.colorTables) {
             selection = this.getContentSelection();
             selectedTrackIndeces = this.getSelectedTrackIndeces();
@@ -745,7 +777,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         }
 
         if (shouldSetTracks) {
-            this.setTracks(); // use this.template
+            this.setTracks(checkSchema); // use this.template
             setSelectedTrackIndeces(this.logController, selectedTrackIndeces);
             if (selection) this.selectContent(selection);
         } else if (
@@ -809,16 +841,26 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (checkSchema) {
             //check against the json schema
-            let errorText = "";
-            if (!validate) errorText = schemaError;
-            else if (!validate(this.template))
-                errorText =
-                    validate.errors && validate.errors[0]
-                        ? validate.errors[0].dataPath +
-                          ": " +
-                          validate.errors[0].message
-                        : "JSON schema validation failed";
-            this.setState({ errorText: errorText });
+            let errorTextTemplate = "";
+            if (!validateTemplate) errorTextTemplate = schemaErrorTemplate;
+            else if (!validateTemplate(this.template))
+                errorTextTemplate = formatSchemaError(validateTemplate);
+            if (errorTextTemplate)
+                errorTextTemplate = "Template: " + errorTextTemplate;
+
+            if (this.props.checkDatafileSchema) {
+                let errorText = "";
+                if (!validate) errorText = schemaError;
+                else if (!validate(this.props.welllog))
+                    errorText = formatSchemaError(validate);
+                if (errorText) {
+                    if (errorText) errorText = "Datafile: " + errorText;
+                    if (errorTextTemplate) errorTextTemplate += "; ";
+                    errorTextTemplate += errorText;
+                }
+            }
+
+            this.setState({ errorText: errorTextTemplate });
         }
 
         if (this.logController) {
