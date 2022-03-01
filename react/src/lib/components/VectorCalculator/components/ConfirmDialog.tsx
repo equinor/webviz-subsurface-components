@@ -6,14 +6,16 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 
-interface SaveDialogProps {
+interface ConfirmDialogProps {
+    id: string;
     open: boolean;
-    onSave: () => void;
-    onClose: () => void;
+    text: string;
+    onYes: () => void;
+    onNo: () => void;
 }
 
-export const SaveDialog: React.FC<SaveDialogProps> = (
-    props: SaveDialogProps
+export const ConfirmDialog: React.FC<ConfirmDialogProps> = (
+    props: ConfirmDialogProps
 ) => {
     const { open } = props;
     const [isOpen, setIsOpen] = React.useState<boolean>(open || false);
@@ -22,32 +24,32 @@ export const SaveDialog: React.FC<SaveDialogProps> = (
         setIsOpen(open || false);
     }, [open]);
 
-    const handleClose = React.useCallback(() => {
-        props.onClose();
+    const handleNoClick = React.useCallback(() => {
+        props.onNo();
         setIsOpen(false);
-    }, [props.onClose, setIsOpen]);
+    }, [props.onNo, setIsOpen]);
 
-    const handleSaveClick = React.useCallback(() => {
-        props.onSave();
+    const handleYesClick = React.useCallback(() => {
+        props.onYes();
         setIsOpen(false);
-    }, [props.onSave]);
+    }, [props.onYes, setIsOpen]);
 
     return (
         <Dialog
             open={isOpen}
-            onClose={() => handleClose()}
-            aria-describedby="save-dialog-description"
+            id={props.id}
+            aria-describedby={`${props.id}-description`}
         >
             <DialogContent>
-                <DialogContentText id="save-dialog-description">
-                    Do you want to save changes?
+                <DialogContentText id={`${props.id}-content-text`}>
+                    {props.text}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => handleClose()} variant="outlined">
+                <Button onClick={() => handleNoClick()} variant="outlined">
                     No
                 </Button>
-                <Button onClick={() => handleSaveClick()}>Yes</Button>
+                <Button onClick={() => handleYesClick()}>Yes</Button>
             </DialogActions>
         </Dialog>
     );

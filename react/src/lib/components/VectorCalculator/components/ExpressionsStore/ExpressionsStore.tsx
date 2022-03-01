@@ -7,6 +7,7 @@ import {
     ExpressionType,
     VariableVectorMapType,
 } from "../../utils/VectorCalculatorTypes";
+import { areVariableVectorMapsEqual } from "../../utils/VectorCalculatorHelperFunctions";
 
 type ActionMap<
     M extends {
@@ -45,6 +46,7 @@ export enum StoreActions {
     SetActiveExpression = "SET_ACTIVE_EXPRESSION",
     SaveEditableExpression = "SAVE_EDITABLE_EXPRESSION",
     ResetEditableExpression = "RESET_EDITABLE_EXPRESSION",
+    SetExpressionTypeValid = "SET_EXPRESSION_TYPE_VALID",
     SetExpression = "SET_EXPRESSION",
     SetName = "SET_NAME",
     SetDescription = "SET_DESCRIPTION",
@@ -60,6 +62,7 @@ type StoreState = {
     editableName: string;
     editableDescription?: string;
     editableVariableVectorMap: VariableVectorMapType[];
+    editableExpressionTypeValid: boolean;
 
     parseData: ExpressionParsingData;
 
@@ -79,6 +82,9 @@ type Payload = {
     };
     [StoreActions.SaveEditableExpression]: {};
     [StoreActions.ResetEditableExpression]: {};
+    [StoreActions.SetExpressionTypeValid]: {
+        isValid: boolean;
+    };
     [StoreActions.SetName]: {
         name: string;
     };
@@ -119,6 +125,18 @@ export const createExpressionTypeFromEditableData = (
     };
 };
 
+export const isExpressionEdited = (state: StoreState): boolean => {
+    const areEqual =
+        state.activeExpression.name === state.editableName &&
+        state.activeExpression.expression === state.editableExpression &&
+        state.activeExpression.description === state.editableDescription &&
+        areVariableVectorMapsEqual(
+            state.activeExpression.variableVectorMap,
+            state.editableVariableVectorMap
+        );
+    return !areEqual;
+};
+
 const initializeStore = (initializerArg: StoreProviderProps): StoreState => {
     return {
         expressions: initializerArg.initialExpressions,
@@ -130,6 +148,8 @@ const initializeStore = (initializerArg: StoreProviderProps): StoreState => {
         editableVariableVectorMap: cloneDeep(
             initialEditableExpression.variableVectorMap
         ),
+        editableExpressionTypeValid: false,
+
         parseData: { isValid: false, parsingMessage: "", variables: [] },
 
         resetActionCounter: 0,
@@ -156,11 +176,24 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
 
             // If active expression is deleted
             if (action.payload.ids.includes(state.activeExpression.id)) {
-                const initializeArgs = {
-                    initialExpressions: newExpressions,
+                // Note: Not resetting reset action counter!
+                return {
+                    ...state,
+                    expressions: newExpressions,
+                    activeExpression: cloneDeep(initialEditableExpression),
+                    editableExpression: initialEditableExpression.expression,
+                    editableName: initialEditableExpression.name,
+                    editableDescription: initialEditableExpression.description,
+                    editableVariableVectorMap: cloneDeep(
+                        initialEditableExpression.variableVectorMap
+                    ),
+                    editableExpressionTypeValid: false,
+                    parseData: {
+                        isValid: false,
+                        parsingMessage: "",
+                        variables: [],
+                    },
                 };
-                // TODO: Prevent reset of reset counter?
-                return initializeStore(initializeArgs);
             }
 
             return { ...state, expressions: newExpressions };
@@ -206,7 +239,12 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
                 resetActionCounter: state.resetActionCounter + 1,
             };
         }
-
+        case StoreActions.SetExpressionTypeValid: {
+            return {
+                ...state,
+                editableExpressionTypeValid: action.payload.isValid,
+            };
+        }
         case StoreActions.SetDescription: {
             return {
                 ...state,

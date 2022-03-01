@@ -1,12 +1,10 @@
 import React from "react";
 import Grid from "@material-ui/core/Grid";
-import { Button } from "@equinor/eds-core-react";
 
 import {
     ExpressionType,
     ExternalParseData,
 } from "../utils/VectorCalculatorTypes";
-import { SaveDialog } from "./SaveDialog";
 import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
 import { ExpressionInputComponent } from "./ExpressionInputComponent";
 import { TreeDataNode } from "@webviz/core-components";
@@ -36,7 +34,6 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     props: VectorCalculatorProps
 ) => {
     const store = useStore();
-    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
     React.useEffect(() => {
         /// Ensure external parsing for active expression
@@ -61,9 +58,8 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     }, [props.externalParseData]);
 
     React.useEffect(() => {
-        const expressions = store.state.expressions;
         // Only send valid expressions
-        const outputExpressions = expressions.filter(
+        const outputExpressions = store.state.expressions.filter(
             (expression) => expression.isValid
         );
 
@@ -74,7 +70,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
 
     React.useEffect(() => {
         if (props.isDashControlled) {
-            // Build expression:
+            // Build ExpressionType for external parsing
             const externalParsingExpression =
                 createExpressionTypeFromEditableData(store.state);
             props.setProps({
@@ -82,19 +78,6 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
             });
         }
     }, [store.state.editableExpression]);
-
-    const handleOpenClick = React.useCallback(() => {
-        console.log("Open pushed!");
-        setIsDialogOpen(true);
-    }, [setIsDialogOpen]);
-    const handleOnSave = () => {
-        setIsDialogOpen(false);
-        console.log("Save pushed");
-    };
-    const handleOnClose = () => {
-        setIsDialogOpen(false);
-        console.log("Closed dialog");
-    };
 
     return (
         <div>
@@ -112,12 +95,6 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
                     />
                 </Grid>
             </Grid>
-            <Button onClick={handleOpenClick}>Open</Button>
-            <SaveDialog
-                open={isDialogOpen}
-                onSave={handleOnSave}
-                onClose={handleOnClose}
-            />
         </div>
     );
 };

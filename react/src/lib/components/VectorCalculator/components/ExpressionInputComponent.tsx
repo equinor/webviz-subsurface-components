@@ -10,9 +10,12 @@ import { ExpressionDescriptionTextField } from "./ExpressionDescriptionTextField
 import { ExpressionNameTextField } from "./ExpressionNameTextField";
 import { ExpressionInputTextField } from "./ExpressionInputTextField";
 
-import { areVariableVectorMapsEqual } from "../utils/VectorCalculatorHelperFunctions";
-
-import { StoreActions, useStore, ExpressionStatus } from "./ExpressionsStore";
+import {
+    isExpressionEdited,
+    StoreActions,
+    useStore,
+    ExpressionStatus,
+} from "./ExpressionsStore";
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
@@ -29,15 +32,13 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     const [disabled, setDisabled] = React.useState<boolean>(
         store.state.activeExpression.id === ""
     );
-    const [isExpressionEdited, setIsExpressionEdited] =
+    const [expressionDataEdited, setExpressionDataEdited] =
         React.useState<boolean>(false);
 
     const [expressionStatus, setExpressionStatus] =
         React.useState<ExpressionStatus>(ExpressionStatus.Evaluating);
     const [nameValid, setNameValid] = React.useState<boolean>(false);
     const [variableVectorMapValid, setVariableVectorMapValid] =
-        React.useState<boolean>(false);
-    const [expressionTypeValid, setExpressionTypeValid] =
         React.useState<boolean>(false);
 
     Icon.add({ clear, save, sync });
@@ -47,17 +48,9 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             setDisabled(store.state.activeExpression.id === "");
         }
 
-        const areEqual =
-            store.state.activeExpression.name === store.state.editableName &&
-            store.state.activeExpression.expression ===
-                store.state.editableExpression &&
-            store.state.activeExpression.description ===
-                store.state.editableDescription &&
-            areVariableVectorMapsEqual(
-                store.state.activeExpression.variableVectorMap,
-                store.state.editableVariableVectorMap
-            );
-        setIsExpressionEdited(!areEqual);
+        const isEdited = isExpressionEdited(store.state);
+
+        setExpressionDataEdited(isEdited);
     }, [
         store.state.activeExpression,
         store.state.editableExpression,
@@ -67,7 +60,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     ]);
 
     const handleSaveClick = React.useCallback((): void => {
-        if (!expressionTypeValid) {
+        if (!store.state.editableExpressionTypeValid) {
             return;
         }
 
@@ -75,7 +68,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
             type: StoreActions.SaveEditableExpression,
             payload: {},
         });
-    }, [expressionTypeValid]);
+    }, [store.state.editableExpressionTypeValid]);
 
     const handleCancelClick = React.useCallback((): void => {
         store.dispatch({
@@ -85,11 +78,15 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
     }, [store]);
 
     React.useEffect(() => {
-        setExpressionTypeValid(
-            nameValid &&
-                variableVectorMapValid &&
-                expressionStatus === ExpressionStatus.Valid
-        );
+        store.dispatch({
+            type: StoreActions.SetExpressionTypeValid,
+            payload: {
+                isValid:
+                    nameValid &&
+                    variableVectorMapValid &&
+                    expressionStatus === ExpressionStatus.Valid,
+            },
+        });
     }, [nameValid, expressionStatus, variableVectorMapValid]);
 
     const handleNameValidChange = (isValid: boolean): void => {
@@ -148,7 +145,7 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                 <Grid item>
                     <Button
                         onClick={handleCancelClick}
-                        disabled={disabled || !isExpressionEdited}
+                        disabled={disabled || !expressionDataEdited}
                         variant="outlined"
                     >
                         <Icon key="cancel" name="clear" />
@@ -160,8 +157,8 @@ export const ExpressionInputComponent: React.FC<ExpressionInputComponent> = (
                         onClick={handleSaveClick}
                         disabled={
                             disabled ||
-                            !expressionTypeValid ||
-                            !isExpressionEdited
+                            !store.state.editableExpressionTypeValid ||
+                            !expressionDataEdited
                         }
                     >
                         <Icon key="save" name="save" />

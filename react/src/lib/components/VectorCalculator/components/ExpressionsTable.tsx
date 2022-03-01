@@ -14,7 +14,8 @@ import { ExpressionType } from "../utils/VectorCalculatorTypes";
 import { BlinkingTableRow } from "../utils/BlinkingTableRow";
 import { EnhancedTableHead } from "../utils/EnhancedTableHead";
 
-import { StoreActions, useStore } from "./ExpressionsStore";
+import { isExpressionEdited, StoreActions, useStore } from "./ExpressionsStore";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
@@ -27,9 +28,13 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     props: ExpressionsTableProps
 ) => {
     const store = useStore();
+    const [isSaveDialogOpen, setIsSaveDialogOpen] = React.useState(false);
+    const [isDiscardDialogOpen, setIsDiscardDialogOpen] = React.useState(false);
     const [expressions, setExpressions] = React.useState<ExpressionType[]>(
         store.state.expressions
     );
+    const [activeExpression, setActiveExpression] =
+        React.useState<ExpressionType>(store.state.activeExpression);
     const [selectedExpressions, setSelectedExpressions] = React.useState<
         ExpressionType[]
     >([]);
@@ -84,12 +89,42 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
         [selectedExpressions, setSelectedExpressions, props.onExpressionsSelect]
     );
 
-    const handleRowClick = (expression: ExpressionType): void => {
-        store.dispatch({
-            type: StoreActions.SetActiveExpression,
-            payload: { expression: expression },
-        });
-    };
+    const handleRowClick = React.useCallback(
+        (expression: ExpressionType): void => {
+            // If default/empty expression is active
+            if (!store.state.activeExpression.id) {
+                setActiveExpression(expression);
+                store.dispatch({
+                    type: StoreActions.SetActiveExpression,
+                    payload: { expression: expression },
+                });
+                return;
+            }
+            if (!isExpressionEdited(store.state)) {
+                setActiveExpression(expression);
+                store.dispatch({
+                    type: StoreActions.SetActiveExpression,
+                    payload: { expression: expression },
+                });
+            } else {
+                if (store.state.editableExpressionTypeValid) {
+                    setIsSaveDialogOpen(true);
+                } else {
+                    setIsDiscardDialogOpen(true);
+                }
+                setActiveExpression(expression);
+            }
+        },
+        [
+            store.state,
+            store.state.activeExpression.id,
+            store.state.editableExpressionTypeValid,
+            isExpressionEdited,
+            setIsSaveDialogOpen,
+            setIsDiscardDialogOpen,
+            setActiveExpression,
+        ]
+    );
 
     const isExpressionSelected = (expression: ExpressionType): boolean => {
         return selectedExpressions.indexOf(expression) !== -1;
@@ -109,84 +144,157 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
         [expressions, setSelectedExpressions, props.onExpressionsSelect]
     );
 
-    return (
-        <TableContainer className="ExpressionsTable" component={Paper}>
-            <Table stickyHeader aria-label="sticky table">
-                <EnhancedTableHead
-                    numSelected={selectedExpressions.length}
-                    onSelectAllClick={handleSelectAllClick}
-                    rowCount={expressions.length}
-                />
-                <TableBody>
-                    {expressions.map((row) => {
-                        const isSelected = isExpressionSelected(row);
-                        const isActive = store.state.activeExpression === row;
-                        const expressionFromMap = getDetailedExpression(row);
-                        const isBlinking = props.blinkingExpressions.some(
-                            (elm) => elm.id == row.id
-                        );
+    const handleOnSave = React.useCallback(() => {
+        // Secure not saving invalid data
+        if (!store.state.editableExpressionTypeValid) {
+            setActiveExpression(store.state.activeExpression);
+        } else {
+            store.dispatch({
+                type: StoreActions.SaveEditableExpression,
+                payload: {},
+            });
+        }
+        setIsSaveDialogOpen(false);
+    }, [
+        store.state.editableExpressionTypeValid,
+        store.state.activeExpression,
+        setActiveExpression,
+        setIsSaveDialogOpen,
+    ]);
 
-                        return (
-                            <BlinkingTableRow
-                                blinking={isBlinking}
-                                hover={true}
-                                role="checkbox"
-                                tabIndex={-1}
-                                key={row.id}
-                                selected={isActive}
-                                aria-checked={isActive}
-                            >
-                                <TableCell padding="checkbox">
-                                    <Checkbox
-                                        checked={isSelected}
-                                        onClick={() => handleCheckBoxClick(row)}
-                                    />
-                                </TableCell>
-                                <TableCell
-                                    align="left"
-                                    onClick={() => handleRowClick(row)}
+    const handleOnNotSave = React.useCallback(() => {
+        setIsSaveDialogOpen(false);
+        store.dispatch({
+            type: StoreActions.SetActiveExpression,
+            payload: { expression: activeExpression },
+        });
+    }, [setIsSaveDialogOpen, activeExpression]);
+
+    const handleOnNotDiscardChanges = React.useCallback(() => {
+        setActiveExpression(store.state.activeExpression);
+        setIsDiscardDialogOpen(false);
+    }, [
+        store.state.activeExpression,
+        setIsDiscardDialogOpen,
+        setActiveExpression,
+    ]);
+
+    const handleOnDiscardChanges = React.useCallback(() => {
+        setIsDiscardDialogOpen(false);
+        store.dispatch({
+            type: StoreActions.SetActiveExpression,
+            payload: { expression: activeExpression },
+        });
+    }, [setIsDiscardDialogOpen, activeExpression]);
+
+    return (
+        <div>
+            <TableContainer className="ExpressionsTable" component={Paper}>
+                <Table stickyHeader aria-label="sticky table">
+                    <EnhancedTableHead
+                        numSelected={selectedExpressions.length}
+                        onSelectAllClick={handleSelectAllClick}
+                        rowCount={expressions.length}
+                    />
+                    <TableBody>
+                        {expressions.map((row) => {
+                            const isSelected = isExpressionSelected(row);
+                            const isActive =
+                                store.state.activeExpression === row;
+                            const expressionFromMap =
+                                getDetailedExpression(row);
+                            const isBlinking = props.blinkingExpressions.some(
+                                (elm) => elm.id == row.id
+                            );
+
+                            return (
+                                <BlinkingTableRow
+                                    blinking={isBlinking}
+                                    hover={true}
+                                    role="checkbox"
+                                    tabIndex={-1}
+                                    key={row.id}
+                                    selected={isActive}
+                                    aria-checked={isActive}
                                 >
-                                    <Tooltip
-                                        key={row.name}
-                                        placement="top"
-                                        title={
-                                            row.description
-                                                ? row.description
-                                                : ""
-                                        }
-                                        enterDelay={1000}
-                                        enterNextDelay={1000}
-                                        hidden={
-                                            !row.description ||
-                                            row.description.length <= 0
-                                        }
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            checked={isSelected}
+                                            onClick={() =>
+                                                handleCheckBoxClick(row)
+                                            }
+                                        />
+                                    </TableCell>
+                                    <TableCell
+                                        align="left"
+                                        onClick={() => handleRowClick(row)}
                                     >
-                                        <div className={"ExpressionsTableCell"}>
-                                            {row.name}
-                                        </div>
-                                    </Tooltip>
-                                </TableCell>
-                                <TableCell
-                                    align="left"
-                                    onClick={() => handleRowClick(row)}
-                                >
-                                    <Tooltip
-                                        key={row.expression}
-                                        placement="top"
-                                        title={expressionFromMap}
-                                        enterDelay={1000}
-                                        enterNextDelay={1000}
+                                        <Tooltip
+                                            key={row.name}
+                                            placement="top"
+                                            title={
+                                                row.description
+                                                    ? row.description
+                                                    : ""
+                                            }
+                                            enterDelay={1000}
+                                            enterNextDelay={1000}
+                                            hidden={
+                                                !row.description ||
+                                                row.description.length <= 0
+                                            }
+                                        >
+                                            <div
+                                                className={
+                                                    "ExpressionsTableCell"
+                                                }
+                                            >
+                                                {row.name}
+                                            </div>
+                                        </Tooltip>
+                                    </TableCell>
+                                    <TableCell
+                                        align="left"
+                                        onClick={() => handleRowClick(row)}
                                     >
-                                        <div className={"ExpressionsTableCell"}>
-                                            {expressionFromMap}
-                                        </div>
-                                    </Tooltip>
-                                </TableCell>
-                            </BlinkingTableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                                        <Tooltip
+                                            key={row.expression}
+                                            placement="top"
+                                            title={expressionFromMap}
+                                            enterDelay={1000}
+                                            enterNextDelay={1000}
+                                        >
+                                            <div
+                                                className={
+                                                    "ExpressionsTableCell"
+                                                }
+                                            >
+                                                {expressionFromMap}
+                                            </div>
+                                        </Tooltip>
+                                    </TableCell>
+                                </BlinkingTableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <ConfirmDialog
+                id={"SaveDialog"}
+                open={isSaveDialogOpen}
+                text={"Do you want to save changes?"}
+                onYes={handleOnSave}
+                onNo={handleOnNotSave}
+            />
+            <ConfirmDialog
+                id={"DiscardDialog"}
+                open={isDiscardDialogOpen}
+                text={
+                    "Edited input is not valid, do you want to discard changes?"
+                }
+                onYes={handleOnDiscardChanges}
+                onNo={handleOnNotDiscardChanges}
+            />
+        </div>
     );
 };
