@@ -292,9 +292,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                 id={"DiscardDialog"}
                 open={isDiscardDialogOpen}
                 containerRef={props.containerRef}
-                text={
-                    "Edited input is not valid, do you want to discard changes?"
-                }
+                text={"Do you want to discard changes?"}
                 onYes={handleOnDiscardChanges}
                 onNo={handleOnNotDiscardChanges}
             />
