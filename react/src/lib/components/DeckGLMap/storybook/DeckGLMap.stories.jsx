@@ -268,8 +268,8 @@ KhMapFlat.parameters = {
 
 // MapLayer. This is never Float32 resolution for properties.
 const mapLayer = exampleData[0].layers[3];
-export const MapLayerFloat32Properties = EditDataTemplate.bind({});
-MapLayerFloat32Properties.args = {
+export const ExperimentalMapLayerFloat32Properties = EditDataTemplate.bind({});
+ExperimentalMapLayerFloat32Properties.args = {
     ...exampleData[0],
     layers: [
         {
@@ -292,8 +292,6 @@ MapLayerFloat32Properties.args = {
 
 // Map3DLayer. Properties encoded in RGB.
 const map3DLayer = exampleData[0].layers[4];
-const axesLayer = exampleData[0].layers[9];
-const wellsLayer = exampleData[0].layers[5];
 export const MapLayerRGBEncodedProperties = EditDataTemplate.bind({});
 MapLayerRGBEncodedProperties.args = {
     ...exampleData[0],
@@ -302,8 +300,6 @@ MapLayerRGBEncodedProperties.args = {
             ...map3DLayer,
             visible: true,
         },
-        axesLayer,
-        wellsLayer,
     ],
     views: {
         layout: [1, 1],
