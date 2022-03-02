@@ -66,14 +66,12 @@ export const ExpressionInputComponent: React.FC<
 
         store.dispatch({
             type: StoreActions.SaveEditableExpression,
-            payload: {},
         });
     }, [store.state.editableExpressionTypeValid]);
 
     const handleCancelClick = React.useCallback((): void => {
         store.dispatch({
             type: StoreActions.ResetEditableExpression,
-            payload: {},
         });
     }, [store]);
 

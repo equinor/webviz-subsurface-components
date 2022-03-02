@@ -11,18 +11,19 @@ import { areVariableVectorMapsEqual } from "../../utils/VectorCalculatorHelperFu
 
 type ActionMap<
     M extends {
-        [index: string]: {
-            [key: string]:
-                | boolean
-                | number
-                | string
-                | string[]
-                | object
-                | ExpressionParsingData
-                | ExpressionType
-                | ExpressionType[]
-                | VariableVectorMapType[];
-        };
+        [index: string]:
+            | {
+                  [key: string]:
+                      | boolean
+                      | number
+                      | string
+                      | string[]
+                      | ExpressionParsingData
+                      | ExpressionType
+                      | ExpressionType[]
+                      | VariableVectorMapType[];
+              }
+            | undefined;
     }
 > = {
     [Key in keyof M]: M[Key] extends undefined
@@ -81,8 +82,8 @@ type Payload = {
     [StoreActions.SetActiveExpression]: {
         expression: ExpressionType;
     };
-    [StoreActions.SaveEditableExpression]: {};
-    [StoreActions.ResetEditableExpression]: {};
+    [StoreActions.SaveEditableExpression]: undefined;
+    [StoreActions.ResetEditableExpression]: undefined;
     [StoreActions.SetExpressionTypeValid]: {
         isValid: boolean;
     };

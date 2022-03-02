@@ -152,7 +152,6 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
         } else {
             store.dispatch({
                 type: StoreActions.SaveEditableExpression,
-                payload: {},
             });
         }
         setIsSaveDialogOpen(false);
