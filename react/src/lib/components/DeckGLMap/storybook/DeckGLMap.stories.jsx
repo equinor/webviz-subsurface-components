@@ -309,14 +309,9 @@ const axes = {
     bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
 };
 export const Axes = MinimalTemplate.bind({});
-KhMapMesh.args = {
+Axes.args = {
     id: "axes",
-    layers: [
-        {
-            ...meshMapLayer,
-            ...axes,
-        },
-    ],
+    layers: [meshMapLayer, axes],
     bounds: [432150, 6475800, 439400, 6481500],
     views: {
         layout: [1, 1],
