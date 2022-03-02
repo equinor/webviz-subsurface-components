@@ -242,10 +242,11 @@ KhMapFlat.args = {
     bounds: [432150, 6475800, 439400, 6481500],
     layers: [
         {
-            ...colormapLayer,
+            "@@type": "ColormapLayer",
+            id: "property_map",
             valueRange: [-3071, 41048],
-            colorMapRange: [-3071, 41048],
             bounds: [432150, 6475800, 439400, 6481500],
+            image: "@@#resources.propertyMap",
         },
         {
             ...hillshadingLayer,
@@ -265,7 +266,7 @@ KhMapFlat.parameters = {
     },
 };
 
-// Map3DLayer. Old version. Properties encoded in RGB.
+// Map3DLayer. Properties encoded in RGB.
 const map3DLayer = exampleData[0].layers[3];
 export const MapLayerRGBEncodedProperties = EditDataTemplate.bind({});
 MapLayerRGBEncodedProperties.args = {
@@ -273,6 +274,29 @@ MapLayerRGBEncodedProperties.args = {
     layers: [
         {
             ...map3DLayer,
+            visible: true,
+        },
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
+// MapLayer. This is never Float32 resolution for properties.
+const mapLayer = exampleData[0].layers[4];
+export const MapLayerFloat32Properties = EditDataTemplate.bind({});
+MapLayerFloat32Properties.args = {
+    ...exampleData[0],
+    layers: [
+        {
+            ...mapLayer,
             meshMaxError: 5.0,
             visible: true,
         },

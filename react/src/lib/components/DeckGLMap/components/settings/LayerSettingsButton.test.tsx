@@ -9,27 +9,28 @@ import { testState } from "../../test/testReduxState";
 
 describe("test layers settings button", () => {
     it("snapshot test", () => {
-        const { container } = render(
-            Wrapper({
-                children: (
-                    <LayerSettingsButton
-                        layer={testState.layers[testState.layers.length - 1]}
-                    />
-                ),
-            })
+        const drawing_layer = testState.layers.find(
+            (item) => item["@@type"] === "DrawingLayer"
         );
+        const { container } = drawing_layer
+            ? render(
+                  Wrapper({
+                      children: <LayerSettingsButton layer={drawing_layer} />,
+                  })
+              )
+            : render(<div />);
         expect(container.firstChild).toMatchSnapshot();
     });
     it("click to dispatch redux action", async () => {
-        render(
-            Wrapper({
-                children: (
-                    <LayerSettingsButton
-                        layer={testState.layers[testState.layers.length - 1]}
-                    />
-                ),
-            })
+        const drawing_layer = testState.layers.find(
+            (item) => item["@@type"] === "DrawingLayer"
         );
+        drawing_layer &&
+            render(
+                Wrapper({
+                    children: <LayerSettingsButton layer={drawing_layer} />,
+                })
+            );
         userEvent.click(screen.getByRole("button"));
         expect(screen.getByText(/draw mode/i)).toBeVisible();
         expect(
@@ -46,15 +47,15 @@ describe("test layers settings button", () => {
         });
     });
     it("should close menu when clicked on backdrop", async () => {
-        render(
-            Wrapper({
-                children: (
-                    <LayerSettingsButton
-                        layer={testState.layers[testState.layers.length - 1]}
-                    />
-                ),
-            })
+        const drawing_layer = testState.layers.find(
+            (item) => item["@@type"] === "DrawingLayer"
         );
+        drawing_layer &&
+            render(
+                Wrapper({
+                    children: <LayerSettingsButton layer={drawing_layer} />,
+                })
+            );
         userEvent.click(screen.getByRole("button"));
         const layer_settings_menu = screen.getByRole("menu");
         expect(layer_settings_menu).toBeInTheDocument();
@@ -62,15 +63,15 @@ describe("test layers settings button", () => {
         await waitFor(() => expect(layer_settings_menu).not.toBeVisible());
     });
     it("should close menu when clicked twice on layers button", async () => {
-        render(
-            Wrapper({
-                children: (
-                    <LayerSettingsButton
-                        layer={testState.layers[testState.layers.length - 1]}
-                    />
-                ),
-            })
+        const drawing_layer = testState.layers.find(
+            (item) => item["@@type"] === "DrawingLayer"
         );
+        drawing_layer &&
+            render(
+                Wrapper({
+                    children: <LayerSettingsButton layer={drawing_layer} />,
+                })
+            );
         userEvent.click(screen.getByRole("button"));
         const layer_settings_menu = screen.getByRole("menu");
         expect(layer_settings_menu).toBeInTheDocument();
