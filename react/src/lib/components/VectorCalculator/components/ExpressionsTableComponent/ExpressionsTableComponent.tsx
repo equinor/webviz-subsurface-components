@@ -128,30 +128,37 @@ export const ExpressionsTableComponent: React.FC<
         <Grid
             container
             item
-            component={Paper}
             className="ExpressionTableComponent"
-            xs={12}
-            spacing={3}
             direction="column"
+            alignItems="stretch"
+            justifyContent="space-between"
+            xs={6}
         >
-            <Grid item>
+            <Grid item className="TableWrapperGridItem">
                 <ExpressionsTable
                     containerRef={props.containerRef}
                     blinkingExpressions={blinkingTableExpressions}
                     onExpressionsSelect={handleExpressionsSelect}
                 />
-            </Grid>
-            <Grid item>
                 {blinkingTableExpressions.length !== 0 && (
-                    <Alert variant="filled" severity="error">
+                    <Alert
+                        variant="filled"
+                        severity="error"
+                        className="WarningAlert"
+                    >
                         {blinkingTableExpressions.length > 1
                             ? "Expressions not deletable!"
                             : "Expression not deletable!"}
                     </Alert>
                 )}
             </Grid>
-
-            <Grid container item xs={12}>
+            <Grid
+                container
+                item
+                style={{ height: 80 }}
+                alignContent="flex-end"
+                spacing={2}
+            >
                 <Grid container item xs={8} spacing={2}>
                     <Grid item>
                         <Button

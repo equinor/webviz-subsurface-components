@@ -22,6 +22,7 @@ export const EnhancedTableHead: React.FC<EnhancedTableProps> = (
                         checked={numSelected > 0 && numSelected <= rowCount}
                         onChange={onSelectAllClick}
                         inputProps={{ "aria-label": "select all expressions" }}
+                        color="primary"
                     />
                 </TableCell>
                 <TableCell

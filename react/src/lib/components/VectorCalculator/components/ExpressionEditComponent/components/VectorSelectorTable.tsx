@@ -7,7 +7,7 @@ import {
     TableBody,
     TableCell,
 } from "@material-ui/core";
-import { TreeDataNode } from "@webviz/core-components";
+import { ScrollArea, TreeDataNode } from "@webviz/core-components";
 import cloneDeep from "lodash/cloneDeep";
 
 import { StoreActions, useStore } from "../../ExpressionsStore";
@@ -178,51 +178,58 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
     );
 
     return (
-        <TableContainer
-            component={Paper}
-            className="VectorSelectorTableContainer"
-        >
-            {disabled && <div className="DisableOverlay" />}
-            <Table>
-                <TableBody>
-                    {variableVectorMap.map((row, index) => {
-                        return (
-                            <TableRow
-                                tabIndex={-1}
-                                key={"row_" + row.variableName}
-                            >
-                                <TableCell align="left" key={row.variableName}>
-                                    {row.variableName}
-                                </TableCell>
-                                <TableCell key={`cell_${row.variableName}`}>
-                                    <VectorSelector
-                                        id={
-                                            "vector_selector_" +
-                                            row.variableName
-                                        }
-                                        key={
-                                            "vector_selector_" +
-                                            row.variableName
-                                        }
-                                        delimiter=":"
-                                        label=""
-                                        selectedTags={row.vectorName}
-                                        setProps={(props) =>
-                                            updateProps(props, index)
-                                        }
-                                        numMetaNodes={0}
-                                        maxNumSelectedNodes={1}
-                                        numSecondsUntilSuggestionsAreShown={0}
-                                        placeholder="Add new vector..."
-                                        data={vectorData}
-                                        caseInsensitiveMatching={true}
-                                    />
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <ScrollArea>
+            <TableContainer className="VectorSelectorTableContainer">
+                {disabled && <div className="DisableOverlay" />}
+                <Table>
+                    <TableBody>
+                        {variableVectorMap.map((row, index) => {
+                            return (
+                                <TableRow
+                                    tabIndex={-1}
+                                    key={"row_" + row.variableName}
+                                >
+                                    <TableCell
+                                        align="left"
+                                        key={row.variableName}
+                                    >
+                                        {row.variableName}
+                                    </TableCell>
+                                    <TableCell
+                                        key={`cell_${row.variableName}`}
+                                        style={{ minWidth: 240 }}
+                                    >
+                                        <VectorSelector
+                                            id={
+                                                "vector_selector_" +
+                                                row.variableName
+                                            }
+                                            key={
+                                                "vector_selector_" +
+                                                row.variableName
+                                            }
+                                            delimiter=":"
+                                            label=""
+                                            selectedTags={row.vectorName}
+                                            setProps={(props) =>
+                                                updateProps(props, index)
+                                            }
+                                            numMetaNodes={0}
+                                            maxNumSelectedNodes={1}
+                                            numSecondsUntilSuggestionsAreShown={
+                                                0
+                                            }
+                                            placeholder="Add new vector..."
+                                            data={vectorData}
+                                            caseInsensitiveMatching={true}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </ScrollArea>
     );
 };

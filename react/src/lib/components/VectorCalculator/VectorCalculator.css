@@ -1,18 +1,30 @@
 .VectorCalculator {
     display: block;
-    padding: 10px;
     flex-grow: 1;
     margin-top: 5px;
+    height: 100%;
+    max-height: 100%;
+}
+
+.VectorCalculator > .MuiGrid-root {
+    height: 100%;
 }
 
 .VectorCalculator .ExpressionEditComponent {
-    padding: 20px;
     min-width: 400px;
 }
 
-.VectorCalculator .ExpressionTableComponent {
-    padding: 20px;
-    min-width: 360px;
+.VectorCalculator
+    .ExpressionEditComponent
+    .MuiGrid-root
+    .MuiGrid-item:last-child {
+    padding-bottom: 0px;
+}
+
+.VectorCalculator .WarningAlert {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
 }
 
 .VectorCalculator .ExpressionsTableHeader {
@@ -27,16 +39,43 @@
     width: 65%;
 }
 
-.VectorCalculator .ExpressionsTable {
+.VectorCalculator .TableWrapperGridItem {
+    flex-grow: 4;
+    height: 0;
+    border: 1px #ccc solid;
+    background-color: #f7f7f7;
+    padding: 0;
     position: relative;
-    max-height: 450px;
-    max-width: 100%;
 }
 
-.VectorCalculator .ExpressionsTable table {
+.VectorCalculator .TableWrapperGridItem .ScrollArea {
+    height: 100%;
+}
+
+.VectorCalculator .TableWrapperGridItem tbody {
+    height: 100%;
+    background-color: #fff;
+}
+
+.VectorCalculator .ExpressionsTable {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    height: calc(100% - 57px);
+    overflow: hidden;
+}
+
+.VectorCalculator .ExpressionsTable td {
     table-layout: fixed;
 }
 
+.VectorCalculator .ExpressionsTable .Mui-selected {
+    background-color: #edf4fb;
+}
+
+.VectorCalculator .ExpressionsTable .Mui-selected:hover {
+    background-color: #e3eefa;
+}
 .VectorCalculator .ExpressionsTableCell {
     display: inline-block;
     position: relative;
@@ -52,7 +91,7 @@
 
 .VectorCalculator .VectorSelectorTableContainer {
     position: relative;
-    max-height: 450px;
+    max-height: 100%;
     max-width: 100%;
 }
 

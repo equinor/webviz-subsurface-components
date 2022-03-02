@@ -103,33 +103,32 @@ export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
         <Grid
             container
             item
-            component={Paper}
             className="ExpressionEditComponent"
-            xs={12}
-            spacing={3}
             direction="column"
+            alignItems="stretch"
+            xs={6}
         >
-            <Grid item>
+            <Grid item style={{ height: 90 }}>
                 <ExpressionNameTextField
                     vectors={props.vectors}
                     disabled={disabled}
                     onValidChanged={handleNameValidChange}
                 />
             </Grid>
-            <Grid item>
+            <Grid item style={{ height: 70 }}>
                 <ExpressionInputTextField
                     externalParsing={props.externalParsing}
                     disabled={disabled}
                     onStatusChanged={handleExpressionStatusChanged}
                 />
             </Grid>
-            <Grid item>
+            <Grid item style={{ height: 90 }}>
                 <ExpressionDescriptionTextField
                     disabled={disabled}
                     maxLength={props.maxExpressionDescriptionLength}
                 />
             </Grid>
-            <Grid container item xs={12} spacing={0}>
+            <Grid item className="TableWrapperGridItem">
                 <VectorSelectorTable
                     vectorData={props.vectors}
                     disabled={
@@ -139,7 +138,14 @@ export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
                     onValidChanged={handleVariableVectorMapValidChanged}
                 />
             </Grid>
-            <Grid container item spacing={2} justify="flex-end">
+            <Grid
+                container
+                item
+                spacing={2}
+                justify="flex-end"
+                alignContent="flex-end"
+                style={{ height: 80 }}
+            >
                 <Grid item>
                     <Button
                         onClick={handleCancelClick}
