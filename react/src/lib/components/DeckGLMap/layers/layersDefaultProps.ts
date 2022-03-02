@@ -128,7 +128,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         "@@type": "AxesLayer",
         name: "Axes",
         id: "axes-layer",
-        visible: false,
+        visible: true,
     },
     DrawingLayer: {
         "@@type": "DrawingLayer",
