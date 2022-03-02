@@ -138,14 +138,12 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         const plots = (track as GraphTrack).plots;
 
         const welllog = this.props.wellLogView.props.welllog;
-        if (welllog && welllog[0]) {
-            const curves = welllog[0].curves;
+        const curves = welllog.curves;
 
-            for (const plot of plots) {
-                const iCurve = plot.id as number;
-                const title = getPlotTitle(plot) || curves[iCurve].name;
-                nodes.push(this.createRemovePlotMenuItem(title, plot));
-            }
+        for (const plot of plots) {
+            const iCurve = plot.id as number;
+            const title = getPlotTitle(plot) || curves[iCurve].name;
+            nodes.push(this.createRemovePlotMenuItem(title, plot));
         }
 
         return nodes;
@@ -177,14 +175,12 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         const plots = (track as GraphTrack).plots;
 
         const welllog = this.props.wellLogView.props.welllog;
-        if (welllog && welllog[0]) {
-            const curves = welllog[0].curves;
+        const curves = welllog.curves;
 
-            for (const plot of plots) {
-                const iCurve = plot.id as number;
-                const title = getPlotTitle(plot) || curves[iCurve].name;
-                nodes.push(this.createEditPlotMenuItem(title, plot));
-            }
+        for (const plot of plots) {
+            const iCurve = plot.id as number;
+            const title = getPlotTitle(plot) || curves[iCurve].name;
+            nodes.push(this.createEditPlotMenuItem(title, plot));
         }
 
         return nodes;
