@@ -6,15 +6,15 @@ import { add, copy, delete_forever } from "@equinor/eds-icons";
 import { v4 as uuidv4 } from "uuid";
 import { cloneDeep } from "lodash";
 
-import { StoreActions, useStore } from "./ExpressionsStore";
-import { ExpressionsTable } from "./ExpressionsTable";
-import { ExpressionType } from "../utils/VectorCalculatorTypes";
+import { StoreActions, useStore } from "../ExpressionsStore";
+import { ExpressionsTable } from "./components/ExpressionsTable";
+import { ExpressionType } from "../../utils/VectorCalculatorTypes";
 import {
     getAvailableName,
     getDefaultExpression,
-} from "../utils/VectorCalculatorHelperFunctions";
+} from "../../utils/VectorCalculatorHelperFunctions";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
+import "!style-loader!css-loader!../../VectorCalculator.css";
 
 interface ExpressionsTableComponentProps {
     containerRef: React.RefObject<HTMLDivElement | null>;

@@ -2,10 +2,15 @@ import React from "react";
 import { Icon, TextField, Progress } from "@equinor/eds-core-react";
 import { error_filled, thumbs_up } from "@equinor/eds-icons";
 
-import { ExpressionStatus, StoreActions, useStore } from "./ExpressionsStore";
+import {
+    ExpressionStatus,
+    StoreActions,
+    useStore,
+} from "../../ExpressionsStore";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
-import { getExpressionParseData } from "../utils/ExpressionParser";
+import { getExpressionParseData } from "../../../utils/ExpressionParser";
+
+import "!style-loader!css-loader!../../../VectorCalculator.css";
 
 type ExpressionInputTextFieldVariantType = "success" | "error" | "default";
 

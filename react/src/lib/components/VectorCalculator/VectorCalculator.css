@@ -5,7 +5,7 @@
     margin-top: 5px;
 }
 
-.VectorCalculator .ExpressionInputComponent {
+.VectorCalculator .ExpressionEditComponent {
     padding: 20px;
     min-width: 400px;
 }
@@ -50,13 +50,13 @@
     height: 58px;
 }
 
-.VectorCalculator .VariablesTableContainer {
+.VectorCalculator .VectorSelectorTableContainer {
     position: relative;
     max-height: 450px;
     max-width: 100%;
 }
 
-.VectorCalculator .VariablesTableContainer table {
+.VectorCalculator .VectorSelectorTableContainer table {
     table-layout: fixed;
 }
 

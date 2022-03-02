@@ -9,15 +9,20 @@ import {
     Tooltip,
 } from "@material-ui/core";
 
-import { getDetailedExpression } from "../utils/VectorCalculatorHelperFunctions";
-import { ExpressionType } from "../utils/VectorCalculatorTypes";
-import { BlinkingTableRow } from "../utils/BlinkingTableRow";
-import { EnhancedTableHead } from "../utils/EnhancedTableHead";
+import { BlinkingTableRow } from "./BlinkingTableRow";
+import { EnhancedTableHead } from "./EnhancedTableHead";
 
-import { isExpressionEdited, StoreActions, useStore } from "./ExpressionsStore";
-import { ConfirmDialog } from "./ConfirmDialog";
+import { getDetailedExpression } from "../../../utils/VectorCalculatorHelperFunctions";
+import { ExpressionType } from "../../../utils/VectorCalculatorTypes";
+import { ConfirmDialog } from "../../../utils/ConfirmDialog";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
+import {
+    isExpressionEdited,
+    StoreActions,
+    useStore,
+} from "../../ExpressionsStore";
+
+import "!style-loader!css-loader!../../../VectorCalculator.css";
 
 interface ExpressionsTableProps {
     blinkingExpressions: ExpressionType[];

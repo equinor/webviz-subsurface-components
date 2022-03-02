@@ -5,29 +5,29 @@ import { Grid, Paper } from "@material-ui/core";
 import { clear, save, sync } from "@equinor/eds-icons";
 import { TreeDataNode } from "@webviz/core-components";
 
-import { VariablesTable } from "./VariablesTable";
-import { ExpressionDescriptionTextField } from "./ExpressionDescriptionTextField";
-import { ExpressionNameTextField } from "./ExpressionNameTextField";
-import { ExpressionInputTextField } from "./ExpressionInputTextField";
+import { VectorSelectorTable } from "./components/VectorSelectorTable";
+import { ExpressionDescriptionTextField } from "./components/ExpressionDescriptionTextField";
+import { ExpressionNameTextField } from "./components/ExpressionNameTextField";
+import { ExpressionInputTextField } from "./components/ExpressionInputTextField";
 
 import {
     isExpressionEdited,
     StoreActions,
     useStore,
     ExpressionStatus,
-} from "./ExpressionsStore";
+} from "../ExpressionsStore";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
+import "!style-loader!css-loader!../../VectorCalculator.css";
 
-interface ExpressionInputComponentProps {
+interface ExpressionEditComponentProps {
     vectors: TreeDataNode[];
     externalParsing: boolean;
     maxExpressionDescriptionLength: number;
 }
 
-export const ExpressionInputComponent: React.FC<
-    ExpressionInputComponentProps
-> = (props: ExpressionInputComponentProps) => {
+export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
+    props: ExpressionEditComponentProps
+) => {
     const store = useStore();
     const [disabled, setDisabled] = React.useState<boolean>(
         store.state.activeExpression.id === ""
@@ -104,7 +104,7 @@ export const ExpressionInputComponent: React.FC<
             container
             item
             component={Paper}
-            className="ExpressionInputComponent"
+            className="ExpressionEditComponent"
             xs={12}
             spacing={3}
             direction="column"
@@ -130,7 +130,7 @@ export const ExpressionInputComponent: React.FC<
                 />
             </Grid>
             <Grid container item xs={12} spacing={0}>
-                <VariablesTable
+                <VectorSelectorTable
                     vectorData={props.vectors}
                     disabled={
                         disabled ||

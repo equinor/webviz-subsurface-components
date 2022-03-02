@@ -6,7 +6,7 @@ import {
     ExternalParseData,
 } from "../utils/VectorCalculatorTypes";
 import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
-import { ExpressionInputComponent } from "./ExpressionInputComponent";
+import { ExpressionEditComponent } from "./ExpressionEditComponent";
 import { TreeDataNode } from "@webviz/core-components";
 
 import {
@@ -89,7 +89,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
                     />
                 </Grid>
                 <Grid item xs={6}>
-                    <ExpressionInputComponent
+                    <ExpressionEditComponent
                         vectors={props.vectors}
                         externalParsing={props.isDashControlled}
                         maxExpressionDescriptionLength={

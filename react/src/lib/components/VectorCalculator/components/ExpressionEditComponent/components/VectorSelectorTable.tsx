@@ -10,18 +10,18 @@ import {
 import { TreeDataNode } from "@webviz/core-components";
 import cloneDeep from "lodash/cloneDeep";
 
-import { StoreActions, useStore } from "./ExpressionsStore";
-import { VariableVectorMapType } from "../utils/VectorCalculatorTypes";
+import { StoreActions, useStore } from "../../ExpressionsStore";
+import { VariableVectorMapType } from "../../../utils/VectorCalculatorTypes";
 import {
     areVariableVectorMapsEqual,
     createVariableVectorMapFromVariables,
     isVariableVectorMapValid,
-} from "../utils/VectorCalculatorHelperFunctions";
-import VectorSelector from "../../VectorSelector";
+} from "../../../utils/VectorCalculatorHelperFunctions";
+import VectorSelector from "../../../../VectorSelector";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
+import "!style-loader!css-loader!../../../VectorCalculator.css";
 
-interface VariablesTableProps {
+interface VectorSelectorTableProps {
     vectorData: TreeDataNode[];
     disabled?: boolean;
     onValidChanged: (isValid: boolean) => void;
@@ -33,8 +33,8 @@ type VectorSelectorParentProps = {
     selectedIds: string[];
 };
 
-export const VariablesTable: React.FC<VariablesTableProps> = (
-    props: VariablesTableProps
+export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
+    props: VectorSelectorTableProps
 ) => {
     const { vectorData } = props;
     const store = useStore();
@@ -178,7 +178,10 @@ export const VariablesTable: React.FC<VariablesTableProps> = (
     );
 
     return (
-        <TableContainer component={Paper} className="VariablesTableContainer">
+        <TableContainer
+            component={Paper}
+            className="VectorSelectorTableContainer"
+        >
             {disabled && <div className="DisableOverlay" />}
             <Table>
                 <TableBody>
