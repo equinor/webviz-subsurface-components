@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import { VectorCalculatorComponent } from "./components/VectorCalculatorComponent";
 import { StoreProvider } from "./components/ExpressionsStore";
 import { string } from "jsverify";
-import "!style-loader!css-loader!./VectorCalculator.css";
 
 /**
  * VectorCalculator is a component that allows to calculate new vectors by creating a mathematical expression
@@ -21,11 +20,9 @@ import "!style-loader!css-loader!./VectorCalculator.css";
  */
 export const VectorCalculator = (props) => {
     return (
-        <div className={"VectorCalculator"}>
-            <StoreProvider initialExpressions={props.expressions}>
-                <VectorCalculatorComponent {...props} />
-            </StoreProvider>
-        </div>
+        <StoreProvider initialExpressions={props.expressions}>
+            <VectorCalculatorComponent {...props} />
+        </StoreProvider>
     );
 };
 

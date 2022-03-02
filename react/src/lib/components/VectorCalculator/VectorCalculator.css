@@ -3,6 +3,11 @@
     padding: 10px;
     flex-grow: 1;
     margin-top: 5px;
+    height: 100%;
+}
+
+.VectorCalculator > div {
+    height: 100%;
 }
 
 .VectorCalculator .ExpressionEditComponent {

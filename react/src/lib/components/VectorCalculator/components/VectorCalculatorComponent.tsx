@@ -15,6 +15,8 @@ import {
     useStore,
 } from "./ExpressionsStore";
 
+import "!style-loader!css-loader!../VectorCalculator.css";
+
 interface ParentProps {
     expressions?: ExpressionType[];
     externalParseExpression?: ExpressionType;
@@ -81,7 +83,7 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     }, [store.state.editableExpression]);
 
     return (
-        <div ref={vectorCalculatorRef}>
+        <div ref={vectorCalculatorRef} className={"VectorCalculator"}>
             <Grid container spacing={2}>
                 <Grid item xs={6}>
                     <ExpressionsTableComponent
