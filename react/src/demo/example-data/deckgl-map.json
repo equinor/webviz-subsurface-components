@@ -136,17 +136,6 @@
       },
       {
         "@@type": "DrawingLayer"
-      },
-      {
-        "@@type": "AxesLayer",
-        "bounds": [
-          432205,
-          6475078,
-          -3500,
-          437720,
-          6481113,
-          0
-        ]
       }
     ],
     "editedData": {},
