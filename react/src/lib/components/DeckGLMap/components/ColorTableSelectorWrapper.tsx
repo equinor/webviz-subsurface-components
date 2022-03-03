@@ -22,7 +22,7 @@ export const ColorSelectorWrapper: React.FC = (props) => {
                                         useColorTableColors={true} 
                                         useD3Colors={false} 
                                         key={1}
-                                        parentdata={props.parentdata}
+                                        parentdata={props}
                                     />
                                 </Accordion.Panel>
                             </Accordion.Item>
@@ -33,7 +33,7 @@ export const ColorSelectorWrapper: React.FC = (props) => {
                                     D3 Color Scale
                                 </Accordion.Header>
                                 <Accordion.Panel>
-                                    {/* <ColorSelector useColorTableColors={false} useD3Colors={true} key={1}/> */}
+                                    <ColorSelector useColorTableColors={false} useD3Colors={true} key={1} parentdata={props} />
                                 </Accordion.Panel>
                             </Accordion.Item>
                         </Accordion>

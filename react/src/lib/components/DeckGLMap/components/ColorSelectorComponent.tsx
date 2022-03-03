@@ -2,8 +2,7 @@ import * as React from "react";
 import { LegendContinous } from "./legendContinous";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
-import {colorScalesCont} from "@emerson-eps/color-tables/src/component/Utils/d3ColorScale"
-import { ColorSelectorWrapper } from "./ColorTableSelectorWrapper"
+import {colorScalesCont} from "./d3ColorScale"
 
 const position = [16, 206];
 const continuosColorData: any = []
@@ -25,22 +24,22 @@ colorTableContinuousData.forEach((element: any) => {
 });
 
 // code is for d3 continuous data
-// var d3continuousData = colorScalesCont.filter((element: any) => {
-//     return element.discrete == false; 
-// });
+var d3continuousData = colorScalesCont.filter((element: any) => {
+    return element.discrete == false; 
+});
 
-// d3continuousData.forEach((element: any) => {
-//     continuosD3ColorData.push({color: element.colors, name: element.name})
-// });
+d3continuousData.forEach((element: any) => {
+    continuosD3ColorData.push({color: element.colors, name: element.name})
+});
 
 export const ColorSelector: React.FC<legendProps> = ({
     useColorTableColors,
     parentdata,
-    //useD3Colors,
+    useD3Colors,
 }: legendProps) => {
     let continuousLegend;
 
-    const [parent, setIsParent] = React.useState();
+    //const [parent, setIsParent] = React.useState();
     // const parent_data = React.useCallback((parent_data: any) => {
     //     console.log('colorselectorcomponent---', parent_data)
     //     setIsParent(parent_data);
@@ -55,22 +54,23 @@ export const ColorSelector: React.FC<legendProps> = ({
                         legendColorName={''} 
                         useContColorTable={true}
                         valueIndex={key}
-                        parentFunc={parentdata}
+                        parentFunc={parentdata.parentdata}
             />
         });
     } 
-    // if (useD3Colors) {
-    //     continuousLegend = continuosD3ColorData.map((val: any, key: any) => {
-    //         return <LegendContinous
-    //                     position={position + key}
-    //                     colorArray={{}}
-    //                     legendColor={val.color} 
-    //                     legendColorName={val.name} 
-    //                     useContColorTable={false}  
-    //                     valueIndex={key + "0"}
-    //         />
-    //     });
-    // }
+    if (useD3Colors) {
+        continuousLegend = continuosD3ColorData.map((val: any, key: any) => {
+            return <LegendContinous
+                        position={position + key}
+                        colorArray={{}}
+                        legendColor={val.color} 
+                        legendColorName={val.name} 
+                        useContColorTable={false}  
+                        valueIndex={key + "0"}
+                        parentFunc={parentdata.parentdata}
+            />
+        });
+    }
 
     return (
         <div>

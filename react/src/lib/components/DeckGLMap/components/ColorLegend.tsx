@@ -46,11 +46,11 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         [layers]
     );
 
-    const [parent, setIsParent] = React.useState();
+    const [parent] = React.useState();
 
-    const parent_data = React.useCallback((parent_data: any) => {
-        setIsParent(parent_data);
-    }, []);
+    // const parent_data = React.useCallback((parent_data: any) => {
+    //     setIsParent(parent_data);
+    // }, []);
 
     // Get color table for log curves.
     React.useEffect(() => {
@@ -103,7 +103,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     // colorTables={parent ? parent.color : colorTables}
                     colorTables={colorTables}
                     horizontal={horizontal}
-                    // parentdata={parent_data}
+                    //parentdata={parent_data}
                 />
             )}
         </div>

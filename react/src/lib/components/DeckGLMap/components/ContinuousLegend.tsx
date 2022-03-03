@@ -34,9 +34,10 @@ export const ContinuousLegend: React.FC<legendProps> = ({
     //parentdata
 }: legendProps) => {
     const divRef = useRef<HTMLDivElement>(null);
-    const [parent, setIsParent] = React.useState();
+    const [parent, setIsParent] = React.useState([] as any);
 
     const parent_data = React.useCallback((parent_data: any) => {
+        console.log('parent_data', parent_data)
         setIsParent(parent_data);
     }, []);
 
@@ -57,7 +58,6 @@ export const ContinuousLegend: React.FC<legendProps> = ({
 
 
     function continuousLegend() {
-        console.log('typeof', colorTables[0].name)
         const itemColor: ItemColor[] = [];
         // Return the matched colors array from color.tables.json file
         let colorTableColors = colorsArray(colorName, colorTables);
@@ -69,9 +69,9 @@ export const ContinuousLegend: React.FC<legendProps> = ({
         //     colorTableColors = colorTables;
         // } 
 
+        console.log('parent', parent)
         
-        
-        if (parent) {
+        if (parent.color) {
             colorTableColors = parent.color;
         } else {
             colorTableColors;
@@ -84,7 +84,6 @@ export const ContinuousLegend: React.FC<legendProps> = ({
                 color: RGBToHex(value).color,
             });
         });
-        
         
         const colorScale = scaleSequential().domain([min, max]);
         // append a defs (for definition) element to your SVG

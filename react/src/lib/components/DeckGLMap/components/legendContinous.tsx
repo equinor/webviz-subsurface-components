@@ -2,6 +2,7 @@ import * as React from "react";
 import { useRef } from "react";
 import { RGBToHex } from "../utils/continousLegend";
 //import {colorScalesCont} from "@emerson-eps/color-tables/src/component/Utils/d3ColorScale"
+import {colorScalesCont} from "./d3ColorScale"
 import * as d3 from "d3";
 
 interface legendProps {
@@ -29,11 +30,18 @@ export const LegendContinous: React.FC<legendProps> = ({
     parentFunc
 }: legendProps) => {
 
+    if (legendColor)
+    var data = d3.range(10).map(d=> ({color:legendColor(d/10), value:d}))
+
     const handleChange = React.useCallback(() => {
-        //console.log('colorArray--in', colorArray)
-        parentFunc(colorArray);
-        //setIsParent(childData);
+        if (Object.keys(colorArray).length > 0) {
+            parentFunc(colorArray);
+        } else {
+            parentFunc(data);
+        }
     }, []);
+
+    //console.log('colorArray', colorArray)
 
     const divRef = useRef<HTMLDivElement>(null);
     React.useEffect(() => {
@@ -42,9 +50,9 @@ export const LegendContinous: React.FC<legendProps> = ({
             colortableLegend()
         } 
         // d3 colors
-        // else if (useContColorTable == false && divRef.current) {
-        //     d3colorLegend(colorScalesCont)
-        // }
+        else if (useContColorTable == false && divRef.current) {
+            d3colorLegend(colorScalesCont)
+        }
         return function cleanup() {
             d3.select(divRef.current).select("svg").remove();
         };
@@ -110,64 +118,70 @@ export const LegendContinous: React.FC<legendProps> = ({
     }
 
     // continuous legend using d3 color scale (linear gradiend code)
-    // function d3colorLegend(colorscale: any) {
+    function d3colorLegend(colorscale: any) {
+        const itemColor: any = [];
 
-    //     const itemColor: any = [];
+        colorscale.forEach((value: any) => {
+            // return the color and offset needed to draw the legend
+            itemColor.push(value.colors);
+        });
 
-    //     colorscale.forEach((value: any) => {
-    //         // return the color and offset needed to draw the legend
-    //         itemColor.push(value.colors);
-    //     });
+       
 
-    //     // create an array of steps based on the color scale
-    //     // returns an array of evenly-spaced numbers. Returns the integers from zero to the specified end minus one.
-    //     // d3.range(start, stop, step)
-    //     var data = d3.range(10).map(d=> ({color:legendColor(d/10), value:d}))
-    //     // get the array's min and max value
-    //     var extent: any = d3.extent(data, d => d.value); 
+        // create an array of steps based on the color scale
+        // returns an array of evenly-spaced numbers. Returns the integers from zero to the specified end minus one.
+        // d3.range(start, stop, step)
+        
 
-    //     // append a defs (for definition) element to your SVG
-    //     const svgLegend = d3.select(divRef.current)
-    //         .append("svg")
-    //         .style("height", "50px")
-    //         .style("display", "flex")
+       // console.log('data.color-', data)
+        // const handleChange1 = React.useCallback(() => {
+        //     parentFunc(data.color)
+        // }, []);
+        // get the array's min and max value
+        var extent: any = d3.extent(data, d => d.value); 
 
-    //     const defs = svgLegend.append("defs");
-    //     let currentIndex = "linear-gradient-" + valueIndex;
-    //     // append a linearGradient element to the defs and give it a unique id
-    //     const linearGradient = defs
-    //         .append("linearGradient")
-    //         .attr("id", currentIndex)
-    //         .attr("x1", "0%")
-    //         .attr("x2", "100%") //since it's a horizontal linear gradient
-    //         .attr("y1", "0%")
-    //         .attr("y2", "0%");
+        // append a defs (for definition) element to your SVG
+        const svgLegend = d3.select(divRef.current)
+            .append("svg")
+            .style("height", "50px")
+            .style("display", "flex")
 
-    //     // append multiple color stops by using D3's data/enter step
-    //     linearGradient.selectAll("stop")
-    //         .data(data)
-    //         .enter().append("stop")
-    //         .attr("offset", d => ((d.value - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
-    //         .attr("stop-color", d => d.color);
+        const defs = svgLegend.append("defs");
+        let currentIndex = "linear-gradient-" + valueIndex;
+        // append a linearGradient element to the defs and give it a unique id
+        const linearGradient = defs
+            .append("linearGradient")
+            .attr("id", currentIndex)
+            .attr("x1", "0%")
+            .attr("x2", "100%") //since it's a horizontal linear gradient
+            .attr("y1", "0%")
+            .attr("y2", "0%");
 
-    //     // append title
-    //     svgLegend
-    //         .append("text")
-    //         .attr("class", "legendTitle")
-    //         .attr("x", 0)
-    //         .attr("y", 43)
-    //         .style("text-anchor", "left")
-    //         .text(legendColorName);
+        // append multiple color stops by using D3's data/enter step
+        linearGradient.selectAll("stop")
+            .data(data)
+            .enter().append("stop")
+            .attr("offset", d => ((d.value - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
+            .attr("stop-color", d => d.color);
 
-    //     // draw the rectangle and fill with gradient
-    //     svgLegend
-    //         .append("rect")
-    //         .attr("x", 180)
-    //         .attr("y", 30)
-    //         .attr("width", 150)
-    //         .attr("height", 25)
-    //         .style("fill", "url(#"+currentIndex+")");
-    // }
+        // append title
+        svgLegend
+            .append("text")
+            .attr("class", "legendTitle")
+            .attr("x", 0)
+            .attr("y", 43)
+            .style("text-anchor", "left")
+            .text(legendColorName);
+
+        // draw the rectangle and fill with gradient
+        svgLegend
+            .append("rect")
+            .attr("x", 180)
+            .attr("y", 30)
+            .attr("width", 150)
+            .attr("height", 25)
+            .style("fill", "url(#"+currentIndex+")");
+    }
 
     return (
         <div

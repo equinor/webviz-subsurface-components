@@ -32,7 +32,7 @@ const position = [16, 10];
 const name = "PORO";
 const horizontal = true;
 const colorName = "Rainbow";
-const parentdata= "true";
+//const parentdata= "true";
 
 const Template = (args) => {
     return <ContinuousLegend {...args} />;
@@ -48,5 +48,5 @@ LegendTemplate.args = {
     colorName,
     colorTables,
     horizontal,
-    parentdata,
+    //parentdata,
 };
