@@ -29,6 +29,8 @@ interface Props {
     maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
     maxContentZoom?: number; // default is 256
 
+    checkDatafileSchema?: boolean;
+
     // callbacks:
     onCreateController?: (controller: WellLogController) => void;
     onInfo?: (
@@ -215,6 +217,7 @@ class WellLogViewWithScroller extends Component<Props> {
                     hideLegend={this.props.hideLegend}
                     maxVisibleTrackNum={this.props.maxVisibleTrackNum}
                     maxContentZoom={this.props.maxContentZoom}
+                    checkDatafileSchema={this.props.checkDatafileSchema}
                     primaryAxis={this.props.primaryAxis}
                     axisTitles={this.props.axisTitles}
                     axisMnemos={this.props.axisMnemos}

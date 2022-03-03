@@ -196,7 +196,15 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     rotDeg: number;
 
     // Contourlines reference point and interval.
+    // A value of [-1.0, -1.0] will disable contour lines.
+    // default value: [-1.0, -1.0]
     contours: [number, number];
+
+    // Contourlines may be calculated either on depth/z-value or on property/texture value
+    // If this is set to false, lines will follow properties instead of depth.
+    // In 2D mode this is always the case regardless.
+    // default: true
+    isContoursDepth: boolean;
 
     // Name of color map. E.g "PORO"
     colorMapName: string;
@@ -285,7 +293,7 @@ export default class Map3DLayer extends CompositeLayer<
                 propertyValueRange: this.props.propertyValueRange,
                 colorMapRange: this.props.colorMapRange,
                 isReadoutDepth: this.props.isReadoutDepth,
-                isContoursDepth: isMesh,
+                isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
             })
         );
         return [layer];
