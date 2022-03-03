@@ -602,7 +602,7 @@ class VectorCalculatorDemo extends Component {
 
     render() {
         return (
-            <div style={{ height: "90vh", width: "90vw" }}>
+            <div style={{ height: "40vh", width: "90vw" }}>
                 <VectorCalculator
                     id="vector_calculator"
                     vectors={this.vectors}

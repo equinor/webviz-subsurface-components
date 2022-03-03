@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Icon } from "@equinor/eds-core-react";
-import { Grid, Paper } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import { add, copy, delete_forever } from "@equinor/eds-icons";
 import { v4 as uuidv4 } from "uuid";

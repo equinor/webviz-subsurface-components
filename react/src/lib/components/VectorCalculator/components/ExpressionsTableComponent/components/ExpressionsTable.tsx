@@ -6,7 +6,6 @@ import {
     TableCell,
     TableContainer,
     Tooltip,
-    Theme,
 } from "@material-ui/core";
 
 import { BlinkingTableRow } from "./BlinkingTableRow";
@@ -23,7 +22,6 @@ import {
 } from "../../ExpressionsStore";
 
 import "!style-loader!css-loader!../../../VectorCalculator.css";
-import { ScrollArea } from "@webviz/core-components";
 
 interface ExpressionsTableProps {
     blinkingExpressions: ExpressionType[];
@@ -205,93 +203,90 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                 </Table>
             </TableContainer>
             <TableContainer className="ExpressionsTable">
-                <ScrollArea>
-                    <Table aria-label="sticky table">
-                        <TableBody>
-                            {expressions.map((row) => {
-                                const isSelected = isExpressionSelected(row);
-                                const isActive =
-                                    store.state.activeExpression === row;
-                                const expressionFromMap =
-                                    getDetailedExpression(row);
-                                const isBlinking =
-                                    props.blinkingExpressions.some(
-                                        (elm) => elm.id == row.id
-                                    );
+                <Table aria-label="sticky table">
+                    <TableBody>
+                        {expressions.map((row) => {
+                            const isSelected = isExpressionSelected(row);
+                            const isActive =
+                                store.state.activeExpression === row;
+                            const expressionFromMap =
+                                getDetailedExpression(row);
+                            const isBlinking = props.blinkingExpressions.some(
+                                (elm) => elm.id == row.id
+                            );
 
-                                return (
-                                    <BlinkingTableRow
-                                        blinking={isBlinking}
-                                        hover={true}
-                                        role="checkbox"
-                                        tabIndex={-1}
-                                        key={row.id}
-                                        selected={isActive}
-                                        aria-checked={isActive}
+                            return (
+                                <BlinkingTableRow
+                                    blinking={isBlinking}
+                                    hover={true}
+                                    role="checkbox"
+                                    tabIndex={-1}
+                                    key={row.id}
+                                    selected={isActive}
+                                    aria-checked={isActive}
+                                >
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            checked={isSelected}
+                                            onClick={() =>
+                                                handleCheckBoxClick(row)
+                                            }
+                                            color="primary"
+                                        />
+                                    </TableCell>
+                                    <TableCell
+                                        align="left"
+                                        onClick={() => handleRowClick(row)}
                                     >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                checked={isSelected}
-                                                onClick={() =>
-                                                    handleCheckBoxClick(row)
-                                                }
-                                                color="primary"
-                                            />
-                                        </TableCell>
-                                        <TableCell
-                                            align="left"
-                                            onClick={() => handleRowClick(row)}
+                                        <Tooltip
+                                            key={row.name}
+                                            placement="top"
+                                            title={
+                                                row.description
+                                                    ? row.description
+                                                    : ""
+                                            }
+                                            enterDelay={1000}
+                                            enterNextDelay={1000}
+                                            hidden={
+                                                !row.description ||
+                                                row.description.length <= 0
+                                            }
                                         >
-                                            <Tooltip
-                                                key={row.name}
-                                                placement="top"
-                                                title={
-                                                    row.description
-                                                        ? row.description
-                                                        : ""
-                                                }
-                                                enterDelay={1000}
-                                                enterNextDelay={1000}
-                                                hidden={
-                                                    !row.description ||
-                                                    row.description.length <= 0
+                                            <div
+                                                className={
+                                                    "ExpressionsTableCell ExpressionsTableHeaderNameCell"
                                                 }
                                             >
-                                                <div
-                                                    className={
-                                                        "ExpressionsTableCell"
-                                                    }
-                                                >
-                                                    {row.name}
-                                                </div>
-                                            </Tooltip>
-                                        </TableCell>
-                                        <TableCell
-                                            align="left"
-                                            onClick={() => handleRowClick(row)}
+                                                {row.name}
+                                            </div>
+                                        </Tooltip>
+                                    </TableCell>
+                                    <TableCell
+                                        align="left"
+                                        onClick={() => handleRowClick(row)}
+                                    >
+                                        <Tooltip
+                                            key={row.expression}
+                                            placement="top"
+                                            title={expressionFromMap}
+                                            enterDelay={1000}
+                                            enterNextDelay={1000}
                                         >
-                                            <Tooltip
-                                                key={row.expression}
-                                                placement="top"
-                                                title={expressionFromMap}
-                                                enterDelay={1000}
-                                                enterNextDelay={1000}
+                                            <div
+                                                className={
+                                                    "ExpressionsTableCell ExpressionsTableHeaderExpressionCell"
+                                                }
                                             >
-                                                <div
-                                                    className={
-                                                        "ExpressionsTableCell"
-                                                    }
-                                                >
-                                                    {expressionFromMap}
-                                                </div>
-                                            </Tooltip>
-                                        </TableCell>
-                                    </BlinkingTableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </ScrollArea>
+                                                {expressionFromMap}
+                                            </div>
+                                        </Tooltip>
+                                    </TableCell>
+                                </BlinkingTableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
             </TableContainer>
             <ConfirmDialog
                 id={"SaveDialog"}

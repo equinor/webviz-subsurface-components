@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Button, Icon } from "@equinor/eds-core-react";
-import { Grid, Paper } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { clear, save, sync } from "@equinor/eds-icons";
 import { TreeDataNode } from "@webviz/core-components";
 
