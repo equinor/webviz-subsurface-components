@@ -28,7 +28,7 @@ describe("Well Completions", () => {
         });
         cy.getIframeBody()
             .find("#root > div > div:nth-child(3) > svg[role='progressbar']", {
-                timeout: 20000,
+                timeout: 30000,
             })
             .should("not.exist");
     });

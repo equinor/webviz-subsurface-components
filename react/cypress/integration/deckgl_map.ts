@@ -20,13 +20,15 @@ describe("Map component", () => {
         });
         cy.getIframeBody()
             .find("#root > div > div:nth-child(3) > svg[role='progressbar']", {
-                timeout: 20000,
+                timeout: 30000,
             })
             .should("not.exist");
     });
 
     it("Should hide pie charts", () => {
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
+        cy.getIframeBody()
+            .find('[id="layers-selector-button"]')
+            .click({ waitForAnimations: false });
         cy.getIframeBody()
             .find("[id='Pie chart-switch']")
             .click({ force: true });

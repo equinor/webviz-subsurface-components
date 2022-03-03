@@ -98,22 +98,22 @@ jobs:
       # Run cypress tests on firefox browser
       - name: E2E on firefox
         if: github.event_name != 'release' && matrix.e2e-on-firefox
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@33ec2f03412577367c7c6aac7b646c88e646e33c
         with:
           browser: firefox
           working-directory: ./react
           start: npm run storybook
           wait-on: "http://localhost:6006"
-        uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: cypress-screenshots
-          path: cypress/screenshots
-        uses: actions/upload-artifact@v2
+          path: react/cypress/screenshots
+      - uses: actions/upload-artifact@v2
         if: always()
         with:
           name: cypress-videos
-          path: cypress/videos
+          path: react/cypress/videos
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
