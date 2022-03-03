@@ -87,6 +87,7 @@ export const LayerIcons = {
     GridLayer: "grid_layer",
     FaultPolygonsLayer: "fault",
     DrawingLayer: "brush",
+    AxesLayer: "brush",
 };
 
 export type LayerType = keyof typeof LayerIcons;
