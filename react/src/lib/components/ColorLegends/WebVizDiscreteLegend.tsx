@@ -7,9 +7,9 @@ const colorTables = require("@emerson-eps/color-tables/src/component/color-table
 interface LegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
     title: string;
-    position: number[];
+    position?: number[] | null;
     colorName: string;
-    horizontal?: boolean;
+    horizontal?: boolean | null;
 }
 
 const DiscreteLegendWrapper: React.FC<LegendProps> = ({
@@ -33,6 +33,7 @@ const DiscreteLegendWrapper: React.FC<LegendProps> = ({
 
 DiscreteLegendWrapper.propTypes = {
     title: PropTypes.string.isRequired,
+    position: PropTypes.arrayOf(PropTypes.number.isRequired),
     colorName: PropTypes.string.isRequired,
     horizontal: PropTypes.bool,
 };

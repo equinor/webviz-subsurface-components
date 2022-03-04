@@ -11,7 +11,7 @@ interface LegendProps {
     max: number;
     position?: number[] | null;
     colorName: string;
-    horizontal?: boolean;
+    horizontal?: boolean | null;
 }
 
 const ContinuousLegendWrapper: React.FC<LegendProps> = ({
@@ -30,7 +30,7 @@ const ContinuousLegendWrapper: React.FC<LegendProps> = ({
             position={position}
             colorName={colorName}
             colorTables={colorTables}
-            horizontal={horizontal}
+            horizontal={horizontal ? horizontal : null}
         />
     );
 };
@@ -39,6 +39,7 @@ ContinuousLegendWrapper.propTypes = {
     title: PropTypes.string.isRequired,
     min: PropTypes.number.isRequired,
     max: PropTypes.number.isRequired,
+    position: PropTypes.arrayOf(PropTypes.number.isRequired),
     colorName: PropTypes.string.isRequired,
     horizontal: PropTypes.bool,
 };
