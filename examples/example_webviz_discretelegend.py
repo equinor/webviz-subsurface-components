@@ -20,7 +20,7 @@ if __name__ == "__main__":
     }
 
     legend_obj = wsc.WebVizDiscreteLegend(
-        "discreteData"=Discrete_Data
+        "discreteData"=Discrete_Data,
         "title"="Wells / ZONELOG",
         "position"=[16, 10],
         "colorName"="Stratigraphy",
