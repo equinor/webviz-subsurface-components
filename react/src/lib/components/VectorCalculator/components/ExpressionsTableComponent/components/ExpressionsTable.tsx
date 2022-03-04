@@ -14,7 +14,6 @@ import { EnhancedTableHead } from "./EnhancedTableHead";
 import { getDetailedExpression } from "../../../utils/VectorCalculatorHelperFunctions";
 import { ExpressionType } from "../../../utils/VectorCalculatorTypes";
 import { ConfirmDialog } from "../../../utils/ConfirmDialog";
-
 import {
     isExpressionEdited,
     StoreActions,
@@ -192,9 +191,12 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     }, [setIsDiscardDialogOpen, activeExpression]);
 
     return (
-        <>
+        <div>
             <TableContainer>
-                <Table aria-label="sticky table">
+                <Table
+                    aria-label="sticky table"
+                    className="ExpressionsTableHeaderTable"
+                >
                     <EnhancedTableHead
                         numSelected={selectedExpressions.length}
                         onSelectAllClick={handleSelectAllClick}
@@ -237,6 +239,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                     <TableCell
                                         align="left"
                                         onClick={() => handleRowClick(row)}
+                                        className="ExpressionsTableNameCell"
                                     >
                                         <Tooltip
                                             key={row.name}
@@ -255,7 +258,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                         >
                                             <div
                                                 className={
-                                                    "ExpressionsTableCell ExpressionsTableHeaderNameCell"
+                                                    "ExpressionsTableCell "
                                                 }
                                             >
                                                 {row.name}
@@ -265,6 +268,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                     <TableCell
                                         align="left"
                                         onClick={() => handleRowClick(row)}
+                                        className="ExpressionsTableExpressionCell"
                                     >
                                         <Tooltip
                                             key={row.expression}
@@ -275,7 +279,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                         >
                                             <div
                                                 className={
-                                                    "ExpressionsTableCell ExpressionsTableHeaderExpressionCell"
+                                                    "ExpressionsTableCell"
                                                 }
                                             >
                                                 {expressionFromMap}
@@ -304,6 +308,6 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                 onYes={handleOnDiscardChanges}
                 onNo={handleOnNotDiscardChanges}
             />
-        </>
+        </div>
     );
 };

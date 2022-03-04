@@ -31,13 +31,18 @@
 
 .VectorCalculator .ExpressionsTableHeader {
     font-weight: bold;
+    background-color: #f7f7f7;
 }
 
-.VectorCalculator .ExpressionsTableHeaderNameCell {
+.VectorCalculator .ExpressionsTableHeaderTable {
+    table-layout: fixed;
+}
+
+.VectorCalculator .ExpressionsTableNameCell {
     width: 35%;
 }
 
-.VectorCalculator .ExpressionsTableHeaderExpressionCell {
+.VectorCalculator .ExpressionsTableExpressionCell {
     width: 65%;
 }
 
@@ -63,7 +68,7 @@
     background-color: #fff;
 }
 
-.VectorCalculator .ExpressionsTable td {
+.VectorCalculator .ExpressionsTable table {
     table-layout: fixed;
 }
 
