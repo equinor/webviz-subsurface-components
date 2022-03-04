@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
+//import { colorTablesArray } from "@emerson-eps/color-tables/";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
 
@@ -8,13 +9,19 @@ interface LegendProps {
     title: string;
     min: number;
     max: number;
-};
+    position?: number[] | null;
+    colorName: string;
+    horizontal?: boolean;
+}
 
-const ContinuousLegendWrapper: React.FC<LegendProps> = ({title, min, max}) => {
-    const position = [16, 10];
-    const horizontal = true;
-    const colorName = "Rainbow";
-
+const ContinuousLegendWrapper: React.FC<LegendProps> = ({
+    title,
+    min,
+    max,
+    position,
+    colorName,
+    horizontal,
+}) => {
     return (
         <ContinuousLegend
             min={min}
@@ -32,6 +39,8 @@ ContinuousLegendWrapper.propTypes = {
     title: PropTypes.string.isRequired,
     min: PropTypes.number.isRequired,
     max: PropTypes.number.isRequired,
+    colorName: PropTypes.string.isRequired,
+    horizontal: PropTypes.bool,
 };
 
 export default ContinuousLegendWrapper;
