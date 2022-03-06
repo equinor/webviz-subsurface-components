@@ -20,21 +20,12 @@ if __name__ == "__main__":
     }
 
     legend_obj = wsc.WebVizDiscreteLegend(
-<<<<<<< HEAD
         discreteData=Discrete_Data,
         title="Wells / ZONELOG",
         position=[16, 10],
         colorName="Stratigraphy",
         horizontal=True,
         colorTables=Color_Tables,
-=======
-        "discreteData"=Discrete_Data,
-        "title"="Wells / ZONELOG",
-        "position"=[16, 10],
-        "colorName"="Stratigraphy",
-        "horizontal"=True,
-        "colorTables"=Color_Tables,
->>>>>>> 840512e11f96cf78c1ef4f9df73d61c1d4b7b47f
     )
 
     app = Dash(__name__)
