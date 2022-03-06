@@ -13,13 +13,13 @@ if __name__ == "__main__":
     Color_Tables = "https://raw.githubusercontent.com/emerson-eps/color-tables/main/react-app/src/component/color-tables.json"
 
     legend_obj = wsc.WebVizContinuousLegend(
-        "min"=0,
-        "max"=0.35,
-        "title"="Wells / PORO",
-        "position"=[16, 10],
-        "colorName"="Rainbow",
-        "horizontal"=True,
-        "colorTables"=Color_Tables,
+        min=0,
+        max=0.35,
+        title="Wells / PORO",
+        position=[16, 10],
+        colorName="Rainbow",
+        horizontal=True,
+        colorTables=Color_Tables,
     )
 
     app = Dash(__name__)
