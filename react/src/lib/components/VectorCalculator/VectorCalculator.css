@@ -4,23 +4,10 @@
     margin-top: 5px;
     height: 100%;
     max-height: 100%;
-    min-height: 500px;
-    min-width: 900px;
 }
 
 .VectorCalculator > .MuiGrid-root {
     height: 100%;
-}
-
-.VectorCalculator .ExpressionEditComponent {
-    min-width: 400px;
-}
-
-.VectorCalculator
-    .ExpressionEditComponent
-    .MuiGrid-root
-    .MuiGrid-item:last-child {
-    padding-bottom: 0px;
 }
 
 .VectorCalculator .WarningAlert {

@@ -191,7 +191,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     }, [setIsDiscardDialogOpen, activeExpression]);
 
     return (
-        <div>
+        <>
             <TableContainer>
                 <Table
                     aria-label="sticky table"
@@ -308,6 +308,6 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                 onYes={handleOnDiscardChanges}
                 onNo={handleOnNotDiscardChanges}
             />
-        </div>
+        </>
     );
 };

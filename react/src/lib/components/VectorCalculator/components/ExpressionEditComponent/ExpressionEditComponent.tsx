@@ -100,14 +100,7 @@ export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
     };
 
     return (
-        <Grid
-            container
-            item
-            className="ExpressionEditComponent"
-            direction="column"
-            alignItems="stretch"
-            xs={6}
-        >
+        <Grid container item direction="column" alignItems="stretch" xs={6}>
             <Grid item style={{ height: 90 }}>
                 <ExpressionNameTextField
                     vectors={props.vectors}
@@ -128,7 +121,11 @@ export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
                     maxLength={props.maxExpressionDescriptionLength}
                 />
             </Grid>
-            <Grid item className="TableWrapperGridItem">
+            <Grid
+                item
+                className="TableWrapperGridItem"
+                style={{ minHeight: 70 }}
+            >
                 <VectorSelectorTable
                     vectorData={props.vectors}
                     disabled={
