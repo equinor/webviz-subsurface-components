@@ -19,7 +19,7 @@ import VectorCalculatorDemo from "./VectorCalculatorDemo";
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "VectorCalculator" };
+        this.state = { value: "LeafletMap" };
     }
 
     onChange(e) {
