@@ -14,7 +14,10 @@ export const EnhancedTableHead: React.FC<EnhancedTableProps> = (
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
+                <TableCell
+                    padding="checkbox"
+                    className="ExpressionsTableHeader"
+                >
                     <Checkbox
                         indeterminate={
                             numSelected > 0 && numSelected < rowCount
@@ -22,16 +25,17 @@ export const EnhancedTableHead: React.FC<EnhancedTableProps> = (
                         checked={numSelected > 0 && numSelected <= rowCount}
                         onChange={onSelectAllClick}
                         inputProps={{ "aria-label": "select all expressions" }}
+                        color="primary"
                     />
                 </TableCell>
                 <TableCell
-                    className="ExpressionsTableHeader ExpressionsTableHeaderNameCell"
+                    className="ExpressionsTableHeader ExpressionsTableNameCell"
                     align="left"
                 >
                     {"Name"}
                 </TableCell>
                 <TableCell
-                    className="ExpressionsTableHeader ExpressionsTableHeaderExpressionCell"
+                    className="ExpressionsTableHeader ExpressionsTableExpressionCell"
                     align="left"
                 >
                     {"Expression"}

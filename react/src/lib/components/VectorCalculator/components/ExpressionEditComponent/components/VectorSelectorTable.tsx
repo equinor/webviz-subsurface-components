@@ -1,6 +1,5 @@
 import React from "react";
 import {
-    Paper,
     Table,
     TableContainer,
     TableRow,
@@ -178,10 +177,7 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
     );
 
     return (
-        <TableContainer
-            component={Paper}
-            className="VectorSelectorTableContainer"
-        >
+        <TableContainer className="VectorSelectorTableContainer">
             {disabled && <div className="DisableOverlay" />}
             <Table>
                 <TableBody>
@@ -191,10 +187,17 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
                                 tabIndex={-1}
                                 key={"row_" + row.variableName}
                             >
-                                <TableCell align="left" key={row.variableName}>
+                                <TableCell
+                                    align="left"
+                                    key={row.variableName}
+                                    style={{ width: "10%" }}
+                                >
                                     {row.variableName}
                                 </TableCell>
-                                <TableCell key={`cell_${row.variableName}`}>
+                                <TableCell
+                                    key={`cell_${row.variableName}`}
+                                    style={{ minWidth: 240 }}
+                                >
                                     <VectorSelector
                                         id={
                                             "vector_selector_" +

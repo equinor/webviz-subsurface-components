@@ -84,21 +84,20 @@ export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
 
     return (
         <div ref={vectorCalculatorRef} className={"VectorCalculator"}>
-            <Grid container spacing={2}>
-                <Grid item xs={6}>
-                    <ExpressionsTableComponent
-                        containerRef={vectorCalculatorRef}
-                    />
-                </Grid>
-                <Grid item xs={6}>
-                    <ExpressionEditComponent
-                        vectors={props.vectors}
-                        externalParsing={props.isDashControlled}
-                        maxExpressionDescriptionLength={
-                            props.maxExpressionDescriptionLength
-                        }
-                    />
-                </Grid>
+            <Grid
+                container
+                spacing={3}
+                alignItems="stretch"
+                justifyContent="space-between"
+            >
+                <ExpressionsTableComponent containerRef={vectorCalculatorRef} />
+                <ExpressionEditComponent
+                    vectors={props.vectors}
+                    externalParsing={props.isDashControlled}
+                    maxExpressionDescriptionLength={
+                        props.maxExpressionDescriptionLength
+                    }
+                />
             </Grid>
         </div>
     );

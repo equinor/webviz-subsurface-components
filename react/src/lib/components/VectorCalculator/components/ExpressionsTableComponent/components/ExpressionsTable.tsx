@@ -1,7 +1,6 @@
 import React from "react";
 import {
     Checkbox,
-    Paper,
     Table,
     TableBody,
     TableCell,
@@ -15,7 +14,6 @@ import { EnhancedTableHead } from "./EnhancedTableHead";
 import { getDetailedExpression } from "../../../utils/VectorCalculatorHelperFunctions";
 import { ExpressionType } from "../../../utils/VectorCalculatorTypes";
 import { ConfirmDialog } from "../../../utils/ConfirmDialog";
-
 import {
     isExpressionEdited,
     StoreActions,
@@ -193,14 +191,21 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     }, [setIsDiscardDialogOpen, activeExpression]);
 
     return (
-        <div>
-            <TableContainer className="ExpressionsTable" component={Paper}>
-                <Table stickyHeader aria-label="sticky table">
+        <>
+            <TableContainer>
+                <Table
+                    aria-label="sticky table"
+                    className="ExpressionsTableHeaderTable"
+                >
                     <EnhancedTableHead
                         numSelected={selectedExpressions.length}
                         onSelectAllClick={handleSelectAllClick}
                         rowCount={expressions.length}
                     />
+                </Table>
+            </TableContainer>
+            <TableContainer className="ExpressionsTable">
+                <Table aria-label="sticky table">
                     <TableBody>
                         {expressions.map((row) => {
                             const isSelected = isExpressionSelected(row);
@@ -228,11 +233,13 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                             onClick={() =>
                                                 handleCheckBoxClick(row)
                                             }
+                                            color="primary"
                                         />
                                     </TableCell>
                                     <TableCell
                                         align="left"
                                         onClick={() => handleRowClick(row)}
+                                        className="ExpressionsTableNameCell"
                                     >
                                         <Tooltip
                                             key={row.name}
@@ -261,6 +268,7 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                                     <TableCell
                                         align="left"
                                         onClick={() => handleRowClick(row)}
+                                        className="ExpressionsTableExpressionCell"
                                     >
                                         <Tooltip
                                             key={row.expression}
@@ -300,6 +308,6 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
                 onYes={handleOnDiscardChanges}
                 onNo={handleOnNotDiscardChanges}
             />
-        </div>
+        </>
     );
 };
