@@ -381,7 +381,7 @@ Map.defaultProps = {
     legend: {
         visible: true,
         position: [5, 10],
-        horizontal: true,
+        horizontal: false,
     },
     coordinateUnit: "m",
     zoom: -3,

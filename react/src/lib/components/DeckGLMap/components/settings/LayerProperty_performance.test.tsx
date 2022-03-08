@@ -11,19 +11,19 @@ import { testState } from "../../test/testReduxState";
 
 describe("Test Layer Property", () => {
     it("performance test", () => {
-        render(
-            Wrapper({
-                children: (
-                    <Profiler id="Layer properties" onRender={logTimes}>
-                        <LayerProperty
-                            layer={
-                                testState.layers[testState.layers.length - 1]
-                            }
-                        />
-                    </Profiler>
-                ),
-            })
+        const drawing_layer = testState.layers.find(
+            (item) => item["@@type"] === "DrawingLayer"
         );
+        drawing_layer &&
+            render(
+                Wrapper({
+                    children: (
+                        <Profiler id="Layer properties" onRender={logTimes}>
+                            <LayerProperty layer={drawing_layer} />
+                        </Profiler>
+                    ),
+                })
+            );
         if (obj.perf_metrics[0][2] > 100) {
             core.warning(
                 "Layer Property Component in '/components/DeckGLMap/components/settings/' seems to have performance issues. Actual render time:" +

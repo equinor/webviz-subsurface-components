@@ -9,6 +9,7 @@ uniform bool flatShading;
 uniform float opacity;
 
 uniform bool isReadoutDepth;
+uniform bool isContoursDepth;
 
 uniform float contourReferencePoint;
 uniform float contourInterval;
@@ -49,7 +50,7 @@ void main(void) {
    vec4 color = hasTexture ? texture(sampler, vTexCoord) : vColor;
 
    // Discard transparent pixels.
-   if (!picking_uActive && color.w < 0.99) {
+   if (!picking_uActive && color.w < 1.0) {
          discard;
          return;
    }
@@ -87,16 +88,17 @@ void main(void) {
       return;
    }
 
+   float propertyValue = 0.0;
    if (hasTexture) {
       float opcacity = color.w;
       float floatScaler =  1.0 / (256.0 * 256.0 * 256.0 - 1.0);
       vec3 rgb = color.rgb;
       rgb *= vec3(16711680.0, 65280.0, 255.0); //255*256*256, 255*256, 255
-      float propertyValue = (rgb.r + rgb.g + rgb.b) * floatScaler;
+      float propertyValue_norm = (rgb.r + rgb.g + rgb.b) * floatScaler; // propertyValue_norm will be in range [0-1]
 
       // If colorMapRangeMin/Max specified, color map will span this interval.
-      float x  = propertyValue * (valueRangeMax - valueRangeMin) + valueRangeMin;
-      x = (x - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
+      propertyValue  = propertyValue_norm * (valueRangeMax - valueRangeMin) + valueRangeMin;
+      float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
       x = max(0.0, x);
       x = min(1.0, x);
 
@@ -106,10 +108,12 @@ void main(void) {
 
    bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
    if (is_contours) {
-      float depth =  (abs(worldPos.z) - contourReferencePoint) / contourInterval;
+      // Contours are made of either depths or properties.
+      float val =  (hasTexture && !isContoursDepth) ? (propertyValue - contourReferencePoint) / contourInterval
+                                                    : (abs(worldPos.z) - contourReferencePoint) / contourInterval;
 
-      float f  =  fract(depth);
-      float df = fwidth(depth);
+      float f  = fract(val);
+      float df = fwidth(val);
 
       // keep: float c = smoothstep(df * 1.0, df * 2.0, f); // smootstep from/to no of pixels distance fronm contour line.
       float c = smoothstep(0.0, df * 2.0, f);

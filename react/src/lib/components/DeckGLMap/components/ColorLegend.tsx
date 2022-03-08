@@ -113,7 +113,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
 ColorLegend.defaultProps = {
     visible: true,
     position: [5, 10],
-    horizontal: true,
+    horizontal: false,
 };
 
 export default ColorLegend;

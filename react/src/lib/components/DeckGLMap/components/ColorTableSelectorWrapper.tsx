@@ -5,7 +5,7 @@ import {ColorSelector} from "./ColorSelectorComponent"
 //export const ColorSelectorWrapper = () => {
 export const ColorSelectorWrapper: React.FC = (props) => {
     return (
-        <div style={{width: "360px", zIndex:"999", float:"right"}}>
+        <div style={{width: "650px"}}>
             <Accordion >
                 <Accordion.Item isExpanded>
                     <Accordion.Header>
@@ -21,7 +21,6 @@ export const ColorSelectorWrapper: React.FC = (props) => {
                                     <ColorSelector 
                                         useColorTableColors={true} 
                                         useD3Colors={false} 
-                                        key={1}
                                         parentdata={props}
                                     />
                                 </Accordion.Panel>
@@ -33,7 +32,11 @@ export const ColorSelectorWrapper: React.FC = (props) => {
                                     D3 Color Scale
                                 </Accordion.Header>
                                 <Accordion.Panel>
-                                    <ColorSelector useColorTableColors={false} useD3Colors={true} key={1} parentdata={props} />
+                                    <ColorSelector 
+                                        useColorTableColors={false} 
+                                        useD3Colors={true} 
+                                        parentdata={props} 
+                                    />
                                 </Accordion.Panel>
                             </Accordion.Item>
                         </Accordion>
