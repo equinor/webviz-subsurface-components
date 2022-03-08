@@ -19,6 +19,7 @@ import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
+import NorthArrow3D from "./NorthArrow3D";
 import { getLayersInViewport } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 
@@ -123,6 +124,14 @@ export interface MapProps {
         position?: number[] | null;
     };
 
+    /**
+     * Parameters for the NorthArrow3D component.
+     */
+    northArrow?: {
+        visible?: boolean | null;
+        position?: number[] | null;
+    };
+
     coordinateUnit?: string;
 
     legend?: {
@@ -157,6 +166,7 @@ const Map: React.FC<MapProps> = ({
     views,
     coords,
     scale,
+    northArrow,
     coordinateUnit,
     legend,
     colorTables,
@@ -327,6 +337,15 @@ const Map: React.FC<MapProps> = ({
                                     colorTables={colorTables}
                                 />
                             )}
+
+                            {northArrow?.visible ? (
+                                <NorthArrow3D
+                                    rotationOrbit={viewState?.rotationOrbit}
+                                    rotationX={viewState?.rotationX}
+                                    position={northArrow.position}
+                                />
+                            ) : null}
+
                             <Settings
                                 viewportId={view.id}
                                 layerIds={view.layerIds}

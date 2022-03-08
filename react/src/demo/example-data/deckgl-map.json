@@ -15,6 +15,13 @@
         10
       ]
     },
+    "northArrow": {
+      "visible": true,
+      "position": [
+        50,
+        50
+      ]
+    },
     "legend": {
       "visible": true,
       "position": [

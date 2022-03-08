@@ -28,6 +28,10 @@ interface DeckGLMapProps {
         widthPerUnit?: number | null;
         position?: number[] | null;
     };
+    northArrow?: {
+        visible?: boolean | null;
+        position?: number[] | null;
+    };
     coordinateUnit?: string;
     legend?: {
         visible?: boolean | null;
@@ -48,6 +52,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     views,
     coords,
     scale,
+    northArrow,
     coordinateUnit,
     legend,
     colorTables,
@@ -114,6 +119,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 views={views}
                 coords={coords}
                 scale={scale}
+                northArrow={northArrow}
                 coordinateUnit={coordinateUnit}
                 legend={legend}
                 colorTables={colorTables}
@@ -243,6 +249,20 @@ DeckGLMap.propTypes = {
         widthPerUnit: PropTypes.number,
         /**
          * Scale bar position in pixels.
+         */
+        position: PropTypes.arrayOf(PropTypes.number.isRequired),
+    }),
+
+    /**
+     * Parameters for the Distance NorthArrow3D component
+     */
+    northArrow: PropTypes.shape({
+        /**
+         * Toggle component visibility.
+         */
+        visible: PropTypes.bool,
+        /**
+         * North arrow position in pixels.
          */
         position: PropTypes.arrayOf(PropTypes.number.isRequired),
     }),

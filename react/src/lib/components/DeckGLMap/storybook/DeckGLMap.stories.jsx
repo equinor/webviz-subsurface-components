@@ -65,6 +65,13 @@ export default {
                 "position: [number, number] — Scale bar position in pixels.",
         },
 
+        northArrow: {
+            description:
+                "Options for distance north arrow component.<br/>" +
+                "visible: boolean — Show/hide north arrow,<br/>" +
+                "position: [number, number] — north arrow bar position in pixels.",
+        },
+
         coordinateUnit: {
             description: "Unit for the scale ruler",
         },
@@ -312,6 +319,10 @@ Axes.args = {
     id: "axes",
     layers: [meshMapLayer, axes],
     bounds: [432150, 6475800, 439400, 6481500],
+    northArrow: {
+        visible: true,
+        position: [50, 50],
+    },
     views: {
         layout: [1, 1],
         viewports: [
