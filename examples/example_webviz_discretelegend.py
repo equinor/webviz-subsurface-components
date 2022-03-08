@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2020 - Equinor ASA.
 
-import Dash
+import dash
 import webviz_core_components as wcc
 import webviz_subsurface_components as wsc
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
         colorTables=COLOR_TABLES,
     )
 
-    app = Dash(__name__)
+    app = dash.Dash(__name__)
 
     app.layout = wcc.FlexBox(
         children=[
