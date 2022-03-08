@@ -3,8 +3,10 @@ import React from "react";
 import { ScenegraphLayer } from "@deck.gl/mesh-layers";
 import { COORDINATE_SYSTEM } from "deck.gl";
 import { OrbitView } from "@deck.gl/core";
-// import { load } from "@loaders.gl/core";
-// import { GLTFLoader } from "@loaders.gl/gltf";
+import { load } from "@loaders.gl/core";
+import { GLTFLoader } from "@loaders.gl/gltf";
+
+const GLTF_MODEL = "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/gltf/scene.gltf!;
 
 interface NorthArrow3DProps {
     rotationOrbit: number;
@@ -30,7 +32,7 @@ const layers = [
     new ScenegraphLayer({
         id: "north-arrow-scenegraph-layer",
         data: [{}],
-        scenegraph: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/gltf/scene.gltf",
+        scenegraph: load("arrow.gltf", GLTFLoader, {}),
         getOrientation: [0.0, 0.0, 0.0],
         getTranslation: [0.0, 0.0, 0.0],
         getScale: [1, 1, 1],
