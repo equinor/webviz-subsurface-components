@@ -119,7 +119,7 @@ Example1Vertical.args = {
     horizontal: false,
     hideTitles: false,
     hideLegend: false,
-    welllog: require("../../../demo/example-data/L898MUD.json"),
+    welllog: require("../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../demo/example-data/welllog_template_1.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
@@ -128,7 +128,8 @@ export const Example2Horizontal = Template.bind({});
 Example2Horizontal.args = {
     id: "Well-Log-Viewer2",
     horizontal: true,
-    welllog: require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json"),
+    welllog:
+        require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
@@ -137,7 +138,7 @@ export const Discrete = Template.bind({});
 Discrete.args = {
     id: "Well-Log-Viewer3",
     horizontal: false,
-    welllog: require("../../../demo/example-data/volve_logs.json"),
+    welllog: require("../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };

@@ -1,18 +1,6 @@
 import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
 import { rootReducer } from "./reducer";
 
-// #if process.env.NODE_ENV !== "production"
-import { enhancer } from "addon-redux";
-// #endif
-
-const createEnhancer = () => {
-    const enhancers = [];
-    // #if process.env["NODE_ENV"] !== "production"
-    enhancers.push(enhancer);
-    // #endif
-    return enhancers;
-};
-
 export type MapState = ReturnType<typeof rootReducer>;
 export const createStore: (
     initialState: Record<string, unknown>
@@ -20,7 +8,6 @@ export const createStore: (
     configureStore({
         reducer: rootReducer,
         preloadedState: { spec: initialState },
-        enhancers: createEnhancer(),
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 serializableCheck: {

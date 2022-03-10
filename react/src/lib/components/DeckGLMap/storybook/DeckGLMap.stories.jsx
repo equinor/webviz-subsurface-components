@@ -267,16 +267,30 @@ KhMapFlat.parameters = {
 };
 
 // Map3DLayer. Properties encoded in RGB.
-const map3DLayer = exampleData[0].layers[3];
-export const MapLayerRGBEncodedProperties = EditDataTemplate.bind({});
-MapLayerRGBEncodedProperties.args = {
-    ...exampleData[0],
+const meshMapLayer = {
+    "@@type": "Map3DLayer",
+    id: "mesh-layer",
+    bounds: [432205, 6475078, 437720, 6481113],
+    meshMaxError: 100,
+    mesh: "hugin_depth_25_m_normalized_margin.png",
+    meshValueRange: [2782, 3513],
+    propertyTexture: "kh_netmap_25_m_normalized_margin.png",
+    propertyValueRange: [2782, 3513],
+    rotDeg: 0,
+    contours: [0, 50.0],
+    isContoursDepth: true,
+    colorMapName: "Physics",
+    colorMapRange: [2782, 3513],
+};
+export const KhMapMesh = MinimalTemplate.bind({});
+KhMapMesh.args = {
+    id: "kh-mesh-map",
     layers: [
         {
-            ...map3DLayer,
-            visible: true,
+            ...meshMapLayer,
         },
     ],
+    bounds: [432150, 6475800, 439400, 6481500],
     views: {
         layout: [1, 1],
         viewports: [
@@ -289,18 +303,16 @@ MapLayerRGBEncodedProperties.args = {
     },
 };
 
-// MapLayer. This is never Float32 resolution for properties.
-const mapLayer = exampleData[0].layers[4];
-export const MapLayerFloat32Properties = EditDataTemplate.bind({});
-MapLayerFloat32Properties.args = {
-    ...exampleData[0],
-    layers: [
-        {
-            ...mapLayer,
-            meshMaxError: 5.0,
-            visible: true,
-        },
-    ],
+const axes = {
+    "@@type": "AxesLayer",
+    id: "axes-layer",
+    bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+};
+export const Axes = MinimalTemplate.bind({});
+Axes.args = {
+    id: "axes",
+    layers: [meshMapLayer, axes],
+    bounds: [432150, 6475800, 439400, 6481500],
     views: {
         layout: [1, 1],
         viewports: [
@@ -396,5 +408,51 @@ MultiView.args = {
                 layerIds: ["geojson-line-layer", "geojson-layer", "text-layer"],
             },
         ],
+    },
+};
+
+// Experimental MapLayer. This is newer Float32 resolution for properties.
+const mapLayer = {
+    "@@type": "MapLayer",
+    id: "map-layer-float32",
+    mesh: "./volve_hugin_depth_absolute.png",
+    bounds: [432205, 6475078, 437720, 6481113],
+    meshMaxError: 100,
+    propertyTexture: "./volve_property_ieee_float.png",
+    rotDeg: 0,
+    contours: [0, 20.0],
+    colorMapName: "Physics",
+    colorMapRange: [-3071, 41048],
+};
+export const ExperimentalMapLayerFloat32Property = EditDataTemplate.bind({});
+ExperimentalMapLayerFloat32Property.args = {
+    ...exampleData[0],
+    layers: [
+        {
+            ...mapLayer,
+            meshMaxError: 5.0,
+            visible: true,
+        },
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
+ExperimentalMapLayerFloat32Property.parameters = {
+    title: "Test",
+    docs: {
+        description: {
+            story: "An experimental layer using a Float 32 encoded property map.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
     },
 };

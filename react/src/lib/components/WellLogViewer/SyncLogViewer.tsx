@@ -86,7 +86,7 @@ class SyncLogViewer extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        const _axes = this.props.welllogs.map((welllog) =>
+        const _axes = this.props.welllogs.map((welllog: WellLog) =>
             getAvailableAxes(welllog, axisMnemos)
         );
         const axes = _axes[0];
