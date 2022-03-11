@@ -36,12 +36,6 @@ export const LegendComponent: React.FC<legendProps> = ({
 
     const divRef = useRef<HTMLDivElement>(null);
 
-    // create an array of steps based on the color scale
-    // returns an array of evenly-spaced numbers. Returns the integers from zero to the specified end minus one.
-    // d3.range(start, stop, step)
-    if (legendColor)
-    var data = d3.range(10).map(d=> ({color:legendColor(d/10), value:d}))
-
     const handleChange = React.useCallback((data) => {
         if (Object.keys(colorsObject).length > 0) {
             parentFunc(colorsObject);
@@ -153,6 +147,10 @@ export const LegendComponent: React.FC<legendProps> = ({
             itemColor.push(value.colors);
         });
 
+        // create an array of steps based on the color scale
+        // returns an array of evenly-spaced numbers. Returns the integers from zero to the specified end minus one.
+        // d3.range(start, stop, step)
+        var data = d3.range(10).map(d=> ({color:legendColor(d/10), value:d}))
         // get the array's min and max value
         var extent: any = d3.extent(data, d => d.value); 
 

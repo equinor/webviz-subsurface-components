@@ -1,6 +1,9 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
+import { ColorSelectorWrapper } from "../components/ColorTableSelectorWrapper";
+import { ContinuousLegend } from "../../../components/DeckGLMap/components/ContinuousLegend";
+import colorTables from "@emerson-eps/color-tables/src/component/color-tables.json";
 
 export default {
     component: DeckGLMap,
@@ -110,6 +113,7 @@ const EditDataTemplate = (args) => {
             {...args}
             editedData={editedData}
             setProps={(updatedProps) => {
+                console.log('updatedProps', updatedProps)
                 setEditedData(updatedProps.editedData);
             }}
         />
@@ -455,4 +459,56 @@ ExperimentalMapLayerFloat32Property.parameters = {
         inlineStories: false,
         iframeHeight: 500,
     },
+};
+
+// Map example with color selector
+// colorMap layer arguments
+const layers = [exampleData[0].layers[0]];
+const id = exampleData[0].id;
+
+// continous legend arguments
+const min = 0;
+const max = 0.35;
+const dataObjectName = "Wells / PORO";
+const position = [16, 10];
+const name = "PORO";
+const horizontal = true;
+const colorName = "Rainbow";
+
+const mapDataTemplate = (args) => {
+    const [legendUpdated, setLegendUpdated] = React.useState();
+
+    const colorMapaData = React.useCallback((data) => {
+        setLegendUpdated(data);
+    }, []);
+
+    const layerDataChanged = [{...args.layers[0], colorMapName: legendUpdated}]
+
+    return <div>
+            <div>
+                <ContinuousLegend style={{ float: "right", position:"absolute", zIndex: 999, opacity: 1}} 
+                    {...args}
+                    getColorMapname={colorMapaData}
+
+                />
+            </div>
+            <div><DeckGLMap {...args} layers={layerDataChanged} />
+            </div>
+        </div>;
+};
+
+export const ColorSelectorForColorMapLayer = mapDataTemplate.bind({});
+
+ColorSelectorForColorMapLayer.args = {
+    min,
+    max,
+    dataObjectName,
+    position,
+    name,
+    colorName,
+    colorTables,
+    horizontal,
+    ...exampleData[0],
+    id: id,
+    layers,
 };

@@ -13,9 +13,9 @@ declare type legendProps = {
     dataObjectName: string;
     position?: number[] | null;
     colorName: string;
-    colorTables: colorTablesArray;
+    colorTables: colorTablesArray | string;
     horizontal?: boolean | null;
-    //parentdata: any
+    getColorMapname: any
 }
 
 declare type ItemColor = {
@@ -31,14 +31,14 @@ export const ContinuousLegend: React.FC<legendProps> = ({
     colorName,
     colorTables,
     horizontal,
-    //parentdata
+    getColorMapname
 }: legendProps) => {
     const divRef = useRef<HTMLDivElement>(null);
     const [parent, setIsParent] = React.useState([] as any);
 
     const parent_data = React.useCallback((parent_data: any) => {
-        console.log('parent_data', parent_data)
         setIsParent(parent_data);
+        getColorMapname(parent_data.name);
     }, []);
 
     React.useEffect(() => {
@@ -56,20 +56,21 @@ export const ContinuousLegend: React.FC<legendProps> = ({
         setIsToggled(true);
     }, []);
 
+    let dataSet: colorTablesArray = [];
 
-    function continuousLegend() {
+    async function continuousLegend() {
         const itemColor: ItemColor[] = [];
+
+        if (typeof colorTables === "string") {
+            let res = await fetch(colorTables);
+            dataSet = await res.json()
+        }
+        
         // Return the matched colors array from color.tables.json file
-        let colorTableColors = colorsArray(colorName, colorTables);
-        //let colorTableColors; 
-
-        // if (colorTables[0].name) {
-        //     colorTableColors = colorsArray(colorName, colorTables);
-        // } else {
-        //     colorTableColors = colorTables;
-        // } 
-
-        console.log('parent', parent)
+        let colorTableColors = typeof colorTables === "string" ? 
+            colorsArray(colorName, dataSet)
+            :
+            colorsArray(colorName, colorTables);
         
         if (parent.color) {
             colorTableColors = parent.color;
