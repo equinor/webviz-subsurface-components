@@ -1,5 +1,4 @@
-const fsColormap = `
-#define SHADER_NAME colormap-shader
+const fsColormap = `#define SHADER_NAME colormap-shader
 
 #ifdef GL_ES
 precision highp float;

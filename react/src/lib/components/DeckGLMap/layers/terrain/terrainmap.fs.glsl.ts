@@ -1,5 +1,4 @@
-const fsShader = `
-#version 300 es
+const fsShader = `#version 300 es
 #define SHADER_NAME terrainmap-shader
 
 precision highp float;

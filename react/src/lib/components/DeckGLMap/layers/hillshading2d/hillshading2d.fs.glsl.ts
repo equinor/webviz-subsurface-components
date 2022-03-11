@@ -1,5 +1,4 @@
-const fsHillshading = `
-#define SHADER_NAME hillshading2d-shader
+const fsHillshading = `#define SHADER_NAME hillshading2d-shader
 
 #ifdef GL_ES
 precision highp float;

@@ -1,5 +1,4 @@
-const gridVertex = `
-#version 300 es
+const gridVertex = `#version 300 es
 #define SHADER_NAME graph-layer-axis-vertex-shader
 
 precision highp float;
