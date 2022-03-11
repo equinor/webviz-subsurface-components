@@ -102,6 +102,11 @@ module.exports = (env, argv) => {
                         },
                     ],
                 },
+                //{
+                //test: /\.glsl$/i,
+                //type: "asset/source",
+                //loader: "webpack-glsl-loader",
+                //},
                 {
                     enforce: "pre",
                     test: /\.js$/,

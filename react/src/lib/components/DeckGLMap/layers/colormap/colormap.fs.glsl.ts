@@ -1,3 +1,4 @@
+const fsColormap = `
 #define SHADER_NAME colormap-shader
 
 #ifdef GL_ES
@@ -37,4 +38,6 @@ void main(void) {
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 
 }
+`;
 
+export default fsColormap;

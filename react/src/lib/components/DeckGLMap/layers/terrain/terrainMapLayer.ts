@@ -1,7 +1,7 @@
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import fsShader from "!!raw-loader!./terrainmap.fs.glsl";
+import fsShader from "terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
 import { DeckGLLayerContext } from "../../components/Map";
