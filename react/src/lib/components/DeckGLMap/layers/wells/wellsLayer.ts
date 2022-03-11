@@ -273,7 +273,7 @@ export default class WellsLayer extends CompositeLayer<
             : (this.props.data as FeatureCollection);
 
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
-        const positionFormat = is3d ? "XYZ" : "XY";
+        const positionFormat = "XYZ";
 
         const isDashed = !!this.props.lineStyle?.dash;
 
@@ -299,7 +299,7 @@ export default class WellsLayer extends CompositeLayer<
                 getLineWidth: getLineWidth(this.props.lineStyle?.width),
                 extensions: extensions,
                 getDashArray: getDashFactor(this.props.lineStyle?.dash),
-                lineBillboard: is3d,
+                lineBillboard: true,
                 pointBillboard: true,
             })
         );
@@ -324,7 +324,7 @@ export default class WellsLayer extends CompositeLayer<
                     getLineWidth(this.props.lineStyle?.width),
                     -1
                 ),
-                lineBillboard: is3d,
+                lineBillboard: true,
                 pointBillboard: true,
             })
         );
