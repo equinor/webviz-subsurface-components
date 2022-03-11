@@ -10,3 +10,5 @@ export { default as FaultPolygonsLayer } from "./fault_polygons/faultPolygonsLay
 export { default as AxesLayer } from "./axes/axesLayer";
 export { default as SelectableGeoJsonLayer } from "./selectable_geojson/selectableGeoJsonLayer";
 export { default as NorthArrow3DLayer } from "./northarrow/northArrow3DLayer";
+export { default as UnfoldedGeoJsonLayer } from "./intersection/unfoldedGeoJsonLayer";
+export { default as UnfoldedPathLayer } from "./intersection/unfoldedPathLayer";
