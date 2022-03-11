@@ -21,7 +21,7 @@
         5,
         10
       ],
-      "horizontal": true
+      "horizontal": false
     },
     "coordinateUnit": "m",
     "resources": {
@@ -97,19 +97,20 @@
           437720,
           6481113
         ],
-        "meshMaxError": 20.0,
-        "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_hugin_depth_normalized.png",
+        "meshMaxError": 5.0,
+        "mesh": "hugin_depth_25_m_normalized_margin.png",
         "meshValueRange": [
           2782,
           3513
         ],
-        "propertyTexture": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_hugin_depth_normalized.png",
+        "propertyTexture": "kh_netmap_25_m_normalized_margin.png",
         "propertyValueRange": [
           2782,
           3513
         ],
         "rotDeg": 0,
-        "contours": [0, 100.0],
+        "contours": [0, 50.0],
+        "isContoursDepth": true,
         "colorMapName": "Physics",
         "colorMapRange": [
           2782,

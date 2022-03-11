@@ -9,6 +9,7 @@ uniform bool flatShading;
 uniform float opacity;
 
 uniform bool isReadoutDepth;
+uniform bool isContoursDepth;
 
 uniform float contourReferencePoint;
 uniform float contourInterval;
@@ -40,6 +41,8 @@ void main(void) {
    }
 
    vec4 color = hasTexture ? texture(sampler, vTexCoord) : vColor;
+
+   float propertyValue = 0.0; // XXX this must be fixed.
 
    // Discard transparent pixels.
    if (!picking_uActive && color.w < 0.99) {
@@ -86,10 +89,12 @@ void main(void) {
 
    bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
    if (is_contours) {
-      float depth =  (abs(worldPos.z) - contourReferencePoint) / contourInterval;
+      // Contours are made of either depths or properties.
+      float val = isContoursDepth ? (abs(worldPos.z) - contourReferencePoint) / contourInterval
+                                  : (propertyValue - contourReferencePoint) / contourInterval;
 
-      float f  =  fract(depth);
-      float df = fwidth(depth);
+      float f  = fract(val);
+      float df = fwidth(val);
 
       // keep: float c = smoothstep(df * 1.0, df * 2.0, f); // smootstep from/to no of pixels distance fronm contour line.
       float c = smoothstep(0.0, df * 2.0, f);

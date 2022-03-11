@@ -15,6 +15,9 @@ export interface PrivateMeshLayerProps<D> extends SimpleMeshLayerProps<D> {
     // Contourlines reference point and interval.
     contours: [number, number];
 
+    // Contourlines may be calculated either on depth/z-value or on property/texture value
+    isContoursDepth: boolean;
+
     // Property values in a ImageData structure.
     propertyValuesImageData: ImageData;
 
@@ -23,13 +26,14 @@ export interface PrivateMeshLayerProps<D> extends SimpleMeshLayerProps<D> {
 }
 
 const defaultProps = {
-    data: [{ position: [0, 0], angle: 0, color: [255, 0, 0] }],
+    data: [{ position: [0, 0], angle: 0, color: [255, 0, 0, 0] }], // note transparent color so naked mesh (without texture) will be invisible.
     propertyValuesImageData: { value: null, type: "object", async: true },
     getPosition: (d: DataItem) => d.position,
     getColor: (d: DataItem) => d.color,
     getOrientation: (d: DataItem) => [0, d.angle, 0],
     contours: [-1, -1],
     isReadoutDepth: false,
+    isContoursDepth: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     material: {
         ambient: 0.35,
@@ -52,6 +56,7 @@ export default class PrivateMeshLayer extends SimpleMeshLayer<
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isReadoutDepth = this.props.isReadoutDepth;
+        const isContoursDepth = this.props.isContoursDepth;
 
         super.draw({
             uniforms: {
@@ -59,6 +64,7 @@ export default class PrivateMeshLayer extends SimpleMeshLayer<
                 contourReferencePoint,
                 contourInterval,
                 isReadoutDepth,
+                isContoursDepth,
             },
         });
     }

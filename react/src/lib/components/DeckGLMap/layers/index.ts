@@ -7,3 +7,4 @@ export { default as WellsLayer } from "./wells/wellsLayer";
 export { default as PieChartLayer } from "./piechart/pieChartLayer";
 export { default as GridLayer } from "./grid/gridLayer";
 export { default as FaultPolygonsLayer } from "./fault_polygons/faultPolygonsLayer";
+export { default as AxesLayer } from "./axes/axesLayer";
