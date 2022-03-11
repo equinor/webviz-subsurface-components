@@ -6,7 +6,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         visible: true,
         valueRange: { type: "array", value: [0, 1] },
-        colorMapRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array" },
         valueDecoder: {
             rgbScaler: [1, 1, 1],
             // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
