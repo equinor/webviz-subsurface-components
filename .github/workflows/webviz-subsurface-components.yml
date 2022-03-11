@@ -109,11 +109,7 @@ jobs:
         with:
           name: cypress-screenshots
           path: react/cypress/screenshots
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: cypress-videos
-          path: react/cypress/videos
+          retention-days: 5
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
