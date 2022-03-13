@@ -42,7 +42,7 @@ ContinuousLegendWrapper.propTypes = {
     position: PropTypes.arrayOf(PropTypes.number.isRequired),
     colorName: PropTypes.string.isRequired,
     horizontal: PropTypes.bool,
-    colorTables: PropTypes.array.isRequired,
+    colorTables: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
 };
 
 export default ContinuousLegendWrapper;
