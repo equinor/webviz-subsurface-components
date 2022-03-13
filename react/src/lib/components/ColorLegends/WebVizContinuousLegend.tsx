@@ -16,7 +16,7 @@ interface LegendProps {
     position?: number[] | null;
     colorName: string;
     horizontal?: boolean | null;
-    colorTables: ColorTable;
+    colorTables: ColorTable | string;
 }
 
 const ContinuousLegendWrapper: React.FC<LegendProps> = ({

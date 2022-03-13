@@ -1,9 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { DiscreteColorLegend } from "@emerson-eps/color-tables";
-import colorTablesArray from "@emerson-eps/color-tables/"; 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables1 = require("@emerson-eps/color-tables/src/component/color-tables.json");
+import colorTablesArray from "@emerson-eps/color-tables/";
 
 interface LegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
@@ -23,18 +21,14 @@ const DiscreteLegendWrapper: React.FC<LegendProps> = ({
     horizontal,
 }) => {
     return (
-        <div>
-            { colorTables && discreteData && (
-                <DiscreteColorLegend
-                    discreteData={discreteData}
-                    dataObjectName={title}
-                    position={position}
-                    colorName={colorName}
-                    colorTables={colorTables1}
-                    horizontal={horizontal}
-                />
-            )}
-        </div> 
+        <DiscreteColorLegend
+            discreteData={discreteData}
+            dataObjectName={title}
+            position={position}
+            colorName={colorName}
+            colorTables={colorTables}
+            horizontal={horizontal}
+        />
     );
 };
 
