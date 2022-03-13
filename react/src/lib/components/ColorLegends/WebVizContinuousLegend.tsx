@@ -1,13 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-
-interface ColorTable {
-    name: string;
-    discrete: boolean;
-    colors: [number, number, number, number][];
-}
+import colorTablesArray from "@emerson-eps/color-tables/";
 
 interface LegendProps {
     title: string;
@@ -16,7 +10,7 @@ interface LegendProps {
     position?: number[] | null;
     colorName: string;
     horizontal?: boolean | null;
-    colorTables: ColorTable | string;
+    colorTables: colorTablesArray | string;
 }
 
 const ContinuousLegendWrapper: React.FC<LegendProps> = ({
@@ -48,7 +42,7 @@ ContinuousLegendWrapper.propTypes = {
     position: PropTypes.arrayOf(PropTypes.number.isRequired),
     colorName: PropTypes.string.isRequired,
     horizontal: PropTypes.bool,
-    colorTables: PropTypes.any,
+    colorTables: PropTypes.array.isRequired,
 };
 
 export default ContinuousLegendWrapper;

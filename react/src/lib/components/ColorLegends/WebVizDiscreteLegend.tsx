@@ -37,7 +37,7 @@ DiscreteLegendWrapper.propTypes = {
     title: PropTypes.string.isRequired,
     position: PropTypes.arrayOf(PropTypes.number.isRequired),
     colorName: PropTypes.string.isRequired,
-    colorTables: PropTypes.any.isRequired,
+    colorTables: PropTypes.array.isRequired,
     horizontal: PropTypes.bool,
 };
 
