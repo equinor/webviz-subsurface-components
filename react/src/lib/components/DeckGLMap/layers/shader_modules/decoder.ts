@@ -1,5 +1,5 @@
 import { ValueDecoder } from "../utils/propertyMapTools";
-import fs from "!!raw-loader!./decoder.fs.glsl";
+import fs from "./decoder.fs.glsl";
 
 // Shader module for the property map value decoder.
 // See https://luma.gl/docs/developer-guide/shader-modules

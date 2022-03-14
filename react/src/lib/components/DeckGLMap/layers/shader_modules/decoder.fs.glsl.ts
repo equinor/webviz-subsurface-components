@@ -1,5 +1,6 @@
 // RGB to float decoder parameters.
-struct Decoder
+
+const fs = `struct Decoder
 {
   vec3 rgbScaler; // r, g and b multipliers
   float floatScaler; // value multiplier
@@ -35,4 +36,6 @@ float decode_rgb2float(vec3 rgb, Decoder dec) {
 float decode_rgb2float(vec3 rgb) {
   return decode_rgb2float(rgb, decoder);
 }
+`;
 
+export default fs;

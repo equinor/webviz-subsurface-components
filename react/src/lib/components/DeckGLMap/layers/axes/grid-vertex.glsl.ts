@@ -1,5 +1,4 @@
-export default `\
-#version 300 es
+const gridVertex = `#version 300 es
 #define SHADER_NAME graph-layer-axis-vertex-shader
 
 precision highp float;
@@ -11,3 +10,5 @@ void main(void) {
    gl_Position = project_common_position_to_clipspace(vec4(position_commonspace, 0.0));
 }
 `;
+
+export default gridVertex;
