@@ -75,7 +75,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
         bounds: { type: "array", value: null, false: true, compare: true },
         propertyValueRange: { type: "array", value: [0, 1] },
-        colorMapRange: { type: "array", value: [0, 1] },
         rotDeg: 0,
         contours: [-1.0, -1.0],
         // If contour lines should follow depth or properties.
