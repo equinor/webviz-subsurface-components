@@ -2,7 +2,7 @@ import * as React from "react";
 import { useRef } from "react";
 import { RGBToHex } from "../utils/continousLegend";
 //import {colorScalesCont} from "@emerson-eps/color-tables/src/component/Utils/d3ColorScale"
-import {colorScalesCont} from "./d3ColorScale"
+import {d3ColorScales} from "./d3ColorScale"
 import * as d3 from "d3";
 
 interface legendProps {
@@ -51,7 +51,7 @@ export const LegendContinous: React.FC<legendProps> = ({
         } 
         // d3 colors
         else if (useContColorTable == false && divRef.current) {
-            d3colorLegend(colorScalesCont)
+            d3colorLegend(d3ColorScales)
         }
         return function cleanup() {
             d3.select(divRef.current).select("svg").remove();

@@ -16,6 +16,7 @@ import VectorSelector from "./components/VectorSelector";
 import WellCompletions from "./components/WellCompletions";
 import { VectorCalculator } from "./components/VectorCalculator";
 import WellLogViewer from "./components/WellLogViewer";
+import ContinuousLegendWrapper from "./components/ColorLegends";
 
 export {
     HistoryMatch,
@@ -30,4 +31,5 @@ export {
     VectorCalculator,
     GroupTree,
     WellLogViewer,
+    ContinuousLegendWrapper,
 };

@@ -15,7 +15,7 @@ declare type legendProps = {
     colorName: string;
     colorTables: colorTablesArray | string;
     horizontal?: boolean | null;
-    getColorMapname: any
+    getColorMapname?: any
 }
 
 declare type ItemColor = {

@@ -5,7 +5,7 @@
         "declaration": true,
         "sourceMap": true, // allow sourcemap support
         "strict": true, // enable all of the strict mode family of options
-        "noImplicitReturns": true,
+        "noImplicitReturns": false,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
@@ -20,6 +20,7 @@
         "allowJs": true, // allow a partial TypeScript and JavaScript codebase
         "skipLibCheck": true, // don't do typechecking on the node modules
         "resolveJsonModule": true,
+        
     },
     "include": ["./src/lib", "./src/custom.d.ts"]
 }
