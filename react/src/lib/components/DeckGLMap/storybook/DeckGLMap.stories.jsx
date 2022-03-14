@@ -475,24 +475,38 @@ const name = "PORO";
 const horizontal = true;
 const colorName = "Rainbow";
 
-const mapDataTemplate = (args) => {
-    const [legendUpdated, setLegendUpdated] = React.useState();
+var element = document.getElementById("DeckGL-Map-wrapper");
+element.style.width = "50% !important"
+element.style.height = "50% !important"
 
-    const colorMapaData = React.useCallback((data) => {
-        setLegendUpdated(data);
+
+const mapDataTemplate = (args) => {
+    const [updateColorName, setUpdateColorName] = React.useState();
+
+    const getColorName = React.useCallback((colorName) => {
+        setUpdateColorName(colorName);
     }, []);
 
-    const layerDataChanged = [{...args.layers[0], colorMapName: legendUpdated}]
+    React.useEffect(() => {
+        element.style.width = "50% !important"
+        element.style.height = "50% !important" 
+        console.log('element', element)
+    }, []);
+
+    const layerDataModified = [{...args.layers[0], colorMapName: updateColorName}]
+
+    element.style.width = "50% !important"
+    element.style.height = "50% !important" 
 
     return <div>
             <div>
                 <ContinuousLegend style={{ float: "right", position:"absolute", zIndex: 999, opacity: 1}} 
                     {...args}
-                    getColorMapname={colorMapaData}
+                    getColorMapname={getColorName}
 
                 />
             </div>
-            <div><DeckGLMap {...args} layers={layerDataChanged} />
+            <div><DeckGLMap {...args} layers={layerDataModified} />
             </div>
         </div>;
 };
