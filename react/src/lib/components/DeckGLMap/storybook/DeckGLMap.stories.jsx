@@ -280,6 +280,16 @@ const meshMapLayer = {
     contours: [0, 50.0],
     isContoursDepth: true,
     colorMapName: "Physics",
+    //material: true  = default material,
+    //          false = no material
+    //          Full spec:
+    //                material: {
+    //                    ambient: 0.35,
+    //                    diffuse: 0.6,
+    //                    shininess: 32,
+    //                    specularColor: [255, 255, 255],
+    //                }
+    material: false,
 };
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {

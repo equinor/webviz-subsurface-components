@@ -3,6 +3,7 @@ import TerrainMapLayer, {
     TerrainMapLayerProps,
     TerrainMapLayerData,
     DECODER,
+    Material,
 } from "./terrainMapLayer";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
@@ -223,6 +224,18 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Will calculate normals and enable phong shading.
     enableSmoothShading: boolean;
+
+    // Surface material properties.
+    // material: true  = default material,
+    //           false = no material,
+    //           or full spec:
+    //      material: {
+    //           ambient: 0.35,
+    //           diffuse: 0.6,
+    //           shininess: 32,
+    //           specularColor: [255, 255, 255],
+    //       }
+    material: Material;
 }
 
 export default class Map3DLayer extends CompositeLayer<
@@ -294,6 +307,7 @@ export default class Map3DLayer extends CompositeLayer<
                 colorMapRange: this.props.colorMapRange,
                 isReadoutDepth: this.props.isReadoutDepth,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
+                material: this.props.material,
             })
         );
         return [layer];

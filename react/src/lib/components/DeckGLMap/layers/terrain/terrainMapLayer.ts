@@ -14,6 +14,15 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
+export type Material =
+    | {
+          ambient: number;
+          diffuse: number;
+          shininess: number;
+          specularColor: [number, number, number];
+      }
+    | boolean;
+
 export const DECODER = {
     rScaler: 256 * 256,
     gScaler: 256,
@@ -83,12 +92,6 @@ const defaultProps = {
     isReadoutDepth: false,
     isContoursDepth: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    material: {
-        ambient: 0.35,
-        diffuse: 0.6,
-        shininess: 600,
-        specularColor: [255, 255, 255],
-    },
 };
 
 // This is a private layer used only by the composite Map3DLayer.
