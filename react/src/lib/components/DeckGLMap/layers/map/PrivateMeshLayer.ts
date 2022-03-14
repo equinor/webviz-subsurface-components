@@ -1,7 +1,7 @@
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import fsShader from "!!raw-loader!./map.fs.glsl";
+import fsShader from "./map.fs.glsl";
 
 export type DataItem = {
     position: [number, number];

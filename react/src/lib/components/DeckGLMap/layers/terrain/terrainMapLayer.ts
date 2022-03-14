@@ -1,7 +1,7 @@
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import fsShader from "!!raw-loader!./terrainmap.fs.glsl";
+import fsShader from "./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
 import { DeckGLLayerContext } from "../../components/Map";
@@ -80,7 +80,6 @@ const defaultProps = {
     contours: [-1, -1],
     colorMapName: "",
     propertyValueRange: [0.0, 1.0],
-    colorMapRange: [0.0, 1.0],
     isReadoutDepth: false,
     isContoursDepth: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
@@ -185,8 +184,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         let value = (r + g + b) * (isPropertyReadout ? floatScaler : 1.0);
 
         if (isPropertyReadout) {
-            // Remap the [0, 1] decoded value to colorMapRange.
-            const [min, max] = this.props.colorMapRange;
+            // Remap the [0, 1] decoded value to property value range.
+            const [min, max] = this.props.propertyValueRange;
             value = value * (max - min) + min;
         }
 
