@@ -280,16 +280,6 @@ const meshMapLayer = {
     contours: [0, 50.0],
     isContoursDepth: true,
     colorMapName: "Physics",
-    //material: true  = default material,
-    //          false = no material
-    //          Full spec:
-    //                material: {
-    //                    ambient: 0.35,
-    //                    diffuse: 0.6,
-    //                    shininess: 32,
-    //                    specularColor: [255, 255, 255],
-    //                }
-    material: false,
 };
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {
@@ -306,6 +296,39 @@ KhMapMesh.args = {
             {
                 id: "view_1",
                 show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
+//Material property may take these values:
+//          true  = default material,
+//          false = no material. This is default property value.
+//          Full spec:
+//                {
+//                    ambient: 0.35,
+//                    diffuse: 0.6,
+//                    shininess: 32,
+//                    specularColor: [255, 255, 255],
+//                }
+const material = {
+    ambient: 0.35,
+    diffuse: 0.6,
+    shininess: 32,
+    specularColor: [255, 255, 255],
+};
+export const MapMaterial = MinimalTemplate.bind({});
+MapMaterial.args = {
+    id: "material",
+    layers: [{ ...meshMapLayer, material }],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
                 layerIds: [],
             },
         ],
