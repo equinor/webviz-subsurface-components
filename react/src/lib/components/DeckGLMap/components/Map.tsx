@@ -433,6 +433,8 @@ function getInitialViewState(
         // target to center of the bound
         target: [bounds[0] + width / 2, bounds[1] + height / 2, 0],
         zoom: zoom,
+        rotationX: 0,
+        rotationOrbit: 0,
     };
 
     return initial_view_state;
