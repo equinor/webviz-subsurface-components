@@ -6,6 +6,7 @@ import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
 import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
+import { createPropertyData, PropertyDataType } from "../utils/layerTools";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -178,27 +179,40 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const r = info.color[0] * DECODER.rScaler;
         const g = info.color[1] * DECODER.gScaler;
         const b = info.color[2] * DECODER.bScaler;
+        const value = r + g + b;
 
-        const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
+        let depth = undefined;
+        const layer_properties: PropertyDataType[] = [];
 
-        const isPropertyReadout = !this.props.isReadoutDepth; // Either map properties or map depths are encoded here.
-        let value = (r + g + b) * (isPropertyReadout ? floatScaler : 1.0);
-
-        if (isPropertyReadout) {
-            // Remap the [0, 1] decoded value to colorMapRange.
-            const [min, max] = this.props.colorMapRange;
-            value = value * (max - min) + min;
-        }
-
-        const valueString =
-            (isPropertyReadout ? "Property: " : "Depth: ") + value.toFixed(1);
+        // Either map properties or map depths are encoded here.
+        if (this.props.isReadoutDepth) depth = value.toFixed(2);
+        else
+            layer_properties.push(
+                getMapProperty(value, this.props.colorMapRange)
+            );
 
         return {
             ...info,
-            propertyValue: valueString,
+            properties: layer_properties,
+            propertyValue: depth,
         };
     }
 }
 
 TerrainMapLayer.layerName = "TerrainMapLayer";
 TerrainMapLayer.defaultProps = defaultProps;
+
+//================= Local help functions. ==================
+
+function getMapProperty(
+    value: number,
+    color_range: [number, number]
+): PropertyDataType {
+    const [min, max] = color_range;
+
+    const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
+    const scaled_value = value * floatScaler;
+
+    value = scaled_value * (max - min) + min;
+    return createPropertyData("Property", value);
+}
