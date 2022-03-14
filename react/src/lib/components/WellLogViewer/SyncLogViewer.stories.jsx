@@ -141,8 +141,8 @@ Default.args = {
     hideTitles: false,
     hideLegend: false,
     welllogs: [
-        require("../../../demo/example-data/L898MUD.json"),
-        require("../../../demo/example-data/L916MUD.json"),
+        require("../../../demo/example-data/L898MUD.json")[0],
+        require("../../../demo/example-data/L916MUD.json")[0],
     ],
     templates: [
         require("../../../demo/example-data/synclog_template.json"),

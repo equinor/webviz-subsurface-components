@@ -10,23 +10,27 @@ export type TemplatePlotTypes =
     | "gradientfill"
     | "stacked";
 
+export type CSSColor = string;
+// rgbhexcolor pattern: "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$"
+// rgbcolor pattern:  "^rgb\\((25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?|[0-9]), ?(25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?|[0-9]), ?(25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?|[0-9])\\)$"
+
 export type TemplatePlotProps = {
     type: TemplatePlotTypes;
     scale?: TemplatePlotScaleTypes; // 'linear' or 'log', default 'linear'
     domain?: [number, number]; // min, max values
 
-    color: string;
-    inverseColor?: string;
+    color: CSSColor;
+    inverseColor?: CSSColor;
 
-    fill?: string; // for 'area' plot
+    fill?: CSSColor; // for 'area' plot
     fillOpacity?: number; // for 'area' and 'gradientfill' plots! default 0.25
     colorTable?: string; // table id (name) for 'gradientfill' plot
     inverseColorTable?: string; // table id (name) for 'gradientfill' plot
     colorScale?: TemplatePlotScaleTypes; // for 'linear' plot scale. default equal to plot scale
     inverseColorScale?: TemplatePlotScaleTypes; // for 'linear' plot scale. default equal to plot scale
 
-    color2?: string; // for 'differetial' plot
-    fill2?: string; // for 'differetial' plot
+    color2?: CSSColor; // for 'differetial' plot
+    fill2?: CSSColor; // for 'differetial' plot
     //...
 }; // Part of JSON
 
@@ -56,6 +60,6 @@ export interface Template {
         allowSecondary?: boolean;
     };
     tracks: TemplateTrack[];
-    styles: TemplateStyle[];
+    styles?: TemplateStyle[];
     //...
 } // JSON

@@ -36,6 +36,10 @@ export default {
             description: "maxContentZoom",
             defaultValue: 256,
         },
+        checkDatafileSchema: {
+            description: "Validate JSON datafile against schems",
+            defaultValue: false,
+        },
         axisMnemos: {
             description: "axisMnemos",
             defaultValue: axisMnemos,
@@ -65,7 +69,7 @@ const Template = (args) => {
 export const Default = Template.bind({});
 Default.args = {
     horizontal: false,
-    welllog: require("../../../../demo/example-data/L898MUD.json"),
+    welllog: require("../../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../../demo/example-data/welllog_template_1.json"),
     colorTables: require("../../../../demo/example-data/color-tables.json"),
 };
