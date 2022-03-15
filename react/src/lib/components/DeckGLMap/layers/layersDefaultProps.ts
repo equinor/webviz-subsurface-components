@@ -6,7 +6,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         visible: true,
         valueRange: { type: "array", value: [0, 1] },
-        colorMapRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array" },
         valueDecoder: {
             rgbScaler: [1, 1, 1],
             // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
@@ -75,7 +75,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
         bounds: { type: "array", value: null, false: true, compare: true },
         propertyValueRange: { type: "array", value: [0, 1] },
-        colorMapRange: { type: "array", value: [0, 1] },
         rotDeg: 0,
         contours: [-1.0, -1.0],
         // If contour lines should follow depth or properties.

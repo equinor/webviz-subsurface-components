@@ -81,7 +81,6 @@ const defaultProps = {
     contours: [-1, -1],
     colorMapName: "",
     propertyValueRange: [0.0, 1.0],
-    colorMapRange: [0.0, 1.0],
     isReadoutDepth: false,
     isContoursDepth: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
