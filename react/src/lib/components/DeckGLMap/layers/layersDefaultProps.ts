@@ -82,7 +82,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         // readout is default property value but if set to true it will be depth/z-value.
         isReadoutDepth: false,
         enableSmoothShading: true,
-        material: false,
+        material: true,
     },
     GridLayer: {
         "@@type": "GridLayer",
