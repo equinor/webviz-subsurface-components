@@ -340,8 +340,14 @@ const Map: React.FC<MapProps> = ({
 
                             {northArrow?.visible ? (
                                 <NorthArrow3D
-                                    rotationOrbit={viewState?.rotationOrbit}
-                                    rotationX={viewState?.rotationX}
+                                    rotationOrbit={
+                                        view.show3D
+                                            ? viewState?.rotationOrbit
+                                            : 0
+                                    }
+                                    rotationX={
+                                        view.show3D ? viewState?.rotationX : 90
+                                    }
                                     position={northArrow.position}
                                 />
                             ) : null}
