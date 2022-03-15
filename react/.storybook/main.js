@@ -7,6 +7,7 @@ module.exports = {
         "@storybook/addon-links",
         "@storybook/addon-essentials",
         "@storybook/addon-actions",
+        "storybook-source-code-addon",
         "addon-redux"
     ],
     core: {

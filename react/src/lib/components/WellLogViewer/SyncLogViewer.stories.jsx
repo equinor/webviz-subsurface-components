@@ -4,6 +4,13 @@ import SyncLogViewer from "./SyncLogViewer";
 export default {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/ SyncLogViewer",
+    parameters: {
+        docs: {
+            description: {
+                component: "An example for linked WellLogView components",
+            },
+        },
+    },
     argTypes: {
         id: {
             description:

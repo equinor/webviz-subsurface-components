@@ -6,6 +6,13 @@ import { axisTitles, axisMnemos } from "../utils/axes";
 export default {
     component: WellLogViewWithScroller,
     title: "WellLogViewer/Components/WellLogViewWithScroller",
+    parameters: {
+        docs: {
+            description: {
+                component: "The component add scrollbars to WellLogView component to make tracks and plots scrollable by scrollbar.",
+            },
+        },
+    },
     argTypes: {
         id: {
             description:

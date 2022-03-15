@@ -4,6 +4,13 @@ import WellLogViewer from "./WellLogViewer";
 export default {
     component: WellLogViewer,
     title: "WellLogViewer/Demo/WellLogViewer",
+    parameters: {
+        docs: {
+            description: {
+                component: "A demo component to deal with WellLogView component.",
+            },
+        },
+    },
     argTypes: {
         id: {
             description:
@@ -113,8 +120,8 @@ const Template = (args) => {
     );
 };
 
-export const Example1Vertical = Template.bind({});
-Example1Vertical.args = {
+export const Default = Template.bind({});
+Default.args = {
     id: "Well-Log-Viewer",
     horizontal: false,
     hideTitles: false,
@@ -124,21 +131,35 @@ Example1Vertical.args = {
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
 
-export const Example2Horizontal = Template.bind({});
-Example2Horizontal.args = {
-    id: "Well-Log-Viewer2",
+export const Horizontal = Template.bind({});
+Horizontal.args = {
+    id: "Well-Log-Viewer-Horizontal",
     horizontal: true,
     welllog:
         require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
+Horizontal.parameters = {
+    docs: {
+        description: {
+            story: "An example showing horizontal orientation of the tracks.",
+        },
+    },
+};     
 
 export const Discrete = Template.bind({});
 Discrete.args = {
-    id: "Well-Log-Viewer3",
+    id: "Well-Log-Viewer-Discrete",
     horizontal: false,
     welllog: require("../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
+Discrete.parameters = {
+    docs: {
+        description: {
+            story: "An example showing the tracks with discrete logs.",
+        },
+    },
+};     
