@@ -280,7 +280,6 @@ const meshMapLayer = {
     contours: [0, 50.0],
     isContoursDepth: true,
     colorMapName: "Physics",
-    colorMapRange: [2782, 3513],
 };
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {
