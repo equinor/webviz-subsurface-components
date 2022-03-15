@@ -303,8 +303,8 @@ KhMapMesh.args = {
 };
 
 //Material property may take these values:
-//          true  = default material,
-//          false = no material. This is default property value.
+//          true  = default material. See deck.gl documentation for what that is. This is default property value.
+//          false = no material.
 //          Full spec:
 //                {
 //                    ambient: 0.35,
@@ -332,6 +332,15 @@ MapMaterial.args = {
                 layerIds: [],
             },
         ],
+    },
+};
+MapMaterial.parameters = {
+    docs: {
+        description: {
+            story: "An example showing example usage of Map3D material property.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
     },
 };
 
