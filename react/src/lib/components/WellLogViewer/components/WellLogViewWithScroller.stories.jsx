@@ -3,14 +3,27 @@ import WellLogViewWithScroller from "./WellLogViewWithScroller";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
 
+const ComponentCode =
+    '<WellLogViewWithScroller id="WellLogViewWithScroller" \r\n' +
+    "    horizontal=false \r\n" +
+    '    welllog={require("../../../../demo/example-data/L898MUD.json")[0]} \r\n' +
+    '    template={require("../../../../demo/example-data/welllog_template_1.json")} \r\n' +
+    '    colorTables={require("../../../../demo/example-data/color-tables.json")} \r\n' +
+    "/>";
+
 export default {
     component: WellLogViewWithScroller,
     title: "WellLogViewer/Components/WellLogViewWithScroller",
     parameters: {
         docs: {
             description: {
-                component: "The component add scrollbars to WellLogView component to make tracks and plots scrollable by scrollbar.",
+                component:
+                    "The component add scrollbars to WellLogView component to make tracks and plots scrollable by scrollbars.",
             },
+        },
+        componentSource: {
+            code: ComponentCode,
+            language: "javascript",
         },
     },
     argTypes: {

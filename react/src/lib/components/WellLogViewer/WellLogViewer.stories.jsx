@@ -1,14 +1,27 @@
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 
+const ComponentCode =
+    '<WellLogViewer id="WellLogViewer" \r\n' +
+    "    horizontal=false \r\n" +
+    '    welllog={require("../../../demo/example-data/L898MUD.json")[0]} \r\n' +
+    '    template={require("../../../demo/example-data/welllog_template_1.json")} \r\n' +
+    '    colorTables={require("../../../demo/example-data/color-tables.json")} \r\n' +
+    "/>";
+
 export default {
     component: WellLogViewer,
     title: "WellLogViewer/Demo/WellLogViewer",
     parameters: {
         docs: {
             description: {
-                component: "A demo component to deal with WellLogView component.",
+                component:
+                    "A demo component to deal with WellLogView component.",
             },
+        },
+        componentSource: {
+            code: ComponentCode,
+            language: "javascript",
         },
     },
     argTypes: {
@@ -146,7 +159,7 @@ Horizontal.parameters = {
             story: "An example showing horizontal orientation of the tracks.",
         },
     },
-};     
+};
 
 export const Discrete = Template.bind({});
 Discrete.args = {
@@ -162,4 +175,4 @@ Discrete.parameters = {
             story: "An example showing the tracks with discrete logs.",
         },
     },
-};     
+};

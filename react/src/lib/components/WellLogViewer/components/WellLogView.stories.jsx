@@ -1,13 +1,13 @@
 import React from "react";
 import WellLogView from "./WellLogView";
 
-const ComponentCode = 
-'<WellLogView id="WellLogView" \r\n'+
-'    horizontal=false \r\n'+
-'    welllog={require("../../../../demo/example-data/L898MUD.json")[0]} \r\n'+
-'    template={require("../../../../demo/example-data/welllog_template_1.json")} \r\n'+
-'    colorTables={require("../../../../demo/example-data/color-tables.json")} \r\n'+
-'/>'
+const ComponentCode =
+    '<WellLogView id="WellLogView" \r\n' +
+    "    horizontal=false \r\n" +
+    '    welllog={require("../../../../demo/example-data/L898MUD.json")[0]} \r\n' +
+    '    template={require("../../../../demo/example-data/welllog_template_1.json")} \r\n' +
+    '    colorTables={require("../../../../demo/example-data/color-tables.json")} \r\n' +
+    "/>";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
 
@@ -17,13 +17,13 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'WellLogView is a basic react component to wrap videx-welllog library for drawing well log data',
-            },            
-            page: CustomMDXDocumentation,
+                component:
+                    "WellLogView is a basic react component to wrap videx-welllog library for drawing well log data",
+            },
         },
         componentSource: {
             code: ComponentCode,
-            language: 'javascript',
+            language: "javascript",
         },
     },
     argTypes: {
@@ -96,4 +96,3 @@ Default.args = {
     template: require("../../../../demo/example-data/welllog_template_1.json"),
     colorTables: require("../../../../demo/example-data/color-tables.json"),
 };
-

@@ -1,6 +1,24 @@
 import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 
+const ComponentCode =
+    '<SyncLogViewer id="SyncLogViewer" \r\n' +
+    "    syncTrackPos==true \r\n" +
+    "    syncContentDomain=true \r\n" +
+    "    syncContentSelection=true \r\n" +
+    "    syncTemplate=true \r\n" +
+    "    horizontal=false \r\n" +
+    "    welllog={[ \r\n" +
+    '       require("../../../demo/example-data/L898MUD.json")[0], \r\n' +
+    '       require("../../../demo/example-data/L916MUD.json")[0], \r\n' +
+    "    ]} \r\n" +
+    "    template={[ \r\n" +
+    '       require("../../../demo/example-data/synclog_template.json"), \r\n' +
+    '       require("../../../demo/example-data/synclog_template.json"), \r\n' +
+    "    } \r\n" +
+    '    colorTables={require("../../../demo/example-data/color-tables.json")} \r\n' +
+    "/>";
+
 export default {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/ SyncLogViewer",
@@ -9,6 +27,10 @@ export default {
             description: {
                 component: "An example for linked WellLogView components",
             },
+        },
+        componentSource: {
+            code: ComponentCode,
+            language: "javascript",
         },
     },
     argTypes: {

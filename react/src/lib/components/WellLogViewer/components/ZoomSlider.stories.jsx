@@ -1,8 +1,7 @@
 import React from "react";
 import ZoomSlider from "./ZoomSlider";
 
-const ComponentCode = 
-'<ZoomSlider value={1} max={128}/>'
+const ComponentCode = "<ZoomSlider value={1} max={128}/>";
 
 export default {
     component: ZoomSlider,
@@ -10,12 +9,13 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: "An auxiliary component for WellLogViewer demo component. Used for setting a zoom factor to well log tracks",
+                component:
+                    "An auxiliary component for WellLogViewer demo component. Used for setting a zoom factor to well log tracks",
             },
         },
         componentSource: {
             code: ComponentCode,
-            language: 'javascript',
+            language: "javascript",
         },
     },
     argTypes: {

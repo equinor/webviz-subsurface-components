@@ -1263,9 +1263,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 <div
                     style={{ flex: "1, 1" }}
                     className="welllogview"
-                    ref={(el) => {
-                        this.container = el as HTMLElement;
-                    }}
+                    ref={el => this.container = el as HTMLElement}
                 />
                 {this.state.errorText ? (
                     <div style={{ flex: "0, 0" }} className="welllogview-error">
