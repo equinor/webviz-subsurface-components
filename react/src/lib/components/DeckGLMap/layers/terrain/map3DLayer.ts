@@ -5,6 +5,7 @@ import TerrainMapLayer, {
     DECODER,
 } from "./terrainMapLayer";
 import { ExtendedLayerProps } from "../utils/layerTools";
+import { RGBAColor } from "@deck.gl/core/utils/color";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { ImageLoader } from "@loaders.gl/images";
@@ -218,6 +219,11 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Use color map in this range.
     colorMapRange: [number, number];
 
+    // Clamp colormap to this color at ends.
+    // If not set it will clamp to color map min and max values.
+    // Given as array of four values (r,g,b,a) e.g: [255, 0, 0, 0]
+    colorMapClampColor: RGBAColor | undefined;
+
     // If true readout will be z value (depth). Otherwise it is the texture property value.
     isReadoutDepth: boolean;
 
@@ -292,6 +298,7 @@ export default class Map3DLayer extends CompositeLayer<
                 colorMapName: this.props.colorMapName,
                 propertyValueRange: this.props.propertyValueRange,
                 colorMapRange: this.props.colorMapRange,
+                colorMapClampColor: this.props.colorMapClampColor,
                 isReadoutDepth: this.props.isReadoutDepth,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
             })

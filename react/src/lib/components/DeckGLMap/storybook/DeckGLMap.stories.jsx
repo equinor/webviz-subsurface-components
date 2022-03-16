@@ -276,9 +276,11 @@ const meshMapLayer = {
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [2782, 3513],
+    colorMapRange: [2815, 3513],
+    colorMapClampColor: [0, 100, 0, 0],
     rotDeg: 0,
     contours: [0, 50.0],
-    isContoursDepth: true,
+    isContoursDepth: false,
     colorMapName: "Physics",
 };
 export const KhMapMesh = MinimalTemplate.bind({});
