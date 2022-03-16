@@ -187,7 +187,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         if (this.props.isReadoutDepth) depth = value.toFixed(2);
         else
             layer_properties.push(
-                getMapProperty(value, this.props.colorMapRange)
+                getMapProperty(value, this.props.propertyValueRange)
             );
 
         return {
@@ -205,9 +205,10 @@ TerrainMapLayer.defaultProps = defaultProps;
 
 function getMapProperty(
     value: number,
-    color_range: [number, number]
+    value_range: [number, number]
 ): PropertyDataType {
-    const [min, max] = color_range;
+    // Remap the [0, 1] decoded value to property value range.
+    const [min, max] = value_range;
 
     const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
     const scaled_value = value * floatScaler;
