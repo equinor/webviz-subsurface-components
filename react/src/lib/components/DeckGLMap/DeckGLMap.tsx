@@ -29,6 +29,9 @@ interface DeckGLMapProps {
         position?: number[] | null;
     };
     coordinateUnit?: string;
+    toolbar?: {
+        visible?: boolean | null;
+    };
     legend?: {
         visible?: boolean | null;
         position?: number[] | null;
@@ -50,6 +53,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     scale,
     coordinateUnit,
     legend,
+    toolbar,
     colorTables,
     editedData,
     setProps,
@@ -115,6 +119,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 coords={coords}
                 scale={scale}
                 coordinateUnit={coordinateUnit}
+                toolbar={toolbar}
                 legend={legend}
                 colorTables={colorTables}
                 editedData={editedData}
@@ -252,6 +257,16 @@ DeckGLMap.propTypes = {
      * Unit for the scale ruler
      */
     coordinateUnit: PropTypes.string,
+
+    /**
+     * Parameters to control toolbar
+     */
+    toolbar: PropTypes.shape({
+        /**
+         * Toggle toolbar visibility
+         */
+        visible: PropTypes.bool,
+    }),
 
     /**
      * Parameters for the legend
