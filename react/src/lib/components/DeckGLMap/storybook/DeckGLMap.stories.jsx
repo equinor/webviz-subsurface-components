@@ -123,7 +123,7 @@ const MinimalTemplate = (args) => {
 
 // Data for custome geojson layer with polyline data
 const customLayerWithPolylineData = {
-    "@@type": "WscGeoJsonLayer",
+    "@@type": "GeoJsonLayer",
     id: "geojson-line-layer",
     name: "Line",
     data: {
@@ -148,7 +148,7 @@ const customLayerWithPolylineData = {
 
 // Data for custom geojson layer with polygon data
 const customLayerWithPolygonData = {
-    "@@type": "WscGeoJsonLayer",
+    "@@type": "GeoJsonLayer",
     id: "geojson-layer",
     name: "Polygon",
     data: {

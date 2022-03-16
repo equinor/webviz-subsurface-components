@@ -1,19 +1,20 @@
 import { GeoJsonLayer } from "@deck.gl/layers";
 import { FeatureCollection } from "geojson";
 import { PickInfo } from "deck.gl";
+import { DeckGLLayerContext } from "../../components/Map";
+import { isDrawingEnabled } from "../utils/layerTools";
 
 export default class WscGeoJsonLayer extends GeoJsonLayer<FeatureCollection> {
     onClick(info: PickInfo<FeatureCollection>): boolean {
-        // Disable selection when drawing is enabled
-        const drawing_layer = this.context.layerManager.getLayers({
-            layerIds: ["drawing-layer"],
-        })?.[0];
-        const is_drawing_enabled =
-            drawing_layer && drawing_layer.props.mode != "view";
-        if (is_drawing_enabled) return false;
-
-        console.log(info.object);
-        return true;
+        // Make selection only when drawing is disabled
+        if (isDrawingEnabled(this.context.layerManager)) {
+            return false;
+        } else {
+            (this.context as DeckGLLayerContext).userData.setEditedData({
+                selectedGeoJsonFeature: info.object,
+            });
+            return true;
+        }
     }
 }
 

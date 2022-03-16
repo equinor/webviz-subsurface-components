@@ -1,5 +1,5 @@
 import { CompositeLayer } from "@deck.gl/core";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
@@ -72,19 +72,15 @@ export default class WellsLayer extends CompositeLayer<
     WellsLayerProps<FeatureCollection>
 > {
     onClick(info: WellsPickInfo): boolean {
-        // Disable selection when drawing is enabled
-        if (
-            this.context.layerManager.getLayers({
-                layerIds: ["drawing-layer"],
-            })?.[0].props.mode != "view"
-        ) {
+        // Make selection only when drawing is disabled
+        if (isDrawingEnabled(this.context.layerManager)) {
             return false;
+        } else {
+            (this.context as DeckGLLayerContext).userData.setEditedData({
+                selectedWell: (info.object as Feature).properties?.["name"],
+            });
+            return true;
         }
-
-        (this.context as DeckGLLayerContext).userData.setEditedData({
-            selectedWell: (info.object as Feature).properties?.["name"],
-        });
-        return true;
     }
 
     shouldUpdateState({
