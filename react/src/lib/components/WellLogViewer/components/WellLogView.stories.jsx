@@ -18,7 +18,7 @@ export default {
         docs: {
             description: {
                 component:
-                    "WellLogView is a basic react component to wrap videx-welllog library for drawing well log data",
+                    "WellLogView is a basic react component to wrap [videx-wellog](https://github.com/equinor/videx-wellog) library for drawing well log data",
             },
         },
         componentSource: {
@@ -61,11 +61,11 @@ export default {
             defaultValue: false,
         },
         hideTitles: {
-            description: "Show Titles on the tracks",
+            description: "Hide Titles on the tracks",
             defaultValue: false,
         },
         hideLegend: {
-            description: "Show Legends on the tracks",
+            description: "Hide Legends on the tracks",
             defaultValue: false,
         },
         axisMnemos: {

@@ -19,7 +19,10 @@ function getScrollbarSizes(): { vertical: number; horizontal: number } {
 }
 
 interface Props {
-    onScroll?: (x: number, y: number) => void; // callback with new scroll positions
+    /**
+     * callback with new scroll positions
+     */
+    onScroll?: (x: number, y: number) => void;
 }
 
 class Scroller extends Component<Props> {

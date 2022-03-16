@@ -21,7 +21,7 @@ const ComponentCode =
 
 export default {
     component: SyncLogViewer,
-    title: "WellLogViewer/Demo/ SyncLogViewer",
+    title: "WellLogViewer/Demo/SyncLogViewer",
     parameters: {
         docs: {
             description: {
