@@ -497,14 +497,16 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     },
                     x: xPos + "%",
                     y: yPos + "%",
-                    width: 100 / nX + "%",
-                    height: 100 / nY + "%",
+
+                    // Using 99.5% of viewport to avoid flickering of deckgl canvas
+                    width: 99.5 / nX + "%",
+                    height: 99.5 / nY + "%",
                     flipY: false,
                     far,
                 });
-                xPos = xPos + 100 / nX;
+                xPos = xPos + 99.5 / nX;
             }
-            yPos = yPos + 100 / nY;
+            yPos = yPos + 99.5 / nY;
         }
     }
     return deckgl_views;
