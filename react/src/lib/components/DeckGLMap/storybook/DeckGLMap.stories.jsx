@@ -289,6 +289,9 @@ KhMapMesh.args = {
             ...meshMapLayer,
         },
     ],
+    toolbar: {
+        visible: false,
+    },
     bounds: [432150, 6475800, 439400, 6481500],
     views: {
         layout: [1, 1],
@@ -335,6 +338,9 @@ GridLayer.args = {
             visible: true,
         },
     ],
+    toolbar: {
+        visible: false,
+    },
     views: {
         layout: [1, 1],
         viewports: [

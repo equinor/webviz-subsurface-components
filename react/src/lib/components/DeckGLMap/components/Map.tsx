@@ -125,6 +125,13 @@ export interface MapProps {
 
     coordinateUnit?: string;
 
+    /**
+     * Parameters to control toolbar
+     */
+    toolbar?: {
+        visible?: boolean | null;
+    };
+
     legend?: {
         visible?: boolean | null;
         position?: number[] | null;
@@ -158,6 +165,7 @@ const Map: React.FC<MapProps> = ({
     coords,
     scale,
     coordinateUnit,
+    toolbar,
     legend,
     colorTables,
     editedData,
@@ -327,10 +335,12 @@ const Map: React.FC<MapProps> = ({
                                     colorTables={colorTables}
                                 />
                             )}
-                            <Settings
-                                viewportId={view.id}
-                                layerIds={view.layerIds}
-                            />
+                            {toolbar?.visible && (
+                                <Settings
+                                    viewportId={view.id}
+                                    layerIds={view.layerIds}
+                                />
+                            )}
                             {views.showLabel && (
                                 <ViewFooter>
                                     {`${
@@ -376,6 +386,9 @@ Map.defaultProps = {
         incrementValue: 100,
         widthPerUnit: 100,
         position: [10, 10],
+    },
+    toolbar: {
+        visible: true,
     },
     legend: {
         visible: true,
@@ -433,7 +446,7 @@ function getInitialViewState(
         // target to center of the bound
         target: [bounds[0] + width / 2, bounds[1] + height / 2, 0],
         zoom: zoom,
-        rotationX: 0,
+        rotationX: 90, // look down z -axis.
         rotationOrbit: 0,
     };
 
