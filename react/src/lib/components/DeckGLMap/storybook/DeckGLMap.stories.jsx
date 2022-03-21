@@ -305,6 +305,48 @@ KhMapMesh.args = {
     },
 };
 
+//Material property may take these values:
+//          true  = default material. See deck.gl documentation for what that is. This is default property value.
+//          false = no material.
+//          Full spec:
+//                {
+//                    ambient: 0.35,
+//                    diffuse: 0.6,
+//                    shininess: 32,
+//                    specularColor: [255, 255, 255],
+//                }
+const material = {
+    ambient: 0.35,
+    diffuse: 0.6,
+    shininess: 32,
+    specularColor: [255, 255, 255],
+};
+export const MapMaterial = MinimalTemplate.bind({});
+MapMaterial.args = {
+    id: "material",
+    layers: [{ ...meshMapLayer, material }],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: [],
+            },
+        ],
+    },
+};
+MapMaterial.parameters = {
+    docs: {
+        description: {
+            story: "An example showing example usage of Map3D material property.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer",
