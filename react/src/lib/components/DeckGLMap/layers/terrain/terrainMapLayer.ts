@@ -131,8 +131,6 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
             (x) => (x ?? 0) / 255
         );
 
-        console.log(colorMapClampColor)
-
         super.draw({
             uniforms: {
                 ...uniforms,
