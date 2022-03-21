@@ -2,6 +2,7 @@ import Layer from "@deck.gl/core/lib/layer";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
+import { LayerManager } from "@deck.gl/core";
 import { Matrix4 } from "math.gl";
 import { cloneDeep } from "lodash";
 import { layersDefaultProps } from "../layersDefaultProps";
@@ -106,4 +107,11 @@ export function getLayersByType(
 ): Layer<unknown>[] {
     if (!layers) return [];
     return layers.filter((l) => l.constructor.name === type);
+}
+
+export function isDrawingEnabled(layer_manager: LayerManager): boolean {
+    const drawing_layer = layer_manager.getLayers({
+        layerIds: ["drawing-layer"],
+    })?.[0];
+    return drawing_layer && drawing_layer.props.mode != "view";
 }

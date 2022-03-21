@@ -461,3 +461,50 @@ ExperimentalMapLayerFloat32Property.parameters = {
         iframeHeight: 500,
     },
 };
+
+// ---------Selectable GeoJson Layer example--------------- //
+export const SelectableFeatureExample = (args) => {
+    const [editedData, setEditedData] = React.useState(args.editedData);
+    React.useEffect(() => {
+        setEditedData(args.editedData);
+    }, [args.editedData]);
+    return (
+        <div>
+            <DeckGLMap
+                {...args}
+                editedData={editedData}
+                setProps={(updatedProps) => {
+                    setEditedData(updatedProps.editedData);
+                }}
+            />
+            <pre>{JSON.stringify(editedData, null, 2)}</pre>
+        </div>
+    );
+};
+
+SelectableFeatureExample.parameters = {
+    docs: {
+        description: {
+            story: "An example showing selectable feature example from the map.",
+        },
+    },
+};
+
+const polylineUsingSelectableGeoJsonLayer = {
+    ...customLayerWithPolylineData,
+    "@@type": "SelectableGeoJsonLayer",
+};
+
+const polygonUsingSelectableGeoJsonLayer = {
+    ...customLayerWithPolygonData,
+    "@@type": "SelectableGeoJsonLayer",
+};
+
+SelectableFeatureExample.args = {
+    id: "DeckGL-Map",
+    bounds: [432205, 6475078, 437720, 6481113],
+    layers: [
+        polylineUsingSelectableGeoJsonLayer,
+        polygonUsingSelectableGeoJsonLayer,
+    ],
+};
