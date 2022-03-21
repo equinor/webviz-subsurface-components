@@ -102,6 +102,8 @@
         "@storybook/addon-docs": "^6.4.19",
         "@storybook/addon-essentials": "^6.4.19",
         "@storybook/addon-links": "^6.4.19",
+        "@storybook/builder-webpack5": "^6.4.19",
+        "@storybook/manager-webpack5": "^6.4.19",
         "@storybook/react": "^6.4.19",
         "@testing-library/jest-dom": "^5.11.9",
         "@testing-library/react": "^12.1.2",
