@@ -1,4 +1,5 @@
 {
+    "$comment": "See https://jsonwelllogformat.org",
     "type": "object",
     "properties": {
         "header": { "$ref": "#/definitions/header" },
