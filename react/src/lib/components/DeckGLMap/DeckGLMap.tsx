@@ -107,7 +107,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
         const layers_default = getLayersWithDefaultProps(layers_store);
         const spec = { layers: layers_default, views: views };
         dispatch(setSpec(spec));
-    }, [layers]);
+    }, [layers, dispatch]);
 
     if (store == undefined) return null;
     return (
