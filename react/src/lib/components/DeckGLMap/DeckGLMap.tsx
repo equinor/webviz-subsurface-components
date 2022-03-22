@@ -89,10 +89,10 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
 
     // create store once with layers data
     const store = React.useMemo(() => {
-        if (layers == undefined) return;
+        //if (layers == undefined) return;
 
         return createStore({
-            layers: getLayersWithDefaultProps(layers),
+            layers: getLayersWithDefaultProps(layers ?? []),
             views: views,
         });
     }, []);
@@ -109,7 +109,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
         dispatch(setSpec(spec));
     }, [layers, dispatch]);
 
-    if (store == undefined) return null;
+    //if (store == undefined) return null;
     return (
         <ReduxProvider store={store}>
             <Map
