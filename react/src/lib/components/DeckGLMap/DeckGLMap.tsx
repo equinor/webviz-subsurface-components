@@ -3,13 +3,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "./redux/store";
-import { setSpec } from "./redux/actions";
-import {
-    applyPropsOnLayers,
-    getLayersWithDefaultProps,
-} from "./layers/utils/layerTools";
+import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import { useDispatch } from "react-redux";
 
 interface DeckGLMapProps {
     id: string;
@@ -97,24 +92,13 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
         });
     }, []);
 
-    // update store if any of the layer prop is changed
-    const dispatch = useDispatch();
-    React.useEffect(() => {
-        if (store == undefined || layers == undefined) return;
-
-        const prev_layers_in_redux = store.getState()["spec"]["layers"];
-        const layers_store = applyPropsOnLayers(prev_layers_in_redux, layers);
-        const layers_default = getLayersWithDefaultProps(layers_store);
-        const spec = { layers: layers_default, views: views };
-        dispatch(setSpec(spec));
-    }, [layers, dispatch]);
-
     if (store == undefined) return null;
     return (
         <ReduxProvider store={store}>
             <Map
                 id={id}
                 resources={resources}
+                layers={layers}
                 bounds={bounds}
                 zoom={zoom}
                 views={views}
