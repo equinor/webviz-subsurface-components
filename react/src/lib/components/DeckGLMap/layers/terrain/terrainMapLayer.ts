@@ -1,6 +1,7 @@
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
+import { RGBAColor } from "@deck.gl/core/utils/color";
 import fsShader from "./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
@@ -14,6 +15,15 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
+
+export type Material =
+    | {
+          ambient: number;
+          diffuse: number;
+          shininess: number;
+          specularColor: [number, number, number];
+      }
+    | boolean;
 
 export const DECODER = {
     rScaler: 256 * 256,
@@ -68,6 +78,10 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
     // Use color map in this range.
     colorMapRange: [number, number];
 
+    // Clamp colormap to this color at ends.
+    // If not set it will clamp to color map min and max values.
+    colorMapClampColor: RGBAColor | undefined;
+
     //If true readout will be z value (depth). Otherwise it is the texture property value.
     isReadoutDepth: boolean;
 }
@@ -84,12 +98,6 @@ const defaultProps = {
     isReadoutDepth: false,
     isContoursDepth: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    material: {
-        ambient: 0.35,
-        diffuse: 0.6,
-        shininess: 600,
-        specularColor: [255, 255, 255],
-    },
 };
 
 // This is a private layer used only by the composite Map3DLayer.
@@ -115,6 +123,17 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
         const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
+        const isClampColor: boolean =
+            this.props.colorMapClampColor !== undefined;
+        let colorMapClampColor = isClampColor
+            ? this.props.colorMapClampColor
+            : [0, 0, 0, 0];
+
+        // Normalize to [0,1] range.
+        colorMapClampColor = (colorMapClampColor as RGBAColor).map(
+            (x) => (x ?? 0) / 255
+        );
+
         super.draw({
             uniforms: {
                 ...uniforms,
@@ -137,6 +156,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                 contourInterval,
                 isReadoutDepth,
                 isContoursDepth,
+                colorMapClampColor,
+                isClampColor,
             },
         });
     }

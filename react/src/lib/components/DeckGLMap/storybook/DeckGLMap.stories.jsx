@@ -276,9 +276,11 @@ const meshMapLayer = {
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [2782, 3513],
+    colorMapRange: [2815, 3513],
+    colorMapClampColor: [0, 100, 0, 0],
     rotDeg: 0,
     contours: [0, 50.0],
-    isContoursDepth: true,
+    isContoursDepth: false,
     colorMapName: "Physics",
 };
 export const KhMapMesh = MinimalTemplate.bind({});
@@ -302,6 +304,48 @@ KhMapMesh.args = {
                 layerIds: [],
             },
         ],
+    },
+};
+
+//Material property may take these values:
+//          true  = default material. See deck.gl documentation for what that is. This is default property value.
+//          false = no material.
+//          Full spec:
+//                {
+//                    ambient: 0.35,
+//                    diffuse: 0.6,
+//                    shininess: 32,
+//                    specularColor: [255, 255, 255],
+//                }
+const material = {
+    ambient: 0.35,
+    diffuse: 0.6,
+    shininess: 32,
+    specularColor: [255, 255, 255],
+};
+export const MapMaterial = MinimalTemplate.bind({});
+MapMaterial.args = {
+    id: "material",
+    layers: [{ ...meshMapLayer, material }],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: [],
+            },
+        ],
+    },
+};
+MapMaterial.parameters = {
+    docs: {
+        description: {
+            story: "An example showing example usage of Map3D material property.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
     },
 };
 
@@ -460,4 +504,51 @@ ExperimentalMapLayerFloat32Property.parameters = {
         inlineStories: false,
         iframeHeight: 500,
     },
+};
+
+// ---------Selectable GeoJson Layer example--------------- //
+export const SelectableFeatureExample = (args) => {
+    const [editedData, setEditedData] = React.useState(args.editedData);
+    React.useEffect(() => {
+        setEditedData(args.editedData);
+    }, [args.editedData]);
+    return (
+        <div>
+            <DeckGLMap
+                {...args}
+                editedData={editedData}
+                setProps={(updatedProps) => {
+                    setEditedData(updatedProps.editedData);
+                }}
+            />
+            <pre>{JSON.stringify(editedData, null, 2)}</pre>
+        </div>
+    );
+};
+
+SelectableFeatureExample.parameters = {
+    docs: {
+        description: {
+            story: "An example showing selectable feature example from the map.",
+        },
+    },
+};
+
+const polylineUsingSelectableGeoJsonLayer = {
+    ...customLayerWithPolylineData,
+    "@@type": "SelectableGeoJsonLayer",
+};
+
+const polygonUsingSelectableGeoJsonLayer = {
+    ...customLayerWithPolygonData,
+    "@@type": "SelectableGeoJsonLayer",
+};
+
+SelectableFeatureExample.args = {
+    id: "DeckGL-Map",
+    bounds: [432205, 6475078, 437720, 6481113],
+    layers: [
+        polylineUsingSelectableGeoJsonLayer,
+        polygonUsingSelectableGeoJsonLayer,
+    ],
 };

@@ -7,8 +7,7 @@ import { testState } from "./testReduxState";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const exampleData = require("../../../../demo/example-data/group-tree.json");
 export const testStore = createReduxStore(testState);
-// eslint-disable-next-line no-undef
-testStore.dispatch = jest.fn();
+testStore.dispatch = jest.fn() as never;
 
 // eslint-disable-next-line react/prop-types
 export const Wrapper = ({
