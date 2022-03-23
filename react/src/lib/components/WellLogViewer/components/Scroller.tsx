@@ -23,6 +23,7 @@ interface Props {
      * callback with new scroll positions
      */
     onScroll?: (x: number, y: number) => void;
+    children?: ReactNode;
 }
 
 class Scroller extends Component<Props> {
