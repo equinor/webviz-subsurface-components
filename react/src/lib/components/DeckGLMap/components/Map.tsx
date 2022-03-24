@@ -6,7 +6,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setSpec } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
@@ -19,7 +20,11 @@ import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
-import { getLayersInViewport } from "../layers/utils/layerTools";
+import {
+    applyPropsOnLayers,
+    getLayersInViewport,
+    getLayersWithDefaultProps,
+} from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -88,6 +93,12 @@ export interface MapProps {
      */
     resources?: Record<string, unknown>;
 
+    /* List of JSON object containing layer specific data.
+     * Each JSON object will consist of layer type with key as "@@type" and
+     * layer specific data, if any.
+     */
+    layers?: Record<string, unknown>[];
+
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
@@ -125,6 +136,13 @@ export interface MapProps {
 
     coordinateUnit?: string;
 
+    /**
+     * Parameters to control toolbar
+     */
+    toolbar?: {
+        visible?: boolean | null;
+    };
+
     legend?: {
         visible?: boolean | null;
         position?: number[] | null;
@@ -152,12 +170,14 @@ export interface MapProps {
 const Map: React.FC<MapProps> = ({
     id,
     resources,
+    layers,
     bounds,
     zoom,
     views,
     coords,
     scale,
     coordinateUnit,
+    toolbar,
     legend,
     colorTables,
     editedData,
@@ -183,28 +203,32 @@ const Map: React.FC<MapProps> = ({
         setDeckGLViews(jsonToObject(viewsProps) as View[]);
     }, [viewsProps]);
 
-    // get layers data from store
-    const spec = useSelector((st: MapState) => st.spec);
-    const [layersData, setLayersData] = useState<LayerProps<unknown>[]>();
-    useEffect(() => {
-        if (isEmpty(spec) || !("layers" in spec)) return;
-        setLayersData(spec["layers"] as LayerProps<unknown>[]);
-    }, [spec]);
+    // update store if any of the layer prop is changed
+    const dispatch = useDispatch();
+    const st_layers = useSelector(
+        (st: MapState) => st.spec["layers"]
+    ) as Record<string, unknown>[];
+    React.useEffect(() => {
+        if (st_layers == undefined || layers == undefined) return;
+
+        const updated_layers = applyPropsOnLayers(st_layers, layers);
+        const layers_default = getLayersWithDefaultProps(updated_layers);
+        const updated_spec = { layers: layers_default, views: views };
+        dispatch(setSpec(updated_spec));
+    }, [layers, dispatch]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
     useEffect(() => {
-        if (!layersData || !layersData.length) {
-            return;
-        }
+        const layers = st_layers as LayerProps<unknown>[];
+        if (!layers || layers.length == 0) return;
+
         const enumerations = [];
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
 
-        setDeckGLLayers(
-            jsonToObject(layersData, enumerations) as Layer<unknown>[]
-        );
-    }, [layersData, resources, editedData]);
+        setDeckGLLayers(jsonToObject(layers, enumerations) as Layer<unknown>[]);
+    }, [st_layers, resources, editedData]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [viewState, setViewState] = useState<any>();
@@ -327,10 +351,12 @@ const Map: React.FC<MapProps> = ({
                                     colorTables={colorTables}
                                 />
                             )}
-                            <Settings
-                                viewportId={view.id}
-                                layerIds={view.layerIds}
-                            />
+                            {toolbar?.visible && (
+                                <Settings
+                                    viewportId={view.id}
+                                    layerIds={view.layerIds}
+                                />
+                            )}
                             {views.showLabel && (
                                 <ViewFooter>
                                     {`${
@@ -376,6 +402,9 @@ Map.defaultProps = {
         incrementValue: 100,
         widthPerUnit: 100,
         position: [10, 10],
+    },
+    toolbar: {
+        visible: true,
     },
     legend: {
         visible: true,
@@ -433,7 +462,7 @@ function getInitialViewState(
         // target to center of the bound
         target: [bounds[0] + width / 2, bounds[1] + height / 2, 0],
         zoom: zoom,
-        rotationX: 0,
+        rotationX: 90, // look down z -axis.
         rotationOrbit: 0,
     };
 
@@ -484,14 +513,16 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     },
                     x: xPos + "%",
                     y: yPos + "%",
-                    width: 100 / nX + "%",
-                    height: 100 / nY + "%",
+
+                    // Using 99.5% of viewport to avoid flickering of deckgl canvas
+                    width: 99.5 / nX + "%",
+                    height: 99.5 / nY + "%",
                     flipY: false,
                     far,
                 });
-                xPos = xPos + 100 / nX;
+                xPos = xPos + 99.5 / nX;
             }
-            yPos = yPos + 100 / nY;
+            yPos = yPos + 99.5 / nY;
         }
     }
     return deckgl_views;

@@ -610,13 +610,30 @@ export interface WellLogController {
 import { Info } from "./InfoTypes";
 
 interface Props {
+    /**
+     * Array of JSON objects describing well log data.
+     */
     welllog: WellLog;
+    /**
+     * Prop containing track template data.
+     */
     template: Template;
+    /**
+     * Prop containing color table data.
+     */
     colorTables: ColorTable[];
+    /**
+     * Orientation of the track plots on the screen.
+     */
     horizontal?: boolean;
     primaryAxis: string;
-
+    /**
+     * Show Titles on the tracks
+     */
     hideTitles?: boolean;
+    /**
+     * Hide Legends on the tracks
+     */
     hideLegend?: boolean;
 
     axisTitles: Record<string, string>;
@@ -625,6 +642,9 @@ interface Props {
     maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
     maxContentZoom?: number; // default is 256
 
+    /**
+     * Validate JSON datafile against schems
+     */
     checkDatafileSchema?: boolean;
 
     // callbacks:
@@ -636,13 +656,31 @@ interface Props {
         iTo: number
     ) => void;
 
-    onTrackScroll?: () => void; // called when track scrolling is changed
-    onTrackSelection?: () => void; // called when track selection is changed
-    onContentRescale?: () => void; // called when content zoom and scrolling are changed
-    onContentSelection?: () => void; // called when content zoom and scrolling are changed
+    /**
+     * called when track scrolling is changed
+     */
+    onTrackScroll?: () => void;
+    /**
+     * called when track selection is changed
+     */
+    onTrackSelection?: () => void;
+    /**
+     * called when content zoom and scrolling are changed
+     */
+    onContentRescale?: () => void;
+    /**
+     * called when content zoom and scrolling are changed
+     */
+    onContentSelection?: () => void;
 
-    onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void; // called when mouse click on a track
-    onTemplateChanged?: () => void; // called when template is changed
+    /**
+     * called when mouse click on a track
+     */
+    onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
+    /**
+     * called when template is changed
+     */
+    onTemplateChanged?: () => void;
 }
 
 interface State {
@@ -1263,9 +1301,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 <div
                     style={{ flex: "1, 1" }}
                     className="welllogview"
-                    ref={(el) => {
-                        this.container = el as HTMLElement;
-                    }}
+                    ref={(el) => (this.container = el as HTMLElement)}
                 />
                 {this.state.errorText ? (
                     <div style={{ flex: "0, 0" }} className="welllogview-error">

@@ -23,6 +23,9 @@
       ],
       "horizontal": false
     },
+    "toolbar": {
+      "visible": true
+    },
     "coordinateUnit": "m",
     "resources": {
       "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",

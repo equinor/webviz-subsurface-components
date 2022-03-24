@@ -3,11 +3,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "./redux/store";
-import { setSpec } from "./redux/actions";
-import {
-    applyPropsOnLayers,
-    getLayersWithDefaultProps,
-} from "./layers/utils/layerTools";
+import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface DeckGLMapProps {
@@ -29,6 +25,9 @@ interface DeckGLMapProps {
         position?: number[] | null;
     };
     coordinateUnit?: string;
+    toolbar?: {
+        visible?: boolean | null;
+    };
     legend?: {
         visible?: boolean | null;
         position?: number[] | null;
@@ -50,6 +49,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     scale,
     coordinateUnit,
     legend,
+    toolbar,
     colorTables,
     editedData,
     setProps,
@@ -92,29 +92,20 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
         });
     }, []);
 
-    // update store if any of the layer prop is changed
-    React.useEffect(() => {
-        if (store == undefined || layers == undefined) return;
-
-        const prev_layers_in_redux = store.getState()["spec"]["layers"];
-        const layers_store = applyPropsOnLayers(prev_layers_in_redux, layers);
-        const layers_default = getLayersWithDefaultProps(layers_store);
-        const spec = { layers: layers_default, views: views };
-        store.dispatch(setSpec(spec));
-    }, [layers]);
-
     if (store == undefined) return null;
     return (
         <ReduxProvider store={store}>
             <Map
                 id={id}
                 resources={resources}
+                layers={layers}
                 bounds={bounds}
                 zoom={zoom}
                 views={views}
                 coords={coords}
                 scale={scale}
                 coordinateUnit={coordinateUnit}
+                toolbar={toolbar}
                 legend={legend}
                 colorTables={colorTables}
                 editedData={editedData}
@@ -252,6 +243,16 @@ DeckGLMap.propTypes = {
      * Unit for the scale ruler
      */
     coordinateUnit: PropTypes.string,
+
+    /**
+     * Parameters to control toolbar
+     */
+    toolbar: PropTypes.shape({
+        /**
+         * Toggle toolbar visibility
+         */
+        visible: PropTypes.bool,
+    }),
 
     /**
      * Parameters for the legend
