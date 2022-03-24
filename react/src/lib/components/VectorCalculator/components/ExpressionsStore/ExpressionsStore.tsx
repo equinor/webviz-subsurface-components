@@ -67,9 +67,6 @@ type StoreState = {
     editableExpressionTypeValid: boolean;
 
     parseData: ExpressionParsingData;
-
-    // Reset counter is needed as variableVectorMap is dependent of editableExpression
-    resetActionCounter: number;
 };
 
 type Payload = {
@@ -153,8 +150,6 @@ const initializeStore = (initializerArg: StoreProviderProps): StoreState => {
         editableExpressionTypeValid: false,
 
         parseData: { isValid: false, parsingMessage: "", variables: [] },
-
-        resetActionCounter: 0,
     };
 };
 
@@ -208,6 +203,11 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
             return {
                 ...state,
                 activeExpression: action.payload.expression,
+                editableName: action.payload.expression.name,
+                editableExpression: action.payload.expression.expression,
+                editableDescription: action.payload.expression.description,
+                editableVariableVectorMap:
+                    action.payload.expression.variableVectorMap,
             };
         }
 
@@ -238,7 +238,11 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
         case StoreActions.ResetEditableExpression: {
             return {
                 ...state,
-                resetActionCounter: state.resetActionCounter + 1,
+                editableName: state.activeExpression.name,
+                editableExpression: state.activeExpression.expression,
+                editableDescription: state.activeExpression.description,
+                editableVariableVectorMap:
+                    state.activeExpression.variableVectorMap,
             };
         }
         case StoreActions.SetExpressionTypeValid: {

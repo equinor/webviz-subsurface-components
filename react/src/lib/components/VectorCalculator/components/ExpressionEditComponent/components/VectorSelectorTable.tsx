@@ -9,6 +9,7 @@ import {
 import { TreeDataNode } from "@webviz/core-components";
 import cloneDeep from "lodash/cloneDeep";
 
+import VectorSelector from "../../../../VectorSelector";
 import { StoreActions, useStore } from "../../ExpressionsStore";
 import { VariableVectorMapType } from "../../../utils/VectorCalculatorTypes";
 import {
@@ -16,7 +17,6 @@ import {
     createVariableVectorMapFromVariables,
     isVariableVectorMapValid,
 } from "../../../utils/VectorCalculatorHelperFunctions";
-import VectorSelector from "../../../../VectorSelector";
 
 import "!style-loader!css-loader!../../../VectorCalculator.css";
 
@@ -35,13 +35,12 @@ type VectorSelectorParentProps = {
 export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
     props: VectorSelectorTableProps
 ) => {
-    const { vectorData } = props;
     const store = useStore();
     const [isValid, setIsValid] = React.useState<boolean>(
         isVariableVectorMapValid(
             store.state.editableVariableVectorMap,
             ":",
-            vectorData
+            props.vectorData
         )
     );
     const [variableVectorMap, setVariableVectorMap] = React.useState<
@@ -88,35 +87,18 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
 
         setVariableVectorMap(newVariableVectorMap);
         setIsValid(
-            isVariableVectorMapValid(newVariableVectorMap, ":", vectorData)
+            isVariableVectorMapValid(
+                newVariableVectorMap,
+                ":",
+                props.vectorData
+            )
         );
     }, [store.state.editableVariableVectorMap]);
 
     React.useEffect(() => {
-        store.dispatch({
-            type: StoreActions.SetVariableVectorMap,
-            payload: {
-                variableVectorMap:
-                    store.state.activeExpression.variableVectorMap,
-            },
-        });
-    }, [store.state.resetActionCounter]);
-
-    React.useEffect(() => {
-        // Update map when new active expression
-        const newVariableVectorMap = cloneDeep(
+        setCachedVariableVectorMap(
             store.state.activeExpression.variableVectorMap
         );
-
-        if (
-            !areVariableVectorMapsEqual(variableVectorMap, newVariableVectorMap)
-        ) {
-            store.dispatch({
-                type: StoreActions.SetVariableVectorMap,
-                payload: { variableVectorMap: newVariableVectorMap },
-            });
-        }
-        setCachedVariableVectorMap(newVariableVectorMap);
     }, [store.state.activeExpression.variableVectorMap]);
 
     React.useEffect(() => {
@@ -217,7 +199,7 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
                                         maxNumSelectedNodes={1}
                                         numSecondsUntilSuggestionsAreShown={0}
                                         placeholder="Add new vector..."
-                                        data={vectorData}
+                                        data={props.vectorData}
                                         caseInsensitiveMatching={true}
                                     />
                                 </TableCell>
