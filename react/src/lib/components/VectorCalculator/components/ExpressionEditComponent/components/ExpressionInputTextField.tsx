@@ -1,6 +1,7 @@
 import React from "react";
 import { Icon, TextField, Progress } from "@equinor/eds-core-react";
 import { error_filled, thumbs_up } from "@equinor/eds-icons";
+Icon.add({ error_filled, thumbs_up });
 
 import {
     ExpressionStatus,
@@ -41,8 +42,6 @@ export const ExpressionInputTextField: React.FC<
             variant: "default",
             icon: [],
         });
-
-    Icon.add({ error_filled, thumbs_up });
 
     const getTextFieldStyleData =
         React.useCallback((): ExpressionInputTextFieldStyleData => {

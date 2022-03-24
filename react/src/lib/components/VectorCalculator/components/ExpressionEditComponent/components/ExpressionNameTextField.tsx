@@ -1,6 +1,9 @@
 import React from "react";
-import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
+
 import { TextField, Icon } from "@equinor/eds-core-react";
+import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
+Icon.add({ error_filled, thumbs_up, warning_filled });
+
 import { TreeDataNode } from "@webviz/core-components";
 
 import { StoreActions, useStore } from "../../ExpressionsStore";
@@ -43,8 +46,6 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
             icon: [],
             helperText: "",
         });
-
-    Icon.add({ error_filled, thumbs_up, warning_filled });
 
     const getTextFieldStyleData = React.useCallback(
         (name: string): ExpressionNameTextFieldStyleData => {

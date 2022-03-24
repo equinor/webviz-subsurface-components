@@ -188,15 +188,15 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
                                 key={"row_" + row.variableName}
                             >
                                 <TableCell
+                                    className="VectorSelectorTableVariableColumn"
                                     align="left"
                                     key={row.variableName}
-                                    style={{ width: "10%" }}
                                 >
                                     {row.variableName}
                                 </TableCell>
                                 <TableCell
+                                    className="VectorSelectorTableVectorSelectorColumn"
                                     key={`cell_${row.variableName}`}
-                                    style={{ minWidth: 240 }}
                                 >
                                     <VectorSelector
                                         id={

@@ -1,8 +1,12 @@
 import React from "react";
-import { Button, Icon } from "@equinor/eds-core-react";
+
 import { Grid } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
+
+import { Button, Icon } from "@equinor/eds-core-react";
 import { add, copy, delete_forever } from "@equinor/eds-icons";
+Icon.add({ add, copy, delete_forever });
+
 import { v4 as uuidv4 } from "uuid";
 import { cloneDeep } from "lodash";
 
@@ -36,8 +40,6 @@ export const ExpressionsTableComponent: React.FC<
     );
     const [blinkingTableExpressions, setBlinkingTableExpressions] =
         React.useState<ExpressionType[]>([]);
-
-    Icon.add({ add, copy, delete_forever });
 
     React.useEffect(() => {
         // Unmount timer
@@ -153,9 +155,9 @@ export const ExpressionsTableComponent: React.FC<
                 )}
             </Grid>
             <Grid
+                className="ActionButtonsGridItem"
                 container
                 item
-                style={{ height: 80 }}
                 alignContent="flex-end"
                 spacing={2}
             >

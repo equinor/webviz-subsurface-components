@@ -1,9 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+import {
+    ExpressionTypePropTypes,
+    ExternalParseDataPropTypes,
+} from "./utils/VectorCalculatorTypes";
 import { VectorCalculatorComponent } from "./components/VectorCalculatorComponent";
 import { StoreProvider } from "./components/ExpressionsStore";
-import { string } from "jsverify";
 
 /**
  * VectorCalculator is a component that allows to calculate new vectors by creating a mathematical expression
@@ -49,20 +52,7 @@ VectorCalculator.propTypes = {
      * and a map of character variables and the corresponding vector name.
      */
     expressions: PropTypes.arrayOf(
-        PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            expression: PropTypes.string.isRequired,
-            id: PropTypes.string.isRequired,
-            variableVectorMap: PropTypes.arrayOf(
-                PropTypes.shape({
-                    variableName: string.isRequired,
-                    vectorName: string.isRequired,
-                })
-            ).isRequired,
-            description: PropTypes.string,
-            isValid: PropTypes.bool.isRequired,
-            isDeletable: PropTypes.bool.isRequired,
-        })
+        PropTypes.shape(ExpressionTypePropTypes).isRequired
     ).isRequired,
 
     /**
@@ -83,12 +73,7 @@ VectorCalculator.propTypes = {
     /**
      * Data for external parsing of mathematical expression
      */
-    externalParseData: PropTypes.shape({
-        expression: PropTypes.string.isRequired,
-        id: PropTypes.string.isRequired,
-        variables: PropTypes.arrayOf(string.isRequired).isRequired,
-        isValid: PropTypes.bool.isRequired,
-    }),
+    externalParseData: PropTypes.shape(ExternalParseDataPropTypes),
 
     /**
      * Dash-assigned callback that should be called to report property changes

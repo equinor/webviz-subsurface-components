@@ -1,8 +1,10 @@
 import React from "react";
 
 import { Button, Icon } from "@equinor/eds-core-react";
-import { Grid } from "@material-ui/core";
 import { clear, save, sync } from "@equinor/eds-icons";
+Icon.add({ clear, save, sync });
+
+import { Grid } from "@material-ui/core";
 import { TreeDataNode } from "@webviz/core-components";
 
 import { VectorSelectorTable } from "./components/VectorSelectorTable";
@@ -41,16 +43,12 @@ export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
     const [variableVectorMapValid, setVariableVectorMapValid] =
         React.useState<boolean>(false);
 
-    Icon.add({ clear, save, sync });
-
     React.useEffect(() => {
         if (disabled !== (store.state.activeExpression.id === "")) {
             setDisabled(store.state.activeExpression.id === "");
         }
 
-        const isEdited = isExpressionEdited(store.state);
-
-        setExpressionDataEdited(isEdited);
+        setExpressionDataEdited(isExpressionEdited(store.state));
     }, [
         store.state.activeExpression,
         store.state.editableExpression,
@@ -100,22 +98,29 @@ export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
     };
 
     return (
-        <Grid container item direction="column" alignItems="stretch" xs={6}>
-            <Grid item style={{ height: 90 }}>
+        <Grid
+            className="ExpressionEditComponent"
+            container
+            item
+            direction="column"
+            alignItems="stretch"
+            xs={6}
+        >
+            <Grid item className="ExpressionNameTextFieldGridItem">
                 <ExpressionNameTextField
                     vectors={props.vectors}
                     disabled={disabled}
                     onValidChanged={handleNameValidChange}
                 />
             </Grid>
-            <Grid item style={{ height: 70 }}>
+            <Grid item className="ExpressionInputTextFieldGridItem">
                 <ExpressionInputTextField
                     externalParsing={props.externalParsing}
                     disabled={disabled}
                     onStatusChanged={handleExpressionStatusChanged}
                 />
             </Grid>
-            <Grid item style={{ height: 90 }}>
+            <Grid item className="ExpressionDescriptionTextFieldGridItem">
                 <ExpressionDescriptionTextField
                     disabled={disabled}
                     maxLength={props.maxExpressionDescriptionLength}
@@ -123,8 +128,7 @@ export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
             </Grid>
             <Grid
                 item
-                className="TableWrapperGridItem"
-                style={{ minHeight: 70 }}
+                className="TableWrapperGridItem VectorSelectorTableGridItem"
             >
                 <VectorSelectorTable
                     vectorData={props.vectors}
@@ -136,12 +140,12 @@ export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
                 />
             </Grid>
             <Grid
+                className="ActionButtonsGridItem"
                 container
                 item
                 spacing={2}
                 justify="flex-end"
                 alignContent="flex-end"
-                style={{ height: 80 }}
             >
                 <Grid item>
                     <Button

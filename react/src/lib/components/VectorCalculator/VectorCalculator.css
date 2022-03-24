@@ -75,6 +75,23 @@
     text-overflow: ellipsis;
 }
 
+.VectorCalculator .ExpressionNameTextFieldGridItem {
+    height: 90px;
+}
+.VectorCalculator .ExpressionInputTextFieldGridItem {
+    height: 90px;
+}
+.VectorCalculator .ExpressionDescriptionTextFieldGridItem {
+    height: 90px;
+}
+.VectorCalculator .VectorSelectorTableGridItem {
+    min-height: 70px;
+}
+
+.VectorCalculator .ActionButtonsGridItem {
+    height: 80px;
+}
+
 .VectorCalculator .TextFieldWrapper {
     height: 58px;
 }
@@ -87,6 +104,14 @@
 
 .VectorCalculator .VectorSelectorTableContainer table {
     table-layout: fixed;
+}
+
+.VectorCalculator .VectorSelectorTableVariableColumn {
+    width: 10%;
+}
+
+.VectorCalculator .VectorSelectorTableVectorSelectorColumn {
+    min-width: 240px;
 }
 
 .VectorCalculator .DisableOverlay {
