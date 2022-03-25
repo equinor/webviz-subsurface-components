@@ -138,14 +138,12 @@ export const isExpressionEdited = (state: StoreState): boolean => {
 const initializeStore = (initializerArg: StoreProviderProps): StoreState => {
     return {
         expressions: initializerArg.initialExpressions,
-        activeExpression: cloneDeep(initialEditableExpression),
+        activeExpression: initialEditableExpression,
 
         editableExpression: initialEditableExpression.expression,
         editableName: initialEditableExpression.name,
         editableDescription: initialEditableExpression.description,
-        editableVariableVectorMap: cloneDeep(
-            initialEditableExpression.variableVectorMap
-        ),
+        editableVariableVectorMap: initialEditableExpression.variableVectorMap,
         editableExpressionTypeValid: false,
 
         parseData: { isValid: false, parsingMessage: "", variables: [] },
@@ -173,13 +171,12 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
                 return {
                     ...state,
                     expressions: newExpressions,
-                    activeExpression: cloneDeep(initialEditableExpression),
+                    activeExpression: initialEditableExpression,
                     editableExpression: initialEditableExpression.expression,
                     editableName: initialEditableExpression.name,
                     editableDescription: initialEditableExpression.description,
-                    editableVariableVectorMap: cloneDeep(
-                        initialEditableExpression.variableVectorMap
-                    ),
+                    editableVariableVectorMap:
+                        initialEditableExpression.variableVectorMap,
                     editableExpressionTypeValid: false,
                     parseData: {
                         isValid: false,
