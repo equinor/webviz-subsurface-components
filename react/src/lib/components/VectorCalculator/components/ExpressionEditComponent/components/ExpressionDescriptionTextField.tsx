@@ -2,29 +2,27 @@ import React from "react";
 
 import { MaxLengthTextField } from "./MaxLengthTextField";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
+import { StoreActions, useStore } from "../../ExpressionsStore";
+
+import "!style-loader!css-loader!../../../VectorCalculator.css";
 
 interface ExpressionDescriptionTextFieldProps {
     maxLength: number;
-    description?: string;
     disabled?: boolean;
-    onDescriptionChange: (description: string) => void;
 }
 
 export const ExpressionDescriptionTextField: React.FC<
     ExpressionDescriptionTextFieldProps
 > = (props: ExpressionDescriptionTextFieldProps) => {
-    const [description, setDescription] = React.useState<string>("");
-
-    React.useEffect(() => {
-        setDescription(props.description ? props.description : "");
-    }, [props.description]);
+    const store = useStore();
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement & HTMLTextAreaElement>
     ): void => {
-        const newDescription: string = e.target.value;
-        props.onDescriptionChange(newDescription);
+        store.dispatch({
+            type: StoreActions.SetDescription,
+            payload: { description: e.target.value },
+        });
     };
 
     return (
@@ -35,7 +33,11 @@ export const ExpressionDescriptionTextField: React.FC<
                 label="Description"
                 placeholder="Description (optional)"
                 onChange={handleInputChange}
-                value={description}
+                value={
+                    store.state.editableDescription
+                        ? store.state.editableDescription
+                        : ""
+                }
                 disabled={props.disabled}
             />
         </div>

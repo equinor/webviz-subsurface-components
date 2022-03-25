@@ -1,33 +1,33 @@
 import React from "react";
-import { Button, Icon } from "@equinor/eds-core-react";
-import { Grid, Paper } from "@material-ui/core";
+
+import { Grid } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
+
+import { Button, Icon } from "@equinor/eds-core-react";
 import { add, copy, delete_forever } from "@equinor/eds-icons";
+Icon.add({ add, copy, delete_forever });
+
 import { v4 as uuidv4 } from "uuid";
 import { cloneDeep } from "lodash";
 
-import { ExpressionsTable } from "./ExpressionsTable";
-import { ExpressionType } from "../utils/VectorCalculatorTypes";
+import { StoreActions, useStore } from "../ExpressionsStore";
+import { ExpressionsTable } from "./components/ExpressionsTable";
+import { ExpressionType } from "../../utils/VectorCalculatorTypes";
 import {
     getAvailableName,
     getDefaultExpression,
-} from "../utils/VectorCalculatorHelperFunctions";
+} from "../../utils/VectorCalculatorHelperFunctions";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
+import "!style-loader!css-loader!../../VectorCalculator.css";
 
 interface ExpressionsTableComponentProps {
-    expressions: ExpressionType[];
-    onActiveExpressionChange: (expression: ExpressionType | undefined) => void;
-    onExpressionsChange: (expressions: ExpressionType[]) => void;
+    containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export const ExpressionsTableComponent: React.FC<
     ExpressionsTableComponentProps
 > = (props: ExpressionsTableComponentProps) => {
-    const { expressions } = props;
-    const [activeExpression, setActiveExpression] = React.useState<
-        ExpressionType | undefined
-    >(undefined);
+    const store = useStore();
     const [selectedExpressions, setSelectedExpressions] = React.useState<
         ExpressionType[]
     >([]);
@@ -37,8 +37,6 @@ export const ExpressionsTableComponent: React.FC<
     );
     const [blinkingTableExpressions, setBlinkingTableExpressions] =
         React.useState<ExpressionType[]>([]);
-
-    Icon.add({ add, copy, delete_forever });
 
     React.useEffect(() => {
         // Unmount timer
@@ -56,24 +54,8 @@ export const ExpressionsTableComponent: React.FC<
         );
     }, [selectedExpressions]);
 
-    const addNewExpressions = React.useCallback(
-        (newExpressions: ExpressionType[]): void => {
-            const newExpressionsList = cloneDeep(expressions);
-            for (const elm of newExpressions) {
-                newExpressionsList.push(elm);
-            }
-            props.onExpressionsChange(newExpressionsList);
-        },
-        [expressions]
-    );
-
     const handleExpressionsSelect = (expressions: ExpressionType[]): void => {
         setSelectedExpressions(expressions);
-    };
-
-    const handleActiveExpressionSelect = (expression: ExpressionType): void => {
-        setActiveExpression(expression);
-        props.onActiveExpressionChange(expression);
     };
 
     const handleCloneClick = React.useCallback((): void => {
@@ -84,19 +66,24 @@ export const ExpressionsTableComponent: React.FC<
         const newExpressions: ExpressionType[] = [];
         for (const elm of selectedExpressions) {
             const cloneExpr = cloneDeep(elm);
-            cloneExpr.name = getAvailableName(elm.name, expressions);
+            cloneExpr.name = getAvailableName(
+                elm.name,
+                store.state.expressions
+            );
             cloneExpr.id = uuidv4();
             cloneExpr.isDeletable = true;
             newExpressions.push(cloneExpr);
         }
-        addNewExpressions(newExpressions);
-    }, [selectedExpressions, addNewExpressions, getAvailableName]);
+        store.dispatch({
+            type: StoreActions.AddExpressions,
+            payload: { expressions: newExpressions },
+        });
+    }, [store.state.expressions, selectedExpressions, getAvailableName]);
 
     const handleDeleteClick = React.useCallback((): void => {
         const nonDeletableExpressions = selectedExpressions.filter((elm) => {
             return !elm.isDeletable;
         });
-        setSelectedExpressions(nonDeletableExpressions);
 
         // Handle blinking in table
         setBlinkingTableExpressions(nonDeletableExpressions);
@@ -108,61 +95,71 @@ export const ExpressionsTableComponent: React.FC<
         const deletableExpressions = selectedExpressions.filter((elm) => {
             return elm.isDeletable;
         });
-        const newExpressionsList = expressions.filter((elm) => {
-            return deletableExpressions.indexOf(elm) === -1;
-        });
-        props.onExpressionsChange(newExpressionsList);
+        const deletableExpressionIds = deletableExpressions.map(
+            (elm) => elm.id
+        );
 
-        if (
-            activeExpression !== undefined &&
-            !newExpressionsList.some((el) => el.id === activeExpression.id)
-        ) {
-            setActiveExpression(undefined);
-            props.onActiveExpressionChange(undefined);
-        }
+        store.dispatch({
+            type: StoreActions.DeleteExpressions,
+            payload: { ids: deletableExpressionIds },
+        });
     }, [
-        activeExpression,
         blinkingTimer,
-        expressions,
         selectedExpressions,
-        setActiveExpression,
         setBlinkingTableExpressions,
         setSelectedExpressions,
-        props.onActiveExpressionChange,
-        props.onExpressionsChange,
     ]);
 
     const handleNewClick = React.useCallback((): void => {
-        const newName = getAvailableName("New Expression", expressions);
+        const newName = getAvailableName(
+            "New Expression",
+            store.state.expressions
+        );
         const newExpression: ExpressionType = {
             ...getDefaultExpression(),
             name: newName,
         };
-        addNewExpressions([newExpression]);
-    }, [expressions, addNewExpressions, getAvailableName]);
+        store.dispatch({
+            type: StoreActions.AddExpressions,
+            payload: { expressions: [newExpression] },
+        });
+    }, [store.state.expressions, getAvailableName]);
 
     return (
-        <Paper className="ExpressionTableComponent">
-            <Grid container item xs={12} spacing={3} direction="column">
-                <Grid item>
-                    <ExpressionsTable
-                        expressions={expressions}
-                        blinkingExpressions={blinkingTableExpressions}
-                        onExpressionsSelect={handleExpressionsSelect}
-                        onActiveExpressionSelect={handleActiveExpressionSelect}
-                    />
-                </Grid>
-                <Grid item>
-                    {blinkingTableExpressions.length !== 0 && (
-                        <Alert variant="filled" severity="error">
-                            {blinkingTableExpressions.length > 1
-                                ? "Expressions not deletable!"
-                                : "Expression not deletable!"}
-                        </Alert>
-                    )}
-                </Grid>
+        <Grid
+            container
+            item
+            className="ExpressionTableComponent"
+            direction="column"
+            alignItems="stretch"
+            justifyContent="space-between"
+            xs={6}
+        >
+            <Grid item className="TableWrapperGridItem">
+                <ExpressionsTable
+                    containerRef={props.containerRef}
+                    blinkingExpressions={blinkingTableExpressions}
+                    onExpressionsSelect={handleExpressionsSelect}
+                />
+                {blinkingTableExpressions.length !== 0 && (
+                    <Alert
+                        variant="filled"
+                        severity="error"
+                        className="WarningAlert"
+                    >
+                        {blinkingTableExpressions.length > 1
+                            ? "Expressions not deletable!"
+                            : "Expression not deletable!"}
+                    </Alert>
+                )}
             </Grid>
-            <Grid container item xs={12}>
+            <Grid
+                className="ActionButtonsGridItem"
+                container
+                item
+                alignContent="flex-end"
+                spacing={2}
+            >
                 <Grid container item xs={8} spacing={2}>
                     <Grid item>
                         <Button
@@ -187,7 +184,7 @@ export const ExpressionsTableComponent: React.FC<
                         </Button>
                     </Grid>
                 </Grid>
-                <Grid container item xs={4} spacing={1} justify="flex-end">
+                <Grid container item xs={4} justifyContent="flex-end">
                     <Grid item>
                         <Button onClick={handleNewClick}>
                             <Icon key="new" name="add" />
@@ -196,6 +193,6 @@ export const ExpressionsTableComponent: React.FC<
                     </Grid>
                 </Grid>
             </Grid>
-        </Paper>
+        </Grid>
     );
 };
