@@ -141,11 +141,9 @@ const getVariablesVectorMap = (
     variableVectorMap: VariableVectorMapType[]
 ): Map<string, string> => {
     const map = new Map<string, string>();
-
-    for (const elm of variableVectorMap) {
-        map.set(elm.variableName, elm.vectorName[0]);
-    }
-
+    variableVectorMap.forEach((elm) =>
+        map.set(elm.variableName, elm.vectorName[0])
+    );
     return map;
 };
 
@@ -238,26 +236,14 @@ export const createVariableVectorMapFromVariables = (
     variables: string[],
     variableVectorMap: VariableVectorMapType[]
 ): VariableVectorMapType[] => {
-    const map: VariableVectorMapType[] = [];
-    for (const variable of variables) {
+    return variables.map((variable) => {
         const mapElm = variableVectorMap.find(
             (elm) => elm.variableName === variable
         );
         if (!mapElm) {
-            map.push({ variableName: variable, vectorName: [] });
+            return { variableName: variable, vectorName: [] };
         } else {
-            map.push(mapElm);
+            return mapElm;
         }
-    }
-    return map;
-};
-
-export const getVariablesFromMap = (
-    variableVectorMap: VariableVectorMapType[]
-): string[] => {
-    const variables = [];
-    for (const elm of variableVectorMap) {
-        variables.push(elm.variableName);
-    }
-    return variables;
+    });
 };

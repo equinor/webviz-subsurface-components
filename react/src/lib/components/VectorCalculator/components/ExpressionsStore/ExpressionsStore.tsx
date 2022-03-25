@@ -1,5 +1,4 @@
 import React from "react";
-
 import { cloneDeep } from "lodash";
 
 import {
@@ -157,9 +156,7 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
     switch (action.type) {
         case StoreActions.AddExpressions: {
             const newExpressions = cloneDeep(state.expressions);
-            for (const elm of action.payload.expressions) {
-                newExpressions.push(elm);
-            }
+            newExpressions.push(...action.payload.expressions);
             return { ...state, expressions: newExpressions };
         }
 
@@ -173,7 +170,6 @@ const StoreReducer = (state: StoreState, action: Actions): StoreState => {
 
             // If active expression is deleted
             if (action.payload.ids.includes(state.activeExpression.id)) {
-                // Note: Not resetting reset action counter!
                 return {
                     ...state,
                     expressions: newExpressions,

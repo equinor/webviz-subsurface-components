@@ -28,9 +28,6 @@ export const ExpressionsTableComponent: React.FC<
     ExpressionsTableComponentProps
 > = (props: ExpressionsTableComponentProps) => {
     const store = useStore();
-    const [expressions, setExpressions] = React.useState<ExpressionType[]>(
-        store.state.expressions
-    );
     const [selectedExpressions, setSelectedExpressions] = React.useState<
         ExpressionType[]
     >([]);
@@ -47,10 +44,6 @@ export const ExpressionsTableComponent: React.FC<
             blinkingTimer.current && clearTimeout(blinkingTimer.current);
         };
     }, []);
-
-    React.useEffect(() => {
-        setExpressions(store.state.expressions);
-    }, [store.state.expressions]);
 
     React.useEffect(() => {
         // Disable delete when all expressions are non-deletable
@@ -73,7 +66,10 @@ export const ExpressionsTableComponent: React.FC<
         const newExpressions: ExpressionType[] = [];
         for (const elm of selectedExpressions) {
             const cloneExpr = cloneDeep(elm);
-            cloneExpr.name = getAvailableName(elm.name, expressions);
+            cloneExpr.name = getAvailableName(
+                elm.name,
+                store.state.expressions
+            );
             cloneExpr.id = uuidv4();
             cloneExpr.isDeletable = true;
             newExpressions.push(cloneExpr);
@@ -82,7 +78,7 @@ export const ExpressionsTableComponent: React.FC<
             type: StoreActions.AddExpressions,
             payload: { expressions: newExpressions },
         });
-    }, [expressions, selectedExpressions, getAvailableName]);
+    }, [store.state.expressions, selectedExpressions, getAvailableName]);
 
     const handleDeleteClick = React.useCallback((): void => {
         const nonDeletableExpressions = selectedExpressions.filter((elm) => {
@@ -115,7 +111,10 @@ export const ExpressionsTableComponent: React.FC<
     ]);
 
     const handleNewClick = React.useCallback((): void => {
-        const newName = getAvailableName("New Expression", expressions);
+        const newName = getAvailableName(
+            "New Expression",
+            store.state.expressions
+        );
         const newExpression: ExpressionType = {
             ...getDefaultExpression(),
             name: newName,
@@ -124,7 +123,7 @@ export const ExpressionsTableComponent: React.FC<
             type: StoreActions.AddExpressions,
             payload: { expressions: [newExpression] },
         });
-    }, [expressions, getAvailableName]);
+    }, [store.state.expressions, getAvailableName]);
 
     return (
         <Grid

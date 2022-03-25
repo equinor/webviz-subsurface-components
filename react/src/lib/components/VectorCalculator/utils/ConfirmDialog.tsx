@@ -18,12 +18,11 @@ interface ConfirmDialogProps {
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = (
     props: ConfirmDialogProps
 ) => {
-    const { open } = props;
-    const [isOpen, setIsOpen] = React.useState<boolean>(open || false);
+    const [isOpen, setIsOpen] = React.useState<boolean>(props.open || false);
 
     React.useEffect(() => {
-        setIsOpen(open || false);
-    }, [open]);
+        setIsOpen(props.open || false);
+    }, [props.open]);
 
     const handleNoClick = React.useCallback(() => {
         props.onNo();

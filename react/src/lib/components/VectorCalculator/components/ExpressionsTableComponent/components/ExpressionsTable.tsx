@@ -8,9 +8,6 @@ import {
     Tooltip,
 } from "@material-ui/core";
 
-import { BlinkingTableRow } from "./BlinkingTableRow";
-import { EnhancedTableHead } from "./EnhancedTableHead";
-
 import { getDetailedExpression } from "../../../utils/VectorCalculatorHelperFunctions";
 import { ExpressionType } from "../../../utils/VectorCalculatorTypes";
 import { ConfirmDialog } from "../../../utils/ConfirmDialog";
@@ -19,6 +16,9 @@ import {
     StoreActions,
     useStore,
 } from "../../ExpressionsStore";
+
+import { BlinkingTableRow } from "./BlinkingTableRow";
+import { EnhancedTableHead } from "./EnhancedTableHead";
 
 import "!style-loader!css-loader!../../../VectorCalculator.css";
 
@@ -48,15 +48,9 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
     }, [store.state.expressions]);
 
     React.useEffect(() => {
-        // Update selected expressions
-        const newSelectedExpressions = expressions.filter((expr) => {
-            for (const elm of selectedExpressions) {
-                if (elm.id === expr.id) {
-                    return true;
-                }
-            }
-            return false;
-        });
+        const newSelectedExpressions = expressions.filter((expr) =>
+            selectedExpressions.some((elm) => elm.id === expr.id)
+        );
 
         if (newSelectedExpressions !== selectedExpressions) {
             setSelectedExpressions(newSelectedExpressions);
@@ -95,28 +89,21 @@ export const ExpressionsTable: React.FC<ExpressionsTableProps> = (
 
     const handleRowClick = React.useCallback(
         (expression: ExpressionType): void => {
-            // If default/empty expression is active
-            if (!store.state.activeExpression.id) {
-                setActiveExpression(expression);
+            setActiveExpression(expression);
+            if (
+                !store.state.activeExpression.id ||
+                !isExpressionEdited(store.state)
+            ) {
                 store.dispatch({
                     type: StoreActions.SetActiveExpression,
                     payload: { expression: expression },
                 });
                 return;
             }
-            if (!isExpressionEdited(store.state)) {
-                setActiveExpression(expression);
-                store.dispatch({
-                    type: StoreActions.SetActiveExpression,
-                    payload: { expression: expression },
-                });
+            if (store.state.editableExpressionTypeValid) {
+                setIsSaveDialogOpen(true);
             } else {
-                if (store.state.editableExpressionTypeValid) {
-                    setIsSaveDialogOpen(true);
-                } else {
-                    setIsDiscardDialogOpen(true);
-                }
-                setActiveExpression(expression);
+                setIsDiscardDialogOpen(true);
             }
         },
         [

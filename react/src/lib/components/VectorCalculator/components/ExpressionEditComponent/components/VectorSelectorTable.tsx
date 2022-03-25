@@ -58,7 +58,7 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
             const newCachedVariableVectorMap = cloneDeep(
                 cachedVariableVectorMap
             );
-            for (const elm of newMap) {
+            newMap.forEach((elm) => {
                 // Find reference to cached object
                 const cachedElm = newCachedVariableVectorMap.find(
                     (cachedElm) => cachedElm.variableName === elm.variableName
@@ -70,7 +70,7 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
                     // Update existing cache
                     cachedElm.vectorName = elm.vectorName;
                 }
-            }
+            });
             return newCachedVariableVectorMap;
         },
         [cachedVariableVectorMap]
@@ -127,7 +127,7 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
         }
     }, [store.state.parseData]);
 
-    const updateProps = React.useCallback(
+    const updateVariableVectorMap = React.useCallback(
         (
             vectorSelectorProps: VectorSelectorParentProps,
             index: number
@@ -193,7 +193,10 @@ export const VectorSelectorTable: React.FC<VectorSelectorTableProps> = (
                                         label=""
                                         selectedTags={row.vectorName}
                                         setProps={(props) =>
-                                            updateProps(props, index)
+                                            updateVariableVectorMap(
+                                                props,
+                                                index
+                                            )
                                         }
                                         numMetaNodes={0}
                                         maxNumSelectedNodes={1}
