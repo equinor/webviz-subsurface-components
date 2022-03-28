@@ -1,7 +1,7 @@
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import { RGBAColor } from "@deck.gl/core/utils/color";
+import { RGBColor } from "@deck.gl/core/utils/color";
 import fsShader from "./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
@@ -80,7 +80,8 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
 
     // Clamp colormap to this color at ends.
     // If not set it will clamp to color map min and max values.
-    colorMapClampColor: RGBAColor | undefined;
+    // If set to false the clamp color will be completely transparent.
+    colorMapClampColor: RGBColor | undefined | false;
 
     //If true readout will be z value (depth). Otherwise it is the texture property value.
     isReadoutDepth: boolean;
@@ -124,15 +125,19 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
         const isClampColor: boolean =
-            this.props.colorMapClampColor !== undefined;
+            this.props.colorMapClampColor !== undefined &&
+            this.props.colorMapClampColor !== false;
         let colorMapClampColor = isClampColor
             ? this.props.colorMapClampColor
-            : [0, 0, 0, 0];
+            : [0, 0, 0];
 
         // Normalize to [0,1] range.
-        colorMapClampColor = (colorMapClampColor as RGBAColor).map(
+        colorMapClampColor = (colorMapClampColor as RGBColor).map(
             (x) => (x ?? 0) / 255
         );
+
+        const isColorMapClampColorTransparent: boolean =
+            this.props.colorMapClampColor as boolean === false;
 
         super.draw({
             uniforms: {
@@ -157,6 +162,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                 isReadoutDepth,
                 isContoursDepth,
                 colorMapClampColor,
+                isColorMapClampColorTransparent,
                 isClampColor,
             },
         });
