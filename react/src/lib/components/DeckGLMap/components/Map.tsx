@@ -2,7 +2,7 @@ import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 import { PickInfo } from "deck.gl";
 import { Feature } from "geojson";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
@@ -17,6 +17,7 @@ import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
+import { ViewStateProps } from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
@@ -26,6 +27,7 @@ import {
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
+import fitBounds from "../utils/fit-bounds";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
@@ -188,7 +190,7 @@ const Map: React.FC<MapProps> = ({
     const [initialViewState, setInitialViewState] =
         useState<Record<string, unknown>>();
     useEffect(() => {
-        if (bounds == undefined || zoom == undefined) return;
+        if (bounds == undefined) return;
         setInitialViewState(getInitialViewState(bounds, zoom));
     }, [bounds, zoom]);
 
@@ -231,16 +233,6 @@ const Map: React.FC<MapProps> = ({
     }, [st_layers, resources, editedData]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [viewState, setViewState] = useState<any>();
-
-    const refCb = useCallback((deckRef) => {
-        if (deckRef && deckRef.deck) {
-            // Needed to initialize the viewState on first load
-            setViewState(deckRef.deck.viewState);
-        }
-    }, []);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
         (pickInfo, event) => {
@@ -259,8 +251,39 @@ const Map: React.FC<MapProps> = ({
         [coords]
     );
 
-    const [isLoaded, setIsLoaded] = useState<boolean>(false);
+    const deckRef = useRef<DeckGL>(null);
+    const [viewState, setViewState] = useState<ViewStateProps>();
 
+    const onLoad = useCallback(() => {
+        if (deckRef == null) return;
+
+        const deck = deckRef.current?.deck;
+        if (deck && bounds) {
+            const width = deck.width;
+            const height = deck.height;
+            const [west, south] = [bounds[0], bounds[1]];
+            const [east, north] = [bounds[2], bounds[3]];
+            const fitted_bound = fitBounds({
+                width,
+                height,
+                bounds: [
+                    [west, south],
+                    [east, north],
+                ],
+            });
+
+            const zoom_defined_by_consumer = zoom != undefined;
+            const view_state = {
+                target: [fitted_bound.x, fitted_bound.y, 0],
+                zoom: zoom_defined_by_consumer ? zoom : fitted_bound.zoom,
+                rotationX: 90, // look down z -axis.
+                rotationOrbit: 0,
+            };
+            setViewState(view_state);
+        }
+    }, [deckRef]);
+
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
             const state = deckGLLayers.every((layer) => layer.isLoaded);
@@ -325,11 +348,13 @@ const Map: React.FC<MapProps> = ({
                         return feat?.properties?.["name"];
                     }
                 }}
-                ref={refCb}
+                ref={deckRef}
                 onHover={onHover}
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
                 }
+                onLoad={onLoad}
+                onResize={onLoad}
                 onAfterRender={onAfterRender}
             >
                 {children}
@@ -372,11 +397,7 @@ const Map: React.FC<MapProps> = ({
 
             {scale?.visible ? (
                 <DistanceScale
-                    zoom={
-                        viewState?.zoom
-                            ? viewState.zoom
-                            : initialViewState?.["zoom"]
-                    }
+                    zoom={viewState?.zoom}
                     incrementValue={scale.incrementValue}
                     widthPerUnit={scale.widthPerUnit}
                     position={scale.position}
@@ -412,7 +433,6 @@ Map.defaultProps = {
         horizontal: false,
     },
     coordinateUnit: "m",
-    zoom: -3,
     views: {
         layout: [1, 1],
         showLabel: false,
@@ -453,7 +473,7 @@ function jsonToObject(
 // returns initial view state for DeckGL
 function getInitialViewState(
     bounds: [number, number, number, number],
-    zoom: number
+    zoom?: number
 ): Record<string, unknown> {
     const width = bounds[2] - bounds[0]; // right - left
     const height = bounds[3] - bounds[1]; // top - bottom
@@ -461,7 +481,7 @@ function getInitialViewState(
     const initial_view_state = {
         // target to center of the bound
         target: [bounds[0] + width / 2, bounds[1] + height / 2, 0],
-        zoom: zoom,
+        zoom: zoom ?? 0,
         rotationX: 90, // look down z -axis.
         rotationOrbit: 0,
     };
