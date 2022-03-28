@@ -276,8 +276,8 @@ const meshMapLayer = {
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [2782, 3513],
-    colorMapRange: [2815, 3513],
-    colorMapClampColor: [0, 100, 0, 0],
+    colorMapRange: [3000, 3513],
+    colorMapClampColor: [0, 255, 0], //  a color e.g. [0, 255, 0],  false or undefined.
     rotDeg: 0,
     contours: [0, 50.0],
     isContoursDepth: false,

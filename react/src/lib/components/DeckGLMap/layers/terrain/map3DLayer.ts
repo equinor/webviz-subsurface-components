@@ -6,7 +6,7 @@ import TerrainMapLayer, {
     Material,
 } from "./terrainMapLayer";
 import { ExtendedLayerProps } from "../utils/layerTools";
-import { RGBAColor } from "@deck.gl/core/utils/color";
+import { RGBColor } from "@deck.gl/core/utils/color";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { ImageLoader } from "@loaders.gl/images";
@@ -221,9 +221,10 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapRange: [number, number];
 
     // Clamp colormap to this color at ends.
+    // Given as array of three values (r,g,b) e.g: [255, 0, 0]
     // If not set it will clamp to color map min and max values.
-    // Given as array of four values (r,g,b,a) e.g: [255, 0, 0, 0]
-    colorMapClampColor: RGBAColor | undefined;
+    // If set to false the clamp color will be completely transparent.
+    colorMapClampColor: RGBColor | undefined | false;
 
     // If true readout will be z value (depth). Otherwise it is the texture property value.
     isReadoutDepth: boolean;

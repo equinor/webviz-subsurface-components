@@ -32,8 +32,9 @@ uniform float valueRangeMax;
 uniform float colorMapRangeMin;
 uniform float colorMapRangeMax;
 
-uniform vec4 colorMapClampColor;
+uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
+uniform bool isColorMapClampColorTransparent;
 
 
 void main(void) {
@@ -106,17 +107,15 @@ void main(void) {
       if (x < 0.0 || x > 1.0) {
          // Out of range. Use clampcolor.
          if (isClampColor) {
-            if (colorMapClampColor.w < 1.0) {
-               // Transparency in clampcolor.
-               discard;
-               return;
-            }
-            else {
-               color = colorMapClampColor;
-            }
+            color = vec4(colorMapClampColor.rgb, 1.0);
+
+         }
+         else if (isColorMapClampColorTransparent) {
+            discard;
+            return;
          }
          else {
-            // Use min/max coilor to clamp.
+            // Use min/max color to clamp.
             x = max(0.0, x);
             x = min(1.0, x);
 
