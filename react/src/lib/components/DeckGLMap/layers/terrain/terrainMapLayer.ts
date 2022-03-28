@@ -137,7 +137,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         );
 
         const isColorMapClampColorTransparent: boolean =
-            this.props.colorMapClampColor as boolean === false;
+            (this.props.colorMapClampColor as boolean) === false;
 
         super.draw({
             uniforms: {
