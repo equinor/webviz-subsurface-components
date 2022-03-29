@@ -7,6 +7,7 @@ import gridVertex from "./grid-vertex.glsl";
 import { project } from "deck.gl";
 import { COORDINATE_SYSTEM } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
+import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 
 export interface BoxLayerProps<D> extends LayerProps<D> {
     lines: [number]; // from pt , to pt.
@@ -21,6 +22,15 @@ const defaultProps = {
 
 export default class BoxLayer extends Layer<unknown, BoxLayerProps<unknown>> {
     initializeState(context: DeckGLLayerContext): void {
+        const { gl } = context;
+        this.setState(this._getModels(gl));
+    }
+
+    shouldUpdateState(): boolean | string | null {
+        return true;
+    }
+
+    updateState({ context }: UpdateStateInfo<BoxLayerProps<unknown>>): void {
         const { gl } = context;
         this.setState(this._getModels(gl));
     }
