@@ -79,9 +79,10 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
     colorMapRange: [number, number];
 
     // Clamp colormap to this color at ends.
-    // If not set it will clamp to color map min and max values.
+    // Given as array of three values (r,g,b) e.g: [255, 0, 0]
+    // If not set or set to true, it will clamp to color map min and max values.
     // If set to false the clamp color will be completely transparent.
-    colorMapClampColor: RGBColor | undefined | false;
+    colorMapClampColor: RGBColor | undefined | boolean;
 
     //If true readout will be z value (depth). Otherwise it is the texture property value.
     isReadoutDepth: boolean;
@@ -126,6 +127,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
 
         const isClampColor: boolean =
             this.props.colorMapClampColor !== undefined &&
+            this.props.colorMapClampColor !== true &&
             this.props.colorMapClampColor !== false;
         let colorMapClampColor = isClampColor
             ? this.props.colorMapClampColor
