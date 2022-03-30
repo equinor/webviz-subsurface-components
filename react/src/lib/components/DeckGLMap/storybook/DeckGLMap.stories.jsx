@@ -350,11 +350,11 @@ MapMaterial.parameters = {
 // Exapmple of using "colorMapClampColor" property.
 // Clamps colormap to this color at ends.
 // Given as array of three values (r,g,b) e.g: [255, 0, 0]
-// If not set (undefined) it will clamp to color map min and max values.
+// If not set (undefined) or set to true, it will clamp to color map min and max values.
 // If set to false the clamp color will be completely transparent.
 const propertyValueRange = [2782, 3513];
 const colorMapRange = [3000, 3513];
-const colorMapClampColor = [0, 255, 0]; //  a color e.g. [0, 255, 0],  false or undefined.
+const colorMapClampColor = [0, 255, 0]; // a color e.g. [0, 255, 0],  false, true or undefined.
 
 export const MapClampColor = MinimalTemplate.bind({});
 MapClampColor.args = {
