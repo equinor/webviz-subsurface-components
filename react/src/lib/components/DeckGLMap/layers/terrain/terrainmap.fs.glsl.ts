@@ -32,6 +32,9 @@ uniform float valueRangeMax;
 uniform float colorMapRangeMin;
 uniform float colorMapRangeMax;
 
+uniform vec4 colorMapClampColor;
+uniform bool isClampColor;
+
 
 void main(void) {
    geometry.uv = vTexCoord;
@@ -99,11 +102,32 @@ void main(void) {
       // If colorMapRangeMin/Max specified, color map will span this interval.
       propertyValue  = propertyValue_norm * (valueRangeMax - valueRangeMin) + valueRangeMin;
       float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-      x = max(0.0, x);
-      x = min(1.0, x);
+;
+      if (x < 0.0 || x > 1.0) {
+         // Out of range. Use clampcolor.
+         if (isClampColor) {
+            if (colorMapClampColor.w < 1.0) {
+               // Transparency in clampcolor.
+               discard;
+               return;
+            }
+            else {
+               color = colorMapClampColor;
+            }
+         }
+         else {
+            // Use min/max coilor to clamp.
+            x = max(0.0, x);
+            x = min(1.0, x);
 
-      color = texture2D(colormap, vec2(x, 0.5));
-      color.a = opcacity;
+            color = texture2D(colormap, vec2(x, 0.5));
+            color.a = opcacity;
+         }
+      }
+      else {
+         color = texture2D(colormap, vec2(x, 0.5));
+         color.a = opcacity;
+      }
    }
 
    bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;

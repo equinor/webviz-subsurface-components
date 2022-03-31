@@ -1,5 +1,7 @@
 import { create, parseDependencies } from "mathjs";
 
+import { ExpressionParsingData } from "../utils/VectorCalculatorTypes";
+
 const { parse } = create({
     parseDependencies,
 });
@@ -92,12 +94,6 @@ const parseExpression = (expression: string): ParsingResult => {
     }
 
     return { variables: variables };
-};
-
-export type ExpressionParsingData = {
-    isValid: boolean;
-    parsingMessage: string;
-    variables: string[];
 };
 
 export const getExpressionParseData = (

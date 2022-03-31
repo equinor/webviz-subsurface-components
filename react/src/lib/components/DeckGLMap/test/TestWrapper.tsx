@@ -4,7 +4,7 @@ import { createStore } from "../redux/store";
 import { testState } from "../../DeckGLMap/test/testReduxState";
 
 export const testStore = createStore(testState);
-testStore.dispatch = jest.fn();
+testStore.dispatch = jest.fn() as never;
 export const Wrapper = ({
     children,
 }: {
@@ -14,7 +14,7 @@ export const Wrapper = ({
 };
 
 export const emptytestStore = createStore({});
-emptytestStore.dispatch = jest.fn();
+emptytestStore.dispatch = jest.fn() as never;
 export const EmptyWrapper = ({
     children,
 }: {
