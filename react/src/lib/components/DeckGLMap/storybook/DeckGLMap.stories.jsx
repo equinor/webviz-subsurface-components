@@ -382,7 +382,7 @@ MapClampColor.args = {
 MapClampColor.parameters = {
     docs: {
         description: {
-            story: "An example usage of ....",
+            story: 'An example usage of map property `"colorMapClampColor"',
         },
         inlineStories: false,
         iframeHeight: 500,
