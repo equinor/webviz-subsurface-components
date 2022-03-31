@@ -39,9 +39,7 @@
       437720,
       6481113
     ],
-    "zoom": -3,
     "layers": [
-
       {
         "@@type": "ColormapLayer",
         "image": "@@#resources.propertyMap",
