@@ -310,7 +310,7 @@ const Map: React.FC<MapProps> = ({
                 //const layer_name = (info.layer?.props as ExtendedLayerProps<FeatureCollection>)?.name;
                 if (info.layer && info.layer.id === "wells-layer") {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    info.properties?.forEach((property:any) => {
+                    info.properties?.forEach((property: any) => {
                         let propname = property.name;
                         if (propname) {
                             const sep = propname.indexOf(" ");
