@@ -66,34 +66,4 @@ describe("Test Map component", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
     });
-
-    it("snapshot test with invalid array length", () => {
-        const { container } = render(
-            <DeckGLMap
-                id={mapData[0].id}
-                resources={mapData[0].resources}
-                layers={mapData[0].layers}
-                bounds={[0, 0, 0]}
-                zoom={mapData[0].zoom}
-                coords={mapData[0].coords}
-                scale={mapData[0].scale}
-                coordinateUnit={mapData[0].coordinateUnit}
-                legend={mapData[0].legend}
-                editedData={mapData[0].editedData}
-                views={{
-                    layout: [1, 1],
-                    viewports: [
-                        {
-                            id: "view_1",
-                            show3D: false,
-                            layerIds: [],
-                        },
-                    ],
-                }}
-                colorTables={[colorTablesData[0]]}
-                setProps={undefined}
-            />
-        );
-        expect(container.firstChild).toMatchSnapshot();
-    });
 });
