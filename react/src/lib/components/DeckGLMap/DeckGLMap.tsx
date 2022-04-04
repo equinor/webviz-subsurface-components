@@ -36,6 +36,11 @@ interface DeckGLMapProps {
     colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
+
+    /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema?: boolean;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -53,6 +58,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     colorTables,
     editedData,
     setProps,
+    checkDatafileSchema,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -110,6 +116,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 colorTables={colorTables}
                 editedData={editedData}
                 setEditedData={setEditedData}
+                checkDatafileSchema={checkDatafileSchema}
             />
         </ReduxProvider>
     );
@@ -121,6 +128,7 @@ DeckGLMap.defaultProps = {
         showLabel: false,
         viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
+    checkDatafileSchema: false,
 };
 
 const arrayOfLength_propTypes = (
