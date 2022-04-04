@@ -201,7 +201,7 @@ function GetTicks(
     max: number,
     axis_pixel_length: number
 ): number[] {
-    let step = Math.min(Math.round(axis_pixel_length / 50) + 1, 20);
+    let step = Math.min(Math.round(axis_pixel_length / 100) + 1, 20);
     const range = max - min;
 
     const delta = Math.abs(range) / step;
@@ -241,7 +241,7 @@ function GetTickLines(
     bounds: [number, number, number, number, number, number],
     viewport: Viewport
 ): [number[], string[]] {
-    const ndecimals = 1;
+    const ndecimals = 0;
 
     const x_min = bounds[0];
     const x_max = bounds[3];
