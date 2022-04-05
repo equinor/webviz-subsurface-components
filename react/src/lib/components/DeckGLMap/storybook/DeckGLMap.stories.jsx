@@ -276,8 +276,6 @@ const meshMapLayer = {
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [2782, 3513],
-    colorMapRange: [2815, 3513],
-    colorMapClampColor: [0, 100, 0, 0],
     rotDeg: 0,
     contours: [0, 50.0],
     isContoursDepth: false,
@@ -343,6 +341,48 @@ MapMaterial.parameters = {
     docs: {
         description: {
             story: "An example showing example usage of Map3D material property.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+// Exapmple of using "colorMapClampColor" property.
+// Clamps colormap to this color at ends.
+// Given as array of three values (r,g,b) e.g: [255, 0, 0]
+// If not set (undefined) or set to true, it will clamp to color map min and max values.
+// If set to false the clamp color will be completely transparent.
+const propertyValueRange = [2782, 3513];
+const colorMapRange = [3000, 3513];
+const colorMapClampColor = [0, 255, 0]; // a color e.g. [0, 255, 0],  false, true or undefined.
+
+export const MapClampColor = MinimalTemplate.bind({});
+MapClampColor.args = {
+    id: "clampcolor",
+    layers: [
+        {
+            ...meshMapLayer,
+            propertyValueRange,
+            colorMapRange,
+            colorMapClampColor,
+        },
+    ],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: [],
+            },
+        ],
+    },
+};
+MapClampColor.parameters = {
+    docs: {
+        description: {
+            story: 'An example usage of map property `"colorMapClampColor"',
         },
         inlineStories: false,
         iframeHeight: 500,
