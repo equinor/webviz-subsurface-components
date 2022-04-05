@@ -1,4 +1,5 @@
 import Map, { ViewsType } from "./components/Map";
+import { MapMouseEvent } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
@@ -36,6 +37,7 @@ interface DeckGLMapProps {
     colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
+    onMouseEvent?: (event: MapMouseEvent) => void;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -53,6 +55,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     colorTables,
     editedData,
     setProps,
+    onMouseEvent,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -110,6 +113,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 colorTables={colorTables}
                 editedData={editedData}
                 setEditedData={setEditedData}
+                onMouseEvent={onMouseEvent}
             />
         </ReduxProvider>
     );
