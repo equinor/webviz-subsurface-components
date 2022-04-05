@@ -27,7 +27,9 @@ export function validateSchema(data: unknown, schema_type: string): string {
 function createSchemaValidator(
     schema_type: string
 ): ValidateFunction<unknown> | null {
-    const ajv = new Ajv();
+    const ajv = new Ajv({
+        schemas: [wellLogSchema], // add list of dependent schemas
+    });
     let validator: ValidateFunction<unknown> | null = null;
 
     switch (schema_type) {
