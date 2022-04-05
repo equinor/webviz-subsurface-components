@@ -116,7 +116,8 @@ export function fillInfos(
         const visible = allTracks || (iFrom <= iTrack && iTrack < iTo);
         iTrack++;
         if (!visible) continue;
-        const collapsed = collapsedTrackIds.indexOf(_track.id) >= 0;
+        const collapsed =
+            collapsedTrackIds && collapsedTrackIds.indexOf(_track.id) >= 0;
 
         const track = _track as GraphTrack;
         if (grouping === "by_track" && track.plots && track.plots.length) {

@@ -193,10 +193,13 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const { caller, x, y } = event;
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
             if (event.target) {
+                const axisTitle = parent.props.axisTitles
+                    ? parent.props.axisTitles[parent.props.primaryAxis]
+                    : undefined;
                 event.target.textContent = Number.isFinite(value)
-                    ? `Pinned ${
-                          parent.props.axisTitles[parent.props.primaryAxis]
-                      }: ${value.toFixed(1)}`
+                    ? `Pinned ${axisTitle ? axisTitle : ""}: ${value.toFixed(
+                          1
+                      )}`
                     : "-";
                 event.target.style.visibility = "visible";
             }
@@ -206,10 +209,11 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const { caller, x, y } = event;
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
             if (event.target) {
+                const axisTitle = parent.props.axisTitles
+                    ? parent.props.axisTitles[parent.props.primaryAxis]
+                    : undefined;
                 event.target.textContent = Number.isFinite(value)
-                    ? `${
-                          parent.props.axisTitles[parent.props.primaryAxis]
-                      }: ${value.toFixed(1)}`
+                    ? `${axisTitle ? axisTitle : ""}: ${value.toFixed(1)}`
                     : "-";
                 event.target.style.visibility = "visible";
             }
@@ -613,7 +617,7 @@ interface Props {
     /**
      * Array of JSON objects describing well log data.
      */
-    welllog: WellLog;
+    welllog: WellLog | undefined;
     /**
      * Prop containing track template data.
      */
@@ -702,8 +706,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     constructor(props: Props) {
         super(props);
 
-        if (!props.welllog)
-            throw "No props.welllog given in wellLogView component";
+        //if (!props.welllog)
+        //    throw "No props.welllog given in wellLogView component";
 
         this.container = undefined;
         this.logController = undefined;
@@ -901,7 +905,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.setState({ errorText: errorTextTemplate });
         }
 
-        if (this.logController) {
+        if (this.logController && this.props.welllog) {
             const axes = this.getAxesInfo();
             setTracksToController(
                 this.logController,
@@ -1134,7 +1138,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         templateTrack.required = true; // user's tracks could be empty
         const bAfter = true;
 
-        let trackNew: Track;
+        let trackNew: Track | null;
         if (
             templateTrack.plots &&
             templateTrack.plots[0] &&
@@ -1156,16 +1160,18 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 bAfter
             );
         }
-        this.onTemplateChanged();
+        if (trackNew) {
+            this.onTemplateChanged();
 
-        if (bAfter)
-            // force new track to be visible when added after the current
-            this.scrollTrackBy(+1);
-        else {
-            this.onTrackScroll();
-            this.setInfo();
+            if (bAfter)
+                // force new track to be visible when added after the current
+                this.scrollTrackBy(+1);
+            else {
+                this.onTrackScroll();
+                this.setInfo();
+            }
+            this.selectTrack(trackNew, true);
         }
-        this.selectTrack(trackNew, true);
     }
 
     _editTrack(track: Track, templateTrack: TemplateTrack): void {

@@ -14,7 +14,7 @@ import { WellLogController } from "./WellLogView";
 import Scroller from "./Scroller";
 
 interface Props {
-    welllog: WellLog;
+    welllog: WellLog | undefined;
     template: Template;
     colorTables: ColorTable[];
     horizontal?: boolean;

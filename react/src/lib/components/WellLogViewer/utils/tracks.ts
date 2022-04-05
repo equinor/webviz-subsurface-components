@@ -578,15 +578,14 @@ function addGraphTrackPlot(
 
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
-    if (plotFactory) {
-        const welllog = wellLogView.props.welllog;
+    const welllog = wellLogView.props.welllog;
+    if (plotFactory && welllog) {
         const data = welllog.data;
         const curves = welllog.curves;
 
-        const iPrimaryAxis = indexOfElementByNames(
-            curves,
-            axes.mnemos[axes.primaryAxis]
-        );
+        const iPrimaryAxis = !axes.mnemos
+            ? -1
+            : indexOfElementByNames(curves, axes.mnemos[axes.primaryAxis]);
 
         const iCurve = indexOfElementByName(curves, templatePlot.name);
         if (iCurve < 0) console.log("iCurve < 0");
@@ -677,15 +676,14 @@ function editGraphTrackPlot(
 
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
-    if (plotFactory) {
-        const welllog = wellLogView.props.welllog;
+    const welllog = wellLogView.props.welllog;
+    if (plotFactory && welllog) {
         const data = welllog.data;
         const curves = welllog.curves;
 
-        const iPrimaryAxis = indexOfElementByNames(
-            curves,
-            axes.mnemos[axes.primaryAxis]
-        );
+        const iPrimaryAxis = !axes.mnemos
+            ? -1
+            : indexOfElementByNames(curves, axes.mnemos[axes.primaryAxis]);
 
         const iCurve = indexOfElementByName(curves, templatePlot.name);
         if (iCurve < 0) console.log("iCurve < 0");
@@ -916,8 +914,14 @@ const createStackData = async (
     let prev = null;
     let area: AreaData | null = null;
     for (const p of data) {
-        if (prev) {
-            const value = p[1]; // current value
+        const value = p[1]; // current value
+        if (!prev) {
+            if (value !== null && value !== undefined) {
+                // new value is not null
+                // create new interval colored and labeled for the value
+                area = createAreaData(meta, p[0], p[0], value);
+            }
+        } else {
             if (value === prev[1]) {
                 // value is not changed
                 // extend current interval
@@ -1051,10 +1055,9 @@ function addScaleTracks(
 ): void {
     const titlePrimaryAxis = axes.titles[axes.primaryAxis];
     const curvePrimaryAxis = curves[iPrimaryAxis];
-    const iSecondaryAxis = indexOfElementByNames(
-        curves,
-        axes.mnemos[axes.secondaryAxis]
-    );
+    const iSecondaryAxis = !axes.mnemos
+        ? -1
+        : indexOfElementByNames(curves, axes.mnemos[axes.secondaryAxis]);
 
     if (iSecondaryAxis >= 0) {
         info.tracks.push(
@@ -1278,10 +1281,9 @@ export function createTracks(
     const data = welllog.data;
     const curves = welllog.curves;
 
-    const iPrimaryAxis = indexOfElementByNames(
-        curves,
-        axes.mnemos[axes.primaryAxis]
-    );
+    const iPrimaryAxis = !axes.mnemos
+        ? -1
+        : indexOfElementByNames(curves, axes.mnemos[axes.primaryAxis]);
     if (iPrimaryAxis >= 0)
         // scale tracks are needed
         addScaleTracks(info, axes, curves, data, iPrimaryAxis);
@@ -1399,9 +1401,10 @@ export function addOrEditStackedTrack(
     templateTrack: TemplateTrack,
     trackCurrent: Track,
     bAfter: boolean
-): StackedTrack {
+): StackedTrack | null {
     const welllog = wellLogView.props.welllog;
     const templatePlot = templateTrack.plots[0];
+    if (!welllog || !templatePlot) return null;
     const name = templatePlot.name;
     const meta = getDiscreteMeta(welllog, name);
     const data = welllog.data;
