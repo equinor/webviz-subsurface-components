@@ -243,8 +243,8 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         if (checkDatafileSchema) {
             setErrorText(validate(deckGLLayers));
-        }
-    }, [deckGLLayers]);
+        } else setErrorText("");
+    }, [checkDatafileSchema, deckGLLayers]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
