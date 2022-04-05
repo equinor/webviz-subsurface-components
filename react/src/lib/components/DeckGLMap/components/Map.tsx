@@ -172,7 +172,25 @@ export interface MapProps {
      */
     checkDatafileSchema?: boolean;
 
+    /**
+     * For get mouse events
+     */
+    onMouseEvent?: (event: MapMouseEvent) => void;
+
     children?: React.ReactNode;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PickingInfo = any;
+export interface MapMouseEvent {
+    type: "click" | "hover" | "contextmenu";
+    infos: PickingInfo[];
+    // some frequently used values extracted from infos:
+    x?: number;
+    y?: number;
+    wellname?: string;
+    md?: number;
+    tvd?: number;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -191,6 +209,7 @@ const Map: React.FC<MapProps> = ({
     editedData,
     setEditedData,
     checkDatafileSchema,
+    onMouseEvent,
     children,
 }: MapProps) => {
     // state for initial views prop (target and zoom) of DeckGL component
@@ -250,20 +269,82 @@ const Map: React.FC<MapProps> = ({
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
         (pickInfo, event) => {
-            if (coords?.multiPicking && pickInfo.layer) {
-                const infos = pickInfo.layer.context.deck.pickMultipleObjects({
-                    x: event.offsetCenter.x,
-                    y: event.offsetCenter.y,
-                    radius: 1,
-                    depth: coords.pickDepth,
-                });
-                setHoverInfo(infos);
-            } else {
-                setHoverInfo([pickInfo]);
-            }
+            const infos = getPickingInfos(pickInfo, event);
+            setHoverInfo(infos); //  for InfoCard pickInfos
+            callOnMouseEvent("hover", infos, event);
         },
-        [coords]
+        [coords, onMouseEvent]
     );
+
+    const onClick = useCallback(
+        (pickInfo, event) => {
+            const infos = getPickingInfos(pickInfo, event);
+            callOnMouseEvent("click", infos, event);
+        },
+        [coords, onMouseEvent]
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getPickingInfos = (
+        pickInfo: PickingInfo,
+        event: any
+    ): PickingInfo[] => {
+        if (coords?.multiPicking && pickInfo.layer) {
+            return pickInfo.layer.context.deck.pickMultipleObjects({
+                x: event.offsetCenter.x,
+                y: event.offsetCenter.y,
+                radius: 1,
+                depth: coords.pickDepth,
+            });
+        }
+        return [pickInfo];
+    };
+
+    /**
+     * call onMouseEvent callback
+     */
+    const callOnMouseEvent = (
+        type: "click" | "hover",
+        infos: PickingInfo[],
+        event: any
+    ): void => {
+        if (onMouseEvent) {
+            const ev: MapMouseEvent = {
+                type: type,
+                infos: infos,
+            };
+            if (ev.type === "click") {
+                if (event.rightButton) ev.type = "contextmenu";
+            }
+            for (const info of infos) {
+                if (info.coordinate) {
+                    ev.x = info.coordinate[0];
+                    ev.y = info.coordinate[1];
+                }
+                //const layer_name = (info.layer?.props as ExtendedLayerProps<FeatureCollection>)?.name;
+                if (info.layer && info.layer.id === "wells-layer") {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    info.properties?.forEach((property: any) => {
+                        let propname = property.name;
+                        if (propname) {
+                            const sep = propname.indexOf(" ");
+                            if (sep >= 0) {
+                                // it is a simple hack to get well name previously added to the end of property name
+                                ev.wellname = propname.substring(sep + 1);
+                                propname = propname.substring(0, sep);
+                            }
+                        }
+                        if (propname === "MD")
+                            ev.md = parseFloat(property.value);
+                        else if (propname === "TVD")
+                            ev.tvd = parseFloat(property.value);
+                    });
+                    break;
+                }
+            }
+            onMouseEvent(ev);
+        }
+    };
 
     const deckRef = useRef<DeckGL>(null);
     const [viewState, setViewState] = useState<ViewStateProps>();
@@ -364,6 +445,7 @@ const Map: React.FC<MapProps> = ({
                 }}
                 ref={deckRef}
                 onHover={onHover}
+                onClick={onClick}
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
                 }
