@@ -852,13 +852,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.template,
                 "WellLogTemplate"
             );
-            if (errorTextTemplate)
-                errorTextTemplate = "Template: " + errorTextTemplate;
 
             if (this.props.checkDatafileSchema) {
-                let errorText = validateSchema(this.props.welllog, "WellLog");
+                const errorText = validateSchema(this.props.welllog, "WellLog");
                 if (errorText) {
-                    if (errorText) errorText = "Datafile: " + errorText;
                     if (errorTextTemplate) errorTextTemplate += "; ";
                     errorTextTemplate += errorText;
                 }
