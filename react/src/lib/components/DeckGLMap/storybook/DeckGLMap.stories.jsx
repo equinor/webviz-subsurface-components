@@ -606,7 +606,7 @@ const sampleLogData = [
         },
         curves: [
             {
-                kjhkh: "MD",
+                _wrongName: "MD",
                 description: "Measured depth",
                 quantity: "length",
                 unit: "m",
@@ -629,12 +629,50 @@ const sampleLogData = [
     },
 ];
 
+const sampleWellsData = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                _wrongType: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Point",
+                        coordinates: [437506.854656, 6477887.47091],
+                    },
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [437506.85465554806, 6477887.47091465, 25.0],
+                            [
+                                437505.96268892975, 6477887.532817844,
+                                -83.9951103268622,
+                            ],
+                            [
+                                437505.8497621946, 6477887.5323076015,
+                                -97.94448791185415,
+                            ],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "15/9-19 A",
+                color: [28, 255, 12, 255],
+                md: [[0.0, 109.0, 122.94999694824219]],
+            },
+        },
+    ],
+};
+
 export const mapValidator = EditDataTemplate.bind();
 mapValidator.args = {
     ...exampleData[0],
     layers: [
         {
             ...exampleData[0].layers[4],
+            data: sampleWellsData,
             logData: sampleLogData,
         },
     ],

@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import Ajv from "ajv";
 import { ErrorObject, ValidateFunction } from "ajv/dist/types/index";
 
 // schema definations
+/* eslint-disable @typescript-eslint/no-var-requires */
+const wellsSchema = require("./Wells.json");
 const wellLogSchema = require("./WellLog.json");
 const wellLogsSchema = require("./WellLogs.json");
 const wellLogTemplateSchema = require("./WellLogTemplate.json");
@@ -21,7 +22,7 @@ export function validateSchema(data: unknown, schema_type: string): string {
     if (!validator) return "Wrong schema type.";
 
     validator(data);
-    return formatSchemaError(validator.errors);
+    return formatSchemaError(schema_type, validator.errors);
 }
 
 function createSchemaValidator(
@@ -33,6 +34,9 @@ function createSchemaValidator(
     let validator: ValidateFunction<unknown> | null = null;
 
     switch (schema_type) {
+        case "Wells":
+            validator = ajv.compile(wellsSchema);
+            break;
         case "WellLog":
             validator = ajv.compile(wellLogSchema);
             break;
@@ -48,11 +52,17 @@ function createSchemaValidator(
     return validator;
 }
 
-function formatSchemaError(errors?: ErrorObject[] | null): string {
-    if (!errors) return "";
-    if (!errors[0]) return "JSON schema validation failed";
-    return (
-        (errors[0].dataPath ? errors[0].dataPath + ": " : "") +
-        errors[0].message
-    );
+function formatSchemaError(
+    schema_type: string,
+    errors?: ErrorObject[] | null
+): string {
+    let error_text = "";
+    if (!errors) return error_text;
+
+    if (errors[0]) {
+        error_text =
+            (errors[0].dataPath ? errors[0].dataPath + ": " : "") +
+            errors[0].message;
+    } else error_text = "JSON schema validation failed";
+    return `${schema_type}: ${error_text}.`;
 }

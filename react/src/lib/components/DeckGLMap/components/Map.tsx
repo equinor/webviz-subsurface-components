@@ -258,13 +258,6 @@ const Map: React.FC<MapProps> = ({
         setDeckGLLayers(jsonToObject(layers, enumerations) as Layer<unknown>[]);
     }, [st_layers, resources, editedData]);
 
-    const [errorText, setErrorText] = useState("");
-    useEffect(() => {
-        if (checkDatafileSchema) {
-            setErrorText(validate(deckGLLayers));
-        } else setErrorText("");
-    }, [checkDatafileSchema, deckGLLayers]);
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
@@ -386,6 +379,13 @@ const Map: React.FC<MapProps> = ({
         }
     }, [deckGLLayers]);
 
+    const [errorText, setErrorText] = useState<string>();
+    useEffect(() => {
+        if (checkDatafileSchema && !isEmpty(deckGLLayers) && isLoaded) {
+            setErrorText(validate(deckGLLayers));
+        } else setErrorText(undefined);
+    }, [checkDatafileSchema, deckGLLayers, isLoaded]);
+
     const layerFilter = useCallback(
         (args: {
             layer: Layer<unknown, LayerProps<unknown>>;
@@ -505,8 +505,8 @@ const Map: React.FC<MapProps> = ({
 
             {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
 
-            {errorText ? (
-                <div
+            {errorText && (
+                <pre
                     style={{
                         flex: "0, 0",
                         color: "rgb(255, 64, 64)",
@@ -514,8 +514,8 @@ const Map: React.FC<MapProps> = ({
                     }}
                 >
                     {errorText}
-                </div>
-            ) : null}
+                </pre>
+            )}
         </div>
     );
 };
@@ -658,12 +658,23 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
 }
 
 // schema validator
-function validate(layers?: Layer<unknown>[]): string {
-    const wells_layer_props = layers?.find((l) => l.id === "wells-layer")
-        ?.props as WellsLayerProps<FeatureCollection>;
-    const log_data = wells_layer_props?.logData;
+function validate(layers?: Layer<unknown>[]): string | undefined {
+    // validate Well logs and trajectories
+    const wells_layer = layers?.find((l) => l.id === "wells-layer");
+    const wells_layer_props =
+        wells_layer?.props as WellsLayerProps<FeatureCollection>;
 
-    let error_text = validateSchema(log_data, "WellLogs");
-    if (error_text) error_text = "Datafile: " + error_text;
-    return error_text;
+    if (!wells_layer?.isLoaded) return undefined;
+
+    const wells_data = wells_layer_props?.data;
+    const logs_data = wells_layer_props?.logData;
+
+    const errors: string[] = [];
+    let error_text = validateSchema(wells_data, "Wells");
+    if (error_text) errors.push(error_text);
+
+    error_text = validateSchema(logs_data, "WellLogs");
+    if (error_text) errors.push(error_text);
+
+    return errors.join("\n");
 }
