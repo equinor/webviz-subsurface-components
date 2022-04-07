@@ -1,3 +1,139 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Test Color Legend snapshot test 1`] = `null`;
+
+exports[`Test Color Legend snapshot test continous legend 1`] = `
+<div
+  style="position: absolute; right: 16px; top: 10px;"
+>
+  <div
+    id="legend"
+    style="width: 100px; height: 150px;"
+  >
+    <svg
+      class="axis"
+      height="150"
+      style="background-color: rgba(255, 255, 255, 0.8); border-radius: 5px;"
+      width="100"
+    >
+      <defs>
+        <lineargradient
+          id="linear-gradient"
+          x1="0%"
+          x2="0%"
+          y1="0%"
+          y2="100%"
+        >
+          <stop
+            offset="0%"
+            stop-color="#ff0000"
+          />
+          <stop
+            offset="20%"
+            stop-color="#b6b600"
+          />
+          <stop
+            offset="40%"
+            stop-color="#00ff00"
+          />
+          <stop
+            offset="60%"
+            stop-color="#00b6b6"
+          />
+          <stop
+            offset="80%"
+            stop-color="#0000ff"
+          />
+          <stop
+            offset="100%"
+            stop-color="#b600b6"
+          />
+        </lineargradient>
+      </defs>
+      <text
+        class="legendTitle"
+        style="text-anchor: left;"
+        x="25"
+        y="20"
+      >
+        Wells / PORO
+      </text>
+      <rect
+        height="150"
+        style="fill: url(#linear-gradient);"
+        width="25"
+        x="25"
+        y="30"
+      />
+      <g
+        fill="none"
+        font-family="sans-serif"
+        font-size="10"
+        style="font-size: 10px; font-weight: 700;"
+        text-anchor="start"
+        transform="translate(25, 20)"
+      >
+        <path
+          class="domain"
+          d="M24,10.5H0.5V127.5H24"
+          stroke="currentColor"
+        />
+        <g
+          class="tick"
+          opacity="1"
+          transform="translate(0,10.5)"
+        >
+          <line
+            stroke="currentColor"
+            x2="24"
+          />
+          <text
+            dy="0.32em"
+            fill="currentColor"
+            x="27"
+          >
+            0.00
+          </text>
+        </g>
+        <g
+          class="tick"
+          opacity="1"
+          transform="translate(0,127.5)"
+        >
+          <line
+            stroke="currentColor"
+            x2="24"
+          />
+          <text
+            dy="0.32em"
+            fill="currentColor"
+            x="27"
+          >
+            0.35
+          </text>
+        </g>
+      </g>
+    </svg>
+  </div>
+</div>
+`;
+
+exports[`Test Color Legend snapshot test with discrete pattern 1`] = `
+<div
+  style="position: absolute; right: 16px; top: 10px; background-color: rgba(255, 255, 255, 0.8); border-radius: 5px;"
+>
+  <div
+    id="legend"
+    style="margin-right: 41px; margin-top: 5px;"
+  >
+    <div
+      style="margin-bottom: 5px;"
+      y="10"
+    />
+    <svg
+      height="0px"
+      width="220px"
+    />
+  </div>
+</div>
+`;
