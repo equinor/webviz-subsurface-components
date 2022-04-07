@@ -134,18 +134,17 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
 
     menuRemovePlotItems(): ReactNode[] {
         const nodes: ReactNode[] = [];
-        const track = this.props.track;
-        const plots = (track as GraphTrack).plots;
-
         const welllog = this.props.wellLogView.props.welllog;
-        const curves = welllog.curves;
-
-        for (const plot of plots) {
-            const iCurve = plot.id as number;
-            const title = getPlotTitle(plot) || curves[iCurve].name;
-            nodes.push(this.createRemovePlotMenuItem(title, plot));
+        if (welllog) {
+            const track = this.props.track;
+            const plots = (track as GraphTrack).plots;
+            const curves = welllog.curves;
+            for (const plot of plots) {
+                const iCurve = plot.id as number;
+                const title = getPlotTitle(plot) || curves[iCurve].name;
+                nodes.push(this.createRemovePlotMenuItem(title, plot));
+            }
         }
-
         return nodes;
     }
 
@@ -171,18 +170,17 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
 
     menuEditPlotItems(): ReactNode[] {
         const nodes: ReactNode[] = [];
-        const track = this.props.track;
-        const plots = (track as GraphTrack).plots;
-
         const welllog = this.props.wellLogView.props.welllog;
-        const curves = welllog.curves;
-
-        for (const plot of plots) {
-            const iCurve = plot.id as number;
-            const title = getPlotTitle(plot) || curves[iCurve].name;
-            nodes.push(this.createEditPlotMenuItem(title, plot));
+        if (welllog) {
+            const track = this.props.track;
+            const plots = (track as GraphTrack).plots;
+            const curves = welllog.curves;
+            for (const plot of plots) {
+                const iCurve = plot.id as number;
+                const title = getPlotTitle(plot) || curves[iCurve].name;
+                nodes.push(this.createEditPlotMenuItem(title, plot));
+            }
         }
-
         return nodes;
     }
 

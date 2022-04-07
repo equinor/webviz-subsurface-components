@@ -7,7 +7,7 @@ import { createStore } from "./redux/store";
 import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
-interface DeckGLMapProps {
+export interface DeckGLMapProps {
     id: string;
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[];
