@@ -147,32 +147,4 @@ describe("test layers settings button", () => {
             type: "spec/updateLayerProp",
         });
     });
-
-    it("tests menu input", async () => {
-        const drawing_layer = testState.layers.find(
-            (item) => item["@@type"] === "WellsLayer"
-        );
-        const { rerender } = drawing_layer
-            ? render(
-                  Wrapper({
-                      children: <LayerSettingsButton layer={drawing_layer} />,
-                  })
-              )
-            : render(<div />);
-        drawing_layer &&
-            rerender(
-                Wrapper({
-                    children: <LayerSettingsButton layer={{}} />,
-                })
-            );
-        // userEvent.click(screen.getByRole("button"));
-        // const wells_layer_settings_menu = screen.getByRole("menu");
-        // expect(wells_layer_settings_menu).toBeInTheDocument();
-        // fireEvent.change(screen.getByRole("slider"), { target: { value: 25 } });
-        // expect(testStore.dispatch).toHaveBeenCalledTimes(11);
-        // expect(testStore.dispatch).toHaveBeenNthCalledWith(11, {
-        //     payload: ["wells-layer", "opacity", 0.25],
-        //     type: "spec/updateLayerProp",
-        // });
-    });
 });
