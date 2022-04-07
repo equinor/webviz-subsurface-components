@@ -9,7 +9,6 @@ import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getLayersByType } from "../layers/utils/layerTools";
 
 interface ColorLegendProps {
-    visible?: boolean | null;
     position?: number[] | null;
     horizontal?: boolean | null;
     layers: Layer<unknown>[];
@@ -18,7 +17,6 @@ interface ColorLegendProps {
 
 // Todo: Adapt it for other layers too
 const ColorLegend: React.FC<ColorLegendProps> = ({
-    visible,
     position,
     horizontal,
     layers,
@@ -68,10 +66,8 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     const [showLegend, setShowLegend] = React.useState<boolean | null>();
     React.useEffect(() => {
         // check log_curves from layer manager
-        setShowLegend(
-            visible && wellsLayer?.props.visible && wellsLayer?.props.logCurves
-        );
-    }, [visible, wellsLayer?.props.visible, wellsLayer?.props.logCurves]);
+        setShowLegend(wellsLayer?.props.visible && wellsLayer?.props.logCurves);
+    }, [wellsLayer?.props.visible, wellsLayer?.props.logCurves]);
 
     if (!showLegend) return null;
     return (
@@ -102,7 +98,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
 };
 
 ColorLegend.defaultProps = {
-    visible: true,
     position: [5, 10],
     horizontal: false,
 };
