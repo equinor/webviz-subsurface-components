@@ -1,14 +1,14 @@
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 import { PickInfo } from "deck.gl";
-import { Feature, FeatureCollection } from "geojson";
+import { Feature } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setSpec } from "../redux/actions";
-import { WellsLayerProps, WellsPickInfo } from "../layers/wells/wellsLayer";
+import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
@@ -28,7 +28,7 @@ import {
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";
-import { validateSchema } from "../../../inputSchema/validator";
+import { validateLayers } from "../../../inputSchema/schemaValidationUtil";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
@@ -382,7 +382,7 @@ const Map: React.FC<MapProps> = ({
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
         if (checkDatafileSchema && !isEmpty(deckGLLayers) && isLoaded) {
-            setErrorText(validate(deckGLLayers));
+            setErrorText(validateLayers(deckGLLayers));
         } else setErrorText(undefined);
     }, [checkDatafileSchema, deckGLLayers, isLoaded]);
 
@@ -655,26 +655,4 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
         }
     }
     return deckgl_views;
-}
-
-// schema validator
-function validate(layers?: Layer<unknown>[]): string | undefined {
-    // validate Well logs and trajectories
-    const wells_layer = layers?.find((l) => l.id === "wells-layer");
-    const wells_layer_props =
-        wells_layer?.props as WellsLayerProps<FeatureCollection>;
-
-    if (!wells_layer?.isLoaded) return undefined;
-
-    const wells_data = wells_layer_props?.data;
-    const logs_data = wells_layer_props?.logData;
-
-    const errors: string[] = [];
-    let error_text = validateSchema(wells_data, "Wells");
-    if (error_text) errors.push(error_text);
-
-    error_text = validateSchema(logs_data, "WellLogs");
-    if (error_text) errors.push(error_text);
-
-    return errors.join("\n");
 }
