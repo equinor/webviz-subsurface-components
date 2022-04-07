@@ -1,14 +1,14 @@
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 import { PickInfo } from "deck.gl";
-import { Feature } from "geojson";
+import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setSpec } from "../redux/actions";
-import { WellsPickInfo } from "../layers/wells/wellsLayer";
+import { WellsLayerProps, WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
@@ -28,6 +28,7 @@ import {
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";
+import { validateSchema } from "../../../inputSchema/validator";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
@@ -166,7 +167,30 @@ export interface MapProps {
      */
     setEditedData?: (data: Record<string, unknown>) => void;
 
+    /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema?: boolean;
+
+    /**
+     * For get mouse events
+     */
+    onMouseEvent?: (event: MapMouseEvent) => void;
+
     children?: React.ReactNode;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PickingInfo = any;
+export interface MapMouseEvent {
+    type: "click" | "hover" | "contextmenu";
+    infos: PickingInfo[];
+    // some frequently used values extracted from infos:
+    x?: number;
+    y?: number;
+    wellname?: string;
+    md?: number;
+    tvd?: number;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -184,6 +208,8 @@ const Map: React.FC<MapProps> = ({
     colorTables,
     editedData,
     setEditedData,
+    checkDatafileSchema,
+    onMouseEvent,
     children,
 }: MapProps) => {
     // state for initial views prop (target and zoom) of DeckGL component
@@ -232,24 +258,93 @@ const Map: React.FC<MapProps> = ({
         setDeckGLLayers(jsonToObject(layers, enumerations) as Layer<unknown>[]);
     }, [st_layers, resources, editedData]);
 
+    const [errorText, setErrorText] = useState("");
+    useEffect(() => {
+        if (checkDatafileSchema) {
+            setErrorText(validate(deckGLLayers));
+        } else setErrorText("");
+    }, [checkDatafileSchema, deckGLLayers]);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
         (pickInfo, event) => {
-            if (coords?.multiPicking && pickInfo.layer) {
-                const infos = pickInfo.layer.context.deck.pickMultipleObjects({
-                    x: event.offsetCenter.x,
-                    y: event.offsetCenter.y,
-                    radius: 1,
-                    depth: coords.pickDepth,
-                });
-                setHoverInfo(infos);
-            } else {
-                setHoverInfo([pickInfo]);
-            }
+            const infos = getPickingInfos(pickInfo, event);
+            setHoverInfo(infos); //  for InfoCard pickInfos
+            callOnMouseEvent("hover", infos, event);
         },
-        [coords]
+        [coords, onMouseEvent]
     );
+
+    const onClick = useCallback(
+        (pickInfo, event) => {
+            const infos = getPickingInfos(pickInfo, event);
+            callOnMouseEvent("click", infos, event);
+        },
+        [coords, onMouseEvent]
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getPickingInfos = (
+        pickInfo: PickingInfo,
+        event: any
+    ): PickingInfo[] => {
+        if (coords?.multiPicking && pickInfo.layer) {
+            return pickInfo.layer.context.deck.pickMultipleObjects({
+                x: event.offsetCenter.x,
+                y: event.offsetCenter.y,
+                radius: 1,
+                depth: coords.pickDepth,
+            });
+        }
+        return [pickInfo];
+    };
+
+    /**
+     * call onMouseEvent callback
+     */
+    const callOnMouseEvent = (
+        type: "click" | "hover",
+        infos: PickingInfo[],
+        event: any
+    ): void => {
+        if (onMouseEvent) {
+            const ev: MapMouseEvent = {
+                type: type,
+                infos: infos,
+            };
+            if (ev.type === "click") {
+                if (event.rightButton) ev.type = "contextmenu";
+            }
+            for (const info of infos) {
+                if (info.coordinate) {
+                    ev.x = info.coordinate[0];
+                    ev.y = info.coordinate[1];
+                }
+                //const layer_name = (info.layer?.props as ExtendedLayerProps<FeatureCollection>)?.name;
+                if (info.layer && info.layer.id === "wells-layer") {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    info.properties?.forEach((property: any) => {
+                        let propname = property.name;
+                        if (propname) {
+                            const sep = propname.indexOf(" ");
+                            if (sep >= 0) {
+                                // it is a simple hack to get well name previously added to the end of property name
+                                ev.wellname = propname.substring(sep + 1);
+                                propname = propname.substring(0, sep);
+                            }
+                        }
+                        if (propname === "MD")
+                            ev.md = parseFloat(property.value);
+                        else if (propname === "TVD")
+                            ev.tvd = parseFloat(property.value);
+                    });
+                    break;
+                }
+            }
+            onMouseEvent(ev);
+        }
+    };
 
     const deckRef = useRef<DeckGL>(null);
     const [viewState, setViewState] = useState<ViewStateProps>();
@@ -350,6 +445,7 @@ const Map: React.FC<MapProps> = ({
                 }}
                 ref={deckRef}
                 onHover={onHover}
+                onClick={onClick}
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
                 }
@@ -364,7 +460,7 @@ const Map: React.FC<MapProps> = ({
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
-                            {colorTables && (
+                            {colorTables && legend?.visible && (
                                 <ColorLegend
                                     {...legend}
                                     layers={
@@ -408,6 +504,18 @@ const Map: React.FC<MapProps> = ({
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
 
             {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
+
+            {errorText ? (
+                <div
+                    style={{
+                        flex: "0, 0",
+                        color: "rgb(255, 64, 64)",
+                        backgroundColor: "rgb(255, 255, 192)",
+                    }}
+                >
+                    {errorText}
+                </div>
+            ) : null}
         </div>
     );
 };
@@ -439,6 +547,7 @@ Map.defaultProps = {
         viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
     colorTables: colorTables,
+    checkDatafileSchema: false,
 };
 
 export default Map;
@@ -546,4 +655,15 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
         }
     }
     return deckgl_views;
+}
+
+// schema validator
+function validate(layers?: Layer<unknown>[]): string {
+    const wells_layer_props = layers?.find((l) => l.id === "wells-layer")
+        ?.props as WellsLayerProps<FeatureCollection>;
+    const log_data = wells_layer_props?.logData;
+
+    let error_text = validateSchema(log_data, "WellLogs");
+    if (error_text) error_text = "Datafile: " + error_text;
+    return error_text;
 }
