@@ -18,23 +18,6 @@ const layers = getLayersWithDefaultProps(exampleData[0].layers);
 const views = exampleData[0].views;
 
 describe("Test Color Legend", () => {
-    it("snapshot test", () => {
-        const { container } = render(
-            <ColorLegend
-                layers={
-                    getLayersInViewport(
-                        layers,
-                        views.viewports.layerIds
-                    ) as Layer<unknown>[]
-                }
-                colorTables={example_color_table}
-                visible={true}
-                position={[16, 10]}
-                horizontal={false}
-            />
-        );
-        expect(container.firstChild).toMatchSnapshot();
-    });
     it("snapshot test continous legend", () => {
         const { container } = render(
             <ContinuousLegend

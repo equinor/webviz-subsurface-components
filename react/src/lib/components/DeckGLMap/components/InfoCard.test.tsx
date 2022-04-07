@@ -17,11 +17,13 @@ describe("Test Info Card", () => {
                     {
                         x: 152,
                         y: 254,
+                        // @ts-expect-error: to be fixed
                         radius: 1,
                         depth: 638,
                         coordinate: [111, 222],
                     },
                     {
+                        // @ts-expect-error: to be fixed
                         layer: { id: "wells-layer" },
                         property: { name: "Poro WellA", value: 123 },
                     },
@@ -37,6 +39,7 @@ describe("Test Info Card", () => {
                     {
                         x: 152,
                         y: 254,
+                        // @ts-expect-error: to be fixed
                         radius: 1,
                         depth: 638,
                         coordinate: [111, 222],
@@ -56,6 +59,7 @@ describe("Test Info Card", () => {
                     {
                         x: 152,
                         y: 254,
+                        // @ts-expect-error: to be fixed
                         radius: 1,
                         depth: 638,
                         coordinate: undefined,
