@@ -1,10 +1,11 @@
-import { CompositeLayer } from "@deck.gl/core";
+import { CompositeLayer, Viewport } from "@deck.gl/core";
 import BoxLayer from "./boxLayer";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { TextLayer, TextLayerProps } from "@deck.gl/layers";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
+import { Position3D } from "@deck.gl/core/utils/positions";
 
 export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     bounds: [number, number, number, number, number, number];
@@ -12,8 +13,8 @@ export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
 
 type TextLayerData = {
     label: string;
-    from: [number, number, number]; // tick line start
-    to: [number, number, number]; // tick line end
+    from: Position3D; // tick line start
+    to: Position3D; // tick line end
     size: number; // font size
 };
 
@@ -23,14 +24,19 @@ export default class AxesLayer extends CompositeLayer<
 > {
     initializeState(): void {
         const box_lines = GetBoxLines(this.props.bounds);
-        const [tick_lines, tick_labels] = GetTickLines(this.props.bounds);
-        const textlayer_data = maketextLayerData(
+
+        const [tick_lines, tick_labels] = GetTickLines(
+            this.props.bounds,
+            this.context.viewport
+        );
+
+        const textlayerData = maketextLayerData(
             tick_lines,
             tick_labels,
             this.props.bounds
         );
 
-        this.setState({ box_lines, tick_lines, tick_labels, textlayer_data });
+        this.setState({ box_lines, tick_lines, textlayerData });
     }
 
     shouldUpdateState({
@@ -50,12 +56,19 @@ export default class AxesLayer extends CompositeLayer<
     }
 
     updateState(): void {
+        const box_lines = GetBoxLines(this.props.bounds);
+
+        const [tick_lines, tick_labels] = GetTickLines(
+            this.props.bounds,
+            this.context.viewport
+        );
         const textlayerData = maketextLayerData(
-            this.state.tick_lines,
-            this.state.tick_labels,
+            tick_lines,
+            tick_labels,
             this.props.bounds
         );
-        this.setState({ textlayerData });
+
+        this.setState({ box_lines, tick_lines, textlayerData });
     }
 
     getAnchor(d: TextLayerData): string {
@@ -106,6 +119,23 @@ AxesLayer.defaultProps = layersDefaultProps[
 ] as AxesLayerProps<unknown>;
 
 //-- Local functions. -------------------------------------------------
+
+function LineLengthInPixels(
+    p0: Position3D,
+    p1: Position3D,
+    viewport: Viewport
+): number {
+    const screen_from = viewport.project(p0);
+    const screen_to = viewport.project(p1);
+
+    const v = [
+        screen_from[0] - screen_to[0],
+        screen_from[1] - screen_to[1],
+        screen_from[2] - screen_to[2],
+    ];
+    const L = Math.sqrt(v[0] * v[0] + v[1] * v[1]); // Length of axis on screen in pixles.
+    return L;
+}
 
 function maketextLayerData(
     tick_lines: number[],
@@ -160,15 +190,18 @@ function maketextLayerData(
         ];
         const label = tick_labels[i];
 
-        data.push({ label: label, from: from, to: to, size: 12 });
+        data.push({ label: label, from: from, to: to, size: 11 });
     }
 
     return data as [TextLayerData];
 }
 
-function GetTicks(min: number, max: number): number[] {
-    let step = 4;
-
+function GetTicks(
+    min: number,
+    max: number,
+    axis_pixel_length: number
+): number[] {
+    let step = Math.min(Math.round(axis_pixel_length / 100) + 1, 20);
     const range = max - min;
 
     const delta = Math.abs(range) / step;
@@ -195,7 +228,7 @@ function GetTicks(min: number, max: number): number[] {
 
     const ticks: number[] = [];
 
-    //ticks.push(min);  SKIP FIRST AND LAST
+    //ticks.push(min);
     for (let i = 0; i <= step; i++) {
         const x = start + i * incr;
         ticks.push(x);
@@ -205,9 +238,10 @@ function GetTicks(min: number, max: number): number[] {
 }
 
 function GetTickLines(
-    bounds: [number, number, number, number, number, number]
+    bounds: [number, number, number, number, number, number],
+    viewport: Viewport
 ): [number[], string[]] {
-    const ndecimals = 1;
+    const ndecimals = 0;
 
     const x_min = bounds[0];
     const x_max = bounds[3];
@@ -228,7 +262,13 @@ function GetTickLines(
 
     const delta = dz * 0.025; // length of tick marks.
 
-    const z_ticks = GetTicks(z_min, z_max);
+    const Lz = LineLengthInPixels(
+        [x_min, y_min, z_min],
+        [x_min, y_min, z_max],
+        viewport
+    );
+
+    const z_ticks = GetTicks(z_min, z_max, Lz);
     for (let i = 0; i < z_ticks.length; i++) {
         const tick = z_ticks[i];
 
@@ -243,7 +283,7 @@ function GetTickLines(
         lines.push(y_tick);
         lines.push(tick);
 
-        // tick line end. lLt tick mark point 45 degrees out from z axis.
+        // tick line end. let tick mark point 45 degrees out from z axis.
         const x = -delta * Math.cos(3.14157 / 4);
         const y = -delta * Math.sin(3.14157 / 4);
         lines.push(x_tick + x);
@@ -251,7 +291,12 @@ function GetTickLines(
         lines.push(tick);
     }
 
-    const x_ticks = GetTicks(x_min, x_max);
+    const Lx = LineLengthInPixels(
+        [x_min, y_min, z_min],
+        [x_max, y_min, z_min],
+        viewport
+    );
+    const x_ticks = GetTicks(x_min, x_max, Lx);
     for (let i = 0; i < x_ticks.length; i++) {
         const tick = x_ticks[i];
 
@@ -274,7 +319,12 @@ function GetTickLines(
         lines.push(z_tick + z);
     }
 
-    const y_ticks = GetTicks(y_min, y_max);
+    const Ly = LineLengthInPixels(
+        [x_min, y_min, z_min],
+        [x_min, y_max, z_min],
+        viewport
+    );
+    const y_ticks = GetTicks(y_min, y_max, Ly);
     for (let i = 0; i < y_ticks.length; i++) {
         const tick = y_ticks[i];
 
