@@ -8,6 +8,8 @@ import "@testing-library/jest-dom";
 import React from "react";
 import InfoCard from "./InfoCard";
 import userEvent from "@testing-library/user-event";
+import { Layer, PickInfo } from "deck.gl";
+import { LayerProps } from "@deck.gl/core/lib/layer";
 
 describe("Test Info Card", () => {
     it("snapshot test with no props", () => {
@@ -17,16 +19,20 @@ describe("Test Info Card", () => {
                     {
                         x: 152,
                         y: 254,
-                        // @ts-expect-error: to be fixed
                         radius: 1,
                         depth: 638,
                         coordinate: [111, 222],
-                    },
+                    } as unknown as PickInfo<unknown>,
                     {
-                        // @ts-expect-error: to be fixed
-                        layer: { id: "wells-layer" },
-                        property: { name: "Poro WellA", value: 123 },
-                    },
+                        layer: { id: "wells-layer" } as Layer<
+                            unknown,
+                            LayerProps<unknown>
+                        >,
+                        property: {
+                            name: "Poro WellA",
+                            value: 123,
+                        },
+                    } as unknown as PickInfo<unknown>,
                 ]}
             />
         );
@@ -39,11 +45,10 @@ describe("Test Info Card", () => {
                     {
                         x: 152,
                         y: 254,
-                        // @ts-expect-error: to be fixed
                         radius: 1,
                         depth: 638,
                         coordinate: [111, 222],
-                    },
+                    } as unknown as PickInfo<unknown>,
                 ]}
             />
         );
