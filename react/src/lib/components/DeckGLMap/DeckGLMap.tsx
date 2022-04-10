@@ -36,6 +36,8 @@ interface DeckGLMapProps {
     colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
+    //colorMappingData:[number, number, number, number] // default return [0,0,0,0]
+    colorMapping: any;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -53,6 +55,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     colorTables,
     editedData,
     setProps,
+    colorMapping,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -110,6 +113,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 colorTables={colorTables}
                 editedData={editedData}
                 setEditedData={setEditedData}
+                colorMapping={colorMapping}
             />
         </ReduxProvider>
     );

@@ -4,10 +4,11 @@ import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { subtract, distance, dot } from "mathjs";
 import {
-    rgbValues,
     colorTableData,
     colorTablesArray,
+    rgbValues
 } from "@emerson-eps/color-tables/";
+//import { rgbValues } from "../../storybook/continousLegend"
 import {
     Feature,
     GeometryCollection,
@@ -29,6 +30,8 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
+import { color } from "d3-color";
+import { interpolateRgb } from "d3-interpolate";
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -42,6 +45,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
+    // colorMapping: any;
 }
 
 export interface LogCurveDataType {
@@ -177,7 +181,10 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logName,
                         this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
-                            .colorTables
+                            .colorTables,
+                        (this.context as DeckGLLayerContext).userData
+                            .colorMapping
+                        // this.props.colorMapping
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
@@ -399,23 +406,28 @@ function getLogColor(
     logrun_name: string,
     log_name: string,
     logColor: string,
-    colorTables: colorTablesArray
+    colorTables: colorTablesArray,
+    colorMapping: any
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
-
     if (log_data.length == 0 || log_info == undefined) return [];
     const log_color: RGBAColor[] = [];
+
     if (log_info.description == "continuous") {
         const min = Math.min(...log_data);
         const max = Math.max(...log_data);
         const max_delta = max - min;
+        
         log_data.forEach((value) => {
+            // colortable scale
             const rgb = rgbValues(
                 (value - min) / max_delta,
                 logColor,
                 colorTables
             );
+            
+            // colortable scale
             if (rgb != undefined) {
                 if (Array.isArray(rgb)) {
                     log_color.push([rgb[0], rgb[1], rgb[2]]);
@@ -423,28 +435,129 @@ function getLogColor(
                     log_color.push([rgb.r, rgb.g, rgb.b]);
                 }
             }
+            
+            // d3 continuous scale
+            if (typeof(colorMapping) == "function") {
+                var colorMappingRange = colorMapping((value - min) / max_delta)
+                const continuousColors = color(colorMappingRange)?.rgb()
+                if (continuousColors) {
+                    log_color.push([continuousColors.r, continuousColors.g, continuousColors.b]);
+                }
+            }
+
+            // d3 discrete scale
+            if (typeof(colorMapping) == "object") {
+                const max = colorMapping.length - 1;
+                const point = (value - min) / max_delta;
+                let interpolatedValue: any
+                colorMapping.forEach((item: any, index: number) => {
+                    var currentIndex = index
+                    var normalizedCurrentIndex = (currentIndex - 0) / (max - 0);
+                    var  nextIndex = index + 1;
+                    var normalizedNextIndex = (nextIndex - 0) / (max - 0);
+                    //const t = (point - t0) / (t1 - t0); // t = 0.0 gives first color, t = 1.0 gives second color.
+                    if (point >= normalizedCurrentIndex && point <= normalizedNextIndex) {
+                        const interpolate = interpolateRgb(item, colorMapping[nextIndex])(point);
+                        interpolatedValue = color(interpolate)?.rgb()
+                    }
+                });
+                log_color.push([interpolatedValue?.r, interpolatedValue?.g, interpolatedValue?.b]);
+            }
         });
-    } else {
+    } 
+    else {
+        console.log('logColor', logColor)
         const colorsArray: [number, number, number, number][] = colorTableData(
             logColor,
             colorTables
         );
 
+
+        // well log data set for ex : H1: Array(2)0: (4) [255, 26, 202, 255] 1: 13
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
+        var logLength = Object.keys(log_attributes).length;
+        
         // eslint-disable-next-line
         const attributesObject: { [key: string]: any } = {};
-        Object.keys(log_attributes).forEach((key) => {
+
+        Object.keys(log_attributes).forEach((key,item) => {
             // get the code from log_attributes
+            // point like 0,1,2
             const code = log_attributes[key][1];
-            // compare the code and first value from colorsArray(colortable)
-            const colorArrays = colorsArray.find((value: number[]) => {
-                return value[0] == code;
-            });
-            if (colorArrays)
+
+            // for d3 continuous scale
+            if (colorMapping && typeof(colorMapping) === "function") {
+                const min = 0;
+                const max = logLength -1;
+                const normalizedValue = (code - min) / (max - min)
+                const mappedColor = color(colorMapping(normalizedValue))?.rgb()
+                attributesObject[key] = [
+                    [mappedColor?.r, mappedColor?.g, mappedColor?.b],
+                    code,
+                ];
+            }
+
+            // colortable colors
+            if (colorsArray.length > 0) {
+                // compare the code and first value from colorsArray(colortable)
+                var colorArrays = colorsArray.find((value: number[]) => {
+                    return value[0] == code;
+                });
+            }
+            // colortable scale
+            if (colorArrays) {
                 attributesObject[key] = [
                     [colorArrays[1], colorArrays[2], colorArrays[3]],
                     code,
                 ];
+            }
+            // d3 discrete scale
+            if (typeof(colorMapping) == "object") {
+                var d3ColorArrays = colorMapping.find((value: number, index: number) => {
+                    return index == code;
+                });
+            }
+            // d3 discrete scale
+            if (d3ColorArrays) {
+                var convertedColor = color(d3ColorArrays)?.rgb()
+                attributesObject[key] = [
+                    [convertedColor?.r, convertedColor?.g, convertedColor?.b],
+                    code,
+                ];
+            }
+            // // for d3 continuous scale
+            // if (typeof(colorMapping) === "function") {
+            //     const min = 0;
+            //     const max = 14
+            //     const normalizedValue = (code - min) / (max - min)
+            //     const mappedColor = color(colorMapping(normalizedValue))?.rgb()
+            //     attributesObject[key] = [
+            //         [mappedColor?.r, mappedColor?.g, mappedColor?.b],
+            //         code,
+            //     ];
+                // colorMapping.forEach((item: any, index: number) => {
+                //     var currentIndex = index
+                //     var normalizedCurrentIndex = (currentIndex - 0) / (max - 0);
+                //     var  nextIndex = index + 1;
+                //     var normalizedNextIndex = (nextIndex - 0) / (max - 0);
+                //     //const t = (point - t0) / (t1 - t0); // t = 0.0 gives first color, t = 1.0 gives second color.
+                //     if (point >= normalizedCurrentIndex && point <= normalizedNextIndex) {
+                //         const interpolate = interpolateRgb(item, colorMapping[nextIndex])(point);
+                //         interpolatedValue = color(interpolate)?.rgb()
+                //     }
+                // });
+               //const point = (value - min) / max_delta;
+                //console.log('code', code)
+                // var colorMappingRange = colorMapping((code - 0) / (14 - 0))
+                // var dataValue = color(colorMappingRange)?.rgb()
+                // // var d3ColorArrays = colorMapping.find((value: number, index: number) => {
+                // //     return index == code;
+                // // });
+                // attributesObject[key] = [
+                //     [dataValue?.r, dataValue?.g, dataValue?.b],
+                //     code,
+                // ];
+            //}   
         });
         log_data.forEach((log_value) => {
             const dl_attrs = Object.entries(attributesObject).find(

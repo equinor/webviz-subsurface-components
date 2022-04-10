@@ -73,6 +73,7 @@ export interface DeckGLLayerContext extends LayerContext {
     userData: {
         setEditedData: (data: Record<string, unknown>) => void;
         colorTables: colorTablesArray;
+        colorMapping: any;
     };
 }
 
@@ -159,12 +160,16 @@ export interface MapProps {
      */
     editedData?: Record<string, unknown>;
 
+    // colorMapping?: (data: Record<string, unknown>) => void;
+
     /**
      * For reacting to prop changes
      */
     setEditedData?: (data: Record<string, unknown>) => void;
 
     children?: React.ReactNode;
+
+    colorMapping: any;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -182,6 +187,7 @@ const Map: React.FC<MapProps> = ({
     colorTables,
     editedData,
     setEditedData,
+    colorMapping,
     children,
 }: MapProps) => {
     // state for initial views prop (target and zoom) of DeckGL component
@@ -306,6 +312,7 @@ const Map: React.FC<MapProps> = ({
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
                 userData={{
+                    colorMapping: colorMapping,
                     setEditedData: (updated_prop: Record<string, unknown>) => {
                         setEditedData?.(updated_prop);
                     },

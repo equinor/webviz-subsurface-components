@@ -38,6 +38,7 @@ function getImageData(colorMapName: string, colorTables: colorTablesArray) {
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
         const rgb = rgbValues(value, colorMapName, colorTables);
+        //const rgb = colorMap(value);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {

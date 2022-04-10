@@ -1,20 +1,21 @@
 import React from "react";
 import { Layer } from "deck.gl";
 import { WellsLayer } from "../layers";
-import {
-    ContinuousLegend,
-    DiscreteColorLegend,
-} from "@emerson-eps/color-tables";
+import { ContinuousLegend } from "../storybook/ContinuousLegend";
+import { DiscreteColorLegend } from "../storybook/DiscreteLegend";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getLayersByType } from "../layers/utils/layerTools";
+import { useCallback } from "react";
+import { ColorSelectorAccordion } from "../../DeckGLMap/storybook/ColorSelectorAccordion";
 
-interface ColorLegendProps {
+declare type ColorLegendProps = {
+    //interface ColorLegendProps {
     visible?: boolean | null;
     position?: number[] | null;
     horizontal?: boolean | null;
     layers: Layer<unknown>[];
     colorTables: colorTablesArray;
-}
+};
 
 // Todo: Adapt it for other layers too
 const ColorLegend: React.FC<ColorLegendProps> = ({
@@ -66,6 +67,21 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     ]);
 
     const [showLegend, setShowLegend] = React.useState<boolean | null>();
+    const [isToggled, setIsToggled] = React.useState(false);
+    const [updateLegend, setUpdateLegendColor] = React.useState([] as any);
+    const [isCont, setIsCont] = React.useState(false);
+
+    const handleClick = useCallback(() => {
+        setIsToggled(true);
+    }, []);
+
+    // Get new colorscale from colorselector and update legend
+    const colorScaleObject = React.useCallback((data: any, value: boolean) => {
+        // colortable colors name
+        setUpdateLegendColor(data);
+        setIsCont(value);
+    }, []);
+
     React.useEffect(() => {
         // check log_curves from layer manager
         setShowLegend(
@@ -74,29 +90,44 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     }, [visible, wellsLayer?.props.visible, wellsLayer?.props.logCurves]);
 
     if (!showLegend) return null;
+
     return (
         <div>
-            {legendProps.discrete && (
-                <DiscreteColorLegend
-                    discreteData={legendProps.metadata}
-                    dataObjectName={legendProps.title}
-                    position={position}
-                    colorName={legendProps.colorName}
-                    colorTables={colorTables}
-                    horizontal={horizontal}
-                />
-            )}
-            {legendProps.valueRange?.length > 0 && legendProps && (
-                <ContinuousLegend
-                    min={legendProps.valueRange[0]}
-                    max={legendProps.valueRange[1]}
-                    dataObjectName={legendProps.title}
-                    position={position}
-                    colorName={legendProps.colorName}
-                    colorTables={colorTables}
-                    horizontal={horizontal}
-                />
-            )}
+            <div onClick={() => handleClick()}>
+                {legendProps.discrete && !isCont && (
+                    <DiscreteColorLegend
+                        discreteData={legendProps.metadata}
+                        dataObjectName={legendProps.title}
+                        position={position}
+                        colorName={legendProps.colorName}
+                        colorTables={colorTables}
+                        horizontal={horizontal}
+                        updateLegend={updateLegend}
+                    />
+                )}
+                {legendProps.valueRange?.length > 0 &&
+                    legendProps &&
+                    isCont && (
+                        <ContinuousLegend
+                            min={legendProps.valueRange[0]}
+                            max={legendProps.valueRange[1]}
+                            dataObjectName={legendProps.title}
+                            position={position}
+                            colorName={legendProps.colorName}
+                            colorTables={colorTables}
+                            horizontal={horizontal}
+                            updateLegend={updateLegend}
+                        />
+                    )}
+            </div>
+            <div>
+                {isToggled && (
+                    <ColorSelectorAccordion
+                        colorScaleObject={colorScaleObject}
+                        isHorizontal={horizontal}
+                    />
+                )}
+            </div>
         </div>
     );
 };
