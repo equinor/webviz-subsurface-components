@@ -20,6 +20,8 @@ export function validateLayer(layer: Layer<unknown>): string {
             return validateWellsLayer(
                 layer.props as WellsLayerProps<FeatureCollection>
             );
+        case "pie-layer":
+            return validateSchema(layer.props.data, "PieChart");
         default:
             return "";
     }

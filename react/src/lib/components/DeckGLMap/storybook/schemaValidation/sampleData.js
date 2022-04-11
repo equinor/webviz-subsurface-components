@@ -70,3 +70,24 @@ export const sampleWellsData = {
         },
     ],
 };
+
+export const samplePieData = {
+    pies: [
+        {
+            x: 433600,
+            y: 6477600,
+            R: 100,
+            fractions: [
+                { value: 99, idx: 0 },
+                { value: "65", idx: 1 },
+                { value: 67, idx: 2 },
+            ],
+        },
+    ],
+
+    properties: [
+        { color: [255, 0, 0], label: "oil" },
+        { color: [0, 0, 255], label: "water" },
+        { color: [0, 255, 0], label: "gas" },
+    ],
+};

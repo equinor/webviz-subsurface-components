@@ -1,6 +1,6 @@
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
-import { sampleLogData, sampleWellsData } from "./sampleData";
+import { sampleLogData, sampleWellsData, samplePieData } from "./sampleData";
 import exampleData from "../../../../../demo/example-data/deckgl-map.json";
 
 export default {
@@ -26,5 +26,17 @@ wellsLayerValidation.args = {
     legend: {
         visible: false,
     },
+    checkDatafileSchema: true,
+};
+
+export const pieLayerValidation = DeckGLMapTemplate.bind();
+pieLayerValidation.args = {
+    ...exampleData[0],
+    layers: [
+        {
+            "@@type": "PieChartLayer",
+            data: samplePieData,
+        },
+    ],
     checkDatafileSchema: true,
 };
