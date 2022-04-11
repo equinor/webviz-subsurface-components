@@ -10,13 +10,6 @@ export const createStore: (
         preloadedState: { spec: initialState },
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
-                serializableCheck: {
-                    ignoredActions: [
-                        "spec/setSpec",
-                        "spec/updateLayerProp",
-                        "spec/updateVisibleLayers",
-                        "spec/updateDrawingMode",
-                    ],
-                },
+                serializableCheck: false,
             }),
     });

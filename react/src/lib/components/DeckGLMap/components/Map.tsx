@@ -100,7 +100,7 @@ export interface MapProps {
      * Each JSON object will consist of layer type with key as "@@type" and
      * layer specific data, if any.
      */
-    layers: Record<string, unknown>[];
+    layers?: Record<string, unknown>[];
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
@@ -231,15 +231,32 @@ const Map: React.FC<MapProps> = ({
         setDeckGLViews(jsonToObject(viewsProps) as View[]);
     }, [viewsProps]);
 
+    // update store if any of the layer prop is changed
+    const dispatch = useDispatch();
+    const st_layers = useSelector(
+        (st: MapState) => st.spec["layers"]
+    ) as Record<string, unknown>[];
+    React.useEffect(() => {
+        if (st_layers == undefined || layers == undefined) return;
+
+        const updated_layers = applyPropsOnLayers(st_layers, layers);
+        const layers_default = getLayersWithDefaultProps(updated_layers);
+        const updated_spec = { layers: layers_default, views: views };
+        dispatch(setSpec(updated_spec));
+    }, [layers, dispatch]);
+
     const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
     useEffect(() => {
+        const layers = st_layers as LayerProps<unknown>[];
+        if (!layers || layers.length == 0) return;
+
         const enumerations = [];
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
 
         setDeckGLLayers(jsonToObject(layers, enumerations) as Layer<unknown>[]);
-    }, [layers, resources, editedData]);
+    }, [st_layers, resources, editedData]);
 
     const [errorText, setErrorText] = useState("");
     useEffect(() => {
