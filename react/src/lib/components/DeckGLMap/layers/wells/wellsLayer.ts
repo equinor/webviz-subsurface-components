@@ -117,6 +117,7 @@ export default class WellsLayer extends CompositeLayer<
                 positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
+                visible: this.props.outline,
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
             })
@@ -168,6 +169,7 @@ export default class WellsLayer extends CompositeLayer<
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
+                visible: this.props.logCurves,
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath(data.features, d, this.props.logrunName),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
@@ -210,15 +212,7 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const layers: (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] =
-            [colors, highlight];
-        if (this.props.outline) {
-            layers.splice(0, 0, outline);
-        }
-        if (this.props.logCurves) {
-            layers.splice(1, 0, log_layer);
-        }
-
+        const layers = [outline, log_layer, colors, highlight];
         return layers;
     }
 
