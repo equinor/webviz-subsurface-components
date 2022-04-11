@@ -89,8 +89,8 @@ CustomDashedWells.parameters = {
     },
 };
 
-function callback(object: any, objectInfo: any) {
-    if (object.properties.name == "15/9-F-11 B") return [5, 3];
+function callback(object: Record<string, Record<string, unknown>>) {
+    if (object["properties"]["name"] == "15/9-F-11 B") return [5, 3];
     return [0, 0];
 }
 

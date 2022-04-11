@@ -32,7 +32,10 @@ import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
 
 type NumberPair = [number, number];
-type DashAccessorFunction = (object: any, objectInfo: any) => NumberPair;
+type DashAccessorFunction = (
+    object: Record<string, unknown>,
+    objectInfo: Record<string, unknown>
+) => NumberPair;
 type DashAccessor = boolean | NumberPair | DashAccessorFunction | undefined;
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
@@ -81,7 +84,11 @@ const DEFAULT_DASH = [5, 5];
 
 function getDashFactor(accessor: DashAccessor, factor: number) {
     if (typeof accessor == "function") {
-        return (object: any, objectInfo: any): NumberPair => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (
+            object: Record<string, unknown>,
+            objectInfo: Record<string, unknown>
+        ): NumberPair => {
             return multiply(
                 (accessor as DashAccessorFunction)(
                     object,
