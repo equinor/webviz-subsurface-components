@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import userEvent from "@testing-library/user-event";
@@ -21,6 +21,7 @@ describe("test layers settings button", () => {
             : render(<div />);
         expect(container.firstChild).toMatchSnapshot();
     });
+
     it("click to dispatch redux action", async () => {
         const drawing_layer = testState.layers.find(
             (item) => item["@@type"] === "DrawingLayer"
@@ -46,6 +47,7 @@ describe("test layers settings button", () => {
             type: "spec/updateDrawingMode",
         });
     });
+
     it("should close menu when clicked on backdrop", async () => {
         const drawing_layer = testState.layers.find(
             (item) => item["@@type"] === "DrawingLayer"
@@ -62,6 +64,7 @@ describe("test layers settings button", () => {
         userEvent.click(document.body);
         await waitFor(() => expect(layer_settings_menu).not.toBeVisible());
     });
+
     it("should close menu when clicked twice on layers button", async () => {
         const drawing_layer = testState.layers.find(
             (item) => item["@@type"] === "DrawingLayer"
@@ -77,5 +80,71 @@ describe("test layers settings button", () => {
         expect(layer_settings_menu).toBeInTheDocument();
         userEvent.click(screen.getByRole("button"));
         await waitFor(() => expect(layer_settings_menu).not.toBeVisible());
+    });
+
+    it("tests toggle button", async () => {
+        const wells_layer = testState.layers.find(
+            (item) => item["@@type"] === "WellsLayer"
+        );
+        wells_layer &&
+            render(
+                Wrapper({
+                    children: <LayerSettingsButton layer={wells_layer} />,
+                })
+            );
+        userEvent.click(screen.getByRole("button"));
+        const wells_layer_settings_menu = screen.getByRole("menu");
+        expect(wells_layer_settings_menu).toBeInTheDocument();
+        userEvent.click(screen.getByRole("checkbox", { name: "Log curves" }));
+        expect(testStore.dispatch).toHaveBeenCalledTimes(7);
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(7, {
+            payload: ["wells-layer", "logCurves", false],
+            type: "spec/updateLayerProp",
+        });
+    });
+
+    it("tests numeric input", async () => {
+        const wells_layer = testState.layers.find(
+            (item) => item["@@type"] === "WellsLayer"
+        );
+        wells_layer &&
+            render(
+                Wrapper({
+                    children: <LayerSettingsButton layer={wells_layer} />,
+                })
+            );
+        userEvent.click(screen.getByRole("button"));
+        const wells_layer_settings_menu = screen.getByRole("menu");
+        expect(wells_layer_settings_menu).toBeInTheDocument();
+        const trajectory_thickness = screen.getAllByRole("spinbutton", {
+            name: "",
+        })[0];
+        userEvent.type(trajectory_thickness, "7");
+        expect(testStore.dispatch).toHaveBeenCalledTimes(9);
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(9, {
+            payload: ["wells-layer", "lineWidthScale", 57],
+            type: "spec/updateLayerProp",
+        });
+    });
+
+    it("tests slider input", async () => {
+        const wells_layer = testState.layers.find(
+            (item) => item["@@type"] === "WellsLayer"
+        );
+        wells_layer &&
+            render(
+                Wrapper({
+                    children: <LayerSettingsButton layer={wells_layer} />,
+                })
+            );
+        userEvent.click(screen.getByRole("button"));
+        const wells_layer_settings_menu = screen.getByRole("menu");
+        expect(wells_layer_settings_menu).toBeInTheDocument();
+        fireEvent.change(screen.getByRole("slider"), { target: { value: 25 } });
+        expect(testStore.dispatch).toHaveBeenCalledTimes(11);
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(11, {
+            payload: ["wells-layer", "opacity", 0.25],
+            type: "spec/updateLayerProp",
+        });
     });
 });
