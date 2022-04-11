@@ -277,9 +277,9 @@ const Map: React.FC<MapProps> = ({
         [coords, onMouseEvent]
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getPickingInfos = (
         pickInfo: PickingInfo,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: any
     ): PickingInfo[] => {
         if (coords?.multiPicking && pickInfo.layer) {
@@ -299,6 +299,7 @@ const Map: React.FC<MapProps> = ({
     const callOnMouseEvent = (
         type: "click" | "hover",
         infos: PickingInfo[],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: any
     ): void => {
         if (onMouseEvent) {
