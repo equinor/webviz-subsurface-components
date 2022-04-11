@@ -95,4 +95,14 @@ describe("test 'layers' button", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
     });
+    it("test with no layers present", () => {
+        const { container } = render(
+            Wrapper({
+                children: (
+                    <LayersButton id={"layers-button-view_1"} layers={[]} />
+                ),
+            })
+        );
+        expect(container.firstChild).toMatchSnapshot();
+    });
 });
