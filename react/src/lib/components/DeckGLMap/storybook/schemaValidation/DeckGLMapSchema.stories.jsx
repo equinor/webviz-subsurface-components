@@ -5,7 +5,7 @@ import exampleData from "../../../../../demo/example-data/deckgl-map.json";
 
 export default {
     component: DeckGLMap,
-    title: "DeckGLMap/schemaValidation",
+    title: "DeckGLMap/SchemaValidation",
 };
 
 // Template for when edited data needs to be captured.
