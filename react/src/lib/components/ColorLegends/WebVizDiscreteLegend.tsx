@@ -8,7 +8,7 @@ interface LegendProps {
     title: string;
     position?: number[] | null;
     colorName: string;
-    colorTables: colorTablesArray | string;
+    colorTables: any | string;
     horizontal?: boolean | null;
 }
 

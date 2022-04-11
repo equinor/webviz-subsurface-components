@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "./redux/store";
 import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { colorTablesArray } from "@emerson-eps/color-tables";
 
 interface DeckGLMapProps {
     id: string;
@@ -34,7 +34,7 @@ interface DeckGLMapProps {
         position?: number[] | null;
         horizontal?: boolean | null;
     };
-    colorTables?: colorTablesArray;
+    colorTables?: any;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
 
@@ -43,6 +43,7 @@ interface DeckGLMapProps {
      */
     checkDatafileSchema?: boolean;
     onMouseEvent?: (event: MapMouseEvent) => void;
+    colorMapping: any;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -62,6 +63,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     setProps,
     checkDatafileSchema,
     onMouseEvent,
+    colorMapping,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -121,6 +123,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 setEditedData={setEditedData}
                 checkDatafileSchema={checkDatafileSchema}
                 onMouseEvent={onMouseEvent}
+                colorMapping={colorMapping}
             />
         </ReduxProvider>
     );
