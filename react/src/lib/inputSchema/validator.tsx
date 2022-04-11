@@ -31,25 +31,19 @@ function createSchemaValidator(
     const ajv = new Ajv({
         schemas: [wellLogSchema], // add list of dependent schemas
     });
-    let validator: ValidateFunction<unknown> | null = null;
 
     switch (schema_type) {
         case "Wells":
-            validator = ajv.compile(wellsSchema);
-            break;
+            return ajv.compile(wellsSchema);
         case "WellLog":
-            validator = ajv.compile(wellLogSchema);
-            break;
+            return ajv.compile(wellLogSchema);
         case "WellLogs":
-            validator = ajv.compile(wellLogsSchema);
-            break;
+            return ajv.compile(wellLogsSchema);
         case "WellLogTemplate":
-            validator = ajv.compile(wellLogTemplateSchema);
-            break;
+            return ajv.compile(wellLogTemplateSchema);
         default:
             return null;
     }
-    return validator;
 }
 
 function formatSchemaError(
