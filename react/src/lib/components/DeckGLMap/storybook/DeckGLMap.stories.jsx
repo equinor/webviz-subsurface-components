@@ -281,8 +281,6 @@ const meshMapLayer = {
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [2782, 3513],
-    colorMapRange: [2815, 3513],
-    colorMapClampColor: [0, 100, 0, 0],
     rotDeg: 0,
     contours: [0, 50.0],
     isContoursDepth: false,
@@ -349,6 +347,48 @@ MapMaterial.parameters = {
     docs: {
         description: {
             story: "An example showing example usage of Map3D material property.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+// Exapmple of using "colorMapClampColor" property.
+// Clamps colormap to this color at ends.
+// Given as array of three values (r,g,b) e.g: [255, 0, 0]
+// If not set (undefined) or set to true, it will clamp to color map min and max values.
+// If set to false the clamp color will be completely transparent.
+const propertyValueRange = [2782, 3513];
+const colorMapRange = [3000, 3513];
+const colorMapClampColor = [0, 255, 0]; // a color e.g. [0, 255, 0],  false, true or undefined.
+
+export const MapClampColor = MinimalTemplate.bind({});
+MapClampColor.args = {
+    id: "clampcolor",
+    layers: [
+        {
+            ...meshMapLayer,
+            propertyValueRange,
+            colorMapRange,
+            colorMapClampColor,
+        },
+    ],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: [],
+            },
+        ],
+    },
+};
+MapClampColor.parameters = {
+    docs: {
+        description: {
+            story: 'An example usage of map property `"colorMapClampColor"',
         },
         inlineStories: false,
         iframeHeight: 500,
@@ -559,6 +599,57 @@ SelectableFeatureExample.args = {
     ],
 };
 
+const sampleLogData = [
+    {
+        header: {
+            name: "EcoScope Data",
+            well: "35/12-6S",
+            source: "Converted from LIS by Log Studio 4.87 - Petroware AS",
+            operator: "Logtek Petroleum",
+            startIndex: 2907,
+            endIndex: 2908,
+            step: 1,
+        },
+        curves: [
+            {
+                kjhkh: "MD",
+                description: "Measured depth",
+                quantity: "length",
+                unit: "m",
+                valueType: "float",
+                dimensions: 1,
+            },
+            {
+                name: "A40H",
+                description: "Attenuation resistivity 40 inch",
+                quantity: "electrical resistivity",
+                unit: "ohm.m",
+                valueType: "float",
+                dimensions: 1,
+            },
+        ],
+        data: [
+            [2907, 29.955],
+            [2908, 27.733],
+        ],
+    },
+];
+
+export const mapValidator = EditDataTemplate.bind();
+mapValidator.args = {
+    ...exampleData[0],
+    layers: [
+        {
+            ...exampleData[0].layers[4],
+            logData: sampleLogData,
+        },
+    ],
+    legend: {
+        visible: false,
+    },
+    checkDatafileSchema: true,
+};
+
 // Map example with color selector
 // colorMap layer arguments
 const layers = [exampleData[0].layers[0]];
@@ -704,7 +795,7 @@ const wellLayerTemplate = (args) => {
 
     const layerDataChanged = [{...args.wellLayers[0], logColor: wellLegendUpdated}]
     //const layerDataChanged = [{...args.wellLayers[0], colorMapping: colorMapping }]
-    
+
     return <div>
             <div>
                 <ColorLegend style={{ float: "right", position:"absolute", zIndex: 999, opacity: 1}} 
@@ -736,4 +827,4 @@ ColorSelectorForWellLayer.args = {
     legend: {
         visible: false,
     },
-}; 
+};

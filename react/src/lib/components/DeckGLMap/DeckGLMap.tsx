@@ -1,4 +1,5 @@
 import Map, { ViewsType } from "./components/Map";
+import { MapMouseEvent } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
@@ -36,7 +37,12 @@ interface DeckGLMapProps {
     colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
-    //colorMappingData:[number, number, number, number] // default return [0,0,0,0]
+
+    /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema?: boolean;
+    onMouseEvent?: (event: MapMouseEvent) => void;
     colorMapping: any;
 }
 
@@ -55,6 +61,8 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     colorTables,
     editedData,
     setProps,
+    checkDatafileSchema,
+    onMouseEvent,
     colorMapping,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
@@ -113,6 +121,8 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 colorTables={colorTables}
                 editedData={editedData}
                 setEditedData={setEditedData}
+                checkDatafileSchema={checkDatafileSchema}
+                onMouseEvent={onMouseEvent}
                 colorMapping={colorMapping}
             />
         </ReduxProvider>
@@ -125,6 +135,7 @@ DeckGLMap.defaultProps = {
         showLabel: false,
         viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
+    checkDatafileSchema: false,
 };
 
 const arrayOfLength_propTypes = (
@@ -290,6 +301,11 @@ DeckGLMap.propTypes = {
      * For reacting to prop changes
      */
     setProps: PropTypes.func,
+
+    /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema: PropTypes.bool,
 };
 
 export default DeckGLMap;

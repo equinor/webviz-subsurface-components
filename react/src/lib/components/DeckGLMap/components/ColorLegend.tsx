@@ -10,7 +10,6 @@ import { ColorSelectorAccordion } from "@emerson-eps/color-tables/src/component/
 
 //declare type ColorLegendProps = {
 interface ColorLegendProps {
-    visible?: boolean | null;
     position?: number[] | null;
     horizontal?: boolean | null;
     layers: Layer<unknown>[];
@@ -19,7 +18,6 @@ interface ColorLegendProps {
 
 // Todo: Adapt it for other layers too
 const ColorLegend: React.FC<ColorLegendProps> = ({
-    visible,
     position,
     horizontal,
     layers,
@@ -84,10 +82,8 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
 
     React.useEffect(() => {
         // check log_curves from layer manager
-        setShowLegend(
-            visible && wellsLayer?.props.visible && wellsLayer?.props.logCurves
-        );
-    }, [visible, wellsLayer?.props.visible, wellsLayer?.props.logCurves]);
+        setShowLegend(wellsLayer?.props.visible && wellsLayer?.props.logCurves);
+    }, [wellsLayer?.props.visible, wellsLayer?.props.logCurves]);
 
     if (!showLegend) return null;
 
@@ -133,7 +129,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
 };
 
 ColorLegend.defaultProps = {
-    visible: true,
     position: [5, 10],
     horizontal: false,
 };
