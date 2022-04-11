@@ -6,6 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import LayerProperty from "./LayerProperty";
 import { testState } from "../../test/testReduxState";
+
 describe("Test Layer Property", () => {
     it("snapshot test", () => {
         const drawing_layer = testState.layers.find(
@@ -20,6 +21,7 @@ describe("Test Layer Property", () => {
             : render(<div />);
         expect(container.firstChild).toMatchSnapshot();
     });
+
     it("select option to dispatch redux action", async () => {
         const drawing_layer = testState.layers.find(
             (item) => item["@@type"] === "DrawingLayer"
