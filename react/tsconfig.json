@@ -18,7 +18,8 @@
         "jsx": "react", // use typescript to transpile jsx to js
         "target": "es6", // specify ECMAScript target version
         "allowJs": true, // allow a partial TypeScript and JavaScript codebase
-        "skipLibCheck": true // don't do typechecking on the node modules
+        "skipLibCheck": true, // don't do typechecking on the node modules
+        "resolveJsonModule": true 
     },
     "include": ["./src/lib", "./src/custom.d.ts"]
 }

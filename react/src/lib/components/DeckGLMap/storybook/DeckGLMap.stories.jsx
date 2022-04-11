@@ -1,10 +1,11 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import ColorLegend from "./ColorLegend";
+//import ColorLegend from "./ColorLegend";
+import ColorLegend from "@emerson-eps/color-tables/src/component/Legend/ColorLegend";
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
 import * as d3 from "d3";
-import { d3ColorScales } from "../storybook/d3ColorScale";
+import { d3ColorScales } from "@emerson-eps/color-tables/src/component/Utils/d3ColorScale";
 
 export default {
     component: DeckGLMap,

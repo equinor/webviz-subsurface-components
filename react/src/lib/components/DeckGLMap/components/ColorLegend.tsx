@@ -1,15 +1,15 @@
 import React from "react";
 import { Layer } from "deck.gl";
 import { WellsLayer } from "../layers";
-import { ContinuousLegend } from "../storybook/ContinuousLegend";
-import { DiscreteColorLegend } from "../storybook/DiscreteLegend";
+import { ContinuousLegend } from "@emerson-eps/color-tables/";
+import { DiscreteColorLegend } from "@emerson-eps/color-tables/";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { useCallback } from "react";
-import { ColorSelectorAccordion } from "../../DeckGLMap/storybook/ColorSelectorAccordion";
+import { ColorSelectorAccordion } from "@emerson-eps/color-tables/src/component/ColorSelector/ColorSelectorAccordion";
 
-declare type ColorLegendProps = {
-    //interface ColorLegendProps {
+//declare type ColorLegendProps = {
+interface ColorLegendProps {
     visible?: boolean | null;
     position?: number[] | null;
     horizontal?: boolean | null;
