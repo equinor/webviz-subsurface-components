@@ -70,8 +70,8 @@
                     "description": "Value of the last index. Unit according to index curve"
                 },
                 "step": {
-                    "type": "number",
-                    "description": "Distance between indices if regularly sampled. Unit according to index curve. If log is time based, milliseconds assumed"
+                    "type": ["number", "null"],
+                    "description": "Distance between indices if regularly sampled. Unit according to index curve. If log is time based, milliseconds assumed. null if irregular step"
                 },
                 "dataUri": {
                     "type": "string",

@@ -343,7 +343,8 @@ const Map: React.FC<MapProps> = ({
     const deckRef = useRef<DeckGL>(null);
     const [viewState, setViewState] = useState<ViewStateProps>();
 
-    const onLoad = useCallback(() => {
+    // calculate camera position and zoom on view resize
+    const resizeCb = useCallback(() => {
         if (deckRef == null) return;
 
         const deck = deckRef.current?.deck;
@@ -380,12 +381,18 @@ const Map: React.FC<MapProps> = ({
         }
     }, [deckGLLayers]);
 
+    // validate layers data
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
-        if (checkDatafileSchema && !isEmpty(deckGLLayers) && isLoaded) {
-            setErrorText(validateLayers(deckGLLayers));
+        const layers = deckRef.current?.deck.props.layers;
+        if (checkDatafileSchema && layers && isLoaded) {
+            try {
+                validateLayers(layers);
+            } catch (e) {
+                setErrorText(String(e));
+            }
         } else setErrorText(undefined);
-    }, [checkDatafileSchema, deckGLLayers, isLoaded]);
+    }, [checkDatafileSchema, deckRef.current?.deck.props.layers, isLoaded]);
 
     const layerFilter = useCallback(
         (args: {
@@ -450,8 +457,8 @@ const Map: React.FC<MapProps> = ({
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
                 }
-                onLoad={onLoad}
-                onResize={onLoad}
+                onLoad={resizeCb}
+                onResize={resizeCb}
                 onAfterRender={onAfterRender}
             >
                 {children}

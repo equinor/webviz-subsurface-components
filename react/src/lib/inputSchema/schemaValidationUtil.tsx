@@ -2,40 +2,38 @@ import { validateSchema } from "./validator";
 import { Layer } from "deck.gl";
 import WellsLayer from "../components/DeckGLMap/layers/wells/wellsLayer";
 
-export function validateLayers(layers: Layer<unknown>[]): string {
-    const errors: string[] = [];
+export function validateLayers(layers: Layer<unknown>[]): void {
     layers.forEach((layer) => {
         if (layer.isLoaded) {
-            const error = validateLayer(layer);
-            if (error) errors.push(error);
+            validateLayer(layer);
+            try {
+                layer.validateProps();
+            } catch (e) {
+                throw `${layer.id}- ${String(e)}`;
+            }
         }
     });
-    return errors.join("\n");
 }
 
-export function validateLayer(layer: Layer<unknown>): string {
+export function validateLayer(layer: Layer<unknown>): void {
     switch (layer.id) {
         case "wells-layer":
-            return validateWellsLayer(layer as WellsLayer);
+            validateWellsLayer(layer as WellsLayer);
+            break;
         case "pie-layer":
-            return validateSchema(layer.props.data, "PieChart");
+            validateSchema(layer.props.data, "PieChart");
+            break;
         default:
-            return "";
+            return;
     }
 }
 
-function validateWellsLayer(wellsLayer: WellsLayer): string {
-    const errors: string[] = [];
-
+function validateWellsLayer(wellsLayer: WellsLayer): void {
     const wells_data = wellsLayer.props.data;
-    let error_text = validateSchema(wells_data, "Wells");
-    if (error_text) errors.push(error_text);
+    validateSchema(wells_data, "Wells");
 
     const logs_data = getLogData(wellsLayer);
-    error_text = validateSchema(logs_data, "WellLogs");
-    if (error_text) errors.push(error_text);
-
-    return errors.join("\n");
+    validateSchema(logs_data, "WellLogs");
 }
 
 function getLogData(wellsLayer: WellsLayer) {

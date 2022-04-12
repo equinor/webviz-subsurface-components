@@ -22,6 +22,9 @@ wellsLayerValidation.args = {
             data: sampleWellsData,
             logData: sampleLogData,
         },
+        {
+            ...exampleData[0].layers[6],
+        },
     ],
     legend: {
         visible: false,
