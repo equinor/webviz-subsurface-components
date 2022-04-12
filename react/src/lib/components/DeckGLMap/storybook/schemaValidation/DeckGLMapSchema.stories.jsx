@@ -1,6 +1,11 @@
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
-import { sampleLogData, sampleWellsData, samplePieData } from "./sampleData";
+import {
+    sampleLogData,
+    sampleWellsData,
+    samplePieData,
+    sampleGridData,
+} from "./sampleData";
 import exampleData from "../../../../../demo/example-data/deckgl-map.json";
 
 export default {
@@ -13,8 +18,8 @@ const DeckGLMapTemplate = (args) => {
     return <DeckGLMap {...args} />;
 };
 
-export const wellsLayerValidation = DeckGLMapTemplate.bind();
-wellsLayerValidation.args = {
+export const WellsLayerValidation = DeckGLMapTemplate.bind();
+WellsLayerValidation.args = {
     ...exampleData[0],
     layers: [
         {
@@ -32,13 +37,26 @@ wellsLayerValidation.args = {
     checkDatafileSchema: true,
 };
 
-export const pieLayerValidation = DeckGLMapTemplate.bind();
-pieLayerValidation.args = {
+export const PieLayerValidation = DeckGLMapTemplate.bind();
+PieLayerValidation.args = {
     ...exampleData[0],
     layers: [
         {
             "@@type": "PieChartLayer",
             data: samplePieData,
+        },
+    ],
+    checkDatafileSchema: true,
+};
+
+export const GridLayerValidation = DeckGLMapTemplate.bind();
+GridLayerValidation.args = {
+    ...exampleData[0],
+    layers: [
+        {
+            ...exampleData[0].layers[2],
+            data: sampleGridData,
+            visible: true,
         },
     ],
     checkDatafileSchema: true,
