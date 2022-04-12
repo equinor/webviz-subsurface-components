@@ -119,6 +119,31 @@ export const sampleGridData = [
     },
 ];
 
+export const sampleFaultPolygonsData = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [434562, 6477595],
+                        [434562, 6478595],
+                        // [435062, 6478595],
+                        // [435062, 6477595],
+                        // [434562, 6477595],
+                    ],
+                ],
+            },
+            properties: {
+                name: "Top_Hugin:F_52",
+                color: [0, 0, 0, 255],
+            },
+        },
+    ],
+};
+
 export const sampleColorTable = [
     {
         name: "Physics",

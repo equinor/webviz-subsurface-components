@@ -6,6 +6,7 @@ import {
     samplePieData,
     sampleGridData,
     sampleColorTable,
+    sampleFaultPolygonsData,
 } from "./sampleData";
 import exampleData from "../../../../../demo/example-data/deckgl-map.json";
 
@@ -58,6 +59,18 @@ GridLayerValidation.args = {
             ...exampleData[0].layers[2],
             data: sampleGridData,
             visible: true,
+        },
+    ],
+    checkDatafileSchema: true,
+};
+
+export const FaultPolygonsValidation = DeckGLMapTemplate.bind();
+FaultPolygonsValidation.args = {
+    ...exampleData[0],
+    layers: [
+        {
+            "@@type": "FaultPolygonsLayer",
+            data: sampleFaultPolygonsData,
         },
     ],
     checkDatafileSchema: true,
