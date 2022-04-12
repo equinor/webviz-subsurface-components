@@ -344,7 +344,7 @@ const Map: React.FC<MapProps> = ({
     const [viewState, setViewState] = useState<ViewStateProps>();
 
     // calculate camera position and zoom on view resize
-    const resizeCb = useCallback(() => {
+    const onResize = useCallback(() => {
         if (deckRef == null) return;
 
         const deck = deckRef.current?.deck;
@@ -457,8 +457,7 @@ const Map: React.FC<MapProps> = ({
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
                 }
-                onLoad={resizeCb}
-                onResize={resizeCb}
+                onResize={onResize}
                 onAfterRender={onAfterRender}
             >
                 {children}
