@@ -5,6 +5,7 @@ import {
     sampleWellsData,
     samplePieData,
     sampleGridData,
+    sampleColorTable,
 } from "./sampleData";
 import exampleData from "../../../../../demo/example-data/deckgl-map.json";
 
@@ -59,5 +60,19 @@ GridLayerValidation.args = {
             visible: true,
         },
     ],
+    checkDatafileSchema: true,
+};
+
+export const ColorTableValidation = DeckGLMapTemplate.bind();
+ColorTableValidation.args = {
+    ...exampleData[0],
+    layers: [
+        {
+            ...exampleData[0].layers[4],
+            logColor: "Colors_set_5",
+            logRadius: 15,
+        },
+    ],
+    colorTables: sampleColorTable,
     checkDatafileSchema: true,
 };

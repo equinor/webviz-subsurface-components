@@ -1,6 +1,11 @@
 import { validateSchema } from "./validator";
 import { Layer } from "deck.gl";
 import WellsLayer from "../components/DeckGLMap/layers/wells/wellsLayer";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
+
+export function validateColorTables(colorTables: colorTablesArray): void {
+    validateSchema(colorTables, "ColorTables");
+}
 
 export function validateLayers(layers: Layer<unknown>[]): void {
     layers.forEach((layer) => {
