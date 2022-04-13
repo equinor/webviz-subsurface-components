@@ -1,27 +1,32 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import Ajv from "ajv";
 import { ErrorObject, ValidateFunction } from "ajv/dist/types/index";
 
 // schema definations
+/* eslint-disable @typescript-eslint/no-var-requires */
+const wellsSchema = require("./Wells.json");
 const wellLogSchema = require("./WellLog.json");
 const wellLogsSchema = require("./WellLogs.json");
 const wellLogTemplateSchema = require("./WellLogTemplate.json");
+const pieChartSchema = require("./PieChart.json");
+const gridSchema = require("./Grid.json");
 
-// validator function accepts parameter data to be validated and schema type to be validated against.
-// return error message of failure and empty string on success.
-export function validateSchema(data: unknown, schema_type: string): string {
+// Validator function accepts parameter data and schema type to be validated against.
+// Throws error message of failure.
+export function validateSchema(data: unknown, schema_type: string): void {
     let validator: ValidateFunction<unknown> | null = null;
 
     try {
         validator = createSchemaValidator(schema_type);
     } catch (e) {
-        return "Wrong JSON schema for " + schema_type + ". " + String(e);
+        throw "Wrong JSON schema for " + schema_type + ". " + String(e);
     }
 
-    if (!validator) return "Wrong schema type.";
+    if (!validator) throw "Wrong schema type.";
 
     validator(data);
-    return formatSchemaError(validator.errors);
+    if (validator.errors) {
+        throw formatSchemaError(schema_type, validator.errors);
+    }
 }
 
 function createSchemaValidator(
@@ -30,29 +35,33 @@ function createSchemaValidator(
     const ajv = new Ajv({
         schemas: [wellLogSchema], // add list of dependent schemas
     });
-    let validator: ValidateFunction<unknown> | null = null;
 
     switch (schema_type) {
+        case "Wells":
+            return ajv.compile(wellsSchema);
         case "WellLog":
-            validator = ajv.compile(wellLogSchema);
-            break;
+            return ajv.compile(wellLogSchema);
         case "WellLogs":
-            validator = ajv.compile(wellLogsSchema);
-            break;
+            return ajv.compile(wellLogsSchema);
         case "WellLogTemplate":
-            validator = ajv.compile(wellLogTemplateSchema);
-            break;
+            return ajv.compile(wellLogTemplateSchema);
+        case "PieChart":
+            return ajv.compile(pieChartSchema);
+        case "Grid":
+            return ajv.compile(gridSchema);
         default:
             return null;
     }
-    return validator;
 }
 
-function formatSchemaError(errors?: ErrorObject[] | null): string {
-    if (!errors) return "";
-    if (!errors[0]) return "JSON schema validation failed";
-    return (
-        (errors[0].dataPath ? errors[0].dataPath + ": " : "") +
-        errors[0].message
-    );
+function formatSchemaError(schema_type: string, errors: ErrorObject[]): string {
+    let error_text = "";
+
+    if (errors[0]) {
+        error_text =
+            (errors[0].dataPath ? errors[0].dataPath + ": " : "") +
+            errors[0].message;
+    } else error_text = "JSON schema validation failed";
+
+    return `${schema_type}: ${error_text}.`;
 }
