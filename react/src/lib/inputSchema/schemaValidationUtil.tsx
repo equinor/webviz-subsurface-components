@@ -23,6 +23,9 @@ export function validateLayer(layer: Layer<unknown>): void {
         case "pie-layer":
             validateSchema(layer.props.data, "PieChart");
             break;
+        case "grid-layer":
+            validateSchema(layer.props.data, "Grid");
+            break;
         default:
             return;
     }

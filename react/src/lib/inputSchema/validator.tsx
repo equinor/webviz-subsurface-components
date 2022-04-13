@@ -8,6 +8,7 @@ const wellLogSchema = require("./WellLog.json");
 const wellLogsSchema = require("./WellLogs.json");
 const wellLogTemplateSchema = require("./WellLogTemplate.json");
 const pieChartSchema = require("./PieChart.json");
+const gridSchema = require("./Grid.json");
 
 // Validator function accepts parameter data and schema type to be validated against.
 // Throws error message of failure.
@@ -46,6 +47,8 @@ function createSchemaValidator(
             return ajv.compile(wellLogTemplateSchema);
         case "PieChart":
             return ajv.compile(pieChartSchema);
+        case "Grid":
+            return ajv.compile(gridSchema);
         default:
             return null;
     }

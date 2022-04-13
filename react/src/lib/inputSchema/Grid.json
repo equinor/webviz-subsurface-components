@@ -1,0 +1,39 @@
+{
+    "$comment": "See https://jsonwelllogformat.org",
+    "$id": "inputSchema/Grid.json",
+    "type": "array",
+    "items": { "$ref": "#/definitions/data_row" },
+    "definitions": {
+        "data_row": {
+            "type": "object",
+            "required": ["cs", "vs"],
+            "properties": {
+                "i": {
+                    "type": "number",
+                    "description": "Cell i-index, increases toward east."
+                },
+                "j": {
+                    "type": "number",
+                    "description": "Cell j-index, increases towards north."
+                },
+                "z": { "type": "number", "description": "Cell depth." },
+                "cs": {
+                    "type": "array",
+                    "description": "Cell corners",
+                    "items": { "$ref": "#/definitions/cell_corner" },
+                    "minItems": 3
+                },
+                "vs": {
+                    "type": "array",
+                    "description": "Time dependent cell values.",
+                    "items": { "type": "number" }
+                }
+            }
+        },
+        "cell_corner": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3
+        }
+    }
+}
