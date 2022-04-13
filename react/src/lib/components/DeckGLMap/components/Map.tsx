@@ -28,7 +28,10 @@ import {
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";
-import { validateLayers } from "../../../inputSchema/schemaValidationUtil";
+import {
+    validateColorTables,
+    validateLayers,
+} from "../../../inputSchema/schemaValidationUtil";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
@@ -385,9 +388,11 @@ const Map: React.FC<MapProps> = ({
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
         const layers = deckRef.current?.deck.props.layers;
+        // this ensures to validate the schemas only once
         if (checkDatafileSchema && layers && isLoaded) {
             try {
                 validateLayers(layers);
+                colorTables && validateColorTables(colorTables);
             } catch (e) {
                 setErrorText(String(e));
             }

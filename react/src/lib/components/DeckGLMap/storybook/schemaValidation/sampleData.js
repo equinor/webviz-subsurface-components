@@ -118,3 +118,35 @@ export const sampleGridData = [
         vs: 1.0,
     },
 ];
+
+export const sampleColorTable = [
+    {
+        name: "Physics",
+        discrete: false,
+        description: "Full options color table",
+        colorNaN: [255, 255, 255],
+        colorBelow: [255, 0.0, 0.0],
+        colorAbove: [0.0, 0.0, 255],
+        colors: [
+            [0.0, 255, 0.0, 0.0],
+            [0.5, 0.0, 255, 0.0],
+            [1.0, 0.0, 0.0, 255],
+        ],
+    },
+    {
+        name: "Rainbow",
+        discrete: "false",
+        colors: [
+            [0.0, 255, 0.0, 0.0],
+            [1.0, 182, 0.0, 182],
+        ],
+    },
+    {
+        name: "Colors_set_5",
+        discrete: true,
+        colors: [
+            [0, 244, 237, 255],
+            [1, 255, 171, 178],
+        ],
+    },
+];
