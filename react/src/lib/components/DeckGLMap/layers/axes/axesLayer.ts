@@ -222,9 +222,7 @@ function GetTicks(
     const start = Math.ceil(min / incr) * incr;
     const stop = Math.floor(max / incr) * incr;
     const calc_step = Math.floor(Math.abs(stop - start) / incr);
-    if (calc_step > 0) {
-        step = calc_step;
-    }
+    step = calc_step > 0 ? calc_step : 0;
 
     const ticks: number[] = [];
 
