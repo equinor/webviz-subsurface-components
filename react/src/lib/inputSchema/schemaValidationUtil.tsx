@@ -31,6 +31,9 @@ export function validateLayer(layer: Layer<unknown>): void {
         case "grid-layer":
             validateSchema(layer.props.data, "Grid");
             break;
+        case "fault-polygons-layer":
+            validateSchema(layer.props.data, "FaultPolygons");
+            break;
         default:
             return;
     }
