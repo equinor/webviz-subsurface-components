@@ -26,7 +26,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         visible: true,
         rotDeg: 0,
         valueRange: { type: "array", value: [0, 1] },
-        colorMapRange: { type: "array", value: [0, 1] },
         lightDirection: [1, 1, 1],
         ambientLightIntensity: 0.5,
         diffuseLightIntensity: 0.5,
