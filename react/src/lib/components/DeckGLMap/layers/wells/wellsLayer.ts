@@ -2,6 +2,7 @@ import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
+import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
 import {
     rgbValues,
@@ -30,6 +31,13 @@ import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
 
+type NumberPair = [number, number];
+type DashAccessorFunction = (
+    object: Record<string, unknown>,
+    objectInfo: Record<string, unknown>
+) => NumberPair;
+type DashAccessor = boolean | NumberPair | DashAccessorFunction | undefined;
+
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
@@ -42,6 +50,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
+    dashed?: DashAccessor;
 }
 
 export interface LogCurveDataType {
@@ -65,6 +74,37 @@ export interface LogCurveDataType {
 
 export interface WellsPickInfo extends LayerPickInfo {
     logName: string;
+}
+
+function multiply(pair: [number, number], factor: number): [number, number] {
+    return [pair[0] * factor, pair[1] * factor];
+}
+
+const DEFAULT_DASH = [5, 5];
+
+function getDashFactor(accessor: DashAccessor, factor: number) {
+    if (typeof accessor == "function") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (
+            object: Record<string, unknown>,
+            objectInfo: Record<string, unknown>
+        ): NumberPair => {
+            return multiply(
+                (accessor as DashAccessorFunction)(
+                    object,
+                    objectInfo
+                ) as NumberPair,
+                factor
+            );
+        };
+    }
+
+    let value = DEFAULT_DASH as NumberPair;
+    if ((accessor as NumberPair)?.length == 2) {
+        value = accessor as NumberPair;
+    }
+
+    return multiply(value, factor);
 }
 
 export default class WellsLayer extends CompositeLayer<
@@ -108,6 +148,15 @@ export default class WellsLayer extends CompositeLayer<
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
         const positionFormat = is3d ? "XYZ" : "XY";
 
+        const isDashed = !!this.props.dashed;
+
+        const extensions = [
+            new PathStyleExtension({
+                dash: isDashed,
+                highPrecisionDash: isDashed,
+            }),
+        ];
+
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "outline",
@@ -120,8 +169,13 @@ export default class WellsLayer extends CompositeLayer<
                 visible: this.props.outline,
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
+                extensions: extensions,
+                getDashArray: getDashFactor(this.props.dashed, 1),
             })
         );
+
+        const lineWidthFactor =
+            this.props.lineWidthScale / (this.props.lineWidthScale - 1);
 
         const getColor = (d: Feature): RGBAColor => d?.properties?.["color"];
         const colors = new GeoJsonLayer<Feature>(
@@ -137,6 +191,8 @@ export default class WellsLayer extends CompositeLayer<
                 lineWidthScale: this.props.lineWidthScale - 1,
                 getFillColor: getColor,
                 getLineColor: getColor,
+                extensions: extensions,
+                getDashArray: getDashFactor(this.props.dashed, lineWidthFactor),
             })
         );
 
