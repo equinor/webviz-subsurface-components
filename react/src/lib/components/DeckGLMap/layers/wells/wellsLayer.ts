@@ -281,7 +281,6 @@ export default class WellsLayer extends CompositeLayer<
                     this.props.wellNameAtTop,
                     is3d
                 ),
-                positionFormat,
                 pointType: "text",
                 visible: this.props.wellNameVisible,
                 getText: (f: Feature) => f.properties?.["name"],
