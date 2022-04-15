@@ -51,6 +51,10 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logCurves: boolean;
     refine: boolean;
     dashed?: DashAccessor;
+    wellNameVisible: boolean;
+    wellNameAtTop: boolean;
+    wellNameSize: number;
+    wellNameColor: RGBAColor;
 }
 
 export interface LogCurveDataType {
@@ -268,7 +272,27 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const layers = [outline, log_layer, colors, highlight];
+        // well name
+        const names = new GeoJsonLayer<Feature>(
+            this.getSubLayerProps<Feature>({
+                id: "names",
+                data: getWellNamePositionData(
+                    data.features,
+                    this.props.wellNameAtTop,
+                    is3d
+                ),
+                positionFormat,
+                pointType: "text",
+                visible: this.props.wellNameVisible,
+                getText: (f: Feature) => f.properties?.["name"],
+                getTextColor: this.props.wellNameColor,
+                getTextAnchor: "start",
+                getTextAlignmentBaseline: "bottom",
+                getTextSize: this.props.wellNameSize,
+            })
+        );
+
+        const layers = [outline, log_layer, colors, highlight, names];
         return layers;
     }
 
@@ -361,6 +385,38 @@ function isSelectedLogRun(d: LogCurveDataType, logrun_name: string): boolean {
     return d.header.name.toLowerCase() === logrun_name.toLowerCase();
 }
 
+// return name positions at top/bottom of the trajectory
+function getWellNamePositionData(
+    wells_data: Feature[],
+    name_at_top: boolean,
+    view_is_3d: boolean
+): Feature[] {
+    const wells_data_with_point_geometry = wells_data.map((well_data) => {
+        const well_coordinates = getWellCoordinates(well_data);
+        const top = well_coordinates.at(0);
+        const bot = well_coordinates.at(-1);
+
+        // using z=0 for orthographic view to keep label above other other layers
+        const new_top = view_is_3d ? top : [top?.[0], top?.[1], 0];
+        const new_bot = view_is_3d ? bot : [bot?.[0], bot?.[1], 0];
+
+        // Create point type geometry object
+        const point_geometry_object = {
+            type: "Point",
+            coordinates: name_at_top ? new_top : new_bot,
+        } as Point;
+        const new_feature = {
+            ...well_data,
+            geometry: {
+                ...well_data.geometry,
+                geometries: [point_geometry_object],
+            },
+        };
+        return new_feature;
+    });
+    return wells_data_with_point_geometry;
+}
+
 function getWellObjectByName(
     wells_data: Feature[],
     name: string
@@ -371,6 +427,7 @@ function getWellObjectByName(
     );
 }
 
+// Return well head coordinates from Point Geometry
 function getWellHeadCoordinates(well_object?: Feature): Position {
     return (
         (well_object?.geometry as GeometryCollection)?.geometries.find(
@@ -379,6 +436,7 @@ function getWellHeadCoordinates(well_object?: Feature): Position {
     )?.coordinates;
 }
 
+// Return Well/Trajectory coordinates from LineString Geometry
 function getWellCoordinates(well_object?: Feature): Position[] {
     return (
         (well_object?.geometry as GeometryCollection)?.geometries.find(

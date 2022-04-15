@@ -49,6 +49,8 @@ export const SliderTypeProps = [
 ] as const;
 
 export const ToggleTypeProps = [
+    { id: "wellNameVisible", displayName: "Show well name" },
+    { id: "wellNameAtTop", displayName: "Show well name at top" },
     { id: "logCurves", displayName: "Log curves", dependentOnProp: "logData" },
     {
         id: "isReadoutDepth",
@@ -62,6 +64,7 @@ export const MenuTypeProps = [
 ] as const;
 
 export const NumericTypeProps = [
+    { id: "wellNameSize", displayName: "Well name size" },
     {
         id: "lineWidthScale",
         displayName: "Trajectory thickness",
