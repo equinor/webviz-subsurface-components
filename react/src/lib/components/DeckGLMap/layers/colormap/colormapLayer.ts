@@ -24,26 +24,30 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
-function getImageData(colorMapName: string, colorTables: colorTablesArray, colorMapping: any) {
+function getImageData(
+    colorMapName: string,
+    colorTables: colorTablesArray,
+    colorMapping: any
+) {
     const data = new Uint8Array(256 * 3);
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
         const rgb = rgbValues(value, colorMapName, colorTables);
 
-        if (colorMapping) {
-        var coloMapColor = color(colorMapping(value))?.rgb()
-        }
+        const coloMapColor = colorMapping
+            ? color(colorMapping(value))?.rgb()
+            : undefined;
+
         let colors: number[] = [];
 
-        if (rgb != undefined ) {
+        if (rgb != undefined) {
             if (Array.isArray(rgb)) {
                 colors = rgb;
             } else {
                 colors = [rgb.r, rgb.g, rgb.b];
             }
-        }
-        else if (coloMapColor != undefined ) {
+        } else if (coloMapColor != undefined) {
             colors = [coloMapColor.r, coloMapColor.g, coloMapColor.b];
         }
 

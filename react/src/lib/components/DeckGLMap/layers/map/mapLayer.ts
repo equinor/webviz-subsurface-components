@@ -10,7 +10,8 @@ import { TerrainLoader } from "@loaders.gl/terrain";
 // XXX import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
-import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables";
+import { rgbValues } from "@emerson-eps/color-tables";
+import {colorTablesArray} from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
 import GL from "@luma.gl/constants";
 import * as png from "@vivaxy/png";
 import { DeckGLLayerContext } from "../../components/Map";
@@ -145,7 +146,7 @@ function applyColorMap(
     colorMapRange: [number, number],
     colorMapName: string,
     valueRange: [number, number],
-    colorTables: any
+    colorTables: colorTablesArray
 ) {
     // Precalculate colors to save time.
     const colors = [];

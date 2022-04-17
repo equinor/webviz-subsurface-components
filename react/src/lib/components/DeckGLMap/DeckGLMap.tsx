@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "./redux/store";
 import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
-import { colorTablesArray } from "@emerson-eps/color-tables";
+import {colorTablesArray} from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
 
 interface DeckGLMapProps {
     id: string;
@@ -34,7 +34,7 @@ interface DeckGLMapProps {
         position?: number[] | null;
         horizontal?: boolean | null;
     };
-    colorTables?: any;
+    colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
 

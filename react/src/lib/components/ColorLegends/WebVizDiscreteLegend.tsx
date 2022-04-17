@@ -1,14 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { DiscreteColorLegend } from "@emerson-eps/color-tables";
-import colorTablesArray from "@emerson-eps/color-tables/";
+import {colorTablesArray} from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
 
 interface LegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
     title: string;
     position?: number[] | null;
     colorName: string;
-    colorTables: any | string;
+    colorTables: colorTablesArray | string | undefined;
     horizontal?: boolean | null;
 }
 
