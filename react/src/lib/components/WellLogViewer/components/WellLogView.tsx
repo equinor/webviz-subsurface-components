@@ -848,23 +848,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (checkSchema) {
             //check against the json schema
-            let errorTextTemplate = validateSchema(
-                this.template,
-                "WellLogTemplate"
-            );
-            if (errorTextTemplate)
-                errorTextTemplate = "Template: " + errorTextTemplate;
-
-            if (this.props.checkDatafileSchema) {
-                let errorText = validateSchema(this.props.welllog, "WellLog");
-                if (errorText) {
-                    if (errorText) errorText = "Datafile: " + errorText;
-                    if (errorTextTemplate) errorTextTemplate += "; ";
-                    errorTextTemplate += errorText;
+            try {
+                validateSchema(this.template, "WellLogTemplate");
+                if (this.props.checkDatafileSchema) {
+                    validateSchema(this.props.welllog, "WellLog");
                 }
+            } catch (e) {
+                this.setState({ errorText: String(e) });
             }
-
-            this.setState({ errorText: errorTextTemplate });
         }
 
         if (this.logController) {

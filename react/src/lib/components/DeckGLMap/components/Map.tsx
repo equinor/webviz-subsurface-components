@@ -1,14 +1,14 @@
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 import DeckGL from "@deck.gl/react";
 import { PickInfo } from "deck.gl";
-import { Feature, FeatureCollection } from "geojson";
+import { Feature } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setSpec } from "../redux/actions";
-import { WellsLayerProps, WellsPickInfo } from "../layers/wells/wellsLayer";
+import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
@@ -28,7 +28,10 @@ import {
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";
-import { validateSchema } from "../../../inputSchema/validator";
+import {
+    validateColorTables,
+    validateLayers,
+} from "../../../inputSchema/schemaValidationUtil";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
@@ -264,13 +267,6 @@ const Map: React.FC<MapProps> = ({
         setDeckGLLayers(jsonToObject(layers, enumerations) as Layer<unknown>[]);
     }, [st_layers, resources, editedData]);
 
-    const [errorText, setErrorText] = useState("");
-    useEffect(() => {
-        if (checkDatafileSchema) {
-            setErrorText(validate(deckGLLayers));
-        } else setErrorText("");
-    }, [checkDatafileSchema, deckGLLayers]);
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
@@ -290,9 +286,9 @@ const Map: React.FC<MapProps> = ({
         [coords, onMouseEvent]
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getPickingInfos = (
         pickInfo: PickingInfo,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: any
     ): PickingInfo[] => {
         if (coords?.multiPicking && pickInfo.layer) {
@@ -312,6 +308,7 @@ const Map: React.FC<MapProps> = ({
     const callOnMouseEvent = (
         type: "click" | "hover",
         infos: PickingInfo[],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: any
     ): void => {
         if (onMouseEvent) {
@@ -355,7 +352,8 @@ const Map: React.FC<MapProps> = ({
     const deckRef = useRef<DeckGL>(null);
     const [viewState, setViewState] = useState<ViewStateProps>();
 
-    const onLoad = useCallback(() => {
+    // calculate camera position and zoom on view resize
+    const onResize = useCallback(() => {
         if (deckRef == null) return;
 
         const deck = deckRef.current?.deck;
@@ -391,6 +389,21 @@ const Map: React.FC<MapProps> = ({
             setIsLoaded(state);
         }
     }, [deckGLLayers]);
+
+    // validate layers data
+    const [errorText, setErrorText] = useState<string>();
+    useEffect(() => {
+        const layers = deckRef.current?.deck.props.layers;
+        // this ensures to validate the schemas only once
+        if (checkDatafileSchema && layers && isLoaded) {
+            try {
+                validateLayers(layers);
+                colorTables && validateColorTables(colorTables);
+            } catch (e) {
+                setErrorText(String(e));
+            }
+        } else setErrorText(undefined);
+    }, [checkDatafileSchema, deckRef.current?.deck.props.layers, isLoaded]);
 
     const layerFilter = useCallback(
         (args: {
@@ -456,8 +469,7 @@ const Map: React.FC<MapProps> = ({
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
                 }
-                onLoad={onLoad}
-                onResize={onLoad}
+                onResize={onResize}
                 onAfterRender={onAfterRender}
             >
                 {children}
@@ -512,8 +524,8 @@ const Map: React.FC<MapProps> = ({
 
             {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
 
-            {errorText ? (
-                <div
+            {errorText && (
+                <pre
                     style={{
                         flex: "0, 0",
                         color: "rgb(255, 64, 64)",
@@ -521,8 +533,8 @@ const Map: React.FC<MapProps> = ({
                     }}
                 >
                     {errorText}
-                </div>
-            ) : null}
+                </pre>
+            )}
         </div>
     );
 };
@@ -662,15 +674,4 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
         }
     }
     return deckgl_views;
-}
-
-// schema validator
-function validate(layers?: Layer<unknown>[]): string {
-    const wells_layer_props = layers?.find((l) => l.id === "wells-layer")
-        ?.props as WellsLayerProps<FeatureCollection>;
-    const log_data = wells_layer_props?.logData;
-
-    let error_text = validateSchema(log_data, "WellLogs");
-    if (error_text) error_text = "Datafile: " + error_text;
-    return error_text;
 }
