@@ -15,7 +15,6 @@ import { layersDefaultProps } from "../layersDefaultProps";
 import fsColormap from "./colormap.fs.glsl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
-import { color } from "d3-color";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -24,36 +23,24 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
-function getImageData(
-    colorMapName: string,
-    colorTables: colorTablesArray,
-    colorMapping: any
-) {
+function getImageData(colorMapName: string, colorTables: colorTablesArray) {
     const data = new Uint8Array(256 * 3);
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
         const rgb = rgbValues(value, colorMapName, colorTables);
-
-        const coloMapColor = colorMapping
-            ? color(colorMapping(value))?.rgb()
-            : undefined;
-
-        let colors: number[] = [];
-
+        let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
-                colors = rgb;
+                color = rgb;
             } else {
-                colors = [rgb.r, rgb.g, rgb.b];
+                color = [rgb.r, rgb.g, rgb.b];
             }
-        } else if (coloMapColor != undefined) {
-            colors = [coloMapColor.r, coloMapColor.g, coloMapColor.b];
         }
 
-        data[3 * i + 0] = colors[0];
-        data[3 * i + 1] = colors[1];
-        data[3 * i + 2] = colors[2];
+        data[3 * i + 0] = color[0];
+        data[3 * i + 1] = color[1];
+        data[3 * i + 2] = color[2];
     }
 
     return data;
@@ -140,9 +127,7 @@ export default class ColormapLayer extends BitmapLayer<
                     data: getImageData(
                         this.props.colorMapName,
                         (this.context as DeckGLLayerContext).userData
-                            .colorTables,
-                        (this.context as DeckGLLayerContext).userData
-                            .colorMapping
+                            .colorTables
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),

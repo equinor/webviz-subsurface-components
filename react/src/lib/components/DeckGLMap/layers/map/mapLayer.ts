@@ -11,7 +11,7 @@ import { TerrainLoader } from "@loaders.gl/terrain";
 import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { rgbValues } from "@emerson-eps/color-tables";
-import {colorTablesArray} from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
 import GL from "@luma.gl/constants";
 import * as png from "@vivaxy/png";
 import { DeckGLLayerContext } from "../../components/Map";

@@ -3,7 +3,6 @@ import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { ColorLegend } from "@emerson-eps/color-tables";
 const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
-import * as d3 from "d3";
 import { d3ColorScales } from "@emerson-eps/color-tables";
 
 export default {
@@ -599,12 +598,8 @@ SelectableFeatureExample.args = {
 };
 
 // colorselector for welllayer
-
-// Map example with color selector
-// colorMap layer arguments
 const wellLayers = [exampleData[0].layers[4]];
 const wellId = exampleData[0].id;
-// continous legend arguments
 // prop for continous legend
 var min = 0;
 var max = 0.35;
@@ -634,23 +629,10 @@ var discreteData = {
 
 const wellLayerTemplate = (args) => {
     const [wellLegendUpdated, setWellLegendUpdated] = React.useState();
-    //const [wellLegendUpdated, setWellLegendUpdated] = React.useState<() => any>(undefined);
 
     const wellLayerData = React.useCallback((data) => {
-        //setWellLegendUpdated(() => data);
         setWellLegendUpdated(data);
     }, []);
-
-    // const colorMapping = function colorMapping(t) {
-    //     return d3.interpolateInferno(t)
-    // }
-
-    //console.log('wellLegendUpdated', wellLegendUpdated)
-    // if (wellLegendUpdated) {
-    //     setWellLegendUpdated(wellLegendUpdated)
-    // } else {
-    //     setWellLegendUpdated([0,0,0,0])
-    // }
 
     const d3ColorName = d3ColorScales.find((value) => {
         if (wellLegendUpdated) return value.name == wellLegendUpdated;
@@ -658,7 +640,6 @@ const wellLayerTemplate = (args) => {
     });
 
     const colorMapping = d3ColorName?.colors;
-    //const colorMapping = wellLegendUpdated
 
     const layerDataChanged = [
         {
@@ -668,7 +649,6 @@ const wellLayerTemplate = (args) => {
                 : args.wellLayers[0].logColor,
         },
     ];
-    //const layerDataChanged = [{...args.wellLayers[0], colorMapping: colorMapping }]
 
     return (
         <div>

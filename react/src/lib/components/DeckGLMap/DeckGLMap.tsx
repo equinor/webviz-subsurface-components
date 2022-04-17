@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "./redux/store";
 import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
-import {colorTablesArray} from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
 
 export interface DeckGLMapProps {
     id: string;
@@ -43,7 +43,7 @@ export interface DeckGLMapProps {
      */
     checkDatafileSchema?: boolean;
     onMouseEvent?: (event: MapMouseEvent) => void;
-    colorMapping: any;
+    colorMapping: (t: number) => string | string[];
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({

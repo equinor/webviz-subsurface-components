@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { DiscreteColorLegend } from "@emerson-eps/color-tables";
-import {colorTablesArray} from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
 
 interface LegendProps {
     discreteData: { objects: Record<string, [number[], number]> };

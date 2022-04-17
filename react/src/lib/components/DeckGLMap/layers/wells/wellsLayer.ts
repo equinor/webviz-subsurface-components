@@ -6,7 +6,6 @@ import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
 import { colorsArray, rgbValues, RGBToHex } from "@emerson-eps/color-tables";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-//import { rgbValues } from "../../storybook/continousLegend"
 import {
     Feature,
     GeometryCollection,
@@ -238,7 +237,6 @@ export default class WellsLayer extends CompositeLayer<
                             .colorTables,
                         (this.context as DeckGLLayerContext).userData
                             .colorMapping
-                        // this.props.colorMapping
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
@@ -453,6 +451,7 @@ function getLogColor(
     log_name: string,
     logColor: string,
     colorTables: colorTablesArray,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     colorMapping: any
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
@@ -464,7 +463,7 @@ function getLogColor(
         const min = Math.min(...log_data);
         const max = Math.max(...log_data);
         const max_delta = max - min;
-        const getSelectedScale = colorTables.find((value: any) => {
+        const getSelectedScale = colorTables.find((value) => {
             return value.name == logColor;
         });
         const getSelectedScaleLength = getSelectedScale?.colors.length;
@@ -495,8 +494,10 @@ function getLogColor(
                 const point = (value - min) / max_delta;
                 const minValue = 0;
                 const maxValue = normalizingColorMax;
+                // eslint-disable-next-line
                 let interpolatedValue: any;
-                getSelectedScale?.colors.forEach((item: any, index: number) => {
+
+                getSelectedScale?.colors.forEach((item, index) => {
                     const currentIndex = index;
                     const normalizedCurrentIndex =
                         (currentIndex - minValue) / (maxValue - minValue);
@@ -527,7 +528,6 @@ function getLogColor(
                     interpolatedValue?.b,
                 ]);
             }
-
             // d3 continuous scale
             if (typeof colorMapping == "function") {
                 const colorMappingRange = colorMapping(
@@ -547,8 +547,10 @@ function getLogColor(
             if (typeof colorMapping == "object") {
                 const max = colorMapping.length - 1;
                 const point = (value - min) / max_delta;
+                // eslint-disable-next-line
                 let interpolatedValue: any;
-                colorMapping.forEach((item: any, index: number) => {
+
+                colorMapping.forEach((item: string, index: number) => {
                     const currentIndex = index;
                     const normalizedCurrentIndex =
                         (currentIndex - 0) / (max - 0);
@@ -579,7 +581,7 @@ function getLogColor(
             colorTables
         );
 
-        const getSelectedScaleValue = colorTables.find((value: any) => {
+        const getSelectedScaleValue = colorTables.find((value) => {
             return value.name == logColor;
         });
 
@@ -650,7 +652,7 @@ function getLogColor(
             // d3 discrete scale
             if (typeof colorMapping == "object") {
                 const d3ColorArrays = colorMapping.find(
-                    (value: number, index: number) => {
+                    (_value: number, index: number) => {
                         return index == code;
                     }
                 );

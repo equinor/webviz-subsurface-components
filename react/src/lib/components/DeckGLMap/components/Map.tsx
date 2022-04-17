@@ -79,7 +79,7 @@ export interface DeckGLLayerContext extends LayerContext {
     userData: {
         setEditedData: (data: Record<string, unknown>) => void;
         colorTables: colorTablesArray;
-        colorMapping: any;
+        colorMapping: (t: number) => string | string[];
     };
 }
 
@@ -166,8 +166,6 @@ export interface MapProps {
      */
     editedData?: Record<string, unknown>;
 
-    // colorMapping?: (data: Record<string, unknown>) => void;
-
     /**
      * For reacting to prop changes
      */
@@ -185,7 +183,7 @@ export interface MapProps {
 
     children?: React.ReactNode;
 
-    colorMapping: any;
+    colorMapping: (t: number) => string | string[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
