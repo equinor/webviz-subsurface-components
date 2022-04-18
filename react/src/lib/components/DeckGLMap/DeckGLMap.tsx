@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "./redux/store";
 import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
-import { colorTablesArray } from "@emerson-eps/color-tables/src/component/Utils/ColorTableTypes";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 export interface DeckGLMapProps {
     id: string;
