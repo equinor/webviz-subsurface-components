@@ -1,6 +1,6 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
-import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
@@ -139,7 +139,11 @@ export default class WellsLayer extends CompositeLayer<
         );
     }
 
-    renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
+    renderLayers(): (
+        | GeoJsonLayer<Feature>
+        | PathLayer<LogCurveDataType>
+        | TextLayer<Feature>
+    )[] {
         if (!(this.props.data as FeatureCollection).features) {
             return [];
         }
@@ -273,26 +277,22 @@ export default class WellsLayer extends CompositeLayer<
         );
 
         // well name
-        const names = new GeoJsonLayer<Feature>(
+        const names = new TextLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "names",
-                data: getWellNamePositionData(
-                    data.features,
-                    this.props.wellNameAtTop,
-                    is3d
-                ),
-                pointType: "text",
+                data: data.features,
                 visible: this.props.wellNameVisible,
-                getText: (f: Feature) => f.properties?.["name"],
-                getTextColor: this.props.wellNameColor,
-                getTextAnchor: "start",
-                getTextAlignmentBaseline: "bottom",
-                getTextSize: this.props.wellNameSize,
+                getPosition: (d: Feature) =>
+                    getAnnotationPosition(d, this.props.wellNameAtTop, is3d),
+                getText: (d: Feature) => d.properties?.["name"],
+                getColor: this.props.wellNameColor,
+                getAnchor: "start",
+                getAlignmentBaseline: "bottom",
+                getSize: this.props.wellNameSize,
             })
         );
 
-        const layers = [outline, log_layer, colors, highlight, names];
-        return layers;
+        return [outline, log_layer, colors, highlight, names];
     }
 
     // For now, use `any` for the picking types because this function should
@@ -384,36 +384,24 @@ function isSelectedLogRun(d: LogCurveDataType, logrun_name: string): boolean {
     return d.header.name.toLowerCase() === logrun_name.toLowerCase();
 }
 
-// return name positions at top/bottom of the trajectory
-function getWellNamePositionData(
-    wells_data: Feature[],
+// return position for well name and icon
+function getAnnotationPosition(
+    well_data: Feature,
     name_at_top: boolean,
     view_is_3d: boolean
-): Feature[] {
-    const wells_data_with_point_geometry = wells_data.map((well_data) => {
-        const well_coordinates = getWellCoordinates(well_data);
+): Position | null {
+    const well_coordinates = getWellCoordinates(well_data);
+
+    if (name_at_top) {
         const top = well_coordinates.at(0);
-        const bot = well_coordinates.at(-1);
-
         // using z=0 for orthographic view to keep label above other other layers
-        const new_top = view_is_3d ? top : [top?.[0], top?.[1], 0];
-        const new_bot = view_is_3d ? bot : [bot?.[0], bot?.[1], 0];
-
-        // Create point type geometry object
-        const point_geometry_object = {
-            type: "Point",
-            coordinates: name_at_top ? new_top : new_bot,
-        } as Point;
-        const new_feature = {
-            ...well_data,
-            geometry: {
-                ...well_data.geometry,
-                geometries: [point_geometry_object],
-            },
-        };
-        return new_feature;
-    });
-    return wells_data_with_point_geometry;
+        if (top) return view_is_3d ? top : [top[0], top[1], 0];
+    } else {
+        const bot = well_coordinates.at(-1);
+        // using z=0 for orthographic view to keep label above other other layers
+        if (bot) return view_is_3d ? bot : [bot[0], bot[1], 0];
+    }
+    return null;
 }
 
 function getWellObjectByName(
