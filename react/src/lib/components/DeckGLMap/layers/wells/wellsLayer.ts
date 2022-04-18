@@ -1,6 +1,6 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
-import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PathLayer, TextLayer, IconLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
@@ -55,6 +55,10 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameAtTop: boolean;
     wellNameSize: number;
     wellNameColor: RGBAColor;
+    wellSymbolVisible: boolean;
+    wellSymbolAtTop: boolean;
+    wellSymbolSize: number;
+    wellSymbolColor: RGBAColor;
 }
 
 export interface LogCurveDataType {
@@ -143,6 +147,7 @@ export default class WellsLayer extends CompositeLayer<
         | GeoJsonLayer<Feature>
         | PathLayer<LogCurveDataType>
         | TextLayer<Feature>
+        | IconLayer<Feature>
     )[] {
         if (!(this.props.data as FeatureCollection).features) {
             return [];
@@ -292,7 +297,26 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        return [outline, log_layer, colors, highlight, names];
+        const ICON_MAPPING = {
+            marker: { x: 0, y: 150, width: 25, height: 25, mask: false },
+        };
+        const symbols = new IconLayer<Feature>(
+            this.getSubLayerProps<Feature>({
+                id: "symbols",
+                data: data.features,
+                visible: this.props.wellSymbolVisible,
+                iconAtlas: require("D:/BigLoopAnalytics/webviz-subsurface-components/react/src/demo/example-data/wells-symbols.png"),
+                iconMapping: ICON_MAPPING,
+                sizeScale: 5,
+                getPosition: (d: Feature) =>
+                    getAnnotationPosition(d, this.props.wellSymbolAtTop, is3d),
+                getIcon: (d: Feature) => "marker",
+                getSize: this.props.wellSymbolSize,
+                getColor: this.props.wellSymbolColor,
+            })
+        );
+
+        return [outline, log_layer, colors, highlight, names, symbols];
     }
 
     // For now, use `any` for the picking types because this function should

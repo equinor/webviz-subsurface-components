@@ -22,6 +22,7 @@ VolveWells.args = {
         {
             "@@type": "WellsLayer",
             data: "@@#resources.wellsData",
+            wellSymbolVisible: true,
         },
     ],
 };
