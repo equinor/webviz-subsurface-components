@@ -55,6 +55,8 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameAtTop: boolean;
     wellNameSize: number;
     wellNameColor: RGBAColor;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    iconAtlas: any;
     wellSymbolVisible: boolean;
     wellSymbolAtTop: boolean;
     wellSymbolSize: number;
@@ -305,7 +307,7 @@ export default class WellsLayer extends CompositeLayer<
                 id: "symbols",
                 data: data.features,
                 visible: this.props.wellSymbolVisible,
-                iconAtlas: require("D:/BigLoopAnalytics/webviz-subsurface-components/react/src/demo/example-data/wells-symbols.png"),
+                iconAtlas: this.props.iconAtlas,
                 iconMapping: ICON_MAPPING,
                 sizeScale: 5,
                 getPosition: (d: Feature) =>
