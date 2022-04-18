@@ -73,11 +73,6 @@ export const MenuTypeProps = [
 
 export const NumericTypeProps = [
     {
-        id: "wellNameSize",
-        displayName: "Well name size",
-        dependentOnProp: undefined,
-    },
-    {
         id: "lineWidthScale",
         displayName: "Trajectory thickness",
         dependentOnProp: undefined,
@@ -91,6 +86,11 @@ export const NumericTypeProps = [
     {
         id: "lineWidthMinPixels",
         displayName: "Line thickness",
+        dependentOnProp: undefined,
+    },
+    {
+        id: "wellNameSize",
+        displayName: "Well name size",
         dependentOnProp: undefined,
     },
 ] as const;
