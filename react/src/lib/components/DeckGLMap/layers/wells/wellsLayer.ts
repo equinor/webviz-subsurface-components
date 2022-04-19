@@ -400,11 +400,16 @@ function getAnnotationPosition(
             const trajectory = getTrajectory(well_data);
             top = trajectory?.at(0);
         }
+
         // using z=0 for orthographic view to keep label above other other layers
         if (top) return view_is_3d ? top : [top[0], top[1], 0];
     } else {
+        let bot;
+        // if trajectory is not present, return top position from Point geometry
         const trajectory = getTrajectory(well_data);
-        const bot = trajectory?.at(-1);
+        if (trajectory) bot = trajectory?.at(-1);
+        else bot = getWellHeadPosition(well_data);
+
         // using z=0 for orthographic view to keep label above other other layers
         if (bot) return view_is_3d ? bot : [bot[0], bot[1], 0];
     }
