@@ -390,14 +390,21 @@ function getAnnotationPosition(
     name_at_top: boolean,
     view_is_3d: boolean
 ): Position | null {
-    const well_coordinates = getWellCoordinates(well_data);
-
     if (name_at_top) {
-        const top = well_coordinates.at(0);
+        let top;
+
+        // Read top position from Point geometry, if not present, read it from LineString geometry
+        const well_head = getWellHeadPosition(well_data);
+        if (well_data) top = well_head;
+        else {
+            const trajectory = getTrajectory(well_data);
+            top = trajectory?.at(0);
+        }
         // using z=0 for orthographic view to keep label above other other layers
         if (top) return view_is_3d ? top : [top[0], top[1], 0];
     } else {
-        const bot = well_coordinates.at(-1);
+        const trajectory = getTrajectory(well_data);
+        const bot = trajectory?.at(-1);
         // using z=0 for orthographic view to keep label above other other layers
         if (bot) return view_is_3d ? bot : [bot[0], bot[1], 0];
     }
@@ -414,26 +421,30 @@ function getWellObjectByName(
     );
 }
 
-// Return well head coordinates from Point Geometry
-function getWellHeadCoordinates(well_object?: Feature): Position {
-    return (
-        (well_object?.geometry as GeometryCollection)?.geometries.find(
-            (item) => item.type == "Point"
-        ) as Point
-    )?.coordinates;
+function getPointGeometry(well_object: Feature): Point | undefined {
+    return (well_object.geometry as GeometryCollection)?.geometries.find(
+        (item) => item.type == "Point"
+    ) as Point;
 }
 
-// Return Well/Trajectory coordinates from LineString Geometry
-function getWellCoordinates(well_object?: Feature): Position[] {
-    return (
-        (well_object?.geometry as GeometryCollection)?.geometries.find(
-            (item) => item.type == "LineString"
-        ) as LineString
-    )?.coordinates;
+function getLineStringGeometry(well_object: Feature): LineString | undefined {
+    return (well_object.geometry as GeometryCollection)?.geometries.find(
+        (item) => item.type == "LineString"
+    ) as LineString;
 }
 
-function getWellMds(well_object?: Feature): number[] {
-    return well_object?.properties?.["md"][0];
+// Return well head position from Point Geometry
+function getWellHeadPosition(well_object: Feature): Position | undefined {
+    return getPointGeometry(well_object)?.coordinates;
+}
+
+// Return Trajectory data from LineString Geometry
+function getTrajectory(well_object: Feature): Position[] | undefined {
+    return getLineStringGeometry(well_object)?.coordinates;
+}
+
+function getWellMds(well_object: Feature): number[] {
+    return well_object.properties?.["md"][0];
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
@@ -447,7 +458,9 @@ function getLogPath(
     logrun_name: string
 ): Position[] {
     const well_object = getWellObjectByName(wells_data, d.header.well);
-    const well_xyz = getWellCoordinates(well_object);
+    if (!well_object) return [];
+
+    const well_xyz = getTrajectory(well_object);
     const well_mds = getWellMds(well_object);
 
     if (
@@ -623,7 +636,7 @@ function getMd(coord: Position, feature: Feature): number | null {
     if (!feature.properties?.["md"]?.[0] || !feature.geometry) return null;
 
     const measured_depths = feature.properties["md"][0] as number[];
-    const trajectory3D = getWellCoordinates(feature);
+    const trajectory3D = getTrajectory(feature);
 
     if (trajectory3D == undefined) return null;
 
@@ -655,11 +668,11 @@ function getMdProperty(
 }
 
 function getTvd(coord: Position, feature: Feature): number | null {
-    const trajectory3D = getWellCoordinates(feature);
+    const trajectory3D = getTrajectory(feature);
 
     // if trajectory is not found or if it has a data single point then get tvd from well head
     if (trajectory3D == undefined || trajectory3D?.length <= 1) {
-        const wellhead_xyz = getWellHeadCoordinates(feature);
+        const wellhead_xyz = getWellHeadPosition(feature);
         return wellhead_xyz?.[2] ?? null;
     }
     let trajectory;

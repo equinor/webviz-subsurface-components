@@ -51,12 +51,12 @@ export const SliderTypeProps = [
 export const ToggleTypeProps = [
     {
         id: "wellNameVisible",
-        displayName: "Show well name",
+        displayName: "Well name",
         dependentOnProp: undefined,
     },
     {
         id: "wellNameAtTop",
-        displayName: "Show well name at top",
+        displayName: "Well name at top",
         dependentOnProp: undefined,
     },
     { id: "logCurves", displayName: "Log curves", dependentOnProp: "logData" },
