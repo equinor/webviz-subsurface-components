@@ -626,6 +626,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
             height: "100%",
             flipY: false,
             far,
+            near: 1.0,
         });
     } else {
         let yPos = 0;

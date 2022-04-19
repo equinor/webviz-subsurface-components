@@ -270,10 +270,10 @@ KhMapFlat.parameters = {
 const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
-    bounds: [432205, 6475078, 437720, 6481113],
+    bounds: [-1000, -1000, 1000, 1000],
     meshMaxError: 100,
     mesh: "hugin_depth_25_m_normalized_margin.png",
-    meshValueRange: [2782, 3513],
+    meshValueRange: [0, 1000],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [2782, 3513],
     rotDeg: 0,
@@ -392,13 +392,20 @@ MapClampColor.parameters = {
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer",
-    bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+    bounds: [-1000, -1000, -1000, 1000, 1000, 1000],
 };
+const north_arrow_layer = {
+    "@@type": "NorthArrow3DLayer",
+    id: "north-arrow-layer",
+};
+
 export const Axes = MinimalTemplate.bind({});
 Axes.args = {
     id: "axes",
-    layers: [meshMapLayer, axes],
-    bounds: [432150, 6475800, 439400, 6481500],
+    //layers: [meshMapLayer, axes, north_arrow_layer],
+    layers: [axes, north_arrow_layer],
+    //bounds: [432150, 6475800, 439400, 6481500], trengs denne?? eh ja..
+    bounds: [-1000, -1000, 1000, 1000],
     views: {
         layout: [1, 1],
         viewports: [
