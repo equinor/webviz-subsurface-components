@@ -43,7 +43,7 @@ export interface DeckGLMapProps {
      */
     checkDatafileSchema?: boolean;
     onMouseEvent?: (event: MapMouseEvent) => void;
-    colorMapping: (t: number) => string | string[];
+    colorMapping?: (t: number) => string | string[];
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({

@@ -84,7 +84,7 @@ export default {
             description:
                 "Prop containing color table data." +
                 "See colorTables repo for reference:<br/>" +
-                "https://github.com/emerson-eps/color-tables/blob/main/react-app/src/component/color-tables.json",
+                "https://github.com/emerson-eps/color-tables/blob/main/react-app/dist/component/color-tables.json",
         },
 
         editedData: {
