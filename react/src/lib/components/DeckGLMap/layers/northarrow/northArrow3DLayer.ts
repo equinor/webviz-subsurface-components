@@ -10,7 +10,7 @@ import { COORDINATE_SYSTEM } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
 
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
-// import {ConeGeometry} from '@luma.gl/engine';
+import {ConeGeometry} from '@luma.gl/engine';
 import { Vector3 } from "@math.gl/core";
 
 import { GLTF_JSON_NORTH_ARROW } from "../../utils/northArrow";
@@ -33,18 +33,17 @@ export interface NorthArrow3DLayerProps<D> extends LayerProps<D> {
 }
 
 
-
-export default class NorthArrow3DLayer extends CompositeLayer<
+export default class NorthArrow3DLayer extends Layer<
     unknown,
     NorthArrow3DLayerProps<unknown>
 > {
     initializeState(context: DeckGLLayerContext): void {
-        console.log("initializeState")
+        //console.log("initializeState")
         const { gl } = context;
-        const bounds: [number, number, number, number, number, number] = [
-            -100, -100, -100, 100, 100, 100,
-        ];
-        const box_lines = GetBoxLines(bounds);
+        // const bounds: [number, number, number, number, number, number] = [
+        //     -100, -100, -100, 100, 100, 100,
+        // ];
+        // const box_lines = GetBoxLines(bounds);
         // this.setState({ ...models, box_lines });
         this.setState(this._getModels(gl));
     }
@@ -72,110 +71,44 @@ export default class NorthArrow3DLayer extends CompositeLayer<
     }
 
     updateState({ context }): void {
-        //console.log("updateState")
         if (context.gl) {
-            //console.log("updateState")
-            const box_lines = this.state.box_lines;
+            //const box_lines = this.state.box_lines;
             // console.log("updateState box_lines", box_lines)
             // this.setState({ ...this._getModels(context.gl, box_lines), box_lines });
             this.setState(this._getModels(context.gl));
-        }
-        // if (context.gl) {
-        //     const cam_pos = new Vector3(this.context.viewport.cameraPosition);
-        //     console.log(cam_pos)
-        //     //const center = new Vector3(this.unproject([300, 300, 0.0]));
-        //     const center = new Vector3([0.0, 0.0, 0.0]);
-        //     const dir = new Vector3([
-        //         center[0] - cam_pos[0],
-        //         center[1] - cam_pos[1],
-        //         center[2] - cam_pos[2],
-        //     ]);
-        //     dir.normalize();
-        //     dir.scale(600.0); // XXX langt borte men stor..dvs bounds maa være store men de trenger ikke være proerty de boer hardcodes.
 
-        //     // pos: World coordinate for north arrow.
-        //     const pos = new Vector3([
-        //         cam_pos[0] + dir[0],
-        //         cam_pos[1] + dir[1],
-        //         cam_pos[2] + dir[2],
-        //     ]);
-        //     this.setState({ pos });
-        // }
+            //console.log(context)
+        }
     }
       
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms, context }: any): void {
-        console.log("DRAW");
+        //console.log("DRAW context uniforms", context, uniforms);
+        const { gl } = context;
+        gl.disable(gl.DEPTH_TEST);  // XXX det maa dokumenteres at north arrw laget skal maa vaere sist for at dette sdkal fungere..
         super.draw({ moduleParameters, uniforms, context });
+        gl.enable(gl.DEPTH_TEST);
     }
 
-    renderLayers(): ScenegraphLayer<unknown>[] {
 
-        const cam_pos = new Vector3(this.context.viewport.cameraPosition);
-        //console.log("cam_pos: ", cam_pos)
-    
-        //const center = new Vector3(this.context.viewport.center);
-        //const center = new Vector3(this.unproject([100, 100, 0.0]));
-        const center = new Vector3(this.unproject([300, 300, 0.0]));
-        console.log("center: ", center)
-    
-        const dir = new Vector3([
-            center[0] - cam_pos[0],
-            center[1] - cam_pos[1],
-            center[2] - cam_pos[2],
-        ]);
-        dir.normalize();
-        dir.scale(600.0); // XXX langt borte men stor..dvs bounds maa være store men de trenger ikke være proerty de boer hardcodes.
-    
-        //console.log("dir: ", dir)
-    
-        // pos: World coordinate for north arrow.
-        const pos = new Vector3([
-            cam_pos[0] + dir[0],
-            cam_pos[1] + dir[1],
-            cam_pos[2] + dir[2],
-        ]);
-        // //const pos = new Vector3([0,0,0]);
-        // console.log("pos: ", pos)
-
-        // const pos = this.state.pos;
-        // console.log("pos: ", pos)
-
-
-        const layers = [
-            new ScenegraphLayer({
-                id: "north-arrow-scenegraph-layer",
-                data: [{}],
-                //scenegraph: load(url, GLTFLoader, {}),  // XXX loades en gang externt?
-                scenegraph,
-                getOrientation: [0.0, 0.0, 0.0],
-                //getTranslation: [0.0, 0.0, 0.0],
-                getTranslation: pos,
-                getScale: [1, 1, 1],
-                sizeScale: 500, // 200
-                _lighting: "pbr",
-                pickable: false,
-                coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-            }),
-        ];
-
-        return layers;
-    }
 
     //eslint-disable-next-line
     //_getModels(gl: any, box_lines: number[] ) {
     _getModels(gl: any) {
-        const bounds: [number, number, number, number, number, number] = [
-            -10, -10, -10, 10, 10, 10,
-        ];
-        const box_lines = GetBoxLines(bounds);
+        // const bounds: [number, number, number, number, number, number] = [
+        //     -10, -10, -10, 10, 10, 10,
+        // ];
+        //const model_lines = GetBoxLines(bounds);
+        const model_lines = GetArrowLines();
+        //console.log(model_lines)
 
         const cam_pos = new Vector3(this.context.viewport.cameraPosition);
 
         //const center = new Vector3(this.context.viewport.center);
-        const center = new Vector3(this.unproject([100, 100, 0.0]));
-        console.log("center: ", center)
+        const center = new Vector3(this.unproject([100, 100]));
+        //const center = new Vector3([432150, 6475800, 0]);
+        //console.log("center: ", center)
 
         const dir = new Vector3([
             center[0] - cam_pos[0],
@@ -183,7 +116,7 @@ export default class NorthArrow3DLayer extends CompositeLayer<
             center[2] - cam_pos[2],
         ]);
         dir.normalize();
-        dir.scale(600.0); // XXX langt borte men stor..dvs bounds maa være store men de trenger ikke være proerty de boer hardcodes.
+        dir.scale(1000.0); // XXX langt borte men stor..dvs bounds maa være store men de trenger ikke være property de boer hardcodes.
 
         // pos: World coordinate for north arrow.
         const pos = new Vector3([
@@ -195,17 +128,32 @@ export default class NorthArrow3DLayer extends CompositeLayer<
         const lines: number[] = [];
 
         //console.log(box_lines);
-        for (let i = 0; i < box_lines.length / 3; i = i + 1) {
-            const x = box_lines[i * 3 + 0] + pos[0];
-            const y = box_lines[i * 3 + 1] + pos[1];
-            const z = box_lines[i * 3 + 2] + pos[2];
+        const scale = 10;
+        for (let i = 0; i < model_lines.length / 3; i = i + 1) {
+            const x = model_lines[i * 3 + 0] * scale + pos[0];
+            const y = model_lines[i * 3 + 1] * scale  + pos[1];
+            const z = model_lines[i * 3 + 2] * scale  + pos[2];
             lines.push(x, y, z);
         }
+
+        // const scale = 1000;
+        // for (let i = 0; i < model_lines.length / 3; i = i + 1) {
+        //     const x = model_lines[i * 3 + 0] * scale + 432150;
+        //     const y = model_lines[i * 3 + 1] * scale + 6475800;
+        //     const z = model_lines[i * 3 + 2] * scale;
+        //     lines.push(x, y, z);
+        // }
         //console.log(lines);
+
+        // const cone = new ConeGeometry({
+        //     radius: 20,
+        //     height: 100,
+        //     cap: true
+        // });
 
 
         const grids = new Model(gl, {
-            id: `${this.props.id}-gridssssss`,
+            id: `${this.props.id}-grids`,
             vs: gridVertex,
             fs: fragmentShader,
             geometry: new Geometry({
@@ -395,6 +343,80 @@ export default class NorthArrow3DLayer extends CompositeLayer<
 
 
 // //-- Local functions. --------------------------------------
+
+function GetArrowLines(): number[] {
+    const lines: number[][] = [];
+
+    let z = 0.5;
+    lines.push([-1, -2, z]);
+    lines.push([-1,  2, z]);
+
+    lines.push([-1, 2, z]);
+    lines.push([-1.5, 2, z]);
+
+    lines.push([-1.5, 2, z]);
+    lines.push([0, 4, z]);
+
+    lines.push([0, 4, z]);
+    lines.push([1.5, 2, z]);
+
+    lines.push([1.5, 2, z]);
+    lines.push([1, 2, z]);
+
+    lines.push([1, 2, z]);
+    lines.push([1, -2, z]);
+
+    lines.push([1, -2, z]);
+    lines.push([-1, -2, z]);
+
+    z = -0.5;
+    lines.push([-1, -2, z]);
+    lines.push([-1,  2, z]);
+
+    lines.push([-1, 2, z]);
+    lines.push([-1.5, 2, z]);
+
+    lines.push([-1.5, 2, z]);
+    lines.push([0, 4, z]);
+
+    lines.push([0, 4, z]);
+    lines.push([1.5, 2, z]);
+
+    lines.push([1.5, 2, z]);
+    lines.push([1, 2, z]);
+
+    lines.push([1, 2, z]);
+    lines.push([1, -2, z]);
+
+    lines.push([1, -2, z]);
+    lines.push([-1, -2, z]);
+
+    // stolper
+    lines.push([-1, -2, -0.5]);
+    lines.push([-1, -2, 0.5]);
+
+
+    lines.push([-1, 2, -0.5]);
+    lines.push([-1, 2, 0.5]);
+
+    lines.push([-1.5, 2, -0.5]);
+    lines.push([-1.5, 2, 0.5]);
+
+    lines.push([0, 4, -0.5]);
+    lines.push([0, 4, 0.5]);
+
+    lines.push([1.5, 2, -0.5]);
+    lines.push([1.5, 2, 0.5]);
+
+    lines.push([1, 2, -0.5]);
+    lines.push([1, 2, 0.5]);
+
+    lines.push([1, -2, -0.5]);
+    lines.push([1, -2, 0.5]);
+
+
+    return lines.flat();
+}
 
 function GetBoxLines(
     bounds: [number, number, number, number, number, number]
