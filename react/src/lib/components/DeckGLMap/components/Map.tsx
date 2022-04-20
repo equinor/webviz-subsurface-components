@@ -661,7 +661,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     width: 99.5 / nX + "%",
                     height: 99.5 / nY + "%",
                     flipY: false,
-                   // far,
+                    far,
                     near,
                 });
                 xPos = xPos + 99.5 / nX;

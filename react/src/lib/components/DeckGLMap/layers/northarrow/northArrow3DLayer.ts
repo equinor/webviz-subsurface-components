@@ -6,6 +6,7 @@ import fragmentShader from "./axes-fragment.glsl";
 import gridVertex from "./grid-vertex.glsl";
 import { project } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
+import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { Vector3 } from "@math.gl/core";
 
 export type NorthArrow3DLayerProps<D> = LayerProps<D>;
@@ -23,7 +24,9 @@ export default class NorthArrow3DLayer extends Layer<
         return true;
     }
 
-    updateState({ context }: any): void {
+    updateState({
+        context,
+    }: UpdateStateInfo<NorthArrow3DLayerProps<unknown>>): void {
         if (context.gl) {
             this.setState(this._getModels(context.gl));
         }
@@ -42,7 +45,7 @@ export default class NorthArrow3DLayer extends Layer<
     _getModels(gl: any) {
         const model_lines = GetArrowLines();
 
-        const cam_pos = new Vector3(this.context.viewport.cameraPosition);
+        const cam_pos = new Vector3(this.context.viewport.getCameraPosition());
         const center = new Vector3(this.unproject([100, 100]));
 
         const dir = new Vector3([
