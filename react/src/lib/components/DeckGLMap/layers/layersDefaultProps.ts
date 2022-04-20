@@ -130,6 +130,12 @@ export const layersDefaultProps: Record<string, unknown> = {
         id: "axes-layer",
         visible: true,
     },
+    NorthArrow3DLayer: {
+        "@@type": "NorthArrow3DLayer",
+        name: "NorthArrow3D",
+        id: "north-arrow-layer",
+        visible: true,
+    },
     DrawingLayer: {
         "@@type": "DrawingLayer",
         name: "Drawing",
