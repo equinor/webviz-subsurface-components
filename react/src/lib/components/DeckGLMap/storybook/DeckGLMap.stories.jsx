@@ -1,6 +1,9 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
+import { ColorLegend } from "@emerson-eps/color-tables";
+const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
+import { d3ColorScales } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
@@ -81,7 +84,7 @@ export default {
             description:
                 "Prop containing color table data." +
                 "See colorTables repo for reference:<br/>" +
-                "https://github.com/emerson-eps/color-tables/blob/main/react-app/src/component/color-tables.json",
+                "https://github.com/emerson-eps/color-tables/blob/main/react-app/dist/component/color-tables.json",
         },
 
         editedData: {
@@ -591,4 +594,95 @@ SelectableFeatureExample.args = {
         polylineUsingSelectableGeoJsonLayer,
         polygonUsingSelectableGeoJsonLayer,
     ],
+};
+
+// Map example with color selector
+// colorMap layer arguments
+const layers = [exampleData[0].layers[0]];
+const id = exampleData[0].id;
+
+// continous legend arguments
+// prop for continous legend
+var min = 0;
+var max = 0.35;
+var dataObjectName = "Legend";
+var position = [16, 10];
+var horizontal = true;
+var colorName = "Physics";
+
+// prop for discrete data
+var discreteData = {
+    Above_BCU: [[], 0],
+    ABOVE: [[], 1],
+    H12: [[], 2],
+    H11: [[], 3],
+    H10: [[], 4],
+    H9: [[], 5],
+    H8: [[], 6],
+    H7: [[], 7],
+    H6: [[], 8],
+    H5: [[], 9],
+    H4: [[], 10],
+    H3: [[], 11],
+    H2: [[], 12],
+    H1: [[], 13],
+    BELOW: [[], 14],
+};
+
+const mapDataTemplate = (args) => {
+    const [legendUpdated, setLegendUpdated] = React.useState();
+
+    const colorMapaData = React.useCallback((data) => {
+        setLegendUpdated(data);
+    }, []);
+
+    const layerDataChanged = [
+        { ...args.layers[0], colorMapName: legendUpdated },
+    ];
+
+    var d3ColorName = d3ColorScales.find((value) => {
+        return value.name == legendUpdated;
+    });
+
+    const colorMapping = d3ColorName?.colors;
+
+    return (
+        <div>
+            <div>
+                <ColorLegend
+                    style={{
+                        float: "right",
+                        position: "absolute",
+                        zIndex: 999,
+                        opacity: 1,
+                    }}
+                    {...args}
+                    getColorMapname={colorMapaData}
+                />
+            </div>
+            <div>
+                <DeckGLMap
+                    {...args}
+                    colorMapping={colorMapping}
+                    layers={layerDataChanged}
+                />
+            </div>
+        </div>
+    );
+};
+
+export const ColorSelectorForColorMapLayer = mapDataTemplate.bind({});
+
+ColorSelectorForColorMapLayer.args = {
+    min,
+    max,
+    dataObjectName,
+    position,
+    horizontal,
+    colorName,
+    colorTables,
+    discreteData,
+    ...exampleData[0],
+    id: id,
+    layers,
 };

@@ -4,11 +4,8 @@ import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
-import {
-    rgbValues,
-    colorTableData,
-    colorTablesArray,
-} from "@emerson-eps/color-tables/";
+import { rgbValues, colorTablesArray } from "@emerson-eps/color-tables/";
+import { colorTableData } from "@emerson-eps/color-tables";
 import {
     Feature,
     GeometryCollection,
