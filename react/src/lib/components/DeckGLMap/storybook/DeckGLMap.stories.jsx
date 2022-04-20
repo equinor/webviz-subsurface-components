@@ -1,6 +1,8 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
+import { ColorLegend, d3ColorScales } from "@emerson-eps/color-tables";
+import colorTables from "@emerson-eps/color-tables/dist/component/color-tables.json";
 
 export default {
     component: DeckGLMap,
@@ -81,7 +83,7 @@ export default {
             description:
                 "Prop containing color table data." +
                 "See colorTables repo for reference:<br/>" +
-                "https://github.com/emerson-eps/color-tables/blob/main/react-app/src/component/color-tables.json",
+                "https://github.com/emerson-eps/color-tables/blob/main/react-app/dist/component/color-tables.json",
         },
 
         editedData: {
@@ -596,4 +598,101 @@ SelectableFeatureExample.args = {
         polylineUsingSelectableGeoJsonLayer,
         polygonUsingSelectableGeoJsonLayer,
     ],
+};
+
+// colorselector for welllayer
+const wellLayers = [exampleData[0].layers[4]];
+const wellId = exampleData[0].id;
+// prop for continous legend
+var min = 0;
+var max = 0.35;
+var dataObjectName = "Legend";
+var position = [16, 10];
+var horizontal = true;
+var colorName = wellLayers[0].logColor;
+
+// prop for discrete data
+var discreteData = {
+    Above_BCU: [[], 0],
+    ABOVE: [[], 1],
+    H12: [[], 2],
+    H11: [[], 3],
+    H10: [[], 4],
+    H9: [[], 5],
+    H8: [[], 6],
+    H7: [[], 7],
+    H6: [[], 8],
+    H5: [[], 9],
+    H4: [[], 10],
+    H3: [[], 11],
+    H2: [[], 12],
+    H1: [[], 13],
+    BELOW: [[], 14],
+};
+
+const wellLayerTemplate = (args) => {
+    const [wellLegendUpdated, setWellLegendUpdated] = React.useState();
+
+    const wellLayerData = React.useCallback((data) => {
+        setWellLegendUpdated(data);
+    }, []);
+
+    const d3ColorName = d3ColorScales.find((value) => {
+        if (wellLegendUpdated) return value.name == wellLegendUpdated;
+        else return value.name == args.wellLayers[0].logColor;
+    });
+
+    const colorMapping = d3ColorName?.colors;
+
+    const layerDataChanged = [
+        {
+            ...args.wellLayers[0],
+            logColor: wellLegendUpdated
+                ? wellLegendUpdated
+                : args.wellLayers[0].logColor,
+        },
+    ];
+
+    return (
+        <div>
+            <div>
+                <ColorLegend
+                    style={{
+                        float: "right",
+                        position: "absolute",
+                        zIndex: 999,
+                        opacity: 1,
+                    }}
+                    {...args}
+                    getColorMapname={wellLayerData}
+                />
+            </div>
+            <div>
+                <DeckGLMap
+                    {...args}
+                    colorMapping={colorMapping}
+                    layers={layerDataChanged}
+                />
+            </div>
+        </div>
+    );
+};
+
+export const ColorSelectorForWellLayer = wellLayerTemplate.bind({});
+
+ColorSelectorForWellLayer.args = {
+    min,
+    max,
+    dataObjectName,
+    position,
+    horizontal,
+    colorName,
+    colorTables,
+    discreteData,
+    ...exampleData[0],
+    id: wellId,
+    wellLayers,
+    legend: {
+        visible: false,
+    },
 };

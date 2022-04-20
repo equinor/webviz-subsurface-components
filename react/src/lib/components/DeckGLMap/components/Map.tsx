@@ -34,7 +34,7 @@ import {
 } from "../../../inputSchema/schemaValidationUtil";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
+const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
 export interface ViewportType {
     /**
@@ -79,6 +79,7 @@ export interface DeckGLLayerContext extends LayerContext {
     userData: {
         setEditedData: (data: Record<string, unknown>) => void;
         colorTables: colorTablesArray;
+        colorMapping: (t: number) => string | string[];
     };
 }
 
@@ -181,6 +182,8 @@ export interface MapProps {
     onMouseEvent?: (event: MapMouseEvent) => void;
 
     children?: React.ReactNode;
+
+    colorMapping?: (t: number) => string | string[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -214,6 +217,7 @@ const Map: React.FC<MapProps> = ({
     checkDatafileSchema,
     onMouseEvent,
     children,
+    colorMapping,
 }: MapProps) => {
     // state for initial views prop (target and zoom) of DeckGL component
     const [initialViewState, setInitialViewState] =
@@ -441,6 +445,7 @@ const Map: React.FC<MapProps> = ({
                         setEditedData?.(updated_prop);
                     },
                     colorTables: colorTables,
+                    colorMapping: colorMapping,
                 }}
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"

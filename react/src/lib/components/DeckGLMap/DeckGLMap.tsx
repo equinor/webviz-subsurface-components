@@ -43,6 +43,7 @@ export interface DeckGLMapProps {
      */
     checkDatafileSchema?: boolean;
     onMouseEvent?: (event: MapMouseEvent) => void;
+    colorMapping?: (t: number) => string | string[];
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -62,6 +63,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     setProps,
     checkDatafileSchema,
     onMouseEvent,
+    colorMapping,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -121,6 +123,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 setEditedData={setEditedData}
                 checkDatafileSchema={checkDatafileSchema}
                 onMouseEvent={onMouseEvent}
+                colorMapping={colorMapping}
             />
         </ReduxProvider>
     );
