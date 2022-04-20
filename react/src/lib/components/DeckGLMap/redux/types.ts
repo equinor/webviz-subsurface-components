@@ -90,6 +90,7 @@ export const LayerIcons = {
     FaultPolygonsLayer: "fault",
     DrawingLayer: "brush",
     AxesLayer: "brush",
+    NorthArrow3D: "brush",
 };
 
 export type LayerType = keyof typeof LayerIcons;
