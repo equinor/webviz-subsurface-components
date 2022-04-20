@@ -529,12 +529,14 @@ function getLogColor(
                 logColor,
                 colorTables
             );
-            if (rgb != undefined) {
+            if (rgb) {
                 if (Array.isArray(rgb)) {
                     log_color.push([rgb[0], rgb[1], rgb[2]]);
                 } else {
                     log_color.push([rgb.r, rgb.g, rgb.b]);
                 }
+            } else {
+                log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
             }
         });
     } else {
@@ -563,7 +565,9 @@ function getLogColor(
             const dl_attrs = Object.entries(attributesObject).find(
                 ([, value]) => value[1] == log_value
             )?.[1];
-            dl_attrs ? log_color.push(dl_attrs[0]) : log_color.push([0, 0, 0]);
+            dl_attrs
+                ? log_color.push(dl_attrs[0])
+                : log_color.push([0, 0, 0, 0]); // use transparent for undefined/null log values
         });
     }
     return log_color;
