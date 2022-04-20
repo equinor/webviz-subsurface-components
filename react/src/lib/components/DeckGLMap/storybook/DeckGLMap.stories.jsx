@@ -270,11 +270,10 @@ KhMapFlat.parameters = {
 const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
-    //bounds: [-1000, -1000, 1000, 1000],
     bounds: [432205, 6475078, 437720, 6481113],
     meshMaxError: 100,
     mesh: "hugin_depth_25_m_normalized_margin.png",
-    meshValueRange: [0, 1000],
+    meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [2782, 3513],
     rotDeg: 0,
@@ -404,11 +403,8 @@ const north_arrow_layer = {
 export const Axes = MinimalTemplate.bind({});
 Axes.args = {
     id: "axes",
-    //layers: [meshMapLayer, axes, north_arrow_layer],
     layers: [axes, meshMapLayer, north_arrow_layer],
-    //layers: [north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500], // trengs denne?? eh ja..
-    //bounds: [-1000, -1000, 1000, 1000],
+    bounds: [432150, 6475800, 439400, 6481500],
     views: {
         layout: [1, 1],
         viewports: [
