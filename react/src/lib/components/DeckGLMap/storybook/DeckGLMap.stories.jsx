@@ -392,7 +392,6 @@ MapClampColor.parameters = {
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer",
-    //bounds: [-1000, -1000, -1000, 1000, 1000, 1000],
     bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
 };
 const north_arrow_layer = {
