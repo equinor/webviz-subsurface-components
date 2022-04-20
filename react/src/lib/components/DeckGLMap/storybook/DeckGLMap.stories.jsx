@@ -2,7 +2,7 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { ColorLegend } from "@emerson-eps/color-tables";
-const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
+import colorTables from "@emerson-eps/color-tables/dist/component/color-tables.json";
 import { d3ColorScales } from "@emerson-eps/color-tables";
 
 export default {
