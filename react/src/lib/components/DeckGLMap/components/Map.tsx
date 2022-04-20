@@ -183,7 +183,7 @@ export interface MapProps {
 
     children?: React.ReactNode;
 
-    colorMapping: (t: number) => string | string[];
+    colorMapping?: (t: number) => string | string[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
