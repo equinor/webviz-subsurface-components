@@ -394,10 +394,15 @@ const axes = {
     id: "axes-layer",
     bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
 };
+const north_arrow_layer = {
+    "@@type": "NorthArrow3DLayer",
+    id: "north-arrow-layer",
+};
+
 export const Axes = MinimalTemplate.bind({});
 Axes.args = {
     id: "axes",
-    layers: [meshMapLayer, axes],
+    layers: [axes, meshMapLayer, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500],
     views: {
         layout: [1, 1],
