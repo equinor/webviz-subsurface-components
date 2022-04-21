@@ -45,27 +45,39 @@ export default class NorthArrow3DLayer extends Layer<
     _getModels(gl: any) {
         const model_lines = GetArrowLines();
 
-        const cam_pos = new Vector3(this.context.viewport.getCameraPosition());
-        const center = new Vector3(this.unproject([100, 100]));
+        const is_orthographic =
+            this.context.viewport.constructor.name === "OrthographicViewport";
+
+        const view_at = new Vector3(this.unproject([100, 100, 0]));
+        let view_from = new Vector3(this.context.viewport.getCameraPosition());
+
+        if (is_orthographic) {
+            const cam_pos_z = new Vector3(
+                this.context.viewport.getCameraPosition()
+            )[2];
+            view_from = new Vector3([view_at[0], view_at[1], cam_pos_z]);
+        }
 
         const dir = new Vector3([
-            center[0] - cam_pos[0],
-            center[1] - cam_pos[1],
-            center[2] - cam_pos[2],
+            view_at[0] - view_from[0],
+            view_at[1] - view_from[1],
+            view_at[2] - view_from[2],
         ]);
         dir.normalize();
         dir.scale(1000.0);
 
-        // pos: World coordinate for north arrow. Will be fixed realative to camera.
+        // pos: World coordinate for north arrow. Will be fixed relative to camera.
         const pos = new Vector3([
-            cam_pos[0] + dir[0],
-            cam_pos[1] + dir[1],
-            cam_pos[2] + dir[2],
+            view_from[0] + dir[0],
+            view_from[1] + dir[1],
+            view_from[2] + dir[2],
         ]);
 
         const lines: number[] = [];
 
-        const scale = 10;
+        const zoom = this.context.viewport.zoom;
+        const zoom_scale = Math.pow(2, zoom);
+        const scale = is_orthographic ? 15 / zoom_scale : 20;
         for (let i = 0; i < model_lines.length / 3; i = i + 1) {
             const x = model_lines[i * 3 + 0] * scale + pos[0];
             const y = model_lines[i * 3 + 1] * scale + pos[1];
