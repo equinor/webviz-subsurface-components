@@ -105,10 +105,10 @@ export const layersDefaultProps: Record<string, unknown> = {
         logCurves: true,
         refine: true,
         visible: true,
-        wellNameVisible: true,
+        wellNameVisible: false,
         wellNameAtTop: false,
         wellNameSize: 14,
-        wellNameColor: [0, 0, 255, 255],
+        wellNameColor: [0, 0, 0, 255],
         selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     },
     FaultPolygonsLayer: {
