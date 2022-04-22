@@ -55,6 +55,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameAtTop: boolean;
     wellNameSize: number;
     wellNameColor: RGBAColor;
+    trajectoryVisible: boolean;
 }
 
 export interface LogCurveDataType {
@@ -149,9 +150,12 @@ export default class WellsLayer extends CompositeLayer<
         }
 
         const refine = this.props.refine;
-        const data = refine
+        let data = refine
             ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
             : (this.props.data as FeatureCollection);
+
+        const hide_trajectory = !this.props.trajectoryVisible;
+        if (hide_trajectory) data = removeTrajectoryData(data);
 
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
         const positionFormat = is3d ? "XYZ" : "XY";
@@ -224,6 +228,7 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
+        const show_log = this.props.trajectoryVisible && this.props.logCurves;
         const log_layer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps<LogCurveDataType>({
                 id: "log_curve",
@@ -233,7 +238,7 @@ export default class WellsLayer extends CompositeLayer<
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
-                visible: this.props.logCurves,
+                visible: show_log,
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath(data.features, d, this.props.logrunName),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
@@ -426,13 +431,13 @@ function getWellObjectByName(
     );
 }
 
-function getPointGeometry(well_object: Feature): Point | undefined {
+function getPointGeometry(well_object: Feature): Point {
     return (well_object.geometry as GeometryCollection)?.geometries.find(
         (item) => item.type == "Point"
     ) as Point;
 }
 
-function getLineStringGeometry(well_object: Feature): LineString | undefined {
+function getLineStringGeometry(well_object: Feature): LineString {
     return (well_object.geometry as GeometryCollection)?.geometries.find(
         (item) => item.type == "LineString"
     ) as LineString;
@@ -450,6 +455,22 @@ function getTrajectory(well_object: Feature): Position[] | undefined {
 
 function getWellMds(well_object: Feature): number[] {
     return well_object.properties?.["md"][0];
+}
+
+// return wells data with only Point Geometry
+function removeTrajectoryData(data: FeatureCollection): FeatureCollection {
+    return {
+        ...data,
+        features: data.features.map((feature) => {
+            return {
+                ...feature,
+                geometry: {
+                    ...feature.geometry,
+                    geometries: [getPointGeometry(feature)],
+                },
+            };
+        }),
+    };
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
