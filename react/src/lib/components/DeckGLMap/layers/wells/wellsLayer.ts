@@ -4,11 +4,8 @@ import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
-import {
-    rgbValues,
-    colorTableData,
-    colorTablesArray,
-} from "@emerson-eps/color-tables/";
+import { colorsArray, rgbValues } from "@emerson-eps/color-tables";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
 import {
     Feature,
     GeometryCollection,
@@ -477,7 +474,7 @@ function getLogColor(
             }
         });
     } else {
-        const colorsArray: [number, number, number, number][] = colorTableData(
+        const arrayOfColors: [number, number, number, number][] = colorsArray(
             logColor,
             colorTables
         );
@@ -492,7 +489,7 @@ function getLogColor(
             const colorArrays = colorsArray.find((value: number[]) => {
                 return value[0] == code;
             });
-            if (colorArrays)
+            if (arrayOfColors.length > 0)
                 attributesObject[key] = [
                     [colorArrays[1], colorArrays[2], colorArrays[3]],
                     code,
