@@ -2,6 +2,7 @@ import { CompositeLayer } from "@deck.gl/core";
 import TerrainMapLayer, {
     TerrainMapLayerProps,
     TerrainMapLayerData,
+    colorMapFunctionType,
     DECODER,
     Material,
 } from "./terrainMapLayer";
@@ -226,6 +227,11 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // If set to false the clamp color will be completely transparent.
     colorMapClampColor: RGBColor | undefined | boolean;
 
+    // Optional function property.
+    // If defined this function will override the color map.
+    // Takes a value in the range [0,1] and returns a color.
+    colorMapFunction?: colorMapFunctionType;
+
     // If true readout will be z value (depth). Otherwise it is the texture property value.
     isReadoutDepth: boolean;
 
@@ -310,6 +316,7 @@ export default class Map3DLayer extends CompositeLayer<
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
                 colorMapName: this.props.colorMapName,
+                colorMapFunction: this.props.colorMapFunction, // XXX
                 propertyValueRange: this.props.propertyValueRange,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,

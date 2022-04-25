@@ -280,6 +280,7 @@ const meshMapLayer = {
     contours: [0, 50.0],
     isContoursDepth: false,
     colorMapName: "Physics",
+    //colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
 };
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {
