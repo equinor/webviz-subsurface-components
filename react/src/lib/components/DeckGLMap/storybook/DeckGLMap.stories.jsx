@@ -280,7 +280,6 @@ const meshMapLayer = {
     contours: [0, 50.0],
     isContoursDepth: false,
     colorMapName: "Physics",
-    //colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
 };
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {
@@ -404,6 +403,29 @@ export const Axes = MinimalTemplate.bind({});
 Axes.args = {
     id: "axes",
     layers: [axes, meshMapLayer, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
+// Example using "colorMapFunction" property.
+const layer = {
+    ...meshMapLayer,
+    isContoursDepth: true,
+    colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
+};
+export const colorMapFunction = MinimalTemplate.bind({});
+colorMapFunction.args = {
+    id: "colorMapFunction",
+    layers: [layer],
     bounds: [432150, 6475800, 439400, 6481500],
     views: {
         layout: [1, 1],
