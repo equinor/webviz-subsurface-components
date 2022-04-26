@@ -34,7 +34,7 @@ import {
 } from "../../../inputSchema/schemaValidationUtil";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
+const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
 export interface ViewportType {
     /**

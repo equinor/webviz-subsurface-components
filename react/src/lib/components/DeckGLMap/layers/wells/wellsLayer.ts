@@ -4,8 +4,10 @@ import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
-import { colorsArray, rgbValues } from "@emerson-eps/color-tables";
+import { colorsArray, rgbValues, RGBToHex } from "@emerson-eps/color-tables";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { color } from "d3-color";
+import { interpolateRgb } from "d3-interpolate";
 import {
     Feature,
     GeometryCollection,
@@ -457,20 +459,71 @@ function getLogColor(
         const min = Math.min(...log_data);
         const max = Math.max(...log_data);
         const max_delta = max - min;
+        const getSelectedScale = colorTables.find((value) => {
+            return value.name == logColor;
+        });
+        const getSelectedScaleLength = getSelectedScale?.colors.length;
+        const normalizingColorMax = getSelectedScaleLength
+            ? getSelectedScaleLength - 1
+            : null;
+
         log_data.forEach((value) => {
             const rgb = rgbValues(
                 (value - min) / max_delta,
                 logColor,
                 colorTables
             );
-            if (rgb) {
-                if (Array.isArray(rgb)) {
-                    log_color.push([rgb[0], rgb[1], rgb[2]]);
+
+            // colortable continuous scale
+            if (getSelectedScale?.discrete == false) {
+                if (rgb) {
+                    if (Array.isArray(rgb)) {
+                        log_color.push([rgb[0], rgb[1], rgb[2]]);
+                    } else {
+                        log_color.push([rgb.r, rgb.g, rgb.b]);
+                    }
                 } else {
-                    log_color.push([rgb.r, rgb.g, rgb.b]);
+                    log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
                 }
-            } else {
-                log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
+            }
+            // colortable discrete scale
+            if (getSelectedScale?.discrete == true && normalizingColorMax) {
+                const point = (value - min) / max_delta;
+                const minValue = 0;
+                const maxValue = normalizingColorMax;
+                // eslint-disable-next-line
+                let interpolatedValue: any;
+
+                getSelectedScale?.colors.forEach((item, index) => {
+                    const currentIndex = index;
+                    const normalizedCurrentIndex =
+                        (currentIndex - minValue) / (maxValue - minValue);
+                    const nextIndex = index + 1;
+                    const normalizedNextIndex =
+                        (nextIndex - minValue) / (maxValue - 0);
+                    //const t = (point - t0) / (t1 - t0); // t = 0.0 gives first color, t = 1.0 gives second color.
+                    if (
+                        point >= normalizedCurrentIndex &&
+                        point <= normalizedNextIndex
+                    ) {
+                        if (
+                            (item && getSelectedScale?.colors[nextIndex]) !=
+                            undefined
+                        ) {
+                            const interpolate = interpolateRgb(
+                                RGBToHex(item)?.color,
+                                RGBToHex(getSelectedScale?.colors[nextIndex])
+                                    ?.color
+                            )(point);
+                            interpolatedValue = color(interpolate)?.rgb();
+                        }
+                    }
+                });
+                log_color.push([
+                    interpolatedValue?.r,
+                    interpolatedValue?.g,
+                    interpolatedValue?.b,
+                ]);
             }
         });
     } else {
@@ -479,21 +532,61 @@ function getLogColor(
             colorTables
         );
 
+        const getSelectedScaleValue = colorTables.find((value) => {
+            return value.name == logColor;
+        });
+
+        // well log data set for ex : H1: Array(2)0: (4) [255, 26, 202, 255] 1: 13
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
+        const logLength = Object.keys(log_attributes).length;
+
         // eslint-disable-next-line
         const attributesObject: { [key: string]: any } = {};
+
         Object.keys(log_attributes).forEach((key) => {
             // get the code from log_attributes
+            // point like 0,1,2
             const code = log_attributes[key][1];
-            // compare the code and first value from colorsArray(colortable)
-            const colorArrays = colorsArray.find((value: number[]) => {
-                return value[0] == code;
-            });
-            if (arrayOfColors.length > 0)
-                attributesObject[key] = [
-                    [colorArrays[1], colorArrays[2], colorArrays[3]],
-                    code,
-                ];
+
+            // colortable scale
+            if (arrayOfColors.length > 0) {
+                // colortable discrete scale
+                if (getSelectedScaleValue?.discrete == true) {
+                    // compare the code and first value from colorsArray(colortable)
+                    const colorArrays = arrayOfColors.find(
+                        (value: number[]) => {
+                            return value[0] == code;
+                        }
+                    );
+                    if (colorArrays) {
+                        attributesObject[key] = [
+                            [colorArrays[1], colorArrays[2], colorArrays[3]],
+                            code,
+                        ];
+                    }
+                }
+                // colortable continuous scale
+                else {
+                    const min = 0;
+                    const max = logLength - 1;
+                    const normalizedValue = (code - min) / (max - min);
+
+                    const rgb = rgbValues(
+                        normalizedValue,
+                        logColor,
+                        colorTables
+                    );
+
+                    attributesObject[key] = [
+                        [
+                            color(rgb)?.rgb()?.r,
+                            color(rgb)?.rgb()?.g,
+                            color(rgb)?.rgb()?.b,
+                        ],
+                        code,
+                    ];
+                }
+            }
         });
         log_data.forEach((log_value) => {
             const dl_attrs = Object.entries(attributesObject).find(
