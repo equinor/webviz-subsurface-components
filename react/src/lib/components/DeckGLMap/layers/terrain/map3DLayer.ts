@@ -316,7 +316,7 @@ export default class Map3DLayer extends CompositeLayer<
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
                 colorMapName: this.props.colorMapName,
-                colorMapFunction: this.props.colorMapFunction, // XXX
+                colorMapFunction: this.props.colorMapFunction,
                 propertyValueRange: this.props.propertyValueRange,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
