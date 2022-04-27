@@ -416,6 +416,29 @@ Axes.args = {
     },
 };
 
+// Example using "colorMapFunction" property.
+const layer = {
+    ...meshMapLayer,
+    isContoursDepth: true,
+    colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
+};
+export const colorMapFunction = MinimalTemplate.bind({});
+colorMapFunction.args = {
+    id: "colorMapFunction",
+    layers: [layer],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
 // GridLayer.
 const gridLayer = exampleData[0].layers[2];
 export const GridLayer = EditDataTemplate.bind({});
