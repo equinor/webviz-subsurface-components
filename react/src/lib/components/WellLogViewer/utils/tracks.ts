@@ -869,7 +869,7 @@ function createAreaData(
     from: number,
     to: number,
     value: number | string,
-    colorTable: ColorTable | null,
+    colorTable: ColorTable | undefined,
     meta?: DiscreteMeta | null
 ): AreaData | null {
     if (meta) {
@@ -930,8 +930,8 @@ function createAreaData(
 
 const createStackData = async (
     data: [number, number | string][],
-    colorTable: ColorTable | null,
-    meta: DiscreteMeta | null
+    colorTable: ColorTable | undefined,
+    meta: DiscreteMeta | undefined | null
 ) => {
     const arr = [];
     let prev = null;

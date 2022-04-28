@@ -3,31 +3,6 @@ import { ReactNode } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
 
-//import { ColorTable } from "./components/ColorTableTypes";
-/*
-let template = {
-    name: "Template LOG",
-    scale: {
-        primary: "tvd",
-    },
-    tracks: [
-        {
-            plots: [
-                {
-                    name: "ZONELOG",
-                    style: "discrete",
-                },
-            ],
-        },
-    ],
-    styles: [
-        {
-            name: "discrete",
-            type: "stacked",
-        },
-    ],
-};
-*/
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const template = require("../../../demo/example-data/welllog_template_2.json");
 import { WellLog } from "./components/WellLogTypes";
@@ -164,12 +139,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             JSON.stringify(this.props.layers)
                         );
                         this.setState({ layers: layers });
-
-                        //const wellName=controller.props.welllog.header.well;
-                        if (this.state.wellIndex !== undefined) {
-                            const welllog = welllogs[this.state.wellIndex];
-                            const wellName = welllog.header.well;
-                        }
 
                         // Force to rerender ColorLegend after
                         setTimeout(() => {
