@@ -32,12 +32,21 @@ export const DECODER = {
     offset: 0,
 };
 
-function getImageData(colorMapName: string, colorTables: colorTablesArray) {
-    const data = new Uint8Array(256 * 3);
+export type colorMapFunctionType = (x: number) => [number, number, number];
 
+function getImageData(
+    colorMapName: string,
+    colorTables: colorTablesArray,
+    colorMapFunction: colorMapFunctionType | undefined
+) {
+    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
+
+    const data = new Uint8Array(256 * 3);
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-        const rgb = rgbValues(value, colorMapName, colorTables);
+        const rgb = isColorMapFunctionDefined
+            ? (colorMapFunction as colorMapFunctionType)(i / 255)
+            : rgbValues(value, colorMapName, colorTables);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -71,6 +80,11 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
 
     // Name of color map.
     colorMapName: string;
+
+    // Optional function property.
+    // If defined this function will override the color map.
+    // Takes a value in the range [0,1] and returns a color.
+    colorMapFunction?: colorMapFunctionType;
 
     // Min and max property values.
     propertyValueRange: [number, number];
@@ -151,7 +165,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                     data: getImageData(
                         this.props.colorMapName,
                         (this.context as DeckGLLayerContext).userData
-                            .colorTables
+                            .colorTables,
+                        this.props.colorMapFunction
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),

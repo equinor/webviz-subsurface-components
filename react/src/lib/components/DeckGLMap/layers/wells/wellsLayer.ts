@@ -1,12 +1,13 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
-import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
+import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
 import {
     rgbValues,
-    colorTableData,
     colorTablesArray,
+    colorsArray,
 } from "@emerson-eps/color-tables/";
 import {
     Feature,
@@ -30,6 +31,13 @@ import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
 
+type NumberPair = [number, number];
+type DashAccessorFunction = (
+    object: Record<string, unknown>,
+    objectInfo: Record<string, unknown>
+) => NumberPair;
+type DashAccessor = boolean | NumberPair | DashAccessorFunction | undefined;
+
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
     lineWidthScale: number;
@@ -42,6 +50,11 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
+    dashed?: DashAccessor;
+    wellNameVisible: boolean;
+    wellNameAtTop: boolean;
+    wellNameSize: number;
+    wellNameColor: RGBAColor;
 }
 
 export interface LogCurveDataType {
@@ -65,6 +78,37 @@ export interface LogCurveDataType {
 
 export interface WellsPickInfo extends LayerPickInfo {
     logName: string;
+}
+
+function multiply(pair: [number, number], factor: number): [number, number] {
+    return [pair[0] * factor, pair[1] * factor];
+}
+
+const DEFAULT_DASH = [5, 5];
+
+function getDashFactor(accessor: DashAccessor, factor: number) {
+    if (typeof accessor == "function") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (
+            object: Record<string, unknown>,
+            objectInfo: Record<string, unknown>
+        ): NumberPair => {
+            return multiply(
+                (accessor as DashAccessorFunction)(
+                    object,
+                    objectInfo
+                ) as NumberPair,
+                factor
+            );
+        };
+    }
+
+    let value = DEFAULT_DASH as NumberPair;
+    if ((accessor as NumberPair)?.length == 2) {
+        value = accessor as NumberPair;
+    }
+
+    return multiply(value, factor);
 }
 
 export default class WellsLayer extends CompositeLayer<
@@ -95,7 +139,11 @@ export default class WellsLayer extends CompositeLayer<
         );
     }
 
-    renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
+    renderLayers(): (
+        | GeoJsonLayer<Feature>
+        | PathLayer<LogCurveDataType>
+        | TextLayer<Feature>
+    )[] {
         if (!(this.props.data as FeatureCollection).features) {
             return [];
         }
@@ -108,6 +156,15 @@ export default class WellsLayer extends CompositeLayer<
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
         const positionFormat = is3d ? "XYZ" : "XY";
 
+        const isDashed = !!this.props.dashed;
+
+        const extensions = [
+            new PathStyleExtension({
+                dash: isDashed,
+                highPrecisionDash: isDashed,
+            }),
+        ];
+
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "outline",
@@ -117,10 +174,16 @@ export default class WellsLayer extends CompositeLayer<
                 positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
+                visible: this.props.outline,
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
+                extensions: extensions,
+                getDashArray: getDashFactor(this.props.dashed, 1),
             })
         );
+
+        const lineWidthFactor =
+            this.props.lineWidthScale / (this.props.lineWidthScale - 1);
 
         const getColor = (d: Feature): RGBAColor => d?.properties?.["color"];
         const colors = new GeoJsonLayer<Feature>(
@@ -136,6 +199,8 @@ export default class WellsLayer extends CompositeLayer<
                 lineWidthScale: this.props.lineWidthScale - 1,
                 getFillColor: getColor,
                 getLineColor: getColor,
+                extensions: extensions,
+                getDashArray: getDashFactor(this.props.dashed, lineWidthFactor),
             })
         );
 
@@ -168,6 +233,7 @@ export default class WellsLayer extends CompositeLayer<
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
+                visible: this.props.logCurves,
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath(data.features, d, this.props.logrunName),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
@@ -210,16 +276,23 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const layers: (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] =
-            [colors, highlight];
-        if (this.props.outline) {
-            layers.splice(0, 0, outline);
-        }
-        if (this.props.logCurves) {
-            layers.splice(1, 0, log_layer);
-        }
+        // well name
+        const names = new TextLayer<Feature>(
+            this.getSubLayerProps<Feature>({
+                id: "names",
+                data: data.features,
+                visible: this.props.wellNameVisible,
+                getPosition: (d: Feature) =>
+                    getAnnotationPosition(d, this.props.wellNameAtTop, is3d),
+                getText: (d: Feature) => d.properties?.["name"],
+                getColor: this.props.wellNameColor,
+                getAnchor: "start",
+                getAlignmentBaseline: "bottom",
+                getSize: this.props.wellNameSize,
+            })
+        );
 
-        return layers;
+        return [outline, log_layer, colors, highlight, names];
     }
 
     // For now, use `any` for the picking types because this function should
@@ -311,6 +384,38 @@ function isSelectedLogRun(d: LogCurveDataType, logrun_name: string): boolean {
     return d.header.name.toLowerCase() === logrun_name.toLowerCase();
 }
 
+// return position for well name and icon
+function getAnnotationPosition(
+    well_data: Feature,
+    name_at_top: boolean,
+    view_is_3d: boolean
+): Position | null {
+    if (name_at_top) {
+        let top;
+
+        // Read top position from Point geometry, if not present, read it from LineString geometry
+        const well_head = getWellHeadPosition(well_data);
+        if (well_data) top = well_head;
+        else {
+            const trajectory = getTrajectory(well_data);
+            top = trajectory?.at(0);
+        }
+
+        // using z=0 for orthographic view to keep label above other other layers
+        if (top) return view_is_3d ? top : [top[0], top[1], 0];
+    } else {
+        let bot;
+        // if trajectory is not present, return top position from Point geometry
+        const trajectory = getTrajectory(well_data);
+        if (trajectory) bot = trajectory?.at(-1);
+        else bot = getWellHeadPosition(well_data);
+
+        // using z=0 for orthographic view to keep label above other other layers
+        if (bot) return view_is_3d ? bot : [bot[0], bot[1], 0];
+    }
+    return null;
+}
+
 function getWellObjectByName(
     wells_data: Feature[],
     name: string
@@ -321,24 +426,30 @@ function getWellObjectByName(
     );
 }
 
-function getWellHeadCoordinates(well_object?: Feature): Position {
-    return (
-        (well_object?.geometry as GeometryCollection)?.geometries.find(
-            (item) => item.type == "Point"
-        ) as Point
-    )?.coordinates;
+function getPointGeometry(well_object: Feature): Point | undefined {
+    return (well_object.geometry as GeometryCollection)?.geometries.find(
+        (item) => item.type == "Point"
+    ) as Point;
 }
 
-function getWellCoordinates(well_object?: Feature): Position[] {
-    return (
-        (well_object?.geometry as GeometryCollection)?.geometries.find(
-            (item) => item.type == "LineString"
-        ) as LineString
-    )?.coordinates;
+function getLineStringGeometry(well_object: Feature): LineString | undefined {
+    return (well_object.geometry as GeometryCollection)?.geometries.find(
+        (item) => item.type == "LineString"
+    ) as LineString;
 }
 
-function getWellMds(well_object?: Feature): number[] {
-    return well_object?.properties?.["md"][0];
+// Return well head position from Point Geometry
+function getWellHeadPosition(well_object: Feature): Position | undefined {
+    return getPointGeometry(well_object)?.coordinates;
+}
+
+// Return Trajectory data from LineString Geometry
+function getTrajectory(well_object: Feature): Position[] | undefined {
+    return getLineStringGeometry(well_object)?.coordinates;
+}
+
+function getWellMds(well_object: Feature): number[] {
+    return well_object.properties?.["md"][0];
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
@@ -352,7 +463,9 @@ function getLogPath(
     logrun_name: string
 ): Position[] {
     const well_object = getWellObjectByName(wells_data, d.header.well);
-    const well_xyz = getWellCoordinates(well_object);
+    if (!well_object) return [];
+
+    const well_xyz = getTrajectory(well_object);
     const well_mds = getWellMds(well_object);
 
     if (
@@ -416,16 +529,18 @@ function getLogColor(
                 logColor,
                 colorTables
             );
-            if (rgb != undefined) {
+            if (rgb) {
                 if (Array.isArray(rgb)) {
                     log_color.push([rgb[0], rgb[1], rgb[2]]);
                 } else {
                     log_color.push([rgb.r, rgb.g, rgb.b]);
                 }
+            } else {
+                log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
             }
         });
     } else {
-        const colorsArray: [number, number, number, number][] = colorTableData(
+        const arrayOfColors: [number, number, number, number][] = colorsArray(
             logColor,
             colorTables
         );
@@ -437,7 +552,7 @@ function getLogColor(
             // get the code from log_attributes
             const code = log_attributes[key][1];
             // compare the code and first value from colorsArray(colortable)
-            const colorArrays = colorsArray.find((value: number[]) => {
+            const colorArrays = arrayOfColors.find((value: number[]) => {
                 return value[0] == code;
             });
             if (colorArrays)
@@ -450,7 +565,9 @@ function getLogColor(
             const dl_attrs = Object.entries(attributesObject).find(
                 ([, value]) => value[1] == log_value
             )?.[1];
-            dl_attrs ? log_color.push(dl_attrs[0]) : log_color.push([0, 0, 0]);
+            dl_attrs
+                ? log_color.push(dl_attrs[0])
+                : log_color.push([0, 0, 0, 0]); // use transparent for undefined/null log values
         });
     }
     return log_color;
@@ -528,7 +645,7 @@ function getMd(coord: Position, feature: Feature): number | null {
     if (!feature.properties?.["md"]?.[0] || !feature.geometry) return null;
 
     const measured_depths = feature.properties["md"][0] as number[];
-    const trajectory3D = getWellCoordinates(feature);
+    const trajectory3D = getTrajectory(feature);
 
     if (trajectory3D == undefined) return null;
 
@@ -560,11 +677,11 @@ function getMdProperty(
 }
 
 function getTvd(coord: Position, feature: Feature): number | null {
-    const trajectory3D = getWellCoordinates(feature);
+    const trajectory3D = getTrajectory(feature);
 
     // if trajectory is not found or if it has a data single point then get tvd from well head
     if (trajectory3D == undefined || trajectory3D?.length <= 1) {
-        const wellhead_xyz = getWellHeadCoordinates(feature);
+        const wellhead_xyz = getWellHeadPosition(feature);
         return wellhead_xyz?.[2] ?? null;
     }
     let trajectory;
