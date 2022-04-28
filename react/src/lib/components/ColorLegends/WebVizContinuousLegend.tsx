@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-import colorTablesArray from "@emerson-eps/color-tables/";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface LegendProps {
     title: string;
@@ -10,7 +10,7 @@ interface LegendProps {
     position?: number[] | null;
     colorName: string;
     horizontal?: boolean | null;
-    colorTables: colorTablesArray | string;
+    colorTables: colorTablesArray | string | undefined;
 }
 
 const ContinuousLegendWrapper: React.FC<LegendProps> = ({

@@ -6,8 +6,8 @@ import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
 import {
     rgbValues,
-    colorTableData,
     colorTablesArray,
+    colorsArray,
 } from "@emerson-eps/color-tables/";
 import {
     Feature,
@@ -594,7 +594,7 @@ function getLogColor(
             }
         });
     } else {
-        const colorsArray: [number, number, number, number][] = colorTableData(
+        const arrayOfColors: [number, number, number, number][] = colorsArray(
             logColor,
             colorTables
         );
@@ -606,7 +606,7 @@ function getLogColor(
             // get the code from log_attributes
             const code = log_attributes[key][1];
             // compare the code and first value from colorsArray(colortable)
-            const colorArrays = colorsArray.find((value: number[]) => {
+            const colorArrays = arrayOfColors.find((value: number[]) => {
                 return value[0] == code;
             });
             if (colorArrays)
