@@ -128,6 +128,7 @@ class InfoPanel extends Component<Props> {
                     <table
                         style={{
                             borderSpacing: "0px",
+                            width: "100%",
                         }}
                     >
                         <tbody>

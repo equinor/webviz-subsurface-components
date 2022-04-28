@@ -8,6 +8,21 @@ const drawing_layer = exampleData[0].layers.find(
 );
 if (drawing_layer) drawing_layer.visible = false;
 
+const wells_layer = exampleData[0].layers.find(
+    (item) => item["@@type"] === "WellsLayer"
+);
+if (wells_layer) {
+    /*
+    "logData": "@@#resources.logData",
+    "logrunName": "BLOCKING",
+    "logName": "ZONELOG",
+    "logColor": "Stratigraphy"
+    */
+    wells_layer.logName = "ZONE_MAIN"; //
+    wells_layer.logColor = "Stratigraphy"; // "Colors_set_1"
+    //wells_layer.logName = "NTG"
+    //wells_layer.logColor = "Rainbow"
+}
 
 export default {
     component: MapAndWellLogViewer,
@@ -108,7 +123,7 @@ export default {
 
 const Template = (args) => {
     return (
-        <div style={{ height: "95vh", width: "100%", display: "flex" }}>
+        <div style={{ height: "94vh", width: "100%", display: "flex" }}>
             <MapAndWellLogViewer {...args} />
         </div>
     );

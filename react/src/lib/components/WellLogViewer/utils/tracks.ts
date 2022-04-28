@@ -26,6 +26,7 @@ import { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 import { PlotFactory } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
 import { stackLegendConfig } from "./stack/stack-legend";
+import { getInterpolatedColor } from "./color-table";
 
 // missed! import { createScale } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 import { createScale } from "./graph/factory";
@@ -865,10 +866,11 @@ interface DiscreteMeta {
 }
 
 function createAreaData(
-    meta: DiscreteMeta | null,
     from: number,
     to: number,
-    value: number | string
+    value: number | string,
+    colorTable: ColorTable | null,
+    meta?: DiscreteMeta | null
 ): AreaData | null {
     if (meta) {
         // use discrete metadate from WellLog JSON file
@@ -876,18 +878,38 @@ function createAreaData(
         for (const t in objects) {
             const object = objects[t];
             if (value === object[iCode]) {
-                const color = object[iColor];
-                return {
-                    from: from,
-                    to: to,
-                    name: t,
-                    color: {
-                        r: color[0],
-                        g: color[1],
-                        b: color[2],
-                        a: color[3] /*1*/,
-                    },
-                };
+                if (colorTable) {
+                    // get color from the table
+                    const color = getInterpolatedColor(
+                        colorTable,
+                        parseInt(value.toString())
+                    );
+                    return {
+                        from: from,
+                        to: to,
+                        name: t,
+                        color: {
+                            r: color[0],
+                            g: color[1],
+                            b: color[2],
+                            a: 1.0,
+                        },
+                    };
+                } else {
+                    // get color from the meta
+                    const color = object[iColor];
+                    return {
+                        from: from,
+                        to: to,
+                        name: t,
+                        color: {
+                            r: color[0],
+                            g: color[1],
+                            b: color[2],
+                            a: color[3] /*1*/,
+                        },
+                    };
+                }
             }
         }
     } else {
@@ -908,6 +930,7 @@ function createAreaData(
 
 const createStackData = async (
     data: [number, number | string][],
+    colorTable: ColorTable | null,
     meta: DiscreteMeta | null
 ) => {
     const arr = [];
@@ -919,7 +942,7 @@ const createStackData = async (
             if (value !== null && value !== undefined) {
                 // new value is not null
                 // create new interval colored and labeled for the value
-                area = createAreaData(meta, p[0], p[0], value);
+                area = createAreaData(p[0], p[0], value, colorTable, meta);
             }
         } else {
             if (value === prev[1]) {
@@ -936,7 +959,13 @@ const createStackData = async (
                 if (value !== null && value !== undefined) {
                     // new value is not null
                     // create new interval colored and labeled for the value
-                    area = createAreaData(meta, prev[0], p[0], value);
+                    area = createAreaData(
+                        prev[0],
+                        p[0],
+                        value,
+                        colorTable,
+                        meta
+                    );
                 }
             }
         }
@@ -952,7 +981,10 @@ function newStackedTrack(options: StackedTrackOptions): StackedTrack {
     return new StackedTrack(undefined as unknown as number, options);
 }
 
-function getDiscreteMeta(welllog: WellLog, name: string): DiscreteMeta | null {
+export function getDiscreteMeta(
+    welllog: WellLog,
+    name: string
+): DiscreteMeta | null {
     const meta = welllog.metadata_discrete;
     if (meta) {
         // File has metadata for discrete log
@@ -1205,7 +1237,8 @@ function addStackedTrack(
     data: WellLogDataRow[],
     iPrimaryAxis: number,
     templateTrack: TemplateTrack,
-    templateStyles?: TemplateStyle[]
+    templateStyles?: TemplateStyle[],
+    colorTables?: ColorTable[]
 ): void {
     const templatePlot = templateTrack.plots[0];
     const name = templatePlot.name;
@@ -1233,6 +1266,9 @@ function addStackedTrack(
     templateTrackFullPlot.plots[0].type = templatePlotProps.type;
 
     // curve.valueType === "integer", "string"
+    const colorTable = colorTables?.find(
+        (colorTable) => colorTable.name == "Stratigraphy"
+    );
     const meta = getDiscreteMeta(welllog, name);
     if (!meta && curve.valueType == "integer")
         console.log(
@@ -1245,7 +1281,7 @@ function addStackedTrack(
     const options: StackedTrackOptions = {
         abbr: name, // name of the only plot
         legendConfig: stackLegendConfig,
-        data: createStackData.bind(null, plotData.data, meta),
+        data: createStackData.bind(null, plotData.data, colorTable, meta),
         showLabels: true,
         showLines: showLines,
     };
@@ -1270,49 +1306,50 @@ function isStackedTemplateTrack(
 }
 
 export function createTracks(
-    welllog: WellLog,
+    welllog: WellLog | undefined,
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
     templateStyles?: TemplateStyle[], // Part of JSON
     colorTables?: ColorTable[] // JSON
 ): TracksInfo {
     const info = new TracksInfo();
+    if (welllog) {
+        const data = welllog.data;
+        const curves = welllog.curves;
 
-    const data = welllog.data;
-    const curves = welllog.curves;
+        const iPrimaryAxis = !axes.mnemos
+            ? -1
+            : indexOfElementByNames(curves, axes.mnemos[axes.primaryAxis]);
+        if (iPrimaryAxis >= 0)
+            // scale tracks are needed
+            addScaleTracks(info, axes, curves, data, iPrimaryAxis);
 
-    const iPrimaryAxis = !axes.mnemos
-        ? -1
-        : indexOfElementByNames(curves, axes.mnemos[axes.primaryAxis]);
-    if (iPrimaryAxis >= 0)
-        // scale tracks are needed
-        addScaleTracks(info, axes, curves, data, iPrimaryAxis);
-
-    if (templateTracks) {
-        for (const templateTrack of templateTracks) {
-            if (isStackedTemplateTrack(templateTrack, templateStyles)) {
-                addStackedTrack(
-                    info,
-                    welllog,
-                    curves,
-                    data,
-                    iPrimaryAxis,
-                    templateTrack,
-                    templateStyles
-                );
-                continue;
+        if (templateTracks) {
+            for (const templateTrack of templateTracks) {
+                if (isStackedTemplateTrack(templateTrack, templateStyles)) {
+                    addStackedTrack(
+                        info,
+                        welllog,
+                        curves,
+                        data,
+                        iPrimaryAxis,
+                        templateTrack,
+                        templateStyles,
+                        colorTables
+                    );
+                } else {
+                    addGraphTrack(
+                        info,
+                        welllog,
+                        curves,
+                        data,
+                        iPrimaryAxis,
+                        templateTrack,
+                        templateStyles,
+                        colorTables
+                    );
+                }
             }
-
-            addGraphTrack(
-                info,
-                welllog,
-                curves,
-                data,
-                iPrimaryAxis,
-                templateTrack,
-                templateStyles,
-                colorTables
-            );
         }
     }
 
@@ -1406,6 +1443,7 @@ export function addOrEditStackedTrack(
     const templatePlot = templateTrack.plots[0];
     if (!welllog || !templatePlot) return null;
     const name = templatePlot.name;
+    const colorTable = wellLogView.props.colorTables[0];
     const meta = getDiscreteMeta(welllog, name);
     const data = welllog.data;
     const curves = welllog.curves;
@@ -1419,7 +1457,12 @@ export function addOrEditStackedTrack(
     if (track) {
         // edit existing track
         track.options.abbr = name; // name of the only plot
-        track.options.data = createStackData.bind(null, plotData.data, meta);
+        track.options.data = createStackData.bind(
+            null,
+            plotData.data,
+            colorTable,
+            meta
+        );
         track.data = track.options.data;
         setStackedTrackOptionFromTemplate(track.options, templateTrack);
         updateStackedTrackScale(track);
@@ -1428,7 +1471,7 @@ export function addOrEditStackedTrack(
         const showLines = true;
         const options: StackedTrackOptions = {
             abbr: name, // name of the only plot
-            data: createStackData.bind(null, plotData.data, meta),
+            data: createStackData.bind(null, plotData.data, colorTable, meta),
             legendConfig: stackLegendConfig,
             showLabels: true,
             showLines: showLines,

@@ -356,7 +356,7 @@ function createScaleHandler(
 function setTracksToController(
     logController: LogViewer,
     axes: AxesInfo,
-    welllog: WellLog, // JSON Log Format
+    welllog: WellLog | undefined, // JSON Log Format
     template: Template, // JSON
     colorTables: ColorTable[] // JSON
 ) {
@@ -862,7 +862,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             }
         }
 
-        if (this.logController && this.props.welllog) {
+        if (this.logController) {
             const axes = this.getAxesInfo();
             setTracksToController(
                 this.logController,
@@ -1027,9 +1027,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     scrollTrackTo(pos: number): void {
         this.setState((state: Readonly<State>) => {
             const newPos = this._newTrackScrollPos(pos);
-            if (state.scrollTrackPos === newPos) {
-                return null;
-            }
+            if (state.scrollTrackPos === newPos) return null;
             return { scrollTrackPos: newPos };
         });
     }

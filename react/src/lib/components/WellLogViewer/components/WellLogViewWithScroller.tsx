@@ -112,13 +112,11 @@ class WellLogViewWithScroller extends Component<Props> {
     // callback function from Scroller
     onScrollerScroll(x: number, y: number): void {
         const controller = this.controller;
-        if (controller) {
-            const fContent = this.props.horizontal ? x : y; // fraction
-            controller.scrollContentTo(fContent);
-
-            const posTrack = this.calcPosTrack(this.props.horizontal ? y : x);
-            controller.scrollTrackTo(posTrack);
-        }
+        if (!controller) return;
+        const fContent = this.props.horizontal ? x : y; // fraction
+        controller.scrollContentTo(fContent);
+        const posTrack = this.calcPosTrack(this.props.horizontal ? y : x);
+        controller.scrollTrackTo(posTrack);
     }
 
     calcPosTrack(f: number): number {
