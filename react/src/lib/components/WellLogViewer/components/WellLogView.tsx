@@ -18,29 +18,7 @@ import {
 
 import "!vue-style-loader!css-loader!sass-loader!./styles.scss";
 
-import Ajv from "ajv";
-import { ValidateFunction } from "ajv/dist/types/index";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const inputSchema = require("../../../inputSchema/WellLog.json");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const inputTemplateSchema = require("../../../inputSchema/WellLogTemplate.json");
-const ajv = new Ajv();
-let schemaErrorTemplate = "";
-let validateTemplate: ValidateFunction<unknown> | null = null;
-try {
-    validateTemplate = ajv.compile(inputTemplateSchema);
-} catch (e) {
-    schemaErrorTemplate = "Wrong JSON schema for WellLogTemplate. " + String(e);
-    console.error(schemaErrorTemplate);
-}
-let schemaError = "";
-let validate: ValidateFunction<unknown> | null = null;
-try {
-    validate = ajv.compile(inputSchema);
-} catch (e) {
-    schemaError = "Wrong JSON schema for WellLog. " + String(e);
-    console.error(schemaError);
-}
+import { validateSchema } from "../../../inputSchema/validator";
 
 import { select } from "d3";
 
@@ -565,15 +543,6 @@ export function editTrack(
     );
 }
 
-function formatSchemaError(validate: ValidateFunction<unknown>): string {
-    const errors = validate.errors;
-    if (!errors || !errors[0]) return "JSON schema validation failed";
-    return (
-        (errors[0].dataPath ? errors[0].dataPath + ": " : "") +
-        errors[0].message
-    );
-}
-
 export interface TrackMouseEvent {
     track: Track;
     type: /*string, */ "click" | "contextmenu" | "dblclick";
@@ -879,26 +848,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (checkSchema) {
             //check against the json schema
-            let errorTextTemplate = "";
-            if (!validateTemplate) errorTextTemplate = schemaErrorTemplate;
-            else if (!validateTemplate(this.template))
-                errorTextTemplate = formatSchemaError(validateTemplate);
-            if (errorTextTemplate)
-                errorTextTemplate = "Template: " + errorTextTemplate;
-
-            if (this.props.checkDatafileSchema) {
-                let errorText = "";
-                if (!validate) errorText = schemaError;
-                else if (!validate(this.props.welllog))
-                    errorText = formatSchemaError(validate);
-                if (errorText) {
-                    if (errorText) errorText = "Datafile: " + errorText;
-                    if (errorTextTemplate) errorTextTemplate += "; ";
-                    errorTextTemplate += errorText;
+            try {
+                validateSchema(this.template, "WellLogTemplate");
+                if (this.props.checkDatafileSchema) {
+                    validateSchema(this.props.welllog, "WellLog");
                 }
+            } catch (e) {
+                this.setState({ errorText: String(e) });
             }
-
-            this.setState({ errorText: errorTextTemplate });
         }
 
         if (this.logController) {
@@ -922,7 +879,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         });
     }
 
-    /** 
+    /**
       Display current state of track scrolling
       */
     onTrackScroll(): void {

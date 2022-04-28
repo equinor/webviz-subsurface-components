@@ -28,9 +28,13 @@ import {
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";
+import {
+    validateColorTables,
+    validateLayers,
+} from "../../../inputSchema/schemaValidationUtil";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
+const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
 export interface ViewportType {
     /**
@@ -167,6 +171,11 @@ export interface MapProps {
     setEditedData?: (data: Record<string, unknown>) => void;
 
     /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema?: boolean;
+
+    /**
      * For get mouse events
      */
     onMouseEvent?: (event: MapMouseEvent) => void;
@@ -202,6 +211,7 @@ const Map: React.FC<MapProps> = ({
     colorTables,
     editedData,
     setEditedData,
+    checkDatafileSchema,
     onMouseEvent,
     children,
 }: MapProps) => {
@@ -270,9 +280,9 @@ const Map: React.FC<MapProps> = ({
         [coords, onMouseEvent]
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getPickingInfos = (
         pickInfo: PickingInfo,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: any
     ): PickingInfo[] => {
         if (coords?.multiPicking && pickInfo.layer) {
@@ -292,6 +302,7 @@ const Map: React.FC<MapProps> = ({
     const callOnMouseEvent = (
         type: "click" | "hover",
         infos: PickingInfo[],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: any
     ): void => {
         if (onMouseEvent) {
@@ -335,7 +346,8 @@ const Map: React.FC<MapProps> = ({
     const deckRef = useRef<DeckGL>(null);
     const [viewState, setViewState] = useState<ViewStateProps>();
 
-    const onLoad = useCallback(() => {
+    // calculate camera position and zoom on view resize
+    const onResize = useCallback(() => {
         if (deckRef == null) return;
 
         const deck = deckRef.current?.deck;
@@ -371,6 +383,21 @@ const Map: React.FC<MapProps> = ({
             setIsLoaded(state);
         }
     }, [deckGLLayers]);
+
+    // validate layers data
+    const [errorText, setErrorText] = useState<string>();
+    useEffect(() => {
+        const layers = deckRef.current?.deck.props.layers;
+        // this ensures to validate the schemas only once
+        if (checkDatafileSchema && layers && isLoaded) {
+            try {
+                validateLayers(layers);
+                colorTables && validateColorTables(colorTables);
+            } catch (e) {
+                setErrorText(String(e));
+            }
+        } else setErrorText(undefined);
+    }, [checkDatafileSchema, deckRef.current?.deck.props.layers, isLoaded]);
 
     const layerFilter = useCallback(
         (args: {
@@ -435,8 +462,7 @@ const Map: React.FC<MapProps> = ({
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
                 }
-                onLoad={onLoad}
-                onResize={onLoad}
+                onResize={onResize}
                 onAfterRender={onAfterRender}
             >
                 {children}
@@ -446,7 +472,7 @@ const Map: React.FC<MapProps> = ({
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
-                            {colorTables && (
+                            {colorTables && legend?.visible && (
                                 <ColorLegend
                                     {...legend}
                                     layers={
@@ -490,6 +516,18 @@ const Map: React.FC<MapProps> = ({
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
 
             {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
+
+            {errorText && (
+                <pre
+                    style={{
+                        flex: "0, 0",
+                        color: "rgb(255, 64, 64)",
+                        backgroundColor: "rgb(255, 255, 192)",
+                    }}
+                >
+                    {errorText}
+                </pre>
+            )}
         </div>
     );
 };
@@ -521,6 +559,7 @@ Map.defaultProps = {
         viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
     colorTables: colorTables,
+    checkDatafileSchema: false,
 };
 
 export default Map;
@@ -576,6 +615,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
     const far = 9999.9;
+    const near = 0.0001;
     if (!views || !views.viewports || !views.layout) {
         deckgl_views.push({
             "@@type": "OrthographicView",
@@ -587,6 +627,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
             height: "100%",
             flipY: false,
             far,
+            near,
         });
     } else {
         let yPos = 0;
@@ -621,6 +662,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     height: 99.5 / nY + "%",
                     flipY: false,
                     far,
+                    near,
                 });
                 xPos = xPos + 99.5 / nX;
             }

@@ -49,6 +49,16 @@ export const SliderTypeProps = [
 ] as const;
 
 export const ToggleTypeProps = [
+    {
+        id: "wellNameVisible",
+        displayName: "Well name",
+        dependentOnProp: undefined,
+    },
+    {
+        id: "wellNameAtTop",
+        displayName: "Well name at top",
+        dependentOnProp: undefined,
+    },
     { id: "logCurves", displayName: "Log curves", dependentOnProp: "logData" },
     {
         id: "isReadoutDepth",
@@ -78,6 +88,11 @@ export const NumericTypeProps = [
         displayName: "Line thickness",
         dependentOnProp: undefined,
     },
+    {
+        id: "wellNameSize",
+        displayName: "Well name size",
+        dependentOnProp: undefined,
+    },
 ] as const;
 
 export const LayerIcons = {
@@ -90,6 +105,7 @@ export const LayerIcons = {
     FaultPolygonsLayer: "fault",
     DrawingLayer: "brush",
     AxesLayer: "brush",
+    NorthArrow3D: "brush",
 };
 
 export type LayerType = keyof typeof LayerIcons;
