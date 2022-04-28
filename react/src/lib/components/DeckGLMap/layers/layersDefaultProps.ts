@@ -99,7 +99,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         opacity: 1,
         lineWidthScale: 5,
         pointRadiusScale: 8,
-        dashed: false,
+        style: { dash: false },
         outline: true,
         logRadius: 6,
         logCurves: true,
