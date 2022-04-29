@@ -17,7 +17,7 @@ import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
-import { ViewStateProps } from "@deck.gl/core/lib/deck";
+import Deck, { InitialViewStateProps } from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
@@ -215,13 +215,20 @@ const Map: React.FC<MapProps> = ({
     onMouseEvent,
     children,
 }: MapProps) => {
+    const deckRef = useRef<DeckGL>(null);
+
     // state for initial views prop (target and zoom) of DeckGL component
-    const [initialViewState, setInitialViewState] =
-        useState<Record<string, unknown>>();
+    const [viewState, setViewState] = useState<InitialViewStateProps>();
     useEffect(() => {
-        if (bounds == undefined) return;
-        setInitialViewState(getInitialViewState(bounds, zoom));
+        if (bounds === undefined) return;
+        setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
     }, [bounds, zoom]);
+
+    // calculate camera position and zoom on view resize
+    const onResize = useCallback(() => {
+        if (bounds === undefined) return;
+        setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
+    }, [deckRef]);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
@@ -343,39 +350,6 @@ const Map: React.FC<MapProps> = ({
         }
     };
 
-    const deckRef = useRef<DeckGL>(null);
-    const [viewState, setViewState] = useState<ViewStateProps>();
-
-    // calculate camera position and zoom on view resize
-    const onResize = useCallback(() => {
-        if (deckRef == null) return;
-
-        const deck = deckRef.current?.deck;
-        if (deck && bounds) {
-            const width = deck.width;
-            const height = deck.height;
-            const [west, south] = [bounds[0], bounds[1]];
-            const [east, north] = [bounds[2], bounds[3]];
-            const fitted_bound = fitBounds({
-                width,
-                height,
-                bounds: [
-                    [west, south],
-                    [east, north],
-                ],
-            });
-
-            const zoom_defined_by_consumer = zoom != undefined;
-            const view_state = {
-                target: [fitted_bound.x, fitted_bound.y, 0],
-                zoom: zoom_defined_by_consumer ? zoom : fitted_bound.zoom,
-                rotationX: 90, // look down z -axis.
-                rotationOrbit: 0,
-            };
-            setViewState(view_state);
-        }
-    }, [deckRef]);
-
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
@@ -431,8 +405,8 @@ const Map: React.FC<MapProps> = ({
         <div>
             <DeckGL
                 id={id}
-                viewState={viewState}
-                initialViewState={initialViewState}
+                // Let DeckGL automatically manage viewState as stateful component
+                initialViewState={viewState}
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
@@ -459,9 +433,6 @@ const Map: React.FC<MapProps> = ({
                 ref={deckRef}
                 onHover={onHover}
                 onClick={onClick}
-                onViewStateChange={(viewport) =>
-                    setViewState(viewport.viewState)
-                }
                 onResize={onResize}
                 onAfterRender={onAfterRender}
             >
@@ -591,23 +562,28 @@ function jsonToObject(
     return jsonConverter.convert(filtered_data);
 }
 
-// returns initial view state for DeckGL
-function getInitialViewState(
+// return viewstate with computed bounds to fit the data in viewport
+function getViewState(
     bounds: [number, number, number, number],
-    zoom?: number
-): Record<string, unknown> {
-    const width = bounds[2] - bounds[0]; // right - left
-    const height = bounds[3] - bounds[1]; // top - bottom
+    zoom?: number,
+    deck?: Deck
+): InitialViewStateProps {
+    let width = bounds[2] - bounds[0]; // right - left
+    let height = bounds[3] - bounds[1]; // top - bottom
+    if (deck) {
+        width = deck.width;
+        height = deck.height;
+    }
 
-    const initial_view_state = {
-        // target to center of the bound
-        target: [bounds[0] + width / 2, bounds[1] + height / 2, 0],
-        zoom: zoom ?? 0,
-        rotationX: 90, // look down z -axis.
+    const padding = 20;
+    const fitted_bound = fitBounds({ width, height, bounds, padding });
+    const view_state = {
+        target: [fitted_bound.x, fitted_bound.y, 0],
+        zoom: zoom ?? fitted_bound.zoom,
+        rotationX: 0,
         rotationOrbit: 0,
     };
-
-    return initial_view_state;
+    return view_state;
 }
 
 // construct views object for DeckGL component
@@ -663,6 +639,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     flipY: false,
                     far,
                     near,
+                    orbitAxis: "Y",
                 });
                 xPos = xPos + 99.5 / nX;
             }

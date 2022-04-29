@@ -41,7 +41,8 @@ export default function fitBounds({
         );
     }
 
-    const [[west, south], [east, north]] = bounds;
+    const [west, south] = [bounds[0], bounds[1]];
+    const [east, north] = [bounds[2], bounds[3]];
 
     const nw = [west, north];
     const se = [east, south];
