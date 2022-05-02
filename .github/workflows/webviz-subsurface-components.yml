@@ -106,14 +106,14 @@ jobs:
           start: npm run storybook
           wait-on: "http://localhost:6006"
       - uses: actions/upload-artifact@v2
-        if: always()
+        if: failure()
         with:
           name: cypress-screenshots
           path: |
             react/cypress/screenshots
             react/cypress/snapshots
-            react/cypress/snapshots/*/*.snap.png
-          retention-days: 1
+            !react/cypress/snapshots/*/*.snap.png
+          retention-days: 5
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
