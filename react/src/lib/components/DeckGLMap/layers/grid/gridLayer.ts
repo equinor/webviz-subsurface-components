@@ -195,12 +195,15 @@ export default class GridLayer extends Layer<
 
         return {
             models: [triangles_model, triangle_lines_model],
+            //models: [triangle_lines_model, triangles_model],
         };
     }
 
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
-    draw({ uniforms }: any): void {
+    draw({ uniforms, context }: any): void {
+        const { gl } = context;
+
         // This replaces super.draw()
         // DRAW SIN SER UT SOK UNDER.. KANSKJE MAN KAN BRUKE DEN  likevel..
         // // If state has a model, draw it with supplied uniforms
@@ -211,9 +214,20 @@ export default class GridLayer extends Layer<
         // }
 
         if (this.state.models) {
-            for (let i = 0; i < this.state.models.length; i++) {
-                this.state.models[i].draw();
-            }
+            gl.enable(gl.POLYGON_OFFSET_FILL);
+            gl.polygonOffset(0, 1); // XXX dette virker men rydd opp.. faktorene etc.. https://stackoverflow.com/questions/50556776/why-do-i-need-factor-when-using-gl-polygonoffset
+            this.state.models[0].draw();  // triangles_model           https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/polygonOffset
+
+
+            this.state.models[1].draw();  // triangle_lines_model
+            gl.disable(gl.POLYGON_OFFSET_FILL);
+
+
+
+
+            // for (let i = 0; i < this.state.models.length; i++) {
+            //     this.state.models[i].draw();
+            // }
         }
     }
 
