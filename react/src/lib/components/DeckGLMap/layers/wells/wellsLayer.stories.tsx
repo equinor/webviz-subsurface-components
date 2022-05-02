@@ -10,14 +10,12 @@ const Template: ComponentStory<typeof DeckGLMap> = (args) => (
     <DeckGLMap {...args} />
 );
 
-// Volve kh netmap data, flat surface
-export const VolveWells = Template.bind({});
-VolveWells.args = {
+const defaultProps = {
     id: "volve-wells",
     resources: {
         wellsData: "./volve_wells.json",
     },
-    bounds: [432150, 6475800, 439400, 6481500],
+    bounds: [432150, 6475800, 439400, 6481500] as [number, number, number, number],
     layers: [
         {
             "@@type": "WellsLayer",
@@ -25,6 +23,10 @@ VolveWells.args = {
         },
     ],
 };
+
+// Volve kh netmap data, flat surface
+export const VolveWells = Template.bind({});
+VolveWells.args = defaultProps;
 VolveWells.parameters = {
     docs: {
         description: {
@@ -37,21 +39,16 @@ VolveWells.parameters = {
 
 export const DashedWells = Template.bind({});
 DashedWells.args = {
-    id: "dashed-wells",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
-    bounds: [432150, 6475800, 439400, 6481500],
-    layers: [
-        {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
+        ...defaultProps,
+        layers: [
+                {
+                        ...defaultProps.layers[0],
             dashed: true,
             refine: false,
             outline: false,
-        },
-    ],
-};
+                }
+        ],
+}
 DashedWells.parameters = {
     docs: {
         description: {
@@ -64,20 +61,15 @@ DashedWells.parameters = {
 
 export const CustomDashedWells = Template.bind({});
 CustomDashedWells.args = {
-    id: "custom-dashed-wells",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
-    bounds: [432150, 6475800, 439400, 6481500],
-    layers: [
-        {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
+        ...defaultProps,
+        layers: [
+                {
+                        ...defaultProps.layers[0],
             dashed: [10, 3],
             refine: false,
             outline: false,
-        },
-    ],
+                }
+        ],
 };
 CustomDashedWells.parameters = {
     docs: {
@@ -96,20 +88,15 @@ function callback(object: Record<string, Record<string, unknown>>) {
 
 export const CallbackDashedWells = Template.bind({});
 CallbackDashedWells.args = {
-    id: "callback-dashed-wells",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
-    bounds: [432150, 6475800, 439400, 6481500],
-    layers: [
-        {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
+        ...defaultProps,
+        layers: [
+                {
+                        ...defaultProps.layers[0],
             dashed: callback,
             refine: false,
             outline: false,
-        },
-    ],
+                }
+        ],
 };
 CallbackDashedWells.parameters = {
     docs: {
@@ -120,3 +107,58 @@ CallbackDashedWells.parameters = {
         iframeHeight: 500,
     },
 };
+
+export const Wells3d = Template.bind({});
+Wells3d.args = {
+        ...defaultProps,
+    views: {
+            layout: [1, 1],
+            viewports: [
+                    {
+                            id: "a",
+                        show3D: true
+                    }
+            ]
+    },
+};
+Wells3d.parameters = {
+    docs: {
+        description: {
+            story: "3D wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const Wells3dDashed = Template.bind({});
+Wells3dDashed.args = {
+        ...defaultProps,
+        layers: [
+                {
+                        ...defaultProps.layers[0],
+            dashed: true,
+            refine: false,
+            outline: false,
+                }
+        ],
+    views: {
+            layout: [1, 1],
+            viewports: [
+                    {
+                            id: "a",
+                        show3D: true
+                    }
+            ]
+    },
+};
+Wells3dDashed.parameters = {
+    docs: {
+        description: {
+            story: "3D dashed wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
