@@ -31,18 +31,20 @@ import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
 
-type NumberPair = [number, number];
-type Dash = boolean | NumberPair;
-type LineStyle = {
-    dash?: Dash;
-    color?: RGBAColor;
-};
-
 type StyleAccessorFunction = (
     object: Record<string, unknown>,
     objectInfo: Record<string, unknown>
 ) => LineStyle;
-type StyleAccessor = LineStyle | StyleAccessorFunction | undefined;
+
+type NumberPair = [number, number];
+type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
+type ColorAccessor = RGBAColor | StyleAccessorFunction | undefined;
+type LineStyle = NumberPair | RGBAColor;
+
+type StyleAccessor = {
+    color?: ColorAccessor;
+    dash?: DashAccessor;
+};
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -56,12 +58,11 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
-    style?: StyleAccessor;
+    lineStyle: StyleAccessor;
     wellNameVisible: boolean;
     wellNameAtTop: boolean;
     wellNameSize: number;
     wellNameColor: RGBAColor;
-    trajectoryVisible: boolean;
 }
 
 export interface LogCurveDataType {
@@ -91,9 +92,9 @@ function multiply(pair: [number, number], factor: number): [number, number] {
     return [pair[0] * factor, pair[1] * factor];
 }
 
-const DEFAULT_DASH = [5, 5];
+const DEFAULT_DASH = [5, 5] as NumberPair;
 
-function getDashFactor(accessor: StyleAccessor, factor: number) {
+function getDashFactor(accessor: DashAccessor, factor: number) {
     if (typeof accessor == "function") {
         return (
             object: Record<string, unknown>,
@@ -102,31 +103,31 @@ function getDashFactor(accessor: StyleAccessor, factor: number) {
             const dash = (accessor as StyleAccessorFunction)(
                 object,
                 objectInfo
-            )?.dash;
-            let value = DEFAULT_DASH as NumberPair;
+            );
             if (dash) {
-                if ((dash as NumberPair)?.length == 2) {
-                    value = dash as NumberPair;
+                if (dash?.length == 2) {
+                    return multiply(dash, factor);
+                } else {
+                    return multiply(DEFAULT_DASH, factor);
                 }
-                return multiply(value, factor);
             }
             return [0, 0];
         };
     }
 
     let value = DEFAULT_DASH as NumberPair;
-    if (accessor?.dash) {
-        if ((accessor.dash as NumberPair)?.length == 2) {
-            value = accessor.dash as NumberPair;
+    if (accessor) {
+        if ((accessor as NumberPair)?.length == 2) {
+            value = accessor as NumberPair;
         }
         return multiply(value, factor);
     }
     return [0, 0];
 }
 
-function getColor(accessor: StyleAccessor) {
-    if ((accessor as LineStyle).color) {
-        return (accessor as LineStyle).color as RGBAColor;
+function getLineColor(accessor: ColorAccessor) {
+    if (accessor as RGBAColor) {
+        return accessor as RGBAColor;
     }
 
     return (
@@ -137,7 +138,7 @@ function getColor(accessor: StyleAccessor) {
             const color = (accessor as StyleAccessorFunction)(
                 object,
                 objectInfo
-            )?.color;
+            ) as RGBAColor;
             if (color) {
                 return color;
             }
@@ -184,17 +185,14 @@ export default class WellsLayer extends CompositeLayer<
         }
 
         const refine = this.props.refine;
-        let data = refine
+        const data = refine
             ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
             : (this.props.data as FeatureCollection);
-
-        const hide_trajectory = !this.props.trajectoryVisible;
-        if (hide_trajectory) data = removeTrajectoryData(data);
 
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
         const positionFormat = is3d ? "XYZ" : "XY";
 
-        const isDashed = !!this.props.style;
+        const isDashed = !!this.props.lineStyle?.dash;
 
         const extensions = [
             new PathStyleExtension({
@@ -216,7 +214,7 @@ export default class WellsLayer extends CompositeLayer<
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
                 extensions: extensions,
-                getDashArray: getDashFactor(this.props.style, 1),
+                getDashArray: getDashFactor(this.props.lineStyle?.dash, 1),
             })
         );
 
@@ -234,10 +232,13 @@ export default class WellsLayer extends CompositeLayer<
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale - 1,
                 lineWidthScale: this.props.lineWidthScale - 1,
-                getFillColor: getColor(this.props.style),
-                getLineColor: getColor(this.props.style),
+                getFillColor: (d: Feature) => d.properties?.["color"],
+                getLineColor: getLineColor(this.props.lineStyle?.color),
                 extensions: extensions,
-                getDashArray: getDashFactor(this.props.style, lineWidthFactor),
+                getDashArray: getDashFactor(
+                    this.props.lineStyle?.dash,
+                    lineWidthFactor
+                ),
             })
         );
 
@@ -256,12 +257,11 @@ export default class WellsLayer extends CompositeLayer<
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale + 2,
                 lineWidthScale: this.props.lineWidthScale + 2,
-                getFillColor: getColor(this.props.style),
-                getLineColor: getColor(this.props.style),
+                getFillColor: (d: Feature) => d.properties?.["color"],
+                getLineColor: getLineColor(this.props.lineStyle?.color),
             })
         );
 
-        const show_log = this.props.trajectoryVisible && this.props.logCurves;
         const log_layer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps<LogCurveDataType>({
                 id: "log_curve",
@@ -271,7 +271,7 @@ export default class WellsLayer extends CompositeLayer<
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
-                visible: show_log,
+                visible: this.props.logCurves,
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath(data.features, d, this.props.logrunName),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
@@ -488,22 +488,6 @@ function getTrajectory(well_object: Feature): Position[] | undefined {
 
 function getWellMds(well_object: Feature): number[] {
     return well_object.properties?.["md"][0];
-}
-
-// return wells data with only Point Geometry
-function removeTrajectoryData(data: FeatureCollection): FeatureCollection {
-    return {
-        ...data,
-        features: data.features.map((feature) => {
-            return {
-                ...feature,
-                geometry: {
-                    ...feature.geometry,
-                    geometries: [getPointGeometry(feature)],
-                },
-            };
-        }),
-    };
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {

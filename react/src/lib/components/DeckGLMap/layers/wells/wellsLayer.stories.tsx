@@ -46,7 +46,7 @@ StyledWells.args = {
         {
             "@@type": "WellsLayer",
             data: "@@#resources.wellsData",
-            style: { dash: true },
+            lineStyle: { dash: true },
             refine: false,
             outline: false,
         },
@@ -73,7 +73,7 @@ CustomStyledWells.args = {
         {
             "@@type": "WellsLayer",
             data: "@@#resources.wellsData",
-            style: { color: [255, 0, 0, 255], dash: [10, 3] },
+            lineStyle: { color: [255, 0, 0, 255], dash: [10, 3] },
             refine: false,
             outline: false,
         },
@@ -89,14 +89,18 @@ CustomStyledWells.parameters = {
     },
 };
 
-function callback(object: Record<string, Record<string, unknown>>) {
-    if (object["properties"]["name"] == "15/9-F-11 B")
-        return { color: [255, 0, 0, 255], dash: true };
-    else if (object["properties"]["name"] == "15/9-F-14")
-        return { dash: [10, 1] };
-    else if (object["properties"]["name"] == "15/9-F-10")
-        return { color: [0, 0, 0, 0] };
-    return {};
+function colorCallback(object: Record<string, Record<string, unknown>>) {
+    if ((object["properties"]["name"] as string).match("15/9-19"))
+        return object["properties"]["color"];
+    else if ((object["properties"]["name"] as string).match("15/9-F"))
+        return [0, 0, 0, 0];
+    else return [0, 0, 0, 255];
+}
+
+function dashCallback(object: Record<string, Record<string, unknown>>) {
+    if ((object["properties"]["name"] as string).match("15/9-19"))
+        return [1.5, 1.5];
+    else return false;
 }
 
 export const CallbackStyledWells = Template.bind({});
@@ -110,7 +114,7 @@ CallbackStyledWells.args = {
         {
             "@@type": "WellsLayer",
             data: "@@#resources.wellsData",
-            style: callback,
+            lineStyle: { color: colorCallback, dash: dashCallback },
             refine: false,
             outline: false,
         },
@@ -119,7 +123,40 @@ CallbackStyledWells.args = {
 CallbackStyledWells.parameters = {
     docs: {
         description: {
-            story: "Volve wells example with dashed and colored trajectories, with custom style.",
+            story: "Volve wells example with trajectory color and dash style supplied as callback.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const HideAllTrajectory = Template.bind({});
+HideAllTrajectory.args = {
+    id: "trajectory-hidden-wells",
+    resources: {
+        wellsData: "./volve_wells.json",
+        logData:
+            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+    },
+    bounds: [432150, 6475800, 439400, 6481500],
+    layers: [
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData",
+            lineStyle: { color: [0, 0, 0, 0] },
+            refine: false,
+            outline: false,
+            logData: "@@#resources.logData",
+            logrunName: "BLOCKING",
+            logName: "ZONELOG",
+            logColor: "Stratigraphy",
+        },
+    ],
+};
+HideAllTrajectory.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with all trajectory hidden.",
         },
         inlineStories: false,
         iframeHeight: 500,
