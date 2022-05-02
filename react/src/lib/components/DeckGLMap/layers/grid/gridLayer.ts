@@ -22,7 +22,7 @@ import fragmentShader from "./fragment.glsl";
 import vertexShader from "./vertex.glsl";
 import fragmentShaderLines from "./fragment_lines.glsl";
 import vertexShaderLines from "./vertex_lines.glsl";
-
+import { phongLighting } from "@luma.gl/shadertools";
 
 function getColorMapColors(
     colorMapName: string,
@@ -139,7 +139,10 @@ export default class GridLayer extends Layer<
             return [];
         }
  
-        // Cell triangle model.
+        // CELL TRIANGLE MODEL.
+        // const myintarray = new Int32Array(cell_index.length).fill(3);
+        // console.log(cell_index)
+
         const triangles_model = new Model(gl, {
             id: `${this.props.id}-triangles`,
             vs: vertexShader,
@@ -152,19 +155,21 @@ export default class GridLayer extends Layer<
                         size: 3,
                         value: new Float32Array(triangle_colors),
                     },
-                    // cell_index: {
-                    //     size: 1,
-                    //     value: new Int32Array(cell_index),
-                    // },
-                    // XXX tror jeg trenger en picking color ogsaa her..
-                },
+                    cell_index: {
+                        size: 1,
+                        integer: true,
+                        type: GL.INT,
+                        value: new Int32Array(cell_index),
+                        //value: myintarray,
+                    },
+                 },
                 vertexCount: triangle_vertexs.length / 3,
             }),
-            modules: [project, picking],  //  modules: [project32, phongLighting, picking],
+            modules: [project, picking, phongLighting],  //  modules: [project32, phongLighting, picking],
             isInstanced: false, // This only works when set to false.
         });
 
-        // Cell border lines model.
+        // CELL LINE MODEL.
         const line_colors = Array(cell_lines.length).fill([0.25, 0.25, 0.25]).flat();   // XXX bruke heller en separat shader kanskje
         const triangle_lines_model = new Model(gl, {
             id: `${this.props.id}-triangle_lines`,
@@ -177,14 +182,14 @@ export default class GridLayer extends Layer<
                         size: 3,
                         value: new Float32Array(cell_lines),
                     },
-                    color: {  // DENNE BRUKES EGENTLIG IKKE I SHADEREN MER..
+                    color: {  // XXX DENNE BRUKES EGENTLIG IKKE I SHADEREN MER..
                         size: 3,
                         value: new Float32Array(line_colors),
                     },
                 },
                 vertexCount: cell_lines.length / 3,
             }),
-            modules: [project],
+            modules: [project, picking, phongLighting],
             isInstanced: false, // This only works when set to false.
         });
 
@@ -197,6 +202,14 @@ export default class GridLayer extends Layer<
     // eslint-disable-next-line
     draw({ uniforms }: any): void {
         // This replaces super.draw()
+        // DRAW SIN SER UT SOK UNDER.. KANSKJE MAN KAN BRUKE DEN  likevel..
+        // // If state has a model, draw it with supplied uniforms
+        // draw(opts) {
+        //     for (const model of this.getModels()) {
+        //     model.draw(opts);
+        //     }
+        // }
+
         if (this.state.models) {
             for (let i = 0; i < this.state.models.length; i++) {
                 this.state.models[i].draw();
@@ -229,11 +242,19 @@ export default class GridLayer extends Layer<
         const g = info.color[1];
         const b = info.color[2];
 
+        if ( g === 255){
+            // We are picking the lines.
+            return info;
+        }
+
         //console.log("rgb: ", r, g, b);
 
         return {
             ...info,
-            properties: "properies hallo",
+            properties: [
+                { name: "i verdi", value: "value verdii" },
+                { name: "j verdi", value: "value verdjj" },
+            ],
             propertyValue: "propertyValue goddag",
         };
     }
@@ -293,11 +314,26 @@ function makeVertexesAndColorArrays(
         triangle_colors.push(color[0], color[1], color[2]);
         triangle_colors.push(color[0], color[1], color[2]);
 
+        // Cell index.
+        for (let j = 0; j < 3; j++) { // one for each triangle vertex.
+            cell_index.push(2 * i);
+        }
+
+        // XXXXX her må også et assosiativt array med data (CellData? )for hver index fylles opp
+        // kanskje bare peke tilbake på orignal CellData array,.. hm...
+        // dessuten må alle kanaler kod4es i 255 systemet ikke bare gronn kanal som na...
+
         // Triangle 2.
         triangle_vertexs.push(...cell.cs[0], ...cell.cs[2], ...cell.cs[3]);
         triangle_colors.push(color[0], color[1], color[2]);
         triangle_colors.push(color[0], color[1], color[2]);
         triangle_colors.push(color[0], color[1], color[2]);
+
+        // Cell index.
+        for (let j = 0; j < 3; j++) { // one for each triangle vertex.
+            cell_index.push(2 * i + 1);
+        }
+
 
         // Cell lines.
         cell_lines.push(...cell.cs[0], ...cell.cs[1]);
@@ -305,8 +341,7 @@ function makeVertexesAndColorArrays(
         cell_lines.push(...cell.cs[2], ...cell.cs[3]);
         cell_lines.push(...cell.cs[3], ...cell.cs[0]);
 
-        // Cell index.
-        cell_index.push(i);
+
     }
 
     return [triangle_vertexs, triangle_colors, cell_lines, cell_index];
