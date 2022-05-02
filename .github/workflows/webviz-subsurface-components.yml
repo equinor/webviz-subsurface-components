@@ -113,7 +113,7 @@ jobs:
             react/cypress/screenshots
             react/cypress/snapshots
             react/cypress/snapshots/*/*.snap.png
-          retention-days: 5
+          retention-days: 1
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
