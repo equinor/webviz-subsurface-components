@@ -1,13 +1,13 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
-import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
 import {
     rgbValues,
-    colorTableData,
     colorTablesArray,
+    colorsArray,
 } from "@emerson-eps/color-tables/";
 import {
     Feature,
@@ -51,6 +51,10 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logCurves: boolean;
     refine: boolean;
     dashed?: DashAccessor;
+    wellNameVisible: boolean;
+    wellNameAtTop: boolean;
+    wellNameSize: number;
+    wellNameColor: RGBAColor;
 }
 
 export interface LogCurveDataType {
@@ -135,7 +139,11 @@ export default class WellsLayer extends CompositeLayer<
         );
     }
 
-    renderLayers(): (GeoJsonLayer<Feature> | PathLayer<LogCurveDataType>)[] {
+    renderLayers(): (
+        | GeoJsonLayer<Feature>
+        | PathLayer<LogCurveDataType>
+        | TextLayer<Feature>
+    )[] {
         if (!(this.props.data as FeatureCollection).features) {
             return [];
         }
@@ -268,8 +276,23 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const layers = [outline, log_layer, colors, highlight];
-        return layers;
+        // well name
+        const names = new TextLayer<Feature>(
+            this.getSubLayerProps<Feature>({
+                id: "names",
+                data: data.features,
+                visible: this.props.wellNameVisible,
+                getPosition: (d: Feature) =>
+                    getAnnotationPosition(d, this.props.wellNameAtTop, is3d),
+                getText: (d: Feature) => d.properties?.["name"],
+                getColor: this.props.wellNameColor,
+                getAnchor: "start",
+                getAlignmentBaseline: "bottom",
+                getSize: this.props.wellNameSize,
+            })
+        );
+
+        return [outline, log_layer, colors, highlight, names];
     }
 
     // For now, use `any` for the picking types because this function should
@@ -361,6 +384,38 @@ function isSelectedLogRun(d: LogCurveDataType, logrun_name: string): boolean {
     return d.header.name.toLowerCase() === logrun_name.toLowerCase();
 }
 
+// return position for well name and icon
+function getAnnotationPosition(
+    well_data: Feature,
+    name_at_top: boolean,
+    view_is_3d: boolean
+): Position | null {
+    if (name_at_top) {
+        let top;
+
+        // Read top position from Point geometry, if not present, read it from LineString geometry
+        const well_head = getWellHeadPosition(well_data);
+        if (well_data) top = well_head;
+        else {
+            const trajectory = getTrajectory(well_data);
+            top = trajectory?.at(0);
+        }
+
+        // using z=0 for orthographic view to keep label above other other layers
+        if (top) return view_is_3d ? top : [top[0], top[1], 0];
+    } else {
+        let bot;
+        // if trajectory is not present, return top position from Point geometry
+        const trajectory = getTrajectory(well_data);
+        if (trajectory) bot = trajectory?.at(-1);
+        else bot = getWellHeadPosition(well_data);
+
+        // using z=0 for orthographic view to keep label above other other layers
+        if (bot) return view_is_3d ? bot : [bot[0], bot[1], 0];
+    }
+    return null;
+}
+
 function getWellObjectByName(
     wells_data: Feature[],
     name: string
@@ -371,24 +426,30 @@ function getWellObjectByName(
     );
 }
 
-function getWellHeadCoordinates(well_object?: Feature): Position {
-    return (
-        (well_object?.geometry as GeometryCollection)?.geometries.find(
-            (item) => item.type == "Point"
-        ) as Point
-    )?.coordinates;
+function getPointGeometry(well_object: Feature): Point | undefined {
+    return (well_object.geometry as GeometryCollection)?.geometries.find(
+        (item) => item.type == "Point"
+    ) as Point;
 }
 
-function getWellCoordinates(well_object?: Feature): Position[] {
-    return (
-        (well_object?.geometry as GeometryCollection)?.geometries.find(
-            (item) => item.type == "LineString"
-        ) as LineString
-    )?.coordinates;
+function getLineStringGeometry(well_object: Feature): LineString | undefined {
+    return (well_object.geometry as GeometryCollection)?.geometries.find(
+        (item) => item.type == "LineString"
+    ) as LineString;
 }
 
-function getWellMds(well_object?: Feature): number[] {
-    return well_object?.properties?.["md"][0];
+// Return well head position from Point Geometry
+function getWellHeadPosition(well_object: Feature): Position | undefined {
+    return getPointGeometry(well_object)?.coordinates;
+}
+
+// Return Trajectory data from LineString Geometry
+function getTrajectory(well_object: Feature): Position[] | undefined {
+    return getLineStringGeometry(well_object)?.coordinates;
+}
+
+function getWellMds(well_object: Feature): number[] {
+    return well_object.properties?.["md"][0];
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
@@ -402,7 +463,9 @@ function getLogPath(
     logrun_name: string
 ): Position[] {
     const well_object = getWellObjectByName(wells_data, d.header.well);
-    const well_xyz = getWellCoordinates(well_object);
+    if (!well_object) return [];
+
+    const well_xyz = getTrajectory(well_object);
     const well_mds = getWellMds(well_object);
 
     if (
@@ -477,7 +540,7 @@ function getLogColor(
             }
         });
     } else {
-        const colorsArray: [number, number, number, number][] = colorTableData(
+        const arrayOfColors: [number, number, number, number][] = colorsArray(
             logColor,
             colorTables
         );
@@ -489,7 +552,7 @@ function getLogColor(
             // get the code from log_attributes
             const code = log_attributes[key][1];
             // compare the code and first value from colorsArray(colortable)
-            const colorArrays = colorsArray.find((value: number[]) => {
+            const colorArrays = arrayOfColors.find((value: number[]) => {
                 return value[0] == code;
             });
             if (colorArrays)
@@ -582,7 +645,7 @@ function getMd(coord: Position, feature: Feature): number | null {
     if (!feature.properties?.["md"]?.[0] || !feature.geometry) return null;
 
     const measured_depths = feature.properties["md"][0] as number[];
-    const trajectory3D = getWellCoordinates(feature);
+    const trajectory3D = getTrajectory(feature);
 
     if (trajectory3D == undefined) return null;
 
@@ -614,11 +677,11 @@ function getMdProperty(
 }
 
 function getTvd(coord: Position, feature: Feature): number | null {
-    const trajectory3D = getWellCoordinates(feature);
+    const trajectory3D = getTrajectory(feature);
 
     // if trajectory is not found or if it has a data single point then get tvd from well head
     if (trajectory3D == undefined || trajectory3D?.length <= 1) {
-        const wellhead_xyz = getWellHeadCoordinates(feature);
+        const wellhead_xyz = getWellHeadPosition(feature);
         return wellhead_xyz?.[2] ?? null;
     }
     let trajectory;
