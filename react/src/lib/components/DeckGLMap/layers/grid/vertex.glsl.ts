@@ -7,16 +7,26 @@ in vec3 positions;
 
 in vec3 color; // XXX in her i stedet?
 
-// in int cell_index;  // uint kanskje?
-// out int cell_index2;
+in int cell_index;  // uint kanskje?
+flat out int cell_index2;
+
+out vec3 position;
 
 out vec3 vColor;
 
+out vec3 position_commonspace;
+
+out vec3 cameraPosition;
+
 void main(void) {
+   cameraPosition = project_uCameraPosition;
+   
    vColor = color;
 
-   vec3 position_commonspace = project_position(positions);
+   position_commonspace = project_position(positions);
    gl_Position = project_common_position_to_clipspace(vec4(position_commonspace, 0.0));
+
+   cell_index2 = cell_index;
 }
 `;
 

@@ -191,6 +191,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const parentShaders = super.getShaders();
         // Overwrite the default fragment shader with ours.
         parentShaders.fs = fsShader;
+        //console.log(parentShaders.vs)  // XXX ps sizeScale inn i her kan vare syndren ang smaa labeler på akser..
 
         return {
             ...parentShaders,
