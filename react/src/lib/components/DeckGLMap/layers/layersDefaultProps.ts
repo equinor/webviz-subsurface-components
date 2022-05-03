@@ -90,13 +90,13 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         valueRange: { type: "array", value: [0, 1] },
         colorMapRange: { type: "array", value: [0, 1] },
-        //material: true, // XXX vet ikke om dette trenges.. TRNGS FOR AA ENABLE LIGHING!!!
-        material: {
-            ambient: 0.35,
-            diffuse: 0.6,
-            shininess: 32,
-            specularColor: [255, 255, 255],
-        },
+        material: true, // XXX vet ikke om dette trenges.. TRNGS FOR AA ENABLE LIGHING!!!
+        // material: {
+        //     ambient: 0.35,
+        //     diffuse: 0.6,
+        //     shininess: 900,
+        //     specularColor: [255, 255, 255],
+        // },
     },
     WellsLayer: {
         "@@type": "WellsLayer",
