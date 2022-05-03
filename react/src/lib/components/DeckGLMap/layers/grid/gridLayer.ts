@@ -14,7 +14,7 @@ import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import { Layer } from "@deck.gl/core";
 import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/core";
-import { LayerProps } from "@deck.gl/core/lib/layer";
+import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import { picking, project } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
@@ -58,18 +58,14 @@ type CellData = {
 };
 type GridData = CellData[];
 
-// These are the data PolygonLayer expects.
-type CellProperties = {
-    color: RGBAColor;
-    i: number;
-    j: number;
-    depth: number;
-    value: number;
-};
-interface PolygonData {
-    polygon: Position[];
-    properties: CellProperties;
-}
+// // These are the data PolygonLayer expects.
+// type CellProperties = {
+//     color: RGBAColor;
+//     i: number;
+//     j: number;
+//     depth: number;
+//     value: number;
+// };
 export interface GridLayerProps<D> extends ExtendedLayerProps<D> {
     // Name of color map.
     colorMapName: string;
@@ -87,7 +83,16 @@ export default class GridLayer extends Layer<
 > {
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
-        this.setState(this._getModels(gl));
+
+        const updateTimeStep = () => {
+            this.updateState({ context }); // LayerProps, LayerContext
+        };
+
+        // set intial state.
+        this.setState({ ...this._getModels(gl, 0), ti: 0 });
+
+        // For now just cycle over the timesteps.
+        setInterval(updateTimeStep, 200);
     }
 
     shouldUpdateState({
@@ -107,15 +112,21 @@ export default class GridLayer extends Layer<
     }
 
     updateState({ context }: UpdateStateInfo<GridLayerProps<GridData>>): void {
-        //console.log("updateState")
         const { gl } = context;
-        this.setState(this._getModels(gl));
+
+        // Wrap around timestep if necessary.
+        const data = this.props.data as GridData;
+
+        const do_reset_ti = this.state.ti >= (data?.[0]?.vs.length ?? 1) - 1;
+        const timeStep = do_reset_ti ? 0 : this.state.ti + 1;
+        this.setState({
+            ...this._getModels(gl, timeStep),
+            ti: timeStep,
+        });
     }
 
     //eslint-disable-next-line
-    _getModels(gl: any) {
-        //console.log("GETMODEL")
-
+    _getModels(gl: any, timeStep: number) {
         const colors = getColorMapColors(
             this.props.colorMapName,
             (this.context as DeckGLLayerContext).userData.colorTables
@@ -126,13 +137,14 @@ export default class GridLayer extends Layer<
             return [];
         }
 
-        const [triangle_vertexs, triangle_colors, cell_lines, cell_index] = makeVertexesAndColorArrays(
-            data,
-            0,     // this.state.ti
-            colors,
-            this.props.valueRange,
-            this.props.colorMapRange
-        );
+        const [triangle_vertexs, triangle_colors, cell_lines, cell_index] =
+            makeVertexesAndColorArrays(
+                data,
+                timeStep,
+                colors,
+                this.props.valueRange,
+                this.props.colorMapRange
+            );
 
         if (triangle_vertexs.length === 0) {  // XXX trengs dette?
             console.log("WTF!!!", data)
@@ -140,9 +152,6 @@ export default class GridLayer extends Layer<
         }
  
         // CELL TRIANGLE MODEL.
-        // const myintarray = new Int32Array(cell_index.length).fill(3);
-        // console.log(cell_index)
-
         const triangles_model = new Model(gl, {
             id: `${this.props.id}-triangles`,
             vs: vertexShader,
@@ -160,31 +169,25 @@ export default class GridLayer extends Layer<
                         integer: true,
                         type: GL.INT,
                         value: new Int32Array(cell_index),
-                        //value: myintarray,
                     },
-                 },
+                },
                 vertexCount: triangle_vertexs.length / 3,
             }),
-            modules: [project, picking, phongLighting],  //  modules: [project32, phongLighting, picking],
+            modules: [project, picking, phongLighting],
             isInstanced: false, // This only works when set to false.
         });
 
         // CELL LINE MODEL.
-        const line_colors = Array(cell_lines.length).fill([0.25, 0.25, 0.25]).flat();   // XXX bruke heller en separat shader kanskje
         const triangle_lines_model = new Model(gl, {
             id: `${this.props.id}-triangle_lines`,
             vs: vertexShaderLines,
             fs: fragmentShaderLines,
             geometry: new Geometry({
-                drawMode: GL.LINES,  // LINE_LOOP  TRIANGLES LINES POINTS LINE_STRIP
+                drawMode: GL.LINES,
                 attributes: {
                     positions: {
                         size: 3,
                         value: new Float32Array(cell_lines),
-                    },
-                    color: {  // XXX DENNE BRUKES EGENTLIG IKKE I SHADEREN MER..
-                        size: 3,
-                        value: new Float32Array(line_colors),
                     },
                 },
                 vertexCount: cell_lines.length / 3,
@@ -195,7 +198,6 @@ export default class GridLayer extends Layer<
 
         return {
             models: [triangles_model, triangle_lines_model],
-            //models: [triangle_lines_model, triangles_model],
         };
     }
 
@@ -203,48 +205,31 @@ export default class GridLayer extends Layer<
     // eslint-disable-next-line
     draw({ uniforms, context }: any): void {
         const { gl } = context;
-
-        // This replaces super.draw()
-        // DRAW SIN SER UT SOK UNDER.. KANSKJE MAN KAN BRUKE DEN  likevel..
-        // // If state has a model, draw it with supplied uniforms
-        // draw(opts) {
-        //     for (const model of this.getModels()) {
-        //     model.draw(opts);
-        //     }
-        // }
-
         if (this.state.models) {
             gl.enable(gl.POLYGON_OFFSET_FILL);
-            gl.polygonOffset(0, 1); // XXX dette virker men rydd opp.. faktorene etc.. https://stackoverflow.com/questions/50556776/why-do-i-need-factor-when-using-gl-polygonoffset
-            this.state.models[0].draw();  // triangles_model           https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/polygonOffset
-
+            gl.polygonOffset(0, 1);
+            this.state.models[0].draw();
 
             this.state.models[1].draw();  // triangle_lines_model
             gl.disable(gl.POLYGON_OFFSET_FILL);
-
-
-
-
-            // for (let i = 0; i < this.state.models.length; i++) {
-            //     this.state.models[i].draw();
-            // }
         }
     }
 
+    // KEEP
     // decodePickingColor(): number {
     //     return 0;
     // }
 
-    decodePickingColor(color: RGBColor) : number {
-        //console.log("decodePickingColor ", color );
-        return this.nullPickingColor();
+    decodePickingColor(): number {
+        return this.nullPickingColor() as unknown as number;
     }
 
     encodePickingColor(): RGBColor {
         console.log("MOOOORN 2 ");
         return this.nullPickingColor();
     }
-        // For now, use `any` for the picking types.
+
+    // For now, use `any` for the picking types.
     //eslint-disable-next-line
     getPickingInfo({ info }: { info: any }): any {
         if (!info.color) {
@@ -283,7 +268,7 @@ GridLayer.defaultProps = layersDefaultProps[
 
 function makeVertexesAndColorArrays(
     data: GridData,
-    ti: number,  // XXX bare send inn 0
+    ti: number,
     colors: RGBColor[],
     valueRange: [number, number],
     colorMapRange: [number, number]
@@ -293,7 +278,7 @@ function makeVertexesAndColorArrays(
     const cell_lines: number[] = [];
     const cell_index: number[] = [];
 
-    for (let i = 0; i < data.length; i++) {  // / 20 for aa faa litt mindre data   .... data.length
+    for (let i = 0; i < data.length; i++) {
         const cell: CellData = data[i];
         //console.log(cell)
 
@@ -312,15 +297,6 @@ function makeVertexesAndColorArrays(
         x = Math.min(1.0, x);
 
         const color = colors[Math.floor(x * 255)];
-        // const color = [
-        //     Math.random(),
-        //     Math.random(),
-        //     Math.random(),
-        // ];
-
-        // triangle_colors.push(Math.random(), Math.random(), Math.random());
-        // triangle_colors.push(Math.random(), Math.random(), Math.random());
-        // triangle_colors.push(Math.random(), Math.random(), Math.random());
 
         // Triangle 1.
         triangle_vertexs.push(...cell.cs[0], ...cell.cs[1], ...cell.cs[2]);
@@ -344,18 +320,16 @@ function makeVertexesAndColorArrays(
         triangle_colors.push(color[0], color[1], color[2]);
 
         // Cell index.
-        for (let j = 0; j < 3; j++) { // one for each triangle vertex.
+        for (let j = 0; j < 3; j++) {
+            // one for each triangle vertex.
             cell_index.push(2 * i + 1);
         }
-
 
         // Cell lines.
         cell_lines.push(...cell.cs[0], ...cell.cs[1]);
         cell_lines.push(...cell.cs[1], ...cell.cs[2]);
         cell_lines.push(...cell.cs[2], ...cell.cs[3]);
         cell_lines.push(...cell.cs[3], ...cell.cs[0]);
-
-
     }
 
     return [triangle_vertexs, triangle_colors, cell_lines, cell_index];
