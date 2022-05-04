@@ -135,8 +135,6 @@ HideAllTrajectory.args = {
     id: "trajectory-hidden-wells",
     resources: {
         wellsData: "./volve_wells.json",
-        logData:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
     },
     bounds: [432150, 6475800, 439400, 6481500],
     layers: [
@@ -146,10 +144,6 @@ HideAllTrajectory.args = {
             lineStyle: { color: [0, 0, 0, 0] },
             refine: false,
             outline: false,
-            logData: "@@#resources.logData",
-            logrunName: "BLOCKING",
-            logName: "ZONELOG",
-            logColor: "Stratigraphy",
         },
     ],
 };
