@@ -135,6 +135,7 @@ HideAllTrajectory.args = {
     id: "trajectory-hidden-wells",
     resources: {
         wellsData: "./volve_wells.json",
+        logData: "./volve_logs.json",
     },
     bounds: [432150, 6475800, 439400, 6481500],
     layers: [
@@ -144,6 +145,10 @@ HideAllTrajectory.args = {
             lineStyle: { color: [0, 0, 0, 0] },
             refine: false,
             outline: false,
+            logData: "@@#resources.logData",
+            logrunName: "BLOCKING",
+            logName: "ZONELOG",
+            logColor: "Stratigraphy",
         },
     ],
 };
