@@ -1,20 +1,10 @@
-import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps } from "../utils/layerTools";
-import { RGBAColor, RGBColor } from "@deck.gl/core/utils/color";
-import { Position } from "@deck.gl/core/utils/positions";
-import { PolygonLayer } from "@deck.gl/layers";
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import { Feature } from "geojson";
 import { Position3D } from "@deck.gl/core/utils/positions";
-import { PolygonLayerProps } from "@deck.gl/layers";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
-
-//
 import { Layer } from "@deck.gl/core";
 import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/core";
-import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import { picking, project } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
@@ -23,6 +13,7 @@ import vertexShader from "./vertex.glsl";
 import fragmentShaderLines from "./fragment_lines.glsl";
 import vertexShaderLines from "./vertex_lines.glsl";
 import { phongLighting } from "@luma.gl/shadertools";
+import { RGBColor } from "@deck.gl/core/utils/color";
 
 function getColorMapColors(
     colorMapName: string,
@@ -58,14 +49,6 @@ type CellData = {
 };
 type GridData = CellData[];
 
-// // These are the data PolygonLayer expects.
-// type CellProperties = {
-//     color: RGBAColor;
-//     i: number;
-//     j: number;
-//     depth: number;
-//     value: number;
-// };
 export interface GridLayerProps<D> extends ExtendedLayerProps<D> {
     // Name of color map.
     colorMapName: string;
@@ -85,14 +68,17 @@ export default class GridLayer extends Layer<
         const { gl } = context;
 
         const updateTimeStep = () => {
-            this.updateState({ context }); // LayerProps, LayerContext
+            const a_context = { context } as unknown as UpdateStateInfo<
+                GridLayerProps<GridData>
+            >;
+            this.updateState(a_context); // LayerProps, LayerContext
         };
 
         // set intial state.
         this.setState({ ...this._getModels(gl, 0), ti: 0 });
 
         // For now just cycle over the timesteps.
-        setInterval(updateTimeStep, 200);
+        setInterval(updateTimeStep, 500);
     }
 
     shouldUpdateState({
@@ -146,11 +132,10 @@ export default class GridLayer extends Layer<
                 this.props.colorMapRange
             );
 
-        if (triangle_vertexs.length === 0) {  // XXX trengs dette?
-            console.log("WTF!!!", data)
+        if (triangle_vertexs.length === 0) {
             return [];
         }
- 
+
         // CELL TRIANGLE MODEL.
         const triangles_model = new Model(gl, {
             id: `${this.props.id}-triangles`,
@@ -203,14 +188,14 @@ export default class GridLayer extends Layer<
 
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
-    draw({ uniforms, context }: any): void {
+    draw({ context }: any): void {
         const { gl } = context;
         if (this.state.models) {
             gl.enable(gl.POLYGON_OFFSET_FILL);
             gl.polygonOffset(0, 1);
-            this.state.models[0].draw();
+            this.state.models[0].draw(); // triangles
 
-            this.state.models[1].draw();  // triangle_lines_model
+            this.state.models[1].draw(); // triangle lines
             gl.disable(gl.POLYGON_OFFSET_FILL);
         }
     }
@@ -225,7 +210,6 @@ export default class GridLayer extends Layer<
     }
 
     encodePickingColor(): RGBColor {
-        console.log("MOOOORN 2 ");
         return this.nullPickingColor();
     }
 
@@ -241,20 +225,40 @@ export default class GridLayer extends Layer<
         const g = info.color[1];
         const b = info.color[2];
 
-        if ( g === 255){
-            // We are picking the lines.
+        if (r === 255) {
+            // We are picking a line between cells.
             return info;
         }
 
-        //console.log("rgb: ", r, g, b);
+        const index = 256 * 256 * r + 256 * g + b; // index into data array.
+        const data = this.props.data as GridData;
+        if (!data || data.length === 0) {
+            return info;
+        }
+
+        const colors = getColorMapColors(
+            this.props.colorMapName,
+            (this.context as DeckGLLayerContext).userData.colorTables
+        );
+
+        const timeStep = this.state.ti;
+        const cell: CellData = data[index];
+        const propertyValue = cell.vs[timeStep];
+        const color = getColor(
+            propertyValue,
+            colors,
+            this.props.valueRange,
+            this.props.colorMapRange
+        );
 
         return {
             ...info,
             properties: [
-                { name: "i verdi", value: "value verdii" },
-                { name: "j verdi", value: "value verdjj" },
+                { name: "i", value: cell.i },
+                { name: "j", value: cell.j },
+                { name: "depth:", value: cell.z },
+                { name: "value:", value: propertyValue, color },
             ],
-            propertyValue: "propertyValue goddag",
         };
     }
 }
@@ -265,6 +269,28 @@ GridLayer.defaultProps = layersDefaultProps[
 ] as GridLayerProps<GridData>;
 
 //================= Local help functions. ==================
+
+function getColor(
+    propertyValue: number,
+    colors: RGBColor[],
+    valueRange: [number, number],
+    colorMapRange: [number, number]
+): RGBColor {
+    const valueRangeMin = valueRange[0] ?? 0.0;
+    const valueRangeMax = valueRange[1] ?? 1.0;
+
+    // If specified, color map will extend from colorMapRangeMin to colorMapRangeMax.
+    // Otherwise it will extend from valueRangeMin to valueRangeMax.
+    const colorMapRangeMin = colorMapRange?.[0] ?? valueRangeMin;
+    const colorMapRangeMax = colorMapRange?.[1] ?? valueRangeMax;
+    let x = propertyValue * (valueRangeMax - valueRangeMin) + valueRangeMin;
+    x = (x - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
+    x = Math.max(0.0, x);
+    x = Math.min(1.0, x);
+
+    const color = colors[Math.floor(x * 255.0)];
+    return color;
+}
 
 function makeVertexesAndColorArrays(
     data: GridData,
@@ -280,38 +306,29 @@ function makeVertexesAndColorArrays(
 
     for (let i = 0; i < data.length; i++) {
         const cell: CellData = data[i];
-        //console.log(cell)
 
         const propertyValue = cell.vs[ti];
 
-        const valueRangeMin = valueRange[0] ?? 0.0;
-        const valueRangeMax = valueRange[1] ?? 1.0;
+        const color = getColor(
+            propertyValue,
+            colors,
+            valueRange,
+            colorMapRange
+        );
 
-        // If specified, color map will extend from colorMapRangeMin to colorMapRangeMax.
-        // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const colorMapRangeMin = colorMapRange?.[0] ?? valueRangeMin;
-        const colorMapRangeMax = colorMapRange?.[1] ?? valueRangeMax;
-        let x = propertyValue * (valueRangeMax - valueRangeMin) + valueRangeMin;
-        x = (x - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-        x = Math.max(0.0, x);
-        x = Math.min(1.0, x);
-
-        const color = colors[Math.floor(x * 255)];
-
+        // Note. Equal color for all of a triangle vertxes gives constant color in
+        //       a cell which is correct for this layer.
         // Triangle 1.
         triangle_vertexs.push(...cell.cs[0], ...cell.cs[1], ...cell.cs[2]);
         triangle_colors.push(color[0], color[1], color[2]);
         triangle_colors.push(color[0], color[1], color[2]);
         triangle_colors.push(color[0], color[1], color[2]);
 
-        // Cell index.
-        for (let j = 0; j < 3; j++) { // one for each triangle vertex.
-            cell_index.push(2 * i);
+        // Cell index. One for each triangle vertex.
+        for (let j = 0; j < 3; j++) {
+            //cell_index.push(2 * i);
+            cell_index.push(i);
         }
-
-        // XXXXX her må også et assosiativt array med data (CellData? )for hver index fylles opp
-        // kanskje bare peke tilbake på orignal CellData array,.. hm...
-        // dessuten må alle kanaler kod4es i 255 systemet ikke bare gronn kanal som na...
 
         // Triangle 2.
         triangle_vertexs.push(...cell.cs[0], ...cell.cs[2], ...cell.cs[3]);
@@ -322,7 +339,8 @@ function makeVertexesAndColorArrays(
         // Cell index.
         for (let j = 0; j < 3; j++) {
             // one for each triangle vertex.
-            cell_index.push(2 * i + 1);
+            //cell_index.push(2 * i + 1);
+            cell_index.push(i);
         }
 
         // Cell lines.
