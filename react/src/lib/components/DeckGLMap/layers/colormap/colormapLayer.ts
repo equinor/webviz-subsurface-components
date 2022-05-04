@@ -10,7 +10,7 @@ import {
     PropertyMapPickInfo,
     ValueDecoder,
 } from "../utils/propertyMapTools";
-import { getModelMatrix } from "../utils/layerTools";
+import { getModelMatrix, colorMapFunctionType } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import fsColormap from "./colormap.fs.glsl";
 import { DeckGLLayerContext } from "../../components/Map";
@@ -23,12 +23,20 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
-function getImageData(colorMapName: string, colorTables: colorTablesArray) {
+function getImageData(
+    colorMapName: string,
+    colorTables: colorTablesArray,
+    colorMapFunction: colorMapFunctionType | undefined
+) {
+    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
+
     const data = new Uint8Array(256 * 3);
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-        const rgb = rgbValues(value, colorMapName, colorTables);
+        const rgb = isColorMapFunctionDefined
+            ? (colorMapFunction as colorMapFunctionType)(i / 255)
+            : rgbValues(value, colorMapName, colorTables);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -67,6 +75,11 @@ function getImageData(colorMapName: string, colorTables: colorTablesArray) {
 export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
     // Name of color map.
     colorMapName: string;
+
+    // Optional function property.
+    // If defined this function will override the color map.
+    // Takes a value in the range [0,1] and returns a color.
+    colorMapFunction?: colorMapFunctionType;
 
     // Min and max property values.
     valueRange: [number, number];
@@ -127,7 +140,8 @@ export default class ColormapLayer extends BitmapLayer<
                     data: getImageData(
                         this.props.colorMapName,
                         (this.context as DeckGLLayerContext).userData
-                            .colorTables
+                            .colorTables,
+                        this.props.colorMapFunction
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
