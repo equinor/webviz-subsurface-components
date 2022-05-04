@@ -2,11 +2,10 @@ import { CompositeLayer } from "@deck.gl/core";
 import TerrainMapLayer, {
     TerrainMapLayerProps,
     TerrainMapLayerData,
-    colorMapFunctionType,
     DECODER,
     Material,
 } from "./terrainMapLayer";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { RGBColor } from "@deck.gl/core/utils/color";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { TerrainLoader } from "@loaders.gl/terrain";
