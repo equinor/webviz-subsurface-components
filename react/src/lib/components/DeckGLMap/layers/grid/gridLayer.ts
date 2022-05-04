@@ -5,14 +5,13 @@ import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import { Layer } from "@deck.gl/core";
 import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/core";
-import { picking, project } from "deck.gl";
+import { picking, project, phongLighting } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import fragmentShader from "./fragment.glsl";
 import vertexShader from "./vertex.glsl";
 import fragmentShaderLines from "./fragment_lines.glsl";
 import vertexShaderLines from "./vertex_lines.glsl";
-import { phongLighting } from "@luma.gl/shadertools";
 import { RGBColor } from "@deck.gl/core/utils/color";
 
 function getColorMapColors(
@@ -177,7 +176,7 @@ export default class GridLayer extends Layer<
                 },
                 vertexCount: cell_lines.length / 3,
             }),
-            modules: [project, picking, phongLighting],
+            modules: [project, picking],
             isInstanced: false, // This only works when set to false.
         });
 
