@@ -1,8 +1,9 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import { ColorLegend, d3ColorScales } from "@emerson-eps/color-tables";
+import { ColorLegend } from "@emerson-eps/color-tables";
 import colorTables from "@emerson-eps/color-tables/dist/component/color-tables.json";
+import { colorMapFunction } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 
 export default {
     component: DeckGLMap,
@@ -601,7 +602,18 @@ SelectableFeatureExample.args = {
 };
 
 // colorselector for welllayer
-const wellLayers = [exampleData[0].layers[4]];
+const wellLayers = [
+    {
+        "@@type": "WellsLayer",
+        data: "@@#resources.wellsData",
+        logColor: [exampleData[0].layers[4]][0].logColor,
+        logData: "@@#resources.logData",
+        logName: [exampleData[0].layers[4]][0].logName,
+        logrunName: [exampleData[0].layers[4]][0].logrunName,
+        colorMapFunction: colorMapFunction("Stratigraphy"),
+    },
+];
+
 const wellId = exampleData[0].id;
 // prop for continous legend
 var min = 0;
@@ -637,16 +649,12 @@ const wellLayerTemplate = (args) => {
         setWellLegendUpdated(data);
     }, []);
 
-    const d3ColorName = d3ColorScales.find((value) => {
-        if (wellLegendUpdated) return value.name == wellLegendUpdated;
-        else return value.name == args.wellLayers[0].logColor;
-    });
-
-    const colorMapping = d3ColorName?.colors;
-
-    const layerDataChanged = [
+    const layers = [
         {
             ...args.wellLayers[0],
+            colorMapFunction: colorMapFunction(
+                wellLegendUpdated ? wellLegendUpdated : wellLayers[0].logColor
+            ),
             logColor: wellLegendUpdated
                 ? wellLegendUpdated
                 : args.wellLayers[0].logColor,
@@ -668,11 +676,7 @@ const wellLayerTemplate = (args) => {
                 />
             </div>
             <div>
-                <DeckGLMap
-                    {...args}
-                    colorMapping={colorMapping}
-                    layers={layerDataChanged}
-                />
+                <DeckGLMap {...args} layers={layers} />
             </div>
         </div>
     );

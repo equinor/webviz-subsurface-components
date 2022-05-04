@@ -4,8 +4,8 @@ import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
-import { colorsArray, rgbValues, RGBToHex } from "@emerson-eps/color-tables";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { d3ColorScales } from "@emerson-eps/color-tables";
+import { rgbValues } from "@emerson-eps/color-tables";
 import {
     Feature,
     GeometryCollection,
@@ -27,8 +27,7 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
-import { color } from "d3-color";
-import { interpolateRgb } from "d3-interpolate";
+import { colorsArray, colorTablesArray } from "@emerson-eps/color-tables/";
 
 type NumberPair = [number, number];
 type DashAccessorFunction = (
@@ -50,6 +49,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logCurves: boolean;
     refine: boolean;
     dashed?: DashAccessor;
+    colorMapFunction: (x: number) => [number, number, number];
 }
 
 export interface LogCurveDataType {
@@ -235,8 +235,7 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
-                        (this.context as DeckGLLayerContext).userData
-                            .colorMapping
+                        this.props.colorMapFunction
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
@@ -451,8 +450,8 @@ function getLogColor(
     log_name: string,
     logColor: string,
     colorTables: colorTablesArray,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    colorMapping: any
+    // eslint-disable-next-line
+    colorMapFunction: any
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
@@ -463,117 +462,20 @@ function getLogColor(
         const min = Math.min(...log_data);
         const max = Math.max(...log_data);
         const max_delta = max - min;
-        const getSelectedScale = colorTables.find((value) => {
-            return value.name == logColor;
-        });
-        const getSelectedScaleLength = getSelectedScale?.colors.length;
-        const normalizingColorMax = getSelectedScaleLength
-            ? getSelectedScaleLength - 1
-            : null;
 
         log_data.forEach((value) => {
-            const rgb = rgbValues(
-                (value - min) / max_delta,
-                logColor,
-                colorTables
-            );
+            const rgb = colorMapFunction
+                ? colorMapFunction((value - min) / max_delta)
+                : rgbValues((value - min) / max_delta, logColor, colorTables);
 
-            // colortable continuous scale
-            if (getSelectedScale?.discrete == false) {
-                if (rgb) {
-                    if (Array.isArray(rgb)) {
-                        log_color.push([rgb[0], rgb[1], rgb[2]]);
-                    } else {
-                        log_color.push([rgb.r, rgb.g, rgb.b]);
-                    }
+            if (rgb) {
+                if (Array.isArray(rgb)) {
+                    log_color.push([rgb[0], rgb[1], rgb[2]]);
                 } else {
-                    log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
+                    log_color.push([rgb.r, rgb.g, rgb.b]);
                 }
-            }
-            // colortable discrete scale
-            if (getSelectedScale?.discrete == true && normalizingColorMax) {
-                const point = (value - min) / max_delta;
-                const minValue = 0;
-                const maxValue = normalizingColorMax;
-                // eslint-disable-next-line
-                let interpolatedValue: any;
-
-                getSelectedScale?.colors.forEach((item, index) => {
-                    const currentIndex = index;
-                    const normalizedCurrentIndex =
-                        (currentIndex - minValue) / (maxValue - minValue);
-                    const nextIndex = index + 1;
-                    const normalizedNextIndex =
-                        (nextIndex - minValue) / (maxValue - 0);
-                    //const t = (point - t0) / (t1 - t0); // t = 0.0 gives first color, t = 1.0 gives second color.
-                    if (
-                        point >= normalizedCurrentIndex &&
-                        point <= normalizedNextIndex
-                    ) {
-                        if (
-                            (item && getSelectedScale?.colors[nextIndex]) !=
-                            undefined
-                        ) {
-                            const interpolate = interpolateRgb(
-                                RGBToHex(item)?.color,
-                                RGBToHex(getSelectedScale?.colors[nextIndex])
-                                    ?.color
-                            )(point);
-                            interpolatedValue = color(interpolate)?.rgb();
-                        }
-                    }
-                });
-                log_color.push([
-                    interpolatedValue?.r,
-                    interpolatedValue?.g,
-                    interpolatedValue?.b,
-                ]);
-            }
-            // d3 continuous scale
-            if (typeof colorMapping == "function") {
-                const colorMappingRange = colorMapping(
-                    (value - min) / max_delta
-                );
-                const continuousColors = color(colorMappingRange)?.rgb();
-                if (continuousColors) {
-                    log_color.push([
-                        continuousColors.r,
-                        continuousColors.g,
-                        continuousColors.b,
-                    ]);
-                }
-            }
-
-            // d3 discrete scale
-            if (typeof colorMapping == "object") {
-                const max = colorMapping.length - 1;
-                const point = (value - min) / max_delta;
-                // eslint-disable-next-line
-                let interpolatedValue: any;
-
-                colorMapping.forEach((item: string, index: number) => {
-                    const currentIndex = index;
-                    const normalizedCurrentIndex =
-                        (currentIndex - 0) / (max - 0);
-                    const nextIndex = index + 1;
-                    const normalizedNextIndex = (nextIndex - 0) / (max - 0);
-                    //const t = (point - t0) / (t1 - t0); // t = 0.0 gives first color, t = 1.0 gives second color.
-                    if (
-                        point >= normalizedCurrentIndex &&
-                        point <= normalizedNextIndex
-                    ) {
-                        const interpolate = interpolateRgb(
-                            item,
-                            colorMapping[nextIndex]
-                        )(point);
-                        interpolatedValue = color(interpolate)?.rgb();
-                    }
-                });
-                log_color.push([
-                    interpolatedValue?.r,
-                    interpolatedValue?.g,
-                    interpolatedValue?.b,
-                ]);
+            } else {
+                log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
             }
         });
     } else {
@@ -582,90 +484,50 @@ function getLogColor(
             colorTables
         );
 
-        const getSelectedScaleValue = colorTables.find((value) => {
-            return value.name == logColor;
-        });
-
         // well log data set for ex : H1: Array(2)0: (4) [255, 26, 202, 255] 1: 13
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
         const logLength = Object.keys(log_attributes).length;
 
         // eslint-disable-next-line
-        const attributesObject: { [key: string]: any } = {};
+    const attributesObject: { [key: string]: any } = {};
+        const categorial = true;
 
         Object.keys(log_attributes).forEach((key) => {
-            // get the code from log_attributes
-            // point like 0,1,2
-            const code = log_attributes[key][1];
+            // get the point from log_attributes
+            const point = log_attributes[key][1];
+            const max = logLength - 1;
+            //normalizing point : zi = (xi – min(x)) / (max(x) – min(x))
+            const normalizedPoint = (point - 0) / (max - 0);
 
-            // colortable scale
-            if (arrayOfColors.length > 0) {
-                // colortable discrete scale
-                if (getSelectedScaleValue?.discrete == true) {
-                    // compare the code and first value from colorsArray(colortable)
-                    const colorArrays = arrayOfColors.find(
-                        (value: number[]) => {
-                            return value[0] == code;
-                        }
-                    );
-                    if (colorArrays) {
-                        attributesObject[key] = [
-                            [colorArrays[1], colorArrays[2], colorArrays[3]],
-                            code,
-                        ];
-                    }
+            // if colormap function is not defined
+            const colorArrays = arrayOfColors.find((value: number[]) => {
+                return value[0] == point;
+            });
+
+            // if colortable colors scale is choosen
+            const getSelectedScaleValue = colorTables.find((value) => {
+                return value.name == logColor;
+            });
+
+            // if d3 colors scale is choosen
+            const d3ColorName = d3ColorScales.find(
+                (value: { name: string }) => {
+                    return value.name == logColor;
                 }
-                // colortable continuous scale
-                else {
-                    const min = 0;
-                    const max = logLength - 1;
-                    const normalizedValue = (code - min) / (max - min);
+            );
 
-                    const rgb = rgbValues(
-                        normalizedValue,
-                        logColor,
-                        colorTables
-                    );
+            const rgb = colorMapFunction
+                ? getSelectedScaleValue?.discrete == true ||
+                  d3ColorName?.discrete == true
+                    ? colorMapFunction(point, categorial)
+                    : colorMapFunction(normalizedPoint, categorial)
+                : colorArrays;
 
-                    attributesObject[key] = [
-                        [
-                            color(rgb)?.rgb()?.r,
-                            color(rgb)?.rgb()?.g,
-                            color(rgb)?.rgb()?.b,
-                        ],
-                        code,
-                    ];
-                }
-            }
-
-            // for d3 continuous scale
-            if (colorMapping && typeof colorMapping === "function") {
-                const min = 0;
-                const max = logLength - 1;
-                const normalizedValue = (code - min) / (max - min);
-                const mappedColor = color(colorMapping(normalizedValue))?.rgb();
-                attributesObject[key] = [
-                    [mappedColor?.r, mappedColor?.g, mappedColor?.b],
-                    code,
-                ];
-            }
-
-            // d3 discrete scale
-            if (typeof colorMapping == "object") {
-                const d3ColorArrays = colorMapping.find(
-                    (_value: number, index: number) => {
-                        return index == code;
-                    }
-                );
-                if (d3ColorArrays) {
-                    attributesObject[key] = [
-                        [
-                            color(d3ColorArrays)?.rgb()?.r,
-                            color(d3ColorArrays)?.rgb()?.g,
-                            color(d3ColorArrays)?.rgb()?.b,
-                        ],
-                        code,
-                    ];
+            if (rgb) {
+                if (Array.isArray(rgb)) {
+                    attributesObject[key] = [[rgb[1], rgb[2], rgb[3]], point];
+                } else {
+                    attributesObject[key] = [[rgb.r, rgb.g, rgb.b], point];
                 }
             }
         });
