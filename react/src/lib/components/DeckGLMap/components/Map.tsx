@@ -431,6 +431,9 @@ const Map: React.FC<MapProps> = ({
                     }
                 }}
                 ref={deckRef}
+                onViewStateChange={(viewport) =>
+                    setViewState(viewport.viewState)
+                }
                 onHover={onHover}
                 onClick={onClick}
                 onResize={onResize}
