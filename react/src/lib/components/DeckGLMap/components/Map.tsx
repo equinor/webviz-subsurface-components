@@ -33,9 +33,6 @@ import {
     validateLayers,
 } from "../../../inputSchema/schemaValidationUtil";
 
-import { getLayersByType } from "../layers/utils/layerTools";
-import { WellsLayer } from "../layers";
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
@@ -249,23 +246,16 @@ const Map: React.FC<MapProps> = ({
     const st_layers = useSelector(
         (st: MapState) => st.spec["layers"]
     ) as Record<string, unknown>[];
-    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
-    useEffect(() => {
+    React.useEffect(() => {
         if (st_layers == undefined || layers == undefined) return;
 
         const updated_layers = applyPropsOnLayers(st_layers, layers);
         const layers_default = getLayersWithDefaultProps(updated_layers);
         const updated_spec = { layers: layers_default, views: views };
         dispatch(setSpec(updated_spec));
-        if (deckGLLayers) {
-            const wellsLayer = getLayersByType(
-                deckGLLayers,
-                "WellsLayer"
-            )?.[0] as WellsLayer;
-            if (wellsLayer) wellsLayer.setupLegend();
-        }
     }, [layers, dispatch]);
 
+    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
     useEffect(() => {
         const layers = st_layers as LayerProps<unknown>[];
         if (!layers || layers.length == 0) return;
@@ -337,52 +327,22 @@ const Map: React.FC<MapProps> = ({
                 }
                 //const layer_name = (info.layer?.props as ExtendedLayerProps<FeatureCollection>)?.name;
                 if (info.layer && info.layer.id === "wells-layer") {
-                    {
-                        // try to use Object info (see DeckGL getToolTip callback)
-                        const feat = info.object as Feature;
-                        ev.wellname = feat?.properties?.["name"];
-                    }
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    if (info.properties) {
-                        for (const property of info.properties) {
-                            let propname = property.name;
-                            if (propname) {
-                                const sep = propname.indexOf(" ");
-                                if (sep >= 0) {
-                                    if (!ev.wellname)
-                                        ev.wellname = propname.substring(
-                                            sep + 1
-                                        );
-                                    propname = propname.substring(0, sep);
-                                }
+                    info.properties?.forEach((property: any) => {
+                        let propname = property.name;
+                        if (propname) {
+                            const sep = propname.indexOf(" ");
+                            if (sep >= 0) {
+                                // it is a simple hack to get well name previously added to the end of property name
+                                ev.wellname = propname.substring(sep + 1);
+                                propname = propname.substring(0, sep);
                             }
-                            const names_md = [
-                                "DEPTH",
-                                "DEPT",
-                                "MD" /*Measured Depth*/,
-                                "TDEP" /*"Tool DEPth"*/,
-                                "MD_RKB" /*Rotary Relly Bushing*/,
-                            ]; // aliases for MD
-                            const names_tvd = [
-                                "TVD" /*True Vertical Depth*/,
-                                "TVDSS" /*SubSea*/,
-                                "DVER" /*"VERtical Depth"*/,
-                                "TVD_MSL" /*below Mean Sea Level*/,
-                            ]; // aliases for MD
-
-                            if (names_md.find((name) => name == propname))
-                                ev.md = parseFloat(property.value);
-                            else if (names_tvd.find((name) => name == propname))
-                                ev.tvd = parseFloat(property.value);
-
-                            if (
-                                ev.md !== undefined &&
-                                ev.tvd !== undefined &&
-                                ev.wellname !== undefined
-                            )
-                                break;
                         }
-                    }
+                        if (propname === "MD")
+                            ev.md = parseFloat(property.value);
+                        else if (propname === "TVD")
+                            ev.tvd = parseFloat(property.value);
+                    });
                     break;
                 }
             }
@@ -688,4 +648,3 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
     }
     return deckgl_views;
 }
-
