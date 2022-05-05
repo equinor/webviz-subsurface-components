@@ -42,8 +42,8 @@ VolveWells.parameters = {
     },
 };
 
-export const StyledWells = Template.bind({});
-StyledWells.args = {
+export const DashedWells = Template.bind({});
+DashedWells.args = {
     ...defaultProps,
     layers: [
         {
@@ -54,7 +54,7 @@ StyledWells.args = {
         },
     ],
 };
-StyledWells.parameters = {
+DashedWells.parameters = {
     docs: {
         description: {
             story: "Volve wells example with default dashed well trajectories.",
@@ -64,8 +64,8 @@ StyledWells.parameters = {
     },
 };
 
-export const CustomStyledWells = Template.bind({});
-CustomStyledWells.args = {
+export const CustomColoredWells = Template.bind({});
+CustomColoredWells.args = {
     ...defaultProps,
     layers: [
         {
@@ -76,7 +76,7 @@ CustomStyledWells.args = {
         },
     ],
 };
-CustomStyledWells.parameters = {
+CustomColoredWells.parameters = {
     docs: {
         description: {
             story: "Volve wells example with dashed style and red trajectories, with custom style.",
@@ -122,8 +122,8 @@ CallbackStyledWells.parameters = {
     },
 };
 
-export const HideAllTrajectory = Template.bind({});
-HideAllTrajectory.args = {
+export const AllTrajectoryHidden = Template.bind({});
+AllTrajectoryHidden.args = {
     ...defaultProps,
     layers: [
         {
@@ -134,7 +134,7 @@ HideAllTrajectory.args = {
         },
     ],
 };
-HideAllTrajectory.parameters = {
+AllTrajectoryHidden.parameters = {
     docs: {
         description: {
             story: "Volve wells example with all trajectory hidden.",
