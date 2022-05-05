@@ -2,7 +2,7 @@ import React from "react";
 import { ReactNode } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
-import PropTypes from "prop-types";
+//import PropTypes from "prop-types";
 
 import {
     Template,
