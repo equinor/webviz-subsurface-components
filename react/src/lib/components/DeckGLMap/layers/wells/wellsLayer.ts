@@ -27,8 +27,8 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
-import { colorsArray, colorTablesArray } from "@emerson-eps/color-tables/";
-
+import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { getColors } from "@emerson-eps/color-tables"
 type NumberPair = [number, number];
 type DashAccessorFunction = (
     object: Record<string, unknown>,
@@ -542,11 +542,6 @@ function getLogColor(
             }
         });
     } else {
-        const arrayOfColors: [number, number, number, number][] = colorsArray(
-            logColor,
-            colorTables
-        );
-
         // well log data set for ex : H1: Array(2)0: (4) [255, 26, 202, 255] 1: 13
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
         const logLength = Object.keys(log_attributes).length;
@@ -562,11 +557,15 @@ function getLogColor(
             const categorialMax = logLength - 1;
 
             // if colormap function is not defined
-            const colorArrays = arrayOfColors.find((value: number[]) => {
-                return value[0] == point;
-            });
+            const arrayOfColors: [number, number, number, number][] = getColors(
+                logColor,
+                colorTables,
+                point
+            );
 
-            const rgb = colorMappingFunction ? colorMappingFunction(point, categorial, categorialMin, categorialMax) : colorArrays;
+            const rgb = colorMappingFunction ? 
+                        colorMappingFunction(point, categorial, categorialMin, categorialMax) : 
+                        arrayOfColors;
 
             if (rgb) {
                 if (Array.isArray(rgb)) {

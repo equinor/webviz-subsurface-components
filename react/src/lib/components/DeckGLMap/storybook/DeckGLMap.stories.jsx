@@ -684,7 +684,7 @@ const wellLayerTemplate = (args) => {
     const layers = [
         {
             ...args.wellLayers[0],
-            colorMappingFunction: colorMappingFunction(
+            colorMappingFunction: createColorMapFunction(
                 wellLegendUpdated ? wellLegendUpdated : wellLayers[0].logColor
             ),
             logColor: wellLegendUpdated
