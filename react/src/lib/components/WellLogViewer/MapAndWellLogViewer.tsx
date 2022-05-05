@@ -1,5 +1,5 @@
 import React from "react";
-import { ReactNode } from "react";
+import { ReactNode, WeakValidationMap } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
 //import PropTypes from "prop-types";
@@ -90,7 +90,8 @@ function addTemplateTrack(
 }
 
 export class MapAndWellLogViewer extends React.Component<Props, State> {
-    public static propTypes: Record<string, unknown>;
+    //public static propTypes: Record<string, unknown>;
+    public static propTypes?: WeakValidationMap<Props> | undefined;
     constructor(props: Props, state: State) {
         super(props, state);
         this.state = {
