@@ -49,7 +49,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logCurves: boolean;
     refine: boolean;
     dashed?: DashAccessor;
-    colorMapFunction: (x: number) => [number, number, number];
+    colorMappingFunction: (x: number) => [number, number, number];
     wellNameVisible: boolean;
     wellNameAtTop: boolean;
     wellNameSize: number;
@@ -243,7 +243,7 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
-                        this.props.colorMapFunction
+                        this.props.colorMappingFunction
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
@@ -514,7 +514,7 @@ function getLogColor(
     logColor: string,
     colorTables: colorTablesArray,
     // eslint-disable-next-line
-    colorMapFunction: any
+    colorMappingFunction: any
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
@@ -527,8 +527,8 @@ function getLogColor(
         const max_delta = max - min;
 
         log_data.forEach((value) => {
-            const rgb = colorMapFunction
-                ? colorMapFunction((value - min) / max_delta)
+            const rgb = colorMappingFunction
+                ? colorMappingFunction((value - min) / max_delta)
                 : rgbValues((value - min) / max_delta, logColor, colorTables);
 
             if (rgb) {
@@ -558,33 +558,15 @@ function getLogColor(
         Object.keys(log_attributes).forEach((key) => {
             // get the point from log_attributes
             const point = log_attributes[key][1];
-            const max = logLength - 1;
-            //normalizing point : zi = (xi – min(x)) / (max(x) – min(x))
-            const normalizedPoint = (point - 0) / (max - 0);
+            const categorialMin = 0;
+            const categorialMax = logLength - 1;
 
             // if colormap function is not defined
             const colorArrays = arrayOfColors.find((value: number[]) => {
                 return value[0] == point;
             });
 
-            // if colortable colors scale is choosen
-            const getSelectedScaleValue = colorTables.find((value) => {
-                return value.name == logColor;
-            });
-
-            // if d3 colors scale is choosen
-            const d3ColorName = d3ColorScales.find(
-                (value: { name: string }) => {
-                    return value.name == logColor;
-                }
-            );
-
-            const rgb = colorMapFunction
-                ? getSelectedScaleValue?.discrete == true ||
-                  d3ColorName?.discrete == true
-                    ? colorMapFunction(point, categorial)
-                    : colorMapFunction(normalizedPoint, categorial)
-                : colorArrays;
+            const rgb = colorMappingFunction ? colorMappingFunction(point, categorial, categorialMin, categorialMax) : colorArrays;
 
             if (rgb) {
                 if (Array.isArray(rgb)) {

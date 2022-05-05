@@ -3,7 +3,7 @@ import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { ColorLegend } from "@emerson-eps/color-tables";
 import colorTables from "@emerson-eps/color-tables/dist/component/color-tables.json";
-import { colorMapFunction } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
+import { createColorMapFunction } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
@@ -419,6 +419,38 @@ Axes.args = {
     },
 };
 
+// Example using "colorMapFunction" property.
+const layer = {
+    ...meshMapLayer,
+    isContoursDepth: true,
+    colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
+};
+export const colorMapFunction = MinimalTemplate.bind({});
+colorMapFunction.args = {
+    id: "colorMapFunction",
+    layers: [
+        // map layer
+        layer,
+        // colormap layer
+        {
+            ...colormapLayer,
+            image: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+            colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
+        },
+    ],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
 // GridLayer.
 const gridLayer = exampleData[0].layers[2];
 export const GridLayer = EditDataTemplate.bind({});
@@ -610,7 +642,7 @@ const wellLayers = [
         logData: "@@#resources.logData",
         logName: [exampleData[0].layers[4]][0].logName,
         logrunName: [exampleData[0].layers[4]][0].logrunName,
-        colorMapFunction: colorMapFunction("Stratigraphy"),
+        colorMappingFunction: createColorMapFunction("Stratigraphy"),
     },
 ];
 
@@ -652,7 +684,7 @@ const wellLayerTemplate = (args) => {
     const layers = [
         {
             ...args.wellLayers[0],
-            colorMapFunction: colorMapFunction(
+            colorMappingFunction: colorMappingFunction(
                 wellLegendUpdated ? wellLegendUpdated : wellLayers[0].logColor
             ),
             logColor: wellLegendUpdated
