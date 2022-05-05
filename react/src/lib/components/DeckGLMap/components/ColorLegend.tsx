@@ -61,6 +61,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         wellsLayer?.isLoaded,
         wellsLayer?.props?.logName,
         wellsLayer?.props?.logColor,
+        wellsLayer?.state?.legend?.[0],
     ]);
 
     const [showLegend, setShowLegend] = React.useState<boolean | null>();

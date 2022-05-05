@@ -30,6 +30,7 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
+import { getLayersById } from "../../layers/utils/layerTools";
 
 type NumberPair = [number, number];
 type DashAccessorFunction = (
@@ -137,6 +138,38 @@ export default class WellsLayer extends CompositeLayer<
             changeFlags.propsOrDataChanged ||
             changeFlags.updateTriggersChanged
         );
+    }
+
+    getLegendData(value: LogCurveDataType[]) {
+        return getLegendData(
+            value,
+            "",
+            this.props.logName,
+            this.props.logColor
+        );
+    }
+
+    setLegend(value: LogCurveDataType[]): void {
+        this.setState({
+            legend: this.getLegendData(value),
+        });
+    }
+
+    getLogLayer() {
+        return getLayersById(
+            this.internalState?.subLayers,
+            "wells-layer-log_curve"
+        )?.[0];
+    }
+
+    getLogCurveData(): LogCurveDataType[] | undefined {
+        const log_layer = this.getLogLayer();
+        return log_layer?.internalState?.asyncProps?.data?.resolvedValue;
+    }
+
+    setupLegend(): void {
+        const data = this.getLogCurveData();
+        if (data) this.setLegend(data);
     }
 
     renderLayers(): (
@@ -269,13 +302,7 @@ export default class WellsLayer extends CompositeLayer<
                     getPath: [positionFormat],
                 },
                 onDataLoad: (value: LogCurveDataType[]) => {
-                    this.setState({
-                        legend: getLegendData(
-                            value,
-                            this.props.logName,
-                            this.props.logColor
-                        ),
-                    });
+                    this.setLegend(value);
                 },
             })
         );
@@ -305,8 +332,26 @@ export default class WellsLayer extends CompositeLayer<
     getPickingInfo({ info }: { info: any }): any {
         if (!info.object) return info;
 
-        const md_property = getMdProperty(info.coordinate, info.object);
-        const tvd_property = getTvdProperty(info.coordinate, info.object);
+        let md_property = getMdProperty(info.coordinate, info.object);
+        if (!md_property) {
+            md_property = getLogProperty(
+                info.coordinate,
+                (this.props.data as FeatureCollection).features,
+                info.object,
+                this.props.logrunName,
+                "MD"
+            );
+        }
+        let tvd_property = getTvdProperty(info.coordinate, info.object);
+        if (!tvd_property) {
+            tvd_property = getLogProperty(
+                info.coordinate,
+                (this.props.data as FeatureCollection).features,
+                info.object,
+                this.props.logrunName,
+                "TVD"
+            );
+        }
         const log_property = getLogProperty(
             info.coordinate,
             (this.props.data as FeatureCollection).features,
@@ -353,7 +398,7 @@ function getColumn<D>(data: D[][], col: number): D[] {
 function getLogMd(d: LogCurveDataType, logrun_name: string): number[] {
     if (!isSelectedLogRun(d, logrun_name)) return [];
 
-    const names_md = ["DEPTH", "DEPT", "MD", "TDEP"]; // aliases for MD
+    const names_md = ["DEPTH", "DEPT", "MD", "TDEP", "MD_RKB"]; // aliases for MD
     const log_id = getLogIndexByNames(d, names_md);
     return log_id >= 0 ? getColumn(d.data, log_id) : [];
 }
@@ -796,10 +841,17 @@ function getLogProperty(
 // Return data required to build welllayer legend
 function getLegendData(
     logs: LogCurveDataType[],
+    wellName: string,
     logName: string,
     logColor: string
 ) {
-    const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
+    const log = wellName
+        ? logs.find((log) => log.header.well == wellName)
+        : logs[0];
+
+    const logInfo = !log
+        ? undefined
+        : getLogInfo(log, log.header.name, logName);
     const title = "Wells / " + logName;
     const legendProps = [];
     if (logInfo?.description == "discrete") {
@@ -832,3 +884,4 @@ function getLegendData(
         return legendProps;
     }
 }
+

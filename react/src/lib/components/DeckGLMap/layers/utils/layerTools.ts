@@ -112,9 +112,18 @@ export function getLayersByType(
     return layers.filter((l) => l.constructor.name === type);
 }
 
+export function getLayersById(
+    layers: Layer<unknown>[] | undefined,
+    id: string
+): Layer<unknown>[] {
+    if (!layers) return [];
+    return layers.filter((l) => l.id === id);
+}
+
 export function isDrawingEnabled(layer_manager: LayerManager): boolean {
     const drawing_layer = layer_manager.getLayers({
         layerIds: ["drawing-layer"],
     })?.[0];
     return drawing_layer && drawing_layer.props.mode != "view";
 }
+
