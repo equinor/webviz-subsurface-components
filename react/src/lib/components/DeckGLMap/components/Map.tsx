@@ -584,7 +584,7 @@ function getViewState(
     const view_state = {
         target: [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
-        rotationX: 0,
+        rotationX: 90, // look down z -axis
         rotationOrbit: 0,
     };
     return view_state;
@@ -643,7 +643,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     flipY: false,
                     far,
                     near,
-                    orbitAxis: "Y",
+                    //orbitAxis: "Z",
                 });
                 xPos = xPos + 99.5 / nX;
             }
