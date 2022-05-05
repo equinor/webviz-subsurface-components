@@ -71,19 +71,47 @@ export default class AxesLayer extends CompositeLayer<
         this.setState({ box_lines, tick_lines, textlayerData });
     }
 
-    getAnchor(d: TextLayerData): string {
+    getAnchor(d: TextLayerData, is_orthographic: boolean): string {
+        const is_xaxis = d.from[1] !== d.to[1];
+        if (is_orthographic && is_xaxis) {
+            return "middle";
+        }
+
         const screen_from = this.context.viewport.project(d.from);
         const screen_to = this.context.viewport.project(d.to);
-
         if (d.label !== "X" && d.label !== "Y" && d.label !== "Z") {
             if (screen_from[0] < screen_to[0]) {
                 return "start";
             }
         }
+
         return "end";
     }
 
+    getLabelPosition(d: TextLayerData): Position3D {
+        const tick_vec = [
+            d.to[0] - d.from[0],
+            d.to[1] - d.from[1],
+            d.to[2] - d.from[2],
+        ];
+
+        const s = 0.5;
+        return [
+            d.to[0] + s * tick_vec[0],
+            d.to[1] + s * tick_vec[1],
+            d.to[2] + s * tick_vec[2],
+        ];
+    }
+
+    getBaseLine(d: TextLayerData, is_orthographic: boolean): string {
+        const is_xaxis = d.from[1] !== d.to[1];
+        return is_orthographic && is_xaxis ? "top" : "center";
+    }
+
     renderLayers(): [BoxLayer, TextLayerProps<TextLayerData>] {
+        const is_orthographic =
+            this.context.viewport.constructor.name === "OrthographicViewport";
+
         const lines = [...this.state.box_lines, ...this.state.tick_lines];
 
         const box_layer = new BoxLayer(
@@ -98,13 +126,15 @@ export default class AxesLayer extends CompositeLayer<
                 data: this.state.textlayerData,
                 id: "text-layer",
                 pickable: true,
-                getPosition: (d: TextLayerData) => d.to,
+                getPosition: (d: TextLayerData) => this.getLabelPosition(d),
                 getText: (d: TextLayerData) => d.label,
                 sizeUnits: "pixels",
                 getSize: (d: TextLayerData) => d.size,
                 getAngle: 0,
-                getTextAnchor: (d: TextLayerData) => this.getAnchor(d),
-                getAlignmentBaseline: "center",
+                getTextAnchor: (d: TextLayerData) =>
+                    this.getAnchor(d, is_orthographic),
+                getAlignmentBaseline: (d: TextLayerData) =>
+                    this.getBaseLine(d, is_orthographic),
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
             })
         );
@@ -151,11 +181,11 @@ function maketextLayerData(
     const z_min = bounds[2];
     const z_max = bounds[5];
 
-    // const dx = x_max - x_min;  // keep!
-    // const dy = y_max - y_min;
+    const dx = x_max - x_min;
+    const dy = y_max - y_min;
     const dz = z_max - z_min;
 
-    const offset = dz * 0.2;
+    const offset = ((dx + dy + dz) / 3.0) * 0.1;
     const data = [
         {
             label: "X",
@@ -254,11 +284,11 @@ function GetTickLines(
     const tick_labels = [];
 
     // ADD TICK LINES.
-    // const dx = x_max - x_min;   // keep!
-    // const dy = y_max - y_min;
+    const dx = x_max - x_min;
+    const dy = y_max - y_min;
     const dz = z_max - z_min;
 
-    const delta = dz * 0.025; // length of tick marks.
+    const delta = ((dx + dy + dz) / 3.0) * 0.025;
 
     const Lz = LineLengthInPixels(
         [x_min, y_min, z_min],
@@ -309,7 +339,7 @@ function GetTickLines(
         lines.push(y_tick);
         lines.push(z_tick);
 
-        // tick line end. lLt tick mark point 45 degrees out from z axis.
+        // tick line end. let tick mark point 45 degrees out from z axis.
         const z = 0.0;
         const y = -delta;
         lines.push(tick);
