@@ -221,7 +221,6 @@ const Map: React.FC<MapProps> = ({
     const [viewState, setViewState] = useState<ViewStateProps>();
     useEffect(() => {
         if (bounds === undefined) return;
-        console.log("useEffect");
         setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
     }, [bounds, zoom]);
 
@@ -643,7 +642,6 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     flipY: false,
                     far,
                     near,
-                    //orbitAxis: "Z",
                 });
                 xPos = xPos + 99.5 / nX;
             }
