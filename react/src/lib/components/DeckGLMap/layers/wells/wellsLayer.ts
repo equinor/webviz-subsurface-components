@@ -277,7 +277,7 @@ export default class WellsLayer extends CompositeLayer<
                         data.features,
                         d,
                         this.props.logrunName,
-                        this.props.lineStyle.color
+                        this.props.lineStyle?.color
                     ),
                 getColor: (d: LogCurveDataType): RGBAColor[] =>
                     getLogColor(
