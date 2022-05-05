@@ -2,9 +2,17 @@ import React from "react";
 import { ReactNode } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
+import PropTypes from "prop-types";
+
+import {
+    Template,
+    TemplateTrack,
+    TemplatePlotTypes,
+} from "./components/WellLogTemplateTypes";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const template = require("../../../demo/example-data/welllog_template_2.json");
+const template =
+    require("../../../demo/example-data/welllog_template_2.json") as Template;
 import { WellLog } from "./components/WellLogTypes";
 const welllogs =
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -27,11 +35,6 @@ import { axisTitles, axisMnemos } from "./utils/axes";
 import { fillInfos } from "./utils/fill-info";
 import { getDiscreteMeta } from "./utils/tracks";
 
-import {
-    TemplateTrack,
-    TemplatePlotTypes,
-} from "./components/WellLogTemplateTypes";
-
 type Props = DeckGLMapProps;
 
 interface State {
@@ -43,6 +46,15 @@ interface State {
     layers?: Record<string, unknown>[];
 
     wellName: string | undefined;
+}
+
+function findWellsLayer(event: MapMouseEvent) {
+    const info = event.infos.find((info) => info.layer?.id === "wells-layer");
+    return info?.layer;
+}
+
+function findWellLogIndex(welllogs: WellLog[], wellName: string): number {
+    return welllogs.findIndex((welllog) => welllog.header.well === wellName);
 }
 
 function findLog(controller: WellLogController, logName: string): number {
@@ -60,7 +72,25 @@ function detectType(welllog: WellLog, logName: string): TemplatePlotTypes {
     return "line";
 }
 
+function addTemplateTrack(
+    template: Template,
+    welllog: WellLog,
+    logName: string
+): Template {
+    // add missed TemplateTrack for the given logName
+    const type: TemplatePlotTypes = detectType(welllog, logName);
+    const templateNew = JSON.parse(JSON.stringify(template)) as Template;
+    const templateTrack: TemplateTrack = {
+        title: logName,
+        required: true, // force to show on all wells
+        plots: [{ name: logName, type: type, color: "red" }],
+    };
+    templateNew.tracks.push(templateTrack);
+    return templateNew;
+}
+
 export class MapAndWellLogViewer extends React.Component<Props, State> {
+    public static propTypes: Record<string, unknown>;
     constructor(props: Props, state: State) {
         super(props, state);
         this.state = {
@@ -171,9 +201,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             );
         if (event.wellname !== undefined) {
             if (event.type == "click") {
-                const iWell = welllogs.findIndex(
-                    (welllog) => welllog.header.well === event.wellname
-                );
+                const iWell = findWellLogIndex(welllogs, event.wellname);
                 this.setState((state: Readonly<State>) => {
                     if (state.wellIndex === iWell) return null;
                     return {
@@ -184,46 +212,25 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
 
                 const controller = this.state.controller;
                 if (controller) {
-                    const info = event.infos.find(
-                        (info) => info.layer?.id === "wells-layer"
-                    );
-                    if (info && info.layer) {
-                        const logName = info.layer.props?.logName;
-                        {
-                            let iTrack = findLog(controller, logName);
-                            if (iTrack < 0) {
-                                // add missed TemplatTrack for the givet logName
-                                //const welllog = info.object is Feature or WellLog;
-                                const welllog = welllogs[iWell];
-                                const type: TemplatePlotTypes = detectType(
-                                    welllog,
-                                    logName
-                                );
-                                const templateNew = JSON.parse(
-                                    JSON.stringify(
-                                        /*controller.getTemplate()*/ template
-                                    )
-                                );
-                                const templateTrack: TemplateTrack = {
-                                    title: logName,
-                                    plots: [
-                                        {
-                                            name: logName,
-                                            type: type,
-                                            color: "red",
-                                        },
-                                    ],
-                                };
-                                templateNew.tracks.push(templateTrack);
+                    const wellsLayer = findWellsLayer(event);
+                    if (wellsLayer) {
+                        const logName = wellsLayer.props?.logName;
+                        let iTrack = findLog(controller, logName);
+                        if (iTrack < 0) {
+                            //const welllog = info.object is Feature or WellLog;
+                            const welllog = welllogs[iWell];
+                            const templateNew = addTemplateTrack(
+                                /*controller.getTemplate()*/ template,
+                                welllog,
+                                logName
+                            );
+                            controller.setTemplate(templateNew);
 
-                                controller.setTemplate(templateNew);
-
-                                iTrack = findLog(controller, logName);
-                            }
-                            controller.scrollTrackTo(iTrack);
+                            iTrack = findLog(controller, logName);
                         }
+                        controller.scrollTrackTo(iTrack);
 
-                        //layer.props.logrunName
+                        //wellsLayer.props.logrunName
                     }
                 }
             }
@@ -334,3 +341,5 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
         );
     }
 }
+
+MapAndWellLogViewer.propTypes = DeckGLMap.propTypes;
