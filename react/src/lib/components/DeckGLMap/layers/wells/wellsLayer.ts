@@ -215,6 +215,8 @@ export default class WellsLayer extends CompositeLayer<
                 lineWidthScale: this.props.lineWidthScale,
                 extensions: extensions,
                 getDashArray: getDashFactor(this.props.lineStyle?.dash, 1),
+                lineBillboard: is3d,
+                pointBillboard: true,
             })
         );
 
@@ -239,6 +241,8 @@ export default class WellsLayer extends CompositeLayer<
                     this.props.lineStyle?.dash,
                     lineWidthFactor
                 ),
+                lineBillboard: is3d,
+                pointBillboard: true,
             })
         );
 

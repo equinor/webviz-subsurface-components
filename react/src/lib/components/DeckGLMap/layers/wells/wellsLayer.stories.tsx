@@ -10,14 +10,17 @@ const Template: ComponentStory<typeof DeckGLMap> = (args) => (
     <DeckGLMap {...args} />
 );
 
-// Volve kh netmap data, flat surface
-export const VolveWells = Template.bind({});
-VolveWells.args = {
+const defaultProps = {
     id: "volve-wells",
     resources: {
         wellsData: "./volve_wells.json",
     },
-    bounds: [432150, 6475800, 439400, 6481500],
+    bounds: [432150, 6475800, 439400, 6481500] as [
+        number,
+        number,
+        number,
+        number
+    ],
     layers: [
         {
             "@@type": "WellsLayer",
@@ -25,6 +28,10 @@ VolveWells.args = {
         },
     ],
 };
+
+// Volve kh netmap data, flat surface
+export const VolveWells = Template.bind({});
+VolveWells.args = defaultProps;
 VolveWells.parameters = {
     docs: {
         description: {
@@ -37,15 +44,10 @@ VolveWells.parameters = {
 
 export const StyledWells = Template.bind({});
 StyledWells.args = {
-    id: "styled-wells",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
-    bounds: [432150, 6475800, 439400, 6481500],
+    ...defaultProps,
     layers: [
         {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
+            ...defaultProps.layers[0],
             lineStyle: { dash: true },
             refine: false,
             outline: false,
@@ -64,15 +66,10 @@ StyledWells.parameters = {
 
 export const CustomStyledWells = Template.bind({});
 CustomStyledWells.args = {
-    id: "custom-styled-wells",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
-    bounds: [432150, 6475800, 439400, 6481500],
+    ...defaultProps,
     layers: [
         {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
+            ...defaultProps.layers[0],
             lineStyle: { color: [255, 0, 0, 255], dash: [10, 3] },
             refine: false,
             outline: false,
@@ -105,15 +102,10 @@ function dashCallback(object: Record<string, Record<string, unknown>>) {
 
 export const CallbackStyledWells = Template.bind({});
 CallbackStyledWells.args = {
-    id: "callback-styled-wells",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
-    bounds: [432150, 6475800, 439400, 6481500],
+    ...defaultProps,
     layers: [
         {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
+            ...defaultProps.layers[0],
             lineStyle: { color: colorCallback, dash: dashCallback },
             refine: false,
             outline: false,
@@ -132,23 +124,13 @@ CallbackStyledWells.parameters = {
 
 export const HideAllTrajectory = Template.bind({});
 HideAllTrajectory.args = {
-    id: "trajectory-hidden-wells",
-    resources: {
-        wellsData: "./volve_wells.json",
-        logData: "./volve_logs.json",
-    },
-    bounds: [432150, 6475800, 439400, 6481500],
+    ...defaultProps,
     layers: [
         {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
+            ...defaultProps.layers[0],
             lineStyle: { color: [0, 0, 0, 0] },
             refine: false,
             outline: false,
-            logData: "@@#resources.logData",
-            logrunName: "BLOCKING",
-            logName: "ZONELOG",
-            logColor: "Stratigraphy",
         },
     ],
 };
@@ -156,6 +138,60 @@ HideAllTrajectory.parameters = {
     docs: {
         description: {
             story: "Volve wells example with all trajectory hidden.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const Wells3d = Template.bind({});
+Wells3d.args = {
+    ...defaultProps,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "a",
+                show3D: true,
+            },
+        ],
+    },
+};
+Wells3d.parameters = {
+    docs: {
+        description: {
+            story: "3D wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const Wells3dDashed = Template.bind({});
+Wells3dDashed.args = {
+    ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            lineStyle: { dash: true },
+            refine: false,
+            outline: false,
+        },
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "a",
+                show3D: true,
+            },
+        ],
+    },
+};
+Wells3dDashed.parameters = {
+    docs: {
+        description: {
+            story: "3D dashed wells example",
         },
         inlineStories: false,
         iframeHeight: 500,
