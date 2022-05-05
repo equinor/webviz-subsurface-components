@@ -4,7 +4,6 @@ import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
-import { d3ColorScales } from "@emerson-eps/color-tables";
 import { rgbValues } from "@emerson-eps/color-tables";
 import {
     Feature,
@@ -28,7 +27,7 @@ import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import { getColors } from "@emerson-eps/color-tables"
+import { getColors } from "@emerson-eps/color-tables";
 type NumberPair = [number, number];
 type DashAccessorFunction = (
     object: Record<string, unknown>,
@@ -563,9 +562,14 @@ function getLogColor(
                 point
             );
 
-            const rgb = colorMappingFunction ? 
-                        colorMappingFunction(point, categorial, categorialMin, categorialMax) : 
-                        arrayOfColors;
+            const rgb = colorMappingFunction
+                ? colorMappingFunction(
+                      point,
+                      categorial,
+                      categorialMin,
+                      categorialMax
+                  )
+                : arrayOfColors;
 
             if (rgb) {
                 if (Array.isArray(rgb)) {
