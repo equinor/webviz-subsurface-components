@@ -34,7 +34,7 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(2000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("hide_pie_chart");
     });
 
     it("Should hide color legends", () => {
@@ -42,7 +42,7 @@ describe("Map component", () => {
         cy.getIframeBody().find('[id="Wells-switch"]').click({ force: true });
         cy.wait(2000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("hide_color_legend");
     });
 
     it("Should hide faults", () => {
@@ -52,7 +52,7 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(2000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("hide_faults");
     });
 
     it("Should hide north arrow", () => {
@@ -62,17 +62,7 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
-    });
-
-    it("Should hide north arrow", () => {
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.getIframeBody()
-            .find('[id="NorthArrow3D-switch-label"]')
-            .click({ force: true });
-        cy.wait(1000);
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("hide_north_arrow");
     });
 
     it("Should hide hillshading layer", () => {
@@ -82,7 +72,7 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("hide_hillshading_layer");
     });
 
     it("Should hide property layer", () => {
@@ -92,7 +82,7 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("hide_property_layer");
     });
 
     it("Should display grid layer", () => {
@@ -108,7 +98,7 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("display_grid_layer");
     });
 
     it("Should hide drawing layer", () => {

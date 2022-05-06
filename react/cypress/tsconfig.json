@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
-        "types": ["cypress", "node"]
+        "types": ["cypress", "node", "cypress-visual-regression"],
+        "esModuleInterop": true
     },
     "include": ["**/*.*"]
 }

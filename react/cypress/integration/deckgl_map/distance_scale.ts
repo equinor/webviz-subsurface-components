@@ -30,6 +30,6 @@ describe("Map component feature", () => {
             .find("#DeckGL-Map-wrapper")
             .trigger("wheel", { deltaY: -10, force: true });
         cy.wait(1000);
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("zoom in");
     });
 });

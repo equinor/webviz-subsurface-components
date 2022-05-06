@@ -27,14 +27,9 @@ import "@testing-library/cypress/add-commands";
 
 // This is based on examples from Gleb's Working with Iframes Cypress blog post.
 // See: https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/
-import { addMatchImageSnapshotCommand } from "cypress-image-snapshot/command";
+import compareSnapshotCommand from "cypress-visual-regression/dist/command";
 
-addMatchImageSnapshotCommand({
-    failureThreshold: 0.1,
-    failureThresholdType: "percent",
-    customDiffConfig: { threshold: 0.0 },
-    capture: "viewport",
-});
+compareSnapshotCommand();
 
 Cypress.Commands.add("getIframeBody", () => {
     cy.log("getIframeBody");
