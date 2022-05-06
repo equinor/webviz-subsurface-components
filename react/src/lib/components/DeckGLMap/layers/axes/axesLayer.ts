@@ -367,8 +367,8 @@ function GetTickLines(
                 lines.push(x_tick, y_tick, tick);
 
                 // tick line end.
-                const x = -delta * Math.cos(3.14157 / 4);
-                const y = -delta * Math.sin(3.14157 / 4);
+                const x = -0.5 * delta * Math.cos(3.14157 / 4);
+                const y = -0.5 * delta * Math.sin(3.14157 / 4);
                 lines.push(x_tick + x, y_tick + y, tick);
             }
 
@@ -382,8 +382,8 @@ function GetTickLines(
                 lines.push(x_tick, y_tick, tick);
 
                 // tick line end.
-                const x = -delta * Math.cos(3.14157 / 4);
-                const y = -delta * Math.sin(3.14157 / 4);
+                const x = -0.5 * delta * Math.cos(3.14157 / 4);
+                const y = -0.5 * delta * Math.sin(3.14157 / 4);
                 lines.push(x_tick + x, y_tick + y, tick);
             }
         }
