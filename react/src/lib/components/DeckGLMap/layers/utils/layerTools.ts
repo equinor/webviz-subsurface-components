@@ -7,6 +7,9 @@ import { Matrix4 } from "math.gl";
 import { cloneDeep } from "lodash";
 import { layersDefaultProps } from "../layersDefaultProps";
 
+// Return a color given a number in the [0,1] range.
+export type colorMapFunctionType = (x: number) => [number, number, number];
+
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
     name: string;
 }

@@ -7,7 +7,11 @@ import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
 import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
-import { createPropertyData, PropertyDataType } from "../utils/layerTools";
+import {
+    createPropertyData,
+    PropertyDataType,
+    colorMapFunctionType,
+} from "../utils/layerTools";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -31,8 +35,6 @@ export const DECODER = {
     bScaler: 1,
     offset: 0,
 };
-
-export type colorMapFunctionType = (x: number) => [number, number, number];
 
 function getImageData(
     colorMapName: string,
