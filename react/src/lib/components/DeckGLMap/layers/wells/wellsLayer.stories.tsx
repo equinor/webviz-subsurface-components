@@ -87,16 +87,15 @@ CustomColoredWells.parameters = {
 };
 
 function colorCallback(object: Record<string, Record<string, unknown>>) {
-    if ((object["properties"]["name"] as string).match("15/9-19"))
-        return object["properties"]["color"];
-    else if ((object["properties"]["name"] as string).match("15/9-F"))
+    if ((object["properties"]["name"] as string).match("15/9-F-10"))
         return [0, 0, 0, 0];
-    else return [0, 0, 0, 255];
+    else return object["properties"]["color"];
 }
 
 function dashCallback(object: Record<string, Record<string, unknown>>) {
     if ((object["properties"]["name"] as string).match("15/9-19"))
         return [1.5, 1.5];
+    else if (object["properties"]["name"] === "15/9-F-15") return true;
     else return false;
 }
 
