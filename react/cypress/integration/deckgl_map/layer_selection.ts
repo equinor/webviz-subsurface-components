@@ -57,9 +57,7 @@ describe("Map component", () => {
 
     it("Should hide north arrow", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.getIframeBody()
-            .find('[id="NorthArrow3D-switch-label"]')
-            .click({ force: true });
+        cy.getIframeBody().find("#NorthArrow3D-switch").click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.compareSnapshot("hide_north_arrow");
@@ -68,7 +66,7 @@ describe("Map component", () => {
     it("Should hide hillshading layer", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.getIframeBody()
-            .find('[id="Hill shading-switch-label"]')
+            .find('[id="Hill shading-switch"]')
             .click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
@@ -78,7 +76,7 @@ describe("Map component", () => {
     it("Should hide property layer", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.getIframeBody()
-            .find('[id="Property map-switch-label"]')
+            .find('[id="Property map-switch"]')
             .click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
@@ -88,14 +86,12 @@ describe("Map component", () => {
     it("Should display grid layer", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.getIframeBody()
-            .find('[id="Property map-switch-label"]')
+            .find('[id="Property map-switch"]')
             .click({ force: true });
         cy.getIframeBody()
-            .find('[id="Hill shading-switch-label"]')
+            .find('[id="Hill shading-switch"]')
             .click({ force: true });
-        cy.getIframeBody()
-            .find('[id="Grid-switch-label"]')
-            .click({ force: true });
+        cy.getIframeBody().find("#Grid-switch").click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.compareSnapshot("display_grid_layer");
