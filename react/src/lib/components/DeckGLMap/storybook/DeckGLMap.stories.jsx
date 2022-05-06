@@ -403,7 +403,7 @@ export const Axes = MinimalTemplate.bind({});
 Axes.args = {
     id: "axes",
     layers: [axes, meshMapLayer, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500],
+    bounds: [432205, 6475078, 437720, 6481113],
     views: {
         layout: [1, 1],
         viewports: [

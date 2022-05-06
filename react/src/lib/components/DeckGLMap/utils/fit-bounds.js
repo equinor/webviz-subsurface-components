@@ -44,13 +44,10 @@ export default function fitBounds({
     const [west, south] = [bounds[0], bounds[1]];
     const [east, north] = [bounds[2], bounds[3]];
 
-    const nw = [west, north];
-    const se = [east, south];
-
     // width/height on the Web Mercator plane
     const size = [
-        Math.max(Math.abs(se[0] - nw[0]), minExtent),
-        Math.max(Math.abs(se[1] - nw[1]), minExtent),
+        Math.max(Math.abs(east - west), minExtent),
+        Math.max(Math.abs(south - north), minExtent),
     ];
 
     const targetSize = [
@@ -67,10 +64,7 @@ export default function fitBounds({
     const offsetX = (padding.right - padding.left) / 2 / scaleX;
     const offsetY = (padding.bottom - padding.top) / 2 / scaleY;
 
-    const center = [
-        (se[0] + nw[0]) / 2 + offsetX,
-        (se[1] + nw[1]) / 2 + offsetY,
-    ];
+    const center = [(east + west) / 2 + offsetX, (south + north) / 2 + offsetY];
 
     const centerLngLat = center;
     const zoom = Math.min(maxZoom, log2(Math.abs(Math.min(scaleX, scaleY))));

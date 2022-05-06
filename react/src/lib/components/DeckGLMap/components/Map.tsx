@@ -578,8 +578,8 @@ function getViewState(
         height = deck.height;
     }
 
-    const padding = 20;
-    const fitted_bound = fitBounds({ width, height, bounds, padding });
+    const offset = [0, 35];
+    const fitted_bound = fitBounds({ width, height, bounds, offset });
     const view_state = {
         target: [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
