@@ -90,6 +90,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         valueRange: { type: "array", value: [0, 1] },
         colorMapRange: { type: "array", value: [0, 1] },
+        material: true,
     },
     WellsLayer: {
         "@@type": "WellsLayer",
