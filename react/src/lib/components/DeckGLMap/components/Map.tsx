@@ -17,7 +17,7 @@ import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
-import Deck, { ViewStateProps } from "@deck.gl/core/lib/deck";
+import Deck from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
@@ -75,6 +75,13 @@ export interface ViewsType {
     viewports: ViewportType[];
 }
 
+interface ViewStateType {
+    target: number[];
+    zoom: number;
+    rotationX: number;
+    rotationOrbit: number;
+}
+
 export interface DeckGLLayerContext extends LayerContext {
     userData: {
         setEditedData: (data: Record<string, unknown>) => void;
@@ -108,7 +115,7 @@ export interface MapProps {
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
-    bounds?: [number, number, number, number];
+    bounds: [number, number, number, number];
 
     /**
      * Zoom level for the view.
@@ -218,18 +225,27 @@ const Map: React.FC<MapProps> = ({
     const deckRef = useRef<DeckGL>(null);
 
     // state for views prop (target and zoom) of DeckGL component
-    const [viewState, setViewState] = useState<ViewStateProps>();
+    const [viewState, setViewState] = useState<ViewStateType>(
+        getViewState(bounds, zoom)
+    );
+
+    // react on bounds prop change
     useEffect(() => {
-        if (bounds === undefined) return;
-        setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
-    }, [bounds, zoom]);
+        const vs = getViewState(bounds, zoom);
+        setViewState({ ...viewState, target: vs.target });
+    }, [bounds]);
+
+    // react on zoom prop change
+    useEffect(() => {
+        const vs = getViewState(bounds, zoom, deckRef.current?.deck);
+        setViewState({ ...viewState, zoom: vs.zoom });
+    }, [zoom]);
 
     // calculate camera zoom on view resize while maintaining pan
     const onResize = useCallback(() => {
-        if (bounds === undefined) return;
-        const vs = getViewState(bounds, zoom, deckRef.current?.deck);
+        const vs = getViewState(bounds, undefined, deckRef.current?.deck);
         setViewState({ ...viewState, zoom: vs.zoom });
-    }, [deckRef, viewState]);
+    }, [viewState]);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
@@ -570,7 +586,7 @@ function getViewState(
     bounds: [number, number, number, number],
     zoom?: number,
     deck?: Deck
-): ViewStateProps {
+): ViewStateType {
     let width = bounds[2] - bounds[0]; // right - left
     let height = bounds[3] - bounds[1]; // top - bottom
     if (deck) {
@@ -580,7 +596,7 @@ function getViewState(
 
     const padding = 20;
     const fitted_bound = fitBounds({ width, height, bounds, padding });
-    const view_state = {
+    const view_state: ViewStateType = {
         target: [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
         rotationX: 90, // look down z -axis
