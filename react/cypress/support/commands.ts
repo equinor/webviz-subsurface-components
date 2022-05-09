@@ -23,10 +23,6 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-import "@testing-library/cypress/add-commands";
-
-// This is based on examples from Gleb's Working with Iframes Cypress blog post.
-// See: https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/
 import compareSnapshotCommand from "cypress-visual-regression/dist/command";
 
 compareSnapshotCommand();
