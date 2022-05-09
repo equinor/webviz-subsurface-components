@@ -98,18 +98,18 @@ jobs:
 
       # Run cypress tests on firefox browser
       - name: Cache Cypress
+        if: github.event_name != 'release' && matrix.e2e-on-firefox
         id: cache-cypress
         uses: actions/cache@v1
         with:
+          working-directory: ./react
           path: ~/.cache/Cypress
           key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
-
       # now let's install Cypress binary
-      - run: npx cypress install
-      - run: npx cypress cache list
-
-      # and run Cypress tests
-      - run: npx cypress run
+      - run: |
+          npx cypress install --prefix ./react
+          npx cypress cache list --prefix ./react
+          npx cypress run --prefix ./react
 
       # - name: E2E on firefox
       #   if: github.event_name != 'release' && matrix.e2e-on-firefox
