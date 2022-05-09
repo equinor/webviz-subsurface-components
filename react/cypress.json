@@ -6,6 +6,6 @@
     "env": {
         "failSilently": false,
         "ALWAYS_GENERATE_DIFF": false,
-        "type": "actual"
+        "type": "base"
     }
 }
