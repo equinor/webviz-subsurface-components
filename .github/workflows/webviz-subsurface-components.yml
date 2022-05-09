@@ -97,14 +97,28 @@ jobs:
           pytest ./tests --headless
 
       # Run cypress tests on firefox browser
-      - name: E2E on firefox
-        if: github.event_name != 'release' && matrix.e2e-on-firefox
-        uses: cypress-io/github-action@33ec2f03412577367c7c6aac7b646c88e646e33c
+      - name: Cache Cypress
+        id: cache-cypress
+        uses: actions/cache@v1
         with:
-          browser: firefox
-          working-directory: ./react
-          start: npm run storybook
-          wait-on: "http://localhost:6006"
+          path: ~/.cache/Cypress
+          key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+
+      # now let's install Cypress binary
+      - run: npx cypress install
+      - run: npx cypress cache list
+
+      # and run Cypress tests
+      - run: npx cypress run
+
+      # - name: E2E on firefox
+      #   if: github.event_name != 'release' && matrix.e2e-on-firefox
+      #   uses: cypress-io/github-action@33ec2f03412577367c7c6aac7b646c88e646e33c
+      #   with:
+      #     browser: firefox
+      #     working-directory: ./react
+      #     start: npm run storybook
+      #     wait-on: "http://localhost:6006"
       - uses: actions/upload-artifact@v2
         if: always()
         with:
