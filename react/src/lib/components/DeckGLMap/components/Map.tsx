@@ -224,16 +224,10 @@ const Map: React.FC<MapProps> = ({
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 
-    // state for views prop (target and zoom) of DeckGL component
+    // set initial view state based on supplied bounds and zoom in viewState
     const [viewState, setViewState] = useState<ViewStateType>(
         getViewState(bounds, zoom)
     );
-
-    // react on bounds prop change
-    useEffect(() => {
-        const vs = getViewState(bounds, zoom);
-        setViewState({ ...viewState, target: vs.target });
-    }, [bounds]);
 
     // react on zoom prop change
     useEffect(() => {
@@ -241,11 +235,10 @@ const Map: React.FC<MapProps> = ({
         setViewState({ ...viewState, zoom: vs.zoom });
     }, [zoom]);
 
-    // calculate camera zoom on view resize while maintaining pan
-    const onResize = useCallback(() => {
-        const vs = getViewState(bounds, undefined, deckRef.current?.deck);
-        setViewState({ ...viewState, zoom: vs.zoom });
-    }, [viewState]);
+    // calculate view state on deckgl context load (based on viewport size)
+    const onLoad = useCallback(() => {
+        setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
+    }, []);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
@@ -452,7 +445,7 @@ const Map: React.FC<MapProps> = ({
                 }
                 onHover={onHover}
                 onClick={onClick}
-                onResize={onResize}
+                onLoad={onLoad}
                 onAfterRender={onAfterRender}
             >
                 {children}
