@@ -72,11 +72,6 @@ export const MenuTypeProps = [
 ] as const;
 
 export const NumericTypeProps = [
-    {
-        id: "lineWidthScale",
-        displayName: "Trajectory thickness",
-        dependentOnProp: undefined,
-    },
     { id: "logRadius", displayName: "Log radius", dependentOnProp: "logData" },
     {
         id: "pointRadiusScale",

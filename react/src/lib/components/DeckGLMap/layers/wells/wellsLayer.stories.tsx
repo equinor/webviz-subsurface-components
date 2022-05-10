@@ -86,6 +86,28 @@ CustomColoredWells.parameters = {
     },
 };
 
+export const CustomWidthWells = Template.bind({});
+CustomWidthWells.args = {
+    ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            lineStyle: { width: 10 },
+            refine: false,
+            outline: false,
+        },
+    ],
+};
+CustomColoredWells.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with thick lines.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 function colorCallback(object: Record<string, Record<string, unknown>>) {
     if ((object["properties"]["name"] as string).match("15/9-F-10"))
         return [0, 0, 0, 0];
@@ -99,13 +121,23 @@ function dashCallback(object: Record<string, Record<string, unknown>>) {
     else return false;
 }
 
+function widthCallback(object: Record<string, Record<string, unknown>>) {
+    if ((object["properties"]["name"] as string).match("15/9-F-1")) return 3;
+    else if (object["properties"]["name"] === "15/9-F-4") return 8;
+    else return 5;
+}
+
 export const CallbackStyledWells = Template.bind({});
 CallbackStyledWells.args = {
     ...defaultProps,
     layers: [
         {
             ...defaultProps.layers[0],
-            lineStyle: { color: colorCallback, dash: dashCallback },
+            lineStyle: {
+                color: colorCallback,
+                dash: dashCallback,
+                width: widthCallback,
+            },
             refine: false,
             outline: false,
         },
@@ -114,7 +146,7 @@ CallbackStyledWells.args = {
 CallbackStyledWells.parameters = {
     docs: {
         description: {
-            story: "Volve wells example with trajectory color and dash style supplied as callback.",
+            story: "Volve wells example with trajectory color, width and dash style supplied as callback.",
         },
         inlineStories: false,
         iframeHeight: 500,
@@ -174,7 +206,7 @@ Wells3dDashed.args = {
             ...defaultProps.layers[0],
             lineStyle: { dash: true },
             refine: false,
-            outline: false,
+            outline: true,
         },
     ],
     views: {
