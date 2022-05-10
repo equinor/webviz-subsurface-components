@@ -7,6 +7,7 @@ import {
     EditAction,
     Feature,
     FeatureCollection,
+    GeoJsonEditMode,
     ImmutableFeatureCollection,
     ModeProps,
     ModifyMode,
@@ -17,6 +18,7 @@ import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 import { CompositeLayer, PickInfo } from "deck.gl";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
+import { area, length } from "../../utils/measurement";
 
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {
@@ -41,14 +43,50 @@ class CustomModifyMode extends ModifyMode {
     }
 }
 
+function deleteEscapeKeyHandler(
+    drawMode: GeoJsonEditMode,
+    event: KeyboardEvent,
+    props: ModeProps<FeatureCollection>
+) {
+    if (event.key === "Escape") drawMode.getClickSequence().pop();
+    else if (event.key === "Delete") drawMode.resetClickSequence();
+    else return;
+
+    // used to set state so layer can be rerendered
+    const updatedData = new ImmutableFeatureCollection(props.data).getObject();
+    if (updatedData) {
+        props.onEdit({
+            updatedData,
+            editType: "undoDrawing",
+            editContext: {
+                featureIndexes: props.selectedIndexes,
+            },
+        });
+    }
+}
+
+class CustomDrawLineStringMode extends DrawLineStringMode {
+    handleKeyUp(event: KeyboardEvent, props: ModeProps<FeatureCollection>) {
+        super.handleKeyUp(event, props);
+        deleteEscapeKeyHandler(this, event, props);
+    }
+}
+
+class CustomDrawPolygonMode extends DrawPolygonMode {
+    handleKeyUp(event: KeyboardEvent, props: ModeProps<FeatureCollection>) {
+        super.handleKeyUp(event, props);
+        deleteEscapeKeyHandler(this, event, props);
+    }
+}
+
 // Mapping of mode name to mode class
 const MODE_MAP = {
     view: ViewMode,
     modify: CustomModifyMode,
     transform: TransformMode,
     drawPoint: DrawPointMode,
-    drawLineString: DrawLineStringMode,
-    drawPolygon: DrawPolygonMode,
+    drawLineString: CustomDrawLineStringMode,
+    drawPolygon: CustomDrawPolygonMode,
 };
 
 const UNSELECTED_LINE_COLOR: RGBAColor = [0x50, 0x50, 0x50, 0xcc];
@@ -57,6 +95,10 @@ const SELECTED_LINE_COLOR: RGBAColor = [0x0, 0x0, 0x0, 0xff];
 export interface DrawingLayerProps<D> extends ExtendedLayerProps<D> {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
+}
+
+export interface DrawingPickInfo extends PickInfo<unknown> {
+    measurement?: number;
 }
 
 // Composite layer that contains an EditableGeoJsonLayer from nebula.gl
@@ -89,6 +131,24 @@ export default class DrawingLayer extends CompositeLayer<
         }
 
         return false;
+    }
+
+    // For now, use `any` for the picking types because this function should
+    // recieve PickInfo<FeatureCollection>, but it recieves PickInfo<Feature>.
+    //eslint-disable-next-line
+    getPickingInfo({ info }: { info: any }): any {
+        if (!info.object) return info as DrawingPickInfo;
+        const feature = info.object;
+        let measurement;
+        if (feature.geometry.type === "LineString") {
+            measurement = length(feature);
+        } else if (feature.geometry.type === "Polygon") {
+            measurement = area(feature);
+        } else return info as DrawingPickInfo;
+        return {
+            ...info,
+            measurement: measurement,
+        } as DrawingPickInfo;
     }
 
     // Callback for various editing events. Most events will update this component
@@ -127,6 +187,7 @@ export default class DrawingLayer extends CompositeLayer<
                 });
                 break;
             case "movePosition":
+            case "undoDrawing":
                 // Don't use setEditedData to avoid an expensive roundtrip,
                 // since this is done on every mouse move when editing.
                 this.setState({ data: editAction.updatedData });
