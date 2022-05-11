@@ -170,50 +170,58 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         onClick: (event: OverlayClickEvent): void => {
             const { caller, x, y } = event;
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
-            if (event.target) {
+            const elem = event.target;
+            if (elem) {
                 const axisTitle = parent.props.axisTitles
                     ? parent.props.axisTitles[parent.props.primaryAxis]
                     : undefined;
-                event.target.textContent = Number.isFinite(value)
+                elem.textContent = Number.isFinite(value)
                     ? `Pinned ${axisTitle ? axisTitle : ""}: ${value.toFixed(
                           1
                       )}`
                     : "-";
-                event.target.style.visibility = "visible";
+                elem.style.visibility = "visible";
             }
         },
         onMouseMove: (event: OverlayMouseMoveEvent): void => {
             if (parent.selPersistent) return;
             const { caller, x, y } = event;
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
-            if (event.target) {
+            const elem = event.target;
+            if (elem) {
                 const axisTitle = parent.props.axisTitles
                     ? parent.props.axisTitles[parent.props.primaryAxis]
                     : undefined;
-                event.target.textContent = Number.isFinite(value)
+                elem.textContent = Number.isFinite(value)
                     ? `${axisTitle ? axisTitle : ""}: ${value.toFixed(1)}`
                     : "-";
-                event.target.style.visibility = "visible";
+                elem.style.visibility = "visible";
             }
 
             parent.setInfo(value);
             parent.onContentSelection();
         },
         onMouseExit: (event: OverlayMouseExitEvent): void => {
-            if (event.target) event.target.style.visibility = "hidden";
+            const elem = event.target;
+            if (elem) elem.style.visibility = "hidden";
         },
         onRescale: (event: OverlayRescaleEvent): void => {
-            if (event.target && event.transform) {
+            const elem = event.target;
+            if (elem && event.transform) {
                 // event.transform.k could be not valid after add/edit plot
                 // so use getContentZoom(instance) to be consistent
                 // console.log("zoom=", getContentZoom(instance), event.transform.k)
 
                 parent.onContentRescale();
 
-                event.target.style.visibility = "visible";
-                event.target.textContent = `Zoom: x${event.transform.k.toFixed(
-                    1
-                )}`;
+                const k = event.transform.k;
+                if (Number.isFinite(k)) {
+                    elem.style.visibility = "visible";
+                    elem.textContent = `Zoom: x${k.toFixed(1)}`;
+                } else {
+                    // empty logview
+                    elem.style.visibility = "hidden";
+                }
             }
         },
     });

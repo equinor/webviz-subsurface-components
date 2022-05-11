@@ -278,6 +278,13 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                 >
                     <div
                         style={{
+                            flex: "0 0",
+                        }}
+                    >
+                        <center>{this.state.wellName}</center>
+                    </div>
+                    <div
+                        style={{
                             flex: "1 1",
                             height: "90%",
                             minWidth: "25px",
@@ -310,7 +317,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             onCreateController={this.onCreateController}
                             onContentSelection={this.onContentSelection}
                             onTrackScroll={this.onTrackScroll}
-                        ></WellLogViewWithScroller>
+                        />
                     </div>
                     <div
                         style={{
