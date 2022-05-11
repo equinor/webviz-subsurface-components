@@ -17,7 +17,7 @@ import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
-import Deck, { InitialViewStateProps } from "@deck.gl/core/lib/deck";
+import Deck, { ViewStateProps } from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
@@ -32,6 +32,7 @@ import {
     validateColorTables,
     validateLayers,
 } from "../../../inputSchema/schemaValidationUtil";
+import { DrawingPickInfo } from "../layers/drawing/drawingLayer";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
@@ -217,18 +218,19 @@ const Map: React.FC<MapProps> = ({
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 
-    // state for initial views prop (target and zoom) of DeckGL component
-    const [viewState, setViewState] = useState<InitialViewStateProps>();
+    // state for views prop (target and zoom) of DeckGL component
+    const [viewState, setViewState] = useState<ViewStateProps>();
     useEffect(() => {
         if (bounds === undefined) return;
         setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
     }, [bounds, zoom]);
 
-    // calculate camera position and zoom on view resize
+    // calculate camera zoom on view resize while maintaining pan
     const onResize = useCallback(() => {
         if (bounds === undefined) return;
-        setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
-    }, [deckRef]);
+        const vs = getViewState(bounds, zoom, deckRef.current?.deck);
+        setViewState({ ...viewState, zoom: vs.zoom });
+    }, [deckRef, viewState]);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
@@ -405,8 +407,7 @@ const Map: React.FC<MapProps> = ({
         <div>
             <DeckGL
                 id={id}
-                // Let DeckGL automatically manage viewState as stateful component
-                initialViewState={viewState}
+                viewState={viewState}
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
@@ -421,16 +422,23 @@ const Map: React.FC<MapProps> = ({
                 }
                 // @ts-expect-error: Fix type in WellsLayer
                 getTooltip={(
-                    info: PickInfo<unknown> | WellsPickInfo
+                    info: PickInfo<unknown>
                 ): string | null | undefined => {
                     if ((info as WellsPickInfo)?.logName) {
                         return (info as WellsPickInfo)?.logName;
+                    } else if (info.layer?.id === "drawing-layer") {
+                        return (info as DrawingPickInfo).measurement?.toFixed(
+                            2
+                        );
                     } else {
                         const feat = info.object as Feature;
                         return feat?.properties?.["name"];
                     }
                 }}
                 ref={deckRef}
+                onViewStateChange={(viewport) =>
+                    setViewState(viewport.viewState)
+                }
                 onHover={onHover}
                 onClick={onClick}
                 onResize={onResize}
@@ -567,7 +575,7 @@ function getViewState(
     bounds: [number, number, number, number],
     zoom?: number,
     deck?: Deck
-): InitialViewStateProps {
+): ViewStateProps {
     let width = bounds[2] - bounds[0]; // right - left
     let height = bounds[3] - bounds[1]; // top - bottom
     if (deck) {
@@ -580,7 +588,7 @@ function getViewState(
     const view_state = {
         target: [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
-        rotationX: 0,
+        rotationX: 90, // look down z -axis
         rotationOrbit: 0,
     };
     return view_state;
@@ -639,7 +647,6 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     flipY: false,
                     far,
                     near,
-                    orbitAxis: "Y",
                 });
                 xPos = xPos + 99.5 / nX;
             }

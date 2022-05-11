@@ -36,11 +36,14 @@ void main(void) {
     return;
   }
 
-  vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
+  // KEEP. Disable lighting for now. Better with uniform color pver a cell.
+  // vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
 
-  // Use normal lighting.
-  vec3 lightColor = lighting_getLightColor(vColor.rgb, cameraPosition, position_commonspace.xyz, normal);
-  fragColor = vec4(lightColor, 1.0);
+  // // Use normal lighting.
+  // vec3 lightColor = lighting_getLightColor(vColor.rgb, cameraPosition, position_commonspace.xyz, normal);
+  // fragColor = vec4(lightColor, 1.0);
+
+  fragColor = vec4(vColor, 1.0);
 }
 `;
 
