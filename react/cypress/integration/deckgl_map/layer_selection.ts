@@ -43,7 +43,7 @@ describe("Map component", () => {
         cy.getIframeBody().find('[id="Wells-switch"]').click({ force: true });
         cy.wait(2000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.wait(1000);
+        cy.wait(1500);
         cy.compareSnapshot("hide_color_legend");
     });
 
@@ -54,7 +54,7 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(2000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.wait(1000);
+        cy.wait(1500);
         cy.compareSnapshot("hide_faults");
     });
 
@@ -63,7 +63,7 @@ describe("Map component", () => {
         cy.getIframeBody().find("#NorthArrow3D-switch").click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.wait(1000);
+        cy.wait(1500);
         cy.compareSnapshot("hide_north_arrow");
     });
 
@@ -74,7 +74,7 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.wait(1000);
+        cy.wait(1500);
         cy.compareSnapshot("hide_hillshading_layer");
     });
 
@@ -85,7 +85,7 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.wait(1000);
+        cy.wait(1500);
         cy.compareSnapshot("hide_property_layer");
     });
 
@@ -100,7 +100,7 @@ describe("Map component", () => {
         cy.getIframeBody().find("#Grid-switch").click({ force: true });
         cy.wait(1000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.wait(1000);
+        cy.wait(1500);
         cy.compareSnapshot("display_grid_layer");
     });
 
@@ -112,7 +112,7 @@ describe("Map component", () => {
             .find('[id="drawing-layer-button"]')
             .should("not.exist");
         cy.getIframeBody().find('[id="Drawing-switch"]').click({ force: true });
-        cy.wait(1000);
+        cy.wait(1500);
         cy.getIframeBody().find('[id="drawing-layer-button"]').should("exist");
     });
 });

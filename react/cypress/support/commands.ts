@@ -25,7 +25,7 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 import compareSnapshotCommand from "cypress-visual-regression/dist/command";
 
-compareSnapshotCommand();
+compareSnapshotCommand({ errorThreshold: 0.005 });
 
 Cypress.Commands.add("getIframeBody", () => {
     cy.log("getIframeBody");

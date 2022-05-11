@@ -105,8 +105,11 @@ jobs:
           working-directory: ./react
           path: ~/.cache/Cypress
           key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+
       # now let's install Cypress binary
-      - run: |
+      - name: install cypress binary
+        if: github.event_name != 'release' && matrix.e2e-on-firefox
+        run: |
           cd react
           npx cypress install
           npx cypress cache list
