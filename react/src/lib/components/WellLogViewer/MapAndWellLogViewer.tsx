@@ -278,10 +278,11 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                 >
                     <div
                         style={{
+                            textAlign: "center",
                             flex: "0 0",
                         }}
                     >
-                        <center>{this.state.wellName}</center>
+                        {this.state.wellName}
                     </div>
                     <div
                         style={{
