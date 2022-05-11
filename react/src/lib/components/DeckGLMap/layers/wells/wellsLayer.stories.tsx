@@ -206,7 +206,7 @@ Wells3dDashed.args = {
             ...defaultProps.layers[0],
             lineStyle: { dash: true },
             refine: false,
-            outline: true,
+            outline: false,
         },
     ],
     views: {
