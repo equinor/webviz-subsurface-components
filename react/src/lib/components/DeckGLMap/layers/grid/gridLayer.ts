@@ -189,13 +189,14 @@ export default class GridLayer extends Layer<
     // eslint-disable-next-line
     draw({ context }: any): void {
         const { gl } = context;
+
         if (this.state.models) {
             gl.enable(gl.POLYGON_OFFSET_FILL);
-            gl.polygonOffset(0, 1);
+            gl.polygonOffset(1, 1);
             this.state.models[0].draw(); // triangles
+            gl.disable(gl.POLYGON_OFFSET_FILL);
 
             this.state.models[1].draw(); // triangle lines
-            gl.disable(gl.POLYGON_OFFSET_FILL);
         }
     }
 
