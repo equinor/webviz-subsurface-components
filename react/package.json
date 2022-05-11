@@ -41,7 +41,10 @@
         "prepare": "npm run build:npm",
         "postpack": "npm run tidy-up",
         "prepublishOnly": "npm test && npm run lint",
-        "preversion": "npm run lint"
+        "preversion": "npm run lint",
+        "start-test": "concurrently \"npm run storybook\" \"npm run cypress:test\" -k -s first",
+        "cypress:test": "wait-on http://localhost:6006 && cypress run --browser firefox",
+        "cypress:run": "cypress run"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
