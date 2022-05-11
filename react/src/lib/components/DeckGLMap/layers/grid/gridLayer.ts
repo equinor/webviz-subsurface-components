@@ -23,7 +23,7 @@ function getColorMapColors(
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
         const rgb = rgbValues(value, colorMapName, colorTables);
-        let color: RGBColor = [155, 255, 255];
+        let color: RGBColor = [0, 0, 0];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
                 color = [rgb[0], rgb[1], rgb[2]];
@@ -308,12 +308,10 @@ function makeVertexesAndColorArrays(
 
         const propertyValue = cell.vs[ti];
 
-        const color = getColor(
-            propertyValue,
-            colors,
-            valueRange,
-            colorMapRange
-        );
+        let color = getColor(propertyValue, colors, valueRange, colorMapRange);
+
+        // Normalize color.
+        color = [color[0] / 255.0, color[1] / 255.0, color[2] / 255.0];
 
         // Note. Equal color for all of a triangle vertxes gives constant color in
         //       a cell which is correct for this layer.
