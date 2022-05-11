@@ -122,7 +122,7 @@ describe("test layers settings button", () => {
         userEvent.type(trajectory_thickness, "7");
         expect(testStore.dispatch).toHaveBeenCalledTimes(9);
         expect(testStore.dispatch).toHaveBeenNthCalledWith(9, {
-            payload: ["wells-layer", "lineWidthScale", 57],
+            payload: ["wells-layer", "lineWidthScale", 17],
             type: "spec/updateLayerProp",
         });
     });
