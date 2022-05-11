@@ -48,7 +48,7 @@ DashedWells.args = {
     layers: [
         {
             ...defaultProps.layers[0],
-            dashed: true,
+            lineStyle: { dash: true },
             refine: false,
             outline: false,
         },
@@ -64,49 +64,79 @@ DashedWells.parameters = {
     },
 };
 
-export const CustomDashedWells = Template.bind({});
-CustomDashedWells.args = {
+export const CustomColoredWells = Template.bind({});
+CustomColoredWells.args = {
     ...defaultProps,
     layers: [
         {
             ...defaultProps.layers[0],
-            dashed: [10, 3],
+            lineStyle: { color: [255, 0, 0, 255], dash: [10, 3] },
             refine: false,
             outline: false,
         },
     ],
 };
-CustomDashedWells.parameters = {
+CustomColoredWells.parameters = {
     docs: {
         description: {
-            story: "Volve wells example with dashed well trajectories, with custom style.",
+            story: "Volve wells example with dashed style and red trajectories, with custom style.",
         },
         inlineStories: false,
         iframeHeight: 500,
     },
 };
 
-function callback(object: Record<string, Record<string, unknown>>) {
-    if (object["properties"]["name"] == "15/9-F-11 B") return [5, 3];
-    return [0, 0];
+function colorCallback(object: Record<string, Record<string, unknown>>) {
+    if ((object["properties"]["name"] as string).match("15/9-F-10"))
+        return [0, 0, 0, 0];
+    else return object["properties"]["color"];
 }
 
-export const CallbackDashedWells = Template.bind({});
-CallbackDashedWells.args = {
+function dashCallback(object: Record<string, Record<string, unknown>>) {
+    if ((object["properties"]["name"] as string).match("15/9-19"))
+        return [1.5, 1.5];
+    else if (object["properties"]["name"] === "15/9-F-15") return true;
+    else return false;
+}
+
+export const CallbackStyledWells = Template.bind({});
+CallbackStyledWells.args = {
     ...defaultProps,
     layers: [
         {
             ...defaultProps.layers[0],
-            dashed: callback,
+            lineStyle: { color: colorCallback, dash: dashCallback },
             refine: false,
             outline: false,
         },
     ],
 };
-CallbackDashedWells.parameters = {
+CallbackStyledWells.parameters = {
     docs: {
         description: {
-            story: "Volve wells example with dashed well trajectories, with custom style.",
+            story: "Volve wells example with trajectory color and dash style supplied as callback.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const AllTrajectoryHidden = Template.bind({});
+AllTrajectoryHidden.args = {
+    ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            lineStyle: { color: [0, 0, 0, 0] },
+            refine: false,
+            outline: false,
+        },
+    ],
+};
+AllTrajectoryHidden.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with all trajectory hidden.",
         },
         inlineStories: false,
         iframeHeight: 500,
@@ -142,7 +172,7 @@ Wells3dDashed.args = {
     layers: [
         {
             ...defaultProps.layers[0],
-            dashed: true,
+            lineStyle: { dash: true },
             refine: false,
             outline: false,
         },

@@ -32,6 +32,7 @@ import {
     validateColorTables,
     validateLayers,
 } from "../../../inputSchema/schemaValidationUtil";
+import { DrawingPickInfo } from "../layers/drawing/drawingLayer";
 
 import { getLayersByType } from "../layers/utils/layerTools";
 import { WellsLayer } from "../layers";
@@ -461,10 +462,14 @@ const Map: React.FC<MapProps> = ({
                 }
                 // @ts-expect-error: Fix type in WellsLayer
                 getTooltip={(
-                    info: PickInfo<unknown> | WellsPickInfo
+                    info: PickInfo<unknown>
                 ): string | null | undefined => {
                     if ((info as WellsPickInfo)?.logName) {
                         return (info as WellsPickInfo)?.logName;
+                    } else if (info.layer?.id === "drawing-layer") {
+                        return (info as DrawingPickInfo).measurement?.toFixed(
+                            2
+                        );
                     } else {
                         const feat = info.object as Feature;
                         return feat?.properties?.["name"];
