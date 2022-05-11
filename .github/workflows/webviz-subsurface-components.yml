@@ -41,10 +41,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Use Node.js 15.12
-        uses: actions/setup-node@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "15.12"
+          node-version: 16
 
       - name: 📦 Install build dependencies
         # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
@@ -97,23 +97,23 @@ jobs:
           pytest ./tests --headless
 
       # Run cypress tests on firefox browser
-      - name: E2E on firefox
-        if: github.event_name != 'release' && matrix.e2e-on-firefox
-        uses: cypress-io/github-action@33ec2f03412577367c7c6aac7b646c88e646e33c
-        with:
-          browser: firefox
-          working-directory: ./react
-          start: npm run storybook
-          wait-on: "http://localhost:6006"
-      - uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: |
-            react/cypress/screenshots
-            react/cypress/snapshots
-            !react/cypress/snapshots/*/*.snap.png
-          retention-days: 5
+      # - name: E2E on firefox
+      #   if: github.event_name != 'release' && matrix.e2e-on-firefox
+      #   uses: cypress-io/github-action@33ec2f03412577367c7c6aac7b646c88e646e33c
+      #   with:
+      #     browser: firefox
+      #     working-directory: ./react
+      #     start: npm run storybook
+      #     wait-on: "http://localhost:6006"
+      # - uses: actions/upload-artifact@v2
+      #   if: failure()
+      #   with:
+      #     name: cypress-screenshots
+      #     path: |
+      #       react/cypress/screenshots
+      #       react/cypress/snapshots
+      #       !react/cypress/snapshots/*/*.snap.png
+      #     retention-days: 5
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

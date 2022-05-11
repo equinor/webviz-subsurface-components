@@ -8,7 +8,6 @@ in vec3 color;
 in int cell_index;
 flat out int cell_index_fs;
 
-out vec3 position;
 out vec3 vColor;
 out vec3 position_commonspace;
 out vec3 cameraPosition;
