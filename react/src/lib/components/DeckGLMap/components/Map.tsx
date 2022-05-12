@@ -533,7 +533,7 @@ Map.defaultProps = {
         position: [10, 10],
     },
     toolbar: {
-        visible: true,
+        visible: false,
     },
     legend: {
         visible: true,
