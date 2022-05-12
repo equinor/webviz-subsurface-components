@@ -4,6 +4,7 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 
 export default {
     component: DeckGLMap,
+    title: "DeckGLMap / Wells Layer",
 } as ComponentMeta<typeof DeckGLMap>;
 
 const Template: ComponentStory<typeof DeckGLMap> = (args) => (
@@ -29,13 +30,65 @@ const defaultProps = {
     ],
 };
 
-// Volve kh netmap data, flat surface
+// Volve wells default example.
 export const VolveWells = Template.bind({});
 VolveWells.args = defaultProps;
 VolveWells.parameters = {
     docs: {
         description: {
             story: "Volve wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+// Volve wells with logs.
+//
+export const DiscreteWellLogs = Template.bind({});
+DiscreteWellLogs.args = {
+    ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            refine: false,
+            outline: false,
+            logData: "./volve_logs.json",
+            logrunName: "BLOCKING",
+            logName: "ZONELOG",
+            logColor: "Stratigraphy",
+        },
+    ],
+};
+DiscreteWellLogs.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with well logs.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const ContinuousWellLogs = Template.bind({});
+ContinuousWellLogs.args = {
+    ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            refine: false,
+            outline: false,
+            logData: "./volve_logs.json",
+            logrunName: "BLOCKING",
+            logName: "PORO",
+            logColor: "Physics",
+        },
+    ],
+};
+ContinuousWellLogs.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with well logs.",
         },
         inlineStories: false,
         iframeHeight: 500,
