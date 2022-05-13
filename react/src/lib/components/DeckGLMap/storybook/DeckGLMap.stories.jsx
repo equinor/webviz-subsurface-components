@@ -461,6 +461,7 @@ GridLayer.args = {
             ...gridLayer,
             visible: true,
         },
+        axes,
     ],
     toolbar: {
         visible: false,
