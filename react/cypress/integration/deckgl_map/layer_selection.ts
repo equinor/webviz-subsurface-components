@@ -90,21 +90,6 @@ describe("Map component", () => {
         cy.compareSnapshot("hide_property_layer");
     });
 
-    it("Should display grid layer", () => {
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.getIframeBody()
-            .find('[id="Property map-switch"]')
-            .click({ force: true });
-        cy.getIframeBody()
-            .find('[id="Hill shading-switch"]')
-            .click({ force: true });
-        cy.getIframeBody().find("#Grid-switch").click({ force: true });
-        cy.wait(1000);
-        cy.getIframeBody().find("#view-view_1_2D").click();
-        cy.wait(1000);
-        cy.compareSnapshot("display_grid_layer");
-    });
-
     it("Should hide drawing layer", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.getIframeBody().find('[id="Drawing-switch"]').click({ force: true });
