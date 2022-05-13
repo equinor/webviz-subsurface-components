@@ -261,6 +261,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     }
 }
 
+// XXX husk aa fjerne at man kan velge deppth eller value i gui,,,
+
 TerrainMapLayer.layerName = "TerrainMapLayer";
 TerrainMapLayer.defaultProps = defaultProps;
 
