@@ -226,76 +226,23 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
             return info;
         }
 
-        ///////////////////
         // Texture coordinates.
         const s = info.color[0] / 255.0;
         const t = info.color[1] / 255.0;
-  
-
+ 
         // MESH HEIGHT VALUE.
         const meshImageData: ImageData = this.props.meshImageData;
-        //console.log(meshImageData)
-        const int_view_property_mesh = new Uint8ClampedArray(
-            meshImageData.data,
-            0,
-            meshImageData.data.length
-        );
-
-        const w_mesh = meshImageData.width;
-        const h_mesh = meshImageData.height;
-        const j_mesh = Math.min(Math.floor(w_mesh * s), w_mesh - 1);
-        const i_mesh = Math.min(Math.floor(h_mesh * t), h_mesh - 1);
-        const pixelNo_mesh = i_mesh * w_mesh + j_mesh;
-
-        const r_mesh = int_view_property_mesh[pixelNo_mesh * 4 + 0] * DECODER.rScaler;
-        const g_mesh = int_view_property_mesh[pixelNo_mesh * 4 + 1] * DECODER.gScaler;
-        const b_mesh = int_view_property_mesh[pixelNo_mesh * 4 + 2] * DECODER.bScaler;
-        const a_mesh = int_view_property_mesh[pixelNo_mesh * 4 + 3];
-        const value_mesh = r_mesh + g_mesh + b_mesh;
-
-
+        const value_mesh = getValue(meshImageData, s, t, DECODER);
 
         // TEXTURE PROPERTY VALUE.
         const textureImageData: ImageData = this.props.textureImageData;
-        const int_view_property = new Uint8ClampedArray(
-            textureImageData.data,
-            0,
-            textureImageData.data.length
-        );
+        const value_property = getValue(textureImageData, s, t, DECODER);
 
-        const w = textureImageData.width;
-        const h = textureImageData.height;
-        const j = Math.min(Math.floor(w *  s), w - 1);
-        const i = Math.min(Math.floor(h * t), h - 1);
-        const pixelNo = i * w + j;
 
-        if (w !== w_mesh || h !== h_mesh) {
-            console.log("SKANDALE")
-        }
-
-        // valueString =
-        //     "Property: " +
-        //     (!Number.isNaN(value) && value !== undefined
-        //         ? value.toFixed(1)
-        //         : " - ");
-        ///////////////////////////////////////        
-
-        // Note these colors are in the  0-255 range.
-        const r = int_view_property[pixelNo * 4 + 0] * DECODER.rScaler;
-        const g = int_view_property[pixelNo * 4 + 1] * DECODER.gScaler;
-        const b = int_view_property[pixelNo * 4 + 2] * DECODER.bScaler;
-        const a = int_view_property[pixelNo * 4 + 3];
-        const value = r + g + b;
-
-        let depth = 9.99;
         const layer_properties: PropertyDataType[] = [];
-
-        // Either map properties or map depths are encoded here.
-        // if (this.props.isReadoutDepth) depth = value.toFixed(2);
-        // else
         layer_properties.push(
-            getMapProperty("Property", value, this.props.propertyValueRange),
-            getMapProperty("Depth", value, this.props.meshValueRange)
+            getMapProperty("Property", value_mesh, this.props.propertyValueRange),
+            getMapProperty("Depth", value_property, this.props.meshValueRange)
         );
 
         return {
@@ -305,8 +252,6 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         };
     }
 }
-
-// XXX husk aa fjerne at man kan velge deppth eller value i gui,,,
 
 TerrainMapLayer.layerName = "TerrainMapLayer";
 TerrainMapLayer.defaultProps = defaultProps;
@@ -326,4 +271,27 @@ function getMapProperty(
 
     value = scaled_value * (max - min) + min;
     return createPropertyData(name, value);
+}
+
+function getValue(imageData: ImageData, s: number, t: number, decoder: { rScaler: number; gScaler: number; bScaler: number; }): number {
+    const int_view = new Uint8ClampedArray(
+        imageData.data,
+        0,
+        imageData.data.length
+    );
+
+    const w = imageData.width;
+    const h = imageData.height;
+    const j = Math.min(Math.floor(w *  s), w - 1);
+    const i = Math.min(Math.floor(h * t), h - 1);
+    const pixelNo = i * w + j;
+
+    // Note these colors are in the  0-255 range.
+    const r = int_view[pixelNo * 4 + 0] * decoder.rScaler;
+    const g = int_view[pixelNo * 4 + 1] * decoder.gScaler;
+    const b = int_view[pixelNo * 4 + 2] * decoder.bScaler;
+    const a = int_view[pixelNo * 4 + 3];
+    const value = r + g + b;
+
+    return value;
 }
