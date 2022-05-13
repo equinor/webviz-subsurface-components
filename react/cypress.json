@@ -1,4 +1,11 @@
 {
     "baseUrl": "http://localhost:6006/?path=/story/deckglmap--default",
-    "video": true
+    "video": true,
+    "screenshotsFolder": "./cypress/snapshots/actual",
+    "trashAssetsBeforeRuns": true,
+    "env": {
+        "failSilently": false,
+        "ALWAYS_GENERATE_DIFF": false,
+        "type": "actual"
+    }
 }

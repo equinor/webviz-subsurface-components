@@ -34,15 +34,18 @@ describe("Map component", () => {
             .click({ force: true });
         cy.wait(2000);
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.getIframeBody().find("#view-view_1_2D").click();
+        cy.wait(1000);
+        cy.compareSnapshot("hide_pie_chart");
     });
 
     it("Should hide color legends", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.getIframeBody().find('[id="Wells-switch"]').click({ force: true });
         cy.wait(2000);
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.getIframeBody().find("#view-view_1_2D").click();
+        cy.wait(1000);
+        cy.compareSnapshot("hide_color_legend");
     });
 
     it("Should hide faults", () => {
@@ -51,64 +54,40 @@ describe("Map component", () => {
             .find('[id="Fault polygons-switch"]')
             .click({ force: true });
         cy.wait(2000);
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.getIframeBody().find("#view-view_1_2D").click();
+        cy.wait(1000);
+        cy.compareSnapshot("hide_faults");
     });
 
     it("Should hide north arrow", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.getIframeBody()
-            .find('[id="NorthArrow3D-switch-label"]')
-            .click({ force: true });
+        cy.getIframeBody().find("#NorthArrow3D-switch").click({ force: true });
         cy.wait(1000);
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
-    });
-
-    it("Should hide north arrow", () => {
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.getIframeBody()
-            .find('[id="NorthArrow3D-switch-label"]')
-            .click({ force: true });
+        cy.getIframeBody().find("#view-view_1_2D").click();
         cy.wait(1000);
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("hide_north_arrow");
     });
 
     it("Should hide hillshading layer", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.getIframeBody()
-            .find('[id="Hill shading-switch-label"]')
+            .find('[id="Hill shading-switch"]')
             .click({ force: true });
         cy.wait(1000);
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.getIframeBody().find("#view-view_1_2D").click();
+        cy.wait(1000);
+        cy.compareSnapshot("hide_hillshading_layer");
     });
 
     it("Should hide property layer", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.getIframeBody()
-            .find('[id="Property map-switch-label"]')
+            .find('[id="Property map-switch"]')
             .click({ force: true });
         cy.wait(1000);
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
-    });
-
-    it("Should display grid layer", () => {
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.getIframeBody()
-            .find('[id="Property map-switch-label"]')
-            .click({ force: true });
-        cy.getIframeBody()
-            .find('[id="Hill shading-switch-label"]')
-            .click({ force: true });
-        cy.getIframeBody()
-            .find('[id="Grid-switch-label"]')
-            .click({ force: true });
+        cy.getIframeBody().find("#view-view_1_2D").click();
         cy.wait(1000);
-        cy.getIframeBody().find('[id="layers-selector-button"]').click();
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("hide_property_layer");
     });
 
     it("Should hide drawing layer", () => {
@@ -119,7 +98,6 @@ describe("Map component", () => {
             .find('[id="drawing-layer-button"]')
             .should("not.exist");
         cy.getIframeBody().find('[id="Drawing-switch"]').click({ force: true });
-        cy.wait(1000);
         cy.getIframeBody().find('[id="drawing-layer-button"]').should("exist");
     });
 });

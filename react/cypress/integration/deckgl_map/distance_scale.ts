@@ -28,8 +28,8 @@ describe("Map component feature", () => {
     it("Should update distance sacle", () => {
         cy.getIframeBody()
             .find("#DeckGL-Map-wrapper")
-            .trigger("wheel", { deltaY: -10, force: true });
+            .trigger("wheel", { deltaY: -50, force: true });
         cy.wait(1000);
-        cy.matchImageSnapshot();
+        cy.compareSnapshot("zoom in");
     });
 });

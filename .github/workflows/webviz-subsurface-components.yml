@@ -97,23 +97,73 @@ jobs:
           pytest ./tests --headless
 
       # Run cypress tests on firefox browser
-      # - name: E2E on firefox
-      #   if: github.event_name != 'release' && matrix.e2e-on-firefox
-      #   uses: cypress-io/github-action@33ec2f03412577367c7c6aac7b646c88e646e33c
-      #   with:
-      #     browser: firefox
-      #     working-directory: ./react
-      #     start: npm run storybook
-      #     wait-on: "http://localhost:6006"
-      # - uses: actions/upload-artifact@v2
+      - name: Cache Cypress
+        if: github.event_name != 'release' && matrix.e2e-on-firefox
+        id: cache-cypress
+        uses: actions/cache@v1
+        with:
+          working-directory: ./react
+          path: ~/.cache/Cypress
+          key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+
+      # now let's install Cypress binary
+      - name: install cypress binary
+        if: github.event_name != 'release' && matrix.e2e-on-firefox
+        run: |
+          cd react
+          npx cypress install
+          npx cypress cache list
+
+      - name: e2e-on-firefox
+        if: github.event_name != 'release' && matrix.e2e-on-firefox
+        run: |
+          cd react
+          npm run start-test
+
+      - name: upload artfacts
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: |
+            react/cypress/screenshots
+            react/cypress/snapshots
+          retention-days: 5
+
+      # - name: check modified files
       #   if: failure()
+      #   run: |
+      #     echo "=============== list untracked files ==============="
+      #     git ls-files --others --exclude-standard
+
+      #     echo "========== check paths of untracked files =========="
+      #     git ls-files --others --exclude-standard > files.txt
+      #     while IFS= read -r file
+      #     do
+      #       echo $file
+      #       if [[ $file = react/cypress/snapshots/*/*/__diff_output__/* ]]; then
+      #         echo "This modified file is under the 'cypress' folder."
+      #         echo "::set-output name=run_job::true"
+      #         break
+      #       else
+      #         echo "::set-output name=run_job::false"
+      #       fi
+      #     done < files.txt
+
+      # - name: Create comment
+      #   needs: check
+      #   if: needs.check.outputs.run_job == 'true'
+      #   uses: peter-evans/create-or-update-comment@v1
       #   with:
-      #     name: cypress-screenshots
-      #     path: |
-      #       react/cypress/screenshots
-      #       react/cypress/snapshots
-      #       !react/cypress/snapshots/*/*.snap.png
-      #     retention-days: 5
+      #     issue-number: ${{ github.event.number }}
+      #     body: |
+      #       Looks like image comparison has failed with some tests. Please check artifacts folder in Actions
+      #       - With GitHub **Markdown** :warning:
+
+      # - name: Run Script
+      #   needs: check
+      #   if: needs.check.outputs.run_job == 'true'
+      #   run: ./cypress_script.sh
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

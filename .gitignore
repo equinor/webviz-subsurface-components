@@ -204,6 +204,10 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# Cypress stuff
+react/cypress/snapshots/actual/*
+react/cypress/snapshots/diff/*
+
 # Translations
 *.mo
 *.pot

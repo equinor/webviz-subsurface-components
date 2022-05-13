@@ -23,18 +23,9 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-import "@testing-library/cypress/add-commands";
+import compareSnapshotCommand from "cypress-visual-regression/dist/command";
 
-// This is based on examples from Gleb's Working with Iframes Cypress blog post.
-// See: https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/
-import { addMatchImageSnapshotCommand } from "cypress-image-snapshot/command";
-
-addMatchImageSnapshotCommand({
-    failureThreshold: 0.1,
-    failureThresholdType: "percent",
-    customDiffConfig: { threshold: 0.0 },
-    capture: "viewport",
-});
+compareSnapshotCommand({ errorThreshold: 0.005 });
 
 Cypress.Commands.add("getIframeBody", () => {
     cy.log("getIframeBody");
