@@ -287,7 +287,7 @@ export const ContinuousColorTable: React.FC = () => {
     const [colorTable, setColorTable] = useState("Physics");
 
     const mapProps = React.useMemo(() => {
-    	return {
+        return {
             ...defaultProps,
             layers: [
                 {
@@ -295,12 +295,11 @@ export const ContinuousColorTable: React.FC = () => {
                     logColor: colorTable,
                 },
             ],
-	    }
+        };
     }, [colorTable]);
 
     const handleOnChange = (event: React.FormEvent) => {
-    	setColorTable((event.target as HTMLInputElement)?.value);
-
+        setColorTable((event.target as HTMLInputElement)?.value);
     };
     return (
         <>
