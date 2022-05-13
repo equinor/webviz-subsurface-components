@@ -10,6 +10,11 @@ interface Props {
      * Initial state of the component.
      */
     value: number;
+
+    min?: number;
+    max?: number;
+    step?: number;
+
     /**
      * Callback to update the state of the component.
      */
@@ -17,7 +22,7 @@ interface Props {
 }
 
 const NumericInput: React.FC<Props> = React.memo(
-    ({ label, value, onChange }: Props) => {
+    ({ label, value, min, max, step, onChange }: Props) => {
         return (
             <div
                 style={{
@@ -39,7 +44,9 @@ const NumericInput: React.FC<Props> = React.memo(
                     type={"number"}
                     value={value}
                     onChange={onChange}
-                    min={0}
+                    min={min}
+                    max={max}
+                    step={step}
                     style={{
                         fontSize: 15,
                         textAlign: "right",
@@ -50,6 +57,11 @@ const NumericInput: React.FC<Props> = React.memo(
         );
     }
 );
+
+NumericInput.defaultProps = {
+    min: 0,
+    step: 1,
+};
 
 NumericInput.displayName = "NumericInput";
 export default NumericInput;
