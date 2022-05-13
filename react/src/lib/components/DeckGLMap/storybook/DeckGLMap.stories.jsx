@@ -276,12 +276,13 @@ const meshMapLayer = {
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
-    propertyValueRange: [2782, 3513],
+    propertyValueRange: [-3071, 41048],
     rotDeg: 0,
-    contours: [0, 50.0],
-    isContoursDepth: false,
+    isContoursDepth: true,
+    contours: [0, 100.0],
     colorMapName: "Physics",
 };
+
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {
     id: "kh-mesh-map",
@@ -459,6 +460,7 @@ GridLayer.args = {
             ...gridLayer,
             visible: true,
         },
+        axes,
     ],
     toolbar: {
         visible: false,
