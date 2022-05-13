@@ -14,6 +14,8 @@ import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
+import * as png from "@vivaxy/png";
+
 
 type MeshType = {
     attributes: {
@@ -176,9 +178,15 @@ async function load_mesh_and_texture(
     }
 
     const image_name = isTexture ? texture_name : mesh_name;
-    const texture = await load(image_name, ImageLoader, {});
+    const texture = await load(image_name, ImageLoader, {
+        image: { type: "data" }, // Will load as ImageData.
+    });
 
-    return Promise.all([mesh, texture]);
+    const meshImageData = await load(mesh_name, ImageLoader, {
+        image: { type: "data" }, // Will load as ImageData.
+    });
+
+    return Promise.all([mesh, meshImageData, texture]);
 }
 
 export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
@@ -265,9 +273,10 @@ export default class Map3DLayer extends CompositeLayer<
             this.props.propertyTexture
         );
 
-        p.then(([mesh, texture]) => {
+        p.then(([mesh, meshImageData, texture]) => {
             this.setState({
                 mesh,
+                meshImageData,
                 texture,
             });
         });
@@ -311,6 +320,9 @@ export default class Map3DLayer extends CompositeLayer<
             >({
                 mesh: this.state.mesh,
                 texture: this.state.texture,
+                textureImageData: this.state.texture,
+                meshImageData: this.state.meshImageData,
+                meshValueRange:this.props.meshValueRange,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
