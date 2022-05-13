@@ -284,33 +284,34 @@ Wells3dDashed.parameters = {
 };
 
 export const ContinuousColorTable: React.FC = () => {
-    const [mapProps, setMapProps] = useState({
-        ...defaultProps,
-        layers: [continuousLogsLayer],
-    });
+    const [colorTable, setColorTable] = useState("Physics");
 
-    const handleOnChange = (event: React.FormEvent) => {
-        console.log(event);
-        setMapProps({
+    const mapProps = React.useMemo(() => {
+    	return {
             ...defaultProps,
             layers: [
                 {
                     ...continuousLogsLayer,
-                    logColor: (event.target as HTMLInputElement)?.value,
+                    logColor: colorTable,
                 },
             ],
-        });
+	    }
+    }, [colorTable]);
+
+    const handleOnChange = (event: React.FormEvent) => {
+    	setColorTable((event.target as HTMLInputElement)?.value);
+
     };
     return (
         <>
             <NativeSelect
                 id={"test"}
                 label={"Color table"}
-                value={"Physics"}
+                value={colorTable}
                 onChange={handleOnChange}
             >
-                <option key={"physics"}>{"Physics"}</option>
-                <option key={"rainbow"}>{"Rainbow"}</option>
+                <option key={"Physics"}>{"Physics"}</option>
+                <option key={"Rainbow"}>{"Rainbow"}</option>
             </NativeSelect>
             {
                 <div style={{ height: "80vh", position: "relative" }}>
