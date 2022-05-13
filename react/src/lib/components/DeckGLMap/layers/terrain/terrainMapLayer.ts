@@ -74,6 +74,15 @@ export type DataItem = {
 export type TerrainMapLayerData = [DataItem?];
 
 export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
+    // texture as ImageData.
+    textureImageData: ImageData;
+
+    // mesh  as ImageData.
+    meshImageData: ImageData;
+
+    // Min and max of map height values values.
+    meshValueRange: [number, number];
+
     // Contourlines reference point and interval.
     contours: [number, number];
 
@@ -101,7 +110,7 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
     colorMapClampColor: RGBColor | undefined | boolean;
 
     //If true readout will be z value (depth). Otherwise it is the texture property value.
-    isReadoutDepth: boolean;
+    isReadoutDepth: boolean;  // XXX denne skal fjernes.
 }
 
 const defaultProps = {
@@ -116,6 +125,9 @@ const defaultProps = {
     isReadoutDepth: false,
     isContoursDepth: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+    textureImageData: { value: null, type: "object", async: true },
+    meshImageData: { value: null, type: "object", async: true },
+    meshValueRange: [0.0, 1.0],
 };
 
 // This is a private layer used only by the composite Map3DLayer.
@@ -220,21 +232,77 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
             return info;
         }
 
+        ///////////////////
+        // Texture coordinates.
+        const s = info.color[0] / 255.0;
+        const t = info.color[1] / 255.0;
+  
+
+        // MESH HEIGHT VALUE.
+        const meshImageData: ImageData = this.props.meshImageData;
+        //console.log(meshImageData)
+        const int_view_property_mesh = new Uint8ClampedArray(
+            meshImageData.data,
+            0,
+            meshImageData.data.length
+        );
+
+        const w_mesh = meshImageData.width;
+        const h_mesh = meshImageData.height;
+        const j_mesh = Math.min(Math.floor(w_mesh * s), w_mesh - 1);
+        const i_mesh = Math.min(Math.floor(h_mesh * t), h_mesh - 1);
+        const pixelNo_mesh = i_mesh * w_mesh + j_mesh;
+
+        const r_mesh = int_view_property_mesh[pixelNo_mesh * 4 + 0] * DECODER.rScaler;
+        const g_mesh = int_view_property_mesh[pixelNo_mesh * 4 + 1] * DECODER.gScaler;
+        const b_mesh = int_view_property_mesh[pixelNo_mesh * 4 + 2] * DECODER.bScaler;
+        const a_mesh = int_view_property_mesh[pixelNo_mesh * 4 + 3];
+        const value_mesh = r_mesh + g_mesh + b_mesh;
+
+
+
+        // TEXTURE PROPERTY VALUE.
+        const textureImageData: ImageData = this.props.textureImageData;
+        const int_view_property = new Uint8ClampedArray(
+            textureImageData.data,
+            0,
+            textureImageData.data.length
+        );
+
+        const w = textureImageData.width;
+        const h = textureImageData.height;
+        const j = Math.min(Math.floor(w *  s), w - 1);
+        const i = Math.min(Math.floor(h * t), h - 1);
+        const pixelNo = i * w + j;
+
+        if (w !== w_mesh || h !== h_mesh) {
+            console.log("SKANDALE")
+        }
+
+        // valueString =
+        //     "Property: " +
+        //     (!Number.isNaN(value) && value !== undefined
+        //         ? value.toFixed(1)
+        //         : " - ");
+        ///////////////////////////////////////        
+
         // Note these colors are in the  0-255 range.
-        const r = info.color[0] * DECODER.rScaler;
-        const g = info.color[1] * DECODER.gScaler;
-        const b = info.color[2] * DECODER.bScaler;
+        const r = int_view_property[pixelNo * 4 + 0] * DECODER.rScaler;
+        const g = int_view_property[pixelNo * 4 + 1] * DECODER.gScaler;
+        const b = int_view_property[pixelNo * 4 + 2] * DECODER.bScaler;
+        const a = int_view_property[pixelNo * 4 + 3];
         const value = r + g + b;
 
-        let depth = undefined;
+        let depth = 9.99;
         const layer_properties: PropertyDataType[] = [];
 
         // Either map properties or map depths are encoded here.
-        if (this.props.isReadoutDepth) depth = value.toFixed(2);
-        else
-            layer_properties.push(
-                getMapProperty(value, this.props.propertyValueRange)
-            );
+        // if (this.props.isReadoutDepth) depth = value.toFixed(2);
+        // else
+        layer_properties.push(
+            getMapProperty("Property", value, this.props.propertyValueRange),
+            getMapProperty("Depth", value, this.props.meshValueRange)
+        );
 
         return {
             ...info,
@@ -244,12 +312,15 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     }
 }
 
+// XXX husk aa fjerne at man kan velge deppth eller value i gui,,,
+
 TerrainMapLayer.layerName = "TerrainMapLayer";
 TerrainMapLayer.defaultProps = defaultProps;
 
 //================= Local help functions. ==================
 
 function getMapProperty(
+    name: string,
     value: number,
     value_range: [number, number]
 ): PropertyDataType {
@@ -260,5 +331,5 @@ function getMapProperty(
     const scaled_value = value * floatScaler;
 
     value = scaled_value * (max - min) + min;
-    return createPropertyData("Property", value);
+    return createPropertyData(name, value);
 }
