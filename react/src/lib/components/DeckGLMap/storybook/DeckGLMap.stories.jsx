@@ -276,9 +276,9 @@ const meshMapLayer = {
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
-    propertyValueRange: [2782, 3513],
+    propertyValueRange: [-3071, 41048],  //[-3071, 41048],  [2782, 3513] // XXX
     rotDeg: 0,
-    contours: [0, 50.0],
+    contours: [0, 5000.0],
     isContoursDepth: false,
     colorMapName: "Physics",
 };
