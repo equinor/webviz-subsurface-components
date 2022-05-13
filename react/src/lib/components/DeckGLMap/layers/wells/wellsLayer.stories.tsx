@@ -283,35 +283,40 @@ Wells3dDashed.parameters = {
     },
 };
 
-export const ContinuousColorTable = () => {
-  const [mapProps, setMapProps] = useState({
-	...defaultProps,
-	layers: [
-		continuousLogsLayer
-	],
-  });
+export const ContinuousColorTable: React.FC = () => {
+    const [mapProps, setMapProps] = useState({
+        ...defaultProps,
+        layers: [continuousLogsLayer],
+    });
 
-  const handleOnChange = (event: React.FormEvent) => {
-	console.log(event);
-	setMapProps({
-		...defaultProps,
-		layers: [
-			{
-				...continuousLogsLayer,
-				logColor: (event.target as HTMLInputElement)?.value,
-			},
-		],
-	});
-  };
-  return (<>
-		<NativeSelect
-			id={"test"}
-			label={"Color table"}
-			value={"Physics"}
-			onChange={handleOnChange}>
-			<option key={"physics"}>{"Physics"}</option>
-			<option key={"rainbow"}>{"Rainbow"}</option>
-		</NativeSelect>
-	{<div style={{ height: '80vh', position: 'relative' }}><DeckGLMap {...mapProps} /></div>}
-	</>);
+    const handleOnChange = (event: React.FormEvent) => {
+        console.log(event);
+        setMapProps({
+            ...defaultProps,
+            layers: [
+                {
+                    ...continuousLogsLayer,
+                    logColor: (event.target as HTMLInputElement)?.value,
+                },
+            ],
+        });
+    };
+    return (
+        <>
+            <NativeSelect
+                id={"test"}
+                label={"Color table"}
+                value={"Physics"}
+                onChange={handleOnChange}
+            >
+                <option key={"physics"}>{"Physics"}</option>
+                <option key={"rainbow"}>{"Rainbow"}</option>
+            </NativeSelect>
+            {
+                <div style={{ height: "80vh", position: "relative" }}>
+                    <DeckGLMap {...mapProps} />
+                </div>
+            }
+        </>
+    );
 };
