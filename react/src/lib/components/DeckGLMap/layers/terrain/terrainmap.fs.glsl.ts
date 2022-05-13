@@ -54,22 +54,20 @@ void main(void) {
 
    float texture_alpha = color.a;
 
-   // // Discard transparent pixels.
-   // if (!picking_uActive && color.w < 1.0) {
-   //       discard;
-   //       return;
-   // }
+   // Discard transparent pixels.
+   if (!picking_uActive && color.w < 1.0) {
+         discard;
+         return;
+   }
 
    // Picking pass.
    if (picking_uActive) {
       // Send texture coordinates.
       float s = vTexCoord.x;
       float t = vTexCoord.y;
+      float b = texture_alpha > 0.95 ? 255.0 : 0.0;
 
-      //float g = texture_alpha; //XXX texture_alpha == 1.0 ? 255.0 : 0.0;
-      float g = texture_alpha > 0.95 ? 255.0 : 0.0;
-
-      fragColor = vec4(s, t, g, 1.0);
+      fragColor = vec4(s, t, b, 1.0);
       return;
    }
 
