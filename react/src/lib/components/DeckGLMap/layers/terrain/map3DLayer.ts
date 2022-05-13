@@ -14,6 +14,8 @@ import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
+import * as png from "@vivaxy/png";
+
 
 type MeshType = {
     attributes: {
