@@ -108,9 +108,6 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
     // If not set or set to true, it will clamp to color map min and max values.
     // If set to false the clamp color will be completely transparent.
     colorMapClampColor: RGBColor | undefined | boolean;
-
-    //If true readout will be z value (depth). Otherwise it is the texture property value.
-    isReadoutDepth: boolean;  // XXX denne skal fjernes.
 }
 
 const defaultProps = {
@@ -122,7 +119,6 @@ const defaultProps = {
     contours: [-1, -1],
     colorMapName: "",
     propertyValueRange: [0.0, 1.0],
-    isReadoutDepth: false,
     isContoursDepth: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     textureImageData: { value: null, type: "object", async: true },
@@ -142,7 +138,6 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     draw({ uniforms, context }: any): void {
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
         const contourInterval = this.props.contours[1] ?? -1.0;
-        const isReadoutDepth = this.props.isReadoutDepth;
         const isContoursDepth = this.props.isContoursDepth;
 
         const valueRangeMin = this.props.propertyValueRange[0] ?? 0.0;
@@ -190,7 +185,6 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                 colorMapRangeMax,
                 contourReferencePoint,
                 contourInterval,
-                isReadoutDepth,
                 isContoursDepth,
                 colorMapClampColor,
                 isColorMapClampColorTransparent,

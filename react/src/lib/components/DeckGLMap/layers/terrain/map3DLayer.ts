@@ -14,8 +14,6 @@ import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
-import * as png from "@vivaxy/png";
-
 
 type MeshType = {
     attributes: {
@@ -239,9 +237,6 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Takes a value in the range [0,1] and returns a color.
     colorMapFunction?: colorMapFunctionType;
 
-    // If true readout will be z value (depth). Otherwise it is the texture property value.
-    isReadoutDepth: boolean;
-
     // Will calculate normals and enable phong shading.
     enableSmoothShading: boolean;
 
@@ -322,7 +317,7 @@ export default class Map3DLayer extends CompositeLayer<
                 texture: this.state.texture,
                 textureImageData: this.state.texture,
                 meshImageData: this.state.meshImageData,
-                meshValueRange:this.props.meshValueRange,
+                meshValueRange: this.props.meshValueRange,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
@@ -331,7 +326,6 @@ export default class Map3DLayer extends CompositeLayer<
                 propertyValueRange: this.props.propertyValueRange,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
-                isReadoutDepth: this.props.isReadoutDepth,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
                 material: this.props.material,
             })
