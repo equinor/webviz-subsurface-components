@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { NativeSelect } from "@equinor/eds-core-react";
 
 export default {
     component: DeckGLMap,
@@ -28,6 +29,16 @@ const defaultProps = {
             data: "@@#resources.wellsData",
         },
     ],
+};
+
+const continuousLogsLayer = {
+    ...defaultProps.layers[0],
+    refine: false,
+    outline: false,
+    logData: "./volve_logs.json",
+    logrunName: "BLOCKING",
+    logName: "PORO",
+    logColor: "Physics",
 };
 
 // Volve wells default example.
@@ -73,17 +84,7 @@ DiscreteWellLogs.parameters = {
 export const ContinuousWellLogs = Template.bind({});
 ContinuousWellLogs.args = {
     ...defaultProps,
-    layers: [
-        {
-            ...defaultProps.layers[0],
-            refine: false,
-            outline: false,
-            logData: "./volve_logs.json",
-            logrunName: "BLOCKING",
-            logName: "PORO",
-            logColor: "Physics",
-        },
-    ],
+    layers: [continuousLogsLayer],
 };
 ContinuousWellLogs.parameters = {
     docs: {
@@ -280,4 +281,37 @@ Wells3dDashed.parameters = {
         inlineStories: false,
         iframeHeight: 500,
     },
+};
+
+export const ContinuousColorTable = () => {
+  const [mapProps, setMapProps] = useState({
+	...defaultProps,
+	layers: [
+		continuousLogsLayer
+	],
+  });
+
+  const handleOnChange = (event: React.FormEvent) => {
+	console.log(event);
+	setMapProps({
+		...defaultProps,
+		layers: [
+			{
+				...continuousLogsLayer,
+				logColor: (event.target as HTMLInputElement)?.value,
+			},
+		],
+	});
+  };
+  return (<>
+		<NativeSelect
+			id={"test"}
+			label={"Color table"}
+			value={"Physics"}
+			onChange={handleOnChange}>
+			<option key={"physics"}>{"Physics"}</option>
+			<option key={"rainbow"}>{"Rainbow"}</option>
+		</NativeSelect>
+	{<div style={{ height: '80vh', position: 'relative' }}><DeckGLMap {...mapProps} /></div>}
+	</>);
 };
