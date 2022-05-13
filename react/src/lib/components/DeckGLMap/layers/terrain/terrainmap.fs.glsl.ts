@@ -8,7 +8,6 @@ uniform sampler2D sampler;
 uniform bool flatShading;
 uniform float opacity;
 
-uniform bool isReadoutDepth;
 uniform bool isContoursDepth;
 
 uniform float contourReferencePoint;
@@ -66,7 +65,6 @@ void main(void) {
       float t = vTexCoord.y;
 
       fragColor = vec4(s, t, 0.0, 1.0);
-
       return;
    }
 
