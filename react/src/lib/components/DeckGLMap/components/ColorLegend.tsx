@@ -1,12 +1,10 @@
 import React from "react";
 import { Layer } from "deck.gl";
-import { WellsLayer } from "../layers";
 import {
     DiscreteColorLegend,
     ContinuousLegend,
 } from "@emerson-eps/color-tables";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import { getLayersByType } from "../layers/utils/layerTools";
 
 interface ColorLegendProps {
     position?: number[] | null;
@@ -43,19 +41,12 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         },
     ]);
 
-    //layers will have entries of unique type only
-    const wellsLayer = React.useMemo(
-        () => getLayersByType(layers, "WellsLayer")?.[0] as WellsLayer,
-        [layers]
-    );
-
     // Get color table for log curves.
     React.useEffect(() => {
-        // needed else throw error
-        if (!layers || !wellsLayer?.isLoaded) return;
+        if (!layers) return;
         const getLegendData: any = [];
         layers.map((layer: any) => {
-            if (layer.id == "wells-layer") {
+            if (layer?.id == "wells-layer" && layer?.isLoaded) {
                 getLegendData.push({
                     title: layer?.state?.legend[0].title,
                     colorName: layer?.props?.logColor,
@@ -65,25 +56,27 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     visible: layer?.props?.visible,
                 });
             }
-            if (layer.id == "colormap-layer") {
+            if (layer?.id == "colormap-layer" && layer?.isLoaded) {
+                const min = layer?.state.model.uniforms.colorMapRangeMin
+                const max = layer?.state.model.uniforms.colorMapRangeMax
                 getLegendData.push({
-                    title: "colorMapLayer",
+                    title: layer?.props?.name,
                     colorName: layer?.props?.colorMapName,
                     discrete: false,
                     metadata: { objects: {} },
-                    valueRange: [0, 1],
+                    valueRange: [min, max],
                     visible: layer?.props?.visible,
                 });
             }
         });
         setLegendProps(getLegendData);
-    }, [layers, wellsLayer?.isLoaded]);
+    }, [layers]);
 
     return (
         <div
-            // className="flex-container" style={{display: "flex"}}
             style={{
                 position: "absolute",
+                display: "flex",
                 right: position ? position[0] : " ",
                 top: position ? position[1] : " ",
                 zIndex: 999,
