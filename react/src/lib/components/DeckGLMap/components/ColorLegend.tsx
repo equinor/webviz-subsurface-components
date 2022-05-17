@@ -9,7 +9,7 @@ import { colorTablesArray } from "@emerson-eps/color-tables/";
 interface ColorLegendProps {
     position?: number[] | null;
     horizontal?: boolean | null;
-    layers: Layer<unknown>[] | any;
+    layers: Layer<unknown>[];
     colorTables: colorTablesArray;
 }
 
@@ -44,7 +44,9 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     // Get color table for log curves.
     React.useEffect(() => {
         if (!layers) return;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const getLegendData: any = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         layers.map((layer: any) => {
             if (layer?.id == "wells-layer" && layer?.isLoaded) {
                 getLegendData.push({
@@ -57,8 +59,8 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                 });
             }
             if (layer?.id == "colormap-layer" && layer?.isLoaded) {
-                const min = layer?.state.model.uniforms.colorMapRangeMin
-                const max = layer?.state.model.uniforms.colorMapRangeMax
+                const min = layer?.state.model.uniforms.colorMapRangeMin;
+                const max = layer?.state.model.uniforms.colorMapRangeMax;
                 getLegendData.push({
                     title: layer?.props?.name,
                     colorName: layer?.props?.colorMapName,
