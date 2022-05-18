@@ -48,7 +48,11 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         const getLegendData: any = [];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         layers.map((layer: any) => {
-            if (layer?.id == "wells-layer" && layer?.isLoaded) {
+            if (
+                layer?.id == "wells-layer" &&
+                layer?.isLoaded &&
+                Object.keys(layer?.state).length > 0
+            ) {
                 getLegendData.push({
                     title: layer?.state?.legend[0].title,
                     colorName: layer?.props?.logColor,
@@ -58,7 +62,11 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     visible: layer?.props?.visible,
                 });
             }
-            if (layer?.id == "colormap-layer" && layer?.isLoaded) {
+            if (
+                layer?.id == "colormap-layer" &&
+                layer?.isLoaded &&
+                Object.keys(layer?.state).length > 0
+            ) {
                 const min = layer?.state.model.uniforms.colorMapRangeMin;
                 const max = layer?.state.model.uniforms.colorMapRangeMax;
                 getLegendData.push({
@@ -85,9 +93,9 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
             }}
         >
             {legendProps.map(
-                (legend) =>
+                (legend, index) =>
                     legend.visible && (
-                        <div>
+                        <div key={index}>
                             {legend.discrete && (
                                 <DiscreteColorLegend
                                     discreteData={legend.metadata}
