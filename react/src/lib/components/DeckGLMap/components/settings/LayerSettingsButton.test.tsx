@@ -119,10 +119,11 @@ describe("test layers settings button", () => {
         const trajectory_thickness = screen.getAllByRole("spinbutton", {
             name: "",
         })[0];
+        userEvent.clear(trajectory_thickness);
         userEvent.type(trajectory_thickness, "7");
-        expect(testStore.dispatch).toHaveBeenCalledTimes(9);
-        expect(testStore.dispatch).toHaveBeenNthCalledWith(9, {
-            payload: ["wells-layer", "lineWidthScale", 57],
+        expect(testStore.dispatch).toHaveBeenCalledTimes(10);
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(10, {
+            payload: ["wells-layer", "lineWidthScale", 7],
             type: "spec/updateLayerProp",
         });
     });
@@ -141,8 +142,8 @@ describe("test layers settings button", () => {
         const wells_layer_settings_menu = screen.getByRole("menu");
         expect(wells_layer_settings_menu).toBeInTheDocument();
         fireEvent.change(screen.getByRole("slider"), { target: { value: 25 } });
-        expect(testStore.dispatch).toHaveBeenCalledTimes(11);
-        expect(testStore.dispatch).toHaveBeenNthCalledWith(11, {
+        expect(testStore.dispatch).toHaveBeenCalledTimes(12);
+        expect(testStore.dispatch).toHaveBeenNthCalledWith(12, {
             payload: ["wells-layer", "opacity", 0.25],
             type: "spec/updateLayerProp",
         });

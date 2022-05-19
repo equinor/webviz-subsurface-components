@@ -142,7 +142,7 @@ const customLayerWithPolylineData = {
             },
         ],
     },
-    lineWidthScale: 20,
+    getLineWidth: 20,
     lineWidthMinPixels: 2,
 };
 
@@ -167,7 +167,7 @@ const customLayerWithPolygonData = {
             ],
         },
     },
-    lineWidthScale: 20,
+    getLineWidth: 20,
     lineWidthMinPixels: 2,
     getLineColor: [0, 255, 255],
     getFillColor: [0, 255, 0],

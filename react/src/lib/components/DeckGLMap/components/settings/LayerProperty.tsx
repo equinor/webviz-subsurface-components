@@ -29,7 +29,7 @@ const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
 
     const isControlDisplayable = (
         propId: string,
-        dependentOnProp: string | undefined
+        dependentOnProp?: string
     ): boolean => {
         if (!layer) return false;
 
@@ -44,21 +44,24 @@ const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
                 {
                     // first render all boolean properties
                     ToggleTypeProps.map(
-                        ({ id, displayName, dependentOnProp }) =>
-                            isControlDisplayable(id, dependentOnProp) && (
+                        (prop) =>
+                            isControlDisplayable(
+                                prop.id,
+                                prop.dependentOnProp
+                            ) && (
                                 <ToggleButton
-                                    label={displayName}
-                                    checked={layer[id] as boolean}
+                                    label={prop.displayName}
+                                    checked={layer[prop.id] as boolean}
                                     onChange={(
                                         e: ChangeEvent<HTMLInputElement>
                                     ) => {
                                         updateProp(
                                             layer["id"],
-                                            id,
+                                            prop.id,
                                             e.target.checked
                                         );
                                     }}
-                                    key={`prop-toggle-${layer["id"]}-${id}`}
+                                    key={`prop-toggle-${layer["id"]}-${prop.id}`}
                                 />
                             )
                     )
@@ -67,21 +70,25 @@ const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
                 {
                     // then render all numeric properties
                     NumericTypeProps.map(
-                        ({ id, displayName, dependentOnProp }) =>
-                            isControlDisplayable(id, dependentOnProp) && (
+                        (prop) =>
+                            isControlDisplayable(
+                                prop.id,
+                                prop.dependentOnProp
+                            ) && (
                                 <NumericInput
-                                    label={displayName}
-                                    value={layer[id] as number}
+                                    label={prop.displayName}
+                                    value={layer[prop.id] as number}
+                                    step={prop.step}
                                     onChange={(
                                         e: ChangeEvent<HTMLInputElement>
                                     ) => {
                                         updateProp(
                                             layer["id"],
-                                            id,
+                                            prop.id,
                                             Number(e.target.value)
                                         );
                                     }}
-                                    key={`prop-numeric-input-${layer["id"]}-${id}`}
+                                    key={`prop-numeric-input-${layer["id"]}-${prop.id}`}
                                 />
                             )
                     )
@@ -90,32 +97,28 @@ const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
                 {
                     // then render all slider properties
                     SliderTypeProps.map(
-                        ({
-                            id,
-                            displayName,
-                            min,
-                            max,
-                            step,
-                            dependentOnProp,
-                        }) =>
-                            isControlDisplayable(id, dependentOnProp) && (
+                        (prop) =>
+                            isControlDisplayable(
+                                prop.id,
+                                prop.dependentOnProp
+                            ) && (
                                 <SliderInput
-                                    label={displayName}
-                                    min={min}
-                                    max={max}
-                                    step={step}
-                                    value={layer[id] as number}
+                                    label={prop.displayName}
+                                    min={prop.min}
+                                    max={prop.max}
+                                    step={prop.step}
+                                    value={layer[prop.id] as number}
                                     onChange={(
                                         _: FormEvent<HTMLDivElement>,
                                         value: number | number[]
                                     ) => {
                                         updateProp(
                                             layer["id"],
-                                            id,
+                                            prop.id,
                                             (value as number) / 100
                                         );
                                     }}
-                                    key={`prop-slider-${layer["id"]}-${id}`}
+                                    key={`prop-slider-${layer["id"]}-${prop.id}`}
                                 />
                             )
                     )
@@ -124,13 +127,16 @@ const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
                 {
                     // lastly render all menu type properties
                     MenuTypeProps.map(
-                        ({ id, displayName, dependentOnProp }) =>
-                            isControlDisplayable(id, dependentOnProp) && (
+                        (prop) =>
+                            isControlDisplayable(
+                                prop.id,
+                                prop.dependentOnProp
+                            ) && (
                                 <DrawModeSelector
                                     layerId={layer["id"] as string}
-                                    label={displayName}
-                                    value={layer[id] as string}
-                                    key={`prop-menu-${layer["id"]}-${id}`}
+                                    label={prop.displayName}
+                                    value={layer[prop.id] as string}
+                                    key={`prop-menu-${layer["id"]}-${prop.id}`}
                                 />
                             )
                     )

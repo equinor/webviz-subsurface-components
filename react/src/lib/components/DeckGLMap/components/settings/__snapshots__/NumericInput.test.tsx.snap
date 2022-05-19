@@ -114,6 +114,7 @@ exports[`Test Numeric Input snapshot test 1`] = `
     class="c2"
     id="Trajectory thickness-input"
     min="0"
+    step="1"
     style="font-size: 15px; text-align: right; width: 3rem;"
     type="number"
     value="15"
