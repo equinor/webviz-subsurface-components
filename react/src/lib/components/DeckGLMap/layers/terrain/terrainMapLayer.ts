@@ -230,6 +230,12 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const s = info.color[0] / 255.0;
         const t = info.color[1] / 255.0;
 
+        const is_outside: boolean = info.color[2] == 0;
+        if (is_outside) {
+            // Mouse is outside the non-transparent part of the map.
+            return info;
+        }
+
         // MESH HEIGHT VALUE.
         const meshImageData: ImageData = this.props.meshImageData;
         const value_mesh = getValue(meshImageData, s, t, DECODER);

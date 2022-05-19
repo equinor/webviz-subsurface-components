@@ -52,6 +52,8 @@ void main(void) {
 
    vec4 color = hasTexture ? texture(sampler, vTexCoord) : vColor;
 
+   float texture_alpha = color.a;
+
    // Discard transparent pixels.
    if (!picking_uActive && color.w < 1.0) {
          discard;
@@ -64,7 +66,9 @@ void main(void) {
       float s = vTexCoord.x;
       float t = vTexCoord.y;
 
-      fragColor = vec4(s, t, 0.0, 1.0);
+      float g = texture_alpha == 1.0 ? 255.0 : 0.0;
+
+      fragColor = vec4(s, t, g, 1.0);
       return;
    }
 
