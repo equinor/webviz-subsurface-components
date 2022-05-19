@@ -229,7 +229,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         // Texture coordinates.
         const s = info.color[0] / 255.0;
         const t = info.color[1] / 255.0;
- 
+
         // MESH HEIGHT VALUE.
         const meshImageData: ImageData = this.props.meshImageData;
         const value_mesh = getValue(meshImageData, s, t, DECODER);
@@ -238,17 +238,19 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const textureImageData: ImageData = this.props.textureImageData;
         const value_property = getValue(textureImageData, s, t, DECODER);
 
-
         const layer_properties: PropertyDataType[] = [];
         layer_properties.push(
-            getMapProperty("Property", value_mesh, this.props.propertyValueRange),
+            getMapProperty(
+                "Property",
+                value_mesh,
+                this.props.propertyValueRange
+            ),
             getMapProperty("Depth", value_property, this.props.meshValueRange)
         );
 
         return {
             ...info,
             properties: layer_properties,
-            propertyValue: depth,
         };
     }
 }
@@ -273,7 +275,12 @@ function getMapProperty(
     return createPropertyData(name, value);
 }
 
-function getValue(imageData: ImageData, s: number, t: number, decoder: { rScaler: number; gScaler: number; bScaler: number; }): number {
+function getValue(
+    imageData: ImageData,
+    s: number,
+    t: number,
+    decoder: { rScaler: number; gScaler: number; bScaler: number }
+): number {
     const int_view = new Uint8ClampedArray(
         imageData.data,
         0,
@@ -282,7 +289,7 @@ function getValue(imageData: ImageData, s: number, t: number, decoder: { rScaler
 
     const w = imageData.width;
     const h = imageData.height;
-    const j = Math.min(Math.floor(w *  s), w - 1);
+    const j = Math.min(Math.floor(w * s), w - 1);
     const i = Math.min(Math.floor(h * t), h - 1);
     const pixelNo = i * w + j;
 
@@ -290,7 +297,7 @@ function getValue(imageData: ImageData, s: number, t: number, decoder: { rScaler
     const r = int_view[pixelNo * 4 + 0] * decoder.rScaler;
     const g = int_view[pixelNo * 4 + 1] * decoder.gScaler;
     const b = int_view[pixelNo * 4 + 2] * decoder.bScaler;
-    const a = int_view[pixelNo * 4 + 3];
+    //const a = int_view[pixelNo * 4 + 3];
     const value = r + g + b;
 
     return value;
