@@ -28,7 +28,6 @@ WellsSettings.args = {
         "@@type": "WellsLayer",
         id: "wells-layer",
         opacity: 1,
-        lineWidthScale: 5,
         pointRadiusScale: 8,
         visible: true,
     },

@@ -14,7 +14,8 @@ import { getModelMatrix, colorMapFunctionType } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import fsColormap from "./colormap.fs.glsl";
 import { DeckGLLayerContext } from "../../components/Map";
-import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { getRgbData } from "@emerson-eps/color-tables";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -36,7 +37,7 @@ function getImageData(
         const value = i / 255.0;
         const rgb = isColorMapFunctionDefined
             ? (colorMapFunction as colorMapFunctionType)(i / 255)
-            : rgbValues(value, colorMapName, colorTables);
+            : getRgbData(value, colorMapName, colorTables);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
