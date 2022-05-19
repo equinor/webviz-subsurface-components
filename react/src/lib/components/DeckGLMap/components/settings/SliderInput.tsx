@@ -13,15 +13,15 @@ interface Props {
     /**
      * Min value.
      */
-    min: number;
+    min?: number;
     /**
      * Max value.
      */
-    max: number;
+    max?: number;
     /**
      * Stepping interval.
      */
-    step: number;
+    step?: number;
     /**
      * Callback to update the state of the component.
      */
