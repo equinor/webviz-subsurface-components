@@ -23,7 +23,6 @@ import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
 import {
     applyPropsOnLayers,
-    getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
@@ -33,6 +32,7 @@ import {
     validateLayers,
 } from "../../../inputSchema/schemaValidationUtil";
 import { DrawingPickInfo } from "../layers/drawing/drawingLayer";
+import { getLayersByType } from "../layers/utils/layerTools";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
@@ -463,12 +463,16 @@ const Map: React.FC<MapProps> = ({
                             {colorTables && legend?.visible && (
                                 <ColorLegend
                                     {...legend}
-                                    layers={
-                                        getLayersInViewport(
-                                            deckGLLayers,
-                                            view.layerIds
-                                        ) as Layer<unknown>[]
-                                    }
+                                    layers={[
+                                        getLayersByType(
+                                            deckRef.current?.deck.props.layers,
+                                            "WellsLayer"
+                                        )?.[0],
+                                        getLayersByType(
+                                            deckRef.current?.deck.props.layers,
+                                            "ColormapLayer"
+                                        )?.[0],
+                                    ]}
                                     colorTables={colorTables}
                                 />
                             )}
