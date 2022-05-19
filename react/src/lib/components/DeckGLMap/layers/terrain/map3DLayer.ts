@@ -311,7 +311,7 @@ export default class Map3DLayer extends CompositeLayer<
             >({
                 mesh: this.state.mesh,
                 texture: this.state.texture,
-                pickable: this.props.pickable,
+                pickable: true,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
                 colorMapName: this.props.colorMapName,
