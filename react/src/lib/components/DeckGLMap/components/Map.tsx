@@ -33,9 +33,8 @@ import {
 } from "../../../inputSchema/schemaValidationUtil";
 import { DrawingPickInfo } from "../layers/drawing/drawingLayer";
 import { getLayersByType } from "../layers/utils/layerTools";
-
-import { getLayersByType } from "../layers/utils/layerTools";
 import { WellsLayer } from "../layers";
+
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");

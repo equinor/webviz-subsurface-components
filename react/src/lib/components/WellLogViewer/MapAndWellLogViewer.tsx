@@ -10,8 +10,8 @@ import {
     TemplatePlotTypes,
 } from "./components/WellLogTemplateTypes";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const template =
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     require("../../../demo/example-data/welllog_template_2.json") as Template;
 import { WellLog } from "./components/WellLogTypes";
 const welllogs =
@@ -19,7 +19,7 @@ const welllogs =
     require("../../../demo/example-data/volve_logs.json") as WellLog[];
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("@emerson-eps/color-tables/src/component/color-tables.json");
+const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 //const colorTables = require("../../../demo/example-data/color-tables.json");
 
 import { WellLogController } from "./components/WellLogView";

@@ -82,7 +82,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         setLegendProps(getLegendData);
     }, [layers]);
 
-
     return (
         <div
             style={{
