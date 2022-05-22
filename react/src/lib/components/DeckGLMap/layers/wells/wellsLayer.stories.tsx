@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { NativeSelect } from "@equinor/eds-core-react";
 
 export default {
     component: DeckGLMap,
+    title: "DeckGLMap / Wells Layer",
 } as ComponentMeta<typeof DeckGLMap>;
 
 const Template: ComponentStory<typeof DeckGLMap> = (args) => (
@@ -29,13 +31,65 @@ const defaultProps = {
     ],
 };
 
-// Volve kh netmap data, flat surface
+const continuousLogsLayer = {
+    ...defaultProps.layers[0],
+    refine: false,
+    outline: false,
+    logData: "./volve_logs.json",
+    logrunName: "BLOCKING",
+    logName: "PORO",
+    logColor: "Physics",
+};
+
+// Volve wells default example.
 export const VolveWells = Template.bind({});
 VolveWells.args = defaultProps;
 VolveWells.parameters = {
     docs: {
         description: {
             story: "Volve wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+// Volve wells with logs.
+//
+export const DiscreteWellLogs = Template.bind({});
+DiscreteWellLogs.args = {
+    ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            refine: false,
+            outline: false,
+            logData: "./volve_logs.json",
+            logrunName: "BLOCKING",
+            logName: "ZONELOG",
+            logColor: "Stratigraphy",
+        },
+    ],
+};
+DiscreteWellLogs.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with well logs.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const ContinuousWellLogs = Template.bind({});
+ContinuousWellLogs.args = {
+    ...defaultProps,
+    layers: [continuousLogsLayer],
+};
+ContinuousWellLogs.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with well logs.",
         },
         inlineStories: false,
         iframeHeight: 500,
@@ -86,6 +140,28 @@ CustomColoredWells.parameters = {
     },
 };
 
+export const CustomWidthWells = Template.bind({});
+CustomWidthWells.args = {
+    ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            lineStyle: { width: 10 },
+            refine: false,
+            outline: false,
+        },
+    ],
+};
+CustomColoredWells.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with thick lines.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 function colorCallback(object: Record<string, Record<string, unknown>>) {
     if ((object["properties"]["name"] as string).match("15/9-F-10"))
         return [0, 0, 0, 0];
@@ -99,13 +175,23 @@ function dashCallback(object: Record<string, Record<string, unknown>>) {
     else return false;
 }
 
+function widthCallback(object: Record<string, Record<string, unknown>>) {
+    if ((object["properties"]["name"] as string).match("15/9-F-1")) return 3;
+    else if (object["properties"]["name"] === "15/9-F-4") return 8;
+    else return 5;
+}
+
 export const CallbackStyledWells = Template.bind({});
 CallbackStyledWells.args = {
     ...defaultProps,
     layers: [
         {
             ...defaultProps.layers[0],
-            lineStyle: { color: colorCallback, dash: dashCallback },
+            lineStyle: {
+                color: colorCallback,
+                dash: dashCallback,
+                width: widthCallback,
+            },
             refine: false,
             outline: false,
         },
@@ -114,7 +200,7 @@ CallbackStyledWells.args = {
 CallbackStyledWells.parameters = {
     docs: {
         description: {
-            story: "Volve wells example with trajectory color and dash style supplied as callback.",
+            story: "Volve wells example with trajectory color, width and dash style supplied as callback.",
         },
         inlineStories: false,
         iframeHeight: 500,
@@ -195,4 +281,42 @@ Wells3dDashed.parameters = {
         inlineStories: false,
         iframeHeight: 500,
     },
+};
+
+export const ContinuousColorTable: React.FC = () => {
+    const [colorTable, setColorTable] = useState("Physics");
+
+    const mapProps = React.useMemo(() => {
+        return {
+            ...defaultProps,
+            layers: [
+                {
+                    ...continuousLogsLayer,
+                    logColor: colorTable,
+                },
+            ],
+        };
+    }, [colorTable]);
+
+    const handleOnChange = (event: React.FormEvent) => {
+        setColorTable((event.target as HTMLInputElement)?.value);
+    };
+    return (
+        <>
+            <NativeSelect
+                id={"test"}
+                label={"Color table"}
+                value={colorTable}
+                onChange={handleOnChange}
+            >
+                <option key={"Physics"}>{"Physics"}</option>
+                <option key={"Rainbow"}>{"Rainbow"}</option>
+            </NativeSelect>
+            {
+                <div style={{ height: "80vh", position: "relative" }}>
+                    <DeckGLMap {...mapProps} />
+                </div>
+            }
+        </>
+    );
 };

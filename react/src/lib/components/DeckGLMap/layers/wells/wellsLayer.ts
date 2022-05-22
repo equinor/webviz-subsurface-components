@@ -37,11 +37,13 @@ type StyleAccessorFunction = (
 type NumberPair = [number, number];
 type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
 type ColorAccessor = RGBAColor | StyleAccessorFunction | undefined;
-type LineStyle = NumberPair | RGBAColor;
+type WidthAccessor = number | StyleAccessor | undefined;
+type LineStyle = NumberPair | RGBAColor | number;
 
 type StyleAccessor = {
     color?: ColorAccessor;
     dash?: DashAccessor;
+    width?: WidthAccessor;
 };
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
@@ -91,37 +93,40 @@ function multiply(pair: [number, number], factor: number): [number, number] {
     return [pair[0] * factor, pair[1] * factor];
 }
 
+const DEFAULT_LINE_WIDTH = 5;
 const DEFAULT_DASH = [5, 5] as NumberPair;
 
-function getDashFactor(accessor: DashAccessor, factor: number) {
-    if (typeof accessor == "function") {
-        return (
-            object: Feature,
-            objectInfo: Record<string, unknown>
-        ): NumberPair => {
-            const dash = (accessor as StyleAccessorFunction)(
+function getDashFactor(
+    accessor: DashAccessor,
+    width_accessor?: number | ((object: Feature) => number),
+    offset = 0
+) {
+    return (
+        object: Feature,
+        objectInfo: Record<string, unknown>
+    ): NumberPair => {
+        let width = DEFAULT_LINE_WIDTH;
+        if (typeof width_accessor == "function") {
+            width = (width_accessor as StyleAccessorFunction)(object) as number;
+        } else if (width_accessor as number) {
+            width = width_accessor as number;
+        }
+        const factor = width / (width + offset);
+
+        let dash: NumberPair = [0, 0];
+        if (typeof accessor == "function") {
+            dash = (accessor as StyleAccessorFunction)(
                 object,
                 objectInfo
-            );
-            if (dash) {
-                if (dash?.length == 2) {
-                    return multiply(dash, factor);
-                } else {
-                    return multiply(DEFAULT_DASH, factor);
-                }
-            }
-            return [0, 0];
-        };
-    }
-
-    let value = DEFAULT_DASH as NumberPair;
-    if (accessor) {
-        if ((accessor as NumberPair)?.length == 2) {
-            value = accessor as NumberPair;
+            ) as NumberPair;
+        } else if (accessor as NumberPair) dash = accessor as NumberPair;
+        else if (accessor) dash = DEFAULT_DASH;
+        if (dash.length == 2) {
+            return multiply(dash, factor);
+        } else {
+            return multiply(DEFAULT_DASH, factor);
         }
-        return multiply(value, factor);
-    }
-    return [0, 0];
+    };
 }
 
 function getLineColor(accessor: ColorAccessor) {
@@ -144,6 +149,23 @@ function getLineColor(accessor: ColorAccessor) {
         }
         return object.properties?.["color"] as RGBAColor;
     };
+}
+
+function getLineWidth(
+    accessor: WidthAccessor,
+    offset = 0
+): number | ((object: Feature) => number) {
+    if (typeof accessor == "function") {
+        return (object: Feature): number => {
+            return (
+                ((accessor as StyleAccessorFunction)(object) as number) + offset
+            );
+        };
+    }
+
+    if (accessor as number) return (accessor as number) + offset;
+
+    return DEFAULT_LINE_WIDTH + offset;
 }
 
 export default class WellsLayer extends CompositeLayer<
@@ -212,15 +234,13 @@ export default class WellsLayer extends CompositeLayer<
                 visible: this.props.outline,
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
+                getLineWidth: getLineWidth(this.props.lineStyle?.width),
                 extensions: extensions,
-                getDashArray: getDashFactor(this.props.lineStyle?.dash, 1),
+                getDashArray: getDashFactor(this.props.lineStyle?.dash),
                 lineBillboard: is3d,
                 pointBillboard: true,
             })
         );
-
-        const lineWidthFactor =
-            this.props.lineWidthScale / (this.props.lineWidthScale - 1);
 
         const colors = new GeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
@@ -232,13 +252,15 @@ export default class WellsLayer extends CompositeLayer<
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale - 1,
-                lineWidthScale: this.props.lineWidthScale - 1,
+                lineWidthScale: this.props.lineWidthScale,
+                getLineWidth: getLineWidth(this.props.lineStyle?.width, -1),
                 getFillColor: (d: Feature) => d.properties?.["color"],
                 getLineColor: getLineColor(this.props.lineStyle?.color),
                 extensions: extensions,
                 getDashArray: getDashFactor(
                     this.props.lineStyle?.dash,
-                    lineWidthFactor
+                    getLineWidth(this.props.lineStyle?.width),
+                    -1
                 ),
                 lineBillboard: is3d,
                 pointBillboard: true,
@@ -259,7 +281,8 @@ export default class WellsLayer extends CompositeLayer<
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale + 2,
-                lineWidthScale: this.props.lineWidthScale + 2,
+                lineWidthScale: this.props.lineWidthScale,
+                getLineWidth: getLineWidth(this.props.lineStyle?.width, 2),
                 getFillColor: (d: Feature) => d.properties?.["color"],
                 getLineColor: getLineColor(this.props.lineStyle?.color),
             })

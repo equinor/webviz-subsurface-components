@@ -1,24 +1,24 @@
 {
     "compilerOptions": {
         "baseUrl": "src",
-        "outDir": "./dist/", // path to output directory
+        "outDir": "./dist/",
         "declaration": true,
-        "sourceMap": true, // allow sourcemap support
-        "strict": true, // enable all of the strict mode family of options
+        "sourceMap": true,
+        "strict": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true,
         "forceConsistentCasingInFileNames": true,
-        "module": "es6", // specify module code generation
+        "module": "es6",
         "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
-        "jsx": "react", // use typescript to transpile jsx to js
-        "target": "es6", // specify ECMAScript target version
-        "allowJs": true, // allow a partial TypeScript and JavaScript codebase
-        "skipLibCheck": true // don't do typechecking on the node modules
+        "jsx": "react",
+        "target": "es6",
+        "allowJs": true,
+        "skipLibCheck": true
     },
     "include": ["./src/lib", "./src/custom.d.ts"]
 }

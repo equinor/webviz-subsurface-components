@@ -17,13 +17,12 @@ import { DeckGLView } from "./DeckGLView";
 import { Viewport } from "@deck.gl/core";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
-import Deck, { ViewStateProps } from "@deck.gl/core/lib/deck";
+import Deck from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
 import {
     applyPropsOnLayers,
-    getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
@@ -33,6 +32,7 @@ import {
     validateLayers,
 } from "../../../inputSchema/schemaValidationUtil";
 import { DrawingPickInfo } from "../layers/drawing/drawingLayer";
+import { getLayersByType } from "../layers/utils/layerTools";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
@@ -76,6 +76,13 @@ export interface ViewsType {
     viewports: ViewportType[];
 }
 
+interface ViewStateType {
+    target: number[];
+    zoom: number;
+    rotationX: number;
+    rotationOrbit: number;
+}
+
 export interface DeckGLLayerContext extends LayerContext {
     userData: {
         setEditedData: (data: Record<string, unknown>) => void;
@@ -109,7 +116,7 @@ export interface MapProps {
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
-    bounds?: [number, number, number, number];
+    bounds: [number, number, number, number];
 
     /**
      * Zoom level for the view.
@@ -218,19 +225,21 @@ const Map: React.FC<MapProps> = ({
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 
-    // state for views prop (target and zoom) of DeckGL component
-    const [viewState, setViewState] = useState<ViewStateProps>();
-    useEffect(() => {
-        if (bounds === undefined) return;
-        setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
-    }, [bounds, zoom]);
+    // set initial view state based on supplied bounds and zoom in viewState
+    const [viewState, setViewState] = useState<ViewStateType>(
+        getViewState(bounds, zoom)
+    );
 
-    // calculate camera zoom on view resize while maintaining pan
-    const onResize = useCallback(() => {
-        if (bounds === undefined) return;
+    // react on zoom prop change
+    useEffect(() => {
         const vs = getViewState(bounds, zoom, deckRef.current?.deck);
         setViewState({ ...viewState, zoom: vs.zoom });
-    }, [deckRef, viewState]);
+    }, [zoom]);
+
+    // calculate view state on deckgl context load (based on viewport size)
+    const onLoad = useCallback(() => {
+        setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
+    }, []);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
@@ -441,7 +450,7 @@ const Map: React.FC<MapProps> = ({
                 }
                 onHover={onHover}
                 onClick={onClick}
-                onResize={onResize}
+                onLoad={onLoad}
                 onAfterRender={onAfterRender}
             >
                 {children}
@@ -454,12 +463,16 @@ const Map: React.FC<MapProps> = ({
                             {colorTables && legend?.visible && (
                                 <ColorLegend
                                     {...legend}
-                                    layers={
-                                        getLayersInViewport(
-                                            deckGLLayers,
-                                            view.layerIds
-                                        ) as Layer<unknown>[]
-                                    }
+                                    layers={[
+                                        getLayersByType(
+                                            deckRef.current?.deck.props.layers,
+                                            "WellsLayer"
+                                        )?.[0],
+                                        getLayersByType(
+                                            deckRef.current?.deck.props.layers,
+                                            "ColormapLayer"
+                                        )?.[0],
+                                    ]}
                                     colorTables={colorTables}
                                 />
                             )}
@@ -524,7 +537,7 @@ Map.defaultProps = {
         position: [10, 10],
     },
     toolbar: {
-        visible: true,
+        visible: false,
     },
     legend: {
         visible: true,
@@ -575,7 +588,7 @@ function getViewState(
     bounds: [number, number, number, number],
     zoom?: number,
     deck?: Deck
-): ViewStateProps {
+): ViewStateType {
     let width = bounds[2] - bounds[0]; // right - left
     let height = bounds[3] - bounds[1]; // top - bottom
     if (deck) {
@@ -585,7 +598,7 @@ function getViewState(
 
     const padding = 20;
     const fitted_bound = fitBounds({ width, height, bounds, padding });
-    const view_state = {
+    const view_state: ViewStateType = {
         target: [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
         rotationX: 90, // look down z -axis
