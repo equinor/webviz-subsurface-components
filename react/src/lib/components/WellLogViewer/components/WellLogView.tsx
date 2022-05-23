@@ -68,8 +68,14 @@ function showSelection(
     horizontal: boolean | undefined,
     logViewer: LogViewer /*LogController*/
 ) {
-    const value = vCur !== undefined ? logViewer.scale(vCur) : Number.NaN;
-    if (!Number.isFinite(value)) {
+    if (vCur === undefined) {
+        rbelm.style.visibility = "hidden";
+        pinelm.style.visibility = "hidden";
+        return;
+    }
+    const v = logViewer.scale(vCur);
+    if (!Number.isFinite(v)) {
+        // logViewer could be empty
         rbelm.style.visibility = "hidden";
         pinelm.style.visibility = "hidden";
         return;
@@ -78,7 +84,7 @@ function showSelection(
     const rubberBandSize = 9;
     const offset = rubberBandSize / 2;
 
-    rbelm.style[horizontal ? "left" : "top"] = `${value - offset}px`;
+    rbelm.style[horizontal ? "left" : "top"] = `${v - offset}px`;
     rbelm.style.visibility = "visible";
 
     if (vPin !== undefined && Number.isFinite(vPin)) {
