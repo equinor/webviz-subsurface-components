@@ -18,12 +18,14 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     position,
     horizontal,
     layers,
+    colorTables,
 }: ColorLegendProps) => {
     const [legendProps, setLegendProps] = React.useState<
         [
             {
                 title: string;
                 colorName: string;
+                colorTables: colorTablesArray;
                 discrete: boolean;
                 metadata: { objects: Record<string, [number[], number]> };
                 valueRange: number[];
@@ -34,6 +36,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         {
             title: "",
             colorName: "string",
+            colorTables: colorTables,
             discrete: false,
             metadata: { objects: {} },
             valueRange: [],
@@ -59,6 +62,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     discrete: layer?.state?.legend[0].discrete,
                     metadata: layer?.state?.legend[0].metadata,
                     valueRange: layer?.state?.legend[0].valueRange,
+                    colorTables: layer?.state?.legend[0].colorTables,
                     visible: layer?.props?.visible,
                 });
             }
@@ -101,6 +105,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                                     discreteData={legend.metadata}
                                     dataObjectName={legend.title}
                                     colorName={legend.colorName}
+                                    colorTables={legend.colorTables}
                                     position={position}
                                     horizontal={horizontal}
                                 />
@@ -111,6 +116,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                                     max={legend.valueRange[1]}
                                     dataObjectName={legend.title}
                                     colorName={legend.colorName}
+                                    colorTables={legend.colorTables}
                                     position={position}
                                     horizontal={horizontal}
                                 />

@@ -606,6 +606,16 @@ function getNeighboringMdIndices(mds: number[], md: number): number[] {
     return idx === 0 ? [idx, idx + 1] : [idx - 1, idx];
 }
 
+function getPositionByMD(well_xyz: Position[], well_mds: number[], md: number) {
+    const [l_idx, h_idx] = getNeighboringMdIndices(well_mds, md);
+    const md_low = well_mds[l_idx];
+    const md_normalized = (md - md_low) / (well_mds[h_idx] - md_low);
+    return interpolateNumberArray(
+        well_xyz[l_idx],
+        well_xyz[h_idx]
+    )(md_normalized);
+}
+
 function getLogPath(
     wells_data: Feature[],
     d: LogCurveDataType,
@@ -629,15 +639,10 @@ function getLogPath(
     const log_xyz: Position[] = [];
     const log_mds = getLogMd(d, logrun_name);
     log_mds.forEach((md) => {
-        const [l_idx, h_idx] = getNeighboringMdIndices(well_mds, md);
-        const md_normalized =
-            (md - well_mds[l_idx]) / (well_mds[h_idx] - well_mds[l_idx]);
-        const xyz = interpolateNumberArray(
-            well_xyz[l_idx],
-            well_xyz[h_idx]
-        )(md_normalized);
+        const xyz = getPositionByMD(well_xyz, well_mds, md);
         log_xyz.push(xyz);
     });
+
     return log_xyz;
 }
 
@@ -694,6 +699,8 @@ function getLogColor(
             logColor,
             colorTables
         );
+        if (!arrayOfColors.length)
+            console.error("Empty or missed '" + logColor + "' color table");
 
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
         // eslint-disable-next-line

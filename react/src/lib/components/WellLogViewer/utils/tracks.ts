@@ -55,7 +55,11 @@ import {
 
 import { updateLegendRows } from "./log-viewer";
 
-function indexOfElementByName(array: Named[], name: string): number {
+export function deepCopy<T>(source: T): T {
+    return JSON.parse(JSON.stringify(source)) as T;
+}
+
+export function indexOfElementByName(array: Named[], name: string): number {
     if (array && name) {
         const nameUpper = name.toUpperCase();
         let i = 0;
@@ -1257,9 +1261,7 @@ function addStackedTrack(
         templatePlot,
         templateStyles
     );
-    const templateTrackFullPlot: TemplateTrack = JSON.parse(
-        JSON.stringify(templateTrack)
-    );
+    const templateTrackFullPlot: TemplateTrack = deepCopy(templateTrack);
     const label = makeTrackHeader(welllog, templateTrack);
 
     templateTrackFullPlot.title = label;
@@ -1403,9 +1405,7 @@ function setStackedTrackOptionFromTemplate(
 ): void {
     options.label = templateTrack.title;
 
-    (options as TrackOptionsEx).__template = JSON.parse(
-        JSON.stringify(templateTrack)
-    );
+    (options as TrackOptionsEx).__template = deepCopy(templateTrack);
 }
 
 export function addOrEditGraphTrack(

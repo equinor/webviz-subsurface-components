@@ -32,6 +32,7 @@ import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
 import { getTrackTemplate } from "../utils/tracks";
 import { isScaleTrack } from "../utils/tracks";
+import { deepCopy } from "../utils/tracks";
 
 import {
     addOrEditGraphTrack,
@@ -776,7 +777,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             shouldSetTracks = true;
             checkSchema = true;
         } else if (this.props.template !== prevProps.template) {
-            this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
+            this.template = deepCopy(this.props.template); // save external template content to current
             shouldSetTracks = true;
             checkSchema = true;
         } else if (this.props.colorTables !== prevProps.colorTables) {
@@ -1082,7 +1083,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             for (const track of this.logController.tracks) {
                 if (isScaleTrack(track)) continue;
                 const templateTrack = getTrackTemplate(track);
-                tracks.push(JSON.parse(JSON.stringify(templateTrack)));
+                tracks.push(deepCopy(templateTrack));
             }
         }
         return {

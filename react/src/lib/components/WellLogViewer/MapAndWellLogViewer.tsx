@@ -2,11 +2,11 @@ import React from "react";
 import { ReactNode, WeakValidationMap } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
-//import PropTypes from "prop-types";
 
 import {
     Template,
     TemplateTrack,
+    TemplatePlot,
     TemplatePlotTypes,
 } from "./components/WellLogTemplateTypes";
 
@@ -19,21 +19,39 @@ const welllogs =
     require("../../../demo/example-data/volve_logs.json") as WellLog[];
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
-//const colorTables = require("../../../demo/example-data/color-tables.json");
+//const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const colorTables = require("../../../demo/example-data/color-tables.json");
 
 import { WellLogController } from "./components/WellLogView";
 import { LogViewer } from "@equinor/videx-wellog";
 import { Info } from "./components/InfoTypes";
 import { MapMouseEvent } from "../DeckGLMap/components/Map";
 
-//import AxisSelector from "./components/AxisSelector";
 import InfoPanel from "./components/InfoPanel";
-//import ZoomSlider from "./components/ZoomSlider";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { axisTitles, axisMnemos } from "./utils/axes";
 import { fillInfos } from "./utils/fill-info";
-import { getDiscreteMeta } from "./utils/tracks";
+import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
+import { deepCopy } from "./utils/tracks";
+
+function getTemplatePlotColorTable(templatePlot: TemplatePlot) {
+    let colorTable = templatePlot.colorTable;
+    if (!colorTable && templatePlot.style) {
+        const templateStyles = template.styles;
+        if (templateStyles) {
+            const iStyle = indexOfElementByName(
+                templateStyles,
+                templatePlot.style
+            );
+            if (iStyle >= 0) {
+                const style = templateStyles[iStyle];
+                colorTable = style.colorTable;
+            }
+        }
+    }
+    return colorTable;
+}
 
 type Props = DeckGLMapProps;
 
@@ -79,7 +97,7 @@ function addTemplateTrack(
 ): Template {
     // add missed TemplateTrack for the given logName
     const type: TemplatePlotTypes = detectType(welllog, logName);
-    const templateNew = JSON.parse(JSON.stringify(template)) as Template;
+    const templateNew = deepCopy(template);
     const templateTrack: TemplateTrack = {
         title: logName,
         required: true, // force to show on all wells
@@ -90,7 +108,6 @@ function addTemplateTrack(
 }
 
 export class MapAndWellLogViewer extends React.Component<Props, State> {
-    //public static propTypes: Record<string, unknown>;
     public static propTypes?: WeakValidationMap<Props> | undefined;
     constructor(props: Props, state: State) {
         super(props, state);
@@ -159,23 +176,17 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                         wells_layer["logName"] !== templatePlot.name
                     ) {
                         wells_layer["logName"] = templatePlot.name;
-                        let colorTable = templatePlot.colorTable;
-                        if (templatePlot.style) {
-                            //styles(plot.style)
-                            //colorTable = style.colorTable;
-                        } else colorTable = templatePlot.colorTable;
+                        const colorTable =
+                            getTemplatePlotColorTable(templatePlot);
+                        if (colorTable) wells_layer["logColor"] = colorTable;
+                        //(wells_layer.context as DeckGLLayerContext).userData.colorTables=colorTables;
 
-                        if (colorTable) wells_layer["logColor"] = colorTable; // "Stratigraphy"; // "Colors_set_1"
-                        const layers = JSON.parse(
-                            JSON.stringify(this.props.layers)
-                        );
+                        const layers = deepCopy(this.props.layers);
                         this.setState({ layers: layers });
 
                         // Force to rerender ColorLegend after
                         setTimeout(() => {
-                            const layers = JSON.parse(
-                                JSON.stringify(this.props.layers)
-                            );
+                            const layers = deepCopy(this.props.layers);
                             this.setState({ layers: layers });
                         }, 200);
                     }
@@ -185,21 +196,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
     }
 
     onMouseEvent(event: MapMouseEvent): void {
-        if (event.type == "click")
-            console.log(
-                "type =",
-                event.type,
-                " x =",
-                event.x,
-                " y =",
-                event.y,
-                " wellname =",
-                event.wellname,
-                " md =",
-                event.md,
-                " tvd =",
-                event.tvd
-            );
         if (event.wellname !== undefined) {
             if (event.type == "click") {
                 const iWell = findWellLogIndex(welllogs, event.wellname);
@@ -352,4 +348,3 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
 }
 
 MapAndWellLogViewer.propTypes = { ...DeckGLMap.propTypes };
-console.log(MapAndWellLogViewer.propTypes);
