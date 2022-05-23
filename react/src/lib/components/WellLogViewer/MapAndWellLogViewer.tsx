@@ -10,13 +10,14 @@ import {
     TemplatePlotTypes,
 } from "./components/WellLogTemplateTypes";
 
-const template =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require("../../../demo/example-data/welllog_template_2.json") as Template;
 import { WellLog } from "./components/WellLogTypes";
 const welllogs =
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     require("../../../demo/example-data/volve_logs.json") as WellLog[];
+
+const template =
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require("../../../demo/example-data/welllog_template_2.json") as Template;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
@@ -36,7 +37,10 @@ import { fillInfos } from "./utils/fill-info";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 import { deepCopy } from "./utils/tracks";
 
-function getTemplatePlotColorTable(templatePlot: TemplatePlot) {
+function getTemplatePlotColorTable(
+    template: Template,
+    templatePlot: TemplatePlot
+) {
     let colorTable = templatePlot.colorTable;
     if (!colorTable && templatePlot.style) {
         const templateStyles = template.styles;
@@ -76,8 +80,7 @@ function findWellLogIndex(welllogs: WellLog[], wellName: string): number {
     return welllogs.findIndex((welllog) => welllog.header.well === wellName);
 }
 
-function findLog(controller: WellLogController, logName: string): number {
-    const template = controller.getTemplate();
+function findLog(template: Template, logName: string): number {
     return template.tracks.findIndex(
         (track) => track.plots[0]?.name === logName
     );
@@ -177,8 +180,10 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                         wells_layer["logName"] !== templatePlot.name
                     ) {
                         wells_layer["logName"] = templatePlot.name;
-                        const colorTable =
-                            getTemplatePlotColorTable(templatePlot);
+                        const colorTable = getTemplatePlotColorTable(
+                            template,
+                            templatePlot
+                        );
                         if (colorTable) wells_layer["logColor"] = colorTable;
                         //(wells_layer.context as DeckGLLayerContext).userData.colorTables=colorTables;
 
@@ -212,19 +217,20 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                 if (controller) {
                     const wellsLayer = findWellsLayer(event);
                     if (wellsLayer) {
+                        const template = controller.getTemplate();
                         const logName = wellsLayer.props?.logName;
-                        let iTrack = findLog(controller, logName);
+                        let iTrack = findLog(template, logName);
                         if (iTrack < 0) {
                             //const welllog = info.object is Feature or WellLog;
                             const welllog = welllogs[iWell];
                             const templateNew = addTemplateTrack(
-                                /*controller.getTemplate()*/ template,
+                                template,
                                 welllog,
                                 logName
                             );
                             controller.setTemplate(templateNew);
 
-                            iTrack = findLog(controller, logName);
+                            iTrack = findLog(template, logName);
                         }
                         controller.scrollTrackTo(iTrack);
 

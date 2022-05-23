@@ -719,7 +719,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     componentDidMount(): void {
         this.createLogViewer();
 
-        this.template = JSON.parse(JSON.stringify(this.props.template)); // save external template content to current
+        this.template = deepCopy(this.props.template); // save external template content to current
         this.setTracks(true);
     }
 
