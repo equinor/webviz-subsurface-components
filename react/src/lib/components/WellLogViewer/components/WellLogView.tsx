@@ -68,7 +68,7 @@ function showSelection(
     horizontal: boolean | undefined,
     logViewer: LogViewer /*LogController*/
 ) {
-    const value = vPin !== undefined ? logViewer.scale(vCur) : Number.NaN;
+    const value = vCur !== undefined ? logViewer.scale(vCur) : Number.NaN;
     if (!Number.isFinite(value)) {
         rbelm.style.visibility = "hidden";
         pinelm.style.visibility = "hidden";
