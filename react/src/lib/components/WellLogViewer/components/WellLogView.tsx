@@ -42,8 +42,7 @@ import {
 } from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
 
-import { TemplatePlot } from "./WellLogTemplateTypes";
-import { TemplateTrack } from "./WellLogTemplateTypes";
+import { TemplatePlot, TemplateTrack } from "./WellLogTemplateTypes";
 
 import {
     removeOverlay,
@@ -69,23 +68,21 @@ function showSelection(
     horizontal: boolean | undefined,
     logViewer: LogViewer /*LogController*/
 ) {
-    if (vCur === undefined) {
+    const value = logViewer.scale(vCur);
+    if (!Number.isFinite(value)) {
         rbelm.style.visibility = "hidden";
         pinelm.style.visibility = "hidden";
         return;
     }
 
-    const pinelm1 = pinelm.firstElementChild as HTMLElement;
-
     const rubberBandSize = 9;
     const offset = rubberBandSize / 2;
 
-    rbelm.style[horizontal ? "left" : "top"] = `${
-        logViewer.scale(vCur) - offset
-    }px`;
+    rbelm.style[horizontal ? "left" : "top"] = `${value - offset}px`;
     rbelm.style.visibility = "visible";
 
-    if (vPin !== undefined) {
+    if (Number.isFinite(vPin)) {
+        const pinelm1 = pinelm.firstElementChild as HTMLElement;
         let min, max;
         if (vPin < vCur) {
             pinelm1.style[horizontal ? "left" : "top"] = `${offset}px`;

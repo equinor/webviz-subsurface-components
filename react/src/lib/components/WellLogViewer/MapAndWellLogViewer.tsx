@@ -19,9 +19,9 @@ const welllogs =
     require("../../../demo/example-data/volve_logs.json") as WellLog[];
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-//const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
+const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("../../../demo/example-data/color-tables.json");
+//const colorTables = require("../../../demo/example-data/color-tables.json");
 
 import { WellLogController } from "./components/WellLogView";
 import { LogViewer } from "@equinor/videx-wellog";
@@ -278,7 +278,9 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             flex: "0 0",
                         }}
                     >
-                        {this.state.wellName}
+                        {this.state.wellName
+                            ? this.state.wellName
+                            : "Select well by clicking on the map"}
                     </div>
                     <div
                         style={{

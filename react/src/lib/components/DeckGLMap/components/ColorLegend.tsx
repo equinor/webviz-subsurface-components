@@ -35,7 +35,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     >([
         {
             title: "",
-            colorName: "string",
+            colorName: "",
             colorTables: colorTables,
             discrete: false,
             metadata: { objects: {} },
@@ -58,11 +58,13 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
             ) {
                 getLegendData.push({
                     title: layer?.state?.legend[0].title,
-                    colorName: layer?.props?.logColor,
+                    colorName:
+                        layer?.state?.legend[0].colorName ||
+                        layer?.props?.logColor,
                     discrete: layer?.state?.legend[0].discrete,
                     metadata: layer?.state?.legend[0].metadata,
                     valueRange: layer?.state?.legend[0].valueRange,
-                    colorTables: layer?.state?.legend[0].colorTables,
+                    colorTables: colorTables,
                     visible: layer?.props?.visible,
                 });
             }

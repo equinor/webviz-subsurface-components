@@ -189,8 +189,7 @@
   "styles": [
     {
       "name": "discrete",
-      "type": "stacked",
-      "colorTable": "Colors_set_1"
+      "type": "stacked"
     }
   ]
 }
