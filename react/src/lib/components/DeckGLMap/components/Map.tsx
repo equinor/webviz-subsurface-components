@@ -372,7 +372,7 @@ const Map: React.FC<MapProps> = ({
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
-        const layers = deckRef.current?.deck.props.layers;
+        const layers = deckRef.current?.deck.props.layers as Layer<unknown>[];
         // this ensures to validate the schemas only once
         if (checkDatafileSchema && layers && isLoaded) {
             try {
@@ -465,11 +465,13 @@ const Map: React.FC<MapProps> = ({
                                     {...legend}
                                     layers={[
                                         getLayersByType(
-                                            deckRef.current?.deck.props.layers,
+                                            deckRef.current?.deck.props
+                                                .layers as Layer<unknown>[],
                                             "WellsLayer"
                                         )?.[0],
                                         getLayersByType(
-                                            deckRef.current?.deck.props.layers,
+                                            deckRef.current?.deck.props
+                                                .layers as Layer<unknown>[],
                                             "ColormapLayer"
                                         )?.[0],
                                     ]}
