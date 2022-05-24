@@ -1268,9 +1268,21 @@ function addStackedTrack(
     templateTrackFullPlot.plots[0].type = templatePlotProps.type;
 
     // curve.valueType === "integer", "string"
-    const colorTable = colorTables?.find(
-        (colorTable) => colorTable.name == "Stratigraphy"
-    );
+    const logColor = templatePlotProps.colorTable;
+    let colorTable = undefined;
+    if (logColor) {
+        if (colorTables) {
+            colorTable = colorTables.find(
+                (colorTable) => colorTable.name == logColor
+            );
+            if (!colorTable)
+                console.error("Missed '" + logColor + "' color table");
+        } else {
+            console.error(
+                "No color tables file given for '" + logColor + "' color table"
+            );
+        }
+    }
     const meta = getDiscreteMeta(welllog, name);
     if (!meta && curve.valueType == "integer")
         console.log(

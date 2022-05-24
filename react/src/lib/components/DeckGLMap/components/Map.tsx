@@ -197,9 +197,10 @@ export type PickingInfo = any;
 export interface MapMouseEvent {
     type: "click" | "hover" | "contextmenu";
     infos: PickingInfo[];
-    // some frequently used values extracted from infos:
+    // some frequently used values extracted from infos[]:
     x?: number;
     y?: number;
+    // Only for one well. Full information is available in infos[]
     wellname?: string;
     md?: number;
     tvd?: number;

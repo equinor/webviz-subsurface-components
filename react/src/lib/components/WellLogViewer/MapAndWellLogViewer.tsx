@@ -88,7 +88,7 @@ function findLog(template: Template, logName: string): number {
 
 function detectType(welllog: WellLog, logName: string): TemplatePlotTypes {
     if (welllog) {
-        const meta = getDiscreteMeta(welllog, logName); // non-standard extention
+        const meta = getDiscreteMeta(welllog, logName); // non-standard extention of WellLog JSON file
         if (meta) return "stacked";
     }
     return "line";
@@ -334,21 +334,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             width: "100%",
                         }}
                     >
-                        {/*<AxisSelector
-                            header="Primary scale"
-                        />*/}
                         <InfoPanel header="Readout" infos={this.state.infos} />
-                        {/*<div style={{ paddingLeft: "10px", display: "flex" }}>
-                            <span>Zoom:</span>
-                            <span
-                                style={{
-                                    flex: "1 1 100px",
-                                    padding: "0 20px 0 10px",
-                                }}
-                            >
-                            <ZoomSlider />
-                            </span>
-                        </div>*/}
                     </div>
                 </div>
             </div>
