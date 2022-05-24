@@ -341,6 +341,7 @@ export default class WellsLayer extends CompositeLayer<
                             this.props.logName,
                             this.props.logColor
                         ),
+                        //colorLegendData:
                     });
                 },
             })

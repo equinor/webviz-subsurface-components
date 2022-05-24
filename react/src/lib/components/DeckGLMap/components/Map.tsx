@@ -23,6 +23,7 @@ import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
 import {
     applyPropsOnLayers,
+    getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
@@ -460,7 +461,7 @@ const Map: React.FC<MapProps> = ({
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
-                            {colorTables && legend?.visible && (
+                            {/* {colorTables && legend?.visible && (
                                 <ColorLegend
                                     {...legend}
                                     layers={[
@@ -473,6 +474,30 @@ const Map: React.FC<MapProps> = ({
                                             "ColormapLayer"
                                         )?.[0],
                                     ]}
+                                    colorTables={colorTables}
+                                />
+                            )} */}
+                            {colorTables && legend?.visible && (
+                                <ColorLegend
+                                    {...legend}
+                                    layerIds={view.layerIds}
+                                    layers={
+                                        getLayersInViewport(
+                                            deckGLLayers,
+                                            view.layerIds
+                                        ) as Layer<unknown>[]
+                                    }
+                                    // layers={[
+                                    //     getLayersByType(
+                                    //         deckRef.current?.deck.props.layers,
+                                    //         "WellsLayer"
+                                    //     )?.[0],
+                                    //     getLayersByType(
+                                    //         deckRef.current?.deck.props.layers,
+                                    //         "ColormapLayer"
+                                    //     )?.[0],
+                                    // ]}
+                                    viewportId={view.id}
                                     colorTables={colorTables}
                                 />
                             )}
