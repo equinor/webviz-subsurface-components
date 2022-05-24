@@ -236,6 +236,12 @@ const Map: React.FC<MapProps> = ({
         setViewState({ ...viewState, zoom: vs.zoom });
     }, [zoom]);
 
+    // react on bounds prop change
+    useEffect(() => {
+        const vs = getViewState(bounds, zoom, deckRef.current?.deck);
+        setViewState({ ...viewState, target: vs.target });
+    }, [bounds]);
+
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
