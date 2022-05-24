@@ -8,8 +8,8 @@ import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface ColorLegendProps {
     // Pass additional css style to the parent color legend container
-    cssStyle?: Record<string, unknown>;
-    horizontal?: boolean;
+    cssStyle?: Record<string, unknown> | null;
+    horizontal?: boolean | null;
     layers: Layer<unknown>[];
     colorTables: colorTablesArray;
 }

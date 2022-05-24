@@ -15,7 +15,7 @@ describe("Test Color Legend", () => {
                 zoom={0}
                 incrementValue={0}
                 widthPerUnit={0}
-                position={[0, 0]}
+                cssStyle={{ top: 0, left: 0 }}
                 scaleUnit="m"
             />
         );
@@ -27,7 +27,7 @@ describe("Test Color Legend", () => {
                 zoom={1}
                 incrementValue={100}
                 widthPerUnit={100}
-                position={[10, 10]}
+                cssStyle={{ top: 10, left: 10 }}
                 scaleUnit="m"
             />
         );

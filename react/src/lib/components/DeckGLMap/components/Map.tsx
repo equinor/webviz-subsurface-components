@@ -145,7 +145,7 @@ export interface MapProps {
         visible?: boolean | null;
         incrementValue?: number | null;
         widthPerUnit?: number | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
     };
 
     coordinateUnit?: string;
@@ -159,7 +159,7 @@ export interface MapProps {
 
     legend?: {
         visible?: boolean | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
         horizontal?: boolean | null;
     };
 
@@ -534,14 +534,14 @@ Map.defaultProps = {
         visible: true,
         incrementValue: 100,
         widthPerUnit: 100,
-        position: [10, 10],
+        cssStyle: { top: 10, left: 10 },
     },
     toolbar: {
         visible: false,
     },
     legend: {
         visible: true,
-        position: [5, 10],
+        cssStyle: { top: 5, right: 10 },
         horizontal: false,
     },
     coordinateUnit: "m",
