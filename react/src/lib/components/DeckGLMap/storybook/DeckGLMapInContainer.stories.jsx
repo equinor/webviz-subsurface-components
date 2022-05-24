@@ -1,7 +1,6 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import { makeStyles } from "@material-ui/styles";
 
 export default {
     component: DeckGLMap,
@@ -629,26 +628,4 @@ SelectableFeatureExample.args = {
         polylineUsingSelectableGeoJsonLayer,
         polygonUsingSelectableGeoJsonLayer,
     ],
-};
-
-// Map used inside a div container template
-const useStyles = makeStyles({
-    main: {
-        width: 500,
-        height: 500,
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        border: "1px solid black",
-        background: "azure",
-        position: "fixed",
-    },
-});
-export const MapInContainer = () => {
-    const classes = useStyles();
-    return (
-        <div className={classes.main}>
-            <DeckGLMap {...exampleData[0]} />
-        </div>
-    );
 };
