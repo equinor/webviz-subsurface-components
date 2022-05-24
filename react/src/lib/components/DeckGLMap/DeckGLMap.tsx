@@ -42,6 +42,10 @@ export interface DeckGLMapProps {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema?: boolean;
+
+    /**
+     * For get mouse events
+     */
     onMouseEvent?: (event: MapMouseEvent) => void;
 }
 
@@ -303,6 +307,11 @@ DeckGLMap.propTypes = {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema: PropTypes.bool,
+
+    /**
+     * For get mouse events
+     */
+    onMouseEvent: PropTypes.func,
 };
 
 export default DeckGLMap;
