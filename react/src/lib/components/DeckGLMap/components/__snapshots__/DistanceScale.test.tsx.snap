@@ -2,7 +2,7 @@
 
 exports[`Test Color Legend snapshot test with default props 1`] = `
 <div
-  style="left: 10px; top: 10px; position: relative;"
+  style="position: absolute;"
 >
   <label>
     800
@@ -16,7 +16,7 @@ exports[`Test Color Legend snapshot test with default props 1`] = `
 
 exports[`Test Color Legend snapshot test with higher zoom 1`] = `
 <div
-  style="left: 10px; top: 10px; position: relative;"
+  style="position: absolute;"
 >
   <label>
     50
