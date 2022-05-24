@@ -465,11 +465,13 @@ const Map: React.FC<MapProps> = ({
                                     {...legend}
                                     layers={[
                                         getLayersByType(
-                                            deckRef.current?.deck.props.layers as Layer<unknown>[],
+                                            deckRef.current?.deck.props
+                                                .layers as Layer<unknown>[],
                                             "WellsLayer"
                                         )?.[0],
                                         getLayersByType(
-                                            deckRef.current?.deck.props.layers as Layer<unknown>[],
+                                            deckRef.current?.deck.props
+                                                .layers as Layer<unknown>[],
                                             "ColormapLayer"
                                         )?.[0],
                                     ]}
