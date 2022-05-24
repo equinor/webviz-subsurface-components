@@ -19,14 +19,14 @@ exports[`Test Map component snapshot test 1`] = `
     />
   </div>
   <div
-    style="bottom: 10px; left: 10px; position: relative;"
+    style="left: 10px; top: 10px; position: relative;"
   >
     <label>
       100
+      m
     </label>
-    m
     <div
-      style="width: 99.27470534904805px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px; margin-right: 3px; right: 0px; bottom: 0px;"
+      style="width: 99.27470534904805px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px;"
     />
   </div>
   <div>
@@ -89,14 +89,14 @@ exports[`Test Map component snapshot test with edited data 1`] = `
     />
   </div>
   <div
-    style="bottom: 10px; left: 10px; position: relative;"
+    style="left: 10px; top: 10px; position: relative;"
   >
     <label>
       100
+      m
     </label>
-    m
     <div
-      style="width: 99.27470534904805px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px; margin-right: 3px; right: 0px; bottom: 0px;"
+      style="width: 99.27470534904805px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px;"
     />
   </div>
   <div>
