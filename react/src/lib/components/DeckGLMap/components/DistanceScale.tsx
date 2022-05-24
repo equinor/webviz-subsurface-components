@@ -37,9 +37,6 @@ const DistanceScale: React.FC<scaleProps> = ({
         borderTop: "none",
         display: "inline-block",
         marginLeft: "3px",
-        marginRight: "3px",
-        right: 0,
-        bottom: 0,
     };
 
     const scaleValue =
@@ -57,13 +54,15 @@ const DistanceScale: React.FC<scaleProps> = ({
     return (
         <div
             style={{
-                bottom: position[0],
-                left: position[1],
+                left: position[0],
+                top: position[1],
                 position: "relative",
             }}
         >
-            <label>{convertedValue.toFixed(0)}</label>
-            {convertedUnit}
+            <label>
+                {convertedValue.toFixed(0)}
+                {convertedUnit}
+            </label>
             <div style={scaleRulerStyle}></div>
         </div>
     );
