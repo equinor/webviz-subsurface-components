@@ -499,10 +499,8 @@ const Map: React.FC<MapProps> = ({
 
             {scale?.visible ? (
                 <DistanceScale
+                    {...scale}
                     zoom={viewState?.zoom}
-                    incrementValue={scale.incrementValue}
-                    widthPerUnit={scale.widthPerUnit}
-                    position={scale.position}
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
