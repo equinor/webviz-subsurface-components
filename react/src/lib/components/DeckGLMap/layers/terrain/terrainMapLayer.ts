@@ -1,11 +1,17 @@
-import { SimpleMeshLayer } from "@deck.gl/mesh-layers"; // XXX RENAME LAYER TIL NOE MED MESH??
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import fsShader from "!!raw-loader!./terrainmap.fs.glsl";
+import { RGBColor } from "@deck.gl/core/utils/color";
+import fsShader from "./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
-import { DeckGLLayerContext } from "../../components/DeckGLWrapper";
+import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
+import {
+    createPropertyData,
+    PropertyDataType,
+    colorMapFunctionType,
+} from "../utils/layerTools";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -14,19 +20,35 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
-const DECODER = {
+export type Material =
+    | {
+          ambient: number;
+          diffuse: number;
+          shininess: number;
+          specularColor: [number, number, number];
+      }
+    | boolean;
+
+export const DECODER = {
     rScaler: 256 * 256,
     gScaler: 256,
     bScaler: 1,
     offset: 0,
 };
 
-function getImageData(colorMapName: string, _colorTables: colorTablesArray) {
-    const data = new Uint8Array(256 * 3);
+function getImageData(
+    colorMapName: string,
+    colorTables: colorTablesArray,
+    colorMapFunction: colorMapFunctionType | undefined
+) {
+    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
 
+    const data = new Uint8Array(256 * 3);
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-        const rgb = rgbValues(value, colorMapName, _colorTables);
+        const rgb = isColorMapFunctionDefined
+            ? (colorMapFunction as colorMapFunctionType)(i / 255)
+            : rgbValues(value, colorMapName, colorTables);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -35,7 +57,6 @@ function getImageData(colorMapName: string, _colorTables: colorTablesArray) {
                 color = [rgb.r, rgb.g, rgb.b];
             }
         }
-        //console.log(color)
         data[3 * i + 0] = color[0];
         data[3 * i + 1] = color[1];
         data[3 * i + 2] = color[2];
@@ -56,37 +77,45 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
     // Contourlines reference point and interval.
     contours: [number, number];
 
+    // Contourlines may be calculated either on depth/z-value or on property/texture value
+    isContoursDepth: boolean;
+
     // Name of color map.
     colorMapName: string;
 
+    // Optional function property.
+    // If defined this function will override the color map.
+    // Takes a value in the range [0,1] and returns a color.
+    colorMapFunction?: colorMapFunctionType;
+
     // Min and max property values.
-    valueRange: [number, number];
+    propertyValueRange: [number, number];
 
     // Use color map in this range.
     colorMapRange: [number, number];
+
+    // Clamp colormap to this color at ends.
+    // Given as array of three values (r,g,b) e.g: [255, 0, 0]
+    // If not set or set to true, it will clamp to color map min and max values.
+    // If set to false the clamp color will be completely transparent.
+    colorMapClampColor: RGBColor | undefined | boolean;
 
     //If true readout will be z value (depth). Otherwise it is the texture property value.
     isReadoutDepth: boolean;
 }
 
 const defaultProps = {
-    data: [{ position: [0, 0], angle: 0, color: [255, 0, 0] }], // dummy data
+    data: [{ position: [0, 0], angle: 0, color: [255, 0, 0, 0] }], // dummy data
 
     getPosition: (d: DataItem) => d.position,
     getColor: (d: DataItem) => d.color,
     getOrientation: (d: DataItem) => [0, d.angle, 0],
     contours: [-1, -1],
     colorMapName: "",
-    valueRange: [0.0, 1.0],
-    colorMapRange: [0.0, 1.0],
+    propertyValueRange: [0.0, 1.0],
     isReadoutDepth: false,
+    isContoursDepth: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    material: {
-        ambient: 0.35,
-        diffuse: 0.6,
-        shininess: 600,
-        specularColor: [255, 255, 255],
-    },
 };
 
 // This is a private layer used only by the composite Map3DLayer.
@@ -102,14 +131,31 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isReadoutDepth = this.props.isReadoutDepth;
+        const isContoursDepth = this.props.isContoursDepth;
 
-        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
-        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
+        const valueRangeMin = this.props.propertyValueRange[0] ?? 0.0;
+        const valueRangeMax = this.props.propertyValueRange[1] ?? 1.0;
 
         // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
         const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
         const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+
+        const isClampColor: boolean =
+            this.props.colorMapClampColor !== undefined &&
+            this.props.colorMapClampColor !== true &&
+            this.props.colorMapClampColor !== false;
+        let colorMapClampColor = isClampColor
+            ? this.props.colorMapClampColor
+            : [0, 0, 0];
+
+        // Normalize to [0,1] range.
+        colorMapClampColor = (colorMapClampColor as RGBColor).map(
+            (x) => (x ?? 0) / 255
+        );
+
+        const isColorMapClampColorTransparent: boolean =
+            (this.props.colorMapClampColor as boolean) === false;
 
         super.draw({
             uniforms: {
@@ -121,7 +167,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                     data: getImageData(
                         this.props.colorMapName,
                         (this.context as DeckGLLayerContext).userData
-                            .colorTables
+                            .colorTables,
+                        this.props.colorMapFunction
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
@@ -132,6 +179,10 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                 contourReferencePoint,
                 contourInterval,
                 isReadoutDepth,
+                isContoursDepth,
+                colorMapClampColor,
+                isColorMapClampColorTransparent,
+                isClampColor,
             },
         });
     }
@@ -173,27 +224,41 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const r = info.color[0] * DECODER.rScaler;
         const g = info.color[1] * DECODER.gScaler;
         const b = info.color[2] * DECODER.bScaler;
+        const value = r + g + b;
 
-        const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
+        let depth = undefined;
+        const layer_properties: PropertyDataType[] = [];
 
-        const isPropertyReadout = !this.props.isReadoutDepth; // Either map properties or map depths are encoded here.
-        let value = (r + g + b) * (isPropertyReadout ? floatScaler : 1.0);
-
-        if (isPropertyReadout) {
-            // Remap the [0, 1] decoded value to colorMapRange.
-            const [min, max] = this.props.colorMapRange;
-            value = value * (max - min) + min;
-        }
-
-        const valueString =
-            (isPropertyReadout ? "Property: " : "Depth: ") + value.toFixed(1);
+        // Either map properties or map depths are encoded here.
+        if (this.props.isReadoutDepth) depth = value.toFixed(2);
+        else
+            layer_properties.push(
+                getMapProperty(value, this.props.propertyValueRange)
+            );
 
         return {
             ...info,
-            propertyValue: valueString,
+            properties: layer_properties,
+            propertyValue: depth,
         };
     }
 }
 
 TerrainMapLayer.layerName = "TerrainMapLayer";
 TerrainMapLayer.defaultProps = defaultProps;
+
+//================= Local help functions. ==================
+
+function getMapProperty(
+    value: number,
+    value_range: [number, number]
+): PropertyDataType {
+    // Remap the [0, 1] decoded value to property value range.
+    const [min, max] = value_range;
+
+    const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
+    const scaled_value = value * floatScaler;
+
+    value = scaled_value * (max - min) + min;
+    return createPropertyData("Property", value);
+}

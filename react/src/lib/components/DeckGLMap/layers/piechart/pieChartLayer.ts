@@ -1,11 +1,11 @@
 import { CompositeLayer } from "@deck.gl/core";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { Position } from "@deck.gl/core/utils/positions";
 import { SolidPolygonLayer } from "@deck.gl/layers";
-import { patchLayerProps } from "../utils/layerTools";
 import { PickInfo } from "deck.gl";
 import { layersDefaultProps } from "../layersDefaultProps";
+import { DeckGLLayerContext } from "../../components/Map";
 
 type PieProperties = [{ color: RGBAColor; label: string }];
 
@@ -41,20 +41,16 @@ export default class PieChartLayer extends CompositeLayer<
     PieChartLayerProps<PiesData>
 > {
     onClick(info: PickInfo<PolygonData>): boolean {
-        // Disable selection when drawing is enabled
-        if (
-            this.context.layerManager.getLayers({
-                layerIds: ["drawing-layer"],
-            })?.[0].props.mode != "view"
-        ) {
+        // Make selection only when drawing is disabled
+        if (isDrawingEnabled(this.context.layerManager)) {
             return false;
+        } else {
+            const pie_idx = (info.object as PolygonData)?.properties.pieIndex;
+            (this.context as DeckGLLayerContext).userData.setEditedData({
+                selectedPie: (this.props.data as PiesData)?.pies[pie_idx],
+            });
+            return true;
         }
-
-        const pie_idx = (info.object as PolygonData)?.properties.pieIndex;
-        patchLayerProps<PiesData>(this, {
-            selectedPie: (this.props.data as PiesData)?.pies[pie_idx],
-        } as PieChartLayerProps<PiesData>);
-        return true;
     }
 
     renderLayers(): SolidPolygonLayer<PolygonData>[] {

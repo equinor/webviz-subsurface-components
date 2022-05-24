@@ -14,7 +14,9 @@ module.exports = {
             { configFile: "./config/babel.config.json" },
         ],
     },
-    transformIgnorePatterns: ["<rootDir>/node_modules/(?!(@webviz)/)"],
+    transformIgnorePatterns: [
+        "<rootDir>/node_modules/(?!(@webviz|(@emerson-eps/color-tables)|d3-color|d3-interpolate|d3-delaunay|d3-delaunator|delaunator|robust-predicates)/)",
+    ],
     testPathIgnorePatterns: ["<rootDir>/node_modules", "<rootDir>/dist"],
     modulePathIgnorePatterns: ["<rootDir>/dist"],
 };

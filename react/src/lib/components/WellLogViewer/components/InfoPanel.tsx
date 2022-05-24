@@ -25,7 +25,10 @@ const styleGroupRow = {
     cursor: "pointer",
 };
 
-function formatValue(v1: number) {
+function formatValue(v1: number | string): string {
+    if (typeof v1 === "string")
+        // discrete log
+        return v1;
     if (!Number.isFinite(v1)) return "";
     let v = v1.toPrecision(4);
     if (v.indexOf(".") >= 0) {
@@ -83,23 +86,34 @@ class InfoPanel extends Component<Props> {
             );
         }
 
+        let name = info.name ? info.name : "?";
+        if (name.length > 15)
+            // compress too long names
+            name = name.substring(0, 13) + "…";
+        // print long names and values with a smaller font size
+        const nameStyle: React.CSSProperties =
+            name.length > 10 ? { fontSize: "x-small" } : {};
+        const value = formatValue(info.value);
+        const valueStyle: React.CSSProperties = {
+            width: "90px",
+            paddingLeft: "1.5em",
+            textAlign: "right",
+        };
+        if (value.length > 8) valueStyle.fontSize = "x-small";
         return (
-            <tr key={info.trackId + "." + info.name}>
-                {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
+            <tr
+                key={
+                    info.trackId +
+                    "." +
+                    info.name /*Set unique key prop just for react pleasure*/
+                }
+            >
                 {/*info.type*/}
                 <td style={{ color: info.color, fontSize: "small" }}>
                     {"\u2B24" /*big circle*/}
                 </td>
-                <td>{info.name}</td>
-                <td
-                    style={{
-                        width: "90px",
-                        paddingLeft: "1.5em",
-                        textAlign: "right",
-                    }}
-                >
-                    {formatValue(info.value)}
-                </td>
+                <td style={nameStyle}>{name}</td>
+                <td style={valueStyle}>{value}</td>
                 <td style={{ paddingLeft: "0.5em" }}>{info.units}</td>
             </tr>
         );

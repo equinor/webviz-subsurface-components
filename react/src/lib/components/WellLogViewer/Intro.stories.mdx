@@ -1,0 +1,59 @@
+import { Meta, Canvas, Story } from '@storybook/addon-docs';
+
+import imageWellLogViewer from "./WellLogViewer.png"
+
+<Meta title="WellLogViewer/Overview" />
+
+# WellLogView examples
+
+## Introduction
+These stories contain examples of usage of components for visualization of well log data files.
+There are two main examples: 
+[WellLogViewer](?path=/story/welllogviewer-overview--page#welllogviewer-component) wich contains essential parts of typical well log viewer 
+and [SyncLogViewer](?path=/story/welllogviewer-overview--page#synclogviewer-component) wich contains synchronized views for two different log files.
+
+## WellLogView component
+[WellLogView](?path=/docs/welllogviewer-components-welllogview--default) is a basic react component to wrap [ViDEx well log](https://github.com/equinor/videx-wellog) library for drawing well log data.
+
+The component can zoom and pan visible area of tracks by mouse and support selecting of depth interval.
+
+As input data it accept data files in following formats:
+#### Well Log Data Format
+The JSON Well Log Format is used in WellLogView component for input Well Log data files.
+
+It is a modern well log format created in order to overcome the deficiencies of existing formats.
+It is based on the JavaScript Object Notation open standard (RFC 8259). 
+Full description of the format could be found on the site https://jsonwelllogformat.org .
+
+The file format could be described with a following 
+[JSON schema](https://github.com/equinor/webviz-subsurface-components/blob/master/react/src/lib/inputSchema/WellLog.json)
+
+#### Template Format
+The JSON file describing content of well log view: what tracks should be displayed and what curves it should contains.
+
+The file format could be described with a following 
+[JSON schema](https://github.com/equinor/webviz-subsurface-components/blob/master/react/src/lib/inputSchema/WellLogTemplate.json)
+
+#### Color Table Format
+The JSON file used as a supplement to template file and describe color tables for visualizing different type of log curves.
+
+See also [@emerson-eps/color-tables](https://github.com/emerson-eps/color-tables) component.
+
+
+## WellLogViewer component
+[A demo component](?path=/story/welllogviewer-demo-welllogviewer--default) to deal with WellLogView component.
+It contains WellLogView component surrounded by auxiliary components: 
+readout panel, axis selector and zoom slider.
+
+The number and properties of tracks and curves could be interactively edited by corresponding content menus and dialog boxes.
+
+<img src={imageWellLogViewer} />
+
+_WellLogViewer component architecture._
+
+## SyncLogViewer component
+[An example](?path=/story/welllogviewer-demo-synclogviewer--default) for two linked WellLogView components.
+It demonstrate how different well log views can be synchronized in such complex programs as well correlation applications.
+
+The component architecture is similar to WellLogViewer's one but contains two views for well logs an two readout panels.
+

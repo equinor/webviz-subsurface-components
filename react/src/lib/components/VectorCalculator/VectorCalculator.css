@@ -1,41 +1,70 @@
 .VectorCalculator {
     display: block;
-    padding: 5px;
     flex-grow: 1;
+    margin-top: 5px;
+    height: 100%;
 }
 
-.VectorCalculator .ExpressionInputComponent {
-    padding: 20px;
-    min-width: 400px;
+.VectorCalculator > .MuiGrid-root {
+    height: 100%;
 }
 
-.VectorCalculator .ExpressionTableComponent {
-    padding: 20px;
-    min-width: 360px;
+.VectorCalculator .WarningAlert {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
 }
 
 .VectorCalculator .ExpressionsTableHeader {
     font-weight: bold;
+    background-color: #f7f7f7;
 }
 
-.VectorCalculator .ExpressionsTableHeaderNameCell {
+.VectorCalculator .ExpressionsTableHeaderTable {
+    table-layout: fixed;
+}
+
+.VectorCalculator .ExpressionsTableNameCell {
     width: 35%;
 }
 
-.VectorCalculator .ExpressionsTableHeaderExpressionCell {
+.VectorCalculator .ExpressionsTableExpressionCell {
     width: 65%;
+}
+
+.VectorCalculator .TableWrapperGridItem {
+    flex-grow: 4;
+    height: 0;
+    border: 1px #ccc solid;
+    background-color: #fff;
+    padding: 0;
+    position: relative;
+}
+
+.VectorCalculator .TableWrapperGridItem tbody {
+    height: 100%;
+    background-color: #fff;
 }
 
 .VectorCalculator .ExpressionsTable {
     position: relative;
-    max-height: 450px;
     max-width: 100%;
+    max-height: 100%;
+    height: calc(100% - 57px);
+    background-color: #fff;
 }
 
 .VectorCalculator .ExpressionsTable table {
     table-layout: fixed;
 }
 
+.VectorCalculator .ExpressionsTable .Mui-selected {
+    background-color: #edf4fb;
+}
+
+.VectorCalculator .ExpressionsTable .Mui-selected:hover {
+    background-color: #e3eefa;
+}
 .VectorCalculator .ExpressionsTableCell {
     display: inline-block;
     position: relative;
@@ -45,13 +74,43 @@
     text-overflow: ellipsis;
 }
 
+.VectorCalculator .ExpressionNameTextFieldGridItem {
+    height: 90px;
+}
+.VectorCalculator .ExpressionInputTextFieldGridItem {
+    height: 90px;
+}
+.VectorCalculator .ExpressionDescriptionTextFieldGridItem {
+    height: 90px;
+}
+.VectorCalculator .VectorSelectorTableGridItem {
+    min-height: 70px;
+}
+
+.VectorCalculator .ActionButtonsGridItem {
+    height: 80px;
+}
+
 .VectorCalculator .TextFieldWrapper {
     height: 58px;
 }
 
-.VectorCalculator .VariablesTableContainer {
-    overflow: visible;
+.VectorCalculator .VectorSelectorTableContainer {
     position: relative;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.VectorCalculator .VectorSelectorTableContainer table {
+    table-layout: fixed;
+}
+
+.VectorCalculator .VectorSelectorTableVariableColumn {
+    width: 10%;
+}
+
+.VectorCalculator .VectorSelectorTableVectorSelectorColumn {
+    min-width: 240px;
 }
 
 .VectorCalculator .DisableOverlay {

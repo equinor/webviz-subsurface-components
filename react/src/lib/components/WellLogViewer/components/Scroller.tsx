@@ -19,7 +19,11 @@ function getScrollbarSizes(): { vertical: number; horizontal: number } {
 }
 
 interface Props {
-    onScroll: (x: number, y: number) => void;
+    /**
+     * callback with new scroll positions
+     */
+    onScroll?: (x: number, y: number) => void;
+    children?: ReactNode;
 }
 
 class Scroller extends Component<Props> {
@@ -59,24 +63,41 @@ class Scroller extends Component<Props> {
         if (this.scroller) this.resizeObserver.unobserve(this.scroller);
     }
 
-    /* 
-      callback from HTML element
+    /* current position access functions */
+    getScrollX(): number {
+        const elOuter = this.scroller;
+        if (!elOuter) return 0;
+        const scrollWidth = elOuter.scrollWidth - elOuter.clientWidth;
+        return scrollWidth ? elOuter.scrollLeft / scrollWidth : 0;
+    }
+    getScrollY(): number {
+        const elOuter = this.scroller;
+        if (!elOuter) return 0;
+        const scrollHeight = elOuter.scrollHeight - elOuter.clientHeight;
+        return scrollHeight ? elOuter.scrollTop / scrollHeight : 0;
+    }
+    getScrollPos(vertical: boolean | undefined): number {
+        return vertical ? this.getScrollY() : this.getScrollX();
+    }
+
+    /**
+     * callback from HTML element
      */
     onScroll(): void {
         const elOuter = this.scroller;
         if (!elOuter) return;
-
-        const scrollTop = elOuter.scrollTop;
-        const scrollHeight = elOuter.scrollHeight - elOuter.clientHeight;
-        const scrollLeft = elOuter.scrollLeft;
-        const scrollWidth = elOuter.scrollWidth - elOuter.clientWidth;
-
-        // compute fractions
-        const x = scrollWidth ? scrollLeft / scrollWidth : 0;
-        const y = scrollHeight ? scrollTop / scrollHeight : 0;
-        this.props.onScroll(x, y); // notify parent
+        // notify parent
+        if (this.props.onScroll)
+            this.props.onScroll(this.getScrollX(), this.getScrollY());
     }
 
+    /* functions to externally set zoom and scroll position */
+
+    /**
+     * @param x value to set the horizontal beginning of visible part of content (fraction)
+     * @param y value to set the vertical beginning of visible part of content (fraction)
+     * @returns true if visible part is changed
+     */
     scrollTo(x: number, y: number): boolean {
         if (x < 0.0) x = 0.0;
         else if (x > 1.0) x = 1.0;
@@ -102,6 +123,11 @@ class Scroller extends Component<Props> {
         }
         return false;
     }
+    /**
+     * @param xZoom set X zoom factor of visible part of content
+     * @param yZoom set Y zoom factor of visible part of content
+     * @returns true if visible part is changed
+     */
     zoom(xZoom: number, yZoom: number): boolean {
         const elOuter = this.scroller;
         if (!elOuter) return false;
@@ -118,6 +144,7 @@ class Scroller extends Component<Props> {
         ) {
             elInner.style.width = widthInner;
             elInner.style.height = heightInner;
+
             return true;
         }
         return false;

@@ -7,19 +7,24 @@ module.exports = {
         "@storybook/addon-links",
         "@storybook/addon-essentials",
         "@storybook/addon-actions",
-        "addon-redux"
+        "addon-redux",
+        "storybook-addon-performance/register",
+        "storybook-source-code-addon",
     ],
     core: {
         builder: "webpack5",
     },
     webpackFinal: (config) => {
-        config.module.rules.push({
-            test: /\.scss$/,
-            use: ["vue-style-loader", "css-loader", "sass-loader"],
-        }, {
-            test: /\.(fs|vs).glsl$/i,
-            use: ["raw-loader"]            
-        });
+        config.module.rules.push(
+            {
+                test: /\.scss$/,
+                use: ["vue-style-loader", "css-loader", "sass-loader"],
+            },
+            {
+                test: /\.(fs|vs).glsl$/i,
+                use: ["raw-loader"],
+            }
+        );
         return {
             ...config,
             resolve: {

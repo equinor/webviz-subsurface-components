@@ -602,14 +602,16 @@ class VectorCalculatorDemo extends Component {
 
     render() {
         return (
-            <VectorCalculator
-                id="vector_calculator"
-                vectors={this.vectors}
-                expressions={this.expressions}
-                isDashControlled={false}
-                maxExpressionDescriptionLength={35}
-                setProps={this.setProps}
-            />
+            <div style={{ height: "60vh", width: "90vw" }}>
+                <VectorCalculator
+                    id="vector_calculator"
+                    vectors={this.vectors}
+                    expressions={this.expressions}
+                    isDashControlled={false}
+                    maxExpressionDescriptionLength={35}
+                    setProps={this.setProps}
+                />
+            </div>
         );
     }
 }
