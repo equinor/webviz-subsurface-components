@@ -109,7 +109,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                                     dataObjectName={legend.title}
                                     colorName={legend.colorName}
                                     //colorTables={legend.colorTables}
-                                    position={position}
                                     horizontal={horizontal}
                                 />
                             )}
