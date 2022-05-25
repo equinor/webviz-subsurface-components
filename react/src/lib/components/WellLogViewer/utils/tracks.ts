@@ -882,38 +882,42 @@ function createAreaData(
         for (const t in objects) {
             const object = objects[t];
             if (value === object[iCode]) {
+                let rgba: {
+                    r: number;
+                    g: number;
+                    b: number;
+                    a?: number;
+                };
                 if (colorTable) {
                     // get color from the table
                     const color = getInterpolatedColor(
                         colorTable,
                         parseInt(value.toString())
                     );
-                    return {
-                        from: from,
-                        to: to,
-                        name: t,
-                        color: {
-                            r: color[0],
-                            g: color[1],
-                            b: color[2],
-                            a: 1.0,
-                        },
+                    rgba = {
+                        r: color[0],
+                        g: color[1],
+                        b: color[2],
+                        a: 1.0,
                     };
                 } else {
                     // get color from the meta
                     const color = object[iColor];
-                    return {
-                        from: from,
-                        to: to,
-                        name: t,
-                        color: {
-                            r: color[0],
-                            g: color[1],
-                            b: color[2],
-                            a: color[3] /*1*/,
-                        },
+                    rgba = {
+                        r: color[0],
+                        g: color[1],
+                        b: color[2],
+                        a: color[3] /*1.0*/,
                     };
                 }
+                return {
+                    from: from,
+                    to: to,
+                    name: t,
+                    color: rgba,
+
+                    code: value, // add some attribute to AreaData
+                } as AreaData;
             }
         }
     } else {
@@ -1282,6 +1286,8 @@ function addStackedTrack(
                 "No color tables file given for '" + logColor + "' color table"
             );
         }
+    } else {
+        console.error("No color table given in template plot props");
     }
     const meta = getDiscreteMeta(welllog, name);
     if (!meta && curve.valueType == "integer")

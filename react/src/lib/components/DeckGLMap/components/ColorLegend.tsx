@@ -104,7 +104,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                         <div key={index}>
                             {legend.discrete && (
                                 <DiscreteColorLegend
-                                    key={index}
                                     discreteData={legend.metadata}
                                     dataObjectName={legend.title}
                                     colorName={legend.colorName}
@@ -114,7 +113,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                             )}
                             {legend.valueRange?.length > 0 && legend && (
                                 <ContinuousLegend
-                                    key={index}
                                     min={legend.valueRange[0]}
                                     max={legend.valueRange[1]}
                                     dataObjectName={legend.title}

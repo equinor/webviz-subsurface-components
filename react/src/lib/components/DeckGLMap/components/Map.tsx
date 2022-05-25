@@ -202,6 +202,7 @@ export interface MapMouseEvent {
     y?: number;
     // Only for one well. Full information is available in infos[]
     wellname?: string;
+    wellcolor?: Uint8Array; // well color
     md?: number;
     tvd?: number;
 }
@@ -353,22 +354,32 @@ const Map: React.FC<MapProps> = ({
                 }
                 //const layer_name = (info.layer?.props as ExtendedLayerProps<FeatureCollection>)?.name;
                 if (info.layer && info.layer.id === "wells-layer") {
+                    // info.object is Feature or WellLog;
                     {
                         // try to use Object info (see DeckGL getToolTip callback)
                         const feat = info.object as Feature;
-                        ev.wellname = feat?.properties?.["name"];
+                        const properties = feat?.properties;
+                        if (properties) {
+                            ev.wellname = properties["name"];
+                            ev.wellcolor = properties["color"];
+                        }
                     }
+                    if (!ev.wellname)
+                        ev.wellname = info.object.header?.["well"]; // object is WellLog
+
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     if (info.properties) {
                         for (const property of info.properties) {
+                            if (!ev.wellcolor) ev.wellcolor = property.color;
                             let propname = property.name;
                             if (propname) {
                                 const sep = propname.indexOf(" ");
                                 if (sep >= 0) {
-                                    if (!ev.wellname)
+                                    if (!ev.wellname) {
                                         ev.wellname = propname.substring(
                                             sep + 1
                                         );
+                                    }
                                     propname = propname.substring(0, sep);
                                 }
                             }

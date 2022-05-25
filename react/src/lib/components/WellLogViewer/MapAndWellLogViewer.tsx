@@ -69,6 +69,7 @@ interface State {
     layers?: Record<string, unknown>[];
 
     wellName: string | undefined;
+    wellColor?: string;
 }
 
 function findWellsLayer(event: MapMouseEvent) {
@@ -210,6 +211,15 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                     return {
                         wellIndex: iWell,
                         wellName: event.wellname,
+                        wellColor: event.wellcolor
+                            ? "rgb(" +
+                              event.wellcolor[0] +
+                              "," +
+                              event.wellcolor[1] +
+                              "," +
+                              event.wellcolor[2] +
+                              ")"
+                            : undefined,
                     };
                 });
 
@@ -285,6 +295,17 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             flex: "0 0",
                         }}
                     >
+                        {this.state.wellColor && (
+                            <span
+                                style={{
+                                    color: this.state.wellColor,
+                                    fontSize: "small",
+                                }}
+                            >
+                                {"\u2B24 " /*big circle*/}
+                            </span>
+                        )}
+
                         {this.state.wellName
                             ? this.state.wellName
                             : "Select well by clicking on the map"}
