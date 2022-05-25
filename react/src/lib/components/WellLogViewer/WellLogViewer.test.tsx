@@ -27,6 +27,7 @@ describe("Test Well Log Viewer Component", () => {
                 template={exampleTemplate}
                 colorTables={exampleColorTable}
                 horizontal={true}
+                hideLegend={true}
                 readoutOptions={{
                     allTracks: false,
                     grouping: "by_track",
