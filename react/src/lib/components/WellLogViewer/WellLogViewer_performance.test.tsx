@@ -9,7 +9,12 @@ import WellLogViewer from "./WellLogViewer";
 import logTimes, { obj } from "../../performanceUtility/onRenderFunction";
 
 const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
-//const exampleWellLog = require("../../../demo/example-data/L898MUD.json");
+//const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
+const exampleWellLog = {
+    header: {},
+    curves: [],
+    data: [],
+};
 const exampleColorTable = require("../../../demo/example-data/color-tables.json");
 
 window.ResizeObserver =
@@ -28,7 +33,7 @@ describe("Well Log Viewer perfomance", () => {
                     <Profiler id="Well Log Viewer" onRender={logTimes}>
                         <WellLogViewer
                             id=""
-                            welllog={[]}
+                            welllog={exampleWellLog}
                             hideLegend={true}
                             hideTitles={true}
                             template={exampleTemplate}
