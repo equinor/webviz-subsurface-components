@@ -245,7 +245,7 @@ const Map: React.FC<MapProps> = ({
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
-    }, []);
+    }, [bounds, zoom]);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
