@@ -248,7 +248,7 @@ const Map: React.FC<MapProps> = ({
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
-    }, []);
+    }, [bounds, zoom]);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
@@ -652,8 +652,7 @@ function getViewState(
         height = deck.height;
     }
 
-    const padding = 20;
-    const fitted_bound = fitBounds({ width, height, bounds, padding });
+    const fitted_bound = fitBounds({ width, height, bounds });
     const view_state: ViewStateType = {
         target: [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
