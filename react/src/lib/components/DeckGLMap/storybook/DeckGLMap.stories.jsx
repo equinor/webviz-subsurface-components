@@ -644,11 +644,16 @@ const useStyles = makeStyles({
         position: "fixed",
     },
 });
-export const MapInContainer = () => {
+
+export const MapInContainer = (args) => {
     const classes = useStyles();
     return (
         <div className={classes.main}>
-            <DeckGLMap {...exampleData[0]} />
+            <DeckGLMap {...args} />
         </div>
     );
+};
+
+MapInContainer.args = {
+    ...exampleData[0],
 };
