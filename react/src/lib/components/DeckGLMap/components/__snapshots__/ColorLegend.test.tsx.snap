@@ -2,6 +2,6 @@
 
 exports[`Test Color Legend snapshot test 1`] = `
 <div
-  style="position: absolute; display: flex; right: 5px; top: 10px; z-index: 999;"
+  style="position: absolute; display: flex; z-index: 999;"
 />
 `;
