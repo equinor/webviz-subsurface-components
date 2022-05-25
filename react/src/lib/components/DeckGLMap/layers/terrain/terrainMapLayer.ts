@@ -235,6 +235,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
             // Mouse is outside the non-transparent part of the map.
             return info;
         }
+        console.log(is_outside ? "OUTSIDE" : "INSIDE", info.color[2])
+
 
         // MESH HEIGHT VALUE.
         const meshImageData: ImageData = this.props.meshImageData;
@@ -304,5 +306,35 @@ function getValue(
     const b = int_view[pixelNo * 4 + 2] * decoder.bScaler;
     const value = r + g + b;
 
-    return value;
+    //const value = r + g + b;
+
+    let pixelNo = i * w + j;
+    let r = int_view[pixelNo * 4 + 0] * decoder.rScaler;
+    let g = int_view[pixelNo * 4 + 1] * decoder.gScaler;
+    let b = int_view[pixelNo * 4 + 2] * decoder.bScaler;
+    const value1 = r + g + b;
+
+    pixelNo = (i+1) * w + j;
+    r = int_view[pixelNo * 4 + 0] * decoder.rScaler;
+    g = int_view[pixelNo * 4 + 1] * decoder.gScaler;
+    b = int_view[pixelNo * 4 + 2] * decoder.bScaler;
+    const value2 = r + g + b;
+
+    pixelNo = (i * w) + (j+1);
+    r = int_view[pixelNo * 4 + 0] * decoder.rScaler;
+    g = int_view[pixelNo * 4 + 1] * decoder.gScaler;
+    b = int_view[pixelNo * 4 + 2] * decoder.bScaler;
+    const value3 = r + g + b;
+
+    pixelNo = (i+1) * w + (j+1);
+    r = int_view[pixelNo * 4 + 0] * decoder.rScaler;
+    g = int_view[pixelNo * 4 + 1] * decoder.gScaler;
+    b = int_view[pixelNo * 4 + 2] * decoder.bScaler;
+    const value4 = r + g + b;
+
+    //return (value1 + value2 + value3 + value4) / 4;
+    return value1;
+    
+
+    //return value;
 }
