@@ -7,7 +7,8 @@ import {
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface ColorLegendProps {
-    position?: number[] | null;
+    // Pass additional css style to the parent color legend container
+    cssStyle?: Record<string, unknown> | null;
     horizontal?: boolean | null;
     layers: Layer<unknown>[];
     colorTables: colorTablesArray;
@@ -15,7 +16,7 @@ interface ColorLegendProps {
 
 // Todo: Adapt it for other layers too
 const ColorLegend: React.FC<ColorLegendProps> = ({
-    position,
+    cssStyle,
     horizontal,
     layers,
 }: ColorLegendProps) => {
@@ -87,9 +88,8 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
             style={{
                 position: "absolute",
                 display: "flex",
-                right: position ? position[0] : " ",
-                top: position ? position[1] : " ",
                 zIndex: 999,
+                ...cssStyle,
             }}
         >
             {legendProps.map(
@@ -101,7 +101,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                                     discreteData={legend.metadata}
                                     dataObjectName={legend.title}
                                     colorName={legend.colorName}
-                                    position={position}
                                     horizontal={horizontal}
                                 />
                             )}
@@ -111,7 +110,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                                     max={legend.valueRange[1]}
                                     dataObjectName={legend.title}
                                     colorName={legend.colorName}
-                                    position={position}
                                     horizontal={horizontal}
                                 />
                             )}
@@ -123,7 +121,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
 };
 
 ColorLegend.defaultProps = {
-    position: [5, 10],
     horizontal: false,
 };
 
