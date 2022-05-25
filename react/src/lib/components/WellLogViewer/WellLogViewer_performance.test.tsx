@@ -29,6 +29,8 @@ describe("Well Log Viewer perfomance", () => {
                         <WellLogViewer
                             id=""
                             welllog={[]}
+                            hideLegend={true}
+                            hideTitles={true}
                             template={exampleTemplate}
                             colorTables={exampleColorTable}
                             onContentRescale={function (): void {
