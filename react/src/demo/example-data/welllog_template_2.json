@@ -189,7 +189,8 @@
   "styles": [
     {
       "name": "discrete",
-      "type": "stacked"
+      "type": "stacked",
+      "colorTable": "Stratigraphy"
     }
   ]
 }
