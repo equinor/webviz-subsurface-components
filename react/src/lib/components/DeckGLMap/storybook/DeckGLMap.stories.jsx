@@ -272,7 +272,7 @@ const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
     bounds: [432205, 6475078, 437720, 6481113],
-    meshMaxError: 100,
+    meshMaxError: 100, // XXX 100,
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
