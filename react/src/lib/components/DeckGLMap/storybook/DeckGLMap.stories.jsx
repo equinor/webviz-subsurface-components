@@ -272,14 +272,14 @@ const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
     bounds: [432205, 6475078, 437720, 6481113],
-    meshMaxError: 100,
+    meshMaxError: 100, // XXX 100,
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [-3071, 41048],
     rotDeg: 0,
-    isContoursDepth: false,
-    contours: [0, 2500.0],
+    isContoursDepth: true,
+    contours: [0, 100.0],
     colorMapName: "Physics",
 };
 export const KhMapMesh = MinimalTemplate.bind({});
