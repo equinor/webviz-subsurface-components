@@ -641,9 +641,9 @@ MultiColorMap.args = {
         exampleData[0].layers[0],
         {
             ...exampleData[0].layers[0],
-            "colorMapRange":[3000,3100],
-            "id":"colormap-2-layer",
-            }
+            colorMapRange: [3000, 3100],
+            id: "colormap-2-layer",
+        },
     ],
     views: {
         layout: [1, 2],
@@ -661,7 +661,6 @@ MultiColorMap.args = {
                 show3D: false,
                 layerIds: ["colormap-2-layer"],
             },
-           
         ],
     },
 };

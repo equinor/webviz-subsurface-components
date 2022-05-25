@@ -153,6 +153,18 @@ export default class ColormapLayer extends BitmapLayer<
             },
             moduleParameters: mergedModuleParams,
         });
+
+        const legendProps = [];
+
+        legendProps.push({
+            discrete: false,
+            metadata: { objects: {} },
+            valueRange: [colorMapRangeMin, colorMapRangeMax],
+            colorName: this.props.colorMapName,
+            title: "PropertyMapLayer",
+        });
+
+        this.setState({ legend: legendProps });
     }
 
     // Signature from the base class, eslint doesn't like the any type.
