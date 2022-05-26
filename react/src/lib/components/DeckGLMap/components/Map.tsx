@@ -460,30 +460,13 @@ const Map: React.FC<MapProps> = ({
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
-                            {/* {colorTables && legend?.visible && (
-                                <ColorLegend
-                                    {...legend}
-                                    layers={[
-                                        getLayersByType(
-                                            deckRef.current?.deck.props
-                                                .layers as Layer<unknown>[],
-                                            "WellsLayer"
-                                        )?.[0],
-                                        getLayersByType(
-                                            deckRef.current?.deck.props
-                                                .layers as Layer<unknown>[],
-                                            "ColormapLayer"
-                                        )?.[0],
-                                    ]}
-                                    colorTables={colorTables}
-                                />
-                            )} */}
                             {colorTables && legend?.visible && (
                                 <ColorLegend
                                     {...legend}
                                     layers={
                                         getLayersInViewport(
-                                            deckGLLayers,
+                                            deckRef.current?.deck.props
+                                                .layers as Layer<unknown>[],
                                             view.layerIds
                                         ) as Layer<unknown>[]
                                     }
