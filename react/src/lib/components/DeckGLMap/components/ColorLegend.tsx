@@ -7,7 +7,8 @@ import {
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface ColorLegendProps {
-    position?: number[] | null;
+    // Pass additional css style to the parent color legend container
+    cssStyle?: Record<string, unknown> | null;
     horizontal?: boolean | null;
     layers: Layer<unknown>[];
     colorTables: colorTablesArray;
@@ -15,7 +16,7 @@ interface ColorLegendProps {
 
 // Todo: Adapt it for other layers too
 const ColorLegend: React.FC<ColorLegendProps> = ({
-    position,
+    cssStyle,
     horizontal,
     layers,
 }: ColorLegendProps) => {
@@ -24,16 +25,15 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
             style={{
                 position: "absolute",
                 display: "flex",
-                right: position ? position[0] : " ",
-                top: position ? position[1] : " ",
                 zIndex: 999,
+                ...cssStyle,
             }}
         >
             {layers.map(
                 (layer, index) =>
                     layer?.props?.visible &&
                     layer?.state?.legend?.[0] && (
-                        <div>
+                        <div style={{ marginTop: 30 }}>
                             {layer?.state?.legend?.[0].discrete && (
                                 <DiscreteColorLegend
                                     discreteData={
@@ -45,7 +45,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                                     colorName={
                                         layer.state.legend?.[0].colorName
                                     }
-                                    position={position}
                                     horizontal={horizontal}
                                     key={index}
                                 />
@@ -67,7 +66,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                                         colorName={
                                             layer.state.legend?.[0].colorName
                                         }
-                                        position={position}
                                         horizontal={horizontal}
                                         key={index}
                                     />
@@ -80,7 +78,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
 };
 
 ColorLegend.defaultProps = {
-    position: [5, 10],
     horizontal: false,
 };
 
