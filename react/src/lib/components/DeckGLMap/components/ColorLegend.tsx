@@ -33,7 +33,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                 (layer, index) =>
                     layer?.props?.visible &&
                     layer?.state?.legend?.[0] && (
-                        <div style={{ marginTop: 30 }}>
+                        <div style={{ marginTop: 30 }} key={index}>
                             {layer?.state?.legend?.[0].discrete && (
                                 <DiscreteColorLegend
                                     discreteData={
@@ -46,7 +46,6 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                                         layer.state.legend?.[0].colorName
                                     }
                                     horizontal={horizontal}
-                                    key={index}
                                 />
                             )}
                             {layer?.state?.legend?.[0].valueRange?.length > 0 &&
@@ -67,7 +66,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                                             layer.state.legend?.[0].colorName
                                         }
                                         horizontal={horizontal}
-                                        key={index}
+                                        id={layer?.props?.id}
                                     />
                                 )}
                         </div>
