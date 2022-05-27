@@ -248,8 +248,10 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                     }
                 }
             }
-            if (event.md !== undefined && this.state.controller)
-                this.state.controller.selectContent([event.md, undefined]);
+            if (event.wellname === this.state.wellName)
+                if (event.md !== undefined && this.state.controller)
+                    // synchronize selection only from the current well
+                    this.state.controller.selectContent([event.md, undefined]);
         }
     }
     render(): ReactNode {
