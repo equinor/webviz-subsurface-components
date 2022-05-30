@@ -145,7 +145,7 @@ export interface MapProps {
         visible?: boolean | null;
         incrementValue?: number | null;
         widthPerUnit?: number | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
     };
 
     coordinateUnit?: string;
@@ -159,7 +159,7 @@ export interface MapProps {
 
     legend?: {
         visible?: boolean | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
         horizontal?: boolean | null;
     };
 
@@ -236,10 +236,16 @@ const Map: React.FC<MapProps> = ({
         setViewState({ ...viewState, zoom: vs.zoom });
     }, [zoom]);
 
+    // react on bounds prop change
+    useEffect(() => {
+        const vs = getViewState(bounds, zoom, deckRef.current?.deck);
+        setViewState({ ...viewState, target: vs.target });
+    }, [bounds]);
+
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
-    }, []);
+    }, [bounds, zoom]);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
@@ -372,7 +378,7 @@ const Map: React.FC<MapProps> = ({
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
-        const layers = deckRef.current?.deck.props.layers;
+        const layers = deckRef.current?.deck.props.layers as Layer<unknown>[];
         // this ensures to validate the schemas only once
         if (checkDatafileSchema && layers && isLoaded) {
             try {
@@ -465,11 +471,13 @@ const Map: React.FC<MapProps> = ({
                                     {...legend}
                                     layers={[
                                         getLayersByType(
-                                            deckRef.current?.deck.props.layers,
+                                            deckRef.current?.deck.props
+                                                .layers as Layer<unknown>[],
                                             "WellsLayer"
                                         )?.[0],
                                         getLayersByType(
-                                            deckRef.current?.deck.props.layers,
+                                            deckRef.current?.deck.props
+                                                .layers as Layer<unknown>[],
                                             "ColormapLayer"
                                         )?.[0],
                                     ]}
@@ -497,10 +505,8 @@ const Map: React.FC<MapProps> = ({
 
             {scale?.visible ? (
                 <DistanceScale
+                    {...scale}
                     zoom={viewState?.zoom}
-                    incrementValue={scale.incrementValue}
-                    widthPerUnit={scale.widthPerUnit}
-                    position={scale.position}
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
@@ -534,14 +540,14 @@ Map.defaultProps = {
         visible: true,
         incrementValue: 100,
         widthPerUnit: 100,
-        position: [10, 10],
+        cssStyle: { top: 10, left: 10 },
     },
     toolbar: {
         visible: false,
     },
     legend: {
         visible: true,
-        position: [5, 10],
+        cssStyle: { top: 5, right: 10 },
         horizontal: false,
     },
     coordinateUnit: "m",
@@ -596,8 +602,7 @@ function getViewState(
         height = deck.height;
     }
 
-    const padding = 20;
-    const fitted_bound = fitBounds({ width, height, bounds, padding });
+    const fitted_bound = fitBounds({ width, height, bounds });
     const view_state: ViewStateType = {
         target: [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
