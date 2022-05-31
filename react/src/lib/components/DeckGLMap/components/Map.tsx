@@ -467,7 +467,7 @@ const Map: React.FC<MapProps> = ({
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
                             {colorTables && legend?.visible && (
-                               <ColorLegend
+                                <ColorLegend
                                     {...legend}
                                     layers={
                                         getLayersInViewport(

@@ -911,19 +911,25 @@ function getLegendData(
     logName: string,
     logColor: string
 ) {
+    const legendProps = {
+        discrete: false,
+        metadata: {},
+        valueRange: [0.0, 1.0],
+        colorName: "",
+        title: "",
+    };
+
     const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
     const title = "Wells / " + logName;
-    const legendProps = [];
     if (logInfo?.description == "discrete") {
         const meta = logs[0]["metadata_discrete"];
-        const metadataDiscrete = meta[logName].objects;
-        legendProps.push({
-            title: title,
-            colorName: logColor,
-            discrete: true,
-            metadata: metadataDiscrete,
-            valueRange: [],
-        });
+        const metadataDiscrete: Record<string, [RGBAColor, number]> =
+            meta[logName].objects;
+        legendProps.title = title;
+        legendProps.colorName = logColor;
+        legendProps.discrete = true;
+        legendProps.metadata = metadataDiscrete;
+        legendProps.valueRange = [];
         return legendProps;
     } else {
         const minArray: number[] = [];
@@ -933,14 +939,11 @@ function getLegendData(
             minArray.push(Math.min(...logValues));
             maxArray.push(Math.max(...logValues));
         });
-        legendProps.push({
-            title: title,
-            name: logName,
-            colorName: logColor,
-            discrete: false,
-            metadata: { objects: {} },
-            valueRange: [Math.min(...minArray), Math.max(...maxArray)],
-        });
+        legendProps.title = title;
+        legendProps.colorName = logColor;
+        legendProps.discrete = false;
+        legendProps.metadata = { objects: {} };
+        legendProps.valueRange = [Math.min(...minArray), Math.max(...maxArray)];
         return legendProps;
     }
 }
