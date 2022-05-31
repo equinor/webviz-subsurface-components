@@ -32,8 +32,9 @@ function mapToRange(resolved_mesh: MeshType, meshValueRange: [number, number]) {
     const vertexs = resolved_mesh.attributes.POSITION.value;
     const nvertexs = vertexs.length / 3;
 
-    for (let i = 0; i < nvertexs; i++) {
+    for (let i = 0; i < nvertexs; i++) { // XXX
         let Z = vertexs[i * 3 + 2];
+        //console.log(Z)
         Z = Z * floatScaler; // maps to [0-1]
         Z = min + Z * delta;
         vertexs[i * 3 + 2] = -Z; // depths are positive along negative z axis.
@@ -52,6 +53,11 @@ function add_normals(
     let ntriangles = indices.length / 3;
 
     ////////////////////////////////////////////////////////////////
+    console.log("bounds: ", bounds)
+    const left = bounds[0];
+    const bottom = bounds[1];
+    const right = bounds[2];
+    const top = bounds[3];
     // Remove all triangles that are in undefined areas. That is triangles which
     const xmin = bounds[0];
     const ymin = bounds[1];
