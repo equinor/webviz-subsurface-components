@@ -94,7 +94,7 @@ export function getLayersInViewport(
     layers: Record<string, unknown>[] | Layer<unknown>[],
     layerIds: string[] | undefined
 ): Record<string, unknown>[] | Layer<unknown>[] {
-    if (layerIds && layerIds.length > 0) {
+    if (layerIds && layerIds.length > 0 && layers) {
         const layers_in_view = (layers as never[]).filter((layer) =>
             layerIds.includes(layer["id"] as string)
         );
