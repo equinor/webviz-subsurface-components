@@ -271,7 +271,8 @@ KhMapFlat.parameters = {
 const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
-    bounds: [432205, 6475078, 437720, 6481113],
+    bounds: [432205, 6475078, 437720, 6481113],  // ORIG 
+    //bounds: [432205, 6481113, 437720, 6475078],  // flipped Y
     meshMaxError: 100,
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
@@ -459,6 +460,7 @@ GridLayer.args = {
             ...gridLayer,
             visible: true,
         },
+        axes,
     ],
     toolbar: {
         visible: false,

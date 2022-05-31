@@ -32,42 +32,172 @@ function mapToRange(resolved_mesh: MeshType, meshValueRange: [number, number]) {
     const vertexs = resolved_mesh.attributes.POSITION.value;
     const nvertexs = vertexs.length / 3;
 
-    for (let i = 0; i < nvertexs; i++) {
+    for (let i = 0; i < nvertexs; i++) { // XXX
         let Z = vertexs[i * 3 + 2];
+        //console.log(Z)
         Z = Z * floatScaler; // maps to [0-1]
-        Z = Z * delta + min;
-        vertexs[i * 3 + 2] = -Z; // depths are positive along negative z axis.
+        // ORIG Z = Z * delta + min;
+        // ORIG vertexs[i * 3 + 2] = -Z; // depths are positive along negative z axis.  // XXX elfthand.. her tar jeg jo allede hensyn til z akse ned.. hm..
+        
+        Z = min + Z * delta;
+        vertexs[i * 3 + 2] = -Z; // depths are positive along negative z axis.  // XXX elfthand.. her tar jeg jo allede hensyn til z akse ned.. hm..
     }
 
     return resolved_mesh;
 }
 
-function add_normals(resolved_mesh: MeshType) {
+function add_normals(
+    resolved_mesh: MeshType,
+    meshImageData: ImageData,
+    bounds: [number, number, number, number]
+) {
     const vertexs = resolved_mesh.attributes.POSITION.value;
     let indices = resolved_mesh.indices.value;
     let ntriangles = indices.length / 3;
 
     ////////////////////////////////////////////////////////////////
+    console.log("bounds: ", bounds)
+    const left = bounds[0];
+    const bottom = bounds[1];
+    const right = bounds[2];
+    const top = bounds[3];
     // Remove all triangles that are in undefined areas. That is triangles which
-    // have one or more corner at zero depth.
-    const skirt_depth = -2782; // skirt depth fist pixel..
-    //console.log(skirt_depth)
+
+    const w = meshImageData.width;
+    const h = meshImageData.height;
+    //console.log(w, h)
+    const int_view = new Uint8ClampedArray(
+        meshImageData.data,
+        0,
+        meshImageData.data.length
+    );
+
+    // // sjekk alpha...
+    // for (let i = 0; i < h; i++)
+    // for (let j = 0; j < w; j++) {
+    //     const pixelNo = i * w + j;
+
+    //     const a = int_view[pixelNo * 4 + 3];
+    //     //if (a === 255)  console.log(a)
+
+    // }
+
+    const dx = (right - left) / (w - 1);  // XXX abs her?
+    const dy = (top - bottom) / (h - 1);
+
+
     const indices_reduced = [];
-    for (let t = 0; t < ntriangles; t++) {
-        const i0 = indices[t * 3 + 0];
-        const i1 = indices[t * 3 + 1];
-        const i2 = indices[t * 3 + 2];
+    for (let tn = 0; tn < ntriangles; tn++) {
+        const i0 = indices[tn * 3 + 0];
+        const i1 = indices[tn * 3 + 1];
+        const i2 = indices[tn * 3 + 2];
 
-        // Triangles' three corner's z values.
-        const v0Z = vertexs[i0 * 3 + 2];
-        const v1Z = vertexs[i1 * 3 + 2];
-        const v2Z = vertexs[i2 * 3 + 2];
 
-        // if (t < 100) {
-        //   console.log(v0Z)
-        // }
+        let alphas = [i0, i1, i2];
 
-        if (v0Z !== skirt_depth && v1Z !== skirt_depth && v2Z !== skirt_depth) {
+
+        alphas = alphas.map((index) => {
+            const x = vertexs[index * 3 + 0];
+            const y = vertexs[index * 3 + 1];
+
+            const j = Math.round( (x - left) / dx);
+            const i = Math.round( (y - bottom) / dy);
+
+            // const diff = j - ( (x - left) / dx);
+            // console.log(dx, diff)
+
+
+            // const pixelNo = i * w + j;
+            // const a = int_view[pixelNo * 4 + 3];
+            // if (x === left) {
+            //     //console.log("AHA", a, i, j );
+            // }
+            // return a < 255;
+
+            const pixelNo = i * w + j;
+            const b = int_view[pixelNo * 4 + 3] < 255;
+
+            const pixelNo1 = i * w + (j - 1);
+            const b1 = int_view[pixelNo1 * 4 + 3] < 255;
+
+            const pixelNo2 = i * w + (j + 1);
+            const b2 = int_view[pixelNo2 * 4 + 3] < 255;
+
+            const pixelNo3 = (i + 1) * w + j;
+            const b3 = int_view[pixelNo3 * 4 + 3] < 255;
+
+            const pixelNo4 = (i - 1) * w + j;
+            const b4 = int_view[pixelNo4 * 4 + 3] < 255;
+
+            // 
+            const pixelNo5 = (i - 1) * w + (j - 1);
+            const b5 = int_view[pixelNo5 * 4 + 3] < 255;
+
+            const pixelNo6 = (i + 1) * w + (j + 1);
+            const b6 = int_view[pixelNo6 * 4 + 3] < 255;
+
+            const pixelNo7 = (i + 1) * w + (j - 1);
+            const b7 = int_view[pixelNo7 * 4 + 3] < 255;
+
+            const pixelNo8 = (i - 1) * w + (j + 1);
+            const b8 = int_view[pixelNo8 * 4 + 3] < 255;
+
+            return b || b1 || b2 || b3 || b4 || b5 || b6 || b7 || b8;
+
+        });
+
+        const do_remove = alphas.some((a) => a);
+
+
+        
+        // alphas = alphas.map((index) => {
+        //     const x = vertexs[index * 3 + 0];
+        //     const y = vertexs[index * 3 + 1];
+        //     const s = (x - left) / (right - left);
+        //     const t = (y - bottom) / (top - bottom);
+
+        //     const j = Math.min(Math.round(w * s), w - 1);
+        //     const i = Math.min(Math.round(h * t), h - 1);  // floor vs round  husk ikke for negative tall.. 
+        //     const pixelNo = i * w + j;
+        //     const a = int_view[pixelNo * 4 + 3];
+        //     if (x === left) {
+        //         console.log("AHA", a);
+        //     }
+        //     return a;
+        // });
+
+        // const do_remove = alphas.some((a) => a === 250);
+
+
+
+        // // 'alphas' now contains the alpa value for each corner in triangle 'tn'.
+        // // if (tn  < 10)  console.log(alphas)
+
+        // // Alternativ 2
+        // const x1 = vertexs[i0 * 3 + 0];
+        // const y1 = vertexs[i0 * 3 + 1];
+        // const x2 = vertexs[i1 * 3 + 0];
+        // const y2 = vertexs[i1 * 3 + 1];
+        // const x3 = vertexs[i2 * 3 + 0];
+        // const y3 = vertexs[i2 * 3 + 1];
+        // const x = (x1 + x2 + x3) / 3;
+        // const y = (y1 + y2 + y3) / 3;
+        // const s = (x - left) / (right - left);
+        // const t = (y - bottom) / (top - bottom);
+        // const j = Math.min(Math.floor(w * s), w - 1);
+        // const i = Math.min(Math.floor(h * t), h - 1);
+        // const pixelNo = i * w + j;
+        // const a = int_view[pixelNo * 4 + 3];
+
+        // const do_remove2 = a === 250; // XXX eller sjekk på < 255 kanske..
+
+
+        // if (tn  < 100)  console.log(i, j)
+     
+        //const do_remove3 = do_remove || do_remove2;
+        
+
+        if (!do_remove) {
             indices_reduced.push(i0);
             indices_reduced.push(i1);
             indices_reduced.push(i2);
@@ -78,8 +208,66 @@ function add_normals(resolved_mesh: MeshType) {
     indices = resolved_mesh.indices.value;
     ntriangles = indices.length / 3;
 
-    //console.log(ntriangles)
+    ///// SJKKK OM DET ER NOE ALPHA IGJEN ///////////////////////////////////////////////////////////
 
+    for (let tn = 0; tn < ntriangles; tn++) {
+        const i0 = indices[tn * 3 + 0];
+        const i1 = indices[tn * 3 + 1];
+        const i2 = indices[tn * 3 + 2];
+
+
+        let alphas = [i0, i1, i2];
+
+
+        alphas = alphas.map((index) => {
+            const x = vertexs[index * 3 + 0];
+            const y = vertexs[index * 3 + 1];
+
+            const j = Math.round( (x - left) / dx);
+            const i = Math.round( (y - bottom) / dy);
+
+            const pixelNo = i * w + j;
+            const a = int_view[pixelNo * 4 + 3];
+            if (x === left) {
+                console.log("AHA2", a, i, j );
+            }
+            return a;
+        });
+
+    }
+    ////////////////////////////////////////////////////////////////
+    
+
+
+
+
+    // const indices_reduced = [];
+    // for (let t = 0; t < ntriangles; t++) {
+    //     const i0 = indices[t * 3 + 0];
+    //     const i1 = indices[t * 3 + 1];
+    //     const i2 = indices[t * 3 + 2];
+
+    //     // Triangles' three corner's z values.
+    //     const v0Z = vertexs[i0 * 3 + 2];
+    //     const v1Z = vertexs[i1 * 3 + 2];
+    //     const v2Z = vertexs[i2 * 3 + 2];
+
+    //     // if (t < 100) {
+    //     //   console.log(v0Z)
+    //     // }
+
+    //     if (v0Z !== skirt_depth && v1Z !== skirt_depth && v2Z !== skirt_depth) {
+    //         indices_reduced.push(i0);
+    //         indices_reduced.push(i1);
+    //         indices_reduced.push(i2);
+    //     }
+    // }
+
+    // resolved_mesh.indices.value = new Uint32Array(indices_reduced);
+    // indices = resolved_mesh.indices.value;
+    // ntriangles = indices.length / 3;
+
+    //console.log(ntriangles)
     ////////////////////////////////////////////////////////////////
 
 
@@ -169,6 +357,15 @@ async function load_mesh_and_texture(
         console.log("Error. One or both of texture and mesh must be given!");
     }
 
+    const image_name = isTexture ? texture_name : mesh_name;
+    const texture = await load(image_name, ImageLoader, {
+        image: { type: "data" }, // Will load as ImageData.
+    });
+
+    const meshImageData = await load(mesh_name, ImageLoader, {
+        image: { type: "data" }, // Will load as ImageData.
+    });
+
     let mesh: MeshType;
     if (isMesh) {
         mesh = await load(mesh_name, TerrainLoader, {
@@ -186,7 +383,7 @@ async function load_mesh_and_texture(
 
         // Note: mesh contains triangles. No normals they must be added.
         if (enableSmoothShading) {
-            mesh = add_normals(mesh);
+            mesh = add_normals(mesh, meshImageData, bounds);
         }
     } else {
         // Mesh data is missing.
@@ -210,15 +407,6 @@ async function load_mesh_and_texture(
             indices: { value: new Uint32Array([0, 1, 3, 1, 3, 2]), size: 1 },
         };
     }
-
-    const image_name = isTexture ? texture_name : mesh_name;
-    const texture = await load(image_name, ImageLoader, {
-        image: { type: "data" }, // Will load as ImageData.
-    });
-
-    const meshImageData = await load(mesh_name, ImageLoader, {
-        image: { type: "data" }, // Will load as ImageData.
-    });
 
     return Promise.all([mesh, meshImageData, texture]);
 }
@@ -364,6 +552,7 @@ export default class Map3DLayer extends CompositeLayer<
                 colorMapClampColor: this.props.colorMapClampColor,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
                 material: this.props.material,
+                wireframe: false,
             })
         );
         return [layer];
