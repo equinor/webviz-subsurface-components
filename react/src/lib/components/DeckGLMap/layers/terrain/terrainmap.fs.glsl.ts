@@ -55,10 +55,10 @@ void main(void) {
    float texture_alpha = color.a;
 
    // Discard transparent pixels.
-   if (!picking_uActive && color.w < 0.95) {
-         discard;
-         return;
-   }
+   // if (!picking_uActive && color.w < 0.95) {
+   //       discard;
+   //       return;
+   // }
 
    // Picking pass.
    if (picking_uActive) {
