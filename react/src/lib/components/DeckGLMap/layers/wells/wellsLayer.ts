@@ -912,18 +912,15 @@ function getLegendData(
 ) {
     const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
     const title = "Wells / " + logName;
-    const legendProps = [];
     if (logInfo?.description == "discrete") {
         const meta = logs[0]["metadata_discrete"];
         const metadataDiscrete = meta[logName].objects;
-        legendProps.push({
+        return {
             title: title,
             colorName: logColor,
             discrete: true,
             metadata: metadataDiscrete,
-            valueRange: [],
-        });
-        return legendProps;
+        };
     } else {
         const minArray: number[] = [];
         const maxArray: number[] = [];
@@ -932,14 +929,12 @@ function getLegendData(
             minArray.push(Math.min(...logValues));
             maxArray.push(Math.max(...logValues));
         });
-        legendProps.push({
+        return {
             title: title,
             name: logName,
             colorName: logColor,
             discrete: false,
-            metadata: { objects: {} },
             valueRange: [Math.min(...minArray), Math.max(...maxArray)],
-        });
-        return legendProps;
+        };
     }
 }

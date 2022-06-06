@@ -32,39 +32,25 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
             {layers.map(
                 (layer, index) =>
                     layer?.props?.visible &&
-                    layer?.state?.legend?.[0] && (
+                    layer?.state?.legend && (
                         <div style={{ marginTop: 30 }} key={index}>
-                            {layer?.state?.legend?.[0].discrete && (
+                            {layer?.state?.legend.discrete && (
                                 <DiscreteColorLegend
-                                    discreteData={
-                                        layer.state.legend?.[0].metadata
-                                    }
-                                    dataObjectName={
-                                        layer.state.legend?.[0].title
-                                    }
-                                    colorName={
-                                        layer.state.legend?.[0].colorName
-                                    }
+                                    discreteData={layer.state.legend.metadata}
+                                    dataObjectName={layer.state.legend.title}
+                                    colorName={layer.state.legend.colorName}
                                     horizontal={horizontal}
                                 />
                             )}
-                            {layer?.state?.legend?.[0].valueRange?.length > 0 &&
-                                layer?.state?.legend?.[0] && (
+                            {layer?.state?.legend.valueRange?.length > 0 &&
+                                layer?.state?.legend && (
                                     <ContinuousLegend
-                                        min={
-                                            layer.state.legend?.[0]
-                                                .valueRange[0]
-                                        }
-                                        max={
-                                            layer.state.legend?.[0]
-                                                .valueRange[1]
-                                        }
+                                        min={layer.state.legend.valueRange[0]}
+                                        max={layer.state.legend.valueRange[1]}
                                         dataObjectName={
-                                            layer.state.legend?.[0].title
+                                            layer.state.legend.title
                                         }
-                                        colorName={
-                                            layer.state.legend?.[0].colorName
-                                        }
+                                        colorName={layer.state.legend.colorName}
                                         horizontal={horizontal}
                                         id={layer?.props?.id}
                                     />

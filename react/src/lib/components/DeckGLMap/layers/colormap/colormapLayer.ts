@@ -16,6 +16,7 @@ import fsColormap from "./colormap.fs.glsl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getRgbData } from "@emerson-eps/color-tables";
+import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -188,52 +189,29 @@ export default class ColormapLayer extends BitmapLayer<
         };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // eslint-disable-next-line
-    initializeState(params: any): void {
-        super.initializeState(params);
-        const legendProps = [];
-
-        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
-        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
-
-        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
-        // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const min = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const max = this.props.colorMapRange?.[1] ?? valueRangeMax;
-
-        legendProps.push({
-            discrete: false,
-            metadata: { objects: {} },
-            valueRange: [min, max],
-            colorName: this.props.colorMapName,
-            title: "PropertyMapLayer",
-        });
-
-        this.setState({ legend: legendProps });
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // eslint-disable-next-line
-    updateState({ props, oldProps, context, changeFlags }: any) {
+    updateState({
+        oldProps,
+        props,
+        context,
+        changeFlags,
+    }: UpdateStateInfo<ColormapLayerProps<unknown>>): void {
         super.updateState({ props, oldProps, context, changeFlags });
-        const legendProps = [];
-        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
-        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
+        const valueRangeMin = props.valueRange[0] ?? 0.0;
+        const valueRangeMax = props.valueRange[1] ?? 1.0;
 
         // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const min = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const max = this.props.colorMapRange?.[1] ?? valueRangeMax;
+        const min = props.colorMapRange?.[0] ?? valueRangeMin;
+        const max = props.colorMapRange?.[1] ?? valueRangeMax;
 
-        legendProps.push({
-            discrete: false,
-            metadata: { objects: {} },
-            valueRange: [min, max],
-            colorName: this.props.colorMapName,
-            title: "PropertyMapLayer",
+        this.setState({
+            legend: {
+                discrete: false,
+                valueRange: [min, max],
+                colorName: props.colorMapName,
+                title: "PropertyMapLayer",
+            },
         });
-        this.setState({ legend: legendProps });
     }
 }
 
