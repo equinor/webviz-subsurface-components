@@ -189,29 +189,21 @@ export default class ColormapLayer extends BitmapLayer<
         };
     }
 
-    updateState({
-        oldProps,
-        props,
-        context,
-        changeFlags,
-    }: UpdateStateInfo<ColormapLayerProps<unknown>>): void {
-        super.updateState({ props, oldProps, context, changeFlags });
-        const valueRangeMin = props.valueRange[0] ?? 0.0;
-        const valueRangeMax = props.valueRange[1] ?? 1.0;
+    getLegendData() {
+        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
+        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
 
         // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const min = props.colorMapRange?.[0] ?? valueRangeMin;
-        const max = props.colorMapRange?.[1] ?? valueRangeMax;
+        const min = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const max = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
-        this.setState({
-            legend: {
-                discrete: false,
-                valueRange: [min, max],
-                colorName: props.colorMapName,
-                title: "PropertyMapLayer",
-            },
-        });
+        return {
+            discrete: false,
+            valueRange: [min, max],
+            colorName: this.props.colorMapName,
+            title: "PropertyMapLayer",
+        };
     }
 }
 

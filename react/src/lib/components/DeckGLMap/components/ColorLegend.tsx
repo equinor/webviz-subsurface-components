@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import { Layer } from "deck.gl";
 import {
     DiscreteColorLegend,
@@ -20,50 +20,55 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     horizontal,
     layers,
 }: ColorLegendProps) => {
-    return (
-        <div
-            style={{
-                position: "absolute",
-                display: "flex",
-                zIndex: 999,
-                ...cssStyle,
-            }}
-        >
-            {layers.map(
-                (layer, index) =>
-                    layer?.props?.visible &&
-                    layer?.state?.legend && (
-                        <div style={{ marginTop: 30 }} key={index}>
-                            {layer?.state?.legend.discrete && (
+    function Legend() {
+        const items: ReactElement[] = [];
+        layers.map((layer, index) => {
+            if (layer.props.visible) {
+                const legend_data = layer.getLegendData?.();
+                if (legend_data) {
+                    if (legend_data.discrete) {
+                        items.push(
+                            <div style={{ marginTop: 30 }} key={index}>
                                 <DiscreteColorLegend
-                                    discreteData={layer.state.legend.metadata}
-                                    dataObjectName={layer.state.legend.title}
-                                    colorName={layer.state.legend.colorName}
+                                    discreteData={legend_data.metadata}
+                                    dataObjectName={legend_data.title}
+                                    colorName={legend_data.colorName}
                                     horizontal={horizontal}
                                 />
-                            )}
-                            {layer?.state?.legend.valueRange?.length > 0 &&
-                                layer?.state?.legend && (
-                                    <ContinuousLegend
-                                        min={layer.state.legend.valueRange[0]}
-                                        max={layer.state.legend.valueRange[1]}
-                                        dataObjectName={
-                                            layer.state.legend.title
-                                        }
-                                        colorName={layer.state.legend.colorName}
-                                        horizontal={horizontal}
-                                        id={layer?.props?.id}
-                                    />
-                                )}
-                        </div>
-                    )
-            )}
-        </div>
-    );
-};
+                            </div>
+                        );
+                    } else {
+                        items.push(
+                            <div style={{ marginTop: 30 }} key={index}>
+                                <ContinuousLegend
+                                    min={legend_data.valueRange[0]}
+                                    max={legend_data.valueRange[1]}
+                                    dataObjectName={legend_data.title}
+                                    colorName={legend_data.colorName}
+                                    horizontal={horizontal}
+                                    id={layer?.props?.id}
+                                />
+                            </div>
+                        );
+                    }
+                }
+            }
+        });
+        return (
+            <div
+                style={{
+                    position: "absolute",
+                    display: "flex",
+                    zIndex: 999,
+                    ...cssStyle,
+                }}
+            >
+                {items}
+            </div>
+        );
+    }
 
-ColorLegend.defaultProps = {
-    horizontal: false,
+    return <Legend />;
 };
 
 export default ColorLegend;

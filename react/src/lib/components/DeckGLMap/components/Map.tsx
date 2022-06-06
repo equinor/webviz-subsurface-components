@@ -471,9 +471,7 @@ const Map: React.FC<MapProps> = ({
                                     {...legend}
                                     layers={
                                         getLayersInViewport(
-                                            // deckGLLayers,
-                                            deckRef.current?.deck.props
-                                                .layers as Layer<unknown>[],
+                                            deckGLLayers,
                                             view.layerIds
                                         ) as Layer<unknown>[]
                                     }

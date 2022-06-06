@@ -53,7 +53,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedWell: string;
-    logData: string | LogCurveDataType;
+    logData: string | LogCurveDataType[];
     logName: string;
     logColor: string;
     logrunName: string;
@@ -197,6 +197,19 @@ export default class WellsLayer extends CompositeLayer<
         );
     }
 
+    getLegendData() {
+        const curve_layer = this.internalState.subLayers.find(
+            (layer) => layer.id === "wells-layer-log_curve"
+        );
+        if (curve_layer) {
+            return getLegendData(
+                curve_layer.props.data,
+                this.props.logName,
+                this.props.logColor
+            );
+        }
+    }
+
     renderLayers(): (
         | GeoJsonLayer<Feature>
         | PathLayer<LogCurveDataType>
@@ -333,15 +346,6 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logRadius,
                     ],
                     getPath: [positionFormat],
-                },
-                onDataLoad: (value: LogCurveDataType[]) => {
-                    this.setState({
-                        legend: getLegendData(
-                            value,
-                            this.props.logName,
-                            this.props.logColor
-                        ),
-                    });
                 },
             })
         );
