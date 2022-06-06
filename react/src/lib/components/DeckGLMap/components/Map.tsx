@@ -23,6 +23,7 @@ import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
 import {
     applyPropsOnLayers,
+    ExtendedLayer,
     getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
@@ -272,7 +273,9 @@ const Map: React.FC<MapProps> = ({
         dispatch(setSpec(updated_spec));
     }, [layers, dispatch]);
 
-    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
+    const [deckGLLayers, setDeckGLLayers] = useState<ExtendedLayer<unknown>[]>(
+        []
+    );
     useEffect(() => {
         const layers = st_layers as LayerProps<unknown>[];
         if (!layers || layers.length == 0) return;
@@ -282,7 +285,9 @@ const Map: React.FC<MapProps> = ({
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
 
-        setDeckGLLayers(jsonToObject(layers, enumerations) as Layer<unknown>[]);
+        setDeckGLLayers(
+            jsonToObject(layers, enumerations) as ExtendedLayer<unknown>[]
+        );
     }, [st_layers, resources, editedData]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -473,7 +478,7 @@ const Map: React.FC<MapProps> = ({
                                         getLayersInViewport(
                                             deckGLLayers,
                                             view.layerIds
-                                        ) as Layer<unknown>[]
+                                        ) as ExtendedLayer<unknown>[]
                                     }
                                     colorTables={colorTables}
                                 />
@@ -563,7 +568,7 @@ export default Map;
 function jsonToObject(
     data: ViewProps[] | LayerProps<unknown>[],
     enums: Record<string, unknown>[] | undefined = undefined
-): Layer<unknown>[] | View[] {
+): ExtendedLayer<unknown>[] | View[] {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {

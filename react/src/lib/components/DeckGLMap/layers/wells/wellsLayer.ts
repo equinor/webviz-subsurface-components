@@ -1,4 +1,4 @@
-import { CompositeLayer } from "@deck.gl/core";
+import { Layer, CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
@@ -30,6 +30,10 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
+import {
+    ContinuousLegendDataType,
+    DiscreteLegendDataType,
+} from "../../components/ColorLegend";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -197,9 +201,9 @@ export default class WellsLayer extends CompositeLayer<
         );
     }
 
-    getLegendData() {
+    getLegendData(): ContinuousLegendDataType | DiscreteLegendDataType | null {
         const curve_layer = this.internalState.subLayers.find(
-            (layer) => layer.id === "wells-layer-log_curve"
+            (layer: Layer<unknown>) => layer.id === "wells-layer-log_curve"
         );
         if (curve_layer) {
             return getLegendData(
@@ -208,6 +212,7 @@ export default class WellsLayer extends CompositeLayer<
                 this.props.logColor
             );
         }
+        return null;
     }
 
     renderLayers(): (
@@ -913,7 +918,7 @@ function getLegendData(
     logs: LogCurveDataType[],
     logName: string,
     logColor: string
-) {
+): ContinuousLegendDataType | DiscreteLegendDataType {
     const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
     const title = "Wells / " + logName;
     if (logInfo?.description == "discrete") {
@@ -935,7 +940,6 @@ function getLegendData(
         });
         return {
             title: title,
-            name: logName,
             colorName: logColor,
             discrete: false,
             valueRange: [Math.min(...minArray), Math.max(...maxArray)],

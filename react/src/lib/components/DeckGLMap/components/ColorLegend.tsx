@@ -1,16 +1,30 @@
 import React, { ReactElement } from "react";
-import { Layer } from "deck.gl";
 import {
     DiscreteColorLegend,
     ContinuousLegend,
 } from "@emerson-eps/color-tables";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { ExtendedLayer } from "../layers/utils/layerTools";
+import { RGBAColor } from "@deck.gl/core/utils/color";
+
+interface LegendBaseData {
+    title: string;
+    colorName: string;
+    discrete: boolean;
+}
+export interface DiscreteLegendDataType extends LegendBaseData {
+    metadata: Record<string, [RGBAColor, number]>;
+}
+
+export interface ContinuousLegendDataType extends LegendBaseData {
+    valueRange: [number, number];
+}
 
 interface ColorLegendProps {
     // Pass additional css style to the parent color legend container
     cssStyle?: Record<string, unknown> | null;
     horizontal?: boolean | null;
-    layers: Layer<unknown>[];
+    layers: ExtendedLayer<unknown>[];
     colorTables: colorTablesArray;
 }
 
@@ -27,24 +41,28 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                 const legend_data = layer.getLegendData?.();
                 if (legend_data) {
                     if (legend_data.discrete) {
+                        const dld =
+                            layer.getLegendData?.() as DiscreteLegendDataType;
                         items.push(
                             <div style={{ marginTop: 30 }} key={index}>
                                 <DiscreteColorLegend
-                                    discreteData={legend_data.metadata}
-                                    dataObjectName={legend_data.title}
-                                    colorName={legend_data.colorName}
+                                    discreteData={dld.metadata}
+                                    dataObjectName={dld.title}
+                                    colorName={dld.colorName}
                                     horizontal={horizontal}
                                 />
                             </div>
                         );
                     } else {
+                        const cld =
+                            layer.getLegendData?.() as ContinuousLegendDataType;
                         items.push(
                             <div style={{ marginTop: 30 }} key={index}>
                                 <ContinuousLegend
-                                    min={legend_data.valueRange[0]}
-                                    max={legend_data.valueRange[1]}
-                                    dataObjectName={legend_data.title}
-                                    colorName={legend_data.colorName}
+                                    min={cld.valueRange[0]}
+                                    max={cld.valueRange[1]}
+                                    dataObjectName={cld.title}
+                                    colorName={cld.colorName}
                                     horizontal={horizontal}
                                     id={layer?.props?.id}
                                 />
