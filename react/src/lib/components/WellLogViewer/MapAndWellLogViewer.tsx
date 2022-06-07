@@ -2,7 +2,9 @@ import React from "react";
 import { ReactNode, WeakValidationMap } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
+//import { WellSelector } from "../DeckGLMap/components/Map";
 
+import { WellsLayer } from "../DeckGLMap/layers";
 import {
     Template,
     TemplateTrack,
@@ -68,13 +70,14 @@ interface State {
 
     layers?: Record<string, unknown>[];
 
-    wellName: string | undefined;
+    wellName?: string;
+    selection?: [number,number];
     wellColor?: string;
 }
 
 function findWellsLayer(event: MapMouseEvent) {
     const info = event.infos.find((info) => info.layer?.id === "wells-layer");
-    return info?.layer;
+    return info?.layer as WellsLayer;
 }
 
 function findWellLogIndex(welllogs: WellLog[], wellName: string): number {
@@ -121,7 +124,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             infos: [],
             editedData: props.editedData,
             layers: props.layers,
-            wellName: undefined,
         };
         this.onInfo = this.onInfo.bind(this);
         this.onCreateController = this.onCreateController.bind(this);
@@ -158,10 +160,16 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
         this.setState({ controller: controller });
     }
     onContentSelection(): void {
-        //const baseDomain = controller.getContentBaseDomain();
-        //const domain = controller.getContentDomain();
-        //const selection = controller.getContentSelection();
-        //console.log(selection);
+        const controller = this.state.controller;
+        if (!controller) return;
+        const selection = controller.getContentSelection();
+
+        // synchronize selection only from the current well
+        /*if (?? === this.state.wellName)*/ {
+            this.setState({
+                selection: selection
+            });
+        }
     }
     onTrackScroll(): void {
         const controller = this.state.controller;
@@ -220,6 +228,8 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                               event.wellcolor[2] +
                               ")"
                             : undefined,
+
+                        selection: [event.md, undefined]
                     };
                 });
 
@@ -243,17 +253,26 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             iTrack = findLog(template, logName);
                         }
                         controller.scrollTrackTo(iTrack);
-
-                        //wellsLayer.props.logrunName
                     }
                 }
             }
-            if (event.wellname === this.state.wellName)
-                if (event.md !== undefined && this.state.controller)
-                    // synchronize selection only from the current well
-                    this.state.controller.selectContent([event.md, undefined]);
+            if (event.wellname === this.state.wellName) {
+                // synchronize selection only from the current well
+                if (event.md !== undefined) {
+                    this.state.controller?.selectContent([event.md, undefined]);
+                    this.setState({
+                        selection: [event.md, undefined]
+                    });
+                    
+                    //if (wellsLayer) 
+                    //    wellsLayer.setSelection(event.wellname, [event.md, undefined]);
+                }
+            }
         }
     }
+
+    //onCreateWellSelector(wellSelector:WellSelector): void {}
+
     render(): ReactNode {
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
@@ -280,6 +299,8 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                                 });
                             }}
                             onMouseEvent={this.onMouseEvent}
+                            //onCreateWellSelector={this.onCreateWellSelector.bind(this)}
+                            selection={ {well:this.state.wellName, selection:this.state.selection }}
                         />
                     </div>
                 </div>

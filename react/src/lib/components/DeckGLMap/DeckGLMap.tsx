@@ -1,11 +1,14 @@
 import Map, { ViewsType } from "./components/Map";
 import { MapMouseEvent } from "./components/Map";
+//import { WellSelector } from "./components/Map";
+
 import React from "react";
 import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
 import { createStore } from "./redux/store";
 import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
+
 
 export interface DeckGLMapProps {
     id: string;
@@ -47,6 +50,10 @@ export interface DeckGLMapProps {
      * For get mouse events
      */
     onMouseEvent?: (event: MapMouseEvent) => void;
+
+    //onCreateWellSelector: (selector: WellSelector)=>void;
+    
+    selection?: { well:string|undefined, selection: [number | undefined, number | undefined]|undefined };
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -66,6 +73,8 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     setProps,
     checkDatafileSchema,
     onMouseEvent,
+    onCreateWellSelector,
+    selection,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -125,6 +134,8 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 setEditedData={setEditedData}
                 checkDatafileSchema={checkDatafileSchema}
                 onMouseEvent={onMouseEvent}
+                onCreateWellSelector={onCreateWellSelector}
+                selection={selection}
             />
         </ReduxProvider>
     );

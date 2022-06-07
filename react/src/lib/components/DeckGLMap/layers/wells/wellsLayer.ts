@@ -3,7 +3,7 @@ import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
-import { subtract, distance, dot } from "mathjs";
+import { subtract, distance, dot, e } from "mathjs";
 import {
     rgbValues,
     colorTablesArray,
@@ -182,7 +182,19 @@ export default class WellsLayer extends CompositeLayer<
             (this.context as DeckGLLayerContext).userData.setEditedData({
                 selectedWell: (info.object as Feature).properties?.["name"],
             });
+            //this.props.selectedWell=(info.object as Feature).properties?.["name"]
             return true;
+        }
+    }
+
+    setSelection(well:string|undefined, _selection?: [number | undefined, number | undefined]) {
+        //const selection_layer = this.getSelectionLayer();
+        //if(selection_layer) {  
+        if(this.internalState) {
+            this.setState({
+                well:well,
+                selection:_selection
+            });
         }
     }
 
@@ -217,6 +229,13 @@ export default class WellsLayer extends CompositeLayer<
         return getLayersById(
             this.internalState?.subLayers,
             "wells-layer-log_curve"
+        )?.[0];
+    }
+
+    getSelectionLayer() {
+        return getLayersById(
+            this.internalState?.subLayers,
+            "wells-layer-selection"
         )?.[0];
     }
 
@@ -355,10 +374,9 @@ export default class WellsLayer extends CompositeLayer<
                     getColor: [
                         this.props.logrunName,
                         this.props.logName,
+                        this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
-                        this.props.logName,
-                        this.props.logColor,
                     ],
                     getWidth: [
                         this.props.logrunName,
@@ -372,6 +390,60 @@ export default class WellsLayer extends CompositeLayer<
                 },
             })
         );
+
+        const selection_layer = new PathLayer<LogCurveDataType>(
+            this.getSubLayerProps<LogCurveDataType>({
+                id: "selection",
+                data: this.props.logData,
+                positionFormat,
+                pickable: false,
+                widthScale: 10,
+                widthMinPixels: 1,
+                miterLimit: 100,
+                visible: this.props.logCurves,
+                getPath: (d: LogCurveDataType): Position[] =>
+                    getLogPath1(
+                        data.features,
+                        d,
+                        this.state.well,
+                        this.state.selection,
+                        this.props.logrunName,
+                        this.props.lineStyle?.color
+                    ),
+                getColor: (d: LogCurveDataType): RGBAColor[] =>
+                    getLogColor1(
+                        data.features,
+                        d,
+                        this.state.well,
+                        this.state.selection,
+                        this.props.logrunName,
+                    ),
+                getWidth: (d: LogCurveDataType): number | number[] =>
+                    this.props.logRadius*1.5 ||
+                    getLogWidth(d, this.props.logrunName, this.props.logName),
+                updateTriggers: {
+                    getColor: [
+                        this.props.logrunName,
+                        this.state.well, 
+                        this.state.selection,
+                    ],
+                    getWidth: [
+                        this.props.logrunName,
+                        this.props.logName,
+                        this.props.logRadius,
+                    ],
+                    getPath: [positionFormat, 
+                        this.props.logrunName,
+                        this.state.well, 
+                        this.state.selection,
+                    ],
+                },
+                onDataLoad: (value: LogCurveDataType[]) => {
+                    this.setLegend(value);
+                },
+            })
+        );
+
 
         // well name
         const names = new TextLayer<Feature>(
@@ -394,7 +466,7 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        return [outline, log_layer, colors, highlight, names];
+        return [outline, log_layer, colors, highlight, selection_layer, names];
     }
 
     // For now, use `any` for the picking types because this function should
@@ -726,6 +798,126 @@ function getLogColor(
                 ? log_color.push(dl_attrs[0])
                 : log_color.push([0, 0, 0, 0]); // use transparent for undefined/null log values
         });
+    }
+    return log_color;
+}
+
+
+
+function getLogPath1(
+    wells_data: Feature[],
+    d: LogCurveDataType,
+    selectedWell: string|undefined,
+    selection: number[]|undefined,
+    logrun_name: string,
+    trajectory_line_color?: ColorAccessor
+): Position[] {
+    if(selectedWell!==d.header.well)
+        return [];
+    const well_object = getWellObjectByName(wells_data, d.header.well);
+    if (!well_object) return [];
+
+    const well_xyz = getTrajectory(well_object, trajectory_line_color);
+    const well_mds = getWellMds(well_object);
+
+    if (
+        well_xyz == undefined ||
+        well_mds == undefined ||
+        well_xyz.length == 0 ||
+        well_mds.length == 0
+    )
+        return [];
+
+    const log_xyz: Position[] = [];
+
+    const log_mds = getLogMd(d, logrun_name);
+    if(!log_mds)
+        return [];
+    
+    let md0=selection[0]
+    if(md0 !== undefined) {
+        let md1=selection[1]
+        const mdFirst=well_mds[0];
+        const mdLast=well_mds[well_mds.length-1];
+
+        if(md1!==undefined) {
+            if(md0>md1) {
+                let tmp=md0; md0=md1; md1=tmp;
+            }
+        }
+
+        const delta = 2;
+        if(md0-delta>mdFirst) {
+            let xyz = getPositionByMD(well_xyz, well_mds, md0-delta);
+            log_xyz.push(xyz);
+            xyz = getPositionByMD(well_xyz, well_mds, md0);
+            log_xyz.push(xyz);
+        }
+        if(md1!==undefined) {
+            let index=0;
+            well_mds.forEach((md) => {
+                if(md0<=md && md<=md1) {
+                    const xyz = well_xyz[index];
+                    log_xyz.push(xyz);
+                }
+                index++;
+            });
+            if(md1+delta<mdLast) {
+                let xyz = getPositionByMD(well_xyz, well_mds, md1);
+                log_xyz.push(xyz);
+                xyz = getPositionByMD(well_xyz, well_mds, md1+delta);
+                log_xyz.push(xyz);
+            }
+        }
+    }
+    return log_xyz;
+} 
+
+function getLogColor1(
+    wells_data: Feature[],
+    d: LogCurveDataType,
+    selectedWell: string|undefined,
+    selection: number[]|undefined,
+    logrun_name: string,
+): RGBAColor[] {
+    if(selectedWell!==d.header.well)
+        return [];
+    const well_object = getWellObjectByName(wells_data, d.header.well);
+    if (!well_object) return [];
+
+    const well_mds = getWellMds(well_object);
+
+    const log_mds = getLogMd(d, logrun_name);
+    if (!log_mds || log_mds.length === 0) return [];
+   
+    const log_color: RGBAColor[] = [];
+
+    let md0=selection[0]
+    if(md0!==undefined) {
+        const mdFirst=well_mds[0];
+        const mdLast=well_mds[well_mds.length-1];
+        let md1=selection[1]
+        let swap=false;
+        if(md1!==undefined) {
+            if(md0>md1) {
+                let tmp=md0; md0=md1; md1=tmp;
+                swap=true;
+            }
+        }
+        const delta = 2;
+        if(md0-delta>mdFirst) 
+            log_color.push(swap? [0, 255, 0, 128]: [255, 0, 0, 128]);
+        
+        if(md1!==undefined) {
+            log_color.push([128, 128, 128, 128]);
+            well_mds.forEach((md) => {
+                if(md0<=md && md<=md1) {
+                    log_color.push([128, 128, 128, 128]);
+                }
+            });
+        }
+        if(md1+delta<mdLast) 
+            log_color.push(swap? [255, 0, 0, 128]: [0, 255, 0, 128]);
     }
     return log_color;
 }
