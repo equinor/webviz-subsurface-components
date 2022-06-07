@@ -73,7 +73,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     setProps,
     checkDatafileSchema,
     onMouseEvent,
-    onCreateWellSelector,
+    //onCreateWellSelector,
     selection,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
@@ -134,7 +134,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 setEditedData={setEditedData}
                 checkDatafileSchema={checkDatafileSchema}
                 onMouseEvent={onMouseEvent}
-                onCreateWellSelector={onCreateWellSelector}
+                //onCreateWellSelector={onCreateWellSelector}
                 selection={selection}
             />
         </ReduxProvider>

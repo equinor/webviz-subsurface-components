@@ -71,7 +71,7 @@ interface State {
     layers?: Record<string, unknown>[];
 
     wellName?: string;
-    selection?: [number,number];
+    selection?: [number|undefined,number|undefined];
     wellColor?: string;
 }
 

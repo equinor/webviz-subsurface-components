@@ -3,12 +3,13 @@ import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
-import { subtract, distance, dot, e } from "mathjs";
+import { subtract, distance, dot } from "mathjs";
 import {
     rgbValues,
     colorTablesArray,
     colorsArray,
 } from "@emerson-eps/color-tables/";
+
 import {
     Feature,
     GeometryCollection,
@@ -182,7 +183,7 @@ export default class WellsLayer extends CompositeLayer<
             (this.context as DeckGLLayerContext).userData.setEditedData({
                 selectedWell: (info.object as Feature).properties?.["name"],
             });
-            //this.props.selectedWell=(info.object as Feature).properties?.["name"]
+            this.props.selectedWell=(info.object as Feature).properties?.["name"]
             return true;
         }
     }
@@ -808,11 +809,11 @@ function getLogPath1(
     wells_data: Feature[],
     d: LogCurveDataType,
     selectedWell: string|undefined,
-    selection: number[]|undefined,
+    selection: [number|undefined, number|undefined]|undefined,
     logrun_name: string,
     trajectory_line_color?: ColorAccessor
 ): Position[] {
-    if(selectedWell!==d.header.well)
+    if(!selection || selectedWell!==d.header.well)
         return [];
     const well_object = getWellObjectByName(wells_data, d.header.well);
     if (!well_object) return [];
@@ -828,21 +829,21 @@ function getLogPath1(
     )
         return [];
 
-    const log_xyz: Position[] = [];
-
     const log_mds = getLogMd(d, logrun_name);
     if(!log_mds)
         return [];
+
+    const log_xyz: Position[] = [];
     
-    let md0=selection[0]
+    let md0=selection[0] as number;
     if(md0 !== undefined) {
-        let md1=selection[1]
+        let md1=selection[1] as number;
         const mdFirst=well_mds[0];
         const mdLast=well_mds[well_mds.length-1];
 
         if(md1!==undefined) {
             if(md0>md1) {
-                let tmp=md0; md0=md1; md1=tmp;
+                const tmp:number=md0; md0=md1; md1=tmp;
             }
         }
 
@@ -877,10 +878,10 @@ function getLogColor1(
     wells_data: Feature[],
     d: LogCurveDataType,
     selectedWell: string|undefined,
-    selection: number[]|undefined,
+    selection: [number|undefined, number|undefined]|undefined,
     logrun_name: string,
 ): RGBAColor[] {
-    if(selectedWell!==d.header.well)
+    if(!selection || selectedWell!==d.header.well)
         return [];
     const well_object = getWellObjectByName(wells_data, d.header.well);
     if (!well_object) return [];
@@ -892,15 +893,15 @@ function getLogColor1(
    
     const log_color: RGBAColor[] = [];
 
-    let md0=selection[0]
-    if(md0!==undefined) {
+    let md0=selection[0] as number;
+    if(md0 !== undefined) {
         const mdFirst=well_mds[0];
         const mdLast=well_mds[well_mds.length-1];
-        let md1=selection[1]
+        let md1=selection[1] as number;
         let swap=false;
         if(md1!==undefined) {
             if(md0>md1) {
-                let tmp=md0; md0=md1; md1=tmp;
+                let tmp:number=md0; md0=md1; md1=tmp;
                 swap=true;
             }
         }
