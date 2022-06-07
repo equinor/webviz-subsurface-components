@@ -23,7 +23,6 @@ import { isEmpty } from "lodash";
 import ColorLegend from "./ColorLegend";
 import {
     applyPropsOnLayers,
-    getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
@@ -556,13 +555,18 @@ const Map: React.FC<MapProps> = ({
                             {colorTables && legend?.visible && (
                                 <ColorLegend
                                     {...legend}
-                                    layers={
-                                        getLayersInViewport(
+                                    layers={[
+                                        getLayersByType(
                                             deckRef.current?.deck.props
                                                 .layers as Layer<unknown>[],
-                                            view.layerIds
-                                        ) as Layer<unknown>[]
-                                    }
+                                            "WellsLayer"
+                                        )?.[0],
+                                        getLayersByType(
+                                            deckRef.current?.deck.props
+                                                .layers as Layer<unknown>[],
+                                            "ColormapLayer"
+                                        )?.[0],
+                                    ]}
                                     colorTables={colorTables}
                                 />
                             )}

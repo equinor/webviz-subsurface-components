@@ -187,54 +187,6 @@ export default class ColormapLayer extends BitmapLayer<
             propertyValue: val,
         };
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // eslint-disable-next-line
-    initializeState(params: any): void {
-        super.initializeState(params);
-        const legendProps = [];
-
-        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
-        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
-
-        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
-        // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const min = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const max = this.props.colorMapRange?.[1] ?? valueRangeMax;
-
-        legendProps.push({
-            discrete: false,
-            metadata: { objects: {} },
-            valueRange: [min, max],
-            colorName: this.props.colorMapName,
-            title: "PropertyMapLayer",
-        });
-
-        this.setState({ legend: legendProps });
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // eslint-disable-next-line
-    updateState({ props, oldProps, context, changeFlags }: any) {
-        super.updateState({ props, oldProps, context, changeFlags });
-        const legendProps = [];
-        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
-        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
-
-        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
-        // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const min = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const max = this.props.colorMapRange?.[1] ?? valueRangeMax;
-
-        legendProps.push({
-            discrete: false,
-            metadata: { objects: {} },
-            valueRange: [min, max],
-            colorName: this.props.colorMapName,
-            title: "PropertyMapLayer",
-        });
-        this.setState({ legend: legendProps });
-    }
 }
 
 ColormapLayer.layerName = "ColormapLayer";

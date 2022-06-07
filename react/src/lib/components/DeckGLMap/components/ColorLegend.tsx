@@ -21,6 +21,74 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     layers,
     colorTables,
 }: ColorLegendProps) => {
+    const [legendProps, setLegendProps] = React.useState<
+        [
+            {
+                title: string;
+                colorName: string;
+                colorTables: colorTablesArray;
+                discrete: boolean;
+                metadata: { objects: Record<string, [number[], number]> };
+                valueRange: number[];
+                visible: boolean;
+            }
+        ]
+    >([
+        {
+            title: "",
+            colorName: "",
+            colorTables: colorTables,
+            discrete: false,
+            metadata: { objects: {} },
+            valueRange: [],
+            visible: true,
+        },
+    ]);
+
+    // Get color table for log curves.
+    React.useEffect(() => {
+        if (!layers) return;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const getLegendData: any = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        layers.map((layer: any) => {
+            if (
+                layer?.id == "wells-layer" &&
+                layer?.isLoaded &&
+                Object.keys(layer?.state).length > 0
+            ) {
+                getLegendData.push({
+                    title: layer?.state?.legend[0].title,
+                    colorName:
+                        layer?.state?.legend[0].colorName ||
+                        layer?.props?.logColor,
+                    discrete: layer?.state?.legend[0].discrete,
+                    metadata: layer?.state?.legend[0].metadata,
+                    valueRange: layer?.state?.legend[0].valueRange,
+                    colorTables: colorTables,
+                    visible: layer?.props?.visible,
+                });
+            }
+            if (
+                layer?.id == "colormap-layer" &&
+                layer?.isLoaded &&
+                Object.keys(layer?.state).length > 0
+            ) {
+                const min = layer?.state.model.uniforms.colorMapRangeMin;
+                const max = layer?.state.model.uniforms.colorMapRangeMax;
+                getLegendData.push({
+                    title: layer?.props?.name,
+                    colorName: layer?.props?.colorMapName,
+                    discrete: false,
+                    metadata: { objects: {} },
+                    valueRange: [min, max],
+                    visible: layer?.props?.visible,
+                });
+            }
+        });
+        setLegendProps(getLegendData);
+    }, [layers]);
+
     return (
         <div
             style={{
@@ -30,46 +98,29 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                 ...cssStyle,
             }}
         >
-            {layers.map(
-                (layer, index) =>
-                    layer?.props?.visible &&
-                    layer?.state?.legend?.[0] && (
-                        <div style={{ marginTop: 30 }} key={index}>
-                            {layer?.state?.legend?.[0].discrete && (
+            {legendProps.map(
+                (legend, index) =>
+                    legend.visible && (
+                        <div key={index}>
+                            {legend.discrete && (
                                 <DiscreteColorLegend
-                                    discreteData={
-                                        layer.state.legend?.[0].metadata
-                                    }
-                                    dataObjectName={
-                                        layer.state.legend?.[0].title
-                                    }
-                                    colorName={
-                                        layer.state.legend?.[0].colorName
-                                    }
+                                    discreteData={legend.metadata}
+                                    dataObjectName={legend.title}
+                                    colorName={legend.colorName}
+                                    //colorTables={legend.colorTables}
                                     horizontal={horizontal}
                                 />
                             )}
-                            {layer?.state?.legend?.[0].valueRange?.length > 0 &&
-                                layer?.state?.legend?.[0] && (
-                                    <ContinuousLegend
-                                        min={
-                                            layer.state.legend?.[0]
-                                                .valueRange[0]
-                                        }
-                                        max={
-                                            layer.state.legend?.[0]
-                                                .valueRange[1]
-                                        }
-                                        dataObjectName={
-                                            layer.state.legend?.[0].title
-                                        }
-                                        colorName={
-                                            layer.state.legend?.[0].colorName
-                                        }
-                                        horizontal={horizontal}
-                                        id={layer?.props?.id}
-                                    />
-                                )}
+                            {legend.valueRange?.length > 0 && legend && (
+                                <ContinuousLegend
+                                    min={legend.valueRange[0]}
+                                    max={legend.valueRange[1]}
+                                    dataObjectName={legend.title}
+                                    colorName={legend.colorName}
+                                    //colorTables={legend.colorTables}
+                                    horizontal={horizontal}
+                                />
+                            )}
                         </div>
                     )
             )}
