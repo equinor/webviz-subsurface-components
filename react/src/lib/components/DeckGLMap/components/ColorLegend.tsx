@@ -5,7 +5,7 @@ import {
 } from "@emerson-eps/color-tables";
 import { ExtendedLayer } from "../layers/utils/layerTools";
 import { RGBAColor } from "@deck.gl/core/utils/color";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
+//import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface LegendBaseData {
     title: string;
@@ -23,7 +23,8 @@ export interface ContinuousLegendDataType extends LegendBaseData {
 interface ColorLegendProps {
     horizontal?: boolean | null;
     layer: ExtendedLayer<unknown>;
-    colorTables: colorTablesArray | string | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    colorTables: any;
 }
 
 const ColorLegend: React.FC<ColorLegendProps> = ({
