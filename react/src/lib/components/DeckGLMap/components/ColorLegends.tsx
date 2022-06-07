@@ -8,7 +8,7 @@ interface ColorLegendsProps {
     cssStyle?: Record<string, unknown> | null;
     horizontal?: boolean | null;
     layers: ExtendedLayer<unknown>[];
-    colorTables: colorTablesArray | string;
+    colorTables: colorTablesArray | string | undefined;
 }
 
 // Todo: Adapt it for other layers too
