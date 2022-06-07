@@ -670,6 +670,7 @@ MultiColorMap.args = {
         {
             ...exampleData[0].layers[0],
             colorMapRange: [3000, 3100],
+            valueRange: [3000, 3100],
             id: "colormap-2-layer",
         },
     ],
