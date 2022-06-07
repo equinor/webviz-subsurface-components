@@ -1,9 +1,8 @@
-import React, { ReactElement } from "react";
+import React from "react";
 import {
     DiscreteColorLegend,
     ContinuousLegend,
 } from "@emerson-eps/color-tables";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { ExtendedLayer } from "../layers/utils/layerTools";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 
@@ -21,72 +20,47 @@ export interface ContinuousLegendDataType extends LegendBaseData {
 }
 
 interface ColorLegendProps {
-    // Pass additional css style to the parent color legend container
-    cssStyle?: Record<string, unknown> | null;
     horizontal?: boolean | null;
-    layers: ExtendedLayer<unknown>[];
-    colorTables: colorTablesArray;
+    layer: ExtendedLayer<unknown>;
 }
 
-// Todo: Adapt it for other layers too
 const ColorLegend: React.FC<ColorLegendProps> = ({
-    cssStyle,
     horizontal,
-    layers,
+    layer,
 }: ColorLegendProps) => {
-    function Legend() {
-        const items: ReactElement[] = [];
-        layers.map((layer, index) => {
-            if (layer.props.visible) {
-                const legend_data = layer.getLegendData?.();
-                if (legend_data) {
-                    if (legend_data.discrete) {
-                        const dld =
-                            layer.getLegendData?.() as DiscreteLegendDataType;
-                        items.push(
-                            <div style={{ marginTop: 30 }} key={index}>
-                                <DiscreteColorLegend
-                                    discreteData={dld.metadata}
-                                    dataObjectName={dld.title}
-                                    colorName={dld.colorName}
-                                    horizontal={horizontal}
-                                />
-                            </div>
-                        );
-                    } else {
-                        const cld =
-                            layer.getLegendData?.() as ContinuousLegendDataType;
-                        items.push(
-                            <div style={{ marginTop: 30 }} key={index}>
-                                <ContinuousLegend
-                                    min={cld.valueRange[0]}
-                                    max={cld.valueRange[1]}
-                                    dataObjectName={cld.title}
-                                    colorName={cld.colorName}
-                                    horizontal={horizontal}
-                                    id={layer?.props?.id}
-                                />
-                            </div>
-                        );
-                    }
-                }
-            }
-        });
-        return (
-            <div
-                style={{
-                    position: "absolute",
-                    display: "flex",
-                    zIndex: 999,
-                    ...cssStyle,
-                }}
-            >
-                {items}
-            </div>
-        );
-    }
+    const [legendData, setLegendData] = React.useState<
+        DiscreteLegendDataType | ContinuousLegendDataType
+    >();
+    React.useEffect(() => {
+        const legend_data = layer.getLegendData?.() ?? layer.state?.legend;
+        setLegendData(legend_data);
+    }, [layer.props, layer.state?.legend]);
 
-    return <Legend />;
+    if (!legendData || !layer.props.visible) return null;
+    return (
+        <div style={{ marginTop: 30 }}>
+            {legendData.discrete && (
+                <DiscreteColorLegend
+                    discreteData={
+                        (legendData as DiscreteLegendDataType).metadata
+                    }
+                    dataObjectName={legendData.title}
+                    colorName={legendData.colorName}
+                    horizontal={horizontal}
+                />
+            )}
+            {!legendData.discrete && (
+                <ContinuousLegend
+                    min={(legendData as ContinuousLegendDataType).valueRange[0]}
+                    max={(legendData as ContinuousLegendDataType).valueRange[1]}
+                    dataObjectName={legendData.title}
+                    colorName={legendData.colorName}
+                    horizontal={horizontal}
+                    id={layer.props.id}
+                />
+            )}
+        </div>
+    );
 };
 
 export default ColorLegend;

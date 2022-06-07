@@ -20,7 +20,7 @@ import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import Deck from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
-import ColorLegend from "./ColorLegend";
+import ColorLegends from "./ColorLegends";
 import {
     applyPropsOnLayers,
     ExtendedLayer,
@@ -471,8 +471,8 @@ const Map: React.FC<MapProps> = ({
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
-                            {colorTables && legend?.visible && (
-                                <ColorLegend
+                            {legend?.visible && (
+                                <ColorLegends
                                     {...legend}
                                     layers={
                                         getLayersInViewport(
@@ -480,7 +480,6 @@ const Map: React.FC<MapProps> = ({
                                             view.layerIds
                                         ) as ExtendedLayer<unknown>[]
                                     }
-                                    colorTables={colorTables}
                                 />
                             )}
                             {toolbar?.visible && (

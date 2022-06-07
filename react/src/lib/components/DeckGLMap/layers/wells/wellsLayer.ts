@@ -1,4 +1,4 @@
-import { Layer, CompositeLayer } from "@deck.gl/core";
+import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
@@ -201,20 +201,6 @@ export default class WellsLayer extends CompositeLayer<
         );
     }
 
-    getLegendData(): ContinuousLegendDataType | DiscreteLegendDataType | null {
-        const curve_layer = this.internalState.subLayers.find(
-            (layer: Layer<unknown>) => layer.id === "wells-layer-log_curve"
-        );
-        if (curve_layer) {
-            return getLegendData(
-                curve_layer.props.data,
-                this.props.logName,
-                this.props.logColor
-            );
-        }
-        return null;
-    }
-
     renderLayers(): (
         | GeoJsonLayer<Feature>
         | PathLayer<LogCurveDataType>
@@ -351,6 +337,15 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logRadius,
                     ],
                     getPath: [positionFormat],
+                },
+                onDataLoad: (value: LogCurveDataType[]) => {
+                    this.setState({
+                        legend: getLegendData(
+                            value,
+                            this.props.logName,
+                            this.props.logColor
+                        ),
+                    });
                 },
             })
         );
