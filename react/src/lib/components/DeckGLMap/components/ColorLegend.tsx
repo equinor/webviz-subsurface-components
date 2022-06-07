@@ -23,7 +23,7 @@ export interface ContinuousLegendDataType extends LegendBaseData {
 interface ColorLegendProps {
     horizontal?: boolean | null;
     layer: ExtendedLayer<unknown>;
-    colorTables: colorTablesArray | string;
+    colorTables: colorTablesArray | string | undefined;
 }
 
 const ColorLegend: React.FC<ColorLegendProps> = ({
