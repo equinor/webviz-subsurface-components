@@ -23,7 +23,7 @@ export interface DeckGLMapProps {
         visible?: boolean | null;
         incrementValue?: number | null;
         widthPerUnit?: number | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
     };
     coordinateUnit?: string;
     toolbar?: {
@@ -31,7 +31,7 @@ export interface DeckGLMapProps {
     };
     legend?: {
         visible?: boolean | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
         horizontal?: boolean | null;
     };
     colorTables?: colorTablesArray;
@@ -245,9 +245,9 @@ DeckGLMap.propTypes = {
          */
         widthPerUnit: PropTypes.number,
         /**
-         * Scale bar position in pixels.
+         * Scale bar css style can be used for positioning.
          */
-        position: PropTypes.arrayOf(PropTypes.number.isRequired),
+        cssStyle: PropTypes.objectOf(PropTypes.any),
     }),
 
     /**
@@ -275,9 +275,9 @@ DeckGLMap.propTypes = {
          */
         visible: PropTypes.bool,
         /**
-         * Legend position in pixels.
+         * Legend css style can be used for positioning.
          */
-        position: PropTypes.arrayOf(PropTypes.number.isRequired),
+        cssStyle: PropTypes.objectOf(PropTypes.any),
         /**
          * Orientation of color legend
          */

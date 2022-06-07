@@ -30,6 +30,10 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
+import {
+    ContinuousLegendDataType,
+    DiscreteLegendDataType,
+} from "../../components/ColorLegend";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -53,7 +57,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedWell: string;
-    logData: string | LogCurveDataType;
+    logData: string | LogCurveDataType[];
     logName: string;
     logColor: string;
     logrunName: string;
@@ -910,21 +914,18 @@ function getLegendData(
     logs: LogCurveDataType[],
     logName: string,
     logColor: string
-) {
+): ContinuousLegendDataType | DiscreteLegendDataType {
     const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
     const title = "Wells / " + logName;
-    const legendProps = [];
     if (logInfo?.description == "discrete") {
         const meta = logs[0]["metadata_discrete"];
         const metadataDiscrete = meta[logName].objects;
-        legendProps.push({
+        return {
             title: title,
             colorName: logColor,
             discrete: true,
             metadata: metadataDiscrete,
-            valueRange: [],
-        });
-        return legendProps;
+        };
     } else {
         const minArray: number[] = [];
         const maxArray: number[] = [];
@@ -933,14 +934,11 @@ function getLegendData(
             minArray.push(Math.min(...logValues));
             maxArray.push(Math.max(...logValues));
         });
-        legendProps.push({
+        return {
             title: title,
-            name: logName,
             colorName: logColor,
             discrete: false,
-            metadata: { objects: {} },
             valueRange: [Math.min(...minArray), Math.max(...maxArray)],
-        });
-        return legendProps;
+        };
     }
 }
