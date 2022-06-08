@@ -614,8 +614,8 @@ function getViewState(
 function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
-    const far = 9999.9;
-    const near = 0.0001;
+    const far = 9999;
+    const near = 0.01;
     if (!views || !views.viewports || !views.layout) {
         deckgl_views.push({
             "@@type": "OrthographicView",
