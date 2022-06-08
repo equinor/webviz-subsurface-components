@@ -2,7 +2,6 @@ import React from "react";
 import { ReactNode, WeakValidationMap } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
-//import { WellSelector } from "../DeckGLMap/components/Map";
 
 import { WellsLayer } from "../DeckGLMap/layers";
 import {
@@ -301,8 +300,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
         }
     }
 
-    //onCreateWellSelector(wellSelector:WellSelector): void {}
-
     render(): ReactNode {
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
@@ -329,7 +326,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                                 });
                             }}
                             onMouseEvent={this.onMouseEvent}
-                            //onCreateWellSelector={this.onCreateWellSelector.bind(this)}
                             selection={{
                                 well: this.state.wellName,
                                 selection: this.state.selection,

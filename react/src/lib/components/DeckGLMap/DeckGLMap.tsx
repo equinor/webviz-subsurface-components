@@ -1,6 +1,5 @@
 import Map, { ViewsType } from "./components/Map";
 import { MapMouseEvent } from "./components/Map";
-//import { WellSelector } from "./components/Map";
 
 import React from "react";
 import PropTypes from "prop-types";
@@ -73,7 +72,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     setProps,
     checkDatafileSchema,
     onMouseEvent,
-    //onCreateWellSelector,
     selection,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
@@ -134,7 +132,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 setEditedData={setEditedData}
                 checkDatafileSchema={checkDatafileSchema}
                 onMouseEvent={onMouseEvent}
-                //onCreateWellSelector={onCreateWellSelector}
                 selection={selection}
             />
         </ReduxProvider>

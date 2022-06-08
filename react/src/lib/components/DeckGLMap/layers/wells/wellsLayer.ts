@@ -35,6 +35,7 @@ import {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
+import { getLayersById } from "../../layers/utils/layerTools";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -1168,7 +1169,12 @@ function getLegendData(
     logName: string,
     logColor: string
 ): ContinuousLegendDataType | DiscreteLegendDataType {
-    const logInfo = getLogInfo(logs[0], logs[0].header.name, logName);
+    const log = wellName
+        ? logs.find((log) => log.header.well == wellName)
+        : logs[0];
+    const logInfo = !log
+        ? undefined
+        : getLogInfo(log, log.header.name, logName);
     const title = "Wells / " + logName;
     if (logInfo?.description == "discrete") {
         const meta = logs[0]["metadata_discrete"];

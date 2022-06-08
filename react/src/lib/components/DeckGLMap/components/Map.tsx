@@ -93,8 +93,6 @@ export interface DeckGLLayerContext extends LayerContext {
     };
 }
 
-//export type WellSelector = (well:string|undefined, selection?: [number | undefined, number | undefined])=>void;
-
 export interface MapProps {
     /**
      * The ID of this component, used to identify dash components
