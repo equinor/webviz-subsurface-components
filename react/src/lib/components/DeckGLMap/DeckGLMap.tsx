@@ -9,7 +9,6 @@ import { createStore } from "./redux/store";
 import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
-
 export interface DeckGLMapProps {
     id: string;
     resources?: Record<string, unknown>;
@@ -52,8 +51,11 @@ export interface DeckGLMapProps {
     onMouseEvent?: (event: MapMouseEvent) => void;
 
     //onCreateWellSelector: (selector: WellSelector)=>void;
-    
-    selection?: { well:string|undefined, selection: [number | undefined, number | undefined]|undefined };
+
+    selection?: {
+        well: string | undefined;
+        selection: [number | undefined, number | undefined] | undefined;
+    };
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({

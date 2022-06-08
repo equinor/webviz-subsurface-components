@@ -183,18 +183,23 @@ export default class WellsLayer extends CompositeLayer<
             (this.context as DeckGLLayerContext).userData.setEditedData({
                 selectedWell: (info.object as Feature).properties?.["name"],
             });
-            this.props.selectedWell=(info.object as Feature).properties?.["name"]
+            this.props.selectedWell = (info.object as Feature).properties?.[
+                "name"
+            ];
             return true;
         }
     }
 
-    setSelection(well:string|undefined, _selection?: [number | undefined, number | undefined]) {
+    setSelection(
+        well: string | undefined,
+        _selection?: [number | undefined, number | undefined]
+    ) {
         //const selection_layer = this.getSelectionLayer();
-        //if(selection_layer) {  
-        if(this.internalState) {
+        //if(selection_layer) {
+        if (this.internalState) {
             this.setState({
-                well:well,
-                selection:_selection
+                well: well,
+                selection: _selection,
             });
         }
     }
@@ -417,15 +422,15 @@ export default class WellsLayer extends CompositeLayer<
                         d,
                         this.state.well,
                         this.state.selection,
-                        this.props.logrunName,
+                        this.props.logrunName
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
-                    this.props.logRadius*1.5 ||
+                    this.props.logRadius * 1.5 ||
                     getLogWidth(d, this.props.logrunName, this.props.logName),
                 updateTriggers: {
                     getColor: [
                         this.props.logrunName,
-                        this.state.well, 
+                        this.state.well,
                         this.state.selection,
                     ],
                     getWidth: [
@@ -433,9 +438,10 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logName,
                         this.props.logRadius,
                     ],
-                    getPath: [positionFormat, 
+                    getPath: [
+                        positionFormat,
                         this.props.logrunName,
-                        this.state.well, 
+                        this.state.well,
                         this.state.selection,
                     ],
                 },
@@ -444,7 +450,6 @@ export default class WellsLayer extends CompositeLayer<
                 },
             })
         );
-
 
         // well name
         const names = new TextLayer<Feature>(
@@ -803,18 +808,15 @@ function getLogColor(
     return log_color;
 }
 
-
-
 function getLogPath1(
     wells_data: Feature[],
     d: LogCurveDataType,
-    selectedWell: string|undefined,
-    selection: [number|undefined, number|undefined]|undefined,
+    selectedWell: string | undefined,
+    selection: [number | undefined, number | undefined] | undefined,
     logrun_name: string,
     trajectory_line_color?: ColorAccessor
 ): Position[] {
-    if(!selection || selectedWell!==d.header.well)
-        return [];
+    if (!selection || selectedWell !== d.header.well) return [];
     const well_object = getWellObjectByName(wells_data, d.header.well);
     if (!well_object) return [];
 
@@ -830,59 +832,61 @@ function getLogPath1(
         return [];
 
     const log_mds = getLogMd(d, logrun_name);
-    if(!log_mds)
-        return [];
+    if (!log_mds) return [];
 
     const log_xyz: Position[] = [];
-    
-    let md0=selection[0] as number;
-    if(md0 !== undefined) {
-        let md1=selection[1] as number;
-        const mdFirst=well_mds[0];
-        const mdLast=well_mds[well_mds.length-1];
 
-        if(md1!==undefined) {
-            if(md0>md1) {
-                const tmp:number=md0; md0=md1; md1=tmp;
+    let md0 = selection[0] as number;
+    if (md0 !== undefined) {
+        let md1 = selection[1];
+        if (md1 == md0) md1 = undefined;
+        const mdFirst = well_mds[0];
+        const mdLast = well_mds[well_mds.length - 1];
+
+        if (md1 !== undefined) {
+            if (md0 > md1) {
+                const tmp: number = md0;
+                md0 = md1;
+                md1 = tmp;
             }
         }
 
         const delta = 2;
-        if(md0-delta>mdFirst) {
-            let xyz = getPositionByMD(well_xyz, well_mds, md0-delta);
+        if (md0 - delta > mdFirst) {
+            let xyz = getPositionByMD(well_xyz, well_mds, md0 - delta);
             log_xyz.push(xyz);
             xyz = getPositionByMD(well_xyz, well_mds, md0);
             log_xyz.push(xyz);
         }
-        if(md1!==undefined) {
-            let index=0;
+        if (md1 !== undefined) {
+            const _md1 = md1 as number;
+            let index = 0;
             well_mds.forEach((md) => {
-                if(md0<=md && md<=md1) {
+                if (md0 <= md && md <= _md1) {
                     const xyz = well_xyz[index];
                     log_xyz.push(xyz);
                 }
                 index++;
             });
-            if(md1+delta<mdLast) {
-                let xyz = getPositionByMD(well_xyz, well_mds, md1);
+            if (_md1 + delta < mdLast) {
+                let xyz = getPositionByMD(well_xyz, well_mds, _md1);
                 log_xyz.push(xyz);
-                xyz = getPositionByMD(well_xyz, well_mds, md1+delta);
+                xyz = getPositionByMD(well_xyz, well_mds, _md1 + delta);
                 log_xyz.push(xyz);
             }
         }
     }
     return log_xyz;
-} 
+}
 
 function getLogColor1(
     wells_data: Feature[],
     d: LogCurveDataType,
-    selectedWell: string|undefined,
-    selection: [number|undefined, number|undefined]|undefined,
-    logrun_name: string,
+    selectedWell: string | undefined,
+    selection: [number | undefined, number | undefined] | undefined,
+    logrun_name: string
 ): RGBAColor[] {
-    if(!selection || selectedWell!==d.header.well)
-        return [];
+    if (!selection || selectedWell !== d.header.well) return [];
     const well_object = getWellObjectByName(wells_data, d.header.well);
     if (!well_object) return [];
 
@@ -890,35 +894,40 @@ function getLogColor1(
 
     const log_mds = getLogMd(d, logrun_name);
     if (!log_mds || log_mds.length === 0) return [];
-   
+
     const log_color: RGBAColor[] = [];
 
-    let md0=selection[0] as number;
-    if(md0 !== undefined) {
-        const mdFirst=well_mds[0];
-        const mdLast=well_mds[well_mds.length-1];
-        let md1=selection[1] as number;
-        let swap=false;
-        if(md1!==undefined) {
-            if(md0>md1) {
-                let tmp:number=md0; md0=md1; md1=tmp;
-                swap=true;
+    let md0 = selection[0] as number;
+    if (md0 !== undefined) {
+        const mdFirst = well_mds[0];
+        const mdLast = well_mds[well_mds.length - 1];
+        let md1 = selection[1];
+        if (md1 == md0) md1 = undefined;
+        let swap = false;
+        if (md1 !== undefined) {
+            if (md0 > md1) {
+                const tmp: number = md0;
+                md0 = md1;
+                md1 = tmp;
+                swap = true;
             }
         }
         const delta = 2;
-        if(md0-delta>mdFirst) 
-            log_color.push(swap? [0, 255, 0, 128]: [255, 0, 0, 128]);
-        
-        if(md1!==undefined) {
+        if (md0 - delta > mdFirst)
+            log_color.push(swap ? [0, 255, 0, 128] : [255, 0, 0, 128]);
+
+        if (md1 !== undefined) {
+            const _md1 = md1 as number;
             log_color.push([128, 128, 128, 128]);
             well_mds.forEach((md) => {
-                if(md0<=md && md<=md1) {
+                if (md0 <= md && md <= _md1) {
                     log_color.push([128, 128, 128, 128]);
                 }
             });
+
+            if (_md1 + delta < mdLast)
+                log_color.push(swap ? [255, 0, 0, 128] : [0, 255, 0, 128]);
         }
-        if(md1+delta<mdLast) 
-            log_color.push(swap? [255, 0, 0, 128]: [0, 255, 0, 128]);
     }
     return log_color;
 }

@@ -981,7 +981,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     selectContent(selection: [number | undefined, number | undefined]): void {
         this.selCurrent = selection[0];
         this.selPinned = selection[1];
-        this.selPersistent = this.selPinned ? true : false;
+        this.selPersistent = this.selPinned !== undefined;
 
         this.showSelection();
         this.setInfo(); // reflect new value in this.selCurrent
