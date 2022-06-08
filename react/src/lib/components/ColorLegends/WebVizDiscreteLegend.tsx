@@ -7,8 +7,17 @@ interface LegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
     title: string;
     position?: number[] | null;
+    /** 
+     * Name of color table
+     */
     colorName: string;
+    /** 
+     * Color tables
+     */
     colorTables: colorTablesArray | string | undefined;
+    /**
+     * Direction of the legend
+     */
     horizontal?: boolean | null;
 }
 
@@ -42,7 +51,7 @@ DiscreteLegendWrapper.propTypes = {
      */
     title: PropTypes.string.isRequired,
     position: PropTypes.arrayOf(PropTypes.number.isRequired),
-    /* Name of color table /
+    /* Name of color table */
     colorName: PropTypes.string.isRequired,
     /* Color tables */
     colorTables: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
