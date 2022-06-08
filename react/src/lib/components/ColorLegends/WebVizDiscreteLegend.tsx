@@ -33,11 +33,16 @@ const DiscreteLegendWrapper: React.FC<LegendProps> = ({
 };
 
 DiscreteLegendWrapper.propTypes = {
+    /* Additional data for discrete legend */
     discreteData: PropTypes.any.isRequired,
+    /* Legend title */
     title: PropTypes.string.isRequired,
     position: PropTypes.arrayOf(PropTypes.number.isRequired),
+    /* Name of color table /
     colorName: PropTypes.string.isRequired,
+    /* Color tables */
     colorTables: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+    /* Direction of the legend */
     horizontal: PropTypes.bool,
 };
 
