@@ -72,7 +72,7 @@ interface State {
     wellName?: string;
     selection?: [number | undefined, number | undefined];
     selPersistent?: boolean;
-    wellColor?: string;
+    wellcolor?: Uint8Array; // well color
 }
 
 function findWellsLayer(event: MapMouseEvent) {
@@ -222,7 +222,11 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                         | [number | undefined, number | undefined]
                         | undefined = undefined;
                     let selPersistent: boolean | undefined = undefined;
-                    if (!state.selection || state.selPersistent) {
+                    if (
+                        state.wellIndex !== iWell ||
+                        !state.selection ||
+                        state.selPersistent
+                    ) {
                         selection = [event.md, undefined];
                         selPersistent = false;
                     } else {
@@ -240,15 +244,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                     return {
                         wellIndex: iWell,
                         wellName: event.wellname,
-                        wellColor: event.wellcolor
-                            ? "rgb(" +
-                              event.wellcolor[0] +
-                              "," +
-                              event.wellcolor[1] +
-                              "," +
-                              event.wellcolor[2] +
-                              ")"
-                            : undefined,
+                        wellColor: event.wellcolor,
                         selection: selection,
                         selPersistent: selPersistent,
                     };
@@ -301,6 +297,9 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
     }
 
     render(): ReactNode {
+        const wellName = this.state.wellName;
+        const wellColor = this.state.wellColor;
+        const wellIndex = this.state.wellIndex;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <div
@@ -327,7 +326,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             }}
                             onMouseEvent={this.onMouseEvent}
                             selection={{
-                                well: this.state.wellName,
+                                well: wellName,
                                 selection: this.state.selection,
                             }}
                         />
@@ -347,10 +346,18 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             flex: "0 0",
                         }}
                     >
-                        {this.state.wellColor && (
+                        {wellColor && (
                             <span
                                 style={{
-                                    color: this.state.wellColor,
+                                    color: wellColor
+                                        ? "rgb(" +
+                                          wellColor[0] +
+                                          "," +
+                                          wellColor[1] +
+                                          "," +
+                                          wellColor[2] +
+                                          ")"
+                                        : undefined,
                                     fontSize: "small",
                                 }}
                             >
@@ -358,8 +365,8 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             </span>
                         )}
 
-                        {this.state.wellName
-                            ? this.state.wellName
+                        {wellName
+                            ? wellName
                             : "Select well by clicking on the map"}
                     </div>
                     <div
@@ -371,16 +378,14 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                         }}
                     >
                         <div className="welllogview-error">
-                            {this.state.wellIndex === -1
-                                ? "No well logs for the well '" +
-                                  this.state.wellName +
-                                  "'"
+                            {wellIndex === -1
+                                ? "No well logs for the well '" + wellName + "'"
                                 : ""}
                         </div>
                         <WellLogViewWithScroller
                             welllog={
-                                this.state.wellIndex !== undefined
-                                    ? welllogs[this.state.wellIndex]
+                                wellIndex !== undefined
+                                    ? welllogs[wellIndex]
                                     : undefined
                             }
                             template={template}

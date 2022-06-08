@@ -1168,7 +1168,8 @@ function getLegendData(
     wellName: string,
     logName: string,
     logColor: string
-): ContinuousLegendDataType | DiscreteLegendDataType {
+): ContinuousLegendDataType | DiscreteLegendDataType | null {
+    if (!logs) return null;
     const log = wellName
         ? logs.find((log) => log.header.well == wellName)
         : logs[0];
@@ -1177,7 +1178,7 @@ function getLegendData(
         : getLogInfo(log, log.header.name, logName);
     const title = "Wells / " + logName;
     if (logInfo?.description == "discrete") {
-        const meta = logs[0]["metadata_discrete"];
+        const meta = log["metadata_discrete"];
         const metadataDiscrete = meta[logName].objects;
         return {
             title: title,
