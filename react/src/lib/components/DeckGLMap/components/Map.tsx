@@ -20,9 +20,10 @@ import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import Deck from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
-import ColorLegend from "./ColorLegend";
+import ColorLegends from "./ColorLegends";
 import {
     applyPropsOnLayers,
+    ExtendedLayer,
     getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
@@ -301,7 +302,9 @@ const Map: React.FC<MapProps> = ({
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
 
-        setDeckGLLayers(jsonToObject(layers, enumerations) as Layer<unknown>[]);
+        setDeckGLLayers(
+            jsonToObject(layers, enumerations) as ExtendedLayer<unknown>[]
+        );
     }, [st_layers, resources, editedData]);
 
     useEffect(() => {
@@ -534,17 +537,15 @@ const Map: React.FC<MapProps> = ({
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
-                            {colorTables && legend?.visible && (
-                                <ColorLegend
+                            {legend?.visible && (
+                                <ColorLegends
                                     {...legend}
                                     layers={
                                         getLayersInViewport(
-                                            deckRef.current?.deck.props
-                                                .layers as Layer<unknown>[],
+                                            deckGLLayers,
                                             view.layerIds
-                                        ) as Layer<unknown>[]
+                                        ) as ExtendedLayer<unknown>[]
                                     }
-                                    colorTables={colorTables}
                                 />
                             )}
                             {toolbar?.visible && (
@@ -632,7 +633,7 @@ export default Map;
 function jsonToObject(
     data: ViewProps[] | LayerProps<unknown>[],
     enums: Record<string, unknown>[] | undefined = undefined
-): Layer<unknown>[] | View[] {
+): ExtendedLayer<unknown>[] | View[] {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {
@@ -679,8 +680,8 @@ function getViewState(
 function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
-    const far = 9999.9;
-    const near = 0.0001;
+    const far = 9999;
+    const near = 0.01;
     if (!views || !views.viewports || !views.layout) {
         deckgl_views.push({
             "@@type": "OrthographicView",

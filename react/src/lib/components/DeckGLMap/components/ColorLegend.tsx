@@ -1,84 +1,66 @@
 import React from "react";
-import { Layer } from "deck.gl";
 import {
     DiscreteColorLegend,
     ContinuousLegend,
 } from "@emerson-eps/color-tables";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { ExtendedLayer } from "../layers/utils/layerTools";
+import { RGBAColor } from "@deck.gl/core/utils/color";
 
-interface ColorLegendProps {
-    // Pass additional css style to the parent color legend container
-    cssStyle?: Record<string, unknown> | null;
-    horizontal?: boolean | null;
-    layers: Layer<unknown>[];
-    colorTables: colorTablesArray;
+interface LegendBaseData {
+    title: string;
+    colorName: string;
+    discrete: boolean;
+}
+export interface DiscreteLegendDataType extends LegendBaseData {
+    metadata: Record<string, [RGBAColor, number]>;
 }
 
-// Todo: Adapt it for other layers too
+export interface ContinuousLegendDataType extends LegendBaseData {
+    valueRange: [number, number];
+}
+
+interface ColorLegendProps {
+    horizontal?: boolean | null;
+    layer: ExtendedLayer<unknown>;
+}
+
 const ColorLegend: React.FC<ColorLegendProps> = ({
-    cssStyle,
     horizontal,
-    layers,
-}: // should be used colorTables,
-ColorLegendProps) => {
+    layer,
+}: ColorLegendProps) => {
+    const [legendData, setLegendData] = React.useState<
+        DiscreteLegendDataType | ContinuousLegendDataType
+    >();
+    React.useEffect(() => {
+        const legend_data = layer.getLegendData?.() ?? layer.state?.legend;
+        setLegendData(legend_data);
+    }, [layer.props, layer.state?.legend]);
+
+    if (!legendData || !layer.props.visible) return null;
     return (
-        <div
-            style={{
-                position: "absolute",
-                display: "flex",
-                zIndex: 999,
-                ...cssStyle,
-            }}
-        >
-            {layers.map(
-                (layer, index) =>
-                    layer?.props?.visible &&
-                    layer?.state?.legend?.[0] && (
-                        <div style={{ marginTop: 30 }} key={index}>
-                            {layer?.state?.legend?.[0].discrete && (
-                                <DiscreteColorLegend
-                                    discreteData={
-                                        layer.state.legend?.[0].metadata
-                                    }
-                                    dataObjectName={
-                                        layer.state.legend?.[0].title
-                                    }
-                                    colorName={
-                                        layer.state.legend?.[0].colorName
-                                    }
-                                    horizontal={horizontal}
-                                />
-                            )}
-                            {layer?.state?.legend?.[0].valueRange?.length > 0 &&
-                                layer?.state?.legend?.[0] && (
-                                    <ContinuousLegend
-                                        min={
-                                            layer.state.legend?.[0]
-                                                .valueRange[0]
-                                        }
-                                        max={
-                                            layer.state.legend?.[0]
-                                                .valueRange[1]
-                                        }
-                                        dataObjectName={
-                                            layer.state.legend?.[0].title
-                                        }
-                                        colorName={
-                                            layer.state.legend?.[0].colorName
-                                        }
-                                        horizontal={horizontal}
-                                        id={layer?.props?.id}
-                                    />
-                                )}
-                        </div>
-                    )
+        <div style={{ marginTop: 30 }}>
+            {legendData.discrete && (
+                <DiscreteColorLegend
+                    discreteData={
+                        (legendData as DiscreteLegendDataType).metadata
+                    }
+                    dataObjectName={legendData.title}
+                    colorName={legendData.colorName}
+                    horizontal={horizontal}
+                />
+            )}
+            {!legendData.discrete && (
+                <ContinuousLegend
+                    min={(legendData as ContinuousLegendDataType).valueRange[0]}
+                    max={(legendData as ContinuousLegendDataType).valueRange[1]}
+                    dataObjectName={legendData.title}
+                    colorName={legendData.colorName}
+                    horizontal={horizontal}
+                    id={layer.props.id}
+                />
             )}
         </div>
     );
-};
-
-ColorLegend.defaultProps = {
-    horizontal: false,
 };
 
 export default ColorLegend;
