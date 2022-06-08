@@ -33,13 +33,9 @@ const DiscreteLegendWrapper: React.FC<LegendProps> = ({
 };
 
 DiscreteLegendWrapper.propTypes = {
-    /**
-     *  Additional data for discrete legend 
-     */
+    /* Additional data for discrete legend */
     discreteData: PropTypes.any.isRequired,
-    /** 
-     * Legend title
-     */
+    /* Legend title */
     title: PropTypes.string.isRequired,
     position: PropTypes.arrayOf(PropTypes.number.isRequired),
     /* Name of color table /
