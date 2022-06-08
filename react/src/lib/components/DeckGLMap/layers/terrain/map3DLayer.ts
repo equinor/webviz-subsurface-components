@@ -298,10 +298,10 @@ export default class Map3DLayer extends CompositeLayer<
     }
 
     renderLayers(): [TerrainMapLayer] {
-        const isRotPointDefined = typeof this.props.rotPoint !== "undefined";
-        const center = isRotPointDefined
-            ? this.props.rotPoint
-            : [this.props.bounds[0], this.props.bounds[3]]; // Rotate around upper left corner of bounds (default).
+        const center = this.props.rotPoint || [
+            this.props.bounds[0], // Rotate around upper left corner of bounds (default).
+            this.props.bounds[3],
+        ];
 
         const rotatingModelMatrix = getModelMatrix(
             this.props.rotDeg,
