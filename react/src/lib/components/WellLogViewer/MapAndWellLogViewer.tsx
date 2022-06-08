@@ -72,7 +72,7 @@ interface State {
     wellName?: string;
     selection?: [number | undefined, number | undefined];
     selPersistent?: boolean;
-    wellcolor?: Uint8Array; // well color
+    wellColor?: Uint8Array; // well color
 }
 
 function findWellsLayer(event: MapMouseEvent) {
