@@ -20,9 +20,10 @@ import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import Deck from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
-import ColorLegend from "./ColorLegend";
+import ColorLegends from "./ColorLegends";
 import {
     applyPropsOnLayers,
+    ExtendedLayer,
     getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
@@ -272,7 +273,9 @@ const Map: React.FC<MapProps> = ({
         dispatch(setSpec(updated_spec));
     }, [layers, dispatch]);
 
-    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
+    const [deckGLLayers, setDeckGLLayers] = useState<ExtendedLayer<unknown>[]>(
+        []
+    );
     useEffect(() => {
         const layers = st_layers as LayerProps<unknown>[];
         if (!layers || layers.length == 0) return;
@@ -282,7 +285,9 @@ const Map: React.FC<MapProps> = ({
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
 
-        setDeckGLLayers(jsonToObject(layers, enumerations) as Layer<unknown>[]);
+        setDeckGLLayers(
+            jsonToObject(layers, enumerations) as ExtendedLayer<unknown>[]
+        );
     }, [st_layers, resources, editedData]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -466,17 +471,15 @@ const Map: React.FC<MapProps> = ({
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
-                            {colorTables && legend?.visible && (
-                                <ColorLegend
+                            {legend?.visible && (
+                                <ColorLegends
                                     {...legend}
                                     layers={
                                         getLayersInViewport(
-                                            deckRef.current?.deck.props
-                                                .layers as Layer<unknown>[],
+                                            deckGLLayers,
                                             view.layerIds
-                                        ) as Layer<unknown>[]
+                                        ) as ExtendedLayer<unknown>[]
                                     }
-                                    colorTables={colorTables}
                                 />
                             )}
                             {toolbar?.visible && (
@@ -564,7 +567,7 @@ export default Map;
 function jsonToObject(
     data: ViewProps[] | LayerProps<unknown>[],
     enums: Record<string, unknown>[] | undefined = undefined
-): Layer<unknown>[] | View[] {
+): ExtendedLayer<unknown>[] | View[] {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {

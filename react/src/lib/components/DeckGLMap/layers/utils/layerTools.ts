@@ -1,17 +1,24 @@
-import Layer from "@deck.gl/core/lib/layer";
 import { PickInfo } from "@deck.gl/core/lib/deck";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
-import { LayerManager } from "@deck.gl/core";
+import { Layer, LayerManager } from "@deck.gl/core";
 import { Matrix4 } from "math.gl";
 import { cloneDeep } from "lodash";
 import { layersDefaultProps } from "../layersDefaultProps";
+import {
+    ContinuousLegendDataType,
+    DiscreteLegendDataType,
+} from "../../components/ColorLegend";
 
 // Return a color given a number in the [0,1] range.
 export type colorMapFunctionType = (x: number) => [number, number, number];
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
     name: string;
+}
+
+export interface ExtendedLayer<D> extends Layer<D> {
+    getLegendData?: () => DiscreteLegendDataType | ContinuousLegendDataType;
 }
 
 export interface PropertyDataType {
