@@ -1177,7 +1177,7 @@ function getLegendData(
         ? undefined
         : getLogInfo(log, log.header.name, logName);
     const title = "Wells / " + logName;
-    if (logInfo?.description == "discrete") {
+    if (log && logInfo?.description == "discrete") {
         const meta = log["metadata_discrete"];
         const metadataDiscrete = meta[logName].objects;
         return {
