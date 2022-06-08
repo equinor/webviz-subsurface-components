@@ -19,8 +19,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     cssStyle,
     horizontal,
     layers,
-}: // should be used colorTables,
-ColorLegendProps) => {
+}: ColorLegendProps) => {
     return (
         <div
             style={{
