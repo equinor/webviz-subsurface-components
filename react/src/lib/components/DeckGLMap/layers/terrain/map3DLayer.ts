@@ -194,8 +194,11 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image for map properties. (ex, poro or perm values as a texture)
     propertyTexture: string;
 
-    // Rotates around 'bounds' upper left corner counterclockwise in degrees.
+    // Rotates map counterclockwise in degrees around 'rotPoint'.
     rotDeg: number;
+
+    // Point to rotate around using 'rotDeg'. Defaults to 'bounds' upper left corner if not set.
+    rotPoint: [number, number];
 
     // Contourlines reference point and interval.
     // A value of [-1.0, -1.0] will disable contour lines.
@@ -295,10 +298,15 @@ export default class Map3DLayer extends CompositeLayer<
     }
 
     renderLayers(): [TerrainMapLayer] {
+        const isRotPointDefined = typeof this.props.rotPoint !== "undefined";
+        const center = isRotPointDefined
+            ? this.props.rotPoint
+            : [this.props.bounds[0], this.props.bounds[3]]; // Rotate around upper left corner of bounds (default).
+
         const rotatingModelMatrix = getModelMatrix(
             this.props.rotDeg,
-            this.props.bounds[0] as number, // Rotate around upper left corner of bounds
-            this.props.bounds[3] as number
+            center[0],
+            center[1]
         );
 
         const isMesh =
