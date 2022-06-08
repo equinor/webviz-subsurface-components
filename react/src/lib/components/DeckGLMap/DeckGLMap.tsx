@@ -50,8 +50,6 @@ export interface DeckGLMapProps {
      */
     onMouseEvent?: (event: MapMouseEvent) => void;
 
-    //onCreateWellSelector: (selector: WellSelector)=>void;
-
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;

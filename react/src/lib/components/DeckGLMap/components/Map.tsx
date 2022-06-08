@@ -192,8 +192,6 @@ export interface MapProps {
      */
     onMouseEvent?: (event: MapMouseEvent) => void;
 
-    //onCreateWellSelector: (selector: WellSelector)=>void;
-
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
@@ -234,7 +232,6 @@ const Map: React.FC<MapProps> = ({
     setEditedData,
     checkDatafileSchema,
     onMouseEvent,
-    //onCreateWellSelector,
     selection,
     children,
 }: MapProps) => {
@@ -315,21 +312,6 @@ const Map: React.FC<MapProps> = ({
 
         wellslayer?.setSelection(selection?.well, selection?.selection);
     }, [selection]);
-
-    /*
-    useEffect(() => {
-        const wellSelector = (well:string|undefined, selection?: [number | undefined, number | undefined])=>{
-            let wellslayer=getLayersByType(
-                deckRef.current?.deck.props
-                    .layers as Layer<unknown>[],
-                "WellsLayer"
-            )?.[0] as WellsLayer;
-
-            wellslayer?.setSelection(well, selection) 
-        }
-        onCreateWellSelector(wellSelector);
-    }, [onCreateWellSelector]); 
-    */
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
