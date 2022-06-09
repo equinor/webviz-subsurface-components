@@ -274,7 +274,7 @@ const Map: React.FC<MapProps> = ({
     const st_layers = useSelector(
         (st: MapState) => st.spec["layers"]
     ) as Record<string, unknown>[];
-    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
+
     useEffect(() => {
         if (st_layers == undefined || layers == undefined) return;
 
@@ -282,6 +282,10 @@ const Map: React.FC<MapProps> = ({
         const layers_default = getLayersWithDefaultProps(updated_layers);
         const updated_spec = { layers: layers_default, views: views };
         dispatch(setSpec(updated_spec));
+    }, [layers, dispatch]);
+
+    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
+    useEffect(() => {
         if (deckGLLayers) {
             const wellsLayer = getLayersByType(
                 deckGLLayers,
@@ -289,8 +293,7 @@ const Map: React.FC<MapProps> = ({
             )?.[0] as WellsLayer;
             if (wellsLayer) wellsLayer.setupLegend();
         }
-    }, [layers, dispatch]);
-
+    }, [deckGLLayers]);
     useEffect(() => {
         const layers = st_layers as LayerProps<unknown>[];
         if (!layers || layers.length == 0) return;
