@@ -25,7 +25,7 @@ describe("Test Color Legend", () => {
                         "text-layer",
                     ]) as Layer<unknown>[]
                 }
-               colorTables={colorTables}
+                colorTables={colorTables}
             />
         );
         expect(container.firstChild).toMatchSnapshot();
