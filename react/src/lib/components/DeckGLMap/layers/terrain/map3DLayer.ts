@@ -191,7 +191,7 @@ async function load_mesh_and_texture(
     const isTexture = texture_name !== "";
 
     if (!isMesh && !isTexture) {
-        console.log("Error. One or both of texture and mesh must be given!");
+        console.error("Error. One or both of texture and mesh must be given!");
     }
 
     const image_name = isTexture ? texture_name : mesh_name;
