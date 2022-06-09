@@ -85,8 +85,8 @@ function add_normals(
             // Note: assumes increasing 'j' along increasing X axis and Y axis and
             // increasing 'i' along decreasing Y axis.
             // 'j' along image width. 'i' along image height.
-            const j = Math.round( (x - xmin) / dx);
-            const i = h - Math.round( (y - ymin) / dy);
+            const j = Math.round((x - xmin) / dx);
+            const i = h - Math.round((y - ymin) / dy);
             const pixelNo = i * w + j;
 
             // Check alpha (transparency) for this triangle corner.
