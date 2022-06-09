@@ -650,7 +650,7 @@ const wellId = exampleData[0].id;
 // prop for continous legend
 var min = 0;
 var max = 0.35;
-var dataObjectName = "Legend";
+var dataObjectName = [exampleData[0].layers[4]][0].logName;
 var position = [16, 10];
 var horizontal = true;
 var colorName = wellLayers[0].logColor;
@@ -695,21 +695,17 @@ const wellLayerTemplate = (args) => {
 
     return (
         <div>
-            <div>
-                <ColorLegend
-                    style={{
-                        float: "right",
-                        position: "absolute",
-                        zIndex: 999,
-                        opacity: 1,
-                    }}
-                    {...args}
-                    getColorMapname={wellLayerData}
-                />
+            <div
+                style={{
+                    float: "right",
+                    zIndex: 999,
+                    opacity: 1,
+                    position: "relative",
+                }}
+            >
+                <ColorLegend {...args} getColorMapname={wellLayerData} />
             </div>
-            <div>
-                <DeckGLMap {...args} layers={layers} />
-            </div>
+            <DeckGLMap {...args} layers={layers} />
         </div>
     );
 };
