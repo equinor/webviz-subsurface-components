@@ -16,6 +16,7 @@ import fsColormap from "./colormap.fs.glsl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getRgbData } from "@emerson-eps/color-tables";
+import { ContinuousLegendDataType } from "../../components/ColorLegend";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -185,6 +186,23 @@ export default class ColormapLayer extends BitmapLayer<
             // For more details, see https://deck.gl/docs/developer-guide/custom-layers/picking
             index: 0,
             propertyValue: val,
+        };
+    }
+
+    getLegendData(): ContinuousLegendDataType {
+        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
+        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
+
+        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // Otherwise it will extend from valueRangeMin to valueRangeMax.
+        const min = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const max = this.props.colorMapRange?.[1] ?? valueRangeMax;
+
+        return {
+            discrete: false,
+            valueRange: [min, max],
+            colorName: this.props.colorMapName,
+            title: "PropertyMapLayer",
         };
     }
 }

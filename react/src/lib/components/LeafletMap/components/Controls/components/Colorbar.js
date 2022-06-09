@@ -122,6 +122,7 @@ const ColorBar = (props) => {
 
 ColorBar.propTypes = {
     map: PropTypes.object,
+    position: PropTypes.object,
 };
 
 export default ColorBar;

@@ -20,9 +20,11 @@ import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import Deck from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
 import { isEmpty } from "lodash";
-import ColorLegend from "./ColorLegend";
+import ColorLegends from "./ColorLegends";
 import {
     applyPropsOnLayers,
+    ExtendedLayer,
+    getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
@@ -32,7 +34,6 @@ import {
     validateLayers,
 } from "../../../inputSchema/schemaValidationUtil";
 import { DrawingPickInfo } from "../layers/drawing/drawingLayer";
-import { getLayersByType } from "../layers/utils/layerTools";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
@@ -145,7 +146,7 @@ export interface MapProps {
         visible?: boolean | null;
         incrementValue?: number | null;
         widthPerUnit?: number | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
     };
 
     coordinateUnit?: string;
@@ -159,7 +160,7 @@ export interface MapProps {
 
     legend?: {
         visible?: boolean | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
         horizontal?: boolean | null;
     };
 
@@ -236,10 +237,16 @@ const Map: React.FC<MapProps> = ({
         setViewState({ ...viewState, zoom: vs.zoom });
     }, [zoom]);
 
+    // react on bounds prop change
+    useEffect(() => {
+        const vs = getViewState(bounds, zoom, deckRef.current?.deck);
+        setViewState({ ...viewState, target: vs.target });
+    }, [bounds]);
+
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
-    }, []);
+    }, [bounds, zoom]);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
@@ -266,7 +273,9 @@ const Map: React.FC<MapProps> = ({
         dispatch(setSpec(updated_spec));
     }, [layers, dispatch]);
 
-    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
+    const [deckGLLayers, setDeckGLLayers] = useState<ExtendedLayer<unknown>[]>(
+        []
+    );
     useEffect(() => {
         const layers = st_layers as LayerProps<unknown>[];
         if (!layers || layers.length == 0) return;
@@ -276,7 +285,9 @@ const Map: React.FC<MapProps> = ({
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
 
-        setDeckGLLayers(jsonToObject(layers, enumerations) as Layer<unknown>[]);
+        setDeckGLLayers(
+            jsonToObject(layers, enumerations) as ExtendedLayer<unknown>[]
+        );
     }, [st_layers, resources, editedData]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -372,7 +383,7 @@ const Map: React.FC<MapProps> = ({
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
-        const layers = deckRef.current?.deck.props.layers;
+        const layers = deckRef.current?.deck.props.layers as Layer<unknown>[];
         // this ensures to validate the schemas only once
         if (checkDatafileSchema && layers && isLoaded) {
             try {
@@ -460,20 +471,15 @@ const Map: React.FC<MapProps> = ({
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
-                            {colorTables && legend?.visible && (
-                                <ColorLegend
+                            {legend?.visible && (
+                                <ColorLegends
                                     {...legend}
-                                    layers={[
-                                        getLayersByType(
-                                            deckRef.current?.deck.props.layers,
-                                            "WellsLayer"
-                                        )?.[0],
-                                        getLayersByType(
-                                            deckRef.current?.deck.props.layers,
-                                            "ColormapLayer"
-                                        )?.[0],
-                                    ]}
-                                    colorTables={colorTables}
+                                    layers={
+                                        getLayersInViewport(
+                                            deckGLLayers,
+                                            view.layerIds
+                                        ) as ExtendedLayer<unknown>[]
+                                    }
                                 />
                             )}
                             {toolbar?.visible && (
@@ -497,10 +503,8 @@ const Map: React.FC<MapProps> = ({
 
             {scale?.visible ? (
                 <DistanceScale
+                    {...scale}
                     zoom={viewState?.zoom}
-                    incrementValue={scale.incrementValue}
-                    widthPerUnit={scale.widthPerUnit}
-                    position={scale.position}
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
@@ -534,14 +538,14 @@ Map.defaultProps = {
         visible: true,
         incrementValue: 100,
         widthPerUnit: 100,
-        position: [10, 10],
+        cssStyle: { top: 10, left: 10 },
     },
     toolbar: {
         visible: false,
     },
     legend: {
         visible: true,
-        position: [5, 10],
+        cssStyle: { top: 5, right: 10 },
         horizontal: false,
     },
     coordinateUnit: "m",
@@ -563,7 +567,7 @@ export default Map;
 function jsonToObject(
     data: ViewProps[] | LayerProps<unknown>[],
     enums: Record<string, unknown>[] | undefined = undefined
-): Layer<unknown>[] | View[] {
+): ExtendedLayer<unknown>[] | View[] {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {
@@ -596,8 +600,7 @@ function getViewState(
         height = deck.height;
     }
 
-    const padding = 20;
-    const fitted_bound = fitBounds({ width, height, bounds, padding });
+    const fitted_bound = fitBounds({ width, height, bounds });
     const view_state: ViewStateType = {
         target: [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
@@ -611,8 +614,8 @@ function getViewState(
 function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
-    const far = 9999.9;
-    const near = 0.0001;
+    const far = 9999;
+    const near = 0.01;
     if (!views || !views.viewports || !views.layout) {
         deckgl_views.push({
             "@@type": "OrthographicView",

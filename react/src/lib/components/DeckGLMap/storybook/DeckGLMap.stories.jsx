@@ -1,6 +1,7 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
+import { makeStyles } from "@material-ui/styles";
 import { ColorLegend } from "@emerson-eps/color-tables";
 import colorTables from "@emerson-eps/color-tables/dist/component/color-tables.json";
 import { createColorMapFunction } from "@emerson-eps/color-tables";
@@ -631,6 +632,69 @@ SelectableFeatureExample.args = {
         polylineUsingSelectableGeoJsonLayer,
         polygonUsingSelectableGeoJsonLayer,
     ],
+};
+
+// Map used inside a div container template
+const useStyles = makeStyles({
+    main: {
+        width: 500,
+        height: 500,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        border: "1px solid black",
+        background: "azure",
+        position: "fixed",
+    },
+});
+
+export const MapInContainer = (args) => {
+    const classes = useStyles();
+    return (
+        <div className={classes.main}>
+            <DeckGLMap {...args} />
+        </div>
+    );
+};
+
+MapInContainer.args = {
+    ...exampleData[0],
+};
+
+export const MultiColorMap = EditDataTemplate.bind({});
+MultiColorMap.args = {
+    ...exampleData[0],
+    legend: {
+        visible: true,
+    },
+    zoom: -5,
+    layers: [
+        exampleData[0].layers[0],
+        {
+            ...exampleData[0].layers[0],
+            colorMapRange: [3000, 3100],
+            valueRange: [3000, 3100],
+            id: "colormap-2-layer",
+        },
+    ],
+    views: {
+        layout: [1, 2],
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                name: "Colormap layer",
+                show3D: false,
+                layerIds: ["colormap-layer"],
+            },
+            {
+                id: "view_2",
+                name: "Colormap 2 layer",
+                show3D: false,
+                layerIds: ["colormap-2-layer"],
+            },
+        ],
+    },
 };
 
 // colorselector for welllayer
