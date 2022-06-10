@@ -276,7 +276,7 @@ const meshMapLayer = {
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
-    propertyValueRange: [2782, 3513],
+    propertyValueRange: [-3071, 41048],
     rotDeg: 0, // default rotate around bounds' upper left corner.
     //rotPoint: [432205 + (439400 - 432205) / 2, 6475078 + (6481113 - 6475078) / 2],  // rotate around middle
     contours: [0, 50.0],
