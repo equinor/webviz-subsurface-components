@@ -298,7 +298,7 @@ export default class Map3DLayer extends CompositeLayer<
     }
 
     renderLayers(): [TerrainMapLayer] {
-        const center = this.props.rotPoint || [
+        const center = this.props.rotPoint ?? [
             this.props.bounds[0], // Rotate around upper left corner of bounds (default).
             this.props.bounds[3],
         ];
