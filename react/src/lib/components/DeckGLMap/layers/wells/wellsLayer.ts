@@ -198,8 +198,6 @@ export default class WellsLayer extends CompositeLayer<
         well: string | undefined,
         _selection?: [number | undefined, number | undefined]
     ) {
-        //const selection_layer = this.getSelectionLayer();
-        //if(selection_layer) {
         if (this.internalState) {
             this.setState({
                 well: well,
