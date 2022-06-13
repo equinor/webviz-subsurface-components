@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { NativeSelect } from "@equinor/eds-core-react";
-import { createColorMapFunction } from "@emerson-eps/color-tables";
-import { ColorLegend } from "@emerson-eps/color-tables";
+import { createColorMapFunction, ColorLegend } from "@emerson-eps/color-tables";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
