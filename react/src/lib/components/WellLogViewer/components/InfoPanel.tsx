@@ -131,7 +131,7 @@ class InfoPanel extends Component<Props> {
                         }}
                     >
                         <tbody>
-                            {this.props.infos.map(this.createRow.bind(this))}
+                            {this.props.infos?.map(this.createRow.bind(this))}
                         </tbody>
                     </table>
                 </fieldset>
