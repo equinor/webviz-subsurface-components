@@ -4,7 +4,11 @@ import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { subtract, distance, dot } from "mathjs";
-import { rgbValues } from "@emerson-eps/color-tables";
+import {
+    rgbValues,
+    colorTablesArray,
+    getColors,
+} from "@emerson-eps/color-tables/";
 import {
     Feature,
     GeometryCollection,
@@ -26,8 +30,6 @@ import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
-import { getColors } from "@emerson-eps/color-tables";
 import {
     ContinuousLegendDataType,
     DiscreteLegendDataType,

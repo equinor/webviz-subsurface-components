@@ -2,9 +2,6 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { makeStyles } from "@material-ui/styles";
-import { ColorLegend } from "@emerson-eps/color-tables";
-import colorTables from "@emerson-eps/color-tables/dist/component/color-tables.json";
-import { createColorMapFunction } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
@@ -696,101 +693,5 @@ MultiColorMap.args = {
                 layerIds: ["colormap-2-layer"],
             },
         ],
-    },
-};
-
-// colorselector for welllayer
-const wellLayers = [
-    {
-        "@@type": "WellsLayer",
-        data: "@@#resources.wellsData",
-        logColor: [exampleData[0].layers[4]][0].logColor,
-        logData: "@@#resources.logData",
-        logName: [exampleData[0].layers[4]][0].logName,
-        logrunName: [exampleData[0].layers[4]][0].logrunName,
-        colorMappingFunction: createColorMapFunction("Stratigraphy"),
-    },
-];
-
-const wellId = exampleData[0].id;
-// prop for continous legend
-var min = 0;
-var max = 0.35;
-var dataObjectName = [exampleData[0].layers[4]][0].logName;
-var position = [16, 10];
-var horizontal = true;
-var colorName = wellLayers[0].logColor;
-
-// prop for discrete data
-var discreteData = {
-    Above_BCU: [[], 0],
-    ABOVE: [[], 1],
-    H12: [[], 2],
-    H11: [[], 3],
-    H10: [[], 4],
-    H9: [[], 5],
-    H8: [[], 6],
-    H7: [[], 7],
-    H6: [[], 8],
-    H5: [[], 9],
-    H4: [[], 10],
-    H3: [[], 11],
-    H2: [[], 12],
-    H1: [[], 13],
-    BELOW: [[], 14],
-};
-
-const wellLayerTemplate = (args) => {
-    const [wellLegendUpdated, setWellLegendUpdated] = React.useState();
-
-    const wellLayerData = React.useCallback((data) => {
-        setWellLegendUpdated(data);
-    }, []);
-
-    const layers = [
-        {
-            ...args.wellLayers[0],
-            colorMappingFunction: createColorMapFunction(
-                wellLegendUpdated ? wellLegendUpdated : wellLayers[0].logColor
-            ),
-            logColor: wellLegendUpdated
-                ? wellLegendUpdated
-                : args.wellLayers[0].logColor,
-        },
-    ];
-
-    return (
-        <div>
-            <div
-                style={{
-                    float: "right",
-                    zIndex: 999,
-                    opacity: 1,
-                    position: "relative",
-                }}
-            >
-                <ColorLegend {...args} getColorMapname={wellLayerData} />
-            </div>
-            <DeckGLMap {...args} layers={layers} />
-        </div>
-    );
-};
-
-export const ColorSelectorForWellLayer = wellLayerTemplate.bind({});
-
-ColorSelectorForWellLayer.args = {
-    min,
-    max,
-    dataObjectName,
-    position,
-    horizontal,
-    colorName,
-    colorTables,
-    discreteData,
-    ...exampleData[0],
-    id: wellId,
-    wellLayers,
-    legend: {
-        visible: false,
     },
 };

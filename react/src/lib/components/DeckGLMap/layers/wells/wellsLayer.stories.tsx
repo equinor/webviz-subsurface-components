@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { NativeSelect } from "@equinor/eds-core-react";
+import { createColorMapFunction } from "@emerson-eps/color-tables";
+import { ColorLegend } from "@emerson-eps/color-tables";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
 export default {
     component: DeckGLMap,
@@ -319,4 +323,98 @@ export const ContinuousColorTable: React.FC = () => {
             }
         </>
     );
+};
+
+// colorselector for welllayer
+const wellLayers = [
+    {
+        ...defaultProps.layers[0],
+        refine: false,
+        outline: false,
+        logData: "./volve_logs.json",
+        logrunName: "BLOCKING",
+        logName: "ZONELOG",
+        logColor: "Stratigraphy",
+        colorMappingFunction: createColorMapFunction("Stratigraphy"),
+    },
+];
+
+// prop for legend
+const min = 0;
+const max = 0.35;
+const dataObjectName = "ZONELOG";
+const position = [16, 10];
+const horizontal = true;
+const colorName = wellLayers[0].logColor;
+const discreteData = {
+    Above_BCU: [[], 0],
+    ABOVE: [[], 1],
+    H12: [[], 2],
+    H11: [[], 3],
+    H10: [[], 4],
+    H9: [[], 5],
+    H8: [[], 6],
+    H7: [[], 7],
+    H6: [[], 8],
+    H5: [[], 9],
+    H4: [[], 10],
+    H3: [[], 11],
+    H2: [[], 12],
+    H1: [[], 13],
+    BELOW: [[], 14],
+};
+
+const wellLayerTemplate = (args) => {
+    const [wellLegendUpdated, setWellLegendUpdated] = React.useState();
+
+    const wellLayerData = React.useCallback((data) => {
+        setWellLegendUpdated(data);
+    }, []);
+
+    const layers = [
+        {
+            ...args.wellLayers[0],
+            colorMappingFunction: createColorMapFunction(
+                wellLegendUpdated ? wellLegendUpdated : wellLayers[0].logColor
+            ),
+            logColor: wellLegendUpdated
+                ? wellLegendUpdated
+                : wellLayers[0].logColor,
+        },
+    ];
+
+    return (
+        <div>
+            <div
+                style={{
+                    float: "right",
+                    zIndex: 999,
+                    opacity: 1,
+                    position: "relative",
+                }}
+            >
+                <ColorLegend {...args} getColorMapname={wellLayerData} />
+            </div>
+            <DeckGLMap {...args} layers={layers} />
+        </div>
+    );
+};
+
+export const WellLayerColorSelector = wellLayerTemplate.bind({});
+
+WellLayerColorSelector.args = {
+    min,
+    max,
+    dataObjectName,
+    position,
+    horizontal,
+    colorName,
+    colorTables,
+    discreteData,
+    ...defaultProps,
+    id: defaultProps.id,
+    wellLayers,
+    legend: {
+        visible: false,
+    },
 };
