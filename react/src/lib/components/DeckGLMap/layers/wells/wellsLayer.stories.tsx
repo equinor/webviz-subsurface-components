@@ -364,7 +364,8 @@ const discreteData = {
     BELOW: [[], 14],
 };
 
-const wellLayerTemplate = (args) => {
+//eslint-disable-next-line
+const wellLayerTemplate = (args: any) => {
     const [wellLegendUpdated, setWellLegendUpdated] = React.useState();
 
     const wellLayerData = React.useCallback((data) => {
@@ -400,7 +401,8 @@ const wellLayerTemplate = (args) => {
     );
 };
 
-export const WellLayerColorSelector = wellLayerTemplate.bind({});
+//eslint-disable-next-line
+export const WellLayerColorSelector: any = wellLayerTemplate.bind({});
 
 WellLayerColorSelector.args = {
     min,
