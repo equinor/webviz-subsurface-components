@@ -46,17 +46,8 @@ describe("Map component", () => {
     it("Should remove colormap layer", () => {
         cy.getIframeBody().contains("Loading assests...").should("not.exist");
         cy.get(
-            "#panel-tab-content > div:nth-child(1) > div > table > tbody > tr:nth-child(9) > td:nth-child(2) > div > div > div > span.rejt-not-collapsed > svg.rejt-plus-menu.css-16vj5s2"
+            "#panel-tab-content > div:nth-child(1) > div > table > tbody > tr:nth-child(9) > td:nth-child(2) > div > div > div > span.rejt-not-collapsed > ul > div:nth-child(1) > span.rejt-collapsed > svg > path"
         ).click();
-        cy.fixture("wellLayer.json")
-            .as("data")
-            .then((data) => {
-                cy.get(
-                    "#panel-tab-content > div:nth-child(1) > div > table > tbody > tr:nth-child(9) > td:nth-child(2) > div > div > div > span.rejt-not-collapsed > div > span > input"
-                ).type(JSON.stringify(data), {
-                    parseSpecialCharSequences: false,
-                });
-            });
         cy.contains("Save").click();
         cy.contains("TypeError").should("not.exist");
     });
