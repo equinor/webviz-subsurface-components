@@ -401,9 +401,9 @@ const wellLayerTemplate = (args: any) => {
 };
 
 //eslint-disable-next-line
-export const WellLayerColorSelector: any = wellLayerTemplate.bind({});
+export const LegendWithColorSelector: any = wellLayerTemplate.bind({});
 
-WellLayerColorSelector.args = {
+LegendWithColorSelector.args = {
     min,
     max,
     dataObjectName,
@@ -417,5 +417,15 @@ WellLayerColorSelector.args = {
     wellLayers,
     legend: {
         visible: false,
+    },
+};
+
+LegendWithColorSelector.parameters = {
+    docs: {
+        description: {
+            story: "Clicking on legend opens(toggle) the color selector component and then click on the color scale to update the layer.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
     },
 };
