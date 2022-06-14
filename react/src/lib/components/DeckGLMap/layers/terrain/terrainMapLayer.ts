@@ -238,7 +238,10 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
 
         // MESH HEIGHT VALUE.
         const meshImageData: ImageData = this.props.meshImageData;
-        const value_mesh = getValue(meshImageData, s, t, DECODER);
+        const isMeshImageData = meshImageData !== null;
+        const value_mesh = isMeshImageData
+            ? getValue(meshImageData, s, t, DECODER)
+            : 0;
 
         // TEXTURE PROPERTY VALUE.
         const textureImageData: ImageData = this.props.textureImageData;
@@ -251,7 +254,9 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                 value_property,
                 this.props.propertyValueRange
             ),
-            getMapProperty("Depth", value_mesh, this.props.meshValueRange)
+            isMeshImageData
+                ? getMapProperty("Depth", value_mesh, this.props.meshValueRange)
+                : { name: "Depth", value: 0 }
         );
 
         return {

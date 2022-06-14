@@ -199,9 +199,7 @@ async function load_mesh_and_texture(
         image: { type: "data" }, // Will load as ImageData.
     });
 
-    const meshImageData = await load(mesh_name, ImageLoader, {
-        image: { type: "data" }, // Will load as ImageData.
-    });
+    let meshImageData = null;
 
     let mesh: MeshType;
     if (isMesh) {
@@ -217,6 +215,10 @@ async function load_mesh_and_texture(
 
         // Remap height to meshValueRange
         mesh = mapToRange(mesh, meshValueRange);
+
+        meshImageData = await load(mesh_name, ImageLoader, {
+            image: { type: "data" }, // Will load as ImageData.
+        });
 
         // Note: mesh contains triangles. No normals they must be added.
         if (enableSmoothShading) {
