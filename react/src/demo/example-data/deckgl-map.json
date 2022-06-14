@@ -10,17 +10,17 @@
       "visible": true,
       "incrementValue": 100,
       "widthPerUnit": 100,
-      "position": [
-        10,
-        10
-      ]
+      "cssStyle": {
+        "left": 10,
+        "top": 10
+      }
     },
     "legend": {
       "visible": true,
-      "position": [
-        5,
-        10
-      ],
+      "cssStyle": {
+        "right": 10,
+        "top": 10
+      },
       "horizontal": false
     },
     "toolbar": {

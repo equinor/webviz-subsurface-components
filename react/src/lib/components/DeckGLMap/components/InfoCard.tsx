@@ -55,6 +55,9 @@ const useStyles = makeStyles({
             borderRadius: "5px",
             position: "absolute",
             bottom: 0,
+            left: 0,
+            marginLeft: "3px",
+            marginBottom: "3px",
         },
     },
     icon_style: {
