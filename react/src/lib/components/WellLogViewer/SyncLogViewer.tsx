@@ -69,19 +69,20 @@ class SyncLogViewer extends Component<Props, State> {
 
     collapsedTrackIds: (string | number)[];
 
-    onCreateControllerBind: ((controller: WellLogController) => void)[];
-    onInfoBind: ((
-        x: number,
-        logController: LogViewer,
-        iFrom: number,
-        iTo: number
-    ) => void)[];
-
-    onTrackScrollBind: (() => void)[];
-    onTrackSelectionBind: (() => void)[];
-    onContentRescaleBind: (() => void)[];
-    onContentSelectionBind: (() => void)[];
-    onTemplateChangedBind: (() => void)[];
+    callbacks: {
+        onCreateControllerBind: (controller: WellLogController) => void;
+        onInfoBind: (
+            x: number,
+            logController: LogViewer,
+            iFrom: number,
+            iTo: number
+        ) => void;
+        onTrackScrollBind: () => void;
+        onTrackSelectionBind: () => void;
+        onContentRescaleBind: () => void;
+        onContentSelectionBind: () => void;
+        onTemplateChangedBind: () => void;
+    }[];
 
     constructor(props: Props) {
         super(props);
@@ -90,8 +91,8 @@ class SyncLogViewer extends Component<Props, State> {
             getAvailableAxes(welllog, axisMnemos)
         );
         const axes = _axes[0];
-        let primaryAxis = axes[0];
-        if (this.props.templates[0]) {
+        let primaryAxis = axes?.[0];
+        if (this.props.templates[0] && axes) {
             this.props.templates[0].scale.primary = "tvd"; //!!!!!
             if (
                 this.props.templates[0] &&
@@ -101,53 +102,39 @@ class SyncLogViewer extends Component<Props, State> {
                     primaryAxis = this.props.templates[0].scale.primary;
             }
         }
+
         this.state = {
             primaryAxis: primaryAxis, //"md"
             axes: axes, //["md", "tvd"]
             infos: [[], []],
 
-            sliderValue: 4.0,
+            sliderValue: 4.0, // zoom
         };
 
         this.controllers = [null, null];
 
         this.collapsedTrackIds = [];
 
-        this.onCreateControllerBind = [
-            this.onCreateController.bind(this, 0),
-            this.onCreateController.bind(this, 1),
-        ];
-
-        this.onInfoBind = [
-            this.onInfo.bind(this, 0),
-            this.onInfo.bind(this, 1),
-        ];
-
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
 
-        this.onTrackScrollBind = [
-            this.onTrackScroll.bind(this, 0),
-            this.onTrackScroll.bind(this, 1),
-        ];
-
-        this.onTrackSelectionBind = [
-            this.onTrackSelection.bind(this, 0),
-            this.onTrackSelection.bind(this, 1),
-        ];
-
-        this.onContentRescaleBind = [
-            this.onContentRescale.bind(this, 0),
-            this.onContentRescale.bind(this, 1),
-        ];
-
-        this.onContentSelectionBind = [
-            this.onContentSelection.bind(this, 0),
-            this.onContentSelection.bind(this, 1),
-        ];
-        this.onTemplateChangedBind = [
-            this.onTemplateChanged.bind(this, 0),
-            this.onTemplateChanged.bind(this, 1),
-        ];
+        this.callbacks = [];
+        this.props.welllogs.map((_welllog: WellLog, index: number) => {
+            this.callbacks.push({
+                onCreateControllerBind: this.onCreateController.bind(
+                    this,
+                    index
+                ),
+                onInfoBind: this.onInfo.bind(this, index),
+                onTrackScrollBind: this.onTrackScroll.bind(this, index),
+                onTrackSelectionBind: this.onTrackSelection.bind(this, index),
+                onContentRescaleBind: this.onContentRescale.bind(this, index),
+                onContentSelectionBind: this.onContentSelection.bind(
+                    this,
+                    index
+                ),
+                onTemplateChangedBind: this.onTemplateChanged.bind(this, index),
+            });
+        });
 
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
 
@@ -259,12 +246,11 @@ class SyncLogViewer extends Component<Props, State> {
         );
 
         this.setState((state: Readonly<State>) => {
-            return {
-                infos: [
-                    iView == 0 ? infos : state.infos[0],
-                    iView == 1 ? infos : state.infos[1],
-                ],
-            };
+            const newState: { infos: Info[][] } = { infos: [] };
+            this.props.welllogs.map((_welllog: WellLog, index: number) =>
+                newState.infos.push(iView == index ? infos : state.infos[index])
+            );
+            return newState;
         });
     }
     // callback function from WellLogView
@@ -473,53 +459,50 @@ class SyncLogViewer extends Component<Props, State> {
         this.updateReadoutPanel();
     }
 
+    createView(
+        index: number,
+        maxContentZoom: number,
+        maxVisibleTrackNum: number
+    ): ReactNode {
+        const callbacks = this.callbacks[index];
+        return (
+            <WellLogViewWithScroller
+                key={index}
+                welllog={this.props.welllogs[index]}
+                template={
+                    this.props.templates[index]
+                        ? this.props.templates[index]
+                        : this.props.templates[0]
+                }
+                colorTables={this.props.colorTables}
+                horizontal={this.props.horizontal}
+                hideTitles={this.props.hideTitles}
+                hideLegend={this.props.hideLegend}
+                maxVisibleTrackNum={maxVisibleTrackNum}
+                maxContentZoom={maxContentZoom}
+                primaryAxis={this.state.primaryAxis}
+                axisTitles={axisTitles}
+                axisMnemos={axisMnemos}
+                onInfo={callbacks.onInfoBind}
+                onCreateController={callbacks.onCreateControllerBind}
+                onTrackMouseEvent={onTrackMouseEvent}
+                onTrackScroll={callbacks.onTrackScrollBind}
+                onTrackSelection={callbacks.onTrackSelectionBind}
+                onContentRescale={callbacks.onContentRescaleBind}
+                onContentSelection={callbacks.onContentSelectionBind}
+                onTemplateChanged={callbacks.onTemplateChangedBind}
+            />
+        );
+    }
+
     render(): ReactNode {
         const maxContentZoom = 256;
         const maxVisibleTrackNum = this.props.horizontal ? 2 : 3;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
-                <WellLogViewWithScroller
-                    welllog={this.props.welllogs[0]}
-                    template={this.props.templates[0]}
-                    colorTables={this.props.colorTables}
-                    horizontal={this.props.horizontal}
-                    hideTitles={this.props.hideTitles}
-                    hideLegend={this.props.hideLegend}
-                    maxVisibleTrackNum={maxVisibleTrackNum}
-                    maxContentZoom={maxContentZoom}
-                    primaryAxis={this.state.primaryAxis}
-                    axisTitles={axisTitles}
-                    axisMnemos={axisMnemos}
-                    onInfo={this.onInfoBind[0]}
-                    onCreateController={this.onCreateControllerBind[0]}
-                    onTrackMouseEvent={onTrackMouseEvent}
-                    onTrackScroll={this.onTrackScrollBind[0]}
-                    onTrackSelection={this.onTrackSelectionBind[0]}
-                    onContentRescale={this.onContentRescaleBind[0]}
-                    onContentSelection={this.onContentSelectionBind[0]}
-                    onTemplateChanged={this.onTemplateChangedBind[0]}
-                />
-                <WellLogViewWithScroller
-                    welllog={this.props.welllogs[1]}
-                    template={this.props.templates[1]}
-                    colorTables={this.props.colorTables}
-                    horizontal={this.props.horizontal}
-                    hideTitles={this.props.hideTitles}
-                    hideLegend={this.props.hideLegend}
-                    maxVisibleTrackNum={maxVisibleTrackNum}
-                    maxContentZoom={maxContentZoom}
-                    primaryAxis={this.state.primaryAxis}
-                    axisTitles={axisTitles}
-                    axisMnemos={axisMnemos}
-                    onInfo={this.onInfoBind[1]}
-                    onCreateController={this.onCreateControllerBind[1]}
-                    onTrackMouseEvent={onTrackMouseEvent}
-                    onTrackScroll={this.onTrackScrollBind[1]}
-                    onTrackSelection={this.onTrackSelectionBind[1]}
-                    onContentRescale={this.onContentRescaleBind[1]}
-                    onContentSelection={this.onContentSelectionBind[1]}
-                    onTemplateChanged={this.onTemplateChangedBind[1]}
-                />
+                {this.props.welllogs.map((_welllog: WellLog, index: number) =>
+                    this.createView(index, maxContentZoom, maxVisibleTrackNum)
+                )}
                 <div
                     style={{
                         flex: "0, 0",
@@ -538,18 +521,19 @@ class SyncLogViewer extends Component<Props, State> {
                         value={this.state.primaryAxis}
                         onChange={this.onChangePrimaryAxis}
                     />
-                    <InfoPanel
-                        header="Readout"
-                        onGroupClick={this.onInfoGroupClick}
-                        infos={this.state.infos[0]}
-                    />
-                    <br />
-                    <InfoPanel
-                        header="Readout"
-                        onGroupClick={this.onInfoGroupClick}
-                        infos={this.state.infos[1]}
-                    />
-                    <br />
+                    {this.props.welllogs.map(
+                        (_welllog: WellLog, index: number) => (
+                            <InfoPanel
+                                key={index}
+                                header={
+                                    "Readout " +
+                                    this.props.welllogs[index].header.well
+                                }
+                                onGroupClick={this.onInfoGroupClick}
+                                infos={this.state.infos[index]}
+                            />
+                        )
+                    )}
                     <div style={{ paddingLeft: "10px", display: "flex" }}>
                         <span>Zoom:</span>
                         <span
