@@ -188,9 +188,9 @@ export default class WellsLayer extends CompositeLayer<
             (this.context as DeckGLLayerContext).userData.setEditedData({
                 selectedWell: (info.object as Feature).properties?.["name"],
             });
-            this.props.selectedWell = (info.object as Feature).properties?.[
+            /*this.props.selectedWell = (info.object as Feature).properties?.[
                 "name"
-            ];
+            ];*/
             return true;
         }
     }
