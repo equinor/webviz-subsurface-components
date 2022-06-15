@@ -10,14 +10,13 @@ import {
     PropertyMapPickInfo,
     ValueDecoder,
 } from "../utils/propertyMapTools";
-import { getModelMatrix } from "../utils/layerTools";
+import { getModelMatrix, colorMapFunctionType } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import fsColormap from "./colormap.fs.glsl";
 import { DeckGLLayerContext } from "../../components/Map";
-import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
-import { RGBToHex } from "@emerson-eps/color-tables";
-import { color } from "d3-color";
-import { interpolateRgb } from "d3-interpolate";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { getRgbData } from "@emerson-eps/color-tables";
+import { ContinuousLegendDataType } from "../../components/ColorLegend";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -29,93 +28,29 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    colorMapping: any
+    colorMapFunction: colorMapFunctionType | undefined
 ) {
+    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
+
     const data = new Uint8Array(256 * 3);
-    // eslint-disable-next-line
-
-    const getScaleObject = colorTables.find((value) => {
-        return value.name == colorMapName;
-    });
-
-    const minValue = 0;
-    const maxValue = getScaleObject?.colors.length
-        ? getScaleObject?.colors.length - 1
-        : null;
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-        let rgb = rgbValues(value, colorMapName, colorTables);
-
-        // d3 continuous color scale
-        if (colorMapping && typeof colorMapping == "function") {
-            rgb = color(colorMapping(value))?.rgb();
-        }
-
-        if (getScaleObject?.discrete == true && maxValue) {
-            // eslint-disable-next-line
-
-            getScaleObject?.colors.forEach((item, index) => {
-                const currentIndex = index;
-                const normalizedCurrentIndex =
-                    (currentIndex - minValue) / (maxValue - minValue);
-                const nextIndex = index + 1;
-                const normalizedNextIndex =
-                    (nextIndex - minValue) / (maxValue - 0);
-                //const t = (point - t0) / (t1 - t0); // t = 0.0 gives first color, t = 1.0 gives second color.
-                if (
-                    value >= normalizedCurrentIndex &&
-                    value <= normalizedNextIndex
-                ) {
-                    if (
-                        (item && getScaleObject?.colors[nextIndex]) != undefined
-                    ) {
-                        const interpolate = interpolateRgb(
-                            RGBToHex(item)?.color,
-                            RGBToHex(getScaleObject?.colors[nextIndex])?.color
-                        )(value);
-                        rgb = color(interpolate)?.rgb();
-                    }
-                }
-            });
-        }
-
-        // d3 discrete color scale
-        if (colorMapping && typeof colorMapping == "object") {
-            const max = colorMapping.length - 1;
-
-            colorMapping.forEach((item: string, index: number) => {
-                const currentIndex = index;
-                const normalizedCurrentIndex = (currentIndex - 0) / (max - 0);
-                const nextIndex = index + 1;
-                const normalizedNextIndex = (nextIndex - 0) / (max - 0);
-                //const t = (point - t0) / (t1 - t0); // t = 0.0 gives first color, t = 1.0 gives second color.
-                if (
-                    value >= normalizedCurrentIndex &&
-                    value <= normalizedNextIndex
-                ) {
-                    const interpolate = interpolateRgb(
-                        item,
-                        colorMapping[nextIndex]
-                    )(value);
-                    rgb = color(interpolate)?.rgb();
-                }
-            });
-        }
-        let colors: number[] = [];
-
+        const rgb = isColorMapFunctionDefined
+            ? (colorMapFunction as colorMapFunctionType)(i / 255)
+            : getRgbData(value, colorMapName, colorTables);
+        let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
-                colors = rgb;
+                color = rgb;
             } else {
-                colors = [rgb.r, rgb.g, rgb.b];
+                color = [rgb.r, rgb.g, rgb.b];
             }
         }
 
-        data[3 * i + 0] = colors[0];
-        data[3 * i + 1] = colors[1];
-        data[3 * i + 2] = colors[2];
+        data[3 * i + 0] = color[0];
+        data[3 * i + 1] = color[1];
+        data[3 * i + 2] = color[2];
     }
 
     return data;
@@ -142,6 +77,11 @@ function getImageData(
 export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
     // Name of color map.
     colorMapName: string;
+
+    // Optional function property.
+    // If defined this function will override the color map.
+    // Takes a value in the range [0,1] and returns a color.
+    colorMapFunction?: colorMapFunctionType;
 
     // Min and max property values.
     valueRange: [number, number];
@@ -203,8 +143,7 @@ export default class ColormapLayer extends BitmapLayer<
                         this.props.colorMapName,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
-                        (this.context as DeckGLLayerContext).userData
-                            .colorMapping
+                        this.props.colorMapFunction
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
@@ -247,6 +186,23 @@ export default class ColormapLayer extends BitmapLayer<
             // For more details, see https://deck.gl/docs/developer-guide/custom-layers/picking
             index: 0,
             propertyValue: val,
+        };
+    }
+
+    getLegendData(): ContinuousLegendDataType {
+        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
+        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
+
+        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // Otherwise it will extend from valueRangeMin to valueRangeMax.
+        const min = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const max = this.props.colorMapRange?.[1] ?? valueRangeMax;
+
+        return {
+            discrete: false,
+            valueRange: [min, max],
+            colorName: this.props.colorMapName,
+            title: "PropertyMapLayer",
         };
     }
 }

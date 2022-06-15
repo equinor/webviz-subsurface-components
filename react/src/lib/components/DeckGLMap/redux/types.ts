@@ -37,48 +37,68 @@ export const DrawModes = [
     { id: "drawPolygon", displayName: "Create polygon" },
 ] as const;
 
-export const SliderTypeProps = [
+export type ToolPropType = {
+    id: string;
+    displayName: string;
+    dependentOnProp?: string;
+};
+
+export type NumberType = ToolPropType & {
+    min?: number;
+    max?: number;
+    step?: number;
+};
+
+export const SliderTypeProps: NumberType[] = [
     {
         id: "opacity",
         displayName: "Opacity",
         min: 0,
         max: 100,
         step: 1,
-        dependentOnProp: undefined,
     },
-] as const;
+];
 
-export const ToggleTypeProps = [
+export const ToggleTypeProps: ToolPropType[] = [
+    {
+        id: "wellNameVisible",
+        displayName: "Well name",
+    },
+    {
+        id: "wellNameAtTop",
+        displayName: "Well name at top",
+    },
     { id: "logCurves", displayName: "Log curves", dependentOnProp: "logData" },
     {
         id: "isReadoutDepth",
         displayName: "Depth readout",
-        dependentOnProp: undefined,
     },
-] as const;
+];
 
-export const MenuTypeProps = [
-    { id: "mode", displayName: "Draw mode", dependentOnProp: undefined },
-] as const;
+export const MenuTypeProps: ToolPropType[] = [
+    { id: "mode", displayName: "Draw mode" },
+];
 
-export const NumericTypeProps = [
+export const NumericTypeProps: NumberType[] = [
     {
         id: "lineWidthScale",
-        displayName: "Trajectory thickness",
-        dependentOnProp: undefined,
+        displayName: "Trajectory thickness scale",
+        step: 0.1,
     },
     { id: "logRadius", displayName: "Log radius", dependentOnProp: "logData" },
     {
         id: "pointRadiusScale",
         displayName: "Well head radius",
-        dependentOnProp: undefined,
     },
     {
         id: "lineWidthMinPixels",
         displayName: "Line thickness",
-        dependentOnProp: undefined,
     },
-] as const;
+    {
+        id: "wellNameSize",
+        displayName: "Well name size",
+    },
+];
 
 export const LayerIcons = {
     ColormapLayer: "surface_layer",
@@ -90,6 +110,7 @@ export const LayerIcons = {
     FaultPolygonsLayer: "fault",
     DrawingLayer: "brush",
     AxesLayer: "brush",
+    NorthArrow3D: "brush",
 };
 
 export type LayerType = keyof typeof LayerIcons;

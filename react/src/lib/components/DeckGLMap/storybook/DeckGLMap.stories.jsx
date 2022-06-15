@@ -1,6 +1,7 @@
 import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
+import { makeStyles } from "@material-ui/styles";
 import { ColorLegend } from "@emerson-eps/color-tables";
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 import { d3ColorScales } from "@emerson-eps/color-tables";
@@ -145,7 +146,7 @@ const customLayerWithPolylineData = {
             },
         ],
     },
-    lineWidthScale: 20,
+    getLineWidth: 20,
     lineWidthMinPixels: 2,
 };
 
@@ -170,7 +171,7 @@ const customLayerWithPolygonData = {
             ],
         },
     },
-    lineWidthScale: 20,
+    getLineWidth: 20,
     lineWidthMinPixels: 2,
     getLineColor: [0, 255, 255],
     getFillColor: [0, 255, 0],
@@ -278,12 +279,14 @@ const meshMapLayer = {
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
-    propertyValueRange: [2782, 3513],
-    rotDeg: 0,
-    contours: [0, 50.0],
-    isContoursDepth: false,
+    propertyValueRange: [-3071, 41048],
+    rotDeg: 0, // default rotate around bounds' upper left corner.
+    //rotPoint: [432205 + (439400 - 432205) / 2, 6475078 + (6481113 - 6475078) / 2],  // rotate around middle
+    contours: [0, 100.0],
+    isContoursDepth: true,
     colorMapName: "Physics",
 };
+
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {
     id: "kh-mesh-map",
@@ -397,10 +400,47 @@ const axes = {
     id: "axes-layer",
     bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
 };
+const north_arrow_layer = {
+    "@@type": "NorthArrow3DLayer",
+    id: "north-arrow-layer",
+};
+
 export const Axes = MinimalTemplate.bind({});
 Axes.args = {
     id: "axes",
-    layers: [meshMapLayer, axes],
+    layers: [axes, meshMapLayer, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
+// Example using "colorMapFunction" property.
+const layer = {
+    ...meshMapLayer,
+    isContoursDepth: true,
+    colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
+};
+export const colorMapFunction = MinimalTemplate.bind({});
+colorMapFunction.args = {
+    id: "colorMapFunction",
+    layers: [
+        // map layer
+        layer,
+        // colormap layer
+        {
+            ...colormapLayer,
+            image: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+            colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
+        },
+    ],
     bounds: [432150, 6475800, 439400, 6481500],
     views: {
         layout: [1, 1],
@@ -424,6 +464,7 @@ GridLayer.args = {
             ...gridLayer,
             visible: true,
         },
+        axes,
     ],
     toolbar: {
         visible: false,
@@ -596,6 +637,69 @@ SelectableFeatureExample.args = {
     ],
 };
 
+// Map used inside a div container template
+const useStyles = makeStyles({
+    main: {
+        width: 500,
+        height: 500,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        border: "1px solid black",
+        background: "azure",
+        position: "fixed",
+    },
+});
+
+export const MapInContainer = (args) => {
+    const classes = useStyles();
+    return (
+        <div className={classes.main}>
+            <DeckGLMap {...args} />
+        </div>
+    );
+};
+
+MapInContainer.args = {
+    ...exampleData[0],
+};
+
+export const MultiColorMap = EditDataTemplate.bind({});
+MultiColorMap.args = {
+    ...exampleData[0],
+    legend: {
+        visible: true,
+    },
+    zoom: -5,
+    layers: [
+        exampleData[0].layers[0],
+        {
+            ...exampleData[0].layers[0],
+            colorMapRange: [3000, 3100],
+            valueRange: [3000, 3100],
+            id: "colormap-2-layer",
+        },
+    ],
+    views: {
+        layout: [1, 2],
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                name: "Colormap layer",
+                show3D: false,
+                layerIds: ["colormap-layer"],
+            },
+            {
+                id: "view_2",
+                name: "Colormap 2 layer",
+                show3D: false,
+                layerIds: ["colormap-2-layer"],
+            },
+        ],
+    },
+};
+
 // Map example with color selector
 // colorMap layer arguments
 const layers = [exampleData[0].layers[0]];
@@ -648,32 +752,28 @@ const mapDataTemplate = (args) => {
 
     return (
         <div>
-            <div>
-                <ColorLegend
-                    style={{
-                        float: "right",
-                        position: "absolute",
-                        zIndex: 999,
-                        opacity: 1,
-                    }}
-                    {...args}
-                    getColorMapname={colorMapaData}
-                />
+            <div
+                style={{
+                    float: "right",
+                    zIndex: 999,
+                    opacity: 1,
+                    position: "relative",
+                }}
+            >
+                <ColorLegend {...args} getColorMapname={colorMapaData} />
             </div>
-            <div>
-                <DeckGLMap
-                    {...args}
-                    colorMapping={colorMapping}
-                    layers={layerDataChanged}
-                />
-            </div>
+            <DeckGLMap
+                {...args}
+                colorMapping={colorMapping}
+                layers={layerDataChanged}
+            />
         </div>
     );
 };
 
-export const ColorSelectorForColorMapLayer = mapDataTemplate.bind({});
+export const ColorMapLayerColorSelector = mapDataTemplate.bind({});
 
-ColorSelectorForColorMapLayer.args = {
+ColorMapLayerColorSelector.args = {
     min,
     max,
     dataObjectName,
@@ -685,4 +785,17 @@ ColorSelectorForColorMapLayer.args = {
     ...exampleData[0],
     id: id,
     layers,
+    legend: {
+        visible: false,
+    },
+};
+
+ColorMapLayerColorSelector.parameters = {
+    docs: {
+        description: {
+            story: "Clicking on legend opens(toggle) the color selector component and then click on the color scale to update the layer.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
 };

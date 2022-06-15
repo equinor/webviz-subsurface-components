@@ -41,7 +41,8 @@ export default function fitBounds({
         );
     }
 
-    const [[west, south], [east, north]] = bounds;
+    const [west, south] = [bounds[0], bounds[1]];
+    const [east, north] = [bounds[2], bounds[3]];
 
     const nw = [west, north];
     const se = [east, south];
@@ -56,7 +57,6 @@ export default function fitBounds({
         width - padding.left - padding.right - Math.abs(offset[0]) * 2,
         height - padding.top - padding.bottom - Math.abs(offset[1]) * 2,
     ];
-    console.assert(targetSize[0] > 0 && targetSize[1] > 0);
 
     // scale = screen pixels per unit on the Web Mercator plane
     const scaleX = targetSize[0] / size[0];
