@@ -5,6 +5,7 @@ import {
 } from "@emerson-eps/color-tables";
 import { ExtendedLayer } from "../layers/utils/layerTools";
 import { RGBAColor } from "@deck.gl/core/utils/color";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface LegendBaseData {
     title: string;
@@ -22,11 +23,13 @@ export interface ContinuousLegendDataType extends LegendBaseData {
 interface ColorLegendProps {
     horizontal?: boolean | null;
     layer: ExtendedLayer<unknown>;
+    colorTables: colorTablesArray | string | undefined;
 }
 
 const ColorLegend: React.FC<ColorLegendProps> = ({
     horizontal,
     layer,
+    colorTables,
 }: ColorLegendProps) => {
     const [legendData, setLegendData] = React.useState<
         DiscreteLegendDataType | ContinuousLegendDataType
@@ -47,6 +50,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     dataObjectName={legendData.title}
                     colorName={legendData.colorName}
                     horizontal={horizontal}
+                    colorTables={colorTables}
                 />
             )}
             {!legendData.discrete && (
@@ -57,6 +61,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     colorName={legendData.colorName}
                     horizontal={horizontal}
                     id={layer.props.id}
+                    colorTables={colorTables}
                 />
             )}
         </div>

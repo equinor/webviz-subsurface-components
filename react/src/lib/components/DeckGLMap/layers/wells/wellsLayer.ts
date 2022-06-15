@@ -7,7 +7,7 @@ import { subtract, distance, dot } from "mathjs";
 import {
     rgbValues,
     colorTablesArray,
-    colorsArray,
+    getColors,
 } from "@emerson-eps/color-tables/";
 import {
     Feature,
@@ -64,6 +64,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
+    colorMappingFunction: (x: number) => [number, number, number];
     lineStyle: StyleAccessor;
     wellNameVisible: boolean;
     wellNameAtTop: boolean;
@@ -317,7 +318,8 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logName,
                         this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
-                            .colorTables
+                            .colorTables,
+                        this.props.colorMappingFunction
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
@@ -621,23 +623,25 @@ function getLogColor(
     logrun_name: string,
     log_name: string,
     logColor: string,
-    colorTables: colorTablesArray
+    colorTables: colorTablesArray,
+    // eslint-disable-next-line
+    colorMappingFunction: any
 ): RGBAColor[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
-
     if (log_data.length == 0 || log_info == undefined) return [];
     const log_color: RGBAColor[] = [];
+
     if (log_info.description == "continuous") {
         const min = Math.min(...log_data);
         const max = Math.max(...log_data);
         const max_delta = max - min;
+
         log_data.forEach((value) => {
-            const rgb = rgbValues(
-                (value - min) / max_delta,
-                logColor,
-                colorTables
-            );
+            const rgb = colorMappingFunction
+                ? colorMappingFunction((value - min) / max_delta)
+                : rgbValues((value - min) / max_delta, logColor, colorTables);
+
             if (rgb) {
                 if (Array.isArray(rgb)) {
                     log_color.push([rgb[0], rgb[1], rgb[2]]);
@@ -649,26 +653,43 @@ function getLogColor(
             }
         });
     } else {
-        const arrayOfColors: [number, number, number, number][] = colorsArray(
-            logColor,
-            colorTables
-        );
-
+        // well log data set for ex : H1: Array(2)0: (4) [255, 26, 202, 255] 1: 13
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
+        const logLength = Object.keys(log_attributes).length;
+
         // eslint-disable-next-line
-        const attributesObject: { [key: string]: any } = {};
+    const attributesObject: { [key: string]: any } = {};
+        const categorial = true;
+
         Object.keys(log_attributes).forEach((key) => {
-            // get the code from log_attributes
-            const code = log_attributes[key][1];
-            // compare the code and first value from colorsArray(colortable)
-            const colorArrays = arrayOfColors.find((value: number[]) => {
-                return value[0] == code;
-            });
-            if (colorArrays)
-                attributesObject[key] = [
-                    [colorArrays[1], colorArrays[2], colorArrays[3]],
-                    code,
-                ];
+            // get the point from log_attributes
+            const point = log_attributes[key][1];
+            const categorialMin = 0;
+            const categorialMax = logLength - 1;
+
+            // if colormap function is not defined
+            const arrayOfColors: [number, number, number, number][] = getColors(
+                logColor,
+                colorTables,
+                point
+            );
+
+            const rgb = colorMappingFunction
+                ? colorMappingFunction(
+                      point,
+                      categorial,
+                      categorialMin,
+                      categorialMax
+                  )
+                : arrayOfColors;
+
+            if (rgb) {
+                if (Array.isArray(rgb)) {
+                    attributesObject[key] = [[rgb[1], rgb[2], rgb[3]], point];
+                } else {
+                    attributesObject[key] = [[rgb.r, rgb.g, rgb.b], point];
+                }
+            }
         });
         log_data.forEach((log_value) => {
             const dl_attrs = Object.entries(attributesObject).find(

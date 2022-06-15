@@ -480,6 +480,7 @@ const Map: React.FC<MapProps> = ({
                                             view.layerIds
                                         ) as ExtendedLayer<unknown>[]
                                     }
+                                    colorTables={colorTables}
                                 />
                             )}
                             {toolbar?.visible && (
