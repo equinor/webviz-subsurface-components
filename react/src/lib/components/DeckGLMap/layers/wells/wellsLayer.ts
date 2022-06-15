@@ -793,21 +793,24 @@ function getLogColor(
             const categorialMin = 0;
             const categorialMax = logLength - 1;
 
-            // if colormap function is not defined
-            const arrayOfColors: [number, number, number, number][] = getColors(
-                logColor,
-                colorTables,
-                point
-            );
-
-            const rgb = colorMappingFunction
-                ? colorMappingFunction(
-                      point,
-                      categorial,
-                      categorialMin,
-                      categorialMax
-                  )
-                : arrayOfColors;
+            let rgb;
+            if (colorMappingFunction) {
+                rgb = colorMappingFunction(
+                    point,
+                    categorial,
+                    categorialMin,
+                    categorialMax
+                );
+            } else {
+                // if colormap function is not defined
+                const arrayOfColors: [number, number, number, number][] =
+                    getColors(logColor, colorTables, point);
+                if (!arrayOfColors.length)
+                    console.error(
+                        "Empty or missed '" + logColor + "' color table"
+                    );
+                rgb = arrayOfColors;
+            }
 
             if (rgb) {
                 if (Array.isArray(rgb)) {

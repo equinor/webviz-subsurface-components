@@ -190,7 +190,7 @@
     {
       "name": "discrete",
       "type": "stacked",
-      "colorTable": "Stratigraphy"
+      "colorTable": "Colors_set_2"
     }
   ]
 }

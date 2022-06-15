@@ -1,6 +1,5 @@
 import Map, { ViewsType } from "./components/Map";
 import { MapMouseEvent } from "./components/Map";
-
 import React from "react";
 import PropTypes from "prop-types";
 import { Provider as ReduxProvider } from "react-redux";
@@ -49,6 +48,9 @@ export interface DeckGLMapProps {
      */
     onMouseEvent?: (event: MapMouseEvent) => void;
 
+    /**
+     * Range selection of the current well
+     */
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
@@ -320,6 +322,20 @@ DeckGLMap.propTypes = {
      * For get mouse events
      */
     onMouseEvent: PropTypes.func,
+
+    /**
+     * Range selection of the current well
+     */
+    //selection: PropTypes.shape({
+    //    /**
+    //     * Current well name
+    //     */
+    //	well: PropTypes.string,
+    //    /**
+    //     * [from/cuurrent, to]
+    //     */
+    //    selection: PropTypes.arrayOf(PropTypes.number)
+    //}),
 };
 
 export default DeckGLMap;

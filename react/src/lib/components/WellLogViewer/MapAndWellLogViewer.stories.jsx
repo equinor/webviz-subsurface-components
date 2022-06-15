@@ -19,7 +19,7 @@ if (wells_layer) {
     "logColor": "Stratigraphy"
     */
     wells_layer.logName = "ZONE_MAIN"; //
-    wells_layer.logColor = "Stratigraphy"; //
+    wells_layer.logColor = "Colors_set_2"; //"Stratigraphy";
 }
 
 export default {

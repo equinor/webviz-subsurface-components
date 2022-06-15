@@ -21,9 +21,7 @@ const template =
     require("../../../demo/example-data/welllog_template_2.json") as Template;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-//const colorTables = require("../../../demo/example-data/color-tables.json");
+const colorTables = require("../../../demo/example-data/color-tables.json");
 // see also react\src\demo\example-data\welllog_template_2.json
 
 import { WellLogController } from "./components/WellLogView";
