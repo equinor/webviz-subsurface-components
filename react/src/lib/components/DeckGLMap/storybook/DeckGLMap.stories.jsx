@@ -643,7 +643,7 @@ const useStyles = makeStyles({
         transform: "translate(-50%, -50%)",
         border: "1px solid black",
         background: "azure",
-        position: "fixed",
+        position: "absolute",
     },
 });
 
