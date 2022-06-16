@@ -8,12 +8,14 @@ function binarySearch(array: number[][], v: number) {
         hi = array.length;
     while (1 + lo < hi) {
         const mi = lo + ((hi - lo) >> 1);
-        if (array[mi][0] >= v) {
+        if (array[mi][0] > v) {
             hi = mi;
         } else {
             lo = mi;
         }
     }
+    // v should be in the semiopen interval [array[lo][0], array[hi][0])
+    // i.e. array[lo][0] <= v < array[hi][0]
     return hi;
 }
 
@@ -41,6 +43,48 @@ export function color4ToString(
     // see colorToString()
     const p = 0x1000000 | (color[1] << 16) | (color[2] << 8) | color[3];
     return "#" + p.toString(16).substr(1);
+}
+
+/*
+  get HTML string with interpolated color value in #xxxxxx format
+*/
+export function getInterpolatedColor(
+    colorTable: ColorTable,
+    v: number
+): [number, number, number] {
+    // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
+
+    const cNaN: [number, number, number] = colorTable.colorNaN
+        ? colorTable.colorNaN
+        : [255, 255, 255]; // "white"
+    if (Number.isNaN(v)) {
+        return cNaN;
+    }
+
+    const colors = colorTable.colors;
+    const j = binarySearch(colors, v);
+
+    const cBelow = colorTable.colorBelow ? colorTable.colorBelow : cNaN;
+    if (j <= 0) {
+        return cBelow;
+    }
+
+    const cAbove = colorTable.colorAbove ? colorTable.colorAbove : cBelow;
+    if (j >= colors.length) {
+        return cAbove;
+    }
+
+    // linear interpolation on interval [colors[j-1][0], colors[j][0]]
+    const color0 = colors[j - 1];
+    const color = colors[j];
+
+    const f = (v - color0[0]) / (color[0] - color0[0]);
+
+    return [
+        color0[1] + f * (color[1] - color0[1]),
+        color0[2] + f * (color[2] - color0[2]),
+        color0[3] + f * (color[3] - color0[3]),
+    ];
 }
 
 /*
