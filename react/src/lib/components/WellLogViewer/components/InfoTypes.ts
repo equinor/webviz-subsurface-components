@@ -2,7 +2,8 @@ export interface Info {
     name?: string;
     units?: string;
     color: string;
-    value: number | string /*string for discrete*/;
+    value: number;
+    discrete?: string /*string for discrete*/;
     type: string; // "seperator"; "line", "linestep", "area", "dot", ...
     trackId: number | string;
 

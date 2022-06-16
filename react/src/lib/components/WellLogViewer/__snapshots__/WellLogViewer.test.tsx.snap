@@ -297,7 +297,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
           Readout
         </legend>
         <table
-          style="border-spacing: 0px;"
+          style="border-spacing: 0px; width: 100%;"
         >
           <tbody>
             <tr>

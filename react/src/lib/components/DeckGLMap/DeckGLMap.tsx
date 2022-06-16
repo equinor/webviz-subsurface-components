@@ -42,7 +42,19 @@ export interface DeckGLMapProps {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema?: boolean;
+
+    /**
+     * For get mouse events
+     */
     onMouseEvent?: (event: MapMouseEvent) => void;
+
+    /**
+     * Range selection of the current well
+     */
+    selection?: {
+        well: string | undefined;
+        selection: [number | undefined, number | undefined] | undefined;
+    };
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -62,6 +74,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     setProps,
     checkDatafileSchema,
     onMouseEvent,
+    selection,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -121,6 +134,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 setEditedData={setEditedData}
                 checkDatafileSchema={checkDatafileSchema}
                 onMouseEvent={onMouseEvent}
+                selection={selection}
             />
         </ReduxProvider>
     );
@@ -303,6 +317,25 @@ DeckGLMap.propTypes = {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema: PropTypes.bool,
+
+    /**
+     * For get mouse events
+     */
+    onMouseEvent: PropTypes.func,
+
+    /**
+     * Range selection of the current well
+     */
+    //selection: PropTypes.shape({
+    //    /**
+    //     * Current well name
+    //     */
+    //	well: PropTypes.string,
+    //    /**
+    //     * [from/cuurrent, to]
+    //     */
+    //    selection: PropTypes.arrayOf(PropTypes.number)
+    //}),
 };
 
 export default DeckGLMap;
