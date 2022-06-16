@@ -20,7 +20,6 @@ const DiscreteLegendWrapper: React.FC<LegendProps> = ({
     colorTables,
     horizontal,
 }) => {
-    console.log("colorTables---", colorTables);
     return (
         <DiscreteColorLegend
             discreteData={discreteData}

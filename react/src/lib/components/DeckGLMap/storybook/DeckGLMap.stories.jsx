@@ -2,9 +2,8 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { makeStyles } from "@material-ui/styles";
-import { ColorLegend } from "@emerson-eps/color-tables";
+import { ColorLegend, d3ColorScales, createColorMapFunction } from "@emerson-eps/color-tables";
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
-import { d3ColorScales } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
@@ -764,7 +763,10 @@ const mapDataTemplate = (args) => {
             </div>
             <DeckGLMap
                 {...args}
-                colorMapping={colorMapping}
+                //colorMapping={colorMapping}
+                colorMapping= {createColorMapFunction(
+                    legendUpdated ? legendUpdated : "Physics"
+                )}
                 layers={layerDataChanged}
             />
         </div>
