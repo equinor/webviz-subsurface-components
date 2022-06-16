@@ -130,7 +130,7 @@ if __name__ == "__main__":
             "coordinatePosition": "bottomright",
         },
         updateMode="",
-        minz_arrayoom=-5,
+        minZoom=-5,
     )
 
     app = dash.Dash(__name__)
