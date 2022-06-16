@@ -1,7 +1,5 @@
-import React, { useState } from "react";
 import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import { NativeSelect } from "@equinor/eds-core-react";
 
 export default {
     component: DeckGLMap,
@@ -16,41 +14,76 @@ const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
     bounds: [432205, 6475078, 437720, 6481113],
-    meshMaxError: 100,
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
-    propertyValueRange: [2782, 3513],
+    propertyValueRange: [-3071, 41048],
     contours: [0, 50.0],
-    isContoursDepth: false,
-    colorMapName: "Physics",
-};
-
-
-const layer = {
-    ...meshMapLayer,
     isContoursDepth: true,
-    colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
 };
 
-export const LinearColorMap = Template.bind({});
-
-LinearColorMap.args = {
-    id: "colorMapFunction",
-    layers: [
-        // map layer
-        layer,
-    ],
+const defaultArgs = {
     bounds: [432150, 6475800, 439400, 6481500],
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-                layerIds: [],
+};
+
+const defaultParameters = {
+    docs: {
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+function gradientColorMap(x: number) {
+        return [255 - x * 255, 255 - x * 100, 255 * x];
+}
+
+function nearestColorMap(x: number) {
+        if (x > .5)
+                return [100, 255, 255];
+        else if (x > .1)
+                return [255, 100, 255];
+        return [255, 255, 100];
+}
+
+export const GradientFunctionColorMap = Template.bind({});
+
+GradientFunctionColorMap.args = {
+        ...defaultArgs,
+    id: "gradient-color-map",
+    layers: [
+        {...meshMapLayer,
+            colorMapFunction: gradientColorMap,
             },
-        ],
+    ],
+};
+
+GradientFunctionColorMap.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using gradient color mapping function.",
+        },
+    },
+};
+
+export const StepFunctionColorMap = Template.bind({});
+
+StepFunctionColorMap.args = {
+    ...defaultArgs,
+    id: "nearest-color-map",
+    layers: [
+        {...meshMapLayer,
+            colorMapFunction: nearestColorMap,
+            },
+    ],
+};
+
+StepFunctionColorMap.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using step color mapping function.",
+        },
     },
 };
 
