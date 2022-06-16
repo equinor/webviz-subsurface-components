@@ -6,10 +6,6 @@ export default {
     title: "DeckGLMap / Map 3D Layer",
 } as ComponentMeta<typeof DeckGLMap>;
 
-const Template: ComponentStory<typeof DeckGLMap> = (args) => (
-    <DeckGLMap {...args} />
-);
-
 const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
@@ -45,9 +41,8 @@ function nearestColorMap(x: number) {
         return [255, 255, 100];
 }
 
-export const GradientFunctionColorMap = Template.bind({});
-
-GradientFunctionColorMap.args = {
+export const GradientFunctionColorMap: ComponentStory<typeof DeckGLMap> = () => {
+    const args = {
         ...defaultArgs,
     id: "gradient-color-map",
     layers: [
@@ -55,6 +50,8 @@ GradientFunctionColorMap.args = {
             colorMapFunction: gradientColorMap,
             },
     ],
+    };
+    return <DeckGLMap {...args} />
 };
 
 GradientFunctionColorMap.parameters = {
@@ -66,17 +63,19 @@ GradientFunctionColorMap.parameters = {
     },
 };
 
-export const StepFunctionColorMap = Template.bind({});
+export const StepFunctionColorMap: ComponentStory<typeof DeckGLMap> = () => {
+        const args = {
+            ...defaultArgs,
+            id: "nearest-color-map",
+            layers: [
+                {...meshMapLayer,
+                    colorMapFunction: nearestColorMap,
+                    },
+            ],
+        };
 
-StepFunctionColorMap.args = {
-    ...defaultArgs,
-    id: "nearest-color-map",
-    layers: [
-        {...meshMapLayer,
-            colorMapFunction: nearestColorMap,
-            },
-    ],
-};
+    return <DeckGLMap {...args} />
+}
 
 StepFunctionColorMap.parameters = {
     docs: {
