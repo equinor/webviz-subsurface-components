@@ -7,10 +7,12 @@ export default {
     title: "DeckGLMap / Map 3D Layer",
 } as ComponentMeta<typeof DeckGLMap>;
 
+type NumberQuad = [number, number, number, number];
+
 const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
-    bounds: [432205, 6475078, 437720, 6481113],
+    bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
@@ -20,7 +22,7 @@ const meshMapLayer = {
 };
 
 const defaultArgs = {
-    bounds: [432150, 6475800, 439400, 6481500],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
 };
 
 const defaultParameters = {
