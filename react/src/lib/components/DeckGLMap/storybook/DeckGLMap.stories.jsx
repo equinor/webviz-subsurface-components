@@ -2,7 +2,7 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { makeStyles } from "@material-ui/styles";
-import { ColorLegend, d3ColorScales, createColorMapFunction } from "@emerson-eps/color-tables";
+import { ColorLegend, createColorMapFunction } from "@emerson-eps/color-tables";
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
 export default {
@@ -699,11 +699,45 @@ MultiColorMap.args = {
     },
 };
 
+const defaultProps = {
+    id: "some-layer",
+    resources: {
+        maoData:
+            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+    },
+    bounds: [432150, 6475800, 439400, 6481500],
+    layers: [
+        {
+            "@@type": "ColormapLayer",
+            data: "@@#resources.maoData",
+        },
+    ],
+};
+
 // Map example with color selector
 // colorMap layer arguments
-const layers = [exampleData[0].layers[0]];
-const id = exampleData[0].id;
-
+//const layers = [exampleData[0].layers[0]];
+const layers = [
+    {
+        "@@type": "ColormapLayer",
+        name: "Property map",
+        //id: "colormap-layer",
+        pickable: true,
+        visible: true,
+        valueRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array" },
+        valueDecoder: {
+            rgbScaler: [1, 1, 1],
+            // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
+            floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
+            offset: 0,
+            step: 0,
+        },
+        rotDeg: 0,
+        colorMapName: "Rainbow",
+    },
+];
+//const id = defaultProps.id;
 // continous legend arguments
 // prop for continous legend
 var min = 0;
@@ -740,14 +774,14 @@ const mapDataTemplate = (args) => {
     }, []);
 
     const layerDataChanged = [
-        { ...args.layers[0], colorMapName: legendUpdated },
+        {
+            ...args.layers[0],
+            colorMapName: legendUpdated,
+            colorMapFunction: createColorMapFunction(
+                legendUpdated ? legendUpdated : colorName
+            ),
+        },
     ];
-
-    var d3ColorName = d3ColorScales.find((value) => {
-        return value.name == legendUpdated;
-    });
-
-    const colorMapping = d3ColorName?.colors;
 
     return (
         <div>
@@ -761,18 +795,13 @@ const mapDataTemplate = (args) => {
             >
                 <ColorLegend {...args} getColorMapname={colorMapaData} />
             </div>
-            <DeckGLMap
-                {...args}
-                //colorMapping={colorMapping}
-                colorMapping= {createColorMapFunction(
-                    legendUpdated ? legendUpdated : "Physics"
-                )}
-                layers={layerDataChanged}
-            />
+            <DeckGLMap {...args} layers={layerDataChanged} />
         </div>
     );
 };
-
+// const defaultArgs = {
+//     bounds: [432150, 6475800, 439400, 6481500],
+// };
 export const ColorMapLayerColorSelector = mapDataTemplate.bind({});
 
 ColorMapLayerColorSelector.args = {
@@ -784,9 +813,11 @@ ColorMapLayerColorSelector.args = {
     colorName,
     colorTables,
     discreteData,
+    //...layers,
     ...exampleData[0],
-    id: id,
-    layers,
+    //...defaultProps,
+    //id: id,
+
     legend: {
         visible: false,
     },
