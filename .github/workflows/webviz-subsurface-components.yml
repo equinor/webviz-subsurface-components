@@ -145,6 +145,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         if: failure()
       - name: Check outputs
+        if: failure()
         #if: ${{ steps.cpr.outputs.pull-request-number }}
         run: |
           echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
