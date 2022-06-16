@@ -491,7 +491,7 @@ const Map: React.FC<MapProps> = ({
         return null;
 
     return (
-        <div>
+        <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
                 id={id}
                 viewState={viewState}
