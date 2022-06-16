@@ -1,3 +1,4 @@
+import React from "react";
 import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 
@@ -30,28 +31,24 @@ const defaultParameters = {
 };
 
 function gradientColorMap(x: number) {
-        return [255 - x * 255, 255 - x * 100, 255 * x];
+    return [255 - x * 255, 255 - x * 100, 255 * x];
 }
 
 function nearestColorMap(x: number) {
-        if (x > .5)
-                return [100, 255, 255];
-        else if (x > .1)
-                return [255, 100, 255];
-        return [255, 255, 100];
+    if (x > 0.5) return [100, 255, 255];
+    else if (x > 0.1) return [255, 100, 255];
+    return [255, 255, 100];
 }
 
-export const GradientFunctionColorMap: ComponentStory<typeof DeckGLMap> = () => {
+export const GradientFunctionColorMap: ComponentStory<
+    typeof DeckGLMap
+> = () => {
     const args = {
         ...defaultArgs,
-    id: "gradient-color-map",
-    layers: [
-        {...meshMapLayer,
-            colorMapFunction: gradientColorMap,
-            },
-    ],
+        id: "gradient-color-map",
+        layers: [{ ...meshMapLayer, colorMapFunction: gradientColorMap }],
     };
-    return <DeckGLMap {...args} />
+    return <DeckGLMap {...args} />;
 };
 
 GradientFunctionColorMap.parameters = {
@@ -64,18 +61,14 @@ GradientFunctionColorMap.parameters = {
 };
 
 export const StepFunctionColorMap: ComponentStory<typeof DeckGLMap> = () => {
-        const args = {
-            ...defaultArgs,
-            id: "nearest-color-map",
-            layers: [
-                {...meshMapLayer,
-                    colorMapFunction: nearestColorMap,
-                    },
-            ],
-        };
+    const args = {
+        ...defaultArgs,
+        id: "nearest-color-map",
+        layers: [{ ...meshMapLayer, colorMapFunction: nearestColorMap }],
+    };
 
-    return <DeckGLMap {...args} />
-}
+    return <DeckGLMap {...args} />;
+};
 
 StepFunctionColorMap.parameters = {
     docs: {
@@ -85,4 +78,3 @@ StepFunctionColorMap.parameters = {
         },
     },
 };
-
