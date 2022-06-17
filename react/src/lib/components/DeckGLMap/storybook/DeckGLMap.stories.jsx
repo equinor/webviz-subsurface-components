@@ -699,56 +699,36 @@ MultiColorMap.args = {
     },
 };
 
-// const defaultProps = {
-//     id: "some-layer",
-//     resources: {
-//         maoData:
-//             "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-//     },
-//     bounds: [432150, 6475800, 439400, 6481500],
-//     layers: [
-//         {
-//             "@@type": "ColormapLayer",
-//             data: "@@#resources.maoData",
-//         },
-//     ],
-// };
+// ColormapLayer with color selector component
+const defaultProps = {
+    id: "DeckGlMap",
+    resources: {
+        propertyMap:
+            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+    },
+    bounds: [432150, 6475800, 439400, 6481500],
+};
 
-// Map example with color selector
-// colorMap layer arguments
-//const layers = [exampleData[0].layers[0]];
-// const layers = [
-//     {
-//         "@@type": "ColormapLayer",
-//         name: "Property map",
-//         //id: "colormap-layer",
-//         pickable: true,
-//         visible: true,
-//         valueRange: { type: "array", value: [0, 1] },
-//         colorMapRange: { type: "array" },
-//         valueDecoder: {
-//             rgbScaler: [1, 1, 1],
-//             // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
-//             floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
-//             offset: 0,
-//             step: 0,
-//         },
-//         rotDeg: 0,
-//         colorMapName: "Rainbow",
-//     },
-// ];
-//const id = defaultProps.id;
-// continous legend arguments
-// prop for continous legend
-var min = 0;
-var max = 0.35;
-var dataObjectName = "Legend";
-var position = [16, 10];
-var horizontal = true;
-var colorName = "Physics";
+const layers = [
+    {
+        "@@type": "ColormapLayer",
+        image: "@@#resources.propertyMap",
+        rotDeg: 0,
+        bounds: [432205, 6475078, 437720, 6481113],
+        colorMapName: "Rainbow",
+        valueRange: [2782, 3513],
+        colorMapRange: [2782, 3513],
+    },
+];
 
-// prop for discrete data
-var discreteData = {
+// prop for legend
+const min = 0;
+const max = 0.35;
+const dataObjectName = "Legend";
+const position = [16, 10];
+const horizontal = true;
+const colorName = "Physics";
+const discreteData = {
     Above_BCU: [[], 0],
     ABOVE: [[], 1],
     H12: [[], 2],
@@ -767,18 +747,18 @@ var discreteData = {
 };
 
 const mapDataTemplate = (args) => {
-    const [legendUpdated, setLegendUpdated] = React.useState();
+    const [getColorName, setColorName] = React.useState();
 
-    const colorMapaData = React.useCallback((data) => {
-        setLegendUpdated(data);
+    const colorMapData = React.useCallback((data) => {
+        setColorName(data);
     }, []);
 
-    const layerDataChanged = [
+    const updatedLayerData = [
         {
             ...args.layers[0],
-            colorMapName: legendUpdated,
+            colorMapName: getColorName,
             colorMapFunction: createColorMapFunction(
-                legendUpdated ? legendUpdated : colorName
+                getColorName ? getColorName : colorName
             ),
         },
     ];
@@ -793,15 +773,13 @@ const mapDataTemplate = (args) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} getColorMapname={colorMapaData} />
+                <ColorLegend {...args} getColorMapname={colorMapData} />
             </div>
-            <DeckGLMap {...args} layers={layerDataChanged} />
+            <DeckGLMap {...args} layers={updatedLayerData} />
         </div>
     );
 };
-// const defaultArgs = {
-//     bounds: [432150, 6475800, 439400, 6481500],
-// };
+
 export const ColorMapLayerColorSelector = mapDataTemplate.bind({});
 
 ColorMapLayerColorSelector.args = {
@@ -813,11 +791,8 @@ ColorMapLayerColorSelector.args = {
     colorName,
     colorTables,
     discreteData,
-    //...layers,
-    ...exampleData[0],
-    //...defaultProps,
-    //id: id,
-
+    layers,
+    ...defaultProps,
     legend: {
         visible: false,
     },
