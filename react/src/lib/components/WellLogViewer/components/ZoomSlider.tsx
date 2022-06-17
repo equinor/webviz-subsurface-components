@@ -56,7 +56,9 @@ class ZoomSlider extends Component<Props, State> {
         if (typeof level === "number") {
             this.setState((state: Readonly<State>) => {
                 if (state.level === level) return null;
-                this.props.onChange(convertLevelToValue(level));
+                if (this.props.onChange)
+                    this.props.onChange(convertLevelToValue(level));
+                else console.error("ZoomSlider props.onChange not set");
                 return { level: level as number };
             });
         }

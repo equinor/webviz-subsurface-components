@@ -646,7 +646,7 @@ const useStyles = makeStyles({
         transform: "translate(-50%, -50%)",
         border: "1px solid black",
         background: "azure",
-        position: "fixed",
+        position: "absolute",
     },
 });
 
@@ -699,44 +699,44 @@ MultiColorMap.args = {
     },
 };
 
-const defaultProps = {
-    id: "some-layer",
-    resources: {
-        maoData:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-    },
-    bounds: [432150, 6475800, 439400, 6481500],
-    layers: [
-        {
-            "@@type": "ColormapLayer",
-            data: "@@#resources.maoData",
-        },
-    ],
-};
+// const defaultProps = {
+//     id: "some-layer",
+//     resources: {
+//         maoData:
+//             "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+//     },
+//     bounds: [432150, 6475800, 439400, 6481500],
+//     layers: [
+//         {
+//             "@@type": "ColormapLayer",
+//             data: "@@#resources.maoData",
+//         },
+//     ],
+// };
 
 // Map example with color selector
 // colorMap layer arguments
 //const layers = [exampleData[0].layers[0]];
-const layers = [
-    {
-        "@@type": "ColormapLayer",
-        name: "Property map",
-        //id: "colormap-layer",
-        pickable: true,
-        visible: true,
-        valueRange: { type: "array", value: [0, 1] },
-        colorMapRange: { type: "array" },
-        valueDecoder: {
-            rgbScaler: [1, 1, 1],
-            // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
-            floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
-            offset: 0,
-            step: 0,
-        },
-        rotDeg: 0,
-        colorMapName: "Rainbow",
-    },
-];
+// const layers = [
+//     {
+//         "@@type": "ColormapLayer",
+//         name: "Property map",
+//         //id: "colormap-layer",
+//         pickable: true,
+//         visible: true,
+//         valueRange: { type: "array", value: [0, 1] },
+//         colorMapRange: { type: "array" },
+//         valueDecoder: {
+//             rgbScaler: [1, 1, 1],
+//             // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
+//             floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
+//             offset: 0,
+//             step: 0,
+//         },
+//         rotDeg: 0,
+//         colorMapName: "Rainbow",
+//     },
+// ];
 //const id = defaultProps.id;
 // continous legend arguments
 // prop for continous legend
