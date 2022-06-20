@@ -145,6 +145,10 @@ jobs:
         run: |
           chmod +x ./cypress.sh
           ./cypress.sh
+          rm -rf react/cypress/snapshots/actual
+          rm -rf react/cypress/snapshots/diff
+          rm files.txt
+          rm files2.txt
 
       - name: Create Pull Request
         id: cpr
