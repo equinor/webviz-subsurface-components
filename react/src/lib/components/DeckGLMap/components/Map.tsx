@@ -90,7 +90,6 @@ export interface DeckGLLayerContext extends LayerContext {
     userData: {
         setEditedData: (data: Record<string, unknown>) => void;
         colorTables: colorTablesArray;
-        colorMapping: (t: number) => string | string[];
     };
 }
 
@@ -198,8 +197,6 @@ export interface MapProps {
     };
 
     children?: React.ReactNode;
-
-    colorMapping?: (t: number) => string | string[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -230,7 +227,6 @@ const Map: React.FC<MapProps> = ({
     toolbar,
     legend,
     colorTables,
-    colorMapping,
     editedData,
     setEditedData,
     checkDatafileSchema,
@@ -507,7 +503,6 @@ const Map: React.FC<MapProps> = ({
                         setEditedData?.(updated_prop);
                     },
                     colorTables: colorTables,
-                    colorMapping: colorMapping,
                 }}
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
