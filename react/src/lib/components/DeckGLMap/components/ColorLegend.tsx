@@ -11,6 +11,7 @@ interface LegendBaseData {
     title: string;
     colorName: string;
     discrete: boolean;
+    colorMapFunction: any
 }
 export interface DiscreteLegendDataType extends LegendBaseData {
     metadata: Record<string, [RGBAColor, number]>;
@@ -40,6 +41,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     }, [layer.props, layer.state?.legend]);
 
     if (!legendData || !layer.props.visible) return null;
+    //console.log('legendData.colorMapFunction', legendData.colorMapFunction)
     return (
         <div style={{ marginTop: 30 }}>
             {legendData.discrete && (
@@ -62,6 +64,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     horizontal={horizontal}
                     id={layer.props.id}
                     colorTables={colorTables}
+                    colorMapFunction={legendData.colorMapFunction}
                 />
             )}
         </div>

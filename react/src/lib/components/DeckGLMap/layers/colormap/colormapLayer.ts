@@ -203,6 +203,7 @@ export default class ColormapLayer extends BitmapLayer<
             valueRange: [min, max],
             colorName: this.props.colorMapName,
             title: "PropertyMapLayer",
+            colorMapFunction: this.props.colorMapFunction
         };
     }
 }
