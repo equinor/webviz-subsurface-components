@@ -715,7 +715,6 @@ const layers = [
         image: "@@#resources.propertyMap",
         rotDeg: 0,
         bounds: [432205, 6475078, 437720, 6481113],
-        colorMapName: "Rainbow",
         valueRange: [2782, 3513],
         colorMapRange: [2782, 3513],
     },
@@ -728,23 +727,6 @@ const dataObjectName = "Legend";
 const position = [16, 10];
 const horizontal = true;
 const colorName = "Physics";
-const discreteData = {
-    Above_BCU: [[], 0],
-    ABOVE: [[], 1],
-    H12: [[], 2],
-    H11: [[], 3],
-    H10: [[], 4],
-    H9: [[], 5],
-    H8: [[], 6],
-    H7: [[], 7],
-    H6: [[], 8],
-    H5: [[], 9],
-    H4: [[], 10],
-    H3: [[], 11],
-    H2: [[], 12],
-    H1: [[], 13],
-    BELOW: [[], 14],
-};
 
 const mapDataTemplate = (args) => {
     const [getColorName, setColorName] = React.useState();
@@ -790,7 +772,6 @@ ColorMapLayerColorSelector.args = {
     horizontal,
     colorName,
     colorTables,
-    discreteData,
     layers,
     ...defaultProps,
     legend: {
