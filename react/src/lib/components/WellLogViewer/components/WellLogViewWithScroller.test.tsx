@@ -35,6 +35,8 @@ describe("Test Well Log View Component with Scroller", () => {
                     tvd: ["TVD", "TVDSS", "DVER", "TVD_MSL"],
                     time: ["TIME"],
                 }}
+                hideLegend={true}
+                hideTitles={true}
             />
         );
         expect(container.firstChild).toMatchSnapshot();
