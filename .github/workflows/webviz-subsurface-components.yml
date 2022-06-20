@@ -140,10 +140,16 @@ jobs:
             react/cypress/snapshots
           retention-days: 5
 
+      - name: see the actual screenshots
+        if: failure()
+        run: |
+          ./cypress.sh
+
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v4
         if: failure()
+
       - name: Check outputs
         if: failure()
         #if: ${{ steps.cpr.outputs.pull-request-number }}
