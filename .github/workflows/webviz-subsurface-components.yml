@@ -154,6 +154,11 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         if: failure()
+        with:
+          commit-message: updated cypress snapshots
+          title: Cypress - New Snapshots
+          body: This is an auto-generated PR to update cypress snapshots.
+          base: ${{ github.head_ref }}
 
       - name: Check outputs
         if: failure()
