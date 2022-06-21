@@ -20,10 +20,6 @@ const data = {
                 type: "GeometryCollection",
                 geometries: [
                     {
-                        type: "Point",
-                        coordinates: [500, 2000, -400],
-                    },
-                    {
                         type: "LineString",
                         coordinates: [
                             [500, 2000, -400],

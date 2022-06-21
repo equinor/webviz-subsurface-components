@@ -198,7 +198,7 @@ export default class WellsLayer extends CompositeLayer<
     setSelection(
         well: string | undefined,
         _selection?: [number | undefined, number | undefined]
-    ) {
+    ): void {
         if (this.internalState) {
             this.setState({
                 well: well,
@@ -219,7 +219,9 @@ export default class WellsLayer extends CompositeLayer<
         );
     }
 
-    getLegendData(value: LogCurveDataType[]) {
+    getLegendData(
+        value: LogCurveDataType[]
+    ): ContinuousLegendDataType | DiscreteLegendDataType | null {
         return getLegendData(
             value,
             "",
@@ -234,14 +236,14 @@ export default class WellsLayer extends CompositeLayer<
         });
     }
 
-    getLogLayer() {
+    getLogLayer(): Layer<unknown>[] {
         return getLayersById(
             this.internalState?.subLayers,
             "wells-layer-log_curve"
         )?.[0];
     }
 
-    getSelectionLayer() {
+    getSelectionLayer(): Layer<unknown>[] {
         return getLayersById(
             this.internalState?.subLayers,
             "wells-layer-selection"
