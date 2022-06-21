@@ -1,5 +1,6 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
+import { Layer } from "@deck.gl/core";
 import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
@@ -236,14 +237,14 @@ export default class WellsLayer extends CompositeLayer<
         });
     }
 
-    getLogLayer(): Layer<unknown>[] {
+    getLogLayer(): Layer<unknown> {
         return getLayersById(
             this.internalState?.subLayers,
             "wells-layer-log_curve"
         )?.[0];
     }
 
-    getSelectionLayer(): Layer<unknown>[] {
+    getSelectionLayer(): Layer<unknown> {
         return getLayersById(
             this.internalState?.subLayers,
             "wells-layer-selection"
