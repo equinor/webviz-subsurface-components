@@ -19,6 +19,7 @@ import { registerLoaders } from "@loaders.gl/core";
 import GL from "@luma.gl/constants";
 
 import * as CustomLayers from "../layers";
+import * as CustomViews from "../views";
 
 // Note: deck already registers JSONLoader...
 registerLoaders([]);
@@ -27,7 +28,14 @@ export default {
     // Classes that should be instantiatable by JSON converter
     classes: Object.assign(
         // Support `@deck.gl/core` Views
-        { FirstPersonView, MapView, OrbitView, OrthographicView },
+        {
+            FirstPersonView,
+            MapView,
+            OrbitView,
+            OrthographicView,
+            ...CustomViews,
+        },
+
         // a map of all layers that should be exposes as JSONLayers
         Layers,
         AggregationLayers,
