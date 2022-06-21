@@ -273,7 +273,9 @@ export default class WellsLayer extends CompositeLayer<
             : (this.props.data as FeatureCollection);
 
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
-        const positionFormat = "XYZ";
+        const isOrthographic =
+            this.context.viewport.constructor.name === "OrthographicViewport";
+        const positionFormat = isOrthographic ? "XY" : "XYZ";
 
         const isDashed = !!this.props.lineStyle?.dash;
 
