@@ -1,12 +1,13 @@
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
+import { ComponentStory, ComponentMeta } from "@storybook/react";
 
 export default {
     component: DeckGLMap,
     title: "DeckGLMap",
-};
+} as ComponentMeta<typeof DeckGLMap>;
 
-const DeckGLMapTemplate = (args) => {
+const DeckGLMapTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
     return <DeckGLMap {...args} />;
 };
 
