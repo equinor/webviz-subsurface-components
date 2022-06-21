@@ -3,7 +3,7 @@ import DeckGLMap from "../../DeckGLMap";
 
 export default {
     component: DeckGLMap,
-    title: "DeckGLMap / IntersectionView",
+    title: "DeckGLMap",
 };
 
 const DeckGLMapTemplate = (args) => {
@@ -59,8 +59,8 @@ const axes2 = {
 };
 
 // Intersection view example
-export const IntersectionView = DeckGLMapTemplate.bind({});
-IntersectionView.args = {
+export const ExperimentalIntersectionView = DeckGLMapTemplate.bind({});
+ExperimentalIntersectionView.args = {
     id: "DeckGLMap",
     bounds: [0, 0, 2000, 3000],
     layers: [axes2, sampleDataWellsLayer, sampleDataExtendedPathLayer],
