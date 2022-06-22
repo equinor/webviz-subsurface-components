@@ -12,7 +12,7 @@ interface LegendBaseData {
     title: string;
     colorName: string;
     discrete: boolean;
-    colorMapFunction: colorMapFunctionType;
+    colorMapFunction?: colorMapFunctionType;
 }
 export interface DiscreteLegendDataType extends LegendBaseData {
     metadata: Record<string, [RGBAColor, number]>;

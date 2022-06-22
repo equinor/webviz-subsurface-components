@@ -28,7 +28,7 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | undefined
+    colorMapFunction: colorMapFunctionType
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
 
