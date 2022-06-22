@@ -50,11 +50,7 @@
     "license": "MPL",
     "dependencies": {
         "@danmarshall/deckgl-typings": "^4.9.0",
-<<<<<<< HEAD
         "@emerson-eps/color-tables": "^0.2.38",
-=======
-        "@emerson-eps/color-tables": "^0.2.37",
->>>>>>> 2048f2056dcccb6a6d993a4c7aa3b418e14be177
         "@equinor/eds-core-react": "^0.12.1",
         "@equinor/eds-icons": "^0.9.1",
         "@equinor/videx-wellog": "^0.7.0",
