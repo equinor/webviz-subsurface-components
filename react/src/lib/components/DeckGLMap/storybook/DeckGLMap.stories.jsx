@@ -2,6 +2,8 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { makeStyles } from "@material-ui/styles";
+import { ColorLegend, createColorMapFunction } from "@emerson-eps/color-tables";
+const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
 export default {
     component: DeckGLMap,
@@ -694,5 +696,95 @@ MultiColorMap.args = {
                 layerIds: ["colormap-2-layer"],
             },
         ],
+    },
+};
+
+// ColormapLayer with color selector component
+const defaultProps = {
+    id: "DeckGlMap",
+    resources: {
+        propertyMap:
+            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+    },
+    bounds: [432150, 6475800, 439400, 6481500],
+};
+
+const layers = [
+    {
+        "@@type": "ColormapLayer",
+        image: "@@#resources.propertyMap",
+        rotDeg: 0,
+        bounds: [432205, 6475078, 437720, 6481113],
+        valueRange: [2782, 3513],
+        colorMapRange: [2782, 3513],
+    },
+];
+
+// prop for legend
+const min = 0;
+const max = 0.35;
+const dataObjectName = "Legend";
+const position = [16, 10];
+const horizontal = true;
+const colorName = "Physics";
+
+const mapDataTemplate = (args) => {
+    const [getColorName, setColorName] = React.useState();
+
+    const colorMapData = React.useCallback((data) => {
+        setColorName(data);
+    }, []);
+
+    const updatedLayerData = [
+        {
+            ...args.layers[0],
+            colorMapName: getColorName,
+            colorMapFunction: createColorMapFunction(
+                getColorName ? getColorName : colorName
+            ),
+        },
+    ];
+
+    return (
+        <div>
+            <div
+                style={{
+                    float: "right",
+                    zIndex: 999,
+                    opacity: 1,
+                    position: "relative",
+                }}
+            >
+                <ColorLegend {...args} getColorMapname={colorMapData} />
+            </div>
+            <DeckGLMap {...args} layers={updatedLayerData} />
+        </div>
+    );
+};
+
+export const ColorMapLayerColorSelector = mapDataTemplate.bind({});
+
+ColorMapLayerColorSelector.args = {
+    min,
+    max,
+    dataObjectName,
+    position,
+    horizontal,
+    colorName,
+    colorTables,
+    layers,
+    ...defaultProps,
+    legend: {
+        visible: false,
+    },
+};
+
+ColorMapLayerColorSelector.parameters = {
+    docs: {
+        description: {
+            story: "Clicking on legend opens(toggle) the color selector component and then click on the color scale to update the layer.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
     },
 };
