@@ -34,13 +34,6 @@ const data = {
 };
 
 // Sample data for intersection view
-const sampleDataWellsLayer = {
-    "@@type": "WellsLayer",
-    id: "wells-layer",
-    data: "@@#resources.wellsdata",
-};
-
-// Sample data for intersection view
 const sampleDataExtendedPathLayer = {
     "@@type": "UnfoldedGeoJsonLayer",
     id: "enhanced-path-layer",
@@ -60,7 +53,7 @@ export const ExperimentalIntersectionView = DeckGLMapTemplate.bind({});
 ExperimentalIntersectionView.args = {
     id: "DeckGLMap",
     bounds: [0, 0, 2000, 3000],
-    layers: [axes2, sampleDataWellsLayer, sampleDataExtendedPathLayer],
+    layers: [axes2, sampleDataExtendedPathLayer],
     resources: { wellsdata: data },
     views: {
         layout: [1, 2],
@@ -70,7 +63,7 @@ ExperimentalIntersectionView.args = {
                 id: "orbit_view",
                 name: "3d view",
                 show3D: true,
-                layerIds: ["axes-layer", "wells-layer"],
+                layerIds: ["axes-layer", "enhanced-path-layer"],
             },
             {
                 id: "intersection_view",
