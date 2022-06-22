@@ -2,7 +2,6 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { makeStyles } from "@material-ui/styles";
-import { createColorMapFunction } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
@@ -436,10 +435,7 @@ colorMapFunction.args = {
         {
             ...colormapLayer,
             image: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-            colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // kept for reference
-            // colorMapFunction: createColorMapFunction(
-            //     colormapLayer.colorMapName
-            // ), // If defined this function will override the colormap.
+            colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x],
         },
     ],
     bounds: [432150, 6475800, 439400, 6481500],

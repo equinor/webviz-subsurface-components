@@ -6,12 +6,13 @@ import {
 import { ExtendedLayer } from "../layers/utils/layerTools";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { colorMapFunctionType } from "../layers/utils/layerTools";
 
 interface LegendBaseData {
     title: string;
     colorName: string;
     discrete: boolean;
-    colorMapFunction: any
+    colorMapFunction: colorMapFunctionType;
 }
 export interface DiscreteLegendDataType extends LegendBaseData {
     metadata: Record<string, [RGBAColor, number]>;
