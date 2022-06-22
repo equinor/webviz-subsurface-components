@@ -14,6 +14,7 @@ import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
+import { ContinuousLegendDataType } from "../../components/ColorLegend";
 
 type MeshType = {
     attributes: {
@@ -403,6 +404,18 @@ export default class Map3DLayer extends CompositeLayer<
             })
         );
         return [layer];
+    }
+
+    getLegendData(): ContinuousLegendDataType {
+        const min = this.props.colorMapRange?.[0];
+        const max = this.props.colorMapRange?.[1];
+
+        return {
+            discrete: false,
+            valueRange: [min, max],
+            colorName: this.props.colorMapName,
+            title: "PropertyMapLayer",
+        };
     }
 }
 
