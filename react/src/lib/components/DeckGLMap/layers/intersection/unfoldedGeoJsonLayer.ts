@@ -1,12 +1,9 @@
+import { Layer, Viewport } from "deck.gl";
 import { GeoJsonLayer, GeoJsonLayerProps, PathLayer } from "@deck.gl/layers";
 import { Feature, FeatureCollection } from "geojson";
 import { LineString } from "geojson";
 import { zip } from "lodash";
 import { distance } from "mathjs";
-
-interface UnfoldedGeoJsonLayerProps<D> extends GeoJsonLayerProps<D> {
-    isIntersectionView?: boolean;
-}
 
 function getUnfoldedPath(object: Feature) {
     const worldCoordinates = (object.geometry as LineString).coordinates;
@@ -29,24 +26,32 @@ function getUnfoldedPath(object: Feature) {
 
 export default class UnfoldedGeoJsonLayer<
     D = FeatureCollection
-> extends GeoJsonLayer<D, UnfoldedGeoJsonLayerProps<D>> {
-    renderLayers(): [PathLayer<D>] {
+> extends GeoJsonLayer<D, GeoJsonLayerProps<D>> {
+    renderLayers(): PathLayer<D>[] {
         const layers = super.renderLayers();
-        // const is_intersection_view =
-        //     this.context.viewport.constructor.name === "IntersectionViewport";
-        // if (is_intersection_view) {
         const path_layer_id = layers.findIndex(
             (layer) => layer?.[1].constructor.name == "PathLayer"
         );
         const pathLayer = layers[path_layer_id]?.[1];
         const unfoldedPathLayer = pathLayer.clone({
+            id: "unfolded-path-layer",
             getPath: getUnfoldedPath,
         });
-        return [unfoldedPathLayer];
+        return [pathLayer, unfoldedPathLayer];
+    }
+
+    filterSubLayer({
+        layer,
+        viewport,
+    }: {
+        layer: Layer<D>;
+        viewport: Viewport;
+    }): boolean {
+        if (viewport.constructor.name === "IntersectionViewport") {
+            return layer.id === "unfolded-path-layer";
+        }
+        return layer.id !== "unfolded-path-layer";
     }
 }
 
 UnfoldedGeoJsonLayer.layerName = "UnfoldedGeoJsonLayer";
-UnfoldedGeoJsonLayer.defaultProps = {
-    isIntersectionView: false,
-};
