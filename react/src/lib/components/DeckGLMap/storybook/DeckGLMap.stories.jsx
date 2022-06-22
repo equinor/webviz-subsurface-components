@@ -435,7 +435,7 @@ colorMapFunction.args = {
         {
             ...colormapLayer,
             image: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-            colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x],
+            colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
         },
     ],
     bounds: [432150, 6475800, 439400, 6481500],

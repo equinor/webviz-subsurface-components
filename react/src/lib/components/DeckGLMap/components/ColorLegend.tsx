@@ -42,7 +42,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     }, [layer.props, layer.state?.legend]);
 
     if (!legendData || !layer.props.visible) return null;
-    //console.log('legendData.colorMapFunction', legendData.colorMapFunction)
+
     return (
         <div style={{ marginTop: 30 }}>
             {legendData.discrete && (
