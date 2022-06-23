@@ -156,9 +156,10 @@ jobs:
         if: failure()
         with:
           commit-message: updated cypress snapshots
-          title: Cypress - New Snapshots
+          title: Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}
           body: This is an auto-generated PR to update cypress snapshots.
           base: ${{ github.head_ref }}
+          reviewers: ${{ github.actor }}
 
       - name: Check outputs
         if: failure()
