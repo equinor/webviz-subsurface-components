@@ -91,7 +91,7 @@ def test_evaluate_numpy_array_values():
     )
     assert np.array_equal(
         parser.parse("ln(E^x)").evaluate({"x": np.array([10, 20, 30])}),
-        np.array([10, 20, 30]),
+        np.array([10., 20., 30.]),
     )
     assert np.array_equal(
         parser.parse("x/(x+y)").evaluate(
@@ -115,5 +115,5 @@ def test_evaluate_logarithm():
     # Logarithm with base-10 og natural log
     assert parser.parse("log10(100)").evaluate({}) == 2.0
     assert parser.parse("log10(1E4)").evaluate({}) == 4.0
-    assert parser.parse("ln(E^100)").evaluate({}) == 100.0
+    assert np.isclose(parser.parse("ln(E^100)").evaluate({}), 100.0)
     assert parser.parse("ln(E**25)").evaluate({}) == 25.0
