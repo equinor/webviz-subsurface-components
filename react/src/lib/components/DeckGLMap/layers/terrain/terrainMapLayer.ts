@@ -47,13 +47,17 @@ function getImageData(
 
     const data = new Uint8Array(256 * 3);
 
-	const defaultColorMap = createDefaultContinuousColorScale;
+    const defaultColorMap = createDefaultContinuousColorScale;
 
-	const colorMap = isColorMapFunctionDefined ? colorMapFunction : (isColorMapNameDefined ? (value: number) => rgbValues(value, colorMapName, colorTables) : defaultColorMap());
+    const colorMap = isColorMapFunctionDefined
+        ? colorMapFunction
+        : isColorMapNameDefined
+        ? (value: number) => rgbValues(value, colorMapName, colorTables)
+        : defaultColorMap();
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-		const color = colorMap ? colorMap(value) : [0, 0, 0];
+        const color = colorMap ? colorMap(value) : [0, 0, 0];
         data[3 * i + 0] = color[0];
         data[3 * i + 1] = color[1];
         data[3 * i + 2] = color[2];
