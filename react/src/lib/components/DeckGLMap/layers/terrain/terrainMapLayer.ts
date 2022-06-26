@@ -7,6 +7,7 @@ import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/core";
 import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
+import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 import {
     createPropertyData,
     PropertyDataType,
@@ -42,21 +43,17 @@ function getImageData(
     colorMapFunction: colorMapFunctionType | undefined
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
+    const isColorMapNameDefined = !!colorMapName;
 
     const data = new Uint8Array(256 * 3);
+
+	const defaultColorMap = createDefaultContinuousColorScale;
+
+	const colorMap = isColorMapFunctionDefined ? colorMapFunction : (isColorMapNameDefined ? (value: number) => rgbValues(value, colorMapName, colorTables) : defaultColorMap());
+
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
-        const rgb = isColorMapFunctionDefined
-            ? (colorMapFunction as colorMapFunctionType)(i / 255)
-            : rgbValues(value, colorMapName, colorTables);
-        let color: number[] = [];
-        if (rgb != undefined) {
-            if (Array.isArray(rgb)) {
-                color = rgb;
-            } else {
-                color = [rgb.r, rgb.g, rgb.b];
-            }
-        }
+		const color = colorMap ? colorMap(value) : [0, 0, 0];
         data[3 * i + 0] = color[0];
         data[3 * i + 1] = color[1];
         data[3 * i + 2] = color[2];

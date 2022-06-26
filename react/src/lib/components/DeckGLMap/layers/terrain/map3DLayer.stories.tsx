@@ -80,3 +80,22 @@ StepFunctionColorMap.parameters = {
         },
     },
 };
+
+export const DefaultColorScale: ComponentStory<typeof DeckGLMap> = () => {
+    const args = {
+        ...defaultArgs,
+        id: "default-color-scale",
+        layers: [{ ...meshMapLayer }],
+    };
+
+    return <DeckGLMap {...args} />;
+};
+
+DefaultColorScale.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Readout example.",
+        },
+    },
+};
