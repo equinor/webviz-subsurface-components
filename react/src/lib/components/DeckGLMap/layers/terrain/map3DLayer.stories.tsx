@@ -1,7 +1,7 @@
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
 import { useHoverInfo } from "../../components/Map";
-import InfoCard from "../../components/InfoCard"
+import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 
 export default {
@@ -111,10 +111,11 @@ export const Readout: ComponentStory<typeof DeckGLMap> = () => {
 
     const [hoverInfo] = useHoverInfo();
 
-    return <DeckGLMap {...args} >
-    	
-    	<InfoCard {...hoverInfo}/>
-    </DeckGLMap>;
+    return (
+        <DeckGLMap {...args}>
+            <InfoCard {...hoverInfo} />
+        </DeckGLMap>
+    );
 };
 
 Readout.parameters = {
