@@ -293,7 +293,6 @@ KhMapMesh.args = {
     layers: [
         {
             ...meshMapLayer,
-            colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
         },
     ],
     toolbar: {
