@@ -1,6 +1,6 @@
 import React from "react";
+import { useHoverInfo, PickingInfo } from "../../components/Map";
 import DeckGLMap from "../../DeckGLMap";
-import { useHoverInfo } from "../../components/Map";
 import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 
@@ -103,18 +103,26 @@ DefaultColorScale.parameters = {
 };
 
 export const Readout: ComponentStory<typeof DeckGLMap> = () => {
-    const args = {
-        ...defaultArgs,
-        id: "readout",
-        layers: [{ ...meshMapLayer }],
-    };
 
-    const [hoverInfo] = useHoverInfo();
+    const [hoverInfo, hoverCallback] = useHoverInfo();
+
+    const args = React.useMemo<any>(() => {
+    	return {
+		...defaultArgs,
+		id: "readout",
+		layers: [{ ...meshMapLayer }],
+		coords: {
+			visible: false,
+			},
+		onMouseEvent: hoverCallback,
+	    };
+	    }, [hoverCallback]);
 
     return (
-        <DeckGLMap {...args}>
-            <InfoCard {...hoverInfo} />
-        </DeckGLMap>
+    	<>
+        <DeckGLMap {...args} />
+            {hoverInfo && <InfoCard pickInfos={hoverInfo} />}
+	    </>
     );
 };
 

@@ -160,6 +160,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
 
     React.useEffect(() => {
         if (props.pickInfos.length === 0) {
+        //if (!props.pickInfos || props.pickInfos?.length === 0) {
             setInfoCardData(null);
             return;
         }

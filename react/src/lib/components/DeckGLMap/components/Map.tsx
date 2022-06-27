@@ -93,6 +93,8 @@ export interface DeckGLLayerContext extends LayerContext {
     };
 }
 
+export type EventCallback = (event: MapMouseEvent) => void;
+
 export interface MapProps {
     /**
      * The ID of this component, used to identify dash components
@@ -214,9 +216,12 @@ export interface MapMouseEvent {
     tvd?: number;
 }
 
-export function useHoverInfo(): PickingInfo[] {
+export function useHoverInfo(): [PickingInfo[], EventCallback] {
     const [hoverInfo, setHoverInfo] = React.useState<PickingInfo[]>([]);
-    return [hoverInfo, setHoverInfo];
+    const callback = React.useCallback((pickEvent: MapMouseEvent) => {
+        setHoverInfo(pickEvent.infos);
+    }, []);
+    return [hoverInfo, callback];
 }
 
 const Map: React.FC<MapProps> = ({
@@ -227,6 +232,7 @@ const Map: React.FC<MapProps> = ({
     zoom,
     views,
     coords,
+    //coords=Map.defaultProps?.coords,
     scale,
     coordinateUnit,
     toolbar,
@@ -345,12 +351,12 @@ const Map: React.FC<MapProps> = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: any
     ): PickingInfo[] => {
-        if (coords?.multiPicking && pickInfo.layer) {
+        if (pickInfo.layer) {
             return pickInfo.layer.context.deck.pickMultipleObjects({
                 x: event.offsetCenter.x,
                 y: event.offsetCenter.y,
                 radius: 1,
-                depth: coords.pickDepth,
+                depth: coords?.pickDepth || 1,
             });
         }
         return [pickInfo];
