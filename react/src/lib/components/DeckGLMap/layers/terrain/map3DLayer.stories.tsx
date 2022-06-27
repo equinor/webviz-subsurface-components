@@ -1,5 +1,7 @@
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
+import { useHoverInfo } from "../../components/Map";
+import InfoCard from "../../components/InfoCard"
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 
 export default {
@@ -92,6 +94,30 @@ export const DefaultColorScale: ComponentStory<typeof DeckGLMap> = () => {
 };
 
 DefaultColorScale.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Default color scale.",
+        },
+    },
+};
+
+export const Readout: ComponentStory<typeof DeckGLMap> = () => {
+    const args = {
+        ...defaultArgs,
+        id: "readout",
+        layers: [{ ...meshMapLayer }],
+    };
+
+    const [hoverInfo] = useHoverInfo();
+
+    return <DeckGLMap {...args} >
+    	
+    	<InfoCard {...hoverInfo}/>
+    </DeckGLMap>;
+};
+
+Readout.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {

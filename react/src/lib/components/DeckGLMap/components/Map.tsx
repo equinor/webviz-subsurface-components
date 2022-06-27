@@ -214,6 +214,11 @@ export interface MapMouseEvent {
     tvd?: number;
 }
 
+export function useHoverInfo() {
+        const [hoverInfo, setHoverInfo] = React.useState<any>([]);
+        return [hoverInfo, setHoverInfo];
+}
+
 const Map: React.FC<MapProps> = ({
     id,
     resources,
@@ -318,7 +323,7 @@ const Map: React.FC<MapProps> = ({
     }, [selection]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [hoverInfo, setHoverInfo] = useState<any>([]);
+    const [hoverInfo, setHoverInfo] = useHoverInfo();
     const onHover = useCallback(
         (pickInfo, event) => {
             const infos = getPickingInfos(pickInfo, event);
