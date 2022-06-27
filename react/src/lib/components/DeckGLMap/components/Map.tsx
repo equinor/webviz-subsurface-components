@@ -232,7 +232,6 @@ const Map: React.FC<MapProps> = ({
     zoom,
     views,
     coords,
-    //coords=Map.defaultProps?.coords,
     scale,
     coordinateUnit,
     toolbar,
@@ -328,7 +327,9 @@ const Map: React.FC<MapProps> = ({
         wellslayer?.setSelection(selection?.well, selection?.selection);
     }, [selection]);
 
-    const [hoverInfo, setHoverInfo] = useHoverInfo();
+    //const [hoverInfo, setHoverInfo] = useHoverInfo();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
         (pickInfo, event) => {
             const infos = getPickingInfos(pickInfo, event);
