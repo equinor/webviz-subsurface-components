@@ -379,7 +379,7 @@ export default class Map3DLayer extends CompositeLayer<
 
         const isMesh =
             typeof this.props.mesh !== "undefined" && this.props.mesh !== "";
-
+        console.log('---', this.props.colorMapFunction)
         const layer = new TerrainMapLayer(
             this.getSubLayerProps<
                 TerrainMapLayerData,
@@ -405,8 +405,9 @@ export default class Map3DLayer extends CompositeLayer<
         );
         return [layer];
     }
-
+    
     getLegendData(): ContinuousLegendDataType {
+        console.log('colorMapFunction', this.props.colorMapFunction)
         const min = this.props.colorMapRange ? this.props.colorMapRange[0] : this.props.meshValueRange[0];
         const max = this.props.colorMapRange ? this.props.colorMapRange[1] : this.props.meshValueRange[1];
 
@@ -414,7 +415,8 @@ export default class Map3DLayer extends CompositeLayer<
             discrete: false,
             valueRange: [min, max],
             colorName: this.props.colorMapName,
-            title: "PropertyMapLayer",
+            title: "Map3dLayer",
+            colorMapFunction: this.props.colorMapFunction,
         };
     }
 }

@@ -19,6 +19,7 @@ const meshMapLayer = {
     propertyValueRange: [-3071, 41048],
     contours: [0, 50.0],
     isContoursDepth: true,
+    colorMapFunction: (x: any) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
 };
 
 const defaultArgs = {
