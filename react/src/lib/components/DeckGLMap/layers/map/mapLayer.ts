@@ -151,15 +151,7 @@ function applyColorMap(
     const colors = [];
     for (let i = 0; i < 256; i++) {
         const rgb = rgbValues(i / 255.0, colorMapName, colorTables); // Note: The call to rgbValues is very slow.
-        let color: number[] = [];
-        if (rgb != undefined) {
-            if (Array.isArray(rgb)) {
-                color = rgb;
-            } else {
-                color = [rgb.r, rgb.g, rgb.b];
-            }
-        }
-        colors.push(color);
+        colors.push(rgb);
     }
 
     // Get value range.
