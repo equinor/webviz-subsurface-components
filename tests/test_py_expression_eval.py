@@ -91,7 +91,7 @@ def test_evaluate_numpy_array_values():
     )
     assert np.array_equal(
         parser.parse("ln(E^x)").evaluate({"x": np.array([10, 20, 30])}),
-        np.array([10., 20., 30.]),
+        np.array([10.0, 20.0, 30.0]),
     )
     assert np.array_equal(
         parser.parse("x/(x+y)").evaluate(
