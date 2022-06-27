@@ -284,6 +284,9 @@ const meshMapLayer = {
     contours: [0, 100.0],
     isContoursDepth: true,
     colorMapName: "Physics",
+    legend: {
+        visible: false,
+    },
 };
 
 export const KhMapMesh = MinimalTemplate.bind({});

@@ -407,8 +407,8 @@ export default class Map3DLayer extends CompositeLayer<
     }
 
     getLegendData(): ContinuousLegendDataType {
-        const min = this.props.colorMapRange?.[0];
-        const max = this.props.colorMapRange?.[1];
+        const min = this.props.colorMapRange ? this.props.colorMapRange[0] : this.props.meshValueRange[0];
+        const max = this.props.colorMapRange ? this.props.colorMapRange[1] : this.props.meshValueRange[1];
 
         return {
             discrete: false,
