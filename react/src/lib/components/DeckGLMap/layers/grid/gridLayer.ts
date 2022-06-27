@@ -260,12 +260,8 @@ export default class GridLayer extends Layer<
     }
 
     getLegendData(): ContinuousLegendDataType {
-        const min = this.props.colorMapRange
-            ? this.props.colorMapRange[0]
-            : this.props.valueRange[0];
-        const max = this.props.colorMapRange
-            ? this.props.colorMapRange[1]
-            : this.props.valueRange[1];
+        const min = this.props.colorMapRange[0] || this.props.valueRange[0];
+        const max = this.props.colorMapRange[1] || this.props.valueRange[1];
 
         return {
             discrete: false,
