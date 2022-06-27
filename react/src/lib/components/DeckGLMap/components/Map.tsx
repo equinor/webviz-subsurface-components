@@ -191,7 +191,7 @@ export interface MapProps {
     /**
      * For get mouse events
      */
-    onMouseEvent?: (event: MapMouseEvent) => void;
+    onMouseEvent?: EventCallback;
 
     selection?: {
         well: string | undefined;
@@ -327,7 +327,6 @@ const Map: React.FC<MapProps> = ({
         wellslayer?.setSelection(selection?.well, selection?.selection);
     }, [selection]);
 
-    //const [hoverInfo, setHoverInfo] = useHoverInfo();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
@@ -352,12 +351,12 @@ const Map: React.FC<MapProps> = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: any
     ): PickingInfo[] => {
-        if (pickInfo.layer) {
+        if (coords?.multiPicking && pickInfo.layer) {
             return pickInfo.layer.context.deck.pickMultipleObjects({
                 x: event.offsetCenter.x,
                 y: event.offsetCenter.y,
                 radius: 1,
-                depth: coords?.pickDepth || 1,
+                depth: coords.pickDepth,
             });
         }
         return [pickInfo];

@@ -1,5 +1,5 @@
 import React from "react";
-import { useHoverInfo, PickingInfo } from "../../components/Map";
+import { useHoverInfo } from "../../components/Map";
 import DeckGLMap from "../../DeckGLMap";
 import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
