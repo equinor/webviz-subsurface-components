@@ -25,11 +25,7 @@ function getColorMapColors(
         const rgb = rgbValues(value, colorMapName, colorTables);
         let color: RGBColor = [0, 0, 0];
         if (rgb != undefined) {
-            if (Array.isArray(rgb)) {
-                color = [rgb[0], rgb[1], rgb[2]];
-            } else {
-                color = [rgb.r, rgb.g, rgb.b];
-            }
+            color = rgb;
         }
 
         colors.push(color);
