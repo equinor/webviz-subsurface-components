@@ -103,26 +103,25 @@ DefaultColorScale.parameters = {
 };
 
 export const Readout: ComponentStory<typeof DeckGLMap> = () => {
-
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
-    const args = React.useMemo<any>(() => {
-    	return {
-		...defaultArgs,
-		id: "readout",
-		layers: [{ ...meshMapLayer }],
-		coords: {
-			visible: false,
-			},
-		onMouseEvent: hoverCallback,
-	    };
-	    }, [hoverCallback]);
+    const args = React.useMemo(() => {
+        return {
+            ...defaultArgs,
+            id: "readout",
+            layers: [{ ...meshMapLayer }],
+            coords: {
+                visible: false,
+            },
+            onMouseEvent: hoverCallback,
+        };
+    }, [hoverCallback]);
 
     return (
-    	<>
-        <DeckGLMap {...args} />
+        <>
+            <DeckGLMap {...args} />
             {hoverInfo && <InfoCard pickInfos={hoverInfo} />}
-	    </>
+        </>
     );
 };
 
