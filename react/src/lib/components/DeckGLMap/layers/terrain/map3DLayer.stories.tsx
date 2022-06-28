@@ -46,8 +46,8 @@ function nearestColorMap(x: number) {
 }
 
 function breakpointColorMap(x: number, breakpoint: number) {
-    if (x > breakpoint) return [100, 255, 255];
-    return [255, 255, 100];
+    if (x > breakpoint) return [0, 87, 183];
+    return [255, 215, 0];
 }
 
 function createColorMap(breakpoint: number) {
@@ -119,19 +119,22 @@ const useStyles = makeStyles({
         position: "relative",
     },
     legend: {
-        width: 150,
+        width: 100,
         position: "absolute",
         top: "0",
         right: "0",
-    }
+    },
 });
 
 export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
     const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
 
-    const colorMap = React.useCallback((value: number) => {
-    	return createColorMap(breakpoint)(value);
-	}, [breakpoint]);
+    const colorMap = React.useCallback(
+        (value: number) => {
+            return createColorMap(breakpoint)(value);
+        },
+        [breakpoint]
+    );
 
     const props = React.useMemo(() => {
         return {
@@ -153,9 +156,13 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
         <>
             <div className={useStyles().main}>
                 <DeckGLMap {...props} />;
-		<div className={useStyles().legend}>
-			<ContinuousLegend min={meshMapLayer.propertyValueRange[0]} max={meshMapLayer.propertyValueRange[1]} colorMapFunction={colorMap} />
-		</div>
+                <div className={useStyles().legend}>
+                    <ContinuousLegend
+                        min={meshMapLayer.propertyValueRange[0]}
+                        max={meshMapLayer.propertyValueRange[1]}
+                        colorMapFunction={colorMap}
+                    />
+                </div>
             </div>
             <Slider
                 min={0}
