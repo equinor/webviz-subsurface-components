@@ -13,6 +13,7 @@ import vertexShader from "./vertex.glsl";
 import fragmentShaderLines from "./fragment_lines.glsl";
 import vertexShaderLines from "./vertex_lines.glsl";
 import { RGBColor } from "@deck.gl/core/utils/color";
+import { ContinuousLegendDataType } from "../../components/ColorLegend";
 
 function getColorMapColors(
     colorMapName: string,
@@ -255,6 +256,18 @@ export default class GridLayer extends Layer<
                 { name: "depth:", value: cell.z },
                 { name: "value:", value: propertyValue, color },
             ],
+        };
+    }
+
+    getLegendData(): ContinuousLegendDataType {
+        const min = this.props.colorMapRange[0] || this.props.valueRange[0];
+        const max = this.props.colorMapRange[1] || this.props.valueRange[1];
+
+        return {
+            discrete: false,
+            valueRange: [min, max],
+            colorName: this.props.colorMapName,
+            title: "GridLayer",
         };
     }
 }
