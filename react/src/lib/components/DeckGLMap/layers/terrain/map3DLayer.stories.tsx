@@ -145,7 +145,7 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
                     colorMapFunction: colorMap,
                 },
             ],
-	    legend: {visible: false},
+            legend: { visible: false },
         };
     }, [breakpoint]);
 
