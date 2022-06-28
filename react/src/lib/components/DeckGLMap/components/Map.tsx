@@ -214,6 +214,16 @@ export interface MapMouseEvent {
     tvd?: number;
 }
 
+function getTooltip(info: PickInfo<unknown>) {
+    if ((info as WellsPickInfo)?.logName) {
+        return (info as WellsPickInfo)?.logName;
+    } else if (info.layer?.id === "drawing-layer") {
+        return (info as DrawingPickInfo).measurement?.toFixed(2);
+    }
+    const feat = info.object as Feature;
+    return feat?.properties?.["name"];
+}
+
 const Map: React.FC<MapProps> = ({
     id,
     resources,
@@ -507,21 +517,7 @@ const Map: React.FC<MapProps> = ({
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
                 }
-                // @ts-expect-error: Fix type in WellsLayer
-                getTooltip={(
-                    info: PickInfo<unknown>
-                ): string | null | undefined => {
-                    if ((info as WellsPickInfo)?.logName) {
-                        return (info as WellsPickInfo)?.logName;
-                    } else if (info.layer?.id === "drawing-layer") {
-                        return (info as DrawingPickInfo).measurement?.toFixed(
-                            2
-                        );
-                    } else {
-                        const feat = info.object as Feature;
-                        return feat?.properties?.["name"];
-                    }
-                }}
+                getTooltip={getTooltip}
                 ref={deckRef}
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
