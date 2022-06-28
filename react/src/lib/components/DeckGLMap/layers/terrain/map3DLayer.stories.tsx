@@ -1,6 +1,8 @@
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { Slider } from "@material-ui/core";
+import { makeStyles } from "@material-ui/styles";
 
 export default {
     component: DeckGLMap,
@@ -40,6 +42,15 @@ function nearestColorMap(x: number) {
     if (x > 0.5) return [100, 255, 255];
     else if (x > 0.1) return [255, 100, 255];
     return [255, 255, 100];
+}
+
+function breakpointColorMap(x: number, breakpoint: number) {
+    if (x > breakpoint) return [100, 255, 255];
+    return [255, 255, 100];
+}
+
+function createColorMap(breakpoint: number) {
+    return (value: number) => breakpointColorMap(value, breakpoint);
 }
 
 export const GradientFunctionColorMap: ComponentStory<
@@ -96,6 +107,63 @@ DefaultColorScale.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Readout example.",
+        },
+    },
+};
+
+const useStyles = makeStyles({
+    main: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+});
+
+export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
+
+    const props = React.useMemo(() => {
+        return {
+            ...args,
+            layers: [
+                {
+                    ...meshMapLayer,
+                    colorMapFunction: createColorMap(breakpoint),
+                },
+            ],
+        };
+    }, [breakpoint]);
+
+    const handleChange = React.useCallback((_event, value) => {
+        setBreakpoint(value / 100);
+    }, []);
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />;
+            </div>
+            <Slider
+                min={0}
+                max={100}
+                defaultValue={50}
+                step={1}
+                onChange={handleChange}
+            />
+        </>
+    );
+};
+
+BreakpointColorMap.args = {
+    ...defaultArgs,
+    id: "breakpoint-color-map",
+};
+
+BreakpointColorMap.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using a color scale with a breakpoint.",
         },
     },
 };
