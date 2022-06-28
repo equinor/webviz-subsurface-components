@@ -40,6 +40,8 @@ import { WellsLayer } from "../layers";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
+export type TooltipCallback = (info: PickInfo<unknown>) => string | null;
+
 export interface ViewportType {
     /**
      * Viewport id
@@ -197,6 +199,8 @@ export interface MapProps {
     };
 
     children?: React.ReactNode;
+
+    getTooltip?: TooltipCallback;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -214,7 +218,7 @@ export interface MapMouseEvent {
     tvd?: number;
 }
 
-function getTooltip(info: PickInfo<unknown>) {
+function defaultTooltip(info: PickInfo<unknown>) {
     if ((info as WellsPickInfo)?.logName) {
         return (info as WellsPickInfo)?.logName;
     } else if (info.layer?.id === "drawing-layer") {
@@ -243,6 +247,7 @@ const Map: React.FC<MapProps> = ({
     onMouseEvent,
     selection,
     children,
+    getTooltip = defaultTooltip,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 

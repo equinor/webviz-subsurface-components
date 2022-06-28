@@ -34,14 +34,12 @@ const Template: ComponentStory<typeof DeckGLMap> = (args) => (
 );
 
 function mdTooltip(info: PickInfo<unknown>) {
-        if (!info.picked) 
-                return null;
-        const value = (info as WellsPickInfo)?.properties?.[0].value;
-        if (!value)
-                return null;
-        const f = format(".2f");
-        const niceValue = f(+value);
-        return "MD: " + niceValue;
+    if (!info.picked) return null;
+    const value = (info as WellsPickInfo)?.properties?.[0].value;
+    if (!value) return null;
+    const f = format(".2f");
+    const niceValue = f(+value);
+    return "MD: " + niceValue;
 }
 
 export const TooltipApi = Template.bind({});
@@ -49,10 +47,10 @@ TooltipApi.args = {
     ...defaultProps,
     layers: [
         {
-                ...defaultWellsLayer,
+            ...defaultWellsLayer,
             lineStyle: { width: 7 },
-                }
-                ],
+        },
+    ],
     getTooltip: mdTooltip,
     bounds: [433000, 6476000, 439000, 6480000],
 };
