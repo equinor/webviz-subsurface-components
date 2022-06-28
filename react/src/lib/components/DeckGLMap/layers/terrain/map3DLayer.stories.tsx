@@ -155,7 +155,7 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
     return (
         <>
             <div className={useStyles().main}>
-                <DeckGLMap {...props} />;
+                <DeckGLMap {...props} />
                 <div className={useStyles().legend}>
                     <ContinuousLegend
                         min={meshMapLayer.propertyValueRange[0]}
