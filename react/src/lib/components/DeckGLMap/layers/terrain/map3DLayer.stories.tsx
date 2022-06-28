@@ -46,8 +46,8 @@ function nearestColorMap(x: number) {
 }
 
 function breakpointColorMap(x: number, breakpoint: number) {
-    if (x > breakpoint) return [0, 90, 180];
-    return [255, 200, 0];
+    if (x > breakpoint) return [0, 50, 200];
+    return [255, 255, 0];
 }
 
 function createColorMap(breakpoint: number) {
