@@ -1,6 +1,9 @@
 import React from "react";
-import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { Slider } from "@material-ui/core";
+import { makeStyles } from "@material-ui/styles";
+import DeckGLMap from "../../DeckGLMap";
+import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
@@ -40,6 +43,15 @@ function nearestColorMap(x: number) {
     if (x > 0.5) return [100, 255, 255];
     else if (x > 0.1) return [255, 100, 255];
     return [255, 255, 100];
+}
+
+function breakpointColorMap(x: number, breakpoint: number) {
+    if (x > breakpoint) return [0, 50, 200];
+    return [255, 255, 0];
+}
+
+function createColorMap(breakpoint: number) {
+    return (value: number) => breakpointColorMap(value, breakpoint);
 }
 
 export const GradientFunctionColorMap: ComponentStory<
@@ -96,6 +108,84 @@ DefaultColorScale.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Readout example.",
+        },
+    },
+};
+
+const useStyles = makeStyles({
+    main: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+    legend: {
+        width: 100,
+        position: "absolute",
+        top: "0",
+        right: "0",
+    },
+});
+
+export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
+
+    const colorMap = React.useCallback(
+        (value: number) => {
+            return createColorMap(breakpoint)(value);
+        },
+        [breakpoint]
+    );
+
+    const props = React.useMemo(() => {
+        return {
+            ...args,
+            layers: [
+                {
+                    ...meshMapLayer,
+                    colorMapFunction: colorMap,
+                },
+            ],
+            legend: { visible: false },
+        };
+    }, [breakpoint]);
+
+    const handleChange = React.useCallback((_event, value) => {
+        setBreakpoint(value / 100);
+    }, []);
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+                <div className={useStyles().legend}>
+                    <ContinuousLegend
+                        min={meshMapLayer.propertyValueRange[0]}
+                        max={meshMapLayer.propertyValueRange[1]}
+                        colorMapFunction={colorMap}
+                    />
+                </div>
+            </div>
+            <Slider
+                min={0}
+                max={100}
+                defaultValue={50}
+                step={1}
+                onChange={handleChange}
+            />
+        </>
+    );
+};
+
+BreakpointColorMap.args = {
+    ...defaultArgs,
+    id: "breakpoint-color-map",
+};
+
+BreakpointColorMap.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using a color scale with a breakpoint.",
         },
     },
 };
