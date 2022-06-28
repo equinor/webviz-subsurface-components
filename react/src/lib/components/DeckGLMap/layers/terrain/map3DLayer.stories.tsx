@@ -5,7 +5,6 @@ import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { Slider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import DeckGLMap from "../../DeckGLMap";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 export default {
