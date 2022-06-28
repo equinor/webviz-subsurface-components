@@ -406,16 +406,15 @@ export default class Map3DLayer extends CompositeLayer<
     }
 
     getLegendData(): ContinuousLegendDataType {
-        const min = this.props.colorMapRange
-            ? this.props.colorMapRange[0]
-            : this.props.meshValueRange[0];
-        const max = this.props.colorMapRange
-            ? this.props.colorMapRange[1]
-            : this.props.meshValueRange[1];
+        const colorRange = this.props.colorMapRange;
+        const propertyRange =
+            this.props.propertyTexture && this.props.propertyValueRange;
+        const meshRange = this.props.mesh && this.props.meshValueRange;
+        const legendRange = colorRange || propertyRange || meshRange;
 
         return {
             discrete: false,
-            valueRange: [min, max],
+            valueRange: legendRange,
             colorName: this.props.colorMapName,
             title: "Map3dLayer",
             colorMapFunction: this.props.colorMapFunction,
