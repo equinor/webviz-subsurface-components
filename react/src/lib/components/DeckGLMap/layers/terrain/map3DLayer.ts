@@ -14,6 +14,7 @@ import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
+import { ContinuousLegendDataType } from "../../components/ColorLegend";
 
 type MeshType = {
     attributes: {
@@ -378,7 +379,6 @@ export default class Map3DLayer extends CompositeLayer<
 
         const isMesh =
             typeof this.props.mesh !== "undefined" && this.props.mesh !== "";
-
         const layer = new TerrainMapLayer(
             this.getSubLayerProps<
                 TerrainMapLayerData,
@@ -403,6 +403,22 @@ export default class Map3DLayer extends CompositeLayer<
             })
         );
         return [layer];
+    }
+
+    getLegendData(): ContinuousLegendDataType {
+        const colorRange = this.props.colorMapRange;
+        const propertyRange =
+            this.props.propertyTexture && this.props.propertyValueRange;
+        const meshRange = this.props.mesh && this.props.meshValueRange;
+        const legendRange = colorRange || propertyRange || meshRange;
+
+        return {
+            discrete: false,
+            valueRange: legendRange,
+            colorName: this.props.colorMapName,
+            title: "Map3dLayer",
+            colorMapFunction: this.props.colorMapFunction,
+        };
     }
 }
 
