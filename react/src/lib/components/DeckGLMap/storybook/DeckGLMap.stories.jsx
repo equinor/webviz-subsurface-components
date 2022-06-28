@@ -421,6 +421,46 @@ Axes.args = {
     },
 };
 
+// Example using "Map" layer. AUses float32 mesh and properties binary arrays. Not PNG.
+const axes_hugin = {
+    "@@type": "AxesLayer",
+    id: "axes-layer2",
+    bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
+};
+const mapLayer = {
+    "@@type": "MapLayer",
+    id: "mesh-layer",
+    bounds: [
+        [432150, 6475800], // origo
+        [1451, 1141], // nx, ny
+        [5, 5], //dx, dy
+    ],
+    meshUrl: "hugin_depth_5_m.float32",
+    meshMaxError: 1,
+    propertiesUrl: "kh_netmap_5_m.float32",
+    contours: [0, 100.0],
+    isContoursDepth: true,
+    material: true,
+    colorMapName: "Physics",
+};
+
+export const MapFloat = MinimalTemplate.bind({});
+MapFloat.args = {
+    id: "map",
+    layers: [axes_hugin, mapLayer, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+                layerIds: [],
+            },
+        ],
+    },
+};
+
 // Example using "colorMapFunction" property.
 const layer = {
     ...meshMapLayer,
@@ -543,51 +583,6 @@ MultiView.args = {
     },
 };
 
-// Experimental MapLayer. This is newer Float32 resolution for properties.
-const mapLayer = {
-    "@@type": "MapLayer",
-    id: "map-layer-float32",
-    mesh: "./volve_hugin_depth_absolute.png",
-    bounds: [432205, 6475078, 437720, 6481113],
-    meshMaxError: 100,
-    propertyTexture: "./volve_property_ieee_float.png",
-    rotDeg: 0,
-    contours: [0, 20.0],
-    colorMapName: "Physics",
-    colorMapRange: [-3071, 41048],
-};
-export const ExperimentalMapLayerFloat32Property = EditDataTemplate.bind({});
-ExperimentalMapLayerFloat32Property.args = {
-    ...exampleData[0],
-    layers: [
-        {
-            ...mapLayer,
-            meshMaxError: 5.0,
-            visible: true,
-        },
-    ],
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-                layerIds: [],
-            },
-        ],
-    },
-};
-
-ExperimentalMapLayerFloat32Property.parameters = {
-    title: "Test",
-    docs: {
-        description: {
-            story: "An experimental layer using a Float 32 encoded property map.",
-        },
-        inlineStories: false,
-        iframeHeight: 500,
-    },
-};
 
 // ---------Selectable GeoJson Layer example--------------- //
 export const SelectableFeatureExample = (args) => {
