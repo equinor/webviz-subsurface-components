@@ -100,15 +100,14 @@ function makeMesh(
     bounds: BoundsType,
     meshData: Float32Array,
     meshMaxError: number
-): MeshType {    
+): MeshType {
     const [width, height] = boundsNxNy(bounds);
 
-    //const terrain = new Float32Array((w + 1) * (h + 1)); // +1 ?? jaja..
-    const terrain = new Float32Array(meshData);  // m
+    const terrain = new Float32Array(meshData);
     const tin = new Delatin(terrain, width, height);
 
     tin.run(meshMaxError);
-    // // @ts-expect-error
+    // @ts-expect-error keep
     const { coords, triangles } = tin;
     const vertices = coords;
 
@@ -271,7 +270,8 @@ async function load_mesh_and_texture(
     gl: unknown
 ) {
     let isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
-    const isTexture =  typeof propertiesUrl !== "undefined" && propertiesUrl !== "";
+    const isTexture =
+        typeof propertiesUrl !== "undefined" && propertiesUrl !== "";
 
     if (!isMesh && !isTexture) {
         console.error("Error. One or both of texture and mesh must be given!");
@@ -443,7 +443,8 @@ export default class MapLayer extends CompositeLayer<
             this.context.gl
         );
 
-        p.then(([mesh, propertyValueRange, meshData, propertyData, texture]) => {
+        p.then(
+            ([mesh, propertyValueRange, meshData, propertyData, texture]) => {
                 this.setState({
                     mesh,
                     propertyValueRange,
@@ -476,8 +477,8 @@ export default class MapLayer extends CompositeLayer<
     }
 
     renderLayers(): [TerrainMapLayer] {
-        const [minX, minY, maxX, maxY] = boundsToMinMax(this.props.bounds);
-        const [width, height] = boundsNxNy(this.props.bounds);
+        const [minX, minY] = boundsToMinMax(this.props.bounds);
+        const [width] = boundsNxNy(this.props.bounds);
         const center = this.props.rotPoint ?? [minX, minY];
 
         const rotatingModelMatrix = getModelMatrix(

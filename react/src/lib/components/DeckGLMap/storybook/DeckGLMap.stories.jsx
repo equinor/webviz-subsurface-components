@@ -583,7 +583,6 @@ MultiView.args = {
     },
 };
 
-
 // ---------Selectable GeoJson Layer example--------------- //
 export const SelectableFeatureExample = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);

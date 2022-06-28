@@ -14,9 +14,8 @@
 // TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 // THIS SOFTWARE.
 
+/* eslint-disable */
 // @ts-nocheck
-
-/* eslint-disable complexity, max-params, max-statements, max-depth, no-constant-condition */
 export default class Delatin {
   constructor(data, width, height = width) {
     this.data = data; // height data
