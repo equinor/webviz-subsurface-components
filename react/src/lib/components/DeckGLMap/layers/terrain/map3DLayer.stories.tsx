@@ -1,8 +1,9 @@
 import React from "react";
-import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { Slider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
+import DeckGLMap from "../../DeckGLMap";
+import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
@@ -117,10 +118,20 @@ const useStyles = makeStyles({
         border: "1px solid black",
         position: "relative",
     },
+    legend: {
+        width: 150,
+        position: "absolute",
+        top: "0",
+        right: "0",
+    }
 });
 
 export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
     const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
+
+    const colorMap = React.useCallback((value: number) => {
+    	return createColorMap(breakpoint)(value);
+	}, [breakpoint]);
 
     const props = React.useMemo(() => {
         return {
@@ -128,7 +139,7 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
             layers: [
                 {
                     ...meshMapLayer,
-                    colorMapFunction: createColorMap(breakpoint),
+                    colorMapFunction: colorMap,
                 },
             ],
         };
@@ -142,6 +153,9 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
         <>
             <div className={useStyles().main}>
                 <DeckGLMap {...props} />;
+		<div className={useStyles().legend}>
+			<ContinuousLegend min={meshMapLayer.propertyValueRange[0]} max={meshMapLayer.propertyValueRange[1]} colorMapFunction={colorMap} />
+		</div>
             </div>
             <Slider
                 min={0}
