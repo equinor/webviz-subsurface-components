@@ -26,9 +26,9 @@ type MeshType = {
     indices: { value: Uint32Array; size: number };
 };
 
-type BoundsType = [[number, number], [number, number], [number, number]];
+type Bounds = [[number, number], [number, number], [number, number]];
 
-function boundsToMinMax(bounds: BoundsType): [number, number, number, number] {
+function boundsToMinMax(bounds: Bounds): [number, number, number, number] {
     // [[origoX, origoY], [nx, ny], [dx, dy]]]
     const origo = bounds[0];
 
@@ -47,7 +47,7 @@ function boundsToMinMax(bounds: BoundsType): [number, number, number, number] {
     return [xmin, ymin, xmax, ymax];
 }
 
-function boundsNxNy(bounds: BoundsType): [number, number] {
+function boundsNxNy(bounds: Bounds): [number, number] {
     const nx = bounds[1][0];
     const ny = bounds[1][1];
 
@@ -97,7 +97,7 @@ function makeFixedSizeCopy(
 }
 
 function makeMesh(
-    bounds: BoundsType,
+    bounds: Bounds,
     meshData: Float32Array,
     meshMaxError: number
 ): MeshType {
@@ -263,7 +263,7 @@ function add_normals(resolved_mesh: MeshType) {
 
 async function load_mesh_and_texture(
     meshUrl: string,
-    bounds: BoundsType,
+    bounds: Bounds,
     meshMaxError: number,
     enableSmoothShading: boolean,
     propertiesUrl: string,
