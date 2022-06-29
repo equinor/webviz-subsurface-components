@@ -237,7 +237,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         layer_properties.push(
             createPropertyData("Depth", depth_value),
             createPropertyData(
-                "value_property",
+                "Property",
                 isNaN(property_value) ? "NaN" : property_value
             )
         );
