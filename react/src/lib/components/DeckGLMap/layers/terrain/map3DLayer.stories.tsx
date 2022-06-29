@@ -1,8 +1,10 @@
 import React from "react";
+import { useHoverInfo } from "../../components/Map";
+import DeckGLMap from "../../DeckGLMap";
+import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { Slider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import DeckGLMap from "../../DeckGLMap";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 export default {
@@ -104,6 +106,38 @@ export const DefaultColorScale: ComponentStory<typeof DeckGLMap> = () => {
 };
 
 DefaultColorScale.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Default color scale.",
+        },
+    },
+};
+
+export const Readout: ComponentStory<typeof DeckGLMap> = () => {
+    const [hoverInfo, hoverCallback] = useHoverInfo();
+
+    const args = React.useMemo(() => {
+        return {
+            ...defaultArgs,
+            id: "readout",
+            layers: [{ ...meshMapLayer }],
+            coords: {
+                visible: false,
+            },
+            onMouseEvent: hoverCallback,
+        };
+    }, [hoverCallback]);
+
+    return (
+        <>
+            <DeckGLMap {...args} />
+            {hoverInfo && <InfoCard pickInfos={hoverInfo} />}
+        </>
+    );
+};
+
+Readout.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
