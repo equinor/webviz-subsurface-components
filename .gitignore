@@ -205,8 +205,8 @@ coverage.xml
 .pytest_cache/
 
 # Cypress stuff
-react/cypress/snapshots/actual/*
-react/cypress/snapshots/diff/*
+chromedriver
+chromedriver_linux64.zip
 
 # Translations
 *.mo

@@ -28,9 +28,9 @@ jobs:
             run-performance-tests: false
           - python-version: 3.9
             run-performance-tests: false
-          - python-version: 3.9 # This particular job in the matrix is allowed to fail(for performance and cypress test)
-            run-performance-tests: true
             e2e-on-firefox: true
+          - python-version: 3.9 # This particular job in the matrix is allowed to fail(for performance tests)
+            run-performance-tests: true
 
     steps:
       - name: 📖 Checkout commit locally
@@ -106,14 +106,16 @@ jobs:
           npm run test_correctness --prefix ./react
           pytest ./tests --headless
 
-      # Run cypress tests on firefox browser
+      # This action allows caching cypress dependencies
       - name: Cache Cypress
         if: github.event_name != 'release' && matrix.e2e-on-firefox
         id: cache-cypress
         uses: actions/cache@v1
         with:
           working-directory: ./react
+          # list of files to cache and restore
           path: ~/.cache/Cypress
+          # An explicit key for restoring and saving the cache
           key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
       # now let's install Cypress binary
@@ -122,17 +124,19 @@ jobs:
         run: |
           cd react
           npx cypress install
-          npx cypress cache list
 
-      - name: e2e-on-firefox
+      # run the cypress tests
+      - name: e2e on firefox
+        id: cypressOutput
         if: github.event_name != 'release' && matrix.e2e-on-firefox
         run: |
           cd react
           npm run start-test
 
+      # upload the failure screenshots for reference
       - name: upload artfacts
         uses: actions/upload-artifact@v2
-        if: failure()
+        if: steps.cypressOutput.outcome == 'failure'
         with:
           name: cypress-screenshots
           path: |
@@ -140,40 +144,36 @@ jobs:
             react/cypress/snapshots
           retention-days: 5
 
-      # - name: check modified files
-      #   if: failure()
-      #   run: |
-      #     echo "=============== list untracked files ==============="
-      #     git ls-files --others --exclude-standard
+      - name: check if the tests failed due to difference in snapshots
+        id: check_file_changed
+        run: |
+          if [[ -d react/cypress/snapshots/diff ]]
+          then
+            echo "::set-output name=docs_changed::true"
+          else
+            echo "::set-output name=docs_changed::false"
+          fi
 
-      #     echo "========== check paths of untracked files =========="
-      #     git ls-files --others --exclude-standard > files.txt
-      #     while IFS= read -r file
-      #     do
-      #       echo $file
-      #       if [[ $file = react/cypress/snapshots/*/*/__diff_output__/* ]]; then
-      #         echo "This modified file is under the 'cypress' folder."
-      #         echo "::set-output name=run_job::true"
-      #         break
-      #       else
-      #         echo "::set-output name=run_job::false"
-      #       fi
-      #     done < files.txt
+      - name: replace newly captured snapshots
+        if: steps.check_file_changed.outputs.docs_changed == 'true'
+        run: |
+          chmod +x ./cypress.sh
+          ./cypress.sh
+          rm -rf react/cypress/snapshots/actual
+          rm -rf react/cypress/snapshots/diff
+          rm files.txt
+          rm files2.txt
 
-      # - name: Create comment
-      #   needs: check
-      #   if: needs.check.outputs.run_job == 'true'
-      #   uses: peter-evans/create-or-update-comment@v1
-      #   with:
-      #     issue-number: ${{ github.event.number }}
-      #     body: |
-      #       Looks like image comparison has failed with some tests. Please check artifacts folder in Actions
-      #       - With GitHub **Markdown** :warning:
-
-      # - name: Run Script
-      #   needs: check
-      #   if: needs.check.outputs.run_job == 'true'
-      #   run: ./cypress_script.sh
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@5a6b15373e5788c38d83296b674ad5abea28085c
+        if: steps.check_file_changed.outputs.docs_changed == 'true'
+        with:
+          commit-message: updated cypress snapshots
+          title: Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}
+          body: This is an auto-generated PR to update cypress snapshots.
+          base: ${{ github.head_ref }}
+          reviewers: ${{ github.actor }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

@@ -42,7 +42,7 @@ describe("Well Completions", () => {
         cy.getIframeBody().find(slider).type("{rightarrow}".repeat(1));
         cy.getIframeBody().find(slider).should("have.attr", "aria-valuenow", 1);
         cy.getIframeBody().find(slider).should("have.text", "2000-06-01");
-        cy.compareSnapshot("updated graph");
+        cy.compareSnapshot("updated-graph");
     });
 
     it("test wells per page", () => {
