@@ -226,6 +226,7 @@ export function useHoverInfo(): [PickingInfo[], EventCallback] {
         setHoverInfo(pickEvent.infos);
     }, []);
     return [hoverInfo, callback];
+}
 
 function defaultTooltip(info: PickInfo<unknown>) {
     if ((info as WellsPickInfo)?.logName) {
