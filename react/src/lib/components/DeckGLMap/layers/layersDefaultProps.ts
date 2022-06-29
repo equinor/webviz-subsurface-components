@@ -68,8 +68,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         meshMaxError: { type: "number", value: 5 },
         // Url to png image for map properties. (ex, poro or perm values as a texture)
         propertyTexture: "",
-        // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
-        bounds: { type: "array", value: null, false: true, compare: true },
         propertyValueRange: { type: "array", value: [0, 1] },
         rotDeg: 0,
         contours: [-1.0, -1.0],

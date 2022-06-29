@@ -25,20 +25,23 @@ type MeshType = {
     indices: { value: Uint32Array; size: number };
 };
 
-type BoundsType = [[number, number], [number, number], [number, number]];
+// These two types both describes the mesh' extent in the horizontal plane.
+type Bounds = [number, number, number, number];
+type Frame = {
+    origin: [number, number];
+    increment: [number, number];
+    count: [number, number];
+};
 
-function boundsToMinMax(bounds: BoundsType): [number, number, number, number] {
-    // [[origoX, origoY], [nx, ny], [dx, dy]]]
-    const origo = bounds[0];
+function getMinMax(dim: Frame): Bounds {
+    const nx = dim.count[0];
+    const ny = dim.count[1];
 
-    const nx = bounds[1][0];
-    const ny = bounds[1][1];
+    const dx = dim.increment[0];
+    const dy = dim.increment[1];
 
-    const dx = bounds[2][0];
-    const dy = bounds[2][1];
-
-    const xmin = origo[0];
-    const ymin = origo[1];
+    const xmin = dim.origin[0];
+    const ymin = dim.origin[1];
 
     const xmax = xmin + nx * dx;
     const ymax = ymin + ny * dy;
@@ -67,7 +70,7 @@ function mapToRange(resolved_mesh: MeshType, meshValueRange: [number, number]) {
 function add_normals(
     resolved_mesh: MeshType,
     meshImageData: ImageData,
-    bounds: BoundsType
+    bounds: [number, number, number, number]
 ) {
     const vertexs = resolved_mesh.attributes.POSITION.value;
     let indices = resolved_mesh.indices.value;
@@ -75,7 +78,7 @@ function add_normals(
 
     ////////////////////////////////////////////////////////////////
     // Remove all triangles that are in undefined areas. That is triangles which
-    const [xmin, ymin, xmax, ymax] = boundsToMinMax(bounds);
+    const [xmin, ymin, xmax, ymax] = bounds;
 
     const w = meshImageData.width;
     const h = meshImageData.height;
@@ -200,7 +203,7 @@ function add_normals(
 
 async function load_mesh_and_texture(
     mesh_name: string,
-    bounds: BoundsType,
+    bounds: Bounds,
     meshMaxError: number,
     meshValueRange: [number, number],
     enableSmoothShading: boolean,
@@ -225,7 +228,7 @@ async function load_mesh_and_texture(
         mesh = await load(mesh_name, TerrainLoader, {
             terrain: {
                 elevationDecoder: DECODER,
-                bounds: boundsToMinMax(bounds),
+                bounds,
                 meshMaxError,
                 skirtHeight: 0.0,
             },
@@ -245,8 +248,8 @@ async function load_mesh_and_texture(
         }
     } else {
         // Mesh data is missing.
-        // Make a flat square size of bounds using two triangles.  z = 0.
-        const [minX, minY, maxX, maxY] = boundsToMinMax(bounds);
+        // Make a flat square size of enclosing dim using two triangles.  z = 0.
+        const [minX, minY, maxX, maxY] = bounds;
         const p0 = [minX, minY, 0.0];
         const p1 = [minX, maxY, 0.0];
         const p2 = [maxX, maxY, 0.0];
@@ -270,9 +273,11 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image representing the height mesh.
     mesh: string;
 
-    // Bounding box of the terrain mesh [[origoX, origoY], [nx, ny], [dx, dy]]] in world coordinates.
-    // nx, y: number of cells in each direction. dx, dy: cell width in each direction.
-    bounds: [[number, number], [number, number], [number, number]];
+    // Horizontal extent of the terrain mesh.
+    frame?: Frame;
+
+    // Deprecated: mesh's horizonal extent as [xmin, ymin, xmax, ymax]
+    bounds?: [number, number, number, number];
 
     // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
     meshMaxError: number;
@@ -283,7 +288,7 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Rotates map counterclockwise in degrees around 'rotPoint' specified below.
     rotDeg: number;
 
-    // Point to rotate around using 'rotDeg'. Defaults to origo specified in 'bounds'.
+    // Point to rotate around using 'rotDeg'. Defaults to mesh origin.
     rotPoint: [number, number];
 
     // Contourlines reference point and interval.
@@ -342,9 +347,14 @@ export default class Map3DLayer extends CompositeLayer<
 > {
     initializeState(): void {
         // Load mesh and texture and store in state.
+        const isBounds = typeof this.props.bounds !== "undefined";
+        const bounds = (
+            isBounds ? this.props.bounds : getMinMax(this.props.frame as Frame)
+        ) as Bounds;
+
         const p = load_mesh_and_texture(
             this.props.mesh,
-            this.props.bounds,
+            bounds,
             this.props.meshMaxError,
             this.props.meshValueRange,
             this.props.enableSmoothShading,
@@ -382,7 +392,12 @@ export default class Map3DLayer extends CompositeLayer<
     }
 
     renderLayers(): [TerrainMapLayer] {
-        const [minX, minY] = boundsToMinMax(this.props.bounds);
+        const isBounds = typeof this.props.bounds !== "undefined";
+        const bounds = (
+            isBounds ? this.props.bounds : getMinMax(this.props.frame as Frame)
+        ) as Bounds;
+
+        const [minX, minY] = [bounds[0], bounds[1]];
         const center = this.props.rotPoint ?? [minX, minY];
 
         const rotatingModelMatrix = getModelMatrix(
