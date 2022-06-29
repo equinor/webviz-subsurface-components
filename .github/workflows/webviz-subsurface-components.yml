@@ -148,8 +148,7 @@ jobs:
         id: check_file_changed
         run: |
           Directory="/react/cypress/snapshots/diff"
-          if [ -d "$Directory" ];
-          then
+          if [ -d "$Directory" ]; then
 	          Write-Host "::set-output name=docs_changed::true"
           else
             Write-Host "::set-output name=docs_changed::false"
