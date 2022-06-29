@@ -60,7 +60,7 @@ setup(
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRE,
     extras_require={"tests": TESTS_REQUIRE, "dependencies": INSTALL_REQUIRES},
-    setup_requires=["setuptools_scm>=3.2"],
+    setup_requires=["setuptools_scm<7"],  # Python 3.6 support dropped in v 7.0.0
     python_requires="~=3.6",
     use_scm_version=True,
     classifiers=[

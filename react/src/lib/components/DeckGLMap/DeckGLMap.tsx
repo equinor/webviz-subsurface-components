@@ -11,7 +11,7 @@ export interface DeckGLMapProps {
     id: string;
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[];
-    bounds?: [number, number, number, number];
+    bounds: [number, number, number, number];
     zoom?: number;
     views?: ViewsType;
     coords?: {
@@ -23,7 +23,7 @@ export interface DeckGLMapProps {
         visible?: boolean | null;
         incrementValue?: number | null;
         widthPerUnit?: number | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
     };
     coordinateUnit?: string;
     toolbar?: {
@@ -31,7 +31,7 @@ export interface DeckGLMapProps {
     };
     legend?: {
         visible?: boolean | null;
-        position?: number[] | null;
+        cssStyle?: Record<string, unknown> | null;
         horizontal?: boolean | null;
     };
     colorTables?: colorTablesArray;
@@ -42,7 +42,19 @@ export interface DeckGLMapProps {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema?: boolean;
+
+    /**
+     * For get mouse events
+     */
     onMouseEvent?: (event: MapMouseEvent) => void;
+
+    /**
+     * Range selection of the current well
+     */
+    selection?: {
+        well: string | undefined;
+        selection: [number | undefined, number | undefined] | undefined;
+    };
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -62,6 +74,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     setProps,
     checkDatafileSchema,
     onMouseEvent,
+    selection,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -121,6 +134,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 setEditedData={setEditedData}
                 checkDatafileSchema={checkDatafileSchema}
                 onMouseEvent={onMouseEvent}
+                selection={selection}
             />
         </ReduxProvider>
     );
@@ -245,9 +259,9 @@ DeckGLMap.propTypes = {
          */
         widthPerUnit: PropTypes.number,
         /**
-         * Scale bar position in pixels.
+         * Scale bar css style can be used for positioning.
          */
-        position: PropTypes.arrayOf(PropTypes.number.isRequired),
+        cssStyle: PropTypes.objectOf(PropTypes.any),
     }),
 
     /**
@@ -275,9 +289,9 @@ DeckGLMap.propTypes = {
          */
         visible: PropTypes.bool,
         /**
-         * Legend position in pixels.
+         * Legend css style can be used for positioning.
          */
-        position: PropTypes.arrayOf(PropTypes.number.isRequired),
+        cssStyle: PropTypes.objectOf(PropTypes.any),
         /**
          * Orientation of color legend
          */
@@ -303,6 +317,25 @@ DeckGLMap.propTypes = {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema: PropTypes.bool,
+
+    /**
+     * For get mouse events
+     */
+    onMouseEvent: PropTypes.func,
+
+    /**
+     * Range selection of the current well
+     */
+    //selection: PropTypes.shape({
+    //    /**
+    //     * Current well name
+    //     */
+    //	well: PropTypes.string,
+    //    /**
+    //     * [from/cuurrent, to]
+    //     */
+    //    selection: PropTypes.arrayOf(PropTypes.number)
+    //}),
 };
 
 export default DeckGLMap;

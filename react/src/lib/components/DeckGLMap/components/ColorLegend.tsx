@@ -1,105 +1,75 @@
 import React from "react";
-import { Layer } from "deck.gl";
-import { WellsLayer } from "../layers";
 import {
-    ContinuousLegend,
     DiscreteColorLegend,
+    ContinuousLegend,
 } from "@emerson-eps/color-tables";
+import { ExtendedLayer } from "../layers/utils/layerTools";
+import { RGBAColor } from "@deck.gl/core/utils/color";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import { getLayersByType } from "../layers/utils/layerTools";
+import { colorMapFunctionType } from "../layers/utils/layerTools";
 
-interface ColorLegendProps {
-    position?: number[] | null;
-    horizontal?: boolean | null;
-    layers: Layer<unknown>[];
-    colorTables: colorTablesArray;
+interface LegendBaseData {
+    title: string;
+    colorName: string;
+    discrete: boolean;
+    colorMapFunction?: colorMapFunctionType;
+}
+export interface DiscreteLegendDataType extends LegendBaseData {
+    metadata: Record<string, [RGBAColor, number]>;
 }
 
-// Todo: Adapt it for other layers too
+export interface ContinuousLegendDataType extends LegendBaseData {
+    valueRange: [number, number];
+}
+
+interface ColorLegendProps {
+    horizontal?: boolean | null;
+    layer: ExtendedLayer<unknown>;
+    colorTables: colorTablesArray | string | undefined;
+}
+
 const ColorLegend: React.FC<ColorLegendProps> = ({
-    position,
     horizontal,
-    layers,
+    layer,
     colorTables,
 }: ColorLegendProps) => {
-    const [legendProps, setLegendProps] = React.useState<{
-        title: string;
-        name: string;
-        colorName: string;
-        discrete: boolean;
-        metadata: { objects: Record<string, [number[], number]> };
-        valueRange: number[];
-    }>({
-        title: "",
-        name: "string",
-        colorName: "string",
-        discrete: false,
-        metadata: { objects: {} },
-        valueRange: [],
-    });
-
-    // layers will have entries of unique type only
-    const wellsLayer = React.useMemo(
-        () => getLayersByType(layers, "WellsLayer")?.[0] as WellsLayer,
-        [layers]
-    );
-
-    // Get color table for log curves.
+    const [legendData, setLegendData] = React.useState<
+        DiscreteLegendDataType | ContinuousLegendDataType
+    >();
     React.useEffect(() => {
-        if (!wellsLayer?.isLoaded || !wellsLayer.props.logData) return;
+        const legend_data = layer.getLegendData?.() ?? layer.state?.legend;
+        setLegendData(legend_data);
+    }, [layer.props, layer.state?.legend]);
 
-        const legend = wellsLayer.state.legend[0];
-        setLegendProps({
-            title: legend.title,
-            name: wellsLayer?.props?.logName,
-            colorName: wellsLayer?.props?.logColor,
-            discrete: legend.discrete,
-            metadata: legend.metadata,
-            valueRange: legend.valueRange,
-        });
-    }, [
-        wellsLayer?.isLoaded,
-        wellsLayer?.props?.logName,
-        wellsLayer?.props?.logColor,
-    ]);
+    if (!legendData || !layer.props.visible) return null;
 
-    const [showLegend, setShowLegend] = React.useState<boolean | null>();
-    React.useEffect(() => {
-        // check log_curves from layer manager
-        setShowLegend(wellsLayer?.props.visible && wellsLayer?.props.logCurves);
-    }, [wellsLayer?.props.visible, wellsLayer?.props.logCurves]);
-
-    if (!showLegend) return null;
     return (
-        <div>
-            {legendProps.discrete && (
+        <div style={{ marginTop: 30 }}>
+            {legendData.discrete && (
                 <DiscreteColorLegend
-                    discreteData={legendProps.metadata}
-                    dataObjectName={legendProps.title}
-                    position={position}
-                    colorName={legendProps.colorName}
-                    colorTables={colorTables}
+                    discreteData={
+                        (legendData as DiscreteLegendDataType).metadata
+                    }
+                    dataObjectName={legendData.title}
+                    colorName={legendData.colorName}
                     horizontal={horizontal}
+                    colorTables={colorTables}
                 />
             )}
-            {legendProps.valueRange?.length > 0 && legendProps && (
+            {!legendData.discrete && (
                 <ContinuousLegend
-                    min={legendProps.valueRange[0]}
-                    max={legendProps.valueRange[1]}
-                    dataObjectName={legendProps.title}
-                    position={position}
-                    colorName={legendProps.colorName}
-                    colorTables={colorTables}
+                    min={(legendData as ContinuousLegendDataType).valueRange[0]}
+                    max={(legendData as ContinuousLegendDataType).valueRange[1]}
+                    dataObjectName={legendData.title}
+                    colorName={legendData.colorName}
                     horizontal={horizontal}
+                    id={layer.props.id}
+                    colorTables={colorTables}
+                    colorMapFunction={legendData.colorMapFunction}
                 />
             )}
         </div>
     );
-};
-
-ColorLegend.defaultProps = {
-    position: [5, 10],
-    horizontal: false,
 };
 
 export default ColorLegend;
