@@ -9,6 +9,14 @@ module.exports = {
         "@storybook/addon-actions",
         "addon-redux",
         "storybook-addon-performance/register",
+		{
+			name: "@storybook/addon-docs",
+			  options: {
+				sourceLoaderOptions: {
+				  injectStoryParameters: false,
+				},
+			  },
+		},
         "@storybook/addon-storysource",
     ],
     core: {
