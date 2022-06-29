@@ -278,7 +278,7 @@ const meshMapLayer = {
     bounds: [
         [432205, 6475078], // origo
         [229, 291], // nx, ny
-        [24, 24], //dx, dy
+        [24, 20], //dx, dy
     ],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [-3071, 41048],
