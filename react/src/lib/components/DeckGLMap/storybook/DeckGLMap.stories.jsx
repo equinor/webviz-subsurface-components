@@ -273,14 +273,17 @@ KhMapFlat.parameters = {
 const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
-    bounds: [432205, 6475078, 437720, 6481113],
-    meshMaxError: 100,
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
+    bounds: [
+        [432205, 6475078], // origo
+        [229, 291], // nx, ny
+        [24, 24], //dx, dy
+    ],
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [-3071, 41048],
-    rotDeg: 0, // default rotate around bounds' upper left corner.
-    //rotPoint: [432205 + (439400 - 432205) / 2, 6475078 + (6481113 - 6475078) / 2],  // rotate around middle
+    rotDeg: 0, // default rotate around origo. [xmin, ymin]
+    //rotPoint: [435802, 6478095],  // rotate around middle
     contours: [0, 100.0],
     isContoursDepth: true,
     colorMapName: "Physics",
