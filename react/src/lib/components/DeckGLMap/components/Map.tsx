@@ -95,6 +95,8 @@ export interface DeckGLLayerContext extends LayerContext {
     };
 }
 
+export type EventCallback = (event: MapMouseEvent) => void;
+
 export interface MapProps {
     /**
      * The ID of this component, used to identify dash components
@@ -191,7 +193,7 @@ export interface MapProps {
     /**
      * For get mouse events
      */
-    onMouseEvent?: (event: MapMouseEvent) => void;
+    onMouseEvent?: EventCallback;
 
     selection?: {
         well: string | undefined;
@@ -216,6 +218,14 @@ export interface MapMouseEvent {
     wellcolor?: Uint8Array; // well color
     md?: number;
     tvd?: number;
+}
+
+export function useHoverInfo(): [PickingInfo[], EventCallback] {
+    const [hoverInfo, setHoverInfo] = React.useState<PickingInfo[]>([]);
+    const callback = React.useCallback((pickEvent: MapMouseEvent) => {
+        setHoverInfo(pickEvent.infos);
+    }, []);
+    return [hoverInfo, callback];
 }
 
 function defaultTooltip(info: PickInfo<unknown>) {
