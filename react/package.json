@@ -44,7 +44,8 @@
         "preversion": "npm run lint",
         "start-test": "concurrently \"npm run storybook\" \"npm run cypress:test\" -k -s first",
         "cypress:test": "wait-on http://localhost:6006 && cypress run --browser firefox",
-        "cypress:run": "cypress run"
+        "cypress:run": "cypress run",
+        "coverage:visual-regression": "react-scripts test --watchAll=false --coverage --coverageDirectory=coverage/visual-regression --roots=\"<rootDir>\" --testMatch=\"<rootDir>/storyshots/index.js\""
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
@@ -105,6 +106,7 @@
         "@storybook/addon-docs": "^6.4.19",
         "@storybook/addon-essentials": "^6.4.19",
         "@storybook/addon-links": "^6.4.19",
+        "@storybook/addon-storyshots": "^6.5.9",
         "@storybook/builder-webpack5": "^6.4.19",
         "@storybook/manager-webpack5": "^6.4.19",
         "@storybook/react": "^6.4.19",
@@ -153,6 +155,7 @@
         "raw-loader": "^4.0.2",
         "react-ace": "^9.5.0",
         "react-docgen": "^5.3.1",
+        "react-scripts": "^5.0.1",
         "react-test-renderer": "^17.0.2",
         "redux-mock-store": "^1.5.4",
         "sass": "^1.36.0",
