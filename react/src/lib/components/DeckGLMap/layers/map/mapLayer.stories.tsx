@@ -37,6 +37,7 @@ const meshMapLayer = {
     },
     propertiesUrl: "kh_netmap_5_m.float32",
     contours: [0, 100.0],
+    rotDeg: 0,
     isContoursDepth: true,
     material: true,
     colorMapName: "Physics",
