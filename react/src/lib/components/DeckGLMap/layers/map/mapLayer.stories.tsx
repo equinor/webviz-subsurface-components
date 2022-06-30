@@ -30,11 +30,11 @@ const meshMapLayer = {
     "@@type": "MapLayer",
     id: "mesh-layer",
     meshUrl: "hugin_depth_5_m.float32",
-    bounds: [
-        [432150, 6475800], // origo
-        [1451, 1141], // nx, ny
-        [5, 5], //dx, dy
-    ],
+    frame: {
+        origin: [432150, 6475800],
+        count: [1451, 1141],
+        increment: [5, 5],
+    },
     propertiesUrl: "kh_netmap_5_m.float32",
     contours: [0, 100.0],
     isContoursDepth: true,

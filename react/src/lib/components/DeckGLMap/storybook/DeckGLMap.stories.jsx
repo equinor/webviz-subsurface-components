@@ -414,7 +414,7 @@ Axes.args = {
         viewports: [
             {
                 id: "view_1",
-                show3D: false,
+                show3D: true,
                 layerIds: [],
             },
         ],

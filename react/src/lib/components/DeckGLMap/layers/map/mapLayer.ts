@@ -26,20 +26,23 @@ type MeshType = {
     indices: { value: Uint32Array; size: number };
 };
 
-type Bounds = [[number, number], [number, number], [number, number]];
+// These two types both describes the mesh' extent in the horizontal plane.
+type Bounds = [number, number, number, number];
+type Frame = {
+    origin: [number, number];
+    increment: [number, number];
+    count: [number, number];
+};
 
-function boundsToMinMax(bounds: Bounds): [number, number, number, number] {
-    // [[origoX, origoY], [nx, ny], [dx, dy]]]
-    const origo = bounds[0];
+function getMinMax(dim: Frame): Bounds {
+    const nx = dim.count[0];
+    const ny = dim.count[1];
 
-    const nx = bounds[1][0];
-    const ny = bounds[1][1];
+    const dx = dim.increment[0];
+    const dy = dim.increment[1];
 
-    const dx = bounds[2][0];
-    const dy = bounds[2][1];
-
-    const xmin = origo[0];
-    const ymin = origo[1];
+    const xmin = dim.origin[0];
+    const ymin = dim.origin[1];
 
     const xmax = xmin + nx * dx;
     const ymax = ymin + ny * dy;
@@ -47,9 +50,9 @@ function boundsToMinMax(bounds: Bounds): [number, number, number, number] {
     return [xmin, ymin, xmax, ymax];
 }
 
-function boundsNxNy(bounds: Bounds): [number, number] {
-    const nx = bounds[1][0];
-    const ny = bounds[1][1];
+function dimNxNy(dim: Frame): [number, number] {
+    const nx = dim.count[0];
+    const ny = dim.count[1];
 
     return [nx, ny];
 }
@@ -62,7 +65,7 @@ function replaceNaN(meshData: Float32Array, value: number) {
     }
 }
 
-function getMinMax(data: Float32Array) {
+function getFloat32ArrayMinMax(data: Float32Array) {
     let max = -99999999;
     let min = 99999999;
     for (let i = 0; i < data.length; i++) {
@@ -97,11 +100,11 @@ function makeFixedSizeCopy(
 }
 
 function makeMesh(
-    bounds: Bounds,
+    dim: Frame,
     meshData: Float32Array,
     meshMaxError: number
 ): MeshType {
-    const [width, height] = boundsNxNy(bounds);
+    const [width, height] = dimNxNy(dim);
 
     const terrain = new Float32Array(meshData);
     const tin = new Delatin(terrain, width, height);
@@ -119,7 +122,7 @@ function makeMesh(
     // vec2. 1 to 1 relationship with position. represents the uv on the texture image. 0,0 to 1,1.
     const texCoords = new Float32Array(numOfVerticies * 2);
 
-    const [minX, minY, maxX, maxY] = boundsToMinMax(bounds);
+    const [minX, minY, maxX, maxY] = getMinMax(dim);
     const xScale = (maxX - minX) / (width - 1);
     const yScale = (maxY - minY) / (height - 1);
 
@@ -263,7 +266,7 @@ function add_normals(resolved_mesh: MeshType) {
 
 async function load_mesh_and_texture(
     meshUrl: string,
-    bounds: Bounds,
+    dim: Frame,
     meshMaxError: number,
     enableSmoothShading: boolean,
     propertiesUrl: string,
@@ -285,7 +288,7 @@ async function load_mesh_and_texture(
     }
 
     //-- MESH --
-    const [w, h] = boundsNxNy(bounds);
+    const [w, h] = dimNxNy(dim);
     let meshData: Float32Array;
     let mesh: MeshType;
     if (isMesh) {
@@ -297,7 +300,7 @@ async function load_mesh_and_texture(
         meshData = new Float32Array(buffer);
 
         replaceNaN(meshData, 0.0);
-        mesh = makeMesh(bounds, meshData, meshMaxError);
+        mesh = makeMesh(dim, meshData, meshMaxError);
         meshData = makeFixedSizeCopy(meshData, w, h);
 
         removeInactiveTriangles(mesh);
@@ -309,7 +312,7 @@ async function load_mesh_and_texture(
     } else {
         // Mesh data is missing.
         // Make a flat square size of bounds using two triangles.  z = 0.
-        const [minX, minY, maxX, maxY] = boundsToMinMax(bounds);
+        const [minX, minY, maxX, maxY] = getMinMax(dim);
         const p0 = [minX, minY, 0.0];
         const p1 = [minX, maxY, 0.0];
         const p2 = [maxX, maxY, 0.0];
@@ -339,7 +342,7 @@ async function load_mesh_and_texture(
     const data = new Float32Array(buffer);
 
     // create float texture.
-    const propertyValueRange = getMinMax(data);
+    const propertyValueRange = getFloat32ArrayMinMax(data);
     const format = GL.R32F;
     const type = GL.FLOAT;
     const texture = new Texture2D(gl, {
@@ -367,9 +370,13 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to the height (z values) mesh.
     meshUrl: string;
 
-    // Bounding box of the terrain mesh [[origoX, origoY], [nx, ny], [dx, dy]]] in world coordinates.
-    // nx, y: number of cells in each direction. dx, dy: cell width in each direction.
-    bounds: [[number, number], [number, number], [number, number]];
+    // Horizontal extent of the terrain mesh. Format:
+    // {
+    //     origin: [number, number];     // mesh origin in x, y
+    //     increment: [number, number];  // cell size dx, dy
+    //     count: [number, number];      // number of cells in both directions.
+    // }
+    frame: Frame;
 
     // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
     // default: 1.
@@ -436,7 +443,7 @@ export default class MapLayer extends CompositeLayer<
         // Load mesh and texture and store in state.
         const p = load_mesh_and_texture(
             this.props.meshUrl,
-            this.props.bounds,
+            this.props.frame,
             this.props.meshMaxError,
             this.props.enableSmoothShading,
             this.props.propertiesUrl,
@@ -465,7 +472,7 @@ export default class MapLayer extends CompositeLayer<
     }): void {
         const needs_reload =
             !isEqual(props.meshUrl, oldProps.meshUrl) ||
-            !isEqual(props.bounds, oldProps.bounds) ||
+            !isEqual(props.frame, oldProps.frame) ||
             !isEqual(props.meshMaxError, oldProps.meshMaxError) ||
             !isEqual(props.enableSmoothShading, oldProps.enableSmoothShading) ||
             !isEqual(props.propertiesUrl, oldProps.propertiesUrl);
@@ -477,8 +484,8 @@ export default class MapLayer extends CompositeLayer<
     }
 
     renderLayers(): [TerrainMapLayer] {
-        const [minX, minY] = boundsToMinMax(this.props.bounds);
-        const [width] = boundsNxNy(this.props.bounds);
+        const [width] = dimNxNy(this.props.frame);
+        const [minX, minY] = this.props.frame.origin;
         const center = this.props.rotPoint ?? [minX, minY];
 
         const rotatingModelMatrix = getModelMatrix(

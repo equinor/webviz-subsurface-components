@@ -49,9 +49,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         meshMaxError: { type: "number", value: 5 },
         // Url to the properties. (ex, poro or perm values)
         propertiesUrl: "",
-        // Bounding box of the terrain mesh [[origoX, origoY], [nx, ny], [dx, dy]]] in world coordinates.
-        // nx, y: number of cells in each direction. dx, dy: cell width in each direction.
-        bounds: { type: "array", value: null, false: true, compare: true },
+        bounds: { type: "object", value: null, false: true, compare: true },
         colorMapRange: { type: "array" },
         rotDeg: 0,
         contours: [-1.0, -1.0],
