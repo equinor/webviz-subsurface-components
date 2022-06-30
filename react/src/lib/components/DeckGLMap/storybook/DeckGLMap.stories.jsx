@@ -279,8 +279,8 @@ const meshMapLayer = {
     //bounds: [432205, 6475078, 437701, 6480898],  // [xmin, xmax, ymin, ymax]
     frame: {
         origin: [432205, 6475078],
-        count: [229, 291],    // nxny ?
-        increment: [24, 20],  // dxdy ?
+        count: [229, 291],
+        increment: [24, 20],
     },
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [-3071, 41048],
