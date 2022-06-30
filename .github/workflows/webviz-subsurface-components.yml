@@ -58,7 +58,7 @@ jobs:
           # check:
           grep -q '"lockfileVersion": 2,' ./react/package-lock.json
 
-          npm ci --ignore-scripts --prefix ./react
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts --prefix ./react
           npm run setup-deckgl-types --prefix ./react
           npm run copy-package-json --prefix ./react
           pip install "werkzeug<2.1"  # ...while waiting for https://github.com/plotly/dash/issues/1992
@@ -127,7 +127,6 @@ jobs:
 
       # run the cypress tests
       - name: e2e on firefox
-        id: cypressOutput
         if: github.event_name != 'release' && matrix.e2e-on-firefox
         run: |
           cd react
@@ -136,16 +135,17 @@ jobs:
       # upload the failure screenshots for reference
       - name: upload artfacts
         uses: actions/upload-artifact@v2
-        if: steps.cypressOutput.outcome == 'failure'
+        if: github.event_name != 'release' && failure() && matrix.e2e-on-firefox
         with:
           name: cypress-screenshots
           path: |
             react/cypress/screenshots
-            react/cypress/snapshots
+            react/cypress/snapshots/diff
           retention-days: 5
 
       - name: check if the tests failed due to difference in snapshots
         id: check_file_changed
+        if: github.event_name != 'release' && matrix.e2e-on-firefox && failure()
         run: |
           if [[ -d react/cypress/snapshots/diff ]]
           then
@@ -155,7 +155,7 @@ jobs:
           fi
 
       - name: replace newly captured snapshots
-        if: steps.check_file_changed.outputs.docs_changed == 'true'
+        if: steps.check_file_changed.outputs.docs_changed == 'true' && failure()
         run: |
           chmod +x ./cypress.sh
           ./cypress.sh
@@ -167,7 +167,7 @@ jobs:
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@5a6b15373e5788c38d83296b674ad5abea28085c
-        if: steps.check_file_changed.outputs.docs_changed == 'true'
+        if: steps.check_file_changed.outputs.docs_changed == 'true' && failure()
         with:
           commit-message: updated cypress snapshots
           title: Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}

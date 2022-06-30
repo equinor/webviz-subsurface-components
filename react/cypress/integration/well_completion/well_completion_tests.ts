@@ -9,21 +9,16 @@ describe("Well Completions", () => {
                 timeout: 20000,
             }
         );
-        cy.get("body").then(($body) => {
-            if ($body.find("#root > div > div.css-1q7pov5 > nav").length <= 0) {
-                cy.get("body").type("s");
+        cy.get("#wellcompletions-demo").click();
+        cy.get("#storybook-panel-root").then(($body) => {
+            if ($body.is(":visible")) {
+                cy.get("body").type("a");
             }
         });
-        cy.get('[id="wellcompletions-demo"]').click();
+
         cy.get("body").then(($body) => {
-            if ($body.find("#root > div > div.css-1q7pov5 > nav").length > 0) {
+            if ($body.find("nav.sidebar-container").length > 0) {
                 cy.get("body").type("s");
-            }
-            if (
-                $body.find("#root > div > div.react-draggable.css-p5zfqk")
-                    .length > 0
-            ) {
-                cy.get("body").type("a");
             }
         });
         cy.getIframeBody()

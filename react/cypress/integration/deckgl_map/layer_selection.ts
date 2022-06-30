@@ -7,15 +7,15 @@ describe("Map component", () => {
                 timeout: 20000,
             }
         );
-        cy.get("body").then(($body) => {
-            if ($body.find("#root > div > div.css-1q7pov5 > nav").length > 0) {
-                cy.get("body").type("s");
-            }
-            if (
-                $body.find("#root > div > div.react-draggable.css-p5zfqk")
-                    .length > 0
-            ) {
+        cy.get("#storybook-panel-root").then(($body) => {
+            if ($body.is(":visible")) {
                 cy.get("body").type("a");
+            }
+        });
+
+        cy.get("body").then(($body) => {
+            if ($body.find("nav.sidebar-container").length > 0) {
+                cy.get("body").type("s");
             }
         });
         cy.getIframeBody()
@@ -94,10 +94,10 @@ describe("Map component", () => {
         cy.getIframeBody().find('[id="layers-selector-button"]').click();
         cy.getIframeBody().find('[id="Drawing-switch"]').click({ force: true });
         cy.wait(1000);
+        cy.getIframeBody().find('[id="drawing-layer-button"]').should("exist");
+        cy.getIframeBody().find('[id="Drawing-switch"]').click({ force: true });
         cy.getIframeBody()
             .find('[id="drawing-layer-button"]')
             .should("not.exist");
-        cy.getIframeBody().find('[id="Drawing-switch"]').click({ force: true });
-        cy.getIframeBody().find('[id="drawing-layer-button"]').should("exist");
     });
 });
