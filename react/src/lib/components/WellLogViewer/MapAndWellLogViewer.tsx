@@ -312,15 +312,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             layers={this.state.layers}
                             editedData={this.state.editedData}
                             colorTables={colorTables}
-                            setProps={(
-                                updatedProps: Record<string, unknown>
-                            ) => {
-                                this.setState({
-                                    editedData: updatedProps[
-                                        "editedData"
-                                    ] as any,
-                                });
-                            }}
                             onMouseEvent={this.onMouseEvent}
                             selection={{
                                 well: wellName,

@@ -71,6 +71,7 @@
         "clsx": "^1.1.1",
         "convert-units": "^2.3.4",
         "d3": "^5.11.0",
+        "d3-format": "^1.4.5",
         "deck.gl": "^8.7.5",
         "deep-equal": "^2.0.5",
         "fast-json-patch": "^3.0.0-1",

@@ -40,6 +40,8 @@ import { WellsLayer } from "../layers";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
+export type TooltipCallback = (info: PickInfo<unknown>) => string | null;
+
 export interface ViewportType {
     /**
      * Viewport id
@@ -92,6 +94,8 @@ export interface DeckGLLayerContext extends LayerContext {
         colorTables: colorTablesArray;
     };
 }
+
+export type EventCallback = (event: MapMouseEvent) => void;
 
 export interface MapProps {
     /**
@@ -189,7 +193,7 @@ export interface MapProps {
     /**
      * For get mouse events
      */
-    onMouseEvent?: (event: MapMouseEvent) => void;
+    onMouseEvent?: EventCallback;
 
     selection?: {
         well: string | undefined;
@@ -197,6 +201,8 @@ export interface MapProps {
     };
 
     children?: React.ReactNode;
+
+    getTooltip?: TooltipCallback;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -212,6 +218,24 @@ export interface MapMouseEvent {
     wellcolor?: Uint8Array; // well color
     md?: number;
     tvd?: number;
+}
+
+export function useHoverInfo(): [PickingInfo[], EventCallback] {
+    const [hoverInfo, setHoverInfo] = React.useState<PickingInfo[]>([]);
+    const callback = React.useCallback((pickEvent: MapMouseEvent) => {
+        setHoverInfo(pickEvent.infos);
+    }, []);
+    return [hoverInfo, callback];
+}
+
+function defaultTooltip(info: PickInfo<unknown>) {
+    if ((info as WellsPickInfo)?.logName) {
+        return (info as WellsPickInfo)?.logName;
+    } else if (info.layer?.id === "drawing-layer") {
+        return (info as DrawingPickInfo).measurement?.toFixed(2);
+    }
+    const feat = info.object as Feature;
+    return feat?.properties?.["name"];
 }
 
 const Map: React.FC<MapProps> = ({
@@ -233,6 +257,7 @@ const Map: React.FC<MapProps> = ({
     onMouseEvent,
     selection,
     children,
+    getTooltip = defaultTooltip,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 
@@ -507,21 +532,7 @@ const Map: React.FC<MapProps> = ({
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
                 }
-                // @ts-expect-error: Fix type in WellsLayer
-                getTooltip={(
-                    info: PickInfo<unknown>
-                ): string | null | undefined => {
-                    if ((info as WellsPickInfo)?.logName) {
-                        return (info as WellsPickInfo)?.logName;
-                    } else if (info.layer?.id === "drawing-layer") {
-                        return (info as DrawingPickInfo).measurement?.toFixed(
-                            2
-                        );
-                    } else {
-                        const feat = info.object as Feature;
-                        return feat?.properties?.["name"];
-                    }
-                }}
+                getTooltip={getTooltip}
                 ref={deckRef}
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
