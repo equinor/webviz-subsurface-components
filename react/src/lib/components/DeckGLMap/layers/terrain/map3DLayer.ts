@@ -348,8 +348,13 @@ export default class Map3DLayer extends CompositeLayer<
     initializeState(): void {
         // Load mesh and texture and store in state.
         const isBounds = typeof this.props.bounds !== "undefined";
+        if (isBounds) {
+            console.warn('"bounds" is deprecated. Use "frame" instead.');
+        }
+
+        const isFrame = typeof this.props.frame !== "undefined";
         const bounds = (
-            isBounds ? this.props.bounds : getMinMax(this.props.frame as Frame)
+            isFrame ? getMinMax(this.props.frame as Frame) : this.props.bounds
         ) as Bounds;
 
         const p = load_mesh_and_texture(
