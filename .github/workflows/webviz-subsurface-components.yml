@@ -140,7 +140,7 @@ jobs:
           name: cypress-screenshots
           path: |
             react/cypress/screenshots
-            react/cypress/snapshots/diff
+            react/cypress/snapshots
           retention-days: 5
 
       - name: check if the tests failed due to difference in snapshots
@@ -149,20 +149,20 @@ jobs:
         run: |
           if [[ -d react/cypress/snapshots/diff ]]
           then
-            echo "::set-output name=docs_changed::true"
+            echo ::set-output name=docs_changed::true
           else
-            echo "::set-output name=docs_changed::false"
+            echo ::set-output name=docs_changed::false
           fi
 
       - name: replace newly captured snapshots
         if: steps.check_file_changed.outputs.docs_changed == 'true' && failure()
         run: |
-          chmod +x ./cypress.sh
-          ./cypress.sh
+          chmod +x ./cypress.sh || true
+          ./cypress.sh || true
           rm -rf react/cypress/snapshots/actual
           rm -rf react/cypress/snapshots/diff
-          rm files.txt
-          rm files2.txt
+          rm -rf files.txt
+          rm -rf files2.txt
 
       - name: Create Pull Request
         id: cpr
