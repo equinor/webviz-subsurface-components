@@ -8,7 +8,6 @@ uniform sampler2D sampler;
 uniform bool flatShading;
 uniform float opacity;
 
-uniform bool isReadoutDepth;
 uniform bool isContoursDepth;
 
 uniform float contourReferencePoint;
@@ -53,42 +52,22 @@ void main(void) {
 
    vec4 color = hasTexture ? texture(sampler, vTexCoord) : vColor;
 
+   float texture_alpha = color.a;
+
    // Discard transparent pixels.
-   if (!picking_uActive && color.w < 1.0) {
+   if (!picking_uActive && color.w < 0.99) {
          discard;
          return;
    }
 
    // Picking pass.
    if (picking_uActive) {
-      if (isReadoutDepth) {
-         // Readout should not be the surface property but the surface height (z value).
-         float depth = abs(worldPos.z);
-         
-         // Express in 255 system.
-         float r = 0.0;
-         float g = 0.0;
-         float b = 0.0;
+      // Send texture coordinates.
+      float s = vTexCoord.x;
+      float t = vTexCoord.y;
+      float b = texture_alpha > 0.95 ? 255.0 : 0.0;
 
-         if (depth >= (256.0 * 256.0) - 1.0) {
-            r = floor(depth / (256.0 * 256.0));
-            depth -= r * (256.0 * 256.0);
-         }
-
-         if (depth >= 256.0 - 1.0) {
-            g = floor(depth / 256.0);
-            depth -= g * 256.0;
-         }
-
-         b = floor(depth);
-
-         fragColor = vec4(r / 255.0, g / 255.0, b / 255.0,  1.0);
-      }
-      else {
-         // Readout is the surface property, i.e. the raw texture value.
-         fragColor = color;
-      }
-
+      fragColor = vec4(s, t, b, 1.0);
       return;
    }
 

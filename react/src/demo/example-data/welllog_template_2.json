@@ -15,13 +15,13 @@
     {
       "plots": [
         {
+          "name": "PORO"
+        },
+        {
           "name": "NTG"
         },
         {
           "name": "SW"
-        },
-        {
-          "name": "PORO"
         }
       ]
     },
@@ -189,7 +189,8 @@
   "styles": [
     {
       "name": "discrete",
-      "type": "stacked"
+      "type": "stacked",
+      "colorTable": "Stratigraphy"
     }
   ]
 }

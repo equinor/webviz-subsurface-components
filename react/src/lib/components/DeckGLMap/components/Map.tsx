@@ -34,9 +34,13 @@ import {
     validateLayers,
 } from "../../../inputSchema/schemaValidationUtil";
 import { DrawingPickInfo } from "../layers/drawing/drawingLayer";
+import { getLayersByType } from "../layers/utils/layerTools";
+import { WellsLayer } from "../layers";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
+
+export type TooltipCallback = (info: PickInfo<unknown>) => string | null;
 
 export interface ViewportType {
     /**
@@ -90,6 +94,8 @@ export interface DeckGLLayerContext extends LayerContext {
         colorTables: colorTablesArray;
     };
 }
+
+export type EventCallback = (event: MapMouseEvent) => void;
 
 export interface MapProps {
     /**
@@ -187,9 +193,16 @@ export interface MapProps {
     /**
      * For get mouse events
      */
-    onMouseEvent?: (event: MapMouseEvent) => void;
+    onMouseEvent?: EventCallback;
+
+    selection?: {
+        well: string | undefined;
+        selection: [number | undefined, number | undefined] | undefined;
+    };
 
     children?: React.ReactNode;
+
+    getTooltip?: TooltipCallback;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -197,12 +210,32 @@ export type PickingInfo = any;
 export interface MapMouseEvent {
     type: "click" | "hover" | "contextmenu";
     infos: PickingInfo[];
-    // some frequently used values extracted from infos:
+    // some frequently used values extracted from infos[]:
     x?: number;
     y?: number;
+    // Only for one well. Full information is available in infos[]
     wellname?: string;
+    wellcolor?: Uint8Array; // well color
     md?: number;
     tvd?: number;
+}
+
+export function useHoverInfo(): [PickingInfo[], EventCallback] {
+    const [hoverInfo, setHoverInfo] = React.useState<PickingInfo[]>([]);
+    const callback = React.useCallback((pickEvent: MapMouseEvent) => {
+        setHoverInfo(pickEvent.infos);
+    }, []);
+    return [hoverInfo, callback];
+}
+
+function defaultTooltip(info: PickInfo<unknown>) {
+    if ((info as WellsPickInfo)?.logName) {
+        return (info as WellsPickInfo)?.logName;
+    } else if (info.layer?.id === "drawing-layer") {
+        return (info as DrawingPickInfo).measurement?.toFixed(2);
+    }
+    const feat = info.object as Feature;
+    return feat?.properties?.["name"];
 }
 
 const Map: React.FC<MapProps> = ({
@@ -222,7 +255,9 @@ const Map: React.FC<MapProps> = ({
     setEditedData,
     checkDatafileSchema,
     onMouseEvent,
+    selection,
     children,
+    getTooltip = defaultTooltip,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 
@@ -264,7 +299,8 @@ const Map: React.FC<MapProps> = ({
     const st_layers = useSelector(
         (st: MapState) => st.spec["layers"]
     ) as Record<string, unknown>[];
-    React.useEffect(() => {
+
+    useEffect(() => {
         if (st_layers == undefined || layers == undefined) return;
 
         const updated_layers = applyPropsOnLayers(st_layers, layers);
@@ -273,9 +309,16 @@ const Map: React.FC<MapProps> = ({
         dispatch(setSpec(updated_spec));
     }, [layers, dispatch]);
 
-    const [deckGLLayers, setDeckGLLayers] = useState<ExtendedLayer<unknown>[]>(
-        []
-    );
+    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
+    useEffect(() => {
+        if (deckGLLayers) {
+            const wellsLayer = getLayersByType(
+                deckGLLayers,
+                "WellsLayer"
+            )?.[0] as WellsLayer;
+            if (wellsLayer) wellsLayer.setupLegend();
+        }
+    }, [deckGLLayers]);
     useEffect(() => {
         const layers = st_layers as LayerProps<unknown>[];
         if (!layers || layers.length == 0) return;
@@ -289,6 +332,15 @@ const Map: React.FC<MapProps> = ({
             jsonToObject(layers, enumerations) as ExtendedLayer<unknown>[]
         );
     }, [st_layers, resources, editedData]);
+
+    useEffect(() => {
+        const wellslayer = getLayersByType(
+            deckRef.current?.deck.props.layers as Layer<unknown>[],
+            "WellsLayer"
+        )?.[0] as WellsLayer;
+
+        wellslayer?.setSelection(selection?.well, selection?.selection);
+    }, [selection]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
@@ -349,22 +401,62 @@ const Map: React.FC<MapProps> = ({
                 }
                 //const layer_name = (info.layer?.props as ExtendedLayerProps<FeatureCollection>)?.name;
                 if (info.layer && info.layer.id === "wells-layer") {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    info.properties?.forEach((property: any) => {
-                        let propname = property.name;
-                        if (propname) {
-                            const sep = propname.indexOf(" ");
-                            if (sep >= 0) {
-                                // it is a simple hack to get well name previously added to the end of property name
-                                ev.wellname = propname.substring(sep + 1);
-                                propname = propname.substring(0, sep);
-                            }
+                    // info.object is Feature or WellLog;
+                    {
+                        // try to use Object info (see DeckGL getToolTip callback)
+                        const feat = info.object as Feature;
+                        const properties = feat?.properties;
+                        if (properties) {
+                            ev.wellname = properties["name"];
+                            ev.wellcolor = properties["color"];
                         }
-                        if (propname === "MD")
-                            ev.md = parseFloat(property.value);
-                        else if (propname === "TVD")
-                            ev.tvd = parseFloat(property.value);
-                    });
+                    }
+                    if (!ev.wellname)
+                        ev.wellname = info.object.header?.["well"]; // object is WellLog
+
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    if (info.properties) {
+                        for (const property of info.properties) {
+                            if (!ev.wellcolor) ev.wellcolor = property.color;
+                            let propname = property.name;
+                            if (propname) {
+                                const sep = propname.indexOf(" ");
+                                if (sep >= 0) {
+                                    if (!ev.wellname) {
+                                        ev.wellname = propname.substring(
+                                            sep + 1
+                                        );
+                                    }
+                                    propname = propname.substring(0, sep);
+                                }
+                            }
+                            const names_md = [
+                                "DEPTH",
+                                "DEPT",
+                                "MD" /*Measured Depth*/,
+                                "TDEP" /*"Tool DEPth"*/,
+                                "MD_RKB" /*Rotary Relly Bushing*/,
+                            ]; // aliases for MD
+                            const names_tvd = [
+                                "TVD" /*True Vertical Depth*/,
+                                "TVDSS" /*SubSea*/,
+                                "DVER" /*"VERtical Depth"*/,
+                                "TVD_MSL" /*below Mean Sea Level*/,
+                            ]; // aliases for MD
+
+                            if (names_md.find((name) => name == propname))
+                                ev.md = parseFloat(property.value);
+                            else if (names_tvd.find((name) => name == propname))
+                                ev.tvd = parseFloat(property.value);
+
+                            if (
+                                ev.md !== undefined &&
+                                ev.tvd !== undefined &&
+                                ev.wellname !== undefined
+                            )
+                                break;
+                        }
+                    }
                     break;
                 }
             }
@@ -424,7 +516,7 @@ const Map: React.FC<MapProps> = ({
         return null;
 
     return (
-        <div>
+        <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
                 id={id}
                 viewState={viewState}
@@ -440,21 +532,7 @@ const Map: React.FC<MapProps> = ({
                 getCursor={({ isDragging }): string =>
                     isDragging ? "grabbing" : "default"
                 }
-                // @ts-expect-error: Fix type in WellsLayer
-                getTooltip={(
-                    info: PickInfo<unknown>
-                ): string | null | undefined => {
-                    if ((info as WellsPickInfo)?.logName) {
-                        return (info as WellsPickInfo)?.logName;
-                    } else if (info.layer?.id === "drawing-layer") {
-                        return (info as DrawingPickInfo).measurement?.toFixed(
-                            2
-                        );
-                    } else {
-                        const feat = info.object as Feature;
-                        return feat?.properties?.["name"];
-                    }
-                }}
+                getTooltip={getTooltip}
                 ref={deckRef}
                 onViewStateChange={(viewport) =>
                     setViewState(viewport.viewState)
@@ -480,6 +558,7 @@ const Map: React.FC<MapProps> = ({
                                             view.layerIds
                                         ) as ExtendedLayer<unknown>[]
                                     }
+                                    colorTables={colorTables}
                                 />
                             )}
                             {toolbar?.visible && (
@@ -644,6 +723,8 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                 const cur_viewport = views.viewports[deckgl_views.length];
                 const view_type: string = cur_viewport.show3D
                     ? "OrbitView"
+                    : cur_viewport.id === "intersection_view"
+                    ? "IntersectionView"
                     : "OrthographicView";
                 const id_suffix = cur_viewport.show3D ? "_3D" : "_2D";
                 const view_id: string = cur_viewport.id + id_suffix;

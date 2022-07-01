@@ -16,11 +16,7 @@ import { ExtPlotOptions } from "./tracks";
 import { isScaleTrack } from "./tracks";
 import { getPlotType } from "./tracks";
 
-function getValue(
-    x: number,
-    data: [],
-    type: string
-): number /*|string for discrete?*/ {
+function getValue(x: number, data: [], type: string): number {
     let v = Number.NaN;
     if (Number.isFinite(x)) {
         const n = data.length;
@@ -106,7 +102,6 @@ export function fillInfos(
     addScaleTrackInfos(infos, x, logController, tracks);
 
     // another tracks
-
     const allTracks = options?.allTracks;
     const grouping = options?.grouping;
 
@@ -116,15 +111,15 @@ export function fillInfos(
         const visible = allTracks || (iFrom <= iTrack && iTrack < iTo);
         iTrack++;
         if (!visible) continue;
-        const collapsed = collapsedTrackIds.indexOf(_track.id) >= 0;
+        const collapsed =
+            collapsedTrackIds && collapsedTrackIds.indexOf(_track.id) >= 0;
 
         const track = _track as GraphTrack;
         if (grouping === "by_track" && track.plots && track.plots.length) {
             infos.push({
                 name: track.options.label,
-                units: "",
-                color: "",
-                value: -999,
+                color: "", // dummy value
+                value: Number.NaN, // dummy value,
                 type: "track",
                 collapsed: collapsed,
                 trackId: track.id,
@@ -135,14 +130,16 @@ export function fillInfos(
             if (_track instanceof StackedTrack) {
                 const trackStacked = _track as StackedTrack;
                 const d = trackStacked.data;
-                let value = "";
+                let discrete = "";
+                let value = Number.NaN; // dummy value
                 let color = "";
                 if (d) {
                     // data is ready
                     for (let i = 0; i < d.length; i++) {
                         const p = d[i];
                         if (p.from <= x && x <= p.to) {
-                            value = p.name;
+                            value = p.code; // additional attribute to AreaData
+                            discrete = p.name;
                             color =
                                 "rgb(" +
                                 p.color.r +
@@ -160,6 +157,7 @@ export function fillInfos(
                     units: "",
                     color: color,
                     value: value,
+                    discrete: discrete,
                     type: "stacked", //??
                     trackId: trackStacked.id,
                 });

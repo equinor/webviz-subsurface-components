@@ -53,7 +53,7 @@ void main(void) {
    // Picking pass.
    if (picking_uActive) {
       if (isReadoutDepth) {
-         // Readout should not be surface height (z value).
+         // Readout is surface height (z value).
          float depth = abs(worldPos.z);
          
          // Express in 255 system.

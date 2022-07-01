@@ -5,11 +5,14 @@ import {
 } from "@emerson-eps/color-tables";
 import { ExtendedLayer } from "../layers/utils/layerTools";
 import { RGBAColor } from "@deck.gl/core/utils/color";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { colorMapFunctionType } from "../layers/utils/layerTools";
 
 interface LegendBaseData {
     title: string;
     colorName: string;
     discrete: boolean;
+    colorMapFunction?: colorMapFunctionType;
 }
 export interface DiscreteLegendDataType extends LegendBaseData {
     metadata: Record<string, [RGBAColor, number]>;
@@ -22,11 +25,13 @@ export interface ContinuousLegendDataType extends LegendBaseData {
 interface ColorLegendProps {
     horizontal?: boolean | null;
     layer: ExtendedLayer<unknown>;
+    colorTables: colorTablesArray | string | undefined;
 }
 
 const ColorLegend: React.FC<ColorLegendProps> = ({
     horizontal,
     layer,
+    colorTables,
 }: ColorLegendProps) => {
     const [legendData, setLegendData] = React.useState<
         DiscreteLegendDataType | ContinuousLegendDataType
@@ -37,6 +42,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
     }, [layer.props, layer.state?.legend]);
 
     if (!legendData || !layer.props.visible) return null;
+
     return (
         <div style={{ marginTop: 30 }}>
             {legendData.discrete && (
@@ -47,6 +53,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     dataObjectName={legendData.title}
                     colorName={legendData.colorName}
                     horizontal={horizontal}
+                    colorTables={colorTables}
                 />
             )}
             {!legendData.discrete && (
@@ -57,6 +64,8 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     colorName={legendData.colorName}
                     horizontal={horizontal}
                     id={layer.props.id}
+                    colorTables={colorTables}
+                    colorMapFunction={legendData.colorMapFunction}
                 />
             )}
         </div>
