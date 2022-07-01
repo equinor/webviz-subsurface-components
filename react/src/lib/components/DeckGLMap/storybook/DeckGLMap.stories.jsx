@@ -727,6 +727,7 @@ const dataObjectName = "Legend";
 const position = [16, 10];
 const horizontal = true;
 const colorName = "Physics";
+const reverseRange = false;
 
 const mapDataTemplate = (args) => {
     const [getColorName, setColorName] = React.useState();
@@ -755,7 +756,7 @@ const mapDataTemplate = (args) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} getColorMapname={colorMapData} />
+                <ColorLegend {...args} getColorName={colorMapData} />
             </div>
             <DeckGLMap {...args} layers={updatedLayerData} />
         </div>
@@ -777,6 +778,7 @@ ColorMapLayerColorSelector.args = {
     legend: {
         visible: false,
     },
+    reverseRange,
 };
 
 ColorMapLayerColorSelector.parameters = {

@@ -168,6 +168,7 @@ export interface MapProps {
         visible?: boolean | null;
         cssStyle?: Record<string, unknown> | null;
         horizontal?: boolean | null;
+        reverseRange?: boolean | null;
     };
 
     /**
@@ -626,6 +627,7 @@ Map.defaultProps = {
         visible: true,
         cssStyle: { top: 5, right: 10 },
         horizontal: false,
+        reverseRange: false,
     },
     coordinateUnit: "m",
     views: {

@@ -33,6 +33,7 @@ export interface DeckGLMapProps {
         visible?: boolean | null;
         cssStyle?: Record<string, unknown> | null;
         horizontal?: boolean | null;
+        reverseRange?: boolean | null;
     };
     colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
@@ -303,6 +304,10 @@ DeckGLMap.propTypes = {
          * Orientation of color legend
          */
         horizontal: PropTypes.bool,
+        /**
+         * Reverse range(min,max)
+         */
+        reverseRange: PropTypes.bool,
     }),
 
     /**
