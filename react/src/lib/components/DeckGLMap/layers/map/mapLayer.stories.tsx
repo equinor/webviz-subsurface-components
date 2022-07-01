@@ -92,8 +92,7 @@ export const MapLayer: ComponentStory<typeof DeckGLMap> = () => {
             viewports: [
                 {
                     id: "view_1",
-                    show3D: true,
-                    //layerIds: [],
+                    show3D: false,
                 },
             ],
         } as Views,
