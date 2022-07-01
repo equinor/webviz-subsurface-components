@@ -29,10 +29,22 @@ type MeshType = {
 // These two types both describes the mesh' extent in the horizontal plane.
 type Bounds = [number, number, number, number];
 type Frame = {
+    // mesh origin
     origin: [number, number];
+
+    // cells size in each direction.
     increment: [number, number];
+
+    // no cells in each direction.
     count: [number, number];
+
+    // Rotates map counterclockwise in degrees around 'rotPoint' specified below.
+    rotDeg?: number;
+
+    // Point to rotate around using 'rotDeg'. Defaults to mesh origin.
+    rotPoint?: [number, number];
 };
+
 
 function getMinMax(dim: Frame): Bounds {
     const nx = dim.count[0];
@@ -385,12 +397,6 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to the properties. (ex, poro or perm values)
     propertiesUrl: string;
 
-    // Rotates map counterclockwise in degrees around 'rotPoint' specified below.
-    rotDeg: number;
-
-    // Point to rotate around using 'rotDeg'. Defaults to origo specified in 'bounds'.
-    rotPoint: [number, number];
-
     // Contourlines reference point and interval.
     // A value of [-1.0, -1.0] will disable contour lines.
     // default value: [-1.0, -1.0]
@@ -486,10 +492,10 @@ export default class MapLayer extends CompositeLayer<
     renderLayers(): [TerrainMapLayer] {
         const [width] = dimNxNy(this.props.frame);
         const [minX, minY] = this.props.frame.origin;
-        const center = this.props.rotPoint ?? [minX, minY];
+        const center = this.props.frame.rotPoint ?? [minX, minY];
 
         const rotatingModelMatrix = getModelMatrix(
-            this.props.rotDeg,
+            this.props.frame.rotDeg ?? 0,
             center[0],
             center[1]
         );

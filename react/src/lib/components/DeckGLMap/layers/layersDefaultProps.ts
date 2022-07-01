@@ -51,10 +51,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         propertiesUrl: "",
         bounds: { type: "object", value: null, false: true, compare: true },
         colorMapRange: { type: "array" },
-        rotDeg: 0,
         contours: [-1.0, -1.0],
-        // readout is default property value but if set to true it will be depth/z-value.
-        isReadoutDepth: true,
         enableSmoothShading: true,
     },
 
@@ -78,8 +75,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         contours: [-1.0, -1.0],
         // If contour lines should follow depth or properties.
         isContoursDepth: true,
-        // readout is default property value but if set to true it will be depth/z-value.
-        isReadoutDepth: false,
         enableSmoothShading: true,
         material: true,
     },
