@@ -281,11 +281,10 @@ const meshMapLayer = {
         origin: [432205, 6475078],
         count: [229, 291],
         increment: [24, 20],
+        rotDeg: 0,
     },
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [-3071, 41048],
-    rotDeg: 0, // default rotate around origin (xmin, xmax)
-    //rotPoint: [435802, 6478095],  // rotate around middle
     contours: [0, 100.0],
     isContoursDepth: true,
     colorMapName: "Physics",
