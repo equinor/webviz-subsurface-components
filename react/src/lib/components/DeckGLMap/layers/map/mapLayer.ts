@@ -45,7 +45,6 @@ type Frame = {
     rotPoint?: [number, number];
 };
 
-
 function getMinMax(dim: Frame): Bounds {
     const nx = dim.count[0];
     const ny = dim.count[1];
