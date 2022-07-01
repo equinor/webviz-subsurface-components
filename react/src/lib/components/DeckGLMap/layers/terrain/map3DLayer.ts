@@ -28,9 +28,20 @@ type MeshType = {
 // These two types both describes the mesh' extent in the horizontal plane.
 type Bounds = [number, number, number, number];
 type Frame = {
+    // mesh origin
     origin: [number, number];
+
+    // cells size in each direction.
     increment: [number, number];
+
+    // no cells in each direction.
     count: [number, number];
+
+    // Rotates map counterclockwise in degrees around 'rotPoint' specified below.
+    rotDeg?: number;
+
+    // Point to rotate around using 'rotDeg'. Defaults to mesh origin.
+    rotPoint?: [number, number];
 };
 
 function getMinMax(dim: Frame): Bounds {
@@ -285,12 +296,6 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image for map properties. (ex, poro or perm values as a texture)
     propertyTexture: string;
 
-    // Rotates map counterclockwise in degrees around 'rotPoint' specified below.
-    rotDeg: number;
-
-    // Point to rotate around using 'rotDeg'. Defaults to mesh origin.
-    rotPoint: [number, number];
-
     // Contourlines reference point and interval.
     // A value of [-1.0, -1.0] will disable contour lines.
     // default value: [-1.0, -1.0]
@@ -403,10 +408,10 @@ export default class Map3DLayer extends CompositeLayer<
         ) as Bounds;
 
         const [minX, minY] = [bounds[0], bounds[1]];
-        const center = this.props.rotPoint ?? [minX, minY];
+        const center = this.props.frame?.rotPoint ?? [minX, minY];
 
         const rotatingModelMatrix = getModelMatrix(
-            this.props.rotDeg,
+            this.props.frame?.rotDeg ?? 0,
             center[0],
             center[1]
         );
