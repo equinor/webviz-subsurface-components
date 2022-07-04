@@ -98,45 +98,47 @@ function createDataItem(item: string): ReactNode {
 }
 
 export function dataNames(
-    welllog: WellLog,
+    welllog: WellLog | undefined,
     track: Track | null,
     discrete?: boolean
 ): string[] {
     const names: string[] = [];
-    const skipUsed = !!track;
-    const plots = track ? (track as GraphTrack).plots : undefined;
-    const abbr = track ? track.options.abbr : undefined;
+    if (welllog) {
+        const skipUsed = !!track;
+        const plots = track ? (track as GraphTrack).plots : undefined;
+        const abbr = track ? track.options.abbr : undefined;
 
-    const curves = welllog.curves;
-    let iCurve = 0;
-    for (const curve of curves) {
-        if (
-            discrete &&
-            curve.valueType !== "string" &&
-            curve.valueType !== "integer"
-        )
-            continue;
+        const curves = welllog.curves;
+        let iCurve = 0;
+        for (const curve of curves) {
+            if (
+                discrete &&
+                curve.valueType !== "string" &&
+                curve.valueType !== "integer"
+            )
+                continue;
 
-        let bUsed = false;
-        if (plots) {
-            // GraphTrack
-            for (const plot of plots)
-                if (plot.id == iCurve) {
-                    bUsed = true;
-                    break;
-                }
-        } else if (abbr === curve.name) {
-            // Scale tracks?
-            bUsed = true;
+            let bUsed = false;
+            if (plots) {
+                // GraphTrack
+                for (const plot of plots)
+                    if (plot.id == iCurve) {
+                        bUsed = true;
+                        break;
+                    }
+            } else if (abbr === curve.name) {
+                // Scale tracks?
+                bUsed = true;
+            }
+            if (!bUsed || !skipUsed) names.push(curve.name);
+            iCurve++;
         }
-        if (!bUsed || !skipUsed) names.push(curve.name);
-        iCurve++;
     }
     return names;
 }
 
 export function createDataItems(
-    welllog: WellLog,
+    welllog: WellLog | undefined,
     track: Track | null,
     discrete?: boolean
 ): ReactNode[] {

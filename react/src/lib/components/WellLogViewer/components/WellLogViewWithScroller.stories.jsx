@@ -36,7 +36,7 @@ export default {
             defaultValue: false,
         },
         welllog: {
-            description: "Array of JSON objects describing well log data.",
+            description: "JSON object describing well log data.",
         },
         template: {
             description: "Prop containing track template data.",

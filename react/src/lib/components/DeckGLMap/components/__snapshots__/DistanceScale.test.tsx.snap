@@ -2,28 +2,28 @@
 
 exports[`Test Color Legend snapshot test with default props 1`] = `
 <div
-  style="bottom: 10px; left: 10px; position: relative;"
+  style="position: absolute;"
 >
   <label>
     800
+    m
   </label>
-  m
   <div
-    style="width: 100px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px; margin-right: 3px; right: 0px; bottom: 0px;"
+    style="width: 100px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px;"
   />
 </div>
 `;
 
 exports[`Test Color Legend snapshot test with higher zoom 1`] = `
 <div
-  style="bottom: 10px; left: 10px; position: relative;"
+  style="position: absolute; top: 10px; left: 10px;"
 >
   <label>
     50
+    m
   </label>
-  m
   <div
-    style="width: 100px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px; margin-right: 3px; right: 0px; bottom: 0px;"
+    style="width: 100px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px;"
   />
 </div>
 `;

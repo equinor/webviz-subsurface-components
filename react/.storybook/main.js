@@ -9,7 +9,15 @@ module.exports = {
         "@storybook/addon-actions",
         "addon-redux",
         "storybook-addon-performance/register",
-        "storybook-source-code-addon",
+		{
+			name: "@storybook/addon-docs",
+			  options: {
+				sourceLoaderOptions: {
+				  injectStoryParameters: false,
+				},
+			  },
+		},
+        "@storybook/addon-storysource",
     ],
     core: {
         builder: "webpack5",

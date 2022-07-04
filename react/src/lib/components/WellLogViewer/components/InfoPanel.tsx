@@ -25,12 +25,10 @@ const styleGroupRow = {
     cursor: "pointer",
 };
 
-function formatValue(v1: number | string): string {
-    if (typeof v1 === "string")
-        // discrete log
-        return v1;
-    if (!Number.isFinite(v1)) return "";
-    let v = v1.toPrecision(4);
+function formatValue(value: number): string {
+    if (!Number.isFinite(value)) return "";
+    if (Number.isInteger(value)) return value.toFixed(0);
+    let v = value.toPrecision(4);
     if (v.indexOf(".") >= 0) {
         // cut trailing zeroes
         for (;;) {
@@ -93,13 +91,15 @@ class InfoPanel extends Component<Props> {
         // print long names and values with a smaller font size
         const nameStyle: React.CSSProperties =
             name.length > 10 ? { fontSize: "x-small" } : {};
-        const value = formatValue(info.value);
+        let value = formatValue(info.value);
+        if (info.discrete)
+            value = info.discrete + (value ? "\xA0(" + value + ")" : "");
         const valueStyle: React.CSSProperties = {
             width: "90px",
             paddingLeft: "1.5em",
             textAlign: "right",
         };
-        if (value.length > 8) valueStyle.fontSize = "x-small";
+        if (value.length > 10) valueStyle.fontSize = "x-small";
         return (
             <tr
                 key={
@@ -128,10 +128,11 @@ class InfoPanel extends Component<Props> {
                     <table
                         style={{
                             borderSpacing: "0px",
+                            width: "100%",
                         }}
                     >
                         <tbody>
-                            {this.props.infos.map(this.createRow.bind(this))}
+                            {this.props.infos?.map(this.createRow.bind(this))}
                         </tbody>
                     </table>
                 </fieldset>

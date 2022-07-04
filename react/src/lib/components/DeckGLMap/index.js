@@ -1,1 +1,1 @@
-export { default } from "./DeckGLMap";
+export { default, DeckGLMapProps } from "./DeckGLMap";

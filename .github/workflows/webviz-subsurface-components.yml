@@ -41,18 +41,28 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Use Node.js 15.12
-        uses: actions/setup-node@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "15.12"
+          node-version: 16
 
       - name: 📦 Install build dependencies
         # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
         run: |
+
+          # In https://github.com/equinor/webviz-subsurface-components/pull/1010 we
+          # loosened up npm constraint to include npm version using lockfileVersion: 1
+          # for downstream users. However in the development of this repository we
+          # want to limit ourselves to lockfileVersion: 2. 
+          # While waiting for dropping node 14 and npm 6 support, we include this manual
+          # check:
+          grep -q '"lockfileVersion": 2,' ./react/package-lock.json
+
           npm ci --ignore-scripts --prefix ./react
           npm run setup-deckgl-types --prefix ./react
           npm run copy-package-json --prefix ./react
           pip install "werkzeug<2.1"  # ...while waiting for https://github.com/plotly/dash/issues/1992
+          pip install "dash<2.5"  # Build issue upstream in dash==2.5
           pip install .[dependencies]
           pip install dash[dev]
 
@@ -97,23 +107,23 @@ jobs:
           pytest ./tests --headless
 
       # Run cypress tests on firefox browser
-      - name: E2E on firefox
-        if: github.event_name != 'release' && matrix.e2e-on-firefox
-        uses: cypress-io/github-action@33ec2f03412577367c7c6aac7b646c88e646e33c
-        with:
-          browser: firefox
-          working-directory: ./react
-          start: npm run storybook
-          wait-on: "http://localhost:6006"
-      - uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: |
-            react/cypress/screenshots
-            react/cypress/snapshots
-            !react/cypress/snapshots/*/*.snap.png
-          retention-days: 5
+      # - name: E2E on firefox
+      #   if: github.event_name != 'release' && matrix.e2e-on-firefox
+      #   uses: cypress-io/github-action@33ec2f03412577367c7c6aac7b646c88e646e33c
+      #   with:
+      #     browser: firefox
+      #     working-directory: ./react
+      #     start: npm run storybook
+      #     wait-on: "http://localhost:6006"
+      # - uses: actions/upload-artifact@v2
+      #   if: failure()
+      #   with:
+      #     name: cypress-screenshots
+      #     path: |
+      #       react/cypress/screenshots
+      #       react/cypress/snapshots
+      #       !react/cypress/snapshots/*/*.snap.png
+      #     retention-days: 5
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
