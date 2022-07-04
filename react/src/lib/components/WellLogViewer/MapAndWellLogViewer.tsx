@@ -274,13 +274,14 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             if (event.wellname === this.state.wellName) {
                 // synchronize selection only from the current well
                 if (event.md !== undefined) {
-                    this.state.controller?.selectContent([
-                        event.md,
-                        this.state.selection?.[1],
-                    ]);
-
                     this.setState((state: Readonly<State>) => {
                         if (state.selPersistent) return null;
+
+                        this.state.controller?.selectContent([
+                            event.md,
+                            this.state.selection?.[1],
+                        ]);
+    
                         return {
                             selection: [event.md, state.selection?.[1]],
                         };
