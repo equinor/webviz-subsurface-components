@@ -69,7 +69,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         // Url to png image for map properties. (ex, poro or perm values as a texture)
         propertyTexture: "",
         propertyValueRange: { type: "array", value: [0, 1] },
-        rotDeg: 0,
         contours: [-1.0, -1.0],
         // If contour lines should follow depth or properties.
         isContoursDepth: true,
