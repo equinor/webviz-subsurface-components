@@ -34,7 +34,7 @@ const meshMapLayer = {
         origin: [432150, 6475800],
         count: [1451, 1141],
         increment: [5, 5],
-        rotDeg: 30,
+        rotDeg: 0,
     },
     propertiesUrl: "kh_netmap_5_m.float32",
     contours: [0, 100.0],
