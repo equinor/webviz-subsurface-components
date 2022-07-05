@@ -19,10 +19,17 @@ module.exports = {
 		},
         "@storybook/addon-storysource",
     ],
+    //features: {
+        //storyStoreV7: true
+    //},
     core: {
         builder: "webpack5",
+        //options: {
+            //lazyCompilation: true,
+        //},
     },
     webpackFinal: (config) => {
+    //webpackFinal: async (config) => {
         config.module.rules.push(
             {
                 test: /\.scss$/,
@@ -33,6 +40,8 @@ module.exports = {
                 use: ["raw-loader"],
             }
         );
+        //config.devtool = "source-map";
+        //config.devtool = "eval-source-map";
         return {
             ...config,
             resolve: {

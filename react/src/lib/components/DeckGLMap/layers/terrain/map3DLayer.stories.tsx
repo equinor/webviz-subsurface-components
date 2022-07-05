@@ -38,16 +38,19 @@ const defaultParameters = {
 };
 
 function gradientColorMap(x: number) {
+	console.log("gradientColorMap");
     return [255 - x * 255, 255 - x * 100, 255 * x];
 }
 
 function nearestColorMap(x: number) {
+	console.log("nearestColorMap");
     if (x > 0.5) return [100, 255, 255];
     else if (x > 0.1) return [255, 100, 255];
     return [255, 255, 100];
 }
 
 function breakpointColorMap(x: number, breakpoint: number) {
+	console.log("breakpointColorMap");
     if (x > breakpoint) return [0, 50, 200];
     return [255, 255, 0];
 }
