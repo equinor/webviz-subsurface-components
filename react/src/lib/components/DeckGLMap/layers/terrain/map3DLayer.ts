@@ -396,6 +396,7 @@ export default class Map3DLayer extends CompositeLayer<
         const needs_reload =
             !isEqual(props.mesh, oldProps.mesh) ||
             !isEqual(props.bounds, oldProps.bounds) ||
+            !isEqual(props.frame, oldProps.frame) ||
             !isEqual(props.meshMaxError, oldProps.meshMaxError) ||
             !isEqual(props.meshValueRange, oldProps.meshValueRange) ||
             !isEqual(props.enableSmoothShading, oldProps.enableSmoothShading) ||
