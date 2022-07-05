@@ -261,6 +261,16 @@ export default class WellsLayer extends CompositeLayer<
         if (data) this.setLegend(data);
     }
 
+    updateState({
+        changeFlags,
+    }: UpdateStateInfo<
+        WellsLayerProps<FeatureCollection<Geometry, GeoJsonProperties>>
+    >): void {
+        if (changeFlags.propsOrDataChanged) {
+            this.setupLegend();
+        }
+    }
+
     renderLayers(): (
         | GeoJsonLayer<Feature>
         | PathLayer<LogCurveDataType>

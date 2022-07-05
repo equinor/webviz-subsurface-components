@@ -311,15 +311,6 @@ const Map: React.FC<MapProps> = ({
 
     const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
     useEffect(() => {
-        if (deckGLLayers) {
-            const wellsLayer = getLayersByType(
-                deckGLLayers,
-                "WellsLayer"
-            )?.[0] as WellsLayer;
-            if (wellsLayer) wellsLayer.setupLegend();
-        }
-    }, [deckGLLayers]);
-    useEffect(() => {
         const layers = st_layers as LayerProps<unknown>[];
         if (!layers || layers.length == 0) return;
 
