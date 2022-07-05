@@ -1,35 +1,21 @@
 import { CompositeLayer } from "@deck.gl/core";
-import PrivateMeshLayer, {
-    PrivateMeshLayerProps,
-    PrivateMeshLayerData,
-} from "./PrivateMeshLayer";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import TerrainMapLayer, {
+    TerrainMapLayerProps,
+    TerrainMapLayerData,
+    Material,
+    DEFAULT_TEXTURE_PARAMETERS,
+} from "./terrainMapLayer";
+import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
+import { RGBColor } from "@deck.gl/core/utils/color";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { getModelMatrix } from "../utils/layerTools";
-import { TerrainLoader } from "@loaders.gl/terrain";
-// XXX import { ImageLoader } from "@loaders.gl/images";
-import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
-import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
-import GL from "@luma.gl/constants";
-import * as png from "@vivaxy/png";
-import { DeckGLLayerContext } from "../../components/Map";
-import structuredClone from "@ungap/structured-clone";
+import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
+import Delatin from "./delatin"; // Note: this is copied from terrain loader.
+import { Texture2D } from "@luma.gl/core";
+import GL from "@luma.gl/constants";
 
-const DECODER = {
-    rScaler: -256 * 256, // minus signs -> easy way to invert z-axis.
-    gScaler: -256,
-    bScaler: -1,
-    offset: 0,
-};
-
-const DEFAULT_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
-    [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-    [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
-};
+export const readoutMatrixSize = 150;
 
 type MeshType = {
     attributes: {
@@ -40,11 +26,154 @@ type MeshType = {
     indices: { value: Uint32Array; size: number };
 };
 
-function add_normals(resolved_mesh: MeshType) {
+// These two types both describes the mesh' extent in the horizontal plane.
+type Bounds = [number, number, number, number];
+type Frame = {
+    // mesh origin
+    origin: [number, number];
+
+    // cells size in each direction.
+    increment: [number, number];
+
+    // no cells in each direction.
+    count: [number, number];
+
+    // Rotates map counterclockwise in degrees around 'rotPoint' specified below.
+    rotDeg?: number;
+
+    // Point to rotate around using 'rotDeg'. Defaults to mesh origin.
+    rotPoint?: [number, number];
+};
+
+function getMinMax(dim: Frame): Bounds {
+    const nx = dim.count[0];
+    const ny = dim.count[1];
+
+    const dx = dim.increment[0];
+    const dy = dim.increment[1];
+
+    const xmin = dim.origin[0];
+    const ymin = dim.origin[1];
+
+    const xmax = xmin + nx * dx;
+    const ymax = ymin + ny * dy;
+
+    return [xmin, ymin, xmax, ymax];
+}
+
+function dimNxNy(dim: Frame): [number, number] {
+    const nx = dim.count[0];
+    const ny = dim.count[1];
+
+    return [nx, ny];
+}
+
+function replaceNaN(meshData: Float32Array, value: number) {
+    for (let i = 0; i < meshData.length; i++) {
+        if (isNaN(meshData[i])) {
+            meshData[i] = value;
+        }
+    }
+}
+
+function getFloat32ArrayMinMax(data: Float32Array) {
+    let max = -99999999;
+    let min = 99999999;
+    for (let i = 0; i < data.length; i++) {
+        max = data[i] > max ? data[i] : max;
+        min = data[i] < min ? data[i] : min;
+    }
+    return [min, max];
+}
+
+// Takes a 2D array and returns a resampled square fixed size copy.
+function makeFixedSizeCopy(
+    data: Float32Array,
+    width: number,
+    height: number
+): Float32Array {
+    const sz = readoutMatrixSize;
+    const ret = new Float32Array(sz * sz);
+
+    const stride_w = width / sz;
+    const stride_h = height / sz;
+
+    for (let m = 0; m < sz; m++) {
+        for (let n = 0; n < sz; n++) {
+            const w = Math.round(n * stride_w);
+            const h = Math.round(m * stride_h);
+            const i = m * sz + n;
+            const j = h * width + w;
+            ret[i] = data[j];
+        }
+    }
+    return ret;
+}
+
+function makeMesh(
+    dim: Frame,
+    meshData: Float32Array,
+    meshMaxError: number
+): MeshType {
+    const [width, height] = dimNxNy(dim);
+
+    const terrain = new Float32Array(meshData);
+    const tin = new Delatin(terrain, width, height);
+
+    tin.run(meshMaxError);
+    // @ts-expect-error keep
+    const { coords, triangles } = tin;
+    const vertices = coords;
+
+    // Note: taken (and modified) from parse-terrain.js from terrain loader.
+    //const gridSize = width; // + 1;
+    const numOfVerticies = vertices.length / 2;
+    // vec3. x, y in pixels, z in meters
+    const positions = new Float32Array(numOfVerticies * 3);
+    // vec2. 1 to 1 relationship with position. represents the uv on the texture image. 0,0 to 1,1.
+    const texCoords = new Float32Array(numOfVerticies * 2);
+
+    const [minX, minY, maxX, maxY] = getMinMax(dim);
+    const xScale = (maxX - minX) / (width - 1);
+    const yScale = (maxY - minY) / (height - 1);
+
+    for (let i = 0; i < numOfVerticies; i++) {
+        const x = vertices[i * 2];
+        const y = vertices[i * 2 + 1];
+        //const pixelIdx = y * gridSize + x;
+
+        positions[3 * i + 0] = x * xScale + minX;
+        positions[3 * i + 1] = -y * yScale + maxY;
+        positions[3 * i + 2] = -tin.heightAt(x, y);
+
+        texCoords[2 * i + 0] = x / (width - 1);
+        texCoords[2 * i + 1] = y / (height - 1);
+    }
+
+    const mesh = {
+        attributes: {
+            POSITION: { value: new Float32Array(positions), size: 3 },
+            TEXCOORD_0: { value: new Float32Array(texCoords), size: 2 },
+        },
+        indices: { value: new Uint32Array(triangles), size: 1 },
+    };
+
+    // Keep this. Useful info for the user to adjust "maxMeshError" if necessary.
+    console.debug(
+        "no of triangles, mesh width, height: ",
+        triangles.length / 3,
+        width,
+        height
+    );
+    return mesh;
+}
+
+function removeInactiveTriangles(resolved_mesh: MeshType) {
     const vertexs = resolved_mesh.attributes.POSITION.value;
     let indices = resolved_mesh.indices.value;
     let ntriangles = indices.length / 3;
 
+    ////////////////////////////////////////////////////////////////
     // Remove all triangles that are in undefined areas. That is triangles which
     // have one or more corner at zero depth.
     const indices_reduced = [];
@@ -68,8 +197,14 @@ function add_normals(resolved_mesh: MeshType) {
     resolved_mesh.indices.value = new Uint32Array(indices_reduced);
     indices = resolved_mesh.indices.value;
     ntriangles = indices.length / 3;
+}
 
-    //Calculate one normal pr triangle. And record the triangles each vertex' belongs to.
+function add_normals(resolved_mesh: MeshType) {
+    const vertexs = resolved_mesh.attributes.POSITION.value;
+    const indices = resolved_mesh.indices.value;
+    const ntriangles = indices.length / 3;
+
+    // Calculate one normal pr triangle. And record the triangles each vertex' belongs to.
     const no_unique_vertexes = vertexs.length / 3;
     const vertex_triangles = Array(no_unique_vertexes); // for each vertex a list of triangles it belongs to.
     for (let i = 0; i < no_unique_vertexes; i++) {
@@ -110,8 +245,8 @@ function add_normals(resolved_mesh: MeshType) {
         triangle_normals[t] = normal;
     }
 
-    // Calculate normals. The vertex normal will be the mean of the normals of every triangle the vertex
-    // belongs to.
+    // Calculate normals. The vertex normal will be the mean of the normals
+    // of every triangle the vertex belongs to.
     const normals = Array(vertexs.length).fill(0.0);
 
     for (let i = 0; i < no_unique_vertexes; i++) {
@@ -140,143 +275,46 @@ function add_normals(resolved_mesh: MeshType) {
     return resolved_mesh;
 }
 
-function applyColorMap(
-    resolved_image: ImageData,
-    colorMapRange: [number, number],
-    colorMapName: string,
-    valueRange: [number, number],
-    colorTables: colorTablesArray
-) {
-    // Precalculate colors to save time.
-    const colors = [];
-    for (let i = 0; i < 256; i++) {
-        const rgb = rgbValues(i / 255.0, colorMapName, colorTables); // Note: The call to rgbValues is very slow.
-        colors.push(rgb);
-    }
-
-    // Get value range.
-    const data = resolved_image.data;
-    const float_view = new Float32Array(data.buffer, 0, data.length / 4);
-
-    let valueRangeMin = +9999999.9;
-    let valueRangeMax = -9999999.9;
-    if (typeof valueRange === "undefined") {
-        // Find value range.
-        for (let i = 0; i < data.length; i += 4) {
-            const propertyValue = float_view[i / 4];
-
-            const defined = !(
-                isNaN(propertyValue) ||
-                propertyValue === undefined ||
-                propertyValue === null ||
-                propertyValue === 0
-            );
-            if (defined) {
-                valueRangeMin =
-                    propertyValue < valueRangeMin
-                        ? propertyValue
-                        : valueRangeMin;
-                valueRangeMax =
-                    propertyValue > valueRangeMax
-                        ? propertyValue
-                        : valueRangeMax;
-            }
-        }
-    } else {
-        valueRangeMin = valueRange[0];
-        valueRangeMax = valueRange[1];
-    }
-
-    let colorMapRangeMin = colorMapRange?.[0] ?? valueRangeMin;
-    let colorMapRangeMax = colorMapRange?.[1] ?? valueRangeMax;
-    if (colorMapRangeMax < colorMapRangeMin) {
-        const temp = colorMapRangeMax;
-        colorMapRangeMax = colorMapRangeMin;
-        colorMapRangeMin = temp;
-    }
-
-    // Apply color map.
-    for (let i = 0; i < data.length; i += 4) {
-        const propertyValue = float_view[i / 4];
-
-        let t = 0.0;
-        const defined = !(
-            Number.isNaN(propertyValue) ||
-            propertyValue === undefined ||
-            propertyValue === null ||
-            propertyValue === 0
-        );
-        if (defined) {
-            t = propertyValue;
-            t = (t - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-            t = Math.max(0.0, t);
-            t = Math.min(1.0, t);
-        }
-
-        const color = colors[Math.floor(t * 255.0)];
-        data[i + 0] = color[0];
-        data[i + 1] = color[1];
-        data[i + 2] = color[2];
-        data[i + 3] = defined ? 255 : 0; // Undefined values is set invisible.
-    }
-
-    return resolved_image;
-}
-
-function load_texture(texture_name: string) {
-    const imageData = fetch(texture_name)
-        .then((response) => {
-            return response.blob();
-        })
-        .then((blob) => {
-            return new Promise((resolve) => {
-                const fileReader = new FileReader();
-                fileReader.readAsArrayBuffer(blob);
-                fileReader.onload = () => {
-                    const arrayBuffer = fileReader.result;
-                    const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                    const data = new Uint8ClampedArray(imgData.data);
-                    const imageData = new ImageData(
-                        data,
-                        imgData.width,
-                        imgData.height
-                    );
-                    resolve(imageData);
-                };
-            });
-        })
-        .then((imageData) => {
-            return Promise.resolve(imageData);
-        });
-
-    return imageData;
-}
-
 async function load_mesh_and_texture(
-    mesh_name: string,
-    bounds: [number, number, number, number],
+    meshUrl: string,
+    dim: Frame,
     meshMaxError: number,
     enableSmoothShading: boolean,
-    texture_name: string
+    propertiesUrl: string,
+    gl: unknown
 ) {
-    const isMesh = mesh_name !== "";
-    const isTexture = texture_name !== "";
+    let isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
+    const isTexture =
+        typeof propertiesUrl !== "undefined" && propertiesUrl !== "";
 
     if (!isMesh && !isTexture) {
-        console.log("Error. One or both of texture and mesh must be given!");
+        console.error("Error. One or both of texture and mesh must be given!");
     }
 
+    if (isMesh && !isTexture) {
+        propertiesUrl = meshUrl;
+    } else if (!isMesh && isTexture) {
+        meshUrl = propertiesUrl;
+        isMesh = true;
+    }
+
+    //-- MESH --
+    const [w, h] = dimNxNy(dim);
+    let meshData: Float32Array;
     let mesh: MeshType;
     if (isMesh) {
-        mesh = await load(mesh_name, TerrainLoader, {
-            terrain: {
-                elevationDecoder: DECODER,
-                bounds,
-                meshMaxError,
-                skirtHeight: 0.0,
-            },
-            worker: false,
-        });
+        const response = await fetch(meshUrl);
+        if (!response.ok) {
+            console.error("Could not load ", meshUrl);
+        }
+        const buffer = await response.arrayBuffer();
+        meshData = new Float32Array(buffer);
+
+        replaceNaN(meshData, 0.0);
+        mesh = makeMesh(dim, meshData, meshMaxError);
+        meshData = makeFixedSizeCopy(meshData, w, h);
+
+        removeInactiveTriangles(mesh);
 
         // Note: mesh contains triangles. No normals they must be added.
         if (enableSmoothShading) {
@@ -285,14 +323,11 @@ async function load_mesh_and_texture(
     } else {
         // Mesh data is missing.
         // Make a flat square size of bounds using two triangles.  z = 0.
-        const left = bounds[0];
-        const bottom = bounds[1];
-        const right = bounds[2];
-        const top = bounds[3];
-        const p0 = [left, bottom, 0.0];
-        const p1 = [left, top, 0.0];
-        const p2 = [right, top, 0.0];
-        const p3 = [right, bottom, 0.0];
+        const [minX, minY, maxX, maxY] = getMinMax(dim);
+        const p0 = [minX, minY, 0.0];
+        const p1 = [minX, maxY, 0.0];
+        const p2 = [maxX, maxY, 0.0];
+        const p3 = [maxX, minY, 0.0];
         const vertexes = [...p0, ...p1, ...p2, ...p3];
         const texture_coord = [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0];
 
@@ -303,35 +338,74 @@ async function load_mesh_and_texture(
             },
             indices: { value: new Uint32Array([0, 1, 3, 1, 3, 2]), size: 1 },
         };
+
+        const [w, h] = [2, 2];
+        meshData = new Float32Array([0, 0, 0, 0]);
+        meshData = makeFixedSizeCopy(meshData, w, h);
     }
 
-    const image_name = isTexture ? texture_name : mesh_name;
-    const texture = await load_texture(image_name); // load texture as ImageData structure.
+    //-- PROPERTY TEXTURE. --
+    const response = await fetch(propertiesUrl);
+    if (!response.ok) {
+        console.error("Could not load ", propertiesUrl);
+    }
+    const buffer = await response.arrayBuffer();
+    const data = new Float32Array(buffer);
 
-    return Promise.all([mesh, texture]);
+    // create float texture.
+    const propertyValueRange = getFloat32ArrayMinMax(data);
+    const format = GL.R32F;
+    const type = GL.FLOAT;
+    const texture = new Texture2D(gl, {
+        width: w,
+        height: h,
+        format,
+        type,
+        data,
+        mipmaps: false,
+        parameters: DEFAULT_TEXTURE_PARAMETERS,
+    });
+
+    const propertyData = makeFixedSizeCopy(data, w, h);
+
+    return Promise.all([
+        mesh,
+        propertyValueRange,
+        meshData,
+        propertyData,
+        texture,
+    ]);
 }
 
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
-    // Url to png image representing the height mesh.
-    mesh: string;
+    // Url to the height (z values) mesh.
+    meshUrl: string;
 
-    // Bounding box of the terrain mesh, [minX, minY, maxX, maxY] in world coordinates
-    bounds: [number, number, number, number];
+    // Horizontal extent of the terrain mesh. Format:
+    // {
+    //     origin: [number, number];     // mesh origin in x, y
+    //     increment: [number, number];  // cell size dx, dy
+    //     count: [number, number];      // number of cells in both directions.
+    // }
+    frame: Frame;
 
     // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
+    // default: 1.
     meshMaxError: number;
 
-    // Url to png image for map properties. (ex, poro or perm values as a texture)
-    propertyTexture: string;
-
-    // Rotates around 'bounds' upper left corner counterclockwise in degrees.
-    rotDeg: number;
+    // Url to the properties. (ex, poro or perm values)
+    propertiesUrl: string;
 
     // Contourlines reference point and interval.
+    // A value of [-1.0, -1.0] will disable contour lines.
+    // default value: [-1.0, -1.0]
     contours: [number, number];
 
-    // Min and max property values. If not given these will be calcultated automatically from the data.
-    valueRange: [number, number];
+    // Contourlines may be calculated either on depth/z-value or on property/texture value
+    // If this is set to false, lines will follow properties instead of depth.
+    // In 2D mode this is always the case regardless.
+    // default: true
+    isContoursDepth: boolean;
 
     // Name of color map. E.g "PORO"
     colorMapName: string;
@@ -339,11 +413,31 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     // Use color map in this range.
     colorMapRange: [number, number];
 
-    // If true readout will be z value (depth). Otherwise it is the texture property value.
-    isReadoutDepth: boolean;
+    // Clamp colormap to this color at ends.
+    // Given as array of three values (r,g,b) e.g: [255, 0, 0]
+    // If not set or set to true, it will clamp to color map min and max values.
+    // If set to false the clamp color will be completely transparent.
+    colorMapClampColor: RGBColor | undefined | boolean;
+
+    // Optional function property.
+    // If defined this function will override the color map.
+    // Takes a value in the range [0,1] and returns a color.
+    colorMapFunction?: colorMapFunctionType;
 
     // Will calculate normals and enable phong shading.
     enableSmoothShading: boolean;
+
+    // Surface material properties.
+    // material: true  = default material,
+    //           false = no material,
+    //           or full spec:
+    //      material: {
+    //           ambient: 0.35,
+    //           diffuse: 0.6,
+    //           shininess: 32,
+    //           specularColor: [255, 255, 255],
+    //       }
+    material: Material;
 }
 
 export default class MapLayer extends CompositeLayer<
@@ -353,30 +447,25 @@ export default class MapLayer extends CompositeLayer<
     initializeState(): void {
         // Load mesh and texture and store in state.
         const p = load_mesh_and_texture(
-            this.props.mesh,
-            this.props.bounds,
+            this.props.meshUrl,
+            this.props.frame,
             this.props.meshMaxError,
             this.props.enableSmoothShading,
-            this.props.propertyTexture
+            this.props.propertiesUrl,
+            this.context.gl
         );
 
-        p.then(([mesh, texture]) => {
-            // Apply colormap to the pixels to generate color texture.
-            // Need to take a copy so not to destroy original data.
-            let color_texture = structuredClone(texture); // XXX check if this is still neccessary.
-            color_texture = applyColorMap(
-                color_texture as ImageData,
-                this.props.colorMapRange,
-                this.props.colorMapName,
-                this.props.valueRange,
-                (this.context as DeckGLLayerContext).userData.colorTables
-            );
-
-            this.setState({
-                mesh,
-                color_texture,
-            });
-        });
+        p.then(
+            ([mesh, propertyValueRange, meshData, propertyData, texture]) => {
+                this.setState({
+                    mesh,
+                    propertyValueRange,
+                    meshData,
+                    propertyData,
+                    texture,
+                });
+            }
+        );
     }
 
     updateState({
@@ -387,11 +476,11 @@ export default class MapLayer extends CompositeLayer<
         oldProps: MapLayerProps<unknown>;
     }): void {
         const needs_reload =
-            !isEqual(props.mesh, oldProps.mesh) ||
-            !isEqual(props.bounds, oldProps.bounds) ||
+            !isEqual(props.meshUrl, oldProps.meshUrl) ||
+            !isEqual(props.frame, oldProps.frame) ||
             !isEqual(props.meshMaxError, oldProps.meshMaxError) ||
             !isEqual(props.enableSmoothShading, oldProps.enableSmoothShading) ||
-            !isEqual(props.propertyTexture, oldProps.propertyTexture);
+            !isEqual(props.propertiesUrl, oldProps.propertiesUrl);
 
         if (needs_reload) {
             // Reload mesh and texture.
@@ -399,32 +488,42 @@ export default class MapLayer extends CompositeLayer<
         }
     }
 
-    renderLayers(): [PrivateMeshLayer] {
+    renderLayers(): [TerrainMapLayer] {
+        const [width] = dimNxNy(this.props.frame);
+        const [minX, minY] = this.props.frame.origin;
+        const center = this.props.frame.rotPoint ?? [minX, minY];
+
         const rotatingModelMatrix = getModelMatrix(
-            this.props.rotDeg,
-            this.props.bounds[0] as number, // Rotate around upper left corner of bounds
-            this.props.bounds[3] as number
+            this.props.frame.rotDeg ?? 0,
+            center[0],
+            center[1]
         );
 
         const isMesh =
-            typeof this.props.mesh !== "undefined" && this.props.mesh !== "";
+            typeof this.props.meshUrl !== "undefined" &&
+            this.props.meshUrl !== "";
 
-        const layer = new PrivateMeshLayer(
+        const layer = new TerrainMapLayer(
             this.getSubLayerProps<
-                PrivateMeshLayerData,
-                PrivateMeshLayerProps<PrivateMeshLayerData>
+                TerrainMapLayerData,
+                TerrainMapLayerProps<TerrainMapLayerData>
             >({
                 mesh: this.state.mesh,
-                texture: this.state.color_texture,
-                propertyValuesImageData: this.state.texture,
-                textureParameters: DEFAULT_TEXTURE_PARAMETERS,
+                propertyValueRange: this.state.propertyValueRange,
+                propertyTexture: this.state.texture,
+                meshData: this.state.meshData,
+                propertyData: this.state.propertyData,
+                meshWidth: width,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,
                 colorMapName: this.props.colorMapName,
+                colorMapFunction: this.props.colorMapFunction,
                 colorMapRange: this.props.colorMapRange,
-                isReadoutDepth: this.props.isReadoutDepth,
-                isContoursDepth: isMesh,
+                colorMapClampColor: this.props.colorMapClampColor,
+                isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
+                material: this.props.material,
+                wireframe: false,
             })
         );
         return [layer];
@@ -434,4 +533,4 @@ export default class MapLayer extends CompositeLayer<
 MapLayer.layerName = "MapLayer";
 MapLayer.defaultProps = layersDefaultProps[
     "MapLayer"
-] as MapLayerProps<PrivateMeshLayerData>;
+] as MapLayerProps<TerrainMapLayerData>;
