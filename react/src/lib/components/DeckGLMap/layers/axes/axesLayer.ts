@@ -26,9 +26,8 @@ export default class AxesLayer extends CompositeLayer<
     initializeState(): void {
         const box_lines = GetBoxLines(this.props.bounds);
 
-            //console.log(this.context.viewport);
-            //console.log(this.context.viewport.constructor.name);
-        const is_orthographic = this.context.viewport.constructor.name === "OrthographicViewport";
+        const is_orthographic =
+            this.context.viewport.constructor.name === "OrthographicViewport";
 
         const [tick_lines, tick_labels] = GetTickLines(
             is_orthographic,
@@ -251,7 +250,7 @@ function maketextLayerData(
         ];
         const label = tick_labels[i];
 
-        data.push({ label: label, from: from, to: to, size: 12 });
+        data.push({ label: label, from: from, to: to, size: 11 });
     }
 
     return data as [TextLayerData];
