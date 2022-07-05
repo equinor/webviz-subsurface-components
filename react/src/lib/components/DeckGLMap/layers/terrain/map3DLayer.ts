@@ -422,7 +422,9 @@ export default class Map3DLayer extends CompositeLayer<
         }
 
         if (isRotPointDefined) {
-            console.warn('"rotPoint" is deprecated. Use "frame.rotPoint" instead.');
+            console.warn(
+                '"rotPoint" is deprecated. Use "frame.rotPoint" instead.'
+            );
         }
 
         const [minX, minY] = [bounds[0], bounds[1]];
