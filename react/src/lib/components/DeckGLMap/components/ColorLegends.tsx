@@ -9,7 +9,7 @@ interface ColorLegendsProps {
     horizontal?: boolean | null;
     layers: ExtendedLayer<unknown>[];
     colorTables: colorTablesArray | string | undefined;
-    reverseRange?: boolean | null;
+    reverseRange?: boolean;
 }
 
 // Todo: Adapt it for other layers too

@@ -26,7 +26,7 @@ interface ColorLegendProps {
     horizontal?: boolean | null;
     layer: ExtendedLayer<unknown>;
     colorTables: colorTablesArray | string | undefined;
-    reverseRange?: boolean | null;
+    reverseRange?: boolean;
 }
 
 const ColorLegend: React.FC<ColorLegendProps> = ({
