@@ -417,6 +417,14 @@ export default class Map3DLayer extends CompositeLayer<
         const isRotDegDefined = typeof this.props.rotDeg !== "undefined";
         const isRotPointDefined = typeof this.props.rotPoint !== "undefined";
 
+        if (isRotDegDefined) {
+            console.warn('"rotDeg" is deprecated. Use "frame.rotDeg" instead.');
+        }
+
+        if (isRotPointDefined) {
+            console.warn('"rotPoint" is deprecated. Use "frame.rotPoint" instead.');
+        }
+
         const [minX, minY] = [bounds[0], bounds[1]];
         const center =
             this.props.frame?.rotPoint ??
