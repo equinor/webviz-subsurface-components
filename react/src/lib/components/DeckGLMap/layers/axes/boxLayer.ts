@@ -44,10 +44,15 @@ export default class BoxLayer extends Layer<unknown, BoxLayerProps<unknown>> {
             geometry: new Geometry({
                 drawMode: GL.LINES,
                 attributes: {
+                    colors: {
+                        size: 4,
+                        value: new Float32Array([0., .5, 1., 1.]),
+                        },
                     positions: new Float32Array(this.props.lines),
                 },
                 vertexCount: this.props.lines.length / 3,
             }),
+
             modules: [project],
             isInstanced: false, // This only works when set to false.
         });

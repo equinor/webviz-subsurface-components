@@ -125,10 +125,10 @@ export const layersDefaultProps: Record<string, unknown> = {
         selectedPie: "@@editedData.selectedPie", // used to get data from deckgl layer
     },
     AxesLayer: {
-        "@@type": "AxesLayer",
-        name: "Axes",
-        id: "axes-layer",
-        visible: true,
+        //"@@type": "AxesLayer",
+        //name: "Axes",
+        //id: "axes-layer",
+        //visible: true,
     },
     NorthArrow3DLayer: {
         "@@type": "NorthArrow3DLayer",

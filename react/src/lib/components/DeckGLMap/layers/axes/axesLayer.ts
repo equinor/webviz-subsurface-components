@@ -9,6 +9,7 @@ import { Position3D } from "@deck.gl/core/utils/positions";
 
 export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     bounds: [number, number, number, number, number, number];
+	labelColor?: [number, number, number, number];
 }
 
 type TextLayerData = {
@@ -25,8 +26,9 @@ export default class AxesLayer extends CompositeLayer<
     initializeState(): void {
         const box_lines = GetBoxLines(this.props.bounds);
 
-        const is_orthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
+            //console.log(this.context.viewport);
+            //console.log(this.context.viewport.constructor.name);
+        const is_orthographic = this.context.viewport.constructor.name === "OrthographicViewport";
 
         const [tick_lines, tick_labels] = GetTickLines(
             is_orthographic,
@@ -159,6 +161,7 @@ export default class AxesLayer extends CompositeLayer<
                 getAlignmentBaseline: (d: TextLayerData) =>
                     this.getBaseLine(d, is_orthographic),
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+				getColor: this.props.labelColor || [0, 0, 0, 255],
             })
         );
 
@@ -248,7 +251,7 @@ function maketextLayerData(
         ];
         const label = tick_labels[i];
 
-        data.push({ label: label, from: from, to: to, size: 11 });
+        data.push({ label: label, from: from, to: to, size: 12 });
     }
 
     return data as [TextLayerData];
