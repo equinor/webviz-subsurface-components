@@ -280,7 +280,7 @@ const meshMapLayer = {
     frame: {
         origin: [432205, 6475078],
         count: [229, 291],
-        increment: [24, 20],
+        increment: [25, 25],
         rotDeg: 0,
     },
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
@@ -401,7 +401,7 @@ MapClampColor.parameters = {
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer",
-    bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+    bounds: [432205, 6475078, -3500, 437930, 6482353, 0],
 };
 const north_arrow_layer = {
     "@@type": "NorthArrow3DLayer",
@@ -412,7 +412,7 @@ export const Axes = MinimalTemplate.bind({});
 Axes.args = {
     id: "axes",
     layers: [axes, meshMapLayer, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500],
+    bounds: [432205, 6475078, 437930, 6482353],
     views: {
         layout: [1, 1],
         viewports: [
