@@ -159,7 +159,7 @@ function makeMesh(
     };
 
     // Keep this. Useful info for the user to adjust "maxMeshError" if necessary.
-    console.log(
+    console.debug(
         "no of triangles, mesh width, height: ",
         triangles.length / 3,
         width,

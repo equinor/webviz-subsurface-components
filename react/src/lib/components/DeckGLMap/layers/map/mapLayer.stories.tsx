@@ -13,15 +13,6 @@ export default {
 } as ComponentMeta<typeof DeckGLMap>;
 
 type NumberQuad = [number, number, number, number];
-type Views = {
-    layout: [number, number];
-    viewports: [
-        {
-            id: string;
-            show3D: boolean;
-        }
-    ];
-};
 
 const valueRange = [-3071, 41048];
 
@@ -82,22 +73,34 @@ const north_arrow_layer = {
     "@@type": "NorthArrow3DLayer",
     id: "north-arrow-layer",
 };
-export const MapLayer: ComponentStory<typeof DeckGLMap> = () => {
-    const args = {
-        id: "map",
-        layers: [axes_hugin, meshMapLayer, north_arrow_layer],
-        bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: false,
-                },
-            ],
-        } as Views,
-    };
+
+export const MapLayer: ComponentStory<typeof DeckGLMap> = (args) => {
     return <DeckGLMap {...args} />;
+};
+
+MapLayer.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayer, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+};
+
+export const MapLayer3d: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+MapLayer3d.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayer, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
 };
 
 export const GradientFunctionColorMap: ComponentStory<
