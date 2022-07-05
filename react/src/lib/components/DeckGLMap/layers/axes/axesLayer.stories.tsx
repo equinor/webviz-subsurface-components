@@ -6,7 +6,6 @@ import { RGBAColor } from "@deck.gl/core/utils/color";
 
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import AxesLayer from "./axesLayer";
-import { DeckGLProps } from "@deck.gl/react/deckgl";
 
 export default {
     component: DeckGL,
