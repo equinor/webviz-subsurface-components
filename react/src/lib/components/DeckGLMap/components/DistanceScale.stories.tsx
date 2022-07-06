@@ -8,7 +8,7 @@ export default {
 } as ComponentMeta<typeof DistanceScale>;
 
 const darkModeStyle = {
-        color: "white",
+    color: "white",
 };
 
 const Template: ComponentStory<typeof DistanceScale> = (args) => (
@@ -20,7 +20,7 @@ export const Baseline = Template.bind({});
 export const DarkMode = Template.bind({});
 
 DarkMode.args = {
-        style: darkModeStyle,
+    style: darkModeStyle,
 };
 
 DarkMode.parameters = {
