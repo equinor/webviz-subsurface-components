@@ -143,6 +143,7 @@ export default class AxesLayer extends CompositeLayer<
             this.getSubLayerProps({
                 lines,
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+                color: this.props.labelColor || [0, 0, 0, 255],
             })
         );
 

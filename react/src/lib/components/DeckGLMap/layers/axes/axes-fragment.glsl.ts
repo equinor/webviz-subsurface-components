@@ -5,8 +5,10 @@ precision highp float;
 
 out vec4 fragColor;
 
+uniform vec4 uColor;
+
 void main(void) {
-  fragColor = vec4(0.0, 0.0, 0.0,   1.0);
+  fragColor = vec4(uColor.rgb, 1.0);
 }
 `;
 

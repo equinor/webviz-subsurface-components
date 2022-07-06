@@ -5,12 +5,13 @@ import { LayerProps } from "@deck.gl/core/lib/layer";
 import fragmentShader from "./axes-fragment.glsl";
 import gridVertex from "./grid-vertex.glsl";
 import { project } from "deck.gl";
-import { COORDINATE_SYSTEM } from "deck.gl";
+import { COORDINATE_SYSTEM, RGBAColor } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 
 export interface BoxLayerProps<D> extends LayerProps<D> {
     lines: [number]; // from pt , to pt.
+    color: RGBAColor;
 }
 
 const defaultProps = {
@@ -18,6 +19,7 @@ const defaultProps = {
     id: "box-layer",
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     lines: [],
+    color: [0, 0, 0, 1],
 };
 
 export default class BoxLayer extends Layer<unknown, BoxLayerProps<unknown>> {
@@ -41,6 +43,7 @@ export default class BoxLayer extends Layer<unknown, BoxLayerProps<unknown>> {
             id: `${this.props.id}-grids`,
             vs: gridVertex,
             fs: fragmentShader,
+            uniforms: { uColor: this.props.color },
             geometry: new Geometry({
                 drawMode: GL.LINES,
                 attributes: {
