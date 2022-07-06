@@ -7,8 +7,22 @@ export default {
     title: "DeckGLMap / Components / DistanceScale",
 } as ComponentMeta<typeof DistanceScale>;
 
+const darkModeStyle = {
+        color: "white",
+};
+
 const Template: ComponentStory<typeof DistanceScale> = (args) => (
     <DistanceScale {...args} />
 );
 
 export const Baseline = Template.bind({});
+
+export const DarkMode = Template.bind({});
+
+DarkMode.args = {
+        style: darkModeStyle,
+};
+
+DarkMode.parameters = {
+    backgrounds: { default: "dark" },
+};
