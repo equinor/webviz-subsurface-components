@@ -2,7 +2,7 @@ import React from "react";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const convert = require("convert-units");
 
-interface scaleProps {
+export interface ScaleProps {
     // Needed the zoom value to calculate width in units
     zoom?: number;
     // Scale increment value
@@ -19,13 +19,13 @@ const roundToStep = function (num: number, step: number) {
     return Math.floor(num / step + 0.5) * step;
 };
 
-const DistanceScale: React.FC<scaleProps> = ({
+const DistanceScale: React.FC<ScaleProps> = ({
     zoom,
     incrementValue,
     widthPerUnit,
     cssStyle,
     scaleUnit,
-}: scaleProps) => {
+}: ScaleProps) => {
     if (!zoom || !widthPerUnit || !incrementValue) return null;
 
     const [rulerWidth, setRulerWidth] = React.useState<number>(0);
