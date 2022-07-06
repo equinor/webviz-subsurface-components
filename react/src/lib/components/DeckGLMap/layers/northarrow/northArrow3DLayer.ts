@@ -3,15 +3,16 @@ import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/core";
 import { project } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
+import { LayerProps } from "@deck.gl/core/lib/layer";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { Vector3 } from "@math.gl/core";
-import { ExtendedLayerProps } from "../utils/layerTools";
 import { RGBAColor } from "deck.gl";
 import vertexShader from "./northarrow-vertex.glsl";
 import fragmentShader from "./northarrow-fragment.glsl";
 
-export interface NorthArrow3DLayerProps<D> extends ExtendedLayerProps<D> {
-    color?: RGBAColor;
+export interface NorthArrow3DLayerProps<D> extends LayerProps<D> {
+    lines: [number]; // from pt , to pt.
+    color: RGBAColor;
 }
 export default class NorthArrow3DLayer extends Layer<
     unknown,
