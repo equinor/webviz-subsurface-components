@@ -1,7 +1,7 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
-import { PickInfo } from ".";
+import { PickInfo } from "deck.gl";
 import DeckGLMap from "./DeckGLMap";
 import { WellsPickInfo } from "./layers/wells/wellsLayer";
 
