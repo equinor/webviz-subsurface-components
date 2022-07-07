@@ -227,6 +227,9 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const t = info.color[1] / 255.0;
 
         // MESH & PROPERTY VALUE.
+        const isSeparatePropertyValues =
+            this.props.meshData === this.props.propertyData; // If property values points to the depth values we only log depth values on readout.
+
         const j = Math.max(Math.round(s * readoutMatrixSize) - 1, 0);
         const i = Math.max(Math.round(t * readoutMatrixSize) - 1, 0);
         const idx = i * readoutMatrixSize + j;
@@ -234,13 +237,15 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const property_value = this.props.propertyData[idx];
 
         const layer_properties: PropertyDataType[] = [];
-        layer_properties.push(
-            createPropertyData("Depth", depth_value),
-            createPropertyData(
-                "Property",
-                isNaN(property_value) ? "NaN" : property_value
-            )
-        );
+        layer_properties.push(createPropertyData("Depth", depth_value));
+        if (!isSeparatePropertyValues) {
+            layer_properties.push(
+                createPropertyData(
+                    "Property",
+                    isNaN(property_value) ? "NaN" : property_value
+                )
+            );
+        }
 
         return {
             ...info,
