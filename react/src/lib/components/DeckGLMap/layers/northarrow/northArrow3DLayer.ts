@@ -11,7 +11,6 @@ import vertexShader from "./northarrow-vertex.glsl";
 import fragmentShader from "./northarrow-fragment.glsl";
 
 export interface NorthArrow3DLayerProps<D> extends LayerProps<D> {
-    lines: [number]; // from pt , to pt.
     color: RGBAColor;
 }
 export default class NorthArrow3DLayer extends Layer<

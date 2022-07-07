@@ -6,9 +6,6 @@ import { RGBAColor } from "@deck.gl/core/utils/color";
 
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import AxesLayer from "./axesLayer";
-import NorthArrow3DLayer, {
-    NorthArrow3DLayerProps,
-} from "../northarrow/northArrow3DLayer";
 
 export default {
     component: DeckGL,
@@ -27,20 +24,13 @@ const layerProps = {
     ],
 };
 
-const arrowProps = {
-    color: [0, 0, 0, 255],
-};
-
 function getRgba(color: string) {
     const c = rgb(color);
     return [c.r, c.g, c.b, c.opacity * 255];
 }
 
 export const Baseline: ComponentStory<typeof DeckGL> = (args) => {
-    args.layers = [
-        new AxesLayer({ ...layerProps }),
-        new NorthArrow3DLayer(arrowProps as NorthArrow3DLayerProps<unknown>),
-    ];
+    args.layers = [new AxesLayer({ ...layerProps })];
     args.views = [new OrthographicView({})];
     return <DeckGL {...args} />;
 };
@@ -50,10 +40,6 @@ function ColoredLabels(props: { labelColor: string }) {
         new AxesLayer({
             ...layerProps,
             labelColor: getRgba(props.labelColor) as RGBAColor,
-        }),
-        new NorthArrow3DLayer({
-            ...(arrowProps as NorthArrow3DLayerProps<unknown>),
-            color: getRgba(props.labelColor) as RGBAColor,
         }),
     ];
     const views = [new OrthographicView({})];
