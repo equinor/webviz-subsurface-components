@@ -9,7 +9,7 @@ exports[`Test Color Legend snapshot test with default props 1`] = `
     m
   </label>
   <div
-    style="width: 100px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px;"
+    style="width: 100px; height: 4px; border: 2px solid; border-color: gray; display: inline-block; margin-left: 3px;"
   />
 </div>
 `;
@@ -23,7 +23,7 @@ exports[`Test Color Legend snapshot test with higher zoom 1`] = `
     m
   </label>
   <div
-    style="width: 100px; height: 4px; border: 2px solid gray; display: inline-block; margin-left: 3px;"
+    style="width: 100px; height: 4px; border: 2px solid; border-color: gray; display: inline-block; margin-left: 3px;"
   />
 </div>
 `;
