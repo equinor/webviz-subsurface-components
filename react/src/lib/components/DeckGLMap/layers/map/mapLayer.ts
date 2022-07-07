@@ -366,7 +366,8 @@ async function load_mesh_and_texture(
         parameters: DEFAULT_TEXTURE_PARAMETERS,
     });
 
-    const propertyData = makeFixedSizeCopy(data, w, h);
+    const propertyData =
+        meshUrl === propertiesUrl ? meshData : makeFixedSizeCopy(data, w, h);
 
     return Promise.all([
         mesh,
