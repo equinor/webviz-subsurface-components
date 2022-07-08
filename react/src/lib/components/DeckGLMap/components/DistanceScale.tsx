@@ -2,7 +2,7 @@ import React from "react";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const convert = require("convert-units");
 
-interface scaleProps {
+export interface ScaleProps {
     // Needed the zoom value to calculate width in units
     zoom?: number;
     // Scale increment value
@@ -10,7 +10,7 @@ interface scaleProps {
     // Scale bar width in pixels per unit value
     widthPerUnit?: number | null;
     // additional css style to position the component
-    cssStyle?: Record<string, unknown> | null;
+    style?: React.CSSProperties;
     // default unit for the scale ruler
     scaleUnit?: string;
 }
@@ -19,21 +19,22 @@ const roundToStep = function (num: number, step: number) {
     return Math.floor(num / step + 0.5) * step;
 };
 
-const DistanceScale: React.FC<scaleProps> = ({
+const DistanceScale: React.FC<ScaleProps> = ({
     zoom,
     incrementValue,
     widthPerUnit,
-    cssStyle,
+    style,
     scaleUnit,
-}: scaleProps) => {
+}: ScaleProps) => {
     if (!zoom || !widthPerUnit || !incrementValue) return null;
 
     const [rulerWidth, setRulerWidth] = React.useState<number>(0);
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
-    const scaleRulerStyle = {
+    const scaleRulerStyle: React.CSSProperties = {
         width: rulerWidth,
         height: "4px",
-        border: "2px solid gray",
+        border: "2px solid",
+        borderColor: style?.["color"] || "gray",
         borderTop: "none",
         display: "inline-block",
         marginLeft: "3px",
@@ -55,7 +56,7 @@ const DistanceScale: React.FC<scaleProps> = ({
         <div
             style={{
                 position: "absolute",
-                ...cssStyle,
+                ...style,
             }}
         >
             <label>

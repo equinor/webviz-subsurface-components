@@ -362,6 +362,7 @@ const discreteData = {
     H1: [[], 13],
     BELOW: [[], 14],
 };
+const reverseRange = false;
 
 //eslint-disable-next-line
 const wellLayerTemplate = (args: any) => {
@@ -393,7 +394,7 @@ const wellLayerTemplate = (args: any) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} getColorMapname={wellLayerData} />
+                <ColorLegend {...args} getColorName={wellLayerData} />
             </div>
             <DeckGLMap {...args} layers={layers} />
         </div>
@@ -418,6 +419,7 @@ LegendWithColorSelector.args = {
     legend: {
         visible: false,
     },
+    reverseRange,
 };
 
 LegendWithColorSelector.parameters = {

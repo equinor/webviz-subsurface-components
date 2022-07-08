@@ -18,6 +18,8 @@ import { VectorCalculator } from "./components/VectorCalculator";
 import WellLogViewer from "./components/WellLogViewer";
 import WebVizContinuousLegend from "./components/ColorLegends/WebVizContinuousLegend";
 import WebVizDiscreteLegend from "./components/ColorLegends/WebVizDiscreteLegend";
+import { PickInfo } from "deck.gl";
+import { TooltipCallback } from "./components/DeckGLMap/components/Map";
 
 export {
     HistoryMatch,
@@ -34,4 +36,6 @@ export {
     WellLogViewer,
     WebVizContinuousLegend,
     WebVizDiscreteLegend,
+    PickInfo,
+    TooltipCallback,
 };

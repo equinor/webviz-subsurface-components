@@ -273,14 +273,18 @@ KhMapFlat.parameters = {
 const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
-    bounds: [432205, 6475078, 437720, 6481113],
-    meshMaxError: 100,
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
+    // Either "bounds" or "frame". "bounds" will be deprecated."
+    //bounds: [432205, 6475078, 437701, 6480898],  // [xmin, xmax, ymin, ymax]
+    frame: {
+        origin: [432205, 6475078],
+        count: [229, 291],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [-3071, 41048],
-    rotDeg: 0, // default rotate around bounds' upper left corner.
-    //rotPoint: [432205 + (439400 - 432205) / 2, 6475078 + (6481113 - 6475078) / 2],  // rotate around middle
     contours: [0, 100.0],
     isContoursDepth: true,
     colorMapName: "Physics",
@@ -397,7 +401,7 @@ MapClampColor.parameters = {
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer",
-    bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+    bounds: [432205, 6475078, -3500, 437930, 6482353, 0],
 };
 const north_arrow_layer = {
     "@@type": "NorthArrow3DLayer",
@@ -408,13 +412,13 @@ export const Axes = MinimalTemplate.bind({});
 Axes.args = {
     id: "axes",
     layers: [axes, meshMapLayer, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500],
+    bounds: [432205, 6475078, 437930, 6482353],
     views: {
         layout: [1, 1],
         viewports: [
             {
                 id: "view_1",
-                show3D: false,
+                show3D: true,
                 layerIds: [],
             },
         ],
@@ -540,52 +544,6 @@ MultiView.args = {
                 layerIds: ["geojson-line-layer", "geojson-layer", "text-layer"],
             },
         ],
-    },
-};
-
-// Experimental MapLayer. This is newer Float32 resolution for properties.
-const mapLayer = {
-    "@@type": "MapLayer",
-    id: "map-layer-float32",
-    mesh: "./volve_hugin_depth_absolute.png",
-    bounds: [432205, 6475078, 437720, 6481113],
-    meshMaxError: 100,
-    propertyTexture: "./volve_property_ieee_float.png",
-    rotDeg: 0,
-    contours: [0, 20.0],
-    colorMapName: "Physics",
-    colorMapRange: [-3071, 41048],
-};
-export const ExperimentalMapLayerFloat32Property = EditDataTemplate.bind({});
-ExperimentalMapLayerFloat32Property.args = {
-    ...exampleData[0],
-    layers: [
-        {
-            ...mapLayer,
-            meshMaxError: 5.0,
-            visible: true,
-        },
-    ],
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-                layerIds: [],
-            },
-        ],
-    },
-};
-
-ExperimentalMapLayerFloat32Property.parameters = {
-    title: "Test",
-    docs: {
-        description: {
-            story: "An experimental layer using a Float 32 encoded property map.",
-        },
-        inlineStories: false,
-        iframeHeight: 500,
     },
 };
 
@@ -727,6 +685,7 @@ const dataObjectName = "Legend";
 const position = [16, 10];
 const horizontal = true;
 const colorName = "Physics";
+const reverseRange = false;
 
 const mapDataTemplate = (args) => {
     const [getColorName, setColorName] = React.useState();
@@ -755,7 +714,7 @@ const mapDataTemplate = (args) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} getColorMapname={colorMapData} />
+                <ColorLegend {...args} getColorName={colorMapData} />
             </div>
             <DeckGLMap {...args} layers={updatedLayerData} />
         </div>
@@ -777,6 +736,7 @@ ColorMapLayerColorSelector.args = {
     legend: {
         visible: false,
     },
+    reverseRange,
 };
 
 ColorMapLayerColorSelector.parameters = {
