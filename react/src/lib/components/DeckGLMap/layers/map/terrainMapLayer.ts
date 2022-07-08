@@ -235,7 +235,9 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         for (let i = 0; i < this.props.readOutData.length; i++) {
             const value = this.props.readOutData[i][idx];
             const name = this.props.readOutDataName[i];
-            layer_properties.push(createPropertyData(name, value));
+            layer_properties.push(
+                createPropertyData(name, isNaN(value) ? "NaN" : value)
+            );
         }
 
         return {
