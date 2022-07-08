@@ -20,16 +20,18 @@ const valueRange = [-3071, 41048];
 const meshMapLayer = {
     "@@type": "MapLayer",
     id: "mesh-layer",
-    meshUrl: "hugin_depth_5_m.float32",
+    meshUrl:
+        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/hugin_depth_5_m.float32",
     frame: {
         origin: [432150, 6475800],
         count: [1451, 1141],
         increment: [5, 5],
         rotDeg: 0,
     },
-    propertiesUrl: "kh_netmap_5_m.float32",
-    contours: [0, 100.0],
-    isContoursDepth: true,
+    propertiesUrl:
+        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/kh_netmap_5_m.float32",
+    contours: [0, 1000],
+    isContoursDepth: false,
     material: true,
     colorMapName: "Physics",
 };

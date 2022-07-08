@@ -283,20 +283,20 @@ async function load_mesh_and_texture(
     propertiesUrl: string,
     gl: unknown
 ) {
-    let isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
-    const isTexture =
+    const isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
+    const isProperties =
         typeof propertiesUrl !== "undefined" && propertiesUrl !== "";
 
-    if (!isMesh && !isTexture) {
+    if (!isMesh && !isProperties) {
         console.error("Error. One or both of texture and mesh must be given!");
     }
 
-    if (isMesh && !isTexture) {
+    if (isMesh && !isProperties) {
         propertiesUrl = meshUrl;
-    } else if (!isMesh && isTexture) {
-        meshUrl = propertiesUrl;
-        isMesh = true;
     }
+
+    const readOutData: Float32Array[] = [];
+    const readOutDataName: string[] = [];
 
     //-- MESH --
     const [w, h] = dimNxNy(dim);
@@ -320,6 +320,9 @@ async function load_mesh_and_texture(
         if (enableSmoothShading) {
             mesh = add_normals(mesh);
         }
+
+        readOutData.push(meshData);
+        readOutDataName.push("Depth");
     } else {
         // Mesh data is missing.
         // Make a flat square size of bounds using two triangles.  z = 0.
@@ -366,15 +369,18 @@ async function load_mesh_and_texture(
         parameters: DEFAULT_TEXTURE_PARAMETERS,
     });
 
-    const propertyData =
-        meshUrl === propertiesUrl ? meshData : makeFixedSizeCopy(data, w, h);
+    if (isProperties) {
+        const propertyData = makeFixedSizeCopy(data, w, h);
+        readOutData.push(propertyData);
+        readOutDataName.push("Property");
+    }
 
     return Promise.all([
         mesh,
         propertyValueRange,
-        meshData,
-        propertyData,
         texture,
+        readOutData,
+        readOutDataName,
     ]);
 }
 
@@ -457,15 +463,21 @@ export default class MapLayer extends CompositeLayer<
         );
 
         p.then(
-            ([mesh, propertyValueRange, meshData, propertyData, texture]) => {
+            ([
+                mesh,
+                propertyValueRange,
+                texture,
+                readOutData,
+                readOutDataName,
+            ]) => {
                 this.setState({
                     mesh,
                     propertyValueRange,
-                    meshData,
-                    propertyData,
                     texture,
+                    readOutData,
+                    readOutDataName,
                 });
-            }
+        }
         );
     }
 
@@ -512,8 +524,8 @@ export default class MapLayer extends CompositeLayer<
                 mesh: this.state.mesh,
                 propertyValueRange: this.state.propertyValueRange,
                 propertyTexture: this.state.texture,
-                meshData: this.state.meshData,
-                propertyData: this.state.propertyData,
+                readOutData: this.state.readOutData,
+                readOutDataName: this.state.readOutDataName,
                 meshWidth: width,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
@@ -522,7 +534,7 @@ export default class MapLayer extends CompositeLayer<
                 colorMapFunction: this.props.colorMapFunction,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
-                isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
+                isContoursDepth: !isMesh ? false : this.props.isContoursDepth,  
                 material: this.props.material,
                 wireframe: false,
             })
