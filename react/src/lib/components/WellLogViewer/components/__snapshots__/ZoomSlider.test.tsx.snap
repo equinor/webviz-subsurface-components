@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Test Well Log View Component with Scroller snapshot test 1`] = `
+exports[`Test zoom slider snapshot test 1`] = `
 <span
   class="MuiSlider-root MuiSlider-colorPrimary"
 >
