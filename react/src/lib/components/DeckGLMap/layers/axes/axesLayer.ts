@@ -11,6 +11,7 @@ import { RGBAColor } from "deck.gl";
 export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     bounds: [number, number, number, number, number, number];
     labelColor?: RGBAColor;
+    axisColor?: RGBAColor;
 }
 
 type TextLayerData = {
@@ -143,7 +144,7 @@ export default class AxesLayer extends CompositeLayer<
             this.getSubLayerProps({
                 lines,
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-                color: this.props.labelColor || [0, 0, 0, 255],
+                color: this.props.axisColor || [0, 0, 0, 255],
             })
         );
 

@@ -9,7 +9,7 @@ export default {
 
 type NumberQuad = [number, number, number, number];
 
-const white = [255, 255, 2550, 255];
+const white = [255, 255, 255, 255];
 
 const axes = {
     "@@type": "AxesLayer",
@@ -79,7 +79,7 @@ export const NorthArrow2dDarkMode: ComponentStory<typeof DeckGLMap> = (
 NorthArrow2dDarkMode.args = {
     ...defaultArgs,
     layers: [
-        { ...axes, labelColor: white },
+        { ...axes, labelColor: white, axisColor: white },
         { ...north_arrow_layer, color: white },
     ],
     views: {
