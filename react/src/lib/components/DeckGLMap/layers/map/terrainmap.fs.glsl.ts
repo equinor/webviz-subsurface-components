@@ -37,6 +37,16 @@ uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
 
+// The "isnan" function does not work properly in webgl. See this link:
+// https://stackoverflow.com/questions/9446888/best-way-to-detect-nans-in-opengl-shaders
+bool isnan( float val )
+{
+  return ( val < 0.0 || 0.0 < val || val == 0.0 ) ? false : true;
+  // important: some nVidias failed to cope with version below.
+  // Probably wrong optimization.
+  /*return ( val <= 0.0 || 0.0 <= val ) ? false : true;*/
+}
+
 
 void main(void) {
    geometry.uv = vTexCoord;
@@ -73,7 +83,6 @@ void main(void) {
       return;
    }
   
-
    // If colorMapRangeMin/Max specified, color map will span this interval.
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
    if (x < 0.0 || x > 1.0) {
@@ -99,11 +108,11 @@ void main(void) {
    }
 
 
-   bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
+   bool is_contours = true; //contourReferencePoint != -1.0 && contourInterval != -1.0;
    if (is_contours) {
       // Contours are made of either depths or properties.
-      float val =  (hasTexture && !isContoursDepth) ? (propertyValue - contourReferencePoint) / contourInterval
-                                                    : (abs(worldPos.z) - contourReferencePoint) / contourInterval;
+      float val = isContoursDepth ? (abs(worldPos.z) - contourReferencePoint) / contourInterval
+                                  : (propertyValue - contourReferencePoint) / contourInterval;
 
       float f  = fract(val);
       float df = fwidth(val);
