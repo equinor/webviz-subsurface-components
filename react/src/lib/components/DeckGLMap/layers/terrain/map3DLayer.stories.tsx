@@ -1,6 +1,11 @@
 import React from "react";
+import { useHoverInfo } from "../../components/Map";
 import DeckGLMap from "../../DeckGLMap";
+import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { Slider } from "@material-ui/core";
+import { makeStyles } from "@material-ui/styles";
+import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
@@ -42,6 +47,15 @@ function nearestColorMap(x: number) {
     return [255, 255, 100];
 }
 
+function breakpointColorMap(x: number, breakpoint: number) {
+    if (x > breakpoint) return [0, 50, 200];
+    return [255, 255, 0];
+}
+
+function createColorMap(breakpoint: number) {
+    return (value: number) => breakpointColorMap(value, breakpoint);
+}
+
 export const GradientFunctionColorMap: ComponentStory<
     typeof DeckGLMap
 > = () => {
@@ -77,6 +91,135 @@ StepFunctionColorMap.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Example using step color mapping function.",
+        },
+    },
+};
+
+export const DefaultColorScale: ComponentStory<typeof DeckGLMap> = () => {
+    const args = {
+        ...defaultArgs,
+        id: "default-color-scale",
+        layers: [{ ...meshMapLayer }],
+    };
+
+    return <DeckGLMap {...args} />;
+};
+
+DefaultColorScale.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Default color scale.",
+        },
+    },
+};
+
+export const Readout: ComponentStory<typeof DeckGLMap> = () => {
+    const [hoverInfo, hoverCallback] = useHoverInfo();
+
+    const args = React.useMemo(() => {
+        return {
+            ...defaultArgs,
+            id: "readout",
+            layers: [{ ...meshMapLayer }],
+            coords: {
+                visible: false,
+            },
+            onMouseEvent: hoverCallback,
+        };
+    }, [hoverCallback]);
+
+    return (
+        <>
+            <DeckGLMap {...args} />
+            {hoverInfo && <InfoCard pickInfos={hoverInfo} />}
+        </>
+    );
+};
+
+Readout.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Readout example.",
+        },
+    },
+};
+
+const useStyles = makeStyles({
+    main: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+    legend: {
+        width: 100,
+        position: "absolute",
+        top: "0",
+        right: "0",
+    },
+});
+
+export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
+
+    const colorMap = React.useCallback(
+        (value: number) => {
+            return createColorMap(breakpoint)(value);
+        },
+        [breakpoint]
+    );
+
+    const props = React.useMemo(() => {
+        return {
+            ...args,
+            layers: [
+                {
+                    ...meshMapLayer,
+                    colorMapFunction: colorMap,
+                },
+            ],
+            legend: { visible: false },
+        };
+    }, [breakpoint]);
+
+    const handleChange = React.useCallback((_event, value) => {
+        setBreakpoint(value / 100);
+    }, []);
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+                <div className={useStyles().legend}>
+                    <ContinuousLegend
+                        min={meshMapLayer.propertyValueRange[0]}
+                        max={meshMapLayer.propertyValueRange[1]}
+                        colorMapFunction={colorMap}
+                    />
+                </div>
+            </div>
+            <Slider
+                min={0}
+                max={100}
+                defaultValue={50}
+                step={1}
+                onChange={handleChange}
+            />
+        </>
+    );
+};
+
+BreakpointColorMap.args = {
+    ...defaultArgs,
+    id: "breakpoint-color-map",
+};
+
+BreakpointColorMap.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using a color scale with a breakpoint.",
         },
     },
 };

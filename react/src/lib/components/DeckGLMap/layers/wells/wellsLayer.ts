@@ -1,5 +1,6 @@
 import { CompositeLayer } from "@deck.gl/core";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
+import { Layer } from "@deck.gl/core";
 import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import { RGBAColor } from "@deck.gl/core/utils/color";
 import { PathStyleExtension } from "@deck.gl/extensions";
@@ -198,7 +199,7 @@ export default class WellsLayer extends CompositeLayer<
     setSelection(
         well: string | undefined,
         _selection?: [number | undefined, number | undefined]
-    ) {
+    ): void {
         if (this.internalState) {
             this.setState({
                 well: well,
@@ -219,7 +220,9 @@ export default class WellsLayer extends CompositeLayer<
         );
     }
 
-    getLegendData(value: LogCurveDataType[]) {
+    getLegendData(
+        value: LogCurveDataType[]
+    ): ContinuousLegendDataType | DiscreteLegendDataType | null {
         return getLegendData(
             value,
             "",
@@ -234,14 +237,14 @@ export default class WellsLayer extends CompositeLayer<
         });
     }
 
-    getLogLayer() {
+    getLogLayer(): Layer<unknown> {
         return getLayersById(
             this.internalState?.subLayers,
             "wells-layer-log_curve"
         )?.[0];
     }
 
-    getSelectionLayer() {
+    getSelectionLayer(): Layer<unknown> {
         return getLayersById(
             this.internalState?.subLayers,
             "wells-layer-selection"
@@ -273,7 +276,9 @@ export default class WellsLayer extends CompositeLayer<
             : (this.props.data as FeatureCollection);
 
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
-        const positionFormat = is3d ? "XYZ" : "XY";
+        const isOrthographic =
+            this.context.viewport.constructor.name === "OrthographicViewport";
+        const positionFormat = isOrthographic ? "XY" : "XYZ";
 
         const isDashed = !!this.props.lineStyle?.dash;
 
@@ -299,7 +304,7 @@ export default class WellsLayer extends CompositeLayer<
                 getLineWidth: getLineWidth(this.props.lineStyle?.width),
                 extensions: extensions,
                 getDashArray: getDashFactor(this.props.lineStyle?.dash),
-                lineBillboard: is3d,
+                lineBillboard: true,
                 pointBillboard: true,
             })
         );
@@ -324,7 +329,7 @@ export default class WellsLayer extends CompositeLayer<
                     getLineWidth(this.props.lineStyle?.width),
                     -1
                 ),
-                lineBillboard: is3d,
+                lineBillboard: true,
                 pointBillboard: true,
             })
         );

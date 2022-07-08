@@ -2,6 +2,8 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { makeStyles } from "@material-ui/styles";
+import { ColorLegend, createColorMapFunction } from "@emerson-eps/color-tables";
+const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
 export default {
     component: DeckGLMap,
@@ -271,14 +273,18 @@ KhMapFlat.parameters = {
 const meshMapLayer = {
     "@@type": "Map3DLayer",
     id: "mesh-layer",
-    bounds: [432205, 6475078, 437720, 6481113],
-    meshMaxError: 100,
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
+    // Either "bounds" or "frame". "bounds" will be deprecated."
+    //bounds: [432205, 6475078, 437701, 6480898],  // [xmin, xmax, ymin, ymax]
+    frame: {
+        origin: [432205, 6475078],
+        count: [229, 291],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
     propertyTexture: "kh_netmap_25_m_normalized_margin.png",
     propertyValueRange: [-3071, 41048],
-    rotDeg: 0, // default rotate around bounds' upper left corner.
-    //rotPoint: [432205 + (439400 - 432205) / 2, 6475078 + (6481113 - 6475078) / 2],  // rotate around middle
     contours: [0, 100.0],
     isContoursDepth: true,
     colorMapName: "Physics",
@@ -395,7 +401,7 @@ MapClampColor.parameters = {
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer",
-    bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+    bounds: [432205, 6475078, -3500, 437930, 6482353, 0],
 };
 const north_arrow_layer = {
     "@@type": "NorthArrow3DLayer",
@@ -406,13 +412,13 @@ export const Axes = MinimalTemplate.bind({});
 Axes.args = {
     id: "axes",
     layers: [axes, meshMapLayer, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500],
+    bounds: [432205, 6475078, 437930, 6482353],
     views: {
         layout: [1, 1],
         viewports: [
             {
                 id: "view_1",
-                show3D: false,
+                show3D: true,
                 layerIds: [],
             },
         ],
@@ -541,52 +547,6 @@ MultiView.args = {
     },
 };
 
-// Experimental MapLayer. This is newer Float32 resolution for properties.
-const mapLayer = {
-    "@@type": "MapLayer",
-    id: "map-layer-float32",
-    mesh: "./volve_hugin_depth_absolute.png",
-    bounds: [432205, 6475078, 437720, 6481113],
-    meshMaxError: 100,
-    propertyTexture: "./volve_property_ieee_float.png",
-    rotDeg: 0,
-    contours: [0, 20.0],
-    colorMapName: "Physics",
-    colorMapRange: [-3071, 41048],
-};
-export const ExperimentalMapLayerFloat32Property = EditDataTemplate.bind({});
-ExperimentalMapLayerFloat32Property.args = {
-    ...exampleData[0],
-    layers: [
-        {
-            ...mapLayer,
-            meshMaxError: 5.0,
-            visible: true,
-        },
-    ],
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-                layerIds: [],
-            },
-        ],
-    },
-};
-
-ExperimentalMapLayerFloat32Property.parameters = {
-    title: "Test",
-    docs: {
-        description: {
-            story: "An experimental layer using a Float 32 encoded property map.",
-        },
-        inlineStories: false,
-        iframeHeight: 500,
-    },
-};
-
 // ---------Selectable GeoJson Layer example--------------- //
 export const SelectableFeatureExample = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
@@ -694,5 +654,97 @@ MultiColorMap.args = {
                 layerIds: ["colormap-2-layer"],
             },
         ],
+    },
+};
+
+// ColormapLayer with color selector component
+const defaultProps = {
+    id: "DeckGlMap",
+    resources: {
+        propertyMap:
+            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+    },
+    bounds: [432150, 6475800, 439400, 6481500],
+};
+
+const layers = [
+    {
+        "@@type": "ColormapLayer",
+        image: "@@#resources.propertyMap",
+        rotDeg: 0,
+        bounds: [432205, 6475078, 437720, 6481113],
+        valueRange: [2782, 3513],
+        colorMapRange: [2782, 3513],
+    },
+];
+
+// prop for legend
+const min = 0;
+const max = 0.35;
+const dataObjectName = "Legend";
+const position = [16, 10];
+const horizontal = true;
+const colorName = "Physics";
+const reverseRange = false;
+
+const mapDataTemplate = (args) => {
+    const [getColorName, setColorName] = React.useState();
+
+    const colorMapData = React.useCallback((data) => {
+        setColorName(data);
+    }, []);
+
+    const updatedLayerData = [
+        {
+            ...args.layers[0],
+            colorMapName: getColorName,
+            colorMapFunction: createColorMapFunction(
+                getColorName ? getColorName : colorName
+            ),
+        },
+    ];
+
+    return (
+        <div>
+            <div
+                style={{
+                    float: "right",
+                    zIndex: 999,
+                    opacity: 1,
+                    position: "relative",
+                }}
+            >
+                <ColorLegend {...args} getColorName={colorMapData} />
+            </div>
+            <DeckGLMap {...args} layers={updatedLayerData} />
+        </div>
+    );
+};
+
+export const ColorMapLayerColorSelector = mapDataTemplate.bind({});
+
+ColorMapLayerColorSelector.args = {
+    min,
+    max,
+    dataObjectName,
+    position,
+    horizontal,
+    colorName,
+    colorTables,
+    layers,
+    ...defaultProps,
+    legend: {
+        visible: false,
+    },
+    reverseRange,
+};
+
+ColorMapLayerColorSelector.parameters = {
+    docs: {
+        description: {
+            story: "Clicking on legend opens(toggle) the color selector component and then click on the color scale to update the layer.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
     },
 };
