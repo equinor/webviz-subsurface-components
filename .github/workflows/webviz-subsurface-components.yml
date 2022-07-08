@@ -157,8 +157,8 @@ jobs:
       - name: replace newly captured snapshots
         if: steps.check_file_changed.outputs.docs_changed == 'true' && failure()
         run: |
-          chmod +x ./cypress.sh || true
-          ./cypress.sh || true
+          chmod +x ./react/cypress/cypress.sh || true
+          ./react/cypress/cypress.sh || true
           rm -rf react/cypress/snapshots/actual
           rm -rf react/cypress/snapshots/diff
           rm -rf files.txt
