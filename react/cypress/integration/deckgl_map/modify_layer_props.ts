@@ -27,17 +27,24 @@ describe("Map component", () => {
 
     it("Should add a wells layer", () => {
         cy.getIframeBody().contains("Loading assests...").should("not.exist");
-        cy.get(
-            "#panel-tab-content > div:nth-child(1) > div > table > tbody > tr:nth-child(9) > td:nth-child(2) > div > div > div > span.rejt-not-collapsed > svg.rejt-plus-menu.css-16vj5s2"
-        ).click();
+        const $li = Cypress.$("td:contains('layers')");
+
+        cy.wrap($li)
+            .last()
+            .find(
+                "div > div > div > span.rejt-not-collapsed > svg.rejt-plus-menu"
+            )
+            .click();
+
         cy.fixture("wellLayer.json")
             .as("data")
             .then((data) => {
-                cy.get(
-                    "#panel-tab-content > div:nth-child(1) > div > table > tbody > tr:nth-child(9) > td:nth-child(2) > div > div > div > span.rejt-not-collapsed > div > span > input"
-                ).type(JSON.stringify(data), {
-                    parseSpecialCharSequences: false,
-                });
+                cy.get("input[placeholder='Value']").type(
+                    JSON.stringify(data),
+                    {
+                        parseSpecialCharSequences: false,
+                    }
+                );
             });
         cy.contains("Save").click();
         cy.contains("TypeError").should("not.exist");
@@ -45,10 +52,14 @@ describe("Map component", () => {
 
     it("Should remove colormap layer", () => {
         cy.getIframeBody().contains("Loading assests...").should("not.exist");
-        cy.get(
-            "#panel-tab-content > div:nth-child(1) > div > table > tbody > tr:nth-child(9) > td:nth-child(2) > div > div > div > span.rejt-not-collapsed > ul > div:nth-child(1) > span.rejt-collapsed > svg > path"
-        ).click();
-        cy.contains("Save").click();
+        const $li = Cypress.$("td:contains('layers')");
+
+        cy.wrap($li)
+            .last()
+            .find(
+                "div > div > div > span.rejt-not-collapsed >  ul > div:nth-child(1) > span.rejt-collapsed > svg"
+            )
+            .click();
         cy.contains("TypeError").should("not.exist");
     });
 });
