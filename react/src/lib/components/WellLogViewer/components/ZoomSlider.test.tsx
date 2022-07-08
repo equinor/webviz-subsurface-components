@@ -17,7 +17,7 @@ describe("Test zoom slider", () => {
     it("snapshot test", () => {
         const { container } = render(
             <ZoomSlider
-                onChange={function (value: number): void {
+                onChange={function (): void {
                     throw new Error("Function not implemented.");
                 }}
                 value={0}
