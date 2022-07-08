@@ -42,7 +42,7 @@ describe("test 'layers' button", () => {
             name: "Property map",
         })[0];
         userEvent.click(property_map_checkbox);
-        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
+        expect(testStore.dispatch).toHaveBeenCalledTimes(2);
         expect(testStore.dispatch).toBeCalledWith({
             payload: ["colormap-layer", false],
             type: "spec/updateVisibleLayers",
@@ -90,6 +90,16 @@ describe("test 'layers' button", () => {
                         id={"layers-button-view_1"}
                         layers={testState.layers}
                     />
+                ),
+            })
+        );
+        expect(container.firstChild).toMatchSnapshot();
+    });
+    it("test with no layers present", () => {
+        const { container } = render(
+            Wrapper({
+                children: (
+                    <LayersButton id={"layers-button-view_1"} layers={[]} />
                 ),
             })
         );

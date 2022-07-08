@@ -7,7 +7,7 @@
 /* eslint no-inline-comments: 0 */
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
-import "leaflet/dist/leaflet.css";
+import "!style-loader!css-loader!leaflet/dist/leaflet.css";
 import { CRS } from "leaflet";
 import {
     LayersControl,
@@ -22,7 +22,7 @@ import OptionalLayerControl from "./components/OptionalLayerControl.react";
 import CompositeMapLayer from "./components/CompositeMapLayer.react";
 import DrawControls from "./components/DrawControls.react";
 import VerticalZoom from "./components/VerticalZoom.react";
-import "./layered-map.css";
+import "!style-loader!css-loader!./layered-map.css";
 
 const { BaseLayer, Overlay } = LayersControl;
 const yx = ([x, y]) => {

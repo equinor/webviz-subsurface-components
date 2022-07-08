@@ -9,27 +9,29 @@ import { testState } from "../../test/testReduxState";
 
 describe("Test Layer Property", () => {
     it("snapshot test", () => {
-        const { container } = render(
-            Wrapper({
-                children: (
-                    <LayerProperty
-                        layer={testState.layers[testState.layers.length - 1]}
-                    />
-                ),
-            })
+        const drawing_layer = testState.layers.find(
+            (item) => item["@@type"] === "DrawingLayer"
         );
+        const { container } = drawing_layer
+            ? render(
+                  Wrapper({
+                      children: <LayerProperty layer={drawing_layer} />,
+                  })
+              )
+            : render(<div />);
         expect(container.firstChild).toMatchSnapshot();
     });
+
     it("select option to dispatch redux action", async () => {
-        render(
-            Wrapper({
-                children: (
-                    <LayerProperty
-                        layer={testState.layers[testState.layers.length - 1]}
-                    />
-                ),
-            })
+        const drawing_layer = testState.layers.find(
+            (item) => item["@@type"] === "DrawingLayer"
         );
+        drawing_layer &&
+            render(
+                Wrapper({
+                    children: <LayerProperty layer={drawing_layer} />,
+                })
+            );
         userEvent.selectOptions(
             screen.getByRole("combobox", { name: /draw mode/i }),
             "View"

@@ -10,9 +10,13 @@ import {
     PropertyMapPickInfo,
     ValueDecoder,
 } from "../utils/propertyMapTools";
-import { getModelMatrix } from "../utils/layerTools";
+import { getModelMatrix, colorMapFunctionType } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
-import fsColormap from "!!raw-loader!./colormap.fs.glsl";
+import fsColormap from "./colormap.fs.glsl";
+import { DeckGLLayerContext } from "../../components/Map";
+import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { getRgbData } from "@emerson-eps/color-tables";
+import { ContinuousLegendDataType } from "../../components/ColorLegend";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -20,6 +24,37 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
+
+function getImageData(
+    colorMapName: string,
+    colorTables: colorTablesArray,
+    colorMapFunction: colorMapFunctionType | undefined
+) {
+    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
+
+    const data = new Uint8Array(256 * 3);
+
+    for (let i = 0; i < 256; i++) {
+        const value = i / 255.0;
+        const rgb = isColorMapFunctionDefined
+            ? (colorMapFunction as colorMapFunctionType)(i / 255)
+            : getRgbData(value, colorMapName, colorTables);
+        let color: number[] = [];
+        if (rgb != undefined) {
+            if (Array.isArray(rgb)) {
+                color = rgb;
+            } else {
+                color = [rgb.r, rgb.g, rgb.b];
+            }
+        }
+
+        data[3 * i + 0] = color[0];
+        data[3 * i + 1] = color[1];
+        data[3 * i + 2] = color[2];
+    }
+
+    return data;
+}
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see
 // https://deck.gl/docs/api-reference/layers/bitmap-layer
@@ -40,10 +75,13 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 // > 16mil possible values for any property value range.
 // We also support property maps with an alpha channel. See colormap.fs.glsl for more details.
 export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
-    // Image containing the colors that will be applied to te values.
-    // e.g.: https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png
-    // No size requirements. Alpha channel (opacity) supported.
-    colormap: unknown;
+    // Name of color map.
+    colorMapName: string;
+
+    // Optional function property.
+    // If defined this function will override the color map.
+    // Takes a value in the range [0,1] and returns a color.
+    colorMapFunction?: colorMapFunctionType;
 
     // Min and max property values.
     valueRange: [number, number];
@@ -98,7 +136,15 @@ export default class ColormapLayer extends BitmapLayer<
                 ...uniforms,
                 // Send the colormap texture to the shader.
                 colormap: new Texture2D(context.gl, {
-                    data: this.props.colormap,
+                    width: 256,
+                    height: 1,
+                    format: GL.RGB,
+                    data: getImageData(
+                        this.props.colorMapName,
+                        (this.context as DeckGLLayerContext).userData
+                            .colorTables,
+                        this.props.colorMapFunction
+                    ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
                 valueRangeMin,
@@ -140,6 +186,24 @@ export default class ColormapLayer extends BitmapLayer<
             // For more details, see https://deck.gl/docs/developer-guide/custom-layers/picking
             index: 0,
             propertyValue: val,
+        };
+    }
+
+    getLegendData(): ContinuousLegendDataType {
+        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
+        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
+
+        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // Otherwise it will extend from valueRangeMin to valueRangeMax.
+        const min = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const max = this.props.colorMapRange?.[1] ?? valueRangeMax;
+
+        return {
+            discrete: false,
+            valueRange: [min, max],
+            colorName: this.props.colorMapName,
+            title: "PropertyMapLayer",
+            colorMapFunction: this.props.colorMapFunction,
         };
     }
 }

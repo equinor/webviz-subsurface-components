@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { MapState } from "../../redux/store";
 import LayersButton from "./LayersButton";
 import LayerSettingsButton from "./LayerSettingsButton";
-import { ViewsType, ViewportType } from "../../components/DeckGLWrapper";
+import { getLayersInViewport } from "../../layers/utils/layerTools";
 
 Icon.add({ layers }); // (this needs only be done once)
 
@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             position: "absolute",
-            bottom: theme.spacing(2),
+            bottom: theme.spacing(4),
             right: theme.spacing(2),
             display: "flex",
             flexDirection: "column",
@@ -25,40 +25,24 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export interface SettingsProps {
     viewportId?: string;
+    layerIds?: string[];
 }
 
 const Settings: React.FC<SettingsProps> = React.memo(
-    ({ viewportId }: SettingsProps) => {
+    ({ viewportId, layerIds }: SettingsProps) => {
         const classes = useStyles();
 
         const spec = useSelector((st: MapState) => st.spec);
-
-        const [currentView, setCurrentView] = useState<ViewportType>();
-        useEffect(() => {
-            if (viewportId == undefined) return;
-
-            const views = spec["views"] as ViewsType;
-            const cur_view = views?.viewports?.find((view) =>
-                new RegExp("^" + view.id).test(viewportId)
-            );
-            setCurrentView(cur_view);
-        }, [spec["views"]]);
-
         const [layersInView, setLayersInView] = useState<
             Record<string, unknown>[]
         >([]);
         useEffect(() => {
-            const layers = spec["layers"] as Record<string, unknown>[];
-            const layers_in_viewport = currentView?.layerIds;
-            if (layers_in_viewport && layers_in_viewport.length > 0) {
-                const layers_in_view = layers.filter((layer) =>
-                    layers_in_viewport.includes(layer["id"] as string)
-                );
-                setLayersInView(layers_in_view);
-            } else {
-                setLayersInView(layers);
-            }
-        }, [spec["layers"], currentView]);
+            const layers_in_viewport = getLayersInViewport(
+                spec["layers"] as Record<string, unknown>[],
+                layerIds
+            ) as Record<string, unknown>[];
+            setLayersInView(layers_in_viewport);
+        }, [spec, layerIds]);
 
         if (!layersInView?.length) return null;
         return (
@@ -68,12 +52,12 @@ const Settings: React.FC<SettingsProps> = React.memo(
                         layer && (
                             <LayerSettingsButton
                                 layer={layer}
-                                key={`settings-button-${layer["id"]}-${currentView?.id}`}
+                                key={`layer-settings-button-${layer["id"]}-${viewportId}`}
                             />
                         )
                 )}
                 <LayersButton
-                    id={`layers-button-${currentView?.id}`}
+                    id={`layers-button-${viewportId}`}
                     layers={layersInView}
                 />
             </div>

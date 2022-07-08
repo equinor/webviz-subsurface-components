@@ -10,22 +10,26 @@
       "visible": true,
       "incrementValue": 100,
       "widthPerUnit": 100,
-      "position": [
-        10,
-        10
-      ]
+      "cssStyle": {
+        "left": 10,
+        "top": 10
+      }
     },
     "legend": {
       "visible": true,
-      "position": [
-        5,
-        10
-      ],
-      "horizontal": true
+      "cssStyle": {
+        "right": 10,
+        "top": 10
+      },
+      "horizontal": false
+    },
+    "toolbar": {
+      "visible": true
     },
     "coordinateUnit": "m",
     "resources": {
       "propertyMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+      "depthMap": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
       "wellsData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
       "logData": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json"
     },
@@ -35,12 +39,10 @@
       437720,
       6481113
     ],
-    "zoom": -3,
     "layers": [
       {
         "@@type": "ColormapLayer",
         "image": "@@#resources.propertyMap",
-        "colormap": "https://cdn.jsdelivr.net/gh/kylebarron/deck.gl-raster/assets/colormaps/plasma.png",
         "rotDeg": 0,
         "bounds": [
           432205,
@@ -48,6 +50,7 @@
           437720,
           6481113
         ],
+        "colorMapName": "Rainbow",
         "valueRange": [
           2782,
           3513
@@ -70,27 +73,50 @@
           3513
         ],
         "rotDeg": 0,
-        "image": "@@#resources.propertyMap"
+        "image": "@@#resources.depthMap"
+      },
+      {
+        "@@type": "GridLayer",
+        "id": "grid-layer",
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
+        "colorMapName": "Rainbow",
+        "valueRange": [
+          0,
+          1
+        ],
+        "colorMapRange": [
+          0,
+          1
+        ],
+        "visible": false
       },
       {
         "@@type": "Map3DLayer",
-        "id": "map3d-layer",
-        "mesh": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/depthMap.png",
         "bounds": [
           432205,
           6475078,
           437720,
           6481113
         ],
-        "meshMaxError": 2.0,
-        "propertyTexture": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
+        "meshMaxError": 5.0,
+        "mesh": "hugin_depth_25_m_normalized_margin.png",
+        "meshValueRange": [
+          2782,
+          3513
+        ],
+        "propertyTexture": "kh_netmap_25_m_normalized_margin.png",
+        "propertyValueRange": [
+          2782,
+          3513
+        ],
         "rotDeg": 0,
-        "contours": [0, 100.0]
-      },
-      {
-        "@@type": "GridLayer",
-        "id": "grid-layer",
-        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
+        "contours": [0, 50.0],
+        "isContoursDepth": true,
+        "colorMapName": "Physics",
+        "colorMapRange": [
+          2782,
+          3513
+        ],
         "visible": false
       },
       {
@@ -99,7 +125,7 @@
         "logData": "@@#resources.logData",
         "logrunName": "BLOCKING",
         "logName": "ZONELOG",
-        "selectedWell": "@@#editedData.selectedWell"
+        "logColor": "Stratigraphy"
       },
       {
         "@@type": "FaultPolygonsLayer",
@@ -107,26 +133,20 @@
       },
       {
         "@@type": "PieChartLayer",
-        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json",
-        "selectedPie": "@@#editedData.selectedPie"
+        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json"
       },
       {
-        "@@type": "DrawingLayer",
-        "data": "@@#editedData.data",
-        "selectedFeatureIndexes": "@@#editedData.selectedFeatureIndexes"
+        "@@type": "NorthArrow3DLayer",
+        "visible": true
+      },
+      {
+        "@@type": "DrawingLayer"
       }
     ],
-    "editedData": {
-      "selectedWell": "",
-      "selectedPie": {},
-      "selectedFeatureIndexes": [],
-      "data": {
-          "type": "FeatureCollection",
-          "features": []
-      }
-    },
+    "editedData": {},
     "views": {
       "layout": [1, 1],
+      "showLabel": false,
       "viewports": [
         {
           "id": "view_1",

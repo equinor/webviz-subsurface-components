@@ -1,11 +1,12 @@
 import React, { Component, ReactNode } from "react";
 
-import { TemplatePlot } from "./WellLogTemplateTypes";
-
 import { Track, GraphTrack } from "@equinor/videx-wellog";
 
-import WellLogView from "./WellLogView";
+import { TemplatePlot } from "./WellLogTemplateTypes";
+import { WellLog } from "./WellLogTypes";
 import { ColorTable } from "./ColorTableTypes";
+
+import WellLogView from "./WellLogView";
 
 // material ui
 import {
@@ -46,7 +47,7 @@ const colorItems: Record<string, string> = {
     magenta: "Magenta",
     orange: "Orange",
     gray: "Gray",
-    lightred: "Light red",
+    darkred: "Dark red",
     lightgreen: "Light green",
     lightblue: "Light blue",
     yellow: "Yellow",
@@ -55,7 +56,7 @@ const colorItems: Record<string, string> = {
 
 const noneValue = "-";
 
-function _createItems(items: Record<string, string>): ReactNode[] {
+export function _createItems(items: Record<string, string>): ReactNode[] {
     const nodes: ReactNode[] = [];
     for (const key in items) {
         nodes.push(
@@ -86,6 +87,63 @@ function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
         nodes.push(<option key={colorTable.name}>{colorTable.name}</option>);
     }
     return nodes;
+}
+
+function createDataItem(item: string): ReactNode {
+    return (
+        <option key={item} value={item}>
+            {item}
+        </option>
+    );
+}
+
+export function dataNames(
+    welllog: WellLog | undefined,
+    track: Track | null,
+    discrete?: boolean
+): string[] {
+    const names: string[] = [];
+    if (welllog) {
+        const skipUsed = !!track;
+        const plots = track ? (track as GraphTrack).plots : undefined;
+        const abbr = track ? track.options.abbr : undefined;
+
+        const curves = welllog.curves;
+        let iCurve = 0;
+        for (const curve of curves) {
+            if (
+                discrete &&
+                curve.valueType !== "string" &&
+                curve.valueType !== "integer"
+            )
+                continue;
+
+            let bUsed = false;
+            if (plots) {
+                // GraphTrack
+                for (const plot of plots)
+                    if (plot.id == iCurve) {
+                        bUsed = true;
+                        break;
+                    }
+            } else if (abbr === curve.name) {
+                // Scale tracks?
+                bUsed = true;
+            }
+            if (!bUsed || !skipUsed) names.push(curve.name);
+            iCurve++;
+        }
+    }
+    return names;
+}
+
+export function createDataItems(
+    welllog: WellLog | undefined,
+    track: Track | null,
+    discrete?: boolean
+): ReactNode[] {
+    const names = dataNames(welllog, track, discrete);
+    return names.map((name) => createDataItem(name));
 }
 
 interface Props {
@@ -174,46 +232,15 @@ export class PlotPropertiesDialog extends Component<Props, State> {
     }
 
     dataNames(skipUsed: boolean): string[] {
-        const names: string[] = [];
-        const welllog = this.props.wellLogView.props.welllog;
-        if (welllog && welllog[0]) {
-            const track = this.props.track;
-            const plots = (track as GraphTrack).plots;
-            const abbr = track.options.abbr;
-
-            const curves = welllog[0].curves;
-            let iCurve = 0;
-            for (const curve of curves) {
-                let bUsed = false;
-                if (plots) {
-                    // GraphTrack
-                    for (const plot of plots)
-                        if (plot.id == iCurve) {
-                            bUsed = true;
-                            break;
-                        }
-                } else if (abbr === curve.name) {
-                    // Scale tracks?
-                    bUsed = true;
-                }
-                if (!bUsed || !skipUsed) names.push(curve.name);
-                iCurve++;
-            }
-        }
-        return names;
-    }
-
-    createDataItem(item: string): ReactNode {
-        return (
-            <option key={item} value={item}>
-                {item}
-            </option>
+        return dataNames(
+            this.props.wellLogView.props.welllog,
+            skipUsed ? this.props.track : null
         );
     }
 
     createDataItems(skipUsed: boolean): ReactNode[] {
         const names = this.dataNames(skipUsed);
-        return names.map((name) => this.createDataItem(name));
+        return names.map((name) => createDataItem(name));
     }
 
     createSelectControl(

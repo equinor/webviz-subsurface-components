@@ -3,10 +3,13 @@ import {
     ScaleTrack,
     DualScaleTrack,
     GraphTrack,
+    StackedTrack,
 } from "@equinor/videx-wellog";
 
 import { TrackOptions } from "@equinor/videx-wellog/dist/tracks/interfaces";
 import { GraphTrackOptions } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
+import { StackedTrackOptions } from "@equinor/videx-wellog/dist/tracks/stack/interfaces";
+import { AreaData } from "@equinor/videx-wellog/dist/tracks/stack/interfaces";
 
 import { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 
@@ -21,13 +24,15 @@ import WellLogView from "../components/WellLogView";
 
 import { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 import { PlotFactory } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
+import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
+import { stackLegendConfig } from "./stack/stack-legend";
+import { getInterpolatedColor } from "./color-table";
 
 // missed! import { createScale } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 import { createScale } from "./graph/factory";
 
-import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
-
 import {
+    TemplatePlotTypes,
     TemplatePlotProps,
     TemplateTrack,
     TemplatePlot,
@@ -37,6 +42,8 @@ import {
     WellLog,
     WellLogCurve,
     WellLogDataRow,
+    WellLogMetadataDiscrete,
+    WellLogMetadataDiscreteObjects,
 } from "../components/WellLogTypes";
 
 import {
@@ -48,12 +55,16 @@ import {
 
 import { updateLegendRows } from "./log-viewer";
 
-function indexOfElementByName(array: Named[], name: string): number {
-    if (name) {
+export function deepCopy<T>(source: T): T {
+    return JSON.parse(JSON.stringify(source)) as T;
+}
+
+export function indexOfElementByName(array: Named[], name: string): number {
+    if (array && name) {
         const nameUpper = name.toUpperCase();
         let i = 0;
         for (const element of array) {
-            if (element.name.toUpperCase() == nameUpper) {
+            if (element.name && element.name.toUpperCase() == nameUpper) {
                 return i;
             }
             i++;
@@ -63,15 +74,26 @@ function indexOfElementByName(array: Named[], name: string): number {
 }
 
 function indexOfElementByNames(array: Named[], names: string[]): number {
-    if (names) {
+    if (array && names) {
         /* names should be already in upper case */
         let i = 0;
         for (const element of array) {
-            if (names.indexOf(element.name.toUpperCase()) >= 0) return i;
+            if (element.name && names.indexOf(element.name.toUpperCase()) >= 0)
+                return i;
             i++;
         }
     }
     return -1;
+}
+
+function elementByKeyName<T>(meta: Record<string, T>, name: string): T | null {
+    name = name.toUpperCase();
+    for (const key in meta) {
+        if (key.toUpperCase() === name)
+            // search case insensitive!
+            return meta[key];
+    }
+    return null;
 }
 
 const __colors = [
@@ -101,7 +123,7 @@ const defPlotType = "line";
 class PlotData {
     minmax: [number, number];
     minmaxPrimaryAxis: [number, number];
-    data: [number, number][];
+    data: [number, number | string][];
 
     constructor() {
         this.minmax = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
@@ -121,9 +143,10 @@ function preparePlotData(
     const plot = new PlotData();
     let i = 0;
     for (const row of data) {
-        const value: number = row[iCurve];
-        checkMinMaxValue(plot.minmax, value);
-        const primary: number = iPrimaryAxis >= 0 ? row[iPrimaryAxis] : i++;
+        const value = row[iCurve];
+        if (typeof value == "number") checkMinMaxValue(plot.minmax, value);
+        const primary: number =
+            iPrimaryAxis >= 0 ? (row[iPrimaryAxis] as number) : i++;
         checkMinMaxValue(plot.minmaxPrimaryAxis, primary);
         plot.data.push([primary, value]);
     }
@@ -152,7 +175,7 @@ function makeTrackHeader(
 
     const templatePlots = templateTrack.plots;
     if (templatePlots && templatePlots[0]) {
-        const curves = welllog[0].curves;
+        const curves = welllog.curves;
         // get the first curve name
         const templatePlot = templatePlots[0];
         const iCurve = indexOfElementByName(curves, templatePlot.name);
@@ -200,13 +223,10 @@ export function getAvailableAxes(
     axisMnemos: Record<string, string[]>
 ): string[] {
     const result: string[] = [];
-    if (welllog && welllog[0]) {
-        const curves = welllog[0].curves;
-
-        for (const key in axisMnemos) {
-            const i = indexOfElementByNames(curves, axisMnemos[key]);
-            if (i >= 0) result.push(key);
-        }
+    const curves = welllog.curves;
+    for (const key in axisMnemos) {
+        const i = indexOfElementByNames(curves, axisMnemos[key]);
+        if (i >= 0) result.push(key);
     }
 
     return result;
@@ -221,7 +241,7 @@ import {
     LineStepPlot,
 } from "@equinor/videx-wellog";
 import GradientFillPlot from "../utils/gradientfill-plot";
-export function getPlotType(plot: Plot): string {
+export function getPlotType(plot: Plot): TemplatePlotTypes {
     if (plot instanceof GradientFillPlot) return "gradientfill";
     if (plot instanceof LinePlot) return "line";
     if (plot instanceof AreaPlot) return "area";
@@ -240,19 +260,22 @@ function isValidPlotType(plotType: string): boolean {
             "area",
             "differential",
             "gradientfill",
+
+            "stacked",
         ].indexOf(plotType) >= 0
     );
 }
 
 function getTemplatePlotProps(
     templatePlot: TemplatePlot,
-    templateStyles: TemplateStyle[]
+    templateStyles?: TemplateStyle[]
 ): TemplatePlotProps {
-    const iStyle = templatePlot.style
-        ? indexOfElementByName(templateStyles, templatePlot.style)
-        : -1;
+    const iStyle =
+        templatePlot.style && templateStyles
+            ? indexOfElementByName(templateStyles, templatePlot.style)
+            : -1;
     const options =
-        iStyle >= 0
+        iStyle >= 0 && templateStyles
             ? { ...templateStyles[iStyle], ...templatePlot }
             : { ...templatePlot };
     if (!options.type) options.type = defPlotType;
@@ -266,7 +289,9 @@ function getTemplatePlotProps(
         );
         options.type = defPlotType;
     }
-    if (!options.color) options.color = generateColor();
+    if (options.type !== "stacked") {
+        if (!options.color) options.color = generateColor();
+    }
 
     if (options.type === "area") {
         if (!options.fill) {
@@ -335,7 +360,7 @@ const defColorTable: ColorTable = {
 
 function getColorTable(
     id: string | undefined,
-    colorTables: ColorTable[]
+    colorTables?: ColorTable[]
 ): ColorTable | undefined {
     if (id && typeof id !== "string") {
         console.log("colorTable id='" + id + "' is not string");
@@ -357,13 +382,13 @@ function getColorTable(
 
 function getPlotOptions(
     templatePlotProps: TemplatePlotProps,
-    colorTables: ColorTable[], //"gradientfill" plot
     trackScale: string | undefined, // track scale
     minmax: [number, number],
     curve: WellLogCurve,
     iPlot: number,
     curve2: WellLogCurve | undefined, //"differential" plot
-    iPlot2: number //"differential" plot
+    iPlot2: number, //"differential" plot
+    colorTables?: ColorTable[] //"gradientfill" plot
 ): ExtPlotOptions {
     const scale = templatePlotProps.scale || trackScale || "linear"; //"linear" or "log"
     const domain = (
@@ -438,35 +463,35 @@ function getPlotOptions(
 function getPlotConfig(
     id: string | number,
     templatePlotProps: TemplatePlotProps,
-    colorTables: ColorTable[],
     trackScale: string | undefined, // track scale
     minmax: [number, number],
     curve: WellLogCurve,
     iPlot: number,
     curve2: WellLogCurve | undefined,
-    iPlot2: number
+    iPlot2: number,
+    colorTables?: ColorTable[]
 ): PlotConfig {
     return {
         id: id,
         type: templatePlotProps.type,
         options: getPlotOptions(
             templatePlotProps,
-            colorTables,
             trackScale,
             minmax,
             curve,
             iPlot,
             curve2,
-            iPlot2
+            iPlot2,
+            colorTables
         ),
     };
 }
+
+import { Domain } from "@equinor/videx-wellog/dist/common/interfaces";
 /**
- * Update Track Scale according to the first plot
- * @param track
- * @param options - options for the first plot of the track
+ * Update Graph-Track Scale according to the first plot
  */
-function updateTrackScale(track: GraphTrack): void {
+function updateGraphTrackScale(track: GraphTrack): void {
     const track_options = track.options as TrackOptionsEx;
     const templateTrack = track_options.__template;
     if (templateTrack) {
@@ -485,7 +510,7 @@ function updateTrackScale(track: GraphTrack): void {
 
     if (track.plots.length) {
         const plot = track.plots[0];
-        track.options.domain = plot.options.domain;
+        track.options.domain = plot.options.domain as Domain;
     }
 
     if (!track.options.domain) {
@@ -505,8 +530,44 @@ function updateTrackScale(track: GraphTrack): void {
     }
 
     if (!track.options.scale) throw Error("Invalid track.options.scale!");
-    //if (!track.options.domain) throw Error("Invalid track.options.domain!");
     track.trackScale = createScale(track.options.scale, track.options.domain);
+}
+
+/**
+ * Update Stacked-Track Scale according to the first plot
+ */
+function updateStackedTrackScale(track: StackedTrack): void {
+    const track_options = track.options as TrackOptionsEx;
+    const templateTrack = track_options.__template;
+    if (templateTrack) {
+        if (templateTrack.plots.length) {
+            const plotTemplate = templateTrack.plots[0];
+            //track.options.scale = plotTemplate.scale;
+            //track.options.domain = plotTemplate.domain;
+
+            if (!track.options.label) track.options.label = plotTemplate.name;
+        }
+        //if (track_options.__template.scale) {
+        //track.options.scale = track_options.__template.scale;
+        //}
+        //if (!track.options.scale) track.options.scale = "linear";
+    }
+
+    //if (track.plots.length) {
+    //    const plot = track.plots[0];
+    //    track.options.domain = plot.options.domain;
+    //}
+
+    //if (!track.options.domain) {
+    //    // could be on reguired track with missed data
+    //    console.log("Empty track.options.domain!");
+    //    track.options.domain =
+    //        track.options.scale === "log" ? [1, 100] : [0, 100];
+    //}
+
+    //if (!track.options.scale) throw Error("Invalid track.options.scale!");
+    //track.trackScale = createScale(track.options.scale, track.options.domain);
+    track.xscale;
 }
 
 function addGraphTrackPlot(
@@ -522,92 +583,85 @@ function addGraphTrackPlot(
 
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
-    if (plotFactory) {
-        const welllog = wellLogView.props.welllog;
-        if (welllog && welllog[0]) {
-            const data = welllog[0].data;
-            const curves = welllog[0].curves;
+    const welllog = wellLogView.props.welllog;
+    if (plotFactory && welllog) {
+        const data = welllog.data;
+        const curves = welllog.curves;
 
-            const iPrimaryAxis = indexOfElementByNames(
-                curves,
-                axes.mnemos[axes.primaryAxis]
-            );
+        const iPrimaryAxis = !axes.mnemos
+            ? -1
+            : indexOfElementByNames(curves, axes.mnemos[axes.primaryAxis]);
 
-            const iCurve = indexOfElementByName(curves, templatePlot.name);
-            if (iCurve < 0) console.log("iCurve < 0");
-            const curve = curves[iCurve];
+        const iCurve = indexOfElementByName(curves, templatePlot.name);
+        if (iCurve < 0) console.log("iCurve < 0");
+        const curve = curves[iCurve];
 
-            if (curve.dimensions !== 1) console.log("curve.dimensions !== 1");
-            if (curve.valueType === "string")
-                console.log('curve.valueType === "string"');
+        if (curve.dimensions !== 1) console.log("curve.dimensions !== 1");
+        if (curve.valueType === "string")
+            console.log('curve.valueType === "string"');
 
-            const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
-            checkMinMax(minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
-            const minmax: [number, number] = [
-                plotData.minmax[0],
-                plotData.minmax[1],
-            ];
+        const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+        checkMinMax(minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
+        const minmax: [number, number] = [
+            plotData.minmax[0],
+            plotData.minmax[1],
+        ];
 
-            const plotDatas = track.options.data;
-            const plots = track.plots;
+        const plotDatas = track.options.data;
+        const plots = track.plots;
 
-            const colorTables = wellLogView.props.colorTables;
+        const colorTables = wellLogView.props.colorTables;
 
-            let iCurve2 = -1;
-            let curve2: WellLogCurve | undefined = undefined;
-            let plotData2: PlotData | undefined = undefined;
-            if (templatePlot.type === "differential") {
-                iCurve2 = templatePlot.name2
-                    ? indexOfElementByName(curves, templatePlot.name2)
-                    : -1;
-                curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
-                plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
-                if (!curve2)
-                    console.error(
-                        "templatePlot.name2 '" +
-                            templatePlot.name2 +
-                            "' not found"
-                    );
-                checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
-                checkMinMax(minmax, plotData2.minmax);
-            }
-
-            // Make full props
-            const templatePlotProps = getTemplatePlotProps(
-                templatePlot,
-                /*templateStyles*/ []
-            );
-            const p = getPlotConfig(
-                iCurve,
-                templatePlotProps,
-                colorTables,
-                templateTrack.scale,
-                minmax,
-                curve,
-                plotDatas.length,
-                curve2,
-                plotDatas.length + 1
-            );
-
-            plotDatas.push(plotData.data);
-            if (plotData2) {
-                plotDatas.push(plotData2.data);
-            }
-
-            // GraphTrack
-            const createPlot = plotFactory[p.type];
-            if (!createPlot)
-                throw Error(
-                    `No factory function for creating '${p.type}'-plot!`
+        let iCurve2 = -1;
+        let curve2: WellLogCurve | undefined = undefined;
+        let plotData2: PlotData | undefined = undefined;
+        if (templatePlot.type === "differential") {
+            iCurve2 = templatePlot.name2
+                ? indexOfElementByName(curves, templatePlot.name2)
+                : -1;
+            curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
+            plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+            if (!curve2)
+                console.error(
+                    "templatePlot.name2 '" + templatePlot.name2 + "' not found"
                 );
+            checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
+            checkMinMax(minmax, plotData2.minmax);
+        }
 
-            const plot = createPlot(p, track.trackScale);
-            if (plot) {
-                plots.push(plot);
-                templateTrack.plots.push(templatePlot);
-                updateTrackScale(track);
-                track.prepareData();
-            }
+        // Make full props
+        const templatePlotProps = getTemplatePlotProps(
+            templatePlot,
+            /*templateStyles*/ []
+        );
+        const p = getPlotConfig(
+            iCurve,
+            templatePlotProps,
+            templateTrack.scale,
+            minmax,
+            curve,
+            plotDatas.length,
+            curve2,
+            plotDatas.length + 1,
+            colorTables
+        );
+
+        plotDatas.push(plotData.data);
+        if (plotData2) {
+            plotDatas.push(plotData2.data);
+        }
+
+        // GraphTrack
+        const createPlot = plotFactory[p.type];
+        if (!createPlot)
+            throw Error(`No factory function for creating '${p.type}'-plot!`);
+
+        const plot = createPlot(p, track.trackScale);
+        if (plot) {
+            plots.push(plot);
+            templateTrack.plots.push(templatePlot);
+            updateGraphTrackScale(track);
+            track.prepareData();
         }
     }
     return minmaxPrimaryAxis;
@@ -627,96 +681,89 @@ function editGraphTrackPlot(
 
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
-    if (plotFactory) {
-        const welllog = wellLogView.props.welllog;
-        if (welllog && welllog[0]) {
-            const data = welllog[0].data;
-            const curves = welllog[0].curves;
+    const welllog = wellLogView.props.welllog;
+    if (plotFactory && welllog) {
+        const data = welllog.data;
+        const curves = welllog.curves;
 
-            const iPrimaryAxis = indexOfElementByNames(
-                curves,
-                axes.mnemos[axes.primaryAxis]
-            );
+        const iPrimaryAxis = !axes.mnemos
+            ? -1
+            : indexOfElementByNames(curves, axes.mnemos[axes.primaryAxis]);
 
-            const iCurve = indexOfElementByName(curves, templatePlot.name);
-            if (iCurve < 0) console.log("iCurve < 0");
-            const curve = curves[iCurve];
+        const iCurve = indexOfElementByName(curves, templatePlot.name);
+        if (iCurve < 0) console.log("iCurve < 0");
+        const curve = curves[iCurve];
 
-            if (curve.dimensions !== 1) console.log("curve.dimensions !== 1");
-            if (curve.valueType === "string")
-                console.log('curve.valueType === "string"');
+        if (curve.dimensions !== 1) console.log("curve.dimensions !== 1");
+        if (curve.valueType === "string")
+            console.log('curve.valueType === "string"');
 
-            const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
-            checkMinMax(minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
-            const minmax: [number, number] = [
-                plotData.minmax[0],
-                plotData.minmax[1],
-            ];
+        const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+        checkMinMax(minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
+        const minmax: [number, number] = [
+            plotData.minmax[0],
+            plotData.minmax[1],
+        ];
 
-            const plotDatas = track.options.data;
-            const plots = track.plots;
+        const plotDatas = track.options.data;
+        const plots = track.plots;
 
-            const colorTables = wellLogView.props.colorTables;
+        const colorTables = wellLogView.props.colorTables;
 
-            let iCurve2 = -1;
-            let curve2: WellLogCurve | undefined = undefined;
-            let plotData2: PlotData | undefined = undefined;
-            if (templatePlot.type === "differential") {
-                iCurve2 = templatePlot.name2
-                    ? indexOfElementByName(curves, templatePlot.name2)
-                    : -1;
-                curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
-                if (!curve2)
-                    console.error(
-                        "templatePlot.name2 '" +
-                            templatePlot.name2 +
-                            "' not found"
-                    );
-                plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
-                checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
-                checkMinMax(minmax, plotData2.minmax);
-            }
-
-            // Make full props
-            const templatePlotProps = getTemplatePlotProps(
-                templatePlot,
-                /*templateStyles*/ []
-            );
-            const p = getPlotConfig(
-                iCurve,
-                templatePlotProps,
-                colorTables,
-                templateTrack.scale,
-                minmax,
-                curve,
-                plotDatas.length,
-                curve2,
-                plotDatas.length + 1
-            );
-
-            plotDatas.push(plotData.data);
-            if (plotData2) {
-                plotDatas.push(plotData2.data);
-            }
-
-            // GraphTrack
-            const createPlot = plotFactory[p.type];
-            if (!createPlot)
-                throw Error(
-                    `No factory function for creating '${p.type}'-plot!`
+        let iCurve2 = -1;
+        let curve2: WellLogCurve | undefined = undefined;
+        let plotData2: PlotData | undefined = undefined;
+        if (templatePlot.type === "differential") {
+            iCurve2 = templatePlot.name2
+                ? indexOfElementByName(curves, templatePlot.name2)
+                : -1;
+            curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
+            if (!curve2)
+                console.error(
+                    "templatePlot.name2 '" + templatePlot.name2 + "' not found"
                 );
+            plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+            checkMinMax(minmaxPrimaryAxis, plotData2.minmaxPrimaryAxis);
+            checkMinMax(minmax, plotData2.minmax);
+        }
 
-            const iPlot = plots.indexOf(plot);
-            if (iPlot < 0) {
-                console.error("Error!", "Edited plot not found!");
-            } else {
-                const plotNew = createPlot(p, track.trackScale);
-                if (plotNew) {
-                    plots[iPlot] = plotNew; // replace plot
-                    templateTrack.plots[iPlot] = templatePlot;
-                    updateTrackScale(track);
-                    track.prepareData();
-                }
+        // Make full props
+        const templatePlotProps = getTemplatePlotProps(
+            templatePlot,
+            /*templateStyles*/ []
+        );
+        const p = getPlotConfig(
+            iCurve,
+            templatePlotProps,
+            templateTrack.scale,
+            minmax,
+            curve,
+            plotDatas.length,
+            curve2,
+            plotDatas.length + 1,
+            colorTables
+        );
+
+        plotDatas.push(plotData.data);
+        if (plotData2) {
+            plotDatas.push(plotData2.data);
+        }
+
+        // GraphTrack
+        const createPlot = plotFactory[p.type];
+        if (!createPlot)
+            throw Error(`No factory function for creating '${p.type}'-plot!`);
+
+        const iPlot = plots.indexOf(plot);
+        if (iPlot < 0) {
+            console.error("Error!", "Edited plot not found!");
+        } else {
+            const plotNew = createPlot(p, track.trackScale);
+            if (plotNew) {
+                plots[iPlot] = plotNew; // replace plot
+                templateTrack.plots[iPlot] = templatePlot;
+                updateGraphTrackScale(track);
+                track.prepareData();
             }
         }
     }
@@ -773,7 +820,7 @@ export function removeGraphTrackPlot(
     plot: Plot
 ): void {
     _removeGraphTrackPlot(track, plot);
-    updateTrackScale(track);
+    updateGraphTrackScale(track);
 
     if (wellLogView.logController) {
         updateLegendRows(wellLogView.logController);
@@ -786,8 +833,8 @@ export function removeGraphTrackPlot(
 function newDualScaleTrack(
     mode: number,
     title: string,
-    abbr: string,
-    units: string
+    abbr?: string | null,
+    units?: string | null
 ): DualScaleTrack {
     return new DualScaleTrack(undefined as unknown as number, {
         mode: mode,
@@ -800,7 +847,11 @@ function newDualScaleTrack(
     });
 }
 
-function newScaleTrack(title: string, abbr: string, units: string): ScaleTrack {
+function newScaleTrack(
+    title: string,
+    abbr?: string | null,
+    units?: string | null
+): ScaleTrack {
     return new ScaleTrack(undefined as unknown as number, {
         maxWidth: 50,
         width: 2,
@@ -809,6 +860,164 @@ function newScaleTrack(title: string, abbr: string, units: string): ScaleTrack {
         units: units ? units : "",
         legendConfig: scaleLegendConfig,
     });
+}
+
+//////////////////
+interface DiscreteMeta {
+    iCode: number;
+    iColor: number;
+    objects: WellLogMetadataDiscreteObjects;
+}
+
+function createAreaData(
+    from: number,
+    to: number,
+    value: number | string,
+    colorTable: ColorTable | undefined,
+    meta?: DiscreteMeta | null
+): AreaData | null {
+    if (meta) {
+        // use discrete metadate from WellLog JSON file
+        const { objects, iColor, iCode } = meta;
+        for (const t in objects) {
+            const object = objects[t];
+            if (value === object[iCode]) {
+                let rgba: {
+                    r: number;
+                    g: number;
+                    b: number;
+                    a?: number;
+                };
+                if (colorTable) {
+                    // get color from the table
+                    const color = getInterpolatedColor(
+                        colorTable,
+                        parseInt(value.toString())
+                    );
+                    rgba = {
+                        r: color[0],
+                        g: color[1],
+                        b: color[2],
+                        a: 1.0,
+                    };
+                } else {
+                    // get color from the meta
+                    const color = object[iColor];
+                    rgba = {
+                        r: color[0],
+                        g: color[1],
+                        b: color[2],
+                        a: color[3] /*1.0*/,
+                    };
+                }
+                return {
+                    from: from,
+                    to: to,
+                    name: t,
+                    color: rgba,
+
+                    code: value, // add some attribute to AreaData
+                } as AreaData;
+            }
+        }
+    } else {
+        return {
+            from: from,
+            to: to,
+            name: value.toString(),
+            color: {
+                r: 224,
+                g: 224,
+                b: 224,
+                a: 1 /*1*/,
+            },
+        };
+    }
+    return null;
+}
+
+const createStackData = async (
+    data: [number, number | string][],
+    colorTable: ColorTable | undefined,
+    meta: DiscreteMeta | undefined | null
+) => {
+    const arr = [];
+    let prev = null;
+    let area: AreaData | null = null;
+    for (const p of data) {
+        const value = p[1]; // current value
+        if (!prev) {
+            if (value !== null && value !== undefined) {
+                // new value is not null
+                // create new interval colored and labeled for the value
+                area = createAreaData(p[0], p[0], value, colorTable, meta);
+            }
+        } else {
+            if (value === prev[1]) {
+                // value is not changed
+                // extend current interval
+                if (area) area.to = p[0];
+            } else {
+                // new value encountered
+                if (area) {
+                    // store old interval
+                    arr.push(area);
+                    area = null; //  wait for a new non-null value
+                }
+                if (value !== null && value !== undefined) {
+                    // new value is not null
+                    // create new interval colored and labeled for the value
+                    area = createAreaData(
+                        prev[0],
+                        p[0],
+                        value,
+                        colorTable,
+                        meta
+                    );
+                }
+            }
+        }
+        prev = p;
+    }
+    if (area)
+        // store the last interval
+        arr.push(area);
+    return arr;
+};
+
+function newStackedTrack(options: StackedTrackOptions): StackedTrack {
+    return new StackedTrack(undefined as unknown as number, options);
+}
+
+export function getDiscreteMeta(
+    welllog: WellLog,
+    name: string
+): DiscreteMeta | null {
+    const meta = welllog.metadata_discrete;
+    if (meta) {
+        // File has metadata for discrete log
+        //const table=meta[name.toUpperCase()]; // search case insensitive!
+        const table: WellLogMetadataDiscrete | null = elementByKeyName(
+            meta,
+            name
+        );
+        if (table) {
+            // there is a metadata for given log name
+            const attributes = table.attributes; // ["color", "code"]
+            if (attributes) {
+                const iCode = attributes.indexOf("code");
+                const iColor = attributes.indexOf("color");
+                if (iColor >= 0 && iCode >= 0)
+                    // all values are OK
+                    return {
+                        iCode: iCode,
+                        iColor: iColor,
+                        objects: table.objects, // [attr1,attr2]                ,
+                    };
+            }
+        }
+    }
+    return null; // something went wrong
 }
 
 import { createPlotType } from "@equinor/videx-wellog";
@@ -858,8 +1067,8 @@ export function newGraphTrack(
 }
 
 export function isScaleTrack(track: Track): boolean {
-    if ((track as ScaleTrack).xscale) return true;
-    //if ((track as DualScaleTrack).xscale) return true;
+    if (track instanceof ScaleTrack) return true;
+    if (track instanceof DualScaleTrack) return true;
     return false;
 }
 export function getScaleTrackNum(tracks: Track[]): number {
@@ -877,158 +1086,293 @@ export interface AxesInfo {
     mnemos: Record<string, string[]>;
 }
 
-export function createTracks(
-    welllog: WellLog,
+function addScaleTracks(
+    info: TracksInfo,
     axes: AxesInfo,
-    templateTracks: TemplateTrack[], // Part of JSON
-    templateStyles: TemplateStyle[], // Part of JSON
-    colorTables: ColorTable[] // JSON
-): TracksInfo {
-    const info = new TracksInfo();
+    curves: WellLogCurve[],
+    data: WellLogDataRow[],
+    iPrimaryAxis: number
+): void {
+    const titlePrimaryAxis = axes.titles[axes.primaryAxis];
+    const curvePrimaryAxis = curves[iPrimaryAxis];
+    const iSecondaryAxis = !axes.mnemos
+        ? -1
+        : indexOfElementByNames(curves, axes.mnemos[axes.secondaryAxis]);
 
-    if (welllog && welllog[0]) {
-        const data = welllog[0].data;
-        const curves = welllog[0].curves;
-
-        const iPrimaryAxis = indexOfElementByNames(
-            curves,
-            axes.mnemos[axes.primaryAxis]
+    if (iSecondaryAxis >= 0) {
+        info.tracks.push(
+            newDualScaleTrack(
+                0,
+                titlePrimaryAxis,
+                curvePrimaryAxis.name,
+                curvePrimaryAxis.unit
+            )
         );
-        if (iPrimaryAxis >= 0) {
-            const titlePrimaryAxis = axes.titles[axes.primaryAxis];
-            const curvePrimaryAxis = curves[iPrimaryAxis];
-            const iSecondaryAxis = indexOfElementByNames(
-                curves,
-                axes.mnemos[axes.secondaryAxis]
-            );
 
-            if (iSecondaryAxis >= 0) {
-                info.tracks.push(
-                    newDualScaleTrack(
-                        0,
-                        titlePrimaryAxis,
-                        curvePrimaryAxis.name,
-                        curvePrimaryAxis.unit
-                    )
-                );
+        const titleSecondaryAxis = axes.titles[axes.secondaryAxis];
+        const curveSecondaryAxis = curves[iSecondaryAxis];
+        info.tracks.push(
+            newDualScaleTrack(
+                1,
+                titleSecondaryAxis,
+                curveSecondaryAxis.name,
+                curveSecondaryAxis.unit
+            )
+        );
 
-                const titleSecondaryAxis = axes.titles[axes.secondaryAxis];
-                const curveSecondaryAxis = curves[iSecondaryAxis];
-                info.tracks.push(
-                    newDualScaleTrack(
-                        1,
-                        titleSecondaryAxis,
-                        curveSecondaryAxis.name,
-                        curveSecondaryAxis.unit
-                    )
-                );
+        info.primaries = new Float32Array(data.length); // 32 bits should be enough
+        info.secondaries = new Float32Array(data.length);
+        {
+            let count = 0;
+            for (const row of data) {
+                const secondary: number = row[iSecondaryAxis] as number;
+                checkMinMaxValue(info.minmaxSecondaryAxis, secondary);
 
-                info.primaries = new Float32Array(data.length); // 32 bits should be enough
-                info.secondaries = new Float32Array(data.length);
-                {
-                    let count = 0;
-                    for (const row of data) {
-                        const secondary: number = row[iSecondaryAxis];
-                        checkMinMaxValue(info.minmaxSecondaryAxis, secondary);
-
-                        if (secondary !== null) {
-                            const primary: number = row[iPrimaryAxis];
-                            if (primary !== null) {
-                                info.secondaries[count] = secondary;
-                                info.primaries[count] = primary;
-                                count++;
-                            }
-                        }
-                    }
-                    if (count < info.primaries.length) {
-                        // resize arrays to actual size used
-                        info.primaries = info.primaries.subarray(0, count);
-                        info.secondaries = info.secondaries.subarray(0, count);
+                if (secondary !== null) {
+                    const primary: number = row[iPrimaryAxis] as number;
+                    if (primary !== null) {
+                        info.secondaries[count] = secondary;
+                        info.primaries[count] = primary;
+                        count++;
                     }
                 }
-            } else {
-                info.tracks.push(
-                    newScaleTrack(
-                        titlePrimaryAxis,
-                        curvePrimaryAxis.name,
-                        curvePrimaryAxis.unit
-                    )
-                );
+            }
+            if (count < info.primaries.length) {
+                // resize arrays to actual size used
+                info.primaries = info.primaries.subarray(0, count);
+                info.secondaries = info.secondaries.subarray(0, count);
             }
         }
+    } else {
+        info.tracks.push(
+            newScaleTrack(
+                titlePrimaryAxis,
+                curvePrimaryAxis.name,
+                curvePrimaryAxis.unit
+            )
+        );
+    }
+}
 
-        for (const templateTrack of templateTracks) {
-            const plotDatas: [number, number][][] = [];
-            const plots: PlotConfig[] = [];
-            for (const templatePlot of templateTrack.plots) {
-                const iCurve = indexOfElementByName(curves, templatePlot.name);
-                if (iCurve < 0) continue;
-                const curve = curves[iCurve];
+function addGraphTrack(
+    info: TracksInfo,
+    welllog: WellLog,
+    curves: WellLogCurve[],
+    data: WellLogDataRow[],
+    iPrimaryAxis: number,
+    templateTrack: TemplateTrack,
+    templateStyles?: TemplateStyle[],
+    colorTables?: ColorTable[]
+): void {
+    const plotDatas: [number, number | string][][] = [];
+    const plots: PlotConfig[] = [];
+    if (templateTrack.plots)
+        for (const templatePlot of templateTrack.plots) {
+            // see also addGraphTrackPlot(wellLogView, track, templatePlot);
 
-                if (curve.dimensions !== 1) continue;
-                if (curve.valueType === "string") continue;
+            const iCurve = indexOfElementByName(curves, templatePlot.name);
+            if (iCurve < 0) continue; // curve not found
+            const curve = curves[iCurve];
 
-                const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
-                checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
-                const minmax: [number, number] = [
-                    plotData.minmax[0],
-                    plotData.minmax[1],
-                ];
+            if (curve.dimensions !== 1) continue;
+            if (curve.valueType === "string") continue;
 
-                let iCurve2 = -1;
-                let curve2: WellLogCurve | undefined = undefined;
-                let plotData2: PlotData | undefined = undefined;
-                if (templatePlot.type === "differential") {
-                    iCurve2 = templatePlot.name2
-                        ? indexOfElementByName(curves, templatePlot.name2)
-                        : -1;
-                    curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
-                    plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
-                    checkMinMax(
-                        info.minmaxPrimaryAxis,
-                        plotData2.minmaxPrimaryAxis
-                    );
-                    checkMinMax(minmax, plotData2.minmax);
-                }
+            const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+            checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
+            const minmax: [number, number] = [
+                plotData.minmax[0],
+                plotData.minmax[1],
+            ];
 
-                // make full props
-                const templatePlotProps = getTemplatePlotProps(
-                    templatePlot,
-                    templateStyles
+            let iCurve2 = -1;
+            let curve2: WellLogCurve | undefined = undefined;
+            let plotData2: PlotData | undefined = undefined;
+            if (templatePlot.type === "differential") {
+                iCurve2 = templatePlot.name2
+                    ? indexOfElementByName(curves, templatePlot.name2)
+                    : -1;
+                curve2 = iCurve2 >= 0 ? curves[iCurve2] : undefined;
+                plotData2 = preparePlotData(data, iCurve2, iPrimaryAxis);
+                checkMinMax(
+                    info.minmaxPrimaryAxis,
+                    plotData2.minmaxPrimaryAxis
                 );
-                const p = getPlotConfig(
-                    iCurve,
-                    templatePlotProps,
-                    colorTables,
-                    templateTrack.scale,
-                    minmax,
-                    curve,
-                    plotDatas.length,
-                    curve2,
-                    plotDatas.length + 1
-                );
-
-                plotDatas.push(plotData.data);
-                if (plotData2) {
-                    plotDatas.push(plotData2.data);
-                }
-
-                plots.push(p);
+                checkMinMax(minmax, plotData2.minmax);
             }
-            if (plots.length || templateTrack.required) {
-                const options: GraphTrackOptions = {
-                    data: plotDatas,
-                    plots: plots,
-                };
-                setTrackOptionFromTemplate(options, templateTrack);
-                options.label = makeTrackHeader(welllog, templateTrack);
 
-                const track = newGraphTrack(options);
-                updateTrackScale(track);
-                info.tracks.push(track);
+            // make full props
+            const templatePlotProps = getTemplatePlotProps(
+                templatePlot,
+                templateStyles
+            );
+            const p = getPlotConfig(
+                iCurve,
+                templatePlotProps,
+                templateTrack.scale,
+                minmax,
+                curve,
+                plotDatas.length,
+                curve2,
+                plotDatas.length + 1,
+                colorTables
+            );
+
+            plotDatas.push(plotData.data);
+            if (plotData2) {
+                plotDatas.push(plotData2.data);
+            }
+
+            plots.push(p);
+        }
+    if (plots.length || templateTrack.required) {
+        const label = makeTrackHeader(welllog, templateTrack);
+        const options: GraphTrackOptions = {
+            data: plotDatas,
+            plots: plots,
+        };
+        setGraphTrackOptionFromTemplate(options, templateTrack);
+        options.label = label;
+
+        const track = newGraphTrack(options);
+        updateGraphTrackScale(track);
+        info.tracks.push(track);
+    }
+}
+function addStackedTrack(
+    info: TracksInfo,
+    welllog: WellLog,
+    curves: WellLogCurve[],
+    data: WellLogDataRow[],
+    iPrimaryAxis: number,
+    templateTrack: TemplateTrack,
+    templateStyles?: TemplateStyle[],
+    colorTables?: ColorTable[]
+): void {
+    const templatePlot = templateTrack.plots[0];
+    const name = templatePlot.name;
+
+    const iCurve = indexOfElementByName(curves, name);
+    if (iCurve < 0) return; // curve not found
+    const curve = curves[iCurve];
+
+    if (curve.dimensions !== 1) return;
+
+    const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+    checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
+
+    // make full props
+    const templatePlotProps = getTemplatePlotProps(
+        templatePlot,
+        templateStyles
+    );
+    const templateTrackFullPlot: TemplateTrack = deepCopy(templateTrack);
+    const label = makeTrackHeader(welllog, templateTrack);
+
+    templateTrackFullPlot.title = label;
+    templateTrackFullPlot.plots[0].type = templatePlotProps.type;
+
+    // curve.valueType === "integer", "string"
+    const logColor = templatePlotProps.colorTable;
+    let colorTable = undefined;
+    if (logColor) {
+        if (colorTables) {
+            colorTable = colorTables.find(
+                (colorTable) => colorTable.name == logColor
+            );
+            if (!colorTable)
+                console.error("Missed '" + logColor + "' color table");
+        } else {
+            console.error(
+                "No color tables file given for '" + logColor + "' color table"
+            );
+        }
+    } else {
+        console.error("No color table given in template plot props");
+    }
+    const meta = getDiscreteMeta(welllog, name);
+    if (!meta && curve.valueType == "integer")
+        console.log(
+            "Discrete meta information for '" +
+                name +
+                "' not found. Use default"
+        );
+
+    const showLines = true;
+    const options: StackedTrackOptions = {
+        abbr: name, // name of the only plot
+        legendConfig: stackLegendConfig,
+        data: createStackData.bind(null, plotData.data, colorTable, meta),
+        showLabels: true,
+        showLines: showLines,
+    };
+    setStackedTrackOptionFromTemplate(options, templateTrackFullPlot);
+    const track = newStackedTrack(options);
+    updateStackedTrackScale(track);
+    info.tracks.push(track);
+}
+
+function isStackedTemplateTrack(
+    templateTrack: TemplateTrack,
+    templateStyles?: TemplateStyle[]
+) {
+    if (!templateTrack.plots) return false;
+    const templatePlot = templateTrack.plots[0];
+    if (!templatePlot) return false;
+    const templatePlotProps = getTemplatePlotProps(
+        templatePlot,
+        templateStyles
+    );
+    return templatePlotProps.type === "stacked";
+}
+
+export function createTracks(
+    welllog: WellLog | undefined,
+    axes: AxesInfo,
+    templateTracks: TemplateTrack[], // Part of JSON
+    templateStyles?: TemplateStyle[], // Part of JSON
+    colorTables?: ColorTable[] // JSON
+): TracksInfo {
+    const info = new TracksInfo();
+    if (welllog) {
+        const data = welllog.data;
+        const curves = welllog.curves;
+
+        const iPrimaryAxis = !axes.mnemos
+            ? -1
+            : indexOfElementByNames(curves, axes.mnemos[axes.primaryAxis]);
+        if (iPrimaryAxis >= 0)
+            // scale tracks are needed
+            addScaleTracks(info, axes, curves, data, iPrimaryAxis);
+
+        if (templateTracks) {
+            for (const templateTrack of templateTracks) {
+                if (isStackedTemplateTrack(templateTrack, templateStyles)) {
+                    addStackedTrack(
+                        info,
+                        welllog,
+                        curves,
+                        data,
+                        iPrimaryAxis,
+                        templateTrack,
+                        templateStyles,
+                        colorTables
+                    );
+                } else {
+                    addGraphTrack(
+                        info,
+                        welllog,
+                        curves,
+                        data,
+                        iPrimaryAxis,
+                        templateTrack,
+                        templateStyles,
+                        colorTables
+                    );
+                }
             }
         }
     }
+
     return info;
 }
 
@@ -1058,7 +1402,7 @@ function addTrack(
     }
 }
 
-function setTrackOptionFromTemplate(
+function setGraphTrackOptionFromTemplate(
     options: GraphTrackOptions,
     templateTrack: TemplateTrack
 ): void {
@@ -1073,6 +1417,14 @@ function setTrackOptionFromTemplate(
         JSON.stringify(templateTrack)
     );
 }
+function setStackedTrackOptionFromTemplate(
+    options: StackedTrackOptions,
+    templateTrack: TemplateTrack
+): void {
+    options.label = templateTrack.title;
+
+    (options as TrackOptionsEx).__template = deepCopy(templateTrack);
+}
 
 export function addOrEditGraphTrack(
     wellLogView: WellLogView,
@@ -1083,20 +1435,70 @@ export function addOrEditGraphTrack(
 ): GraphTrack {
     if (track) {
         // edit existing track
-        setTrackOptionFromTemplate(track.options, templateTrack);
-        updateTrackScale(track);
+        setGraphTrackOptionFromTemplate(track.options, templateTrack);
+        updateGraphTrackScale(track);
     } else {
         const options: GraphTrackOptions = {
             plots: [],
             data: [],
         };
-        setTrackOptionFromTemplate(options, templateTrack);
+        setGraphTrackOptionFromTemplate(options, templateTrack);
         track = newGraphTrack(options);
         addTrack(wellLogView, track, trackCurrent, bAfter);
     }
-    if (wellLogView.logController) {
-        wellLogView.logController.updateTracks();
+    if (wellLogView.logController) wellLogView.logController.updateTracks();
+    return track;
+}
+
+export function addOrEditStackedTrack(
+    wellLogView: WellLogView,
+    track: StackedTrack | null,
+    templateTrack: TemplateTrack,
+    trackCurrent: Track,
+    bAfter: boolean
+): StackedTrack | null {
+    const welllog = wellLogView.props.welllog;
+    const templatePlot = templateTrack.plots[0];
+    if (!welllog || !templatePlot) return null;
+    const name = templatePlot.name;
+    const colorTable = wellLogView.props.colorTables[0];
+    const meta = getDiscreteMeta(welllog, name);
+    const data = welllog.data;
+    const curves = welllog.curves;
+    const iCurve = indexOfElementByName(curves, templatePlot.name);
+    const axes = wellLogView.getAxesInfo();
+    const iPrimaryAxis = indexOfElementByNames(
+        curves,
+        axes.mnemos[axes.primaryAxis]
+    );
+    const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+    if (track) {
+        // edit existing track
+        track.options.abbr = name; // name of the only plot
+        track.options.data = createStackData.bind(
+            null,
+            plotData.data,
+            colorTable,
+            meta
+        );
+        track.data = track.options.data;
+        setStackedTrackOptionFromTemplate(track.options, templateTrack);
+        updateStackedTrackScale(track);
+        if (wellLogView.logController) wellLogView.logController.refresh();
+    } else {
+        const showLines = true;
+        const options: StackedTrackOptions = {
+            abbr: name, // name of the only plot
+            data: createStackData.bind(null, plotData.data, colorTable, meta),
+            legendConfig: stackLegendConfig,
+            showLabels: true,
+            showLines: showLines,
+        };
+        setStackedTrackOptionFromTemplate(options, templateTrack);
+        track = newStackedTrack(options);
+        addTrack(wellLogView, track, trackCurrent, bAfter);
     }
+    if (wellLogView.logController) wellLogView.logController.updateTracks();
     return track;
 }
 

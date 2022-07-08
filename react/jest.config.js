@@ -4,7 +4,7 @@
  */
 module.exports = {
     moduleNameMapper: {
-        "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
+        "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga|scss)$":
             "<rootDir>/__mocks__/fileMock.js",
         "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js",
     },
@@ -14,5 +14,9 @@ module.exports = {
             { configFile: "./config/babel.config.json" },
         ],
     },
-    transformIgnorePatterns: ["<rootDir>/node_modules/(?!(@webviz)/)"],
+    transformIgnorePatterns: [
+        "<rootDir>/node_modules/(?!(@webviz|(@emerson-eps/color-tables)|d3-color|d3-interpolate|d3-delaunay|d3-delaunator|delaunator|robust-predicates)/)",
+    ],
+    testPathIgnorePatterns: ["<rootDir>/node_modules", "<rootDir>/dist"],
+    modulePathIgnorePatterns: ["<rootDir>/dist"],
 };

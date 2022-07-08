@@ -1,9 +1,29 @@
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 
+const ComponentCode =
+    '<WellLogViewer id="WellLogViewer" \r\n' +
+    "    horizontal=false \r\n" +
+    '    welllog={require("../../../demo/example-data/L898MUD.json")[0]} \r\n' +
+    '    template={require("../../../demo/example-data/welllog_template_1.json")} \r\n' +
+    '    colorTables={require("../../../demo/example-data/color-tables.json")} \r\n' +
+    "/>";
+
 export default {
     component: WellLogViewer,
-    title: "WellLogViewer/Demo",
+    title: "WellLogViewer/Demo/WellLogViewer",
+    parameters: {
+        docs: {
+            description: {
+                component:
+                    "A demo component to deal with WellLogView component.",
+            },
+        },
+        componentSource: {
+            code: ComponentCode,
+            language: "javascript",
+        },
+    },
     argTypes: {
         id: {
             description:
@@ -20,6 +40,14 @@ export default {
         },
         horizontal: {
             description: "Orientation of the track plots on the screen.",
+            defaultValue: false,
+        },
+        hideTitles: {
+            description: "Hide titles on the tracks.",
+            defaultValue: false,
+        },
+        hideLegend: {
+            description: "Hide legends on the tracks.",
             defaultValue: false,
         },
         readoutOptions: {
@@ -41,9 +69,39 @@ export default {
     },
 };
 
+function fillInfo(controller) {
+    if (!controller) return "-";
+    const baseDomain = controller.getContentBaseDomain();
+    const domain = controller.getContentDomain();
+    const selection = controller.getContentSelection();
+    return (
+        "total: [" +
+        baseDomain[0].toFixed(0) +
+        ", " +
+        baseDomain[1].toFixed(0) +
+        "], " +
+        "visible: [" +
+        domain[0].toFixed(0) +
+        ", " +
+        domain[1].toFixed(0) +
+        "]" +
+        (selection[0] !== undefined
+            ? ", selected: [" +
+              selection[0].toFixed(0) +
+              (selection[1] !== undefined
+                  ? ", " + selection[1].toFixed(0)
+                  : "") +
+              "]"
+            : "")
+    );
+}
+
 const Template = (args) => {
+    const infoRef = React.useRef();
+    const setInfo = function (info) {
+        if (infoRef.current) infoRef.current.innerHTML = info;
+    };
     const [controller, setController] = React.useState(null);
-    const [info, setInfo] = React.useState("");
     const onCreateController = React.useCallback(
         (controller) => {
             setController(controller);
@@ -51,33 +109,10 @@ const Template = (args) => {
         [controller]
     );
     const onContentRescale = React.useCallback(() => {
-        if (!controller) {
-            setInfo("-");
-            return;
-        }
-        const baseDomain = controller.getContentBaseDomain();
-        const domain = controller.getContentDomain();
-        const selection = controller.getContentSelection();
-        setInfo(
-            "total: [" +
-                baseDomain[0].toFixed(0) +
-                ", " +
-                baseDomain[1].toFixed(0) +
-                "], " +
-                "visible: [" +
-                domain[0].toFixed(0) +
-                ", " +
-                domain[1].toFixed(0) +
-                "]" +
-                (selection[0] !== undefined
-                    ? ", selected: [" +
-                      selection[0].toFixed(0) +
-                      (selection[1] !== undefined
-                          ? ", " + selection[1].toFixed(0)
-                          : "") +
-                      "]"
-                    : "")
-        );
+        setInfo(fillInfo(controller));
+    }, [controller]);
+    const onContentSelection = React.useCallback(() => {
+        setInfo(fillInfo(controller));
     }, [controller]);
 
     return (
@@ -90,36 +125,54 @@ const Template = (args) => {
                     {...args}
                     onCreateController={onCreateController}
                     onContentRescale={onContentRescale}
+                    onContentSelection={onContentSelection}
                 />
             </div>
-            <div style={{ width: "100%", flex: 0 }}>{info}</div>
+            <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
         </div>
     );
 };
 
-export const Example1Vertical = Template.bind({});
-Example1Vertical.args = {
+export const Default = Template.bind({});
+Default.args = {
     id: "Well-Log-Viewer",
     horizontal: false,
-    welllog: require("../../../demo/example-data/L898MUD.json"),
+    hideTitles: false,
+    hideLegend: false,
+    welllog: require("../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../demo/example-data/welllog_template_1.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
 
-export const Example1Template2 = Template.bind({});
-Example1Template2.args = {
-    id: "Well-Log-Viewer2",
+export const Horizontal = Template.bind({});
+Horizontal.args = {
+    id: "Well-Log-Viewer-Horizontal",
     horizontal: true,
-    welllog: require("../../../demo/example-data/L898MUD.json"),
+    welllog:
+        require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
 };
+Horizontal.parameters = {
+    docs: {
+        description: {
+            story: "An example showing horizontal orientation of the tracks.",
+        },
+    },
+};
 
-export const Example2Vertical = Template.bind({});
-Example2Vertical.args = {
-    id: "Well-Log-Viewer3",
+export const Discrete = Template.bind({});
+Discrete.args = {
+    id: "Well-Log-Viewer-Discrete",
     horizontal: false,
-    welllog: require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json"),
-    template: require("../../../demo/example-data/welllog_template_1.json"),
+    welllog: require("../../../demo/example-data/volve_logs.json")[0],
+    template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
+};
+Discrete.parameters = {
+    docs: {
+        description: {
+            story: "An example showing the tracks with discrete logs.",
+        },
+    },
 };

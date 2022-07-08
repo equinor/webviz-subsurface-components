@@ -26,8 +26,8 @@
                     "style": "HKL",
                     "type": "area",
                     "color": "blue",
-                    "fill": "red",
-                    "inverseColor": "green"
+                    "fill": "rgb(12,24,233)",
+                    "inverseColor": "#00ff00"
                 }
             ]
         },

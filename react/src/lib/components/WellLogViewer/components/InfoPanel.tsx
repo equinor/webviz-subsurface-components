@@ -25,9 +25,10 @@ const styleGroupRow = {
     cursor: "pointer",
 };
 
-function formatValue(v1: number) {
-    if (!Number.isFinite(v1)) return "";
-    let v = v1.toPrecision(4);
+function formatValue(value: number): string {
+    if (!Number.isFinite(value)) return "";
+    if (Number.isInteger(value)) return value.toFixed(0);
+    let v = value.toPrecision(4);
     if (v.indexOf(".") >= 0) {
         // cut trailing zeroes
         for (;;) {
@@ -83,23 +84,36 @@ class InfoPanel extends Component<Props> {
             );
         }
 
+        let name = info.name ? info.name : "?";
+        if (name.length > 15)
+            // compress too long names
+            name = name.substring(0, 13) + "…";
+        // print long names and values with a smaller font size
+        const nameStyle: React.CSSProperties =
+            name.length > 10 ? { fontSize: "x-small" } : {};
+        let value = formatValue(info.value);
+        if (info.discrete)
+            value = info.discrete + (value ? "\xA0(" + value + ")" : "");
+        const valueStyle: React.CSSProperties = {
+            width: "90px",
+            paddingLeft: "1.5em",
+            textAlign: "right",
+        };
+        if (value.length > 10) valueStyle.fontSize = "x-small";
         return (
-            <tr key={info.trackId + "." + info.name}>
-                {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
+            <tr
+                key={
+                    info.trackId +
+                    "." +
+                    info.name /*Set unique key prop just for react pleasure*/
+                }
+            >
                 {/*info.type*/}
                 <td style={{ color: info.color, fontSize: "small" }}>
                     {"\u2B24" /*big circle*/}
                 </td>
-                <td>{info.name}</td>
-                <td
-                    style={{
-                        width: "90px",
-                        paddingLeft: "1.5em",
-                        textAlign: "right",
-                    }}
-                >
-                    {formatValue(info.value)}
-                </td>
+                <td style={nameStyle}>{name}</td>
+                <td style={valueStyle}>{value}</td>
                 <td style={{ paddingLeft: "0.5em" }}>{info.units}</td>
             </tr>
         );
@@ -114,10 +128,11 @@ class InfoPanel extends Component<Props> {
                     <table
                         style={{
                             borderSpacing: "0px",
+                            width: "100%",
                         }}
                     >
                         <tbody>
-                            {this.props.infos.map(this.createRow.bind(this))}
+                            {this.props.infos?.map(this.createRow.bind(this))}
                         </tbody>
                     </table>
                 </fieldset>

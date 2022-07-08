@@ -1,11 +1,11 @@
 export const layersDefaultProps: Record<string, unknown> = {
     ColormapLayer: {
+        "@@type": "ColormapLayer",
         name: "Property map",
         id: "colormap-layer",
         pickable: true,
         visible: true,
-        colormap: { type: "object", value: null, async: true },
-        valueRange: { type: "array" },
+        valueRange: { type: "array", value: [0, 1] },
         colorMapRange: { type: "array" },
         valueDecoder: {
             rgbScaler: [1, 1, 1],
@@ -15,19 +15,20 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
         rotDeg: 0,
+        colorMapName: "Rainbow",
     },
     Hillshading2DLayer: {
+        "@@type": "Hillshading2DLayer",
         name: "Hill shading",
         id: "hillshading-layer",
         opacity: 1.0,
         pickable: true,
         visible: true,
         rotDeg: 0,
-        valueRange: { type: "array" },
-        colorMapRange: { type: "array" },
-        lightDirection: { type: "array", value: [1, 1, 1] },
-        ambientLightIntensity: { type: "number", value: 0.5 },
-        diffuseLightIntensity: { type: "number", value: 0.5 },
+        valueRange: { type: "array", value: [0, 1] },
+        lightDirection: [1, 1, 1],
+        ambientLightIntensity: 0.5,
+        diffuseLightIntensity: 0.5,
         valueDecoder: {
             rgbScaler: [1, 1, 1],
             // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
@@ -36,42 +37,75 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
     },
-    Map3DLayer: {
-        name: "Map 3D",
-        id: "3D-map-layer",
+    MapLayer: {
+        "@@type": "MapLayer",
+        name: "Map",
+        id: "map3d-layer-float32",
         pickable: true,
-        visible: false,
+        visible: true,
+        // Url for the height field.
+        meshUrl: "",
+        // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
+        meshMaxError: { type: "number", value: 5 },
+        // Url to the properties. (ex, poro or perm values)
+        propertiesUrl: "",
+        bounds: { type: "object", value: null, false: true, compare: true },
+        colorMapRange: { type: "array" },
+        contours: [-1.0, -1.0],
+        enableSmoothShading: true,
+    },
+
+    Map3DLayer: {
+        "@@type": "Map3DLayer",
+        name: "Map 3D",
+        id: "map3d-layer",
+        pickable: true,
+        visible: true,
         // Url to png image for height field.
-        mesh: { type: "string", optional: false },
+        mesh: "",
+        meshValueRange: { type: "array", value: [0, 1] },
         // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
         meshMaxError: { type: "number", value: 5 },
         // Url to png image for map properties. (ex, poro or perm values as a texture)
-        propertyTexture: { type: "string", optional: false },
-        // Bounding box of the terrain image, [minX, minY, maxX, maxY] in world coordinates
-        bounds: { type: "array", value: null, false: true, compare: true },
-        valueRange: { type: "array", value: [0, 1] },
-        rotDeg: 0,
+        propertyTexture: "",
+        propertyValueRange: { type: "array", value: [0, 1] },
         contours: [-1.0, -1.0],
+        // If contour lines should follow depth or properties.
+        isContoursDepth: true,
+        enableSmoothShading: true,
+        material: true,
     },
     GridLayer: {
+        "@@type": "GridLayer",
+        id: "grid-layer",
         name: "Grid",
         pickable: true,
+        valueRange: { type: "array", value: [0, 1] },
+        colorMapRange: { type: "array", value: [0, 1] },
+        material: true,
     },
     WellsLayer: {
+        "@@type": "WellsLayer",
         name: "Wells",
         id: "wells-layer",
         autoHighlight: true,
-        selectionEnabled: true,
         opacity: 1,
-        lineWidthScale: 5,
+        lineWidthScale: 1,
         pointRadiusScale: 8,
+        style: { dash: false },
         outline: true,
-        logRadius: 6,
+        logRadius: 10,
         logCurves: true,
         refine: true,
         visible: true,
+        wellNameVisible: false,
+        wellNameAtTop: false,
+        wellNameSize: 14,
+        wellNameColor: [0, 0, 0, 255],
+        selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     },
     FaultPolygonsLayer: {
+        "@@type": "FaultPolygonsLayer",
         name: "Fault polygons",
         id: "fault-polygons-layer",
         pickable: true,
@@ -80,20 +114,34 @@ export const layersDefaultProps: Record<string, unknown> = {
         lineWidthMinPixels: 2,
     },
     PieChartLayer: {
+        "@@type": "PieChartLayer",
         name: "Pie chart",
         id: "pie-layer",
         pickable: true,
         visible: true,
-        selectionEnabled: true,
+        selectedPie: "@@editedData.selectedPie", // used to get data from deckgl layer
+    },
+    AxesLayer: {
+        "@@type": "AxesLayer",
+        name: "Axes",
+        id: "axes-layer",
+        visible: true,
+    },
+    NorthArrow3DLayer: {
+        "@@type": "NorthArrow3DLayer",
+        name: "NorthArrow3D",
+        id: "north-arrow-layer",
+        visible: true,
     },
     DrawingLayer: {
+        "@@type": "DrawingLayer",
         name: "Drawing",
         id: "drawing-layer",
         pickable: true,
         visible: true,
         mode: "drawLineString",
 
-        // Props mainly used to make the information available to the Map parent comp.
+        // Props used to get/set data in the drawing layer.
         selectedFeatureIndexes: [] as number[],
         data: {
             type: "FeatureCollection",
