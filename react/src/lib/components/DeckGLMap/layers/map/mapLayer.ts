@@ -477,7 +477,7 @@ export default class MapLayer extends CompositeLayer<
                     readOutData,
                     readOutDataName,
                 });
-        }
+            }
         );
     }
 
@@ -534,7 +534,7 @@ export default class MapLayer extends CompositeLayer<
                 colorMapFunction: this.props.colorMapFunction,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
-                isContoursDepth: !isMesh ? false : this.props.isContoursDepth,  
+                isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
                 material: this.props.material,
                 wireframe: false,
             })
