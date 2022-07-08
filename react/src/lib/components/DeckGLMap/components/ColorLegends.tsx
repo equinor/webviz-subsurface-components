@@ -9,6 +9,7 @@ interface ColorLegendsProps {
     horizontal?: boolean | null;
     layers: ExtendedLayer<unknown>[];
     colorTables: colorTablesArray | string | undefined;
+    reverseRange?: boolean;
 }
 
 // Todo: Adapt it for other layers too
@@ -17,6 +18,7 @@ const ColorLegends: React.FC<ColorLegendsProps> = ({
     horizontal,
     layers,
     colorTables,
+    reverseRange,
 }: ColorLegendsProps) => {
     if (layers.length == 0) return null;
     return (
@@ -34,6 +36,7 @@ const ColorLegends: React.FC<ColorLegendsProps> = ({
                     horizontal={horizontal}
                     key={index}
                     colorTables={colorTables}
+                    reverseRange={reverseRange}
                 />
             ))}
         </div>
