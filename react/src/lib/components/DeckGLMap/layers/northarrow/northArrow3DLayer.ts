@@ -53,7 +53,7 @@ export default class NorthArrow3DLayer extends Layer<
 
         if (is_orthographic) {
             const cam_pos_z = new Vector3(
-                this.context.viewport.getCameraPosition()
+                this.context.viewport.cameraPosition
             )[2];
             view_from = new Vector3([view_at[0], view_at[1], cam_pos_z]);
         }
