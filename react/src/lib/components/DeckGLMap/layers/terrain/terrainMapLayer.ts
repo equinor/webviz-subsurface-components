@@ -139,7 +139,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     TerrainMapLayerData,
     TerrainMapLayerProps<TerrainMapLayerData>
 > {
-    properties: any;
+    properties?: PropertyDataType[];
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ uniforms, context }: any): void {
