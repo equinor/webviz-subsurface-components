@@ -15,7 +15,7 @@ import Delatin from "./delatin"; // Note: this is copied from terrain loader.
 import { Texture2D } from "@luma.gl/core";
 import GL from "@luma.gl/constants";
 
-export const readoutMatrixSize = 150;
+export const readoutMatrixSize = 250;
 
 type MeshType = {
     attributes: {
