@@ -3,7 +3,10 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import DeckGLMap from "./DeckGLMap";
 import { PickInfo, TooltipCallback } from "../..";
+//import Map3DLayer from "./layers/terrain/map3DLayer";
 import { WellsPickInfo } from "./layers/wells/wellsLayer";
+import { ExtendedLayerProps, PropertyDataType } from "./layers/utils/layerTools";
+import { TerrainMapPickInfo } from "./layers/terrain/terrainMapLayer";
 
 export default {
     component: DeckGLMap,
@@ -68,7 +71,8 @@ TooltipApi.parameters = {
 export const TooltipStyle = Template.bind({});
 
 const processPropInfo = (
-    properties: Array<Record<string, unknown>>,
+    properties: PropertyDataType[] | undefined,
+    //properties: Array<Record<string, unknown>> | PropertyDataType[],
     filter: string[] | boolean
 ): string => {
     if (!properties) {
@@ -104,10 +108,23 @@ const tooltipImpFunc: TooltipCallback = (
     const layerName = info.layer.constructor.name;
     let outputString = "";
     if (layerName === "Map3DLayer") {
-        outputString += `Property: ${info.layer.props.name}`;
-        outputString += processPropInfo(info.properties, true);
+        const layer = info.layer;
+        const layerProps = layer.props as ExtendedLayerProps<unknown>;
+        const layerName = layerProps.name;
+        const properties = (info as TerrainMapPickInfo).properties;
+        outputString += `Property: ${layerName}`;
+        outputString += processPropInfo(properties, true);
     } else if (layerName === "WellsLayer") {
-        outputString += `Well: ${info.object.properties.name}`;
+        const wellsPickInfo = info as WellsPickInfo;
+        const layer = wellsPickInfo.layer;
+        const layerProps = layer.props as Well
+        const layerName = layerProps.name;
+        const properties = wellsPickInfo.properties;
+        const wellsPickInfoObject = wellsPickInfo.object as Record<
+            string,
+            unknown
+        >;
+        outputString += `Well: ${properties?.name}`;
         outputString += processPropInfo(info.properties, true);
     }
     outputObject["text"] = outputString;
