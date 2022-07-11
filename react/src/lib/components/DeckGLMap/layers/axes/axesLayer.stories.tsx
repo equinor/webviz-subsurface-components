@@ -35,11 +35,12 @@ export const Baseline: ComponentStory<typeof DeckGL> = (args) => {
     return <DeckGL {...args} />;
 };
 
-function ColoredLabels(props: { labelColor: string }) {
+function ColoredLabels(props: { labelColor: string; axisColor: string }) {
     const layers = [
         new AxesLayer({
             ...layerProps,
             labelColor: getRgba(props.labelColor) as RGBAColor,
+            axisColor: getRgba(props.axisColor) as RGBAColor,
         }),
     ];
     const views = [new OrthographicView({})];
@@ -52,6 +53,7 @@ export const DarkMode: ComponentStory<typeof ColoredLabels> = (args) => {
 
 DarkMode.args = {
     labelColor: "white",
+    axisColor: "white",
 };
 
 DarkMode.parameters = {
