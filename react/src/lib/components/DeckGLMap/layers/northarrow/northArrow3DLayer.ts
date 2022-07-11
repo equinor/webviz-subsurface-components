@@ -1,16 +1,18 @@
 import { Layer } from "@deck.gl/core";
 import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/core";
-import { LayerProps } from "@deck.gl/core/lib/layer";
-import fragmentShader from "./axes-fragment.glsl";
-import gridVertex from "./grid-vertex.glsl";
 import { project } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
+import { LayerProps } from "@deck.gl/core/lib/layer";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { Vector3 } from "@math.gl/core";
+import { RGBAColor } from "deck.gl";
+import vertexShader from "./northarrow-vertex.glsl";
+import fragmentShader from "./northarrow-fragment.glsl";
 
-export type NorthArrow3DLayerProps<D> = LayerProps<D>;
-
+export interface NorthArrow3DLayerProps<D> extends LayerProps<D> {
+    color: RGBAColor;
+}
 export default class NorthArrow3DLayer extends Layer<
     unknown,
     NorthArrow3DLayerProps<unknown>
@@ -85,10 +87,12 @@ export default class NorthArrow3DLayer extends Layer<
             lines.push(x, y, z);
         }
 
+        const color = this.props.color.map((x) => (x ?? 0) / 255);
         const grids = new Model(gl, {
             id: `${this.props.id}-grids`,
-            vs: gridVertex,
+            vs: vertexShader,
             fs: fragmentShader,
+            uniforms: { uColor: color },
             geometry: new Geometry({
                 drawMode: GL.LINES,
                 attributes: {
