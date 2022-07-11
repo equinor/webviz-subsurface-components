@@ -31,6 +31,10 @@ export type Material =
       }
     | boolean;
 
+export type TerrainMapPickInfo = PickInfo<TerrainMapLayerData> & {
+    properties?: PropertyDataType[];
+};
+
 export const DECODER = {
     rScaler: 256 * 256,
     gScaler: 256,
@@ -135,6 +139,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     TerrainMapLayerData,
     TerrainMapLayerProps<TerrainMapLayerData>
 > {
+    properties: any;
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ uniforms, context }: any): void {

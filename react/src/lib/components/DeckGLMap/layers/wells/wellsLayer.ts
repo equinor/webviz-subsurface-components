@@ -32,7 +32,7 @@ import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
-import { DeckGLLayerContext, PickingInfo } from "../../components/Map";
+import { DeckGLLayerContext } from "../../components/Map";
 import {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -489,8 +489,11 @@ export default class WellsLayer extends CompositeLayer<
         info,
     }: {
         info: PickInfo<FeatureCollection>;
-    }): WellsPickInfo | PickInfo<FeatureCollection> {
-        if (!info.object) return { ...info, logName: "", properties: [] };
+    }): PickInfo<FeatureCollection> & {
+        properties: PropertyDataType[];
+        logName: string;
+    } {
+        if (!info.object) return { ...info, properties: [], logName: "" };
 
         const coordinate = info.coordinate || [0, 0, 0];
 

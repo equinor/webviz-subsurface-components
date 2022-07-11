@@ -3,10 +3,10 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import DeckGLMap from "./DeckGLMap";
 import { PickInfo, TooltipCallback } from "../..";
-//import Map3DLayer from "./layers/terrain/map3DLayer";
 import { WellsPickInfo } from "./layers/wells/wellsLayer";
 import { ExtendedLayerProps, PropertyDataType } from "./layers/utils/layerTools";
-import { TerrainMapPickInfo } from "./layers/terrain/terrainMapLayer";
+import TerrainMapPickInfo from "./layers/terrain/terrainMapLayer";
+import { FeatureCollection } from "@nebula.gl/edit-modes";
 
 export default {
     component: DeckGLMap,
@@ -83,13 +83,13 @@ const processPropInfo = (
 
     if (typeof filter == "boolean") {
         if (filter) {
-            properties.forEach((ppobj: Record<string, unknown>) => {
+            properties.forEach((ppobj) => {
                 outputString += `\n${ppobj["name"]} : ${ppobj["value"]}`;
             });
         }
     } else {
         // filter is not boolean - thus it is a string array and we should check each property
-        properties.forEach((ppobj: Record<string, unknown>) => {
+        properties.forEach((ppobj) => {
             if (filter.includes(ppobj["name"] as string)) {
                 outputString += `\n${ppobj["name"]} : ${ppobj["value"]}`;
             }
@@ -111,21 +111,17 @@ const tooltipImpFunc: TooltipCallback = (
         const layer = info.layer;
         const layerProps = layer.props as ExtendedLayerProps<unknown>;
         const layerName = layerProps.name;
-        const properties = (info as TerrainMapPickInfo).properties;
+        const properties = (info as unknown as TerrainMapPickInfo).properties;
         outputString += `Property: ${layerName}`;
         outputString += processPropInfo(properties, true);
     } else if (layerName === "WellsLayer") {
         const wellsPickInfo = info as WellsPickInfo;
-        const layer = wellsPickInfo.layer;
-        const layerProps = layer.props as Well
-        const layerName = layerProps.name;
         const properties = wellsPickInfo.properties;
-        const wellsPickInfoObject = wellsPickInfo.object as Record<
-            string,
-            unknown
-        >;
-        outputString += `Well: ${properties?.name}`;
-        outputString += processPropInfo(info.properties, true);
+        const wellsPickInfoObject = wellsPickInfo.object as FeatureCollection;
+        const wellProperties = wellsPickInfoObject.properties;
+        const name = (wellProperties as { name: string }).name;
+        outputString += `Well: ${name || ""}`;
+        outputString += processPropInfo(properties, true);
     }
     outputObject["text"] = outputString;
     outputObject["style"] = { color: "yellow" };
