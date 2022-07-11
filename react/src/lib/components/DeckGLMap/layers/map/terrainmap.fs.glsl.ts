@@ -108,7 +108,7 @@ void main(void) {
    }
 
 
-   bool is_contours = true; //contourReferencePoint != -1.0 && contourInterval != -1.0;
+   bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
    if (is_contours) {
       // Contours are made of either depths or properties.
       float val = isContoursDepth ? (abs(worldPos.z) - contourReferencePoint) / contourInterval
