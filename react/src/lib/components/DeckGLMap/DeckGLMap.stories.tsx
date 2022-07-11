@@ -65,10 +65,34 @@ TooltipApi.parameters = {
     },
 };
 
-
 export const TooltipStyle = Template.bind({});
 
-const processPropInfo = (    properties: Array<Record<string, unknown>>,    filter: string[] | boolean  ): string => {    if (!properties) {      return "";    }    let outputString = "";    if (typeof filter == "boolean") {      if (filter) {        properties.forEach((ppobj: Record<string, unknown>) => {          outputString += `\n${ppobj.name} : ${ppobj.value}`;        });      }    } else {      // filter is not boolean - thus it is a string array and we should check each property      properties.forEach((ppobj: Record<string, unknown>) => {        if (filter.includes(ppobj.name as string)) {          outputString += `\n${ppobj.name} : ${ppobj.value}`;        }      });    }    return outputString;  };
+const processPropInfo = (
+    properties: Array<Record<string, unknown>>,
+    filter: string[] | boolean
+): string => {
+    if (!properties) {
+        return "";
+    }
+
+    let outputString = "";
+
+    if (typeof filter == "boolean") {
+        if (filter) {
+            properties.forEach((ppobj: Record<string, unknown>) => {
+                outputString += `\n${ppobj["name"]} : ${ppobj["value"]}`;
+            });
+        }
+    } else {
+        // filter is not boolean - thus it is a string array and we should check each property
+        properties.forEach((ppobj: Record<string, unknown>) => {
+            if (filter.includes(ppobj["name"] as string)) {
+                outputString += `\n${ppobj["name"]} : ${ppobj["value"]}`;
+            }
+        });
+    }
+    return outputString;
+};
 
 const tooltipImpFunc: TooltipCallback = (
     info: PickInfo<unknown>
@@ -87,7 +111,7 @@ const tooltipImpFunc: TooltipCallback = (
         outputString += processPropInfo(info.properties, true);
     }
     outputObject["text"] = outputString;
-    outputObject["style"] = {"color": "blue"};
+    outputObject["style"] = { color: "yellow" };
     return outputObject;
 };
 
@@ -112,4 +136,3 @@ TooltipStyle.parameters = {
         iframeHeight: 500,
     },
 };
-
