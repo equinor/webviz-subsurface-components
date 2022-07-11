@@ -144,7 +144,7 @@ TooltipStyle.args = {
 TooltipStyle.parameters = {
     docs: {
         description: {
-            story: "Example of overriding the default tooltip, showing measured depth (MD) instead of the default bahaviour, which is to show the well name.",
+            story: "Example of overriding tooltip style.",
         },
         inlineStories: false,
         iframeHeight: 500,
