@@ -31,7 +31,7 @@ const meshMapLayer = {
     propertiesUrl:
         "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/kh_netmap_5_m.float32",
     contours: [0, 1000],
-    isContoursDepth: false,
+    isContoursDepth: true,
     material: true,
     colorMapName: "Physics",
 };
@@ -191,6 +191,46 @@ Readout.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Readout example.",
+        },
+    },
+};
+
+export const MapDiscontinous: ComponentStory<typeof DeckGLMap> = () => {
+    const [hoverInfo, hoverCallback] = useHoverInfo();
+
+    const args = React.useMemo(() => {
+        return {
+            ...defaultArgs,
+            id: "readout",
+            layers: [
+                {
+                    ...meshMapLayer,
+                    meshUrl:
+                        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/hugin_depth_5_m_w_hole.float32",
+                    contours: [0, 50],
+                    material: false,
+                },
+            ],
+            coords: {
+                visible: false,
+            },
+            onMouseEvent: hoverCallback,
+        };
+    }, [hoverCallback]);
+
+    return (
+        <>
+            <DeckGLMap {...args} />
+            {hoverInfo && <InfoCard pickInfos={hoverInfo} />}
+        </>
+    );
+};
+
+MapDiscontinous.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example with discontinous map (map with a hole).",
         },
     },
 };
