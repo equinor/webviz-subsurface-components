@@ -4,14 +4,34 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 
 export default {
     component: DeckGLMap,
-    title: "DeckGLMap",
+    title: "DeckGLMap / Experimental Intersection View",
 } as ComponentMeta<typeof DeckGLMap>;
 
 const DeckGLMapTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
     return <DeckGLMap {...args} />;
 };
 
-const data = {
+const defaultProps = {
+    id: "DeckGLMap",
+    views: {
+        layout: [1, 2] as [number, number],
+        showLabel: true,
+        viewports: [
+            {
+                id: "orbit_view",
+                name: "3d view",
+                show3D: true,
+            },
+            {
+                id: "intersection_view",
+                name: "Intersection view",
+                show3D: false,
+            },
+        ],
+    },
+};
+
+const polyline_data = {
     type: "FeatureCollection",
     features: [
         {
@@ -33,44 +53,57 @@ const data = {
     ],
 };
 
-// Sample data for intersection view
-const sampleDataExtendedPathLayer = {
-    "@@type": "UnfoldedGeoJsonLayer",
-    id: "enhanced-path-layer",
-    data: "@@#resources.wellsdata",
-    lineWidthScale: 20,
-    lineBillboard: true,
+// Intersection view example with sample polyline data
+export const WithSamplePolylineData = DeckGLMapTemplate.bind({});
+WithSamplePolylineData.args = {
+    ...defaultProps,
+    bounds: [0, 0, 2000, 3000] as [number, number, number, number],
+    layers: [
+        {
+            "@@type": "UnfoldedGeoJsonLayer",
+            id: "enhanced-path-layer",
+            data: polyline_data,
+            lineWidthScale: 20,
+            lineBillboard: true,
+        },
+
+        {
+            "@@type": "AxesLayer",
+            id: "axes-layer",
+            bounds: [0, 0, -1000, 2000, 3000, 0],
+        },
+    ],
 };
 
-const axes2 = {
-    "@@type": "AxesLayer",
-    id: "axes-layer",
-    bounds: [0, 0, -1000, 2000, 3000, 0],
-};
-
-// Intersection view example
-export const ExperimentalIntersectionView = DeckGLMapTemplate.bind({});
-ExperimentalIntersectionView.args = {
-    id: "DeckGLMap",
-    bounds: [0, 0, 2000, 3000],
-    layers: [axes2, sampleDataExtendedPathLayer],
-    resources: { wellsdata: data },
-    views: {
-        layout: [1, 2],
-        showLabel: true,
-        viewports: [
-            {
-                id: "orbit_view",
-                name: "3d view",
-                show3D: true,
-                layerIds: ["axes-layer", "enhanced-path-layer"],
-            },
-            {
-                id: "intersection_view",
-                name: "Intersection view",
-                show3D: false,
-                layerIds: ["axes-layer", "enhanced-path-layer"],
-            },
-        ],
+// Intersection view example with wells data
+export const WithWellsData = DeckGLMapTemplate.bind({});
+WithWellsData.args = {
+    ...defaultProps,
+    bounds: [432205, 6475078, 437720, 6481113] as [
+        number,
+        number,
+        number,
+        number
+    ],
+    resources: {
+        wellsData:
+            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
     },
+    layers: [
+        {
+            "@@type": "AxesLayer",
+            id: "axes-layer",
+            bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+        },
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData",
+            lineStyle: {
+                width: (object: Record<string, Record<string, unknown>>) => {
+                    if (object["properties"]["name"] === "15/9-F-4") return 6;
+                    return 0;
+                },
+            },
+        },
+    ],
 };
