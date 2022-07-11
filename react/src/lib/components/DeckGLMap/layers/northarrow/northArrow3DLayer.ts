@@ -1,32 +1,30 @@
-import { Layer } from "@deck.gl/core";
+import {
+    Layer,
+    Viewport,
+    LayerContext,
+    UpdateParameters,
+} from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/core";
 import { LayerProps } from "@deck.gl/core/lib/layer";
 import fragmentShader from "./axes-fragment.glsl";
 import gridVertex from "./grid-vertex.glsl";
 import { project } from "deck.gl";
-import { DeckGLLayerContext } from "../../components/Map";
-import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { Vector3 } from "@math.gl/core";
 
 export type NorthArrow3DLayerProps<D> = LayerProps<D>;
 
-export default class NorthArrow3DLayer extends Layer<
-    unknown,
-    NorthArrow3DLayerProps<unknown>
-> {
-    initializeState(context: DeckGLLayerContext): void {
+export default class NorthArrow3DLayer extends Layer {
+    initializeState(context: LayerContext): void {
         const { gl } = context;
         this.setState(this._getModels(gl));
     }
 
-    shouldUpdateState(): boolean | string | null {
+    shouldUpdateState(): boolean {
         return true;
     }
 
-    updateState({
-        context,
-    }: UpdateStateInfo<NorthArrow3DLayerProps<unknown>>): void {
+    updateState({ context }: UpdateParameters<this>): void {
         if (context.gl) {
             this.setState(this._getModels(context.gl));
         }
@@ -53,7 +51,7 @@ export default class NorthArrow3DLayer extends Layer<
 
         if (is_orthographic) {
             const cam_pos_z = new Vector3(
-                this.context.viewport.cameraPosition
+                (this.context.viewport as Viewport).cameraPosition
             )[2];
             view_from = new Vector3([view_at[0], view_at[1], cam_pos_z]);
         }
