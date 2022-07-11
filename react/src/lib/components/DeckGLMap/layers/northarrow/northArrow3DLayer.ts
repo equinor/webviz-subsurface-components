@@ -87,11 +87,12 @@ export default class NorthArrow3DLayer extends Layer<
             lines.push(x, y, z);
         }
 
+        const color = this.props.color.map((x) => (x ?? 0) / 255);
         const grids = new Model(gl, {
             id: `${this.props.id}-grids`,
             vs: vertexShader,
             fs: fragmentShader,
-            uniforms: { uColor: this.props.color },
+            uniforms: { uColor: color },
             geometry: new Geometry({
                 drawMode: GL.LINES,
                 attributes: {

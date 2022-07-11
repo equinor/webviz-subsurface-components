@@ -39,11 +39,12 @@ export default class BoxLayer extends Layer<unknown, BoxLayerProps<unknown>> {
 
     //eslint-disable-next-line
     _getModels(gl: any) {
+        const color = this.props.color.map((x) => (x ?? 0) / 255);
         const grids = new Model(gl, {
             id: `${this.props.id}-grids`,
             vs: gridVertex,
             fs: fragmentShader,
-            uniforms: { uColor: this.props.color },
+            uniforms: { uColor: color },
             geometry: new Geometry({
                 drawMode: GL.LINES,
                 attributes: {
