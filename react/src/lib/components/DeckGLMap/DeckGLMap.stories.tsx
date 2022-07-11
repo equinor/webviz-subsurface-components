@@ -2,11 +2,15 @@ import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import DeckGLMap from "./DeckGLMap";
-import { PickInfo, TooltipCallback } from "../..";
-import { WellsPickInfo } from "./layers/wells/wellsLayer";
-import { ExtendedLayerProps, PropertyDataType } from "./layers/utils/layerTools";
-import TerrainMapPickInfo from "./layers/terrain/terrainMapLayer";
-import { FeatureCollection } from "@nebula.gl/edit-modes";
+import {
+    PickInfo,
+    TooltipCallback,
+    WellsPickInfo,
+    ExtendedLayerProps,
+    PropertyDataType,
+    TerrainMapPickInfo,
+    FeatureCollection,
+} from "../..";
 
 export default {
     component: DeckGLMap,
@@ -72,7 +76,6 @@ export const TooltipStyle = Template.bind({});
 
 const processPropInfo = (
     properties: PropertyDataType[] | undefined,
-    //properties: Array<Record<string, unknown>> | PropertyDataType[],
     filter: string[] | boolean
 ): string => {
     if (!properties) {
@@ -108,20 +111,18 @@ const tooltipImpFunc: TooltipCallback = (
     const layerName = info.layer.constructor.name;
     let outputString = "";
     if (layerName === "Map3DLayer") {
-        const layer = info.layer;
-        const layerProps = layer.props as ExtendedLayerProps<unknown>;
+        const layerProps = info.layer.props as ExtendedLayerProps<unknown>;
         const layerName = layerProps.name;
         const properties = (info as unknown as TerrainMapPickInfo).properties;
         outputString += `Property: ${layerName}`;
         outputString += processPropInfo(properties, true);
     } else if (layerName === "WellsLayer") {
         const wellsPickInfo = info as WellsPickInfo;
-        const properties = wellsPickInfo.properties;
         const wellsPickInfoObject = wellsPickInfo.object as FeatureCollection;
         const wellProperties = wellsPickInfoObject.properties;
         const name = (wellProperties as { name: string }).name;
         outputString += `Well: ${name || ""}`;
-        outputString += processPropInfo(properties, true);
+        outputString += processPropInfo(wellsPickInfo.properties, true);
     }
     outputObject["text"] = outputString;
     outputObject["style"] = { color: "yellow" };
