@@ -684,23 +684,18 @@ const max = 0.35;
 const dataObjectName = "Legend";
 const position = [16, 10];
 const horizontal = true;
-const colorName = "Physics";
 const reverseRange = false;
 
 const mapDataTemplate = (args) => {
-    const [getColorName, setColorName] = React.useState();
-
+    const [getColorName, setColorName] = React.useState("Rainbow");
     const colorMapData = React.useCallback((data) => {
         setColorName(data);
     }, []);
-
     const updatedLayerData = [
         {
             ...args.layers[0],
             colorMapName: getColorName,
-            colorMapFunction: createColorMapFunction(
-                getColorName ? getColorName : colorName
-            ),
+            colorMapFunction: createColorMapFunction(getColorName),
         },
     ];
 
@@ -729,7 +724,6 @@ ColorMapLayerColorSelector.args = {
     dataObjectName,
     position,
     horizontal,
-    colorName,
     colorTables,
     layers,
     ...defaultProps,
