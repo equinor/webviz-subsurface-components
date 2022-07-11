@@ -406,6 +406,7 @@ const axes = {
 const north_arrow_layer = {
     "@@type": "NorthArrow3DLayer",
     id: "north-arrow-layer",
+    color: [0, 0, 0, 255],
 };
 
 export const Axes = MinimalTemplate.bind({});
