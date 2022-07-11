@@ -49,7 +49,7 @@ export default class NorthArrow3DLayer extends Layer<
             this.context.viewport.constructor.name === "OrthographicViewport";
 
         const view_at = new Vector3(this.unproject([100, 100, 0]));
-        let view_from = new Vector3(this.context.viewport.getCameraPosition());
+        let view_from = new Vector3(this.context.viewport.cameraPosition);
 
         if (is_orthographic) {
             const cam_pos_z = new Vector3(
