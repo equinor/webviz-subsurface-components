@@ -1,0 +1,8 @@
+{
+    "@@type": "WellsLayer",
+    "data": "@@#resources.wellsData",
+    "logData": "@@#resources.logData",
+    "logrunName": "BLOCKING",
+    "logName": "ZONELOG",
+    "logColor": "Stratigraphy"
+}
