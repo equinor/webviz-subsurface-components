@@ -14,6 +14,7 @@ import { isEqual } from "lodash";
 import Delatin from "./delatin"; // Note: this is copied from terrain loader.
 import { Texture2D } from "@luma.gl/core";
 import GL from "@luma.gl/constants";
+import * as png from "@vivaxy/png";
 
 export const readoutMatrixSize = 250;
 
@@ -159,7 +160,7 @@ function makeMesh(
     };
 
     // Keep this. Useful info for the user to adjust "maxMeshError" if necessary.
-    console.debug(
+    console.info(
         "no of triangles, mesh width, height: ",
         triangles.length / 3,
         width,
@@ -307,8 +308,36 @@ async function load_mesh_and_texture(
         if (!response.ok) {
             console.error("Could not load ", meshUrl);
         }
-        const buffer = await response.arrayBuffer();
-        meshData = new Float32Array(buffer);
+
+        const blob = await response.blob();
+        const contentType = response.headers.get("content-type");
+        const isPng = contentType === "image/png";
+        if (isPng) {
+            // Load as Png  with abolute float values.
+            meshData = await new Promise((resolve) => {
+                const fileReader = new FileReader();
+                fileReader.readAsArrayBuffer(blob);
+                fileReader.onload = () => {
+                    const arrayBuffer = fileReader.result;
+                    const imgData = png.decode(arrayBuffer as ArrayBuffer);
+                    const data = imgData.data; // array of int's
+
+                    const n = data.length;
+                    const buffer = new ArrayBuffer(n);
+                    const view = new DataView(buffer);
+                    for (let i = 0; i < n; i++) {
+                        view.setUint8(i, data[i]);
+                    }
+
+                    const floatArray = new Float32Array(buffer);
+                    resolve(floatArray);
+                };
+            });
+        } else {
+            // Load as binary array of floats.
+            const buffer = await blob.arrayBuffer();
+            meshData = new Float32Array(buffer);
+        }
 
         replaceNaN(meshData, 0.0);
         mesh = makeMesh(dim, meshData, meshMaxError);
@@ -352,8 +381,37 @@ async function load_mesh_and_texture(
     if (!response.ok) {
         console.error("Could not load ", propertiesUrl);
     }
-    const buffer = await response.arrayBuffer();
-    const data = new Float32Array(buffer);
+
+    let data: Float32Array;
+    const blob = await response.blob();
+    const contentType = response.headers.get("content-type");
+    const isPng = contentType === "image/png";
+    if (isPng) {
+        // Load as Png  with abolute float values.
+        data = await new Promise((resolve) => {
+            const fileReader = new FileReader();
+            fileReader.readAsArrayBuffer(blob);
+            fileReader.onload = () => {
+                const arrayBuffer = fileReader.result;
+                const imgData = png.decode(arrayBuffer as ArrayBuffer);
+                const data = imgData.data; // array of int's
+
+                const n = data.length;
+                const buffer = new ArrayBuffer(n);
+                const view = new DataView(buffer);
+                for (let i = 0; i < n; i++) {
+                    view.setUint8(i, data[i]);
+                }
+
+                const floatArray = new Float32Array(buffer);
+                resolve(floatArray);
+            };
+        });
+    } else {
+        // Load as binary array of floats.
+        const buffer = await blob.arrayBuffer();
+        data = new Float32Array(buffer);
+    }
 
     // create float texture.
     const propertyValueRange = getFloat32ArrayMinMax(data);

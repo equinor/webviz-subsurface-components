@@ -28,7 +28,25 @@ const meshMapLayer = {
         rotDeg: 0,
     },
     propertiesUrl: "kh_netmap_5_m.float32",
-    contours: [0, 1000],
+    contours: [0, 100],
+    isContoursDepth: true,
+    material: true,
+    colorMapName: "Physics",
+};
+
+// Example using "Map" layer. Uses PNG float for mesh and properties.
+const meshMapLayerPNG = {
+    "@@type": "MapLayer",
+    id: "mesh-layer",
+    meshUrl: "hugin_depth_25_m.png",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.png",
+    contours: [0, 100],
     isContoursDepth: true,
     material: true,
     colorMapName: "Physics",
@@ -100,6 +118,43 @@ MapLayer3d.args = {
                 show3D: true,
             },
         ],
+    },
+};
+
+MapLayer3d.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using large map with approx. 1400x1400 cells.",
+        },
+    },
+};
+
+export const MapLayer3dPng: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+MapLayer3dPng.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayerPNG, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+MapLayer3dPng.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using png as mesh and properties data.",
+        },
     },
 };
 
@@ -193,7 +248,7 @@ Readout.parameters = {
     },
 };
 
-export const MapDiscontinous: ComponentStory<typeof DeckGLMap> = () => {
+export const MapDiscontinuous: ComponentStory<typeof DeckGLMap> = () => {
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
     const args = React.useMemo(() => {
@@ -224,7 +279,7 @@ export const MapDiscontinous: ComponentStory<typeof DeckGLMap> = () => {
     );
 };
 
-MapDiscontinous.parameters = {
+MapDiscontinuous.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
