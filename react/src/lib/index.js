@@ -20,6 +20,14 @@ import WebVizContinuousLegend from "./components/ColorLegends/WebVizContinuousLe
 import WebVizDiscreteLegend from "./components/ColorLegends/WebVizDiscreteLegend";
 import { PickInfo } from "deck.gl";
 import { TooltipCallback } from "./components/DeckGLMap/components/Map";
+import {
+    ExtendedLayerProps,
+    PropertyDataType,
+    LayerPickInfo,
+} from "./components/DeckGLMap/layers/utils/layerTools";
+import { WellsPickInfo } from "./components/DeckGLMap/layers/wells/wellsLayer";
+import TerrainMapPickInfo from "./components/DeckGLMap/layers/terrain/terrainMapLayer";
+import { FeatureCollection } from "@nebula.gl/edit-modes";
 
 export {
     HistoryMatch,
@@ -38,4 +46,10 @@ export {
     WebVizDiscreteLegend,
     PickInfo,
     TooltipCallback,
+    ExtendedLayerProps,
+    PropertyDataType,
+    WellsPickInfo,
+    TerrainMapPickInfo,
+    FeatureCollection,
+    LayerPickInfo,
 };
