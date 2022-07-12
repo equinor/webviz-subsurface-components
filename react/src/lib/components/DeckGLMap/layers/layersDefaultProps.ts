@@ -132,6 +132,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "NorthArrow3D",
         id: "north-arrow-layer",
         visible: true,
+        color: [0, 0, 0, 1],
     },
     DrawingLayer: {
         "@@type": "DrawingLayer",
