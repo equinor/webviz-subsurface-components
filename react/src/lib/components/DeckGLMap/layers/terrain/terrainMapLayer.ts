@@ -1,6 +1,7 @@
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
+import { PickInfo, RGBAColor } from "deck.gl";
 import { RGBColor } from "@deck.gl/core/utils/color";
 import fsShader from "./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
@@ -29,6 +30,10 @@ export type Material =
           specularColor: [number, number, number];
       }
     | boolean;
+
+export type TerrainMapPickInfo = PickInfo<TerrainMapLayerData> & {
+    properties?: PropertyDataType[];
+};
 
 export const DECODER = {
     rScaler: 256 * 256,
@@ -134,6 +139,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     TerrainMapLayerData,
     TerrainMapLayerProps<TerrainMapLayerData>
 > {
+    properties?: PropertyDataType[];
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ uniforms, context }: any): void {
@@ -220,18 +226,24 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         return 0;
     }
 
-    // For now, use `any` for the picking types.
-    //eslint-disable-next-line
-    getPickingInfo({ info }: { info: any }): any {
-        if (!info.color) {
+    getPickingInfo({
+        info,
+    }: {
+        info: PickInfo<TerrainMapLayerData>;
+    }): PickInfo<TerrainMapLayerData> & {
+        properties?: PropertyDataType[];
+    } {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pickColor: RGBAColor = (info as any).color;
+        if (!pickColor) {
             return info;
         }
 
         // Texture coordinates.
-        const s = info.color[0] / 255.0;
-        const t = info.color[1] / 255.0;
+        const s = pickColor[0] / 255.0;
+        const t = pickColor[1] / 255.0;
 
-        const is_outside: boolean = info.color[2] == 0;
+        const is_outside: boolean = pickColor[2] == 0;
         if (is_outside) {
             // Mouse is outside the non-transparent part of the map.
             return info;
