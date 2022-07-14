@@ -1,32 +1,35 @@
-import { Layer } from "@deck.gl/core";
+import {
+    Layer,
+    Viewport,
+    LayerContext,
+    UpdateParameters,
+    LayerProps,
+    project,
+} from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/core";
-import { LayerProps } from "@deck.gl/core/lib/layer";
-import fragmentShader from "./axes-fragment.glsl";
-import gridVertex from "./grid-vertex.glsl";
-import { project } from "deck.gl";
-import { DeckGLLayerContext } from "../../components/Map";
-import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { Vector3 } from "@math.gl/core";
+import { RGBAColor } from "deck.gl";
+import vertexShader from "./northarrow-vertex.glsl";
+import fragmentShader from "./northarrow-fragment.glsl";
 
-export type NorthArrow3DLayerProps<D> = LayerProps<D>;
+export interface NorthArrow3DLayerProps<D> extends LayerProps<D> {
+    color: RGBAColor;
+}
 
 export default class NorthArrow3DLayer extends Layer<
-    unknown,
     NorthArrow3DLayerProps<unknown>
 > {
-    initializeState(context: DeckGLLayerContext): void {
+    initializeState(context: LayerContext): void {
         const { gl } = context;
         this.setState(this._getModels(gl));
     }
 
-    shouldUpdateState(): boolean | string | null {
+    shouldUpdateState(): boolean {
         return true;
     }
 
-    updateState({
-        context,
-    }: UpdateStateInfo<NorthArrow3DLayerProps<unknown>>): void {
+    updateState({ context }: UpdateParameters<this>): void {
         if (context.gl) {
             this.setState(this._getModels(context.gl));
         }
@@ -49,11 +52,11 @@ export default class NorthArrow3DLayer extends Layer<
             this.context.viewport.constructor.name === "OrthographicViewport";
 
         const view_at = new Vector3(this.unproject([100, 100, 0]));
-        let view_from = new Vector3(this.context.viewport.getCameraPosition());
+        let view_from = new Vector3(this.context.viewport.cameraPosition);
 
         if (is_orthographic) {
             const cam_pos_z = new Vector3(
-                this.context.viewport.getCameraPosition()
+                (this.context.viewport as Viewport).cameraPosition
             )[2];
             view_from = new Vector3([view_at[0], view_at[1], cam_pos_z]);
         }
@@ -85,10 +88,12 @@ export default class NorthArrow3DLayer extends Layer<
             lines.push(x, y, z);
         }
 
+        const color = this.props.color.map((x?: number) => (x ?? 0) / 255);
         const grids = new Model(gl, {
             id: `${this.props.id}-grids`,
-            vs: gridVertex,
+            vs: vertexShader,
             fs: fragmentShader,
+            uniforms: { uColor: color },
             geometry: new Geometry({
                 drawMode: GL.LINES,
                 attributes: {

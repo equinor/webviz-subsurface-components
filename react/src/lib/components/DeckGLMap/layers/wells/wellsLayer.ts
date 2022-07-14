@@ -10,6 +10,7 @@ import {
     colorTablesArray,
     getColors,
 } from "@emerson-eps/color-tables/";
+import { PickInfo } from "deck.gl";
 
 import {
     Feature,
@@ -484,44 +485,50 @@ export default class WellsLayer extends CompositeLayer<
         return [outline, log_layer, colors, highlight, selection_layer, names];
     }
 
-    // For now, use `any` for the picking types because this function should
-    // recieve PickInfo<FeatureCollection>, but it recieves PickInfo<Feature>.
-    //eslint-disable-next-line
-    getPickingInfo({ info }: { info: any }): any {
-        if (!info.object) return info;
+    getPickingInfo({
+        info,
+    }: {
+        info: PickInfo<FeatureCollection>;
+    }): PickInfo<FeatureCollection> & {
+        properties: PropertyDataType[];
+        logName: string;
+    } {
+        if (!info.object) return { ...info, properties: [], logName: "" };
+
+        const coordinate = info.coordinate || [0, 0, 0];
 
         let md_property = getMdProperty(
-            info.coordinate,
-            info.object,
+            coordinate,
+            info.object as unknown as Feature,
             this.props.lineStyle?.color
         );
         if (!md_property) {
             md_property = getLogProperty(
-                info.coordinate,
+                coordinate as Position2D,
                 (this.props.data as FeatureCollection).features,
-                info.object,
+                (info as WellsPickInfo).object as LogCurveDataType,
                 this.props.logrunName,
                 "MD"
             );
         }
         let tvd_property = getTvdProperty(
-            info.coordinate,
-            info.object,
+            info.coordinate as Position2D,
+            info.object as unknown as Feature,
             this.props.lineStyle?.color
         );
         if (!tvd_property) {
             tvd_property = getLogProperty(
-                info.coordinate,
+                info.coordinate as Position2D,
                 (this.props.data as FeatureCollection).features,
-                info.object,
+                (info as WellsPickInfo).object as LogCurveDataType,
                 this.props.logrunName,
                 "TVD"
             );
         }
         const log_property = getLogProperty(
-            info.coordinate,
+            info.coordinate as Position2D,
             (this.props.data as FeatureCollection).features,
-            info.object,
+            (info as WellsPickInfo).object as LogCurveDataType,
             this.props.logrunName,
             this.props.logName
         );
@@ -541,7 +548,7 @@ export default class WellsLayer extends CompositeLayer<
         return {
             ...info,
             properties: layer_properties,
-            logName: log_property?.name,
+            logName: log_property?.name || "",
         };
     }
 }
