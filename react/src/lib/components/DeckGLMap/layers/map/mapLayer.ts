@@ -159,13 +159,6 @@ function makeMesh(
         indices: { value: new Uint32Array(triangles), size: 1 },
     };
 
-    // Keep this. Useful info for the user to adjust "maxMeshError" if necessary.
-    console.info(
-        "no of triangles, mesh width, height: ",
-        triangles.length / 3,
-        width,
-        height
-    );
     return mesh;
 }
 
