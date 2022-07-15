@@ -258,8 +258,7 @@ export const MapDiscontinuous: ComponentStory<typeof DeckGLMap> = () => {
             layers: [
                 {
                     ...meshMapLayer,
-                    meshUrl:
-                        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/hugin_depth_5_m_w_hole.float32",
+                    meshUrl: "hugin_depth_5_m_w_hole.float32",
                     contours: [0, 50],
                     material: false,
                 },
