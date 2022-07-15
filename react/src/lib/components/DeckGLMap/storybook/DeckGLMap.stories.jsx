@@ -403,28 +403,6 @@ const axes = {
     id: "axes-layer",
     bounds: [432205, 6475078, -3500, 437930, 6482353, 0],
 };
-const north_arrow_layer = {
-    "@@type": "NorthArrow3DLayer",
-    id: "north-arrow-layer",
-    color: [0, 0, 0, 255],
-};
-
-export const Axes = MinimalTemplate.bind({});
-Axes.args = {
-    id: "axes",
-    layers: [axes, meshMapLayer, north_arrow_layer],
-    bounds: [432205, 6475078, 437930, 6482353],
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-                layerIds: [],
-            },
-        ],
-    },
-};
 
 // Example using "colorMapFunction" property.
 const layer = {
