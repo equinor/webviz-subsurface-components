@@ -70,12 +70,11 @@ export type DataItem = {
 export type TerrainMapLayerData = [DataItem?];
 
 export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
-    meshData: Float32Array;
+    readOutData: Float32Array[];
+    readOutDataName: string[];
+
     meshWidth: number;
-
     propertyTexture: Texture2D;
-
-    propertyData: Float32Array;
 
     // Contourlines reference point and interval.
     contours: [number, number];
@@ -230,17 +229,16 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const j = Math.max(Math.round(s * readoutMatrixSize) - 1, 0);
         const i = Math.max(Math.round(t * readoutMatrixSize) - 1, 0);
         const idx = i * readoutMatrixSize + j;
-        const depth_value = this.props.meshData[idx];
-        const property_value = this.props.propertyData[idx];
 
         const layer_properties: PropertyDataType[] = [];
-        layer_properties.push(
-            createPropertyData("Depth", depth_value),
-            createPropertyData(
-                "Property",
-                isNaN(property_value) ? "NaN" : property_value
-            )
-        );
+
+        for (let i = 0; i < this.props.readOutData.length; i++) {
+            const value = this.props.readOutData[i][idx];
+            const name = this.props.readOutDataName[i];
+            layer_properties.push(
+                createPropertyData(name, isNaN(value) ? "NaN" : value)
+            );
+        }
 
         return {
             ...info,
