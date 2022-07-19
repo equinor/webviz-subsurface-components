@@ -14,8 +14,9 @@ import { isEqual } from "lodash";
 import Delatin from "./delatin"; // Note: this is copied from terrain loader.
 import { Texture2D } from "@luma.gl/core";
 import GL from "@luma.gl/constants";
+import * as png from "@vivaxy/png";
 
-export const readoutMatrixSize = 150;
+export const readoutMatrixSize = 250;
 
 type MeshType = {
     attributes: {
@@ -158,13 +159,6 @@ function makeMesh(
         indices: { value: new Uint32Array(triangles), size: 1 },
     };
 
-    // Keep this. Useful info for the user to adjust "maxMeshError" if necessary.
-    console.debug(
-        "no of triangles, mesh width, height: ",
-        triangles.length / 3,
-        width,
-        height
-    );
     return mesh;
 }
 
@@ -283,20 +277,20 @@ async function load_mesh_and_texture(
     propertiesUrl: string,
     gl: unknown
 ) {
-    let isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
-    const isTexture =
+    const isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
+    const isProperties =
         typeof propertiesUrl !== "undefined" && propertiesUrl !== "";
 
-    if (!isMesh && !isTexture) {
+    if (!isMesh && !isProperties) {
         console.error("Error. One or both of texture and mesh must be given!");
     }
 
-    if (isMesh && !isTexture) {
+    if (isMesh && !isProperties) {
         propertiesUrl = meshUrl;
-    } else if (!isMesh && isTexture) {
-        meshUrl = propertiesUrl;
-        isMesh = true;
     }
+
+    const readOutData: Float32Array[] = [];
+    const readOutDataName: string[] = [];
 
     //-- MESH --
     const [w, h] = dimNxNy(dim);
@@ -307,8 +301,36 @@ async function load_mesh_and_texture(
         if (!response.ok) {
             console.error("Could not load ", meshUrl);
         }
-        const buffer = await response.arrayBuffer();
-        meshData = new Float32Array(buffer);
+
+        const blob = await response.blob();
+        const contentType = response.headers.get("content-type");
+        const isPng = contentType === "image/png";
+        if (isPng) {
+            // Load as Png  with abolute float values.
+            meshData = await new Promise((resolve) => {
+                const fileReader = new FileReader();
+                fileReader.readAsArrayBuffer(blob);
+                fileReader.onload = () => {
+                    const arrayBuffer = fileReader.result;
+                    const imgData = png.decode(arrayBuffer as ArrayBuffer);
+                    const data = imgData.data; // array of int's
+
+                    const n = data.length;
+                    const buffer = new ArrayBuffer(n);
+                    const view = new DataView(buffer);
+                    for (let i = 0; i < n; i++) {
+                        view.setUint8(i, data[i]);
+                    }
+
+                    const floatArray = new Float32Array(buffer);
+                    resolve(floatArray);
+                };
+            });
+        } else {
+            // Load as binary array of floats.
+            const buffer = await blob.arrayBuffer();
+            meshData = new Float32Array(buffer);
+        }
 
         replaceNaN(meshData, 0.0);
         mesh = makeMesh(dim, meshData, meshMaxError);
@@ -320,6 +342,9 @@ async function load_mesh_and_texture(
         if (enableSmoothShading) {
             mesh = add_normals(mesh);
         }
+
+        readOutData.push(meshData);
+        readOutDataName.push("Depth");
     } else {
         // Mesh data is missing.
         // Make a flat square size of bounds using two triangles.  z = 0.
@@ -349,8 +374,37 @@ async function load_mesh_and_texture(
     if (!response.ok) {
         console.error("Could not load ", propertiesUrl);
     }
-    const buffer = await response.arrayBuffer();
-    const data = new Float32Array(buffer);
+
+    let data: Float32Array;
+    const blob = await response.blob();
+    const contentType = response.headers.get("content-type");
+    const isPng = contentType === "image/png";
+    if (isPng) {
+        // Load as Png  with abolute float values.
+        data = await new Promise((resolve) => {
+            const fileReader = new FileReader();
+            fileReader.readAsArrayBuffer(blob);
+            fileReader.onload = () => {
+                const arrayBuffer = fileReader.result;
+                const imgData = png.decode(arrayBuffer as ArrayBuffer);
+                const data = imgData.data; // array of int's
+
+                const n = data.length;
+                const buffer = new ArrayBuffer(n);
+                const view = new DataView(buffer);
+                for (let i = 0; i < n; i++) {
+                    view.setUint8(i, data[i]);
+                }
+
+                const floatArray = new Float32Array(buffer);
+                resolve(floatArray);
+            };
+        });
+    } else {
+        // Load as binary array of floats.
+        const buffer = await blob.arrayBuffer();
+        data = new Float32Array(buffer);
+    }
 
     // create float texture.
     const propertyValueRange = getFloat32ArrayMinMax(data);
@@ -366,14 +420,18 @@ async function load_mesh_and_texture(
         parameters: DEFAULT_TEXTURE_PARAMETERS,
     });
 
-    const propertyData = makeFixedSizeCopy(data, w, h);
+    if (isProperties) {
+        const propertyData = makeFixedSizeCopy(data, w, h);
+        readOutData.push(propertyData);
+        readOutDataName.push("Property");
+    }
 
     return Promise.all([
         mesh,
         propertyValueRange,
-        meshData,
-        propertyData,
         texture,
+        readOutData,
+        readOutDataName,
     ]);
 }
 
@@ -456,13 +514,19 @@ export default class MapLayer extends CompositeLayer<
         );
 
         p.then(
-            ([mesh, propertyValueRange, meshData, propertyData, texture]) => {
+            ([
+                mesh,
+                propertyValueRange,
+                texture,
+                readOutData,
+                readOutDataName,
+            ]) => {
                 this.setState({
                     mesh,
                     propertyValueRange,
-                    meshData,
-                    propertyData,
                     texture,
+                    readOutData,
+                    readOutDataName,
                 });
             }
         );
@@ -511,8 +575,8 @@ export default class MapLayer extends CompositeLayer<
                 mesh: this.state.mesh,
                 propertyValueRange: this.state.propertyValueRange,
                 propertyTexture: this.state.texture,
-                meshData: this.state.meshData,
-                propertyData: this.state.propertyData,
+                readOutData: this.state.readOutData,
+                readOutDataName: this.state.readOutDataName,
                 meshWidth: width,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
