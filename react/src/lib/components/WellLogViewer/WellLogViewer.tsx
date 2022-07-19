@@ -350,9 +350,9 @@ WellLogViewer.propTypes = {
     id: PropTypes.string.isRequired,
 
     /**
-     * Array of JSON objects describing well log data
+     * An object from JSON file describing well log data
      */
-    welllog: PropTypes.array.isRequired,
+    welllog: PropTypes.object.isRequired,
 
     /**
      * Prop containing track template data
