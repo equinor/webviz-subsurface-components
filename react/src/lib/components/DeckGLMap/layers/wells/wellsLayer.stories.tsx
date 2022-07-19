@@ -67,7 +67,7 @@ DiscreteWellLogs.args = {
             ...defaultProps.layers[0],
             refine: false,
             outline: false,
-            logData: "./volve_logs.json",
+            logData: "volve_blocking_zonelog_logs.json",
             logrunName: "BLOCKING",
             logName: "ZONELOG",
             logColor: "Stratigraphy",
