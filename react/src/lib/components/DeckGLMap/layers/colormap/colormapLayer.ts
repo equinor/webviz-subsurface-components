@@ -31,7 +31,7 @@ function getImageData(
     colorMapFunction: colorMapFunctionType | undefined
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
-
+    console.log("Hi");
     const data = new Uint8Array(256 * 3);
 
     for (let i = 0; i < 256; i++) {
