@@ -74,4 +74,39 @@ describe("Test Info Card", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
     });
+
+    it("snapshot test when property value provided", async () => {
+        const { container } = render(
+            <InfoCard
+                pickInfos={[
+                    {
+                        x: 152,
+                        y: 254,
+                        radius: 1,
+                        depth: 638,
+                        coordinate: [111, 222],
+                    } as unknown as PickInfo<unknown>,
+                    {
+                        layer: {
+                            id: "wells-layer",
+                            props: { name: "Wells layer" },
+                        },
+                        properties: [
+                            { name: "Poro", value: 123 },
+                            { name: "Perm", value: 456 },
+                        ],
+                        logName: "LogCurve1",
+                    } as unknown as PickInfo<unknown>,
+                    {
+                        layer: {
+                            id: "hillshading-layer",
+                            props: { name: "Hill shading" },
+                        },
+                        propertyValue: 3152.02,
+                    } as unknown as PickInfo<unknown>,
+                ]}
+            />
+        );
+        expect(container.firstChild).toMatchSnapshot();
+    });
 });
