@@ -27,10 +27,15 @@ const Template = (args) => {
             setEditedData={(updatedProps) => {
                 setEditedData(updatedProps.editedData);
             }}
+            getCameraPosition={{
+                target: [396638.95884797024, 6467831.83598219],
+                zoom: -6.28820538480389,
+                rotationX: 90,
+                rotationOrbit: 0,
+            }}
         />
     );
 };
-
 export const Default = Template.bind({});
 Default.args = {
     ...exampleData[0],
