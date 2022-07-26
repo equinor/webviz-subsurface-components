@@ -83,7 +83,7 @@ export interface ViewsType {
     viewports: ViewportType[];
 }
 
-interface ViewStateType {
+export interface ViewStateType {
     target: number[];
     zoom: number;
     rotationX: number;
@@ -205,6 +205,7 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
+    getCameraPosition?: ViewStateType | undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -240,6 +241,9 @@ function defaultTooltip(info: PickInfo<unknown>) {
     return feat?.properties?.["name"];
 }
 
+// function defaultCameraPosition() {
+//    return {}
+// }
 const Map: React.FC<MapProps> = ({
     id,
     resources,
@@ -260,14 +264,16 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
-}: MapProps) => {
+    getCameraPosition = {} as ViewStateType,
+}: 
+MapProps) => {
     const deckRef = useRef<DeckGL>(null);
-
+    // getViewState(bounds, zoom)
     // set initial view state based on supplied bounds and zoom in viewState
-    const [viewState, setViewState] = useState<ViewStateType>(
-        getViewState(bounds, zoom)
-    );
-
+    const [viewState, setViewState] =
+        useState<ViewStateType>(getCameraPosition);
+    getCameraPosition = viewState;
+    console.log(viewState);
     // react on zoom prop change
     useEffect(() => {
         const vs = getViewState(bounds, zoom, deckRef.current?.deck);
@@ -278,11 +284,16 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         const vs = getViewState(bounds, zoom, deckRef.current?.deck);
         setViewState({ ...viewState, target: vs.target });
+        getCameraPosition = viewState;
     }, [bounds]);
 
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
-        setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
+        if (Object.keys(getCameraPosition).length !== 0) {
+            setViewState(getCameraPosition);
+        } else {
+            setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
+        }
     }, [bounds, zoom]);
 
     // state for views prop of DeckGL component
@@ -521,7 +532,7 @@ const Map: React.FC<MapProps> = ({
         <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
                 id={id}
-                viewState={viewState}
+                viewState={getCameraPosition}
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
@@ -589,11 +600,24 @@ const Map: React.FC<MapProps> = ({
                     scaleUnit={coordinateUnit}
                 />
             ) : null}
-
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
-
             {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
-
+            {Object.keys(getCameraPosition).length !== 0 ? (
+                <div
+                    style={{
+                        position: "absolute",
+                        marginTop: 100,
+                    }}
+                >
+                    <div>zoom: {getCameraPosition.zoom}</div>
+                    <div>rotationX: {getCameraPosition.rotationX}</div>
+                    <div>rotationOrbit: {getCameraPosition.rotationOrbit}</div>
+                    <div>
+                        targetX: {getCameraPosition.target[0]} targetY:
+                        {getCameraPosition.target[1]}
+                    </div>
+                </div>
+            ) : null}
             {errorText && (
                 <pre
                     style={{
