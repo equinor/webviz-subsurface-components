@@ -128,7 +128,7 @@ export default class privateMapLayer extends Layer<
 
     // For now, use `any` for the picking types.
     //eslint-disable-next-line
-    getPickingInfo( { info: any } ): any {
+    getPickingInfo({ info }: { info: any }): any {
         const pickColor = info.color;
         if (!pickColor) {
             return info;
