@@ -1,4 +1,4 @@
-import Map, { ViewsType, TooltipCallback } from "./components/Map";
+import Map, { ViewsType, TooltipCallback, ViewStateType } from "./components/Map";
 import { MapMouseEvent } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
@@ -60,6 +60,7 @@ export interface DeckGLMapProps {
      * Override default tooltip with a callback.
      */
     getTooltip?: TooltipCallback;
+    getCameraPosition?: ViewStateType | undefined;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -81,6 +82,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     onMouseEvent,
     selection,
     getTooltip,
+    getCameraPosition,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -142,6 +144,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 onMouseEvent={onMouseEvent}
                 selection={selection}
                 getTooltip={getTooltip}
+                getCameraPosition={getCameraPosition}
             />
         </ReduxProvider>
     );

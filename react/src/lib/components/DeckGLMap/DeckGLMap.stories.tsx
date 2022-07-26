@@ -11,7 +11,8 @@ import {
     TerrainMapPickInfo,
     FeatureCollection,
 } from "../..";
-
+import { createStore } from "redux";
+import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
 export default {
     component: DeckGLMap,
     title: "DeckGLMap",
@@ -151,5 +152,17 @@ TooltipStyle.parameters = {
         },
         inlineStories: false,
         iframeHeight: 500,
+    },
+};
+
+export const customizedCameraPosition = Template.bind({});
+
+customizedCameraPosition.args = {
+    ...defaultProps,
+    getCameraPosition: {
+        target: [396638.95884797024, 6467831.83598219],
+        zoom: -6.28820538480389,
+        rotationX: 90,
+        rotationOrbit: 0,
     },
 };
