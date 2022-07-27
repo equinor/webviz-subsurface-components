@@ -11,8 +11,7 @@ import {
     TerrainMapPickInfo,
     FeatureCollection,
 } from "../..";
-import { createStore } from "redux";
-import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
+
 export default {
     component: DeckGLMap,
     title: "DeckGLMap",
