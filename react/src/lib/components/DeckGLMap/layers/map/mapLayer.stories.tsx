@@ -354,7 +354,7 @@ Readout.parameters = {
     },
 };
 
-export const MapDiscontinuous: ComponentStory<typeof DeckGLMap> = () => {
+export const BigMapWithHole: ComponentStory<typeof DeckGLMap> = () => {
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
     const args = React.useMemo(() => {
@@ -363,9 +363,10 @@ export const MapDiscontinuous: ComponentStory<typeof DeckGLMap> = () => {
             id: "readout",
             layers: [
                 {
-                    ...meshMapLayerFloat32,
+                    ...meshMapLayerBig,
                     meshUrl: "hugin_depth_5_m_w_hole.float32",
-                    contours: [0, 50],
+                    cellCenteredProperties: false,
+                    gridLines: false,
                     material: false,
                 },
             ],
@@ -384,11 +385,11 @@ export const MapDiscontinuous: ComponentStory<typeof DeckGLMap> = () => {
     );
 };
 
-MapDiscontinuous.parameters = {
+BigMapWithHole.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Example with discontinous map (map with a hole).",
+            story: "Example of map with a hole.",
         },
     },
 };
@@ -424,6 +425,9 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
                 {
                     ...meshMapLayerFloat32,
                     colorMapFunction: colorMap,
+                    cellCenteredProperties: false,
+                    gridLines: false,
+                    material: true,
                 },
             ],
             legend: { visible: false },
