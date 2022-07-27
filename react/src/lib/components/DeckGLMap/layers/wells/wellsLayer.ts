@@ -494,9 +494,10 @@ export default class WellsLayer extends CompositeLayer<
         logName: string;
     } {
         if (!info.object) return { ...info, properties: [], logName: "" };
-
+        console.log("info");
+        console.log(info.object["geometry"]["geometries"]);
+        console.log("====================");
         const coordinate = info.coordinate || [0, 0, 0];
-
         let md_property = getMdProperty(
             coordinate,
             info.object as unknown as Feature,
@@ -533,6 +534,7 @@ export default class WellsLayer extends CompositeLayer<
             this.props.logName
         );
 
+    
         // Patch for inverting tvd readout to fix issue #830,
         // should make proper fix when handling z increase direction - issue #842
         const inverted_tvd_property = tvd_property && {
@@ -544,7 +546,6 @@ export default class WellsLayer extends CompositeLayer<
         if (md_property) layer_properties.push(md_property);
         if (inverted_tvd_property) layer_properties.push(inverted_tvd_property);
         if (log_property) layer_properties.push(log_property);
-
         return {
             ...info,
             properties: layer_properties,
@@ -1042,7 +1043,6 @@ function getMd(
     accessor: ColorAccessor
 ): number | null {
     if (!feature.properties?.["md"]?.[0] || !feature.geometry) return null;
-
     const measured_depths = feature.properties["md"][0] as number[];
     const trajectory3D = getTrajectory(feature, accessor);
 
