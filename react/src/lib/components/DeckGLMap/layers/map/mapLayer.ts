@@ -179,6 +179,9 @@ function makeFullMesh(
     const colorMapRangeMin = colorMapRange?.[0] ?? valueRangeMin;
     const colorMapRangeMax = colorMapRange?.[1] ?? valueRangeMax;
 
+    const isColorMapClampColorTransparent: boolean =
+        (colorMapClampColor as boolean) === false;
+
     const isClampColor: boolean =
         colorMapClampColor !== undefined &&
         colorMapClampColor !== true &&
@@ -189,9 +192,6 @@ function makeFullMesh(
     const clampColor = (colorMapClampColor as RGBColor).map(
         (x) => (x ?? 0) / 255
     );
-
-    const isColorMapClampColorTransparent: boolean =
-        (colorMapClampColor as boolean) === false;
 
     // Dimensions.
     const ox = dim.origin[0];
@@ -235,7 +235,7 @@ function makeFullMesh(
                 );
 
                 if (!color) {
-                    color = [0, 0, 0];
+                    color = [NaN, NaN, NaN];
                 }
 
                 positions.push(x, y, z);
@@ -251,8 +251,16 @@ function makeFullMesh(
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
+                const color = [
+                    vertexColors[3 * i0 + 0],
+                    vertexColors[3 * i0 + 1],
+                    vertexColors[3 * i0 + 2],
+                ];
+                const isColor = !isEqual(color, [NaN, NaN, NaN]);
+
                 // t1
                 if (
+                    isColor &&
                     !isNaN(meshData[i0]) &&
                     !isNaN(meshData[i1]) &&
                     !isNaN(meshData[i3])
@@ -262,6 +270,7 @@ function makeFullMesh(
 
                 // t2
                 if (
+                    isColor &&
                     !isNaN(meshData[i1]) &&
                     !isNaN(meshData[i3]) &&
                     !isNaN(meshData[i2])
@@ -446,13 +455,13 @@ async function load_mesh_and_texture(
         console.error("Could not load ", propertiesUrl);
     }
 
-    let propertiesArray: Float32Array;
+    let propertiesData: Float32Array;
     const blob = await response.blob();
     const contentType = response.headers.get("content-type");
     const isPng = contentType === "image/png";
     if (isPng) {
         // Load as Png  with abolute float values.
-        propertiesArray = await new Promise((resolve) => {
+        propertiesData = await new Promise((resolve) => {
             const fileReader = new FileReader();
             fileReader.readAsArrayBuffer(blob);
             fileReader.onload = () => {
@@ -474,7 +483,7 @@ async function load_mesh_and_texture(
     } else {
         // Load as binary array of floats.
         const buffer = await blob.arrayBuffer();
-        propertiesArray = new Float32Array(buffer);
+        propertiesData = new Float32Array(buffer);
     }
 
     //-- MESH --
@@ -525,7 +534,7 @@ async function load_mesh_and_texture(
         cellCenteredProperties,
         dim,
         meshData,
-        propertiesArray,
+        propertiesData,
         colorMapName,
         colorMapFunction,
         colorMapRange,
@@ -542,7 +551,6 @@ async function load_mesh_and_texture(
     readOutDataName.push("Depth");
 
     // create float texture for the properties of the.
-    //const propertyValueRange = getFloat32ArrayMinMax(propertiesArray);  // XXX denne kan retires...
     const format = GL.R32F;
     const type = GL.FLOAT;
     const propertyTexture = new Texture2D(gl, {
@@ -550,13 +558,13 @@ async function load_mesh_and_texture(
         height: h,
         format,
         type,
-        data: propertiesArray,
+        data: propertiesData,
         mipmaps: false,
         parameters: DEFAULT_TEXTURE_PARAMETERS,
     });
 
     if (isProperties) {
-        const propertyData = makeFixedSizeCopy(propertiesArray, w, h);
+        const propertyData = makeFixedSizeCopy(propertiesData, w, h);
         readOutData.push(propertyData);
         readOutDataName.push("Property");
     }
