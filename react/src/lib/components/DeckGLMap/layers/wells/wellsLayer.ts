@@ -494,9 +494,12 @@ export default class WellsLayer extends CompositeLayer<
         logName: string;
     } {
         if (!info.object) return { ...info, properties: [], logName: "" };
-        // console.log("info");
-        // console.log(info.object["geometry"]["geometries"]);
-        // console.log("====================");
+        console.log(info);
+        if (info.featureType !== undefined) {
+
+        console.log("====================");
+        }
+       
         const coordinate = info.coordinate || [0, 0, 0];
         let md_property = getMdProperty(
             coordinate,
