@@ -241,9 +241,6 @@ function defaultTooltip(info: PickInfo<unknown>) {
     return feat?.properties?.["name"];
 }
 
-// function defaultCameraPosition() {
-//    return {}
-// }
 const Map: React.FC<MapProps> = ({
     id,
     resources,
@@ -602,22 +599,6 @@ MapProps) => {
             ) : null}
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
             {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
-            {Object.keys(getCameraPosition).length !== 0 ? (
-                <div
-                    style={{
-                        position: "absolute",
-                        marginTop: 100,
-                    }}
-                >
-                    <div>zoom: {getCameraPosition.zoom}</div>
-                    <div>rotationX: {getCameraPosition.rotationX}</div>
-                    <div>rotationOrbit: {getCameraPosition.rotationOrbit}</div>
-                    <div>
-                        targetX: {getCameraPosition.target[0]} targetY:
-                        {getCameraPosition.target[1]}
-                    </div>
-                </div>
-            ) : null}
             {errorText && (
                 <pre
                     style={{

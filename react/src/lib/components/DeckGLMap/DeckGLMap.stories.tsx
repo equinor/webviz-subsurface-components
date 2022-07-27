@@ -155,14 +155,35 @@ TooltipStyle.parameters = {
     },
 };
 
-export const customizedCameraPosition = Template.bind({});
+const getCameraPosition = {
+    target: [396638.95884797024, 6467831.83598219],
+    zoom: -6.28820538480389,
+    rotationX: 90,
+    rotationOrbit: 0,
+};
+const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => (
+    <>
+        <DeckGLMap {...args} />
+        <div
+            style={{
+                position: "absolute",
+                marginTop: 100,
+            }}
+        >
+            <div>zoom: {getCameraPosition.zoom}</div>
+            <div>rotationX: {getCameraPosition.rotationX}</div>
+            <div>rotationOrbit: {getCameraPosition.rotationOrbit}</div>
+            <div>
+                targetX: {getCameraPosition.target[0]} targetY:
+                {getCameraPosition.target[1]}
+            </div>
+        </div>
+    </>
+);
+
+export const customizedCameraPosition = CustomTemplate.bind({});
 
 customizedCameraPosition.args = {
     ...defaultProps,
-    getCameraPosition: {
-        target: [396638.95884797024, 6467831.83598219],
-        zoom: -6.28820538480389,
-        rotationX: 90,
-        rotationOrbit: 0,
-    },
+    getCameraPosition: getCameraPosition,
 };
