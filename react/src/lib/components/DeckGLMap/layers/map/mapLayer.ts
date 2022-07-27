@@ -683,18 +683,8 @@ export default class MapLayer extends CompositeLayer<
         props: MapLayerProps<unknown>;
         oldProps: MapLayerProps<unknown>;
     }): void {
-        const needs_reload =
-            !isEqual(props.meshUrl, oldProps.meshUrl) ||
-            !isEqual(props.frame, oldProps.frame) ||
-            !isEqual(
-                props.cellCenteredProperties,
-                oldProps.cellCenteredProperties
-            ) ||
-            !isEqual(props.gridLines, oldProps.gridLines) ||
-            !isEqual(props.propertiesUrl, oldProps.propertiesUrl);
-
+        const needs_reload = !isEqual(props, oldProps);
         if (needs_reload) {
-            // Reload mesh and texture.
             this.initializeState();
         }
     }
@@ -717,7 +707,6 @@ export default class MapLayer extends CompositeLayer<
         const isMesh =
             typeof this.props.meshUrl !== "undefined" &&
             this.props.meshUrl !== "";
-
         const layer = new privateMapLayer(
             this.getSubLayerProps<unknown, privateMapLayerProps<unknown>>({
                 mesh: [this.state.mesh, this.state.mesh_lines],

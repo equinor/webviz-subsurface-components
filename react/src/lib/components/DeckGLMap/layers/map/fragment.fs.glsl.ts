@@ -11,7 +11,7 @@ uniform sampler2D propertyTexture;
 
 in vec2 vTexCoord;
 in vec3 cameraPosition;
-// in vec3 normals_commonspace;
+//in vec3 normals_commonspace;
 in vec4 position_commonspace;
 in vec4 vColor;
 
@@ -23,12 +23,11 @@ void main(void) {
    geometry.uv = vTexCoord;
 
    vec3 normal = vec3(0.0, 0.0, 1.0);
-   if (true) {
-#ifdef DERIVATIVES_AVAILABLE
+   bool nomals_available = false;
+   if (!nomals_available) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
-#endif
-   }
-   // } else {
+   } 
+   // else {
    //    normal = normals_commonspace;
    // }
 
@@ -53,7 +52,6 @@ void main(void) {
       return;
    }
   
-
    bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
    if (is_contours) {
       // Contours are made of either depths or properties.

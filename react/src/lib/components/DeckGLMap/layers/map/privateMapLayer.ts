@@ -5,9 +5,10 @@ import { readoutMatrixSize } from "./mapLayer";
 import { Geometry } from "@luma.gl/core";
 import { picking, project, phongLighting } from "deck.gl";
 import { Model } from "@luma.gl/engine";
-import { LayerContext } from "@deck.gl/core/typed";
+import { DeckGLLayerContext } from "../../components/Map";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { Layer } from "@deck.gl/core";
+import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import vsShader from "./vertex.glsl";
 import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
@@ -59,10 +60,35 @@ export default class privateMapLayer extends Layer<
     unknown,
     privateMapLayerProps<unknown>
 > {
-    initializeState(context: LayerContext): void {
+    initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
         const [model_mesh, mesh_lines_model] = this._getModels(gl);
         this.setState({ models: [model_mesh, mesh_lines_model] });
+    }
+
+    shouldUpdateState({
+        props,
+        oldProps,
+        context,
+        changeFlags,
+    }: UpdateStateInfo<privateMapLayerProps<unknown>>):
+        | boolean
+        | string
+        | null {
+        return (
+            super.shouldUpdateState({
+                props,
+                oldProps,
+                context,
+                changeFlags,
+            }) || changeFlags.propsOrDataChanged
+        );
+    }
+
+    updateState({
+        context,
+    }: UpdateStateInfo<privateMapLayerProps<unknown>>): void {
+        this.initializeState(context as DeckGLLayerContext);
     }
 
     //eslint-disable-next-line
