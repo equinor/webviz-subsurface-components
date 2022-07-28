@@ -5,9 +5,20 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import DeckGLMap from "./DeckGLMap";
+import { format } from "d3-format";
+import { PickInfo, WellsPickInfo } from "../..";
 
 const mapData = require("../../../demo/example-data/deckgl-map.json");
 const colorTablesData = require("../../../demo/example-data/color-tables.json");
+
+function mdTooltip(info: PickInfo<unknown>) {
+    if (!info.picked) return null;
+    const value = (info as WellsPickInfo)?.properties?.[0].value;
+    if (!value) return null;
+    const f = format(".2f");
+    const niceValue = f(+value);
+    return "MD: " + niceValue;
+}
 
 describe("Test Map component", () => {
     it("snapshot test", () => {
@@ -91,6 +102,26 @@ describe("Test Map component", () => {
                     ],
                 }}
                 colorTables={[colorTablesData[0]]}
+            />
+        );
+        expect(container.firstChild).toMatchSnapshot();
+    });
+    xit("snapshot test with over riding tooltip", () => {
+        const { container } = render(
+            <DeckGLMap
+                resources={mapData[0].resources}
+                layers={mapData[0].layers}
+                views={{
+                    layout: [1, 1],
+                    showLabel: false,
+                    viewports: [
+                        { id: "main-view", show3D: false, layerIds: [] },
+                    ],
+                }}
+                checkDatafileSchema={false}
+                id={""}
+                bounds={[433000, 6476000, 439000, 6480000]}
+                getTooltip={mdTooltip}
             />
         );
         expect(container.firstChild).toMatchSnapshot();

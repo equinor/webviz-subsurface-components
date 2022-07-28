@@ -30,4 +30,21 @@ describe("Test Color Legend", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
     });
+    it("snapshot test with props", () => {
+        const { container } = render(
+            <ColorLegends
+                layers={
+                    getLayersInViewport(layers, [
+                        "geojson-line-layer",
+                        "geojson-layer",
+                        "text-layer",
+                    ]) as Layer<unknown>[]
+                }
+                horizontal={true}
+                colorTables={colorTables}
+                reverseRange={true}
+            />
+        );
+        expect(container.firstChild).toMatchSnapshot();
+    });
 });
