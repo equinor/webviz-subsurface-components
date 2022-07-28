@@ -118,9 +118,6 @@ const tooltipImpFunc: TooltipCallback = (
         outputString += processPropInfo(properties, true);
     } else if (layerName === "WellsLayer") {
         const wellsPickInfo = info as WellsPickInfo;
-        console.log("======");
-        console.log(info);
-        console.log("=====");
         const featurePickInfo = info as PickInfo<FeatureCollection>;
         const wellsPickInfoObject = featurePickInfo.object as FeatureCollection;
         const wellProperties = wellsPickInfoObject.properties;
