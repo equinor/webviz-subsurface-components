@@ -494,10 +494,8 @@ export default class WellsLayer extends CompositeLayer<
         logName: string;
     } {
         if (!info.object) return { ...info, properties: [], logName: "" };
-        console.log(info);
         if (info.featureType !== undefined) {
 
-        console.log("====================");
         }
        
         const coordinate = info.coordinate || [0, 0, 0];
@@ -515,6 +513,7 @@ export default class WellsLayer extends CompositeLayer<
                 "MD"
             );
         }
+        console.log(md_property);
         let tvd_property = getTvdProperty(
             info.coordinate as Position2D,
             info.object as unknown as Feature,
