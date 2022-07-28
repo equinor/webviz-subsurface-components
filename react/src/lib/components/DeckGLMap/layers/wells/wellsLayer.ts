@@ -500,7 +500,8 @@ export default class WellsLayer extends CompositeLayer<
         let md_property = getMdProperty(
             coordinate,
             info.object as unknown as Feature,
-            this.props.lineStyle?.color
+            this.props.lineStyle?.color,
+            info.featureType
         );
         if (!md_property) {
             md_property = getLogProperty(
@@ -514,7 +515,8 @@ export default class WellsLayer extends CompositeLayer<
         let tvd_property = getTvdProperty(
             info.coordinate as Position2D,
             info.object as unknown as Feature,
-            this.props.lineStyle?.color
+            this.props.lineStyle?.color,
+            info.featureType
         );
         if (!tvd_property) {
             tvd_property = getLogProperty(
@@ -533,13 +535,6 @@ export default class WellsLayer extends CompositeLayer<
             this.props.logName
         );
 
-        if (info.featureType === "points" && md_property) {
-            md_property.value =0;
-        }
-
-        if (info.featureType === "points" && tvd_property) {
-            tvd_property.value =0;
-        }
         // Patch for inverting tvd readout to fix issue #830,
         // should make proper fix when handling z increase direction - issue #842
         const inverted_tvd_property = tvd_property && {
@@ -1073,8 +1068,12 @@ function getMd(
 function getMdProperty(
     coord: Position,
     feature: Feature,
-    accessor: ColorAccessor
+    accessor: ColorAccessor,
+    featureType: string | undefined
 ): PropertyDataType | null {
+    if (featureType === "points") {
+        return null
+    }
     const md = getMd(coord, feature, accessor);
     if (md != null) {
         const prop_name = "MD " + feature.properties?.["name"];
@@ -1116,8 +1115,12 @@ function getTvd(
 function getTvdProperty(
     coord: Position,
     feature: Feature,
-    accessor: ColorAccessor
+    accessor: ColorAccessor,
+    featureType: string | undefined
 ): PropertyDataType | null {
+    if (featureType === "points") {
+        return null
+    }
     const tvd = getTvd(coord, feature, accessor);
     if (tvd != null) {
         const prop_name = "TVD " + feature.properties?.["name"];
