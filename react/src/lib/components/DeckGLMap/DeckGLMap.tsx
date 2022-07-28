@@ -1,4 +1,8 @@
-import Map, { ViewsType, TooltipCallback, ViewStateType } from "./components/Map";
+import Map, {
+    ViewsType,
+    TooltipCallback,
+    ViewStateType,
+} from "./components/Map";
 import { MapMouseEvent } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
