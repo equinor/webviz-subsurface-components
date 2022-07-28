@@ -216,16 +216,40 @@ AllTrajectoryHidden.args = {
     layers: [
         {
             ...defaultProps.layers[0],
-            lineStyle: { color: [0, 0, 0, 0] },
+            lineStyle: { color: [100, 100, 100, 100] },
+            wellHeadSyle: { pointRadiusScale: 0 },
             refine: false,
             outline: false,
         },
     ],
 };
+
 AllTrajectoryHidden.parameters = {
     docs: {
         description: {
             story: "Volve wells example with all trajectory hidden.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const AllWellHeadsHidden = Template.bind({});
+AllWellHeadsHidden.args = {
+    ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            wellHeadStyle: { pointRadiusScale: 0 },
+            refine: false,
+            outline: false,
+        },
+    ],
+};
+AllWellHeadsHidden.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with all well heads hidden.",
         },
         inlineStories: false,
         iframeHeight: 500,

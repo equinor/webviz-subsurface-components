@@ -268,6 +268,7 @@ const Map: React.FC<MapProps> = ({
         getViewState(bounds, zoom)
     );
 
+    console.log(layers);
     // react on zoom prop change
     useEffect(() => {
         const vs = getViewState(bounds, zoom, deckRef.current?.deck);
