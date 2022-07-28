@@ -494,9 +494,6 @@ export default class WellsLayer extends CompositeLayer<
         logName: string;
     } {
         if (!info.object) return { ...info, properties: [], logName: "" };
-        if (info.featureType !== undefined) {
-
-        }
        
         const coordinate = info.coordinate || [0, 0, 0];
         let md_property = getMdProperty(
@@ -504,7 +501,7 @@ export default class WellsLayer extends CompositeLayer<
             info.object as unknown as Feature,
             this.props.lineStyle?.color
         );
-        if (!md_property) {
+        if (!md_property && info.featureType ===undefined) {
             md_property = getLogProperty(
                 coordinate as Position2D,
                 (this.props.data as FeatureCollection).features,
@@ -512,7 +509,7 @@ export default class WellsLayer extends CompositeLayer<
                 this.props.logrunName,
                 "MD"
             );
-        }
+        } 
         console.log(md_property);
         let tvd_property = getTvdProperty(
             info.coordinate as Position2D,
