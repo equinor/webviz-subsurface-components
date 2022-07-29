@@ -1,7 +1,6 @@
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { Texture2D } from "@luma.gl/core";
 import { createPropertyData, PropertyDataType } from "../utils/layerTools";
-import { readoutMatrixSize } from "./mapLayer";
 import { Geometry } from "@luma.gl/core";
 import { picking, project, phongLighting } from "deck.gl";
 import { Model } from "@luma.gl/engine";
@@ -15,13 +14,24 @@ import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 
 export type MeshType = {
+    drawMode?: number;
     attributes: {
         positions: { value: Float32Array; size: number };
-        TEXCOORD_0?: { value: Float32Array; size: number };
+        TEXCOORD_0: { value: Float32Array; size: number };
         normals?: { value: Float32Array; size: number };
-        colors?: { value: Float32Array; size: number };
+        colors: { value: Float32Array; size: number };
+        properties: { value: Int32Array; size: number };
     };
-    indices?: { value: Uint32Array; size: number };
+    vertexCount: number;
+    indices: { value: Uint32Array; size: number };
+};
+
+export type MeshTypeLines = {
+    drawMode: number;
+    attributes: {
+        positions: { value: Float32Array; size: number };
+    };
+    vertexCount: number;
 };
 
 export type Material =
@@ -34,21 +44,16 @@ export type Material =
     | boolean;
 
 export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
-    mesh: [MeshType, MeshType];
-    meshWidth: number;
+    mesh: MeshType;
+    meshLines: MeshTypeLines;
     propertyTexture: Texture2D;
-
-    readOutData: Float32Array[];
-    readOutDataName: string[];
     contours: [number, number];
     gridLines: boolean;
-
     isContoursDepth: boolean;
 }
 
 const defaultProps = {
     data: ["dummy"],
-    meshWidth: 1,
     contours: [-1, -1],
     isContoursDepth: true,
     gridLines: false,
@@ -93,14 +98,26 @@ export default class privateMapLayer extends Layer<
 
     //eslint-disable-next-line
     _getModels(gl: any) {
-        const [mesh, mesh_lines] = this.props.mesh;
-
         // MESH MODEL
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
             fs: fsShader,
-            geometry: new Geometry(mesh),
+            geometry: new Geometry({
+                drawMode: this.props.mesh.drawMode,
+                attributes: {
+                    positions: this.props.mesh.attributes.positions,
+                    colors: this.props.mesh.attributes.colors,
+                    TEXCOORD_0: this.props.mesh.attributes.TEXCOORD_0,
+                    properties: this.props.mesh.attributes.properties,
+                    vertex_indexs: {
+                        value: new Int32Array(this.props.mesh.indices.value),
+                        size: 1,
+                    },
+                },
+                vertexCount: this.props.mesh.vertexCount,
+                indices: this.props.mesh.indices,
+            }),
             modules: [project, picking, phongLighting],
             isInstanced: false, // This only works when set to false.
         });
@@ -110,7 +127,7 @@ export default class privateMapLayer extends Layer<
             id: `${this.props.id}-lines`,
             vs: vsLineShader,
             fs: fsLineShader,
-            geometry: new Geometry(mesh_lines),
+            geometry: new Geometry(this.props.meshLines),
             modules: [project, picking],
             isInstanced: false,
         });
@@ -160,24 +177,22 @@ export default class privateMapLayer extends Layer<
             return info;
         }
 
-        // Texture coordinates.
-        const s = info.color[0] / 255.0;
-        const t = info.color[1] / 255.0;
-
-        // MESH & PROPERTY VALUE.
-        const j = Math.max(Math.round(s * readoutMatrixSize) - 1, 0);
-        const i = Math.max(Math.round(t * readoutMatrixSize) - 1, 0);
-        const idx = i * readoutMatrixSize + j;
-
         const layer_properties: PropertyDataType[] = [];
 
-        for (let i = 0; i < this.props.readOutData.length; i++) {
-            const value = this.props.readOutData[i][idx];
-            const name = this.props.readOutDataName[i];
-            layer_properties.push(
-                createPropertyData(name, isNaN(value) ? "NaN" : value)
-            );
-        }
+        // Note these colors are in the  0-255 range.
+        const r = info.color[0];
+        const g = info.color[1];
+        const b = info.color[2];
+
+        const vertexIndex = 256 * 256 * r + 256 * g + b;
+
+        const vertexs = this.props.mesh.attributes.positions.value;
+        const depth = -vertexs[3 * vertexIndex + 2];
+        layer_properties.push(createPropertyData("Depth", depth));
+
+        const properties = this.props.mesh.attributes.properties.value;
+        const property = properties[vertexIndex];
+        layer_properties.push(createPropertyData("Property", property));
 
         return {
             ...info,

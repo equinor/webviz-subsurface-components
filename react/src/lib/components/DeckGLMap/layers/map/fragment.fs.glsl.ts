@@ -15,6 +15,8 @@ in vec3 cameraPosition;
 in vec4 position_commonspace;
 in vec4 vColor;
 
+flat in int vertex_indexs_;
+
 out vec4 fragColor;
 
 in vec3 worldPos;
@@ -44,11 +46,26 @@ void main(void) {
 
    //Picking pass.
    if (picking_uActive) {
-      // Send texture coordinates.
-      float s = vTexCoord.x;
-      float t = vTexCoord.y;
-
-      fragColor = vec4(s, t, 0.0, 1.0);
+      // Express triangle index in 255 system.
+      float r = 0.0;
+      float g = 0.0;
+      float b = 0.0;
+  
+      int idx = vertex_indexs_;
+  
+      if (idx >= (256 * 256) - 1) {
+         r = floor(float(idx) / (256.0 * 256.0));
+         idx -= int(r * (256.0 * 256.0));
+      }
+  
+      if (idx >= 256 - 1) {
+         g = floor(float(idx) / 256.0);
+         idx -= int(g * 256.0);
+      }
+  
+      b = float(idx);
+  
+      fragColor = vec4(r / 255.0, g / 255.0, b / 255.0,  1.0);
       return;
    }
   
