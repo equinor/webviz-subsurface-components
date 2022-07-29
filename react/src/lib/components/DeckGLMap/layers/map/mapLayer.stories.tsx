@@ -50,9 +50,9 @@ const meshMapLayerPng = {
     propertiesUrl: "kh_netmap_25_m.png",
     contours: [0, 100],
     isContoursDepth: true,
-    gridLines: true,
+    gridLines: false,
     cellCenteredProperties: true,
-    material: false,
+    material: true,
     colorMapName: "Physics",
 };
 

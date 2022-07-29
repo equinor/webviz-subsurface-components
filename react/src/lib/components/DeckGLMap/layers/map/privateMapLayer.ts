@@ -20,7 +20,7 @@ export type MeshType = {
         TEXCOORD_0: { value: Float32Array; size: number };
         normals?: { value: Float32Array; size: number };
         colors: { value: Float32Array; size: number };
-        properties: { value: Int32Array; size: number };
+        properties: { value: Float32Array; size: number };
     };
     vertexCount: number;
     indices: { value: Uint32Array; size: number };

@@ -345,7 +345,7 @@ function makeFullMesh(
             positions: { value: new Float32Array(positions), size: 3 },
             TEXCOORD_0: { value: new Float32Array(texCoords), size: 2 },
             colors: { value: new Float32Array(vertexColors), size: 3 },
-            properties: { value: new Int32Array(vertexProperties), size: 1 },
+            properties: { value: new Float32Array(vertexProperties), size: 1 },
         },
         vertexCount: indices.length,
         indices: { value: new Uint32Array(indices), size: 1 },
