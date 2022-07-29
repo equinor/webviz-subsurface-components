@@ -501,7 +501,7 @@ export default class WellsLayer extends CompositeLayer<
             coordinate,
             info.object as unknown as Feature,
             this.props.lineStyle?.color,
-            info.featureType
+            info.featureType as unknown as string
         );
         if (!md_property) {
             md_property = getLogProperty(
@@ -516,7 +516,7 @@ export default class WellsLayer extends CompositeLayer<
             info.coordinate as Position2D,
             info.object as unknown as Feature,
             this.props.lineStyle?.color,
-            info.featureType
+            info.featureType as unknown as string
         );
         if (!tvd_property) {
             tvd_property = getLogProperty(

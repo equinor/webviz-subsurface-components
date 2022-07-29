@@ -123,7 +123,7 @@ const tooltipImpFunc: TooltipCallback = (
         const wellProperties = wellsPickInfoObject.properties;
         const name = (wellProperties as { name: string }).name;
         outputString += `Well: ${name || ""}`;
-        if (info.featureType !== "points"){
+        if ((info.featureType as unknown as string) !== "points") {
             outputString += processPropInfo(wellsPickInfo.properties, true);
         }
     }
