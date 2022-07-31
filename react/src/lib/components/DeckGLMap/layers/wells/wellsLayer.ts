@@ -48,7 +48,12 @@ type NumberPair = [number, number];
 type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
 type ColorAccessor = RGBAColor | StyleAccessorFunction | undefined;
 type WidthAccessor = number | StyleAccessor | undefined;
+type SizeAccessor = number | StyleAccessorFunction | undefined;
 type LineStyle = NumberPair | RGBAColor | number;
+type WellHeadStyle = {
+    size?: SizeAccessor;
+    color?: ColorAccessor;
+};
 
 type StyleAccessor = {
     color?: ColorAccessor;
@@ -68,7 +73,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
-    wellHeadStyle: number;
+    wellHeadStyle: WellHeadStyle;
     colorMappingFunction: (x: number) => [number, number, number];
     lineStyle: StyleAccessor;
     wellNameVisible: boolean;
@@ -304,7 +309,7 @@ export default class WellsLayer extends CompositeLayer<
                 pointRadiusScale:
                     this.props.wellHeadStyle === undefined
                         ? this.props.pointRadiusScale
-                        : this.props.wellHeadStyle.pointRadiusScale,
+                        : this.props.wellHeadStyle.size,
                 lineWidthScale: this.props.lineWidthScale,
                 getLineWidth: getLineWidth(this.props.lineStyle?.width),
                 extensions: extensions,
@@ -326,7 +331,7 @@ export default class WellsLayer extends CompositeLayer<
                 pointRadiusScale:
                     this.props.wellHeadStyle === undefined
                         ? this.props.pointRadiusScale - 1
-                        : this.props.wellHeadStyle.pointRadiusScale,
+                        : this.props.wellHeadStyle.size,
                 lineWidthScale: this.props.lineWidthScale,
                 getLineWidth: getLineWidth(this.props.lineStyle?.width, -1),
                 getFillColor: (d: Feature) => d.properties?.["color"],
@@ -358,7 +363,7 @@ export default class WellsLayer extends CompositeLayer<
                 pointRadiusScale:
                     this.props.wellHeadStyle === undefined
                         ? this.props.pointRadiusScale + 2
-                        : this.props.wellHeadStyle.pointRadiusScale,
+                        : this.props.wellHeadStyle.size,
                 lineWidthScale: this.props.lineWidthScale,
                 getLineWidth: getLineWidth(this.props.lineStyle?.width, 2),
                 getFillColor: (d: Feature) => d.properties?.["color"],

@@ -216,8 +216,7 @@ AllTrajectoryHidden.args = {
     layers: [
         {
             ...defaultProps.layers[0],
-            lineStyle: { color: [100, 100, 100, 100] },
-            wellHeadSyle: { pointRadiusScale: 0 },
+            lineStyle: { color: [0, 0, 0, 0] },
             refine: false,
             outline: false,
         },
@@ -240,7 +239,7 @@ AllWellHeadsHidden.args = {
     layers: [
         {
             ...defaultProps.layers[0],
-            wellHeadStyle: { pointRadiusScale: 0 },
+            wellHeadStyle: { size: 0 },
             refine: false,
             outline: false,
         },
