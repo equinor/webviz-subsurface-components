@@ -65,6 +65,7 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     getCameraPosition?: ViewStateType | undefined;
+    isVisible: boolean;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -87,6 +88,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     selection,
     getTooltip,
     getCameraPosition,
+    isVisible,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -149,6 +151,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 selection={selection}
                 getTooltip={getTooltip}
                 getCameraPosition={getCameraPosition}
+                isVisible={isVisible}
             />
         </ReduxProvider>
     );
