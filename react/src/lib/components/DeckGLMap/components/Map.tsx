@@ -206,6 +206,7 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     getCameraPosition?: ViewStateType | undefined;
+    isVisible: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -262,15 +263,13 @@ const Map: React.FC<MapProps> = ({
     children,
     getTooltip = defaultTooltip,
     getCameraPosition = {} as ViewStateType,
-}: 
-MapProps) => {
+    isVisible = false,
+}: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
-    // getViewState(bounds, zoom)
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewState, setViewState] =
         useState<ViewStateType>(getCameraPosition);
     getCameraPosition = viewState;
-    console.log(viewState);
     // react on zoom prop change
     useEffect(() => {
         const vs = getViewState(bounds, zoom, deckRef.current?.deck);
@@ -596,6 +595,22 @@ MapProps) => {
                     zoom={viewState?.zoom}
                     scaleUnit={coordinateUnit}
                 />
+            ) : null}
+            {isVisible ? (
+                <div
+                    style={{
+                        position: "absolute",
+                        marginLeft: 200,
+                    }}
+                >
+                    <div>zoom: {getCameraPosition?.zoom}</div>
+                    <div>rotationX: {getCameraPosition?.rotationX}</div>
+                    <div>rotationOrbit: {getCameraPosition?.rotationOrbit}</div>
+                    <div>
+                        targetX: {getCameraPosition?.target[0]} targetY:
+                        {getCameraPosition?.target[1]}
+                    </div>
+                </div>
             ) : null}
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
             {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
