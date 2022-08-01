@@ -6,9 +6,12 @@ import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { TextLayer, TextLayerProps } from "@deck.gl/layers";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { Position3D } from "@deck.gl/core/utils/positions";
+import { RGBAColor } from "deck.gl";
 
 export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     bounds: [number, number, number, number, number, number];
+    labelColor?: RGBAColor;
+    axisColor?: RGBAColor;
 }
 
 type TextLayerData = {
@@ -141,6 +144,7 @@ export default class AxesLayer extends CompositeLayer<
             this.getSubLayerProps({
                 lines,
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+                color: this.props.axisColor || [0, 0, 0, 255],
             })
         );
 
@@ -159,6 +163,7 @@ export default class AxesLayer extends CompositeLayer<
                 getAlignmentBaseline: (d: TextLayerData) =>
                     this.getBaseLine(d, is_orthographic),
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+                getColor: this.props.labelColor || [0, 0, 0, 255],
             })
         );
 

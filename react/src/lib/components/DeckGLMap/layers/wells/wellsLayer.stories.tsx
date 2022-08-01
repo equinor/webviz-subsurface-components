@@ -67,7 +67,7 @@ DiscreteWellLogs.args = {
             ...defaultProps.layers[0],
             refine: false,
             outline: false,
-            logData: "./volve_logs.json",
+            logData: "volve_blocking_zonelog_logs.json",
             logrunName: "BLOCKING",
             logName: "ZONELOG",
             logColor: "Stratigraphy",
@@ -344,7 +344,6 @@ const max = 0.35;
 const dataObjectName = "ZONELOG";
 const position = [16, 10];
 const horizontal = true;
-const colorName = wellLayers[0].logColor;
 const discreteData = {
     Above_BCU: [[], 0],
     ABOVE: [[], 1],
@@ -362,27 +361,23 @@ const discreteData = {
     H1: [[], 13],
     BELOW: [[], 14],
 };
+const reverseRange = false;
 
 //eslint-disable-next-line
 const wellLayerTemplate = (args: any) => {
-    const [wellLegendUpdated, setWellLegendUpdated] = React.useState();
+    const [getColorName, setColorName] = React.useState("Rainbow");
 
     const wellLayerData = React.useCallback((data) => {
-        setWellLegendUpdated(data);
+        setColorName(data);
     }, []);
 
     const layers = [
         {
             ...args.wellLayers[0],
-            colorMappingFunction: createColorMapFunction(
-                wellLegendUpdated ? wellLegendUpdated : wellLayers[0].logColor
-            ),
-            logColor: wellLegendUpdated
-                ? wellLegendUpdated
-                : wellLayers[0].logColor,
+            colorMappingFunction: createColorMapFunction(getColorName),
+            logColor: getColorName ? getColorName : wellLayers[0].logColor,
         },
     ];
-
     return (
         <div>
             <div
@@ -393,7 +388,7 @@ const wellLayerTemplate = (args: any) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} getColorMapname={wellLayerData} />
+                <ColorLegend {...args} getColorName={wellLayerData} />
             </div>
             <DeckGLMap {...args} layers={layers} />
         </div>
@@ -409,7 +404,6 @@ LegendWithColorSelector.args = {
     dataObjectName,
     position,
     horizontal,
-    colorName,
     colorTables,
     discreteData,
     ...defaultProps,
@@ -418,6 +412,7 @@ LegendWithColorSelector.args = {
     legend: {
         visible: false,
     },
+    reverseRange,
 };
 
 LegendWithColorSelector.parameters = {

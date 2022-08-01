@@ -25,6 +25,41 @@ type MeshType = {
     indices: { value: Uint32Array; size: number };
 };
 
+// These two types both describes the mesh' extent in the horizontal plane.
+type Bounds = [number, number, number, number];
+type Frame = {
+    // mesh origin
+    origin: [number, number];
+
+    // cells size in each direction.
+    increment: [number, number];
+
+    // no cells in each direction.
+    count: [number, number];
+
+    // Rotates map counterclockwise in degrees around 'rotPoint' specified below.
+    rotDeg?: number;
+
+    // Point to rotate around using 'rotDeg'. Defaults to mesh origin.
+    rotPoint?: [number, number];
+};
+
+function getMinMax(dim: Frame): Bounds {
+    const nx = dim.count[0];
+    const ny = dim.count[1];
+
+    const dx = dim.increment[0];
+    const dy = dim.increment[1];
+
+    const xmin = dim.origin[0];
+    const ymin = dim.origin[1];
+
+    const xmax = xmin + nx * dx;
+    const ymax = ymin + ny * dy;
+
+    return [xmin, ymin, xmax, ymax];
+}
+
 function mapToRange(resolved_mesh: MeshType, meshValueRange: [number, number]) {
     const floatScaler = 1.0 / (256.0 * 256.0 * 256.0 - 1.0);
     const [min, max] = meshValueRange;
@@ -54,10 +89,7 @@ function add_normals(
 
     ////////////////////////////////////////////////////////////////
     // Remove all triangles that are in undefined areas. That is triangles which
-    const xmin = bounds[0];
-    const ymin = bounds[1];
-    const xmax = bounds[2];
-    const ymax = bounds[3];
+    const [xmin, ymin, xmax, ymax] = bounds;
 
     const w = meshImageData.width;
     const h = meshImageData.height;
@@ -182,7 +214,7 @@ function add_normals(
 
 async function load_mesh_and_texture(
     mesh_name: string,
-    bounds: [number, number, number, number],
+    bounds: Bounds,
     meshMaxError: number,
     meshValueRange: [number, number],
     enableSmoothShading: boolean,
@@ -227,15 +259,12 @@ async function load_mesh_and_texture(
         }
     } else {
         // Mesh data is missing.
-        // Make a flat square size of bounds using two triangles.  z = 0.
-        const left = bounds[0];
-        const bottom = bounds[1];
-        const right = bounds[2];
-        const top = bounds[3];
-        const p0 = [left, bottom, 0.0];
-        const p1 = [left, top, 0.0];
-        const p2 = [right, top, 0.0];
-        const p3 = [right, bottom, 0.0];
+        // Make a flat square size of enclosing dim using two triangles.  z = 0.
+        const [minX, minY, maxX, maxY] = bounds;
+        const p0 = [minX, minY, 0.0];
+        const p1 = [minX, maxY, 0.0];
+        const p2 = [maxX, maxY, 0.0];
+        const p3 = [maxX, minY, 0.0];
         const vertexes = [...p0, ...p1, ...p2, ...p3];
         const texture_coord = [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0];
 
@@ -255,8 +284,11 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image representing the height mesh.
     mesh: string;
 
-    // Bounding box of the terrain mesh, [minX, minY, maxX, maxY] in world coordinates
-    bounds: [number, number, number, number];
+    // Horizontal extent of the terrain mesh.
+    frame?: Frame;
+
+    // Deprecated: mesh's horizonal extent as [xmin, ymin, xmax, ymax]
+    bounds?: [number, number, number, number];
 
     // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
     meshMaxError: number;
@@ -264,11 +296,11 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Url to png image for map properties. (ex, poro or perm values as a texture)
     propertyTexture: string;
 
-    // Rotates map counterclockwise in degrees around 'rotPoint'.
-    rotDeg: number;
+    // Deprecated: Rotates map counterclockwise in degrees around 'rotPoint' specified below.
+    rotDeg?: number;
 
-    // Point to rotate around using 'rotDeg'. Defaults to 'bounds' upper left corner if not set.
-    rotPoint: [number, number];
+    // Deprecated: Point to rotate around using 'rotDeg'. Defaults to mesh origin.
+    rotPoint?: [number, number];
 
     // Contourlines reference point and interval.
     // A value of [-1.0, -1.0] will disable contour lines.
@@ -326,9 +358,19 @@ export default class Map3DLayer extends CompositeLayer<
 > {
     initializeState(): void {
         // Load mesh and texture and store in state.
+        const isBounds = typeof this.props.bounds !== "undefined";
+        if (isBounds) {
+            console.warn('"bounds" is deprecated. Use "frame" instead.');
+        }
+
+        const isFrame = typeof this.props.frame !== "undefined";
+        const bounds = (
+            isFrame ? getMinMax(this.props.frame as Frame) : this.props.bounds
+        ) as Bounds;
+
         const p = load_mesh_and_texture(
             this.props.mesh,
-            this.props.bounds,
+            bounds,
             this.props.meshMaxError,
             this.props.meshValueRange,
             this.props.enableSmoothShading,
@@ -354,6 +396,7 @@ export default class Map3DLayer extends CompositeLayer<
         const needs_reload =
             !isEqual(props.mesh, oldProps.mesh) ||
             !isEqual(props.bounds, oldProps.bounds) ||
+            !isEqual(props.frame, oldProps.frame) ||
             !isEqual(props.meshMaxError, oldProps.meshMaxError) ||
             !isEqual(props.meshValueRange, oldProps.meshValueRange) ||
             !isEqual(props.enableSmoothShading, oldProps.enableSmoothShading) ||
@@ -366,13 +409,36 @@ export default class Map3DLayer extends CompositeLayer<
     }
 
     renderLayers(): [TerrainMapLayer] {
-        const center = this.props.rotPoint ?? [
-            this.props.bounds[0], // Rotate around upper left corner of bounds (default).
-            this.props.bounds[3],
-        ];
+        const isBounds = typeof this.props.bounds !== "undefined";
+        const bounds = (
+            isBounds ? this.props.bounds : getMinMax(this.props.frame as Frame)
+        ) as Bounds;
+
+        // Note: these are deprecated so this code may be deleted later.
+        const isRotDegDefined = typeof this.props.rotDeg !== "undefined";
+        const isRotPointDefined = typeof this.props.rotPoint !== "undefined";
+
+        if (isRotDegDefined) {
+            console.warn('"rotDeg" is deprecated. Use "frame.rotDeg" instead.');
+        }
+
+        if (isRotPointDefined) {
+            console.warn(
+                '"rotPoint" is deprecated. Use "frame.rotPoint" instead.'
+            );
+        }
+
+        const [minX, minY] = [bounds[0], bounds[1]];
+        const center =
+            this.props.frame?.rotPoint ??
+            ((isRotPointDefined ? this.props.rotPoint : [minX, minY]) as [
+                number,
+                number
+            ]);
 
         const rotatingModelMatrix = getModelMatrix(
-            this.props.rotDeg,
+            this.props.frame?.rotDeg ??
+                ((isRotDegDefined ? this.props.rotDeg : 0) as number),
             center[0],
             center[1]
         );

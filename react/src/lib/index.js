@@ -18,6 +18,17 @@ import { VectorCalculator } from "./components/VectorCalculator";
 import WellLogViewer from "./components/WellLogViewer";
 import WebVizContinuousLegend from "./components/ColorLegends/WebVizContinuousLegend";
 import WebVizDiscreteLegend from "./components/ColorLegends/WebVizDiscreteLegend";
+import { PickInfo } from "deck.gl";
+import { TooltipCallback } from "./components/DeckGLMap/components/Map";
+import {
+    ExtendedLayerProps,
+    PropertyDataType,
+    LayerPickInfo,
+} from "./components/DeckGLMap/layers/utils/layerTools";
+import { WellsPickInfo } from "./components/DeckGLMap/layers/wells/wellsLayer";
+import TerrainMapPickInfo from "./components/DeckGLMap/layers/terrain/terrainMapLayer";
+import { FeatureCollection } from "@nebula.gl/edit-modes";
+import { MapLayerProps } from "./components/DeckGLMap/layers/map/mapLayer";
 
 export {
     HistoryMatch,
@@ -34,4 +45,13 @@ export {
     WellLogViewer,
     WebVizContinuousLegend,
     WebVizDiscreteLegend,
+    PickInfo,
+    TooltipCallback,
+    ExtendedLayerProps,
+    PropertyDataType,
+    WellsPickInfo,
+    TerrainMapPickInfo,
+    FeatureCollection,
+    LayerPickInfo,
+    MapLayerProps,
 };
