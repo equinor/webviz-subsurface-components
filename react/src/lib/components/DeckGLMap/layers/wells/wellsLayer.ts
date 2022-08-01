@@ -96,6 +96,7 @@ export interface LogCurveDataType {
 }
 
 export interface WellsPickInfo extends LayerPickInfo {
+    featureType?: string;
     logName: string;
 }
 
@@ -501,7 +502,7 @@ export default class WellsLayer extends CompositeLayer<
             coordinate,
             info.object as unknown as Feature,
             this.props.lineStyle?.color,
-            info.featureType as unknown as string
+            (info as WellsPickInfo).featureType
         );
         if (!md_property) {
             md_property = getLogProperty(
@@ -516,7 +517,7 @@ export default class WellsLayer extends CompositeLayer<
             info.coordinate as Position2D,
             info.object as unknown as Feature,
             this.props.lineStyle?.color,
-            info.featureType as unknown as string
+            (info as WellsPickInfo).featureType
         );
         if (!tvd_property) {
             tvd_property = getLogProperty(
@@ -1072,7 +1073,7 @@ function getMdProperty(
     featureType: string | undefined
 ): PropertyDataType | null {
     if (featureType === "points") {
-        return null
+        return null;
     }
     const md = getMd(coord, feature, accessor);
     if (md != null) {
@@ -1119,7 +1120,7 @@ function getTvdProperty(
     featureType: string | undefined
 ): PropertyDataType | null {
     if (featureType === "points") {
-        return null
+        return null;
     }
     const tvd = getTvd(coord, feature, accessor);
     if (tvd != null) {
