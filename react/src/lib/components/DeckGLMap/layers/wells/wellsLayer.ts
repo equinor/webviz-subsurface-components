@@ -48,12 +48,8 @@ type NumberPair = [number, number];
 type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
 type ColorAccessor = RGBAColor | StyleAccessorFunction | undefined;
 type WidthAccessor = number | StyleAccessor | undefined;
-type SizeAccessor = number | StyleAccessorFunction | undefined;
 type LineStyle = NumberPair | RGBAColor | number;
-type WellHeadStyle = {
-    size?: SizeAccessor;
-    color?: ColorAccessor;
-};
+type WellHeadAccessor = number | undefined;
 
 type StyleAccessor = {
     color?: ColorAccessor;
@@ -73,7 +69,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
-    wellHeadStyle: WellHeadStyle;
+    wellHeadStyle: WellHeadAccessor;
     colorMappingFunction: (x: number) => [number, number, number];
     lineStyle: StyleAccessor;
     wellNameVisible: boolean;
@@ -182,6 +178,14 @@ function getLineWidth(
     if (accessor as number) return (accessor as number) + offset;
 
     return DEFAULT_LINE_WIDTH + offset;
+}
+
+function getPointRadius(accessor: WellHeadAccessor): number {
+    if (accessor !== undefined) {
+        return accessor;
+    } else {
+        return 1;
+    }
 }
 
 export default class WellsLayer extends CompositeLayer<
@@ -296,6 +300,7 @@ export default class WellsLayer extends CompositeLayer<
             }),
         ];
 
+        console.log(this.props.wellHeadStyle);
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "outline",
@@ -306,12 +311,10 @@ export default class WellsLayer extends CompositeLayer<
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
                 visible: this.props.outline,
-                pointRadiusScale:
-                    this.props.wellHeadStyle === undefined
-                        ? this.props.pointRadiusScale
-                        : this.props.wellHeadStyle.size,
+                pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
                 getLineWidth: getLineWidth(this.props.lineStyle?.width),
+                getPointRadius: getPointRadius(this.props.wellHeadStyle?.size),
                 extensions: extensions,
                 getDashArray: getDashFactor(this.props.lineStyle?.dash),
                 lineBillboard: true,
@@ -328,12 +331,10 @@ export default class WellsLayer extends CompositeLayer<
                 positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
-                pointRadiusScale:
-                    this.props.wellHeadStyle === undefined
-                        ? this.props.pointRadiusScale - 1
-                        : this.props.wellHeadStyle.size,
+                pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
                 getLineWidth: getLineWidth(this.props.lineStyle?.width, -1),
+                getPointRadius: getPointRadius(this.props.wellHeadStyle?.size),
                 getFillColor: (d: Feature) => d.properties?.["color"],
                 getLineColor: getLineColor(this.props.lineStyle?.color),
                 extensions: extensions,
@@ -360,12 +361,10 @@ export default class WellsLayer extends CompositeLayer<
                 positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
-                pointRadiusScale:
-                    this.props.wellHeadStyle === undefined
-                        ? this.props.pointRadiusScale + 2
-                        : this.props.wellHeadStyle.size,
+                pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
                 getLineWidth: getLineWidth(this.props.lineStyle?.width, 2),
+                getPointRadius: getPointRadius(this.props.wellHeadStyle?.size),
                 getFillColor: (d: Feature) => d.properties?.["color"],
                 getLineColor: getLineColor(this.props.lineStyle?.color),
             })
