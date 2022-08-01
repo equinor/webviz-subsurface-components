@@ -9,7 +9,7 @@ import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
-    title: "DeckGLMap / Map Float Layer",
+    title: "DeckGLMap / Map Layer",
 } as ComponentMeta<typeof DeckGLMap>;
 
 type NumberQuad = [number, number, number, number];
@@ -17,7 +17,7 @@ type NumberQuad = [number, number, number, number];
 const valueRange = [-3071, 41048];
 
 // Example using "Map" layer. Uses float32 mesh and properties binary arrays. Not PNG.
-const meshMapLayer = {
+const meshMapLayerBig = {
     "@@type": "MapLayer",
     id: "mesh-layer",
     meshUrl: "hugin_depth_5_m.float32",
@@ -30,12 +30,14 @@ const meshMapLayer = {
     propertiesUrl: "kh_netmap_5_m.float32",
     contours: [0, 100],
     isContoursDepth: true,
+    gridLines: false,
+    cellCenteredProperties: false,
     material: true,
     colorMapName: "Physics",
 };
 
 // Example using "Map" layer. Uses PNG float for mesh and properties.
-const meshMapLayerPNG = {
+const meshMapLayerPng = {
     "@@type": "MapLayer",
     id: "mesh-layer",
     meshUrl: "hugin_depth_25_m.png",
@@ -48,8 +50,59 @@ const meshMapLayerPNG = {
     propertiesUrl: "kh_netmap_25_m.png",
     contours: [0, 100],
     isContoursDepth: true,
-    material: true,
+    gridLines: true,
+    cellCenteredProperties: true,
+    material: false,
     colorMapName: "Physics",
+};
+
+// Example using "Map" layer. Uses float32 float for mesh and properties.
+const meshMapLayerFloat32 = {
+    "@@type": "MapLayer",
+    id: "mesh-layer",
+    meshUrl: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.float32",
+    contours: [0, 100],
+    isContoursDepth: true,
+    cellCenteredProperties: true,
+    gridLines: true,
+    material: false,
+    colorMapName: "Physics",
+};
+
+// Example rotated layer
+const meshMapLayerRotated = {
+    "@@type": "MapLayer",
+    id: "mesh-layer",
+    meshUrl: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 30,
+        //rotPoint: [436000, 6478000],
+    },
+    propertiesUrl: "kh_netmap_25_m.float32",
+    contours: [0, 100],
+    isContoursDepth: true,
+    material: false,
+    colorMapName: "Physics",
+};
+
+const axes_hugin = {
+    "@@type": "AxesLayer",
+    id: "axes-layer2",
+    bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
+};
+const north_arrow_layer = {
+    "@@type": "NorthArrow3DLayer",
+    id: "north-arrow-layer",
 };
 
 const defaultArgs = {
@@ -82,61 +135,14 @@ function createColorMap(breakpoint: number) {
     return (value: number) => breakpointColorMap(value, breakpoint);
 }
 
-const axes_hugin = {
-    "@@type": "AxesLayer",
-    id: "axes-layer2",
-    bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
-};
-const north_arrow_layer = {
-    "@@type": "NorthArrow3DLayer",
-    id: "north-arrow-layer",
-};
-
-export const MapLayer: ComponentStory<typeof DeckGLMap> = (args) => {
-    return <DeckGLMap {...args} />;
-};
-
-MapLayer.args = {
-    id: "map",
-    layers: [axes_hugin, meshMapLayer, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-};
-
-export const MapLayer3d: ComponentStory<typeof DeckGLMap> = (args) => {
-    return <DeckGLMap {...args} />;
-};
-
-MapLayer3d.args = {
-    id: "map",
-    layers: [axes_hugin, meshMapLayer, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
-};
-
-MapLayer3d.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using large map with approx. 1400x1400 cells.",
-        },
-    },
-};
-
 export const MapLayer3dPng: ComponentStory<typeof DeckGLMap> = (args) => {
     return <DeckGLMap {...args} />;
 };
 
 MapLayer3dPng.args = {
     id: "map",
-    layers: [axes_hugin, meshMapLayerPNG, north_arrow_layer],
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
         layout: [1, 1],
@@ -158,13 +164,113 @@ MapLayer3dPng.parameters = {
     },
 };
 
+export const MapLayer2d: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+MapLayer2d.args = {
+    id: "map",
+    layers: [
+        axes_hugin,
+        { ...meshMapLayerFloat32, material: false },
+        north_arrow_layer,
+    ],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+            },
+        ],
+    },
+};
+
+MapLayer2d.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using png as mesh and properties data.",
+        },
+    },
+};
+
+export const MapLayerRotated: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+MapLayerRotated.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayerRotated, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+            },
+        ],
+    },
+};
+
+MapLayerRotated.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using png as mesh and properties data.",
+        },
+    },
+};
+
+export const MapLayerBigMap: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+MapLayerBigMap.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayerBig, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+};
+
+export const MapLayerBigMap3d: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+MapLayerBigMap3d.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayerBig, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+MapLayerBigMap3d.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using large map with approx. 1400x1400 cells.",
+        },
+    },
+};
+
 export const GradientFunctionColorMap: ComponentStory<
     typeof DeckGLMap
 > = () => {
     const args = {
         ...defaultArgs,
         id: "gradient-color-map",
-        layers: [{ ...meshMapLayer, colorMapFunction: gradientColorMap }],
+        layers: [
+            { ...meshMapLayerFloat32, colorMapFunction: gradientColorMap },
+        ],
     };
     return <DeckGLMap {...args} />;
 };
@@ -182,7 +288,7 @@ export const StepFunctionColorMap: ComponentStory<typeof DeckGLMap> = () => {
     const args = {
         ...defaultArgs,
         id: "nearest-color-map",
-        layers: [{ ...meshMapLayer, colorMapFunction: nearestColorMap }],
+        layers: [{ ...meshMapLayerFloat32, colorMapFunction: nearestColorMap }],
     };
 
     return <DeckGLMap {...args} />;
@@ -201,7 +307,7 @@ export const DefaultColorScale: ComponentStory<typeof DeckGLMap> = () => {
     const args = {
         ...defaultArgs,
         id: "default-color-scale",
-        layers: [{ ...meshMapLayer }],
+        layers: [{ ...meshMapLayerFloat32 }],
     };
 
     return <DeckGLMap {...args} />;
@@ -223,7 +329,7 @@ export const Readout: ComponentStory<typeof DeckGLMap> = () => {
         return {
             ...defaultArgs,
             id: "readout",
-            layers: [{ ...meshMapLayer }],
+            layers: [{ ...meshMapLayerFloat32 }],
             coords: {
                 visible: false,
             },
@@ -257,7 +363,7 @@ export const MapDiscontinuous: ComponentStory<typeof DeckGLMap> = () => {
             id: "readout",
             layers: [
                 {
-                    ...meshMapLayer,
+                    ...meshMapLayerFloat32,
                     meshUrl: "hugin_depth_5_m_w_hole.float32",
                     contours: [0, 50],
                     material: false,
@@ -316,7 +422,7 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
             ...args,
             layers: [
                 {
-                    ...meshMapLayer,
+                    ...meshMapLayerFloat32,
                     colorMapFunction: colorMap,
                 },
             ],

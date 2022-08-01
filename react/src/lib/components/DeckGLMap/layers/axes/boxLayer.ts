@@ -8,7 +8,6 @@ import { project } from "deck.gl";
 import { COORDINATE_SYSTEM, RGBAColor } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
-
 export interface BoxLayerProps<D> extends LayerProps<D> {
     lines: [number]; // from pt , to pt.
     color: RGBAColor;
