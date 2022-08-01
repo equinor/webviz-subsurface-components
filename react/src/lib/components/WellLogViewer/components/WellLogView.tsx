@@ -381,13 +381,13 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                 primaryAxis === "md" ? vMD : scaleInterpolator?.forward(vMD);
             const vSecondary =
                 primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
-            const txtPrimary =
-                vPrimary === undefined ? "" : vPrimary.toFixed(0);
-            const txtSecondary =
-                vSecondary === undefined
-                    ? ""
-                    : (primaryAxis === "md" ? "TVD:" : "MD:") +
-                      vSecondary.toFixed(0);
+            const txtPrimary = !Number.isFinite(vPrimary)
+                ? ""
+                : vPrimary?.toFixed(0);
+            const txtSecondary = !Number.isFinite(vSecondary)
+                ? ""
+                : (primaryAxis === "md" ? "TVD:" : "MD:") +
+                  vSecondary?.toFixed(0);
             instance.overlay.remove("wp" + horizon); // clear old if exists
             const pinelm = instance.overlay.create("wp" + horizon, {});
 
