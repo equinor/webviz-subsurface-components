@@ -22,10 +22,6 @@ const template =
 
 import { ColorTable } from "./components/ColorTableTypes";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-//const colorTables = require("../../../demo/example-data/color-tables.json");
-// see also react\src\demo\example-data\welllog_template_2.json
-
 import { WellLogController } from "./components/WellLogView";
 import { LogViewer } from "@equinor/videx-wellog";
 import { Info } from "./components/InfoTypes";

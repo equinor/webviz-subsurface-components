@@ -28,7 +28,7 @@ interface Props {
     welllog: WellLog;
     template: Template;
     colorTables: ColorTable[];
-    wellpick: WellPickProps;
+    wellpick?: WellPickProps;
     horizontal?: boolean;
 
     hideTitles?: boolean;
