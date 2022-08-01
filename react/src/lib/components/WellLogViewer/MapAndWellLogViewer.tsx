@@ -20,8 +20,10 @@ const template =
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     require("../../../demo/example-data/welllog_template_2.json") as Template;
 
+import { ColorTable } from "./components/ColorTableTypes";
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("../../../demo/example-data/color-tables.json");
+//const colorTables = require("../../../demo/example-data/color-tables.json");
 // see also react\src\demo\example-data\welllog_template_2.json
 
 import { WellLogController } from "./components/WellLogView";
@@ -281,7 +283,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             event.md,
                             this.state.selection?.[1],
                         ]);
-    
+
                         return {
                             selection: [event.md, state.selection?.[1]],
                         };
@@ -298,6 +300,12 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
         const wellName = this.state.wellName;
         const wellColor = this.state.wellColor;
         const wellIndex = this.state.wellIndex;
+        const wellpick = {
+            wellpick: require("../../../demo/example-data/wellpicks.json")[0],
+            name: "HORIZON",
+            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            color: "Stratigraphy",
+        };
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <div
@@ -312,7 +320,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             {...this.props}
                             layers={this.state.layers}
                             editedData={this.state.editedData}
-                            colorTables={colorTables}
                             onMouseEvent={this.onMouseEvent}
                             selection={{
                                 well: wellName,
@@ -378,10 +385,8 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                                     : undefined
                             }
                             template={template}
-                            colorTables={
-                                colorTables
-                                //this.props.colorTables as ColorTable[]
-                            }
+                            colorTables={this.props.colorTables as ColorTable[]}
+                            wellpick={wellpick}
                             maxVisibleTrackNum={1}
                             primaryAxis={"md"}
                             axisTitles={axisTitles}

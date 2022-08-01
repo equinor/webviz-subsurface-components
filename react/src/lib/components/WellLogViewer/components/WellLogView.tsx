@@ -22,10 +22,11 @@ import { validateSchema } from "../../../inputSchema/validator";
 
 import { select } from "d3";
 
-import { WellLog } from "./WellLogTypes";
+import { WellLog, WellLogCurve } from "./WellLogTypes";
 import { Template } from "./WellLogTemplateTypes";
 import { ColorTable } from "./ColorTableTypes";
 
+import { getDiscreteColorAndName, getDiscreteMeta } from "../utils/tracks";
 import { createTracks } from "../utils/tracks";
 import { getScaleTrackNum } from "../utils/tracks";
 import { AxesInfo } from "../utils/tracks";
@@ -306,16 +307,176 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
         .style("position", "absolute");
 }
 
-function initOverlay(instance: LogViewer, parent: WellLogView) {
+export interface WellPickProps {
+    wellpick: WellLog; // JSON Log Format
+    name: string; //  "HORIZON"
+    md?: string; //  default is "MD"
+    /**
+     * Prop containing color table data.
+     */
+    colorTables: ColorTable[];
+    color: string; // "Stratigraphy" ...
+}
+
+function showWellPicks(
+    pinelm: HTMLElement,
+    vCur: number | undefined,
+    horizontal: boolean | undefined,
+    logViewer: LogViewer /*LogController*/
+) {
+    if (vCur === undefined) {
+        pinelm.style.visibility = "hidden";
+        return;
+    }
+    const v = logViewer.scale(vCur);
+    if (!Number.isFinite(v)) {
+        // logViewer could be empty
+        pinelm.style.visibility = "hidden";
+        return;
+    }
+
+    const wpSize = 3; //9;
+    const offset = wpSize / 2;
+
+    pinelm.style[horizontal ? "left" : "top"] = `${v - offset}px`;
+    pinelm.style.visibility = "visible";
+}
+
+function _getLogIndexByNames(curves: WellLogCurve[], names: string[]): number {
+    for (const name of names) {
+        const n = name.toLowerCase();
+        const index = curves.findIndex((item) => item.name.toLowerCase() === n);
+        if (index >= 0) return index;
+    }
+    return -1;
+}
+
+function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
+    const wellpick = parent.props.wellpick;
+    if (!wellpick) return;
+    const primaryAxis = parent.props.primaryAxis;
+    const scaleInterpolator = parent.scaleInterpolator;
+
+    const wpSize = 3; //9;
+    //const offset = wpSize / 2;
+    const curves = wellpick.wellpick.curves;
+    const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
+    if (!md)
+        console.error(
+            "MD log is not found for wellpicks ",
+            wellpick.md ? wellpick.md : ""
+        );
+
+    for (const c in curves) {
+        const curve = curves[c];
+        if (curve.name !== wellpick.name) continue;
+        const data = wellpick.wellpick.data;
+        for (const d of data) {
+            if (d[md] === null) continue; // no MD!
+            const horizon = d[c] as string | null;
+            if (horizon === null) continue;
+
+            const vMD = d[md] as number;
+            const vPrimary =
+                primaryAxis === "md" ? vMD : scaleInterpolator?.forward(vMD);
+            const vSecondary =
+                primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
+            const txtPrimary =
+                vPrimary === undefined ? "" : vPrimary.toFixed(0);
+            const txtSecondary =
+                vSecondary === undefined
+                    ? ""
+                    : (primaryAxis === "md" ? "TVD:" : "MD:") +
+                      vSecondary.toFixed(0);
+            instance.overlay.remove("wp" + horizon); // clear old if exists
+            const pinelm = instance.overlay.create("wp" + horizon, {});
+
+            const colorTable = wellpick.colorTables.find(
+                (colorTable) => colorTable.name == wellpick.color
+            );
+
+            const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
+            const { color } = getDiscreteColorAndName(d[c], colorTable, meta);
+
+            const rgba =
+                "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.8)";
+            const styleText =
+                "style='background-color:rgba(" +
+                color[0] +
+                "," +
+                color[1] +
+                "," +
+                color[2] +
+                ",0.16)'";
+
+            const pin = select(pinelm)
+                .classed("wellpick", true)
+                .style(
+                    parent.props.horizontal ? "width" : "height",
+                    `${wpSize}px`
+                )
+                .style(parent.props.horizontal ? "height" : "width", `${100}%`)
+                .style(parent.props.horizontal ? "top" : "left", `${0}px`)
+                .style("background-color", rgba)
+                .style("position", "absolute")
+                .style("visibility", "false");
+
+            pin.append("div")
+                .html(
+                    parent.props.horizontal
+                        ? "<font size=1><table height=100%'><tr><td><span " +
+                              styleText +
+                              ">" +
+                              txtPrimary +
+                              "</span></td></tr><tr><td height=100%><span  " +
+                              styleText +
+                              ">" +
+                              horizon +
+                              "</span></td></tr><tr><td><span " +
+                              styleText +
+                              ">" +
+                              txtSecondary +
+                              "</span></td></tr></table>"
+                        : "<font size=1><table width=100% style='position:relative; top:-1.5em;'><tr><td " +
+                              styleText +
+                              ">" +
+                              txtPrimary +
+                              "</td><td width=100% align=center><span  " +
+                              styleText +
+                              ">" +
+                              horizon +
+                              "</span></td><td " +
+                              styleText +
+                              ">" +
+                              txtSecondary +
+                              "</td></tr></table>"
+                )
+                .style(parent.props.horizontal ? "width" : "height", "1px")
+                .style(parent.props.horizontal ? "height" : "width", `${100}%`)
+                ///.style(parent.props.horizontal ? "left" : "top", `${offset}px`)
+                .style("background-color", rgba)
+                //.style("position", "relative");
+                .style("position", "absolute");
+
+            //const horizontal = parent.props.horizontal;
+            //showWellPicks(pinelm, vPrimary, horizontal, instance)
+        }
+        break;
+    }
+}
+
+function initOverlayes(instance: LogViewer, parent: WellLogView) {
     instance.overlay.elm.style("overflow", "hidden"); // to clip content selection
 
     addReadoutOverlay(instance, parent);
     addRubberbandOverlay(instance, parent);
     addPinnedValueOverlay(instance, parent);
+
+    addWellPickOverlay(instance, parent);
 }
 
 function createInterpolator(from: Float32Array, to: Float32Array) {
-    // 'from' array could be non monotonous (TVD) so could not use binary search
+    // 'from' array could be non monotonous (TVD) so we could not use binary search!
 
     // Calculate linear interpolation factor between the nodes
     const mul = new Float32Array(from.length);
@@ -339,10 +500,10 @@ function createInterpolator(from: Float32Array, to: Float32Array) {
     };
 }
 
-function createScaleHandler(
+function createScaleInterpolator(
     primaries: Float32Array,
     secondaries: Float32Array
-) {
+): ScaleInterpolator {
     const primary2secondary = createInterpolator(primaries, secondaries);
     const secondary2primary = createInterpolator(secondaries, primaries);
 
@@ -354,7 +515,7 @@ function createScaleHandler(
         // PrimaryAxis => SecondaryAxis
         return primary2secondary(v, false);
     };
-    const interpolator: ScaleInterpolator = {
+    return {
         forward,
         reverse,
         forwardInterpolatedDomain: (domain: number[]) =>
@@ -362,7 +523,6 @@ function createScaleHandler(
         reverseInterpolatedDomain: (domain: number[]) =>
             domain.map((v) => primary2secondary(v, true)),
     };
-    return new InterpolatedScaleHandler(interpolator);
 }
 
 function setTracksToController(
@@ -371,7 +531,7 @@ function setTracksToController(
     welllog: WellLog | undefined, // JSON Log Format
     template: Template, // JSON
     colorTables: ColorTable[] // JSON
-) {
+): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
         axes,
@@ -380,10 +540,13 @@ function setTracksToController(
         colorTables
     );
     logController.reset();
-    const scaleHandler = createScaleHandler(primaries, secondaries);
-    logController.scaleHandler = scaleHandler;
+    const scaleInterpolator = createScaleInterpolator(primaries, secondaries);
+    logController.scaleHandler = new InterpolatedScaleHandler(
+        scaleInterpolator
+    );
     logController.domain = minmaxPrimaryAxis;
     logController.setTracks(tracks);
+    return scaleInterpolator;
 }
 
 function addTrackMouseEventListner(
@@ -596,9 +759,10 @@ import { Info } from "./InfoTypes";
 
 interface Props {
     /**
-     * Array of JSON objects describing well log data.
+     * Object from JSON file describing single well log data.
      */
     welllog: WellLog | undefined;
+
     /**
      * Prop containing track template data.
      */
@@ -607,6 +771,10 @@ interface Props {
      * Prop containing color table data.
      */
     colorTables: ColorTable[];
+    /**
+     * Well Picks data
+     */
+    wellpick?: WellPickProps;
     /**
      * Orientation of the track plots on the screen.
      */
@@ -684,12 +852,10 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     template: Template;
 
+    scaleInterpolator: ScaleInterpolator | undefined;
+
     constructor(props: Props) {
         super(props);
-
-        //if (!props.welllog)
-        //    throw "No props.welllog given in wellLogView component";
-
         this.container = undefined;
         this.logController = undefined;
         this.selCurrent = undefined;
@@ -704,6 +870,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             tracks: [],
             styles: [],
         };
+        this.scaleInterpolator = undefined;
 
         this.state = {
             infos: [],
@@ -731,6 +898,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         if (this.props.welllog !== nextProps.welllog) return true;
         if (this.props.template !== nextProps.template) return true;
         if (this.props.colorTables !== nextProps.colorTables) return true;
+        if (this.props.wellpick !== nextProps.wellpick) return true;
         if (this.props.primaryAxis !== nextProps.primaryAxis) return true;
         if (this.props.axisTitles !== nextProps.axisTitles) return true;
         if (this.props.axisMnemos !== nextProps.axisMnemos) return true;
@@ -797,6 +965,9 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             selection = this.getContentSelection();
             selectedTrackIndeces = this.getSelectedTrackIndeces();
             shouldSetTracks = true; //??
+        } else if (this.props.wellpick !== prevProps.wellpick) {
+            if (this.logController)
+                addWellPickOverlay(this.logController, this);
         }
 
         if (shouldSetTracks) {
@@ -839,7 +1010,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
             this.logController.init(this.container);
 
-            initOverlay(this.logController, this);
+            initOverlayes(this.logController, this);
         }
         this.setInfo();
     }
@@ -876,13 +1047,14 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (this.logController) {
             const axes = this.getAxesInfo();
-            setTracksToController(
+            this.scaleInterpolator = setTracksToController(
                 this.logController,
                 axes,
                 this.props.welllog,
                 this.template,
                 this.props.colorTables
             );
+            addWellPickOverlay(this.logController, this);
         }
         this.onTrackScroll();
         this.onTrackSelection();
@@ -975,6 +1147,41 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                     this.props.horizontal,
                     this.logController
                 );
+            }
+
+            const wellpick = this.props.wellpick;
+            if (wellpick) {
+                const primaryAxis = this.props.primaryAxis;
+                const scaleInterpolator = this.scaleInterpolator;
+                const curves = wellpick.wellpick.curves;
+                const md = _getLogIndexByNames(curves, [
+                    wellpick.md ? wellpick.md : "MD",
+                ]);
+                for (const c in curves) {
+                    const curve = curves[c];
+                    if (curve.name !== wellpick.name) continue;
+                    const data = wellpick.wellpick.data;
+                    for (const d of data) {
+                        if (d[md] === null) continue; // no MD!
+
+                        const vMD = d[md] as number;
+                        const vPrimary =
+                            primaryAxis === "md"
+                                ? vMD
+                                : scaleInterpolator?.forward(vMD);
+
+                        const horizon = d[c] as string;
+                        const pinelm =
+                            this.logController.overlay.elements["wp" + horizon];
+                        if (!pinelm) continue;
+                        showWellPicks(
+                            pinelm,
+                            vPrimary,
+                            this.props.horizontal,
+                            this.logController
+                        );
+                    }
+                }
             }
         }
     }
