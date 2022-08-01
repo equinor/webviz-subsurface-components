@@ -26,6 +26,7 @@ const defaultProps = {
                 id: "intersection_view",
                 name: "Intersection view",
                 show3D: false,
+                layerIds: ["enhanced-path-layer", "wells-layer"],
             },
         ],
     },
@@ -66,7 +67,6 @@ WithSamplePolylineData.args = {
             lineWidthScale: 20,
             lineBillboard: true,
         },
-
         {
             "@@type": "AxesLayer",
             id: "axes-layer",
