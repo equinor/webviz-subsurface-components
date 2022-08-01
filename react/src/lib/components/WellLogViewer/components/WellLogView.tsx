@@ -361,11 +361,12 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     //const offset = wpSize / 2;
     const curves = wellpick.wellpick.curves;
     const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
-    if (!md)
+    if (md<0) {
         console.error(
             "MD log is not found for wellpicks ",
             wellpick.md ? wellpick.md : ""
         );
+    }
 
     for (const c in curves) {
         const curve = curves[c];
@@ -465,7 +466,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     }
 }
 
-function initOverlayes(instance: LogViewer, parent: WellLogView) {
+function initOverlays(instance: LogViewer, parent: WellLogView) {
     instance.overlay.elm.style("overflow", "hidden"); // to clip content selection
 
     addReadoutOverlay(instance, parent);
@@ -1010,7 +1011,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
             this.logController.init(this.container);
 
-            initOverlayes(this.logController, this);
+            initOverlays(this.logController, this);
         }
         this.setInfo();
     }
