@@ -10,6 +10,10 @@ in vec3 positions;
 in vec3 colors;
 in vec2 texCoords;
 
+in int vertex_indexs;
+flat out int vertex_indexs_;
+
+
 // Outputs to fragment shader
 out vec2 vTexCoord;
 out vec3 cameraPosition;
@@ -18,10 +22,13 @@ out vec4 position_commonspace;
 out vec4 vColor;
 out vec3 worldPos;
 
+
 void main(void) {
    cameraPosition = project_uCameraPosition;
 
    worldPos = positions;
+
+   vertex_indexs_ = vertex_indexs; // pass to fragment shader
 
    vColor = vec4(colors.rgb, 1.0);
 

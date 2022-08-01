@@ -3,6 +3,7 @@ import privateMapLayer, {
     privateMapLayerProps,
     Material,
     MeshType,
+    MeshTypeLines,
 } from "./privateMapLayer";
 import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { RGBColor } from "@deck.gl/core/utils/color";
@@ -16,8 +17,6 @@ import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 import { DeckGLLayerContext } from "../../components/Map";
 import { TerrainMapLayerData } from "../terrain/terrainMapLayer";
-
-export const readoutMatrixSize = 250;
 
 export const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
@@ -89,30 +88,6 @@ function getFloat32ArrayMinMax(data: Float32Array) {
     return [min, max];
 }
 
-// Takes a 2D array and returns a resampled square fixed size copy.
-function makeFixedSizeCopy(
-    data: Float32Array,
-    width: number,
-    height: number
-): Float32Array {
-    const sz = readoutMatrixSize;
-    const ret = new Float32Array(sz * sz);
-
-    const stride_w = width / sz;
-    const stride_h = height / sz;
-
-    for (let m = 0; m < sz; m++) {
-        for (let n = 0; n < sz; n++) {
-            const w = Math.round(n * stride_w);
-            const h = Math.round(m * stride_h);
-            const i = m * sz + n;
-            const j = h * width + w;
-            ret[i] = data[j];
-        }
-    }
-    return ret;
-}
-
 function getColor(
     propertyValue: number,
     colors: RGBColor[],
@@ -162,7 +137,7 @@ function makeFullMesh(
     colorMapRange: [number, number],
     colorMapClampColor: RGBColor | undefined | boolean,
     colorTables: colorTablesArray
-): [MeshType, MeshType] {
+): [MeshType, MeshTypeLines] {
     const propertyValueRange = getFloat32ArrayMinMax(propertiesData);
 
     const colors = getColorMapColors(
@@ -179,6 +154,9 @@ function makeFullMesh(
     const colorMapRangeMin = colorMapRange?.[0] ?? valueRangeMin;
     const colorMapRangeMax = colorMapRange?.[1] ?? valueRangeMax;
 
+    const isColorMapClampColorTransparent: boolean =
+        (colorMapClampColor as boolean) === false;
+
     const isClampColor: boolean =
         colorMapClampColor !== undefined &&
         colorMapClampColor !== true &&
@@ -189,9 +167,6 @@ function makeFullMesh(
     const clampColor = (colorMapClampColor as RGBColor).map(
         (x) => (x ?? 0) / 255
     );
-
-    const isColorMapClampColorTransparent: boolean =
-        (colorMapClampColor as boolean) === false;
 
     // Dimensions.
     const ox = dim.origin[0];
@@ -210,6 +185,7 @@ function makeFullMesh(
     const texCoords: number[] = [];
     const indices: number[] = [];
     const vertexColors: number[] = [];
+    const vertexProperties: number[] = [];
     const line_positions: number[] = [];
 
     if (!cellCenteredProperties) {
@@ -235,12 +211,13 @@ function makeFullMesh(
                 );
 
                 if (!color) {
-                    color = [0, 0, 0];
+                    color = [NaN, NaN, NaN];
                 }
 
                 positions.push(x, y, z);
                 texCoords.push((x - ox) / (maxX - ox), (y - oy) / (maxY - oy));
                 vertexColors.push(...(color as RGBColor));
+                vertexProperties.push(propertyValue);
             }
         }
 
@@ -251,8 +228,16 @@ function makeFullMesh(
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
+                const color = [
+                    vertexColors[3 * i0 + 0],
+                    vertexColors[3 * i0 + 1],
+                    vertexColors[3 * i0 + 2],
+                ];
+                const isColor = !isEqual(color, [NaN, NaN, NaN]);
+
                 // t1
                 if (
+                    isColor &&
                     !isNaN(meshData[i0]) &&
                     !isNaN(meshData[i1]) &&
                     !isNaN(meshData[i3])
@@ -262,6 +247,7 @@ function makeFullMesh(
 
                 // t2
                 if (
+                    isColor &&
                     !isNaN(meshData[i1]) &&
                     !isNaN(meshData[i3]) &&
                     !isNaN(meshData[i2])
@@ -324,6 +310,10 @@ function makeFullMesh(
                     vertexColors.push(...(color as RGBColor));
                     vertexColors.push(...(color as RGBColor));
                     vertexColors.push(...(color as RGBColor));
+
+                    vertexProperties.push(propertyValue);
+                    vertexProperties.push(propertyValue);
+                    vertexProperties.push(propertyValue);
                 }
 
                 // t2
@@ -340,19 +330,23 @@ function makeFullMesh(
                     vertexColors.push(...(color as RGBColor));
                     vertexColors.push(...(color as RGBColor));
                     vertexColors.push(...(color as RGBColor));
+
+                    vertexProperties.push(propertyValue);
+                    vertexProperties.push(propertyValue);
+                    vertexProperties.push(propertyValue);
                 }
             }
         }
     }
 
-    const mesh = {
+    const mesh: MeshType = {
         drawMode: GL.TRIANGLES,
         attributes: {
             positions: { value: new Float32Array(positions), size: 3 },
             TEXCOORD_0: { value: new Float32Array(texCoords), size: 2 },
             colors: { value: new Float32Array(vertexColors), size: 3 },
+            properties: { value: new Float32Array(vertexProperties), size: 1 },
         },
-        // vertexCount: positions.length / 3,
         vertexCount: indices.length,
         indices: { value: new Uint32Array(indices), size: 1 },
     };
@@ -402,7 +396,7 @@ function makeFullMesh(
         }
     }
 
-    const mesh_lines = {
+    const mesh_lines: MeshTypeLines = {
         drawMode: GL.LINES,
         attributes: {
             positions: { value: new Float32Array(line_positions), size: 3 },
@@ -446,13 +440,13 @@ async function load_mesh_and_texture(
         console.error("Could not load ", propertiesUrl);
     }
 
-    let propertiesArray: Float32Array;
+    let propertiesData: Float32Array;
     const blob = await response.blob();
     const contentType = response.headers.get("content-type");
     const isPng = contentType === "image/png";
     if (isPng) {
         // Load as Png  with abolute float values.
-        propertiesArray = await new Promise((resolve) => {
+        propertiesData = await new Promise((resolve) => {
             const fileReader = new FileReader();
             fileReader.readAsArrayBuffer(blob);
             fileReader.onload = () => {
@@ -474,7 +468,7 @@ async function load_mesh_and_texture(
     } else {
         // Load as binary array of floats.
         const buffer = await blob.arrayBuffer();
-        propertiesArray = new Float32Array(buffer);
+        propertiesData = new Float32Array(buffer);
     }
 
     //-- MESH --
@@ -525,7 +519,7 @@ async function load_mesh_and_texture(
         cellCenteredProperties,
         dim,
         meshData,
-        propertiesArray,
+        propertiesData,
         colorMapName,
         colorMapFunction,
         colorMapRange,
@@ -537,12 +531,7 @@ async function load_mesh_and_texture(
     // Keep this.
     //console.log(`Task took ${(t1 - t0) * 0.001}  seconds.`);
 
-    const meshDataReadout = makeFixedSizeCopy(meshData, w, h);
-    readOutData.push(meshDataReadout);
-    readOutDataName.push("Depth");
-
     // create float texture for the properties of the.
-    //const propertyValueRange = getFloat32ArrayMinMax(propertiesArray);  // XXX denne kan retires...
     const format = GL.R32F;
     const type = GL.FLOAT;
     const propertyTexture = new Texture2D(gl, {
@@ -550,16 +539,10 @@ async function load_mesh_and_texture(
         height: h,
         format,
         type,
-        data: propertiesArray,
+        data: propertiesData,
         mipmaps: false,
         parameters: DEFAULT_TEXTURE_PARAMETERS,
     });
-
-    if (isProperties) {
-        const propertyData = makeFixedSizeCopy(propertiesArray, w, h);
-        readOutData.push(propertyData);
-        readOutDataName.push("Property");
-    }
 
     return Promise.all([
         mesh,
@@ -623,8 +606,8 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapFunction?: colorMapFunctionType;
 
     // Surface material properties.
-    // material: true  = default material,
-    //           false = no material,
+    // material: true  = default material, coloring depends on surface orientation and lighting.
+    //           false = no material,  coloring is independent on surface orientation and lighting.
     //           or full spec:
     //      material: {
     //           ambient: 0.35,
@@ -683,18 +666,8 @@ export default class MapLayer extends CompositeLayer<
         props: MapLayerProps<unknown>;
         oldProps: MapLayerProps<unknown>;
     }): void {
-        const needs_reload =
-            !isEqual(props.meshUrl, oldProps.meshUrl) ||
-            !isEqual(props.frame, oldProps.frame) ||
-            !isEqual(
-                props.cellCenteredProperties,
-                oldProps.cellCenteredProperties
-            ) ||
-            !isEqual(props.gridLines, oldProps.gridLines) ||
-            !isEqual(props.propertiesUrl, oldProps.propertiesUrl);
-
+        const needs_reload = !isEqual(props, oldProps);
         if (needs_reload) {
-            // Reload mesh and texture.
             this.initializeState();
         }
     }
@@ -703,8 +676,6 @@ export default class MapLayer extends CompositeLayer<
         if (Object.keys(this.state).length === 0) {
             return [];
         }
-
-        const [width] = dimNxNy(this.props.frame);
         const [minX, minY] = this.props.frame.origin;
         const center = this.props.frame.rotPoint ?? [minX, minY];
 
@@ -717,11 +688,10 @@ export default class MapLayer extends CompositeLayer<
         const isMesh =
             typeof this.props.meshUrl !== "undefined" &&
             this.props.meshUrl !== "";
-
         const layer = new privateMapLayer(
             this.getSubLayerProps<unknown, privateMapLayerProps<unknown>>({
-                mesh: [this.state.mesh, this.state.mesh_lines],
-                meshWidth: width,
+                mesh: this.state.mesh,
+                meshLines: this.state.mesh_lines,
                 propertyTexture: this.state.propertyTexture,
                 readOutData: this.state.readOutData,
                 readOutDataName: this.state.readOutDataName,
