@@ -158,16 +158,35 @@ const getCameraPosition = {
     rotationX: 90,
     rotationOrbit: 0,
 };
-const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => (
-    <>
-        <DeckGLMap {...args} />
-    </>
-);
+const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [state, setState] = React.useState(getCameraPosition);
+    console.log(state);
+    console.log("==========");
+    return (
+        <>
+            <DeckGLMap
+                {...args}
+                getCameraPosition={state}
+                setState={setState}
+            />
+            <div
+                style={{
+                    position: "absolute",
+                    marginLeft: 200,
+                }}
+            >
+                <div>zoom: {state?.zoom}</div>
+                <div>rotationX: {state?.rotationX}</div>
+                <div>rotationOrbit: {state?.rotationOrbit}</div>
+                <div>
+                    targetX: {state?.target[0]} targetY:
+                    {state?.target[1]}
+                </div>
+            </div>
+        </>
+    );
+};
 
 export const customizedCameraPosition = CustomTemplate.bind({});
 
-customizedCameraPosition.args = {
-    ...defaultProps,
-    getCameraPosition: getCameraPosition,
-    isVisible: true,
-};
+customizedCameraPosition.args = defaultProps;
