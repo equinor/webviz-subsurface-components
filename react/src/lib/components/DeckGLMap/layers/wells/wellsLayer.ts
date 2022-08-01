@@ -300,7 +300,6 @@ export default class WellsLayer extends CompositeLayer<
             }),
         ];
 
-        console.log(this.props.wellHeadStyle);
         const outline = new GeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "outline",
