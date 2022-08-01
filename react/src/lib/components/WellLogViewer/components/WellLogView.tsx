@@ -357,7 +357,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
 
     const curves = wellpick.wellpick.curves;
     const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
-    if (md<0) {
+    if (md < 0) {
         console.error(
             "MD log is not found for wellpicks ",
             wellpick.md ? wellpick.md : ""
