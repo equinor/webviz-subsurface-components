@@ -110,7 +110,7 @@ function addTemplateTrack(
     templateNew.tracks.push(templateTrack);
     return templateNew;
 }
-
+/*
 const wellpick = {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     wellpick: require("../../../demo/example-data/wellpicks.json")[0],
@@ -119,7 +119,7 @@ const wellpick = {
     colorTables: require("../../../demo/example-data/wellpick_colors.json"),
     color: "Stratigraphy",
 };
-
+*/
 export class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
     constructor(props: Props, state: State) {
@@ -385,7 +385,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             }
                             template={template}
                             colorTables={this.props.colorTables as ColorTable[]}
-                            wellpick={wellpick}
+/*                            wellpick={wellpick}*/
                             maxVisibleTrackNum={1}
                             primaryAxis={"md"}
                             axisTitles={axisTitles}
