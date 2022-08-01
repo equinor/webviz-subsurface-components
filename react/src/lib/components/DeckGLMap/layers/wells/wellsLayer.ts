@@ -96,6 +96,7 @@ export interface LogCurveDataType {
 }
 
 export interface WellsPickInfo extends LayerPickInfo {
+    featureType?: string;
     logName: string;
 }
 
@@ -500,7 +501,8 @@ export default class WellsLayer extends CompositeLayer<
         let md_property = getMdProperty(
             coordinate,
             info.object as unknown as Feature,
-            this.props.lineStyle?.color
+            this.props.lineStyle?.color,
+            (info as WellsPickInfo).featureType
         );
         if (!md_property) {
             md_property = getLogProperty(
@@ -514,7 +516,8 @@ export default class WellsLayer extends CompositeLayer<
         let tvd_property = getTvdProperty(
             info.coordinate as Position2D,
             info.object as unknown as Feature,
-            this.props.lineStyle?.color
+            this.props.lineStyle?.color,
+            (info as WellsPickInfo).featureType
         );
         if (!tvd_property) {
             tvd_property = getLogProperty(
@@ -1066,8 +1069,12 @@ function getMd(
 function getMdProperty(
     coord: Position,
     feature: Feature,
-    accessor: ColorAccessor
+    accessor: ColorAccessor,
+    featureType: string | undefined
 ): PropertyDataType | null {
+    if (featureType === "points") {
+        return null;
+    }
     const md = getMd(coord, feature, accessor);
     if (md != null) {
         const prop_name = "MD " + feature.properties?.["name"];
@@ -1109,8 +1116,12 @@ function getTvd(
 function getTvdProperty(
     coord: Position,
     feature: Feature,
-    accessor: ColorAccessor
+    accessor: ColorAccessor,
+    featureType: string | undefined
 ): PropertyDataType | null {
+    if (featureType === "points") {
+        return null;
+    }
     const tvd = getTvd(coord, feature, accessor);
     if (tvd != null) {
         const prop_name = "TVD " + feature.properties?.["name"];
