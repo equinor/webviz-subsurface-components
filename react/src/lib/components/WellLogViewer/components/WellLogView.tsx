@@ -354,11 +354,7 @@ function _getLogIndexByNames(curves: WellLogCurve[], names: string[]): number {
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     const wellpick = parent.props.wellpick;
     if (!wellpick) return;
-    const primaryAxis = parent.props.primaryAxis;
-    const scaleInterpolator = parent.scaleInterpolator;
 
-    const wpSize = 3; //9;
-    //const offset = wpSize / 2;
     const curves = wellpick.wellpick.curves;
     const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
     if (md<0) {
@@ -366,7 +362,14 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             "MD log is not found for wellpicks ",
             wellpick.md ? wellpick.md : ""
         );
+        return;
     }
+
+    const primaryAxis = parent.props.primaryAxis;
+    const scaleInterpolator = parent.scaleInterpolator;
+
+    const wpSize = 3; //9;
+    //const offset = wpSize / 2;
 
     for (const c in curves) {
         const curve = curves[c];
