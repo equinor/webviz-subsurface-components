@@ -968,7 +968,7 @@ async function createStackData (
     colorTable: ColorTable | undefined,
     meta: DiscreteMeta | undefined | null
 ) {
-    const arr : AreaData[] = new Array<AreaData>;
+    const arr : AreaData[] = new Array<AreaData>();
     let prev : [number, string | number] | null = null;
     let area: AreaData | null = null;
     for (const p of data) {
