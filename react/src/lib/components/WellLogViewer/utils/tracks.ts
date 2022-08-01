@@ -982,9 +982,12 @@ async function createStackData (
             continue;
         }
         if(prev) {
-            // move area boundary to the middle of last interval
+            /* move area boundary to the middle of the last interval
             const d = boundary - prev[0];
-            boundary = prev[0]// + d * 0.5;
+            boundary = prev[0] + d * 0.5;
+            */
+            // move area boundary to the beginnig of the last interval
+            boundary = prev[0];
         }
         // extend current area
         if (area) area.to = boundary;
