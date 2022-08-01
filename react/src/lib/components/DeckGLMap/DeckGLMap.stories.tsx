@@ -160,8 +160,6 @@ const getCameraPosition = {
 };
 const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
     const [state, setState] = React.useState(getCameraPosition);
-    console.log(state);
-    console.log("==========");
     return (
         <>
             <DeckGLMap
