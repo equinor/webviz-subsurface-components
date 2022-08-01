@@ -385,7 +385,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             }
                             template={template}
                             colorTables={this.props.colorTables as ColorTable[]}
-/*                            wellpick={wellpick}*/
                             maxVisibleTrackNum={1}
                             primaryAxis={"md"}
                             axisTitles={axisTitles}
