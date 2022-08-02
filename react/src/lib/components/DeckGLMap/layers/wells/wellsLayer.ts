@@ -49,7 +49,7 @@ type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
 type ColorAccessor = RGBAColor | StyleAccessorFunction | undefined;
 type WidthAccessor = number | StyleAccessor | undefined;
 type LineStyle = NumberPair | RGBAColor | number;
-type WellHeadAccessor = number | undefined;
+type WellHeadAccessor = number | StyleAccessor | undefined;
 
 type StyleAccessor = {
     color?: ColorAccessor;
@@ -180,12 +180,19 @@ function getLineWidth(
     return DEFAULT_LINE_WIDTH + offset;
 }
 
-function getPointRadius(accessor: WellHeadAccessor): number {
-    if (accessor !== undefined) {
-        return accessor;
-    } else {
-        return 1;
+function getPointRadius(
+    accessor: WellHeadAccessor
+): number | ((object: Feature) => number) {
+    if (typeof accessor == "function") {
+        return (object: Feature): number => {
+            return (accessor as StyleAccessorFunction)(object) as number;
+        };
     }
+
+    if (typeof accessor === "number") {
+        return accessor as number;
+    }
+    return 1;
 }
 
 export default class WellsLayer extends CompositeLayer<
