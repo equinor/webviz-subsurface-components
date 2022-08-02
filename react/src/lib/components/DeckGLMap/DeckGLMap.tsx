@@ -65,7 +65,7 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     getCameraPosition?: ViewStateType | undefined;
-    setState: React.Dispatch<
+    setState?: React.Dispatch<
         React.SetStateAction<{
             target: number[];
             zoom: number;
@@ -95,7 +95,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     selection,
     getTooltip,
     getCameraPosition,
-    setState
+    setState,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);

@@ -206,7 +206,7 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     getCameraPosition?: ViewStateType | undefined;
-    setState: React.Dispatch<
+    setState?: React.Dispatch<
         React.SetStateAction<{
             target: number[];
             zoom: number;
@@ -270,14 +270,18 @@ const Map: React.FC<MapProps> = ({
     children,
     getTooltip = defaultTooltip,
     getCameraPosition = {} as ViewStateType,
-    setState
+    setState,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewState, setViewState] =
         useState<ViewStateType>(getCameraPosition);
     getCameraPosition = viewState;
-    setState(getCameraPosition);
+
+    if (setState) {
+        setState(getCameraPosition);
+    }
+
     // react on zoom prop change
     useEffect(() => {
         const vs = getViewState(bounds, zoom, deckRef.current?.deck);
