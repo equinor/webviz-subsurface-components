@@ -27,20 +27,27 @@ export function roundMinMax(minmax: [number, number]): [number, number] {
     const kmin = 6; // a minimal number of intervals
     const kmax = 9; // a maximal number of intervals
 
-    if (!isFinite(minmax[0]) || !isFinite(minmax[1]))
-        return [minmax[0], minmax[1]];
+    let mi = minmax[0];
+    let ma = minmax[1];
 
-    if (!minmax[0] && !minmax[1])
+    if (!isFinite(mi) || !isFinite(ma)) return [mi, ma];
+
+    if (!mi && !ma)
         // some special case of absolutly round values (zeroes)
-        return [minmax[0], minmax[1]];
+        return [mi, ma];
 
-    let d = minmax[1] - minmax[0];
-    if (d < 0) return [minmax[0], minmax[1]];
+    let d = ma - mi;
+    if (d < 0) return [mi, ma];
     if (!d) d = 1;
-
+    else {
+        // avoid rounding of already near round values (some round decimals do not have exact the binary representation)
+        ma = ma - d * 0.0000001;
+        mi = mi + d * 0.0000001;
+        d = ma - mi;
+    }
     const l0 = Math.floor(Math.log10(d));
     let p = Math.pow(10, l0 + 1);
-    let c = (minmax[0] + d * 0.5) / p;
+    let c = (mi + d * 0.5) / p;
     if (Math.abs(c) > 1e9) c *= p;
     else c = Math.floor(c) * p;
     let q = 0.5;
@@ -53,10 +60,10 @@ export function roundMinMax(minmax: [number, number]): [number, number] {
         p = p * 0.1;
         while (q >= 0.5) {
             d = p * q;
-            k2 = Math.floor((minmax[1] - c) / d);
-            if (minmax[1] >= c) k2++;
-            k1 = Math.floor((minmax[0] - c) / d);
-            if (minmax[0] < c) k1--;
+            k2 = Math.floor((ma - c) / d);
+            if (ma >= c) k2++;
+            k1 = Math.floor((mi - c) / d);
+            if (mi < c) k1--;
             k = k2 - k1;
             if (k >= kmax) break;
             q = q * 0.5;
@@ -68,10 +75,10 @@ export function roundMinMax(minmax: [number, number]): [number, number] {
         for (; l < l0; l++) {
             while (q <= 2.0) {
                 d = p * q;
-                k2 = Math.floor((minmax[1] - c) / d);
-                if (minmax[1] >= c) k2++;
-                k1 = Math.floor((minmax[0] - c) / d);
-                if (minmax[0] < c) k1--;
+                k2 = Math.floor((ma - c) / d);
+                if (ma >= c) k2++;
+                k1 = Math.floor((mi - c) / d);
+                if (mi < c) k1--;
                 k = k2 - k1;
                 if (k <= kmax) break;
                 q = q * 2.0;
@@ -96,8 +103,8 @@ export function roundMinMax(minmax: [number, number]): [number, number] {
         }
         k1 = k;
     }
-    const a = k1 * d + c,
-        b = k2 * d + c;
+    const a = k1 * d + c;
+    const b = k2 * d + c;
     return [parseFloat(a.toPrecision(5)), parseFloat(b.toPrecision(5))];
 }
 

@@ -722,7 +722,8 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                 )
                     return deckgl_views;
 
-                const cur_viewport = views.viewports[deckgl_views.length];
+                const cur_viewport: ViewportType =
+                    views.viewports[deckgl_views.length];
                 const view_type: string = cur_viewport.show3D
                     ? "OrbitView"
                     : cur_viewport.id === "intersection_view"
