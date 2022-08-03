@@ -34,6 +34,7 @@ export default class IntersectionView extends View<
     constructor(props: IntersectionViewProps) {
         super({
             ...props,
+            target: [0, 0, 0],
             controller: false,
         });
     }

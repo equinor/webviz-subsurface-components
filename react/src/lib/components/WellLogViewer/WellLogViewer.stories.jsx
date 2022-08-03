@@ -133,6 +133,13 @@ const Template = (args) => {
     );
 };
 
+const wellpick = {
+    wellpick: require("../../../demo/example-data/wellpicks.json")[0],
+    name: "HORIZON",
+    colorTables: require("../../../demo/example-data/color-tables.json"),
+    color: "Stratigraphy",
+};
+
 export const Default = Template.bind({});
 Default.args = {
     id: "Well-Log-Viewer",
@@ -142,6 +149,7 @@ Default.args = {
     welllog: require("../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../demo/example-data/welllog_template_1.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
+    wellpick: wellpick,
 };
 
 export const Horizontal = Template.bind({});
@@ -152,6 +160,7 @@ Horizontal.args = {
         require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
+    wellpick: wellpick,
 };
 Horizontal.parameters = {
     docs: {
@@ -168,6 +177,7 @@ Discrete.args = {
     welllog: require("../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
+    wellpick: wellpick,
 };
 Discrete.parameters = {
     docs: {

@@ -112,7 +112,7 @@
         "data_row": {
             "type": "array",
             "items": {
-                "type": ["number", "null"]
+                "type": ["number", "string", "null"]
             }
         },
         "metadata_discrete": {

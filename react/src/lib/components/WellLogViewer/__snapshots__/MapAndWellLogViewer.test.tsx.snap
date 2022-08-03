@@ -61,6 +61,246 @@ exports[`Map and Well Log Viewer snapshot test 1`] = `
                       style="height: 1px; width: 100%; top: 4.5px; background-color: rgba(0, 255, 0, 0.7); position: absolute;"
                     />
                   </div>
+                  <div
+                    class="wellpick"
+                    style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 193, 0, 0.8); visibility: false;"
+                  >
+                    <div
+                      style="height: 1px; width: 100%; background-color: rgba(255, 193, 0, 0.8); position: absolute;"
+                    >
+                      <font
+                        size="1"
+                      >
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
+                        >
+                          <tbody>
+                            <tr>
+                              <td
+                                style="background-color:rgba(255,193,0,0.16)"
+                              >
+                                1644
+                              </td>
+                              <td
+                                align="center"
+                                width="100%"
+                              >
+                                <span
+                                  style="background-color:rgba(255,193,0,0.16)"
+                                >
+                                  Hor_1
+                                </span>
+                              </td>
+                              <td
+                                style="background-color:rgba(255,193,0,0.16)"
+                              />
+                            </tr>
+                          </tbody>
+                        </table>
+                      </font>
+                    </div>
+                  </div>
+                  <div
+                    class="wellpick"
+                    style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 120, 61, 0.8); visibility: false;"
+                  >
+                    <div
+                      style="height: 1px; width: 100%; background-color: rgba(255, 120, 61, 0.8); position: absolute;"
+                    >
+                      <font
+                        size="1"
+                      >
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
+                        >
+                          <tbody>
+                            <tr>
+                              <td
+                                style="background-color:rgba(255,120,61,0.16)"
+                              >
+                                2788
+                              </td>
+                              <td
+                                align="center"
+                                width="100%"
+                              >
+                                <span
+                                  style="background-color:rgba(255,120,61,0.16)"
+                                >
+                                  Hor_2
+                                </span>
+                              </td>
+                              <td
+                                style="background-color:rgba(255,120,61,0.16)"
+                              />
+                            </tr>
+                          </tbody>
+                        </table>
+                      </font>
+                    </div>
+                  </div>
+                  <div
+                    class="wellpick"
+                    style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 155, 76, 0.8); visibility: false;"
+                  >
+                    <div
+                      style="height: 1px; width: 100%; background-color: rgba(255, 155, 76, 0.8); position: absolute;"
+                    >
+                      <font
+                        size="1"
+                      >
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
+                        >
+                          <tbody>
+                            <tr>
+                              <td
+                                style="background-color:rgba(255,155,76,0.16)"
+                              >
+                                3288
+                              </td>
+                              <td
+                                align="center"
+                                width="100%"
+                              >
+                                <span
+                                  style="background-color:rgba(255,155,76,0.16)"
+                                >
+                                  Hor_3
+                                </span>
+                              </td>
+                              <td
+                                style="background-color:rgba(255,155,76,0.16)"
+                              />
+                            </tr>
+                          </tbody>
+                        </table>
+                      </font>
+                    </div>
+                  </div>
+                  <div
+                    class="wellpick"
+                    style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 223, 161, 0.8); visibility: false;"
+                  >
+                    <div
+                      style="height: 1px; width: 100%; background-color: rgba(255, 223, 161, 0.8); position: absolute;"
+                    >
+                      <font
+                        size="1"
+                      >
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
+                        >
+                          <tbody>
+                            <tr>
+                              <td
+                                style="background-color:rgba(255,223,161,0.16)"
+                              >
+                                3611
+                              </td>
+                              <td
+                                align="center"
+                                width="100%"
+                              >
+                                <span
+                                  style="background-color:rgba(255,223,161,0.16)"
+                                >
+                                  Hor_4
+                                </span>
+                              </td>
+                              <td
+                                style="background-color:rgba(255,223,161,0.16)"
+                              />
+                            </tr>
+                          </tbody>
+                        </table>
+                      </font>
+                    </div>
+                  </div>
+                  <div
+                    class="wellpick"
+                    style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 223, 161, 0.8); visibility: false;"
+                  >
+                    <div
+                      style="height: 1px; width: 100%; background-color: rgba(255, 223, 161, 0.8); position: absolute;"
+                    >
+                      <font
+                        size="1"
+                      >
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
+                        >
+                          <tbody>
+                            <tr>
+                              <td
+                                style="background-color:rgba(255,223,161,0.16)"
+                              >
+                                3911
+                              </td>
+                              <td
+                                align="center"
+                                width="100%"
+                              >
+                                <span
+                                  style="background-color:rgba(255,223,161,0.16)"
+                                >
+                                  Hor_5
+                                </span>
+                              </td>
+                              <td
+                                style="background-color:rgba(255,223,161,0.16)"
+                              />
+                            </tr>
+                          </tbody>
+                        </table>
+                      </font>
+                    </div>
+                  </div>
+                  <div
+                    class="wellpick"
+                    style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 223, 161, 0.8); visibility: false;"
+                  >
+                    <div
+                      style="height: 1px; width: 100%; background-color: rgba(255, 223, 161, 0.8); position: absolute;"
+                    >
+                      <font
+                        size="1"
+                      >
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
+                        >
+                          <tbody>
+                            <tr>
+                              <td
+                                style="background-color:rgba(255,223,161,0.16)"
+                              >
+                                4411
+                              </td>
+                              <td
+                                align="center"
+                                width="100%"
+                              >
+                                <span
+                                  style="background-color:rgba(255,223,161,0.16)"
+                                >
+                                  Hor_6
+                                </span>
+                              </td>
+                              <td
+                                style="background-color:rgba(255,223,161,0.16)"
+                              />
+                            </tr>
+                          </tbody>
+                        </table>
+                      </font>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

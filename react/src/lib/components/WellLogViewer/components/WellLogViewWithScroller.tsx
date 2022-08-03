@@ -9,7 +9,7 @@ import { WellLog } from "./WellLogTypes";
 import { Template } from "./WellLogTemplateTypes";
 import { ColorTable } from "./ColorTableTypes";
 
-import { WellLogController } from "./WellLogView";
+import { WellLogController, WellPickProps } from "./WellLogView";
 
 import Scroller from "./Scroller";
 
@@ -17,6 +17,7 @@ interface Props {
     welllog: WellLog | undefined;
     template: Template;
     colorTables: ColorTable[];
+    wellpick?: WellPickProps;
     horizontal?: boolean;
     primaryAxis: string;
 
@@ -199,6 +200,7 @@ class WellLogViewWithScroller extends Component<Props> {
                     welllog={this.props.welllog}
                     template={this.props.template}
                     colorTables={this.props.colorTables}
+                    wellpick={this.props.wellpick}
                     horizontal={this.props.horizontal}
                     hideTitles={this.props.hideTitles}
                     hideLegend={this.props.hideLegend}

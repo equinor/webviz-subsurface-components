@@ -50,9 +50,9 @@ const meshMapLayerPng = {
     propertiesUrl: "kh_netmap_25_m.png",
     contours: [0, 100],
     isContoursDepth: true,
-    gridLines: true,
+    gridLines: false,
     cellCenteredProperties: true,
-    material: false,
+    material: true,
     colorMapName: "Physics",
 };
 
@@ -354,7 +354,7 @@ Readout.parameters = {
     },
 };
 
-export const MapDiscontinuous: ComponentStory<typeof DeckGLMap> = () => {
+export const BigMapWithHole: ComponentStory<typeof DeckGLMap> = () => {
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
     const args = React.useMemo(() => {
@@ -363,9 +363,10 @@ export const MapDiscontinuous: ComponentStory<typeof DeckGLMap> = () => {
             id: "readout",
             layers: [
                 {
-                    ...meshMapLayerFloat32,
+                    ...meshMapLayerBig,
                     meshUrl: "hugin_depth_5_m_w_hole.float32",
-                    contours: [0, 50],
+                    cellCenteredProperties: false,
+                    gridLines: false,
                     material: false,
                 },
             ],
@@ -384,11 +385,11 @@ export const MapDiscontinuous: ComponentStory<typeof DeckGLMap> = () => {
     );
 };
 
-MapDiscontinuous.parameters = {
+BigMapWithHole.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Example with discontinous map (map with a hole).",
+            story: "Example of map with a hole.",
         },
     },
 };
@@ -424,6 +425,9 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
                 {
                     ...meshMapLayerFloat32,
                     colorMapFunction: colorMap,
+                    cellCenteredProperties: false,
+                    gridLines: false,
+                    material: true,
                 },
             ],
             legend: { visible: false },
@@ -451,7 +455,7 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
                 max={100}
                 defaultValue={50}
                 step={1}
-                onChange={handleChange}
+                onChangeCommitted={handleChange}
             />
         </>
     );
@@ -467,6 +471,63 @@ BreakpointColorMap.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Example using a color scale with a breakpoint.",
+        },
+    },
+};
+
+export const ColorMapRange: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [colorMapUpper, setColorMapUpper] = React.useState<number>(41048);
+
+    const props = React.useMemo(() => {
+        return {
+            ...args,
+            layers: [
+                {
+                    ...meshMapLayerFloat32,
+                    colorMapName: "Seismic",
+
+                    colorMapRange: [-3071, colorMapUpper],
+                    colorMapClampColor: false,
+
+                    cellCenteredProperties: false,
+                    gridLines: false,
+                    material: true,
+                },
+            ],
+            legend: { visible: true },
+        };
+    }, [colorMapUpper]);
+
+    const handleChange = React.useCallback((_event, value) => {
+        setColorMapUpper(value);
+    }, []);
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+            </div>
+            <Slider
+                min={10000}
+                max={41048}
+                defaultValue={41048}
+                step={1000}
+                onChangeCommitted={handleChange}
+            />
+        </>
+    );
+};
+
+ColorMapRange.args = {
+    ...defaultArgs,
+    id: "breakpoint-color-map",
+};
+
+ColorMapRange.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: 'Example changin the colorcamp range ("ColorMapRange" property).',
         },
     },
 };

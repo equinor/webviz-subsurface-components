@@ -38,6 +38,7 @@ import {
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
 import { getLayersById } from "../../layers/utils/layerTools";
+import UnfoldedGeoJsonLayer from "../intersection/unfoldedGeoJsonLayer";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -102,6 +103,7 @@ export interface LogCurveDataType {
 }
 
 export interface WellsPickInfo extends LayerPickInfo {
+    featureType?: string;
     logName: string;
 }
 
@@ -303,7 +305,7 @@ export default class WellsLayer extends CompositeLayer<
             }),
         ];
 
-        const outline = new GeoJsonLayer<Feature>(
+        const outline = new UnfoldedGeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "outline",
                 data,
@@ -324,7 +326,7 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const colors = new GeoJsonLayer<Feature>(
+        const colors = new UnfoldedGeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "colors",
                 data,
@@ -355,7 +357,7 @@ export default class WellsLayer extends CompositeLayer<
         );
 
         // Highlight the selected well.
-        const highlight = new GeoJsonLayer<Feature>(
+        const highlight = new UnfoldedGeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "highlight",
                 data: getWellObjectByName(
@@ -524,7 +526,8 @@ export default class WellsLayer extends CompositeLayer<
         let md_property = getMdProperty(
             coordinate,
             info.object as unknown as Feature,
-            this.props.lineStyle?.color
+            this.props.lineStyle?.color,
+            (info as WellsPickInfo).featureType
         );
         if (!md_property) {
             md_property = getLogProperty(
@@ -538,7 +541,8 @@ export default class WellsLayer extends CompositeLayer<
         let tvd_property = getTvdProperty(
             info.coordinate as Position2D,
             info.object as unknown as Feature,
-            this.props.lineStyle?.color
+            this.props.lineStyle?.color,
+            (info as WellsPickInfo).featureType
         );
         if (!tvd_property) {
             tvd_property = getLogProperty(
@@ -765,16 +769,13 @@ function getLogPath(
 }
 
 function getLogIndexByName(d: LogCurveDataType, log_name: string): number {
-    return d.curves.findIndex(
-        (item) => item.name.toLowerCase() === log_name.toLowerCase()
-    );
+    const name = log_name.toLowerCase();
+    return d.curves.findIndex((item) => item.name.toLowerCase() === name);
 }
 
 function getLogIndexByNames(d: LogCurveDataType, names: string[]): number {
     for (const name of names) {
-        const index = d.curves.findIndex(
-            (item) => item.name.toLowerCase() === name.toLowerCase()
-        );
+        const index = getLogIndexByName(d, name);
         if (index >= 0) return index;
     }
     return -1;
@@ -1090,8 +1091,12 @@ function getMd(
 function getMdProperty(
     coord: Position,
     feature: Feature,
-    accessor: ColorAccessor
+    accessor: ColorAccessor,
+    featureType: string | undefined
 ): PropertyDataType | null {
+    if (featureType === "points") {
+        return null;
+    }
     const md = getMd(coord, feature, accessor);
     if (md != null) {
         const prop_name = "MD " + feature.properties?.["name"];
@@ -1133,8 +1138,12 @@ function getTvd(
 function getTvdProperty(
     coord: Position,
     feature: Feature,
-    accessor: ColorAccessor
+    accessor: ColorAccessor,
+    featureType: string | undefined
 ): PropertyDataType | null {
+    if (featureType === "points") {
+        return null;
+    }
     const tvd = getTvd(coord, feature, accessor);
     if (tvd != null) {
         const prop_name = "TVD " + feature.properties?.["name"];
