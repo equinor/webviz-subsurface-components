@@ -42,19 +42,23 @@ import { getLayersById } from "../../layers/utils/layerTools";
 type StyleAccessorFunction = (
     object: Feature,
     objectInfo?: Record<string, unknown>
-) => LineStyle;
+) => StyleData;
 
 type NumberPair = [number, number];
 type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
 type ColorAccessor = RGBAColor | StyleAccessorFunction | undefined;
-type WidthAccessor = number | StyleAccessor | undefined;
-type LineStyle = NumberPair | RGBAColor | number;
-type WellHeadAccessor = number | StyleAccessor | undefined;
+type SizeAccessor = number | StyleAccessorFunction | undefined;
+type StyleData = NumberPair | RGBAColor | number;
 
-type StyleAccessor = {
+type LineStyleAccessor = {
     color?: ColorAccessor;
     dash?: DashAccessor;
-    width?: WidthAccessor;
+    width?: SizeAccessor;
+};
+
+type WellHeadStyleAccessor = {
+    color?: ColorAccessor;
+    size?: SizeAccessor;
 };
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
@@ -69,9 +73,9 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
-    wellHeadStyle: WellHeadAccessor;
+    wellHeadStyle: WellHeadStyleAccessor;
     colorMappingFunction: (x: number) => [number, number, number];
-    lineStyle: StyleAccessor;
+    lineStyle: LineStyleAccessor;
     wellNameVisible: boolean;
     wellNameAtTop: boolean;
     wellNameSize: number;
@@ -165,7 +169,7 @@ function getLineColor(accessor: ColorAccessor) {
 }
 
 function getLineWidth(
-    accessor: WidthAccessor,
+    accessor: SizeAccessor,
     offset = 0
 ): number | ((object: Feature) => number) {
     if (typeof accessor == "function") {
@@ -182,7 +186,7 @@ function getLineWidth(
 }
 
 function getPointRadius(
-    accessor: WellHeadAccessor,
+    accessor: SizeAccessor,
     offset = 0
 ): number | ((object: Feature) => number) {
     if (typeof accessor == "function") {
