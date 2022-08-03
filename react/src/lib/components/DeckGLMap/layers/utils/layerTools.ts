@@ -14,6 +14,7 @@ import {
 export type colorMapFunctionType = (x: number) => [number, number, number];
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
+    "@@type": string;
     name: string;
 }
 
