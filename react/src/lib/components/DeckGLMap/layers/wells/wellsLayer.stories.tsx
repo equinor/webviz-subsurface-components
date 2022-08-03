@@ -165,6 +165,11 @@ CustomColoredWells.parameters = {
     },
 };
 
+function wellheadSizeCallback(object: Record<string, Record<string, unknown>>) {
+    if ((object["properties"]["name"] as string).match("15/9-19")) return 0;
+    else return 8;
+}
+
 function colorCallback(object: Record<string, Record<string, unknown>>) {
     if ((object["properties"]["name"] as string).match("15/9-F-10"))
         return [0, 0, 0, 0];
@@ -194,6 +199,9 @@ CallbackStyledWells.args = {
                 color: colorCallback,
                 dash: dashCallback,
                 width: widthCallback,
+            },
+            wellHeadStyle: {
+                size: wellheadSizeCallback,
             },
             refine: false,
             outline: false,
