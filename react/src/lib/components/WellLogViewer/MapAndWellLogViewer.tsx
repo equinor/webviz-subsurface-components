@@ -20,9 +20,7 @@ const template =
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     require("../../../demo/example-data/welllog_template_2.json") as Template;
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("../../../demo/example-data/color-tables.json");
-// see also react\src\demo\example-data\welllog_template_2.json
+import { ColorTable } from "./components/ColorTableTypes";
 
 import { WellLogController } from "./components/WellLogView";
 import { LogViewer } from "@equinor/videx-wellog";
@@ -112,6 +110,15 @@ function addTemplateTrack(
     templateNew.tracks.push(templateTrack);
     return templateNew;
 }
+
+const wellpick = {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    wellpick: require("../../../demo/example-data/wellpicks.json")[0],
+    name: "HORIZON",
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+    color: "Stratigraphy",
+};
 
 export class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
@@ -274,13 +281,14 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             if (event.wellname === this.state.wellName) {
                 // synchronize selection only from the current well
                 if (event.md !== undefined) {
-                    this.state.controller?.selectContent([
-                        event.md,
-                        this.state.selection?.[1],
-                    ]);
-
                     this.setState((state: Readonly<State>) => {
                         if (state.selPersistent) return null;
+
+                        this.state.controller?.selectContent([
+                            event.md,
+                            this.state.selection?.[1],
+                        ]);
+
                         return {
                             selection: [event.md, state.selection?.[1]],
                         };
@@ -311,7 +319,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             {...this.props}
                             layers={this.state.layers}
                             editedData={this.state.editedData}
-                            colorTables={colorTables}
                             onMouseEvent={this.onMouseEvent}
                             selection={{
                                 well: wellName,
@@ -377,10 +384,8 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                                     : undefined
                             }
                             template={template}
-                            colorTables={
-                                colorTables
-                                //this.props.colorTables as ColorTable[]
-                            }
+                            colorTables={this.props.colorTables as ColorTable[]}
+                            wellpick={wellpick}
                             maxVisibleTrackNum={1}
                             primaryAxis={"md"}
                             axisTitles={axisTitles}

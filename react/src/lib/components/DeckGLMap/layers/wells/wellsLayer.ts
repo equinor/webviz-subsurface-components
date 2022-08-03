@@ -745,16 +745,13 @@ function getLogPath(
 }
 
 function getLogIndexByName(d: LogCurveDataType, log_name: string): number {
-    return d.curves.findIndex(
-        (item) => item.name.toLowerCase() === log_name.toLowerCase()
-    );
+    const name = log_name.toLowerCase();
+    return d.curves.findIndex((item) => item.name.toLowerCase() === name);
 }
 
 function getLogIndexByNames(d: LogCurveDataType, names: string[]): number {
     for (const name of names) {
-        const index = d.curves.findIndex(
-            (item) => item.name.toLowerCase() === name.toLowerCase()
-        );
+        const index = getLogIndexByName(d, name);
         if (index >= 0) return index;
     }
     return -1;
