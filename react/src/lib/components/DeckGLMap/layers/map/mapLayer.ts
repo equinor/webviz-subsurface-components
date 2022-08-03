@@ -235,29 +235,20 @@ function makeFullMesh(
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const color = [
-                    vertexColors[3 * i0 + 0],
-                    vertexColors[3 * i0 + 1],
-                    vertexColors[3 * i0 + 2],
-                ];
-                const isColor = !isEqual(color, [NaN, NaN, NaN]);
-
                 // t1
                 if (
-                    isColor &&
-                    !isNaN(meshData[i0]) &&
-                    !isNaN(meshData[i1]) &&
-                    !isNaN(meshData[i3])
+                    !isNaN(meshData[i0]) && !isNaN(vertexColors[3 * i0 + 0]) && // eslint-disable-line
+                    !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
+                    !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0])    // eslint-disable-line
                 ) {
                     indices.push(i0, i1, i3);
                 }
 
                 // t2
                 if (
-                    isColor &&
-                    !isNaN(meshData[i1]) &&
-                    !isNaN(meshData[i3]) &&
-                    !isNaN(meshData[i2])
+                    !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
+                    !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0]) && // eslint-disable-line
+                    !isNaN(meshData[i2]) && !isNaN(vertexColors[3 * i2 + 0])    // eslint-disable-line
                 ) {
                     indices.push(i1, i3, i2);
                 }
