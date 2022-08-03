@@ -109,6 +109,8 @@ function multiply(pair: [number, number], factor: number): [number, number] {
     return [pair[0] * factor, pair[1] * factor];
 }
 
+const LINE = "line";
+const POINT = "point";
 const DEFAULT_POINT_SIZE = 8;
 const DEFAULT_LINE_WIDTH = 5;
 const DEFAULT_DASH = [5, 5] as NumberPair;
@@ -168,7 +170,8 @@ function getLineColor(accessor: ColorAccessor) {
     };
 }
 
-function getLineWidth(
+function getSize(
+    type: string,
     accessor: SizeAccessor,
     offset = 0
 ): number | ((object: Feature) => number) {
@@ -180,27 +183,12 @@ function getLineWidth(
         };
     }
 
-    if (accessor as number) return (accessor as number) + offset;
+    if ((accessor as number) == 0) return 0;
+    if ((accessor as number) > 0) return (accessor as number) + offset;
 
-    return DEFAULT_LINE_WIDTH + offset;
-}
-
-function getPointRadius(
-    accessor: SizeAccessor,
-    offset = 0
-): number | ((object: Feature) => number) {
-    if (typeof accessor == "function") {
-        return (object: Feature): number => {
-            return (
-                ((accessor as StyleAccessorFunction)(object) as number) + offset
-            );
-        };
-    }
-
-    if (typeof accessor === "number") {
-        return (accessor as number) + offset;
-    }
-    return DEFAULT_POINT_SIZE + offset;
+    if (type == LINE) return DEFAULT_LINE_WIDTH + offset;
+    if (type == POINT) return DEFAULT_POINT_SIZE + offset;
+    return 0;
 }
 
 export default class WellsLayer extends CompositeLayer<
@@ -327,8 +315,8 @@ export default class WellsLayer extends CompositeLayer<
                 visible: this.props.outline,
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getLineWidth(this.props.lineStyle?.width),
-                getPointRadius: getPointRadius(this.props.wellHeadStyle?.size),
+                getLineWidth: getSize(LINE, this.props.lineStyle?.width),
+                getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
                 extensions: extensions,
                 getDashArray: getDashFactor(this.props.lineStyle?.dash),
                 lineBillboard: true,
@@ -347,8 +335,9 @@ export default class WellsLayer extends CompositeLayer<
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getLineWidth(this.props.lineStyle?.width, -1),
-                getPointRadius: getPointRadius(
+                getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
+                getPointRadius: getSize(
+                    POINT,
                     this.props.wellHeadStyle?.size,
                     -1
                 ),
@@ -357,7 +346,7 @@ export default class WellsLayer extends CompositeLayer<
                 extensions: extensions,
                 getDashArray: getDashFactor(
                     this.props.lineStyle?.dash,
-                    getLineWidth(this.props.lineStyle?.width),
+                    getSize(LINE, this.props.lineStyle?.width),
                     -1
                 ),
                 lineBillboard: true,
@@ -380,8 +369,9 @@ export default class WellsLayer extends CompositeLayer<
                 lineWidthUnits: "pixels",
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getLineWidth(this.props.lineStyle?.width, 2),
-                getPointRadius: getPointRadius(
+                getLineWidth: getSize(LINE, this.props.lineStyle?.width, 2),
+                getPointRadius: getSize(
+                    POINT,
                     this.props.wellHeadStyle?.size,
                     2
                 ),
