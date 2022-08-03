@@ -179,4 +179,18 @@ Default.args = {
         require("../../../demo/example-data/synclog_template.json"),
     ],
     colorTables: require("../../../demo/example-data/color-tables.json"),
+    wellpicks: [
+        {
+            wellpick: require("../../../demo/example-data/wellpicks.json")[0],
+            name: "HORIZON",
+            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            color: "Stratigraphy",
+        },
+        {
+            wellpick: require("../../../demo/example-data/wellpicks.json")[1],
+            name: "HORIZON",
+            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            color: "Stratigraphy",
+        },
+    ],
 };

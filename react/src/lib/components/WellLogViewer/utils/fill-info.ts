@@ -16,34 +16,48 @@ import { ExtPlotOptions } from "./tracks";
 import { isScaleTrack } from "./tracks";
 import { getPlotType } from "./tracks";
 
+function getValueOnInterval(
+    x: number,
+    rowPrev: number[],
+    row: number[],
+    type: string
+): number {
+    if (rowPrev[0] == null) return Number.NaN;
+    if (type === "linestep") {
+        if (row[1] == null) return Number.NaN;
+        return row[1]; //!! not rowPrev[1] !!
+    }
+
+    const d = row[0] - rowPrev[0];
+    const f = x - rowPrev[0];
+    if (type === "dot") {
+        if (f < d * 0.5) {
+            if (rowPrev[1] == null) return Number.NaN;
+            return rowPrev[1];
+        }
+        if (row[1] == null) return Number.NaN;
+        return row[1];
+    }
+
+    // "line", "area", "gradientfill"
+    if (rowPrev[1] == null) return Number.NaN;
+    if (row[1] == null) return Number.NaN;
+    const mul = d ? (row[1] - rowPrev[1]) / d : 1.0;
+    return f * mul + rowPrev[1];
+}
+
 function getValue(x: number, data: [], type: string): number {
-    let v = Number.NaN;
+    const v = Number.NaN;
     if (Number.isFinite(x)) {
         const n = data.length;
         for (let i = 0; i < n; i++) {
             const row = data[i];
-            if (row[0] == null) continue;
-            if (row[1] == null) continue;
+            //if (row[0] == null) continue;
+            //!! if (row[1] == null) continue;
             if (x < row[0]) {
                 if (!i) break;
-                else {
-                    const rowPrev = data[i - 1];
-                    if (rowPrev[0] == null || rowPrev[1] == null) break;
-                    if (type === "linestep") {
-                        v = row[1]; //!! not rowPrev[1] !!
-                    } else {
-                        const d = row[0] - rowPrev[0];
-                        const f = x - rowPrev[0];
-                        if (type === "dot") {
-                            v = f < d * 0.5 ? rowPrev[1] : row[1];
-                        } else {
-                            // "line", "area", "gradientfill"
-                            const mul = d ? (row[1] - rowPrev[1]) / d : 1.0;
-                            v = f * mul + rowPrev[1];
-                        }
-                    }
-                }
-                break;
+                const rowPrev = data[i - 1];
+                return getValueOnInterval(x, rowPrev, row, type);
             }
         }
     }

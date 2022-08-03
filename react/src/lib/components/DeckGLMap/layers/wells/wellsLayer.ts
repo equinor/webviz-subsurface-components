@@ -38,22 +38,28 @@ import {
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
 import { getLayersById } from "../../layers/utils/layerTools";
+import UnfoldedGeoJsonLayer from "../intersection/unfoldedGeoJsonLayer";
 
 type StyleAccessorFunction = (
     object: Feature,
     objectInfo?: Record<string, unknown>
-) => LineStyle;
+) => StyleData;
 
 type NumberPair = [number, number];
 type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
 type ColorAccessor = RGBAColor | StyleAccessorFunction | undefined;
-type WidthAccessor = number | StyleAccessor | undefined;
-type LineStyle = NumberPair | RGBAColor | number;
+type SizeAccessor = number | StyleAccessorFunction | undefined;
+type StyleData = NumberPair | RGBAColor | number;
 
-type StyleAccessor = {
+type LineStyleAccessor = {
     color?: ColorAccessor;
     dash?: DashAccessor;
-    width?: WidthAccessor;
+    width?: SizeAccessor;
+};
+
+type WellHeadStyleAccessor = {
+    color?: ColorAccessor;
+    size?: SizeAccessor;
 };
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
@@ -68,8 +74,9 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     logRadius: number;
     logCurves: boolean;
     refine: boolean;
+    wellHeadStyle: WellHeadStyleAccessor;
     colorMappingFunction: (x: number) => [number, number, number];
-    lineStyle: StyleAccessor;
+    lineStyle: LineStyleAccessor;
     wellNameVisible: boolean;
     wellNameAtTop: boolean;
     wellNameSize: number;
@@ -104,6 +111,9 @@ function multiply(pair: [number, number], factor: number): [number, number] {
     return [pair[0] * factor, pair[1] * factor];
 }
 
+const LINE = "line";
+const POINT = "point";
+const DEFAULT_POINT_SIZE = 8;
 const DEFAULT_LINE_WIDTH = 5;
 const DEFAULT_DASH = [5, 5] as NumberPair;
 
@@ -140,7 +150,7 @@ function getDashFactor(
     };
 }
 
-function getLineColor(accessor: ColorAccessor) {
+function getColor(accessor: ColorAccessor) {
     if (accessor as RGBAColor) {
         return accessor as RGBAColor;
     }
@@ -162,8 +172,9 @@ function getLineColor(accessor: ColorAccessor) {
     };
 }
 
-function getLineWidth(
-    accessor: WidthAccessor,
+function getSize(
+    type: string,
+    accessor: SizeAccessor,
     offset = 0
 ): number | ((object: Feature) => number) {
     if (typeof accessor == "function") {
@@ -174,9 +185,12 @@ function getLineWidth(
         };
     }
 
-    if (accessor as number) return (accessor as number) + offset;
+    if ((accessor as number) == 0) return 0;
+    if ((accessor as number) > 0) return (accessor as number) + offset;
 
-    return DEFAULT_LINE_WIDTH + offset;
+    if (type == LINE) return DEFAULT_LINE_WIDTH + offset;
+    if (type == POINT) return DEFAULT_POINT_SIZE + offset;
+    return 0;
 }
 
 export default class WellsLayer extends CompositeLayer<
@@ -291,7 +305,7 @@ export default class WellsLayer extends CompositeLayer<
             }),
         ];
 
-        const outline = new GeoJsonLayer<Feature>(
+        const outline = new UnfoldedGeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "outline",
                 data,
@@ -303,7 +317,8 @@ export default class WellsLayer extends CompositeLayer<
                 visible: this.props.outline,
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getLineWidth(this.props.lineStyle?.width),
+                getLineWidth: getSize(LINE, this.props.lineStyle?.width),
+                getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
                 extensions: extensions,
                 getDashArray: getDashFactor(this.props.lineStyle?.dash),
                 lineBillboard: true,
@@ -311,7 +326,7 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const colors = new GeoJsonLayer<Feature>(
+        const colors = new UnfoldedGeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "colors",
                 data,
@@ -320,15 +335,20 @@ export default class WellsLayer extends CompositeLayer<
                 positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
-                pointRadiusScale: this.props.pointRadiusScale - 1,
+                pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getLineWidth(this.props.lineStyle?.width, -1),
-                getFillColor: (d: Feature) => d.properties?.["color"],
-                getLineColor: getLineColor(this.props.lineStyle?.color),
+                getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
+                getPointRadius: getSize(
+                    POINT,
+                    this.props.wellHeadStyle?.size,
+                    -1
+                ),
+                getFillColor: getColor(this.props.wellHeadStyle?.color),
+                getLineColor: getColor(this.props.lineStyle?.color),
                 extensions: extensions,
                 getDashArray: getDashFactor(
                     this.props.lineStyle?.dash,
-                    getLineWidth(this.props.lineStyle?.width),
+                    getSize(LINE, this.props.lineStyle?.width),
                     -1
                 ),
                 lineBillboard: true,
@@ -337,7 +357,7 @@ export default class WellsLayer extends CompositeLayer<
         );
 
         // Highlight the selected well.
-        const highlight = new GeoJsonLayer<Feature>(
+        const highlight = new UnfoldedGeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "highlight",
                 data: getWellObjectByName(
@@ -349,11 +369,16 @@ export default class WellsLayer extends CompositeLayer<
                 positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
-                pointRadiusScale: this.props.pointRadiusScale + 2,
+                pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getLineWidth(this.props.lineStyle?.width, 2),
-                getFillColor: (d: Feature) => d.properties?.["color"],
-                getLineColor: getLineColor(this.props.lineStyle?.color),
+                getLineWidth: getSize(LINE, this.props.lineStyle?.width, 2),
+                getPointRadius: getSize(
+                    POINT,
+                    this.props.wellHeadStyle?.size,
+                    2
+                ),
+                getFillColor: getColor(this.props.wellHeadStyle?.color),
+                getLineColor: getColor(this.props.lineStyle?.color),
             })
         );
 
@@ -675,7 +700,7 @@ function isTrajectoryVisible(
     color_accessor: ColorAccessor
 ): boolean {
     let alpha;
-    const accessor = getLineColor(color_accessor);
+    const accessor = getColor(color_accessor);
     if (typeof accessor === "function") {
         alpha = accessor(well_object)?.[3];
     } else {
@@ -744,16 +769,13 @@ function getLogPath(
 }
 
 function getLogIndexByName(d: LogCurveDataType, log_name: string): number {
-    return d.curves.findIndex(
-        (item) => item.name.toLowerCase() === log_name.toLowerCase()
-    );
+    const name = log_name.toLowerCase();
+    return d.curves.findIndex((item) => item.name.toLowerCase() === name);
 }
 
 function getLogIndexByNames(d: LogCurveDataType, names: string[]): number {
     for (const name of names) {
-        const index = d.curves.findIndex(
-            (item) => item.name.toLowerCase() === name.toLowerCase()
-        );
+        const index = getLogIndexByName(d, name);
         if (index >= 0) return index;
     }
     return -1;
