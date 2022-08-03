@@ -195,7 +195,7 @@ export default class WellsLayer extends CompositeLayer<
             /*this.props.selectedWell = (info.object as Feature).properties?.[
                 "name"
             ];*/
-            return true;
+            return false;
         }
     }
 

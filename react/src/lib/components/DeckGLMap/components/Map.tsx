@@ -197,14 +197,18 @@ export interface MapProps {
      */
     onMouseEvent?: EventCallback;
 
+    /**
+     * For get key events
+     */
+    onKeyDown?: (e: KeyboardEvent) => void;
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
     };
-
     children?: React.ReactNode;
-
+    isKeyUp?: boolean | undefined;
     getTooltip?: TooltipCallback;
+    setMultiWells?: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -260,6 +264,8 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
+    setMultiWells,
+    onKeyDown,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 
@@ -462,6 +468,14 @@ const Map: React.FC<MapProps> = ({
                     break;
                 }
             }
+            if (
+                onKeyDown &&
+                ev.type === "click" &&
+                ev.wellname !== undefined &&
+                setMultiWells
+            ) {
+                setMultiWells((item) => [...item, ev.wellname as string]);
+            }
             onMouseEvent(ev);
         }
     };
@@ -519,68 +533,72 @@ const Map: React.FC<MapProps> = ({
 
     return (
         <div onContextMenu={(event) => event.preventDefault()}>
-            <DeckGL
-                id={id}
-                viewState={viewState}
-                views={deckGLViews}
-                layerFilter={layerFilter}
-                layers={deckGLLayers}
-                userData={{
-                    setEditedData: (updated_prop: Record<string, unknown>) => {
-                        setEditedData?.(updated_prop);
-                    },
-                    colorTables: colorTables,
-                }}
-                getCursor={({ isDragging }): string =>
-                    isDragging ? "grabbing" : "default"
-                }
-                getTooltip={getTooltip}
-                ref={deckRef}
-                onViewStateChange={(viewport) =>
-                    setViewState(viewport.viewState)
-                }
-                onHover={onHover}
-                onClick={onClick}
-                onLoad={onLoad}
-                onAfterRender={onAfterRender}
-            >
-                {children}
-                {views?.viewports &&
-                    views.viewports.map((view, index) => (
-                        <DeckGLView
-                            key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
-                            id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
-                        >
-                            {legend?.visible && (
-                                <ColorLegends
-                                    {...legend}
-                                    layers={
-                                        getLayersInViewport(
-                                            deckGLLayers,
-                                            view.layerIds
-                                        ) as ExtendedLayer<unknown>[]
-                                    }
-                                    colorTables={colorTables}
-                                />
-                            )}
-                            {toolbar?.visible && (
-                                <Settings
-                                    viewportId={view.id}
-                                    layerIds={view.layerIds}
-                                />
-                            )}
-                            {views.showLabel && (
-                                <ViewFooter>
-                                    {`${
-                                        view.name
-                                            ? view.name
-                                            : `View_${index + 1}`
-                                    } `}
-                                </ViewFooter>
-                            )}
-                        </DeckGLView>
-                    ))}
-            </DeckGL>
+            <div onKeyDown={onKeyDown}>
+                <DeckGL
+                    id={id}
+                    viewState={viewState}
+                    views={deckGLViews}
+                    layerFilter={layerFilter}
+                    layers={deckGLLayers}
+                    userData={{
+                        setEditedData: (
+                            updated_prop: Record<string, unknown>
+                        ) => {
+                            setEditedData?.(updated_prop);
+                        },
+                        colorTables: colorTables,
+                    }}
+                    getCursor={({ isDragging }): string =>
+                        isDragging ? "grabbing" : "default"
+                    }
+                    getTooltip={getTooltip}
+                    ref={deckRef}
+                    onViewStateChange={(viewport) =>
+                        setViewState(viewport.viewState)
+                    }
+                    onHover={onHover}
+                    onClick={onClick}
+                    onLoad={onLoad}
+                    onAfterRender={onAfterRender}
+                >
+                    {children}
+                    {views?.viewports &&
+                        views.viewports.map((view, index) => (
+                            <DeckGLView
+                                key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
+                                id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
+                            >
+                                {legend?.visible && (
+                                    <ColorLegends
+                                        {...legend}
+                                        layers={
+                                            getLayersInViewport(
+                                                deckGLLayers,
+                                                view.layerIds
+                                            ) as ExtendedLayer<unknown>[]
+                                        }
+                                        colorTables={colorTables}
+                                    />
+                                )}
+                                {toolbar?.visible && (
+                                    <Settings
+                                        viewportId={view.id}
+                                        layerIds={view.layerIds}
+                                    />
+                                )}
+                                {views.showLabel && (
+                                    <ViewFooter>
+                                        {`${
+                                            view.name
+                                                ? view.name
+                                                : `View_${index + 1}`
+                                        } `}
+                                    </ViewFooter>
+                                )}
+                            </DeckGLView>
+                        ))}
+                </DeckGL>
+            </div>
 
             {scale?.visible ? (
                 <DistanceScale

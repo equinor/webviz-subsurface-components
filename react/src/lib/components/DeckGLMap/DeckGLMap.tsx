@@ -48,6 +48,12 @@ export interface DeckGLMapProps {
      */
     onMouseEvent?: (event: MapMouseEvent) => void;
 
+     /**
+     * For get key events
+     */
+    onKeyDown?: (e: KeyboardEvent) => void;
+    onKeyUp?: (e: KeyboardEvent) => void;
+    setMultiWells?: React.Dispatch<React.SetStateAction<string[]>>;
     /**
      * Range selection of the current well
      */
@@ -79,12 +85,16 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     setProps,
     checkDatafileSchema,
     onMouseEvent,
+    onKeyDown,
+    onKeyUp,
+    // setMultiWells,
     selection,
     getTooltip,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
-
+    const [multiWells, setMultiWells] = React.useState<string[]>([]);
+    console.log(multiWells);
     React.useEffect(() => {
         if (!editedData) return;
 
@@ -142,6 +152,8 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 onMouseEvent={onMouseEvent}
                 selection={selection}
                 getTooltip={getTooltip}
+                setMultiWells={setMultiWells}
+                onKeyDown={onKeyDown}
             />
         </ReduxProvider>
     );

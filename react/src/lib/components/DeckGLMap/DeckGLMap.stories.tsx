@@ -153,3 +153,29 @@ TooltipStyle.parameters = {
         iframeHeight: 500,
     },
 };
+
+const handleKeyDownEvent = () => {
+    console.log("yes");
+};
+// console.log(multiWells);
+
+const MultipleWellSelectionsTemplate: ComponentStory<typeof DeckGLMap> = (
+    args
+) => {
+    const [multiWells, setMultiWells] = React.useState<string[]>([]);
+    console.log(multiWells);
+    return (
+        <>
+            <DeckGLMap
+                {...args}
+                onKeyDown={handleKeyDownEvent}
+                setMultiWells={setMultiWells}
+            />
+            <div>SelectedWells: {multiWells.join(" ")}</div>
+        </>
+    );
+};
+
+export const MultipleWellSelections = MultipleWellSelectionsTemplate.bind({});
+
+MultipleWellSelections.args = defaultProps;
