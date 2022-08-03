@@ -128,6 +128,7 @@ CustomColoredWells.args = {
         {
             ...defaultProps.layers[0],
             lineStyle: { color: [255, 0, 0, 255], dash: [10, 3] },
+            wellHeadStyle: { color: [255, 0, 0, 255] },
             refine: false,
             outline: false,
         },

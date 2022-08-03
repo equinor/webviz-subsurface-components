@@ -148,7 +148,7 @@ function getDashFactor(
     };
 }
 
-function getLineColor(accessor: ColorAccessor) {
+function getColor(accessor: ColorAccessor) {
     if (accessor as RGBAColor) {
         return accessor as RGBAColor;
     }
@@ -341,8 +341,8 @@ export default class WellsLayer extends CompositeLayer<
                     this.props.wellHeadStyle?.size,
                     -1
                 ),
-                getFillColor: (d: Feature) => d.properties?.["color"],
-                getLineColor: getLineColor(this.props.lineStyle?.color),
+                getFillColor: getColor(this.props.wellHeadStyle?.color),
+                getLineColor: getColor(this.props.lineStyle?.color),
                 extensions: extensions,
                 getDashArray: getDashFactor(
                     this.props.lineStyle?.dash,
@@ -375,8 +375,8 @@ export default class WellsLayer extends CompositeLayer<
                     this.props.wellHeadStyle?.size,
                     2
                 ),
-                getFillColor: (d: Feature) => d.properties?.["color"],
-                getLineColor: getLineColor(this.props.lineStyle?.color),
+                getFillColor: getColor(this.props.wellHeadStyle?.color),
+                getLineColor: getColor(this.props.lineStyle?.color),
             })
         );
 
@@ -696,7 +696,7 @@ function isTrajectoryVisible(
     color_accessor: ColorAccessor
 ): boolean {
     let alpha;
-    const accessor = getLineColor(color_accessor);
+    const accessor = getColor(color_accessor);
     if (typeof accessor === "function") {
         alpha = accessor(well_object)?.[3];
     } else {
