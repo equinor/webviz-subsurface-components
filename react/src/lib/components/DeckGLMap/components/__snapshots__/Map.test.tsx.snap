@@ -18,6 +18,17 @@ exports[`Test Map component snapshot test 1`] = `
       style="left: 0px; top: 0px; width: 100%; position: absolute; height: 100%;"
     />
   </div>
+  <div
+    style="position: absolute;"
+  >
+    <label>
+      800
+      m
+    </label>
+    <div
+      style="width: 100px; height: 4px; border: 2px solid; border-color: gray; display: inline-block; margin-left: 3px;"
+    />
+  </div>
   <div>
     <svg
       aria-valuemax="100"
@@ -75,6 +86,17 @@ exports[`Test Map component snapshot test with edited data 1`] = `
     <canvas
       id="DeckGL-Map"
       style="left: 0px; top: 0px; width: 100%; position: absolute; height: 100%;"
+    />
+  </div>
+  <div
+    style="position: absolute;"
+  >
+    <label>
+      800
+      m
+    </label>
+    <div
+      style="width: 100px; height: 4px; border: 2px solid; border-color: gray; display: inline-block; margin-left: 3px;"
     />
   </div>
   <div>
