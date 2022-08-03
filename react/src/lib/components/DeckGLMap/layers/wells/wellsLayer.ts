@@ -38,6 +38,7 @@ import {
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
 import { getLayersById } from "../../layers/utils/layerTools";
+import UnfoldedGeoJsonLayer from "../intersection/unfoldedGeoJsonLayer";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -291,7 +292,7 @@ export default class WellsLayer extends CompositeLayer<
             }),
         ];
 
-        const outline = new GeoJsonLayer<Feature>(
+        const outline = new UnfoldedGeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "outline",
                 data,
@@ -311,7 +312,7 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const colors = new GeoJsonLayer<Feature>(
+        const colors = new UnfoldedGeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "colors",
                 data,
@@ -337,7 +338,7 @@ export default class WellsLayer extends CompositeLayer<
         );
 
         // Highlight the selected well.
-        const highlight = new GeoJsonLayer<Feature>(
+        const highlight = new UnfoldedGeoJsonLayer<Feature>(
             this.getSubLayerProps<Feature>({
                 id: "highlight",
                 data: getWellObjectByName(
