@@ -378,22 +378,43 @@ function makeFullMesh(
             const y3 = oy + (hh - 1) * dy; // hh - 1 instead of hh + 1 See note above
             const z3 = isMesh && !isNaN(meshData[i3]) ? -meshData[i3] : 0;
 
-            if (!isNaN(meshData[i0]) && !isNaN(meshData[i1])) {
+            if (
+                !isNaN(meshData[i0]) &&
+                !isNaN(meshData[i1]) &&
+                !isNaN(vertexColors[3 * i0 + 0]) &&
+                !isNaN(vertexColors[3 * i1 + 0])
+            ) {
                 line_positions.push(x0, y0, z0);
                 line_positions.push(x1, y1, z1);
             }
-
-            if (!isNaN(meshData[i0]) && !isNaN(meshData[i3])) {
+            if (
+                !isNaN(meshData[i0]) &&
+                !isNaN(meshData[i3]) &&
+                !isNaN(vertexColors[3 * i0 + 0]) &&
+                !isNaN(vertexColors[3 * i3 + 0])
+            ) {
                 line_positions.push(x0, y0, z0);
                 line_positions.push(x3, y3, z3);
             }
 
-            if (w === nx - 2 && !isNaN(meshData[i1]) && !isNaN(meshData[i2])) {
+            if (
+                w === nx - 2 &&
+                !isNaN(meshData[i1]) &&
+                !isNaN(meshData[i2]) &&
+                !isNaN(vertexColors[3 * i1 + 0]) &&
+                !isNaN(vertexColors[3 * i2 + 0])
+            ) {
                 line_positions.push(x1, y1, z1);
                 line_positions.push(x2, y2, z2);
             }
 
-            if (h === ny - 2 && !isNaN(meshData[i2]) && !isNaN(meshData[i3])) {
+            if (
+                h === ny - 2 &&
+                !isNaN(meshData[i2]) &&
+                !isNaN(meshData[i3]) &&
+                !isNaN(vertexColors[3 * i2 + 0]) &&
+                !isNaN(vertexColors[3 * i3 + 0])
+            ) {
                 line_positions.push(x2, y2, z2);
                 line_positions.push(x3, y3, z3);
             }
