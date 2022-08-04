@@ -204,7 +204,10 @@ export default class WellsLayer extends CompositeLayer<
             return false;
         } else {
             if (event.srcEvent.ctrlKey) {
-                if (Object.keys(this.state).length === 0) {
+                if (
+                    Object.keys(this.state).length === 0 ||
+                    !this.state.multipleSelectionWells
+                ) {
                     this.state.multipleSelectionWells = [];
                     this.state.multipleSelectionWells.push(
                         (info.object as Feature).properties?.["name"]

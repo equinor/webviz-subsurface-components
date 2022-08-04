@@ -108,7 +108,6 @@ const EditDataTemplate = (args) => {
     React.useEffect(() => {
         setEditedData(args.editedData);
     }, [args.editedData]);
-    console.log(editedData);
     return (
         <DeckGLMap
             {...args}
