@@ -28,6 +28,7 @@ import {
 import { WellsPickInfo } from "./components/DeckGLMap/layers/wells/wellsLayer";
 import TerrainMapPickInfo from "./components/DeckGLMap/layers/terrain/terrainMapLayer";
 import { FeatureCollection } from "@nebula.gl/edit-modes";
+import { MapLayerProps } from "./components/DeckGLMap/layers/map/mapLayer";
 
 export {
     HistoryMatch,
@@ -52,4 +53,5 @@ export {
     TerrainMapPickInfo,
     FeatureCollection,
     LayerPickInfo,
+    MapLayerProps,
 };

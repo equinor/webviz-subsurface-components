@@ -1,4 +1,4 @@
-const fragmentShader = `#version 300 es
+export default `#version 300 es
 #define SHADER_NAME graph-layer-fragment-shader
 
 precision highp float;
@@ -14,8 +14,7 @@ void main(void) {
     return;
   }
 
-  fragColor = vec4(vColor, 1.0);
+  //fragColor = vec4(vColor, 1.0);
+  fragColor = vec4(0.0, 0.0, 0.0,   1.0);
 }
 `;
-
-export default fragmentShader;

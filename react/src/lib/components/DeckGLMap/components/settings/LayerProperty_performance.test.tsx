@@ -28,9 +28,9 @@ describe("Test Layer Property", () => {
             core.warning(
                 "Layer Property Component in '/components/DeckGLMap/components/settings/' seems to have performance issues. Actual render time:" +
                     obj.perf_metrics[0][2] +
-                    " Expected render time: 100"
+                    " Expected render time: 200"
             );
         }
-        expect(obj.perf_metrics[0][2]).toBeLessThan(100);
+        expect(obj.perf_metrics[0][2]).toBeLessThan(200);
     });
 });

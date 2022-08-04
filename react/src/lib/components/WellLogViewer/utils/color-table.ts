@@ -46,6 +46,30 @@ export function color4ToString(
 }
 
 /*
+export function getExactColor(
+    colorTable: ColorTable,
+    v: number
+): [number, number, number] {
+    const cNaN: [number, number, number] = colorTable.colorNaN
+      ? colorTable.colorNaN
+      : [255, 255, 255]; // "white"
+
+    const colors = colorTable.colors;
+    const j = binarySearch(colors, v);
+
+    const cBelow = colorTable.colorBelow ? colorTable.colorBelow : cNaN;
+    if (j <= 0) {
+        return cBelow;
+    }
+
+    const cAbove = colorTable.colorAbove ? colorTable.colorAbove : cBelow;
+    if (j >= colors.length) {
+        return cAbove;
+    }
+}
+*/
+
+/*
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColor(

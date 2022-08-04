@@ -9,7 +9,7 @@ import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,
-    title: "DeckGLMap / Map 3D Layer",
+    title: "DeckGLMap / Map 3D Delatin mesh Layer",
 } as ComponentMeta<typeof DeckGLMap>;
 
 type NumberQuad = [number, number, number, number];
@@ -34,6 +34,44 @@ const defaultParameters = {
     docs: {
         inlineStories: false,
         iframeHeight: 500,
+    },
+};
+
+const axes = {
+    "@@type": "AxesLayer",
+    id: "axes-layer",
+    bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+};
+const north_arrow_layer = {
+    "@@type": "NorthArrow3DLayer",
+    id: "north-arrow-layer",
+};
+
+export const MapLayer3d: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+MapLayer3d.args = {
+    id: "map",
+    layers: [axes, meshMapLayer, north_arrow_layer],
+    bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+MapLayer3d.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "3d example.",
+        },
     },
 };
 
@@ -195,7 +233,6 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
                     <ContinuousLegend
                         min={meshMapLayer.propertyValueRange[0]}
                         max={meshMapLayer.propertyValueRange[1]}
-                        colorMapFunction={colorMap}
                     />
                 </div>
             </div>
@@ -220,6 +257,58 @@ BreakpointColorMap.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Example using a color scale with a breakpoint.",
+        },
+    },
+};
+
+export const ColorMapRange: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [colorMapUpper, setColorMapUpper] = React.useState<number>(41048);
+
+    const props = React.useMemo(() => {
+        return {
+            ...args,
+            layers: [
+                {
+                    ...meshMapLayer,
+                    colorMapName: "Seismic",
+                    colorMapRange: [-3071, colorMapUpper],
+                    colorMapClampColor: false,
+                },
+            ],
+            legend: { visible: true },
+        };
+    }, [colorMapUpper]);
+
+    const handleChange = React.useCallback((_event, value) => {
+        setColorMapUpper(value);
+    }, []);
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+            </div>
+            <Slider
+                min={10000}
+                max={41048}
+                defaultValue={41048}
+                step={1}
+                onChange={handleChange}
+            />
+        </>
+    );
+};
+
+ColorMapRange.args = {
+    ...defaultArgs,
+    id: "breakpoint-color-map",
+};
+
+ColorMapRange.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: 'Example changin the colorcamp range ("ColorMapRange" property).',
         },
     },
 };
