@@ -20,9 +20,8 @@ describe("Test Color Legend", () => {
             <ColorLegends
                 layers={
                     getLayersInViewport(layers, [
-                        "geojson-line-layer",
-                        "geojson-layer",
-                        "text-layer",
+                        "colormap-layer",
+                        "wells-layer",
                     ]) as Layer<unknown>[]
                 }
                 colorTables={colorTables}
@@ -35,9 +34,8 @@ describe("Test Color Legend", () => {
             <ColorLegends
                 layers={
                     getLayersInViewport(layers, [
-                        "geojson-line-layer",
-                        "geojson-layer",
-                        "text-layer",
+                        "colormap-layer",
+                        "wells-layer",
                     ]) as Layer<unknown>[]
                 }
                 horizontal={true}
