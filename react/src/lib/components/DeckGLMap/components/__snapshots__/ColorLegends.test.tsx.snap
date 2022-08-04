@@ -6,6 +6,8 @@ exports[`Test Color Legend snapshot test 1`] = `
 />
 `;
 
+exports[`Test Color Legend snapshot test if layers=0 1`] = `null`;
+
 exports[`Test Color Legend snapshot test with props 1`] = `
 <div
   style="position: absolute; display: flex; z-index: 999;"

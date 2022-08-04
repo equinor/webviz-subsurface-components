@@ -45,4 +45,15 @@ describe("Test Color Legend", () => {
         );
         expect(container.firstChild).toMatchSnapshot();
     });
+    it("snapshot test if layers=0", () => {
+        const { container } = render(
+            <ColorLegends
+                layers={[]}
+                horizontal={true}
+                colorTables={colorTables}
+                reverseRange={true}
+            />
+        );
+        expect(container.firstChild).toMatchSnapshot();
+    });
 });
