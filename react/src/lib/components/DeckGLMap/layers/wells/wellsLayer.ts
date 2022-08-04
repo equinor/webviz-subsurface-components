@@ -219,7 +219,6 @@ export default class WellsLayer extends CompositeLayer<
                 selectedWell: (info.object as Feature).properties?.["name"],
                 multiSelectedWells: this.state.multipleSelectionWells,
             });
-            console.log(this.state.multipleSelectionWells);
             return true;
         }
     }
