@@ -213,10 +213,14 @@ export default class WellsLayer extends CompositeLayer<
                         (info.object as Feature).properties?.["name"]
                     );
                 } else {
-                    this.state.multipleSelectionWells.push(
-                        (info.object as Feature).properties?.["name"]
-                    );
+                    if (!this.state.multipleSelectionWells.includes()) {
+                        this.state.multipleSelectionWells.push(
+                            (info.object as Feature).properties?.["name"]
+                        );
+                    }
                 }
+            } else {
+                this.state.multipleSelectionWells = [];
             }
             (this.context as DeckGLLayerContext).userData.setEditedData({
                 selectedWell: (info.object as Feature).properties?.["name"],
