@@ -418,21 +418,15 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
         [breakpoint]
     );
 
-    const props = React.useMemo(() => {
-        return {
-            ...args,
-            layers: [
-                {
-                    ...meshMapLayerFloat32,
-                    colorMapFunction: colorMap,
-                    cellCenteredProperties: false,
-                    gridLines: false,
-                    material: true,
-                },
-            ],
-            legend: { visible: false },
-        };
-    }, [breakpoint]);
+    const layer = {
+        ...args?.layers?.[0],
+        colorMapFunction: colorMap,
+    };
+
+    const props = {
+        ...args,
+        layers: [layer],
+    };
 
     const handleChange = React.useCallback((_event, value) => {
         setBreakpoint(value / 100);
@@ -464,6 +458,14 @@ export const BreakpointColorMap: ComponentStory<typeof DeckGLMap> = (args) => {
 BreakpointColorMap.args = {
     ...defaultArgs,
     id: "breakpoint-color-map",
+    layers: [
+        {
+            ...meshMapLayerFloat32,
+            cellCenteredProperties: false,
+            gridLines: false,
+            material: true,
+        },
+    ],
 };
 
 BreakpointColorMap.parameters = {
@@ -478,25 +480,15 @@ BreakpointColorMap.parameters = {
 export const ColorMapRange: ComponentStory<typeof DeckGLMap> = (args) => {
     const [colorMapUpper, setColorMapUpper] = React.useState<number>(41048);
 
-    const props = React.useMemo(() => {
-        return {
-            ...args,
-            layers: [
-                {
-                    ...meshMapLayerFloat32,
-                    colorMapName: "Seismic",
+    const layer = {
+        ...args?.layers?.[0],
+        colorMapRange: [-3071, colorMapUpper],
+    };
 
-                    colorMapRange: [-3071, colorMapUpper],
-                    colorMapClampColor: false,
-
-                    cellCenteredProperties: false,
-                    gridLines: false,
-                    material: true,
-                },
-            ],
-            legend: { visible: true },
-        };
-    }, [colorMapUpper]);
+    const props = {
+        ...args,
+        layers: [layer],
+    };
 
     const handleChange = React.useCallback((_event, value) => {
         setColorMapUpper(value);
@@ -521,13 +513,23 @@ export const ColorMapRange: ComponentStory<typeof DeckGLMap> = (args) => {
 ColorMapRange.args = {
     ...defaultArgs,
     id: "breakpoint-color-map",
+    layers: [
+        {
+            ...meshMapLayerFloat32,
+            colorMapName: "Seismic",
+            colorMapClampColor: false,
+            cellCenteredProperties: false,
+            gridLines: false,
+            material: true,
+        },
+    ],
 };
 
 ColorMapRange.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: 'Example changin the colorcamp range ("ColorMapRange" property).',
+            story: 'Example changing the "ColorMapRange" property using a slider.',
         },
     },
 };
