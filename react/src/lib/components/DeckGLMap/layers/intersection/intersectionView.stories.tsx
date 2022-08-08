@@ -86,8 +86,7 @@ WithWellsData.args = {
         number
     ],
     resources: {
-        wellsData:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+        wellsData: "./volve_wells.json",
     },
     layers: [
         {
@@ -101,6 +100,12 @@ WithWellsData.args = {
             lineStyle: {
                 width: (object: Record<string, Record<string, unknown>>) => {
                     if (object["properties"]["name"] === "15/9-F-4") return 6;
+                    return 0;
+                },
+            },
+            wellHeadStyle: {
+                size: (object: Record<string, Record<string, unknown>>) => {
+                    if (object["properties"]["name"] === "15/9-F-4") return 8;
                     return 0;
                 },
             },
