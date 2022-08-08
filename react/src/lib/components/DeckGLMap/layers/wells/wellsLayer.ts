@@ -197,17 +197,35 @@ export default class WellsLayer extends CompositeLayer<
     FeatureCollection,
     WellsLayerProps<FeatureCollection>
 > {
-    onClick(info: WellsPickInfo): boolean {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
+    onClick(info: WellsPickInfo, event: any): boolean {
         // Make selection only when drawing is disabled
         if (isDrawingEnabled(this.context.layerManager)) {
             return false;
         } else {
+            if (event.srcEvent.ctrlKey) {
+                if (
+                    Object.keys(this.state).length === 0 ||
+                    !this.state.multipleSelectionWells
+                ) {
+                    this.state.multipleSelectionWells = [];
+                    this.state.multipleSelectionWells.push(
+                        (info.object as Feature).properties?.["name"]
+                    );
+                } else {
+                    if (!this.state.multipleSelectionWells.includes()) {
+                        this.state.multipleSelectionWells.push(
+                            (info.object as Feature).properties?.["name"]
+                        );
+                    }
+                }
+            } else {
+                this.state.multipleSelectionWells = [];
+            }
             (this.context as DeckGLLayerContext).userData.setEditedData({
                 selectedWell: (info.object as Feature).properties?.["name"],
+                multiSelectedWells: this.state.multipleSelectionWells,
             });
-            /*this.props.selectedWell = (info.object as Feature).properties?.[
-                "name"
-            ];*/
             return true;
         }
     }
