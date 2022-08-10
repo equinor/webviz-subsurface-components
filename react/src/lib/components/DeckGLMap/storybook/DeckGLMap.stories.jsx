@@ -657,9 +657,11 @@ const layers = [
     },
 ];
 
+
+
 // prop for legend
-const min = 0;
-const max = 0.35;
+let min = layers[0].colorMapRange[0];
+let max = layers[0].colorMapRange[1];
 const dataObjectName = "Legend";
 const position = [16, 10];
 const horizontal = true;
@@ -667,13 +669,23 @@ const reverseRange = false;
 
 const mapDataTemplate = (args) => {
     const [getColorName, setColorName] = React.useState("Rainbow");
+    const [getColorRange, setColorRange] = React.useState();
+    const [isAuto, setAuto] = React.useState();
+
     const colorMapData = React.useCallback((data) => {
         setColorName(data);
     }, []);
+
+    const getColorMapRange = React.useCallback((data) => {
+        if (data.range) setColorRange(data.range);
+        setAuto(data.isAuto)
+    }, []);
+
     const updatedLayerData = [
         {
             ...args.layers[0],
             colorMapName: getColorName,
+            colorMapRange: getColorRange && isAuto == false ? getColorRange : layers[0].colorMapRange,
             colorMapFunction: createColorMapFunction(getColorName),
         },
     ];
@@ -688,7 +700,10 @@ const mapDataTemplate = (args) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} getColorName={colorMapData} />
+                <ColorLegend {...args} 
+                    getColorName={colorMapData} 
+                    getColorRange={getColorMapRange} 
+                />
             </div>
             <DeckGLMap {...args} layers={updatedLayerData} />
         </div>
@@ -705,6 +720,7 @@ ColorMapLayerColorSelector.args = {
     horizontal,
     colorTables,
     layers,
+    zoom: -5,
     ...defaultProps,
     legend: {
         visible: false,
