@@ -42,7 +42,7 @@ const DistanceScale: React.FC<ScaleProps> = ({
         display: "inline-block",
         marginLeft: "3px",
     };
-    console.log(scaleRulerStyle);
+
     const scaleValue =
         widthInUnits < incrementValue
             ? Math.round(widthInUnits)
