@@ -13,6 +13,7 @@ import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 export interface DeckGLMapProps {
     id: string;
+    isBlackTheme: boolean;
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[];
     bounds: [number, number, number, number];
@@ -70,6 +71,7 @@ export interface DeckGLMapProps {
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
     id,
+    isBlackTheme,
     resources,
     layers,
     bounds,
@@ -133,6 +135,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
         <ReduxProvider store={store}>
             <Map
                 id={id}
+                isBlackTheme={isBlackTheme}
                 resources={resources}
                 layers={layers}
                 bounds={bounds}

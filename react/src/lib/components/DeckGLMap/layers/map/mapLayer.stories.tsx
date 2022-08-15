@@ -196,6 +196,39 @@ MapLayer2d.parameters = {
     },
 };
 
+export const MapLayer2dDarkMode: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} isBlackTheme={true} />;
+};
+
+MapLayer2dDarkMode.args = {
+    id: "map",
+    layers: [
+        axes_hugin,
+        { ...meshMapLayerFloat32, material: false },
+        north_arrow_layer,
+    ],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+            },
+        ],
+    },
+};
+
+MapLayer2dDarkMode.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example using png as mesh and properties data.",
+        },
+    },
+    backgrounds: { default: "dark" },
+};
+
 export const MapLayerRotated: ComponentStory<typeof DeckGLMap> = (args) => {
     return <DeckGLMap {...args} />;
 };

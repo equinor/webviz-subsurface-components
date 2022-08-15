@@ -13,6 +13,8 @@ export interface ScaleProps {
     style?: React.CSSProperties;
     // default unit for the scale ruler
     scaleUnit?: string;
+    // change css style based on the theme
+    isBlackTheme: boolean;
 }
 
 const roundToStep = function (num: number, step: number) {
@@ -25,6 +27,7 @@ const DistanceScale: React.FC<ScaleProps> = ({
     widthPerUnit,
     style,
     scaleUnit,
+    isBlackTheme,
 }: ScaleProps) => {
     if (!zoom || !widthPerUnit || !incrementValue) return null;
 
@@ -34,12 +37,12 @@ const DistanceScale: React.FC<ScaleProps> = ({
         width: rulerWidth,
         height: "4px",
         border: "2px solid",
-        borderColor: style?.["color"] || "gray",
+        borderColor: style?.["color"] || (isBlackTheme ? "white" : "grey"),
         borderTop: "none",
         display: "inline-block",
         marginLeft: "3px",
     };
-
+    console.log(scaleRulerStyle);
     const scaleValue =
         widthInUnits < incrementValue
             ? Math.round(widthInUnits)
@@ -59,7 +62,11 @@ const DistanceScale: React.FC<ScaleProps> = ({
                 ...style,
             }}
         >
-            <label>
+            <label
+                style={{
+                    color: isBlackTheme ? "white" : "black",
+                }}
+            >
                 {convertedValue.toFixed(0)}
                 {convertedUnit}
             </label>

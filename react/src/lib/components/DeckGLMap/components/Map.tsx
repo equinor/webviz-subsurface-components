@@ -107,6 +107,7 @@ export interface MapProps {
      */
     id: string;
 
+    isBlackTheme: boolean;
     /**
      * Resource dictionary made available in the DeckGL specification as an enum.
      * The values can be accessed like this: `"@@#resources.resourceId"`, where
@@ -245,6 +246,7 @@ function defaultTooltip(info: PickInfo<unknown>) {
 
 const Map: React.FC<MapProps> = ({
     id,
+    isBlackTheme = false,
     resources,
     layers,
     bounds,
@@ -602,6 +604,7 @@ const Map: React.FC<MapProps> = ({
                     {...scale}
                     zoom={viewState?.zoom}
                     scaleUnit={coordinateUnit}
+                    isBlackTheme={isBlackTheme}
                 />
             ) : null}
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
