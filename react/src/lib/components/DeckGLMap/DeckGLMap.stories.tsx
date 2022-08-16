@@ -11,6 +11,7 @@ import {
     TerrainMapPickInfo,
     FeatureCollection,
 } from "../..";
+import { ViewStateType } from "./components/Map";
 
 export default {
     component: DeckGLMap,
@@ -162,12 +163,18 @@ const getCameraPosition = {
 };
 const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
     const [state, setState] = React.useState(getCameraPosition);
+
+    const onGetCameraPosition = React.useCallback((input: ViewStateType) => {
+        console.log(input);
+        setState(input);
+        return input;
+    }, []);
     return (
         <>
             <DeckGLMap
                 {...args}
                 getCameraPosition={state}
-                setState={setState}
+                onGetCameraPosition={onGetCameraPosition}
             />
             <div
                 style={{
@@ -178,10 +185,8 @@ const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
                 <div>zoom: {state?.zoom}</div>
                 <div>rotationX: {state?.rotationX}</div>
                 <div>rotationOrbit: {state?.rotationOrbit}</div>
-                <div>
-                    targetX: {state?.target[0]} targetY:
-                    {state?.target[1]}
-                </div>
+                <div>targetX: {state?.target[0]}</div>
+                <div>targetY: {state?.target[1]}</div>
             </div>
         </>
     );

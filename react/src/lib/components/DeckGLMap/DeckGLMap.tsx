@@ -52,6 +52,7 @@ export interface DeckGLMapProps {
      */
     onMouseEvent?: (event: MapMouseEvent) => void;
 
+    onGetCameraPosition?: (input: ViewStateType) => void;
     /**
      * Range selection of the current well
      */
@@ -65,14 +66,6 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     getCameraPosition?: ViewStateType | undefined;
-    setState?: React.Dispatch<
-        React.SetStateAction<{
-            target: number[];
-            zoom: number;
-            rotationX: number;
-            rotationOrbit: number;
-        }>
-    >;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -95,7 +88,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     selection,
     getTooltip,
     getCameraPosition,
-    setState,
+    onGetCameraPosition,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -158,7 +151,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 selection={selection}
                 getTooltip={getTooltip}
                 getCameraPosition={getCameraPosition}
-                setState={setState}
+                onGetCameraPosition={onGetCameraPosition}
             />
         </ReduxProvider>
     );

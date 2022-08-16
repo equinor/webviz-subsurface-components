@@ -197,6 +197,8 @@ export interface MapProps {
      */
     onMouseEvent?: EventCallback;
 
+    onGetCameraPosition?: (input: ViewStateType) => void;
+
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
@@ -206,14 +208,6 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     getCameraPosition?: ViewStateType | undefined;
-    setState?: React.Dispatch<
-        React.SetStateAction<{
-            target: number[];
-            zoom: number;
-            rotationX: number;
-            rotationOrbit: number;
-        }>
-    >;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -270,17 +264,12 @@ const Map: React.FC<MapProps> = ({
     children,
     getTooltip = defaultTooltip,
     getCameraPosition = {} as ViewStateType,
-    setState,
+    onGetCameraPosition,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewState, setViewState] =
         useState<ViewStateType>(getCameraPosition);
-    getCameraPosition = viewState;
-
-    if (setState) {
-        setState(getCameraPosition);
-    }
 
     // react on zoom prop change
     useEffect(() => {
@@ -292,7 +281,6 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         const vs = getViewState(bounds, zoom, deckRef.current?.deck);
         setViewState({ ...viewState, target: vs.target });
-        getCameraPosition = viewState;
     }, [bounds]);
 
     // calculate view state on deckgl context load (based on viewport size)
@@ -555,9 +543,12 @@ const Map: React.FC<MapProps> = ({
                 }
                 getTooltip={getTooltip}
                 ref={deckRef}
-                onViewStateChange={(viewport) =>
-                    setViewState(viewport.viewState)
-                }
+                onViewStateChange={(viewport) => {
+                    setViewState(viewport.viewState);
+                    if (onGetCameraPosition) {
+                        onGetCameraPosition(viewport.viewState);
+                    }
+                }}
                 onHover={onHover}
                 onClick={onClick}
                 onLoad={onLoad}
