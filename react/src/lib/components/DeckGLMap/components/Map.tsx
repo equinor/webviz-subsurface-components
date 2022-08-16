@@ -277,8 +277,12 @@ const Map: React.FC<MapProps> = ({
     distanceRuleColorScale,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
+<<<<<<< HEAD
     
 >>>>>>> 1d3cef1 (update)
+=======
+
+>>>>>>> 3cc0687 (fix some unit test error and clean up the code)
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewState, setViewState] = useState<ViewStateType>(cameraPosition);
 

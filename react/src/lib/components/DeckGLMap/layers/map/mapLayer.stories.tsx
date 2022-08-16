@@ -197,7 +197,7 @@ MapLayer2d.parameters = {
 };
 
 export const MapLayer2dDarkMode: ComponentStory<typeof DeckGLMap> = (args) => {
-    return <DeckGLMap {...args} isBlackTheme={true} />;
+    return <DeckGLMap {...args} />;
 };
 
 MapLayer2dDarkMode.args = {

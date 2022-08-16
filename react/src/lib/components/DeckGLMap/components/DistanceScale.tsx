@@ -57,7 +57,7 @@ const DistanceScale: React.FC<ScaleProps> = ({
                 ...style,
             }}
         >
-            <label style={{ style }}>
+            <label style={{ ...style }}>
                 {convertedValue.toFixed(0)}
                 {convertedUnit}
             </label>

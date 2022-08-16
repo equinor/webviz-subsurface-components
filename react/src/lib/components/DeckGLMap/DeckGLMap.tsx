@@ -60,7 +60,7 @@ export interface DeckGLMapProps {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
     };
-    
+
     /**
      * Override default tooltip with a callback.
      */
