@@ -10,11 +10,9 @@ export interface ScaleProps {
     // Scale bar width in pixels per unit value
     widthPerUnit?: number | null;
     // additional css style to position the component
-    style?: React.CSSProperties;
+    style?: Record<string, string>;
     // default unit for the scale ruler
     scaleUnit?: string;
-    // change css style based on the theme
-    isBlackTheme: boolean;
 }
 
 const roundToStep = function (num: number, step: number) {
@@ -27,17 +25,14 @@ const DistanceScale: React.FC<ScaleProps> = ({
     widthPerUnit,
     style,
     scaleUnit,
-    isBlackTheme,
 }: ScaleProps) => {
     if (!zoom || !widthPerUnit || !incrementValue) return null;
-
     const [rulerWidth, setRulerWidth] = React.useState<number>(0);
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
     const scaleRulerStyle: React.CSSProperties = {
         width: rulerWidth,
         height: "4px",
         border: "2px solid",
-        borderColor: style?.["color"] || (isBlackTheme ? "white" : "grey"),
         borderTop: "none",
         display: "inline-block",
         marginLeft: "3px",
@@ -62,11 +57,7 @@ const DistanceScale: React.FC<ScaleProps> = ({
                 ...style,
             }}
         >
-            <label
-                style={{
-                    color: isBlackTheme ? "white" : "black",
-                }}
-            >
+            <label style={{ style }}>
                 {convertedValue.toFixed(0)}
                 {convertedUnit}
             </label>

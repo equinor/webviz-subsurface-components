@@ -107,7 +107,6 @@ export interface MapProps {
      */
     id: string;
 
-    isBlackTheme: boolean;
     /**
      * Resource dictionary made available in the DeckGL specification as an enum.
      * The values can be accessed like this: `"@@#resources.resourceId"`, where
@@ -208,7 +207,12 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
+<<<<<<< HEAD
     cameraPosition?: ViewStateType | undefined;
+=======
+
+    distanceRuleColorScale?: Record<string, string>;
+>>>>>>> 1d3cef1 (update)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -246,7 +250,6 @@ function defaultTooltip(info: PickInfo<unknown>) {
 
 const Map: React.FC<MapProps> = ({
     id,
-    isBlackTheme = false,
     resources,
     layers,
     bounds,
@@ -265,10 +268,17 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
+<<<<<<< HEAD
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
+=======
+    distanceRuleColorScale,
+}: MapProps) => {
+    const deckRef = useRef<DeckGL>(null);
+    
+>>>>>>> 1d3cef1 (update)
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewState, setViewState] = useState<ViewStateType>(cameraPosition);
 
@@ -604,7 +614,7 @@ const Map: React.FC<MapProps> = ({
                     {...scale}
                     zoom={viewState?.zoom}
                     scaleUnit={coordinateUnit}
-                    isBlackTheme={isBlackTheme}
+                    style={distanceRuleColorScale}
                 />
             ) : null}
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />

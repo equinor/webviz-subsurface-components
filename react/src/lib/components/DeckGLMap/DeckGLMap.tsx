@@ -13,7 +13,6 @@ import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 export interface DeckGLMapProps {
     id: string;
-    isBlackTheme: boolean;
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[];
     bounds: [number, number, number, number];
@@ -61,17 +60,21 @@ export interface DeckGLMapProps {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
     };
-
+    
     /**
      * Override default tooltip with a callback.
      */
     getTooltip?: TooltipCallback;
+<<<<<<< HEAD
     cameraPosition?: ViewStateType | undefined;
+=======
+
+    distanceRuleColorScale?: Record<string, string>;
+>>>>>>> 1d3cef1 (update)
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
     id,
-    isBlackTheme,
     resources,
     layers,
     bounds,
@@ -89,8 +92,12 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     onMouseEvent,
     selection,
     getTooltip,
+<<<<<<< HEAD
     cameraPosition,
     getCameraPosition,
+=======
+    distanceRuleColorScale,
+>>>>>>> 1d3cef1 (update)
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -135,7 +142,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
         <ReduxProvider store={store}>
             <Map
                 id={id}
-                isBlackTheme={isBlackTheme}
                 resources={resources}
                 layers={layers}
                 bounds={bounds}
@@ -153,8 +159,12 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 onMouseEvent={onMouseEvent}
                 selection={selection}
                 getTooltip={getTooltip}
+<<<<<<< HEAD
                 cameraPosition={cameraPosition}
                 getCameraPosition={getCameraPosition}
+=======
+                distanceRuleColorScale={distanceRuleColorScale}
+>>>>>>> 1d3cef1 (update)
             />
         </ReduxProvider>
     );
