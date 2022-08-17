@@ -16,11 +16,9 @@ exports[`Test Color Legend snapshot test with default props 1`] = `
 
 exports[`Test Color Legend snapshot test with higher zoom 1`] = `
 <div
-  style="position: absolute; top: 10px; left: 10px;"
+  style="position: absolute;"
 >
-  <label
-    style="top: 10px; left: 10px;"
-  >
+  <label>
     50
     m
   </label>
