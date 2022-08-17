@@ -14,18 +14,18 @@ const { VolveWells, DashedWells, CustomColoredWells, CustomWidthWells } =
 describe("Wells", () => {
     it("should display volve wells story", () => {
         mount(<VolveWells />);
-        cy.wait(60000);
+        cy.wait(5000);
     });
     it("should display dashed wells", () => {
         mount(<DashedWells />);
-        cy.wait(60000);
+        cy.wait(5000);
     });
     it("should display custom color wells", () => {
         mount(<CustomColoredWells />);
-        cy.wait(60000);
+        cy.wait(5000);
     });
     it("should display custom color wells", () => {
         mount(<CustomWidthWells />);
-        cy.wait(60000);
+        cy.wait(5000);
     });
 });
