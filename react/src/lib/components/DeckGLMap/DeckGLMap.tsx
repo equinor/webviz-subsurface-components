@@ -69,8 +69,15 @@ export interface DeckGLMapProps {
     cameraPosition?: ViewStateType | undefined;
 =======
 
+<<<<<<< HEAD
     distanceRuleColorScale?: Record<string, string>;
 >>>>>>> 1d3cef1 (update)
+=======
+    /**
+     *  Override distance ruler style with css input style
+     */
+    distanceRulerStyle?: Record<string, string>;
+>>>>>>> cfed744 (update)
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -93,11 +100,15 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     selection,
     getTooltip,
 <<<<<<< HEAD
+<<<<<<< HEAD
     cameraPosition,
     getCameraPosition,
 =======
     distanceRuleColorScale,
 >>>>>>> 1d3cef1 (update)
+=======
+    distanceRulerStyle,
+>>>>>>> cfed744 (update)
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -160,11 +171,15 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 selection={selection}
                 getTooltip={getTooltip}
 <<<<<<< HEAD
+<<<<<<< HEAD
                 cameraPosition={cameraPosition}
                 getCameraPosition={getCameraPosition}
 =======
                 distanceRuleColorScale={distanceRuleColorScale}
 >>>>>>> 1d3cef1 (update)
+=======
+                distanceRulerStyle={distanceRulerStyle}
+>>>>>>> cfed744 (update)
             />
         </ReduxProvider>
     );

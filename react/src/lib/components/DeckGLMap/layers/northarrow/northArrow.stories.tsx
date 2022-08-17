@@ -91,14 +91,14 @@ NorthArrow2dDarkMode.args = {
             },
         ],
     },
-    distanceRuleColorScale: { color: "white" },
+    distanceRulerStyle: { color: "white"},
 };
 
 NorthArrow2dDarkMode.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Example using north arrow in 2D.",
+            story: "Example using north arrow in 2D Dark Mode.",
         },
     },
     backgrounds: { default: "dark" },

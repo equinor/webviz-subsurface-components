@@ -211,8 +211,12 @@ export interface MapProps {
     cameraPosition?: ViewStateType | undefined;
 =======
 
+<<<<<<< HEAD
     distanceRuleColorScale?: Record<string, string>;
 >>>>>>> 1d3cef1 (update)
+=======
+    distanceRulerStyle?: Record<string, string>;
+>>>>>>> cfed744 (update)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -269,12 +273,16 @@ const Map: React.FC<MapProps> = ({
     children,
     getTooltip = defaultTooltip,
 <<<<<<< HEAD
+<<<<<<< HEAD
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 =======
     distanceRuleColorScale,
+=======
+    distanceRulerStyle,
+>>>>>>> cfed744 (update)
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 <<<<<<< HEAD
@@ -618,7 +626,7 @@ const Map: React.FC<MapProps> = ({
                     {...scale}
                     zoom={viewState?.zoom}
                     scaleUnit={coordinateUnit}
-                    style={distanceRuleColorScale}
+                    style={distanceRulerStyle}
                 />
             ) : null}
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
