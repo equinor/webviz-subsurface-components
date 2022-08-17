@@ -219,7 +219,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
     onMouseEvent(event: MapMouseEvent): void {
         if (event.wellname !== undefined) {
             if (event.type == "click") {
-                console.log(event);
                 const iWell = findWellLogIndex(welllogs, event.wellname);
                 this.setState((state: Readonly<State>) => {
                     //if (state.wellIndex === iWell) return null;
