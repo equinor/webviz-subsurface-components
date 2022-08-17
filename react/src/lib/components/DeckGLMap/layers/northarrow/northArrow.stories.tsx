@@ -91,7 +91,7 @@ NorthArrow2dDarkMode.args = {
             },
         ],
     },
-    distanceRulerStyle: { color: "white"},
+    distanceRulerStyle: { color: "white" },
 };
 
 NorthArrow2dDarkMode.parameters = {
