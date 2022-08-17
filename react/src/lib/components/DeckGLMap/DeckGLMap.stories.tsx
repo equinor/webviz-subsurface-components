@@ -155,17 +155,10 @@ TooltipStyle.parameters = {
     },
 };
 
-const getCameraPosition = {
-    target: [396638.95884797024, 6467831.83598219],
-    zoom: -6.28820538480389,
-    rotationX: 90,
-    rotationOrbit: 0,
-};
 const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
-    const [state, setState] = React.useState(getCameraPosition);
+    const [state, setState] = React.useState(args.cameraPosition);
 
-    const onGetCameraPosition = React.useCallback((input: ViewStateType) => {
-        console.log(input);
+    const getCameraPosition = React.useCallback((input: ViewStateType) => {
         setState(input);
         return input;
     }, []);
@@ -173,8 +166,8 @@ const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
         <>
             <DeckGLMap
                 {...args}
-                getCameraPosition={state}
-                onGetCameraPosition={onGetCameraPosition}
+                cameraPosition={args.cameraPosition}
+                getCameraPosition={getCameraPosition}
             />
             <div
                 style={{
@@ -194,4 +187,14 @@ const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
 
 export const customizedCameraPosition = CustomTemplate.bind({});
 
-customizedCameraPosition.args = defaultProps;
+const cameraPosition = {
+    target: [437500, 6475000],
+    zoom: -5.0,
+    rotationX: 90,
+    rotationOrbit: 0,
+};
+
+customizedCameraPosition.args = {
+    ...defaultProps,
+    cameraPosition,
+};
