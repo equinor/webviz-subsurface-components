@@ -272,7 +272,9 @@ const Map: React.FC<MapProps> = ({
 
     // react on cameraPosition prop change
     useEffect(() => {
-        setViewState(cameraPosition);
+        if (Object.keys(cameraPosition).length !== 0) {
+            setViewState(cameraPosition);
+        }
     }, [cameraPosition]);
 
     // react on zoom prop change
