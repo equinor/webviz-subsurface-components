@@ -154,7 +154,7 @@ export interface MapProps {
         visible?: boolean | null;
         incrementValue?: number | null;
         widthPerUnit?: number | null;
-        cssStyle?: Record<string, unknown> | null;
+        cssStyle?: Record<string, unknown>;
     };
 
     coordinateUnit?: string;
@@ -207,16 +207,8 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
-<<<<<<< HEAD
-    cameraPosition?: ViewStateType | undefined;
-=======
 
-<<<<<<< HEAD
-    distanceRuleColorScale?: Record<string, string>;
->>>>>>> 1d3cef1 (update)
-=======
-    distanceRulerStyle?: Record<string, string>;
->>>>>>> cfed744 (update)
+    cameraPosition?: ViewStateType | undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -272,25 +264,11 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
-<<<<<<< HEAD
-<<<<<<< HEAD
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
-=======
-    distanceRuleColorScale,
-=======
-    distanceRulerStyle,
->>>>>>> cfed744 (update)
-}: MapProps) => {
-    const deckRef = useRef<DeckGL>(null);
-<<<<<<< HEAD
-    
->>>>>>> 1d3cef1 (update)
-=======
 
->>>>>>> 3cc0687 (fix some unit test error and clean up the code)
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewState, setViewState] = useState<ViewStateType>(cameraPosition);
 
@@ -626,7 +604,7 @@ const Map: React.FC<MapProps> = ({
                     {...scale}
                     zoom={viewState?.zoom}
                     scaleUnit={coordinateUnit}
-                    style={distanceRulerStyle}
+                    style={scale.cssStyle}
                 />
             ) : null}
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />

@@ -30,10 +30,6 @@ describe("Test draw-mode menu", () => {
                     " Expected render time: 100"
             );
         }
-<<<<<<< HEAD
-        // expect(obj.perf_metrics[0][2]).toBeLessThan(340);
-=======
         // expect(obj.perf_metrics[0][2]).toBeLessThan(150);
->>>>>>> 3cc0687 (fix some unit test error and clean up the code)
     });
 });

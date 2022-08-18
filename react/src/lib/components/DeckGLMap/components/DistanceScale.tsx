@@ -10,7 +10,7 @@ export interface ScaleProps {
     // Scale bar width in pixels per unit value
     widthPerUnit?: number | null;
     // additional css style to position the component
-    style?: Record<string, string>;
+    style?: Record<string, unknown>;
     // default unit for the scale ruler
     scaleUnit?: string;
 }
