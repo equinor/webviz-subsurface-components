@@ -907,7 +907,8 @@ export function getDiscreteColorAndName(
                     colorTable,
                     !object
                         ? Number.NaN
-                        : parseFloat((object[iCode] as any).toString()) // parseInt for discrete log
+                        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          parseFloat((object[iCode] as any).toString()) // parseInt for discrete log
                 );
             } else {
                 // get color from the meta (obsolete?)
