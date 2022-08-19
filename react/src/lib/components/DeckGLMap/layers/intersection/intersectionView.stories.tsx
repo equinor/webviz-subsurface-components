@@ -1,6 +1,7 @@
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { Feature } from "geojson";
 
 export default {
     component: DeckGLMap,
@@ -109,6 +110,183 @@ WithWellsData.args = {
                     return 0;
                 },
             },
+        },
+    ],
+};
+
+const FencePolygonData = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Polygon",
+                        coordinates: [
+                            [
+                                [500, 1000, -400],
+                                [800, 1200, -400],
+                                [1000, 1100, -400],
+                                [1000, 1100, -600],
+                                [800, 1200, -600],
+                                [500, 1000, -600],
+                                [500, 1000, -400],
+                            ],
+                        ],
+                    },
+                ],
+            },
+        },
+    ],
+};
+
+// With fence polygon data
+export const FencePolygon = DeckGLMapTemplate.bind({});
+FencePolygon.args = {
+    ...defaultProps,
+    bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
+    layers: [
+        {
+            "@@type": "AxesLayer",
+            id: "axes-layer",
+            bounds: [300, 800, -600, 1300, 1600, -400],
+        },
+        {
+            "@@type": "UnfoldedGeoJsonLayer",
+            id: "enhanced-path-layer",
+            data: FencePolygonData,
+            lineWidthScale: 2,
+            lineBillboard: true,
+            stroked: true,
+        },
+    ],
+};
+
+const IntersectionViewData = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Polygon",
+                        coordinates: [
+                            [
+                                [500, 1000, -400],
+                                [800, 1200, -400],
+                                [1000, 1100, -400],
+                                [1000, 1100, -600],
+                                [800, 1200, -600],
+                                [500, 1000, -600],
+                                [500, 1000, -400],
+                            ],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "Fence",
+                color: [235, 107, 52, 255],
+            },
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Point",
+                        coordinates: [500, 1000, -400],
+                    },
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [500, 1000, -400],
+                            [575, 1050, -450],
+                            [650, 1100, -450],
+                            [725, 1150, -500],
+                            [800, 1200, -500],
+                            [900, 1150, -550],
+                            [950, 1125, -550],
+                            [1000, 1100, -550],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "Well",
+                color: [52, 125, 235, 255],
+            },
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [500, 1000, -475],
+                            [800, 1200, -475],
+                            [1000, 1100, -475],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "Surface 1",
+                color: [52, 235, 211, 255],
+            },
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [500, 1000, -525],
+                            [800, 1200, -525],
+                            [1000, 1100, -525],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "Surface 2",
+                color: [32, 252, 3, 255],
+            },
+        },
+    ],
+};
+
+// An intersection view example with sample surface, wells data laong with fence.
+export const IntersectionViewExample = DeckGLMapTemplate.bind({});
+IntersectionViewExample.args = {
+    ...defaultProps,
+    bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
+    layers: [
+        {
+            "@@type": "AxesLayer",
+            id: "axes-layer",
+            bounds: [300, 800, -600, 1300, 1600, -400],
+        },
+        {
+            "@@type": "UnfoldedGeoJsonLayer",
+            id: "enhanced-path-layer",
+            data: IntersectionViewData,
+            lineWidthScale: 1,
+            lineBillboard: true,
+            pointBillboard: true,
+            stroked: true,
+            getPointRadius: 3,
+            getLineColor: (d: Feature) => d.properties?.["color"],
+            getFillColor: (d: Feature) => d.properties?.["color"],
         },
     ],
 };
