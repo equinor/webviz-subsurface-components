@@ -91,13 +91,17 @@ NorthArrow2dDarkMode.args = {
             },
         ],
     },
+    scale: {
+        visible: true,
+        cssStyle: { color: "white" },
+    },
 };
 
 NorthArrow2dDarkMode.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Example using north arrow in 2D.",
+            story: "Example using north arrow in 2D Dark Mode.",
         },
     },
     backgrounds: { default: "dark" },
