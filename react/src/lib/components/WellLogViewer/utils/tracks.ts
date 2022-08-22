@@ -123,7 +123,7 @@ const defPlotType = "line";
 class PlotData {
     minmax: [number, number];
     minmaxPrimaryAxis: [number, number];
-    data: [number, number | string | null][];
+    data: [number | null, number | string | null][];
 
     constructor() {
         this.minmax = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
@@ -876,12 +876,13 @@ let iStringToNum = 0;
 const mapStringToNum = new Map();
 
 export function getDiscreteColorAndName(
-    value: number | string,
+    value: number | string | null,
     colorTable: ColorTable | undefined,
     meta?: DiscreteMeta | null
 ): { color: number[]; name: string } {
     let color: number[];
     let name: string;
+    if (value == null) value = Number.NaN;
     if (meta) {
         // use discrete metadata from WellLog JSON file
         const { objects, iColor, iCode } = meta;
@@ -954,7 +955,6 @@ function createAreaData(
     meta?: DiscreteMeta | null
 ): AreaData | null {
     const { color, name } = getDiscreteColorAndName(value, colorTable, meta);
-    //if(!color) return null;
     return {
         from: from,
         to: to,
@@ -1201,7 +1201,7 @@ function addGraphTrack(
     templateStyles?: TemplateStyle[],
     colorTables?: ColorTable[]
 ): void {
-    const plotDatas: [number, number | string][][] = [];
+    const plotDatas: [number | null, number | string | null][][] = [];
     const plots: PlotConfig[] = [];
     if (templateTrack.plots)
         for (const templatePlot of templateTrack.plots) {
