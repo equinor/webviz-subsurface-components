@@ -200,14 +200,20 @@ export const MapLayer2dDarkMode: ComponentStory<typeof DeckGLMap> = (args) => {
     return <DeckGLMap {...args} />;
 };
 
+const white = [255, 255, 255, 255];
+
 MapLayer2dDarkMode.args = {
     id: "map",
     layers: [
-        axes_hugin,
-        { ...meshMapLayerFloat32, material: false },
-        north_arrow_layer,
+        { ...axes_hugin, labelColor: white, axisColor: white },
+        { ...meshMapLayerFloat32, material: false, gridLines: false },
+        { ...north_arrow_layer, color: white },
     ],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    scale: {
+        visible: true,
+        cssStyle: { color: "white" },
+    },
     views: {
         layout: [1, 1],
         viewports: [

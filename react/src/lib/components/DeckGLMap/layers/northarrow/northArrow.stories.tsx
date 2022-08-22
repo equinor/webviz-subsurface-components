@@ -70,13 +70,13 @@ NorthArrow3d.parameters = {
     },
 };
 
-export const NorthArrow2dAndDistanceRulerDarkMode: ComponentStory<
-    typeof DeckGLMap
-> = (args) => {
+export const NorthArrow2dDarkMode: ComponentStory<typeof DeckGLMap> = (
+    args
+) => {
     return <DeckGLMap {...args} />;
 };
 
-NorthArrow2dAndDistanceRulerDarkMode.args = {
+NorthArrow2dDarkMode.args = {
     ...defaultArgs,
     layers: [
         { ...axes, labelColor: white, axisColor: white },
@@ -97,11 +97,11 @@ NorthArrow2dAndDistanceRulerDarkMode.args = {
     },
 };
 
-NorthArrow2dAndDistanceRulerDarkMode.parameters = {
+NorthArrow2dDarkMode.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Example using north arrow in 2D Dark Mode. Distance ruler in Dark Mode",
+            story: "Example using north arrow in 2D Dark Mode.",
         },
     },
     backgrounds: { default: "dark" },
