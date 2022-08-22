@@ -123,7 +123,7 @@ const defPlotType = "line";
 class PlotData {
     minmax: [number, number];
     minmaxPrimaryAxis: [number, number];
-    data: [number, number | string][];
+    data: [number, number | string | null][];
 
     constructor() {
         this.minmax = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
@@ -143,10 +143,13 @@ function preparePlotData(
     const plot = new PlotData();
     let i = 0;
     for (const row of data) {
-        const value = row[iCurve];
+        let value = row[iCurve];
         if (typeof value == "number") checkMinMaxValue(plot.minmax, value);
         const primary: number =
             iPrimaryAxis >= 0 ? (row[iPrimaryAxis] as number) : i++;
+        if (primary == null)
+            // videx library do not like such data
+            value = null; // force a gap in the graph
         checkMinMaxValue(plot.minmaxPrimaryAxis, primary);
         plot.data.push([primary, value]);
     }
