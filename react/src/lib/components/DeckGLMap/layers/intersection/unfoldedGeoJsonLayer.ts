@@ -1,15 +1,13 @@
-import { Layer, Position3D, Viewport } from "deck.gl";
-import { GeoJsonLayer, GeoJsonLayerProps, PathLayer } from "@deck.gl/layers";
+import { Layer, Position, Viewport } from "deck.gl";
+import { GeoJsonLayer, GeoJsonLayerProps } from "@deck.gl/layers";
 import { Feature, FeatureCollection } from "geojson";
 import { LineString } from "geojson";
-import { zip } from "lodash";
+import { isEqual, zip } from "lodash";
 import { distance } from "mathjs";
-import AxesLayer from "../axes/axesLayer";
 
 const planeY = 2000;
 
-function getUnfoldedPath(object: Feature): Position3D[] {
-    const worldCoordinates = (object.geometry as LineString).coordinates;
+function computeUnfoldedPath(worldCoordinates: Position[]): Position[] {
     const z = worldCoordinates.map((v) => v[2]);
     const delta = worldCoordinates.map((v, i, coordinates) => {
         const prev = coordinates[i - 1] || v;
@@ -23,64 +21,51 @@ function getUnfoldedPath(object: Feature): Position3D[] {
     });
     const vAbscissa = zip(a, [...a].fill(planeY), z);
 
-    return vAbscissa as Position3D[];
+    return vAbscissa as Position[];
 }
 
-function getBoundingBox(
-    coordinates: Position3D[]
-): [number, number, number, number, number, number] {
-    const x_min = 0;
-    const y_min = planeY;
-    const y_max = planeY;
+function computeUnfoldedPolygon(coordinates: Position[]): Position[] {
+    const half = Math.floor(coordinates.length / 2);
+    const upper_line = coordinates.splice(0, half);
+    const lower_line = coordinates.splice(0, half);
+    const uul = computeUnfoldedPath(upper_line);
+    const ull = computeUnfoldedPath(lower_line.reverse());
+    const unfolded_coordinates = uul.concat(ull.reverse());
+    unfolded_coordinates.push(uul[0]);
 
-    const x_max = Math.max.apply(
-        null,
-        coordinates.map(function (i) {
-            return i[0];
-        })
-    );
-    const z_min = Math.min.apply(
-        null,
-        coordinates.map(function (i) {
-            return i[2];
-        })
-    );
-    const z_max = Math.max.apply(
-        null,
-        coordinates.map(function (i) {
-            return i[2];
-        })
-    );
+    return unfolded_coordinates;
+}
 
-    return [x_min, y_min, z_min, x_max, y_max, z_max];
+function getUnfoldedPath(object: Feature): Position[] {
+    const worldCoordinates = (object.geometry as LineString)
+        .coordinates as Position[];
+
+    // check if the path is polygon i.e. closed
+    const is_closed = isEqual(worldCoordinates[0], worldCoordinates.at(-1));
+    if (is_closed) {
+        return computeUnfoldedPolygon(worldCoordinates);
+    } else {
+        return computeUnfoldedPath(worldCoordinates);
+    }
 }
 
 export default class UnfoldedGeoJsonLayer<
     D = FeatureCollection
 > extends GeoJsonLayer<D, GeoJsonLayerProps<D>> {
-    renderLayers(): PathLayer<D>[] {
+    renderLayers(): Layer<D>[] {
         const layers = super.renderLayers();
 
-        const pathLayer = layers
+        const path_layers = layers
             .flat()
-            .find((layer) => layer?.constructor.name === "PathLayer");
-        if (pathLayer == undefined) return layers;
+            .filter((layer) => layer?.constructor.name === "PathLayer");
 
-        const unfoldedPathLayer = pathLayer.clone({
-            id: pathLayer.id + "-for-intersection-view",
-            getPath: getUnfoldedPath,
+        path_layers.forEach((layer) => {
+            const unfolded_layer = layer?.clone({
+                id: layer.id + "-for-intersection-view",
+                getPath: getUnfoldedPath,
+            });
+            if (unfolded_layer) layers.push(unfolded_layer);
         });
-        // add a new unfolded sub layer and render it only in Intersection view
-        layers.push(unfoldedPathLayer);
-
-        const axes = new AxesLayer({
-            name: "Axes",
-            id: pathLayer.id + "-axes-for-intersection-view",
-            bounds: getBoundingBox(
-                getUnfoldedPath(unfoldedPathLayer.props.data[0])
-            ),
-        });
-        layers.push(axes);
 
         return layers;
     }

@@ -20,12 +20,38 @@ describe("Test Color Legend", () => {
             <ColorLegends
                 layers={
                     getLayersInViewport(layers, [
-                        "geojson-line-layer",
-                        "geojson-layer",
-                        "text-layer",
+                        "colormap-layer",
+                        "wells-layer",
                     ]) as Layer<unknown>[]
                 }
                 colorTables={colorTables}
+            />
+        );
+        expect(container.firstChild).toMatchSnapshot();
+    });
+    it("snapshot test with props", () => {
+        const { container } = render(
+            <ColorLegends
+                layers={
+                    getLayersInViewport(layers, [
+                        "colormap-layer",
+                        "wells-layer",
+                    ]) as Layer<unknown>[]
+                }
+                horizontal={true}
+                colorTables={colorTables}
+                reverseRange={true}
+            />
+        );
+        expect(container.firstChild).toMatchSnapshot();
+    });
+    it("snapshot test if layers=0", () => {
+        const { container } = render(
+            <ColorLegends
+                layers={[]}
+                horizontal={true}
+                colorTables={colorTables}
+                reverseRange={true}
             />
         );
         expect(container.firstChild).toMatchSnapshot();
