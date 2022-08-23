@@ -45,14 +45,12 @@ export const layersDefaultProps: Record<string, unknown> = {
         visible: true,
         // Url for the height field.
         meshUrl: "",
-        // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
-        meshMaxError: { type: "number", value: 5 },
-        // Url to the properties. (ex, poro or perm values)
         propertiesUrl: "",
         bounds: { type: "object", value: null, false: true, compare: true },
         colorMapRange: { type: "array" },
         contours: [-1.0, -1.0],
-        enableSmoothShading: true,
+        gridLines: false,
+        cellCenteredProperties: false,
     },
 
     Map3DLayer: {
@@ -91,8 +89,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         autoHighlight: true,
         opacity: 1,
         lineWidthScale: 1,
-        pointRadiusScale: 8,
-        style: { dash: false },
+        pointRadiusScale: 1,
+        lineStyle: { dash: false },
         outline: true,
         logRadius: 10,
         logCurves: true,

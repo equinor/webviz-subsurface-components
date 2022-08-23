@@ -1,12 +1,13 @@
-import { Layer, Viewport } from "deck.gl";
-import { GeoJsonLayer, GeoJsonLayerProps, PathLayer } from "@deck.gl/layers";
+import { Layer, Position, Viewport } from "deck.gl";
+import { GeoJsonLayer, GeoJsonLayerProps } from "@deck.gl/layers";
 import { Feature, FeatureCollection } from "geojson";
 import { LineString } from "geojson";
-import { zip } from "lodash";
+import { isEqual, zip } from "lodash";
 import { distance } from "mathjs";
 
-function getUnfoldedPath(object: Feature) {
-    const worldCoordinates = (object.geometry as LineString).coordinates;
+const planeY = 2000;
+
+function computeUnfoldedPath(worldCoordinates: Position[]): Position[] {
     const z = worldCoordinates.map((v) => v[2]);
     const delta = worldCoordinates.map((v, i, coordinates) => {
         const prev = coordinates[i - 1] || v;
@@ -18,26 +19,55 @@ function getUnfoldedPath(object: Feature) {
         const prev = a.at(-1) || 0;
         a.push(d + prev);
     });
-    const planeY = 2000;
     const vAbscissa = zip(a, [...a].fill(planeY), z);
 
-    return vAbscissa;
+    return vAbscissa as Position[];
+}
+
+function computeUnfoldedPolygon(coordinates: Position[]): Position[] {
+    const half = Math.floor(coordinates.length / 2);
+    const upper_line = coordinates.splice(0, half);
+    const lower_line = coordinates.splice(0, half);
+    const uul = computeUnfoldedPath(upper_line);
+    const ull = computeUnfoldedPath(lower_line.reverse());
+    const unfolded_coordinates = uul.concat(ull.reverse());
+    unfolded_coordinates.push(uul[0]);
+
+    return unfolded_coordinates;
+}
+
+function getUnfoldedPath(object: Feature): Position[] {
+    const worldCoordinates = (object.geometry as LineString)
+        .coordinates as Position[];
+
+    // check if the path is polygon i.e. closed
+    const is_closed = isEqual(worldCoordinates[0], worldCoordinates.at(-1));
+    if (is_closed) {
+        return computeUnfoldedPolygon(worldCoordinates);
+    } else {
+        return computeUnfoldedPath(worldCoordinates);
+    }
 }
 
 export default class UnfoldedGeoJsonLayer<
     D = FeatureCollection
 > extends GeoJsonLayer<D, GeoJsonLayerProps<D>> {
-    renderLayers(): PathLayer<D>[] {
+    renderLayers(): Layer<D>[] {
         const layers = super.renderLayers();
-        const path_layer_id = layers.findIndex(
-            (layer) => layer?.[1].constructor.name == "PathLayer"
-        );
-        const pathLayer = layers[path_layer_id]?.[1];
-        const unfoldedPathLayer = pathLayer.clone({
-            id: "unfolded-path-layer",
-            getPath: getUnfoldedPath,
+
+        const path_layers = layers
+            .flat()
+            .filter((layer) => layer?.constructor.name === "PathLayer");
+
+        path_layers.forEach((layer) => {
+            const unfolded_layer = layer?.clone({
+                id: layer.id + "-for-intersection-view",
+                getPath: getUnfoldedPath,
+            });
+            if (unfolded_layer) layers.push(unfolded_layer);
         });
-        return [pathLayer, unfoldedPathLayer];
+
+        return layers;
     }
 
     filterSubLayer({
@@ -48,9 +78,9 @@ export default class UnfoldedGeoJsonLayer<
         viewport: Viewport;
     }): boolean {
         if (viewport.constructor.name === "IntersectionViewport") {
-            return layer.id === "unfolded-path-layer";
+            return layer.id.search("-for-intersection-view") != -1;
         }
-        return layer.id !== "unfolded-path-layer";
+        return layer.id.search("-for-intersection-view") == -1;
     }
 }
 

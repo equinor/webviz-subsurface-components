@@ -12,7 +12,7 @@ import { WellLog } from "./components/WellLogTypes";
 import { Template } from "./components/WellLogTemplateTypes";
 import { ColorTable } from "./components/ColorTableTypes";
 
-import { WellLogController } from "./components/WellLogView";
+import { WellLogController, WellPickProps } from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
 
@@ -33,6 +33,7 @@ interface Props {
     welllogs: WellLog[];
     templates: Template[];
     colorTables: ColorTable[];
+    wellpicks?: WellPickProps[];
     horizontal?: boolean;
     syncTrackPos?: boolean;
     syncContentDomain?: boolean;
@@ -475,6 +476,7 @@ class SyncLogViewer extends Component<Props, State> {
                         : this.props.templates[0]
                 }
                 colorTables={this.props.colorTables}
+                wellpick={this.props.wellpicks?.[index]}
                 horizontal={this.props.horizontal}
                 hideTitles={this.props.hideTitles}
                 hideLegend={this.props.hideLegend}

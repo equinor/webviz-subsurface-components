@@ -12,7 +12,7 @@ import { WellLog } from "./components/WellLogTypes";
 import { Template } from "./components/WellLogTemplateTypes";
 import { ColorTable } from "./components/ColorTableTypes";
 
-import { WellLogController } from "./components/WellLogView";
+import { WellLogController, WellPickProps } from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
 
@@ -28,6 +28,7 @@ interface Props {
     welllog: WellLog;
     template: Template;
     colorTables: ColorTable[];
+    wellpick?: WellPickProps;
     horizontal?: boolean;
 
     hideTitles?: boolean;
@@ -266,6 +267,7 @@ class WellLogViewer extends Component<Props, State> {
                     welllog={this.props.welllog}
                     template={this.props.template}
                     colorTables={this.props.colorTables}
+                    wellpick={this.props.wellpick}
                     horizontal={this.props.horizontal}
                     hideTitles={this.props.hideTitles}
                     hideLegend={this.props.hideLegend}
@@ -350,9 +352,9 @@ WellLogViewer.propTypes = {
     id: PropTypes.string.isRequired,
 
     /**
-     * Array of JSON objects describing well log data
+     * An object from JSON file describing well log data
      */
-    welllog: PropTypes.array.isRequired,
+    welllog: PropTypes.object.isRequired,
 
     /**
      * Prop containing track template data

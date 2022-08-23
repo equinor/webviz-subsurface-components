@@ -59,3 +59,30 @@ DarkMode.args = {
 DarkMode.parameters = {
     backgrounds: { default: "dark" },
 };
+
+export const CustomLabel: ComponentStory<typeof CustomLabels> = (args) => {
+    return <CustomLabels {...args} />;
+};
+
+function CustomLabels(props: {
+    labelColor: string;
+    labelFontSize: number;
+    fontFamily: string;
+}) {
+    const layers = [
+        new AxesLayer({
+            ...layerProps,
+            labelColor: getRgba(props.labelColor) as RGBAColor,
+            labelFontSize: props.labelFontSize,
+            fontFamily: props.fontFamily,
+        }),
+    ];
+    const views = [new OrthographicView({})];
+    return <DeckGL layers={layers} views={views} />;
+}
+
+CustomLabel.args = {
+    labelColor: "blue",
+    labelFontSize: 10,
+    fontFamily: "math",
+};

@@ -18,7 +18,8 @@ const Template: ComponentStory<typeof DeckGLMap> = (args) => (
 const defaultProps = {
     id: "volve-wells",
     resources: {
-        wellsData: "./volve_wells.json",
+        wellsData:
+            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
     },
     bounds: [432150, 6475800, 439400, 6481500] as [
         number,
@@ -67,7 +68,7 @@ DiscreteWellLogs.args = {
             ...defaultProps.layers[0],
             refine: false,
             outline: false,
-            logData: "./volve_logs.json",
+            logData: "volve_blocking_zonelog_logs.json",
             logrunName: "BLOCKING",
             logName: "ZONELOG",
             logColor: "Stratigraphy",
@@ -128,6 +129,7 @@ CustomColoredWells.args = {
         {
             ...defaultProps.layers[0],
             lineStyle: { color: [255, 0, 0, 255], dash: [10, 3] },
+            wellHeadStyle: { color: [255, 0, 0, 255] },
             refine: false,
             outline: false,
         },
@@ -165,6 +167,11 @@ CustomColoredWells.parameters = {
     },
 };
 
+function wellheadSizeCallback(object: Record<string, Record<string, unknown>>) {
+    if ((object["properties"]["name"] as string).match("15/9-19")) return 0;
+    else return 8;
+}
+
 function colorCallback(object: Record<string, Record<string, unknown>>) {
     if ((object["properties"]["name"] as string).match("15/9-F-10"))
         return [0, 0, 0, 0];
@@ -195,6 +202,9 @@ CallbackStyledWells.args = {
                 dash: dashCallback,
                 width: widthCallback,
             },
+            wellHeadStyle: {
+                size: wellheadSizeCallback,
+            },
             refine: false,
             outline: false,
         },
@@ -222,10 +232,33 @@ AllTrajectoryHidden.args = {
         },
     ],
 };
+
 AllTrajectoryHidden.parameters = {
     docs: {
         description: {
             story: "Volve wells example with all trajectory hidden.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const AllWellHeadsHidden = Template.bind({});
+AllWellHeadsHidden.args = {
+    ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            wellHeadStyle: { size: 0 },
+            refine: false,
+            outline: false,
+        },
+    ],
+};
+AllWellHeadsHidden.parameters = {
+    docs: {
+        description: {
+            story: "Volve wells example with all well heads hidden.",
         },
         inlineStories: false,
         iframeHeight: 500,

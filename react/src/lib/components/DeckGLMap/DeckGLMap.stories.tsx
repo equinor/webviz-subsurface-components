@@ -11,6 +11,7 @@ import {
     TerrainMapPickInfo,
     FeatureCollection,
 } from "../..";
+import { ViewStateType } from "./components/Map";
 
 export default {
     component: DeckGLMap,
@@ -25,7 +26,8 @@ const defaultWellsLayer = {
 const defaultProps = {
     id: "volve-wells",
     resources: {
-        wellsData: "./volve_wells.json",
+        wellsData:
+            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
     },
     bounds: [432150, 6475800, 439400, 6481500] as [
         number,
@@ -123,7 +125,9 @@ const tooltipImpFunc: TooltipCallback = (
         const wellProperties = wellsPickInfoObject.properties;
         const name = (wellProperties as { name: string }).name;
         outputString += `Well: ${name || ""}`;
-        outputString += processPropInfo(wellsPickInfo.properties, true);
+        if (wellsPickInfo.featureType !== "points") {
+            outputString += processPropInfo(wellsPickInfo.properties, true);
+        }
     }
     outputObject["text"] = outputString;
     outputObject["style"] = { color: "yellow" };
@@ -150,4 +154,48 @@ TooltipStyle.parameters = {
         inlineStories: false,
         iframeHeight: 500,
     },
+};
+
+const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [state, setState] = React.useState(args.cameraPosition);
+
+    const getCameraPosition = React.useCallback((input: ViewStateType) => {
+        setState(input);
+        return input;
+    }, []);
+    return (
+        <>
+            <DeckGLMap
+                {...args}
+                cameraPosition={args.cameraPosition}
+                getCameraPosition={getCameraPosition}
+            />
+            <div
+                style={{
+                    position: "absolute",
+                    marginLeft: 200,
+                }}
+            >
+                <div>zoom: {state?.zoom}</div>
+                <div>rotationX: {state?.rotationX}</div>
+                <div>rotationOrbit: {state?.rotationOrbit}</div>
+                <div>targetX: {state?.target[0]}</div>
+                <div>targetY: {state?.target[1]}</div>
+            </div>
+        </>
+    );
+};
+
+export const customizedCameraPosition = CustomTemplate.bind({});
+
+const cameraPosition = {
+    target: [437500, 6475000],
+    zoom: -5.0,
+    rotationX: 90,
+    rotationOrbit: 0,
+};
+
+customizedCameraPosition.args = {
+    ...defaultProps,
+    cameraPosition,
 };

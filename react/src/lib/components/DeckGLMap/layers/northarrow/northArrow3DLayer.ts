@@ -88,7 +88,10 @@ export default class NorthArrow3DLayer extends Layer<
             lines.push(x, y, z);
         }
 
+        // FIX dette  console.log(this.props.color)
         const color = this.props.color.map((x?: number) => (x ?? 0) / 255);
+        color[3] = 1;
+
         const grids = new Model(gl, {
             id: `${this.props.id}-grids`,
             vs: vertexShader,
