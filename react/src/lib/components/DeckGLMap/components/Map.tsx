@@ -207,6 +207,7 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
+
     cameraPosition?: ViewStateType | undefined;
 }
 
@@ -267,6 +268,7 @@ const Map: React.FC<MapProps> = ({
     getCameraPosition,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
+
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewState, setViewState] = useState<ViewStateType>(cameraPosition);
 
@@ -602,6 +604,7 @@ const Map: React.FC<MapProps> = ({
                     {...scale}
                     zoom={viewState?.zoom}
                     scaleUnit={coordinateUnit}
+                    style={scale.cssStyle ?? {}}
                 />
             ) : null}
             <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />

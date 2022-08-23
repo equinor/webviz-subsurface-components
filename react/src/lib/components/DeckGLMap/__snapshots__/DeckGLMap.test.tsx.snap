@@ -19,14 +19,16 @@ exports[`Test Map component snapshot test 1`] = `
     />
   </div>
   <div
-    style="position: absolute;"
+    style="position: absolute; left: 10px; top: 10px;"
   >
-    <label>
+    <label
+      style="left: 10px; top: 10px;"
+    >
       800
       m
     </label>
     <div
-      style="width: 100px; height: 4px; border: 2px solid; border-color: gray; display: inline-block; margin-left: 3px;"
+      style="width: 100px; height: 4px; border: 2px solid; display: inline-block; margin-left: 3px;"
     />
   </div>
   <div>
@@ -89,14 +91,16 @@ exports[`Test Map component snapshot test with edited data 1`] = `
     />
   </div>
   <div
-    style="position: absolute;"
+    style="position: absolute; left: 10px; top: 10px;"
   >
-    <label>
+    <label
+      style="left: 10px; top: 10px;"
+    >
       800
       m
     </label>
     <div
-      style="width: 100px; height: 4px; border: 2px solid; border-color: gray; display: inline-block; margin-left: 3px;"
+      style="width: 100px; height: 4px; border: 2px solid; display: inline-block; margin-left: 3px;"
     />
   </div>
   <div>
@@ -159,14 +163,16 @@ exports[`Test Map component snapshot test with invalid array length 1`] = `
     />
   </div>
   <div
-    style="position: absolute;"
+    style="position: absolute; left: 10px; top: 10px;"
   >
-    <label>
+    <label
+      style="left: 10px; top: 10px;"
+    >
       800
       m
     </label>
     <div
-      style="width: 100px; height: 4px; border: 2px solid; border-color: gray; display: inline-block; margin-left: 3px;"
+      style="width: 100px; height: 4px; border: 2px solid; display: inline-block; margin-left: 3px;"
     />
   </div>
   <div>

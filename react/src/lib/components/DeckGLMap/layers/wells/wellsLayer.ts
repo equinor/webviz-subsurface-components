@@ -226,7 +226,7 @@ export default class WellsLayer extends CompositeLayer<
                 selectedWell: (info.object as Feature).properties?.["name"],
                 multiSelectedWells: this.state.multipleSelectionWells,
             });
-            return true;
+            return false; // do not return true to allow DeckGL props.onClick to be called
         }
     }
 

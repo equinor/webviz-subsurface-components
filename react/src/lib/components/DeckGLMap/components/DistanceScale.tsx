@@ -10,7 +10,7 @@ export interface ScaleProps {
     // Scale bar width in pixels per unit value
     widthPerUnit?: number | null;
     // additional css style to position the component
-    style?: React.CSSProperties;
+    style?: Record<string, unknown>;
     // default unit for the scale ruler
     scaleUnit?: string;
 }
@@ -27,14 +27,12 @@ const DistanceScale: React.FC<ScaleProps> = ({
     scaleUnit,
 }: ScaleProps) => {
     if (!zoom || !widthPerUnit || !incrementValue) return null;
-
     const [rulerWidth, setRulerWidth] = React.useState<number>(0);
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
     const scaleRulerStyle: React.CSSProperties = {
         width: rulerWidth,
         height: "4px",
         border: "2px solid",
-        borderColor: style?.["color"] || "gray",
         borderTop: "none",
         display: "inline-block",
         marginLeft: "3px",
@@ -59,7 +57,7 @@ const DistanceScale: React.FC<ScaleProps> = ({
                 ...style,
             }}
         >
-            <label>
+            <label style={{ ...style }}>
                 {convertedValue.toFixed(0)}
                 {convertedUnit}
             </label>
