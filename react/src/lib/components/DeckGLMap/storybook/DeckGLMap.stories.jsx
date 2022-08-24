@@ -2,7 +2,7 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { makeStyles } from "@material-ui/styles";
-import { ColorLegend, createColorMapFunction } from "@emerson-eps/color-tables";
+import { ColorLegend } from "@emerson-eps/color-tables";
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
 export default {
@@ -670,14 +670,17 @@ const mapDataTemplate = (args) => {
     // user defined range
     const userDefinedRange = React.useCallback((data) => {
         if (data.range) setRange(data.range);
-        setAuto(data.isAuto)
+        setAuto(data.isAuto);
     }, []);
 
     const updatedLayerData = [
         {
             ...args.layers[0],
             colorMapName: getColorName,
-            colorMapRange: colorRange && isAuto == false ? colorRange : layers[0].colorMapRange,
+            colorMapRange:
+                colorRange && isAuto == false
+                    ? colorRange
+                    : layers[0].colorMapRange,
         },
     ];
 
@@ -691,8 +694,9 @@ const mapDataTemplate = (args) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} 
-                    getColorName={colorNameFromSelector} 
+                <ColorLegend
+                    {...args}
+                    getColorName={colorNameFromSelector}
                     getColorRange={userDefinedRange}
                 />
             </div>
