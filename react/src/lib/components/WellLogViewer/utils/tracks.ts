@@ -123,7 +123,7 @@ const defPlotType = "line";
 class PlotData {
     minmax: [number, number];
     minmaxPrimaryAxis: [number, number];
-    data: [number, number | string][];
+    data: [number | null, number | string | null][];
 
     constructor() {
         this.minmax = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
@@ -143,10 +143,13 @@ function preparePlotData(
     const plot = new PlotData();
     let i = 0;
     for (const row of data) {
-        const value = row[iCurve];
+        let value = row[iCurve];
         if (typeof value == "number") checkMinMaxValue(plot.minmax, value);
         const primary: number =
             iPrimaryAxis >= 0 ? (row[iPrimaryAxis] as number) : i++;
+        if (primary == null)
+            // videx library do not like such data
+            value = null; // force a gap in the graph
         checkMinMaxValue(plot.minmaxPrimaryAxis, primary);
         plot.data.push([primary, value]);
     }
@@ -873,12 +876,13 @@ let iStringToNum = 0;
 const mapStringToNum = new Map();
 
 export function getDiscreteColorAndName(
-    value: number | string,
+    value: number | string | null,
     colorTable: ColorTable | undefined,
     meta?: DiscreteMeta | null
 ): { color: number[]; name: string } {
     let color: number[];
     let name: string;
+    if (value == null) value = Number.NaN;
     if (meta) {
         // use discrete metadata from WellLog JSON file
         const { objects, iColor, iCode } = meta;
@@ -951,7 +955,6 @@ function createAreaData(
     meta?: DiscreteMeta | null
 ): AreaData | null {
     const { color, name } = getDiscreteColorAndName(value, colorTable, meta);
-    //if(!color) return null;
     return {
         from: from,
         to: to,
@@ -966,12 +969,12 @@ function createAreaData(
 }
 
 async function createStackData(
-    data: [number, number | string][],
+    data: [number | null, number | string | null][],
     colorTable: ColorTable | undefined,
     meta: DiscreteMeta | undefined | null
 ) {
     const arr: AreaData[] = new Array<AreaData>();
-    let prev: [number, string | number] | null = null;
+    let prev: [number | null, string | number | null] | null = null;
     let area: AreaData | null = null;
     for (const p of data) {
         let boundary = p[0];
@@ -991,9 +994,10 @@ async function createStackData(
             */
             // move area boundary to the beginnig of the last interval
             boundary = prev[0];
+            if (boundary === null) continue;
         }
         // extend current area
-        if (area) area.to = boundary;
+        if (area) area.to = boundary; // null is already processed
 
         const value = p[1]; // current value
         if (prev) {
@@ -1006,7 +1010,7 @@ async function createStackData(
                 }
             }
         }
-        if (value !== null && value !== undefined && !area) {
+        if (!area && value !== null && value !== undefined && p[0] !== null) {
             // new value is not null
             // create new interval colored and labeled for the value
             area = createAreaData(boundary, p[0], value, colorTable, meta);
@@ -1198,7 +1202,7 @@ function addGraphTrack(
     templateStyles?: TemplateStyle[],
     colorTables?: ColorTable[]
 ): void {
-    const plotDatas: [number, number | string][][] = [];
+    const plotDatas: [number | null, number | string | null][][] = [];
     const plots: PlotConfig[] = [];
     if (templateTrack.plots)
         for (const templatePlot of templateTrack.plots) {
