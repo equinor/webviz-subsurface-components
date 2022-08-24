@@ -657,36 +657,46 @@ const layers = [
     },
 ];
 
-
-
-// prop for legend
-let min = layers[0].colorMapRange[0];
-let max = layers[0].colorMapRange[1];
-const dataObjectName = "Legend";
-const position = [16, 10];
-const horizontal = true;
-const reverseRange = false;
-
 const mapDataTemplate = (args) => {
     const [getColorName, setColorName] = React.useState("Rainbow");
-    const [getColorRange, setColorRange] = React.useState();
+    const [colorRange, setRange] = React.useState();
+    const [breakPoint, setBreakPoint] = React.useState();
     const [isAuto, setAuto] = React.useState();
+    const [isNone, setNone] = React.useState();
 
-    const colorMapData = React.useCallback((data) => {
+    // Get selected legend color name from color selector
+    const colorNameFromSelector = React.useCallback((data) => {
         setColorName(data);
     }, []);
 
-    const getColorMapRange = React.useCallback((data) => {
-        if (data.range) setColorRange(data.range);
+    // user defined range
+    const userDefinedRange = React.useCallback((data) => {
+        if (data.range) setRange(data.range);
         setAuto(data.isAuto)
     }, []);
+
+    // user defined breakpoint(domain)
+    const userDefinedBreakPoint = React.useCallback((data) => {
+        if (data.breakpoint) setBreakPoint(data.breakpoint);
+        setNone(data.isNone)
+    }, []);
+
+    let userDefinedDomain = [];
+    
+    if (breakPoint?.length > 0) {
+        var arrOfNum = breakPoint[0].map((str) => {
+            return Number(str);
+        });
+
+        userDefinedDomain = arrOfNum ? arrOfNum : [];
+    }
 
     const updatedLayerData = [
         {
             ...args.layers[0],
             colorMapName: getColorName,
-            colorMapRange: getColorRange && isAuto == false ? getColorRange : layers[0].colorMapRange,
-            colorMapFunction: createColorMapFunction(getColorName),
+            colorMapRange: colorRange && isAuto == false ? colorRange : layers[0].colorMapRange,
+            breakPoint: isNone == false ? userDefinedDomain : [],
         },
     ];
 
@@ -701,8 +711,9 @@ const mapDataTemplate = (args) => {
                 }}
             >
                 <ColorLegend {...args} 
-                    getColorName={colorMapData} 
-                    getColorRange={getColorMapRange} 
+                    getColorName={colorNameFromSelector} 
+                    getColorRange={userDefinedRange}
+                    getBreakpointValue={userDefinedBreakPoint}
                 />
             </div>
             <DeckGLMap {...args} layers={updatedLayerData} />
@@ -713,11 +724,11 @@ const mapDataTemplate = (args) => {
 export const ColorMapLayerColorSelector = mapDataTemplate.bind({});
 
 ColorMapLayerColorSelector.args = {
-    min,
-    max,
-    dataObjectName,
-    position,
-    horizontal,
+    min: layers[0].colorMapRange[0],
+    max: layers[0].colorMapRange[1],
+    dataObjectName: "ColorMap Legend",
+    position: [16, 10],
+    horizontal: true,
     colorTables,
     layers,
     zoom: -5,
@@ -725,7 +736,7 @@ ColorMapLayerColorSelector.args = {
     legend: {
         visible: false,
     },
-    reverseRange,
+    reverseRange: false,
 };
 
 ColorMapLayerColorSelector.parameters = {
