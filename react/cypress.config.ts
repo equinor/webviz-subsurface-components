@@ -1,4 +1,5 @@
 import { defineConfig } from "cypress";
+import { initPlugin } from '@frsource/cypress-plugin-visual-regression-diff/dist/plugins';
 
 export default defineConfig({
   component: {
@@ -6,5 +7,8 @@ export default defineConfig({
       framework: "create-react-app",
       bundler: "webpack",
     },
+    setupNodeEvents(on, config) {
+      initPlugin(on, config);
+    }
   },
 });

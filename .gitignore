@@ -207,6 +207,7 @@ coverage.xml
 # Cypress stuff
 chromedriver
 chromedriver_linux64.zip
+react/cypress/screenshots
 
 # Translations
 *.mo
