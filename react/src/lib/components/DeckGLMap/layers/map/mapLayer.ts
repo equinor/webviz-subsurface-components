@@ -163,10 +163,7 @@ function makeFullMesh(
         colorMapClampColor !== false;
     colorMapClampColor = isClampColor ? colorMapClampColor : [0, 0, 0];
 
-    // Normalize to [0,1] range.
-    const clampColor = (colorMapClampColor as RGBColor).map(
-        (x) => (x ?? 0) / 255
-    );
+    const clampColor = colorMapClampColor;
 
     // Dimensions.
     const ox = dim.origin[0];
