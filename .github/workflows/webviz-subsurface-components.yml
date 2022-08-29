@@ -140,7 +140,7 @@ jobs:
           name: cypress-screenshots
           path: |
             react/cypress/screenshots
-            react/cypress/component
+            react/cypress/component/snapshots-directory
           retention-days: 5
 
       - name: check if the tests failed due to difference in snapshots
