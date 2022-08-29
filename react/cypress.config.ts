@@ -9,6 +9,7 @@ export default defineConfig({
     },
     setupNodeEvents(on, config) {
       initPlugin(on, config);
-    }
+    },
+    env: {pluginVisualRegressionImagesDir: 'snapshots-directory'}
   },
 });

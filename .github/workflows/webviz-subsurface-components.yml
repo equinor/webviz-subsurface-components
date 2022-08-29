@@ -130,7 +130,7 @@ jobs:
         if: github.event_name != 'release' && matrix.e2e-on-firefox
         run: |
           cd react
-          npm run start-test
+          npx cypress run --component
 
       # upload the failure screenshots for reference
       - name: upload artfacts
@@ -140,7 +140,7 @@ jobs:
           name: cypress-screenshots
           path: |
             react/cypress/screenshots
-            react/cypress/snapshots
+            react/cypress/component
           retention-days: 5
 
       - name: check if the tests failed due to difference in snapshots
