@@ -130,7 +130,7 @@ jobs:
         if: github.event_name != 'release' && matrix.e2e-on-firefox
         run: |
           cd react
-          npx cypress run --component
+          npx cypress run --component --env type=base --config screenshotsFolder=cypress/snapshots/base
 
       # upload the failure screenshots for reference
       - name: upload artfacts

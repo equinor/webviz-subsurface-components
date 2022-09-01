@@ -1,5 +1,5 @@
 import { defineConfig } from "cypress";
-import { initPlugin } from '@frsource/cypress-plugin-visual-regression-diff/dist/plugins';
+import getCompareSnapshotsPlugin from 'cypress-visual-regression/dist/plugin';
 
 export default defineConfig({
   component: {
@@ -7,8 +7,10 @@ export default defineConfig({
       framework: "create-react-app",
       bundler: "webpack",
     },
+    "screenshotsFolder": "./cypress/snapshots/actual",
+    "trashAssetsBeforeRuns": true,
     setupNodeEvents(on, config) {
-      initPlugin(on, config);
+      getCompareSnapshotsPlugin(on, config);
     },
     env: {pluginVisualRegressionImagesDir: 'snapshots-directory'}
   },

@@ -11,6 +11,6 @@ describe("Map Component", () => {
         cy.mount(<Default />);
         cy.get("svg[role='progressbar']");
         cy.get("svg[role='progressbar']", {timeout:25000}).should("not.exist");
-        cy.matchImage();
+        cy.compareSnapshot("default-map");
     });
 });

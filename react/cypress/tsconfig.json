@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+      "types": [
+        "cypress",
+        "cypress-visual-regression"
+      ]
+    }
+  }

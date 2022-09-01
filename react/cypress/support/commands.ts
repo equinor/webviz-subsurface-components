@@ -35,4 +35,6 @@
 //     }
 //   }
 // }
-import '@frsource/cypress-plugin-visual-regression-diff/dist/support';
+import compareSnapshotCommand from 'cypress-visual-regression/dist/command';
+
+compareSnapshotCommand();
