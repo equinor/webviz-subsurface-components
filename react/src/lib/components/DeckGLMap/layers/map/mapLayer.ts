@@ -196,9 +196,9 @@ function makeFullMesh(
             for (let w = 0; w < nx; w++) {
                 const i0 = h * nx + w;
 
-                const x = ox + w * dx;
-                const y = oy + (ny - h - 1) * dy; // See note above.
-                const z = -meshData[i0];
+                const x0 = ox + w * dx;
+                const y0 = oy + (ny - 1 - h) * dy; // See note above.
+                const z = isMesh ? -meshData[i0] : 0;
 
                 const propertyValue = propertiesData[i0];
 
@@ -216,9 +216,9 @@ function makeFullMesh(
                     color = [NaN, NaN, NaN];
                 }
 
-                positions.push(x, y, z);
-                const s = (x - ox) / (maxX - ox);
-                const t = 1.0 - (y - oy) / (maxY - oy); // For 1.0 - ... see note above.
+                positions.push(x0, y0, z);
+                const s = (x0 - ox) / (maxX - ox);
+                const t = 1.0 - (y0 - oy) / (maxY - oy); // For 1.0 - ... see note above.
                 texCoords.push(s, t);
                 vertexColors.push(...(color as RGBColor));
                 vertexProperties.push(propertyValue);
@@ -232,22 +232,14 @@ function makeFullMesh(
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                // t1
-                if (
-                    !isNaN(meshData[i0]) && !isNaN(vertexColors[3 * i0 + 0]) && // eslint-disable-line
-                    !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
-                    !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0])    // eslint-disable-line
-                ) {
-                    indices.push(i0, i1, i3);
-                }
+                const isActiveCell = !isNaN(meshData[i0]) && !isNaN(vertexColors[3 * i0 + 0]) && // eslint-disable-line
+                                     !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
+                                     !isNaN(meshData[i2]) && !isNaN(vertexColors[3 * i2 + 0]) && // eslint-disable-line
+                                     !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0]);   // eslint-disable-line
 
-                // t2
-                if (
-                    !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
-                    !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0]) && // eslint-disable-line
-                    !isNaN(meshData[i2]) && !isNaN(vertexColors[3 * i2 + 0])    // eslint-disable-line
-                ) {
-                    indices.push(i1, i3, i2);
+                if (isActiveCell) {
+                    indices.push(i0, i1, i3); // t1
+                    indices.push(i1, i3, i2); // t2
                 }
             }
         }
@@ -256,27 +248,38 @@ function makeFullMesh(
         let i = 0;
         for (let h = 0; h < ny - 1; h++) {
             for (let w = 0; w < nx - 1; w++) {
-                const hh = ny - h - 1; // See note above.
+                const hh = ny - 1 - h; // See note above.
 
                 const i0 = h * nx + w;
+                const i1 = h * nx + (w + 1);
+                const i2 = (h + 1) * nx + (w + 1);
+                const i3 = (h + 1) * nx + w;
+
+                const isActiveCell =
+                    !isNaN(meshData[i0]) &&
+                    !isNaN(meshData[i1]) &&
+                    !isNaN(meshData[i2]) &&
+                    !isNaN(meshData[i3]);
+
+                if (!isActiveCell) {
+                    continue;
+                }
+
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
-                const z0 = isMesh && !isNaN(meshData[i0]) ? -meshData[i0] : 0;
+                const z0 = isMesh ? -meshData[i0] : 0;
 
-                const i1 = h * nx + (w + 1);
                 const x1 = ox + (w + 1) * dx;
                 const y1 = oy + hh * dy;
-                const z1 = isMesh && !isNaN(meshData[i1]) ? -meshData[i1] : 0;
+                const z1 = isMesh ? -meshData[i1] : 0;
 
-                const i2 = (h - 1) * nx + (w + 1); // h - 1 instead of h + 1 See note above
                 const x2 = ox + (w + 1) * dx;
-                const y2 = oy + (hh + 1) * dy;
-                const z2 = isMesh && !isNaN(meshData[i2]) ? -meshData[i2] : 0;
+                const y2 = oy + (hh - 1) * dy; // Note hh - 1 here.
+                const z2 = isMesh ? -meshData[i2] : 0;
 
-                const i3 = (h - 1) * nx + w; // h - 1 instead of h + 1 See note above
                 const x3 = ox + w * dx;
-                const y3 = oy + (hh + 1) * dy;
-                const z3 = isMesh && !isNaN(meshData[i3]) ? -meshData[i3] : 0;
+                const y3 = oy + (hh - 1) * dy; // Note hh - 1 here.
+                const z3 = isMesh ? -meshData[i3] : 0;
 
                 const propertyValue = propertiesData[i0];
                 const color = getColor(
@@ -293,47 +296,33 @@ function makeFullMesh(
                     continue;
                 }
 
-                // t1
-                if (
-                    !isNaN(meshData[i0]) &&
-                    !isNaN(meshData[i1]) &&
-                    !isNaN(meshData[i3])
-                ) {
-                    //                                                                    For 1.0 - .. see note above.
-                    positions.push(x0, y0, z0);  texCoords.push( (x0 - ox) / (maxX - ox), 1.0 - (y0 - oy) / (maxY - oy) ); // eslint-disable-line
-                    positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
-                    positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
+                //  t1                                                                For 1.0 - .. see note above.
+                positions.push(x0, y0, z0);  texCoords.push( (x0 - ox) / (maxX - ox), 1.0 - (y0 - oy) / (maxY - oy) ); // eslint-disable-line
+                positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
+                positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
 
-                    indices.push(i++, i++, i++);
-                    vertexColors.push(...(color as RGBColor));
-                    vertexColors.push(...(color as RGBColor));
-                    vertexColors.push(...(color as RGBColor));
+                indices.push(i++, i++, i++);
+                vertexColors.push(...(color as RGBColor));
+                vertexColors.push(...(color as RGBColor));
+                vertexColors.push(...(color as RGBColor));
 
-                    vertexProperties.push(propertyValue);
-                    vertexProperties.push(propertyValue);
-                    vertexProperties.push(propertyValue);
-                }
+                vertexProperties.push(propertyValue);
+                vertexProperties.push(propertyValue);
+                vertexProperties.push(propertyValue);
 
-                // t2
-                if (
-                    !isNaN(meshData[i1]) &&
-                    !isNaN(meshData[i3]) &&
-                    !isNaN(meshData[i2])
-                ) {
-                    //                                                                    For 1.0 - .. see note above.
-                    positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
-                    positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
-                    positions.push(x2, y2, z2);  texCoords.push( (x2 - ox) / (maxX - ox), 1.0 - (y2 - oy) / (maxY - oy) ); // eslint-disable-line
+                //  t2                                                                For 1.0 - .. see note above.
+                positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
+                positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
+                positions.push(x2, y2, z2);  texCoords.push( (x2 - ox) / (maxX - ox), 1.0 - (y2 - oy) / (maxY - oy) ); // eslint-disable-line
 
-                    indices.push(i++, i++, i++);
-                    vertexColors.push(...(color as RGBColor));
-                    vertexColors.push(...(color as RGBColor));
-                    vertexColors.push(...(color as RGBColor));
+                indices.push(i++, i++, i++);
+                vertexColors.push(...(color as RGBColor));
+                vertexColors.push(...(color as RGBColor));
+                vertexColors.push(...(color as RGBColor));
 
-                    vertexProperties.push(propertyValue);
-                    vertexProperties.push(propertyValue);
-                    vertexProperties.push(propertyValue);
-                }
+                vertexProperties.push(propertyValue);
+                vertexProperties.push(propertyValue);
+                vertexProperties.push(propertyValue);
             }
         }
     }
