@@ -346,7 +346,7 @@ SmallMap.args = {
         viewports: [
             {
                 id: "view_1",
-                show3D: true,
+                show3D: false,
             },
         ],
     },

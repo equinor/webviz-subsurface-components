@@ -179,10 +179,11 @@ function makeFullMesh(
     const maxY = oy + ny * dy;
 
     const positions: number[] = [];
-    const texCoords: number[] = [];
+    const texCoords: number[] = [];  // XXX kan fjernes.
     const indices: number[] = [];
     const vertexColors: number[] = [];
     const vertexProperties: number[] = [];
+    const vertexIndexs: number[] = [];
     const line_positions: number[] = [];
 
     // Note: Assumed layout of the incomming 2D array of data:
@@ -192,6 +193,7 @@ function makeFullMesh(
 
     if (!cellCenteredProperties) {
         // COLOR IS SET LINEARLY INTERPOLATED OVER A CELL.
+        let i = 0;
         for (let h = 0; h < ny; h++) {
             for (let w = 0; w < nx; w++) {
                 const i0 = h * nx + w;
@@ -222,6 +224,7 @@ function makeFullMesh(
                 texCoords.push(s, t);
                 vertexColors.push(...(color as RGBColor));
                 vertexProperties.push(propertyValue);
+                vertexIndexs.push(i++);
             }
         }
 
@@ -238,14 +241,15 @@ function makeFullMesh(
                                      !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0]);   // eslint-disable-line
 
                 if (isActiveCell) {
-                    indices.push(i0, i1, i3); // t1
-                    indices.push(i1, i3, i2); // t2
+                    indices.push(i1, i3, i0); // t1 - i0 provoking index.
+                    indices.push(i1, i3, i2); // t2 - i2 provoking index.
                 }
             }
         }
     } else {
         // COLOR IS SET CONSTANT OVER A CELL.
-        let i = 0;
+        let i_indices = 0;
+        let i_vertices = 0;
         for (let h = 0; h < ny - 1; h++) {
             for (let w = 0; w < nx - 1; w++) {
                 const hh = ny - 1 - h; // See note above.
@@ -296,12 +300,14 @@ function makeFullMesh(
                     continue;
                 }
 
-                //  t1                                                                For 1.0 - .. see note above.
-                positions.push(x0, y0, z0);  texCoords.push( (x0 - ox) / (maxX - ox), 1.0 - (y0 - oy) / (maxY - oy) ); // eslint-disable-line
-                positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
-                positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
+                // t1 - i0 provoking index.                                           For 1.0 - .. see note above.
+                positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y0 - oy) / (maxY - oy) ); // eslint-disable-line
+                positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
+                positions.push(x0, y0, z0);  texCoords.push( (x0 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
 
-                indices.push(i++, i++, i++);
+                vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
+
+                indices.push(i_indices++, i_indices++, i_indices++);
                 vertexColors.push(...(color as RGBColor));
                 vertexColors.push(...(color as RGBColor));
                 vertexColors.push(...(color as RGBColor));
@@ -310,12 +316,14 @@ function makeFullMesh(
                 vertexProperties.push(propertyValue);
                 vertexProperties.push(propertyValue);
 
-                //  t2                                                                For 1.0 - .. see note above.
+                // t2 - i2 provoking index.                                           For 1.0 - .. see note above.
                 positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
                 positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
                 positions.push(x2, y2, z2);  texCoords.push( (x2 - ox) / (maxX - ox), 1.0 - (y2 - oy) / (maxY - oy) ); // eslint-disable-line
 
-                indices.push(i++, i++, i++);
+                vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
+
+                indices.push(i_indices++, i_indices++, i_indices++);
                 vertexColors.push(...(color as RGBColor));
                 vertexColors.push(...(color as RGBColor));
                 vertexColors.push(...(color as RGBColor));
@@ -327,6 +335,8 @@ function makeFullMesh(
         }
     }
 
+    //console.log("ssd: ", vertexIndexs)
+
     const mesh: MeshType = {
         drawMode: GL.TRIANGLES,
         attributes: {
@@ -334,6 +344,7 @@ function makeFullMesh(
             TEXCOORD_0: { value: new Float32Array(texCoords), size: 2 },
             colors: { value: new Float32Array(vertexColors), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
+            vertex_indexs: { value: new Int32Array(vertexIndexs), size: 1 },
         },
         vertexCount: indices.length,
         indices: { value: new Uint32Array(indices), size: 1 },
@@ -442,7 +453,7 @@ async function load_mesh_and_texture(
         propertiesUrl = meshUrl;
     }
 
-    const readOutData: Float32Array[] = [];
+    const readOutData: Float32Array[] = [];  // XXX kan fjernes
     const readOutDataName: string[] = [];
 
     //-- PROPERTY TEXTURE. --
@@ -704,7 +715,7 @@ export default class MapLayer extends CompositeLayer<
                 mesh: this.state.mesh,
                 meshLines: this.state.mesh_lines,
                 propertyTexture: this.state.propertyTexture,
-                readOutData: this.state.readOutData,
+                readOutData: this.state.readOutData, // XXX trengs disse??
                 readOutDataName: this.state.readOutDataName,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,

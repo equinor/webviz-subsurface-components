@@ -17,10 +17,11 @@ export type MeshType = {
     drawMode?: number;
     attributes: {
         positions: { value: Float32Array; size: number };
-        TEXCOORD_0: { value: Float32Array; size: number };
+        TEXCOORD_0: { value: Float32Array; size: number };  // denne trengs ikke
         normals?: { value: Float32Array; size: number };
         colors: { value: Float32Array; size: number };
         properties: { value: Float32Array; size: number };
+        vertex_indexs: { value: Int32Array; size: number };
     };
     vertexCount: number;
     indices: { value: Uint32Array; size: number };
@@ -98,6 +99,7 @@ export default class privateMapLayer extends Layer<
 
     //eslint-disable-next-line
     _getModels(gl: any) {
+        // console.log("this.props.mesh.indices: ", this.props.mesh.indices)
         // MESH MODEL
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
@@ -109,11 +111,14 @@ export default class privateMapLayer extends Layer<
                     positions: this.props.mesh.attributes.positions,
                     colors: this.props.mesh.attributes.colors,
                     TEXCOORD_0: this.props.mesh.attributes.TEXCOORD_0,
-                    properties: this.props.mesh.attributes.properties,
-                    vertex_indexs: {
-                        value: new Int32Array(this.props.mesh.indices.value),
-                        size: 1,
-                    },
+                    properties: this.props.mesh.attributes.properties,  // XXX blir denne brukt??
+
+                    vertex_indexs: this.props.mesh.attributes.vertex_indexs,
+
+                    // vertex_indexs: {
+                    //     value: new Int32Array(this.props.mesh.indices.value),
+                    //     size: 1,
+                    // },
                 },
                 vertexCount: this.props.mesh.vertexCount,
                 indices: this.props.mesh.indices,
@@ -152,7 +157,7 @@ export default class privateMapLayer extends Layer<
         model_mesh
             .setUniforms({
                 ...uniforms,
-                propertyTexture: this.props.propertyTexture,
+                propertyTexture: this.props.propertyTexture, // XXX denne teksturen trengs kanskje ikke.. det er proerty paa hver vertex som interpoleres..
                 contourReferencePoint,
                 contourInterval,
                 isContoursDepth,
@@ -185,6 +190,10 @@ export default class privateMapLayer extends Layer<
         const b = info.color[2];
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
+
+        // XXX
+        //console.log("vertexIndex: ", vertexIndex, b)
+        //console.log("indices: ",  this.props.mesh.indices)
 
         const vertexs = this.props.mesh.attributes.positions.value;
         const depth = -vertexs[3 * vertexIndex + 2];
