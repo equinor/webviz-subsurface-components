@@ -97,7 +97,7 @@ const meshMapLayerFloat32 = {
     propertiesUrl: "kh_netmap_25_m.float32",
     contours: [0, 100],
     isContoursDepth: true,
-    cellCenteredProperties: true,
+    cellCenteredProperties: false,
     gridLines: false,
     material: false,
     colorMapName: "Physics",

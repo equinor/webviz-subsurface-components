@@ -16,8 +16,6 @@ import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 import { DeckGLLayerContext } from "../../components/Map";
 import { TerrainMapLayerData } from "../terrain/terrainMapLayer";
-import { replay_10 } from "@equinor/eds-icons";
-
 
 // These two types both describes the mesh' extent in the horizontal plane.
 type Frame = {
@@ -63,13 +61,6 @@ function getColorMapColors(
 
     // return data;
     return colors;
-}
-
-function dimNxNy(dim: Frame): [number, number] {
-    const nx = dim.count[0];
-    const ny = dim.count[1];
-
-    return [nx, ny];
 }
 
 function getFloat32ArrayMinMax(data: Float32Array) {
@@ -168,9 +159,6 @@ function makeFullMesh(
 
     const nx = dim.count[0];
     const ny = dim.count[1];
-
-    const maxX = ox + nx * dx;
-    const maxY = oy + ny * dy;
 
     const positions: number[] = [];
     const indices: number[] = [];
@@ -325,7 +313,6 @@ function makeFullMesh(
         }
     }
 
-
     const mesh: MeshType = {
         drawMode: GL.TRIANGLES,
         attributes: {
@@ -478,7 +465,6 @@ async function load_mesh_and_properties(
     }
 
     //-- MESH --
-    const [w, h] = dimNxNy(dim);
     let meshData: Float32Array = new Float32Array();
     if (isMesh) {
         const response_mesh = await fetch(meshUrl);
@@ -667,13 +653,17 @@ export default class MapLayer extends CompositeLayer<
         const isMesh =
             typeof this.props.meshUrl !== "undefined" &&
             this.props.meshUrl !== "";
+
+        const canNotEnableContours =
+            this.props.cellCenteredProperties && !this.props.isContoursDepth;
+
         const layer = new privateMapLayer(
             this.getSubLayerProps<unknown, privateMapLayerProps<unknown>>({
                 mesh: this.state.mesh,
                 meshLines: this.state.mesh_lines,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
-                contours: this.props.cellCenteredProperties && !this.props.isContoursDepth ? [-1, -1] : this.props.contours,
+                contours: canNotEnableContours ? [-1, -1] : this.props.contours,
                 gridLines: this.props.gridLines,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
                 material: this.props.material,
