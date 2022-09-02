@@ -28,7 +28,7 @@ jobs:
             run-performance-tests: false
           - python-version: 3.9
             run-performance-tests: false
-            e2e-on-firefox: true
+            e2e: true
           - python-version: 3.9 # This particular job in the matrix is allowed to fail(for performance tests)
             run-performance-tests: true
 
@@ -108,7 +108,7 @@ jobs:
 
       # This action allows caching cypress dependencies
       - name: Cache Cypress
-        if: github.event_name != 'release' && matrix.e2e-on-firefox
+        if: github.event_name != 'release' && matrix.e2e
         id: cache-cypress
         uses: actions/cache@v1
         with:
@@ -120,32 +120,32 @@ jobs:
 
       # now let's install Cypress binary
       - name: install cypress binary
-        if: github.event_name != 'release' && matrix.e2e-on-firefox
+        if: github.event_name != 'release' && matrix.e2e
         run: |
           cd react
           npx cypress install
 
       # run the cypress tests
-      - name: e2e on firefox
-        if: github.event_name != 'release' && matrix.e2e-on-firefox
+      - name: e2e
+        if: github.event_name != 'release' && matrix.e2e
         run: |
           cd react
-          npx cypress run --component --env type=base --config screenshotsFolder=cypress/snapshots/base
+          npx cypress run --broswser edge --component --env type=base --config screenshotsFolder=cypress/snapshots/base
 
       # upload the failure screenshots for reference
       - name: upload artfacts
         uses: actions/upload-artifact@v2
-        if: github.event_name != 'release' && failure() && matrix.e2e-on-firefox
+        if: github.event_name != 'release' && failure() && matrix.e2e
         with:
           name: cypress-screenshots
           path: |
             react/cypress/screenshots
-            react/cypress/component/snapshots-directory
+            react/cypress/snapshots
           retention-days: 5
 
       - name: check if the tests failed due to difference in snapshots
         id: check_file_changed
-        if: github.event_name != 'release' && matrix.e2e-on-firefox && failure()
+        if: github.event_name != 'release' && matrix.e2e && failure()
         run: |
           if [[ -d react/cypress/snapshots/diff ]]
           then
