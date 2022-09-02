@@ -1,5 +1,4 @@
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import { Texture2D } from "@luma.gl/core";
 import { createPropertyData, PropertyDataType } from "../utils/layerTools";
 import { Geometry } from "@luma.gl/core";
 import { picking, project, phongLighting } from "deck.gl";
@@ -17,7 +16,7 @@ export type MeshType = {
     drawMode?: number;
     attributes: {
         positions: { value: Float32Array; size: number };
-        TEXCOORD_0: { value: Float32Array; size: number };  // denne trengs ikke
+        TEXCOORD_0?: { value: Float32Array; size: number };
         normals?: { value: Float32Array; size: number };
         colors: { value: Float32Array; size: number };
         properties: { value: Float32Array; size: number };
@@ -47,7 +46,6 @@ export type Material =
 export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
     mesh: MeshType;
     meshLines: MeshTypeLines;
-    propertyTexture: Texture2D;
     contours: [number, number];
     gridLines: boolean;
     isContoursDepth: boolean;
@@ -99,7 +97,6 @@ export default class privateMapLayer extends Layer<
 
     //eslint-disable-next-line
     _getModels(gl: any) {
-        // console.log("this.props.mesh.indices: ", this.props.mesh.indices)
         // MESH MODEL
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
@@ -110,15 +107,8 @@ export default class privateMapLayer extends Layer<
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
                     colors: this.props.mesh.attributes.colors,
-                    TEXCOORD_0: this.props.mesh.attributes.TEXCOORD_0,
-                    properties: this.props.mesh.attributes.properties,  // XXX blir denne brukt??
-
+                    properties: this.props.mesh.attributes.properties,
                     vertex_indexs: this.props.mesh.attributes.vertex_indexs,
-
-                    // vertex_indexs: {
-                    //     value: new Int32Array(this.props.mesh.indices.value),
-                    //     size: 1,
-                    // },
                 },
                 vertexCount: this.props.mesh.vertexCount,
                 indices: this.props.mesh.indices,
@@ -157,7 +147,6 @@ export default class privateMapLayer extends Layer<
         model_mesh
             .setUniforms({
                 ...uniforms,
-                propertyTexture: this.props.propertyTexture, // XXX denne teksturen trengs kanskje ikke.. det er proerty paa hver vertex som interpoleres..
                 contourReferencePoint,
                 contourInterval,
                 isContoursDepth,

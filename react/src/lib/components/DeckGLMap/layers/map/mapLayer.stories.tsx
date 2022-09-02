@@ -98,7 +98,7 @@ const meshMapLayerFloat32 = {
     contours: [0, 100],
     isContoursDepth: true,
     cellCenteredProperties: true,
-    gridLines: true,
+    gridLines: false,
     material: false,
     colorMapName: "Physics",
 };

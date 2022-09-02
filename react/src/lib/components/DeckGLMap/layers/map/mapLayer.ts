@@ -10,20 +10,14 @@ import { RGBColor } from "@deck.gl/core/utils/color";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
-import { Texture2D } from "@luma.gl/core";
 import GL from "@luma.gl/constants";
 import * as png from "@vivaxy/png";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 import { DeckGLLayerContext } from "../../components/Map";
 import { TerrainMapLayerData } from "../terrain/terrainMapLayer";
+import { replay_10 } from "@equinor/eds-icons";
 
-export const DEFAULT_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-    [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
-};
 
 // These two types both describes the mesh' extent in the horizontal plane.
 type Frame = {
@@ -179,7 +173,6 @@ function makeFullMesh(
     const maxY = oy + ny * dy;
 
     const positions: number[] = [];
-    const texCoords: number[] = [];  // XXX kan fjernes.
     const indices: number[] = [];
     const vertexColors: number[] = [];
     const vertexProperties: number[] = [];
@@ -219,9 +212,6 @@ function makeFullMesh(
                 }
 
                 positions.push(x0, y0, z);
-                const s = (x0 - ox) / (maxX - ox);
-                const t = 1.0 - (y0 - oy) / (maxY - oy); // For 1.0 - ... see note above.
-                texCoords.push(s, t);
                 vertexColors.push(...(color as RGBColor));
                 vertexProperties.push(propertyValue);
                 vertexIndexs.push(i++);
@@ -300,10 +290,10 @@ function makeFullMesh(
                     continue;
                 }
 
-                // t1 - i0 provoking index.                                           For 1.0 - .. see note above.
-                positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y0 - oy) / (maxY - oy) ); // eslint-disable-line
-                positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
-                positions.push(x0, y0, z0);  texCoords.push( (x0 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
+                // t1 - i0 provoking index.
+                positions.push(x1, y1, z1);
+                positions.push(x3, y3, z3);
+                positions.push(x0, y0, z0);
 
                 vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
 
@@ -316,10 +306,10 @@ function makeFullMesh(
                 vertexProperties.push(propertyValue);
                 vertexProperties.push(propertyValue);
 
-                // t2 - i2 provoking index.                                           For 1.0 - .. see note above.
-                positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
-                positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
-                positions.push(x2, y2, z2);  texCoords.push( (x2 - ox) / (maxX - ox), 1.0 - (y2 - oy) / (maxY - oy) ); // eslint-disable-line
+                // t2 - i2 provoking index.
+                positions.push(x1, y1, z1);
+                positions.push(x3, y3, z3);
+                positions.push(x2, y2, z2);
 
                 vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
 
@@ -335,13 +325,11 @@ function makeFullMesh(
         }
     }
 
-    //console.log("ssd: ", vertexIndexs)
 
     const mesh: MeshType = {
         drawMode: GL.TRIANGLES,
         attributes: {
             positions: { value: new Float32Array(positions), size: 3 },
-            TEXCOORD_0: { value: new Float32Array(texCoords), size: 2 },
             colors: { value: new Float32Array(vertexColors), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
             vertex_indexs: { value: new Int32Array(vertexIndexs), size: 1 },
@@ -429,7 +417,7 @@ function makeFullMesh(
     return [mesh, mesh_lines];
 }
 
-async function load_mesh_and_texture(
+async function load_mesh_and_properties(
     meshUrl: string,
     dim: Frame,
     propertiesUrl: string,
@@ -438,8 +426,7 @@ async function load_mesh_and_texture(
     colorMapRange: [number, number],
     colorMapClampColor: boolean | RGBColor | undefined,
     colorTables: colorTablesArray,
-    cellCenteredProperties: boolean,
-    gl: unknown
+    cellCenteredProperties: boolean
 ) {
     const isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
     const isProperties =
@@ -452,9 +439,6 @@ async function load_mesh_and_texture(
     if (isMesh && !isProperties) {
         propertiesUrl = meshUrl;
     }
-
-    const readOutData: Float32Array[] = [];  // XXX kan fjernes
-    const readOutDataName: string[] = [];
 
     //-- PROPERTY TEXTURE. --
     const response = await fetch(propertiesUrl);
@@ -553,26 +537,7 @@ async function load_mesh_and_texture(
     // Keep this.
     //console.log(`Task took ${(t1 - t0) * 0.001}  seconds.`);
 
-    // create float texture for the properties of the.
-    const format = GL.R32F;
-    const type = GL.FLOAT;
-    const propertyTexture = new Texture2D(gl, {
-        width: w,
-        height: h,
-        format,
-        type,
-        data: propertiesData,
-        mipmaps: false,
-        parameters: DEFAULT_TEXTURE_PARAMETERS,
-    });
-
-    return Promise.all([
-        mesh,
-        mesh_lines,
-        propertyTexture,
-        readOutData,
-        readOutDataName,
-    ]);
+    return Promise.all([mesh, mesh_lines]);
 }
 
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
@@ -592,10 +557,13 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Contourlines reference point and interval.
     // A value of [-1.0, -1.0] will disable contour lines.
+    // Contour lines also will also not be activated if "cellCenteredProperties" is set to true
+    // and "isContoursDepth" is set to false. I.e. constant properties within cells and contourlines
+    // to be calculated for properties and not depths.
     // default value: [-1.0, -1.0]
     contours: [number, number];
 
-    // Contourlines may be calculated either on depth/z-value or on property/texture value
+    // Contourlines may be calculated either on depth/z-value or on property value
     // If this is set to false, lines will follow properties instead of depth.
     // In 2D mode this is always the case regardless.
     // default: true
@@ -607,6 +575,7 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Properties are by default at nodes (corners of cells). Setting this to true will
     // color the cell constant interpreting properties as in the middele of the cell.
+    // The property used us in the cell corner corresponding to minimum x and y values.
     // default: false.
     cellCenteredProperties: boolean;
 
@@ -649,7 +618,7 @@ export default class MapLayer extends CompositeLayer<
             .colorTables;
 
         // Load mesh and texture and store in state.
-        const p = load_mesh_and_texture(
+        const p = load_mesh_and_properties(
             this.props.meshUrl,
             this.props.frame,
             this.props.propertiesUrl,
@@ -658,27 +627,15 @@ export default class MapLayer extends CompositeLayer<
             this.props.colorMapRange,
             this.props.colorMapClampColor,
             colorTables,
-            this.props.cellCenteredProperties,
-            this.context.gl
+            this.props.cellCenteredProperties
         );
 
-        p.then(
-            ([
+        p.then(([mesh, mesh_lines]) => {
+            this.setState({
                 mesh,
                 mesh_lines,
-                propertyTexture,
-                readOutData,
-                readOutDataName,
-            ]) => {
-                this.setState({
-                    mesh,
-                    mesh_lines,
-                    propertyTexture,
-                    readOutData,
-                    readOutDataName,
-                });
-            }
-        );
+            });
+        });
     }
 
     updateState({
@@ -714,12 +671,9 @@ export default class MapLayer extends CompositeLayer<
             this.getSubLayerProps<unknown, privateMapLayerProps<unknown>>({
                 mesh: this.state.mesh,
                 meshLines: this.state.mesh_lines,
-                propertyTexture: this.state.propertyTexture,
-                readOutData: this.state.readOutData, // XXX trengs disse??
-                readOutDataName: this.state.readOutDataName,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
-                contours: this.props.contours,
+                contours: this.props.cellCenteredProperties && !this.props.isContoursDepth ? [-1, -1] : this.props.contours,
                 gridLines: this.props.gridLines,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
                 material: this.props.material,
