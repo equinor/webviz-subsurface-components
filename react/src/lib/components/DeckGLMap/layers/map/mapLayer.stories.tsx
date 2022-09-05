@@ -36,6 +36,33 @@ const meshMapLayerBig = {
     colorMapName: "Physics",
 };
 
+// Small test map. 4 by 5 cells. One inactive node => 4 inactive cells.
+// property values and depth values both from 0 to 29.
+// Useful for debugging.
+const smallLayer = {
+    "@@type": "MapLayer",
+    id: "mesh-layer",
+    meshUrl: "small_depths.float32",
+    frame: {
+        origin: [459840.7, 5929826.1],
+        count: [5, 6],
+        increment: [175, 150],
+        rotDeg: 0,
+    },
+    propertiesUrl: "small_properties.float32",
+    gridLines: true,
+    cellCenteredProperties: false,
+    material: false,
+    // black to white colors.
+    colorMapFunction: (value: number) => [
+        value * 255,
+        value * 255,
+        value * 255,
+    ],
+    colorMapRange: [0, 29],
+    colorMapClampColor: [255, 0, 0],
+};
+
 // Example using "Map" layer. Uses PNG float for mesh and properties.
 const meshMapLayerPng = {
     "@@type": "MapLayer",
@@ -70,8 +97,8 @@ const meshMapLayerFloat32 = {
     propertiesUrl: "kh_netmap_25_m.float32",
     contours: [0, 100],
     isContoursDepth: true,
-    cellCenteredProperties: true,
-    gridLines: true,
+    cellCenteredProperties: false,
+    gridLines: false,
     material: false,
     colorMapName: "Physics",
 };
@@ -297,6 +324,39 @@ MapLayerBigMap3d.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Example using large map with approx. 1400x1400 cells.",
+        },
+    },
+};
+
+const axes_small = {
+    "@@type": "AxesLayer",
+    id: "axes_small",
+    bounds: [459790, 5929776, -30, 460590, 5930626, 0],
+};
+export const SmallMap: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+SmallMap.args = {
+    id: "map",
+    layers: [axes_small, smallLayer, north_arrow_layer],
+    bounds: [459840.7, 5929826.1, 460540.7, 5930576.1] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+            },
+        ],
+    },
+};
+
+SmallMap.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "4x5 cells.",
         },
     },
 };

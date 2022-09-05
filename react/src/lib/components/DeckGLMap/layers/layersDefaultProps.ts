@@ -49,6 +49,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         bounds: { type: "object", value: null, false: true, compare: true },
         colorMapRange: { type: "array" },
         contours: [-1.0, -1.0],
+        // If contour lines should follow depth or properties.
+        isContoursDepth: true,
         gridLines: false,
         cellCenteredProperties: false,
     },
