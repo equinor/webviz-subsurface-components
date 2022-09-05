@@ -10,20 +10,12 @@ import { RGBColor } from "@deck.gl/core/utils/color";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
-import { Texture2D } from "@luma.gl/core";
 import GL from "@luma.gl/constants";
 import * as png from "@vivaxy/png";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 import { DeckGLLayerContext } from "../../components/Map";
 import { TerrainMapLayerData } from "../terrain/terrainMapLayer";
-
-export const DEFAULT_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-    [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
-};
 
 // These two types both describes the mesh' extent in the horizontal plane.
 type Frame = {
@@ -69,13 +61,6 @@ function getColorMapColors(
 
     // return data;
     return colors;
-}
-
-function dimNxNy(dim: Frame): [number, number] {
-    const nx = dim.count[0];
-    const ny = dim.count[1];
-
-    return [nx, ny];
 }
 
 function getFloat32ArrayMinMax(data: Float32Array) {
@@ -175,14 +160,11 @@ function makeFullMesh(
     const nx = dim.count[0];
     const ny = dim.count[1];
 
-    const maxX = ox + nx * dx;
-    const maxY = oy + ny * dy;
-
     const positions: number[] = [];
-    const texCoords: number[] = [];
     const indices: number[] = [];
     const vertexColors: number[] = [];
     const vertexProperties: number[] = [];
+    const vertexIndexs: number[] = [];
     const line_positions: number[] = [];
 
     // Note: Assumed layout of the incomming 2D array of data:
@@ -192,13 +174,14 @@ function makeFullMesh(
 
     if (!cellCenteredProperties) {
         // COLOR IS SET LINEARLY INTERPOLATED OVER A CELL.
+        let i = 0;
         for (let h = 0; h < ny; h++) {
             for (let w = 0; w < nx; w++) {
                 const i0 = h * nx + w;
 
-                const x = ox + w * dx;
-                const y = oy + (ny - h - 1) * dy; // See note above.
-                const z = -meshData[i0];
+                const x0 = ox + w * dx;
+                const y0 = oy + (ny - 1 - h) * dy; // See note above.
+                const z = isMesh ? -meshData[i0] : 0;
 
                 const propertyValue = propertiesData[i0];
 
@@ -216,12 +199,10 @@ function makeFullMesh(
                     color = [NaN, NaN, NaN];
                 }
 
-                positions.push(x, y, z);
-                const s = (x - ox) / (maxX - ox);
-                const t = 1.0 - (y - oy) / (maxY - oy); // For 1.0 - ... see note above.
-                texCoords.push(s, t);
+                positions.push(x0, y0, z);
                 vertexColors.push(...(color as RGBColor));
                 vertexProperties.push(propertyValue);
+                vertexIndexs.push(i++);
             }
         }
 
@@ -232,51 +213,55 @@ function makeFullMesh(
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                // t1
-                if (
-                    !isNaN(meshData[i0]) && !isNaN(vertexColors[3 * i0 + 0]) && // eslint-disable-line
-                    !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
-                    !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0])    // eslint-disable-line
-                ) {
-                    indices.push(i0, i1, i3);
-                }
+                const isActiveCell = !isNaN(meshData[i0]) && !isNaN(vertexColors[3 * i0 + 0]) && // eslint-disable-line
+                                     !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
+                                     !isNaN(meshData[i2]) && !isNaN(vertexColors[3 * i2 + 0]) && // eslint-disable-line
+                                     !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0]);   // eslint-disable-line
 
-                // t2
-                if (
-                    !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
-                    !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0]) && // eslint-disable-line
-                    !isNaN(meshData[i2]) && !isNaN(vertexColors[3 * i2 + 0])    // eslint-disable-line
-                ) {
-                    indices.push(i1, i3, i2);
+                if (isActiveCell) {
+                    indices.push(i1, i3, i0); // t1 - i0 provoking index.
+                    indices.push(i1, i3, i2); // t2 - i2 provoking index.
                 }
             }
         }
     } else {
         // COLOR IS SET CONSTANT OVER A CELL.
-        let i = 0;
+        let i_indices = 0;
+        let i_vertices = 0;
         for (let h = 0; h < ny - 1; h++) {
             for (let w = 0; w < nx - 1; w++) {
-                const hh = ny - h - 1; // See note above.
+                const hh = ny - 1 - h; // See note above.
 
                 const i0 = h * nx + w;
+                const i1 = h * nx + (w + 1);
+                const i2 = (h + 1) * nx + (w + 1);
+                const i3 = (h + 1) * nx + w;
+
+                const isActiveCell =
+                    !isNaN(meshData[i0]) &&
+                    !isNaN(meshData[i1]) &&
+                    !isNaN(meshData[i2]) &&
+                    !isNaN(meshData[i3]);
+
+                if (!isActiveCell) {
+                    continue;
+                }
+
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
-                const z0 = isMesh && !isNaN(meshData[i0]) ? -meshData[i0] : 0;
+                const z0 = isMesh ? -meshData[i0] : 0;
 
-                const i1 = h * nx + (w + 1);
                 const x1 = ox + (w + 1) * dx;
                 const y1 = oy + hh * dy;
-                const z1 = isMesh && !isNaN(meshData[i1]) ? -meshData[i1] : 0;
+                const z1 = isMesh ? -meshData[i1] : 0;
 
-                const i2 = (h - 1) * nx + (w + 1); // h - 1 instead of h + 1 See note above
                 const x2 = ox + (w + 1) * dx;
-                const y2 = oy + (hh + 1) * dy;
-                const z2 = isMesh && !isNaN(meshData[i2]) ? -meshData[i2] : 0;
+                const y2 = oy + (hh - 1) * dy; // Note hh - 1 here.
+                const z2 = isMesh ? -meshData[i2] : 0;
 
-                const i3 = (h - 1) * nx + w; // h - 1 instead of h + 1 See note above
                 const x3 = ox + w * dx;
-                const y3 = oy + (hh + 1) * dy;
-                const z3 = isMesh && !isNaN(meshData[i3]) ? -meshData[i3] : 0;
+                const y3 = oy + (hh - 1) * dy; // Note hh - 1 here.
+                const z3 = isMesh ? -meshData[i3] : 0;
 
                 const propertyValue = propertiesData[i0];
                 const color = getColor(
@@ -293,47 +278,37 @@ function makeFullMesh(
                     continue;
                 }
 
-                // t1
-                if (
-                    !isNaN(meshData[i0]) &&
-                    !isNaN(meshData[i1]) &&
-                    !isNaN(meshData[i3])
-                ) {
-                    //                                                                    For 1.0 - .. see note above.
-                    positions.push(x0, y0, z0);  texCoords.push( (x0 - ox) / (maxX - ox), 1.0 - (y0 - oy) / (maxY - oy) ); // eslint-disable-line
-                    positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
-                    positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
+                // t1 - i0 provoking index.
+                positions.push(x1, y1, z1);
+                positions.push(x3, y3, z3);
+                positions.push(x0, y0, z0);
 
-                    indices.push(i++, i++, i++);
-                    vertexColors.push(...(color as RGBColor));
-                    vertexColors.push(...(color as RGBColor));
-                    vertexColors.push(...(color as RGBColor));
+                vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
 
-                    vertexProperties.push(propertyValue);
-                    vertexProperties.push(propertyValue);
-                    vertexProperties.push(propertyValue);
-                }
+                indices.push(i_indices++, i_indices++, i_indices++);
+                vertexColors.push(...(color as RGBColor));
+                vertexColors.push(...(color as RGBColor));
+                vertexColors.push(...(color as RGBColor));
 
-                // t2
-                if (
-                    !isNaN(meshData[i1]) &&
-                    !isNaN(meshData[i3]) &&
-                    !isNaN(meshData[i2])
-                ) {
-                    //                                                                    For 1.0 - .. see note above.
-                    positions.push(x1, y1, z1);  texCoords.push( (x1 - ox) / (maxX - ox), 1.0 - (y1 - oy) / (maxY - oy) ); // eslint-disable-line
-                    positions.push(x3, y3, z3);  texCoords.push( (x3 - ox) / (maxX - ox), 1.0 - (y3 - oy) / (maxY - oy) ); // eslint-disable-line
-                    positions.push(x2, y2, z2);  texCoords.push( (x2 - ox) / (maxX - ox), 1.0 - (y2 - oy) / (maxY - oy) ); // eslint-disable-line
+                vertexProperties.push(propertyValue);
+                vertexProperties.push(propertyValue);
+                vertexProperties.push(propertyValue);
 
-                    indices.push(i++, i++, i++);
-                    vertexColors.push(...(color as RGBColor));
-                    vertexColors.push(...(color as RGBColor));
-                    vertexColors.push(...(color as RGBColor));
+                // t2 - i2 provoking index.
+                positions.push(x1, y1, z1);
+                positions.push(x3, y3, z3);
+                positions.push(x2, y2, z2);
 
-                    vertexProperties.push(propertyValue);
-                    vertexProperties.push(propertyValue);
-                    vertexProperties.push(propertyValue);
-                }
+                vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
+
+                indices.push(i_indices++, i_indices++, i_indices++);
+                vertexColors.push(...(color as RGBColor));
+                vertexColors.push(...(color as RGBColor));
+                vertexColors.push(...(color as RGBColor));
+
+                vertexProperties.push(propertyValue);
+                vertexProperties.push(propertyValue);
+                vertexProperties.push(propertyValue);
             }
         }
     }
@@ -342,9 +317,9 @@ function makeFullMesh(
         drawMode: GL.TRIANGLES,
         attributes: {
             positions: { value: new Float32Array(positions), size: 3 },
-            TEXCOORD_0: { value: new Float32Array(texCoords), size: 2 },
             colors: { value: new Float32Array(vertexColors), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
+            vertex_indexs: { value: new Int32Array(vertexIndexs), size: 1 },
         },
         vertexCount: indices.length,
         indices: { value: new Uint32Array(indices), size: 1 },
@@ -429,7 +404,7 @@ function makeFullMesh(
     return [mesh, mesh_lines];
 }
 
-async function load_mesh_and_texture(
+async function load_mesh_and_properties(
     meshUrl: string,
     dim: Frame,
     propertiesUrl: string,
@@ -438,8 +413,7 @@ async function load_mesh_and_texture(
     colorMapRange: [number, number],
     colorMapClampColor: boolean | RGBColor | undefined,
     colorTables: colorTablesArray,
-    cellCenteredProperties: boolean,
-    gl: unknown
+    cellCenteredProperties: boolean
 ) {
     const isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
     const isProperties =
@@ -452,9 +426,6 @@ async function load_mesh_and_texture(
     if (isMesh && !isProperties) {
         propertiesUrl = meshUrl;
     }
-
-    const readOutData: Float32Array[] = [];
-    const readOutDataName: string[] = [];
 
     //-- PROPERTY TEXTURE. --
     const response = await fetch(propertiesUrl);
@@ -494,7 +465,6 @@ async function load_mesh_and_texture(
     }
 
     //-- MESH --
-    const [w, h] = dimNxNy(dim);
     let meshData: Float32Array = new Float32Array();
     if (isMesh) {
         const response_mesh = await fetch(meshUrl);
@@ -553,26 +523,7 @@ async function load_mesh_and_texture(
     // Keep this.
     //console.log(`Task took ${(t1 - t0) * 0.001}  seconds.`);
 
-    // create float texture for the properties of the.
-    const format = GL.R32F;
-    const type = GL.FLOAT;
-    const propertyTexture = new Texture2D(gl, {
-        width: w,
-        height: h,
-        format,
-        type,
-        data: propertiesData,
-        mipmaps: false,
-        parameters: DEFAULT_TEXTURE_PARAMETERS,
-    });
-
-    return Promise.all([
-        mesh,
-        mesh_lines,
-        propertyTexture,
-        readOutData,
-        readOutDataName,
-    ]);
+    return Promise.all([mesh, mesh_lines]);
 }
 
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
@@ -592,10 +543,13 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Contourlines reference point and interval.
     // A value of [-1.0, -1.0] will disable contour lines.
+    // Contour lines also will also not be activated if "cellCenteredProperties" is set to true
+    // and "isContoursDepth" is set to false. I.e. constant properties within cells and contourlines
+    // to be calculated for properties and not depths.
     // default value: [-1.0, -1.0]
     contours: [number, number];
 
-    // Contourlines may be calculated either on depth/z-value or on property/texture value
+    // Contourlines may be calculated either on depth/z-value or on property value
     // If this is set to false, lines will follow properties instead of depth.
     // In 2D mode this is always the case regardless.
     // default: true
@@ -607,6 +561,7 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Properties are by default at nodes (corners of cells). Setting this to true will
     // color the cell constant interpreting properties as in the middele of the cell.
+    // The property used us in the cell corner corresponding to minimum x and y values.
     // default: false.
     cellCenteredProperties: boolean;
 
@@ -649,7 +604,7 @@ export default class MapLayer extends CompositeLayer<
             .colorTables;
 
         // Load mesh and texture and store in state.
-        const p = load_mesh_and_texture(
+        const p = load_mesh_and_properties(
             this.props.meshUrl,
             this.props.frame,
             this.props.propertiesUrl,
@@ -658,27 +613,15 @@ export default class MapLayer extends CompositeLayer<
             this.props.colorMapRange,
             this.props.colorMapClampColor,
             colorTables,
-            this.props.cellCenteredProperties,
-            this.context.gl
+            this.props.cellCenteredProperties
         );
 
-        p.then(
-            ([
+        p.then(([mesh, mesh_lines]) => {
+            this.setState({
                 mesh,
                 mesh_lines,
-                propertyTexture,
-                readOutData,
-                readOutDataName,
-            ]) => {
-                this.setState({
-                    mesh,
-                    mesh_lines,
-                    propertyTexture,
-                    readOutData,
-                    readOutDataName,
-                });
-            }
-        );
+            });
+        });
     }
 
     updateState({
@@ -710,16 +653,17 @@ export default class MapLayer extends CompositeLayer<
         const isMesh =
             typeof this.props.meshUrl !== "undefined" &&
             this.props.meshUrl !== "";
+
+        const canNotEnableContours =
+            this.props.cellCenteredProperties && !this.props.isContoursDepth;
+
         const layer = new privateMapLayer(
             this.getSubLayerProps<unknown, privateMapLayerProps<unknown>>({
                 mesh: this.state.mesh,
                 meshLines: this.state.mesh_lines,
-                propertyTexture: this.state.propertyTexture,
-                readOutData: this.state.readOutData,
-                readOutDataName: this.state.readOutDataName,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
-                contours: this.props.contours,
+                contours: canNotEnableContours ? [-1, -1] : this.props.contours,
                 gridLines: this.props.gridLines,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
                 material: this.props.material,

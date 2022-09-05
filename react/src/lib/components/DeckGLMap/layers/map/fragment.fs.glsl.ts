@@ -7,7 +7,6 @@ precision highp float;
 uniform bool isContoursDepth;
 uniform float contourReferencePoint;
 uniform float contourInterval;
-uniform sampler2D propertyTexture;
 
 in vec2 vTexCoord;
 in vec3 cameraPosition;
@@ -20,6 +19,7 @@ flat in int vertex_indexs_;
 out vec4 fragColor;
 
 in vec3 worldPos;
+in float property;
 
 void main(void) {
    geometry.uv = vTexCoord;
@@ -35,8 +35,7 @@ void main(void) {
 
    vec4 color = vColor;
 
-   vec4 texture_col = texture2D(propertyTexture, vTexCoord);
-   float propertyValue = texture_col.r; // note this is a float texture with one channel (red)
+   float propertyValue = property;
 
    // // Discard transparent pixels. KEEP
    // if (!picking_uActive && isnan(propertyValue)) {
