@@ -8,6 +8,7 @@ export default defineConfig({
     // },
     baseUrl: 'http://localhost:6006',
     video: true,
+    screenshotOnRunFailure:false,
     trashAssetsBeforeRuns: true,
     env: {
       "failSilently": false,
