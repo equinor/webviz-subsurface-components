@@ -142,6 +142,7 @@ jobs:
           path: |
             react/cypress/screenshots
             react/cypress/snapshots
+            react/cypress/videos
           retention-days: 5
 
       - name: check if the tests failed due to difference in snapshots
