@@ -135,6 +135,7 @@ jobs:
       # upload the failure screenshots for reference
       - name: upload artfacts
         uses: actions/upload-artifact@v2
+        if: always()
         #if: github.event_name != 'release' && failure() && matrix.e2e-on-firefox
         with:
           name: cypress-screenshots
