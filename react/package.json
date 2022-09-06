@@ -44,7 +44,7 @@
         "preversion": "npm run lint",
         "test-cypress": "concurrently 'npm run storybook' 'npm run cypress:test' -k -s first",
         "cypress:test": "wait-on http://localhost:6006 && cypress run",
-        "cypress:run": "cypress run"
+        "cypress:run": "cypress run -b edge --env type=base --config screenshotsFolder=cypress/snapshots/base"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
@@ -113,7 +113,6 @@
         "@testing-library/jest-dom": "^5.11.9",
         "@testing-library/react": "^12.1.2",
         "@testing-library/user-event": "^13.1.9",
-        "@types/cypress-image-snapshot": "^3.1.6",
         "@types/d3-color": "^3.0.2",
         "@types/d3-interpolate": "^3.0.1",
         "@types/jest": "^26.0.20",

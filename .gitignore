@@ -18,6 +18,10 @@ R/
 react/storybook-static/**/*
 !react/storybook-static/favicon.ico
 
+# Cypress stuff
+chromedriver
+chromedriver_linux64.zip
+
 # Created by .ignore support plugin (hsz.mobi)
 ### VisualStudioCode template
 .vscode/

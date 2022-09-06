@@ -7,7 +7,12 @@ export default defineConfig({
     //   return require('./cypress/plugins/index.ts')(on, config)
     // },
     baseUrl: 'http://localhost:6006',
+    video: false,
     trashAssetsBeforeRuns: true,
+    env: {
+      "failSilently": false,
+      "ALWAYS_GENERATE_DIFF": false,
+    },
     setupNodeEvents(on, config) {
       getCompareSnapshotsPlugin(on, config);
     },
