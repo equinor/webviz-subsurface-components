@@ -7,7 +7,7 @@ export default defineConfig({
     //   return require('./cypress/plugins/index.ts')(on, config)
     // },
     baseUrl: 'http://localhost:6006',
-    video: false,
+    video: true,
     trashAssetsBeforeRuns: true,
     env: {
       "failSilently": false,
