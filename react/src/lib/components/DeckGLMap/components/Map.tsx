@@ -224,7 +224,7 @@ export interface MapProps {
      */
     onMouseEvent?: EventCallback;
 
-    getCameraPosition?: (input: ViewStateType) => void;
+    getCameraPosition?: (input: Record<string, ViewStateType>) => void;
 
     selection?: {
         well: string | undefined;
@@ -291,7 +291,7 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
-    cameraPosition = {} as ViewStateType,
+    cameraPosition = {},
     getCameraPosition,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
@@ -300,15 +300,19 @@ const Map: React.FC<MapProps> = ({
     const boundsInitial = bounds ?? [0, 0, 1, 1];
 
     // set initial view state based on supplied bounds and zoom in viewState
-    const [viewState, setViewState] = useState<ViewStateType>(cameraPosition);
+    const [viewState, setViewState] = useState<ViewStateType>(
+        {} as ViewStateType
+    );
 
+    const [viewStates, setViewStates] =
+        useState<Record<string, ViewStateType>>(cameraPosition);
     // react on cameraPosition prop change
     useEffect(() => {
         if (Object.keys(cameraPosition).length !== 0) {
-            setViewState(cameraPosition);
+            setViewStates(cameraPosition);
         }
     }, [cameraPosition]);
-
+    // console.log(viewStates);
     // react on zoom prop change
     useEffect(() => {
         const vs = getViewState(boundsInitial, zoom, deckRef.current?.deck);
@@ -323,12 +327,22 @@ const Map: React.FC<MapProps> = ({
 
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
+        let viewStates: Record<string, ViewStateType> = {};
         if (Object.keys(cameraPosition).length !== 0) {
-            setViewState(cameraPosition);
-        } else {
-            setViewState(
-                getViewState(boundsInitial, zoom, deckRef.current?.deck)
+            setViewStates(cameraPosition);
+            viewStates = Object.fromEntries(
+                viewsProps.map((item) => [item.id, cameraPosition])
             );
+            setViewStates(viewStates);
+        } else {
+            getViewState(boundsInitial, zoom, deckRef.current?.deck);
+            viewStates = Object.fromEntries(
+                viewsProps.map((item) => [
+                    item.id,
+                    getViewState(boundsInitial, zoom, deckRef.current?.deck),
+                ])
+            );
+            setViewStates(viewStates);
         }
     }, [bounds, zoom, cameraPosition]);
 
@@ -599,6 +613,15 @@ const Map: React.FC<MapProps> = ({
         },
         [views]
     );
+    const onViewStateChange = useCallback(({ viewId, viewState }) => {
+        setViewStates((currentViewStates) => ({
+            ...currentViewStates,
+            [viewId]: viewState,
+        }));
+        if (getCameraPosition) {
+            getCameraPosition(viewStates);
+        }
+    }, []);
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
@@ -607,7 +630,7 @@ const Map: React.FC<MapProps> = ({
         <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
                 id={id}
-                viewState={viewState}
+                viewState={viewStates}
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
@@ -622,12 +645,7 @@ const Map: React.FC<MapProps> = ({
                 }
                 getTooltip={getTooltip}
                 ref={deckRef}
-                onViewStateChange={(viewport) => {
-                    setViewState(viewport.viewState);
-                    if (getCameraPosition) {
-                        getCameraPosition(viewport.viewState);
-                    }
-                }}
+                onViewStateChange={onViewStateChange}
                 onHover={onHover}
                 onClick={onClick}
                 onLoad={onLoad}
