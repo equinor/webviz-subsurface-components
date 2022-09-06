@@ -15,12 +15,3 @@
 /**
  * @type {Cypress.PluginConfig}
  */
-// eslint-disable-next-line no-unused-vars
-const {
-    addMatchImageSnapshotPlugin,
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-} = require("cypress-image-snapshot/plugin");
-
-module.exports = (on, config) => {
-    addMatchImageSnapshotPlugin(on, config);
-};
