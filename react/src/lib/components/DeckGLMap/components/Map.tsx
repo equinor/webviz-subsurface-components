@@ -91,6 +91,11 @@ export interface ViewportType {
      * Layers to be displayed on viewport
      */
     layerIds?: string[];
+
+    target?: number[];
+    zoom?: number;
+    rotationX?: number;
+    rotationOrbit?: number;
 }
 
 export interface ViewsType {
@@ -276,7 +281,6 @@ const Map: React.FC<MapProps> = ({
     resources,
     layers,
     bounds,
-    zoom,
     views,
     coords,
     scale,
@@ -312,19 +316,6 @@ const Map: React.FC<MapProps> = ({
             setViewStates(cameraPosition);
         }
     }, [cameraPosition]);
-    // console.log(viewStates);
-    // react on zoom prop change
-    useEffect(() => {
-        const vs = getViewState(boundsInitial, zoom, deckRef.current?.deck);
-        setViewState({ ...viewState, zoom: vs.zoom });
-    }, [zoom]);
-
-    // react on bounds prop change
-    useEffect(() => {
-        const vs = getViewState(boundsInitial, zoom, deckRef.current?.deck);
-        setViewState({ ...viewState, target: vs.target });
-    }, [bounds]);
-
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         let viewStates: Record<string, ViewStateType> = {};
@@ -335,16 +326,20 @@ const Map: React.FC<MapProps> = ({
             );
             setViewStates(viewStates);
         } else {
-            getViewState(boundsInitial, zoom, deckRef.current?.deck);
             viewStates = Object.fromEntries(
                 viewsProps.map((item) => [
                     item.id,
-                    getViewState(boundsInitial, zoom, deckRef.current?.deck),
+                    getViewState(
+                        boundsInitial,
+                        item.target,
+                        item.zoom,
+                        deckRef.current?.deck
+                    ),
                 ])
             );
             setViewStates(viewStates);
         }
-    }, [bounds, zoom, cameraPosition]);
+    }, [bounds, cameraPosition]);
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
@@ -691,7 +686,7 @@ const Map: React.FC<MapProps> = ({
             {scale?.visible ? (
                 <DistanceScale
                     {...scale}
-                    zoom={viewState?.zoom}
+                    zoom={-5}
                     scaleUnit={coordinateUnit}
                     style={scale.cssStyle ?? {}}
                 />
@@ -775,6 +770,7 @@ function jsonToObject(
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
+    target?: number[],
     zoom?: number,
     deck?: Deck
 ): ViewStateType {
@@ -794,7 +790,7 @@ function getViewState(
 
     const fitted_bound = fitBounds({ width, height, bounds });
     const view_state: ViewStateType = {
-        target: [fitted_bound.x, fitted_bound.y, 0],
+        target: target ?? [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,

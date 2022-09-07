@@ -502,6 +502,7 @@ MultiView.args = {
                 name: "Colormap layer",
                 show3D: false,
                 layerIds: ["colormap-layer"],
+                zoom:-5,
             },
             {
                 id: "view_2",
