@@ -17,12 +17,12 @@ import {
 
 import "!style-loader!css-loader!../VectorCalculator.css";
 
-interface ParentProps {
+export type ParentProps = {
     expressions?: ExpressionType[];
     externalParseExpression?: ExpressionType;
 }
 
-interface VectorCalculatorProps {
+export type VectorCalculatorProps = {
     id: string;
     vectors: TreeDataNode[];
     expressions: ExpressionType[];

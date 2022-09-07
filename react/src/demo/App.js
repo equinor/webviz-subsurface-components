@@ -14,7 +14,6 @@ import MorrisDemo from "./MorrisDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
 import VectorSelectorDemo from "./VectorSelectorDemo";
-import VectorCalculatorDemo from "./VectorCalculatorDemo";
 
 class App extends Component {
     constructor(props) {
@@ -49,9 +48,6 @@ class App extends Component {
             case "VectorSelector": {
                 return <VectorSelectorDemo />;
             }
-            case "VectorCalculator": {
-                return <VectorCalculatorDemo />;
-            }
             default: {
                 return null;
             }
@@ -74,7 +70,6 @@ class App extends Component {
                         PriorPosteriorDistribution
                     </option>
                     <option value="VectorSelector">VectorSelector</option>
-                    <option value="VectorCalculator">VectorCalculator</option>
                 </select>
                 {this.renderDemo()}
             </div>
