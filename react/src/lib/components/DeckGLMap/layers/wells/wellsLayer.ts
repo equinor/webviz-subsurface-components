@@ -27,7 +27,7 @@ import {
     PropertyDataType,
     createPropertyData,
 } from "../utils/layerTools";
-import { splineRefine } from "./utils/spline";
+import { splineRefine, GetBoundingBox } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
@@ -61,6 +61,17 @@ type WellHeadStyleAccessor = {
     color?: ColorAccessor;
     size?: SizeAccessor;
 };
+
+function onDataLoad(
+    data: FeatureCollection<Geometry, GeoJsonProperties>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    { layer }: any
+) {
+    const bbox = GetBoundingBox(data as FeatureCollection);
+    if (typeof layer.props.setReportedBoundingBox !== "undefined") {
+        layer.props.setReportedBoundingBox(bbox);
+    }
+}
 
 export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     pointRadiusScale: number;
@@ -600,9 +611,10 @@ export default class WellsLayer extends CompositeLayer<
 }
 
 WellsLayer.layerName = "WellsLayer";
-WellsLayer.defaultProps = layersDefaultProps[
-    "WellsLayer"
-] as WellsLayerProps<FeatureCollection>;
+WellsLayer.defaultProps = {
+    ...(layersDefaultProps["WellsLayer"] as WellsLayerProps<FeatureCollection>),
+    onDataLoad,
+};
 
 //================= Local help functions. ==================
 

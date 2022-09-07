@@ -281,6 +281,9 @@ async function load_mesh_and_texture(
 }
 
 export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setReportedBoundingBox?: any;
+
     // Url to png image representing the height mesh.
     mesh: string;
 
@@ -383,6 +386,33 @@ export default class Map3DLayer extends CompositeLayer<
                 meshImageData,
                 texture,
             });
+        });
+
+        // Report back calculated bounding box now that data is loaded.
+        p.then(() => {
+            const xinc = this.props.frame?.increment?.[0] ?? 0;
+            const yinc = this.props.frame?.increment?.[1] ?? 0;
+
+            const xcount = this.props.frame?.count?.[0] ?? 1;
+            const ycount = this.props.frame?.count?.[1] ?? 1;
+
+            const xMin = this.props.frame?.origin?.[0] ?? 0;
+            const yMin = this.props.frame?.origin?.[0] ?? 0;
+            const zMin = -this.props.meshValueRange[1];
+            const xMax = xMin + xinc * xcount;
+            const yMax = yMin + yinc * ycount;
+            const zMax = -this.props.meshValueRange[0];
+
+            if (typeof this.props.setReportedBoundingBox !== "undefined") {
+                this.props.setReportedBoundingBox([
+                    xMin,
+                    yMin,
+                    zMin,
+                    xMax,
+                    yMax,
+                    zMax,
+                ]);
+            }
         });
     }
 
