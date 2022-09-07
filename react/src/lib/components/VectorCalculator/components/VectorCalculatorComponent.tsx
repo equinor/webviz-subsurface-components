@@ -20,7 +20,7 @@ import "!style-loader!css-loader!../VectorCalculator.css";
 export type ParentProps = {
     expressions?: ExpressionType[];
     externalParseExpression?: ExpressionType;
-}
+};
 
 export type VectorCalculatorProps = {
     id: string;
@@ -30,7 +30,7 @@ export type VectorCalculatorProps = {
     maxExpressionDescriptionLength: number;
     externalParseData?: ExternalParseData;
     setProps: (props: ParentProps) => void;
-}
+};
 
 export const VectorCalculatorComponent: React.FC<VectorCalculatorProps> = (
     props: VectorCalculatorProps

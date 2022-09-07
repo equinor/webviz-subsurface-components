@@ -1,22 +1,21 @@
 import React from "react";
 
-import {Meta, Story} from "@storybook/react";
+import { Meta, Story } from "@storybook/react";
 
 import { VectorCalculator } from "./VectorCalculator";
-import {VectorCalculatorProps} from "../VectorCalculator/components/VectorCalculatorComponent";
+import { VectorCalculatorProps } from "../VectorCalculator/components/VectorCalculatorComponent";
 
 import { v4 as uuidv4 } from "uuid";
 
-
 export default {
     title: "VectorCalculator/VectorCalculator",
-    component: VectorCalculator
+    component: VectorCalculator,
 } as Meta;
 
-const Template: Story<VectorCalculatorProps> = (args)=>{
+const Template: Story<VectorCalculatorProps> = (args) => {
     return (
         <div style={{ height: "70vh", width: "90vw" }}>
-            <VectorCalculator {...args}/>
+            <VectorCalculator {...args} />
         </div>
     );
 };
@@ -614,4 +613,4 @@ Demo.args = {
             isDeletable: false,
         },
     ],
-}
+};
