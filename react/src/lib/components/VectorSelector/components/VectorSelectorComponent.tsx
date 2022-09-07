@@ -37,7 +37,7 @@ type VectorDefinitionsType = {
     [key: string]: { type: string; description: string };
 };
 
-type VectorSelectorPropsType = SmartNodeSelectorPropsType & {
+export type VectorSelectorPropsType = SmartNodeSelectorPropsType & {
     customVectorDefinitions?: VectorDefinitionsType;
 };
 

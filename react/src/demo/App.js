@@ -13,7 +13,6 @@ import LeafletMapDemo from "./LeafletMapDemo";
 import MorrisDemo from "./MorrisDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
-import VectorSelectorDemo from "./VectorSelectorDemo";
 import VectorCalculatorDemo from "./VectorCalculatorDemo";
 
 class App extends Component {
@@ -46,9 +45,6 @@ class App extends Component {
             case "PriorPosteriorDistribution": {
                 return <PriorPosteriorDistributionDemo />;
             }
-            case "VectorSelector": {
-                return <VectorSelectorDemo />;
-            }
             case "VectorCalculator": {
                 return <VectorCalculatorDemo />;
             }
@@ -73,7 +69,6 @@ class App extends Component {
                     <option value="PriorPosteriorDistribution">
                         PriorPosteriorDistribution
                     </option>
-                    <option value="VectorSelector">VectorSelector</option>
                     <option value="VectorCalculator">VectorCalculator</option>
                 </select>
                 {this.renderDemo()}
