@@ -2,7 +2,7 @@ describe("Map component", () => {
     beforeEach(() => {
         cy.visit("/iframe.html?id=deckglmap--default&viewMode=story");
         cy.get("svg[role='progressbar']");
-        cy.get("svg[role='progressbar']", {timeout:30000}).should("not.exist")
+        cy.get("svg[role='progressbar']", {timeout:60000}).should("not.exist")
     });
 
     it("Should hide pie charts", () => {
