@@ -2,7 +2,7 @@ describe("Map component feature", () => {
     beforeEach(() => {
         cy.visit("/iframe.html?id=deckglmap--default&viewMode=story");
         cy.get("svg[role='progressbar']");
-        cy.get("svg[role='progressbar']", {timeout:60000}).should("not.exist")
+        cy.get("svg[role='progressbar']", {timeout:90000}).should("not.exist")
     });
 
     it("Should update distance sacle", () => {
