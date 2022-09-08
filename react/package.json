@@ -43,8 +43,7 @@
         "prepublishOnly": "npm test && npm run lint",
         "preversion": "npm run lint",
         "test-cypress": "concurrently 'npm run storybook' 'npm run cypress:test' -k -s first",
-        "cypress:test": "wait-on http://localhost:6006 && cypress run",
-        "cypress:run": "cypress run -b edge"
+        "cypress:test": "wait-on http://localhost:6006 && cypress run -b edge --headed"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
