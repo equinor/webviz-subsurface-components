@@ -160,11 +160,6 @@ export interface MapProps {
     bounds?: [number, number, number, number] | BoundsAccessor;
 
     /**
-     * Zoom level for the view.
-     */
-    zoom?: number;
-
-    /**
      * Views configuration for map. If not specified, all the layers will be
      * displayed in a single 2D viewport
      */
@@ -281,7 +276,6 @@ const Map: React.FC<MapProps> = ({
     resources,
     layers,
     bounds,
-    zoom,
     views,
     coords,
     scale,
@@ -311,23 +305,17 @@ const Map: React.FC<MapProps> = ({
 
     const [viewStates, setViewStates] =
         useState<Record<string, ViewStateType>>(cameraPosition);
-    // react on cameraPosition prop change
-    useEffect(() => {
-        if (Object.keys(cameraPosition).length !== 0) {
-            setViewStates(cameraPosition);
-        }
-    }, [cameraPosition]);
+
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
-        let viewStates: Record<string, ViewStateType> = {};
+        let tempViewStates: Record<string, ViewStateType> = {};
         if (Object.keys(cameraPosition).length !== 0) {
+            console.log(cameraPosition);
+            console.log("1");
             setViewStates(cameraPosition);
-            viewStates = Object.fromEntries(
-                viewsProps.map((item) => [item.id, cameraPosition])
-            );
-            setViewStates(viewStates);
+            console.log(viewStates);
         } else {
-            viewStates = Object.fromEntries(
+            tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
@@ -338,10 +326,12 @@ const Map: React.FC<MapProps> = ({
                     ),
                 ])
             );
-            setViewStates(viewStates);
+            console.log(viewStates);
+            setViewStates(tempViewStates);
         }
     }, [bounds, cameraPosition]);
 
+    
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
     useEffect(() => {
@@ -611,6 +601,7 @@ const Map: React.FC<MapProps> = ({
     );
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
+            console.log(viewId);
             setViewStates((currentViewStates) => ({
                 ...currentViewStates,
                 [viewId]: viewState,

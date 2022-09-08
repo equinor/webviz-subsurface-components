@@ -74,7 +74,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     resources,
     layers,
     bounds,
-    zoom,
     views,
     coords,
     scale,
@@ -137,7 +136,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 resources={resources}
                 layers={layers}
                 bounds={bounds}
-                zoom={zoom}
                 views={views}
                 coords={coords}
                 scale={scale}
