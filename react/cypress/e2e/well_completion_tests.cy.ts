@@ -26,7 +26,7 @@ describe("Well Completions", () => {
     it("test search wells", () => {
         cy.get("[data-testid='filter_button']").click({ force: true });
         cy.get("#search-well-name").type("_5", { force: true });
-        const values_well = [];
+        const values_well : string[] = [];
 
         cy.get("#svg-context > g:nth-child(2)")
             .find("g")
@@ -37,6 +37,6 @@ describe("Well Completions", () => {
                         values_well.push(text);
                     });
             });
-        values_well.forEach((elem) => elem.should("have.text", "5"));
+        values_well.forEach((elem) => elem.includes("5"))
     });
 });
