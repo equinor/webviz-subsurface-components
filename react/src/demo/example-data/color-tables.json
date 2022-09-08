@@ -73,6 +73,7 @@
     {
         "name": "Stratigraphy",
         "discrete": true,
+        "colorNaN" : [255, 64, 64],
         "colors": [
             [0, 255, 193, 0],
             [1, 255, 120, 61],

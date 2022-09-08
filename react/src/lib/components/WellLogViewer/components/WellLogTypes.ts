@@ -34,7 +34,7 @@ export type WellLogCurve = {
     //axis?: 	array of curve definition; 	// A detailed description of the multi-dimensional structure of the curve in case this spans multiple axes. One element per axis. The combined product of the axis diemsnsions elements must equal the dimensions of the curve. Optional.
     //maxSize?: integer; 	// Maximum storage size (number of bytes) for UTF-8 string data. Used with binary storage in order to align the curve data. [0,>. Optional. 20 assumed if not present. Ignored for curves where valueType is other than string.
 }; // a part of JSON
-export type WellLogDataRow = (number | string)[];
+export type WellLogDataRow = (number | string | null)[];
 
 export type WellLogMetadataDiscreteObjects = Record<string, []>;
 // data example: { "Above_BCU": [ [255,13,186,255], 0 ], "ABOVE": ...  }

@@ -130,5 +130,6 @@ const Template = (args) => {
 export const Default = Template.bind({});
 Default.args = {
     ...exampleData[0],
+    colorTables: require("../../../demo/example-data/color-tables.json"),
     id: "MapAndWellLog", // redefine id from exampleData[0]
 };

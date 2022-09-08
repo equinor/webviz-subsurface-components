@@ -63,12 +63,14 @@ function getImageData(
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
         const color = colorMap ? colorMap(value) : [0, 0, 0];
-        data[3 * i + 0] = color[0];
-        data[3 * i + 1] = color[1];
-        data[3 * i + 2] = color[2];
+        if (color) {
+            data[3 * i + 0] = color[0];
+            data[3 * i + 1] = color[1];
+            data[3 * i + 2] = color[2];
+        }
     }
 
-    return data;
+    return data ? data : [0, 0, 0];
 }
 
 export type DataItem = {

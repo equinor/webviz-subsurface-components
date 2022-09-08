@@ -14,6 +14,7 @@ import {
 export type colorMapFunctionType = (x: number) => [number, number, number];
 
 export interface ExtendedLayerProps<D> extends CompositeLayerProps<D> {
+    "@@type"?: string;
     name: string;
 }
 
@@ -131,5 +132,9 @@ export function isDrawingEnabled(layer_manager: LayerManager): boolean {
     const drawing_layer = layer_manager.getLayers({
         layerIds: ["drawing-layer"],
     })?.[0];
-    return drawing_layer && drawing_layer.props.mode != "view";
+    return (
+        drawing_layer &&
+        drawing_layer.props.visible &&
+        drawing_layer.props.mode != "view"
+    );
 }

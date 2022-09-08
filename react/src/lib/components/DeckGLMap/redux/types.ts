@@ -88,7 +88,8 @@ export const NumericTypeProps: NumberType[] = [
     { id: "logRadius", displayName: "Log radius", dependentOnProp: "logData" },
     {
         id: "pointRadiusScale",
-        displayName: "Well head radius",
+        displayName: "Well head radius scale",
+        step: 0.1,
     },
     {
         id: "lineWidthMinPixels",

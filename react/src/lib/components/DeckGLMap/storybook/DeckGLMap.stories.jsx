@@ -2,7 +2,7 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { makeStyles } from "@material-ui/styles";
-import { ColorLegend, createColorMapFunction } from "@emerson-eps/color-tables";
+import { ColorLegend } from "@emerson-eps/color-tables";
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
 
 export default {
@@ -403,28 +403,6 @@ const axes = {
     id: "axes-layer",
     bounds: [432205, 6475078, -3500, 437930, 6482353, 0],
 };
-const north_arrow_layer = {
-    "@@type": "NorthArrow3DLayer",
-    id: "north-arrow-layer",
-    color: [0, 0, 0, 255],
-};
-
-export const Axes = MinimalTemplate.bind({});
-Axes.args = {
-    id: "axes",
-    layers: [axes, meshMapLayer, north_arrow_layer],
-    bounds: [432205, 6475078, 437930, 6482353],
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-                layerIds: [],
-            },
-        ],
-    },
-};
 
 // Example using "colorMapFunction" property.
 const layer = {
@@ -679,24 +657,30 @@ const layers = [
     },
 ];
 
-// prop for legend
-const min = 0;
-const max = 0.35;
-const dataObjectName = "Legend";
-const position = [16, 10];
-const horizontal = true;
-const reverseRange = false;
-
 const mapDataTemplate = (args) => {
     const [getColorName, setColorName] = React.useState("Rainbow");
-    const colorMapData = React.useCallback((data) => {
+    const [colorRange, setRange] = React.useState();
+    const [isAuto, setAuto] = React.useState();
+
+    // Get selected legend color name from color selector
+    const colorNameFromSelector = React.useCallback((data) => {
         setColorName(data);
     }, []);
+
+    // user defined range
+    const userDefinedRange = React.useCallback((data) => {
+        if (data.range) setRange(data.range);
+        setAuto(data.isAuto);
+    }, []);
+
     const updatedLayerData = [
         {
             ...args.layers[0],
             colorMapName: getColorName,
-            colorMapFunction: createColorMapFunction(getColorName),
+            colorMapRange:
+                colorRange && isAuto == false
+                    ? colorRange
+                    : layers[0].colorMapRange,
         },
     ];
 
@@ -710,7 +694,11 @@ const mapDataTemplate = (args) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} getColorName={colorMapData} />
+                <ColorLegend
+                    {...args}
+                    getColorName={colorNameFromSelector}
+                    getColorRange={userDefinedRange}
+                />
             </div>
             <DeckGLMap {...args} layers={updatedLayerData} />
         </div>
@@ -720,18 +708,19 @@ const mapDataTemplate = (args) => {
 export const ColorMapLayerColorSelector = mapDataTemplate.bind({});
 
 ColorMapLayerColorSelector.args = {
-    min,
-    max,
-    dataObjectName,
-    position,
-    horizontal,
+    min: layers[0].colorMapRange[0],
+    max: layers[0].colorMapRange[1],
+    dataObjectName: "ColorMap Legend",
+    position: [16, 10],
+    horizontal: true,
     colorTables,
     layers,
+    zoom: -5,
     ...defaultProps,
     legend: {
         visible: false,
     },
-    reverseRange,
+    reverseRange: false,
 };
 
 ColorMapLayerColorSelector.parameters = {

@@ -123,7 +123,7 @@ const defPlotType = "line";
 class PlotData {
     minmax: [number, number];
     minmaxPrimaryAxis: [number, number];
-    data: [number, number | string][];
+    data: [number | null, number | string | null][];
 
     constructor() {
         this.minmax = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
@@ -143,10 +143,13 @@ function preparePlotData(
     const plot = new PlotData();
     let i = 0;
     for (const row of data) {
-        const value = row[iCurve];
+        let value = row[iCurve];
         if (typeof value == "number") checkMinMaxValue(plot.minmax, value);
         const primary: number =
             iPrimaryAxis >= 0 ? (row[iPrimaryAxis] as number) : i++;
+        if (primary == null)
+            // videx library do not like such data
+            value = null; // force a gap in the graph
         checkMinMaxValue(plot.minmaxPrimaryAxis, primary);
         plot.data.push([primary, value]);
     }
@@ -869,6 +872,81 @@ interface DiscreteMeta {
     objects: WellLogMetadataDiscreteObjects;
 }
 
+let iStringToNum = 0;
+const mapStringToNum = new Map();
+
+export function getDiscreteColorAndName(
+    value: number | string | null,
+    colorTable: ColorTable | undefined,
+    meta?: DiscreteMeta | null
+): { color: number[]; name: string } {
+    let color: number[];
+    let name: string;
+    if (value == null) value = Number.NaN;
+    if (meta) {
+        // use discrete metadata from WellLog JSON file
+        const { objects, iColor, iCode } = meta;
+        let object: [] | undefined = undefined;
+        if (typeof value == "string") {
+            // value is key
+            name = value;
+            object = objects[value];
+        } else {
+            // usual discrete log
+            name = value.toString();
+            for (const t in objects) {
+                const obj = objects[t];
+                if (value === obj[iCode]) {
+                    // value is code
+                    name = t;
+                    object = obj;
+                    break;
+                }
+            }
+        }
+        /*if(object)*/ {
+            if (colorTable) {
+                // get color from the table
+                color = getInterpolatedColor(
+                    colorTable,
+                    !object
+                        ? Number.NaN
+                        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          parseFloat((object[iCode] as any).toString()) // parseInt for discrete log
+                );
+            } else {
+                // get color from the meta (obsolete?)
+                color = object ? object[iColor] : [255, 25, 25];
+            }
+        }
+    } else {
+        name = value.toString();
+        if (colorTable) {
+            // get color from the table
+            if (typeof value == "string") {
+                let v: number;
+                if (mapStringToNum.has(value)) {
+                    v = mapStringToNum.get(value);
+                } else {
+                    mapStringToNum.set(value, iStringToNum);
+                    v = iStringToNum;
+                    iStringToNum++;
+                }
+                color = getInterpolatedColor(colorTable, v);
+            } else {
+                color = getInterpolatedColor(
+                    colorTable,
+                    parseInt(value.toString())
+                );
+            }
+        } else {
+            // get default color
+            color = [224, 224, 224];
+        }
+    }
+    return { color, name };
+}
+
 function createAreaData(
     from: number,
     to: number,
@@ -876,114 +954,74 @@ function createAreaData(
     colorTable: ColorTable | undefined,
     meta?: DiscreteMeta | null
 ): AreaData | null {
-    if (meta) {
-        // use discrete metadate from WellLog JSON file
-        const { objects, iColor, iCode } = meta;
-        for (const t in objects) {
-            const object = objects[t];
-            if (value === object[iCode]) {
-                let rgba: {
-                    r: number;
-                    g: number;
-                    b: number;
-                    a?: number;
-                };
-                if (colorTable) {
-                    // get color from the table
-                    const color = getInterpolatedColor(
-                        colorTable,
-                        parseInt(value.toString())
-                    );
-                    rgba = {
-                        r: color[0],
-                        g: color[1],
-                        b: color[2],
-                        a: 1.0,
-                    };
-                } else {
-                    // get color from the meta
-                    const color = object[iColor];
-                    rgba = {
-                        r: color[0],
-                        g: color[1],
-                        b: color[2],
-                        a: color[3] /*1.0*/,
-                    };
-                }
-                return {
-                    from: from,
-                    to: to,
-                    name: t,
-                    color: rgba,
-
-                    code: value, // add some attribute to AreaData
-                } as AreaData;
-            }
-        }
-    } else {
-        return {
-            from: from,
-            to: to,
-            name: value.toString(),
-            color: {
-                r: 224,
-                g: 224,
-                b: 224,
-                a: 1 /*1*/,
-            },
-        };
-    }
-    return null;
+    const { color, name } = getDiscreteColorAndName(value, colorTable, meta);
+    return {
+        from: from,
+        to: to,
+        name: name,
+        color: {
+            r: color[0],
+            g: color[1],
+            b: color[2],
+            //, a: color[3]!==undefined? color[3]: 1.0
+        },
+    };
 }
 
-const createStackData = async (
-    data: [number, number | string][],
+async function createStackData(
+    data: [number | null, number | string | null][],
     colorTable: ColorTable | undefined,
     meta: DiscreteMeta | undefined | null
-) => {
-    const arr = [];
-    let prev = null;
+) {
+    const arr: AreaData[] = new Array<AreaData>();
+    let prev: [number | null, string | number | null] | null = null;
     let area: AreaData | null = null;
     for (const p of data) {
-        const value = p[1]; // current value
-        if (!prev) {
-            if (value !== null && value !== undefined) {
-                // new value is not null
-                // create new interval colored and labeled for the value
-                area = createAreaData(p[0], p[0], value, colorTable, meta);
+        let boundary = p[0];
+        if (boundary === null) {
+            // do the same work as at the end of data
+            if (area) {
+                // store the area
+                arr.push(area);
+                area = null;
             }
-        } else {
-            if (value === prev[1]) {
-                // value is not changed
-                // extend current interval
-                if (area) area.to = p[0];
-            } else {
+            continue;
+        }
+        if (prev) {
+            /* move area boundary to the middle of the last interval
+            const d = boundary - prev[0];
+            boundary = prev[0] + d * 0.5;
+            */
+            // move area boundary to the beginnig of the last interval
+            boundary = prev[0];
+            if (boundary === null) continue;
+        }
+        // extend current area
+        if (area) area.to = boundary; // null is already processed
+
+        const value = p[1]; // current value
+        if (prev) {
+            if (value !== prev[1]) {
                 // new value encountered
                 if (area) {
-                    // store old interval
+                    // store the area
                     arr.push(area);
-                    area = null; //  wait for a new non-null value
-                }
-                if (value !== null && value !== undefined) {
-                    // new value is not null
-                    // create new interval colored and labeled for the value
-                    area = createAreaData(
-                        prev[0],
-                        p[0],
-                        value,
-                        colorTable,
-                        meta
-                    );
+                    area = null; // wait for a new non-null value
                 }
             }
+        }
+        if (!area && value !== null && value !== undefined && p[0] !== null) {
+            // new value is not null
+            // create new interval colored and labeled for the value
+            area = createAreaData(boundary, p[0], value, colorTable, meta);
         }
         prev = p;
     }
     if (area)
-        // store the last interval
+        // store the area
         arr.push(area);
     return arr;
-};
+}
 
 function newStackedTrack(options: StackedTrackOptions): StackedTrack {
     return new StackedTrack(undefined as unknown as number, options);
@@ -1164,7 +1202,7 @@ function addGraphTrack(
     templateStyles?: TemplateStyle[],
     colorTables?: ColorTable[]
 ): void {
-    const plotDatas: [number, number | string][][] = [];
+    const plotDatas: [number | null, number | string | null][][] = [];
     const plots: PlotConfig[] = [];
     if (templateTrack.plots)
         for (const templatePlot of templateTrack.plots) {
@@ -1273,7 +1311,7 @@ function addStackedTrack(
 
     // curve.valueType === "integer", "string"
     const logColor = templatePlotProps.colorTable;
-    let colorTable = undefined;
+    let colorTable: ColorTable | undefined = undefined;
     if (logColor) {
         if (colorTables) {
             colorTable = colorTables.find(
