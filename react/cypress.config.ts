@@ -8,13 +8,13 @@ export default defineConfig({
     // },
     baseUrl: 'http://localhost:6006',
     video: true,
-    screenshotsFolder: "./cypress/snapshots/base",
+    screenshotsFolder: "./cypress/snapshots/actual",
     screenshotOnRunFailure:false,
     trashAssetsBeforeRuns: true,
     env: {
       failSilently: false,
       ALWAYS_GENERATE_DIFF: false,
-      type: "base"
+      type: "actual"
     },
     setupNodeEvents(on, config) {
       getCompareSnapshotsPlugin(on, config);
