@@ -281,6 +281,7 @@ const Map: React.FC<MapProps> = ({
     resources,
     layers,
     bounds,
+    zoom,
     views,
     coords,
     scale,
@@ -327,12 +328,12 @@ const Map: React.FC<MapProps> = ({
             setViewStates(viewStates);
         } else {
             viewStates = Object.fromEntries(
-                viewsProps.map((item) => [
+                viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
                         boundsInitial,
                         item.target,
-                        item.zoom,
+                        views?.viewports[index].zoom,
                         deckRef.current?.deck
                     ),
                 ])
@@ -608,15 +609,18 @@ const Map: React.FC<MapProps> = ({
         },
         [views]
     );
-    const onViewStateChange = useCallback(({ viewId, viewState }) => {
-        setViewStates((currentViewStates) => ({
-            ...currentViewStates,
-            [viewId]: viewState,
-        }));
-        if (getCameraPosition) {
-            getCameraPosition(viewStates);
-        }
-    }, []);
+    const onViewStateChange = useCallback(
+        ({ viewId, viewState }) => {
+            setViewStates((currentViewStates) => ({
+                ...currentViewStates,
+                [viewId]: viewState,
+            }));
+            if (getCameraPosition) {
+                getCameraPosition(viewStates);
+            }
+        },
+        [viewStates]
+    );
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
