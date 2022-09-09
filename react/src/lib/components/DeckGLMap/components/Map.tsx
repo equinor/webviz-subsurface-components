@@ -96,6 +96,7 @@ export interface ViewportType {
     zoom?: number;
     rotationX?: number;
     rotationOrbit?: number;
+    isSync?: boolean;
 }
 
 export interface ViewsType {
@@ -224,7 +225,7 @@ export interface MapProps {
      */
     onMouseEvent?: EventCallback;
 
-    getCameraPosition?: (input: Record<string, ViewStateType>) => void;
+    getCameraPosition?: (input: ViewStateType) => void;
 
     selection?: {
         well: string | undefined;
@@ -234,7 +235,10 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
+<<<<<<< HEAD
 
+=======
+>>>>>>> c676ad0 (provide sync and separate on multi views)
     cameraPosition?: ViewStateType | undefined;
 }
 
@@ -290,7 +294,7 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
-    cameraPosition = {},
+    cameraPosition = {} as ViewStateType,
     getCameraPosition,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
@@ -306,14 +310,19 @@ const Map: React.FC<MapProps> = ({
     const [viewStates, setViewStates] =
         useState<Record<string, ViewStateType>>(cameraPosition);
 
+    const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
+        {
+            "main-view_2D": cameraPosition,
+        }
+    );
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
         if (Object.keys(cameraPosition).length !== 0) {
-            console.log(cameraPosition);
-            console.log("1");
-            setViewStates(cameraPosition);
-            console.log(viewStates);
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item) => [item.id, cameraPosition])
+            );
+            setViewStates(tempViewStates);
         } else {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
@@ -326,17 +335,9 @@ const Map: React.FC<MapProps> = ({
                     ),
                 ])
             );
-            console.log(viewStates);
             setViewStates(tempViewStates);
         }
     }, [bounds, cameraPosition]);
-
-    
-    // state for views prop of DeckGL component
-    const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
-    useEffect(() => {
-        setViewsProps(getViews(views) as ViewProps[]);
-    }, [views]);
 
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
     useEffect(() => {
@@ -601,13 +602,26 @@ const Map: React.FC<MapProps> = ({
     );
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
-            console.log(viewId);
-            setViewStates((currentViewStates) => ({
-                ...currentViewStates,
-                [viewId]: viewState,
-            }));
+            const isSyncIds = viewsProps.filter(item => item.isSync).map(item => item.id)
+            if (isSyncIds.includes(viewId)) {
+                let tempViewStates: Record<string, ViewStateType> = {};
+                tempViewStates = Object.fromEntries(
+                    viewsProps.filter(item => item.isSync).map((item) => [item.id, viewState])
+                );
+                setViewStates((currentViewStates) => ({
+                    ...currentViewStates,
+                    ...tempViewStates,
+    
+                }));
+            } else {
+                setViewStates((currentViewStates) => ({
+                    ...currentViewStates,
+                    [viewId]: viewState,
+    
+                }));
+            } 
             if (getCameraPosition) {
-                getCameraPosition(viewStates);
+                getCameraPosition(viewState);
             }
         },
         [viewStates]
@@ -851,6 +865,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
             flipY: false,
             far,
             near,
+            isSync: false,
         });
     } else {
         let yPos = 0;
@@ -889,6 +904,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     flipY: false,
                     far,
                     near,
+                    isSync: views.viewports[deckgl_views.length].isSync
                 });
                 xPos = xPos + 99.5 / nX;
             }

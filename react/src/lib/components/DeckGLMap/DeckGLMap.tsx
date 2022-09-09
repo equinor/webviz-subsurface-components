@@ -53,7 +53,7 @@ export interface DeckGLMapProps {
      */
     onMouseEvent?: (event: MapMouseEvent) => void;
 
-    getCameraPosition?: (input: Record<string, ViewStateType>) => void;
+    getCameraPosition?: (input: ViewStateType) => void;
     /**
      * Range selection of the current well
      */
@@ -66,7 +66,7 @@ export interface DeckGLMapProps {
      * Override default tooltip with a callback.
      */
     getTooltip?: TooltipCallback;
-    cameraPosition?: Record<string, ViewStateType> | undefined;
+    cameraPosition?: ViewStateType | undefined;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
