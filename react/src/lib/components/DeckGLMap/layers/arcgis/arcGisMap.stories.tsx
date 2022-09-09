@@ -12,5 +12,8 @@ const Template = (args: any): any => (<ArcGisMap {...args} />)
 
 export const Map = Template.bind({})
 Map.args = {
-  mapURL: "https://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/SanFrancisco_Bldgs/SceneServer/layers/0",
+  west: -180,
+  south: -90,
+  east: 180,
+  north: 90
 }

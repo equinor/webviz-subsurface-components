@@ -1,62 +1,53 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable react/prop-types */
 import React from "react";
-import {loadArcGISModules} from '@deck.gl/arcgis';
-import {Tile3DLayer} from '@deck.gl/geo-layers';
-import {I3SLoader} from '@loaders.gl/i3s';
+import DeckGL from "@deck.gl/react";
+import { BitmapLayer } from "@deck.gl/layers";
+import { TileLayer } from "@deck.gl/geo-layers";
 
-// Tileset entry point: Indexed 3D layer file url
-const TILESET_URL =
-  'https://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/SanFrancisco_Bldgs/SceneServer/layers/0';
+/* Types Definitions */
+type coordinates = { west:number, south:number, east:number, north:number }
+type getCoordinatesFunction = (url:string) => coordinates
 
-type props = {
-  container: any;
-  mapURL: string;
+
+/* Constants Definitions */
+const URL = "https://ndgishub.nd.gov/arcgis/services/All_Transportation/MapServer/WMSServer?bbox=-180,-90,180,90&format=image/png&height=512&layers=Airports,Roads&request=GetMap&service=WMS&srs=EPSG:4326&styles=&version=1.1.1&width=512";
+
+/* Supporting Functions */
+const getCoordinates: getCoordinatesFunction = (url) => {
+  const substringQuery:string = url.substring(url.indexOf("bbox=")+5, url.indexOf("&"));
+  const coordinates = substringQuery.split(",").map(coordinate => Number(coordinate));
+  return {
+    west: coordinates[0],
+    south: coordinates[1],
+    east: coordinates[2],
+    north: coordinates[3],
+  }
 }
 
-// function component return type? : Promise<JSX.Element>
-// container type
-export default async function ArcGisMap({container, mapURL}: props) {
-  const {DeckRenderer, modules} = await loadArcGISModules([
-    'esri/Map',
-    'esri/views/SceneView',
-    'esri/views/3d/externalRenderers'
-  ]);
-  const [ArcGISMap, SceneView, externalRenderers] = modules;
+export default function ArcGisMap( {viewstate} ) {
 
-  const sceneView = new SceneView({
-    container,
-    qualityProfile: 'high',
-    map: new ArcGISMap({
-      basemap: 'dark-gray-vector'
-    }),
-    environment: {
-      atmosphereEnabled: false
-    },
-    camera: {
-      position: {x: -122.4, y: 37.78, z: 3000},
-      heading: 0,
-      tilt: 25
-    },
-    viewingMode: 'local'
-  });
+  const coordinates: coordinates = getCoordinates(URL)
 
-  const renderer = new DeckRenderer(sceneView, {});
-  externalRenderers.add(sceneView, renderer);
+  const layer = new TileLayer({
+    data: URL,
+    minZoom: 0,
+    maxZoom: 19,
+    tileSize: 256,
+    
+    renderSubLayer: props => {
+      const {
+        bbox: {west, south, east, north},
+      } = props.tile;
 
-  sceneView.on('layerview-create', () => {
-    renderer.deck.layers = [
-      new Tile3DLayer({
-        id: 'tile-3d-layer',
-        data: mapURL,
-        loader: I3SLoader
-      })
-    ];
-  });
-
-  return {
-    remove: () => {
-      sceneView.destroy();
-      renderer.dispose();
+      return new BitmapLayer(props, {
+        data: null,
+        image: props.data,
+        bounds: [west, south, east, north]
+      });
     }
-  };
+  });
+
+  return <DeckGL viewState={viewstate} layers={[layer]} />;
 }
