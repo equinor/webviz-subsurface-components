@@ -91,22 +91,33 @@
         "visible": false
       },
       {
-        "@@type": "MapLayer",
-        "meshUrl": "hugin_depth_25_m.float32",
-        "frame": {
-            "origin": [432150, 6475800],
-            "count": [291, 229],
-            "increment": [25, 25],
-            "rotDeg": 0
-        },
-        "propertiesUrl": "kh_netmap_25_m.float32",
-        "contours": [0, 100],
+        "@@type": "Map3DLayer",
+        "bounds": [
+          432205,
+          6475078,
+          437720,
+          6481113
+        ],
+        "meshMaxError": 5.0,
+        "mesh": "hugin_depth_25_m_normalized_margin.png",
+        "meshValueRange": [
+          2782,
+          3513
+        ],
+        "propertyTexture": "kh_netmap_25_m_normalized_margin.png",
+        "propertyValueRange": [
+          2782,
+          3513
+        ],
+        "rotDeg": 0,
+        "contours": [0, 50.0],
         "isContoursDepth": true,
-        "cellCenteredProperties": false,
-        "gridLines": true,
-        "material": false,
         "colorMapName": "Physics",
-        "visible": true
+        "colorMapRange": [
+          2782,
+          3513
+        ],
+        "visible": false
       },
       {
         "@@type": "WellsLayer",
