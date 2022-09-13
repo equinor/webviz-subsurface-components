@@ -12,8 +12,15 @@ const Template = (args: any): any => (<ArcGisMap {...args} />)
 
 export const Map = Template.bind({})
 Map.args = {
-  west: -180,
-  south: -90,
-  east: 180,
-  north: 90
+  // viewState: {
+  //   longitude: -122.4,
+  //   latitude: 37.74,
+  //   zoom: 11,
+  //   maxZoom: 20,
+  //   pitch: 30,
+  //   bearing: 0
+  // },
+  // controller: true,
+  URL: "https://c.tile.openstreetmap.org/0/0/0.png",
+  // zoom: 0,
 }
