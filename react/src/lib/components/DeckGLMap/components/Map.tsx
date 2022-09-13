@@ -325,7 +325,7 @@ const Map: React.FC<MapProps> = ({
                     item.id,
                     getViewState(
                         boundsInitial,
-                        item.target,
+                        item.target as [number, number],
                         views?.viewports[index].zoom,
                         deckRef.current?.deck
                     ),
@@ -604,13 +604,13 @@ const Map: React.FC<MapProps> = ({
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
             const isSyncIds = viewsProps
-                .filter((item) => item.isSync)
+                .filter((item) => item.isSync as boolean)
                 .map((item) => item.id);
             if (isSyncIds.includes(viewId)) {
                 let tempViewStates: Record<string, ViewStateType> = {};
                 tempViewStates = Object.fromEntries(
                     viewsProps
-                        .filter((item) => item.isSync)
+                        .filter((item) => item.isSync as boolean)
                         .map((item) => [item.id, viewState])
                 );
                 setViewStates((currentViewStates) => ({
