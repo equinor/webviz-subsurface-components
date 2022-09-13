@@ -92,7 +92,7 @@ export interface ViewportType {
      */
     layerIds?: string[];
 
-    target?: number[];
+    target?: [number, number];
     zoom?: number;
     rotationX?: number;
     rotationOrbit?: number;
@@ -602,24 +602,26 @@ const Map: React.FC<MapProps> = ({
     );
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
-            const isSyncIds = viewsProps.filter(item => item.isSync).map(item => item.id)
+            const isSyncIds = viewsProps
+                .filter((item) => item.isSync)
+                .map((item) => item.id);
             if (isSyncIds.includes(viewId)) {
                 let tempViewStates: Record<string, ViewStateType> = {};
                 tempViewStates = Object.fromEntries(
-                    viewsProps.filter(item => item.isSync).map((item) => [item.id, viewState])
+                    viewsProps
+                        .filter((item) => item.isSync)
+                        .map((item) => [item.id, viewState])
                 );
                 setViewStates((currentViewStates) => ({
                     ...currentViewStates,
                     ...tempViewStates,
-    
                 }));
             } else {
                 setViewStates((currentViewStates) => ({
                     ...currentViewStates,
                     [viewId]: viewState,
-    
                 }));
-            } 
+            }
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
@@ -695,7 +697,7 @@ const Map: React.FC<MapProps> = ({
             {scale?.visible ? (
                 <DistanceScale
                     {...scale}
-                    zoom={-5}
+                    zoom={views?.viewports[0].zoom}
                     scaleUnit={coordinateUnit}
                     style={scale.cssStyle ?? {}}
                 />
@@ -904,7 +906,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     flipY: false,
                     far,
                     near,
-                    isSync: views.viewports[deckgl_views.length].isSync
+                    isSync: views.viewports[deckgl_views.length].isSync,
                 });
                 xPos = xPos + 99.5 / nX;
             }
