@@ -235,10 +235,6 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
-<<<<<<< HEAD
-
-=======
->>>>>>> c676ad0 (provide sync and separate on multi views)
     cameraPosition?: ViewStateType | undefined;
 }
 
@@ -302,14 +298,14 @@ const Map: React.FC<MapProps> = ({
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
 
+    // state for views prop of DeckGL component
+    const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
+
+    useEffect(() => {
+        setViewsProps(getViews(views) as ViewProps[]);
+    }, [views]);
+    
     // set initial view state based on supplied bounds and zoom in viewState
-    const [viewState, setViewState] = useState<ViewStateType>(
-        {} as ViewStateType
-    );
-
-    const [viewStates, setViewStates] =
-        useState<Record<string, ViewStateType>>(cameraPosition);
-
     const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
         {
             "main-view_2D": cameraPosition,
