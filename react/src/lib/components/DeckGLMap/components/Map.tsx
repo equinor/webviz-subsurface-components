@@ -311,6 +311,9 @@ const Map: React.FC<MapProps> = ({
             "main-view_2D": cameraPosition,
         }
     );
+    const [firstViewStateId, setFirstViewStatesId] =
+        useState<string>("main-view_2D");
+
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
@@ -318,6 +321,7 @@ const Map: React.FC<MapProps> = ({
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
+            setFirstViewStatesId(viewsProps[0].id);
             setViewStates(tempViewStates);
         } else {
             tempViewStates = Object.fromEntries(
@@ -331,6 +335,7 @@ const Map: React.FC<MapProps> = ({
                     ),
                 ])
             );
+            setFirstViewStatesId(viewsProps[0].id);
             setViewStates(tempViewStates);
         }
     }, [bounds, cameraPosition]);
@@ -603,7 +608,6 @@ const Map: React.FC<MapProps> = ({
     );
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
-            console.log(viewsProps);
             const isSyncIds = viewsProps
                 .filter((item) => item.isSync)
                 .map((item) => item.id);
@@ -627,6 +631,7 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
+            setFirstViewStatesId(viewsProps[0].id);
         },
         [viewStates]
     );
@@ -699,7 +704,11 @@ const Map: React.FC<MapProps> = ({
             {scale?.visible ? (
                 <DistanceScale
                     {...scale}
-                    zoom={views?.viewports[0].zoom}
+                    zoom={
+                        viewStates[firstViewStateId] === undefined
+                            ? -5
+                            : viewStates[firstViewStateId].zoom
+                    }
                     scaleUnit={coordinateUnit}
                     style={scale.cssStyle ?? {}}
                 />
