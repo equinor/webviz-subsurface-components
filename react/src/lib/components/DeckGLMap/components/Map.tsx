@@ -304,7 +304,7 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         setViewsProps(getViews(views) as ViewProps[]);
     }, [views]);
-    
+
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
         {
