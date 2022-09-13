@@ -358,16 +358,21 @@ const Map: React.FC<MapProps> = ({
         );
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
         const is3D = views?.viewports?.[0]?.show3D ?? false;
-
-        const vs = getViewState3D(
-            is3D,
-            union_of_reported_bboxes,
-            zoom,
-            deckRef.current?.deck
+        let tempViewStates: Record<string, ViewStateType> = {};
+        tempViewStates = Object.fromEntries(
+            viewsProps.map((item, index) => [
+                item.id,
+                getViewState3D(
+                    is3D,
+                    union_of_reported_bboxes,
+                    views?.viewports[index].zoom,
+                    deckRef.current?.deck
+                ),
+            ])
         );
 
         if (!isBoundsDefined) {
-            setViewState(vs);
+            setViewStates(tempViewStates);
         }
     }, [reportedBoundingBox]);
 
