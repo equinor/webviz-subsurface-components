@@ -19,7 +19,7 @@ import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
 import Deck from "@deck.gl/core/lib/deck";
 import { ViewProps } from "@deck.gl/core/views/view";
-import { isEmpty } from "lodash";
+//import { isEmpty } from "lodash";
 import ColorLegends from "./ColorLegends";
 import {
     applyPropsOnLayers,
@@ -37,8 +37,34 @@ import { DrawingPickInfo } from "../layers/drawing/drawingLayer";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { WellsLayer } from "../layers";
 
+import { isEmpty, isEqual } from "lodash";
+import { cloneDeep } from "lodash";
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
+
+type BoundingBox = [number, number, number, number, number, number];
+
+function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
+    const boundsInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
+
+    if (typeof b1 === "undefined" || typeof b2 === "undefined") {
+        return boundsInitial;
+    }
+
+    if (isEqual(b1, boundsInitial)) {
+        return b2;
+    }
+
+    const xmin = Math.min(b1[0], b2[0]);
+    const ymin = Math.min(b1[1], b2[1]);
+    const zmin = Math.min(b1[2], b2[2]);
+
+    const xmax = Math.max(b1[3], b2[3]);
+    const ymax = Math.max(b1[4], b2[4]);
+    const zmax = Math.max(b1[5], b2[5]);
+    return [xmin, ymin, zmin, xmax, ymax, zmax];
+}
 
 export type TooltipCallback = (
     info: PickInfo<unknown>
@@ -125,7 +151,7 @@ export interface MapProps {
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
-    bounds: [number, number, number, number];
+    bounds?: [number, number, number, number];
 
     /**
      * Zoom level for the view.
@@ -269,6 +295,9 @@ const Map: React.FC<MapProps> = ({
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 
+    const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
+    const boundsInitial = bounds ?? [0, 0, 1, 1];
+
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewState, setViewState] = useState<ViewStateType>(cameraPosition);
 
@@ -281,13 +310,13 @@ const Map: React.FC<MapProps> = ({
 
     // react on zoom prop change
     useEffect(() => {
-        const vs = getViewState(bounds, zoom, deckRef.current?.deck);
+        const vs = getViewState(boundsInitial, zoom, deckRef.current?.deck);
         setViewState({ ...viewState, zoom: vs.zoom });
     }, [zoom]);
 
     // react on bounds prop change
     useEffect(() => {
-        const vs = getViewState(bounds, zoom, deckRef.current?.deck);
+        const vs = getViewState(boundsInitial, zoom, deckRef.current?.deck);
         setViewState({ ...viewState, target: vs.target });
     }, [bounds]);
 
@@ -296,7 +325,9 @@ const Map: React.FC<MapProps> = ({
         if (Object.keys(cameraPosition).length !== 0) {
             setViewState(cameraPosition);
         } else {
-            setViewState(getViewState(bounds, zoom, deckRef.current?.deck));
+            setViewState(
+                getViewState(boundsInitial, zoom, deckRef.current?.deck)
+            );
         }
     }, [bounds, zoom, cameraPosition]);
 
@@ -311,6 +342,37 @@ const Map: React.FC<MapProps> = ({
         setDeckGLViews(jsonToObject(viewsProps) as View[]);
     }, [viewsProps]);
 
+    const [reportedBoundingBox, setReportedBoundingBox] =
+        useState<BoundingBox>(bboxInitial);
+    const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
+        useState<BoundingBox>(bboxInitial);
+
+    useEffect(() => {
+        // If "bounds" or "cameraPosition" is not defined "viewState" will be
+        // calculated based on the union of the reported bounding boxes from each layer.
+        const isBoundsDefined =
+            typeof bounds !== "undefined" &&
+            typeof cameraPosition !== "undefined";
+
+        const union_of_reported_bboxes = addBoundingBoxes(
+            reportedBoundingBoxAcc,
+            reportedBoundingBox
+        );
+        setReportedBoundingBoxAcc(union_of_reported_bboxes);
+        const is3D = views?.viewports?.[0]?.show3D ?? false;
+
+        const vs = getViewState3D(
+            is3D,
+            union_of_reported_bboxes,
+            zoom,
+            deckRef.current?.deck
+        );
+
+        if (!isBoundsDefined) {
+            setViewState(vs);
+        }
+    }, [reportedBoundingBox]);
+
     // update store if any of the layer prop is changed
     const dispatch = useDispatch();
     const st_layers = useSelector(
@@ -320,7 +382,15 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         if (st_layers == undefined || layers == undefined) return;
 
-        const updated_layers = applyPropsOnLayers(st_layers, layers);
+        // Inject "setReportedBoundingBox" function into layers for them to report
+        // back their respective bounding boxes.
+        let layers_copy = cloneDeep(layers);
+        layers_copy = layers_copy.map((layer) => {
+            layer["setReportedBoundingBox"] = setReportedBoundingBox;
+            return layer;
+        });
+
+        const updated_layers = applyPropsOnLayers(st_layers, layers_copy);
         const layers_default = getLayersWithDefaultProps(updated_layers);
         const updated_spec = { layers: layers_default, views: views };
         dispatch(setSpec(updated_spec));
@@ -701,6 +771,46 @@ function getViewState(
         target: [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
         rotationX: 90, // look down z -axis
+        rotationOrbit: 0,
+    };
+    return view_state;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// return viewstate with computed bounds to fit the data in viewport
+function getViewState3D(
+    is3D: boolean,
+    bounds: [number, number, number, number, number, number],
+    zoom?: number,
+    deck?: Deck
+): ViewStateType {
+    const xMin = bounds[0];
+    const yMin = bounds[1];
+    const zMin = bounds[2];
+
+    const xMax = bounds[3];
+    const yMax = bounds[4];
+    const zMax = bounds[5];
+
+    let width = xMax - xMin;
+    let height = yMax - yMin;
+    if (deck) {
+        width = deck.width;
+        height = deck.height;
+    }
+
+    const target = [
+        xMin + (xMax - xMin) / 2,
+        yMin + (yMax - yMin) / 2,
+        is3D ? zMin + (zMax - zMin) / 2 : 0,
+    ];
+
+    const bounds2D = [xMin, yMin, xMax, yMax];
+    const fitted_bound = fitBounds({ width, height, bounds: bounds2D });
+    const view_state: ViewStateType = {
+        target,
+        zoom: zoom ?? fitted_bound.zoom * 1.2,
+        rotationX: 45, // look down z -axis at 45 degrees
         rotationOrbit: 0,
     };
     return view_state;

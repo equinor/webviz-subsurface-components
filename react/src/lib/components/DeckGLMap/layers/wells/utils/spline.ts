@@ -246,3 +246,44 @@ export function flattenPath(data_in: FeatureCollection): FeatureCollection {
 
     return data;
 }
+
+/**
+ * Calculates bounding box of all wells.
+ */
+export function GetBoundingBox(
+    data: FeatureCollection
+): [number, number, number, number, number, number] {
+    let xMin = 9999999999;
+    let yMin = 9999999999;
+    let zMin = 9999999999;
+    let xMax = -9999999999;
+    let yMax = -9999999999;
+    let zMax = -9999999999;
+
+    const no_wells = data.features.length;
+    for (let well_no = 0; well_no < no_wells; well_no++) {
+        const geometryCollection = data.features[well_no]
+            .geometry as GeometryCollection;
+        const lineString = geometryCollection?.geometries[1] as LineString;
+
+        if (lineString.coordinates?.length === undefined) {
+            continue;
+        }
+
+        const coords = lineString.coordinates as Position3D[];
+        const n = coords.length;
+        for (let i = 0; i < n - 1; i += 1) {
+            const xyz = coords[i];
+
+            xMin = xyz[0] < xMin ? xyz[0] : xMin;
+            yMin = xyz[1] < yMin ? xyz[1] : yMin;
+            zMin = xyz[2] < zMin ? xyz[2] : zMin;
+
+            xMax = xyz[0] > xMax ? xyz[0] : xMax;
+            yMax = xyz[1] > yMax ? xyz[1] : yMax;
+            zMax = xyz[2] > zMax ? xyz[2] : zMax;
+        }
+    }
+
+    return [xMin, yMin, zMin, xMax, yMax, zMax];
+}

@@ -504,10 +504,15 @@ async function load_mesh_and_properties(
     // Keep this.
     //console.log(`Task took ${(t1 - t0) * 0.001}  seconds.`);
 
-    return Promise.all([mesh, mesh_lines]);
+    const valueRange = getFloat32ArrayMinMax(meshData);
+
+    return Promise.all([mesh, mesh_lines, valueRange]);
 }
 
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setReportedBoundingBox?: any;
+
     // Url to the height (z values) mesh.
     meshUrl: string;
 
@@ -597,11 +602,38 @@ export default class MapLayer extends CompositeLayer<
             this.props.cellCenteredProperties
         );
 
-        p.then(([mesh, mesh_lines]) => {
+        p.then(([mesh, mesh_lines, valueRange]) => {
             this.setState({
                 mesh,
                 mesh_lines,
+                valueRange,
             });
+        });
+
+        // Report back calculated bounding box now that data is loaded.
+        p.then(() => {
+            const valueRange = this.state.valueRange;
+            // XXX console.log("valueRange: ", valueRange)
+            const xMin = this.props.frame.origin[0];
+            const yMin = this.props.frame.origin[1];
+            const zMin = -valueRange[0];
+            const xMax =
+                xMin +
+                this.props.frame.increment[0] * this.props.frame.count[0];
+            const yMax =
+                yMin +
+                this.props.frame.increment[1] * this.props.frame.count[1];
+            const zMax = -valueRange[1];
+            if (typeof this.props.setReportedBoundingBox !== "undefined") {
+                this.props.setReportedBoundingBox([
+                    xMin,
+                    yMin,
+                    zMin,
+                    xMax,
+                    yMax,
+                    zMax,
+                ]);
+            }
         });
     }
 

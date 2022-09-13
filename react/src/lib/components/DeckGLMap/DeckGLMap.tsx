@@ -15,7 +15,7 @@ export interface DeckGLMapProps {
     id: string;
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[];
-    bounds: [number, number, number, number];
+    bounds?: [number, number, number, number];
     zoom?: number;
     views?: ViewsType;
     coords?: {
