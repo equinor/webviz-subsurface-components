@@ -299,10 +299,10 @@ const Map: React.FC<MapProps> = ({
     const boundsInitial = bounds ?? [0, 0, 1, 1];
 
     // state for views prop of DeckGL component
-    const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
+    const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
 
     useEffect(() => {
-        setViewsProps(getViews(views) as ViewProps[]);
+        setViewsProps(getViews(views) as ViewportType[]);
     }, [views]);
 
     // set initial view state based on supplied bounds and zoom in viewState
@@ -325,7 +325,7 @@ const Map: React.FC<MapProps> = ({
                     item.id,
                     getViewState(
                         boundsInitial,
-                        item.target as [number, number],
+                        views?.viewports[index].target,
                         views?.viewports[index].zoom,
                         deckRef.current?.deck
                     ),
@@ -603,14 +603,15 @@ const Map: React.FC<MapProps> = ({
     );
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
+            console.log(viewsProps);
             const isSyncIds = viewsProps
-                .filter((item) => item.isSync as boolean)
+                .filter((item) => item.isSync)
                 .map((item) => item.id);
             if (isSyncIds.includes(viewId)) {
                 let tempViewStates: Record<string, ViewStateType> = {};
                 tempViewStates = Object.fromEntries(
                     viewsProps
-                        .filter((item) => item.isSync as boolean)
+                        .filter((item) => item.isSync)
                         .map((item) => [item.id, viewState])
                 );
                 setViewStates((currentViewStates) => ({
@@ -851,7 +852,7 @@ function getViewState3D(
 }
 
 // construct views object for DeckGL component
-function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
+function getViews(views: ViewsType | undefined): ViewportType[] {
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
     const far = 9999;
