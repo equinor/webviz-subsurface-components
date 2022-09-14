@@ -316,31 +316,10 @@ const Map: React.FC<MapProps> = ({
 
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        tempViewStates = Object.fromEntries(
-            viewsProps.map((item, index) => [
-                item.id,
-                getViewState(
-                    boundsInitial,
-                    views?.viewports[index].target,
-                    views?.viewports[index].zoom,
-                    deckRef.current?.deck
-                ),
-            ])
-        );
-        if (viewsProps[0] !== undefined) {
-            setFirstViewStatesId(viewsProps[0].id);
-        }
-        setViewStates(tempViewStates);
-    }, [viewsProps]);
-
-    // calculate view state on deckgl context load (based on viewport size)
-    const onLoad = useCallback(() => {
-        let tempViewStates: Record<string, ViewStateType> = {};
         if (Object.keys(cameraPosition).length !== 0) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
-            setFirstViewStatesId(viewsProps[0].id);
             setViewStates(tempViewStates);
         } else {
             tempViewStates = Object.fromEntries(
@@ -354,7 +333,37 @@ const Map: React.FC<MapProps> = ({
                     ),
                 ])
             );
+            setViewStates(tempViewStates);
+        }
+        if (viewsProps[0] !== undefined) {
             setFirstViewStatesId(viewsProps[0].id);
+        }
+        setViewStates(tempViewStates);
+    }, [viewsProps]);
+
+    // calculate view state on deckgl context load (based on viewport size)
+    const onLoad = useCallback(() => {
+        let tempViewStates: Record<string, ViewStateType> = {};
+        if (Object.keys(cameraPosition).length !== 0) {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item) => [item.id, cameraPosition])
+            );
+            setViewStates(tempViewStates);
+        } else {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item, index) => [
+                    item.id,
+                    getViewState(
+                        boundsInitial,
+                        views?.viewports[index].target,
+                        views?.viewports[index].zoom,
+                        deckRef.current?.deck
+                    ),
+                ])
+            );
+            if (viewsProps[0] !== undefined) {
+                setFirstViewStatesId(viewsProps[0].id);
+            }
             setViewStates(tempViewStates);
         }
     }, [bounds, cameraPosition]);
