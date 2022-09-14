@@ -179,7 +179,7 @@ class VectorCalculatorWrapper(VectorCalculator):
         # Split if positive lookahead or positive lookbehind character is not character a-zA-Z0-9
         # to keep string split separator.
         # Doc: https://medium.com/@shemar.gordon32/how-to-split-and-keep-the-delimiter-s-d433fb697c65
-        # 
+        #
         # Note: re.split() usage requires Python version >= 3.7 due to pattern that could match an
         # empty string.
         # Doc: https://docs.python.org/3/library/re.html#re.split
