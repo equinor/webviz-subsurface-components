@@ -317,7 +317,15 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
         tempViewStates = Object.fromEntries(
-            viewsProps.map((item) => [item.id, cameraPosition])
+            viewsProps.map((item, index) => [
+                item.id,
+                getViewState(
+                    boundsInitial,
+                    views?.viewports[index].target,
+                    views?.viewports[index].zoom,
+                    deckRef.current?.deck
+                ),
+            ])
         );
         if (viewsProps[0] !== undefined) {
             setFirstViewStatesId(viewsProps[0].id);
