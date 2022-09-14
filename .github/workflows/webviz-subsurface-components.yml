@@ -20,15 +20,13 @@ jobs:
     strategy:
       matrix:
         include:
-          - python-version: 3.6
-            run-performance-tests: false
-          - python-version: 3.7
-            run-performance-tests: false
           - python-version: 3.8
             run-performance-tests: false
           - python-version: 3.9
             run-performance-tests: false
-          - python-version: 3.9 # This particular job in the matrix is allowed to fail(for performance and cypress test)
+          - python-version: 3.10
+            run-performance-tests: false
+          - python-version: 3.10 # This particular job in the matrix is allowed to fail(for performance and cypress test)
             run-performance-tests: true
             e2e-on-firefox: true
 
@@ -81,7 +79,6 @@ jobs:
       - name: 📦 Install test dependencies
         run: |
           pip install .[tests]
-          pip install dash[testing]
           wget https://chromedriver.storage.googleapis.com/$(wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
 
@@ -129,7 +126,7 @@ jobs:
         uses: codecov/codecov-action@v1
 
       - name: 🔼 Build and publish Node.js package
-        if: github.event_name == 'release' && matrix.python-version == '3.6'
+        if: github.event_name == 'release' && matrix.python-version == '3.8'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: ./react
@@ -142,7 +139,7 @@ jobs:
           npm publish --access public --tag ${NPM_PUBLISH_TAG:-latest}
 
       - name: 🚢 Build and deploy Python package
-        if: github.event_name == 'release' && matrix.python-version == '3.6'
+        if: github.event_name == 'release' && matrix.python-version == '3.8'
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.pypi_webviz_token }}
@@ -159,7 +156,7 @@ jobs:
         run: npm run build-storybook --prefix ./react
 
       - name: 📚 Update Storybook and GitHub demo application
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.6'
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8'
         run: |
           cp -r ./react/{index.html,output.css,output.js,storybook-static} ..
 

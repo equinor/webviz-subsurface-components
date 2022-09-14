@@ -1,13 +1,8 @@
-from typing import List, Dict, Union
+from typing import List, Dict, TypedDict, Union
 from functools import wraps
 import sys
 import re
 import warnings
-
-if sys.version_info >= (3, 8):
-    from typing import TypedDict
-else:
-    from typing_extensions import TypedDict
 
 import numpy as np
 
