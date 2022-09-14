@@ -1,13 +1,7 @@
-from typing import List, Dict, Union
-from functools import wraps
-import sys
 import re
 import warnings
-
-if sys.version_info >= (3, 8):
-    from typing import TypedDict
-else:
-    from typing_extensions import TypedDict
+from functools import wraps
+from typing import Dict, List, TypedDict, Union
 
 import numpy as np
 
@@ -185,9 +179,11 @@ class VectorCalculatorWrapper(VectorCalculator):
         # Split if positive lookahead or positive lookbehind character is not character a-zA-Z0-9
         # to keep string split separator.
         # Doc: https://medium.com/@shemar.gordon32/how-to-split-and-keep-the-delimiter-s-d433fb697c65
-        expr_split: List[str] = VectorCalculatorWrapper._str_split(
-            "(?=[^a-zA-Z0-9])|(?<=[^a-zA-Z0-9])", expr
-        )
+        #
+        # Note: re.split() usage requires Python version >= 3.7 due to pattern that could match an
+        # empty string.
+        # Doc: https://docs.python.org/3/library/re.html#re.split
+        expr_split: List[str] = re.split("(?=[^a-zA-Z0-9])|(?<=[^a-zA-Z0-9])", expr)
 
         detailed_expr: List[str] = []
         for elm in expr_split:
@@ -205,20 +201,3 @@ class VectorCalculatorWrapper(VectorCalculator):
         for elm in var_vec_map:
             var_vec_dict[elm["variableName"]] = elm["vectorName"][0]
         return var_vec_dict
-
-    def _str_split(pattern: str, string: str) -> List[str]:
-        """
-        String split function.
-
-        Define split function as re.split() in Python version <= 3.6 requires non-empty
-        pattern match - use separate implementation for these python versions.
-
-        Doc: https://docs.python.org/3/library/re.html#re.split
-        """
-        if sys.version_info >= (3, 7):
-            return re.split(pattern, string)
-        else:
-            splits = list((el.start(), el.end()) for el in re.finditer(pattern, string))
-            starts = [0] + [i[1] for i in splits]
-            ends = [i[0] for i in splits] + [len(string)]
-            return [string[start:end] for start, end in zip(starts, ends)]
