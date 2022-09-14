@@ -314,6 +314,17 @@ const Map: React.FC<MapProps> = ({
     const [firstViewStateId, setFirstViewStatesId] =
         useState<string>("main-view_2D");
 
+    useEffect(() => {
+        let tempViewStates: Record<string, ViewStateType> = {};
+        tempViewStates = Object.fromEntries(
+            viewsProps.map((item) => [item.id, cameraPosition])
+        );
+        if (viewsProps[0] !== undefined) {
+            setFirstViewStatesId(viewsProps[0].id);
+        }
+        setViewStates(tempViewStates);
+    }, [viewsProps]);
+
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
