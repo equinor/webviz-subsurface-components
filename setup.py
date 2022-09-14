@@ -26,14 +26,15 @@ package_name = (
 )
 
 INSTALL_REQUIRES = [
-    "dash>=1.6",
+    "dash>=2.0",
     "numpy>=1.14",
-    "pandas>=0.25",
+    "pandas>=1.0",
 ]
 
 TESTS_REQUIRE = [
     "bandit",
     "black>=20.8b1",
+    "dash[testing]",
     "jsonpatch>=1.32",
     "jsonpointer>=2.1",
     "matplotlib>=3.0",
@@ -43,9 +44,6 @@ TESTS_REQUIRE = [
     "selenium>=3.141",
     "webviz-core-components>=0.5.0",
 ]
-
-# 'dash[testing]' to be added in TEST_REQUIRE when
-# https://github.com/pypa/pip/issues/4957 is closed.
 
 setup(
     name=package_name,
@@ -60,8 +58,8 @@ setup(
     install_requires=INSTALL_REQUIRES,
     tests_require=TESTS_REQUIRE,
     extras_require={"tests": TESTS_REQUIRE, "dependencies": INSTALL_REQUIRES},
-    setup_requires=["setuptools_scm<7"],  # Python 3.6 support dropped in v 7.0.0
-    python_requires="~=3.6",
+    setup_requires=["setuptools_scm~=7.0"],
+    python_requires="~=3.8",
     use_scm_version=True,
     classifiers=[
         "Programming Language :: Python :: 3",
