@@ -20,13 +20,13 @@ jobs:
     strategy:
       matrix:
         include:
-          - python-version: 3.8
+          - python-version: "3.8"
             run-performance-tests: false
-          - python-version: 3.9
+          - python-version: "3.9"
             run-performance-tests: false
-          - python-version: 3.10
+          - python-version: "3.10"
             run-performance-tests: false
-          - python-version: 3.10 # This particular job in the matrix is allowed to fail(for performance and cypress test)
+          - python-version: "3.10" # This particular job in the matrix is allowed to fail(for performance and cypress test)
             run-performance-tests: true
             e2e-on-firefox: true
 
