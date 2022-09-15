@@ -127,7 +127,7 @@ jobs:
         if: github.event_name != 'release' && matrix.e2e-tests
         run: |
           cd react
-          npx cypress run --component --headed
+          npx cypress run -b chrome --component --headed
 
       # upload the failure screenshots for reference
       - name: upload artfacts
