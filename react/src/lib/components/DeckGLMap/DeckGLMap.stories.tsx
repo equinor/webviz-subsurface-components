@@ -26,7 +26,8 @@ const defaultWellsLayer = {
 const defaultProps = {
     id: "volve-wells",
     resources: {
-        wellsData: "./volve_wells.json",
+        wellsData:
+            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
     },
     bounds: [432150, 6475800, 439400, 6481500] as [
         number,
