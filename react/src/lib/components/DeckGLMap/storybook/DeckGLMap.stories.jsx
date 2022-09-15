@@ -661,6 +661,25 @@ const mapDataTemplate = (args) => {
     const [getColorName, setColorName] = React.useState("Rainbow");
     const [colorRange, setRange] = React.useState();
     const [isAuto, setAuto] = React.useState();
+    const [breakPoint, setBreakPoint] = React.useState();
+
+    // user defined breakpoint(domain)
+    const userDefinedBreakPoint = React.useCallback((data) => {
+        if (data) setBreakPoint(data);
+    }, []);
+
+    let userDefinedDomain = [];
+
+    if (breakPoint?.length > 0) {
+        var arrOfNum = breakPoint?.map((str) => {
+            return Number(str.position);
+        });
+        userDefinedDomain = arrOfNum ? arrOfNum : [];
+    }
+
+    userDefinedDomain.sort(function (a, b) {
+        return a - b;
+    });
 
     // Get selected legend color name from color selector
     const colorNameFromSelector = React.useCallback((data) => {
@@ -681,6 +700,7 @@ const mapDataTemplate = (args) => {
                 colorRange && isAuto == false
                     ? colorRange
                     : layers[0].colorMapRange,
+            breakPoint: userDefinedDomain ? userDefinedDomain : [],
         },
     ];
 
@@ -696,8 +716,10 @@ const mapDataTemplate = (args) => {
             >
                 <ColorLegend
                     {...args}
+                    colorName={getColorName}
                     getColorName={colorNameFromSelector}
                     getColorRange={userDefinedRange}
+                    getBreakpointValue={userDefinedBreakPoint}
                 />
             </div>
             <DeckGLMap {...args} layers={updatedLayerData} />
