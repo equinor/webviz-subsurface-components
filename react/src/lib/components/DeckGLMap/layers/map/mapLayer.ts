@@ -2,20 +2,18 @@ import { CompositeLayer } from "@deck.gl/core";
 import privateMapLayer, {
     privateMapLayerProps,
     Material,
-    MeshType,
-    MeshTypeLines,
 } from "./privateMapLayer";
 import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { RGBColor } from "@deck.gl/core/utils/color";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
-import GL from "@luma.gl/constants";
 import * as png from "@vivaxy/png";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 import { DeckGLLayerContext } from "../../components/Map";
 import { TerrainMapLayerData } from "../terrain/terrainMapLayer";
+import { makeFullMesh } from "./webworker";
 
 // These two types both describes the mesh' extent in the horizontal plane.
 type Frame = {
@@ -33,6 +31,17 @@ type Frame = {
 
     // Point to rotate around using 'rotDeg'. Defaults to mesh origin.
     rotPoint?: [number, number];
+};
+
+export type Params = {
+    meshData: Float32Array;
+    propertiesData: Float32Array;
+    isMesh: boolean;
+    cellCenteredProperties: boolean;
+    frame: Frame;
+    colors: RGBColor[];
+    colorMapRange: [number, number];
+    colorMapClampColor: RGBColor | undefined | boolean;
 };
 
 function getColorMapColors(
@@ -59,343 +68,16 @@ function getColorMapColors(
         colors.push(color as RGBColor);
     }
 
-    // return data;
     return colors;
-}
-
-function getFloat32ArrayMinMax(data: Float32Array) {
-    let max = -99999999;
-    let min = 99999999;
-    for (let i = 0; i < data.length; i++) {
-        max = data[i] > max ? data[i] : max;
-        min = data[i] < min ? data[i] : min;
-    }
-    return [min, max];
-}
-
-function getColor(
-    propertyValue: number,
-    colors: RGBColor[],
-    colorMapRangeMin: number,
-    colorMapRangeMax: number,
-    isClampColor: boolean,
-    isColorMapClampColorTransparent: boolean,
-    clampColor: RGBColor
-): RGBColor | boolean {
-    let color: RGBColor = [0, 0, 0];
-    if (!isNaN(propertyValue)) {
-        let x =
-            (propertyValue - colorMapRangeMin) /
-            (colorMapRangeMax - colorMapRangeMin);
-
-        if (x < 0.0 || x > 1.0) {
-            // Out of range. Use clampcolor.
-            if (isClampColor) {
-                color = clampColor;
-            } else if (isColorMapClampColorTransparent) {
-                return false;
-            } else {
-                // Use min/max color to clamp.
-                x = Math.max(0.0, x);
-                x = Math.min(1.0, x);
-
-                color = colors[Math.floor(x * 255)];
-            }
-        } else {
-            color = colors[Math.floor(x * 255)];
-        }
-    } else {
-        color = [255, 0, 0];
-    }
-    color = [color[0] / 255, color[1] / 255, color[2] / 255];
-    return color;
-}
-
-function makeFullMesh(
-    isMesh: boolean,
-    cellCenteredProperties: boolean,
-    dim: Frame,
-    meshData: Float32Array,
-    propertiesData: Float32Array,
-    colorMapName: string,
-    colorMapFunction: colorMapFunctionType | undefined,
-    colorMapRange: [number, number],
-    colorMapClampColor: RGBColor | undefined | boolean,
-    colorTables: colorTablesArray
-): [MeshType, MeshTypeLines] {
-    const propertyValueRange = getFloat32ArrayMinMax(propertiesData);
-
-    const colors = getColorMapColors(
-        colorMapName,
-        colorTables,
-        colorMapFunction
-    );
-
-    const valueRangeMin = propertyValueRange[0];
-    const valueRangeMax = propertyValueRange[1];
-
-    // If colorMapRange specified, color map will extend from colorMapRangeMin to colorMapRangeMax.
-    // Otherwise it will extend from valueRangeMin to valueRangeMax.
-    const colorMapRangeMin = colorMapRange?.[0] ?? valueRangeMin;
-    const colorMapRangeMax = colorMapRange?.[1] ?? valueRangeMax;
-
-    const isColorMapClampColorTransparent: boolean =
-        (colorMapClampColor as boolean) === false;
-
-    const isClampColor: boolean =
-        colorMapClampColor !== undefined &&
-        colorMapClampColor !== true &&
-        colorMapClampColor !== false;
-    colorMapClampColor = isClampColor ? colorMapClampColor : [0, 0, 0];
-
-    const clampColor = colorMapClampColor;
-
-    // Dimensions.
-    const ox = dim.origin[0];
-    const oy = dim.origin[1];
-
-    const dx = dim.increment[0];
-    const dy = dim.increment[1];
-
-    const nx = dim.count[0];
-    const ny = dim.count[1];
-
-    const positions: number[] = [];
-    const indices: number[] = [];
-    const vertexColors: number[] = [];
-    const vertexProperties: number[] = [];
-    const vertexIndexs: number[] = [];
-    const line_positions: number[] = [];
-
-    // Note: Assumed layout of the incomming 2D array of data:
-    // First coloumn corresponds to lowest x value. Last column highest x value.
-    // First row corresponds to max y value. Last row corresponds to lowest y value.
-    // This must be taken into account when calculating vertex x,y values and texture coordinates.
-
-    if (!cellCenteredProperties) {
-        // COLOR IS SET LINEARLY INTERPOLATED OVER A CELL.
-        let i = 0;
-        for (let h = 0; h < ny; h++) {
-            for (let w = 0; w < nx; w++) {
-                const i0 = h * nx + w;
-
-                const x0 = ox + w * dx;
-                const y0 = oy + (ny - 1 - h) * dy; // See note above.
-                const z = isMesh ? -meshData[i0] : 0;
-
-                const propertyValue = propertiesData[i0];
-
-                let color = getColor(
-                    propertyValue,
-                    colors,
-                    colorMapRangeMin,
-                    colorMapRangeMax,
-                    isClampColor,
-                    isColorMapClampColorTransparent,
-                    clampColor as RGBColor
-                );
-
-                if (!color) {
-                    color = [NaN, NaN, NaN];
-                }
-
-                positions.push(x0, y0, z);
-                vertexColors.push(...(color as RGBColor));
-                vertexProperties.push(propertyValue);
-                vertexIndexs.push(i++);
-            }
-        }
-
-        for (let h = 0; h < ny - 1; h++) {
-            for (let w = 0; w < nx - 1; w++) {
-                const i0 = h * nx + w;
-                const i1 = h * nx + (w + 1);
-                const i2 = (h + 1) * nx + (w + 1);
-                const i3 = (h + 1) * nx + w;
-
-                const isActiveCell = !isNaN(meshData[i0]) && !isNaN(vertexColors[3 * i0 + 0]) && // eslint-disable-line
-                                     !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
-                                     !isNaN(meshData[i2]) && !isNaN(vertexColors[3 * i2 + 0]) && // eslint-disable-line
-                                     !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0]);   // eslint-disable-line
-
-                if (isActiveCell) {
-                    indices.push(i1, i3, i0); // t1 - i0 provoking index.
-                    indices.push(i1, i3, i2); // t2 - i2 provoking index.
-                }
-            }
-        }
-    } else {
-        // COLOR IS SET CONSTANT OVER A CELL.
-        let i_indices = 0;
-        let i_vertices = 0;
-        for (let h = 0; h < ny - 1; h++) {
-            for (let w = 0; w < nx - 1; w++) {
-                const hh = ny - 1 - h; // See note above.
-
-                const i0 = h * nx + w;
-                const i1 = h * nx + (w + 1);
-                const i2 = (h + 1) * nx + (w + 1);
-                const i3 = (h + 1) * nx + w;
-
-                const isActiveCell =
-                    !isNaN(meshData[i0]) &&
-                    !isNaN(meshData[i1]) &&
-                    !isNaN(meshData[i2]) &&
-                    !isNaN(meshData[i3]);
-
-                if (!isActiveCell) {
-                    continue;
-                }
-
-                const x0 = ox + w * dx;
-                const y0 = oy + hh * dy;
-                const z0 = isMesh ? -meshData[i0] : 0;
-
-                const x1 = ox + (w + 1) * dx;
-                const y1 = oy + hh * dy;
-                const z1 = isMesh ? -meshData[i1] : 0;
-
-                const x2 = ox + (w + 1) * dx;
-                const y2 = oy + (hh - 1) * dy; // Note hh - 1 here.
-                const z2 = isMesh ? -meshData[i2] : 0;
-
-                const x3 = ox + w * dx;
-                const y3 = oy + (hh - 1) * dy; // Note hh - 1 here.
-                const z3 = isMesh ? -meshData[i3] : 0;
-
-                const propertyValue = propertiesData[i0];
-                const color = getColor(
-                    propertyValue,
-                    colors,
-                    colorMapRangeMin,
-                    colorMapRangeMax,
-                    isClampColor,
-                    isColorMapClampColorTransparent,
-                    clampColor as RGBColor
-                );
-
-                if (!color) {
-                    continue;
-                }
-
-                // t1 - i0 provoking index.
-                positions.push(x1, y1, z1);
-                positions.push(x3, y3, z3);
-                positions.push(x0, y0, z0);
-
-                vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
-
-                indices.push(i_indices++, i_indices++, i_indices++);
-                vertexColors.push(...(color as RGBColor));
-                vertexColors.push(...(color as RGBColor));
-                vertexColors.push(...(color as RGBColor));
-
-                vertexProperties.push(propertyValue);
-                vertexProperties.push(propertyValue);
-                vertexProperties.push(propertyValue);
-
-                // t2 - i2 provoking index.
-                positions.push(x1, y1, z1);
-                positions.push(x3, y3, z3);
-                positions.push(x2, y2, z2);
-
-                vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
-
-                indices.push(i_indices++, i_indices++, i_indices++);
-                vertexColors.push(...(color as RGBColor));
-                vertexColors.push(...(color as RGBColor));
-                vertexColors.push(...(color as RGBColor));
-
-                vertexProperties.push(propertyValue);
-                vertexProperties.push(propertyValue);
-                vertexProperties.push(propertyValue);
-            }
-        }
-    }
-
-    const mesh: MeshType = {
-        drawMode: GL.TRIANGLES,
-        attributes: {
-            positions: { value: new Float32Array(positions), size: 3 },
-            colors: { value: new Float32Array(vertexColors), size: 3 },
-            properties: { value: new Float32Array(vertexProperties), size: 1 },
-            vertex_indexs: { value: new Int32Array(vertexIndexs), size: 1 },
-        },
-        vertexCount: indices.length,
-        indices: { value: new Uint32Array(indices), size: 1 },
-    };
-
-    // LINES
-    for (let h = 0; h < ny - 1; h++) {
-        for (let w = 0; w < nx - 1; w++) {
-            const hh = ny - h - 1; // See note above.
-
-            const i0 = h * nx + w;
-            const i1 = h * nx + (w + 1);
-            const i2 = (h + 1) * nx + (w + 1);
-            const i3 = (h + 1) * nx + w;
-
-            const isActiveCell = !isNaN(meshData[i0]) && !isNaN(vertexColors[3 * i0 + 0]) && // eslint-disable-line
-                                 !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
-                                 !isNaN(meshData[i2]) && !isNaN(vertexColors[3 * i2 + 0]) && // eslint-disable-line
-                                 !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0]);   // eslint-disable-line
-
-            if (!isActiveCell) {
-                continue;
-            }
-
-            const x0 = ox + w * dx;
-            const y0 = oy + hh * dy;
-            const z0 = isMesh ? -meshData[i0] : 0;
-
-            const x1 = ox + (w + 1) * dx;
-            const y1 = oy + hh * dy;
-            const z1 = isMesh ? -meshData[i1] : 0;
-
-            const x2 = ox + (w + 1) * dx;
-            const y2 = oy + (hh - 1) * dy;
-            const z2 = isMesh ? -meshData[i2] : 0;
-
-            const x3 = ox + w * dx;
-            const y3 = oy + (hh - 1) * dy;
-            const z3 = isMesh ? -meshData[i3] : 0;
-
-            line_positions.push(x0, y0, z0);
-            line_positions.push(x1, y1, z1);
-
-            line_positions.push(x0, y0, z0);
-            line_positions.push(x3, y3, z3);
-
-            line_positions.push(x1, y1, z1);
-            line_positions.push(x2, y2, z2);
-
-            line_positions.push(x2, y2, z2);
-            line_positions.push(x3, y3, z3);
-        }
-    }
-
-    const mesh_lines: MeshTypeLines = {
-        drawMode: GL.LINES,
-        attributes: {
-            positions: { value: new Float32Array(line_positions), size: 3 },
-        },
-        vertexCount: line_positions.length / 3,
-    };
-
-    return [mesh, mesh_lines];
 }
 
 async function load_mesh_and_properties(
     meshUrl: string,
-    dim: Frame,
-    propertiesUrl: string,
-    colorMapName: string,
-    colorMapFunction: colorMapFunctionType | undefined,
-    colorMapRange: [number, number],
-    colorMapClampColor: boolean | RGBColor | undefined,
-    colorTables: colorTablesArray,
-    cellCenteredProperties: boolean
+    propertiesUrl: string
 ) {
+    // Keep
+    //const t0 = performance.now();
+
     const isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
     const isProperties =
         typeof propertiesUrl !== "undefined" && propertiesUrl !== "";
@@ -484,35 +166,14 @@ async function load_mesh_and_properties(
         }
     }
 
-    // Keep
-    //const t0 = performance.now();
-
-    const [mesh, mesh_lines] = makeFullMesh(
-        isMesh,
-        cellCenteredProperties,
-        dim,
-        meshData,
-        propertiesData,
-        colorMapName,
-        colorMapFunction,
-        colorMapRange,
-        colorMapClampColor,
-        colorTables
-    );
-
     //const t1 = performance.now();
     // Keep this.
-    //console.log(`Task took ${(t1 - t0) * 0.001}  seconds.`);
+    //console.log(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
 
-    const valueRange = getFloat32ArrayMinMax(meshData);
-
-    return Promise.all([mesh, mesh_lines, valueRange]);
+    return Promise.all([isMesh, meshData, propertiesData]);
 }
 
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setReportedBoundingBox?: any;
-
     // Url to the height (z values) mesh.
     meshUrl: string;
 
@@ -586,54 +247,49 @@ export default class MapLayer extends CompositeLayer<
     MapLayerProps<unknown>
 > {
     initializeState(): void {
-        const colorTables = (this.context as DeckGLLayerContext).userData
-            .colorTables;
-
-        // Load mesh and texture and store in state.
         const p = load_mesh_and_properties(
             this.props.meshUrl,
-            this.props.frame,
-            this.props.propertiesUrl,
-            this.props.colorMapName,
-            this.props.colorMapFunction,
-            this.props.colorMapRange,
-            this.props.colorMapClampColor,
-            colorTables,
-            this.props.cellCenteredProperties
+            this.props.propertiesUrl
         );
 
-        p.then(([mesh, mesh_lines, valueRange]) => {
-            this.setState({
-                mesh,
-                mesh_lines,
-                valueRange,
-            });
-        });
+        p.then(([isMesh, meshData, propertiesData]) => {
+            // Using inline web worker for calculating the triangle mesh from
+            // loaded input data so not to halt the GUI thread.
+            const blob = new Blob(
+                ["self.onmessage = ", makeFullMesh.toString()],
+                { type: "text/javascript" }
+            );
+            const url = URL.createObjectURL(blob);
+            const webWorker = new Worker(url);
 
-        // Report back calculated bounding box now that data is loaded.
-        p.then(() => {
-            const valueRange = this.state.valueRange;
-            // XXX console.log("valueRange: ", valueRange)
-            const xMin = this.props.frame.origin[0];
-            const yMin = this.props.frame.origin[1];
-            const zMin = -valueRange[0];
-            const xMax =
-                xMin +
-                this.props.frame.increment[0] * this.props.frame.count[0];
-            const yMax =
-                yMin +
-                this.props.frame.increment[1] * this.props.frame.count[1];
-            const zMax = -valueRange[1];
-            if (typeof this.props.setReportedBoundingBox !== "undefined") {
-                this.props.setReportedBoundingBox([
-                    xMin,
-                    yMin,
-                    zMin,
-                    xMax,
-                    yMax,
-                    zMax,
-                ]);
-            }
+            const colorTables = (this.context as DeckGLLayerContext).userData
+                .colorTables;
+
+            const colors: RGBColor[] = getColorMapColors(
+                this.props.colorMapName,
+                colorTables,
+                this.props.colorMapFunction
+            );
+
+            const params = {
+                meshData,
+                propertiesData,
+                isMesh,
+                cellCenteredProperties: this.props.cellCenteredProperties,
+                frame: this.props.frame,
+                colors,
+                colorMapRange: this.props.colorMapRange,
+                colorMapClampColor: this.props.colorMapClampColor,
+            };
+
+            webWorker.postMessage(params);
+            webWorker.onmessage = (e) => {
+                const [mesh, mesh_lines] = e.data;
+                this.setState({
+                    mesh,
+                    mesh_lines,
+                });
+            };
         });
     }
 
