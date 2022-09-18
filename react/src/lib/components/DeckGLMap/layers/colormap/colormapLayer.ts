@@ -35,8 +35,6 @@ function getImageData(
 
     const data = new Uint8Array(256 * 3);
 
-  
-
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
         const rgb = isColorMapFunctionDefined
