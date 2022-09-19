@@ -66,6 +66,8 @@ function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
+export type BoundsAccessor = () => [number, number, number, number];
+
 export type TooltipCallback = (
     info: PickInfo<unknown>
 ) => string | Record<string, unknown> | null;
@@ -151,7 +153,7 @@ export interface MapProps {
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
-    bounds?: [number, number, number, number];
+    bounds?: [number, number, number, number] | BoundsAccessor;
 
     /**
      * Zoom level for the view.
@@ -755,10 +757,17 @@ function jsonToObject(
 
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
-    bounds: [number, number, number, number],
+    bounds_accessor: [number, number, number, number] | BoundsAccessor,
     zoom?: number,
     deck?: Deck
 ): ViewStateType {
+    let bounds = [0, 0, 1, 1];
+    if (typeof bounds_accessor == "function") {
+        bounds = bounds_accessor();
+    } else {
+        bounds = bounds_accessor;
+    }
+
     let width = bounds[2] - bounds[0]; // right - left
     let height = bounds[3] - bounds[1]; // top - bottom
     if (deck) {
