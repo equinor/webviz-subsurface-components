@@ -668,18 +668,11 @@ const mapDataTemplate = (args) => {
         if (data) setBreakPoint(data);
     }, []);
 
-    let userDefinedDomain = [];
-
     if (breakPoint?.length > 0) {
-        var arrOfNum = breakPoint?.map((str) => {
-            return Number(str.position);
+        breakPoint.sort(function (a, b) {
+            return a - b;
         });
-        userDefinedDomain = arrOfNum ? arrOfNum : [];
     }
-
-    userDefinedDomain.sort(function (a, b) {
-        return a - b;
-    });
 
     // Get selected legend color name from color selector
     const colorNameFromSelector = React.useCallback((data) => {
@@ -700,10 +693,9 @@ const mapDataTemplate = (args) => {
                 colorRange && isAuto == false
                     ? colorRange
                     : layers[0].colorMapRange,
-            breakPoint: userDefinedDomain ? userDefinedDomain : [],
+            breakPoint: breakPoint ? breakPoint : [],
         },
     ];
-
     return (
         <div>
             <div
