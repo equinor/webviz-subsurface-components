@@ -53,9 +53,9 @@ describe("Test Info Card", () => {
             />
         );
         const collapse_button = screen.getByRole("button", { name: "" });
-        expect(screen.getByText("111")).toBeVisible();
+        expect(screen.getByText("111.00 m")).toBeVisible();
         userEvent.click(collapse_button);
-        await waitForElementToBeRemoved(() => screen.getByText("111"));
+        await waitForElementToBeRemoved(() => screen.getByText("111.00 m"));
     });
     it("undefined coordinates", async () => {
         const { container } = render(
