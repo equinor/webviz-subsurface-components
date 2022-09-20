@@ -473,7 +473,7 @@ const Map: React.FC<MapProps> = ({
                     if (item.properties) {
                         unit =
                             item.sourceLayer.props.data.unit === undefined
-                                ? " _"
+                                ? " "
                                 : item.sourceLayer.props.data.unit;
                         item.properties.forEach((element) => {
                             if (
