@@ -315,6 +315,7 @@ const Map: React.FC<MapProps> = ({
         useState<string>("main-view_2D");
 
     useEffect(() => {
+        console.log("1");
         let tempViewStates: Record<string, ViewStateType> = {};
         if (Object.keys(cameraPosition).length !== 0) {
             tempViewStates = Object.fromEntries(
@@ -408,6 +409,51 @@ const Map: React.FC<MapProps> = ({
             setViewStates(tempViewStates);
         }
     }, [reportedBoundingBox]);
+
+    // react on bounds prop change
+    useEffect(() => {
+        let tempViewStates: Record<string, ViewStateType> = {};
+        if (Object.keys(cameraPosition).length === 0) {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item, index) => [
+                    item.id,
+                    getViewState(
+                        boundsInitial,
+                        views?.viewports[index].target,
+                        views?.viewports[index].zoom,
+                        deckRef.current?.deck
+                    ),
+                ])
+            );
+        }
+        if (viewsProps[0] !== undefined) {
+            setFirstViewStatesId(viewsProps[0].id);
+        }
+        console.log(viewsProps);
+        // if (getCameraPosition) {
+        //     getCameraPosition(viewStates[firstViewStateId]);
+        // }
+        setViewStates(tempViewStates);
+    }, [bounds]);
+
+    // react on cameraPosition prop change
+    useEffect(() => {
+        console.log("1");
+        console.log(viewStates);
+        let tempViewStates: Record<string, ViewStateType> = {};
+        if (Object.keys(cameraPosition).length !== 0) {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item) => [item.id, cameraPosition])
+            );
+            setViewStates(tempViewStates);
+        }
+        if (viewsProps[0] !== undefined) {
+            setFirstViewStatesId(viewsProps[0].id);
+        }
+        if (getCameraPosition) {
+            getCameraPosition(cameraPosition);
+        }
+    }, [cameraPosition]);
 
     // update store if any of the layer prop is changed
     const dispatch = useDispatch();
