@@ -41,8 +41,7 @@ import { WellsLayer } from "../layers";
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
+import { colorTables } from "@emerson-eps/color-tables";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -66,6 +65,8 @@ function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
     const zmax = Math.max(b1[5], b2[5]);
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
+
+export type BoundsAccessor = () => [number, number, number, number];
 
 export type TooltipCallback = (
     info: PickInfo<unknown>
@@ -152,7 +153,7 @@ export interface MapProps {
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
-    bounds?: [number, number, number, number];
+    bounds?: [number, number, number, number] | BoundsAccessor;
 
     /**
      * Zoom level for the view.
@@ -787,10 +788,17 @@ function jsonToObject(
 
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
-    bounds: [number, number, number, number],
+    bounds_accessor: [number, number, number, number] | BoundsAccessor,
     zoom?: number,
     deck?: Deck
 ): ViewStateType {
+    let bounds = [0, 0, 1, 1];
+    if (typeof bounds_accessor == "function") {
+        bounds = bounds_accessor();
+    } else {
+        bounds = bounds_accessor;
+    }
+
     let width = bounds[2] - bounds[0]; // right - left
     let height = bounds[3] - bounds[1]; // top - bottom
     if (deck) {

@@ -2,6 +2,7 @@ import Map, {
     ViewsType,
     TooltipCallback,
     ViewStateType,
+    BoundsAccessor,
 } from "./components/Map";
 import { MapMouseEvent } from "./components/Map";
 import React from "react";
@@ -15,7 +16,7 @@ export interface DeckGLMapProps {
     id: string;
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[];
-    bounds?: [number, number, number, number];
+    bounds?: [number, number, number, number] | BoundsAccessor;
     zoom?: number;
     views?: ViewsType;
     coords?: {
@@ -166,26 +167,6 @@ DeckGLMap.defaultProps = {
     checkDatafileSchema: false,
 };
 
-const arrayOfLength_propTypes = (
-    expectedLength: number,
-    optional: boolean,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    props: { [key: string]: any },
-    propName: string,
-    componentName: string
-) => {
-    if (optional && props[propName] == undefined) return null;
-    if (
-        !Array.isArray(props[propName]) ||
-        props[propName].length != expectedLength
-    ) {
-        return new Error(
-            `Prop ${propName} supplied to ${componentName} should be an array of length ${expectedLength}. Validation failed.`
-        );
-    }
-    return null;
-};
-
 DeckGLMap.propTypes = {
     /**
      * The ID of this component, used to identify dash components
@@ -211,8 +192,9 @@ DeckGLMap.propTypes = {
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
+     * It can be either an array or a callback returning [number, number, number, number].
      */
-    bounds: arrayOfLength_propTypes.bind(null, 4, true),
+    bounds: PropTypes.any,
 
     /**
      * Zoom level for the view.
