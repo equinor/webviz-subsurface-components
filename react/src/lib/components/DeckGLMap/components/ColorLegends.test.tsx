@@ -12,7 +12,7 @@ import {
 
 const exampleData = require("../../../../demo/example-data/deckgl-map.json");
 const layers = getLayersWithDefaultProps(exampleData[0].layers);
-const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
+import { colorTables } from "@emerson-eps/color-tables";
 
 describe("Test Color Legend", () => {
     it("snapshot test", () => {
