@@ -5,8 +5,7 @@ import "@testing-library/jest-dom";
 import React from "react";
 import ColorLegend from "./ColorLegend";
 import { ExtendedLayer } from "../layers/utils/layerTools";
-
-const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
+import { colorTables } from "@emerson-eps/color-tables";
 
 describe("Test Color Legend component", () => {
     xit("snapshot test", () => {

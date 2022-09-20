@@ -2,8 +2,7 @@ import React from "react";
 import DeckGLMap from "../DeckGLMap";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
 import { makeStyles } from "@material-ui/styles";
-import { ColorLegend } from "@emerson-eps/color-tables";
-const colorTables = require("@emerson-eps/color-tables/dist/component/color-tables.json");
+import { ColorLegend, colorTables } from "@emerson-eps/color-tables";
 
 export default {
     component: DeckGLMap,

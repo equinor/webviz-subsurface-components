@@ -1,6 +1,5 @@
 import React from "react";
-import { DiscreteColorLegend } from "@emerson-eps/color-tables";
-import colorTables from "@emerson-eps/color-tables/dist/component/color-tables.json";
+import { DiscreteColorLegend, colorTables } from "@emerson-eps/color-tables";
 
 export default {
     component: DiscreteColorLegend,
