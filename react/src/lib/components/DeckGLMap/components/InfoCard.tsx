@@ -161,7 +161,6 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
             setInfoCardData(null);
             return;
         }
-
         const topObject = props.pickInfos[0];
         if (
             topObject.coordinate === undefined ||
@@ -171,8 +170,14 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         }
 
         const xy_properties: PropertyDataType[] = [];
-        xy_properties.push({ name: "x", value: topObject.coordinate[0] });
-        xy_properties.push({ name: "y", value: topObject.coordinate[1] });
+        xy_properties.push({
+            name: "x",
+            value: Number(topObject.coordinate[0]).toFixed(2).toString() + " m",
+        });
+        xy_properties.push({
+            name: "y",
+            value: Number(topObject.coordinate[1]).toFixed(2).toString() + " m",
+        });
 
         const info_card_data: InfoCardDataType[] = [];
         info_card_data.push({
@@ -192,6 +197,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
 
             // collecting card data for 1st type
             const zValue = (info as PropertyMapPickInfo).propertyValue;
+
             if (typeof zValue !== "undefined") {
                 const property = xy_properties.find(
                     (item) => item.name === layer_name

@@ -26,6 +26,7 @@ import {
     ExtendedLayer,
     getLayersInViewport,
     getLayersWithDefaultProps,
+    PropertyDataType,
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";
@@ -454,12 +455,43 @@ const Map: React.FC<MapProps> = ({
         event: any
     ): PickingInfo[] => {
         if (coords?.multiPicking && pickInfo.layer) {
-            return pickInfo.layer.context.deck.pickMultipleObjects({
+            const pickInfos = pickInfo.layer.context.deck.pickMultipleObjects({
                 x: event.offsetCenter.x,
                 y: event.offsetCenter.y,
                 radius: 1,
                 depth: coords.pickDepth,
             });
+            let unit = " _";
+            pickInfos.forEach(
+                (item: {
+                    properties: PropertyDataType[];
+                    unit: string;
+                    sourceLayer: {
+                        props: { data: { unit: string | undefined } };
+                    };
+                }) => {
+                    if (item.properties) {
+                        unit =
+                            item.sourceLayer.props.data.unit === undefined
+                                ? " _"
+                                : item.sourceLayer.props.data.unit;
+                        item.properties.forEach((element) => {
+                            if (
+                                element.name.includes("MD") ||
+                                element.name.includes("TVD")
+                            ) {
+                                element.value =
+                                    Number(element.value)
+                                        .toFixed(2)
+                                        .toString() +
+                                    " " +
+                                    unit;
+                            }
+                        });
+                    }
+                }
+            );
+            return pickInfos;
         }
         return [pickInfo];
     };
