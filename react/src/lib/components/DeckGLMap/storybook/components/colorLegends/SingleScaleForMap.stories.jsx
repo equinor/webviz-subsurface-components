@@ -1,6 +1,5 @@
 import React from "react";
-import { ContinuousLegend } from "@emerson-eps/color-tables";
-import colorTables from "@emerson-eps/color-tables/dist/component/color-tables.json";
+import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";
 import DeckGLMap from "../../../DeckGLMap";
 
 export default {
