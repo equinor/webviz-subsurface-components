@@ -109,7 +109,6 @@ jobs:
         id: cache-cypress
         uses: actions/cache@v1
         with:
-          working-directory: ./react
           # list of files to cache and restore
           path: ~/.cache/Cypress
           # An explicit key for restoring and saving the cache
