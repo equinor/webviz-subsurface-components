@@ -186,7 +186,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
                         class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
                         style="text-align: right;"
                       >
-                        111
+                        111.00 m
                       </td>
                     </tr>
                     <tr
@@ -202,7 +202,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
                         class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
                         style="text-align: right;"
                       >
-                        222
+                        222.00 m
                       </td>
                     </tr>
                     <tr
@@ -527,7 +527,7 @@ exports[`Test Info Card snapshot test with no props 1`] = `
                         class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
                         style="text-align: right;"
                       >
-                        111
+                        111.00 m
                       </td>
                     </tr>
                     <tr
@@ -543,7 +543,7 @@ exports[`Test Info Card snapshot test with no props 1`] = `
                         class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
                         style="text-align: right;"
                       >
-                        222
+                        222.00 m
                       </td>
                     </tr>
                   </tbody>
