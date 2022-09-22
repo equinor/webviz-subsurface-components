@@ -667,12 +667,6 @@ const mapDataTemplate = (args) => {
         if (data) setBreakPoint(data);
     }, []);
 
-    if (breakPoint?.length > 0) {
-        breakPoint.sort(function (a, b) {
-            return a - b;
-        });
-    }
-
     // Get selected legend color name from color selector
     const colorNameFromSelector = React.useCallback((data) => {
         setColorName(data);
