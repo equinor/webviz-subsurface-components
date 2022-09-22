@@ -1,5 +1,6 @@
 {
     "type": "FeatureCollection",
+    "unit": "m",
     "features": [
         {
             "type": "Feature",
