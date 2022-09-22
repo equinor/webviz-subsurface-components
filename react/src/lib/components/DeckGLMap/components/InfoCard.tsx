@@ -120,7 +120,11 @@ function Row(props: { layer_data: InfoCardDataType }) {
                                                                 number,
                                                                 number,
                                                                 number,
+<<<<<<< HEAD
                                                                 number?
+=======
+                                                                number
+>>>>>>> 5f1182f (Replace 3rd party deck.gl types with native)
                                                             ])
                                                         ).toString(),
                                                     }}
