@@ -92,6 +92,12 @@ export interface ViewportType {
      * Layers to be displayed on viewport
      */
     layerIds?: string[];
+
+    target?: [number, number];
+    zoom?: number;
+    rotationX?: number;
+    rotationOrbit?: number;
+    isSync?: boolean;
 }
 
 export interface ViewsType {
@@ -154,11 +160,6 @@ export interface MapProps {
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      */
     bounds?: [number, number, number, number] | BoundsAccessor;
-
-    /**
-     * Zoom level for the view.
-     */
-    zoom?: number;
 
     /**
      * Views configuration for map. If not specified, all the layers will be
@@ -235,7 +236,6 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
-
     cameraPosition?: ViewStateType | undefined;
 }
 
@@ -277,7 +277,6 @@ const Map: React.FC<MapProps> = ({
     resources,
     layers,
     bounds,
-    zoom,
     views,
     coords,
     scale,
@@ -300,44 +299,75 @@ const Map: React.FC<MapProps> = ({
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
 
+    // state for views prop of DeckGL component
+    const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
+
+    useEffect(() => {
+        setViewsProps(getViews(views) as ViewportType[]);
+    }, [views]);
+
     // set initial view state based on supplied bounds and zoom in viewState
-    const [viewState, setViewState] = useState<ViewStateType>(cameraPosition);
-
-    // react on cameraPosition prop change
-    useEffect(() => {
-        if (Object.keys(cameraPosition).length !== 0) {
-            setViewState(cameraPosition);
+    const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
+        {
+            "main-view_2D": cameraPosition,
         }
-    }, [cameraPosition]);
+    );
+    const [firstViewStateId, setFirstViewStatesId] =
+        useState<string>("main-view_2D");
 
-    // react on zoom prop change
     useEffect(() => {
-        const vs = getViewState(boundsInitial, zoom, deckRef.current?.deck);
-        setViewState({ ...viewState, zoom: vs.zoom });
-    }, [zoom]);
-
-    // react on bounds prop change
-    useEffect(() => {
-        const vs = getViewState(boundsInitial, zoom, deckRef.current?.deck);
-        setViewState({ ...viewState, target: vs.target });
-    }, [bounds]);
+        let tempViewStates: Record<string, ViewStateType> = {};
+        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item) => [item.id, cameraPosition])
+            );
+            setViewStates(tempViewStates);
+        } else {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item, index) => [
+                    item.id,
+                    getViewState(
+                        boundsInitial,
+                        views?.viewports[index].target,
+                        views?.viewports[index].zoom,
+                        deckRef.current?.deck
+                    ),
+                ])
+            );
+            setViewStates(tempViewStates);
+        }
+        if (viewsProps[0] !== undefined) {
+            setFirstViewStatesId(viewsProps[0].id);
+        }
+        setViewStates(tempViewStates);
+    }, [viewsProps]);
 
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
-        if (Object.keys(cameraPosition).length !== 0) {
-            setViewState(cameraPosition);
-        } else {
-            setViewState(
-                getViewState(boundsInitial, zoom, deckRef.current?.deck)
+        let tempViewStates: Record<string, ViewStateType> = {};
+        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item) => [item.id, cameraPosition])
             );
+            setViewStates(tempViewStates);
+        } else {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item, index) => [
+                    item.id,
+                    getViewState(
+                        boundsInitial,
+                        views?.viewports[index].target,
+                        views?.viewports[index].zoom,
+                        deckRef.current?.deck
+                    ),
+                ])
+            );
+            if (viewsProps[0] !== undefined) {
+                setFirstViewStatesId(viewsProps[0].id);
+            }
+            setViewStates(tempViewStates);
         }
-    }, [bounds, zoom, cameraPosition]);
-
-    // state for views prop of DeckGL component
-    const [viewsProps, setViewsProps] = useState<ViewProps[]>([]);
-    useEffect(() => {
-        setViewsProps(getViews(views) as ViewProps[]);
-    }, [views]);
+    }, [bounds, cameraPosition]);
 
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
     useEffect(() => {
@@ -362,18 +392,62 @@ const Map: React.FC<MapProps> = ({
         );
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
         const is3D = views?.viewports?.[0]?.show3D ?? false;
-
-        const vs = getViewState3D(
-            is3D,
-            union_of_reported_bboxes,
-            zoom,
-            deckRef.current?.deck
+        let tempViewStates: Record<string, ViewStateType> = {};
+        tempViewStates = Object.fromEntries(
+            viewsProps.map((item, index) => [
+                item.id,
+                getViewState3D(
+                    is3D,
+                    union_of_reported_bboxes,
+                    views?.viewports[index].zoom,
+                    deckRef.current?.deck
+                ),
+            ])
         );
 
         if (!isBoundsDefined) {
-            setViewState(vs);
+            setViewStates(tempViewStates);
         }
     }, [reportedBoundingBox]);
+
+    // react on bounds prop change
+    useEffect(() => {
+        let tempViewStates: Record<string, ViewStateType> = {};
+        if (cameraPosition && Object.keys(cameraPosition).length === 0) {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item, index) => [
+                    item.id,
+                    getViewState(
+                        boundsInitial,
+                        views?.viewports[index].target,
+                        views?.viewports[index].zoom,
+                        deckRef.current?.deck
+                    ),
+                ])
+            );
+            if (viewsProps[0] !== undefined) {
+                setFirstViewStatesId(viewsProps[0].id);
+            }
+            setViewStates(tempViewStates);
+        }
+    }, [bounds]);
+
+    // react on cameraPosition prop change
+    useEffect(() => {
+        let tempViewStates: Record<string, ViewStateType> = {};
+        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item) => [item.id, cameraPosition])
+            );
+            setViewStates(tempViewStates);
+            if (viewsProps[0] !== undefined) {
+                setFirstViewStatesId(viewsProps[0].id);
+            }
+            if (getCameraPosition) {
+                getCameraPosition(cameraPosition);
+            }
+        }
+    }, [cameraPosition]);
 
     // update store if any of the layer prop is changed
     const dispatch = useDispatch();
@@ -631,6 +705,35 @@ const Map: React.FC<MapProps> = ({
         },
         [views]
     );
+    const onViewStateChange = useCallback(
+        ({ viewId, viewState }) => {
+            const isSyncIds = viewsProps
+                .filter((item) => item.isSync)
+                .map((item) => item.id);
+            if (isSyncIds.includes(viewId)) {
+                let tempViewStates: Record<string, ViewStateType> = {};
+                tempViewStates = Object.fromEntries(
+                    viewsProps
+                        .filter((item) => item.isSync)
+                        .map((item) => [item.id, viewState])
+                );
+                setViewStates((currentViewStates) => ({
+                    ...currentViewStates,
+                    ...tempViewStates,
+                }));
+            } else {
+                setViewStates((currentViewStates) => ({
+                    ...currentViewStates,
+                    [viewId]: viewState,
+                }));
+            }
+            if (getCameraPosition) {
+                getCameraPosition(viewState);
+            }
+            setFirstViewStatesId(viewsProps[0].id);
+        },
+        [viewStates]
+    );
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
@@ -639,7 +742,7 @@ const Map: React.FC<MapProps> = ({
         <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
                 id={id}
-                viewState={viewState}
+                viewState={viewStates}
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
@@ -654,12 +757,7 @@ const Map: React.FC<MapProps> = ({
                 }
                 getTooltip={getTooltip}
                 ref={deckRef}
-                onViewStateChange={(viewport) => {
-                    setViewState(viewport.viewState);
-                    if (getCameraPosition) {
-                        getCameraPosition(viewport.viewState);
-                    }
-                }}
+                onViewStateChange={onViewStateChange}
                 onHover={onHover}
                 onClick={onClick}
                 onLoad={onLoad}
@@ -705,7 +803,11 @@ const Map: React.FC<MapProps> = ({
             {scale?.visible ? (
                 <DistanceScale
                     {...scale}
-                    zoom={viewState?.zoom}
+                    zoom={
+                        viewStates[firstViewStateId] === undefined
+                            ? -5
+                            : viewStates[firstViewStateId].zoom
+                    }
                     scaleUnit={coordinateUnit}
                     style={scale.cssStyle ?? {}}
                 />
@@ -789,6 +891,7 @@ function jsonToObject(
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
+    target?: number[],
     zoom?: number,
     deck?: Deck
 ): ViewStateType {
@@ -808,7 +911,7 @@ function getViewState(
 
     const fitted_bound = fitBounds({ width, height, bounds });
     const view_state: ViewStateType = {
-        target: [fitted_bound.x, fitted_bound.y, 0],
+        target: target ?? [fitted_bound.x, fitted_bound.y, 0],
         zoom: zoom ?? fitted_bound.zoom,
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
@@ -857,7 +960,7 @@ function getViewState3D(
 }
 
 // construct views object for DeckGL component
-function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
+function getViews(views: ViewsType | undefined): ViewportType[] {
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
     const far = 9999;
@@ -874,6 +977,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
             flipY: false,
             far,
             near,
+            isSync: false,
         });
     } else {
         let yPos = 0;
@@ -912,6 +1016,7 @@ function getViews(views: ViewsType | undefined): Record<string, unknown>[] {
                     flipY: false,
                     far,
                     near,
+                    isSync: views.viewports[deckgl_views.length].isSync,
                 });
                 xPos = xPos + 99.5 / nX;
             }
