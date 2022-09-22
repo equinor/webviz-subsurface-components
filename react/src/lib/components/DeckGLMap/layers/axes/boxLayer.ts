@@ -2,6 +2,7 @@ import {
     COORDINATE_SYSTEM,
     Color,
     Layer,
+    LayerProps,
     project,
     UpdateParameters,
 } from "@deck.gl/core/typed";
@@ -10,9 +11,7 @@ import { Model, Geometry } from "@luma.gl/engine";
 import fragmentShader from "./axes-fragment.glsl";
 import gridVertex from "./grid-vertex.glsl";
 import { DeckGLLayerContext } from "../../components/Map";
-import { ExtendedLayerProps } from "../utils/layerTools";
-
-export interface BoxLayerProps<D> extends ExtendedLayerProps<D> {
+export interface BoxLayerProps<D> extends LayerProps<D> {
     lines: [number]; // from pt , to pt.
     color: Color;
 }
@@ -29,10 +28,6 @@ export default class BoxLayer extends Layer<BoxLayerProps<unknown>> {
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
         this.setState(this._getModels(gl));
-    }
-
-    shouldUpdateState(): boolean {
-        return true;
     }
 
     updateState({ context }: UpdateParameters<this>): void {

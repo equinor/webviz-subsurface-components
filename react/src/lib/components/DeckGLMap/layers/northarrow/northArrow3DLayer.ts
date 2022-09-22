@@ -13,7 +13,7 @@ import vertexShader from "./northarrow-vertex.glsl";
 import fragmentShader from "./northarrow-fragment.glsl";
 import { ExtendedLayerProps } from "../utils/layerTools";
 
-export interface NorthArrow3DLayerProps<D> extends ExtendedLayerProps<D> {
+export interface NorthArrow3DLayerProps<D> extends LayerProps<D> {
     color: Color;
 }
 

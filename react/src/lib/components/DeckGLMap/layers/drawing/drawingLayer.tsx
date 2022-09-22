@@ -231,7 +231,8 @@ export default class DrawingLayer extends CompositeLayer<
             },
         });
 
-        // @ts-expect-error: EditableGeoJsonLayer from nebula.gl has no typing
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore nebula.gl has no proper typing
         return [new EditableGeoJsonLayer(sub_layer_props)];
     }
 }
