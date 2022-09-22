@@ -17,7 +17,6 @@ export interface DeckGLMapProps {
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[];
     bounds?: [number, number, number, number] | BoundsAccessor;
-    zoom?: number;
     views?: ViewsType;
     coords?: {
         visible?: boolean | null;
@@ -74,7 +73,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     resources,
     layers,
     bounds,
-    zoom,
     views,
     coords,
     scale,
@@ -137,7 +135,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 resources={resources}
                 layers={layers}
                 bounds={bounds}
-                zoom={zoom}
                 views={views}
                 coords={coords}
                 scale={scale}
@@ -197,11 +194,6 @@ DeckGLMap.propTypes = {
     bounds: PropTypes.any,
 
     /**
-     * Zoom level for the view.
-     */
-    zoom: PropTypes.number,
-
-    /**
      * Views configuration for map. If not specified, all the layers will be
      * displayed in a single 2D viewport.
      * Example:
@@ -213,7 +205,8 @@ DeckGLMap.propTypes = {
      *                  "id": "view_1",
      *                  "name"?: "View 1"
      *                  "show3D"?: false,
-     *                  "layerIds": ["layer-ids"]
+     *                  "layerIds": ["layer-ids"],
+     *                  "isSync?": true,
      *              }
      *          ]
      *      }

@@ -28,12 +28,6 @@ const defaultProps = {
     resources: {
         wellsData: "./volve_wells.json",
     },
-    bounds: [432150, 6475800, 439400, 6481500] as [
-        number,
-        number,
-        number,
-        number
-    ],
     layers: [defaultWellsLayer],
 };
 
@@ -187,7 +181,7 @@ const CustomTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
 
 export const customizedCameraPosition = CustomTemplate.bind({});
 
-const cameraPosition = {
+const cameraPosition: ViewStateType = {
     target: [437500, 6475000],
     zoom: -5.0,
     rotationX: 90,
