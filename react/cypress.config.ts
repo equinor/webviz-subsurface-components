@@ -6,6 +6,6 @@ export default defineConfig({
       framework: "create-react-app",
       bundler: "webpack",
     },
-    videoCompression: 1,
+    video:false
   },
 });
