@@ -315,7 +315,6 @@ const Map: React.FC<MapProps> = ({
         useState<string>("main-view_2D");
 
     useEffect(() => {
-        console.log("1");
         let tempViewStates: Record<string, ViewStateType> = {};
         if (Object.keys(cameraPosition).length !== 0) {
             tempViewStates = Object.fromEntries(
@@ -413,7 +412,7 @@ const Map: React.FC<MapProps> = ({
     // react on bounds prop change
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (Object.keys(cameraPosition).length === 0) {
+        if (cameraPosition && Object.keys(cameraPosition).length === 0) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
                     item.id,
@@ -425,33 +424,27 @@ const Map: React.FC<MapProps> = ({
                     ),
                 ])
             );
+            if (viewsProps[0] !== undefined) {
+                setFirstViewStatesId(viewsProps[0].id);
+            }
+            setViewStates(tempViewStates);
         }
-        if (viewsProps[0] !== undefined) {
-            setFirstViewStatesId(viewsProps[0].id);
-        }
-        console.log(viewsProps);
-        // if (getCameraPosition) {
-        //     getCameraPosition(viewStates[firstViewStateId]);
-        // }
-        setViewStates(tempViewStates);
     }, [bounds]);
 
     // react on cameraPosition prop change
     useEffect(() => {
-        console.log("1");
-        console.log(viewStates);
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (Object.keys(cameraPosition).length !== 0) {
+        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
             setViewStates(tempViewStates);
-        }
-        if (viewsProps[0] !== undefined) {
-            setFirstViewStatesId(viewsProps[0].id);
-        }
-        if (getCameraPosition) {
-            getCameraPosition(cameraPosition);
+            if (viewsProps[0] !== undefined) {
+                setFirstViewStatesId(viewsProps[0].id);
+            }
+            if (getCameraPosition) {
+                getCameraPosition(cameraPosition);
+            }
         }
     }, [cameraPosition]);
 
