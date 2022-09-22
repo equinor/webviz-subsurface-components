@@ -686,6 +686,8 @@ const mapDataTemplate = (args) => {
                 colorRange && isAuto == false
                     ? colorRange
                     : layers[0].colorMapRange,
+            // Passing "breakpoint" is temporary solution for now since the colortable does not save the edited breakpoints
+            // When save functionality of breakpoint is done, prop "breakpoint" will be removed from here
             breakPoint: breakPoint ? breakPoint : [],
         },
     ];

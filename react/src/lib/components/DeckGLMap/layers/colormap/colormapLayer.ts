@@ -39,7 +39,9 @@ function getImageData(
         const value = i / 255.0;
         const rgb = isColorMapFunctionDefined
             ? (colorMapFunction as colorMapFunctionType)(i / 255)
-            : getRgbData(value, colorMapName, colorTables, breakpoint);
+            : // Passing argument "breakpoint" is temporary solution for now since the colortable does not save the edited breakpoints
+              // When save functionality of breakpoint is done, prop "breakpoint" will be removed from here
+              getRgbData(value, colorMapName, colorTables, breakpoint);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
