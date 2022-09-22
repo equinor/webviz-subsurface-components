@@ -321,7 +321,6 @@ const Map: React.FC<MapProps> = ({
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
-            setViewStates(tempViewStates);
         } else {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
@@ -334,7 +333,6 @@ const Map: React.FC<MapProps> = ({
                     ),
                 ])
             );
-            setViewStates(tempViewStates);
         }
         if (viewsProps[0] !== undefined) {
             setFirstViewStatesId(viewsProps[0].id);
@@ -349,7 +347,6 @@ const Map: React.FC<MapProps> = ({
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
-            setViewStates(tempViewStates);
         } else {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
@@ -383,9 +380,9 @@ const Map: React.FC<MapProps> = ({
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         const isBoundsDefined =
-            typeof bounds !== "undefined" &&
-            typeof cameraPosition !== "undefined";
-
+            (typeof bounds !== "undefined" ||
+                typeof cameraPosition !== "undefined") &&
+            cameraPosition !== null;
         const union_of_reported_bboxes = addBoundingBoxes(
             reportedBoundingBoxAcc,
             reportedBoundingBox
@@ -404,11 +401,11 @@ const Map: React.FC<MapProps> = ({
                 ),
             ])
         );
-
+        console.log("yes")
         if (!isBoundsDefined) {
             setViewStates(tempViewStates);
         }
-    }, [reportedBoundingBox]);
+    }, [reportedBoundingBox, cameraPosition]);
 
     // react on bounds prop change
     useEffect(() => {
@@ -431,7 +428,7 @@ const Map: React.FC<MapProps> = ({
             setViewStates(tempViewStates);
         }
     }, [bounds]);
-
+    console.log(cameraPosition);
     // react on cameraPosition prop change
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
@@ -895,6 +892,7 @@ function getViewState(
     zoom?: number,
     deck?: Deck
 ): ViewStateType {
+    console.log("getCalled");
     let bounds = [0, 0, 1, 1];
     if (typeof bounds_accessor == "function") {
         bounds = bounds_accessor();
