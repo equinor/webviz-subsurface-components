@@ -9,13 +9,11 @@ import TableRow from "@material-ui/core/TableRow";
 import { Button, Icon } from "@equinor/eds-core-react";
 import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
 
-import { PickInfo } from "@deck.gl/core/lib/deck";
 import {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
 } from "../layers/utils/layerTools";
-import { PropertyMapPickInfo } from "../layers/utils/propertyMapTools";
 import { rgb } from "d3-color";
 import { FeatureCollection } from "geojson";
 
@@ -31,7 +29,7 @@ export interface InfoCardProps {
      * List of JSON object describing picking information of layers
      * that are under the cursor.
      */
-    pickInfos: PickInfo<unknown>[];
+    pickInfos: LayerPickInfo[];
 }
 
 const roundToSignificant = function (num: number) {
@@ -118,7 +116,12 @@ function Row(props: { layer_data: InfoCardDataType }) {
                                                 <span
                                                     style={{
                                                         color: rgb(
-                                                            ...propertyRow.color
+                                                            ...(propertyRow.color as [
+                                                                number,
+                                                                number,
+                                                                number,
+                                                                number
+                                                            ])
                                                         ).toString(),
                                                     }}
                                                 >
@@ -186,9 +189,10 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         });
 
         props.pickInfos.forEach((info) => {
-            const layer_properties = (info as LayerPickInfo)?.properties;
+            const layer_properties = info.properties;
             const layer_name = (
-                info.layer?.props as ExtendedLayerProps<FeatureCollection>
+                info.layer
+                    ?.props as unknown as ExtendedLayerProps<FeatureCollection>
             )?.name;
 
             // pick info can have 2 types of properties that can be displayed on the info card
@@ -196,8 +200,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
             // 2. Another defined as array of property object described by type PropertyDataType
 
             // collecting card data for 1st type
-            const zValue = (info as PropertyMapPickInfo).propertyValue;
-
+            const zValue = (info as LayerPickInfo).propertyValue;
             if (typeof zValue !== "undefined") {
                 const property = xy_properties.find(
                     (item) => item.name === layer_name

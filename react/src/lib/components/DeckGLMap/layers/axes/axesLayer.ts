@@ -1,32 +1,33 @@
-import { CompositeLayer, Viewport } from "@deck.gl/core";
+import {
+    COORDINATE_SYSTEM,
+    Color,
+    CompositeLayer,
+    Position,
+    Viewport,
+    UpdateParameters,
+    LayersList,
+} from "@deck.gl/core/typed";
 import BoxLayer from "./boxLayer";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import { TextLayer, TextLayerProps } from "@deck.gl/layers";
-import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
-import { Position3D } from "@deck.gl/core/utils/positions";
-import { RGBAColor } from "deck.gl";
+import { TextLayer } from "@deck.gl/layers/typed";
 
 export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     bounds: [number, number, number, number, number, number];
-    labelColor?: RGBAColor;
+    labelColor?: Color;
     labelFontSize?: number;
     fontFamily?: string;
-    axisColor?: RGBAColor;
+    axisColor?: Color;
 }
 
 type TextLayerData = {
     label: string;
-    from: Position3D; // tick line start
-    to: Position3D; // tick line end
+    from: Position; // tick line start
+    to: Position; // tick line end
     size: number; // font size
 };
 
-export default class AxesLayer extends CompositeLayer<
-    unknown,
-    AxesLayerProps<unknown>
-> {
+export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
     initializeState(): void {
         const box_lines = GetBoxLines(this.props.bounds);
 
@@ -55,7 +56,7 @@ export default class AxesLayer extends CompositeLayer<
         oldProps,
         context,
         changeFlags,
-    }: UpdateStateInfo<AxesLayerProps<unknown>>): boolean | string | null {
+    }: UpdateParameters<this>): boolean {
         return (
             super.shouldUpdateState({
                 props,
@@ -95,8 +96,8 @@ export default class AxesLayer extends CompositeLayer<
             return "middle";
         }
 
-        const screen_from = this.context.viewport.project(d.from);
-        const screen_to = this.context.viewport.project(d.to);
+        const screen_from = this.context.viewport.project(d.from as number[]);
+        const screen_to = this.context.viewport.project(d.to as number[]);
         const is_labels = d.label !== "X" && d.label !== "Y" && d.label !== "Z"; // labels on axis or XYZ annotations
         if (is_labels) {
             if (screen_from[0] < screen_to[0]) {
@@ -107,21 +108,22 @@ export default class AxesLayer extends CompositeLayer<
         return "end";
     }
 
-    getLabelPosition(d: TextLayerData): Position3D {
+    getLabelPosition(d: TextLayerData): Position {
         const is_labels = d.label !== "X" && d.label !== "Y" && d.label !== "Z"; // labels on axis or XYZ annotations
         if (is_labels) {
-            const tick_vec = [
-                d.to[0] - d.from[0],
-                d.to[1] - d.from[1],
-                d.to[2] - d.from[2],
-            ];
+            const tick_vec = [d.to[0] - d.from[0], d.to[1] - d.from[1]];
+            if (d.to[2] && d.from[2]) tick_vec.push(d.to[2] - d.from[2]);
 
             const s = 0.5;
-            return [
+            const label_position: Position = [
                 d.to[0] + s * tick_vec[0],
                 d.to[1] + s * tick_vec[1],
-                d.to[2] + s * tick_vec[2],
             ];
+            if (d.to[2] && d.from[2]) {
+                label_position.push(d.to[2] + s * tick_vec[2]);
+            }
+
+            return label_position;
         } else {
             // XYZ axis annotaion.
             return d.to;
@@ -138,11 +140,11 @@ export default class AxesLayer extends CompositeLayer<
         return is_orthographic && is_xaxis_label ? "top" : "center";
     }
 
-    renderLayers(): [BoxLayer, TextLayerProps<TextLayerData>] {
+    renderLayers(): LayersList {
         const is_orthographic =
             this.context.viewport.constructor.name === "OrthographicViewport";
 
-        const lines = [...this.state.box_lines, ...this.state.tick_lines];
+        const lines = [...this.state["box_lines"], ...this.state["tick_lines"]];
 
         const box_layer = new BoxLayer(
             this.getSubLayerProps({
@@ -155,7 +157,7 @@ export default class AxesLayer extends CompositeLayer<
         const text_layer = new TextLayer(
             this.getSubLayerProps({
                 fontFamily: this.props.fontFamily ?? "Monaco, monospace",
-                data: this.state.textlayerData,
+                data: this.state["textlayerData"],
                 id: "text-layer",
                 pickable: true,
                 getPosition: (d: TextLayerData) => this.getLabelPosition(d),
@@ -184,8 +186,8 @@ AxesLayer.defaultProps = layersDefaultProps[
 //-- Local functions. -------------------------------------------------
 
 function LineLengthInPixels(
-    p0: Position3D,
-    p1: Position3D,
+    p0: number[],
+    p1: number[],
     viewport: Viewport
 ): number {
     const screen_from = viewport.project(p0);

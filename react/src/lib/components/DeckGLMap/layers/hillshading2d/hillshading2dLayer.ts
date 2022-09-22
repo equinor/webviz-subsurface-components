@@ -1,26 +1,20 @@
-import { BitmapLayer, BitmapLayerProps } from "@deck.gl/layers";
+import { BitmapLayer, BitmapLayerProps } from "@deck.gl/layers/typed";
+import { PickingInfo, Texture } from "@deck.gl/core/typed";
 
 import { decoder } from "../shader_modules";
-import {
-    decodeRGB,
-    BitmapPickInfo,
-    PropertyMapPickInfo,
-    ValueDecoder,
-} from "../utils/propertyMapTools";
+import { decodeRGB, ValueDecoder } from "../utils/propertyMapTools";
 import { getModelMatrix } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
+import { LayerPickInfo } from "../../layers/utils/layerTools";
 
 import fsHillshading from "./hillshading2d.fs.glsl";
-import { FeatureCollection } from "@nebula.gl/edit-modes";
-import { PickInfo } from "deck.gl";
-import { DeckGLLayerContext } from "../../components/Map";
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see
 // https://deck.gl/docs/api-reference/layers/bitmap-layer
 //
 // The property map is encoded in an image and sent in the `image` prop of the BitmapLayer.
 // For more details on the property map encoding, see colormapLayer.ts
-export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
+export interface Hillshading2DProps extends BitmapLayerProps {
     // Min and max property values.
     valueRange: [number, number];
 
@@ -46,25 +40,20 @@ export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
 
 const defaultProps = layersDefaultProps[
     "Hillshading2DLayer"
-] as Hillshading2DProps<unknown>;
+] as Hillshading2DProps;
 
-export default class Hillshading2DLayer extends BitmapLayer<
-    unknown,
-    Hillshading2DProps<unknown>
-> {
-    initializeState(
-        context: PickInfo<FeatureCollection> | DeckGLLayerContext | undefined
-    ): void {
+export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> {
+    initializeState(): void {
         this.setState({
             isLoaded: false,
         });
-        super.initializeState(context);
+        super.initializeState();
     }
 
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms }: any): void {
-        if (!this.state.isLoaded) {
+        if (!this.state["isLoaded"]) {
             this.setState({
                 isLoaded: true,
             });
@@ -112,8 +101,8 @@ export default class Hillshading2DLayer extends BitmapLayer<
                     ...uniforms,
                     // Send extra uniforms to the shader.
                     bitmapResolution: [
-                        this.props.image.width,
-                        this.props.image.height,
+                        (this.props.image as Texture).width,
+                        (this.props.image as Texture).height,
                     ],
                     valueRangeSize: maxVal - minVal,
                     lightDirection: this.props.lightDirection,
@@ -140,8 +129,8 @@ export default class Hillshading2DLayer extends BitmapLayer<
         return parentShaders;
     }
 
-    getPickingInfo({ info }: { info: BitmapPickInfo }): PropertyMapPickInfo {
-        if (this.state.pickingDisabled || !info.color) {
+    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
+        if (this.state["pickingDisabled"] || !info.color) {
             return info;
         }
 

@@ -1,23 +1,27 @@
-import { CompositeLayer } from "@deck.gl/core";
+import {
+    Layer,
+    LayersList,
+    LayerData,
+    CompositeLayer,
+    UpdateParameters,
+    PickingInfo,
+} from "@deck.gl/core/typed";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
-import { Layer } from "@deck.gl/core";
-import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
-import { RGBAColor } from "@deck.gl/core/utils/color";
-import { PathStyleExtension } from "@deck.gl/extensions";
+import { PathLayer, TextLayer } from "@deck.gl/layers/typed";
+import { Color, Position } from "@deck.gl/core/typed";
+import { PathStyleExtension } from "@deck.gl/extensions/typed";
 import { subtract, distance, dot } from "mathjs";
 import {
     rgbValues,
     colorTablesArray,
     getColors,
 } from "@emerson-eps/color-tables/";
-import { PickInfo } from "deck.gl";
 
 import {
     Feature,
     GeometryCollection,
     LineString,
     Point,
-    Position,
     FeatureCollection,
     GeoJsonProperties,
     Geometry,
@@ -29,9 +33,7 @@ import {
 } from "../utils/layerTools";
 import { splineRefine, GetBoundingBox } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
-import { Position2D } from "@deck.gl/core/utils/positions";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import { DeckGLLayerContext } from "../../components/Map";
 import {
     ContinuousLegendDataType,
@@ -47,9 +49,9 @@ type StyleAccessorFunction = (
 
 type NumberPair = [number, number];
 type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
-type ColorAccessor = RGBAColor | StyleAccessorFunction | undefined;
+type ColorAccessor = Color | StyleAccessorFunction | undefined;
 type SizeAccessor = number | StyleAccessorFunction | undefined;
-type StyleData = NumberPair | RGBAColor | number;
+type StyleData = NumberPair | Color | number;
 
 type LineStyleAccessor = {
     color?: ColorAccessor;
@@ -63,13 +65,16 @@ type WellHeadStyleAccessor = {
 };
 
 function onDataLoad(
-    data: FeatureCollection<Geometry, GeoJsonProperties>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    { layer }: any
-) {
-    const bbox = GetBoundingBox(data as FeatureCollection);
-    if (typeof layer.props.setReportedBoundingBox !== "undefined") {
-        layer.props.setReportedBoundingBox(bbox);
+    data: LayerData<FeatureCollection>,
+    context: {
+        propName: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        layer: any;
+    }
+): void {
+    const bbox = GetBoundingBox(data as unknown as FeatureCollection);
+    if (typeof context.layer.props.setReportedBoundingBox !== "undefined") {
+        context.layer.props.setReportedBoundingBox(bbox);
     }
 }
 
@@ -91,7 +96,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameVisible: boolean;
     wellNameAtTop: boolean;
     wellNameSize: number;
-    wellNameColor: RGBAColor;
+    wellNameColor: Color;
 }
 
 export interface LogCurveDataType {
@@ -108,7 +113,7 @@ export interface LogCurveDataType {
         string,
         {
             attributes: unknown;
-            objects: Record<string, [RGBAColor, number]>;
+            objects: Record<string, [Color, number]>;
         }
     >;
 }
@@ -162,24 +167,21 @@ function getDashFactor(
 }
 
 function getColor(accessor: ColorAccessor) {
-    if (accessor as RGBAColor) {
-        return accessor as RGBAColor;
+    if (accessor as Color) {
+        return accessor as Color;
     }
 
-    return (
-        object: Feature,
-        objectInfo?: Record<string, unknown>
-    ): RGBAColor => {
+    return (object: Feature, objectInfo?: Record<string, unknown>): Color => {
         if (typeof accessor === "function") {
             const color = (accessor as StyleAccessorFunction)(
                 object,
                 objectInfo
-            ) as RGBAColor;
+            ) as Color;
             if (color) {
                 return color;
             }
         }
-        return object.properties?.["color"] as RGBAColor;
+        return object.properties?.["color"] as Color;
     };
 }
 
@@ -205,8 +207,7 @@ function getSize(
 }
 
 export default class WellsLayer extends CompositeLayer<
-    FeatureCollection,
-    WellsLayerProps<FeatureCollection>
+    WellsLayerProps<FeatureCollection<Geometry, GeoJsonProperties>>
 > {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
     onClick(info: WellsPickInfo, event: any): boolean {
@@ -217,38 +218,37 @@ export default class WellsLayer extends CompositeLayer<
             if (event.srcEvent.ctrlKey) {
                 if (
                     Object.keys(this.state).length === 0 ||
-                    !this.state.multipleSelectionWells
+                    !this.state["multipleSelectionWells"]
                 ) {
-                    this.state.multipleSelectionWells = [];
-                    this.state.multipleSelectionWells.push(
+                    this.state["multipleSelectionWells"] = [];
+                    this.state["multipleSelectionWells"].push(
                         (info.object as Feature).properties?.["name"]
                     );
                 } else {
                     if (
-                        !this.state.multipleSelectionWells.includes(
+                        !this.state["multipleSelectionWells"].includes(
                             (info.object as Feature).properties?.["name"]
                         )
                     ) {
-                        this.state.multipleSelectionWells.push(
+                        this.state["multipleSelectionWells"].push(
                             (info.object as Feature).properties?.["name"]
                         );
                     } else {
-                        this.state.multipleSelectionWells =
-                            this.state.multipleSelectionWells.filter(
-                                (item: string) =>
-                                    item !==
-                                    (info.object as Feature).properties?.[
-                                        "name"
-                                    ]
-                            );
+                        this.state["multipleSelectionWells"] = this.state[
+                            "multipleSelectionWells"
+                        ].filter(
+                            (item: string) =>
+                                item !==
+                                (info.object as Feature).properties?.["name"]
+                        );
                     }
                 }
             } else {
-                this.state.multipleSelectionWells = [];
+                this.state["multipleSelectionWells"] = [];
             }
-            (this.context as DeckGLLayerContext).userData.setEditedData({
+            this.context.userData.setEditedData({
                 selectedWell: (info.object as Feature).properties?.["name"],
-                multiSelectedWells: this.state.multipleSelectionWells,
+                multiSelectedWells: this.state["multipleSelectionWells"],
             });
             return false; // do not return true to allow DeckGL props.onClick to be called
         }
@@ -266,15 +266,10 @@ export default class WellsLayer extends CompositeLayer<
         }
     }
 
-    shouldUpdateState({
-        changeFlags,
-    }: UpdateStateInfo<
-        WellsLayerProps<FeatureCollection<Geometry, GeoJsonProperties>>
-    >): boolean | string | null {
+    shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
         return (
-            changeFlags.viewportChanged ||
-            changeFlags.propsOrDataChanged ||
-            changeFlags.updateTriggersChanged
+            changeFlags.viewportChanged || changeFlags.propsOrDataChanged /*||
+            changeFlags.updateTriggersChanged */
         );
     }
 
@@ -295,23 +290,21 @@ export default class WellsLayer extends CompositeLayer<
         });
     }
 
-    getLogLayer(): Layer<unknown> {
-        return getLayersById(
-            this.internalState?.subLayers,
-            "wells-layer-log_curve"
-        )?.[0];
+    getLogLayer(): Layer {
+        const sub_layers = this.internalState?.subLayers as Layer[];
+        const log_layer = getLayersById(sub_layers, "wells-layer-log_curve");
+        return (log_layer as Layer[])?.[0];
     }
 
-    getSelectionLayer(): Layer<unknown> {
-        return getLayersById(
-            this.internalState?.subLayers,
-            "wells-layer-selection"
-        )?.[0];
+    getSelectionLayer(): Layer {
+        const sub_layers = this.internalState?.subLayers as Layer[];
+        const log_layer = getLayersById(sub_layers, "wells-layer-selection");
+        return (log_layer as Layer[])?.[0];
     }
 
     getLogCurveData(): LogCurveDataType[] | undefined {
         const log_layer = this.getLogLayer();
-        return log_layer?.internalState?.asyncProps?.data?.resolvedValue;
+        return log_layer?.props.data as LogCurveDataType[];
     }
 
     setupLegend(): void {
@@ -319,19 +312,15 @@ export default class WellsLayer extends CompositeLayer<
         if (data) this.setLegend(data);
     }
 
-    renderLayers(): (
-        | GeoJsonLayer<Feature>
-        | PathLayer<LogCurveDataType>
-        | TextLayer<Feature>
-    )[] {
-        if (!(this.props.data as FeatureCollection).features) {
+    renderLayers(): LayersList {
+        if (!(this.props.data as unknown as FeatureCollection).features) {
             return [];
         }
 
         const refine = this.props.refine;
         const data = refine
-            ? splineRefine(this.props.data as FeatureCollection) // smooth well paths.
-            : (this.props.data as FeatureCollection);
+            ? splineRefine(this.props.data as unknown as FeatureCollection) // smooth well paths.
+            : (this.props.data as unknown as FeatureCollection);
 
         const is3d = this.context.viewport.constructor.name === "OrbitViewport";
         const isOrthographic =
@@ -347,8 +336,8 @@ export default class WellsLayer extends CompositeLayer<
             }),
         ];
 
-        const outline = new UnfoldedGeoJsonLayer<Feature>(
-            this.getSubLayerProps<Feature>({
+        const outline = new UnfoldedGeoJsonLayer(
+            this.getSubLayerProps({
                 id: "outline",
                 data,
                 pickable: false,
@@ -368,8 +357,8 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        const colors = new UnfoldedGeoJsonLayer<Feature>(
-            this.getSubLayerProps<Feature>({
+        const colors = new UnfoldedGeoJsonLayer(
+            this.getSubLayerProps({
                 id: "colors",
                 data,
                 pickable: true,
@@ -399,8 +388,8 @@ export default class WellsLayer extends CompositeLayer<
         );
 
         // Highlight the selected well.
-        const highlight = new UnfoldedGeoJsonLayer<Feature>(
-            this.getSubLayerProps<Feature>({
+        const highlight = new UnfoldedGeoJsonLayer(
+            this.getSubLayerProps({
                 id: "highlight",
                 data: getWellObjectByName(
                     data.features,
@@ -425,7 +414,7 @@ export default class WellsLayer extends CompositeLayer<
         );
 
         const log_layer = new PathLayer<LogCurveDataType>(
-            this.getSubLayerProps<LogCurveDataType>({
+            this.getSubLayerProps({
                 id: "log_curve",
                 data: this.props.logData,
                 positionFormat,
@@ -441,7 +430,7 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logrunName,
                         this.props.lineStyle?.color
                     ),
-                getColor: (d: LogCurveDataType): RGBAColor[] =>
+                getColor: (d: LogCurveDataType): Color[] =>
                     getLogColor(
                         d,
                         this.props.logrunName,
@@ -476,7 +465,7 @@ export default class WellsLayer extends CompositeLayer<
         );
 
         const selection_layer = new PathLayer<LogCurveDataType>(
-            this.getSubLayerProps<LogCurveDataType>({
+            this.getSubLayerProps({
                 id: "selection",
                 data: this.props.logData,
                 positionFormat,
@@ -489,17 +478,17 @@ export default class WellsLayer extends CompositeLayer<
                     getLogPath1(
                         data.features,
                         d,
-                        this.state.well,
-                        this.state.selection,
+                        this.state["well"],
+                        this.state["selection"],
                         this.props.logrunName,
                         this.props.lineStyle?.color
                     ),
-                getColor: (d: LogCurveDataType): RGBAColor[] =>
+                getColor: (d: LogCurveDataType): Color[] =>
                     getLogColor1(
                         data.features,
                         d,
-                        this.state.well,
-                        this.state.selection,
+                        this.state["well"],
+                        this.state["selection"],
                         this.props.logrunName
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
@@ -508,8 +497,8 @@ export default class WellsLayer extends CompositeLayer<
                 updateTriggers: {
                     getColor: [
                         this.props.logrunName,
-                        this.state.well,
-                        this.state.selection,
+                        this.state["well"],
+                        this.state["selection"],
                     ],
                     getWidth: [
                         this.props.logrunName,
@@ -519,8 +508,8 @@ export default class WellsLayer extends CompositeLayer<
                     getPath: [
                         positionFormat,
                         this.props.logrunName,
-                        this.state.well,
-                        this.state.selection,
+                        this.state["well"],
+                        this.state["selection"],
                     ],
                 },
                 onDataLoad: (value: LogCurveDataType[]) => {
@@ -531,7 +520,7 @@ export default class WellsLayer extends CompositeLayer<
 
         // well name
         const names = new TextLayer<Feature>(
-            this.getSubLayerProps<Feature>({
+            this.getSubLayerProps({
                 id: "names",
                 data: data.features,
                 visible: this.props.wellNameVisible,
@@ -553,17 +542,10 @@ export default class WellsLayer extends CompositeLayer<
         return [outline, log_layer, colors, highlight, selection_layer, names];
     }
 
-    getPickingInfo({
-        info,
-    }: {
-        info: PickInfo<FeatureCollection>;
-    }): PickInfo<FeatureCollection> & {
-        properties: PropertyDataType[];
-        logName: string;
-    } {
+    getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
         if (!info.object) return { ...info, properties: [], logName: "" };
 
-        const coordinate = info.coordinate || [0, 0, 0];
+        const coordinate = (info.coordinate || [0, 0, 0]) as Position;
 
         let md_property = getMdProperty(
             coordinate,
@@ -573,32 +555,32 @@ export default class WellsLayer extends CompositeLayer<
         );
         if (!md_property) {
             md_property = getLogProperty(
-                coordinate as Position2D,
-                (this.props.data as FeatureCollection).features,
-                (info as WellsPickInfo).object as LogCurveDataType,
+                coordinate,
+                (this.props.data as unknown as FeatureCollection).features,
+                info.object,
                 this.props.logrunName,
                 "MD"
             );
         }
         let tvd_property = getTvdProperty(
-            info.coordinate as Position2D,
+            coordinate,
             info.object as unknown as Feature,
             this.props.lineStyle?.color,
             (info as WellsPickInfo).featureType
         );
         if (!tvd_property) {
             tvd_property = getLogProperty(
-                info.coordinate as Position2D,
-                (this.props.data as FeatureCollection).features,
-                (info as WellsPickInfo).object as LogCurveDataType,
+                coordinate,
+                (this.props.data as unknown as FeatureCollection).features,
+                info.object,
                 this.props.logrunName,
                 "TVD"
             );
         }
         const log_property = getLogProperty(
-            info.coordinate as Position2D,
-            (this.props.data as FeatureCollection).features,
-            (info as WellsPickInfo).object as LogCurveDataType,
+            coordinate,
+            (this.props.data as unknown as FeatureCollection).features,
+            info.object,
             this.props.logrunName,
             this.props.logName
         );
@@ -626,7 +608,7 @@ export default class WellsLayer extends CompositeLayer<
 WellsLayer.layerName = "WellsLayer";
 WellsLayer.defaultProps = {
     ...(layersDefaultProps["WellsLayer"] as WellsLayerProps<FeatureCollection>),
-    onDataLoad,
+    onDataLoad: (data, context): void => onDataLoad(data, context),
 };
 
 //================= Local help functions. ==================
@@ -692,7 +674,7 @@ function getAnnotationPosition(
         if (well_data) top = well_head;
         else {
             const trajectory = getTrajectory(well_data, color_accessor);
-            top = trajectory?.at(0);
+            top = trajectory?.[0];
         }
 
         // using z=0 for orthographic view to keep label above other other layers
@@ -701,7 +683,7 @@ function getAnnotationPosition(
         let bot;
         // if trajectory is not present, return top position from Point geometry
         const trajectory = getTrajectory(well_data, color_accessor);
-        if (trajectory) bot = trajectory?.at(-1);
+        if (trajectory) bot = trajectory?.slice(-1)?.[0];
         else bot = getWellHeadPosition(well_data);
 
         // using z=0 for orthographic view to keep label above other other layers
@@ -733,8 +715,8 @@ function getLineStringGeometry(well_object: Feature): LineString {
 }
 
 // Return well head position from Point Geometry
-function getWellHeadPosition(well_object: Feature): Position | undefined {
-    return getPointGeometry(well_object)?.coordinates;
+function getWellHeadPosition(well_object: Feature): Position {
+    return getPointGeometry(well_object)?.coordinates as Position;
 }
 
 // return trajectory visibility based on alpha of trajectory color
@@ -747,7 +729,7 @@ function isTrajectoryVisible(
     if (typeof accessor === "function") {
         alpha = accessor(well_object)?.[3];
     } else {
-        alpha = (accessor as RGBAColor)?.[3];
+        alpha = (accessor as Color)?.[3];
     }
     return alpha !== 0;
 }
@@ -758,7 +740,7 @@ function getTrajectory(
     color_accessor: ColorAccessor
 ): Position[] | undefined {
     if (isTrajectoryVisible(well_object, color_accessor))
-        return getLineStringGeometry(well_object)?.coordinates;
+        return getLineStringGeometry(well_object)?.coordinates as Position[];
     else return undefined;
 }
 
@@ -832,11 +814,11 @@ function getLogColor(
     colorTables: colorTablesArray,
     // eslint-disable-next-line
     colorMappingFunction: any
-): RGBAColor[] {
+): Color[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
     if (log_data.length == 0 || log_info == undefined) return [];
-    const log_color: RGBAColor[] = [];
+    const log_color: Color[] = [];
 
     if (log_info.description == "continuous") {
         const min = Math.min(...log_data);
@@ -989,7 +971,7 @@ function getLogColor1(
     selectedWell: string | undefined,
     selection: [number | undefined, number | undefined] | undefined,
     logrun_name: string
-): RGBAColor[] {
+): Color[] {
     if (!selection || selectedWell !== d.header.well) return [];
     const well_object = getWellObjectByName(wells_data, d.header.well);
     if (!well_object) return [];
@@ -999,7 +981,7 @@ function getLogColor1(
     const log_mds = getLogMd(d, logrun_name);
     if (!log_mds || log_mds.length === 0) return [];
 
-    const log_color: RGBAColor[] = [];
+    const log_color: Color[] = [];
 
     let md0 = selection[0] as number;
     if (md0 !== undefined) {
@@ -1093,8 +1075,8 @@ function interpolateDataOnTrajectory(
     }
 
     // Calculate the scalar projection onto segment.
-    const v0 = subtract(coord, survey0);
-    const v1 = subtract(survey1, survey0);
+    const v0 = subtract(coord as number[], survey0 as number[]);
+    const v1 = subtract(survey1 as number[], survey0 as number[]);
 
     // scalar_projection in interval [0,1]
     const scalar_projection: number =
@@ -1215,7 +1197,7 @@ function getSegmentIndex(coord: Position, path: Position[]): number {
 
 // Returns segment index of discrete logs
 function getLogSegmentIndex(
-    coord: Position2D,
+    coord: Position,
     wells_data: Feature[],
     log_data: LogCurveDataType,
     logrun_name: string
@@ -1225,7 +1207,7 @@ function getLogSegmentIndex(
 }
 
 function getLogProperty(
-    coord: Position2D,
+    coord: Position,
     wells_data: Feature[],
     log_data: LogCurveDataType,
     logrun_name: string,
@@ -1245,7 +1227,7 @@ function getLogProperty(
         log_name
     )[segment_index];
 
-    let dl_attrs: [string, [RGBAColor, number]] | undefined = undefined;
+    let dl_attrs: [string, [Color, number]] | undefined = undefined;
     const dl_metadata = getDiscreteLogMetadata(log_data, log_name)?.objects;
     if (dl_metadata) {
         dl_attrs = Object.entries(dl_metadata).find(

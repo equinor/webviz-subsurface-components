@@ -1,13 +1,15 @@
-import { CompositeLayer } from "@deck.gl/core";
+import {
+    CompositeLayer,
+    Color,
+    Position,
+    PickingInfo,
+} from "@deck.gl/core/typed";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
-import { RGBAColor } from "@deck.gl/core/utils/color";
-import { Position } from "@deck.gl/core/utils/positions";
-import { SolidPolygonLayer } from "@deck.gl/layers";
-import { PickInfo } from "deck.gl";
+import { SolidPolygonLayer } from "@deck.gl/layers/typed";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
 
-type PieProperties = [{ color: RGBAColor; label: string }];
+type PieProperties = [{ color: Color; label: string }];
 
 type PieData = {
     x: number;
@@ -26,7 +28,7 @@ interface PiesData {
 interface PolygonData {
     polygon: Position[];
     properties: {
-        color: RGBAColor;
+        color: Color;
         name: string;
         pieIndex: number;
     };
@@ -37,24 +39,25 @@ export interface PieChartLayerProps<D> extends ExtendedLayerProps<D> {
 }
 
 export default class PieChartLayer extends CompositeLayer<
-    PiesData,
     PieChartLayerProps<PiesData>
 > {
-    onClick(info: PickInfo<PolygonData>): boolean {
+    onClick(info: PickingInfo): boolean {
         // Make selection only when drawing is disabled
         if (isDrawingEnabled(this.context.layerManager)) {
             return false;
         } else {
             const pie_idx = (info.object as PolygonData)?.properties.pieIndex;
             (this.context as DeckGLLayerContext).userData.setEditedData({
-                selectedPie: (this.props.data as PiesData)?.pies[pie_idx],
+                selectedPie: (this.props.data as unknown as PiesData)?.pies[
+                    pie_idx
+                ],
             });
             return true;
         }
     }
 
     renderLayers(): SolidPolygonLayer<PolygonData>[] {
-        const pieData = this.props.data as PiesData;
+        const pieData = this.props.data as unknown as PiesData;
         if (!pieData?.pies) {
             // this.props.data is a sum type, and since TS doesn't have
             // pattern matching, we must check it this way.
@@ -62,7 +65,7 @@ export default class PieChartLayer extends CompositeLayer<
         }
 
         const layer = new SolidPolygonLayer<PolygonData>(
-            this.getSubLayerProps<PolygonData, SolidPolygonLayer<PolygonData>>({
+            this.getSubLayerProps({
                 data: makePies(pieData),
                 getFillColor: (d: PolygonData) => d.properties.color,
             })

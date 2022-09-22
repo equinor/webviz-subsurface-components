@@ -1,15 +1,11 @@
-import { BitmapLayer, BitmapLayerProps } from "@deck.gl/layers";
-
+import { BitmapLayer, BitmapLayerProps } from "@deck.gl/layers/typed";
+import { PickingInfo } from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
-import { Texture2D } from "@luma.gl/core";
+import { Texture2D } from "@luma.gl/webgl";
 
+import { LayerPickInfo } from "../../layers/utils/layerTools";
 import { decoder } from "../shader_modules";
-import {
-    decodeRGB,
-    BitmapPickInfo,
-    PropertyMapPickInfo,
-    ValueDecoder,
-} from "../utils/propertyMapTools";
+import { decodeRGB, ValueDecoder } from "../utils/propertyMapTools";
 import { getModelMatrix, colorMapFunctionType } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import fsColormap from "./colormap.fs.glsl";
@@ -17,8 +13,6 @@ import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getRgbData } from "@emerson-eps/color-tables";
 import { ContinuousLegendDataType } from "../../components/ColorLegend";
-import { FeatureCollection } from "@nebula.gl/edit-modes";
-import { PickInfo } from "deck.gl";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -79,7 +73,7 @@ function getImageData(
 // and RGB(255, 255, 255) to the maximum value in valueRange, thus giving us the full
 // > 16mil possible values for any property value range.
 // We also support property maps with an alpha channel. See colormap.fs.glsl for more details.
-export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
+export interface ColormapLayerProps extends BitmapLayerProps {
     // Name of color map.
     colorMapName: string;
 
@@ -107,27 +101,20 @@ export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
     setReportedBoundingBox?: any;
 }
 
-const defaultProps = layersDefaultProps[
-    "ColormapLayer"
-] as ColormapLayerProps<unknown>;
+const defaultProps = layersDefaultProps["ColormapLayer"] as ColormapLayerProps;
 
-export default class ColormapLayer extends BitmapLayer<
-    unknown,
-    ColormapLayerProps<unknown>
-> {
-    initializeState(
-        context: DeckGLLayerContext | PickInfo<FeatureCollection> | undefined
-    ): void {
+export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
+    initializeState(): void {
         this.setState({
             isLoaded: false,
         });
-        super.initializeState(context);
+        super.initializeState();
     }
 
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms, context }: any): void {
-        if (!this.state.isLoaded) {
+        if (!this.state["isLoaded"]) {
             this.setState({
                 isLoaded: true,
             });
@@ -206,8 +193,8 @@ export default class ColormapLayer extends BitmapLayer<
         return parentShaders;
     }
 
-    getPickingInfo({ info }: { info: BitmapPickInfo }): PropertyMapPickInfo {
-        if (this.state.pickingDisabled || !info.color) {
+    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
+        if (this.state["pickingDisabled"] || !info.color) {
             return info;
         }
 
