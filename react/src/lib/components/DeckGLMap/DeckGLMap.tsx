@@ -17,7 +17,6 @@ export interface DeckGLMapProps {
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[];
     bounds?: [number, number, number, number] | BoundsAccessor;
-    zoom?: number;
     views?: ViewsType;
     coords?: {
         visible?: boolean | null;
@@ -194,6 +193,24 @@ DeckGLMap.propTypes = {
      */
     bounds: PropTypes.any,
 
+    /**
+     * Views configuration for map. If not specified, all the layers will be
+     * displayed in a single 2D viewport.
+     * Example:
+     *      views = {
+     *          "layout": [1, 1],
+     *          "showLabel": false,
+     *          "viewports": [
+     *              {
+     *                  "id": "view_1",
+     *                  "name"?: "View 1"
+     *                  "show3D"?: false,
+     *                  "layerIds": ["layer-ids"],
+     *                  "isSync?": true,
+     *              }
+     *          ]
+     *      }
+     */
     // TODO - define proper type for views prop
     views: PropTypes.any,
 

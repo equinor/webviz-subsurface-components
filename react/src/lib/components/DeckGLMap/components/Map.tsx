@@ -316,7 +316,7 @@ const Map: React.FC<MapProps> = ({
 
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (Object.keys(cameraPosition).length !== 0) {
+        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
@@ -344,7 +344,7 @@ const Map: React.FC<MapProps> = ({
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (Object.keys(cameraPosition).length !== 0) {
+        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
