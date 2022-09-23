@@ -28,7 +28,7 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | undefined,
+    colorMapFunction?: colorMapFunctionType,
     breakpoint?: number[]
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
@@ -99,7 +99,7 @@ export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
     rotDeg: number;
 
     // user defined domains
-    breakPoint: number[];
+    breakPoint?: number[];
 }
 
 const defaultProps = layersDefaultProps[
