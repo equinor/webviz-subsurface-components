@@ -302,6 +302,19 @@ const Map: React.FC<MapProps> = ({
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
 
+    // React.useEffect(() => {
+    //     function handleResize() {
+    //         console.log(
+    //             "resized to: ",
+    //             window.innerWidth,
+    //             "x",
+    //             window.innerHeight
+    //         );
+    //     }
+
+    //     window.addEventListener("resize", handleResize);
+    // });
+
     useEffect(() => {
         setViewsProps(getViews(views) as ViewportType[]);
     }, [views]);
@@ -401,7 +414,6 @@ const Map: React.FC<MapProps> = ({
                 ),
             ])
         );
-        console.log("yes")
         if (!isBoundsDefined) {
             setViewStates(tempViewStates);
         }
@@ -428,7 +440,7 @@ const Map: React.FC<MapProps> = ({
             setViewStates(tempViewStates);
         }
     }, [bounds]);
-    console.log(cameraPosition);
+
     // react on cameraPosition prop change
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
@@ -731,10 +743,8 @@ const Map: React.FC<MapProps> = ({
         },
         [viewStates]
     );
-
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
-
     return (
         <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
@@ -892,7 +902,6 @@ function getViewState(
     zoom?: number,
     deck?: Deck
 ): ViewStateType {
-    console.log("getCalled");
     let bounds = [0, 0, 1, 1];
     if (typeof bounds_accessor == "function") {
         bounds = bounds_accessor();
