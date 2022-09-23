@@ -137,15 +137,14 @@ jobs:
           name: cypress-screenshots
           path: |
             react/cypress/screenshots
-            react/cypress/snapshots
-            react/cypress/videos
+            react/cypress-visual-screenshots
           retention-days: 5
 
       - name: check if the tests failed due to difference in snapshots
         id: check_file_changed
         if: github.event_name != 'release' && matrix.e2e-tests && failure()
         run: |
-          if [[ -d react/cypress/snapshots/diff ]]
+          if [[ -d react/cypress-visual-screenshots/diff ]]
           then
             echo ::set-output name=docs_changed::true
           else
