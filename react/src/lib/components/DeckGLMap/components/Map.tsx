@@ -562,7 +562,7 @@ const Map: React.FC<MapProps> = ({
                                         .toString() +
                                     " " +
                                     unit;
-                                element.id = item.layer.id
+                                element.id = item.layer.id;
                             }
                         });
                     }
