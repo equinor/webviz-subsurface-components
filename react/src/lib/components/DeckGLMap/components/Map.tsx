@@ -539,6 +539,7 @@ const Map: React.FC<MapProps> = ({
             let unit = " _";
             pickInfos.forEach(
                 (item: {
+                    layer: any;
                     properties: PropertyDataType[];
                     unit: string;
                     sourceLayer: {
@@ -561,6 +562,7 @@ const Map: React.FC<MapProps> = ({
                                         .toString() +
                                     " " +
                                     unit;
+                                element.id = item.layer.id
                             }
                         });
                     }
@@ -585,6 +587,7 @@ const Map: React.FC<MapProps> = ({
                 type: type,
                 infos: infos,
             };
+            console.log(ev);
             if (ev.type === "click") {
                 if (event.rightButton) ev.type = "contextmenu";
             }

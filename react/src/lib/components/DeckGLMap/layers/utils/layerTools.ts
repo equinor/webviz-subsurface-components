@@ -26,6 +26,7 @@ export interface PropertyDataType {
     name: string;
     value: string | number;
     color?: RGBAColor;
+    id?: string;
 }
 
 // Layer pick info can have multiple properties
