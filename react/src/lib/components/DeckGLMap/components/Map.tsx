@@ -302,18 +302,12 @@ const Map: React.FC<MapProps> = ({
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
 
-    // React.useEffect(() => {
-    //     function handleResize() {
-    //         console.log(
-    //             "resized to: ",
-    //             window.innerWidth,
-    //             "x",
-    //             window.innerHeight
-    //         );
-    //     }
-
-    //     window.addEventListener("resize", handleResize);
-    // });
+    const initialViewState = getViewState(
+        boundsInitial,
+        views?.viewports[0].target,
+        views?.viewports[0].zoom,
+        deckRef.current?.deck
+    );
 
     useEffect(() => {
         setViewsProps(getViews(views) as ViewportType[]);
@@ -393,9 +387,8 @@ const Map: React.FC<MapProps> = ({
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         const isBoundsDefined =
-            (typeof bounds !== "undefined" ||
-                typeof cameraPosition !== "undefined") &&
-            cameraPosition !== null;
+            typeof bounds !== "undefined" ||
+            typeof cameraPosition !== "undefined";
         const union_of_reported_bboxes = addBoundingBoxes(
             reportedBoundingBoxAcc,
             reportedBoundingBox
@@ -417,7 +410,7 @@ const Map: React.FC<MapProps> = ({
         if (!isBoundsDefined) {
             setViewStates(tempViewStates);
         }
-    }, [reportedBoundingBox, cameraPosition]);
+    }, [reportedBoundingBox]);
 
     // react on bounds prop change
     useEffect(() => {
@@ -455,6 +448,15 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(cameraPosition);
             }
+        }
+        if (cameraPosition === null) {
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item) => [item.id, initialViewState])
+            );
+            if (getCameraPosition) {
+                getCameraPosition(initialViewState);
+            }
+            setViewStates(tempViewStates);
         }
     }, [cameraPosition]);
 
@@ -915,7 +917,6 @@ function getViewState(
         width = deck.width;
         height = deck.height;
     }
-
     const fitted_bound = fitBounds({ width, height, bounds });
     const view_state: ViewStateType = {
         target: target ?? [fitted_bound.x, fitted_bound.y, 0],
