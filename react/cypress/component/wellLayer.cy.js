@@ -11,7 +11,7 @@ const { VolveWells, DashedWells, CustomColoredWells, CustomWidthWells } =
 
 //render().unmount();
 
-describe("Wells", () => {
+xdescribe("Wells", () => {
     it("should display volve wells story", () => {
         mount(<VolveWells />);
         cy.wait(5000);
