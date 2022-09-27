@@ -11,7 +11,6 @@ export function makeFullMesh(e: { data: Params }): void {
     const meshData = params.meshData;
     const propertiesData = params.propertiesData;
     const isMesh = params.isMesh;
-    const cellCenteredProperties = params.cellCenteredProperties;
     const frame = params.frame;
     const colors = params.colors;
     const colorMapRange = params.colorMapRange;
@@ -96,6 +95,15 @@ export function makeFullMesh(e: { data: Params }): void {
     const nx = frame.count[0];
     const ny = frame.count[1];
 
+    const propLength = propertiesData.length;
+    const isCellCenteredProperties = propLength === (nx - 1) * (ny - 1);
+
+    if (propLength !== (nx - 1) * (ny - 1) && propLength !== nx * ny) {
+        console.error(
+            "There should be as many property values as nodes (nx*ny) OR as many as cells (nx - 1) * (ny - 1)."
+        );
+    }
+
     const positions: number[] = [];
     const indices: number[] = [];
     const vertexColors: number[] = [];
@@ -108,9 +116,10 @@ export function makeFullMesh(e: { data: Params }): void {
     // First row corresponds to max y value. Last row corresponds to lowest y value.
     // This must be taken into account when calculating vertex x,y values and texture coordinates.
 
-    if (!cellCenteredProperties) {
+    if (!isCellCenteredProperties) {
         // COLOR IS SET LINEARLY INTERPOLATED OVER A CELL.
         let i = 0;
+        // Loop over nodes.
         for (let h = 0; h < ny; h++) {
             for (let w = 0; w < nx; w++) {
                 const i0 = h * nx + w;
@@ -165,6 +174,7 @@ export function makeFullMesh(e: { data: Params }): void {
         // COLOR IS SET CONSTANT OVER A CELL.
         let i_indices = 0;
         let i_vertices = 0;
+        // Loop over cells.
         for (let h = 0; h < ny - 1; h++) {
             for (let w = 0; w < nx - 1; w++) {
                 const hh = ny - 1 - h; // See note above.
@@ -200,7 +210,8 @@ export function makeFullMesh(e: { data: Params }): void {
                 const y3 = oy + (hh - 1) * dy; // Note hh - 1 here.
                 const z3 = isMesh ? -meshData[i3] : 0;
 
-                const propertyValue = propertiesData[i0];
+                const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
+                const propertyValue = propertiesData[propertyIndex];
                 const color = getColor(
                     propertyValue,
                     colors,
