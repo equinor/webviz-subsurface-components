@@ -31,7 +31,6 @@ const meshMapLayerBig = {
     contours: [0, 100],
     isContoursDepth: true,
     gridLines: false,
-    cellCenteredProperties: false,
     material: true,
     colorMapName: "Physics",
 };
@@ -51,7 +50,6 @@ const smallLayer = {
     },
     propertiesUrl: "small_properties.float32",
     gridLines: true,
-    cellCenteredProperties: false,
     material: false,
     // black to white colors.
     colorMapFunction: (value: number) => [
@@ -61,6 +59,56 @@ const smallLayer = {
     ],
     colorMapRange: [0, 29],
     colorMapClampColor: [255, 0, 0],
+};
+
+// This layer has as many property values as depth values hence each cell will be interpolated in color.
+const nodeCenteredPropertiesLayer = {
+    "@@type": "MapLayer",
+    id: "cellCenteredPropertiesLayer-layer",
+
+    meshUrl:
+        "data:text/plain;base64,zczMP5qZ2T9mZuY/MzPzP5qZmT9mZqY/MzOzPwAAwD/NzEw/ZmZmPwAAgD/NzIw/zczMPgAAAD+amRk/MzMzPwAAAIDNzMw9zcxMPpqZmT4=",
+    frame: {
+        origin: [0, 0],
+        count: [4, 5],
+        increment: [1, 1],
+        rotDeg: 0,
+    },
+    propertiesUrl:
+        "data:text/plain;base64,ZmYmQM3MLEAzMzNAmpk5QM3MDEAzMxNAmpkZQAAAIEBmZuY/MzPzPwAAAEBmZgZAMzOzPwAAwD/NzMw/mpnZPwAAgD/NzIw/mpmZP2Zmpj8=",
+    gridLines: true,
+    material: false,
+    // black to white colors.
+    colorMapFunction: (value: number) => [
+        value * 255,
+        value * 255,
+        value * 255,
+    ],
+};
+
+// This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
+const cellCenteredPropertiesLayer = {
+    "@@type": "MapLayer",
+    id: "cellCenteredPropertiesLayer-layer",
+
+    meshUrl:
+        "data:text/plain;base64,zczMP5qZ2T9mZuY/MzPzP5qZmT9mZqY/MzOzPwAAwD/NzEw/ZmZmPwAAgD/NzIw/zczMPgAAAD+amRk/MzMzPwAAAIDNzMw9zcxMPpqZmT4=",
+    frame: {
+        origin: [0, 0],
+        count: [4, 5],
+        increment: [1, 1],
+        rotDeg: 0,
+    },
+    propertiesUrl:
+        "data:text/plain;base64,ZmZmPwAAgD/NzIw/mpkZPzMzMz/NzEw/mpmZPs3MzD4AAAA/AAAAAM3MzD3NzEw+",
+    gridLines: true,
+    material: false,
+    // black to white colors.
+    colorMapFunction: (value: number) => [
+        value * 255,
+        value * 255,
+        value * 255,
+    ],
 };
 
 // Example using "Map" layer. Uses PNG float for mesh and properties.
@@ -78,7 +126,6 @@ const meshMapLayerPng = {
     contours: [0, 100],
     isContoursDepth: true,
     gridLines: false,
-    cellCenteredProperties: true,
     material: true,
     colorMapName: "Physics",
 };
@@ -97,7 +144,6 @@ const meshMapLayerFloat32 = {
     propertiesUrl: "kh_netmap_25_m.float32",
     contours: [0, 100],
     isContoursDepth: true,
-    cellCenteredProperties: false,
     gridLines: false,
     material: false,
     colorMapName: "Physics",
@@ -361,6 +407,70 @@ SmallMap.parameters = {
     },
 };
 
+const axes_lite = {
+    "@@type": "AxesLayer",
+    id: "axes_small",
+    bounds: [-1, -1, -30, 4, 5, 0],
+};
+
+//-- CellCenteredPropMap --
+export const CellCenteredPropMap: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+CellCenteredPropMap.args = {
+    id: "map",
+    layers: [axes_lite, cellCenteredPropertiesLayer, north_arrow_layer],
+    bounds: [-1, -1, 4, 5] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+            },
+        ],
+    },
+};
+
+CellCenteredPropMap.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "A small map with properties given at cell centers. Each cell will be constant colored",
+        },
+    },
+};
+
+//-- NodeCenteredPropMap --
+export const NodeCenteredPropMap: ComponentStory<typeof DeckGLMap> = (args) => {
+    return <DeckGLMap {...args} />;
+};
+
+NodeCenteredPropMap.args = {
+    id: "map",
+    layers: [axes_lite, nodeCenteredPropertiesLayer, north_arrow_layer],
+    bounds: [-1, -1, 4, 5] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+            },
+        ],
+    },
+};
+
+NodeCenteredPropMap.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "A small map with properties given at nodes. Each cell will be interpolated in color.",
+        },
+    },
+};
+
 export const GradientFunctionColorMap: ComponentStory<
     typeof DeckGLMap
 > = () => {
@@ -464,7 +574,6 @@ export const BigMapWithHole: ComponentStory<typeof DeckGLMap> = () => {
                 {
                     ...meshMapLayerBig,
                     meshUrl: "hugin_depth_5_m_w_hole.float32",
-                    cellCenteredProperties: false,
                     gridLines: false,
                     material: false,
                 },
@@ -560,7 +669,6 @@ BreakpointColorMap.args = {
     layers: [
         {
             ...meshMapLayerFloat32,
-            cellCenteredProperties: false,
             gridLines: false,
             material: true,
         },
@@ -617,7 +725,6 @@ ColorMapRange.args = {
             ...meshMapLayerFloat32,
             colorMapName: "Seismic",
             colorMapClampColor: false,
-            cellCenteredProperties: false,
             gridLines: false,
             material: true,
         },

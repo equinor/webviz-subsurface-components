@@ -52,7 +52,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         // If contour lines should follow depth or properties.
         isContoursDepth: true,
         gridLines: false,
-        cellCenteredProperties: false,
     },
 
     Map3DLayer: {
