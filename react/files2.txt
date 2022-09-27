@@ -1,0 +1,1 @@
+cypress-visual-screenshots/diff/defaultMap.cy-default-map-story.png
