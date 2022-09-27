@@ -28,7 +28,8 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | undefined
+    colorMapFunction?: colorMapFunctionType,
+    breakpoint?: number[]
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
 
@@ -38,7 +39,9 @@ function getImageData(
         const value = i / 255.0;
         const rgb = isColorMapFunctionDefined
             ? (colorMapFunction as colorMapFunctionType)(i / 255)
-            : getRgbData(value, colorMapName, colorTables);
+            : // Passing argument "breakpoint" is temporary solution for now since the colortable does not save the edited breakpoints
+              // When save functionality of breakpoint is done, prop "breakpoint" will be removed from here
+              getRgbData(value, colorMapName, colorTables, breakpoint);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -94,6 +97,9 @@ export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
 
     // Rotates image around bounds upper left corner counterclockwise in degrees.
     rotDeg: number;
+
+    // user defined domains
+    breakPoint?: number[];
 }
 
 const defaultProps = layersDefaultProps[
@@ -143,7 +149,8 @@ export default class ColormapLayer extends BitmapLayer<
                         this.props.colorMapName,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
-                        this.props.colorMapFunction
+                        this.props.colorMapFunction,
+                        this.props.breakPoint
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
