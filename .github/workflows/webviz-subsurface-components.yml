@@ -131,8 +131,7 @@ jobs:
       # upload the failure screenshots for reference
       - name: upload artfacts
         uses: actions/upload-artifact@v2
-        if: always()
-        #if: github.event_name != 'release' && failure() && matrix.e2e-tests
+        if: github.event_name != 'release' && failure() && matrix.e2e-tests
         with:
           name: cypress-screenshots
           path: |

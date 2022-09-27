@@ -204,6 +204,10 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# Cypress stuff
+chromedriver
+chromedriver_linux64.zip
+
 # Translations
 *.mo
 *.pot
