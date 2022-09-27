@@ -35,8 +35,8 @@ interface Props {
     templates: Template[];
     colorTables: ColorTable[];
     wellpicks?: WellPickProps[];
-    welldistances?:(number|undefined)[];
-    spacerWidths?:number[];
+    welldistances?: (number | undefined)[];
+    spacerWidths?: number[];
 
     horizontal?: boolean;
     syncTrackPos?: boolean;
@@ -336,8 +336,7 @@ class SyncLogViewer extends Component<Props, State> {
                 if (!isEqDomains(_domain, domain))
                     _controller.zoomContentTo(domain);
             }
-            if (this.props.syncTrackPos)
-                _controller.scrollTrackTo(posTrack);
+            if (this.props.syncTrackPos) _controller.scrollTrackTo(posTrack);
         }
     }
 
@@ -358,8 +357,7 @@ class SyncLogViewer extends Component<Props, State> {
         const trackPos = controller.getTrackScrollPos();
         for (const _controller of this.controllers) {
             if (!_controller || _controller == controller) continue;
-            if (this.props.syncTrackPos)
-                _controller.scrollTrackTo(trackPos);
+            if (this.props.syncTrackPos) _controller.scrollTrackTo(trackPos);
         }
     }
     syncTrackSelection(iView: number): void {
@@ -411,9 +409,9 @@ class SyncLogViewer extends Component<Props, State> {
                     _controller.zoomContentTo(domain);
             }
         }
-       
-        for(let i=iView-1; i<=iView; i++) {
-            const spacer=this.spacers[i];
+
+        for (let i = iView - 1; i <= iView; i++) {
+            const spacer = this.spacers[i];
             if (!spacer) continue;
             spacer.update();
         }
@@ -516,19 +514,15 @@ class SyncLogViewer extends Component<Props, State> {
     createSpacer(index: number): ReactNode {
         const prev = index - 1;
         let width = this.props.spacerWidths?.[prev];
-        if(width===undefined) width = 255 // set some default value
-        if(!width)  
-            return null;
+        if (width === undefined) width = 255; // set some default value
+        if (!width) return null;
         return (
             <div style={{ width: width + "px" }}>
                 <WellLogSpacer
                     controllers={
                         this.controllers
-                        ? [
-                            this.controllers[prev],
-                            this.controllers[index],
-                        ]
-                      : []
+                            ? [this.controllers[prev], this.controllers[index]]
+                            : []
                     }
                     distance={this.props.welldistances?.[prev]}
                     wellpicks={
@@ -542,7 +536,7 @@ class SyncLogViewer extends Component<Props, State> {
                     colorTables={this.props.colorTables}
                     hideTitles={this.props.hideTitles}
                     hideLegend={this.props.hideLegend}
-                        onCreateSpacer={(spacer: WellLogSpacer): void => {
+                    onCreateSpacer={(spacer: WellLogSpacer): void => {
                         this.spacers[index] = spacer;
                     }}
                 ></WellLogSpacer>

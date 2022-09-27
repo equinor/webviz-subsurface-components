@@ -348,60 +348,64 @@ function _getLogIndexByNames(curves: WellLogCurve[], names: string[]): number {
     return -1;
 }
 
-export function getWellPicks(wellLogView: WellLogView)
-{
-  let wps: {vMD:number,vPrimary:number|undefined,vSecondary:number|undefined,horizon:string, color: number[]}[] =[];
-  const wellpick = wellLogView.props.wellpick;
-  if (!wellpick) return wps;
+export function getWellPicks(wellLogView: WellLogView) {
+    const wps: {
+        vMD: number;
+        vPrimary: number | undefined;
+        vSecondary: number | undefined;
+        horizon: string;
+        color: number[];
+    }[] = [];
+    const wellpick = wellLogView.props.wellpick;
+    if (!wellpick) return wps;
 
-  const curves = wellpick.wellpick.curves;
-  const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
-  if (md < 0) {
-      console.error(
-          "MD log is not found for wellpicks ",
-          wellpick.md ? wellpick.md : ""
-      );
-      return wps;
-  }
+    const curves = wellpick.wellpick.curves;
+    const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
+    if (md < 0) {
+        console.error(
+            "MD log is not found for wellpicks ",
+            wellpick.md ? wellpick.md : ""
+        );
+        return wps;
+    }
 
-  const primaryAxis = wellLogView.props.primaryAxis;
-  const scaleInterpolator = wellLogView.scaleInterpolator;
+    const primaryAxis = wellLogView.props.primaryAxis;
+    const scaleInterpolator = wellLogView.scaleInterpolator;
 
-  for (const c in curves) {
-      const curve = curves[c];
-      if (curve.name !== wellpick.name) continue;
-      const data = wellpick.wellpick.data;
-      for (const d of data) {
-          if (d[md] === null) continue; // no MD!
-          const horizon = d[c] as string | null;
-          if (horizon === null) continue;
+    for (const c in curves) {
+        const curve = curves[c];
+        if (curve.name !== wellpick.name) continue;
+        const data = wellpick.wellpick.data;
+        for (const d of data) {
+            if (d[md] === null) continue; // no MD!
+            const horizon = d[c] as string | null;
+            if (horizon === null) continue;
 
-          const vMD = d[md] as number;
-          const vPrimary =
-              primaryAxis === "md" ? vMD : scaleInterpolator?.forward(vMD);
-          const vSecondary =
-              primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
+            const vMD = d[md] as number;
+            const vPrimary =
+                primaryAxis === "md" ? vMD : scaleInterpolator?.forward(vMD);
+            const vSecondary =
+                primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
 
-          const colorTable = wellpick.colorTables.find(
+            const colorTable = wellpick.colorTables.find(
                 (colorTable) => colorTable.name == wellpick.color
-          );
+            );
 
-          const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
-          const { color } = getDiscreteColorAndName(d[c], colorTable, meta);
+            const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
+            const { color } = getDiscreteColorAndName(d[c], colorTable, meta);
 
-
-          let wp={vMD,vPrimary,vSecondary,horizon,color};
-          wps.push(wp);
-      }
-      break;
-  }
-  return wps;
+            const wp = { vMD, vPrimary, vSecondary, horizon, color };
+            wps.push(wp);
+        }
+        break;
+    }
+    return wps;
 }
 
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     const wpSize = 3; //9;
     //const offset = wpSize / 2;
-    const wps=getWellPicks(parent);
+    const wps = getWellPicks(parent);
     if (!wps.length) return;
 
     const wellpick = parent.props.wellpick;
@@ -409,83 +413,79 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
 
     const primaryAxis = parent.props.primaryAxis;
 
-    for(const wp of wps) {
-            const horizon = wp.horizon;
-            const vMD = wp.vMD;
-            const vPrimary = wp.vPrimary;
-            const vSecondary = wp.vSecondary;
-            const color = wp.color
+    for (const wp of wps) {
+        const horizon = wp.horizon;
+        const vMD = wp.vMD;
+        const vPrimary = wp.vPrimary;
+        const vSecondary = wp.vSecondary;
+        const color = wp.color;
 
-            const txtPrimary = !Number.isFinite(vPrimary)
-                ? ""
-                : vPrimary?.toFixed(0);
-            const txtSecondary = !Number.isFinite(vSecondary)
-                ? ""
-                : (primaryAxis === "md" ? "TVD:" : "MD:") +
-                  vSecondary?.toFixed(0);
+        const txtPrimary = !Number.isFinite(vPrimary)
+            ? ""
+            : vPrimary?.toFixed(0);
+        const txtSecondary = !Number.isFinite(vSecondary)
+            ? ""
+            : (primaryAxis === "md" ? "TVD:" : "MD:") + vSecondary?.toFixed(0);
 
-            instance.overlay.remove("wp" + horizon); // clear old if exists
-            const pinelm = instance.overlay.create("wp" + horizon, {});
+        instance.overlay.remove("wp" + horizon); // clear old if exists
+        const pinelm = instance.overlay.create("wp" + horizon, {});
 
-            const rgba =
-                "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.8)";
-            const styleText =
-                "style='background-color:rgba(" +
-                color[0] +
-                "," +
-                color[1] +
-                "," +
-                color[2] +
-                ",0.16)'";
+        const rgba =
+            "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.8)";
+        const styleText =
+            "style='background-color:rgba(" +
+            color[0] +
+            "," +
+            color[1] +
+            "," +
+            color[2] +
+            ",0.16)'";
 
-            const pin = select(pinelm)
-                .classed("wellpick", true)
-                .style(
-                    parent.props.horizontal ? "width" : "height",
-                    `${wpSize}px`
-                )
-                .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-                .style(parent.props.horizontal ? "top" : "left", `${0}px`)
-                .style("background-color", rgba)
-                .style("position", "absolute")
-                .style("visibility", "false");
+        const pin = select(pinelm)
+            .classed("wellpick", true)
+            .style(parent.props.horizontal ? "width" : "height", `${wpSize}px`)
+            .style(parent.props.horizontal ? "height" : "width", `${100}%`)
+            .style(parent.props.horizontal ? "top" : "left", `${0}px`)
+            .style("background-color", rgba)
+            .style("position", "absolute")
+            .style("visibility", "false");
 
-            pin.append("div")
-                .html(
-                    parent.props.horizontal
-                        ? "<font size=1><table height=100%'><tr><td><span " +
-                              styleText +
-                              ">" +
-                              txtPrimary +
-                              "</span></td></tr><tr><td height=100%><span  " +
-                              styleText +
-                              ">" +
-                              horizon +
-                              "</span></td></tr><tr><td><span " +
-                              styleText +
-                              ">" +
-                              txtSecondary +
-                              "</span></td></tr></table>"
-                        : "<font size=1><table width=100% style='position:relative; top:-1.5em;'><tr><td " +
-                              styleText +
-                              ">" +
-                              txtPrimary +
-                              "</td><td width=100% align=center><span  " +
-                              styleText +
-                              ">" +
-                              horizon +
-                              "</span></td><td " +
-                              styleText +
-                              ">" +
-                              txtSecondary +
-                              "</td></tr></table>"
-                )
-                .style(parent.props.horizontal ? "width" : "height", "1px")
-                .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-                ///.style(parent.props.horizontal ? "left" : "top", `${offset}px`)
-                .style("background-color", rgba)
-                //.style("position", "relative");
-                .style("position", "absolute");
+        pin.append("div")
+            .html(
+                parent.props.horizontal
+                    ? "<font size=1><table height=100%'><tr><td><span " +
+                          styleText +
+                          ">" +
+                          txtPrimary +
+                          "</span></td></tr><tr><td height=100%><span  " +
+                          styleText +
+                          ">" +
+                          horizon +
+                          "</span></td></tr><tr><td><span " +
+                          styleText +
+                          ">" +
+                          txtSecondary +
+                          "</span></td></tr></table>"
+                    : "<font size=1><table width=100% style='position:relative; top:-1.5em;'><tr><td " +
+                          styleText +
+                          ">" +
+                          txtPrimary +
+                          "</td><td width=100% align=center><span  " +
+                          styleText +
+                          ">" +
+                          horizon +
+                          "</span></td><td " +
+                          styleText +
+                          ">" +
+                          txtSecondary +
+                          "</td></tr></table>"
+            )
+            .style(parent.props.horizontal ? "width" : "height", "1px")
+            .style(parent.props.horizontal ? "height" : "width", `${100}%`)
+            ///.style(parent.props.horizontal ? "left" : "top", `${offset}px`)
+            .style("background-color", rgba)
+            //.style("position", "relative");
+            .style("position", "absolute");
     }
 }
 
@@ -1183,24 +1183,24 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                     wellpick.md ? wellpick.md : "MD",
                 ]);
 
-                const wps=getWellPicks(this);
+                const wps = getWellPicks(this);
                 if (!wps.length) return;
-                for(const wp of wps) {
-                        const horizon = wp.horizon;
-                        const vMD = wp.vMD;
-                        const vPrimary = wp.vPrimary;
-                        const vSecondary = wp.vSecondary;
-                        const color = wp.color
+                for (const wp of wps) {
+                    const horizon = wp.horizon;
+                    const vMD = wp.vMD;
+                    const vPrimary = wp.vPrimary;
+                    const vSecondary = wp.vSecondary;
+                    const color = wp.color;
 
-                        const pinelm =
-                            this.logController.overlay.elements["wp" + horizon];
-                        if (!pinelm) continue;
-                        showWellPicks(
-                            pinelm,
-                            vPrimary,
-                            this.props.horizontal,
-                            this.logController
-                        );
+                    const pinelm =
+                        this.logController.overlay.elements["wp" + horizon];
+                    if (!pinelm) continue;
+                    showWellPicks(
+                        pinelm,
+                        vPrimary,
+                        this.props.horizontal,
+                        this.logController
+                    );
                 }
             }
         }
