@@ -57,8 +57,8 @@ import {
     scrollTracksTo,
     isTrackSelected,
     selectTrack,
-    getSelectedTrackIndeces,
-    setSelectedTrackIndeces,
+    getSelectedTrackIndices,
+    setSelectedTrackIndices,
 } from "../utils/log-viewer";
 
 function showSelection(
@@ -281,9 +281,6 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
                 }
             }
         },
-        /* keep selection  onMouseExit: (event: OverlayMouseExitEvent): void => {
-            if (event.target) event.target.style.visibility = "hidden";
-        },*/
     });
 
     const pin = select(pinelm)
@@ -351,40 +348,74 @@ function _getLogIndexByNames(curves: WellLogCurve[], names: string[]): number {
     return -1;
 }
 
+export function getWellPicks(wellLogView: WellLogView)
+{
+  let wps: {vMD:number,vPrimary:number|undefined,vSecondary:number|undefined,horizon:string, color: number[]}[] =[];
+  const wellpick = wellLogView.props.wellpick;
+  if (!wellpick) return wps;
+
+  const curves = wellpick.wellpick.curves;
+  const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
+  if (md < 0) {
+      console.error(
+          "MD log is not found for wellpicks ",
+          wellpick.md ? wellpick.md : ""
+      );
+      return wps;
+  }
+
+  const primaryAxis = wellLogView.props.primaryAxis;
+  const scaleInterpolator = wellLogView.scaleInterpolator;
+
+  for (const c in curves) {
+      const curve = curves[c];
+      if (curve.name !== wellpick.name) continue;
+      const data = wellpick.wellpick.data;
+      for (const d of data) {
+          if (d[md] === null) continue; // no MD!
+          const horizon = d[c] as string | null;
+          if (horizon === null) continue;
+
+          const vMD = d[md] as number;
+          const vPrimary =
+              primaryAxis === "md" ? vMD : scaleInterpolator?.forward(vMD);
+          const vSecondary =
+              primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
+
+          const colorTable = wellpick.colorTables.find(
+                (colorTable) => colorTable.name == wellpick.color
+          );
+
+          const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
+          const { color } = getDiscreteColorAndName(d[c], colorTable, meta);
+
+
+          let wp={vMD,vPrimary,vSecondary,horizon,color};
+          wps.push(wp);
+      }
+      break;
+  }
+  return wps;
+}
+
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
+    const wpSize = 3; //9;
+    //const offset = wpSize / 2;
+    const wps=getWellPicks(parent);
+    if (!wps.length) return;
+
     const wellpick = parent.props.wellpick;
     if (!wellpick) return;
 
-    const curves = wellpick.wellpick.curves;
-    const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
-    if (md < 0) {
-        console.error(
-            "MD log is not found for wellpicks ",
-            wellpick.md ? wellpick.md : ""
-        );
-        return;
-    }
-
     const primaryAxis = parent.props.primaryAxis;
-    const scaleInterpolator = parent.scaleInterpolator;
 
-    const wpSize = 3; //9;
-    //const offset = wpSize / 2;
+    for(const wp of wps) {
+            const horizon = wp.horizon;
+            const vMD = wp.vMD;
+            const vPrimary = wp.vPrimary;
+            const vSecondary = wp.vSecondary;
+            const color = wp.color
 
-    for (const c in curves) {
-        const curve = curves[c];
-        if (curve.name !== wellpick.name) continue;
-        const data = wellpick.wellpick.data;
-        for (const d of data) {
-            if (d[md] === null) continue; // no MD!
-            const horizon = d[c] as string | null;
-            if (horizon === null) continue;
-
-            const vMD = d[md] as number;
-            const vPrimary =
-                primaryAxis === "md" ? vMD : scaleInterpolator?.forward(vMD);
-            const vSecondary =
-                primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
             const txtPrimary = !Number.isFinite(vPrimary)
                 ? ""
                 : vPrimary?.toFixed(0);
@@ -392,15 +423,9 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                 ? ""
                 : (primaryAxis === "md" ? "TVD:" : "MD:") +
                   vSecondary?.toFixed(0);
+
             instance.overlay.remove("wp" + horizon); // clear old if exists
             const pinelm = instance.overlay.create("wp" + horizon, {});
-
-            const colorTable = wellpick.colorTables.find(
-                (colorTable) => colorTable.name == wellpick.color
-            );
-
-            const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
-            const { color } = getDiscreteColorAndName(d[c], colorTable, meta);
 
             const rgba =
                 "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.8)";
@@ -461,11 +486,6 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                 .style("background-color", rgba)
                 //.style("position", "relative");
                 .style("position", "absolute");
-
-            //const horizontal = parent.props.horizontal;
-            //showWellPicks(pinelm, vPrimary, horizontal, instance)
-        }
-        break;
     }
 }
 
@@ -752,8 +772,8 @@ export interface WellLogController {
     getTrackScrollPosMax(): number;
     getTrackZoom(): number;
 
-    setSelectedTrackIndeces(selection: number[]): boolean;
-    getSelectedTrackIndeces(): number[];
+    setSelectedTrackIndices(selection: number[]): boolean;
+    getSelectedTrackIndices(): number[];
 
     setTemplate(template: Template): void;
     getTemplate(): Template;
@@ -928,7 +948,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.props.onCreateController(this);
         }
 
-        let selectedTrackIndeces: number[] = []; // indeces to restore
+        let selectedTrackIndices: number[] = []; // Indices to restore
         let selection: [number | undefined, number | undefined] | undefined =
             undefined; // content selection to restore
         let shouldSetTracks = false;
@@ -940,7 +960,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.props.maxContentZoom !== prevProps.maxContentZoom
         ) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = this.getSelectedTrackIndeces();
+            selectedTrackIndices = this.getSelectedTrackIndices();
             this.createLogViewer();
             shouldSetTracks = true;
         }
@@ -955,19 +975,20 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.template = deepCopy(this.props.template); // save external template content to current
             shouldSetTracks = true;
             checkSchema = true;
+        } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
+            this.selectContent([undefined, undefined]);
+            selectedTrackIndices = this.getSelectedTrackIndices();
+            shouldSetTracks = true;
         } else if (this.props.colorTables !== prevProps.colorTables) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = this.getSelectedTrackIndeces();
+            selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true; // force to repaint
-        } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
-            selectedTrackIndeces = this.getSelectedTrackIndeces();
-            shouldSetTracks = true;
         } else if (
             this.props.axisTitles !== prevProps.axisTitles ||
             this.props.axisMnemos !== prevProps.axisMnemos
         ) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = this.getSelectedTrackIndeces();
+            selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true; //??
         } else if (this.props.wellpick !== prevProps.wellpick) {
             if (this.logController)
@@ -976,7 +997,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (shouldSetTracks) {
             this.setTracks(checkSchema); // use this.template
-            setSelectedTrackIndeces(this.logController, selectedTrackIndeces);
+            setSelectedTrackIndices(this.logController, selectedTrackIndices);
             if (selection) this.selectContent(selection);
         } else if (
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
@@ -1161,20 +1182,16 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 const md = _getLogIndexByNames(curves, [
                     wellpick.md ? wellpick.md : "MD",
                 ]);
-                for (const c in curves) {
-                    const curve = curves[c];
-                    if (curve.name !== wellpick.name) continue;
-                    const data = wellpick.wellpick.data;
-                    for (const d of data) {
-                        if (d[md] === null) continue; // no MD!
 
-                        const vMD = d[md] as number;
-                        const vPrimary =
-                            primaryAxis === "md"
-                                ? vMD
-                                : scaleInterpolator?.forward(vMD);
+                const wps=getWellPicks(this);
+                if (!wps.length) return;
+                for(const wp of wps) {
+                        const horizon = wp.horizon;
+                        const vMD = wp.vMD;
+                        const vPrimary = wp.vPrimary;
+                        const vSecondary = wp.vSecondary;
+                        const color = wp.color
 
-                        const horizon = d[c] as string;
                         const pinelm =
                             this.logController.overlay.elements["wp" + horizon];
                         if (!pinelm) continue;
@@ -1184,7 +1201,6 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                             this.props.horizontal,
                             this.logController
                         );
-                    }
                 }
             }
         }
@@ -1268,11 +1284,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this._graphTrackMax() / this._maxVisibleTrackNum();
     }
 
-    getSelectedTrackIndeces(): number[] {
-        return getSelectedTrackIndeces(this.logController);
+    getSelectedTrackIndices(): number[] {
+        return getSelectedTrackIndices(this.logController);
     }
-    setSelectedTrackIndeces(selection: number[]): boolean {
-        const changed = setSelectedTrackIndeces(this.logController, selection);
+    setSelectedTrackIndices(selection: number[]): boolean {
+        const changed = setSelectedTrackIndices(this.logController, selection);
         if (changed) this.onTrackSelection();
         return changed;
     }
