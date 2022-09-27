@@ -1,4 +1,3 @@
-cd ..
 git ls-files --others --exclude-standard > files.txt
 while IFS= read -r file
 do
