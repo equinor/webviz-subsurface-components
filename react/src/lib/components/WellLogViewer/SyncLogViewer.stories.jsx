@@ -206,6 +206,6 @@ Default.args = {
             color: "Stratigraphy",
         },
     ],
-    wellDistances: [2048.3, 512.7, 1024],
-    spacerWidths: [512, 255, 255],
+    spacers: [312, 255],
+    wellDistances: [2048.3, 512.7],
 };

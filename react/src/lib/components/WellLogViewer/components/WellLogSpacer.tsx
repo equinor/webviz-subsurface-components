@@ -69,9 +69,11 @@ class WellLogSpacer extends Component<Props /*, State*/> {
     }
 
     render(): ReactNode {
+        // see also colors in Overlays in WellLogView.ts
         const selColor = "rgba(0, 0, 0, 0.1)";
         const curColor = "rgba(255, 0, 0, 0.1)";
         const pinColor = "rgba(0, 255, 0, 0.1)";
+
         const horizontal = this.props.horizontal;
 
         let ymax = 0;
@@ -203,6 +205,8 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                 style={{
                     width: "100%",
                     height: "100%",
+                    display: "flex",
+                    flexDirection: horizontal ? "row" : "column",
                 }}
                 ref={(el) => (this.container = el as HTMLElement)}
             >
@@ -210,13 +214,19 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                     style={
                         horizontal
                             ? {
+                                  writingMode: horizontal
+                                      ? "vertical-lr"
+                                      : undefined,
+                                  transform: horizontal
+                                      ? "rotate(180deg)"
+                                      : undefined,
                                   width: offsetLeft + "px",
                                   height: height + "px",
                               }
                             : { height: offsetTop + "px", width: width + "px" }
                     }
                 >
-                    <br />
+                    {!this.props.hideTitles ? <br /> : null}
                     {!this.props.hideLegend &&
                     this.props.distance !== undefined ? (
                         <div style={{ fontSize: 12, textAlign: "center" }}>

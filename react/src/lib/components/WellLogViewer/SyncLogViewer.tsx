@@ -31,20 +31,49 @@ import { LogViewer } from "@equinor/videx-wellog";
 import { Info, InfoOptions } from "./components/InfoTypes";
 
 interface Props {
+    /**
+     * Object from JSON file describing single well log data.
+     */
     welllogs: WellLog[];
-    templates: Template[];
-    colorTables: ColorTable[];
-    wellpicks?: WellPickProps[];
-    wellDistances?: (number | undefined)[];
-    spacerWidths?: number[];
 
+    /**
+     * Prop containing track templates data.
+     */
+    templates: Template[];
+    /**
+     * Prop containing color table data.
+     */
+    colorTables: ColorTable[];
+    /**
+     * Well Picks data
+     */
+    wellpicks?: WellPickProps[];
+
+    /**
+     * Set to true or to array of spaser widths if WellLogSpacers should be used
+     */
+    spacers?: boolean | number[];
+    /**
+     * Distanses between wells to show on the spacers
+     */
+    wellDistances?: (number | undefined)[];
+
+    /**
+     * Orientation of the track plots on the screen.
+     */
     horizontal?: boolean;
     syncTrackPos?: boolean;
     syncContentDomain?: boolean;
     syncContentSelection?: boolean;
     syncTemplate?: boolean;
 
+    /**
+     * Show Titles on the tracks
+     */
     hideTitles?: boolean;
+    /**
+     * Hide Legends on the tracks
+     */
     hideLegend?: boolean;
 
     domain?: [number, number]; //  initial visible range
@@ -512,9 +541,10 @@ class SyncLogViewer extends Component<Props, State> {
     }
 
     createSpacer(index: number): ReactNode {
-        if (this.props.horizontal) return null;
+        if (!this.props.spacers) return null;
         const prev = index - 1;
-        let width = this.props.spacerWidths?.[prev];
+        let width =
+            this.props.spacers === true ? 255 : this.props.spacers[prev];
         if (width === undefined) width = 255; // set some default value
         if (!width) return null;
         return (
