@@ -404,7 +404,7 @@ export default class Map3DLayer extends CompositeLayer<
             const ycount = this.props.frame?.count?.[1] ?? 1;
 
             const xMin = this.props.frame?.origin?.[0] ?? bounds[0];
-            const yMin = this.props.frame?.origin?.[0] ?? bounds[1];
+            const yMin = this.props.frame?.origin?.[1] ?? bounds[1];
             const zMin = -this.props.meshValueRange[1];
             const xMax = isFrame ? xMin + xinc * xcount : bounds[2];
             const yMax = isFrame ? yMin + yinc * ycount : bounds[3];
