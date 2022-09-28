@@ -64,7 +64,7 @@ const smallLayer = {
 // This layer has as many property values as depth values hence each cell will be interpolated in color.
 const nodeCenteredPropertiesLayer = {
     "@@type": "MapLayer",
-    id: "cellCenteredPropertiesLayer-layer",
+    id: "node-centered-layer",
 
     meshUrl:
         "data:text/plain;base64,zczMP5qZ2T9mZuY/MzPzP5qZmT9mZqY/MzOzPwAAwD/NzEw/ZmZmPwAAgD/NzIw/zczMPgAAAD+amRk/MzMzPwAAAIDNzMw9zcxMPpqZmT4=",
@@ -89,7 +89,7 @@ const nodeCenteredPropertiesLayer = {
 // This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
 const cellCenteredPropertiesLayer = {
     "@@type": "MapLayer",
-    id: "cellCenteredPropertiesLayer-layer",
+    id: "cell-centered-layer",
 
     meshUrl:
         "data:text/plain;base64,zczMP5qZ2T9mZuY/MzPzP5qZmT9mZqY/MzOzPwAAwD/NzEw/ZmZmPwAAgD/NzIw/zczMPgAAAD+amRk/MzMzPwAAAIDNzMw9zcxMPpqZmT4=",
