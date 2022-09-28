@@ -35,7 +35,7 @@ interface Props {
     templates: Template[];
     colorTables: ColorTable[];
     wellpicks?: WellPickProps[];
-    welldistances?: (number | undefined)[];
+    wellDistances?: (number | undefined)[];
     spacerWidths?: number[];
 
     horizontal?: boolean;

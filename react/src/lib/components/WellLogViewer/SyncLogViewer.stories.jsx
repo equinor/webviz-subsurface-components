@@ -140,7 +140,7 @@ const Template = (args) => {
         [controller]
     );
     const onContentSelection = React.useCallback(
-        (_iView) => {
+        (/*_iView*/) => {
             /*if(iView===0)*/ setInfo(fillInfo(controller));
         },
         [controller]
@@ -186,8 +186,6 @@ Default.args = {
         require("../../../demo/example-data/synclog_template.json"),
     ],
     colorTables: require("../../../demo/example-data/color-tables.json"),
-    welldistances: [2048.3, 512.7, 1024],
-    spacerWidths: [512, 255, 255],
     wellpicks: [
         {
             wellpick: require("../../../demo/example-data/wellpicks.json")[0],
@@ -208,4 +206,6 @@ Default.args = {
             color: "Stratigraphy",
         },
     ],
+    wellDistances: [2048.3, 512.7, 1024],
+    spacerWidths: [512, 255, 255],
 };

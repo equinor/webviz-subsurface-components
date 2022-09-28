@@ -39,16 +39,16 @@ interface Props {
     onCreateSpacer?: (spacer: WellLogSpacer) => void;
 }
 
-interface State {}
+//interface State {}
 
-class WellLogSpacer extends Component<Props, State> {
+class WellLogSpacer extends Component<Props /*, State*/> {
     container: HTMLElement | undefined = undefined;
 
     constructor(props: Props) {
         super(props);
     }
 
-    update() {
+    update(): void {
         this.forceUpdate();
     }
 
@@ -219,6 +219,7 @@ class WellLogSpacer extends Component<Props, State> {
                             {picks.map((value, index) =>
                                 index + 1 < picks.length ? (
                                     <polygon
+                                        key={index}
                                         fill={value.color}
                                         stroke="none"
                                         points={
@@ -238,8 +239,9 @@ class WellLogSpacer extends Component<Props, State> {
                                     />
                                 ) : null
                             )}
-                            {picks.map((value) => (
+                            {picks.map((value, index) => (
                                 <path
+                                    key={index}
                                     fill="none"
                                     stroke={value.color}
                                     d={

@@ -118,10 +118,10 @@ function showSelection(
 function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
     const offset = rubberBandSize / 2;
+    const horizontal = parent.props.horizontal;
     const rbelm = instance.overlay.create("rubber-band", {
         onMouseMove: (event: OverlayMouseMoveEvent) => {
             if (parent.selPersistent) return;
-            const horizontal = parent.props.horizontal;
             const v = horizontal ? event.x : event.y;
             parent.selCurrent = instance.scale.invert(v);
 
@@ -154,27 +154,25 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
 
     const rb = select(rbelm)
         .classed("rubber-band", true)
-        .style(
-            parent.props.horizontal ? "width" : "height",
-            `${rubberBandSize}px`
-        )
-        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
+        .style(horizontal ? "width" : "height", `${rubberBandSize}px`)
+        .style(horizontal ? "height" : "width", `${100}%`)
         .style("background-color", "rgba(255,0,0,0.1)")
         .style("visibility", "hidden");
 
     rb.append("div")
-        .style(parent.props.horizontal ? "width" : "height", "1px")
-        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-        .style(parent.props.horizontal ? "left" : "top", `${offset}px`)
+        .style(horizontal ? "width" : "height", "1px")
+        .style(horizontal ? "height" : "width", `${100}%`)
+        .style(horizontal ? "left" : "top", `${offset}px`)
         .style("background-color", "rgba(255,0,0,0.7)")
         .style("position", "relative");
 }
 
 function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
+    const horizontal = parent.props.horizontal;
     const elm = instance.overlay.create("depth", {
         onClick: (event: OverlayClickEvent): void => {
             const { caller, x, y } = event;
-            const value = caller.scale.invert(parent.props.horizontal ? x : y);
+            const value = caller.scale.invert(horizontal ? x : y);
             const elem = event.target;
             if (elem) {
                 const axisTitle = parent.props.axisTitles
@@ -245,9 +243,9 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
 function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
     const offset = rubberBandSize / 2;
+    const horizontal = parent.props.horizontal;
     const pinelm = instance.overlay.create("pinned", {
         onClick: (event: OverlayClickEvent): void => {
-            const horizontal = parent.props.horizontal;
             const v = horizontal ? event.x : event.y;
             const pinelm = event.target;
             if (pinelm) {
@@ -285,20 +283,17 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
 
     const pin = select(pinelm)
         .classed("pinned", true)
-        .style(
-            parent.props.horizontal ? "width" : "height",
-            `${rubberBandSize}px`
-        )
-        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-        .style(parent.props.horizontal ? "top" : "left", `${0}px`)
+        .style(horizontal ? "width" : "height", `${rubberBandSize}px`)
+        .style(horizontal ? "height" : "width", `${100}%`)
+        .style(horizontal ? "top" : "left", `${0}px`)
         .style("background-color", "rgba(0,0,0,0.1)")
         .style("position", "absolute")
         .style("visibility", "hidden");
 
     pin.append("div")
-        .style(parent.props.horizontal ? "width" : "height", "1px")
-        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-        .style(parent.props.horizontal ? "left" : "top", `${offset}px`)
+        .style(horizontal ? "width" : "height", "1px")
+        .style(horizontal ? "height" : "width", `${100}%`)
+        .style(horizontal ? "left" : "top", `${offset}px`)
         .style("background-color", "rgba(0,255,0,0.7)")
         //.style("position", "relative");
         .style("position", "absolute");
@@ -348,14 +343,16 @@ function _getLogIndexByNames(curves: WellLogCurve[], names: string[]): number {
     return -1;
 }
 
-export function getWellPicks(wellLogView: WellLogView) {
-    const wps: {
-        vMD: number;
-        vPrimary: number | undefined;
-        vSecondary: number | undefined;
-        horizon: string;
-        color: number[];
-    }[] = [];
+interface WellPick {
+    vMD: number;
+    vPrimary: number | undefined;
+    vSecondary: number | undefined;
+    horizon: string;
+    color: number[];
+}
+
+export function getWellPicks(wellLogView: WellLogView): WellPick[] {
+    const wps: WellPick[] = [];
     const wellpick = wellLogView.props.wellpick;
     if (!wellpick) return wps;
 
