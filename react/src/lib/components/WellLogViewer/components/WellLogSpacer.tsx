@@ -69,12 +69,18 @@ class WellLogSpacer extends Component<Props /*, State*/> {
     }
 
     render(): ReactNode {
-        const width = this.container ? this.container.clientWidth : 10;
+        const selColor = "rgba(0, 0, 0, 0.1)";
+        const curColor = "rgba(255, 0, 0, 0.1)";
+        const pinColor = "rgba(0, 255, 0, 0.1)";
+        const horizontal = this.props.horizontal;
+
         let ymax = 0;
         const picks: { color: string; from: number; to: number }[] = [];
 
         let offsetTop = 1157;
-        let clientHeight = 1;
+        let offsetLeft = 1157;
+        let height = 1;
+        let width = 1;
         const controller = this.props.controllers[0] as WellLogView;
         const logViewer = controller?.logController;
         const controller2 = this.props.controllers[1] as WellLogView;
@@ -87,8 +93,13 @@ class WellLogSpacer extends Component<Props /*, State*/> {
 
             if (source) {
                 offsetTop = source.offsetTop;
-                clientHeight = source.clientHeight;
+                offsetLeft = source.offsetLeft;
+                height = source.clientHeight;
+                width = source.clientWidth;
             }
+            if (horizontal)
+                height = this.container ? this.container.clientHeight : 10;
+            else width = this.container ? this.container.clientWidth : 10;
 
             //const wpSize = 3; //9;
             //const offset = wpSize / 2;
@@ -182,6 +193,11 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                 selection[1].to = tmp;
             }
 
+        const from0 = selection[0]?.from?.toFixed(1);
+        const to0 = selection[0]?.to?.toFixed(1);
+        const from1 = selection[1]?.from?.toFixed(1);
+        const to1 = selection[1]?.to?.toFixed(1);
+
         return (
             <div
                 style={{
@@ -190,114 +206,157 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                 }}
                 ref={(el) => (this.container = el as HTMLElement)}
             >
-                <div style={{ height: offsetTop + "px", width: width + "px" }}>
+                <div
+                    style={
+                        horizontal
+                            ? {
+                                  width: offsetLeft + "px",
+                                  height: height + "px",
+                              }
+                            : { height: offsetTop + "px", width: width + "px" }
+                    }
+                >
                     <br />
-                    {!this.props.hideLegend && this.props.distance ? (
+                    {!this.props.hideLegend &&
+                    this.props.distance !== undefined ? (
                         <div style={{ fontSize: 12, textAlign: "center" }}>
                             {"←" + this.props.distance.toFixed(0) + "m→"}
                         </div>
                     ) : null}
                 </div>
-                <div style={{ width: width + "px" }}>
+                <div
+                    style={
+                        horizontal
+                            ? { height: height + "px" }
+                            : { width: width + "px" }
+                    }
+                >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        viewBox={"0 0 " + width + " " + ymax}
+                        viewBox={"0 0 " + width + " " + height}
+                        width={width}
+                        height={height}
                         stroke="currentColor"
                         strokeWidth={3}
                     >
-                        <defs>
-                            <clipPath id="myClip">
-                                <rect
-                                    x="0"
-                                    y="0"
-                                    width={width}
-                                    height={clientHeight}
-                                />
-                            </clipPath>
-                        </defs>
-                        <g clipPath="url(#myClip)">
-                            {picks.map((value, index) =>
-                                index + 1 < picks.length ? (
-                                    <polygon
-                                        key={index}
-                                        fill={value.color}
-                                        stroke="none"
-                                        points={
-                                            "0 " +
-                                            value.from.toFixed(1) +
-                                            " " +
-                                            width +
-                                            " " +
-                                            value.to.toFixed(1) +
-                                            " " +
-                                            width +
-                                            " " +
-                                            picks[index + 1].to.toFixed(1) +
-                                            " 0 " +
-                                            picks[index + 1].from.toFixed(1)
-                                        }
-                                    />
-                                ) : null
-                            )}
-                            {picks.map((value, index) => (
-                                <path
+                        {picks.map((value, index) =>
+                            index + 1 < picks.length ? (
+                                <polygon
                                     key={index}
-                                    fill="none"
-                                    stroke={value.color}
-                                    d={
-                                        "M 0 " +
-                                        value.from.toFixed(1) +
-                                        " L " +
-                                        width +
-                                        " " +
-                                        value.to.toFixed(1)
+                                    fill={value.color}
+                                    stroke="none"
+                                    points={
+                                        horizontal
+                                            ? value.from.toFixed(1) +
+                                              " 0 " +
+                                              value.to.toFixed(1) +
+                                              " " +
+                                              height +
+                                              " " +
+                                              picks[index + 1].to.toFixed(1) +
+                                              " " +
+                                              height +
+                                              " " +
+                                              picks[index + 1].from.toFixed(1) +
+                                              " 0"
+                                            : "0 " +
+                                              value.from.toFixed(1) +
+                                              " " +
+                                              width +
+                                              " " +
+                                              value.to.toFixed(1) +
+                                              " " +
+                                              width +
+                                              " " +
+                                              picks[index + 1].to.toFixed(1) +
+                                              " 0 " +
+                                              picks[index + 1].from.toFixed(1)
                                     }
                                 />
-                            ))}
+                            ) : null
+                        )}
+                        {picks.map((value, index) => (
+                            <path
+                                key={index}
+                                fill="none"
+                                stroke={value.color}
+                                d={
+                                    horizontal
+                                        ? "M " +
+                                          value.from.toFixed(1) +
+                                          "0  L " +
+                                          value.to.toFixed(1) +
+                                          " " +
+                                          height
+                                        : "M 0 " +
+                                          value.from.toFixed(1) +
+                                          " L " +
+                                          width +
+                                          " " +
+                                          value.to.toFixed(1)
+                                }
+                            />
+                        ))}
 
-                            <polygon
-                                fill="rgba(0, 0, 0, 0.1)"
-                                stroke="none"
-                                points={
-                                    "0 " +
-                                    selection[0]?.from?.toFixed(1) +
-                                    " " +
-                                    width +
-                                    " " +
-                                    selection[0]?.to?.toFixed(1) +
-                                    " " +
-                                    width +
-                                    " " +
-                                    selection[1]?.to?.toFixed(1) +
-                                    " 0 " +
-                                    selection[1]?.from?.toFixed(1)
-                                }
-                            />
-                            <path
-                                fill="none"
-                                stroke="rgba(255, 0, 0, 0.1)"
-                                d={
-                                    "M 0 " +
-                                    selection[0]?.from?.toFixed(1) +
-                                    " L " +
-                                    width +
-                                    " " +
-                                    selection[0]?.to?.toFixed(1)
-                                }
-                            />
-                            <path
-                                fill="none"
-                                stroke="rgba(0, 255, 0, 0.1)"
-                                d={
-                                    "M 0 " +
-                                    selection[1]?.from?.toFixed(1) +
-                                    " L " +
-                                    width +
-                                    " " +
-                                    selection[1]?.to?.toFixed(1)
-                                }
-                            />
-                        </g>
+                        <polygon
+                            fill={selColor}
+                            stroke="none"
+                            points={
+                                horizontal
+                                    ? from0 +
+                                      " 0 " +
+                                      to0 +
+                                      " " +
+                                      height +
+                                      " " +
+                                      from1 +
+                                      " " +
+                                      height +
+                                      " " +
+                                      to1 +
+                                      " 0"
+                                    : "0 " +
+                                      from0 +
+                                      " " +
+                                      width +
+                                      " " +
+                                      to0 +
+                                      " " +
+                                      width +
+                                      " " +
+                                      from1 +
+                                      " 0 " +
+                                      to1
+                            }
+                        />
+                        <path
+                            fill="none"
+                            stroke={curColor}
+                            d={
+                                horizontal
+                                    ? "M " +
+                                      from0 +
+                                      " 0 L " +
+                                      to0 +
+                                      " " +
+                                      height
+                                    : "M 0 " + from0 + " L " + width + " " + to0
+                            }
+                        />
+                        <path
+                            fill="none"
+                            stroke={pinColor}
+                            d={
+                                horizontal
+                                    ? "M " +
+                                      from1 +
+                                      " 0 L " +
+                                      to1 +
+                                      " " +
+                                      height
+                                    : "M 0 " + from1 + " L " + width + " " + to1
+                            }
+                        />
                     </svg>
                 </div>
             </div>

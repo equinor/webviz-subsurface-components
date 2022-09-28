@@ -512,12 +512,20 @@ class SyncLogViewer extends Component<Props, State> {
     }
 
     createSpacer(index: number): ReactNode {
+        if (this.props.horizontal) return null;
         const prev = index - 1;
         let width = this.props.spacerWidths?.[prev];
         if (width === undefined) width = 255; // set some default value
         if (!width) return null;
         return (
-            <div style={{ width: width + "px" }}>
+            <div
+                style={
+                    this.props.horizontal
+                        ? { height: width + "px" }
+                        : { width: width + "px" }
+                }
+                key={"s" + index}
+            >
                 <WellLogSpacer
                     controllers={
                         this.controllers
@@ -534,6 +542,7 @@ class SyncLogViewer extends Component<Props, State> {
                             : []
                     }
                     colorTables={this.props.colorTables}
+                    horizontal={this.props.horizontal}
                     hideTitles={this.props.hideTitles}
                     hideLegend={this.props.hideLegend}
                     onCreateSpacer={(spacer: WellLogSpacer): void => {
@@ -544,62 +553,89 @@ class SyncLogViewer extends Component<Props, State> {
         );
     }
 
+    createRightPanel(maxContentZoom: number): ReactNode {
+        return (
+            <div
+                key="rightPanel"
+                style={{
+                    flex: "0, 0",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                    width: "255px",
+                    minWidth: "255px",
+                    maxWidth: "255px",
+                }}
+            >
+                <AxisSelector
+                    header="Primary scale"
+                    axes={this.state.axes}
+                    axisLabels={axisTitles}
+                    value={this.state.primaryAxis}
+                    onChange={this.onChangePrimaryAxis}
+                />
+                {this.props.welllogs.map((_welllog: WellLog, index: number) => (
+                    <InfoPanel
+                        key={index}
+                        header={
+                            "Readout " + this.props.welllogs[index].header.well
+                        }
+                        onGroupClick={this.onInfoGroupClick}
+                        infos={this.state.infos[index]}
+                    />
+                ))}
+                <div style={{ paddingLeft: "10px", display: "flex" }}>
+                    <span>Zoom:</span>
+                    <span
+                        style={{
+                            flex: "1 1 100px",
+                            padding: "0 20px 0 10px",
+                        }}
+                    >
+                        <ZoomSlider
+                            value={this.state.sliderValue}
+                            max={maxContentZoom}
+                            onChange={this.onZoomSliderChange}
+                        />
+                    </span>
+                </div>
+            </div>
+        );
+    }
+
     render(): ReactNode {
         const maxContentZoom = 256;
         const maxVisibleTrackNum = this.props.horizontal ? 2 : 3;
         return (
-            <div style={{ height: "100%", width: "100%", display: "flex" }}>
-                {this.props.welllogs.map((_welllog: WellLog, index: number) => [
-                    index ? this.createSpacer(index) : null,
-                    this.createView(index, maxContentZoom, maxVisibleTrackNum),
-                ])}
+            <div
+                style={{
+                    height: "100%",
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "row",
+                }}
+            >
                 <div
                     style={{
-                        flex: "0, 0",
-                        display: "flex",
-                        flexDirection: "column",
                         height: "100%",
-                        width: "255px",
-                        minWidth: "255px",
-                        maxWidth: "255px",
+                        width: "255px" /*some small value to be grown by flex*/,
+                        flex: "1 1",
+                        display: "flex",
+                        flexDirection: this.props.horizontal ? "column" : "row",
                     }}
                 >
-                    <AxisSelector
-                        header="Primary scale"
-                        axes={this.state.axes}
-                        axisLabels={axisTitles}
-                        value={this.state.primaryAxis}
-                        onChange={this.onChangePrimaryAxis}
-                    />
                     {this.props.welllogs.map(
-                        (_welllog: WellLog, index: number) => (
-                            <InfoPanel
-                                key={index}
-                                header={
-                                    "Readout " +
-                                    this.props.welllogs[index].header.well
-                                }
-                                onGroupClick={this.onInfoGroupClick}
-                                infos={this.state.infos[index]}
-                            />
-                        )
+                        (_welllog: WellLog, index: number) => [
+                            index ? this.createSpacer(index) : null,
+                            this.createView(
+                                index,
+                                maxContentZoom,
+                                maxVisibleTrackNum
+                            ),
+                        ]
                     )}
-                    <div style={{ paddingLeft: "10px", display: "flex" }}>
-                        <span>Zoom:</span>
-                        <span
-                            style={{
-                                flex: "1 1 100px",
-                                padding: "0 20px 0 10px",
-                            }}
-                        >
-                            <ZoomSlider
-                                value={this.state.sliderValue}
-                                max={maxContentZoom}
-                                onChange={this.onZoomSliderChange}
-                            />
-                        </span>
-                    </div>
                 </div>
+                {this.createRightPanel(maxContentZoom)}
             </div>
         );
     }
