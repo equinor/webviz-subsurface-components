@@ -524,7 +524,7 @@ class SyncLogViewer extends Component<Props, State> {
                             ? [this.controllers[prev], this.controllers[index]]
                             : []
                     }
-                    distance={this.props.welldistances?.[prev]}
+                    distance={this.props.wellDistances?.[prev]}
                     wellpicks={
                         this.props.wellpicks
                             ? [
