@@ -64,6 +64,7 @@ export function makeFullMesh(e: { data: Params }): void {
         return color;
     }
 
+    const valueRange = getFloat32ArrayMinMax(meshData);
     const propertyValueRange = getFloat32ArrayMinMax(propertiesData);
 
     const valueRangeMin = propertyValueRange[0];
@@ -339,5 +340,5 @@ export function makeFullMesh(e: { data: Params }): void {
     // Disabling this for now as the second argument should be optional.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    postMessage([mesh, mesh_lines]);
+    postMessage([mesh, mesh_lines, valueRange]);
 }
