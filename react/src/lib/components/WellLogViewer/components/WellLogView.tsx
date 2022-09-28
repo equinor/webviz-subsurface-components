@@ -412,10 +412,10 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     if (!wellpick) return;
 
     const primaryAxis = parent.props.primaryAxis;
+    const horizontal = parent.props.horizontal;
 
     for (const wp of wps) {
         const horizon = wp.horizon;
-        const vMD = wp.vMD;
         const vPrimary = wp.vPrimary;
         const vSecondary = wp.vSecondary;
         const color = wp.color;
@@ -443,16 +443,16 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
 
         const pin = select(pinelm)
             .classed("wellpick", true)
-            .style(parent.props.horizontal ? "width" : "height", `${wpSize}px`)
-            .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-            .style(parent.props.horizontal ? "top" : "left", `${0}px`)
+            .style(horizontal ? "width" : "height", `${wpSize}px`)
+            .style(horizontal ? "height" : "width", `${100}%`)
+            .style(horizontal ? "top" : "left", `${0}px`)
             .style("background-color", rgba)
             .style("position", "absolute")
             .style("visibility", "false");
 
         pin.append("div")
             .html(
-                parent.props.horizontal
+                horizontal
                     ? "<font size=1><table height=100%'><tr><td><span " +
                           styleText +
                           ">" +
@@ -480,9 +480,9 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                           txtSecondary +
                           "</td></tr></table>"
             )
-            .style(parent.props.horizontal ? "width" : "height", "1px")
-            .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-            ///.style(parent.props.horizontal ? "left" : "top", `${offset}px`)
+            .style(horizontal ? "width" : "height", "1px")
+            .style(horizontal ? "height" : "width", `${100}%`)
+            ///.style(horizontal ? "left" : "top", `${offset}px`)
             .style("background-color", rgba)
             //.style("position", "relative");
             .style("position", "absolute");

@@ -42,7 +42,7 @@ interface Props {
 interface State {}
 
 class WellLogSpacer extends Component<Props, State> {
-    container: HTMLElement|undefined = undefined;
+    container: HTMLElement | undefined = undefined;
 
     constructor(props: Props) {
         super(props);
@@ -52,7 +52,7 @@ class WellLogSpacer extends Component<Props, State> {
         this.forceUpdate();
     }
 
-    componentDidUpdate(prevProps: Props/*, prevState: State*/): void {
+    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
         // Typical usage (don't forget to compare props):
         if (this.props.onCreateSpacer !== prevProps.onCreateSpacer) {
             // update callback to component's caller
@@ -60,7 +60,7 @@ class WellLogSpacer extends Component<Props, State> {
         }
     }
 
-    shouldComponentUpdate(nextProps: Props/*, nextState: State*/): boolean {
+    shouldComponentUpdate(nextProps: Props /*, nextState: State*/): boolean {
         if (this.props.colorTables !== nextProps.colorTables) return true;
         if (this.props.controllers !== nextProps.controllers) return true;
         if (this.props.wellpicks !== nextProps.wellpicks) return true;
