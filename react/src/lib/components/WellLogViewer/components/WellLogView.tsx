@@ -1176,21 +1176,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
             const wellpick = this.props.wellpick;
             if (wellpick) {
-                const primaryAxis = this.props.primaryAxis;
-                const scaleInterpolator = this.scaleInterpolator;
-                const curves = wellpick.wellpick.curves;
-                const md = _getLogIndexByNames(curves, [
-                    wellpick.md ? wellpick.md : "MD",
-                ]);
-
                 const wps = getWellPicks(this);
                 if (!wps.length) return;
                 for (const wp of wps) {
                     const horizon = wp.horizon;
-                    const vMD = wp.vMD;
                     const vPrimary = wp.vPrimary;
-                    const vSecondary = wp.vSecondary;
-                    const color = wp.color;
 
                     const pinelm =
                         this.logController.overlay.elements["wp" + horizon];

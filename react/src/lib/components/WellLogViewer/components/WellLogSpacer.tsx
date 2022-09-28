@@ -42,7 +42,7 @@ interface Props {
 interface State {}
 
 class WellLogSpacer extends Component<Props, State> {
-    container: HTMLElement;
+    container: HTMLElement|undefined = undefined;
 
     constructor(props: Props) {
         super(props);
@@ -52,7 +52,7 @@ class WellLogSpacer extends Component<Props, State> {
         this.forceUpdate();
     }
 
-    componentDidUpdate(prevProps: Props, prevState: State): void {
+    componentDidUpdate(prevProps: Props/*, prevState: State*/): void {
         // Typical usage (don't forget to compare props):
         if (this.props.onCreateSpacer !== prevProps.onCreateSpacer) {
             // update callback to component's caller
@@ -60,7 +60,7 @@ class WellLogSpacer extends Component<Props, State> {
         }
     }
 
-    shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
+    shouldComponentUpdate(nextProps: Props/*, nextState: State*/): boolean {
         if (this.props.colorTables !== nextProps.colorTables) return true;
         if (this.props.controllers !== nextProps.controllers) return true;
         if (this.props.wellpicks !== nextProps.wellpicks) return true;
@@ -83,7 +83,6 @@ class WellLogSpacer extends Component<Props, State> {
         const wps2 = controller2 ? getWellPicks(controller2) : null;
         if (wps && wps2 && logViewer) {
             const overlay = logViewer?.overlay;
-            const overlay2 = logViewer2?.overlay;
             const source = overlay?.elm.node();
 
             if (source) {
@@ -91,14 +90,14 @@ class WellLogSpacer extends Component<Props, State> {
                 clientHeight = source.clientHeight;
             }
 
-            const wpSize = 3; //9;
+            //const wpSize = 3; //9;
             //const offset = wpSize / 2;
 
             for (const wp of wps) {
                 const horizon = wp.horizon;
-                const vMD = wp.vMD;
+                //const vMD = wp.vMD;
                 const vPrimary = wp.vPrimary;
-                const vSecondary = wp.vSecondary;
+                //const vSecondary = wp.vSecondary;
                 const color = wp.color;
 
                 const rgba =
