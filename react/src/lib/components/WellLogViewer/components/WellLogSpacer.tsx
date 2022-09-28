@@ -200,6 +200,32 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         const from1 = selection[1]?.from?.toFixed(1);
         const to1 = selection[1]?.to?.toFixed(1);
 
+        const selectionPoints = horizontal
+            ? from0 +
+              " 0 " +
+              to0 +
+              " " +
+              height +
+              " " +
+              to1 +
+              " " +
+              height +
+              " " +
+              from1 +
+              " 0"
+            : "0 " +
+              from0 +
+              " " +
+              width +
+              " " +
+              to0 +
+              " " +
+              width +
+              " " +
+              to1 +
+              " 0 " +
+              from1;
+
         return (
             <div
                 style={{
@@ -311,33 +337,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                         <polygon
                             fill={selColor}
                             stroke="none"
-                            points={
-                                horizontal
-                                    ? from0 +
-                                      " 0 " +
-                                      to0 +
-                                      " " +
-                                      height +
-                                      " " +
-                                      from1 +
-                                      " " +
-                                      height +
-                                      " " +
-                                      to1 +
-                                      " 0"
-                                    : "0 " +
-                                      from0 +
-                                      " " +
-                                      width +
-                                      " " +
-                                      to0 +
-                                      " " +
-                                      width +
-                                      " " +
-                                      from1 +
-                                      " 0 " +
-                                      to1
-                            }
+                            points={selectionPoints}
                         />
                         <path
                             fill="none"
