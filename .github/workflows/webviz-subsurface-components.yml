@@ -157,7 +157,7 @@ jobs:
           npx cypress-image-diff -u
           rm -rf cypress-visual-screenshots/comparison
           rm -rf cypress-visual-screenshots/diff
-          rm -rf cypress/screenshots
+          rm -rf cypress/videos
 
       - name: Create Pull Request
         id: cpr
