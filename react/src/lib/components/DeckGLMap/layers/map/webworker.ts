@@ -58,8 +58,9 @@ export function makeFullMesh(e: { data: Params }): void {
                 color = colors[Math.floor(x * 255)];
             }
         } else {
-            color = [255, 0, 0];
+            return false;
         }
+
         color = [color[0] / 255, color[1] / 255, color[2] / 255];
         return color;
     }
