@@ -37,7 +37,6 @@ export type Params = {
     meshData: Float32Array;
     propertiesData: Float32Array;
     isMesh: boolean;
-    cellCenteredProperties: boolean;
     frame: Frame;
     colors: RGBColor[];
     colorMapRange: [number, number];
@@ -174,6 +173,9 @@ async function load_mesh_and_properties(
 }
 
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setReportedBoundingBox?: any;
+
     // Url to the height (z values) mesh.
     meshUrl: string;
 
@@ -185,12 +187,18 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     // }
     frame: Frame;
 
-    // Url to the properties. (ex, poro or perm values)
+    // Url to the properties (ex, poro or perm values).
+    // If the number of property values equals the number of depth values
+    // the property values will be placed at the nodes and the cell (4 neigboring nodes)
+    // color will be linearly interpolated over the cell.
+    // If the number of property values equals one less than the depth values in
+    // each direction then the property values will be pr cell and the cell will be constant
+    // colored.
     propertiesUrl: string;
 
     // Contourlines reference point and interval.
     // A value of [-1.0, -1.0] will disable contour lines.
-    // Contour lines also will also not be activated if "cellCenteredProperties" is set to true
+    // Contour lines will also not be activated if cells are constant colored
     // and "isContoursDepth" is set to false. I.e. constant properties within cells and contourlines
     // to be calculated for properties and not depths.
     // default value: [-1.0, -1.0]
@@ -205,12 +213,6 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     // Enable gridlines.
     // default: false.
     gridLines: boolean;
-
-    // Properties are by default at nodes (corners of cells). Setting this to true will
-    // color the cell constant interpreting properties as in the middele of the cell.
-    // The property used us in the cell corner corresponding to minimum x and y values.
-    // default: false.
-    cellCenteredProperties: boolean;
 
     // Name of color map. E.g "PORO"
     colorMapName: string;
@@ -271,24 +273,47 @@ export default class MapLayer extends CompositeLayer<
                 this.props.colorMapFunction
             );
 
-            const params = {
+            const webworkerParams = {
                 meshData,
                 propertiesData,
                 isMesh,
-                cellCenteredProperties: this.props.cellCenteredProperties,
                 frame: this.props.frame,
                 colors,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
             };
 
-            webWorker.postMessage(params);
+            webWorker.postMessage(webworkerParams);
             webWorker.onmessage = (e) => {
-                const [mesh, mesh_lines] = e.data;
+                const [mesh, mesh_lines, valueRange] = e.data;
                 this.setState({
                     mesh,
                     mesh_lines,
                 });
+
+                if (typeof this.props.setReportedBoundingBox !== "undefined") {
+                    const xinc = this.props.frame?.increment?.[0] ?? 0;
+                    const yinc = this.props.frame?.increment?.[1] ?? 0;
+
+                    const xcount = this.props.frame?.count?.[0] ?? 1;
+                    const ycount = this.props.frame?.count?.[1] ?? 1;
+
+                    const xMin = this.props.frame?.origin?.[0] ?? 0;
+                    const yMin = this.props.frame?.origin?.[1] ?? 0;
+                    const zMin = -valueRange[0];
+                    const xMax = xMin + xinc * xcount;
+                    const yMax = yMin + yinc * ycount;
+                    const zMax = -valueRange[0];
+
+                    this.props.setReportedBoundingBox([
+                        xMin,
+                        yMin,
+                        zMin,
+                        xMax,
+                        yMax,
+                        zMax,
+                    ]);
+                }
             };
         });
     }
@@ -323,16 +348,13 @@ export default class MapLayer extends CompositeLayer<
             typeof this.props.meshUrl !== "undefined" &&
             this.props.meshUrl !== "";
 
-        const canNotEnableContours =
-            this.props.cellCenteredProperties && !this.props.isContoursDepth;
-
         const layer = new privateMapLayer(
             this.getSubLayerProps<unknown, privateMapLayerProps<unknown>>({
                 mesh: this.state.mesh,
                 meshLines: this.state.mesh_lines,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
-                contours: canNotEnableContours ? [-1, -1] : this.props.contours,
+                contours: this.props.contours,
                 gridLines: this.props.gridLines,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
                 material: this.props.material,

@@ -486,7 +486,6 @@ MultiView.args = {
     legend: {
         visible: false,
     },
-    zoom: -5,
     layers: [
         ...exampleData[0].layers,
         customLayerWithPolylineData,
