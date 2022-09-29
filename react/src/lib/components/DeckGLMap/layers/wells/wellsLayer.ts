@@ -722,13 +722,13 @@ function getWellObjectByName(
 
 function getPointGeometry(well_object: Feature): Point {
     return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item: { type: string; }) => item.type == "Point"
+        (item: { type: string }) => item.type == "Point"
     ) as Point;
 }
 
 function getLineStringGeometry(well_object: Feature): LineString {
     return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item: { type: string; }) => item.type == "LineString"
+        (item: { type: string }) => item.type == "LineString"
     ) as LineString;
 }
 
