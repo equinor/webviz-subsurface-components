@@ -220,57 +220,36 @@ export default class WellsLayer extends CompositeLayer<
                     !this.state.multipleSelectionWells
                 ) {
                     this.state.multipleSelectionWells = [];
-                    this.state.multipleSelectionWells.push({
-                        id: (info.object as Feature).properties?.["name"],
-                        isSelected: true,
-                    });
+                    this.state.multipleSelectionWells.push(
+                        (info.object as Feature).properties?.["name"]
+                    );
                 } else {
                     if (
-                        this.state.multipleSelectionWells.filter(
-                            (item: { id: string }) =>
-                                item.id ===
-                                (info.object as Feature).properties?.["name"]
-                        ).length > 0
+                        !this.state.multipleSelectionWells.includes(
+                            (info.object as Feature).properties?.["name"]
+                        )
                     ) {
-                        const objIndex =
-                            this.state.multipleSelectionWells.findIndex(
-                                (item: { id: string }) =>
-                                    item.id ===
+                        this.state.multipleSelectionWells.push(
+                            (info.object as Feature).properties?.["name"]
+                        );
+                    } else {
+                        this.state.multipleSelectionWells =
+                            this.state.multipleSelectionWells.filter(
+                                (item: string) =>
+                                    item !==
                                     (info.object as Feature).properties?.[
                                         "name"
                                     ]
                             );
-                        if (
-                            this.state.multipleSelectionWells[objIndex]
-                                .isSelected
-                        ) {
-                            this.state.multipleSelectionWells[
-                                objIndex
-                            ].isSelected = false;
-                        } else {
-                            this.state.multipleSelectionWells[
-                                objIndex
-                            ].isSelected = true;
-                        }
-                    } else {
-                        this.state.multipleSelectionWells.push({
-                            id: (info.object as Feature).properties?.["name"],
-                            isSelected: true,
-                        });
                     }
                 }
             } else {
                 this.state.multipleSelectionWells = [];
             }
-            this.state.multipleSelectionWells =
-                this.state.multipleSelectionWells.filter(
-                    (item: { isSelected: boolean }) => item.isSelected === true
-                );
             (this.context as DeckGLLayerContext).userData.setEditedData({
                 selectedWell: (info.object as Feature).properties?.["name"],
                 multiSelectedWells: this.state.multipleSelectionWells,
             });
-
             return false; // do not return true to allow DeckGL props.onClick to be called
         }
     }
@@ -743,13 +722,13 @@ function getWellObjectByName(
 
 function getPointGeometry(well_object: Feature): Point {
     return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item: { type: string }) => item.type == "Point"
+        (item: { type: string; }) => item.type == "Point"
     ) as Point;
 }
 
 function getLineStringGeometry(well_object: Feature): LineString {
     return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item: { type: string }) => item.type == "LineString"
+        (item: { type: string; }) => item.type == "LineString"
     ) as LineString;
 }
 
