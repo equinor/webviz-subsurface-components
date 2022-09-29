@@ -200,31 +200,50 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         const from1 = selection[1]?.from?.toFixed(1);
         const to1 = selection[1]?.to?.toFixed(1);
 
-        const selectionPoints = horizontal
-            ? from0 +
-              " 0 " +
-              to0 +
-              " " +
-              height +
-              " " +
-              to1 +
-              " " +
-              height +
-              " " +
-              from1 +
-              " 0"
-            : "0 " +
-              from0 +
-              " " +
-              width +
-              " " +
-              to0 +
-              " " +
-              width +
-              " " +
-              to1 +
-              " 0 " +
-              from1;
+        const hasSelection0 = from0 !== undefined && to0 !== undefined;
+        const hasSelection1 = from1 !== undefined && to1 !== undefined;
+        const hasSelection = hasSelection0 && hasSelection1;
+
+        let selectionPoints = "";
+        let d1 = "";
+        let d0 = "";
+        if (hasSelection0) {
+            d0 = horizontal
+                ? "M " + from0 + " 0 L " + to0 + " " + height
+                : "M 0 " + from0 + " L " + width + " " + to0;
+        }
+        if (hasSelection1) {
+            d1 = horizontal
+                ? "M " + from1 + " 0 L " + to1 + " " + height
+                : "M 0 " + from1 + " L " + width + " " + to1;
+        }
+        if (hasSelection) {
+            selectionPoints = horizontal
+                ? from0 +
+                  " 0 " +
+                  to0 +
+                  " " +
+                  height +
+                  " " +
+                  to1 +
+                  " " +
+                  height +
+                  " " +
+                  from1 +
+                  " 0"
+                : "0 " +
+                  from0 +
+                  " " +
+                  width +
+                  " " +
+                  to0 +
+                  " " +
+                  width +
+                  " " +
+                  to1 +
+                  " 0 " +
+                  from1;
+        }
 
         return (
             <div
@@ -320,7 +339,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                                     horizontal
                                         ? "M " +
                                           value.from.toFixed(1) +
-                                          "0  L " +
+                                          "0 L " +
                                           value.to.toFixed(1) +
                                           " " +
                                           height
@@ -334,39 +353,21 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                             />
                         ))}
 
-                        <polygon
-                            fill={selColor}
-                            stroke="none"
-                            points={selectionPoints}
-                        />
-                        <path
-                            fill="none"
-                            stroke={curColor}
-                            d={
-                                horizontal
-                                    ? "M " +
-                                      from0 +
-                                      " 0 L " +
-                                      to0 +
-                                      " " +
-                                      height
-                                    : "M 0 " + from0 + " L " + width + " " + to0
-                            }
-                        />
-                        <path
-                            fill="none"
-                            stroke={pinColor}
-                            d={
-                                horizontal
-                                    ? "M " +
-                                      from1 +
-                                      " 0 L " +
-                                      to1 +
-                                      " " +
-                                      height
-                                    : "M 0 " + from1 + " L " + width + " " + to1
-                            }
-                        />
+                        {hasSelection && (
+                            <polygon
+                                fill={selColor}
+                                stroke="none"
+                                points={selectionPoints}
+                            />
+                        )}
+
+                        {hasSelection0 && (
+                            <path fill="none" stroke={curColor} d={d0} />
+                        )}
+
+                        {hasSelection1 && (
+                            <path fill="none" stroke={pinColor} d={d1} />
+                        )}
                     </svg>
                 </div>
             </div>
