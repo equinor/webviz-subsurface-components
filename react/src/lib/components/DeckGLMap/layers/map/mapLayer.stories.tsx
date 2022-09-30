@@ -574,7 +574,7 @@ export const BigMapWithHole: ComponentStory<typeof DeckGLMap> = () => {
                 {
                     ...meshMapLayerBig,
                     meshUrl: "hugin_depth_5_m_w_hole.float32",
-                    gridLines: true,
+                    gridLines: false,
                     material: false,
                 },
             ],

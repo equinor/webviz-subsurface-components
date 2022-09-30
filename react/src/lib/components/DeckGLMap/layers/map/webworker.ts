@@ -59,6 +59,8 @@ export function makeFullMesh(e: { data: Params }): void {
             }
         } else {
             color = [255, 0, 0];
+            // XXX husk her skal det ruturneres false.
+            return false;
         }
         color = [color[0] / 255, color[1] / 255, color[2] / 255];
         return color;
@@ -247,15 +249,10 @@ export function makeFullMesh(e: { data: Params }): void {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const isActiveCell =
-                    !isNaN(meshData[i0]) &&
-                    !isNaN(meshData[i1]) &&
-                    !isNaN(meshData[i2]) &&
-                    !isNaN(meshData[i3]);
-
-                if (!isActiveCell) {
-                    continue;
-                }
+                const i0_act = !isNaN(meshData[i0]); // eslint-disable-line
+                const i1_act = !isNaN(meshData[i1]); // eslint-disable-line
+                const i2_act = !isNaN(meshData[i2]); // eslint-disable-line
+                const i3_act = !isNaN(meshData[i3]); // eslint-disable-line
 
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
@@ -286,41 +283,140 @@ export function makeFullMesh(e: { data: Params }): void {
                 );
 
                 if (!color) {
+                    // Inactive cell, dont draw.
                     continue;
                 }
-
-                // t1 - i0 provoking index.
-                positions.push(x1, y1, z1);
-                positions.push(x3, y3, z3);
-                positions.push(x0, y0, z0);
-
-                vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
-
-                indices.push(i_indices++, i_indices++, i_indices++);
                 const c = color as RGBColor;
-                vertexColors.push(c[0], c[1], c[2]);
-                vertexColors.push(c[0], c[1], c[2]);
-                vertexColors.push(c[0], c[1], c[2]);
 
-                vertexProperties.push(propertyValue);
-                vertexProperties.push(propertyValue);
-                vertexProperties.push(propertyValue);
+                if (i1_act && i3_act) {
+                    // diagonal i1, i3
+                    if (i0_act) {
+                        // t1 - i0 provoking index.
+                        positions.push(x1, y1, z1);
+                        positions.push(x3, y3, z3);
+                        positions.push(x0, y0, z0);
 
-                // t2 - i2 provoking index.
-                positions.push(x1, y1, z1);
-                positions.push(x3, y3, z3);
-                positions.push(x2, y2, z2);
+                        vertexIndexs.push(
+                            i_vertices++,
+                            i_vertices++,
+                            i_vertices++
+                        );
 
-                vertexIndexs.push(i_vertices++, i_vertices++, i_vertices++);
+                        indices.push(i_indices++, i_indices++, i_indices++);
+                        vertexColors.push(c[0], c[1], c[2]);
+                        vertexColors.push(c[0], c[1], c[2]);
+                        vertexColors.push(c[0], c[1], c[2]);
 
-                indices.push(i_indices++, i_indices++, i_indices++);
-                vertexColors.push(c[0], c[1], c[2]);
-                vertexColors.push(c[0], c[1], c[2]);
-                vertexColors.push(c[0], c[1], c[2]);
+                        vertexProperties.push(propertyValue);
+                        vertexProperties.push(propertyValue);
+                        vertexProperties.push(propertyValue);
 
-                vertexProperties.push(propertyValue);
-                vertexProperties.push(propertyValue);
-                vertexProperties.push(propertyValue);
+                        line_positions.push(x0, y0, z0);
+                        line_positions.push(x3, y3, z3);
+
+                        line_positions.push(x0, y0, z0);
+                        line_positions.push(x1, y1, z1);
+                    }
+
+                    if (i2_act) {
+                        // t2 - i2 provoking index.
+                        positions.push(x1, y1, z1);
+                        positions.push(x3, y3, z3);
+                        positions.push(x2, y2, z2);
+
+                        vertexIndexs.push(
+                            i_vertices++,
+                            i_vertices++,
+                            i_vertices++
+                        );
+
+                        indices.push(i_indices++, i_indices++, i_indices++);
+                        vertexColors.push(c[0], c[1], c[2]);
+                        vertexColors.push(c[0], c[1], c[2]);
+                        vertexColors.push(c[0], c[1], c[2]);
+
+                        vertexProperties.push(propertyValue);
+                        vertexProperties.push(propertyValue);
+                        vertexProperties.push(propertyValue);
+
+                        line_positions.push(x2, y2, z2);
+                        line_positions.push(x3, y3, z3);
+
+                        line_positions.push(x2, y2, z2);
+                        line_positions.push(x1, y1, z1);
+                    }
+
+                    // diagonal
+                    if ((i0_act && !i2_act) || (!i0_act && i2_act)) {
+                        line_positions.push(x1, y1, z1);
+                        line_positions.push(x3, y3, z3);
+                    }
+                } else if (i0_act && i2_act) {
+                    // diagonal i0, i2
+                    if (i1_act) {
+                        //indices.push(i1, i2, i0); // t1 - i0 provoking index.
+
+                        // t1 - i0 provoking index.
+                        positions.push(x1, y1, z1);
+                        positions.push(x2, y2, z2);
+                        positions.push(x0, y0, z0);
+
+                        vertexIndexs.push(
+                            i_vertices++,
+                            i_vertices++,
+                            i_vertices++
+                        );
+
+                        indices.push(i_indices++, i_indices++, i_indices++);
+                        vertexColors.push(c[0], c[1], c[2]);
+                        vertexColors.push(c[0], c[1], c[2]);
+                        vertexColors.push(c[0], c[1], c[2]);
+
+                        vertexProperties.push(propertyValue);
+                        vertexProperties.push(propertyValue);
+                        vertexProperties.push(propertyValue);
+
+                        line_positions.push(x1, y1, z1);
+                        line_positions.push(x0, y0, z0);
+
+                        line_positions.push(x1, y1, z1);
+                        line_positions.push(x2, y2, z2);
+                    }
+
+                    if (i3_act) {
+                        // t2 - i2 provoking index.
+                        positions.push(x0, y0, z0);
+                        positions.push(x3, y3, z3);
+                        positions.push(x2, y2, z2);
+
+                        vertexIndexs.push(
+                            i_vertices++,
+                            i_vertices++,
+                            i_vertices++
+                        );
+
+                        indices.push(i_indices++, i_indices++, i_indices++);
+                        vertexColors.push(c[0], c[1], c[2]);
+                        vertexColors.push(c[0], c[1], c[2]);
+                        vertexColors.push(c[0], c[1], c[2]);
+
+                        vertexProperties.push(propertyValue);
+                        vertexProperties.push(propertyValue);
+                        vertexProperties.push(propertyValue);
+
+                        line_positions.push(x3, y3, z3);
+                        line_positions.push(x0, y0, z0);
+
+                        line_positions.push(x3, y3, z3);
+                        line_positions.push(x2, y2, z2);
+                    }
+
+                    // diagonal
+                    if ((i3_act && !i1_act) || (!i3_act && i1_act)) {
+                        line_positions.push(x0, y0, z0);
+                        line_positions.push(x2, y2, z2);
+                    }
+                }
             }
         }
     }
