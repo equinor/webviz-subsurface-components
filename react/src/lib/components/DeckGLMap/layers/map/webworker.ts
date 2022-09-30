@@ -59,7 +59,6 @@ export function makeFullMesh(e: { data: Params }): void {
             }
         } else {
             color = [255, 0, 0];
-            // XXX husk her skal det ruturneres false.
             return false;
         }
         color = [color[0] / 255, color[1] / 255, color[2] / 255];
