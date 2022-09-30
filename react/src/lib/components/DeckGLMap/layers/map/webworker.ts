@@ -432,55 +432,6 @@ export function makeFullMesh(e: { data: Params }): void {
         indices: { value: new Uint32Array(indices), size: 1 },
     };
 
-    // LINES
-    // for (let h = 0; h < ny - 1; h++) {
-    //     for (let w = 0; w < nx - 1; w++) {
-    //         const hh = ny - h - 1; // See note above.
-
-    //         const i0 = h * nx + w;
-    //         const i1 = h * nx + (w + 1);
-    //         const i2 = (h + 1) * nx + (w + 1);
-    //         const i3 = (h + 1) * nx + w;
-
-    //         const isActiveCell = !isNaN(meshData[i0]) && !isNaN(vertexColors[3 * i0 + 0]) && // eslint-disable-line
-    //                              !isNaN(meshData[i1]) && !isNaN(vertexColors[3 * i1 + 0]) && // eslint-disable-line
-    //                              !isNaN(meshData[i2]) && !isNaN(vertexColors[3 * i2 + 0]) && // eslint-disable-line
-    //                              !isNaN(meshData[i3]) && !isNaN(vertexColors[3 * i3 + 0]);   // eslint-disable-line
-
-    //         if (!isActiveCell) {
-    //             continue;
-    //         }
-
-    //         const x0 = ox + w * dx;
-    //         const y0 = oy + hh * dy;
-    //         const z0 = isMesh ? -meshData[i0] : 0;
-
-    //         const x1 = ox + (w + 1) * dx;
-    //         const y1 = oy + hh * dy;
-    //         const z1 = isMesh ? -meshData[i1] : 0;
-
-    //         const x2 = ox + (w + 1) * dx;
-    //         const y2 = oy + (hh - 1) * dy;
-    //         const z2 = isMesh ? -meshData[i2] : 0;
-
-    //         const x3 = ox + w * dx;
-    //         const y3 = oy + (hh - 1) * dy;
-    //         const z3 = isMesh ? -meshData[i3] : 0;
-
-    //         line_positions.push(x0, y0, z0);
-    //         line_positions.push(x1, y1, z1);
-
-    //         line_positions.push(x0, y0, z0);
-    //         line_positions.push(x3, y3, z3);
-
-    //         line_positions.push(x1, y1, z1);
-    //         line_positions.push(x2, y2, z2);
-
-    //         line_positions.push(x2, y2, z2);
-    //         line_positions.push(x3, y3, z3);
-    //     }
-    // }
-
     const mesh_lines: MeshTypeLines = {
         drawMode: 1, // corresponds to GL.LINES,
         attributes: {
