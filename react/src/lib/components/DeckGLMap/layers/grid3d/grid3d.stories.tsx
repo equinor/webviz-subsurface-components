@@ -7,67 +7,16 @@ export default {
     title: "DeckGLMap/Grid3D",
 } as ComponentMeta<typeof DeckGLMap>;
 
-const POINTS = require("../../../../../demo/example-data/vtk-grid/points.json");;
-const POLYS = require("../../../../../demo/example-data/vtk-grid/polys.json");
-const SCALAR = require("../../../../../demo/example-data/vtk-grid/scalar.json");
-
-let CUR_IDX = 0;
-const getPolygon = (object, { index, data }) => {
-    if (index == 0) CUR_IDX = 0;
-
-    const n = data.polys[CUR_IDX];
-    const ni = CUR_IDX + n + 1;
-    const polys = data.polys.slice(CUR_IDX + 1, ni);
-    CUR_IDX = ni;
-
-    const positions: number[][] = [];
-    polys.forEach((p) => {
-        const position = data.points.slice(p * 3, p * 3 + 3) as number[];
-        positions.push(position);
-    });
-    return positions;
-};
-
-const getFillColor = (object, { index, data }) => {
-    const x = data.scalar[index];
-    if (x < 0.1) return [255 - x * 100, 0, 0, 255];
-    if (x < 0.2) return [0, 255 - x * 100, 0, 255];
-    else return [255, 0, 255 - x * 100, 255];
-};
-
-// layers defination
-const grid3dLayer = {
-    "@@type": "PolygonLayer",
-    id: "SolidPolygonLayer",
-    data: {
-        points: POINTS,
-        polys: POLYS,
-        scalar: SCALAR,
-        length: SCALAR.length,
-    },
-
-    /* props from PolygonLayer class */
-    elevationScale: 0,
-    extruded: true,
-    filled: true,
-    getPolygon: (object, { index, data }) =>
-        getPolygon(object, { index, data }),
-    getFillColor: (object, { index, data }) =>
-        getFillColor(object, { index, data }),
-    getLineColor: [0, 0, 0, 255],
-    material: false,
-    stroked: false,
-    wireframe: true,
-
-    autoHighlight: true,
-    highlightColor: [0, 0, 128, 128],
-    pickable: true,
-};
-
-
 const Template: ComponentStory<typeof DeckGLMap> = (args) => (
     <DeckGLMap {...args} />
 );
+
+type POLYDATA = {
+    polys: number[],
+    points: number[],
+    scalar: number[],
+    length: number,
+};
 
 const defaultProps = {
     bounds: [17489.34375, 5001, 6063.6875, 10990.5] as [
@@ -87,7 +36,63 @@ const defaultProps = {
     },
 };
 
+let CUR_IDX = 0;
+const getPolygon = ({ index, data }: {index: number, data: POLYDATA}) => {
+    if (index == 0) CUR_IDX = 0;
+
+    const n = data.polys[CUR_IDX];
+    const ni = CUR_IDX + n + 1;
+    const polys = data.polys.slice(CUR_IDX + 1, ni);
+    CUR_IDX = ni;
+
+    const positions: number[][] = [];
+    polys.forEach((p) => {
+        const position = data.points.slice(p * 3, p * 3 + 3) as number[];
+        positions.push(position);
+    });
+    return positions;
+};
+
+const getFillColor = ({ index, data }: {index: number, data: POLYDATA}) => {
+    const x = data.scalar[index];
+    if (x < 0.1) return [255 - x * 100, 0, 0, 255];
+    if (x < 0.2) return [0, 255 - x * 100, 0, 255];
+    else return [255, 0, 255 - x * 100, 255];
+};
+
 // Grid 3d story
+const POINTS = require("../../../../../demo/example-data/vtk-grid/points.json");;
+const POLYS = require("../../../../../demo/example-data/vtk-grid/polys.json");
+const SCALAR = require("../../../../../demo/example-data/vtk-grid/scalar.json");
+
+const grid3dLayer = {
+    "@@type": "PolygonLayer",
+    id: "SolidPolygonLayer",
+    data: {
+        points: POINTS,
+        polys: POLYS,
+        scalar: SCALAR,
+        length: SCALAR.length,
+    } as POLYDATA,
+
+    /* props from PolygonLayer class */
+    elevationScale: 0,
+    extruded: true,
+    filled: true,
+    getPolygon: (object, { index, data }) =>
+        getPolygon({ index, data }),
+    getFillColor: (object, { index, data }) =>
+        getFillColor({ index, data }),
+    getLineColor: [0, 0, 0, 255],
+    material: false,
+    stroked: false,
+    wireframe: true,
+
+    autoHighlight: true,
+    highlightColor: [0, 0, 128, 128],
+    pickable: true,
+};
+
 export const Grid3D = Template.bind({});
 Grid3D.args = {
     ...defaultProps,
@@ -104,3 +109,53 @@ Grid3D.parameters = {
         iframeHeight: 500,
     },
 };
+
+// 3D grid with intersection data story
+const IPOINTS = require("../../../../../demo/example-data/vtk-grid/intersection_points.json");
+const IPOLYS = require("../../../../../demo/example-data/vtk-grid/intersection_polys.json");
+
+const intersectionLayer = {
+    "@@type": "PolygonLayer",
+    id: "IntersectionSolidPolygonLayer",
+    data: {
+        points: IPOINTS,
+        polys: IPOLYS,
+        length: 850,
+    } as POLYDATA,
+
+    /* props from PolygonLayer class */
+    elevationScale: 0,
+    extruded: true,
+    filled: false,
+    getPolygon: (object, { index, data }) =>
+        getPolygon({ index, data }),
+    getLineColor: [0, 0, 0, 255],
+    getLineWidth: 1,
+    material: true,
+    stroked: true,
+    wireframe: true,
+};
+
+export const Grid3DIntersection = Template.bind({});
+Grid3DIntersection.args = {
+    ...defaultProps,
+    id: "grid-3d-intersection",
+    layers: [intersectionLayer],
+    cameraPosition: {
+        zoom: -1.656,
+        rotationX: -4.6246,
+        rotationOrbit: -36.468,
+        target: [463504.568, 5931407.307, -1557.5486],
+    },
+};
+
+Grid3DIntersection.parameters = {
+    docs: {
+        description: {
+            story: "3D grid intersection geometry using vtk polydata format.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+    
