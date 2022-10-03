@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import DeckGLMap from "../../DeckGLMap";
 
 export default {
     component: DeckGLMap,
-    title: "DeckGLMap/Grid3D",
+    title: "DeckGLMap/Experimental Grid3D",
 } as ComponentMeta<typeof DeckGLMap>;
 
 const Template: ComponentStory<typeof DeckGLMap> = (args) => (
@@ -12,19 +13,19 @@ const Template: ComponentStory<typeof DeckGLMap> = (args) => (
 );
 
 type POLYDATA = {
-    polys: number[],
-    points: number[],
-    scalar: number[],
-    length: number,
+    polys: number[];
+    points: number[];
+    scalar: number[];
+    length: number;
+};
+
+type ITERATION_TYPE = {
+    index: number;
+    data: POLYDATA;
 };
 
 const defaultProps = {
-    bounds: [17489.34375, 5001, 6063.6875, 10990.5] as [
-        number,
-        number,
-        number,
-        number
-    ],
+    bounds: [17489, 5001, 6063, 10990] as [number, number, number, number],
     views: {
         layout: [1, 1] as [number, number],
         viewports: [
@@ -37,7 +38,7 @@ const defaultProps = {
 };
 
 let CUR_IDX = 0;
-const getPolygon = ({ index, data }: {index: number, data: POLYDATA}) => {
+const getPolygon = (index: number, data: POLYDATA) => {
     if (index == 0) CUR_IDX = 0;
 
     const n = data.polys[CUR_IDX];
@@ -53,7 +54,7 @@ const getPolygon = ({ index, data }: {index: number, data: POLYDATA}) => {
     return positions;
 };
 
-const getFillColor = ({ index, data }: {index: number, data: POLYDATA}) => {
+const getFillColor = (index: number, data: POLYDATA) => {
     const x = data.scalar[index];
     if (x < 0.1) return [255 - x * 100, 0, 0, 255];
     if (x < 0.2) return [0, 255 - x * 100, 0, 255];
@@ -61,7 +62,7 @@ const getFillColor = ({ index, data }: {index: number, data: POLYDATA}) => {
 };
 
 // Grid 3d story
-const POINTS = require("../../../../../demo/example-data/vtk-grid/points.json");;
+const POINTS = require("../../../../../demo/example-data/vtk-grid/points.json");
 const POLYS = require("../../../../../demo/example-data/vtk-grid/polys.json");
 const SCALAR = require("../../../../../demo/example-data/vtk-grid/scalar.json");
 
@@ -79,10 +80,10 @@ const grid3dLayer = {
     elevationScale: 0,
     extruded: true,
     filled: true,
-    getPolygon: (object, { index, data }) =>
-        getPolygon({ index, data }),
-    getFillColor: (object, { index, data }) =>
-        getFillColor({ index, data }),
+    getPolygon: (_: unknown, { index, data }: ITERATION_TYPE) =>
+        getPolygon(index, data),
+    getFillColor: (_: unknown, { index, data }: ITERATION_TYPE) =>
+        getFillColor(index, data),
     getLineColor: [0, 0, 0, 255],
     material: false,
     stroked: false,
@@ -127,8 +128,8 @@ const intersectionLayer = {
     elevationScale: 0,
     extruded: true,
     filled: false,
-    getPolygon: (object, { index, data }) =>
-        getPolygon({ index, data }),
+    getPolygon: (_: unknown, { index, data }: ITERATION_TYPE) =>
+        getPolygon(index, data),
     getLineColor: [0, 0, 0, 255],
     getLineWidth: 1,
     material: true,
@@ -158,4 +159,3 @@ Grid3DIntersection.parameters = {
         iframeHeight: 500,
     },
 };
-    
