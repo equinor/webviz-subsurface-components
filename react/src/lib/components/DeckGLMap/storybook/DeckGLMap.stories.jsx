@@ -486,6 +486,7 @@ MultiView.args = {
     legend: {
         visible: false,
     },
+    zoom: -5,
     layers: [
         ...exampleData[0].layers,
         customLayerWithPolylineData,
@@ -667,12 +668,6 @@ const mapDataTemplate = (args) => {
     const [getColorName, setColorName] = React.useState("Rainbow");
     const [colorRange, setRange] = React.useState();
     const [isAuto, setAuto] = React.useState();
-    const [breakPoint, setBreakPoint] = React.useState();
-
-    // user defined breakpoint(domain)
-    const userDefinedBreakPoint = React.useCallback((data) => {
-        if (data) setBreakPoint(data);
-    }, []);
 
     // Get selected legend color name from color selector
     const colorNameFromSelector = React.useCallback((data) => {
@@ -693,11 +688,9 @@ const mapDataTemplate = (args) => {
                 colorRange && isAuto == false
                     ? colorRange
                     : layers[0].colorMapRange,
-            // Passing "breakpoint" is temporary solution for now since the colortable does not save the edited breakpoints
-            // When save functionality of breakpoint is done, prop "breakpoint" will be removed from here
-            breakPoint: breakPoint ? breakPoint : [],
         },
     ];
+
     return (
         <div>
             <div
@@ -710,10 +703,8 @@ const mapDataTemplate = (args) => {
             >
                 <ColorLegend
                     {...args}
-                    colorName={getColorName}
                     getColorName={colorNameFromSelector}
                     getColorRange={userDefinedRange}
-                    getBreakpointValue={userDefinedBreakPoint}
                 />
             </div>
             <DeckGLMap {...args} layers={updatedLayerData} />
