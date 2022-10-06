@@ -57,8 +57,8 @@ import {
     scrollTracksTo,
     isTrackSelected,
     selectTrack,
-    getSelectedTrackIndeces,
-    setSelectedTrackIndeces,
+    getSelectedTrackIndices,
+    setSelectedTrackIndices,
 } from "../utils/log-viewer";
 
 function showSelection(
@@ -118,10 +118,10 @@ function showSelection(
 function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
     const offset = rubberBandSize / 2;
+    const horizontal = parent.props.horizontal;
     const rbelm = instance.overlay.create("rubber-band", {
         onMouseMove: (event: OverlayMouseMoveEvent) => {
             if (parent.selPersistent) return;
-            const horizontal = parent.props.horizontal;
             const v = horizontal ? event.x : event.y;
             parent.selCurrent = instance.scale.invert(v);
 
@@ -154,27 +154,25 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
 
     const rb = select(rbelm)
         .classed("rubber-band", true)
-        .style(
-            parent.props.horizontal ? "width" : "height",
-            `${rubberBandSize}px`
-        )
-        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
+        .style(horizontal ? "width" : "height", `${rubberBandSize}px`)
+        .style(horizontal ? "height" : "width", `${100}%`)
         .style("background-color", "rgba(255,0,0,0.1)")
         .style("visibility", "hidden");
 
     rb.append("div")
-        .style(parent.props.horizontal ? "width" : "height", "1px")
-        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-        .style(parent.props.horizontal ? "left" : "top", `${offset}px`)
+        .style(horizontal ? "width" : "height", "1px")
+        .style(horizontal ? "height" : "width", `${100}%`)
+        .style(horizontal ? "left" : "top", `${offset}px`)
         .style("background-color", "rgba(255,0,0,0.7)")
         .style("position", "relative");
 }
 
 function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
+    const horizontal = parent.props.horizontal;
     const elm = instance.overlay.create("depth", {
         onClick: (event: OverlayClickEvent): void => {
             const { caller, x, y } = event;
-            const value = caller.scale.invert(parent.props.horizontal ? x : y);
+            const value = caller.scale.invert(horizontal ? x : y);
             const elem = event.target;
             if (elem) {
                 const axisTitle = parent.props.axisTitles
@@ -245,9 +243,9 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
 function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
     const rubberBandSize = 9;
     const offset = rubberBandSize / 2;
+    const horizontal = parent.props.horizontal;
     const pinelm = instance.overlay.create("pinned", {
         onClick: (event: OverlayClickEvent): void => {
-            const horizontal = parent.props.horizontal;
             const v = horizontal ? event.x : event.y;
             const pinelm = event.target;
             if (pinelm) {
@@ -281,27 +279,21 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
                 }
             }
         },
-        /* keep selection  onMouseExit: (event: OverlayMouseExitEvent): void => {
-            if (event.target) event.target.style.visibility = "hidden";
-        },*/
     });
 
     const pin = select(pinelm)
         .classed("pinned", true)
-        .style(
-            parent.props.horizontal ? "width" : "height",
-            `${rubberBandSize}px`
-        )
-        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-        .style(parent.props.horizontal ? "top" : "left", `${0}px`)
+        .style(horizontal ? "width" : "height", `${rubberBandSize}px`)
+        .style(horizontal ? "height" : "width", `${100}%`)
+        .style(horizontal ? "top" : "left", `${0}px`)
         .style("background-color", "rgba(0,0,0,0.1)")
         .style("position", "absolute")
         .style("visibility", "hidden");
 
     pin.append("div")
-        .style(parent.props.horizontal ? "width" : "height", "1px")
-        .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-        .style(parent.props.horizontal ? "left" : "top", `${offset}px`)
+        .style(horizontal ? "width" : "height", "1px")
+        .style(horizontal ? "height" : "width", `${100}%`)
+        .style(horizontal ? "left" : "top", `${offset}px`)
         .style("background-color", "rgba(0,255,0,0.7)")
         //.style("position", "relative");
         .style("position", "absolute");
@@ -351,9 +343,18 @@ function _getLogIndexByNames(curves: WellLogCurve[], names: string[]): number {
     return -1;
 }
 
-function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
-    const wellpick = parent.props.wellpick;
-    if (!wellpick) return;
+interface WellPick {
+    vMD: number;
+    vPrimary: number | undefined;
+    vSecondary: number | undefined;
+    horizon: string;
+    color: number[];
+}
+
+export function getWellPicks(wellLogView: WellLogView): WellPick[] {
+    const wps: WellPick[] = [];
+    const wellpick = wellLogView.props.wellpick;
+    if (!wellpick) return wps;
 
     const curves = wellpick.wellpick.curves;
     const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
@@ -362,14 +363,11 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             "MD log is not found for wellpicks ",
             wellpick.md ? wellpick.md : ""
         );
-        return;
+        return wps;
     }
 
-    const primaryAxis = parent.props.primaryAxis;
-    const scaleInterpolator = parent.scaleInterpolator;
-
-    const wpSize = 3; //9;
-    //const offset = wpSize / 2;
+    const primaryAxis = wellLogView.props.primaryAxis;
+    const scaleInterpolator = wellLogView.scaleInterpolator;
 
     for (const c in curves) {
         const curve = curves[c];
@@ -385,15 +383,6 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                 primaryAxis === "md" ? vMD : scaleInterpolator?.forward(vMD);
             const vSecondary =
                 primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
-            const txtPrimary = !Number.isFinite(vPrimary)
-                ? ""
-                : vPrimary?.toFixed(0);
-            const txtSecondary = !Number.isFinite(vSecondary)
-                ? ""
-                : (primaryAxis === "md" ? "TVD:" : "MD:") +
-                  vSecondary?.toFixed(0);
-            instance.overlay.remove("wp" + horizon); // clear old if exists
-            const pinelm = instance.overlay.create("wp" + horizon, {});
 
             const colorTable = wellpick.colorTables.find(
                 (colorTable) => colorTable.name == wellpick.color
@@ -402,70 +391,98 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
             const { color } = getDiscreteColorAndName(d[c], colorTable, meta);
 
-            const rgba =
-                "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.8)";
-            const styleText =
-                "style='background-color:rgba(" +
-                color[0] +
-                "," +
-                color[1] +
-                "," +
-                color[2] +
-                ",0.16)'";
-
-            const pin = select(pinelm)
-                .classed("wellpick", true)
-                .style(
-                    parent.props.horizontal ? "width" : "height",
-                    `${wpSize}px`
-                )
-                .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-                .style(parent.props.horizontal ? "top" : "left", `${0}px`)
-                .style("background-color", rgba)
-                .style("position", "absolute")
-                .style("visibility", "false");
-
-            pin.append("div")
-                .html(
-                    parent.props.horizontal
-                        ? "<font size=1><table height=100%'><tr><td><span " +
-                              styleText +
-                              ">" +
-                              txtPrimary +
-                              "</span></td></tr><tr><td height=100%><span  " +
-                              styleText +
-                              ">" +
-                              horizon +
-                              "</span></td></tr><tr><td><span " +
-                              styleText +
-                              ">" +
-                              txtSecondary +
-                              "</span></td></tr></table>"
-                        : "<font size=1><table width=100% style='position:relative; top:-1.5em;'><tr><td " +
-                              styleText +
-                              ">" +
-                              txtPrimary +
-                              "</td><td width=100% align=center><span  " +
-                              styleText +
-                              ">" +
-                              horizon +
-                              "</span></td><td " +
-                              styleText +
-                              ">" +
-                              txtSecondary +
-                              "</td></tr></table>"
-                )
-                .style(parent.props.horizontal ? "width" : "height", "1px")
-                .style(parent.props.horizontal ? "height" : "width", `${100}%`)
-                ///.style(parent.props.horizontal ? "left" : "top", `${offset}px`)
-                .style("background-color", rgba)
-                //.style("position", "relative");
-                .style("position", "absolute");
-
-            //const horizontal = parent.props.horizontal;
-            //showWellPicks(pinelm, vPrimary, horizontal, instance)
+            const wp = { vMD, vPrimary, vSecondary, horizon, color };
+            wps.push(wp);
         }
         break;
+    }
+    return wps;
+}
+
+function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
+    const wpSize = 3; //9;
+    //const offset = wpSize / 2;
+    const wps = getWellPicks(parent);
+    if (!wps.length) return;
+
+    const wellpick = parent.props.wellpick;
+    if (!wellpick) return;
+
+    const primaryAxis = parent.props.primaryAxis;
+    const horizontal = parent.props.horizontal;
+
+    for (const wp of wps) {
+        const horizon = wp.horizon;
+        const vPrimary = wp.vPrimary;
+        const vSecondary = wp.vSecondary;
+        const color = wp.color;
+
+        const txtPrimary = !Number.isFinite(vPrimary)
+            ? ""
+            : vPrimary?.toFixed(0);
+        const txtSecondary = !Number.isFinite(vSecondary)
+            ? ""
+            : (primaryAxis === "md" ? "TVD:" : "MD:") + vSecondary?.toFixed(0);
+
+        instance.overlay.remove("wp" + horizon); // clear old if exists
+        const pinelm = instance.overlay.create("wp" + horizon, {});
+
+        const rgba =
+            "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.8)";
+        const styleText =
+            "style='background-color:rgba(" +
+            color[0] +
+            "," +
+            color[1] +
+            "," +
+            color[2] +
+            ",0.16)'";
+
+        const pin = select(pinelm)
+            .classed("wellpick", true)
+            .style(horizontal ? "width" : "height", `${wpSize}px`)
+            .style(horizontal ? "height" : "width", `${100}%`)
+            .style(horizontal ? "top" : "left", `${0}px`)
+            .style("background-color", rgba)
+            .style("position", "absolute")
+            .style("visibility", "false");
+
+        pin.append("div")
+            .html(
+                horizontal
+                    ? "<font size=1><table height=100%'><tr><td><span " +
+                          styleText +
+                          ">" +
+                          txtPrimary +
+                          "</span></td></tr><tr><td height=100%><span  " +
+                          styleText +
+                          ">" +
+                          horizon +
+                          "</span></td></tr><tr><td><span " +
+                          styleText +
+                          ">" +
+                          txtSecondary +
+                          "</span></td></tr></table>"
+                    : "<font size=1><table width=100% style='position:relative; top:-1.5em;'><tr><td " +
+                          styleText +
+                          ">" +
+                          txtPrimary +
+                          "</td><td width=100% align=center><span  " +
+                          styleText +
+                          ">" +
+                          horizon +
+                          "</span></td><td " +
+                          styleText +
+                          ">" +
+                          txtSecondary +
+                          "</td></tr></table>"
+            )
+            .style(horizontal ? "width" : "height", "1px")
+            .style(horizontal ? "height" : "width", `${100}%`)
+            ///.style(horizontal ? "left" : "top", `${offset}px`)
+            .style("background-color", rgba)
+            //.style("position", "relative");
+            .style("position", "absolute");
     }
 }
 
@@ -752,8 +769,8 @@ export interface WellLogController {
     getTrackScrollPosMax(): number;
     getTrackZoom(): number;
 
-    setSelectedTrackIndeces(selection: number[]): boolean;
-    getSelectedTrackIndeces(): number[];
+    setSelectedTrackIndices(selection: number[]): boolean;
+    getSelectedTrackIndices(): number[];
 
     setTemplate(template: Template): void;
     getTemplate(): Template;
@@ -928,7 +945,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 this.props.onCreateController(this);
         }
 
-        let selectedTrackIndeces: number[] = []; // indeces to restore
+        let selectedTrackIndices: number[] = []; // Indices to restore
         let selection: [number | undefined, number | undefined] | undefined =
             undefined; // content selection to restore
         let shouldSetTracks = false;
@@ -940,7 +957,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.props.maxContentZoom !== prevProps.maxContentZoom
         ) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = this.getSelectedTrackIndeces();
+            selectedTrackIndices = this.getSelectedTrackIndices();
             this.createLogViewer();
             shouldSetTracks = true;
         }
@@ -955,19 +972,20 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.template = deepCopy(this.props.template); // save external template content to current
             shouldSetTracks = true;
             checkSchema = true;
+        } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
+            this.selectContent([undefined, undefined]);
+            selectedTrackIndices = this.getSelectedTrackIndices();
+            shouldSetTracks = true;
         } else if (this.props.colorTables !== prevProps.colorTables) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = this.getSelectedTrackIndeces();
+            selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true; // force to repaint
-        } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
-            selectedTrackIndeces = this.getSelectedTrackIndeces();
-            shouldSetTracks = true;
         } else if (
             this.props.axisTitles !== prevProps.axisTitles ||
             this.props.axisMnemos !== prevProps.axisMnemos
         ) {
             selection = this.getContentSelection();
-            selectedTrackIndeces = this.getSelectedTrackIndeces();
+            selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true; //??
         } else if (this.props.wellpick !== prevProps.wellpick) {
             if (this.logController)
@@ -976,7 +994,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         if (shouldSetTracks) {
             this.setTracks(checkSchema); // use this.template
-            setSelectedTrackIndeces(this.logController, selectedTrackIndeces);
+            setSelectedTrackIndices(this.logController, selectedTrackIndices);
             if (selection) this.selectContent(selection);
         } else if (
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
@@ -1155,36 +1173,21 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
             const wellpick = this.props.wellpick;
             if (wellpick) {
-                const primaryAxis = this.props.primaryAxis;
-                const scaleInterpolator = this.scaleInterpolator;
-                const curves = wellpick.wellpick.curves;
-                const md = _getLogIndexByNames(curves, [
-                    wellpick.md ? wellpick.md : "MD",
-                ]);
-                for (const c in curves) {
-                    const curve = curves[c];
-                    if (curve.name !== wellpick.name) continue;
-                    const data = wellpick.wellpick.data;
-                    for (const d of data) {
-                        if (d[md] === null) continue; // no MD!
+                const wps = getWellPicks(this);
+                if (!wps.length) return;
+                for (const wp of wps) {
+                    const horizon = wp.horizon;
+                    const vPrimary = wp.vPrimary;
 
-                        const vMD = d[md] as number;
-                        const vPrimary =
-                            primaryAxis === "md"
-                                ? vMD
-                                : scaleInterpolator?.forward(vMD);
-
-                        const horizon = d[c] as string;
-                        const pinelm =
-                            this.logController.overlay.elements["wp" + horizon];
-                        if (!pinelm) continue;
-                        showWellPicks(
-                            pinelm,
-                            vPrimary,
-                            this.props.horizontal,
-                            this.logController
-                        );
-                    }
+                    const pinelm =
+                        this.logController.overlay.elements["wp" + horizon];
+                    if (!pinelm) continue;
+                    showWellPicks(
+                        pinelm,
+                        vPrimary,
+                        this.props.horizontal,
+                        this.logController
+                    );
                 }
             }
         }
@@ -1268,11 +1271,11 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this._graphTrackMax() / this._maxVisibleTrackNum();
     }
 
-    getSelectedTrackIndeces(): number[] {
-        return getSelectedTrackIndeces(this.logController);
+    getSelectedTrackIndices(): number[] {
+        return getSelectedTrackIndices(this.logController);
     }
-    setSelectedTrackIndeces(selection: number[]): boolean {
-        const changed = setSelectedTrackIndeces(this.logController, selection);
+    setSelectedTrackIndices(selection: number[]): boolean {
+        const changed = setSelectedTrackIndices(this.logController, selection);
         if (changed) this.onTrackSelection();
         return changed;
     }
