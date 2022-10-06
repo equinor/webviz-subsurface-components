@@ -66,7 +66,7 @@ function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
-function boundingBoxeCenter(box: BoundingBox): [number, number, number] {
+function boundingBoxCenter(box: BoundingBox): [number, number, number] {
     const xmin = box[0];
     const ymin = box[1];
     const zmin = box[2];
@@ -421,11 +421,16 @@ const Map: React.FC<MapProps> = ({
         });
         const isAxesLayer = typeof axesLayer !== "undefined";
         // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
-        const target = boundingBoxeCenter(
+        const target = boundingBoxCenter(
             isAxesLayer
-                ? (axesLayer!["bounds"] as BoundingBox)
+                ? (axesLayer?.["bounds"] as BoundingBox)
                 : (union_of_reported_bboxes as BoundingBox)
         );
+
+        if (!is3D) {
+            // In 2D target should only contain x and y.
+            target.pop();
+        }
 
         let tempViewStates: Record<string, ViewStateType> = {};
         tempViewStates = Object.fromEntries(
@@ -433,7 +438,7 @@ const Map: React.FC<MapProps> = ({
                 item.id,
                 isBoundsDefined
                     ? getViewState(
-                          bounds!,
+                          boundsInitial,
                           target,
                           views?.viewports[index].zoom,
                           deckRef.current?.deck
