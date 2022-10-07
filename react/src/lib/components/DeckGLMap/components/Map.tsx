@@ -445,20 +445,14 @@ const Map: React.FC<MapProps> = ({
             if (viewsProps[0] !== undefined) {
                 setFirstViewStatesId(viewsProps[0].id);
             }
-            if (getCameraPosition) {
-                getCameraPosition(cameraPosition);
-            }
         }
         if (cameraPosition === null) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, initialViewState])
             );
-            if (getCameraPosition) {
-                getCameraPosition(initialViewState);
-            }
             setViewStates(tempViewStates);
         }
-    }, [cameraPosition]);
+    }, []);
 
     // update store if any of the layer prop is changed
     const dispatch = useDispatch();
