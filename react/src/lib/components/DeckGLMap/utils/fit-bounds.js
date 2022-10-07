@@ -72,9 +72,10 @@ export default function fitBounds({
     ];
 
     const centerLngLat = center;
-    const zoom = Math.min(maxZoom, log2(Math.abs(Math.min(scaleX, scaleY))));
-
-    console.assert(Number.isFinite(zoom));
+    let zoom = Math.min(maxZoom, log2(Math.abs(Math.min(scaleX, scaleY))));
+    if (!Number.isFinite(zoom)) {
+        zoom = 0;
+    }
 
     return {
         x: centerLngLat[0],
