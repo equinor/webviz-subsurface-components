@@ -17,6 +17,8 @@ import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getRgbData } from "@emerson-eps/color-tables";
 import { ContinuousLegendDataType } from "../../components/ColorLegend";
+import { FeatureCollection } from "@nebula.gl/edit-modes";
+import { PickInfo } from "deck.gl";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -100,6 +102,9 @@ export interface ColormapLayerProps<D> extends BitmapLayerProps<D> {
 
     // user defined domains
     breakPoint?: number[];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setReportedBoundingBox?: any;
 }
 
 const defaultProps = layersDefaultProps[
@@ -110,9 +115,36 @@ export default class ColormapLayer extends BitmapLayer<
     unknown,
     ColormapLayerProps<unknown>
 > {
+    initializeState(
+        context: DeckGLLayerContext | PickInfo<FeatureCollection> | undefined
+    ): void {
+        this.setState({
+            isLoaded: false,
+        });
+        super.initializeState(context);
+    }
+
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms, context }: any): void {
+        if (!this.state.isLoaded) {
+            this.setState({
+                isLoaded: true,
+            });
+
+            if (typeof this.props.setReportedBoundingBox !== "undefined") {
+                const xMin = this.props.bounds[0];
+                const yMin = this.props.bounds[1];
+                const zMin = 1;
+                const xMax = this.props.bounds[2];
+                const yMax = this.props.bounds[3];
+                const zMax = -1;
+                const bbox = [xMin, yMin, zMin, xMax, yMax, zMax];
+
+                this.props.setReportedBoundingBox(bbox);
+            }
+        }
+
         const mergedModuleParams = {
             ...moduleParameters,
             valueDecoder: {
