@@ -42,7 +42,6 @@ import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
 
 import { colorTables } from "@emerson-eps/color-tables";
-import { ContinuousColorTable } from "../layers/wells/wellsLayer.stories";
 
 type BoundingBox = [number, number, number, number, number, number];
 

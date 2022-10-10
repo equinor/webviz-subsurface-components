@@ -111,15 +111,16 @@ const cellCenteredPropertiesLayer = {
     ],
 };
 
-const wellsLayer = {
-    "@@type": "WellsLayer",
-    data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-    logData:
-        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
-    logrunName: "BLOCKING",
-    logName: "ZONELOG",
-    logColor: "Stratigraphy",
-};
+// keep
+// const wellsLayer = {
+//     "@@type": "WellsLayer",
+//     data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+//     logData:
+//         "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+//     logrunName: "BLOCKING",
+//     logName: "ZONELOG",
+//     logColor: "Stratigraphy",
+// };
 
 // Example using "Map" layer. Uses PNG float for mesh and properties.
 const meshMapLayerPng = {
