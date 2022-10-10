@@ -219,12 +219,30 @@ function createColorMap(breakpoint: number) {
 }
 
 export const MapLayer3dPng: ComponentStory<typeof DeckGLMap> = (args) => {
-    return <DeckGLMap {...args} />;
+    const [home, setHome] = React.useState<number>(0);
+
+    const handleChange = () => {
+        setHome(home + 1);
+    };
+
+    const props = {
+        ...args,
+        cameraHome: home,
+    };
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+            </div>
+            <button onClick={handleChange}> Reset </button>
+        </>
+    );
 };
 
 MapLayer3dPng.args = {
     id: "map",
-    layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer], //keep: wellsLayer
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
@@ -614,7 +632,7 @@ BigMapWithHole.parameters = {
 
 const useStyles = makeStyles({
     main: {
-        height: 500,
+        height: 600,
         border: "1px solid black",
         position: "relative",
     },

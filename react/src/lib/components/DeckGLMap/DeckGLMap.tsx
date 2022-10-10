@@ -53,6 +53,13 @@ export interface DeckGLMapProps {
     onMouseEvent?: (event: MapMouseEvent) => void;
 
     getCameraPosition?: (input: ViewStateType) => void;
+
+    /**
+     * If changed will reset camera to default position.
+     * Intitial value should be set to 0.
+     */
+    cameraHome?: number;
+
     /**
      * Range selection of the current well
      */
@@ -88,6 +95,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     getTooltip,
     cameraPosition,
     getCameraPosition,
+    cameraHome,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -150,6 +158,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 getTooltip={getTooltip}
                 cameraPosition={cameraPosition}
                 getCameraPosition={getCameraPosition}
+                cameraHome={cameraHome}
             />
         </ReduxProvider>
     );

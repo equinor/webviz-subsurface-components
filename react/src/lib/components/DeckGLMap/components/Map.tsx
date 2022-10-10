@@ -42,6 +42,7 @@ import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
 
 import { colorTables } from "@emerson-eps/color-tables";
+import { ContinuousColorTable } from "../layers/wells/wellsLayer.stories";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -243,6 +244,12 @@ export interface MapProps {
 
     getCameraPosition?: (input: ViewStateType) => void;
 
+    /**
+     * If changed will reset camera to default position.
+     * Intitial value should be set to 0.
+     */
+    cameraHome?: number;
+
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
@@ -308,6 +315,7 @@ const Map: React.FC<MapProps> = ({
     getTooltip = defaultTooltip,
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
+    cameraHome,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 
@@ -323,6 +331,57 @@ const Map: React.FC<MapProps> = ({
         views?.viewports[0].zoom,
         deckRef.current?.deck
     );
+
+    // Local help function.
+    function calcDefaultViewStates() {
+        // If "bounds" or "cameraPosition" is not defined "viewState" will be
+        // calculated based on the union of the reported bounding boxes from each layer.
+        const isBoundsDefined =
+            typeof bounds !== "undefined" &&
+            typeof cameraPosition !== "undefined";
+        const union_of_reported_bboxes = addBoundingBoxes(
+            reportedBoundingBoxAcc,
+            reportedBoundingBox
+        );
+        setReportedBoundingBoxAcc(union_of_reported_bboxes);
+
+        const axesLayer = st_layers.find((e) => {
+            return e["@@type"] === "AxesLayer";
+        });
+        const isAxesLayer = typeof axesLayer !== "undefined";
+        // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
+        const target = boundingBoxCenter(
+            isAxesLayer
+                ? (axesLayer?.["bounds"] as BoundingBox)
+                : (union_of_reported_bboxes as BoundingBox)
+        );
+
+        const is3D = views?.viewports?.[0]?.show3D ?? false;
+        if (!is3D) {
+            target.pop(); // In 2D "target" should only contain x and y.
+        }
+
+        let tempViewStates: Record<string, ViewStateType> = {};
+        tempViewStates = Object.fromEntries(
+            viewsProps.map((item, index) => [
+                item.id,
+                isBoundsDefined
+                    ? getViewState(
+                          boundsInitial,
+                          target,
+                          views?.viewports[index].zoom,
+                          deckRef.current?.deck
+                      )
+                    : getViewState3D(
+                          is3D,
+                          union_of_reported_bboxes,
+                          views?.viewports[index].zoom,
+                          deckRef.current?.deck
+                      ),
+            ])
+        );
+        setViewStates(tempViewStates);
+    }
 
     useEffect(() => {
         setViewsProps(getViews(views) as ViewportType[]);
@@ -405,54 +464,15 @@ const Map: React.FC<MapProps> = ({
         useState<BoundingBox>(bboxInitial);
 
     useEffect(() => {
+        if (typeof cameraHome !== "undefined" && cameraHome !== 0) {
+            calcDefaultViewStates();
+        }
+    }, [cameraHome]);
+
+    useEffect(() => {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-        const isBoundsDefined =
-            typeof bounds !== "undefined" &&
-            typeof cameraPosition !== "undefined";
-        const union_of_reported_bboxes = addBoundingBoxes(
-            reportedBoundingBoxAcc,
-            reportedBoundingBox
-        );
-        setReportedBoundingBoxAcc(union_of_reported_bboxes);
-        const is3D = views?.viewports?.[0]?.show3D ?? false;
-        const axesLayer = st_layers.find((e) => {
-            return e["@@type"] === "AxesLayer";
-        });
-        const isAxesLayer = typeof axesLayer !== "undefined";
-        // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
-        const target = boundingBoxCenter(
-            isAxesLayer
-                ? (axesLayer?.["bounds"] as BoundingBox)
-                : (union_of_reported_bboxes as BoundingBox)
-        );
-
-        if (!is3D) {
-            // In 2D target should only contain x and y.
-            target.pop();
-        }
-
-        let tempViewStates: Record<string, ViewStateType> = {};
-        tempViewStates = Object.fromEntries(
-            viewsProps.map((item, index) => [
-                item.id,
-                isBoundsDefined
-                    ? getViewState(
-                          boundsInitial,
-                          target,
-                          views?.viewports[index].zoom,
-                          deckRef.current?.deck
-                      )
-                    : getViewState3D(
-                          is3D,
-                          union_of_reported_bboxes,
-                          views?.viewports[index].zoom,
-                          deckRef.current?.deck
-                      ),
-            ])
-        );
-
-        setViewStates(tempViewStates);
+        calcDefaultViewStates();
     }, [reportedBoundingBox]);
 
     // react on bounds prop change
