@@ -126,19 +126,25 @@ const Template = (args) => {
     const setInfo = function (info) {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
-    const [controller, setController] = React.useState(null);
+    const [controller, setController] = React.useState(null); // the first WellLog
     const onCreateController = React.useCallback(
-        (controller) => {
-            setController(controller);
+        (iView, controller) => {
+            if (iView === 0) setController(controller);
         },
         [controller]
     );
-    const onContentRescale = React.useCallback(() => {
-        setInfo(fillInfo(controller));
-    }, [controller]);
-    const onContentSelection = React.useCallback(() => {
-        setInfo(fillInfo(controller));
-    }, [controller]);
+    const onContentRescale = React.useCallback(
+        (iView) => {
+            if (iView === 0) setInfo(fillInfo(controller));
+        },
+        [controller]
+    );
+    const onContentSelection = React.useCallback(
+        (/*_iView*/) => {
+            /*if(iView===0)*/ setInfo(fillInfo(controller));
+        },
+        [controller]
+    );
 
     return (
         <div
@@ -153,6 +159,7 @@ const Template = (args) => {
                     onContentSelection={onContentSelection}
                 />
             </div>
+            {/* Print info for the first WellLog */}
             <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
         </div>
     );
@@ -192,5 +199,13 @@ Default.args = {
             colorTables: require("../../../demo/example-data/wellpick_colors.json"),
             color: "Stratigraphy",
         },
+        {
+            wellpick: require("../../../demo/example-data/wellpicks.json")[0],
+            name: "HORIZON",
+            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            color: "Stratigraphy",
+        },
     ],
+    spacers: [312, 255],
+    wellDistances: [2048.3, 512.7],
 };

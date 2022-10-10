@@ -367,6 +367,13 @@ export default class Map3DLayer extends CompositeLayer<
         }
 
         const isFrame = typeof this.props.frame !== "undefined";
+
+        if (!isBounds && !isFrame) {
+            console.error(
+                'Error. Either "Frame" or "bounds" must be given for map3DLayer!'
+            );
+        }
+
         const bounds = (
             isFrame ? getMinMax(this.props.frame as Frame) : this.props.bounds
         ) as Bounds;
@@ -396,11 +403,11 @@ export default class Map3DLayer extends CompositeLayer<
             const xcount = this.props.frame?.count?.[0] ?? 1;
             const ycount = this.props.frame?.count?.[1] ?? 1;
 
-            const xMin = this.props.frame?.origin?.[0] ?? 0;
-            const yMin = this.props.frame?.origin?.[0] ?? 0;
+            const xMin = this.props.frame?.origin?.[0] ?? bounds[0];
+            const yMin = this.props.frame?.origin?.[1] ?? bounds[1];
             const zMin = -this.props.meshValueRange[1];
-            const xMax = xMin + xinc * xcount;
-            const yMax = yMin + yinc * ycount;
+            const xMax = isFrame ? xMin + xinc * xcount : bounds[2];
+            const yMax = isFrame ? yMin + yinc * ycount : bounds[3];
             const zMax = -this.props.meshValueRange[0];
 
             if (typeof this.props.setReportedBoundingBox !== "undefined") {

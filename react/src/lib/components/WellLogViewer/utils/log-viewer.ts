@@ -58,17 +58,17 @@ export function selectTrack(
     return false; // selection is not changed
 }
 
-export function getSelectedTrackIndeces(logViewer?: LogViewer): number[] {
-    const selectedTrackIndeces: number[] = [];
+export function getSelectedTrackIndices(logViewer?: LogViewer): number[] {
+    const selectedTrackIndices: number[] = [];
     if (logViewer) {
         let iTrack = 0;
         for (const track of logViewer.tracks) {
             if (isTrackSelected(logViewer, track))
-                selectedTrackIndeces.push(iTrack);
+                selectedTrackIndices.push(iTrack);
             iTrack++;
         }
     }
-    return selectedTrackIndeces;
+    return selectedTrackIndices;
 }
 
 ///////////////////////
@@ -186,15 +186,15 @@ export function getFirstVisibleTrack(logViewer: LogViewer): number {
     return -1;
 }
 
-export function setSelectedTrackIndeces(
+export function setSelectedTrackIndices(
     logViewer: LogViewer | undefined,
-    selectedTrackIndeces: number[]
+    selectedTrackIndices: number[]
 ): boolean {
     let changed = false;
-    if (logViewer && selectedTrackIndeces) {
+    if (logViewer && selectedTrackIndices) {
         let iTrack = 0;
         for (const track of logViewer.tracks) {
-            const selected = selectedTrackIndeces.indexOf(iTrack) >= 0;
+            const selected = selectedTrackIndices.indexOf(iTrack) >= 0;
             if (selectTrack(logViewer, track, selected)) changed = true;
             iTrack++;
         }

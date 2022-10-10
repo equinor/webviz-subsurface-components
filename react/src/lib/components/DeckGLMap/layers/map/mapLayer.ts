@@ -173,6 +173,9 @@ async function load_mesh_and_properties(
 }
 
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setReportedBoundingBox?: any;
+
     // Url to the height (z values) mesh.
     meshUrl: string;
 
@@ -282,11 +285,35 @@ export default class MapLayer extends CompositeLayer<
 
             webWorker.postMessage(webworkerParams);
             webWorker.onmessage = (e) => {
-                const [mesh, mesh_lines] = e.data;
+                const [mesh, mesh_lines, valueRange] = e.data;
                 this.setState({
                     mesh,
                     mesh_lines,
                 });
+
+                if (typeof this.props.setReportedBoundingBox !== "undefined") {
+                    const xinc = this.props.frame?.increment?.[0] ?? 0;
+                    const yinc = this.props.frame?.increment?.[1] ?? 0;
+
+                    const xcount = this.props.frame?.count?.[0] ?? 1;
+                    const ycount = this.props.frame?.count?.[1] ?? 1;
+
+                    const xMin = this.props.frame?.origin?.[0] ?? 0;
+                    const yMin = this.props.frame?.origin?.[1] ?? 0;
+                    const zMin = -valueRange[0];
+                    const xMax = xMin + xinc * xcount;
+                    const yMax = yMin + yinc * ycount;
+                    const zMax = -valueRange[0];
+
+                    this.props.setReportedBoundingBox([
+                        xMin,
+                        yMin,
+                        zMin,
+                        xMax,
+                        yMax,
+                        zMax,
+                    ]);
+                }
             };
         });
     }

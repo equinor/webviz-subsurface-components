@@ -224,10 +224,23 @@ export default class WellsLayer extends CompositeLayer<
                         (info.object as Feature).properties?.["name"]
                     );
                 } else {
-                    if (!this.state.multipleSelectionWells.includes()) {
+                    if (
+                        !this.state.multipleSelectionWells.includes(
+                            (info.object as Feature).properties?.["name"]
+                        )
+                    ) {
                         this.state.multipleSelectionWells.push(
                             (info.object as Feature).properties?.["name"]
                         );
+                    } else {
+                        this.state.multipleSelectionWells =
+                            this.state.multipleSelectionWells.filter(
+                                (item: string) =>
+                                    item !==
+                                    (info.object as Feature).properties?.[
+                                        "name"
+                                    ]
+                            );
                     }
                 }
             } else {
@@ -709,13 +722,13 @@ function getWellObjectByName(
 
 function getPointGeometry(well_object: Feature): Point {
     return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item) => item.type == "Point"
+        (item: { type: string }) => item.type == "Point"
     ) as Point;
 }
 
 function getLineStringGeometry(well_object: Feature): LineString {
     return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item) => item.type == "LineString"
+        (item: { type: string }) => item.type == "LineString"
     ) as LineString;
 }
 

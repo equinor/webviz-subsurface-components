@@ -64,7 +64,7 @@ const smallLayer = {
 // This layer has as many property values as depth values hence each cell will be interpolated in color.
 const nodeCenteredPropertiesLayer = {
     "@@type": "MapLayer",
-    id: "cellCenteredPropertiesLayer-layer",
+    id: "node-centered-layer",
 
     meshUrl:
         "data:text/plain;base64,zczMP5qZ2T9mZuY/MzPzP5qZmT9mZqY/MzOzPwAAwD/NzEw/ZmZmPwAAgD/NzIw/zczMPgAAAD+amRk/MzMzPwAAAIDNzMw9zcxMPpqZmT4=",
@@ -89,7 +89,7 @@ const nodeCenteredPropertiesLayer = {
 // This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
 const cellCenteredPropertiesLayer = {
     "@@type": "MapLayer",
-    id: "cellCenteredPropertiesLayer-layer",
+    id: "cell-centered-layer",
 
     meshUrl:
         "data:text/plain;base64,zczMP5qZ2T9mZuY/MzPzP5qZmT9mZqY/MzOzPwAAwD/NzEw/ZmZmPwAAgD/NzIw/zczMPgAAAD+amRk/MzMzPwAAAIDNzMw9zcxMPpqZmT4=",
@@ -109,6 +109,16 @@ const cellCenteredPropertiesLayer = {
         value * 255,
         value * 255,
     ],
+};
+
+const wellsLayer = {
+    "@@type": "WellsLayer",
+    data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+    logData:
+        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+    logrunName: "BLOCKING",
+    logName: "ZONELOG",
+    logColor: "Stratigraphy",
 };
 
 // Example using "Map" layer. Uses PNG float for mesh and properties.
@@ -214,7 +224,7 @@ export const MapLayer3dPng: ComponentStory<typeof DeckGLMap> = (args) => {
 
 MapLayer3dPng.args = {
     id: "map",
-    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+    layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
