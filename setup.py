@@ -42,7 +42,7 @@ TESTS_REQUIRE = [
     "pylint>=2.4",
     "scipy>=1.2",
     "selenium>=3.141",
-    "webviz-core-components>=0.5.0",
+    "webviz-core-components>=0.6.0",
 ]
 
 setup(
