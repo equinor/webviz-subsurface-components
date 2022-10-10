@@ -7,6 +7,83 @@ import WellLogView from "./WellLogView";
 
 import { ColorTable } from "./ColorTableTypes";
 
+const patternsize = 24;
+
+const patterns = [
+    require("../../../../demo/example-data/patterns/anhydrite.png"),
+    require("../../../../demo/example-data/patterns/brown_coal.png"),
+    require("../../../../demo/example-data/patterns/calcareous_dolostone.png"),
+    require("../../../../demo/example-data/patterns/chalk.png"),
+    require("../../../../demo/example-data/patterns/claystone.png"),
+    require("../../../../demo/example-data/patterns/conglomerate.png"),
+    require("../../../../demo/example-data/patterns/Diagonal.png"),
+    require("../../../../demo/example-data/patterns/Diagonalx2.png"),
+    require("../../../../demo/example-data/patterns/Diagonalx2_right.png"),
+    require("../../../../demo/example-data/patterns/Diagonalx4.png"),
+    require("../../../../demo/example-data/patterns/Diagonalx4_right.png"),
+    require("../../../../demo/example-data/patterns/dolomitic_limestone.png"),
+    require("../../../../demo/example-data/patterns/dolostone.png"),
+    require("../../../../demo/example-data/patterns/fissile_mudstone.png"),
+    require("../../../../demo/example-data/patterns/fissile_siltstone.png"),
+    require("../../../../demo/example-data/patterns/gypsum.png"),
+    require("../../../../demo/example-data/patterns/gypsum_anhydrite_unspecified.png"),
+    require("../../../../demo/example-data/patterns/halite.png"),
+    require("../../../../demo/example-data/patterns/Horizontal_lines.png"),
+    require("../../../../demo/example-data/patterns/Horizontal_linesx2.png"),
+    require("../../../../demo/example-data/patterns/Horizontal_vertical_lines.png"),
+    require("../../../../demo/example-data/patterns/Horizontal_vertical_linesx2.png"),
+    require("../../../../demo/example-data/patterns/Horizontal_vertical_linesx4.png"),
+    require("../../../../demo/example-data/patterns/limestone.png"),
+    require("../../../../demo/example-data/patterns/marl.png"),
+    require("../../../../demo/example-data/patterns/mudstone.png"),
+    require("../../../../demo/example-data/patterns/salt_general.png"),
+    require("../../../../demo/example-data/patterns/sandstone.png"),
+    require("../../../../demo/example-data/patterns/sedimentary_breccia.png"),
+    require("../../../../demo/example-data/patterns/shale.png"),
+    require("../../../../demo/example-data/patterns/silicic_plutonic_rocks.png"),
+    require("../../../../demo/example-data/patterns/siltstone.png"),
+    require("../../../../demo/example-data/patterns/Vertical_lines.png"),
+    require("../../../../demo/example-data/patterns/Vertical_linesx2.png"),
+    require("../../../../demo/example-data/patterns/vulcanic_rock_general.png"),
+];
+/*const patternNames = [
+    "Anhydrite",
+    "Brown coal",
+    "Calcareous dolostone",
+    "Chalk",
+    "Claystone",
+    "Conglomerate",
+    "Diagonal",
+    "Diagonalx2",
+    "Diagonalx2 right",
+    "Diagonalx4",
+    "Diagonalx4 right",
+    "Dolomitic limestone",
+    "Dolostone",
+    "Fissile mudstone",
+    "Fissile siltstone",
+    "Gypsum",
+    "Gypsum anhydrite unspecified",
+    "Halite",
+    "Horizontal lines",
+    "Horizontal linesx2",
+    "Horizontal vertical lines",
+    "Horizontal vertical linesx2",
+    "Horizontal vertical linesx4",
+    "Limestone",
+    "Marl",
+    "Mudstone",
+    "Salt general",
+    "Sandstone",
+    "Sedimentary breccia",
+    "Shale",
+    "Silicic plutonic rocks",
+    "Siltstone",
+    "Vertical lines",
+    "Vertical linesx2",
+    "vulcanic rock general",
+];*/
+
 interface Props {
     width?: number;
 
@@ -77,7 +154,12 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         const horizontal = this.props.horizontal;
 
         let ymax = 0;
-        const picks: { color: string; from: number; to: number }[] = [];
+        const picks: {
+            color: string;
+            pattern: string;
+            from: number;
+            to: number;
+        }[] = [];
 
         let offsetTop = 1157;
         let offsetLeft = 1157;
@@ -108,9 +190,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
 
             for (const wp of wps) {
                 const horizon = wp.horizon;
-                //const vMD = wp.vMD;
                 const vPrimary = wp.vPrimary;
-                //const vSecondary = wp.vSecondary;
                 const color = wp.color;
 
                 const rgba =
@@ -121,6 +201,17 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                     "," +
                     color[2] +
                     ",0.8)";
+
+                const pattern =
+                    rgba === "rgba(255,193,0,0.8)"
+                        ? "url(#pattern1)"
+                        : rgba === "rgba(255,120,61,0.8)"
+                        ? "url(#pattern2)"
+                        : rgba === "rgba(255,223,161,0.8)"
+                        ? "url(#pattern3)"
+                        : rgba === "rgba(255,155,76,0.8)"
+                        ? "url(#pattern4)"
+                        : "";
 
                 const vCur = vPrimary;
                 if (vCur === undefined) continue;
@@ -143,6 +234,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                             from: v,
                             to: v2,
                             color: rgba,
+                            pattern: pattern,
                         });
 
                         break;
@@ -226,24 +318,48 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                   height +
                   " " +
                   to1 +
-                  " " +
-                  height +
-                  " " +
-                  from1 +
-                  " 0"
+                  (" " + height + " " + from1 + " 0")
                 : "0 " +
                   from0 +
                   " " +
                   width +
                   " " +
                   to0 +
-                  " " +
-                  width +
-                  " " +
-                  to1 +
-                  " 0 " +
-                  from1;
+                  (" " + width + " " + to1 + " 0 " + from1);
         }
+
+        const fillPoints: string[] = [];
+        picks.map((value, index) => {
+            if (index + 1 >= picks.length) return;
+            const value1 = picks[index + 1];
+            fillPoints.push(
+                horizontal
+                    ? value.from.toFixed(1) +
+                          " 0 " +
+                          value.to.toFixed(1) +
+                          " " +
+                          height +
+                          " " +
+                          (value1.to.toFixed(1) +
+                              " " +
+                              height +
+                              " " +
+                              value1.from.toFixed(1) +
+                              " 0")
+                    : "0 " +
+                          value.from.toFixed(1) +
+                          " " +
+                          width +
+                          " " +
+                          value.to.toFixed(1) +
+                          " " +
+                          (width +
+                              " " +
+                              value1.to.toFixed(1) +
+                              " 0 " +
+                              value1.from.toFixed(1))
+            );
+        });
 
         return (
             <div
@@ -294,41 +410,78 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                         stroke="currentColor"
                         strokeWidth={3}
                     >
-                        {picks.map((value, index) =>
-                            index + 1 < picks.length ? (
-                                <polygon
-                                    key={index}
-                                    fill={value.color}
-                                    stroke="none"
-                                    points={
-                                        horizontal
-                                            ? value.from.toFixed(1) +
-                                              " 0 " +
-                                              value.to.toFixed(1) +
-                                              " " +
-                                              height +
-                                              " " +
-                                              picks[index + 1].to.toFixed(1) +
-                                              " " +
-                                              height +
-                                              " " +
-                                              picks[index + 1].from.toFixed(1) +
-                                              " 0"
-                                            : "0 " +
-                                              value.from.toFixed(1) +
-                                              " " +
-                                              width +
-                                              " " +
-                                              value.to.toFixed(1) +
-                                              " " +
-                                              width +
-                                              " " +
-                                              picks[index + 1].to.toFixed(1) +
-                                              " 0 " +
-                                              picks[index + 1].from.toFixed(1)
-                                    }
+                        <defs>
+                            <pattern
+                                id="pattern1"
+                                width={patternsize}
+                                height={patternsize}
+                                patternUnits="userSpaceOnUse"
+                            >
+                                <image
+                                    width={patternsize}
+                                    height={patternsize}
+                                    href={patterns[1]}
                                 />
-                            ) : null
+                            </pattern>
+                            <pattern
+                                id="pattern2"
+                                width={patternsize}
+                                height={patternsize}
+                                patternUnits="userSpaceOnUse"
+                            >
+                                <image
+                                    width={patternsize}
+                                    height={patternsize}
+                                    href={patterns[0]}
+                                />
+                            </pattern>
+                            <pattern
+                                id="pattern3"
+                                width={patternsize}
+                                height={patternsize}
+                                patternUnits="userSpaceOnUse"
+                            >
+                                <image
+                                    width={patternsize}
+                                    height={patternsize}
+                                    href={patterns[2]}
+                                />
+                            </pattern>
+                            <pattern
+                                id="pattern4"
+                                width={patternsize}
+                                height={patternsize}
+                                patternUnits="userSpaceOnUse"
+                            >
+                                <image
+                                    width={patternsize}
+                                    height={patternsize}
+                                    href={patterns[3]}
+                                />
+                            </pattern>
+                        </defs>
+
+                        {picks.map(
+                            (value, index) =>
+                                index + 1 < picks.length && [
+                                    value.color && (
+                                        <polygon
+                                            key={index}
+                                            fill={value.color}
+                                            stroke="none"
+                                            points={fillPoints[index]}
+                                        />
+                                    ),
+                                    value.pattern && (
+                                        <polygon
+                                            key={"p" + index}
+                                            fill={value.pattern}
+                                            fillOpacity={0.45}
+                                            stroke="none"
+                                            points={fillPoints[index]}
+                                        />
+                                    ),
+                                ]
                         )}
                         {picks.map((value, index) => (
                             <path
