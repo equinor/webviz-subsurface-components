@@ -11,11 +11,15 @@ const { Default } = composeStories(stories);
 render(<Default />).unmount();
 
 describe("Map Story Tests", () => {
-    it("should diplay default story", () => {
-        mount(<Default />);
-        cy.get("svg[role='progressbar']")
-        cy.get("svg[role='progressbar']", {timeout: 180000}).should("not.exist")
-        cy.wait(1000)
-        cy.compareSnapshot('default-map-story')
-    });
+  it("should diplay default story",{
+      "retries": {
+        "runMode": 1,
+      }
+    } ,() => {
+      mount(<Default />);
+      cy.get("svg[role='progressbar']")
+      //cy.get("svg[role='progressbar']", {timeout: 180000}).should("not.exist")
+      cy.wait(1000)
+      cy.compareSnapshot('default-map-story')
+  });
 });

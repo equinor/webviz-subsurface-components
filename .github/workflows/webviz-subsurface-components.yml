@@ -158,6 +158,7 @@ jobs:
           rm -rf cypress-visual-screenshots/comparison
           rm -rf cypress-visual-screenshots/diff
           rm -rf cypress/screenshots
+          rm -rf cypress/videos
 
       - name: Create Pull Request
         id: cpr
@@ -167,7 +168,7 @@ jobs:
           commit-message: updated cypress snapshots
           title: Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}
           body: This is an auto-generated PR to update cypress snapshots.
-          base: ${{ github.head_ref }}
+          base: ${{ github.event.head_ref }}
           reviewers: ${{ github.actor }}
 
       - name: Upload coverage to Codecov
