@@ -522,7 +522,7 @@ const Map: React.FC<MapProps> = ({
         (pickInfo, event) => {
             const infos = getPickingInfos(pickInfo, event);
             setHoverInfo(infos); //  for InfoCard pickInfos
-            callOnMouseEvent("hover", infos, event);
+            callOnMouseEvent?.("hover", infos, event);
         },
         [coords, onMouseEvent]
     );
@@ -530,7 +530,7 @@ const Map: React.FC<MapProps> = ({
     const onClick = useCallback(
         (pickInfo, event) => {
             const infos = getPickingInfos(pickInfo, event);
-            callOnMouseEvent("click", infos, event);
+            callOnMouseEvent?.("click", infos, event);
         },
         [coords, onMouseEvent]
     );
