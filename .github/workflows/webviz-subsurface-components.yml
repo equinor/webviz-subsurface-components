@@ -118,6 +118,9 @@ jobs:
       - name: install cypress binary
         if: github.event_name != 'release' && matrix.e2e-tests
         run: |
+          echo "${{ github.event.pull_request.head.repo.full_name }}"
+          echo "${{ github.head_ref }}"
+          echo "${{ github.event.head_ref }}"
           cd react
           npx cypress install
 
@@ -168,7 +171,7 @@ jobs:
           commit-message: updated cypress snapshots
           title: Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}
           body: This is an auto-generated PR to update cypress snapshots.
-          base: ${{ github.event.head_ref }}
+          base: ${{ github.head_ref }}
           reviewers: ${{ github.actor }}
 
       - name: Upload coverage to Codecov
