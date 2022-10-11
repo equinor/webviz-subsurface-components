@@ -800,6 +800,10 @@ interface Props {
      * Orientation of the track plots on the screen.
      */
     horizontal?: boolean;
+
+    /**
+     * Primary axis: " md", "tvd",...
+     */
     primaryAxis: string;
     /**
      * Show Titles on the tracks

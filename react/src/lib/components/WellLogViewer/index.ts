@@ -1,2 +1,3 @@
 export { default } from "./WellLogViewer";
-export { default } from "./SyncLogViewer ;
+export { default as WellLogViewer } from "./WellLogViewer";
+export { default as SyncLogViewer } from "./SyncLogViewer";

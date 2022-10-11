@@ -47,6 +47,24 @@ export default {
         colorTables: {
             description: "Prop containing color table data.",
         },
+        wellpicks: {
+            description: "Well Picks data array",
+        },
+        patternsTable: {
+            description: "Patterns table",
+        },
+        patterns: {
+            description: "Horizon to pattern index map",
+        },
+
+        spacers: {
+            description:
+                "Set to true or spacer width or to array of widths if WellLogSpacers should be used",
+        },
+        wellDistances: {
+            description: "Distanses between wells to show on the spacers",
+        },
+
         horizontal: {
             description: "Orientation of the track plots on the screen.",
             defaultValue: false,

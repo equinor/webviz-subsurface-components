@@ -13,40 +13,37 @@ export interface PatternsTable {
     patternNames?: string[];
 }
 
-function patternId(index, pattern) {
-    return "pattern" + index + "_" + pattern;
+function patternId(uid: number, index: number) {
+    return "pattern" + uid + "_" + index;
 }
 
 function createPattern(
+    uid: number,
     index: number,
-    i: number,
     patternsTable: PatternsTable
 ): ReactNode {
     const patternSize = patternsTable.patternSize;
-    const patterns = patternsTable.patterns;
+    const pattern = patternsTable.patterns[index];
+    const id = patternId(uid, index);
     return (
         <pattern
-            key={"pattern" + i}
-            id={patternId(index, i)}
+            key={id}
+            id={id}
             width={patternSize}
             height={patternSize}
             patternUnits="userSpaceOnUse"
         >
-            <image
-                width={patternSize}
-                height={patternSize}
-                href={patterns[i]}
-            />
+            <image width={patternSize} height={patternSize} href={pattern} />
         </pattern>
     );
 }
 
-function createDefs(index: number, patternsTable?: PatternsTable): ReactNode {
+function createDefs(uid: number, patternsTable?: PatternsTable): ReactNode {
     if (!patternsTable) return null;
     return (
         <defs key="defs">
-            {patternsTable.patterns.map((value: string, i: number) =>
-                createPattern(index, i, patternsTable)
+            {patternsTable.patterns.map((value: string, index: number) =>
+                createPattern(uid, index, patternsTable)
             )}
         </defs>
     );
@@ -99,13 +96,13 @@ let count = 0;
 class WellLogSpacer extends Component<Props /*, State*/> {
     container: HTMLElement | undefined = undefined;
 
-    index: number = count++; // generate some unique number for pattern ids in SVGs
+    uid: number = count++; // generate some unique id prefix for pattern ids in SVGs
 
     defs: ReactNode;
 
     constructor(props: Props) {
         super(props);
-        this.defs = createDefs(this.index, this.props.patternsTable);
+        this.defs = createDefs(this.uid, this.props.patternsTable);
     }
 
     update(): void {
@@ -119,7 +116,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
             if (this.props.onCreateSpacer) this.props.onCreateSpacer(this);
         }
         if (this.props.patternsTable !== prevProps.patternsTable) {
-            this.defs = createDefs(this.index, this.props.patternsTable);
+            this.defs = createDefs(this.uid, this.props.patternsTable);
         }
     }
 
@@ -190,7 +187,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                         (val) => val[0] === horizon
                     );
                     if (p) {
-                        pattern = "url(#" + patternId(this.index, p[1]) + ")";
+                        pattern = "url(#" + patternId(this.uid, p[1]) + ")";
                     }
                 }
 

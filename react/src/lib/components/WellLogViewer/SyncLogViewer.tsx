@@ -46,17 +46,23 @@ interface Props {
      */
     colorTables: ColorTable[];
     /**
-     * Well Picks data
+     * Well Picks data array
      */
     wellpicks?: WellPickProps[];
 
+    /**
+     * Patterns table
+     */
     patternsTable?: PatternsTable;
+    /**
+     * Horizon to pattern index map
+     */
     patterns?: [string, number][];
 
     /**
-     * Set to true or to array of spaser widths if WellLogSpacers should be used
+     * Set to true or spacer width or to array of widths if WellLogSpacers should be used
      */
-    spacers?: boolean | number[];
+    spacers?: boolean | number | number[];
     /**
      * Distanses between wells to show on the spacers
      */
@@ -548,7 +554,11 @@ class SyncLogViewer extends Component<Props, State> {
         if (!this.props.spacers) return null;
         const prev = index - 1;
         let width =
-            this.props.spacers === true ? 255 : this.props.spacers[prev];
+            this.props.spacers === true
+                ? 255 // default width
+                : typeof this.props.spacers === "number"
+                ? this.props.spacers // all widths are equal
+                : this.props.spacers[prev]; // individual width
         if (width === undefined) width = 255; // set some default value
         if (!width) return null;
 
@@ -714,6 +724,29 @@ SyncLogViewer.propTypes = {
      * Prop containing color table data
      */
     colorTables: PropTypes.array.isRequired,
+
+    /**
+     * Well Picks data array
+     */
+    wellpicks: PropTypes.array,
+
+    /**
+     * Patterns table
+     */
+    patternsTable: PropTypes.object,
+    /**
+     * Horizon to pattern index map
+     */
+    patterns: PropTypes.array,
+
+    /**
+     * Set to true or to array of spacer widths if WellLogSpacers should be used
+     */
+    spacers: PropTypes.array,
+    /**
+     * Distanses between wells to show on the spacers
+     */
+    wellDistances: PropTypes.array,
 
     /**
      * Orientation of the track plots on the screen. Default is false

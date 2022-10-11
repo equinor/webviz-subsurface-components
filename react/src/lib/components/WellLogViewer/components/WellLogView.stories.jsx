@@ -44,6 +44,9 @@ export default {
         colorTables: {
             description: "Prop containing color table data.",
         },
+        wellpick: {
+            description: "Well Picks data",
+        },
         primaryAxis: {
             description: "primaryAxis",
             defaultValue: "md",
