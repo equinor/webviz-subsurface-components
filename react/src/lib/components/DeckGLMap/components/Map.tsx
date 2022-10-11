@@ -245,7 +245,6 @@ export interface MapProps {
 
     /**
      * If changed will reset camera to default position.
-     * Intitial value should be set to 0.
      */
     cameraHome?: boolean;
 
