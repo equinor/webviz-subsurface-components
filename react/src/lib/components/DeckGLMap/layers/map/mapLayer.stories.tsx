@@ -238,15 +238,15 @@ MapLayer3dPng.parameters = {
 };
 
 export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
-    const [home, setHome] = React.useState<boolean>(false);
+    const [home, setHome] = React.useState<number>(0);
 
     const handleChange = () => {
-        setHome(!home);
+        setHome(home + 1);
     };
 
     const props = {
         ...args,
-        cameraHome: home,
+        triggerHome: home,
     };
 
     return (
@@ -254,7 +254,7 @@ export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
             <div className={useStyles().main}>
                 <DeckGLMap {...props} />
             </div>
-            <button onClick={handleChange}> Reset </button>
+            <button onClick={handleChange}> Reset Camera </button>
         </>
     );
 };
@@ -279,9 +279,9 @@ ResetCameraProperty.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: `Example using optional 'cameraHome' property.
+            story: `Example using optional 'triggerHome' property.
                     When this property is changed camera will reset to home position.
-                    Using the button the property will switch between true and false.`,
+                    Using the button the property will change its value.`,
         },
     },
 };

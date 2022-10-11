@@ -246,7 +246,7 @@ export interface MapProps {
     /**
      * If changed will reset camera to default position.
      */
-    cameraHome?: boolean;
+    triggerHome?: number;
 
     selection?: {
         well: string | undefined;
@@ -313,7 +313,7 @@ const Map: React.FC<MapProps> = ({
     getTooltip = defaultTooltip,
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
-    cameraHome,
+    triggerHome,
 }: MapProps) => {
     const deckRef = useRef<DeckGL>(null);
 
@@ -462,10 +462,10 @@ const Map: React.FC<MapProps> = ({
         useState<BoundingBox>(bboxInitial);
 
     useEffect(() => {
-        if (typeof cameraHome !== "undefined") {
+        if (typeof triggerHome !== "undefined") {
             calcDefaultViewStates();
         }
-    }, [cameraHome]);
+    }, [triggerHome]);
 
     useEffect(() => {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
