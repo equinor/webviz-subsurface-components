@@ -280,7 +280,7 @@ ResetCameraProperty.parameters = {
         ...defaultParameters.docs,
         description: {
             story: `Example using optional 'cameraHome' property.
-                    When this property ia changed camera will reset to home position.
+                    When this property is changed camera will reset to home position.
                     Using the button the property will switch between true and false.`,
         },
     },
