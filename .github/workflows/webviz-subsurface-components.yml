@@ -172,7 +172,6 @@ jobs:
           title: Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}
           body: This is an auto-generated PR to update cypress snapshots.
           push-to-fork: ${{ github.event.pull_request.head.repo.full_name }}
-          base: ${{ github.head_ref }}
           reviewers: ${{ github.actor }}
 
       - name: Upload coverage to Codecov
