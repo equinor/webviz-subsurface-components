@@ -463,7 +463,7 @@ const Map: React.FC<MapProps> = ({
         useState<BoundingBox>(bboxInitial);
 
     useEffect(() => {
-        if (typeof cameraHome !== "undefined" && cameraHome !== 0) {
+        if (typeof cameraHome !== "undefined") {
             calcDefaultViewStates();
         }
     }, [cameraHome]);

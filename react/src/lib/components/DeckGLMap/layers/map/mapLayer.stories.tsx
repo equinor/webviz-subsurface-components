@@ -111,17 +111,6 @@ const cellCenteredPropertiesLayer = {
     ],
 };
 
-// keep
-// const wellsLayer = {
-//     "@@type": "WellsLayer",
-//     data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-//     logData:
-//         "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
-//     logrunName: "BLOCKING",
-//     logName: "ZONELOG",
-//     logColor: "Stratigraphy",
-// };
-
 // Example using "Map" layer. Uses PNG float for mesh and properties.
 const meshMapLayerPng = {
     "@@type": "MapLayer",
@@ -220,30 +209,12 @@ function createColorMap(breakpoint: number) {
 }
 
 export const MapLayer3dPng: ComponentStory<typeof DeckGLMap> = (args) => {
-    const [home, setHome] = React.useState<number>(0);
-
-    const handleChange = () => {
-        setHome(home + 1);
-    };
-
-    const props = {
-        ...args,
-        cameraHome: home,
-    };
-
-    return (
-        <>
-            <div className={useStyles().main}>
-                <DeckGLMap {...props} />
-            </div>
-            <button onClick={handleChange}> Reset </button>
-        </>
-    );
+    return <DeckGLMap {...args} />;
 };
 
 MapLayer3dPng.args = {
     id: "map",
-    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer], //keep: wellsLayer
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
@@ -262,6 +233,55 @@ MapLayer3dPng.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Example using png as mesh and properties data.",
+        },
+    },
+};
+
+export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [home, setHome] = React.useState<boolean>(false);
+
+    const handleChange = () => {
+        setHome(!home);
+    };
+
+    const props = {
+        ...args,
+        cameraHome: home,
+    };
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+            </div>
+            <button onClick={handleChange}> Reset </button>
+        </>
+    );
+};
+
+ResetCameraProperty.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+ResetCameraProperty.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: `Example using optional 'cameraHome' property.
+                    When this property ia changed camera will reset to home position.
+                    Using the button the property will switch between true and false.`,
         },
     },
 };
@@ -633,7 +653,7 @@ BigMapWithHole.parameters = {
 
 const useStyles = makeStyles({
     main: {
-        height: 600,
+        height: 500,
         border: "1px solid black",
         position: "relative",
     },
