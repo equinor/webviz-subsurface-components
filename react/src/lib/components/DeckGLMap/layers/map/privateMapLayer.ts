@@ -133,6 +133,10 @@ export default class privateMapLayer extends Layer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw(args: any): void {
+        if (!this.state.models) {
+            return;
+        }
+
         const { uniforms, context } = args;
         const { gl } = context;
 
