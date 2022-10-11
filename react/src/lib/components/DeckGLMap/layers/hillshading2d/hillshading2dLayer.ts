@@ -11,6 +11,9 @@ import { getModelMatrix } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 
 import fsHillshading from "./hillshading2d.fs.glsl";
+import { FeatureCollection } from "@nebula.gl/edit-modes";
+import { PickInfo } from "deck.gl";
+import { DeckGLLayerContext } from "../../components/Map";
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see
 // https://deck.gl/docs/api-reference/layers/bitmap-layer
@@ -36,6 +39,9 @@ export interface Hillshading2DProps<D> extends BitmapLayerProps<D> {
 
     // Rotates image around bounds upper left corner counterclockwise in degrees.
     rotDeg: number;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setReportedBoundingBox?: any;
 }
 
 const defaultProps = layersDefaultProps[
@@ -46,9 +52,36 @@ export default class Hillshading2DLayer extends BitmapLayer<
     unknown,
     Hillshading2DProps<unknown>
 > {
+    initializeState(
+        context: PickInfo<FeatureCollection> | DeckGLLayerContext | undefined
+    ): void {
+        this.setState({
+            isLoaded: false,
+        });
+        super.initializeState(context);
+    }
+
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms }: any): void {
+        if (!this.state.isLoaded) {
+            this.setState({
+                isLoaded: true,
+            });
+
+            if (typeof this.props.setReportedBoundingBox !== "undefined") {
+                const xMin = this.props.bounds[0];
+                const yMin = this.props.bounds[1];
+                const zMin = 1;
+                const xMax = this.props.bounds[2];
+                const yMax = this.props.bounds[3];
+                const zMax = -1;
+                const bbox = [xMin, yMin, zMin, xMax, yMax, zMax];
+
+                this.props.setReportedBoundingBox(bbox);
+            }
+        }
+
         if (this.props.image) {
             const mergedModuleParams = {
                 ...moduleParameters,

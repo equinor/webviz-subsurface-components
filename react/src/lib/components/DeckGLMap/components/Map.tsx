@@ -66,6 +66,21 @@ function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
+function boundingBoxCenter(box: BoundingBox): [number, number, number] {
+    const xmin = box[0];
+    const ymin = box[1];
+    const zmin = box[2];
+
+    const xmax = box[3];
+    const ymax = box[4];
+    const zmax = box[5];
+    return [
+        xmin + 0.5 * (xmax - xmin),
+        ymin + 0.5 * (ymax - ymin),
+        zmin + 0.5 * (zmax - zmin),
+    ];
+}
+
 export type BoundsAccessor = () => [number, number, number, number];
 
 export type TooltipCallback = (
@@ -378,6 +393,12 @@ const Map: React.FC<MapProps> = ({
         setDeckGLViews(jsonToObject(viewsProps) as View[]);
     }, [viewsProps]);
 
+    // update store if any of the layer prop is changed
+    const dispatch = useDispatch();
+    const st_layers = useSelector(
+        (st: MapState) => st.spec["layers"]
+    ) as Record<string, unknown>[];
+
     const [reportedBoundingBox, setReportedBoundingBox] =
         useState<BoundingBox>(bboxInitial);
     const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
@@ -395,21 +416,43 @@ const Map: React.FC<MapProps> = ({
         );
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
         const is3D = views?.viewports?.[0]?.show3D ?? false;
+        const axesLayer = st_layers.find((e) => {
+            return e["@@type"] === "AxesLayer";
+        });
+        const isAxesLayer = typeof axesLayer !== "undefined";
+        // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
+        const target = boundingBoxCenter(
+            isAxesLayer
+                ? (axesLayer?.["bounds"] as BoundingBox)
+                : (union_of_reported_bboxes as BoundingBox)
+        );
+
+        if (!is3D) {
+            // In 2D target should only contain x and y.
+            target.pop();
+        }
+
         let tempViewStates: Record<string, ViewStateType> = {};
         tempViewStates = Object.fromEntries(
             viewsProps.map((item, index) => [
                 item.id,
-                getViewState3D(
-                    is3D,
-                    union_of_reported_bboxes,
-                    views?.viewports[index].zoom,
-                    deckRef.current?.deck
-                ),
+                isBoundsDefined
+                    ? getViewState(
+                          boundsInitial,
+                          target,
+                          views?.viewports[index].zoom,
+                          deckRef.current?.deck
+                      )
+                    : getViewState3D(
+                          is3D,
+                          union_of_reported_bboxes,
+                          views?.viewports[index].zoom,
+                          deckRef.current?.deck
+                      ),
             ])
         );
-        if (!isBoundsDefined) {
-            setViewStates(tempViewStates);
-        }
+
+        setViewStates(tempViewStates);
     }, [reportedBoundingBox]);
 
     // react on bounds prop change
@@ -445,26 +488,14 @@ const Map: React.FC<MapProps> = ({
             if (viewsProps[0] !== undefined) {
                 setFirstViewStatesId(viewsProps[0].id);
             }
-            if (getCameraPosition) {
-                getCameraPosition(cameraPosition);
-            }
         }
         if (cameraPosition === null) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, initialViewState])
             );
-            if (getCameraPosition) {
-                getCameraPosition(initialViewState);
-            }
             setViewStates(tempViewStates);
         }
-    }, [cameraPosition]);
-
-    // update store if any of the layer prop is changed
-    const dispatch = useDispatch();
-    const st_layers = useSelector(
-        (st: MapState) => st.spec["layers"]
-    ) as Record<string, unknown>[];
+    }, []);
 
     useEffect(() => {
         if (st_layers == undefined || layers == undefined) return;

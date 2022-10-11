@@ -111,6 +111,16 @@ const cellCenteredPropertiesLayer = {
     ],
 };
 
+const wellsLayer = {
+    "@@type": "WellsLayer",
+    data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+    logData:
+        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+    logrunName: "BLOCKING",
+    logName: "ZONELOG",
+    logColor: "Stratigraphy",
+};
+
 // Example using "Map" layer. Uses PNG float for mesh and properties.
 const meshMapLayerPng = {
     "@@type": "MapLayer",
@@ -214,7 +224,7 @@ export const MapLayer3dPng: ComponentStory<typeof DeckGLMap> = (args) => {
 
 MapLayer3dPng.args = {
     id: "map",
-    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+    layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
