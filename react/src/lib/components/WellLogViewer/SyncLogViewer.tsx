@@ -3,6 +3,7 @@ import React, { Component, ReactNode } from "react";
 import PropTypes from "prop-types";
 
 import WellLogSpacer from "./components/WellLogSpacer";
+import { PatternsTable } from "./components/WellLogSpacer";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
@@ -48,6 +49,9 @@ interface Props {
      * Well Picks data
      */
     wellpicks?: WellPickProps[];
+
+    patternsTable?: PatternsTable;
+    patterns?: [string, number][];
 
     /**
      * Set to true or to array of spaser widths if WellLogSpacers should be used
@@ -547,6 +551,7 @@ class SyncLogViewer extends Component<Props, State> {
             this.props.spacers === true ? 255 : this.props.spacers[prev];
         if (width === undefined) width = 255; // set some default value
         if (!width) return null;
+
         return (
             <div
                 style={
@@ -572,6 +577,8 @@ class SyncLogViewer extends Component<Props, State> {
                             : []
                     }
                     colorTables={this.props.colorTables}
+                    patternsTable={this.props.patternsTable}
+                    patterns={this.props.patterns}
                     horizontal={this.props.horizontal}
                     hideTitles={this.props.hideTitles}
                     hideLegend={this.props.hideLegend}

@@ -7,82 +7,50 @@ import WellLogView from "./WellLogView";
 
 import { ColorTable } from "./ColorTableTypes";
 
-const patternsize = 24;
+export interface PatternsTable {
+    patternSize: number;
+    patterns: string[];
+    patternNames?: string[];
+}
 
-const patterns = [
-    require("../../../../demo/example-data/patterns/anhydrite.png"),
-    require("../../../../demo/example-data/patterns/brown_coal.png"),
-    require("../../../../demo/example-data/patterns/calcareous_dolostone.png"),
-    require("../../../../demo/example-data/patterns/chalk.png"),
-    require("../../../../demo/example-data/patterns/claystone.png"),
-    require("../../../../demo/example-data/patterns/conglomerate.png"),
-    require("../../../../demo/example-data/patterns/Diagonal.png"),
-    require("../../../../demo/example-data/patterns/Diagonalx2.png"),
-    require("../../../../demo/example-data/patterns/Diagonalx2_right.png"),
-    require("../../../../demo/example-data/patterns/Diagonalx4.png"),
-    require("../../../../demo/example-data/patterns/Diagonalx4_right.png"),
-    require("../../../../demo/example-data/patterns/dolomitic_limestone.png"),
-    require("../../../../demo/example-data/patterns/dolostone.png"),
-    require("../../../../demo/example-data/patterns/fissile_mudstone.png"),
-    require("../../../../demo/example-data/patterns/fissile_siltstone.png"),
-    require("../../../../demo/example-data/patterns/gypsum.png"),
-    require("../../../../demo/example-data/patterns/gypsum_anhydrite_unspecified.png"),
-    require("../../../../demo/example-data/patterns/halite.png"),
-    require("../../../../demo/example-data/patterns/Horizontal_lines.png"),
-    require("../../../../demo/example-data/patterns/Horizontal_linesx2.png"),
-    require("../../../../demo/example-data/patterns/Horizontal_vertical_lines.png"),
-    require("../../../../demo/example-data/patterns/Horizontal_vertical_linesx2.png"),
-    require("../../../../demo/example-data/patterns/Horizontal_vertical_linesx4.png"),
-    require("../../../../demo/example-data/patterns/limestone.png"),
-    require("../../../../demo/example-data/patterns/marl.png"),
-    require("../../../../demo/example-data/patterns/mudstone.png"),
-    require("../../../../demo/example-data/patterns/salt_general.png"),
-    require("../../../../demo/example-data/patterns/sandstone.png"),
-    require("../../../../demo/example-data/patterns/sedimentary_breccia.png"),
-    require("../../../../demo/example-data/patterns/shale.png"),
-    require("../../../../demo/example-data/patterns/silicic_plutonic_rocks.png"),
-    require("../../../../demo/example-data/patterns/siltstone.png"),
-    require("../../../../demo/example-data/patterns/Vertical_lines.png"),
-    require("../../../../demo/example-data/patterns/Vertical_linesx2.png"),
-    require("../../../../demo/example-data/patterns/vulcanic_rock_general.png"),
-];
-/*const patternNames = [
-    "Anhydrite",
-    "Brown coal",
-    "Calcareous dolostone",
-    "Chalk",
-    "Claystone",
-    "Conglomerate",
-    "Diagonal",
-    "Diagonalx2",
-    "Diagonalx2 right",
-    "Diagonalx4",
-    "Diagonalx4 right",
-    "Dolomitic limestone",
-    "Dolostone",
-    "Fissile mudstone",
-    "Fissile siltstone",
-    "Gypsum",
-    "Gypsum anhydrite unspecified",
-    "Halite",
-    "Horizontal lines",
-    "Horizontal linesx2",
-    "Horizontal vertical lines",
-    "Horizontal vertical linesx2",
-    "Horizontal vertical linesx4",
-    "Limestone",
-    "Marl",
-    "Mudstone",
-    "Salt general",
-    "Sandstone",
-    "Sedimentary breccia",
-    "Shale",
-    "Silicic plutonic rocks",
-    "Siltstone",
-    "Vertical lines",
-    "Vertical linesx2",
-    "vulcanic rock general",
-];*/
+function patternId(index, pattern) {
+    return "pattern" + index + "_" + pattern;
+}
+
+function createPattern(
+    index: number,
+    i: number,
+    patternsTable: PatternsTable
+): ReactNode {
+    const patternSize = patternsTable.patternSize;
+    const patterns = patternsTable.patterns;
+    return (
+        <pattern
+            key={"pattern" + i}
+            id={patternId(index, i)}
+            width={patternSize}
+            height={patternSize}
+            patternUnits="userSpaceOnUse"
+        >
+            <image
+                width={patternSize}
+                height={patternSize}
+                href={patterns[i]}
+            />
+        </pattern>
+    );
+}
+
+function createDefs(index: number, patternsTable?: PatternsTable): ReactNode {
+    if (!patternsTable) return null;
+    return (
+        <defs key="defs">
+            {patternsTable.patterns.map((value: string, i: number) =>
+                createPattern(index, i, patternsTable)
+            )}
+        </defs>
+    );
+}
 
 interface Props {
     width?: number;
@@ -97,6 +65,9 @@ interface Props {
      * Well Picks data
      */
     wellpicks?: WellPickProps[];
+
+    patternsTable?: PatternsTable;
+    patterns?: [string, number][];
 
     distance?: number;
 
@@ -118,11 +89,23 @@ interface Props {
 
 //interface State {}
 
+// see also colors in Overlays in WellLogView.ts
+const selColor = "rgba(0, 0, 0, 0.1)";
+const curColor = "rgba(255, 0, 0, 0.1)";
+const pinColor = "rgba(0, 255, 0, 0.1)";
+
+let count = 0;
+
 class WellLogSpacer extends Component<Props /*, State*/> {
     container: HTMLElement | undefined = undefined;
 
+    index: number = count++; // generate some unique number for pattern ids in SVGs
+
+    defs: ReactNode;
+
     constructor(props: Props) {
         super(props);
+        this.defs = createDefs(this.index, this.props.patternsTable);
     }
 
     update(): void {
@@ -135,6 +118,9 @@ class WellLogSpacer extends Component<Props /*, State*/> {
             // update callback to component's caller
             if (this.props.onCreateSpacer) this.props.onCreateSpacer(this);
         }
+        if (this.props.patternsTable !== prevProps.patternsTable) {
+            this.defs = createDefs(this.index, this.props.patternsTable);
+        }
     }
 
     shouldComponentUpdate(nextProps: Props /*, nextState: State*/): boolean {
@@ -146,11 +132,6 @@ class WellLogSpacer extends Component<Props /*, State*/> {
     }
 
     render(): ReactNode {
-        // see also colors in Overlays in WellLogView.ts
-        const selColor = "rgba(0, 0, 0, 0.1)";
-        const curColor = "rgba(255, 0, 0, 0.1)";
-        const pinColor = "rgba(0, 255, 0, 0.1)";
-
         const horizontal = this.props.horizontal;
 
         let ymax = 0;
@@ -202,16 +183,16 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                     color[2] +
                     ",0.8)";
 
-                const pattern =
-                    rgba === "rgba(255,193,0,0.8)"
-                        ? "url(#pattern1)"
-                        : rgba === "rgba(255,120,61,0.8)"
-                        ? "url(#pattern2)"
-                        : rgba === "rgba(255,223,161,0.8)"
-                        ? "url(#pattern3)"
-                        : rgba === "rgba(255,155,76,0.8)"
-                        ? "url(#pattern4)"
-                        : "";
+                let pattern = "";
+
+                if (this.props.patterns) {
+                    const p = this.props.patterns.find(
+                        (val) => val[0] === horizon
+                    );
+                    if (p) {
+                        pattern = "url(#" + patternId(this.index, p[1]) + ")";
+                    }
+                }
 
                 const vCur = vPrimary;
                 if (vCur === undefined) continue;
@@ -410,57 +391,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                         stroke="currentColor"
                         strokeWidth={3}
                     >
-                        <defs>
-                            <pattern
-                                id="pattern1"
-                                width={patternsize}
-                                height={patternsize}
-                                patternUnits="userSpaceOnUse"
-                            >
-                                <image
-                                    width={patternsize}
-                                    height={patternsize}
-                                    href={patterns[1]}
-                                />
-                            </pattern>
-                            <pattern
-                                id="pattern2"
-                                width={patternsize}
-                                height={patternsize}
-                                patternUnits="userSpaceOnUse"
-                            >
-                                <image
-                                    width={patternsize}
-                                    height={patternsize}
-                                    href={patterns[0]}
-                                />
-                            </pattern>
-                            <pattern
-                                id="pattern3"
-                                width={patternsize}
-                                height={patternsize}
-                                patternUnits="userSpaceOnUse"
-                            >
-                                <image
-                                    width={patternsize}
-                                    height={patternsize}
-                                    href={patterns[2]}
-                                />
-                            </pattern>
-                            <pattern
-                                id="pattern4"
-                                width={patternsize}
-                                height={patternsize}
-                                patternUnits="userSpaceOnUse"
-                            >
-                                <image
-                                    width={patternsize}
-                                    height={patternsize}
-                                    href={patterns[3]}
-                                />
-                            </pattern>
-                        </defs>
-
+                        {this.defs}
                         {picks.map(
                             (value, index) =>
                                 index + 1 < picks.length && [
