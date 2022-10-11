@@ -171,6 +171,7 @@ jobs:
           commit-message: updated cypress snapshots
           title: Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}
           body: This is an auto-generated PR to update cypress snapshots.
+          push-to-fork: avanti-em/webviz-subsurface-components
           base: ${{ github.event.pull_request.head.ref }}
           reviewers: ${{ github.actor }}
 
