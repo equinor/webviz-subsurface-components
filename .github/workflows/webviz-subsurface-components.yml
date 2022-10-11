@@ -120,7 +120,7 @@ jobs:
         run: |
           echo "${{ github.event.pull_request.head.repo.full_name }}"
           echo "${{ github.head_ref }}"
-          echo "${{ github.event.head_ref }}"
+          echo "${{ github.event.pull_request.head.ref }}"
           cd react
           npx cypress install
 
@@ -171,8 +171,7 @@ jobs:
           commit-message: updated cypress snapshots
           title: Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}
           body: This is an auto-generated PR to update cypress snapshots.
-          push-to-fork: ${{ github.event.pull_request.head.repo.full_name }}
-          base: ${{ github.head_ref }}
+          base: ${{ github.event.pull_request.head.ref }}
           reviewers: ${{ github.actor }}
 
       - name: Upload coverage to Codecov
