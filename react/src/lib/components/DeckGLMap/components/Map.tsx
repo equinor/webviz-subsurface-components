@@ -513,7 +513,7 @@ const Map: React.FC<MapProps> = ({
             );
             setViewStates(tempViewStates);
         }
-    }, []);
+    }, [cameraPosition]);
 
     useEffect(() => {
         if (st_layers == undefined || layers == undefined) return;

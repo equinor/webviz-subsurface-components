@@ -263,6 +263,9 @@ export default class MapLayer extends CompositeLayer<
             );
             const url = URL.createObjectURL(blob);
             const webWorker = new Worker(url);
+            function webWorkerTerminate() {
+                webWorker.terminate();
+            }
 
             const colorTables = (this.context as DeckGLLayerContext).userData
                 .colorTables;
@@ -314,6 +317,8 @@ export default class MapLayer extends CompositeLayer<
                         zMax,
                     ]);
                 }
+
+                webWorkerTerminate();
             };
         });
     }
@@ -325,7 +330,17 @@ export default class MapLayer extends CompositeLayer<
         props: MapLayerProps<unknown>;
         oldProps: MapLayerProps<unknown>;
     }): void {
-        const needs_reload = !isEqual(props, oldProps);
+        const needs_reload =
+            !isEqual(props.meshUrl, oldProps.meshUrl) ||
+            !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
+            !isEqual(props.frame, oldProps.frame) ||
+            !isEqual(props.gridLines, oldProps.gridLines) ||
+            !isEqual(props.colorMapName, oldProps.colorMapName) ||
+            !isEqual(props.colorMapRange, oldProps.colorMapRange) ||
+            !isEqual(props.colorMapClampColor, oldProps.colorMapClampColor) ||
+            !isEqual(props.colorMapFunction, oldProps.colorMapFunction) ||
+            !isEqual(props.material, oldProps.material);
+
         if (needs_reload) {
             this.initializeState();
         }
