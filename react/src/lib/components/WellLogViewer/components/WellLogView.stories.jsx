@@ -60,7 +60,7 @@ export default {
             defaultValue: 256,
         },
         checkDatafileSchema: {
-            description: "Validate JSON datafile against schems",
+            description: "Validate JSON datafile against schema",
             defaultValue: false,
         },
         hideTitles: {

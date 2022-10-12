@@ -69,6 +69,14 @@ export default {
             description: "Orientation of the track plots on the screen.",
             defaultValue: false,
         },
+        maxVisibleTrackNum: {
+            description: "maxVisibleTrackNum",
+            defaultValue: 4,
+        },
+        maxContentZoom: {
+            description: "maxContentZoom",
+            defaultValue: 256,
+        },
         hideTitles: {
             description: "Hide titles on the tracks.",
             defaultValue: false,

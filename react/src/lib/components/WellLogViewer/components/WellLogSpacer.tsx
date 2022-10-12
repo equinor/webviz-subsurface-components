@@ -42,7 +42,7 @@ function createDefs(uid: number, patternsTable?: PatternsTable): ReactNode {
     if (!patternsTable) return null;
     return (
         <defs key="defs">
-            {patternsTable.patterns.map((value: string, index: number) =>
+            {patternsTable.patterns.map((_value: string, index: number) =>
                 createPattern(uid, index, patternsTable)
             )}
         </defs>

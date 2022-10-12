@@ -133,10 +133,11 @@ class WellLogViewer extends Component<Props, State> {
         }
 
         if (
-            this.props.domain &&
-            (!prevProps.domain ||
-                this.props.domain[0] !== prevProps.domain[0] ||
-                this.props.domain[1] !== prevProps.domain[1])
+            (!this.props.domain && prevProps.domain) ||
+            (this.props.domain &&
+                (!prevProps.domain ||
+                    this.props.domain[0] !== prevProps.domain[0] ||
+                    this.props.domain[1] !== prevProps.domain[1]))
         ) {
             this.setControllerZoom();
         }

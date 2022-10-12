@@ -1207,7 +1207,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     setContentBaseDomain(domain: [number, number]): void {
         if (this.logController)
-            return setContentBaseDomain(this.logController, domain);
+            setContentBaseDomain(this.logController, domain);
     }
     getContentBaseDomain(): [number, number] {
         if (this.logController) return getContentBaseDomain(this.logController);
