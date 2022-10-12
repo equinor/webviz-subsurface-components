@@ -42,6 +42,7 @@ import {
     removeGraphTrackPlot,
 } from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
+import { getAvailableAxes } from "../utils/tracks";
 
 import { TemplatePlot, TemplateTrack } from "./WellLogTemplateTypes";
 
@@ -778,7 +779,7 @@ export interface WellLogController {
 
 import { Info } from "./InfoTypes";
 
-interface Props {
+export interface WellLogViewProps {
     /**
      * Object from JSON file describing single well log data.
      */
@@ -817,8 +818,17 @@ interface Props {
     axisTitles: Record<string, string>;
     axisMnemos: Record<string, string[]>;
 
+    /**
+     * The maximum number of visible tracks
+     */
     maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
+    /**
+     * The maximum zoom value
+     */
     maxContentZoom?: number; // default is 256
+
+    domain?: [number, number]; //  initial visible range
+    selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
 
     /**
      * Validate JSON datafile against schems
@@ -861,6 +871,48 @@ interface Props {
     onTemplateChanged?: () => void;
 }
 
+export function shouldUpdateWellLogView(
+    props: WellLogViewProps,
+    nextProps: WellLogViewProps
+): boolean {
+    // Props could contain some unknown object key:value so we should ignore they
+    // so compare only known key:values
+    if (props.horizontal !== nextProps.horizontal) return true;
+    if (props.hideTitles !== nextProps.hideTitles) return true;
+    if (props.hideLegend !== nextProps.hideLegend) return true;
+
+    if (props.welllog !== nextProps.welllog) return true;
+    if (props.template !== nextProps.template) return true;
+    if (props.colorTables !== nextProps.colorTables) return true;
+    if (props.wellpick !== nextProps.wellpick) return true;
+    if (props.primaryAxis !== nextProps.primaryAxis) return true;
+    if (props.axisTitles !== nextProps.axisTitles) return true;
+    if (props.axisMnemos !== nextProps.axisMnemos) return true;
+
+    if (props.maxVisibleTrackNum !== nextProps.maxVisibleTrackNum) return true;
+    if (props.maxContentZoom !== nextProps.maxContentZoom) return true;
+
+    if (!isEqualRanges(props.domain, nextProps.domain)) return true;
+    if (!isEqualRanges(props.selection, nextProps.selection)) return true;
+
+    if (props.checkDatafileSchema !== nextProps.checkDatafileSchema)
+        return true;
+
+    // callbacks
+    // ignore all?
+
+    return false;
+}
+
+function isEqualRanges(
+    d1: undefined | [number | undefined, number | undefined],
+    d2: undefined | [number | undefined, number | undefined]
+): boolean {
+    if (!d1) return !d2;
+    if (!d2) return !d1;
+    return d1[0] !== d2[0] || d1[1] !== d2[1];
+}
+
 interface State {
     infos: Info[];
 
@@ -868,7 +920,10 @@ interface State {
     errorText?: string;
 }
 
-class WellLogView extends Component<Props, State> implements WellLogController {
+class WellLogView
+    extends Component<WellLogViewProps, State>
+    implements WellLogController
+{
     container?: HTMLElement;
     logController?: LogViewer;
     selCurrent: number | undefined; // current mouse position
@@ -879,7 +934,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     scaleInterpolator: ScaleInterpolator | undefined;
 
-    constructor(props: Props) {
+    constructor(props: WellLogViewProps) {
         super(props);
         this.container = undefined;
         this.logController = undefined;
@@ -906,6 +961,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         // set callback to component's caller
         if (this.props.onCreateController) this.props.onCreateController(this);
+
+        this.setControllerZoom();
     }
 
     componentDidMount(): void {
@@ -915,33 +972,18 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setTracks(true);
     }
 
-    shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-        if (this.props.horizontal !== nextProps.horizontal) return true;
-        if (this.props.hideTitles !== nextProps.hideTitles) return true;
-        if (this.props.hideLegend !== nextProps.hideLegend) return true;
+    shouldComponentUpdate(
+        nextProps: WellLogViewProps,
+        nextState: State
+    ): boolean {
+        if (shouldUpdateWellLogView(this.props, nextProps)) return true;
 
-        if (this.props.welllog !== nextProps.welllog) return true;
-        if (this.props.template !== nextProps.template) return true;
-        if (this.props.colorTables !== nextProps.colorTables) return true;
-        if (this.props.wellpick !== nextProps.wellpick) return true;
-        if (this.props.primaryAxis !== nextProps.primaryAxis) return true;
-        if (this.props.axisTitles !== nextProps.axisTitles) return true;
-        if (this.props.axisMnemos !== nextProps.axisMnemos) return true;
-
-        if (this.props.maxVisibleTrackNum !== nextProps.maxVisibleTrackNum)
-            return true;
         if (this.state.scrollTrackPos !== nextState.scrollTrackPos) return true;
         if (this.state.errorText !== nextState.errorText) return true;
 
-        if (this.props.maxContentZoom !== nextProps.maxContentZoom) return true;
-        if (this.props.checkDatafileSchema !== nextProps.checkDatafileSchema)
-            return true;
-
-        // callbacks
-
         return false;
     }
-    componentDidUpdate(prevProps: Props, prevState: State): void {
+    componentDidUpdate(prevProps: WellLogViewProps, prevState: State): void {
         // Typical usage (don't forget to compare props):
         if (this.props.onCreateController !== prevProps.onCreateController) {
             // update callback to component's caller
@@ -1008,6 +1050,24 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.onTrackSelection();
             this.setInfo();
         }
+
+        if (
+            this.props.domain &&
+            (!prevProps.domain ||
+                this.props.domain[0] !== prevProps.domain[0] ||
+                this.props.domain[1] !== prevProps.domain[1])
+        ) {
+            this.setControllerZoom();
+        }
+
+        if (
+            this.props.selection &&
+            (!prevProps.selection ||
+                this.props.selection[0] !== prevProps.selection[0] ||
+                this.props.selection[1] !== prevProps.selection[1])
+        ) {
+            this.setControllerSelection();
+        }
     }
 
     createLogViewer(): void {
@@ -1041,15 +1101,21 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo();
     }
     getAxesInfo(): AxesInfo {
+        // get Object keys available in the welllog
+        const axes = getAvailableAxes(
+            this.props.welllog,
+            this.props.axisMnemos
+        );
+        const primaryAxisIndex = axes.findIndex(
+            (value: string) => value === this.props.primaryAxis
+        );
         return {
             primaryAxis: this.props.primaryAxis,
             secondaryAxis:
                 this.props.template &&
                 this.props.template.scale &&
-                this.props.template.scale.allowSecondary
-                    ? this.props.primaryAxis == "md"
-                        ? "tvd"
-                        : "md"
+                this.props.template.scale.allowSecondary // get next in available axes
+                    ? axes[primaryAxisIndex + 1] || axes[0]
                     : "",
             titles: this.props.axisTitles,
             mnemos: this.props.axisMnemos,
@@ -1091,6 +1157,12 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this.logController?.tracks.find(function (track: Track) {
             return track.id === trackId;
         });
+    }
+    setControllerZoom(): void {
+        if (this.props.domain) this.zoomContentTo(this.props.domain);
+    }
+    setControllerSelection(): void {
+        if (this.props.selection) this.selectContent(this.props.selection);
     }
 
     /**
@@ -1243,6 +1315,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     _maxVisibleTrackNum(): number {
         return this.props.maxVisibleTrackNum
             ? this.props.maxVisibleTrackNum
+            : this.props.horizontal
+            ? 3
             : 5 /*some default value*/;
     }
 

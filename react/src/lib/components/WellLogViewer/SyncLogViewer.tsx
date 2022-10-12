@@ -66,7 +66,10 @@ interface Props {
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances?: (number | undefined)[];
+    wellDistances?: {
+        units: string;
+        distances: (number | undefined)[];
+    };
 
     /**
      * Orientation of the track plots on the screen.
@@ -577,7 +580,12 @@ class SyncLogViewer extends Component<Props, State> {
                             ? [this.controllers[prev], this.controllers[index]]
                             : []
                     }
-                    distance={this.props.wellDistances?.[prev]}
+                    distance={{
+                        units: this.props.wellDistances
+                            ? this.props.wellDistances.units
+                            : "",
+                        value: this.props.wellDistances?.distances[prev],
+                    }}
                     wellpicks={
                         this.props.wellpicks
                             ? [
@@ -746,7 +754,7 @@ SyncLogViewer.propTypes = {
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances: PropTypes.array,
+    wellDistances: PropTypes.object,
 
     /**
      * Orientation of the track plots on the screen. Default is false

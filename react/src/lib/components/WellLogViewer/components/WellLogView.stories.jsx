@@ -52,11 +52,11 @@ export default {
             defaultValue: "md",
         },
         maxVisibleTrackNum: {
-            description: "maxVisibleTrackNum",
-            defaultValue: 4,
+            description: "The maximum number of visible tracks",
+            defaultValue: 5,
         },
         maxContentZoom: {
-            description: "maxContentZoom",
+            description: "The maximum zoom value",
             defaultValue: 256,
         },
         checkDatafileSchema: {

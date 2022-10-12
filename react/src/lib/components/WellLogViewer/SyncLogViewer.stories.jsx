@@ -70,8 +70,8 @@ export default {
             defaultValue: false,
         },
         maxVisibleTrackNum: {
-            description: "maxVisibleTrackNum",
-            defaultValue: 4,
+            description: "The maximum number of visible tracks",
+            defaultValue: 3,
         },
         maxContentZoom: {
             description: "maxContentZoom",
@@ -315,5 +315,8 @@ Default.args = {
     patterns: require("../../../demo/example-data/horizon_patterns.json"),
 
     spacers: [312, 255],
-    wellDistances: [2048.3, 512.7],
+    wellDistances: {
+        units: "m",
+        distances: [2048.3, 512.7],
+    },
 };

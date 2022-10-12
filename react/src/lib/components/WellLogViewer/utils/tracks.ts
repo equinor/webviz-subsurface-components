@@ -222,16 +222,17 @@ type Named = {
 };
 
 export function getAvailableAxes(
-    welllog: WellLog,
+    welllog: WellLog | undefined,
     axisMnemos: Record<string, string[]>
 ): string[] {
     const result: string[] = [];
-    const curves = welllog.curves;
-    for (const key in axisMnemos) {
-        const i = indexOfElementByNames(curves, axisMnemos[key]);
-        if (i >= 0) result.push(key);
+    if (welllog) {
+        const curves = welllog.curves;
+        for (const key in axisMnemos) {
+            const i = indexOfElementByNames(curves, axisMnemos[key]);
+            if (i >= 0) result.push(key);
+        }
     }
-
     return result;
 }
 

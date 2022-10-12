@@ -1,60 +1,19 @@
 import React, { Component, ReactNode } from "react";
 
-import { LogViewer } from "@equinor/videx-wellog";
-import { TrackMouseEvent } from "./WellLogView";
-
 import WellLogView from "./WellLogView";
+import { WellLogViewProps } from "./WellLogView";
 
-import { WellLog } from "./WellLogTypes";
-import { Template } from "./WellLogTemplateTypes";
-import { ColorTable } from "./ColorTableTypes";
-
-import { WellLogController, WellPickProps } from "./WellLogView";
+import { WellLogController } from "./WellLogView";
 
 import Scroller from "./Scroller";
 
-interface Props {
-    welllog: WellLog | undefined;
-    template: Template;
-    colorTables: ColorTable[];
-    wellpick?: WellPickProps;
-    horizontal?: boolean;
-    primaryAxis: string;
+export type WellLogViewWithScrollerProps = WellLogViewProps;
 
-    hideTitles?: boolean;
-    hideLegend?: boolean;
-
-    axisTitles: Record<string, string>;
-    axisMnemos: Record<string, string[]>;
-
-    maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
-    maxContentZoom?: number; // default is 256
-
-    checkDatafileSchema?: boolean;
-
-    // callbacks:
-    onCreateController?: (controller: WellLogController) => void;
-    onInfo?: (
-        x: number,
-        logController: LogViewer,
-        iFrom: number,
-        iTo: number
-    ) => void;
-
-    onTrackScroll?: () => void; // called when track scrolling are changed
-    onTrackSelection?: () => void; // called when trackselection is changed
-    onContentRescale?: () => void; // called when content zoom and scrolling are changed
-    onContentSelection?: () => void; // called when content zoom and scrolling are changed
-
-    onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void; // called when mouse click on a track
-    onTemplateChanged?: () => void; // called when track scrolling are changed
-}
-
-class WellLogViewWithScroller extends Component<Props> {
+class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
     controller: WellLogController | null;
     scroller: Scroller | null;
 
-    constructor(props: Props) {
+    constructor(props: WellLogViewWithScrollerProps) {
         super(props);
 
         this.controller = null;
@@ -74,7 +33,7 @@ class WellLogViewWithScroller extends Component<Props> {
         this.setScrollerPosAndZoom();
     }
 
-    shouldComponentUpdate(nextProps: Props): boolean {
+    shouldComponentUpdate(nextProps: WellLogViewWithScrollerProps): boolean {
         return !Object.is(this.props, nextProps);
     }
 
@@ -197,23 +156,10 @@ class WellLogViewWithScroller extends Component<Props> {
                 onScroll={this.onScrollerScroll}
             >
                 <WellLogView
-                    welllog={this.props.welllog}
-                    template={this.props.template}
-                    colorTables={this.props.colorTables}
-                    wellpick={this.props.wellpick}
-                    horizontal={this.props.horizontal}
-                    hideTitles={this.props.hideTitles}
-                    hideLegend={this.props.hideLegend}
-                    maxVisibleTrackNum={this.props.maxVisibleTrackNum}
-                    maxContentZoom={this.props.maxContentZoom}
-                    checkDatafileSchema={this.props.checkDatafileSchema}
-                    primaryAxis={this.props.primaryAxis}
-                    axisTitles={this.props.axisTitles}
-                    axisMnemos={this.props.axisMnemos}
-                    onInfo={this.props.onInfo}
+                    // copy all props
+                    {...this.props}
+                    // redefine some callbacks
                     onCreateController={this.onCreateController}
-                    onTrackMouseEvent={this.props.onTrackMouseEvent}
-                    onTemplateChanged={this.props.onTemplateChanged}
                     onTrackScroll={this.onTrackScroll}
                     onTrackSelection={this.onTrackSelection}
                     onContentRescale={this.onContentRescale}

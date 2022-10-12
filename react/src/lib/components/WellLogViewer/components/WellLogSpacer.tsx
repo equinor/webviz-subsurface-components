@@ -66,7 +66,13 @@ interface Props {
     patternsTable?: PatternsTable;
     patterns?: [string, number][];
 
-    distance?: number;
+    /**
+     * Distanse between wells to show on the spacer
+     */
+    distance?: {
+        units: string;
+        value: number | undefined;
+    };
 
     /**
      * Orientation of the track plots on the screen.
@@ -367,9 +373,13 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                 >
                     {!this.props.hideTitles ? <br /> : null}
                     {!this.props.hideLegend &&
-                    this.props.distance !== undefined ? (
+                    this.props.distance !== undefined &&
+                    this.props.distance.value !== undefined ? (
                         <div style={{ fontSize: 12, textAlign: "center" }}>
-                            {"←" + this.props.distance.toFixed(0) + "m→"}
+                            {"←" +
+                                this.props.distance.value.toFixed(0) +
+                                this.props.distance.units +
+                                "→"}
                         </div>
                     ) : null}
                 </div>

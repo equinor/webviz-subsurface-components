@@ -3,16 +3,15 @@ import React, { Component, ReactNode } from "react";
 import PropTypes from "prop-types";
 
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
+import { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
+import { shouldUpdateWellLogView } from "./components/WellLogView";
+
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
 
 import ZoomSlider from "./components/ZoomSlider";
 
-import { WellLog } from "./components/WellLogTypes";
-import { Template } from "./components/WellLogTemplateTypes";
-import { ColorTable } from "./components/ColorTableTypes";
-
-import { WellLogController, WellPickProps } from "./components/WellLogView";
+import { WellLogController } from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
 
@@ -24,18 +23,9 @@ import { LogViewer } from "@equinor/videx-wellog";
 
 import { Info, InfoOptions } from "./components/InfoTypes";
 
-interface Props {
-    welllog: WellLog;
-    template: Template;
-    colorTables: ColorTable[];
-    wellpick?: WellPickProps;
-    horizontal?: boolean;
-
-    hideTitles?: boolean;
-    hideLegend?: boolean;
-
-    domain?: [number, number]; //  initial visible range
-    selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
+interface Props extends WellLogViewWithScrollerProps {
+    //domain?: [number, number]; //  initial visible range
+    //selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
 
     readoutOptions?: InfoOptions; // options for readout
 
@@ -104,6 +94,8 @@ class WellLogViewer extends Component<Props, State> {
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
+        if (shouldUpdateWellLogView(this.props, nextProps)) return true;
+
         return (
             !Object.is(this.props, nextProps) ||
             !Object.is(this.state, nextState)
@@ -130,25 +122,6 @@ class WellLogViewer extends Component<Props, State> {
                 axes: axes,
                 // will be changed by callback! infos: [],
             });
-        }
-
-        if (
-            (!this.props.domain && prevProps.domain) ||
-            (this.props.domain &&
-                (!prevProps.domain ||
-                    this.props.domain[0] !== prevProps.domain[0] ||
-                    this.props.domain[1] !== prevProps.domain[1]))
-        ) {
-            this.setControllerZoom();
-        }
-
-        if (
-            this.props.selection &&
-            (!prevProps.selection ||
-                this.props.selection[0] !== prevProps.selection[0] ||
-                this.props.selection[1] !== prevProps.selection[1])
-        ) {
-            this.setControllerSelection();
         }
 
         if (
@@ -195,8 +168,6 @@ class WellLogViewer extends Component<Props, State> {
         if (this.props.onCreateController)
             // set callback to component's caller
             this.props.onCreateController(controller);
-
-        this.setControllerZoom();
     }
     // callback function from WellLogView
     onContentRescale(): void {
@@ -237,15 +208,6 @@ class WellLogViewer extends Component<Props, State> {
         });
     }
 
-    setControllerZoom(): void {
-        if (!this.controller) return;
-        if (this.props.domain) this.controller.zoomContentTo(this.props.domain);
-    }
-    setControllerSelection(): void {
-        if (!this.controller) return;
-        if (this.props.selection)
-            this.controller.selectContent(this.props.selection);
-    }
     onInfoGroupClick(trackId: string | number): void {
         const i = this.collapsedTrackIds.indexOf(trackId);
         if (i < 0) this.collapsedTrackIds.push(trackId);
@@ -272,7 +234,7 @@ class WellLogViewer extends Component<Props, State> {
                     horizontal={this.props.horizontal}
                     hideTitles={this.props.hideTitles}
                     hideLegend={this.props.hideLegend}
-                    maxVisibleTrackNum={this.props.horizontal ? 3 : 5}
+                    maxVisibleTrackNum={this.props.maxVisibleTrackNum}
                     maxContentZoom={maxContentZoom}
                     checkDatafileSchema={checkDatafileSchema}
                     primaryAxis={this.state.primaryAxis}
@@ -368,9 +330,17 @@ WellLogViewer.propTypes = {
     colorTables: PropTypes.array.isRequired,
 
     /**
+     * Well picks data
+     */
+    wellpick: PropTypes.object,
+
+    /**
      * Orientation of the track plots on the screen. Default is false
      */
     horizontal: PropTypes.bool,
+
+    maxVisibleTrackNum: PropTypes.number,
+    maxContentZoom: PropTypes.number,
 
     /**
      * Hide titles of the track. Default is false
