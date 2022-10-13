@@ -1,4 +1,4 @@
-import React, { Component, ReactNode } from "react";
+import React, { Component } from "react";
 
 import PropTypes from "prop-types";
 
@@ -16,8 +16,6 @@ import ZoomSlider from "./components/ZoomSlider";
 import { WellLogController } from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
-
-import { axisTitles, axisMnemos } from "./utils/axes";
 
 import { onTrackMouseEvent } from "./utils/edit-track";
 import { fillInfos } from "./utils/fill-info";
@@ -69,7 +67,10 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     constructor(props: WellLogViewerProps) {
         super(props);
 
-        const axes = getAvailableAxes(this.props.welllog, axisMnemos);
+        const axes = getAvailableAxes(
+            this.props.welllog,
+            this.props.axisMnemos
+        );
         let primaryAxis = axes[0];
         if (this.props.template && this.props.template.scale.primary) {
             if (axes.indexOf(this.props.template.scale.primary) >= 0)
@@ -128,7 +129,10 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
             this.props.template !== prevProps.template /*||
             this.props.colorTables !== prevProps.colorTables*/
         ) {
-            const axes = getAvailableAxes(this.props.welllog, axisMnemos);
+            const axes = getAvailableAxes(
+                this.props.welllog,
+                this.props.axisMnemos
+            );
             let primaryAxis = axes[0];
             if (this.props.template && this.props.template.scale.primary) {
                 if (axes.indexOf(this.props.template.scale.primary) >= 0) {
@@ -239,7 +243,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
             ); // force to update readout panel
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         const maxContentZoom = 256;
         const checkDatafileSchema = true;
         return (
@@ -256,8 +260,8 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     maxContentZoom={maxContentZoom}
                     checkDatafileSchema={checkDatafileSchema}
                     primaryAxis={this.state.primaryAxis}
-                    axisTitles={axisTitles}
-                    axisMnemos={axisMnemos}
+                    axisTitles={this.props.axisTitles}
+                    axisMnemos={this.props.axisMnemos}
                     onInfo={this.onInfo}
                     onCreateController={this.onCreateController}
                     onTrackMouseEvent={onTrackMouseEvent}
@@ -279,7 +283,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     <AxisSelector
                         header="Primary scale"
                         axes={this.state.axes}
-                        axisLabels={axisTitles}
+                        axisLabels={this.props.axisTitles}
                         value={this.state.primaryAxis}
                         onChange={this.onChangePrimaryAxis}
                     />
@@ -322,71 +326,13 @@ const InfoOptions_propTypes = PropTypes.shape({
     grouping: PropTypes.string,
 });
 
-/*
- */
 WellLogViewer.propTypes = {
-    /**
-     * The ID of this component, used to identify dash components
-     * in callbacks. The ID needs to be unique across all of the
-     * components in an app.
-     */
-    id: PropTypes.string.isRequired,
-
-    /**
-     * An object from JSON file describing well log data
-     */
-    welllog: PropTypes.object.isRequired,
-
-    /**
-     * Prop containing track template data
-     */
-    template: PropTypes.object.isRequired,
-
-    /**
-     * Prop containing color table data
-     */
-    colorTables: PropTypes.array.isRequired,
-
-    /**
-     * Well picks data
-     */
-    wellpick: PropTypes.object,
-
-    /**
-     * Orientation of the track plots on the screen. Default is false
-     */
-    horizontal: PropTypes.bool,
-
-    /**
-     * The maximum number of visible tracks
-     */
-    maxVisibleTrackNum: PropTypes.number,
-    maxContentZoom: PropTypes.number,
-
-    /**
-     * Hide titles of the track. Default is false
-     */
-    hideTitles: PropTypes.bool,
-
-    /**
-     * Hide legends of the track. Default is false
-     */
-    hideLegend: PropTypes.bool,
+    ...WellLogViewWithScroller.propTypes,
 
     /**
      * Options for readout panel
      */
     readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
-
-    /**
-     * Initial visible interval of the log data
-     */
-    domain: PropTypes.arrayOf(PropTypes.number),
-
-    /**
-     * Initial selected interval of the log data
-     */
-    selection: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default WellLogViewer;

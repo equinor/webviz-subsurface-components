@@ -53,6 +53,7 @@ const Template = (args) => {
 
 export const Default = Template.bind({});
 Default.args = {
+    id: "Well-Log-Viewer-With-Scroller",
     horizontal: false,
     welllog: require("../../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../../demo/example-data/welllog_template_1.json"),

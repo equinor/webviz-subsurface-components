@@ -10,6 +10,8 @@ const ComponentCode =
     '    colorTables={require("../../../demo/example-data/color-tables.json")} \r\n' +
     "/>";
 
+import { axisTitles, axisMnemos } from "./utils/axes";
+
 export default {
     component: WellLogViewer,
     title: "WellLogViewer/Demo/WellLogViewer",
@@ -115,6 +117,8 @@ Default.args = {
     template: require("../../../demo/example-data/welllog_template_1.json"),
     colorTables: require("../../../demo/example-data/color-tables.json"),
     wellpick: wellpick,
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
 };
 
 export const Horizontal = Template.bind({});

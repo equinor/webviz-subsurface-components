@@ -192,7 +192,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         );
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         if (this.props.type == "removePlots") {
             return (
                 <div>

@@ -134,7 +134,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         return false;
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         const horizontal = this.props.horizontal;
 
         let ymax = 0;

@@ -18,7 +18,6 @@ import { WellLogController, WellPickProps } from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
 
-import { axisTitles, axisMnemos } from "./utils/axes";
 import { checkMinMax } from "./utils/minmax";
 function isEqDomains(d1: [number, number], d2: [number, number]): boolean {
     const eps: number = Math.abs(d1[1] - d1[0] + (d2[1] - d2[0])) * 0.00001;
@@ -89,8 +88,40 @@ interface Props {
      */
     hideLegend?: boolean;
 
-    domain?: [number, number]; //  initial visible range
-    selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
+    /**
+     * Log mnemonics for axes
+     */
+    axisTitles: Record<string, string>;
+
+    /**
+     * Names for axes
+     */
+    axisMnemos: Record<string, string[]>;
+
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
+
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom?: number; // default is 256
+
+    /**
+     * Initial visible range
+     */
+    domain?: [number, number];
+
+    /**
+     * Initial selected range
+     */
+    selection?: [number | undefined, number | undefined];
+
+    /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema?: boolean;
 
     readoutOptions?: InfoOptions; // options for readout
 
@@ -136,7 +167,7 @@ class SyncLogViewer extends Component<Props, State> {
         super(props);
 
         const _axes = this.props.welllogs.map((welllog: WellLog) =>
-            getAvailableAxes(welllog, axisMnemos)
+            getAvailableAxes(welllog, this.props.axisMnemos)
         );
         const axes = _axes[0];
         let primaryAxis = axes?.[0];
@@ -198,6 +229,7 @@ class SyncLogViewer extends Component<Props, State> {
     }
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
+        //?!
         return (
             !Object.is(this.props, nextProps) ||
             !Object.is(this.state, nextState)
@@ -211,7 +243,7 @@ class SyncLogViewer extends Component<Props, State> {
             this.props.colorTables !== prevProps.colorTables*/
         ) {
             const _axes = this.props.welllogs.map((welllog) =>
-                getAvailableAxes(welllog, axisMnemos)
+                getAvailableAxes(welllog, this.props.axisMnemos)
             );
             const axes = _axes[0];
             let primaryAxis = axes[0];
@@ -516,11 +548,7 @@ class SyncLogViewer extends Component<Props, State> {
         this.updateReadoutPanel();
     }
 
-    createView(
-        index: number,
-        maxContentZoom: number,
-        maxVisibleTrackNum: number
-    ): ReactNode {
+    createView(index: number): ReactNode {
         const callbacks = this.callbacks[index];
         return (
             <WellLogViewWithScroller
@@ -536,11 +564,15 @@ class SyncLogViewer extends Component<Props, State> {
                 horizontal={this.props.horizontal}
                 hideTitles={this.props.hideTitles}
                 hideLegend={this.props.hideLegend}
-                maxVisibleTrackNum={maxVisibleTrackNum}
-                maxContentZoom={maxContentZoom}
+                axisTitles={this.props.axisTitles}
+                axisMnemos={this.props.axisMnemos}
+                maxVisibleTrackNum={
+                    this.props.maxVisibleTrackNum || this.props.horizontal
+                        ? 2
+                        : 3
+                }
+                maxContentZoom={this.props.maxContentZoom}
                 primaryAxis={this.state.primaryAxis}
-                axisTitles={axisTitles}
-                axisMnemos={axisMnemos}
                 onInfo={callbacks.onInfoBind}
                 onCreateController={callbacks.onCreateControllerBind}
                 onTrackMouseEvent={onTrackMouseEvent}
@@ -608,7 +640,7 @@ class SyncLogViewer extends Component<Props, State> {
         );
     }
 
-    createRightPanel(maxContentZoom: number): ReactNode {
+    createRightPanel(): ReactNode {
         return (
             <div
                 key="rightPanel"
@@ -625,7 +657,7 @@ class SyncLogViewer extends Component<Props, State> {
                 <AxisSelector
                     header="Primary scale"
                     axes={this.state.axes}
-                    axisLabels={axisTitles}
+                    axisLabels={this.props.axisTitles}
                     value={this.state.primaryAxis}
                     onChange={this.onChangePrimaryAxis}
                 />
@@ -649,7 +681,7 @@ class SyncLogViewer extends Component<Props, State> {
                     >
                         <ZoomSlider
                             value={this.state.sliderValue}
-                            max={maxContentZoom}
+                            max={this.props.maxContentZoom || 256 /*default*/}
                             onChange={this.onZoomSliderChange}
                         />
                     </span>
@@ -658,9 +690,7 @@ class SyncLogViewer extends Component<Props, State> {
         );
     }
 
-    render(): ReactNode {
-        const maxContentZoom = 256;
-        const maxVisibleTrackNum = this.props.horizontal ? 2 : 3;
+    render(): JSX.Element {
         return (
             <div
                 style={{
@@ -682,15 +712,11 @@ class SyncLogViewer extends Component<Props, State> {
                     {this.props.welllogs.map(
                         (_welllog: WellLog, index: number) => [
                             index ? this.createSpacer(index) : null,
-                            this.createView(
-                                index,
-                                maxContentZoom,
-                                maxVisibleTrackNum
-                            ),
+                            this.createView(index),
                         ]
                     )}
                 </div>
-                {this.createRightPanel(maxContentZoom)}
+                {this.createRightPanel()}
             </div>
         );
     }
@@ -762,6 +788,11 @@ SyncLogViewer.propTypes = {
     horizontal: PropTypes.bool,
 
     /**
+     * Primary axis id: " md", "tvd", "time"...
+     */
+    primaryAxis: PropTypes.string,
+
+    /**
      * Hide titles of the track. Default is false
      */
     hideTitles: PropTypes.bool,
@@ -770,6 +801,46 @@ SyncLogViewer.propTypes = {
      * Hide legends of the track. Default is false
      */
     hideLegend: PropTypes.bool,
+
+    /**
+     * Log mnemonics for axes
+     */
+    axisTitles: PropTypes.object,
+
+    /**
+     * Names for axes
+     */
+    axisMnemos: PropTypes.object,
+
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum: PropTypes.number,
+
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom: PropTypes.number,
+
+    /**
+     * Initial visible interval of the log data
+     */
+    domain: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Initial selected interval of the log data
+     */
+    selection: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema: PropTypes.bool,
+
+    /**
+     * Options for readout panel
+     */
+    readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
 
     /**
      * Synchronize the first visible track number in views
@@ -790,21 +861,6 @@ SyncLogViewer.propTypes = {
      * Synchronize templates in views
      */
     syncTemplate: PropTypes.bool,
-
-    /**
-     * Options for readout panel
-     */
-    readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
-
-    /**
-     * Initial visible interval of the log data
-     */
-    domain: PropTypes.arrayOf(PropTypes.number),
-
-    /**
-     * Initial selected interval of the log data
-     */
-    selection: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default SyncLogViewer;

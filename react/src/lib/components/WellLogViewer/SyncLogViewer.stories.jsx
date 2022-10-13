@@ -19,6 +19,8 @@ const ComponentCode =
     '    colorTables={require("../../../demo/example-data/color-tables.json")} \r\n' +
     "/>";
 
+import { axisTitles, axisMnemos } from "./utils/axes";
+
 export default {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
@@ -319,4 +321,7 @@ Default.args = {
         units: "m",
         distances: [2048.3, 512.7],
     },
+
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
 };

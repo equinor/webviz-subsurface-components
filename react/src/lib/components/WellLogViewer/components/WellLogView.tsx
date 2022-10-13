@@ -1,5 +1,7 @@
-import React, { Component, ReactNode } from "react";
+import React, { Component } from "react";
 import { LogViewer } from "@equinor/videx-wellog";
+
+import PropTypes from "prop-types";
 
 import {
     InterpolatedScaleHandler,
@@ -787,10 +789,12 @@ export interface WellLogViewProps {
      * Prop containing track template data.
      */
     template: Template;
+
     /**
      * Prop containing color table data.
      */
     colorTables: ColorTable[];
+
     /**
      * Well Picks data
      */
@@ -817,6 +821,7 @@ export interface WellLogViewProps {
      * Log mnemonics for axes
      */
     axisTitles: Record<string, string>;
+
     /**
      * Names for axes
      */
@@ -826,6 +831,7 @@ export interface WellLogViewProps {
      * The maximum number of visible tracks
      */
     maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
+
     /**
      * The maximum zoom value
      */
@@ -835,6 +841,7 @@ export interface WellLogViewProps {
      * Initial visible range
      */
     domain?: [number, number];
+
     /**
      * Initial selected range
      */
@@ -992,6 +999,8 @@ class WellLogView
     extends Component<WellLogViewProps, State>
     implements WellLogController
 {
+    public static propTypes: Record<string, unknown>;
+
     container?: HTMLElement;
     logController?: LogViewer;
     selCurrent: number | undefined; // current mouse position
@@ -1621,7 +1630,7 @@ class WellLogView
         }
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         return (
             <div
                 style={{
@@ -1647,5 +1656,89 @@ class WellLogView
         );
     }
 }
+
+WellLogView.propTypes = {
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    id: PropTypes.string.isRequired,
+
+    /**
+     * An object from JSON file describing well log data
+     */
+    welllog: PropTypes.object.isRequired,
+
+    /**
+     * Prop containing track template data
+     */
+    template: PropTypes.object.isRequired,
+
+    /**
+     * Prop containing color table data
+     */
+    colorTables: PropTypes.array.isRequired,
+
+    /**
+     * Well picks data
+     */
+    wellpick: PropTypes.object,
+
+    /**
+     * Orientation of the track plots on the screen. Default is false
+     */
+    horizontal: PropTypes.bool,
+
+    /**
+     * Primary axis id: " md", "tvd", "time"...
+     */
+    primaryAxis: PropTypes.string,
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTitles: PropTypes.bool,
+
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideLegend: PropTypes.bool,
+
+    /**
+     * Log mnemonics for axes
+     */
+    axisTitles: PropTypes.object,
+
+    /**
+     * Names for axes
+     */
+    axisMnemos: PropTypes.object,
+
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum: PropTypes.number,
+
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom: PropTypes.number,
+
+    /**
+     * Initial visible interval of the log data
+     */
+    domain: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Initial selected interval of the log data
+     */
+    selection: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema: PropTypes.bool,
+};
 
 export default WellLogView;

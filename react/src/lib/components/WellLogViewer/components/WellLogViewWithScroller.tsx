@@ -1,4 +1,4 @@
-import React, { Component, ReactNode } from "react";
+import React, { Component } from "react";
 
 import WellLogView from "./WellLogView";
 import { WellLogViewProps, argTypesWellLogViewProp } from "./WellLogView";
@@ -11,6 +11,8 @@ export type WellLogViewWithScrollerProps = WellLogViewProps;
 export const argTypesWellLogViewScrollerProp = argTypesWellLogViewProp;
 
 class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
+    public static propTypes: Record<string, unknown>;
+
     controller: WellLogController | null;
     scroller: Scroller | null;
 
@@ -150,7 +152,7 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
         if (shouldUpdateScroller) scroller.scrollTo(x, y);
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         return (
             <Scroller
                 ref={(el) => (this.scroller = el as Scroller)}
@@ -170,5 +172,7 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
         );
     }
 }
+
+WellLogViewWithScroller.propTypes = WellLogView.propTypes;
 
 export default WellLogViewWithScroller;

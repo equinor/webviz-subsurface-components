@@ -1,5 +1,5 @@
 import React from "react";
-import { ReactNode, WeakValidationMap } from "react";
+import { WeakValidationMap } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
 
@@ -301,7 +301,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
         }
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         const wellName = this.state.wellName;
         const wellColor = this.state.wellColor;
         const wellIndex = this.state.wellIndex;

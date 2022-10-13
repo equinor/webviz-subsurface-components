@@ -5,6 +5,7 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import { WellLogController } from "./components/WellLogView";
+import { axisTitles, axisMnemos } from "./utils/axes";
 
 const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
 const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
@@ -29,6 +30,8 @@ describe("Test Well Log Viewer Component", () => {
                 horizontal={true}
                 hideLegend={true}
                 hideTitles={true}
+                axisTitles={axisTitles}
+                axisMnemos={axisMnemos}
                 readoutOptions={{
                     allTracks: false,
                     grouping: "by_track",
