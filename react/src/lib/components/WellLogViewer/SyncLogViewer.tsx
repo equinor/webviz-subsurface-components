@@ -567,9 +567,8 @@ class SyncLogViewer extends Component<Props, State> {
                 axisTitles={this.props.axisTitles}
                 axisMnemos={this.props.axisMnemos}
                 maxVisibleTrackNum={
-                    this.props.maxVisibleTrackNum || this.props.horizontal
-                        ? 2
-                        : 3
+                    this.props.maxVisibleTrackNum ||
+                    (this.props.horizontal ? 2 : 3)
                 }
                 maxContentZoom={this.props.maxContentZoom}
                 primaryAxis={this.state.primaryAxis}

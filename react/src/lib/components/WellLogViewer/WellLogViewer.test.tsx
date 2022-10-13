@@ -30,6 +30,7 @@ describe("Test Well Log Viewer Component", () => {
                 horizontal={true}
                 hideLegend={true}
                 hideTitles={true}
+                primaryAxis={"md"}
                 axisTitles={axisTitles}
                 axisMnemos={axisMnemos}
                 readoutOptions={{

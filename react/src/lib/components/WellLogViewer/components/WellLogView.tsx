@@ -178,9 +178,10 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const value = caller.scale.invert(horizontal ? x : y);
             const elem = event.target;
             if (elem) {
-                const axisTitle = parent.props.axisTitles
-                    ? parent.props.axisTitles[parent.props.primaryAxis]
-                    : undefined;
+                const axisTitle =
+                    !parent.props.axisTitles || !parent.props.primaryAxis
+                        ? undefined
+                        : parent.props.axisTitles[parent.props.primaryAxis];
                 elem.textContent = Number.isFinite(value)
                     ? `Pinned ${axisTitle ? axisTitle : ""}: ${value.toFixed(
                           1
@@ -195,9 +196,11 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
             const elem = event.target;
             if (elem) {
-                const axisTitle = parent.props.axisTitles
-                    ? parent.props.axisTitles[parent.props.primaryAxis]
-                    : undefined;
+                const axisTitle = !parent.props.axisTitles
+                    ? undefined
+                    : !parent.props.primaryAxis
+                    ? parent.props.axisTitles[0]
+                    : parent.props.axisTitles[parent.props.primaryAxis];
                 elem.textContent = Number.isFinite(value)
                     ? `${axisTitle ? axisTitle : ""}: ${value.toFixed(1)}`
                     : "-";
@@ -805,9 +808,9 @@ export interface WellLogViewProps {
     horizontal?: boolean;
 
     /**
-     * Primary axis id: " md", "tvd", "time"...
+     * Primary axis id: "md", "tvd", "time"... Default is the first available from axisMnemos
      */
-    primaryAxis: string;
+    primaryAxis?: string;
     /**
      * Show Titles on the tracks
      */
@@ -1187,11 +1190,12 @@ class WellLogView
             (value: string) => value === this.props.primaryAxis
         );
         return {
-            primaryAxis: this.props.primaryAxis,
+            primaryAxis: this.props.primaryAxis || "",
             secondaryAxis:
                 this.props.template &&
                 this.props.template.scale &&
-                this.props.template.scale.allowSecondary // get next in available axes
+                this.props.template.scale.allowSecondary &&
+                axes.length > 1 // get next in available axes
                     ? axes[primaryAxisIndex + 1] || axes[0]
                     : "",
             titles: this.props.axisTitles,
@@ -1458,11 +1462,16 @@ class WellLogView
                 tracks.push(deepCopy(templateTrack));
             }
         }
+        const axes = getAvailableAxes(
+            this.props.welllog,
+            this.props.axisMnemos
+        );
         return {
             name: template.name,
             scale: {
-                primary: this.props.primaryAxis,
-                allowSecondary: template.scale?.allowSecondary,
+                primary: this.props.primaryAxis || "" /* no scale track */,
+                allowSecondary:
+                    template.scale?.allowSecondary && axes.length > 1,
             },
             tracks: tracks,
             styles: template.styles,
