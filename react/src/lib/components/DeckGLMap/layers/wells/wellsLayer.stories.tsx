@@ -22,6 +22,12 @@ const defaultProps = {
     resources: {
         wellsData: "./volve_wells.json",
     },
+    bounds: [432150, 6475800, 439400, 6481500] as [
+        number,
+        number,
+        number,
+        number
+    ],
     layers: [
         {
             "@@type": "WellsLayer",

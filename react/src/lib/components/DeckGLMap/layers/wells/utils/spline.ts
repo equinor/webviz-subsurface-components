@@ -2,8 +2,6 @@ import { FeatureCollection, GeometryCollection, LineString } from "geojson";
 import { cloneDeep } from "lodash";
 import { Position3D } from "../../utils/layerTools";
 
-type Position3D = [number, number, number];
-
 /**
  * Given four points P0, P1, P2, P4 and a argument t in the interval [0,1].
  * returns function value at t. t == 0 corresponds to P1 and t == 1 corrsponds to P2
