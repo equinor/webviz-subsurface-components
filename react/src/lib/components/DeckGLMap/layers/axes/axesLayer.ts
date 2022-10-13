@@ -2,13 +2,12 @@ import {
     COORDINATE_SYSTEM,
     Color,
     CompositeLayer,
-    Position,
     Viewport,
     UpdateParameters,
     LayersList,
 } from "@deck.gl/core/typed";
 import BoxLayer from "./boxLayer";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import { Position3D, ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { TextLayer } from "@deck.gl/layers/typed";
 
@@ -22,8 +21,8 @@ export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
 
 type TextLayerData = {
     label: string;
-    from: Position; // tick line start
-    to: Position; // tick line end
+    from: Position3D; // tick line start
+    to: Position3D; // tick line end
     size: number; // font size
 };
 
@@ -96,8 +95,8 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
             return "middle";
         }
 
-        const screen_from = this.context.viewport.project(d.from as number[]);
-        const screen_to = this.context.viewport.project(d.to as number[]);
+        const screen_from = this.context.viewport.project(d.from);
+        const screen_to = this.context.viewport.project(d.to);
         const is_labels = d.label !== "X" && d.label !== "Y" && d.label !== "Z"; // labels on axis or XYZ annotations
         if (is_labels) {
             if (screen_from[0] < screen_to[0]) {
@@ -108,22 +107,18 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
         return "end";
     }
 
-    getLabelPosition(d: TextLayerData): Position {
+    getLabelPosition(d: TextLayerData): Position3D {
         const is_labels = d.label !== "X" && d.label !== "Y" && d.label !== "Z"; // labels on axis or XYZ annotations
         if (is_labels) {
             const tick_vec = [d.to[0] - d.from[0], d.to[1] - d.from[1]];
             if (d.to[2] && d.from[2]) tick_vec.push(d.to[2] - d.from[2]);
 
             const s = 0.5;
-            const label_position: Position = [
+            return [
                 d.to[0] + s * tick_vec[0],
                 d.to[1] + s * tick_vec[1],
+                d.to[2] + s * tick_vec[2],
             ];
-            if (d.to[2] && d.from[2]) {
-                label_position.push(d.to[2] + s * tick_vec[2]);
-            }
-
-            return label_position;
         } else {
             // XYZ axis annotaion.
             return d.to;
@@ -186,8 +181,8 @@ AxesLayer.defaultProps = layersDefaultProps[
 //-- Local functions. -------------------------------------------------
 
 function LineLengthInPixels(
-    p0: number[],
-    p1: number[],
+    p0: Position3D,
+    p1: Position3D,
     viewport: Viewport
 ): number {
     const screen_from = viewport.project(p0);

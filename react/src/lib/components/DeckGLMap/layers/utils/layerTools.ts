@@ -15,6 +15,8 @@ import {
 } from "../../components/ColorLegend";
 import DrawingLayer from "../drawing/drawingLayer";
 
+export type Position3D = [number, number, number];
+
 // Return a color given a number in the [0,1] range.
 export type colorMapFunctionType = (x: number) => [number, number, number];
 

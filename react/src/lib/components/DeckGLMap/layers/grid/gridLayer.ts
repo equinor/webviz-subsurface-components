@@ -1,5 +1,8 @@
-import { ExtendedLayerProps, LayerPickInfo } from "../utils/layerTools";
-import { Position } from "@deck.gl/core/typed";
+import {
+    ExtendedLayerProps,
+    LayerPickInfo,
+    Position3D,
+} from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import {
@@ -45,7 +48,7 @@ type CellData = {
     i: number;
     j: number;
     z: number; // cell depth
-    cs: [Position, Position, Position, Position]; // 4 corners
+    cs: [Position3D, Position3D, Position3D, Position3D]; // 4 corners
     vs: [number]; // time dependent values
 };
 type GridData = CellData[];

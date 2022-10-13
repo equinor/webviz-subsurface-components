@@ -35,7 +35,7 @@ interface PolygonData {
 }
 
 export interface PieChartLayerProps<D> extends ExtendedLayerProps<D> {
-    selectedPie: PieData;
+    selectedPie: D;
 }
 
 export default class PieChartLayer extends CompositeLayer<
