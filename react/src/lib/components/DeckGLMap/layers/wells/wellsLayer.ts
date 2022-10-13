@@ -69,11 +69,7 @@ function onDataLoad(
     context: {
         propName: string;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-<<<<<<< HEAD
         layer: Layer<any>;
-=======
-        layer: any;
->>>>>>> 5f1182f (Replace 3rd party deck.gl types with native)
     }
 ): void {
     const bbox = GetBoundingBox(data as unknown as FeatureCollection);
@@ -272,8 +268,9 @@ export default class WellsLayer extends CompositeLayer<
 
     shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
         return (
-            changeFlags.viewportChanged || changeFlags.propsOrDataChanged /*||
-            changeFlags.updateTriggersChanged */
+            changeFlags.viewportChanged ||
+            changeFlags.propsOrDataChanged ||
+            typeof changeFlags.updateTriggersChanged === "object"
         );
     }
 
@@ -678,7 +675,7 @@ function getAnnotationPosition(
         if (well_data) top = well_head;
         else {
             const trajectory = getTrajectory(well_data, color_accessor);
-            top = trajectory?.[0];
+            top = trajectory?.at(0);
         }
 
         // using z=0 for orthographic view to keep label above other other layers
@@ -687,7 +684,7 @@ function getAnnotationPosition(
         let bot;
         // if trajectory is not present, return top position from Point geometry
         const trajectory = getTrajectory(well_data, color_accessor);
-        if (trajectory) bot = trajectory?.slice(-1)?.[0];
+        if (trajectory) bot = trajectory?.at(-1);
         else bot = getWellHeadPosition(well_data);
 
         // using z=0 for orthographic view to keep label above other other layers
