@@ -248,7 +248,7 @@ export default class MapLayer extends CompositeLayer<
     unknown,
     MapLayerProps<unknown>
 > {
-    initializeState(): void {
+    rebuildData(reportBoundingBox: boolean): void {
         const p = load_mesh_and_properties(
             this.props.meshUrl,
             this.props.propertiesUrl
@@ -294,7 +294,10 @@ export default class MapLayer extends CompositeLayer<
                     mesh_lines,
                 });
 
-                if (typeof this.props.setReportedBoundingBox !== "undefined") {
+                if (
+                    typeof this.props.setReportedBoundingBox !== "undefined" &&
+                    reportBoundingBox
+                ) {
                     const xinc = this.props.frame?.increment?.[0] ?? 0;
                     const yinc = this.props.frame?.increment?.[1] ?? 0;
 
@@ -323,6 +326,11 @@ export default class MapLayer extends CompositeLayer<
         });
     }
 
+    initializeState(): void {
+        const reportBoundingBox = true;
+        this.rebuildData(reportBoundingBox);
+    }
+
     updateState({
         props,
         oldProps,
@@ -342,7 +350,8 @@ export default class MapLayer extends CompositeLayer<
             !isEqual(props.material, oldProps.material);
 
         if (needs_reload) {
-            this.initializeState();
+            const reportBoundingBox = false;
+            this.rebuildData(reportBoundingBox);
         }
     }
 
