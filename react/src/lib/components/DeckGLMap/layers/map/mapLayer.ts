@@ -248,7 +248,7 @@ export default class MapLayer extends CompositeLayer<
     unknown,
     MapLayerProps<unknown>
 > {
-    initializeState(): void {
+    rebuildData(reportBoundingBox: boolean): void {
         const p = load_mesh_and_properties(
             this.props.meshUrl,
             this.props.propertiesUrl
@@ -263,6 +263,9 @@ export default class MapLayer extends CompositeLayer<
             );
             const url = URL.createObjectURL(blob);
             const webWorker = new Worker(url);
+            function webWorkerTerminate() {
+                webWorker.terminate();
+            }
 
             const colorTables = (this.context as DeckGLLayerContext).userData
                 .colorTables;
@@ -291,7 +294,10 @@ export default class MapLayer extends CompositeLayer<
                     mesh_lines,
                 });
 
-                if (typeof this.props.setReportedBoundingBox !== "undefined") {
+                if (
+                    typeof this.props.setReportedBoundingBox !== "undefined" &&
+                    reportBoundingBox
+                ) {
                     const xinc = this.props.frame?.increment?.[0] ?? 0;
                     const yinc = this.props.frame?.increment?.[1] ?? 0;
 
@@ -314,8 +320,15 @@ export default class MapLayer extends CompositeLayer<
                         zMax,
                     ]);
                 }
+
+                webWorkerTerminate();
             };
         });
+    }
+
+    initializeState(): void {
+        const reportBoundingBox = true;
+        this.rebuildData(reportBoundingBox);
     }
 
     updateState({
@@ -325,9 +338,20 @@ export default class MapLayer extends CompositeLayer<
         props: MapLayerProps<unknown>;
         oldProps: MapLayerProps<unknown>;
     }): void {
-        const needs_reload = !isEqual(props, oldProps);
+        const needs_reload =
+            !isEqual(props.meshUrl, oldProps.meshUrl) ||
+            !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
+            !isEqual(props.frame, oldProps.frame) ||
+            !isEqual(props.gridLines, oldProps.gridLines) ||
+            !isEqual(props.colorMapName, oldProps.colorMapName) ||
+            !isEqual(props.colorMapRange, oldProps.colorMapRange) ||
+            !isEqual(props.colorMapClampColor, oldProps.colorMapClampColor) ||
+            !isEqual(props.colorMapFunction, oldProps.colorMapFunction) ||
+            !isEqual(props.material, oldProps.material);
+
         if (needs_reload) {
-            this.initializeState();
+            const reportBoundingBox = false;
+            this.rebuildData(reportBoundingBox);
         }
     }
 

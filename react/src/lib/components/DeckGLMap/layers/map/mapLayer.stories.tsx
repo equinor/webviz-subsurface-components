@@ -111,16 +111,6 @@ const cellCenteredPropertiesLayer = {
     ],
 };
 
-const wellsLayer = {
-    "@@type": "WellsLayer",
-    data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-    logData:
-        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
-    logrunName: "BLOCKING",
-    logName: "ZONELOG",
-    logColor: "Stratigraphy",
-};
-
 // Example using "Map" layer. Uses PNG float for mesh and properties.
 const meshMapLayerPng = {
     "@@type": "MapLayer",
@@ -224,7 +214,7 @@ export const MapLayer3dPng: ComponentStory<typeof DeckGLMap> = (args) => {
 
 MapLayer3dPng.args = {
     id: "map",
-    layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
@@ -243,6 +233,55 @@ MapLayer3dPng.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Example using png as mesh and properties data.",
+        },
+    },
+};
+
+export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [home, setHome] = React.useState<number>(0);
+
+    const handleChange = () => {
+        setHome(home + 1);
+    };
+
+    const props = {
+        ...args,
+        triggerHome: home,
+    };
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+            </div>
+            <button onClick={handleChange}> Reset Camera </button>
+        </>
+    );
+};
+
+ResetCameraProperty.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+ResetCameraProperty.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: `Example using optional 'triggerHome' property.
+                    When this property is changed camera will reset to home position.
+                    Using the button the property will change its value.`,
         },
     },
 };
