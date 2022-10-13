@@ -303,7 +303,7 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
 export interface WellPickProps {
     wellpick: WellLog; // JSON Log Format
     name: string; //  "HORIZON"
-    md?: string; //  default is "MD"
+    md?: string; //  Log mnemonics for depth log. default is "MD"
     /**
      * Prop containing color table data.
      */
@@ -358,12 +358,10 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
     if (!wellpick) return wps;
 
     const curves = wellpick.wellpick.curves;
-    const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
+    const mnemo = wellpick.md ? wellpick.md : "MD";
+    const md = _getLogIndexByNames(curves, [mnemo]);
     if (md < 0) {
-        console.error(
-            "MD log is not found for wellpicks ",
-            wellpick.md ? wellpick.md : ""
-        );
+        console.error("Depth log '" + mnemo + "' is not found for wellpicks");
         return wps;
     }
 
@@ -803,7 +801,7 @@ export interface WellLogViewProps {
     horizontal?: boolean;
 
     /**
-     * Primary axis: " md", "tvd",...
+     * Primary axis id: " md", "tvd", "time"...
      */
     primaryAxis: string;
     /**
@@ -815,7 +813,13 @@ export interface WellLogViewProps {
      */
     hideLegend?: boolean;
 
+    /**
+     * Log mnemonics for axes
+     */
     axisTitles: Record<string, string>;
+    /**
+     * Names for axes
+     */
     axisMnemos: Record<string, string[]>;
 
     /**
@@ -827,8 +831,14 @@ export interface WellLogViewProps {
      */
     maxContentZoom?: number; // default is 256
 
-    domain?: [number, number]; //  initial visible range
-    selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
+    /**
+     * Initial visible range
+     */
+    domain?: [number, number];
+    /**
+     * Initial selected range
+     */
+    selection?: [number | undefined, number | undefined];
 
     /**
      * Validate JSON datafile against schems
@@ -870,6 +880,64 @@ export interface WellLogViewProps {
      */
     onTemplateChanged?: () => void;
 }
+
+export const argTypesWellLogViewProp = {
+    horizontal: {
+        description: "Orientation of the track plots on the screen.",
+        defaultValue: false,
+    },
+    welllog: {
+        description: "JSON object describing well log data.",
+    },
+    template: {
+        description: "Prop containing track template data.",
+    },
+    colorTables: {
+        description: "Prop containing color table data.",
+    },
+    wellpick: {
+        description: "Well Picks data",
+    },
+    primaryAxis: {
+        description: "Primary axis id",
+        defaultValue: "md",
+    },
+    maxVisibleTrackNum: {
+        description: "The maximum number of visible tracks",
+        defaultValue: 5,
+    },
+    maxContentZoom: {
+        description: "The maximum zoom value",
+        defaultValue: 256,
+    },
+    domain: {
+        description: "Initial visible range",
+    },
+    selection: {
+        description: "Initial selected range",
+    },
+    checkDatafileSchema: {
+        description: "Validate JSON datafile against schema",
+        defaultValue: false,
+    },
+    hideTitles: {
+        description: "Hide Titles on the tracks",
+        defaultValue: false,
+    },
+    hideLegend: {
+        description: "Hide Legends on the tracks",
+        defaultValue: false,
+    },
+    axisMnemos: {
+        description: "Log mnemonics for axes",
+        //defaultValue: axisMnemos,
+    },
+    axisTitles: {
+        description: "Names for axes",
+        //defaultValue: axisTitles,
+    },
+    // callbacks...
+};
 
 export function shouldUpdateWellLogView(
     props: WellLogViewProps,

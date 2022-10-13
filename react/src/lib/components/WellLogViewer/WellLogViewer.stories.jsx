@@ -1,5 +1,6 @@
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
+import { argTypesWellLogViewerProp } from "./WellLogViewer";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
@@ -25,54 +26,10 @@ export default {
         },
     },
     argTypes: {
+        ...argTypesWellLogViewerProp,
         id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
-        },
-        welllog: {
-            description: "Array of JSON objects describing well log data.",
-        },
-        template: {
-            description: "Prop containing track template data.",
-        },
-        colorTables: {
-            description: "Prop containing color table data.",
-        },
-        horizontal: {
-            description: "Orientation of the track plots on the screen.",
-            defaultValue: false,
-        },
-        maxVisibleTrackNum: {
-            description: "The maximum number of visible tracks",
-            defaultValue: 5,
-        },
-        maxContentZoom: {
-            description: "The maximum zoom value",
-            defaultValue: 256,
-        },
-        hideTitles: {
-            description: "Hide titles on the tracks.",
-            defaultValue: false,
-        },
-        hideLegend: {
-            description: "Hide legends on the tracks.",
-            defaultValue: false,
-        },
-        readoutOptions: {
-            description:
-                "Options for readout panel.<br/>" +
-                "allTracks: boolean — Show not only visible tracks,<br/>" +
-                "grouping: string — How group values.",
-            defaultValue: {
-                allTracks: false,
-                grouping: "by_track",
-            },
-        },
-        domain: {
-            description: "Initial visible interval of the log data.",
-        },
-        selection: {
-            description: "Initial selected interval of the log data.",
         },
     },
 };

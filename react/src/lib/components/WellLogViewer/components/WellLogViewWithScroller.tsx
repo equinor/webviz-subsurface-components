@@ -1,13 +1,14 @@
 import React, { Component, ReactNode } from "react";
 
 import WellLogView from "./WellLogView";
-import { WellLogViewProps } from "./WellLogView";
+import { WellLogViewProps, argTypesWellLogViewProp } from "./WellLogView";
 
 import { WellLogController } from "./WellLogView";
 
 import Scroller from "./Scroller";
 
 export type WellLogViewWithScrollerProps = WellLogViewProps;
+export const argTypesWellLogViewScrollerProp = argTypesWellLogViewProp;
 
 class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
     controller: WellLogController | null;

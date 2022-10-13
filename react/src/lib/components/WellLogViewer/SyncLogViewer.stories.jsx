@@ -74,7 +74,7 @@ export default {
             defaultValue: 3,
         },
         maxContentZoom: {
-            description: "maxContentZoom",
+            description: "The maximum zoom value",
             defaultValue: 256,
         },
         hideTitles: {

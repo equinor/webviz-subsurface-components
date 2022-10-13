@@ -1,5 +1,6 @@
 import React from "react";
 import WellLogView from "./WellLogView";
+import { argTypesWellLogViewProp } from "./WellLogView";
 
 const ComponentCode =
     '<WellLogView id="WellLogView" \r\n' +
@@ -27,57 +28,10 @@ export default {
         },
     },
     argTypes: {
+        ...argTypesWellLogViewProp,
         id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
-        },
-        horizontal: {
-            description: "Orientation of the track plots on the screen.",
-            defaultValue: false,
-        },
-        welllog: {
-            description: "JSON object describing well log data.",
-        },
-        template: {
-            description: "Prop containing track template data.",
-        },
-        colorTables: {
-            description: "Prop containing color table data.",
-        },
-        wellpick: {
-            description: "Well Picks data",
-        },
-        primaryAxis: {
-            description: "primaryAxis",
-            defaultValue: "md",
-        },
-        maxVisibleTrackNum: {
-            description: "The maximum number of visible tracks",
-            defaultValue: 5,
-        },
-        maxContentZoom: {
-            description: "The maximum zoom value",
-            defaultValue: 256,
-        },
-        checkDatafileSchema: {
-            description: "Validate JSON datafile against schema",
-            defaultValue: false,
-        },
-        hideTitles: {
-            description: "Hide Titles on the tracks",
-            defaultValue: false,
-        },
-        hideLegend: {
-            description: "Hide Legends on the tracks",
-            defaultValue: false,
-        },
-        axisMnemos: {
-            description: "axisMnemos",
-            defaultValue: axisMnemos,
-        },
-        axisTitles: {
-            description: "axisTitles",
-            defaultValue: axisTitles,
         },
     },
 };
@@ -98,6 +52,8 @@ Default.args = {
     welllog: require("../../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../../demo/example-data/welllog_template_1.json"),
     colorTables: require("../../../../demo/example-data/color-tables.json"),
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
 };
 
 export const Discrete = Template.bind({});
@@ -106,4 +62,6 @@ Discrete.args = {
     welllog: require("../../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../../demo/example-data/welllog_template_2.json"),
     colorTables: require("../../../../demo/example-data/color-tables.json"),
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
 };

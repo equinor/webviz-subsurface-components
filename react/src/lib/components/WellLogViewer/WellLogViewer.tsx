@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
+import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
+
 import { shouldUpdateWellLogView } from "./components/WellLogView";
 
 import InfoPanel from "./components/InfoPanel";
@@ -23,10 +25,7 @@ import { LogViewer } from "@equinor/videx-wellog";
 
 import { Info, InfoOptions } from "./components/InfoTypes";
 
-interface Props extends WellLogViewWithScrollerProps {
-    //domain?: [number, number]; //  initial visible range
-    //selection?: [number | undefined, number | undefined]; //  initial selected range [a,b]
-
+export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     readoutOptions?: InfoOptions; // options for readout
 
     // callbacks
@@ -36,6 +35,22 @@ interface Props extends WellLogViewWithScrollerProps {
 
     onCreateController?: (controller: WellLogController) => void;
 }
+
+export const argTypesWellLogViewerProp = {
+    ...argTypesWellLogViewScrollerProp,
+    readoutOptions: {
+        description:
+            "Options for readout panel.<br/>" +
+            "allTracks: boolean — Show not only visible tracks,<br/>" +
+            "grouping: string — How group values.",
+        defaultValue: {
+            allTracks: false,
+            grouping: "by_track",
+        },
+    },
+    // callbacks...
+};
+
 interface State {
     axes: string[]; // axes available in welllog
     primaryAxis: string;
@@ -44,14 +59,14 @@ interface State {
     sliderValue: number; // value for zoom slider
 }
 
-class WellLogViewer extends Component<Props, State> {
+class WellLogViewer extends Component<WellLogViewerProps, State> {
     public static propTypes: Record<string, unknown>;
 
     controller: WellLogController | null;
 
     collapsedTrackIds: (string | number)[];
 
-    constructor(props: Props) {
+    constructor(props: WellLogViewerProps) {
         super(props);
 
         const axes = getAvailableAxes(this.props.welllog, axisMnemos);
@@ -93,7 +108,10 @@ class WellLogViewer extends Component<Props, State> {
         this.setSliderValue();
     }
 
-    shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
+    shouldComponentUpdate(
+        nextProps: WellLogViewerProps,
+        nextState: State
+    ): boolean {
         if (shouldUpdateWellLogView(this.props, nextProps)) return true;
 
         return (
@@ -102,7 +120,9 @@ class WellLogViewer extends Component<Props, State> {
         );
     }
 
-    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
+    componentDidUpdate(
+        prevProps: WellLogViewerProps /*, prevState: State*/
+    ): void {
         if (
             this.props.welllog !== prevProps.welllog ||
             this.props.template !== prevProps.template /*||
@@ -111,11 +131,9 @@ class WellLogViewer extends Component<Props, State> {
             const axes = getAvailableAxes(this.props.welllog, axisMnemos);
             let primaryAxis = axes[0];
             if (this.props.template && this.props.template.scale.primary) {
-                if (axes.indexOf(this.props.template.scale.primary) < 0) {
-                    if (this.props.welllog === prevProps.welllog) return; // nothing to update
-                } else {
+                if (axes.indexOf(this.props.template.scale.primary) >= 0) {
                     primaryAxis = this.props.template.scale.primary;
-                }
+                } else if (this.props.welllog === prevProps.welllog) return; // nothing to update
             }
             this.setState({
                 primaryAxis: primaryAxis,
@@ -339,6 +357,9 @@ WellLogViewer.propTypes = {
      */
     horizontal: PropTypes.bool,
 
+    /**
+     * The maximum number of visible tracks
+     */
     maxVisibleTrackNum: PropTypes.number,
     maxContentZoom: PropTypes.number,
 
