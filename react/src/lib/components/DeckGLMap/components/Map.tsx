@@ -44,6 +44,7 @@ import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
 
 import { colorTables } from "@emerson-eps/color-tables";
+import { getModelMatrixScale } from "../layers/utils/layerTools";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -259,6 +260,8 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
+
+    scaleZ?: number;
 }
 
 export interface MapMouseEvent {
@@ -314,6 +317,7 @@ const Map: React.FC<MapProps> = ({
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
     triggerHome,
+    scaleZ,
 }: MapProps) => {
     const deckRef = useRef<DeckGLRef>(null);
 
@@ -378,6 +382,7 @@ const Map: React.FC<MapProps> = ({
                       ),
             ])
         );
+        setDidUserChangeCamera(false);
         setViewStates(tempViewStates);
     }
 
@@ -470,7 +475,9 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-        calcDefaultViewStates();
+        if (!didUserChangeCamera) {
+            calcDefaultViewStates();
+        }
     }, [reportedBoundingBox]);
 
     // react on bounds prop change
@@ -518,11 +525,19 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         if (st_layers == undefined || layers == undefined) return;
 
-        // Inject "setReportedBoundingBox" function into layers for them to report
-        // back their respective bounding boxes.
+        const m = getModelMatrixScale(scaleZ ?? 1);
+
         let layers_copy = cloneDeep(layers);
         layers_copy = layers_copy.map((layer) => {
+            // Inject "setReportedBoundingBox" function into layer for it to report
+            // back its respective bounding boxe.
             layer["setReportedBoundingBox"] = setReportedBoundingBox;
+
+            // Set "modelLayer" matrix to reflect correct z scaling.
+            if (layer["@@type"] !== "NorthArrow3DLayer") {
+                layer["modelMatrix"] = m;
+            }
+
             return layer;
         });
 
@@ -530,7 +545,7 @@ const Map: React.FC<MapProps> = ({
         const layers_default = getLayersWithDefaultProps(updated_layers);
         const updated_spec = { layers: layers_default, views: views };
         dispatch(setSpec(updated_spec));
-    }, [layers, dispatch]);
+    }, [scaleZ, layers, dispatch]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
     useEffect(() => {
@@ -756,6 +771,9 @@ const Map: React.FC<MapProps> = ({
         },
         [views]
     );
+
+    const [didUserChangeCamera, setDidUserChangeCamera] =
+        useState<boolean>(false);
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
             const isSyncIds = viewsProps
@@ -782,6 +800,7 @@ const Map: React.FC<MapProps> = ({
                 getCameraPosition(viewState);
             }
             setFirstViewStatesId(viewsProps[0].id);
+            setDidUserChangeCamera(true);
         },
         [viewStates]
     );

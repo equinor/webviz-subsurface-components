@@ -477,8 +477,17 @@ export default class Map3DLayer extends CompositeLayer<
             center[1]
         );
 
+        const isModelMatrix =
+            typeof this.props.modelMatrix !== "undefined" &&
+            this.props.modelMatrix !== null;
+
+        if (isModelMatrix) {
+            rotatingModelMatrix.multiplyRight(this.props.modelMatrix);
+        }
+
         const isMesh =
             typeof this.props.mesh !== "undefined" && this.props.mesh !== "";
+
         const layer = new TerrainMapLayer(
             this.getSubLayerProps({
                 mesh: this.state["mesh"],

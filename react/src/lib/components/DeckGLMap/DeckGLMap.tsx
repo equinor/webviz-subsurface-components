@@ -72,6 +72,8 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
+
+    scaleZ?: number;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -95,6 +97,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     cameraPosition,
     getCameraPosition,
     triggerHome,
+    scaleZ,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -158,6 +161,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 cameraPosition={cameraPosition}
                 getCameraPosition={getCameraPosition}
                 triggerHome={triggerHome}
+                scaleZ={scaleZ}
             />
         </ReduxProvider>
     );

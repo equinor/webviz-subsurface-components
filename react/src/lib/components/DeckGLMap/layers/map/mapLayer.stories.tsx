@@ -16,6 +16,17 @@ type NumberQuad = [number, number, number, number];
 
 const valueRange = [-3071, 41048];
 
+const wellsLayer = {
+    "@@type": "WellsLayer",
+    id: "wells-layer",
+    data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+    logData:
+        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+    logrunName: "BLOCKING",
+    logName: "ZONELOG",
+    logColor: "Stratigraphy",
+};
+
 // Example using "Map" layer. Uses float32 mesh and properties binary arrays. Not PNG.
 const meshMapLayerBig = {
     "@@type": "MapLayer",
@@ -173,6 +184,7 @@ const axes_hugin = {
     id: "axes-layer2",
     bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
 };
+
 const north_arrow_layer = {
     "@@type": "NorthArrow3DLayer",
     id: "north-arrow-layer",
@@ -237,15 +249,80 @@ MapLayer3dPng.parameters = {
     },
 };
 
+export const ScaleZ: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [scaleZ, setScaleZ] = React.useState<number>(1);
+
+    const handleChange = React.useCallback((_event, value) => {
+        const scale = value / 100;
+        setScaleZ(scale);
+    }, []);
+
+    const props = {
+        ...args,
+        scaleZ,
+    };
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+            </div>
+            <Slider
+                min={0}
+                max={1000}
+                defaultValue={100}
+                step={10}
+                onChange={handleChange}
+            />
+        </>
+    );
+};
+
+ScaleZ.args = {
+    id: "ScaleZ",
+    layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+ScaleZ.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: `Example scale z.`,
+        },
+    },
+};
+
 export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
     const [home, setHome] = React.useState<number>(0);
+    const [camera, setCamera] = React.useState({
+        rotationOrbit: 0,
+        rotationX: 89,
+        target: [435775, 6478650, -1750],
+        zoom: -3.5109619192773796,
+    });
 
-    const handleChange = () => {
+    const handleChange1 = () => {
         setHome(home + 1);
+    };
+
+    const handleChange2 = () => {
+        setCamera({ ...camera, rotationOrbit: camera.rotationOrbit + 5 });
     };
 
     const props = {
         ...args,
+        cameraPosition: camera,
         triggerHome: home,
     };
 
@@ -254,16 +331,23 @@ export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
             <div className={useStyles().main}>
                 <DeckGLMap {...props} />
             </div>
-            <button onClick={handleChange}> Reset Camera </button>
+            <button onClick={handleChange1}> Reset Camera </button>
+            <button onClick={handleChange2}> Change Camera </button>
         </>
     );
 };
 
 ResetCameraProperty.args = {
-    id: "map",
+    id: "ResetCameraProperty",
     layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    cameraPosition: {
+        rotationOrbit: 0,
+        rotationX: 80,
+        target: [435775, 6478650, -1750],
+        zoom: -3.5109619192773796,
+    },
     views: {
         layout: [1, 1],
         viewports: [
@@ -282,6 +366,56 @@ ResetCameraProperty.parameters = {
             story: `Example using optional 'triggerHome' property.
                     When this property is changed camera will reset to home position.
                     Using the button the property will change its value.`,
+        },
+    },
+};
+
+export const AddLayer: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [layers, setLayers] = React.useState([
+        axes_hugin,
+        meshMapLayerPng,
+        north_arrow_layer,
+    ]);
+
+    const handleChange = () => {
+        setLayers([axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer]);
+    };
+
+    const props = {
+        ...args,
+        layers,
+    };
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+            </div>
+            <button onClick={handleChange}> Add layer </button>
+        </>
+    );
+};
+
+AddLayer.args = {
+    id: "AddLayer",
+
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+AddLayer.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: `Example using button to add a layer.`,
         },
     },
 };

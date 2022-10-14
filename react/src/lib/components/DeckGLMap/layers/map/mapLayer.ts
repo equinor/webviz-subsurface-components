@@ -365,6 +365,14 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
             typeof this.props.meshUrl !== "undefined" &&
             this.props.meshUrl !== "";
 
+        const isModelMatrix =
+            typeof this.props.modelMatrix !== "undefined" &&
+            this.props.modelMatrix !== null;
+
+        if (isModelMatrix) {
+            rotatingModelMatrix.multiplyRight(this.props.modelMatrix);
+        }
+
         const layer = new privateMapLayer(
             this.getSubLayerProps({
                 mesh: this.state["mesh"],

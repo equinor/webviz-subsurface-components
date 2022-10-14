@@ -71,6 +71,13 @@ export function getModelMatrix(deg: number, x: number, y: number): Matrix4 {
     return m2mRotm1;
 }
 
+// Return a model matrix representing a rotation of "deg" degrees around the point x, y
+export function getModelMatrixScale(scaleZ: number): Matrix4 {
+    const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+    const mScaleZ = new Matrix4(IDENTITY).scale([1, 1, scaleZ]);
+    return mScaleZ;
+}
+
 // update layer object to include additional props
 export function applyPropsOnLayers(
     layer_props: Record<string, unknown>[],
