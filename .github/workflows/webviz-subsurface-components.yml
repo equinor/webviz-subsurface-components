@@ -164,7 +164,9 @@ jobs:
           rm -rf cypress/videos
 
       - name: create pull request
-        run: gh pr create --reviewer ${{ github.actor }} -R avanti-em/webviz-subsurface-components -B avanti-em:cypress-component-test -H cypress-component-test --title 'Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}' --body 'Created by Github action'
+        run: gh pr create --reviewer ${{ github.actor }} -R https://github.com/avanti-em/webviz-subsurface-components -B avanti-em:cypress-component-test -H cypress-component-test --title 'Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}' --body 'Created by Github action'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
