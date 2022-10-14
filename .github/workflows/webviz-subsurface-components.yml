@@ -165,7 +165,9 @@ jobs:
 
       - name: create pull request
         run: gh pr create --reviewer ${{ github.actor }} -B ${{ github.head_ref }} -H ${{ github.head_ref }} --title 'Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}' --body 'Created by Github action'
-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
 
