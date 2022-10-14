@@ -31,7 +31,7 @@ jobs:
             run-performance-tests: true
            
     steps:
-      - name: 📖 Checkout commit locally
+      - name: 📖   commit locally
         uses: actions/checkout@v2
 
       - name: 🐍 Set up Python ${{ matrix.python-version }}
@@ -163,17 +163,8 @@ jobs:
           rm -rf cypress/screenshots
           rm -rf cypress/videos
 
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@5a6b15373e5788c38d83296b674ad5abea28085c
-        if: steps.check_file_changed.outputs.docs_changed == 'true' && failure()
-        with:
-          commit-message: updated cypress snapshots
-          title: Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}
-          body: This is an auto-generated PR to update cypress snapshots.
-          request-to-parent: true
-          base: ${{ github.head_ref }}
-          reviewers: ${{ github.actor }}
+      - name: create pull request
+        run: gh pr create --reviewer ${{ github.actor }} -B ${{ github.head_ref }} -H ${{ github.head_ref }} --title 'Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}' --body 'Created by Github action'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
