@@ -1031,7 +1031,7 @@ function getViews(views: ViewsType | undefined): ViewportType[] {
             height: "100%",
             flipY: false,
             far: 99999,
-            near: -9999,
+            near: -99999,
             isSync: false,
         });
     } else {
