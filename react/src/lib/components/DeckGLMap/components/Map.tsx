@@ -1020,8 +1020,6 @@ function getViewState3D(
 function getViews(views: ViewsType | undefined): ViewportType[] {
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
-    const far = 9999;
-    const near = 0.01;
     if (!views || !views.viewports || !views.layout) {
         deckgl_views.push({
             "@@type": "OrthographicView",
@@ -1032,8 +1030,8 @@ function getViews(views: ViewsType | undefined): ViewportType[] {
             width: "100%",
             height: "100%",
             flipY: false,
-            far,
-            near,
+            far: 99999,
+            near: -9999,
             isSync: false,
         });
     } else {
@@ -1057,6 +1055,9 @@ function getViews(views: ViewsType | undefined): ViewportType[] {
                     : "OrthographicView";
                 const id_suffix = cur_viewport.show3D ? "_3D" : "_2D";
                 const view_id: string = cur_viewport.id + id_suffix;
+
+                const far = 99999;
+                const near = cur_viewport.show3D ? 0.01 : -99999;
 
                 deckgl_views.push({
                     "@@type": view_type,
