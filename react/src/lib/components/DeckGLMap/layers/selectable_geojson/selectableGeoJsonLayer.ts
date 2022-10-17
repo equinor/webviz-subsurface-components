@@ -1,11 +1,11 @@
-import { GeoJsonLayer } from "@deck.gl/layers";
-import { FeatureCollection } from "geojson";
-import { PickInfo } from "deck.gl";
+import { GeoJsonLayer } from "@deck.gl/layers/typed";
+import { Feature } from "geojson";
+import { PickingInfo } from "@deck.gl/core/typed";
 import { DeckGLLayerContext } from "../../components/Map";
 import { isDrawingEnabled } from "../utils/layerTools";
 
-export default class SelectableGeoJsonLayer extends GeoJsonLayer<FeatureCollection> {
-    onClick(info: PickInfo<FeatureCollection>): boolean {
+export default class SelectableGeoJsonLayer extends GeoJsonLayer<Feature> {
+    onClick(info: PickingInfo): boolean {
         // Make selection only when drawing is disabled
         if (isDrawingEnabled(this.context.layerManager)) {
             return false;

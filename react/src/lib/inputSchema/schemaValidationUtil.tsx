@@ -1,13 +1,12 @@
 import { validateSchema } from "./validator";
-import { Layer } from "deck.gl";
-import WellsLayer from "../components/DeckGLMap/layers/wells/wellsLayer";
+import { Layer } from "@deck.gl/core/typed";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 export function validateColorTables(colorTables: colorTablesArray): void {
     validateSchema(colorTables, "ColorTables");
 }
 
-export function validateLayers(layers: Layer<unknown>[]): void {
+export function validateLayers(layers: Layer[]): void {
     layers.forEach((layer) => {
         if (layer.isLoaded) {
             validateLayer(layer);
@@ -20,10 +19,10 @@ export function validateLayers(layers: Layer<unknown>[]): void {
     });
 }
 
-export function validateLayer(layer: Layer<unknown>): void {
+export function validateLayer(layer: Layer): void {
     switch (layer.id) {
         case "wells-layer":
-            validateWellsLayer(layer as WellsLayer);
+            validateWellsLayer(layer);
             break;
         case "pie-layer":
             validateSchema(layer.props.data, "PieChart");
@@ -39,7 +38,7 @@ export function validateLayer(layer: Layer<unknown>): void {
     }
 }
 
-function validateWellsLayer(wellsLayer: WellsLayer): void {
+function validateWellsLayer(wellsLayer: Layer): void {
     const wells_data = wellsLayer.props.data;
     validateSchema(wells_data, "Wells");
 
@@ -47,9 +46,9 @@ function validateWellsLayer(wellsLayer: WellsLayer): void {
     validateSchema(logs_data, "WellLogs");
 }
 
-function getLogData(wellsLayer: WellsLayer) {
-    const sub_layers = wellsLayer.internalState.subLayers as Layer<unknown>[];
-    const log_layer = sub_layers.find(
+function getLogData(wellsLayer: Layer) {
+    const sub_layers = wellsLayer.internalState?.subLayers;
+    const log_layer = sub_layers?.find(
         (layer) => layer.id === "wells-layer-log_curve"
     );
     return log_layer?.props.data;

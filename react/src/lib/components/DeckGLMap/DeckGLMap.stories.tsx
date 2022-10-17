@@ -3,14 +3,14 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import DeckGLMap from "./DeckGLMap";
 import {
-    PickInfo,
     TooltipCallback,
+    LayerPickInfo,
     WellsPickInfo,
     ExtendedLayerProps,
     PropertyDataType,
-    TerrainMapPickInfo,
     FeatureCollection,
 } from "../..";
+import { PickingInfo } from "@deck.gl/core/typed";
 import { ViewStateType } from "./components/Map";
 
 export default {
@@ -41,7 +41,7 @@ const Template: ComponentStory<typeof DeckGLMap> = (args) => (
     <DeckGLMap {...args} />
 );
 
-function mdTooltip(info: PickInfo<unknown>) {
+function mdTooltip(info: PickingInfo) {
     if (!info.picked) return null;
     const value = (info as WellsPickInfo)?.properties?.[0].value;
     if (!value) return null;
@@ -103,7 +103,7 @@ const processPropInfo = (
 };
 
 const tooltipImpFunc: TooltipCallback = (
-    info: PickInfo<unknown>
+    info: PickingInfo
 ): Record<string, unknown> | string | null => {
     if (!info.picked || !info.layer) {
         return null;
@@ -112,15 +112,15 @@ const tooltipImpFunc: TooltipCallback = (
     const layerName = info.layer.constructor.name;
     let outputString = "";
     if (layerName === "Map3DLayer") {
-        const layerProps = info.layer.props as ExtendedLayerProps<unknown>;
+        const layerProps = info.layer
+            .props as unknown as ExtendedLayerProps<unknown>;
         const layerName = layerProps.name;
-        const properties = (info as unknown as TerrainMapPickInfo).properties;
+        const properties = (info as LayerPickInfo).properties;
         outputString += `Property: ${layerName}`;
         outputString += processPropInfo(properties, true);
     } else if (layerName === "WellsLayer") {
         const wellsPickInfo = info as WellsPickInfo;
-        const featurePickInfo = info as PickInfo<FeatureCollection>;
-        const wellsPickInfoObject = featurePickInfo.object as FeatureCollection;
+        const wellsPickInfoObject = info.object as FeatureCollection;
         const wellProperties = wellsPickInfoObject.properties;
         const name = (wellProperties as { name: string }).name;
         outputString += `Well: ${name || ""}`;

@@ -1,13 +1,4 @@
-import { PickInfo } from "@deck.gl/core/lib/deck";
-import { RGBColor } from "@deck.gl/core/utils/color";
-
-export interface BitmapPickInfo extends PickInfo<unknown> {
-    color?: RGBColor;
-}
-
-export interface PropertyMapPickInfo extends BitmapPickInfo {
-    propertyValue?: number;
-}
+import { Color } from "@deck.gl/core/typed";
 
 // Parameters used to decode a float value from RGB pixels.
 export interface ValueDecoder {
@@ -25,7 +16,7 @@ export interface ValueDecoder {
 // but this time performed in the js world.
 // Optionally, this function can also remap an [0, 1] value to a different range, [min, max].
 export function decodeRGB(
-    [r, g, b]: RGBColor,
+    [r, g, b]: Color,
     decoder: ValueDecoder,
     remapToRange?: [number, number]
 ): number {

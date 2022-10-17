@@ -1,12 +1,10 @@
-import { CompositeLayer } from "@deck.gl/core";
+import { CompositeLayer, Color } from "@deck.gl/core/typed";
 import TerrainMapLayer, {
-    TerrainMapLayerProps,
     TerrainMapLayerData,
     DECODER,
     Material,
 } from "./terrainMapLayer";
 import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
-import { RGBColor } from "@deck.gl/core/utils/color";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { ImageLoader } from "@loaders.gl/images";
@@ -332,7 +330,7 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Given as array of three values (r,g,b) e.g: [255, 0, 0]
     // If not set or set to true, it will clamp to color map min and max values.
     // If set to false the clamp color will be completely transparent.
-    colorMapClampColor: RGBColor | undefined | boolean;
+    colorMapClampColor: Color | undefined | boolean;
 
     // Optional function property.
     // If defined this function will override the color map.
@@ -356,7 +354,6 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
 }
 
 export default class Map3DLayer extends CompositeLayer<
-    unknown,
     Map3DLayerProps<unknown>
 > {
     initializeState(): void {
@@ -483,14 +480,11 @@ export default class Map3DLayer extends CompositeLayer<
         const isMesh =
             typeof this.props.mesh !== "undefined" && this.props.mesh !== "";
         const layer = new TerrainMapLayer(
-            this.getSubLayerProps<
-                TerrainMapLayerData,
-                TerrainMapLayerProps<TerrainMapLayerData>
-            >({
-                mesh: this.state.mesh,
-                texture: this.state.texture,
-                textureImageData: this.state.texture,
-                meshImageData: this.state.meshImageData,
+            this.getSubLayerProps({
+                mesh: this.state["mesh"],
+                texture: this.state["texture"],
+                textureImageData: this.state["texture"],
+                meshImageData: this.state["meshImageData"],
                 meshValueRange: this.props.meshValueRange,
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,

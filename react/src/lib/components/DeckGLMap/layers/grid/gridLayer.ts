@@ -1,30 +1,38 @@
-import { ExtendedLayerProps } from "../utils/layerTools";
-import { Position3D } from "@deck.gl/core/utils/positions";
+import {
+    ExtendedLayerProps,
+    LayerPickInfo,
+    Position3D,
+} from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
-import { Layer } from "@deck.gl/core";
+import {
+    Color,
+    Layer,
+    picking,
+    project,
+    phongLighting,
+    PickingInfo,
+    UpdateParameters,
+} from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
-import { Model, Geometry } from "@luma.gl/core";
-import { picking, project, phongLighting } from "deck.gl";
+import { Model, Geometry } from "@luma.gl/engine";
 import { DeckGLLayerContext } from "../../components/Map";
-import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import fragmentShader from "./fragment.glsl";
 import vertexShader from "./vertex.glsl";
 import fragmentShaderLines from "./fragment_lines.glsl";
 import vertexShaderLines from "./vertex_lines.glsl";
-import { RGBColor } from "@deck.gl/core/utils/color";
 import { ContinuousLegendDataType } from "../../components/ColorLegend";
 
 function getColorMapColors(
     colorMapName: string,
     colorTables: colorTablesArray
-): RGBColor[] {
-    const colors: RGBColor[] = [];
+): Color[] {
+    const colors: Color[] = [];
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
         const rgb = rgbValues(value, colorMapName, colorTables);
-        let color: RGBColor = [0, 0, 0];
+        let color: Color = [0, 0, 0];
         if (rgb != undefined) {
             color = rgb;
         }
@@ -56,17 +64,12 @@ export interface GridLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapRange: [number, number];
 }
 
-export default class GridLayer extends Layer<
-    GridData,
-    GridLayerProps<GridData>
-> {
+export default class GridLayer extends Layer<GridLayerProps<GridData>> {
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
 
         const updateTimeStep = () => {
-            const a_context = { context } as unknown as UpdateStateInfo<
-                GridLayerProps<GridData>
-            >;
+            const a_context = { context } as UpdateParameters<this>;
             this.updateState(a_context); // LayerProps, LayerContext
         };
 
@@ -82,7 +85,7 @@ export default class GridLayer extends Layer<
         oldProps,
         context,
         changeFlags,
-    }: UpdateStateInfo<GridLayerProps<GridData>>): boolean | string | null {
+    }: UpdateParameters<this>): boolean {
         return (
             super.shouldUpdateState({
                 props,
@@ -93,14 +96,14 @@ export default class GridLayer extends Layer<
         );
     }
 
-    updateState({ context }: UpdateStateInfo<GridLayerProps<GridData>>): void {
+    updateState({ context }: UpdateParameters<this>): void {
         const { gl } = context;
 
         // Wrap around timestep if necessary.
         const data = this.props.data as GridData;
 
-        const do_reset_ti = this.state.ti >= (data?.[0]?.vs.length ?? 1) - 1;
-        const timeStep = do_reset_ti ? 0 : this.state.ti + 1;
+        const do_reset_ti = this.state["ti"] >= (data?.[0]?.vs.length ?? 1) - 1;
+        const timeStep = do_reset_ti ? 0 : this.state["ti"] + 1;
         this.setState({
             ...this._getModels(gl, timeStep),
             ti: timeStep,
@@ -187,13 +190,13 @@ export default class GridLayer extends Layer<
     draw({ context }: any): void {
         const { gl } = context;
 
-        if (this.state.models) {
+        if (this.state["models"]) {
             gl.enable(gl.POLYGON_OFFSET_FILL);
             gl.polygonOffset(1, 1);
-            this.state.models[0].draw(); // triangles
+            this.state["models"][0].draw(); // triangles
             gl.disable(gl.POLYGON_OFFSET_FILL);
 
-            this.state.models[1].draw(); // triangle lines
+            this.state["models"][1].draw(); // triangle lines
         }
     }
 
@@ -206,13 +209,11 @@ export default class GridLayer extends Layer<
         return this.nullPickingColor() as unknown as number;
     }
 
-    encodePickingColor(): RGBColor {
+    encodePickingColor(): number[] {
         return this.nullPickingColor();
     }
 
-    // For now, use `any` for the picking types.
-    //eslint-disable-next-line
-    getPickingInfo({ info }: { info: any }): any {
+    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
         if (!info.color) {
             return info;
         }
@@ -238,7 +239,7 @@ export default class GridLayer extends Layer<
             (this.context as DeckGLLayerContext).userData.colorTables
         );
 
-        const timeStep = this.state.ti;
+        const timeStep = this.state["ti"];
         const cell: CellData = data[index];
         const propertyValue = cell.vs[timeStep];
         const color = getColor(
@@ -281,10 +282,10 @@ GridLayer.defaultProps = layersDefaultProps[
 
 function getColor(
     propertyValue: number,
-    colors: RGBColor[],
+    colors: Color[],
     valueRange: [number, number],
     colorMapRange: [number, number]
-): RGBColor {
+): Color {
     const valueRangeMin = valueRange[0] ?? 0.0;
     const valueRangeMax = valueRange[1] ?? 1.0;
 
@@ -304,7 +305,7 @@ function getColor(
 function makeVertexesAndColorArrays(
     data: GridData,
     ti: number,
-    colors: RGBColor[],
+    colors: Color[],
     valueRange: [number, number],
     colorMapRange: [number, number]
 ): [number[], number[], number[], number[]] {

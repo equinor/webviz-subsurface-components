@@ -1,8 +1,7 @@
 import React from "react";
-import DeckGL from "@deck.gl/react";
-import { OrthographicView } from "@deck.gl/core";
+import DeckGL from "@deck.gl/react/typed";
 import { rgb } from "d3-color";
-import { RGBAColor } from "@deck.gl/core/utils/color";
+import { Color, OrthographicView } from "@deck.gl/core/typed";
 
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import AxesLayer from "./axesLayer";
@@ -39,8 +38,8 @@ function ColoredLabels(props: { labelColor: string; axisColor: string }) {
     const layers = [
         new AxesLayer({
             ...layerProps,
-            labelColor: getRgba(props.labelColor) as RGBAColor,
-            axisColor: getRgba(props.axisColor) as RGBAColor,
+            labelColor: getRgba(props.labelColor) as Color,
+            axisColor: getRgba(props.axisColor) as Color,
         }),
     ];
     const views = [new OrthographicView({})];
@@ -72,7 +71,7 @@ function CustomLabels(props: {
     const layers = [
         new AxesLayer({
             ...layerProps,
-            labelColor: getRgba(props.labelColor) as RGBAColor,
+            labelColor: getRgba(props.labelColor) as Color,
             labelFontSize: props.labelFontSize,
             fontFamily: props.fontFamily,
         }),
