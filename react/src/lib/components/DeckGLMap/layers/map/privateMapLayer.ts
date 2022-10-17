@@ -1,12 +1,20 @@
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import { createPropertyData, PropertyDataType } from "../utils/layerTools";
-import { Geometry } from "@luma.gl/core";
-import { picking, project, phongLighting } from "deck.gl";
-import { Model } from "@luma.gl/engine";
+import {
+    COORDINATE_SYSTEM,
+    Layer,
+    picking,
+    project,
+    phongLighting,
+    PickingInfo,
+    UpdateParameters,
+} from "@deck.gl/core/typed";
+import {
+    createPropertyData,
+    LayerPickInfo,
+    PropertyDataType,
+} from "../utils/layerTools";
+import { Model, Geometry } from "@luma.gl/engine";
 import { DeckGLLayerContext } from "../../components/Map";
 import { ExtendedLayerProps } from "../utils/layerTools";
-import { Layer } from "@deck.gl/core";
-import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
 import vsShader from "./vertex.glsl";
 import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
@@ -61,7 +69,6 @@ const defaultProps = {
 
 // This is a private layer used only by the composite Map3DLayer
 export default class privateMapLayer extends Layer<
-    unknown,
     privateMapLayerProps<unknown>
 > {
     initializeState(context: DeckGLLayerContext): void {
@@ -75,10 +82,7 @@ export default class privateMapLayer extends Layer<
         oldProps,
         context,
         changeFlags,
-    }: UpdateStateInfo<privateMapLayerProps<unknown>>):
-        | boolean
-        | string
-        | null {
+    }: UpdateParameters<this>): boolean {
         return (
             super.shouldUpdateState({
                 props,
@@ -89,9 +93,7 @@ export default class privateMapLayer extends Layer<
         );
     }
 
-    updateState({
-        context,
-    }: UpdateStateInfo<privateMapLayerProps<unknown>>): void {
+    updateState({ context }: UpdateParameters<this>): void {
         this.initializeState(context as DeckGLLayerContext);
     }
 
@@ -133,7 +135,7 @@ export default class privateMapLayer extends Layer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw(args: any): void {
-        if (!this.state.models) {
+        if (!this.state["models"]) {
             return;
         }
 
@@ -144,7 +146,7 @@ export default class privateMapLayer extends Layer<
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isContoursDepth = this.props.isContoursDepth;
 
-        const [model_mesh, mesh_lines_model] = this.state.models;
+        const [model_mesh, mesh_lines_model] = this.state["models"];
 
         gl.enable(gl.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
@@ -167,11 +169,8 @@ export default class privateMapLayer extends Layer<
         return 0;
     }
 
-    // For now, use `any` for the picking types.
-    //eslint-disable-next-line
-    getPickingInfo({ info }: { info: any }): any {
-        const pickColor = info.color;
-        if (!pickColor) {
+    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
+        if (!info.color) {
             return info;
         }
 

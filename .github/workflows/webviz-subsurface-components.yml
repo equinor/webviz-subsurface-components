@@ -57,7 +57,6 @@ jobs:
           grep -q '"lockfileVersion": 2,' ./react/package-lock.json
 
           npm ci --ignore-scripts --prefix ./react
-          npm run setup-deckgl-types --prefix ./react
           npm run copy-package-json --prefix ./react
           pip install "werkzeug<2.1"  # ...while waiting for https://github.com/plotly/dash/issues/1992
           pip install "dash<2.5"  # Build issue upstream in dash==2.5

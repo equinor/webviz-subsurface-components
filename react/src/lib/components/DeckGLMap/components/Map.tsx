@@ -1,7 +1,17 @@
-import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
-import DeckGL from "@deck.gl/react";
-import { PickInfo } from "deck.gl";
-import { Feature } from "geojson";
+import { JSONConfiguration, JSONConverter } from "@deck.gl/json/typed";
+import DeckGL, { DeckGLRef } from "@deck.gl/react/typed";
+import {
+    Color,
+    Deck,
+    Layer,
+    LayersList,
+    LayerProps,
+    LayerContext,
+    View,
+    Viewport,
+    PickingInfo,
+} from "@deck.gl/core/typed";
+import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
@@ -12,21 +22,13 @@ import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
-import { Layer, View } from "deck.gl";
-import { DeckGLView } from "./DeckGLView";
-import { Viewport } from "@deck.gl/core";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import { LayerProps, LayerContext } from "@deck.gl/core/lib/layer";
-import Deck from "@deck.gl/core/lib/deck";
-import { ViewProps } from "@deck.gl/core/views/view";
-//import { isEmpty } from "lodash";
 import ColorLegends from "./ColorLegends";
 import {
     applyPropsOnLayers,
     ExtendedLayer,
     getLayersInViewport,
     getLayersWithDefaultProps,
-    PropertyDataType,
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";
@@ -34,7 +36,7 @@ import {
     validateColorTables,
     validateLayers,
 } from "../../../inputSchema/schemaValidationUtil";
-import { DrawingPickInfo } from "../layers/drawing/drawingLayer";
+import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { WellsLayer } from "../layers";
 
@@ -84,7 +86,7 @@ function boundingBoxCenter(box: BoundingBox): [number, number, number] {
 export type BoundsAccessor = () => [number, number, number, number];
 
 export type TooltipCallback = (
-    info: PickInfo<unknown>
+    info: PickingInfo
 ) => string | Record<string, unknown> | null;
 
 export interface ViewportType {
@@ -259,8 +261,6 @@ export interface MapProps {
     cameraPosition?: ViewStateType | undefined;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type PickingInfo = any;
 export interface MapMouseEvent {
     type: "click" | "hover" | "contextmenu";
     infos: PickingInfo[];
@@ -269,7 +269,7 @@ export interface MapMouseEvent {
     y?: number;
     // Only for one well. Full information is available in infos[]
     wellname?: string;
-    wellcolor?: Uint8Array; // well color
+    wellcolor?: Color; // well color
     md?: number;
     tvd?: number;
 }
@@ -282,11 +282,11 @@ export function useHoverInfo(): [PickingInfo[], EventCallback] {
     return [hoverInfo, callback];
 }
 
-function defaultTooltip(info: PickInfo<unknown>) {
+function defaultTooltip(info: PickingInfo) {
     if ((info as WellsPickInfo)?.logName) {
         return (info as WellsPickInfo)?.logName;
     } else if (info.layer?.id === "drawing-layer") {
-        return (info as DrawingPickInfo).measurement?.toFixed(2);
+        return (info as LayerPickInfo).propertyValue?.toFixed(2);
     }
     const feat = info.object as Feature;
     return feat?.properties?.["name"];
@@ -315,7 +315,7 @@ const Map: React.FC<MapProps> = ({
     getCameraPosition,
     triggerHome,
 }: MapProps) => {
-    const deckRef = useRef<DeckGL>(null);
+    const deckRef = useRef<DeckGLRef>(null);
 
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
@@ -532,7 +532,7 @@ const Map: React.FC<MapProps> = ({
         dispatch(setSpec(updated_spec));
     }, [layers, dispatch]);
 
-    const [deckGLLayers, setDeckGLLayers] = useState<Layer<unknown>[]>([]);
+    const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
     useEffect(() => {
         if (deckGLLayers) {
             const wellsLayer = getLayersByType(
@@ -543,7 +543,7 @@ const Map: React.FC<MapProps> = ({
         }
     }, [deckGLLayers]);
     useEffect(() => {
-        const layers = st_layers as LayerProps<unknown>[];
+        const layers = st_layers;
         if (!layers || layers.length == 0) return;
 
         const enumerations = [];
@@ -551,18 +551,19 @@ const Map: React.FC<MapProps> = ({
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
 
-        setDeckGLLayers(
-            jsonToObject(layers, enumerations) as ExtendedLayer<unknown>[]
-        );
+        setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
     }, [st_layers, resources, editedData]);
 
     useEffect(() => {
-        const wellslayer = getLayersByType(
-            deckRef.current?.deck.props.layers as Layer<unknown>[],
-            "WellsLayer"
-        )?.[0] as WellsLayer;
+        const layers = deckRef.current?.deck?.props.layers;
+        if (layers) {
+            const wellslayer = getLayersByType(
+                layers,
+                "WellsLayer"
+            )?.[0] as WellsLayer;
 
-        wellslayer?.setSelection(selection?.well, selection?.selection);
+            wellslayer?.setSelection(selection?.well, selection?.selection);
+        }
     }, [selection]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -589,43 +590,34 @@ const Map: React.FC<MapProps> = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: any
     ): PickingInfo[] => {
-        if (coords?.multiPicking && pickInfo.layer) {
+        if (coords?.multiPicking && pickInfo.layer?.context.deck) {
             const pickInfos = pickInfo.layer.context.deck.pickMultipleObjects({
                 x: event.offsetCenter.x,
                 y: event.offsetCenter.y,
-                radius: 1,
-                depth: coords.pickDepth,
-            });
-            let unit = " _";
-            pickInfos.forEach(
-                (item: {
-                    properties: PropertyDataType[];
-                    unit: string;
-                    sourceLayer: {
-                        props: { data: { unit: string | undefined } };
-                    };
-                }) => {
-                    if (item.properties) {
-                        unit =
-                            item.sourceLayer.props.data.unit === undefined
-                                ? " "
-                                : item.sourceLayer.props.data.unit;
-                        item.properties.forEach((element) => {
-                            if (
-                                element.name.includes("MD") ||
-                                element.name.includes("TVD")
-                            ) {
-                                element.value =
-                                    Number(element.value)
-                                        .toFixed(2)
-                                        .toString() +
-                                    " " +
-                                    unit;
-                            }
-                        });
-                    }
+                depth: coords.pickDepth ? coords.pickDepth : undefined,
+            }) as LayerPickInfo[];
+            pickInfos.forEach((item) => {
+                if (item.properties) {
+                    let unit = (
+                        item.sourceLayer?.props
+                            .data as unknown as FeatureCollection & {
+                            unit: string;
+                        }
+                    )?.unit;
+                    if (unit == undefined) unit = " ";
+                    item.properties.forEach((element) => {
+                        if (
+                            element.name.includes("MD") ||
+                            element.name.includes("TVD")
+                        ) {
+                            element.value =
+                                Number(element.value).toFixed(2).toString() +
+                                " " +
+                                unit;
+                        }
+                    });
                 }
-            );
+            });
             return pickInfos;
         }
         return [pickInfo];
@@ -648,7 +640,7 @@ const Map: React.FC<MapProps> = ({
             if (ev.type === "click") {
                 if (event.rightButton) ev.type = "contextmenu";
             }
-            for (const info of infos) {
+            for (const info of infos as LayerPickInfo[]) {
                 if (info.coordinate) {
                     ev.x = info.coordinate[0];
                     ev.y = info.coordinate[1];
@@ -699,9 +691,9 @@ const Map: React.FC<MapProps> = ({
                             ]; // aliases for MD
 
                             if (names_md.find((name) => name == propname))
-                                ev.md = parseFloat(property.value);
+                                ev.md = parseFloat(property.value as string);
                             else if (names_tvd.find((name) => name == propname))
-                                ev.tvd = parseFloat(property.value);
+                                ev.tvd = parseFloat(property.value as string);
 
                             if (
                                 ev.md !== undefined &&
@@ -721,7 +713,9 @@ const Map: React.FC<MapProps> = ({
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
-            const state = deckGLLayers.every((layer) => layer.isLoaded);
+            const state = deckGLLayers.every(
+                (layer) => (layer as Layer).isLoaded
+            );
             setIsLoaded(state);
         }
     }, [deckGLLayers]);
@@ -729,7 +723,7 @@ const Map: React.FC<MapProps> = ({
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
-        const layers = deckRef.current?.deck.props.layers as Layer<unknown>[];
+        const layers = deckRef.current?.deck?.props.layers as Layer[];
         // this ensures to validate the schemas only once
         if (checkDatafileSchema && layers && isLoaded) {
             try {
@@ -739,13 +733,10 @@ const Map: React.FC<MapProps> = ({
                 setErrorText(String(e));
             }
         } else setErrorText(undefined);
-    }, [checkDatafileSchema, deckRef.current?.deck.props.layers, isLoaded]);
+    }, [checkDatafileSchema, deckRef.current?.deck?.props.layers, isLoaded]);
 
     const layerFilter = useCallback(
-        (args: {
-            layer: Layer<unknown, LayerProps<unknown>>;
-            viewport: Viewport;
-        }): boolean => {
+        (args: { layer: Layer; viewport: Viewport }): boolean => {
             // display all the layers if views are not specified correctly
             if (!views || !views.viewports || !views.layout) return true;
 
@@ -804,6 +795,7 @@ const Map: React.FC<MapProps> = ({
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
+                // @ts-expect-error this prop doesn't exists directly on DeckGL, but on Deck.Context
                 userData={{
                     setEditedData: (updated_prop: Record<string, unknown>) => {
                         setEditedData?.(updated_prop);
@@ -824,7 +816,8 @@ const Map: React.FC<MapProps> = ({
                 {children}
                 {views?.viewports &&
                     views.viewports.map((view, index) => (
-                        <DeckGLView
+                        // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
+                        <View
                             key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                             id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
                         >
@@ -855,7 +848,7 @@ const Map: React.FC<MapProps> = ({
                                     } `}
                                 </ViewFooter>
                             )}
-                        </DeckGLView>
+                        </View>
                     ))}
             </DeckGL>
             {scale?.visible ? (
@@ -924,9 +917,9 @@ export default Map;
 // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
 // See https://deck.gl/docs/api-reference/json/overview for more details.
 function jsonToObject(
-    data: ViewProps[] | LayerProps<unknown>[],
+    data: Record<string, unknown>[] | LayerProps[],
     enums: Record<string, unknown>[] | undefined = undefined
-): ExtendedLayer<unknown>[] | View[] {
+): LayersList | View[] {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {
@@ -940,7 +933,7 @@ function jsonToObject(
     const jsonConverter = new JSONConverter({ configuration });
 
     // remove empty data/layer object
-    const filtered_data = (data as Record<string, unknown>[]).filter(
+    const filtered_data = data.filter(
         (value) => Object.keys(value).length !== 0
     );
     return jsonConverter.convert(filtered_data);
