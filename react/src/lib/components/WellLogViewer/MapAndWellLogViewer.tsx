@@ -2,6 +2,7 @@ import React from "react";
 import { WeakValidationMap } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
+import { Color } from "@deck.gl/core/typed";
 
 import { WellsLayer } from "../DeckGLMap/layers";
 import {
@@ -68,7 +69,7 @@ interface State {
     wellName?: string;
     selection?: [number | undefined, number | undefined];
     selPersistent?: boolean;
-    wellColor?: Uint8Array; // well color
+    wellColor?: Color; // well color
 }
 
 function findWellsLayer(event: MapMouseEvent) {

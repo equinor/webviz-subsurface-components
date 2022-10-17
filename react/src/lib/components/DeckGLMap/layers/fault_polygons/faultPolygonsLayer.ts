@@ -1,26 +1,21 @@
-import { CompositeLayer } from "@deck.gl/core";
-import { GeoJsonLayer, GeoJsonLayerProps } from "@deck.gl/layers";
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import { RGBAColor } from "@deck.gl/core/utils/color";
+import { COORDINATE_SYSTEM, Color, CompositeLayer } from "@deck.gl/core/typed";
+import { GeoJsonLayer, GeoJsonLayerProps } from "@deck.gl/layers/typed";
 import { Feature } from "geojson";
 import { layersDefaultProps } from "../layersDefaultProps";
 
-const getColor = (d: Feature): RGBAColor => {
-    const c: RGBAColor = d?.properties?.["color"];
+const getColor = (d: Feature): Color => {
+    const c: Color = d?.properties?.["color"];
     const r = c[0] ?? 0;
     const g = c[1] ?? 0;
     const b = c[2] ?? 0;
     return [r, g, b, 30]; // make fill color transparent
 };
 
-export type FaultPolygonsLayerProps<D> = GeoJsonLayerProps<D>;
-export default class FaultPolygonsLayer extends CompositeLayer<
-    unknown,
-    FaultPolygonsLayerProps<unknown>
-> {
-    renderLayers(): GeoJsonLayer<unknown>[] {
-        const layer = new GeoJsonLayer<unknown>(
-            this.getSubLayerProps<unknown, GeoJsonLayer<unknown>>({
+export type FaultPolygonsLayerProps = GeoJsonLayerProps;
+export default class FaultPolygonsLayer extends CompositeLayer<FaultPolygonsLayerProps> {
+    renderLayers(): GeoJsonLayer<Feature>[] {
+        const layer = new GeoJsonLayer<Feature>(
+            this.getSubLayerProps({
                 id: this.props.id,
                 data: this.props.data,
                 pickable: this.props.pickable,
@@ -40,4 +35,4 @@ export default class FaultPolygonsLayer extends CompositeLayer<
 FaultPolygonsLayer.layerName = "FaultPolygonsLayer";
 FaultPolygonsLayer.defaultProps = layersDefaultProps[
     "FaultPolygonsLayer"
-] as FaultPolygonsLayerProps<unknown>;
+] as FaultPolygonsLayerProps;

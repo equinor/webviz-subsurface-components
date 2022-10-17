@@ -1,6 +1,6 @@
-import { Position3D } from "@deck.gl/core/utils/positions";
 import { FeatureCollection, GeometryCollection, LineString } from "geojson";
 import { cloneDeep } from "lodash";
+import { Position3D } from "../../utils/layerTools";
 
 /**
  * Given four points P0, P1, P2, P4 and a argument t in the interval [0,1].

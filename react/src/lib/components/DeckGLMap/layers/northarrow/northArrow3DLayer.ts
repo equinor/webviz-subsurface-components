@@ -3,18 +3,18 @@ import {
     Viewport,
     LayerContext,
     UpdateParameters,
-    LayerProps,
     project,
 } from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
-import { Model, Geometry } from "@luma.gl/core";
+import { Model, Geometry } from "@luma.gl/engine";
 import { Vector3 } from "@math.gl/core";
-import { RGBAColor } from "deck.gl";
+import { Color } from "@deck.gl/core/typed";
 import vertexShader from "./northarrow-vertex.glsl";
 import fragmentShader from "./northarrow-fragment.glsl";
+import { ExtendedLayerProps } from "../utils/layerTools";
 
-export interface NorthArrow3DLayerProps<D> extends LayerProps<D> {
-    color: RGBAColor;
+export interface NorthArrow3DLayerProps<D> extends ExtendedLayerProps<D> {
+    color: Color;
 }
 
 export default class NorthArrow3DLayer extends Layer<
