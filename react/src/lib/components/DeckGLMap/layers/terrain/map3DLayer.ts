@@ -13,6 +13,7 @@ import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import { ContinuousLegendDataType } from "../../components/ColorLegend";
+import { Matrix4 } from "math.gl";
 
 type MeshType = {
     attributes: {
@@ -482,7 +483,9 @@ export default class Map3DLayer extends CompositeLayer<
             this.props.modelMatrix !== null;
 
         if (isModelMatrix) {
-            rotatingModelMatrix.multiplyRight(this.props.modelMatrix);
+            rotatingModelMatrix.multiplyRight(
+                this.props.modelMatrix as Matrix4
+            );
         }
 
         const isMesh =

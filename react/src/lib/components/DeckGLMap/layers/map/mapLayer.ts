@@ -10,6 +10,7 @@ import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dis
 import { DeckGLLayerContext } from "../../components/Map";
 import { TerrainMapLayerData } from "../terrain/terrainMapLayer";
 import { makeFullMesh } from "./webworker";
+import { Matrix4 } from "math.gl";
 
 // These two types both describes the mesh' extent in the horizontal plane.
 type Frame = {
@@ -370,7 +371,9 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
             this.props.modelMatrix !== null;
 
         if (isModelMatrix) {
-            rotatingModelMatrix.multiplyRight(this.props.modelMatrix);
+            rotatingModelMatrix.multiplyRight(
+                this.props.modelMatrix as Matrix4
+            );
         }
 
         const layer = new privateMapLayer(
