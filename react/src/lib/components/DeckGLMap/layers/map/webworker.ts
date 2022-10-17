@@ -1,6 +1,6 @@
 import { MeshType, MeshTypeLines } from "./privateMapLayer";
 import { Params } from "./mapLayer";
-import { RGBColor } from "@deck.gl/core/utils/color";
+import { Color } from "@deck.gl/core/typed";
 
 export function makeFullMesh(e: { data: Params }): void {
     const params = e.data;
@@ -28,14 +28,14 @@ export function makeFullMesh(e: { data: Params }): void {
 
     function getColor(
         propertyValue: number,
-        colors: RGBColor[],
+        colors: Color[],
         colorMapRangeMin: number,
         colorMapRangeMax: number,
         isClampColor: boolean,
         isColorMapClampColorTransparent: boolean,
-        clampColor: RGBColor
-    ): RGBColor | boolean {
-        let color: RGBColor = [0, 0, 0];
+        clampColor: Color
+    ): Color | boolean {
+        let color: Color = [0, 0, 0];
         if (!isNaN(propertyValue)) {
             let x =
                 (propertyValue - colorMapRangeMin) /
@@ -139,7 +139,7 @@ export function makeFullMesh(e: { data: Params }): void {
                     colorMapRangeMax,
                     isClampColor,
                     isColorMapClampColorTransparent,
-                    clampColor as RGBColor
+                    clampColor as Color
                 );
 
                 if (!color) {
@@ -147,7 +147,7 @@ export function makeFullMesh(e: { data: Params }): void {
                 }
 
                 positions.push(x0, y0, z);
-                const c = color as RGBColor;
+                const c = color as Color;
                 vertexColors.push(c[0], c[1], c[2]);
                 vertexProperties.push(propertyValue);
                 vertexIndexs.push(i++);
@@ -278,14 +278,14 @@ export function makeFullMesh(e: { data: Params }): void {
                     colorMapRangeMax,
                     isClampColor,
                     isColorMapClampColorTransparent,
-                    clampColor as RGBColor
+                    clampColor as Color
                 );
 
                 if (!color) {
                     // Inactive cell, dont draw.
                     continue;
                 }
-                const c = color as RGBColor;
+                const c = color as Color;
 
                 if (i1_act && i3_act) {
                     // diagonal i1, i3

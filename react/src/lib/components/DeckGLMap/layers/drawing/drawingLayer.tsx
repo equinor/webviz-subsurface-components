@@ -1,5 +1,12 @@
-import { COORDINATE_SYSTEM, RGBAColor } from "@deck.gl/core";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import {
+    COORDINATE_SYSTEM,
+    Color,
+    CompositeLayer,
+    PickingInfo,
+    LayerContext,
+    LayersList,
+} from "@deck.gl/core/typed";
+import { ExtendedLayerProps, LayerPickInfo } from "../utils/layerTools";
 import {
     DrawLineStringMode,
     DrawPointMode,
@@ -15,7 +22,6 @@ import {
     ViewMode,
 } from "@nebula.gl/edit-modes";
 import { EditableGeoJsonLayer } from "@nebula.gl/layers";
-import { CompositeLayer, PickInfo } from "deck.gl";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
 import { area, length } from "../../utils/measurement";
@@ -89,26 +95,21 @@ const MODE_MAP = {
     drawPolygon: CustomDrawPolygonMode,
 };
 
-const UNSELECTED_LINE_COLOR: RGBAColor = [0x50, 0x50, 0x50, 0xcc];
-const SELECTED_LINE_COLOR: RGBAColor = [0x0, 0x0, 0x0, 0xff];
+const UNSELECTED_LINE_COLOR: Color = [0x50, 0x50, 0x50, 0xcc];
+const SELECTED_LINE_COLOR: Color = [0x0, 0x0, 0x0, 0xff];
 
 export interface DrawingLayerProps<D> extends ExtendedLayerProps<D> {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
 }
 
-export interface DrawingPickInfo extends PickInfo<unknown> {
-    measurement?: number;
-}
-
 // Composite layer that contains an EditableGeoJsonLayer from nebula.gl
 // See https://nebula.gl/docs/api-reference/layers/editable-geojson-layer
 export default class DrawingLayer extends CompositeLayer<
-    FeatureCollection,
     DrawingLayerProps<FeatureCollection>
 > {
-    initializeState(params?: PickInfo<FeatureCollection>): void {
-        super.initializeState(params);
+    initializeState(context: LayerContext): void {
+        super.initializeState(context);
 
         this.setState({
             data: this.props.data,
@@ -119,7 +120,7 @@ export default class DrawingLayer extends CompositeLayer<
     // Select features when clicking on them if in view or modify modes.
     // The selection is used to set current selected drawing, and
     // is sent to the map component parent via setEditedData.
-    onClick(info: PickInfo<FeatureCollection>): boolean {
+    onClick(info: PickingInfo): boolean {
         if (this.props.mode === "view" || this.props.mode === "modify") {
             this.setState({
                 selectedFeatureIndexes: [info.index],
@@ -135,20 +136,19 @@ export default class DrawingLayer extends CompositeLayer<
 
     // For now, use `any` for the picking types because this function should
     // recieve PickInfo<FeatureCollection>, but it recieves PickInfo<Feature>.
-    //eslint-disable-next-line
-    getPickingInfo({ info }: { info: any }): any {
-        if (!info.object) return info as DrawingPickInfo;
+    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
+        if (!info.object) return info;
         const feature = info.object;
         let measurement;
         if (feature.geometry.type === "LineString") {
             measurement = length(feature);
         } else if (feature.geometry.type === "Polygon") {
             measurement = area(feature);
-        } else return info as DrawingPickInfo;
+        } else return info;
         return {
             ...info,
-            measurement: measurement,
-        } as DrawingPickInfo;
+            propertyValue: measurement,
+        };
     }
 
     // Callback for various editing events. Most events will update this component
@@ -197,9 +197,9 @@ export default class DrawingLayer extends CompositeLayer<
 
     // Return the line color based on the selection status.
     // The same can be done for other features (polygons, points etc).
-    _getLineColor(feature: Feature): RGBAColor {
-        const is_feature_selected = this.state.selectedFeatureIndexes.some(
-            (i: number) => this.state.data.features[i] === feature
+    _getLineColor(feature: Feature): Color {
+        const is_feature_selected = this.state["selectedFeatureIndexes"].some(
+            (i: number) => this.state["data"].features[i] === feature
         );
         if (is_feature_selected) {
             return SELECTED_LINE_COLOR;
@@ -208,32 +208,31 @@ export default class DrawingLayer extends CompositeLayer<
         }
     }
 
-    renderLayers(): [EditableGeoJsonLayer?] {
+    renderLayers(): LayersList {
         if (this.props.visible == false) {
             return [];
         }
-        return [
-            new EditableGeoJsonLayer(
-                this.getSubLayerProps({
-                    data: this.state.data,
-                    mode: MODE_MAP[this.props.mode as keyof typeof MODE_MAP],
-                    modeConfig: {
-                        viewport: this.context.viewport,
-                    },
-                    selectedFeatureIndexes: this.state.selectedFeatureIndexes,
-                    coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-                    onEdit: (editAction: EditAction<FeatureCollection>) =>
-                        this._onEdit(editAction),
-                    _subLayerProps: {
-                        geojson: {
-                            autoHighlight: true,
-                            getLineColor: (feature: Feature) =>
-                                this._getLineColor(feature),
-                        },
-                    },
-                })
-            ),
-        ];
+        const sub_layer_props = this.getSubLayerProps({
+            data: this.state["data"],
+            mode: MODE_MAP[this.props.mode as keyof typeof MODE_MAP],
+            modeConfig: {
+                viewport: this.context.viewport,
+            },
+            selectedFeatureIndexes: this.state["selectedFeatureIndexes"],
+            coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+            onEdit: (editAction: EditAction<FeatureCollection>) =>
+                this._onEdit(editAction),
+            _subLayerProps: {
+                geojson: {
+                    autoHighlight: true,
+                    getLineColor: (feature: Feature) =>
+                        this._getLineColor(feature),
+                },
+            },
+        });
+
+        // @ts-expect-error: EditableGeoJsonLayer from nebula.gl has no typing
+        return [new EditableGeoJsonLayer(sub_layer_props)];
     }
 }
 

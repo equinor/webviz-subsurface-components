@@ -8,8 +8,8 @@ import "@testing-library/jest-dom";
 import React from "react";
 import InfoCard from "./InfoCard";
 import userEvent from "@testing-library/user-event";
-import { Layer, PickInfo } from "deck.gl";
-import { LayerProps } from "@deck.gl/core/lib/layer";
+import { Layer } from "@deck.gl/core/typed";
+import { LayerPickInfo } from "../layers/utils/layerTools";
 
 describe("Test Info Card", () => {
     it("snapshot test with no props", () => {
@@ -22,17 +22,16 @@ describe("Test Info Card", () => {
                         radius: 1,
                         depth: 638,
                         coordinate: [111, 222],
-                    } as unknown as PickInfo<unknown>,
+                    } as unknown as LayerPickInfo,
                     {
-                        layer: { id: "wells-layer" } as Layer<
-                            unknown,
-                            LayerProps<unknown>
-                        >,
-                        property: {
-                            name: "Poro WellA",
-                            value: 123,
-                        },
-                    } as unknown as PickInfo<unknown>,
+                        layer: { id: "wells-layer" } as Layer,
+                        property: [
+                            {
+                                name: "Poro WellA",
+                                value: 123,
+                            },
+                        ],
+                    } as unknown as LayerPickInfo,
                 ]}
             />
         );
@@ -48,7 +47,7 @@ describe("Test Info Card", () => {
                         radius: 1,
                         depth: 638,
                         coordinate: [111, 222],
-                    } as unknown as PickInfo<unknown>,
+                    } as unknown as LayerPickInfo,
                 ]}
             />
         );
@@ -64,11 +63,10 @@ describe("Test Info Card", () => {
                     {
                         x: 152,
                         y: 254,
-                        // @ts-expect-error: to be fixed
                         radius: 1,
                         depth: 638,
                         coordinate: undefined,
-                    },
+                    } as unknown as LayerPickInfo,
                 ]}
             />
         );
@@ -85,7 +83,7 @@ describe("Test Info Card", () => {
                         radius: 1,
                         depth: 638,
                         coordinate: [111, 222],
-                    } as unknown as PickInfo<unknown>,
+                    } as unknown as LayerPickInfo,
                     {
                         layer: {
                             id: "wells-layer",
@@ -96,14 +94,14 @@ describe("Test Info Card", () => {
                             { name: "Perm", value: 456 },
                         ],
                         logName: "LogCurve1",
-                    } as unknown as PickInfo<unknown>,
+                    } as unknown as LayerPickInfo,
                     {
                         layer: {
                             id: "hillshading-layer",
                             props: { name: "Hill shading" },
                         },
                         propertyValue: 3152.02,
-                    } as unknown as PickInfo<unknown>,
+                    } as unknown as LayerPickInfo,
                 ]}
             />
         );
