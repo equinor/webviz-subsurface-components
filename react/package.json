@@ -49,7 +49,7 @@
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
     "dependencies": {
-        "@emerson-eps/color-tables": "^0.4.18",
+        "@emerson-eps/color-tables": "^0.4.21",
         "@equinor/eds-core-react": "^0.12.1",
         "@equinor/eds-icons": "^0.9.1",
         "@equinor/videx-wellog": "^0.7.0",

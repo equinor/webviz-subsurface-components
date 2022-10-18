@@ -877,7 +877,17 @@ function getLogColor(
 
             if (rgb) {
                 if (Array.isArray(rgb)) {
-                    attributesObject[key] = [[rgb[1], rgb[2], rgb[3]], point];
+                    if (rgb.length === 3) {
+                        attributesObject[key] = [
+                            [rgb[0], rgb[1], rgb[2]],
+                            point,
+                        ];
+                    } else {
+                        attributesObject[key] = [
+                            [rgb[1], rgb[2], rgb[3]],
+                            point,
+                        ];
+                    }
                 } else {
                     attributesObject[key] = [[rgb.r, rgb.g, rgb.b], point];
                 }
