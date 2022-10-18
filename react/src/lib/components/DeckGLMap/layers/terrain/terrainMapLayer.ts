@@ -1,11 +1,12 @@
-import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
-import { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/simple-mesh-layer/simple-mesh-layer";
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import { PickInfo, RGBAColor } from "deck.gl";
-import { RGBColor } from "@deck.gl/core/utils/color";
+import {
+    SimpleMeshLayer,
+    SimpleMeshLayerProps,
+} from "@deck.gl/mesh-layers/typed";
+import { COORDINATE_SYSTEM } from "@deck.gl/core/typed";
+import { Color, PickingInfo } from "@deck.gl/core/typed";
 import fsShader from "./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
-import { Texture2D } from "@luma.gl/core";
+import { Texture2D } from "@luma.gl/webgl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
@@ -30,10 +31,6 @@ export type Material =
           specularColor: [number, number, number];
       }
     | boolean;
-
-export type TerrainMapPickInfo = PickInfo<TerrainMapLayerData> & {
-    properties?: PropertyDataType[];
-};
 
 export const DECODER = {
     rScaler: 256 * 256,
@@ -115,7 +112,7 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
     // Given as array of three values (r,g,b) e.g: [255, 0, 0]
     // If not set or set to true, it will clamp to color map min and max values.
     // If set to false the clamp color will be completely transparent.
-    colorMapClampColor: RGBColor | undefined | boolean;
+    colorMapClampColor: Color | undefined | boolean;
 }
 
 const defaultProps = {
@@ -123,7 +120,7 @@ const defaultProps = {
 
     getPosition: (d: DataItem) => d.position,
     getColor: (d: DataItem) => d.color,
-    getOrientation: (d: DataItem) => [0, d.angle, 0],
+    getOrientation: (d: DataItem): [number, number, number] => [0, d.angle, 0],
     contours: [-1, -1],
     colorMapName: "",
     propertyValueRange: [0.0, 1.0],
@@ -166,7 +163,7 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
             : [0, 0, 0];
 
         // Normalize to [0,1] range.
-        colorMapClampColor = (colorMapClampColor as RGBColor).map(
+        colorMapClampColor = (colorMapClampColor as Color).map(
             (x) => (x ?? 0) / 255
         );
 
@@ -228,15 +225,11 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         return 0;
     }
 
-    getPickingInfo({
-        info,
-    }: {
-        info: PickInfo<TerrainMapLayerData>;
-    }): PickInfo<TerrainMapLayerData> & {
+    getPickingInfo({ info }: { info: PickingInfo }): PickingInfo & {
         properties?: PropertyDataType[];
     } {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const pickColor: RGBAColor = (info as any).color;
+        const pickColor = info.color as Color;
         if (!pickColor) {
             return info;
         }

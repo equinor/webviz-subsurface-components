@@ -1,5 +1,5 @@
 import { FeatureOf, LineString, Polygon } from "@nebula.gl/edit-modes";
-import { Position } from "deck.gl";
+import { Position } from "@deck.gl/core/typed";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const meta = require("@turf/meta");

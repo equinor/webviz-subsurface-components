@@ -1,14 +1,14 @@
 import React from "react";
 import { CircularProgress } from "@equinor/eds-core-react";
-import { Layer } from "deck.gl";
+import { Layer, LayersList } from "@deck.gl/core/typed";
 
 interface StatusIndicatorProps {
-    layers: Layer<unknown>[];
+    layers: LayersList;
     isLoaded: boolean;
 }
 
-function getLoadProgress(layers: Layer<unknown>[]) {
-    const loaded = layers?.filter((layer) => layer.isLoaded);
+function getLoadProgress(layers: LayersList) {
+    const loaded = layers?.filter((layer) => (layer as Layer)?.isLoaded);
     const count = loaded?.length;
     const progress = count / layers?.length;
     return progress * 100;

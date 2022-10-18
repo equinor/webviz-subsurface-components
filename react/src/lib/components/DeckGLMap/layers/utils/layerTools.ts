@@ -1,7 +1,11 @@
-import { PickInfo } from "@deck.gl/core/lib/deck";
-import { RGBAColor } from "@deck.gl/core/utils/color";
-import { CompositeLayerProps } from "@deck.gl/core/lib/composite-layer";
-import { Layer, LayerManager } from "@deck.gl/core";
+import { PickingInfo } from "@deck.gl/core/typed";
+import { Color } from "@deck.gl/core/typed";
+import {
+    Layer,
+    LayersList,
+    LayerManager,
+    CompositeLayerProps,
+} from "@deck.gl/core/typed";
 import { Matrix4 } from "math.gl";
 import { cloneDeep } from "lodash";
 import { layersDefaultProps } from "../layersDefaultProps";
@@ -9,6 +13,9 @@ import {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
+import DrawingLayer from "../drawing/drawingLayer";
+
+export type Position3D = [number, number, number];
 
 // Return a color given a number in the [0,1] range.
 export type colorMapFunctionType = (x: number) => [number, number, number];
@@ -25,12 +32,13 @@ export interface ExtendedLayer<D> extends Layer<D> {
 export interface PropertyDataType {
     name: string;
     value: string | number;
-    color?: RGBAColor;
+    color?: Color;
 }
 
 // Layer pick info can have multiple properties
-export interface LayerPickInfo extends PickInfo<unknown> {
-    properties?: PropertyDataType[];
+export interface LayerPickInfo extends PickingInfo {
+    propertyValue?: number; // for single property
+    properties?: PropertyDataType[]; // for multiple properties
 }
 
 // Creates property object which will be used to display layer property
@@ -38,7 +46,7 @@ export interface LayerPickInfo extends PickInfo<unknown> {
 export function createPropertyData(
     name: string,
     value: string | number,
-    color?: RGBAColor
+    color?: Color
 ): PropertyDataType {
     return {
         name: name,
@@ -99,9 +107,9 @@ export function getLayersWithDefaultProps(
 }
 
 export function getLayersInViewport(
-    layers: Record<string, unknown>[] | Layer<unknown>[],
+    layers: Record<string, unknown>[] | LayersList,
     layerIds: string[] | undefined
-): Record<string, unknown>[] | Layer<unknown>[] {
+): Record<string, unknown>[] | LayersList {
     if (layerIds && layerIds.length > 0 && layers) {
         const layers_in_view = (layers as never[]).filter((layer) =>
             layerIds.includes(layer["id"] as string)
@@ -112,26 +120,20 @@ export function getLayersInViewport(
     }
 }
 
-export function getLayersByType(
-    layers: Layer<unknown>[] | undefined,
-    type: string
-): Layer<unknown>[] {
+export function getLayersByType(layers: LayersList, type: string): LayersList {
     if (!layers) return [];
-    return layers.filter((l) => l.constructor.name === type);
+    return layers.filter((l) => l?.constructor.name === type);
 }
 
-export function getLayersById(
-    layers: Layer<unknown>[] | undefined,
-    id: string
-): Layer<unknown>[] {
+export function getLayersById(layers: LayersList, id: string): LayersList {
     if (!layers) return [];
-    return layers.filter((l) => l.id === id);
+    return layers.filter((l) => (l as Layer).id === id);
 }
 
 export function isDrawingEnabled(layer_manager: LayerManager): boolean {
     const drawing_layer = layer_manager.getLayers({
         layerIds: ["drawing-layer"],
-    })?.[0];
+    })?.[0] as DrawingLayer;
     return (
         drawing_layer &&
         drawing_layer.props.visible &&

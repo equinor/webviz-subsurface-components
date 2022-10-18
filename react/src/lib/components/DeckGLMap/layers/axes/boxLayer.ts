@@ -1,16 +1,20 @@
-import { Layer } from "@deck.gl/core";
+import {
+    COORDINATE_SYSTEM,
+    Color,
+    Layer,
+    project,
+    UpdateParameters,
+} from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
-import { Model, Geometry } from "@luma.gl/core";
-import { LayerProps } from "@deck.gl/core/lib/layer";
+import { Model, Geometry } from "@luma.gl/engine";
 import fragmentShader from "./axes-fragment.glsl";
 import gridVertex from "./grid-vertex.glsl";
-import { project } from "deck.gl";
-import { COORDINATE_SYSTEM, RGBAColor } from "deck.gl";
 import { DeckGLLayerContext } from "../../components/Map";
-import { UpdateStateInfo } from "@deck.gl/core/lib/layer";
-export interface BoxLayerProps<D> extends LayerProps<D> {
+import { ExtendedLayerProps } from "../utils/layerTools";
+
+export interface BoxLayerProps<D> extends ExtendedLayerProps<D> {
     lines: [number]; // from pt , to pt.
-    color: RGBAColor;
+    color: Color;
 }
 
 const defaultProps = {
@@ -21,17 +25,17 @@ const defaultProps = {
     color: [0, 0, 0, 1],
 };
 
-export default class BoxLayer extends Layer<unknown, BoxLayerProps<unknown>> {
+export default class BoxLayer extends Layer<BoxLayerProps<unknown>> {
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
         this.setState(this._getModels(gl));
     }
 
-    shouldUpdateState(): boolean | string | null {
+    shouldUpdateState(): boolean {
         return true;
     }
 
-    updateState({ context }: UpdateStateInfo<BoxLayerProps<unknown>>): void {
+    updateState({ context }: UpdateParameters<this>): void {
         const { gl } = context;
         this.setState(this._getModels(gl));
     }
