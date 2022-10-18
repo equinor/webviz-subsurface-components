@@ -608,6 +608,9 @@ const Map: React.FC<MapProps> = ({
         }
     }, [selection]);
 
+    // multiple well layers
+    const [multipleWells, setMultipleWells] = useState<string[]>([]);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
@@ -672,7 +675,7 @@ const Map: React.FC<MapProps> = ({
         type: "click" | "hover",
         infos: PickingInfo[],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        event: any
+        event: any,
     ): void => {
         if (onMouseEvent) {
             const ev: MapMouseEvent = {
@@ -699,6 +702,7 @@ const Map: React.FC<MapProps> = ({
                             ev.wellcolor = properties["color"];
                         }
                     }
+                  
                     if (!ev.wellname)
                         ev.wellname = info.object.header?.["well"]; // object is WellLog
 
@@ -844,6 +848,17 @@ const Map: React.FC<MapProps> = ({
                 // @ts-expect-error this prop doesn't exists directly on DeckGL, but on Deck.Context
                 userData={{
                     setEditedData: (updated_prop: Record<string, unknown>) => {
+                        if (
+                            multipleWells.includes(updated_prop["selectedWell"] as string)
+                        ) {
+                            const temp = multipleWells.filter(item => item !== updated_prop["selectedWell"])
+                            updated_prop["multiSelectedWells"]= temp
+                            setMultipleWells(temp)
+                        } else {
+                            const temp = multipleWells.concat(updated_prop["selectedWell"] as string)
+                            updated_prop["multiSelectedWells"]= temp
+                            setMultipleWells(temp)
+                        }
                         setEditedData?.(updated_prop);
                     },
                     colorTables: colorTables,
