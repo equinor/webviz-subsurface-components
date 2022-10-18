@@ -1,5 +1,6 @@
 import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
+import { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +
@@ -36,88 +37,10 @@ export default {
         },
     },
     argTypes: {
+        ...argTypesSyncLogViewerProp,
         id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
-        },
-        welllogs: {
-            description: "Array of JSON objects describing well log data.",
-        },
-        templates: {
-            description: "Array of track template data.",
-        },
-        colorTables: {
-            description: "Prop containing color table data.",
-        },
-        wellpicks: {
-            description: "Well Picks data array",
-        },
-        patternsTable: {
-            description: "Patterns table",
-        },
-        patterns: {
-            description: "Horizon to pattern index map",
-        },
-
-        spacers: {
-            description:
-                "Set to true or spacer width or to array of widths if WellLogSpacers should be used",
-        },
-        wellDistances: {
-            description: "Distanses between wells to show on the spacers",
-        },
-
-        horizontal: {
-            description: "Orientation of the track plots on the screen.",
-            defaultValue: false,
-        },
-        maxVisibleTrackNum: {
-            description: "The maximum number of visible tracks",
-            defaultValue: 3,
-        },
-        maxContentZoom: {
-            description: "The maximum zoom value",
-            defaultValue: 256,
-        },
-        hideTitles: {
-            description: "Hide titles on the tracks.",
-            defaultValue: false,
-        },
-        hideLegend: {
-            description: "Hide legends on the tracks.",
-            defaultValue: false,
-        },
-        syncTrackPos: {
-            description: "Synchronize first visible track",
-            defaultValue: false,
-        },
-        syncContentDomain: {
-            description: "Synchronize visible content domain",
-            defaultValue: false,
-        },
-        syncContentSelection: {
-            description: "Synchronize content selection",
-            defaultValue: false,
-        },
-        syncTemplate: {
-            description: "Synchronize templates in the views",
-            defaultValue: false,
-        },
-        readoutOptions: {
-            description:
-                "Options for readout panel.<br/>" +
-                "allTracks: boolean — Show not only visible tracks,<br/>" +
-                "grouping: string — How group values.",
-            defaultValue: {
-                allTracks: false,
-                grouping: "by_track",
-            },
-        },
-        domain: {
-            description: "Initial visible interval of the log data.",
-        },
-        selection: {
-            description: "Initial selected interval of the log data.",
         },
     },
 };
