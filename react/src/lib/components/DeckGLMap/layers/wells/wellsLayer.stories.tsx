@@ -123,6 +123,44 @@ DashedWells.parameters = {
     },
 };
 
+// Volve wells default example.
+export const MultipleVolveWells = Template.bind({});
+MultipleVolveWells.args = {
+    id: "volve-wells",
+    resources: {
+        wellsData: "./volve_wells_1.json",
+        wellsData2: "./volve_wells_2.json",
+    },
+    bounds: [432150, 6475800, 439400, 6481500] as [
+        number,
+        number,
+        number,
+        number
+    ],
+    layers: [
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData",
+            id: "id1",
+        },
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData2",
+            id: "id2",
+        },
+    ],
+};
+
+MultipleVolveWells.parameters = {
+    docs: {
+        description: {
+            story: "Multiple Volve wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 export const CustomColoredWells = Template.bind({});
 CustomColoredWells.args = {
     ...defaultProps,
@@ -136,6 +174,7 @@ CustomColoredWells.args = {
         },
     ],
 };
+
 CustomColoredWells.parameters = {
     docs: {
         description: {
@@ -158,6 +197,7 @@ CustomWidthWells.args = {
         },
     ],
 };
+
 CustomColoredWells.parameters = {
     docs: {
         description: {
