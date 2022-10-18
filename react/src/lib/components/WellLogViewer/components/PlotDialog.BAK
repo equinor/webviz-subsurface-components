@@ -283,7 +283,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         );
     }
 
-    render(): JSX.Element {
+    render(): ReactNode {
         const trackTemplate = getTrackTemplate(this.props.track);
         const title = this.props.templatePlot ? "Edit plot" : "Add New Plot";
         const skipUsed = this.props.templatePlot ? false : true; /*??*/

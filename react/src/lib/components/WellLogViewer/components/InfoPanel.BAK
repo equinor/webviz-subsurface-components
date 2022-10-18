@@ -119,7 +119,7 @@ class InfoPanel extends Component<Props> {
         );
     }
 
-    render(): JSX.Element {
+    render(): ReactNode {
         return (
             <div style={{ overflowY: "auto", overflowX: "hidden" }}>
                 <fieldset>

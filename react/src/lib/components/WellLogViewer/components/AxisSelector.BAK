@@ -26,7 +26,7 @@ class AxisSelector extends Component<Props> {
         );
     }
 
-    render(): JSX.Element {
+    render(): ReactNode {
         if (!this.props.axes || this.props.axes.length < 1) return <></>; // nothing to render
         return (
             <div>
