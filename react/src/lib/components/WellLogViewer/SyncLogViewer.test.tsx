@@ -25,6 +25,7 @@ describe("Sync Log Viewer", () => {
                 id="Sync-Log-Viewer"
                 hideTitles={true}
                 hideLegend={true}
+                primaryAxis={"md"}
                 axisTitles={axisTitles}
                 axisMnemos={axisMnemos}
                 welllogs={[exampleWellLog]}

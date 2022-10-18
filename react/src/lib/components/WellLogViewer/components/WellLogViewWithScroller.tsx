@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import WellLogView from "./WellLogView";
 import { WellLogViewProps, argTypesWellLogViewProp } from "./WellLogView";
+import { _propTypesWellLogView } from "./WellLogView";
 
 import { WellLogController } from "./WellLogView";
 
@@ -173,6 +174,6 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
     }
 }
 
-WellLogViewWithScroller.propTypes = WellLogView.propTypes;
+WellLogViewWithScroller.propTypes = _propTypesWellLogView(); // WellLogView.propTypes;
 
 export default WellLogViewWithScroller;

@@ -1666,88 +1666,93 @@ class WellLogView
     }
 }
 
-WellLogView.propTypes = {
-    /**
-     * The ID of this component, used to identify dash components
-     * in callbacks. The ID needs to be unique across all of the
-     * components in an app.
-     */
-    id: PropTypes.string.isRequired,
+WellLogView.propTypes = _propTypesWellLogView();
 
-    /**
-     * An object from JSON file describing well log data
-     */
-    welllog: PropTypes.object.isRequired,
+export function _propTypesWellLogView(): Record<string, unknown> {
+    console.log("_propTypesWellLogView");
+    return {
+        /**
+         * The ID of this component, used to identify dash components
+         * in callbacks. The ID needs to be unique across all of the
+         * components in an app.
+         */
+        id: PropTypes.string,
 
-    /**
-     * Prop containing track template data
-     */
-    template: PropTypes.object.isRequired,
+        /**
+         * An object from JSON file describing well log data
+         */
+        welllog: PropTypes.object, //.isRequired,
 
-    /**
-     * Prop containing color table data
-     */
-    colorTables: PropTypes.array.isRequired,
+        /**
+         * Prop containing track template data
+         */
+        template: PropTypes.object.isRequired,
 
-    /**
-     * Well picks data
-     */
-    wellpick: PropTypes.object,
+        /**
+         * Prop containing color table data
+         */
+        colorTables: PropTypes.array.isRequired,
 
-    /**
-     * Orientation of the track plots on the screen. Default is false
-     */
-    horizontal: PropTypes.bool,
+        /**
+         * Well picks data
+         */
+        wellpick: PropTypes.object,
 
-    /**
-     * Primary axis id: " md", "tvd", "time"...
-     */
-    primaryAxis: PropTypes.string,
+        /**
+         * Orientation of the track plots on the screen. Default is false
+         */
+        horizontal: PropTypes.bool,
 
-    /**
-     * Hide titles of the track. Default is false
-     */
-    hideTitles: PropTypes.bool,
+        /**
+         * Primary axis id: " md", "tvd", "time"...
+         */
+        primaryAxis: PropTypes.string,
 
-    /**
-     * Hide legends of the track. Default is false
-     */
-    hideLegend: PropTypes.bool,
+        /**
+         * Hide titles of the track. Default is false
+         */
+        hideTitles: PropTypes.bool,
 
-    /**
-     * Log mnemonics for axes
-     */
-    axisTitles: PropTypes.object,
+        /**
+         * Hide legends of the track. Default is false
+         */
+        hideLegend: PropTypes.bool,
 
-    /**
-     * Names for axes
-     */
-    axisMnemos: PropTypes.object,
+        /**
+         * Log mnemonics for axes
+         */
+        axisTitles: PropTypes.object,
 
-    /**
-     * The maximum number of visible tracks
-     */
-    maxVisibleTrackNum: PropTypes.number,
+        /**
+         * Names for axes
+         */
+        axisMnemos: PropTypes.object,
 
-    /**
-     * The maximum zoom value
-     */
-    maxContentZoom: PropTypes.number,
+        /**
+         * The maximum number of visible tracks
+         */
+        maxVisibleTrackNum: PropTypes.number,
 
-    /**
-     * Initial visible interval of the log data
-     */
-    domain: PropTypes.arrayOf(PropTypes.number),
+        /**
+         * The maximum zoom value
+         */
+        maxContentZoom: PropTypes.number,
 
-    /**
-     * Initial selected interval of the log data
-     */
-    selection: PropTypes.arrayOf(PropTypes.number),
+        /**
+         * Initial visible interval of the log data
+         */
+        domain: PropTypes.arrayOf(PropTypes.number),
 
-    /**
-     * Validate JSON datafile against schems
-     */
-    checkDatafileSchema: PropTypes.bool,
-};
+        /**
+         * Initial selected interval of the log data
+         */
+        selection: PropTypes.arrayOf(PropTypes.number),
+
+        /**
+         * Validate JSON datafile against schems
+         */
+        checkDatafileSchema: PropTypes.bool,
+    };
+}
 
 export default WellLogView;
