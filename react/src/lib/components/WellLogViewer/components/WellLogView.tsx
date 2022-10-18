@@ -1669,7 +1669,6 @@ class WellLogView
 WellLogView.propTypes = _propTypesWellLogView();
 
 export function _propTypesWellLogView(): Record<string, unknown> {
-    console.log("_propTypesWellLogView");
     return {
         /**
          * The ID of this component, used to identify dash components
