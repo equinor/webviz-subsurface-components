@@ -164,7 +164,12 @@ jobs:
           rm -rf cypress/videos
 
       - name: create pull request
-        run: gh pr create --reviewer ${{ github.actor }} -R https://github.com/avanti-em/webviz-subsurface-components -B avanti-em:cypress-component-test -H avanti-em:cypress-component-test --title 'Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}' --body 'Created by Github action'
+        if: steps.check_file_changed.outputs.docs_changed == 'true' && failure()
+        run: | 
+          git config user.name ${{ github.actor }}
+          git checkout -b update_snaps
+          git commit -am "updating snapshots"
+          gh pr create --reviewer ${{ github.actor }} -B ${{ github.actor }}:${{ github.head_ref }} -H ${{ github.actor }}:update_snaps --title 'Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}' --body 'Created by Github action'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
