@@ -331,7 +331,7 @@ const InfoOptions_propTypes = PropTypes.shape({
  */
 console.log("_propTypesWellLogView()=", _propTypesWellLogView());
 WellLogViewer.propTypes = {
-    //..._propTypesWellLogView(), //WellLogViewWithScroller.propTypes,
+    ..._propTypesWellLogView(), //WellLogViewWithScroller.propTypes,
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
@@ -368,11 +368,6 @@ WellLogViewer.propTypes = {
      * Hide legends of the track. Default is false
      */
     hideLegend: PropTypes.bool,
-
-    /**
-     * Options for readout panel
-     */
-    readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
 
     /**
      * Initial visible interval of the log data
@@ -418,6 +413,11 @@ WellLogViewer.propTypes = {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema: PropTypes.bool,
+
+    /**
+     * Options for readout panel
+     */
+    readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
 };
 console.log("WellLogViewer.propTypes=", WellLogViewer.propTypes);
 export default WellLogViewer;
