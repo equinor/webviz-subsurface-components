@@ -331,7 +331,8 @@ const InfoOptions_propTypes = PropTypes.shape({
  */
 console.log("_propTypesWellLogView()=", _propTypesWellLogView());
 WellLogViewer.propTypes = {
-    ..._propTypesWellLogView(), //WellLogViewWithScroller.propTypes,
+    //..._propTypesWellLogView(), //
+    ...WellLogViewWithScroller.propTypes,
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
