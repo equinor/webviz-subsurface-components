@@ -45,6 +45,10 @@ import { cloneDeep } from "lodash";
 
 import { colorTables } from "@emerson-eps/color-tables";
 import { getModelMatrixScale } from "../layers/utils/layerTools";
+//
+//import { Controller } from "deck.gl";
+import { OrbitController, OrthographicController } from "@deck.gl/core";
+import { updateCurrentNodeInfo } from "lib/components/GroupTree/redux/actions";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -260,8 +264,6 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
-
-    scaleZ?: number;
 }
 
 export interface MapMouseEvent {
@@ -317,7 +319,6 @@ const Map: React.FC<MapProps> = ({
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
     triggerHome,
-    scaleZ,
 }: MapProps) => {
     const deckRef = useRef<DeckGLRef>(null);
 
@@ -385,10 +386,6 @@ const Map: React.FC<MapProps> = ({
         setDidUserChangeCamera(false);
         setViewStates(tempViewStates);
     }
-
-    useEffect(() => {
-        setViewsProps(getViews(views) as ViewportType[]);
-    }, [views]);
 
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
@@ -522,10 +519,46 @@ const Map: React.FC<MapProps> = ({
         }
     }, [cameraPosition]);
 
+
+    //XXX
+    const [scaleZ, setScaleZ] = useState<number>(1);
+    const [scaleZUp, setScaleZUp] = useState<number>(1);
+    const [scaleZDown, setScaleZDown] = useState<number>(1);
+
+    const scaleUpFunction = () => {
+        console.log("scaleUpFunction called. ", scaleZUp)
+        //setScaleZUp(scaleZUp + 1);
+        setScaleZUp(Math.random());
+    };
+
+    const scaleDownFunction = () => {
+        setScaleZDown(Math.random());
+    };
+
+    useEffect(() => {
+        setScaleZ(scaleZ * 1.05)
+    }, [scaleZUp]);
+
+    useEffect(() => {
+        setScaleZ(scaleZ * 0.95)
+    }, [scaleZDown]);
+
+    useEffect(() => {
+        setViewsProps(
+            getViews(
+                views,
+                scaleUpFunction,
+                scaleDownFunction
+            ) as ViewportType[]
+        );
+    }, [views]);
+
+    // XXX del denne i to...
     useEffect(() => {
         if (st_layers == undefined || layers == undefined) return;
 
-        const m = getModelMatrixScale(scaleZ ?? 1);
+        const m = getModelMatrixScale(scaleZ);
+        console.log("scaleX in useEffect: ", scaleZ)
 
         let layers_copy = cloneDeep(layers);
         layers_copy = layers_copy.map((layer) => {
@@ -545,6 +578,7 @@ const Map: React.FC<MapProps> = ({
         const layers_default = getLayersWithDefaultProps(updated_layers);
         const updated_spec = { layers: layers_default, views: views };
         dispatch(setSpec(updated_spec));
+        console.log("dispatch")
     }, [scaleZ, layers, dispatch]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
@@ -557,6 +591,7 @@ const Map: React.FC<MapProps> = ({
             if (wellsLayer) wellsLayer.setupLegend();
         }
     }, [deckGLLayers]);
+
     useEffect(() => {
         const layers = st_layers;
         if (!layers || layers.length == 0) return;
@@ -1029,7 +1064,19 @@ function getViewState3D(
 }
 
 // construct views object for DeckGL component
-function getViews(views: ViewsType | undefined): ViewportType[] {
+function getViews(views: ViewsType | undefined, scaleUpFunction, scaleDownFunction): ViewportType[] {
+    class ZScaleOrbitController extends OrbitController {
+        handleEvent(event: { type: string; key: string }) {
+            if (event.type === "keydown" && event.key === "ArrowUp") {
+                scaleUpFunction();
+            } else if (event.type === "keydown" && event.key === "ArrowDown") {
+                scaleDownFunction();
+            } else {
+                super.handleEvent(event);
+            }
+        }
+    }
+
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
     if (!views || !views.viewports || !views.layout) {
@@ -1075,6 +1122,9 @@ function getViews(views: ViewsType | undefined): ViewportType[] {
                     "@@type": view_type,
                     id: view_id,
                     controller: {
+                        type: cur_viewport.show3D
+                            ? ZScaleOrbitController
+                            : OrthographicController,
                         doubleClickZoom: false,
                     },
                     x: xPos + "%",

@@ -250,45 +250,38 @@ MapLayer3dPng.parameters = {
 };
 
 export const ScaleZ: ComponentStory<typeof DeckGLMap> = (args) => {
-    const [scaleZ, setScaleZ] = React.useState<number>(1);
-
-    const handleChange = React.useCallback((_event, value) => {
-        const scale = value / 100;
-        setScaleZ(scale);
-    }, []);
-
-    const props = {
-        ...args,
-        scaleZ,
-    };
-
     return (
         <>
             <div className={useStyles().main}>
-                <DeckGLMap {...props} />
+                <DeckGLMap {...args} />
             </div>
-            <Slider
-                min={0}
-                max={1000}
-                defaultValue={100}
-                step={10}
-                onChange={handleChange}
-            />
+            <div>Use arrow up/down keys to scale in Z direction.</div>
         </>
     );
 };
 
 ScaleZ.args = {
-    id: "ScaleZ",
+    id: "map",
     layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    //layers: [axes_hugin],
 
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
-        layout: [1, 1],
+        layout: [1, 2],
         viewports: [
             {
                 id: "view_1",
+                layerIds: ["axes-layer2", "mesh-layer", "north-arrow-layer"],
+                //layerIds: ["axes-layer2"],
                 show3D: true,
+                isSync: true,
+            },
+            {
+                id: "view_2",
+                layerIds: ["axes-layer2", "wells-layer", "north-arrow-layer"],
+                //layerIds: ["axes-layer2"],
+                show3D: true,
+                isSync: true,
             },
         ],
     },
@@ -298,10 +291,72 @@ ScaleZ.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: `Example scale z.`,
+            story: "Example scaling in z direction using arrow up/down buttons.",
         },
     },
 };
+
+// export const ScaleZ: ComponentStory<typeof DeckGLMap> = (args) => {
+//     const [scaleZ, setScaleZ] = React.useState<number>(1);
+
+//     const handleChange = React.useCallback((_event, value) => {
+//         const scale = value / 100;
+//         setScaleZ(scale);
+//     }, []);
+
+//     const props = {
+//         ...args,
+//         scaleZ,
+//     };
+
+//     return (
+//         <>
+//             <div className={useStyles().main}>
+//                 <DeckGLMap {...props} />
+//             </div>
+//             <Slider
+//                 min={0}
+//                 max={1000}
+//                 defaultValue={100}
+//                 step={10}
+//                 onChange={handleChange}
+//             />
+//         </>
+//     );
+// };
+
+// ScaleZ.args = {
+//     id: "ScaleZ",
+//     layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
+//     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+
+//     views: {
+//         layout: [1, 2],
+//         viewports: [
+//             {
+//                 id: "view_1",
+//                 layerIds: ["axes-layer2", "mesh-layer", "north-arrow-layer"],
+//                 show3D: true,
+//                 isSync: true,
+//             },
+//             {
+//                 id: "view_2",
+//                 layerIds: ["axes-layer2", "wells-layer", "north-arrow-layer"],
+//                 show3D: true,
+//                 isSync: true,
+//             },
+//         ],
+//     },
+// };
+
+// ScaleZ.parameters = {
+//     docs: {
+//         ...defaultParameters.docs,
+//         description: {
+//             story: `Example scale z.`,
+//         },
+//     },
+// };
 
 export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
     const [home, setHome] = React.useState<number>(0);
