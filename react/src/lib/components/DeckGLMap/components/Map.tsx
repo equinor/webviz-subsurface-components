@@ -849,21 +849,26 @@ const Map: React.FC<MapProps> = ({
                 userData={{
                     setEditedData: (updated_prop: Record<string, unknown>) => {
                         if (
-                            multipleWells.includes(
-                                updated_prop["selectedWell"] as string
-                            )
+                            Object.keys(updated_prop).includes("selectedWell")
                         ) {
-                            const temp = multipleWells.filter(
-                                (item) => item !== updated_prop["selectedWell"]
-                            );
-                            updated_prop["multiSelectedWells"] = temp;
-                            setMultipleWells(temp);
-                        } else {
-                            const temp = multipleWells.concat(
-                                updated_prop["selectedWell"] as string
-                            );
-                            updated_prop["multiSelectedWells"] = temp;
-                            setMultipleWells(temp);
+                            if (
+                                multipleWells.includes(
+                                    updated_prop["selectedWell"] as string
+                                )
+                            ) {
+                                const temp = multipleWells.filter(
+                                    (item) =>
+                                        item !== updated_prop["selectedWell"]
+                                );
+                                updated_prop["multiSelectedWells"] = temp;
+                                setMultipleWells(temp);
+                            } else {
+                                const temp = multipleWells.concat(
+                                    updated_prop["selectedWell"] as string
+                                );
+                                updated_prop["multiSelectedWells"] = temp;
+                                setMultipleWells(temp);
+                            }
                         }
                         setEditedData?.(updated_prop);
                     },
