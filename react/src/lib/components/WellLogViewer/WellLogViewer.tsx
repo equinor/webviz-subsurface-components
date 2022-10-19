@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
-import { _propTypesWellLogView } from "./components/WellLogView";
+//import { _propTypesWellLogView } from "./components/WellLogView";
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
 
@@ -328,7 +328,88 @@ const InfoOptions_propTypes = PropTypes.shape({
 });
 
 WellLogViewer.propTypes = {
-    ..._propTypesWellLogView(), //WellLogViewWithScroller.propTypes,
+    //do not work with python dash!    ..._propTypesWellLogView(), // ...WellLogViewWithScroller.propTypes,
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    id: PropTypes.string.isRequired,
+
+    /**
+     * An object from JSON file describing well log data
+     */
+    welllog: PropTypes.object.isRequired,
+
+    /**
+     * Prop containing track template data
+     */
+    template: PropTypes.object.isRequired,
+
+    /**
+     * Prop containing color table data
+     */
+    colorTables: PropTypes.array.isRequired,
+
+    /**
+     * Orientation of the track plots on the screen. Default is false
+     */
+    horizontal: PropTypes.bool,
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTitles: PropTypes.bool,
+
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideLegend: PropTypes.bool,
+
+    /**
+     * Initial visible interval of the log data
+     */
+    domain: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Initial selected interval of the log data
+     */
+    selection: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Well picks data
+     */
+    wellpick: PropTypes.object,
+
+    /**
+     * Primary axis id: " md", "tvd", "time"...
+     */
+    primaryAxis: PropTypes.string,
+
+    /**
+     * Log mnemonics for axes
+     */
+    axisTitles: PropTypes.object,
+
+    /**
+     * Names for axes
+     */
+    axisMnemos: PropTypes.object,
+
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum: PropTypes.number,
+
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom: PropTypes.number,
+
+    /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema: PropTypes.bool,
 
     /**
      * Options for readout panel
