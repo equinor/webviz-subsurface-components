@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
-//import { _propTypesWellLogView } from "./components/WellLogView";
+import { _propTypesWellLogView } from "./components/WellLogView";
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
 
@@ -330,6 +330,7 @@ const InfoOptions_propTypes = PropTypes.shape({
 /*
  */
 WellLogViewer.propTypes = {
+    ..._propTypesWellLogView(), //WellLogViewWithScroller.propTypes,
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
