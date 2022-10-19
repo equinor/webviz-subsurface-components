@@ -384,4 +384,3 @@ WellLogViewer.propTypes = {
 };
 
 export default WellLogViewer;
-
