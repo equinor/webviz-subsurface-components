@@ -327,13 +327,61 @@ const InfoOptions_propTypes = PropTypes.shape({
     grouping: PropTypes.string,
 });
 
+/*
+ */
 WellLogViewer.propTypes = {
-    ..._propTypesWellLogView(), //WellLogViewWithScroller.propTypes,
+    /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    id: PropTypes.string.isRequired,
+
+    /**
+     * An object from JSON file describing well log data
+     */
+    welllog: PropTypes.object.isRequired,
+
+    /**
+     * Prop containing track template data
+     */
+    template: PropTypes.object.isRequired,
+
+    /**
+     * Prop containing color table data
+     */
+    colorTables: PropTypes.array.isRequired,
+
+    /**
+     * Orientation of the track plots on the screen. Default is false
+     */
+    horizontal: PropTypes.bool,
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTitles: PropTypes.bool,
+
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideLegend: PropTypes.bool,
 
     /**
      * Options for readout panel
      */
     readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
+
+    /**
+     * Initial visible interval of the log data
+     */
+    domain: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Initial selected interval of the log data
+     */
+    selection: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default WellLogViewer;
+
