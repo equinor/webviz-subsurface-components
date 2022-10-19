@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
-import { _propTypesWellLogView } from "./components/WellLogView";
+//import { _propTypesWellLogView } from "./components/WellLogView";
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
 
