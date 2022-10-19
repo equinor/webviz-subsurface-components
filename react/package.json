@@ -41,10 +41,7 @@
         "prepare": "npm run build:npm",
         "postpack": "npm run tidy-up",
         "prepublishOnly": "npm test && npm run lint",
-        "preversion": "npm run lint",
-        "test-cypress": "concurrently 'npm run storybook' 'npm run cypress:test' -k -s first",
-        "cypress:test": "wait-on http://localhost:6006 && cypress run",
-        "cypress:run": "cypress run"
+        "preversion": "npm run lint"
     },
     "browserslist": [
         "last 1 version",
