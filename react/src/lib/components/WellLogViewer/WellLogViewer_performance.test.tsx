@@ -7,6 +7,7 @@ import * as core from "@actions/core";
 import { Wrapper } from "../GroupTree/test/TestWrapper";
 import WellLogViewer from "./WellLogViewer";
 import logTimes, { obj } from "../../performanceUtility/onRenderFunction";
+import { axisTitles, axisMnemos } from "./utils/axes";
 
 const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
 //const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
@@ -36,6 +37,9 @@ describe("Well Log Viewer perfomance", () => {
                             welllog={exampleWellLog}
                             hideLegend={true}
                             hideTitles={true}
+                            primaryAxis={"md"}
+                            axisTitles={axisTitles}
+                            axisMnemos={axisMnemos}
                             template={exampleTemplate}
                             colorTables={exampleColorTable}
                             onContentRescale={function (): void {
