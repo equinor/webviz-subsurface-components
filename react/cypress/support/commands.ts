@@ -1,5 +1,6 @@
+/// <reference types="cypress" />
 // ***********************************************
-// This example commands.js shows you how to
+// This example commands.ts shows you how to
 // create various custom commands and overwrite
 // existing commands.
 //
@@ -23,28 +24,16 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-
-// This is based on examples from Gleb's Working with Iframes Cypress blog post.
-// See: https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/
-import { addMatchImageSnapshotCommand } from "cypress-image-snapshot/command";
-
-addMatchImageSnapshotCommand({
-    failureThreshold: 0.1,
-    failureThresholdType: "percent",
-    customDiffConfig: { threshold: 0.0 },
-    capture: "viewport",
-});
-
-Cypress.Commands.add("getIframeBody", () => {
-    cy.log("getIframeBody");
-
-    // get the storybook's iframe > document > body,
-    // then wraps the body element to allow for continued chaining
-    // i.e. cy.getIframeBody().findBy(...)
-    return cy
-        .get("#storybook-preview-iframe")
-        .its("0.contentDocument.body")
-        .should("not.be.empty")
-
-        .then((body) => cy.wrap(body));
-});
+//
+// declare global {
+//   namespace Cypress {
+//     interface Chainable {
+//       login(email: string, password: string): Chainable<void>
+//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
+//     }
+//   }
+// }
+const compareSnapshotCommand = require('cypress-image-diff-js/dist/command')
+compareSnapshotCommand()
