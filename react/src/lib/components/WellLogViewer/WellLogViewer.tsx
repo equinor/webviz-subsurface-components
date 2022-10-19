@@ -383,6 +383,41 @@ WellLogViewer.propTypes = {
      * Initial selected interval of the log data
      */
     selection: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Well picks data
+     */
+    wellpick: PropTypes.object,
+
+    /**
+     * Primary axis id: " md", "tvd", "time"...
+     */
+    primaryAxis: PropTypes.string,
+
+    /**
+     * Log mnemonics for axes
+     */
+    axisTitles: PropTypes.object,
+
+    /**
+     * Names for axes
+     */
+    axisMnemos: PropTypes.object,
+
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum: PropTypes.number,
+
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom: PropTypes.number,
+
+    /**
+     * Validate JSON datafile against schems
+     */
+    checkDatafileSchema: PropTypes.bool,
 };
 console.log("WellLogViewer.propTypes=", WellLogViewer.propTypes);
 export default WellLogViewer;
