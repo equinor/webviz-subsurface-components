@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
-//import { _propTypesWellLogView } from "./components/WellLogView";
+import { _propTypesWellLogView } from "./components/WellLogView";
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
 
@@ -329,6 +329,7 @@ const InfoOptions_propTypes = PropTypes.shape({
 
 /*
  */
+console.log("_propTypesWellLogView()=",_propTypesWellLogView())
 WellLogViewer.propTypes = {
     //..._propTypesWellLogView(), //WellLogViewWithScroller.propTypes,
     /**
@@ -383,5 +384,5 @@ WellLogViewer.propTypes = {
      */
     selection: PropTypes.arrayOf(PropTypes.number),
 };
-
+console.log("WellLogViewer.propTypes=",WellLogViewer.propTypes)
 export default WellLogViewer;
