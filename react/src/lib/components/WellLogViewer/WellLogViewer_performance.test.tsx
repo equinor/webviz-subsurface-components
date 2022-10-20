@@ -7,6 +7,7 @@ import * as core from "@actions/core";
 import { Wrapper } from "../GroupTree/test/TestWrapper";
 import WellLogViewer from "./WellLogViewer";
 import logTimes, { obj } from "../../performanceUtility/onRenderFunction";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
 //const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
@@ -15,7 +16,7 @@ const exampleWellLog = {
     curves: [],
     data: [],
 };
-const exampleColorTable = require("../../../demo/example-data/color-tables.json");
+const exampleColorTable = colorTables;
 
 window.ResizeObserver =
     window.ResizeObserver ||

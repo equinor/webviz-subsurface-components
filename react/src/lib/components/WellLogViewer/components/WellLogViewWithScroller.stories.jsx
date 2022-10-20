@@ -1,6 +1,6 @@
 import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
-
+import { colorTables } from "@emerson-eps/color-tables";
 import { axisTitles, axisMnemos } from "../utils/axes";
 
 const ComponentCode =
@@ -8,7 +8,7 @@ const ComponentCode =
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../demo/example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../demo/example-data/welllog_template_1.json")} \r\n' +
-    '    colorTables={require("../../../../demo/example-data/color-tables.json")} \r\n' +
+    "    colorTables={colorTables} \r\n" +
     "/>";
 
 export default {
@@ -91,5 +91,5 @@ Default.args = {
     horizontal: false,
     welllog: require("../../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../../demo/example-data/welllog_template_1.json"),
-    colorTables: require("../../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
 };

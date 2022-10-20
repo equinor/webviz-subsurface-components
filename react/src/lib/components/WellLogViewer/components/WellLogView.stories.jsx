@@ -1,12 +1,13 @@
 import React from "react";
 import WellLogView from "./WellLogView";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const ComponentCode =
     '<WellLogView id="WellLogView" \r\n' +
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../demo/example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../demo/example-data/welllog_template_1.json")} \r\n' +
-    '    colorTables={require("../../../../demo/example-data/color-tables.json")} \r\n' +
+    "    colorTables={colorTables} \r\n" +
     "/>";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
@@ -94,7 +95,7 @@ Default.args = {
     horizontal: false,
     welllog: require("../../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../../demo/example-data/welllog_template_1.json"),
-    colorTables: require("../../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
 };
 
 export const Discrete = Template.bind({});
@@ -102,5 +103,5 @@ Discrete.args = {
     horizontal: false,
     welllog: require("../../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../../demo/example-data/welllog_template_2.json"),
-    colorTables: require("../../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
 };

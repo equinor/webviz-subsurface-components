@@ -1,12 +1,13 @@
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
     "    horizontal=false \r\n" +
     '    welllog={require("../../../demo/example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../demo/example-data/welllog_template_1.json")} \r\n' +
-    '    colorTables={require("../../../demo/example-data/color-tables.json")} \r\n' +
+    "    colorTables={colorTables} \r\n" +
     "/>";
 
 export default {
@@ -136,7 +137,7 @@ const Template = (args) => {
 const wellpick = {
     wellpick: require("../../../demo/example-data/wellpicks.json")[0],
     name: "HORIZON",
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     color: "Stratigraphy",
 };
 
@@ -148,7 +149,7 @@ Default.args = {
     hideLegend: false,
     welllog: require("../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../demo/example-data/welllog_template_1.json"),
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     wellpick: wellpick,
 };
 
@@ -159,7 +160,7 @@ Horizontal.args = {
     welllog:
         require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     wellpick: wellpick,
 };
 Horizontal.parameters = {
@@ -176,7 +177,7 @@ Discrete.args = {
     horizontal: false,
     welllog: require("../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     wellpick: wellpick,
 };
 Discrete.parameters = {
