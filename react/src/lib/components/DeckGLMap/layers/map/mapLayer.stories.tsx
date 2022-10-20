@@ -250,36 +250,48 @@ MapLayer3dPng.parameters = {
 };
 
 export const ScaleZ: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [layers, setLayers] = React.useState([
+        axes_hugin,
+        meshMapLayerPng,
+        north_arrow_layer,
+    ]);
+
+    const handleChange = () => {
+        setLayers([axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer]);
+    };
+
+    const props = {
+        ...args,
+        layers,
+    };
+
     return (
         <>
             <div className={useStyles().main}>
-                <DeckGLMap {...args} />
+                <DeckGLMap {...props} />
             </div>
-            <div>Use arrow up/down keys to scale in Z direction.</div>
+            <button onClick={handleChange}> Add layer </button>
         </>
     );
 };
 
 ScaleZ.args = {
-    id: "map",
-    layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
-    //layers: [axes_hugin],
-
+    id: "ScaleZ",
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+
     views: {
         layout: [1, 2],
         viewports: [
             {
                 id: "view_1",
                 layerIds: ["axes-layer2", "mesh-layer", "north-arrow-layer"],
-                //layerIds: ["axes-layer2"],
                 show3D: true,
                 isSync: true,
             },
             {
                 id: "view_2",
                 layerIds: ["axes-layer2", "wells-layer", "north-arrow-layer"],
-                //layerIds: ["axes-layer2"],
                 show3D: true,
                 isSync: true,
             },
@@ -295,68 +307,6 @@ ScaleZ.parameters = {
         },
     },
 };
-
-// export const ScaleZ: ComponentStory<typeof DeckGLMap> = (args) => {
-//     const [scaleZ, setScaleZ] = React.useState<number>(1);
-
-//     const handleChange = React.useCallback((_event, value) => {
-//         const scale = value / 100;
-//         setScaleZ(scale);
-//     }, []);
-
-//     const props = {
-//         ...args,
-//         scaleZ,
-//     };
-
-//     return (
-//         <>
-//             <div className={useStyles().main}>
-//                 <DeckGLMap {...props} />
-//             </div>
-//             <Slider
-//                 min={0}
-//                 max={1000}
-//                 defaultValue={100}
-//                 step={10}
-//                 onChange={handleChange}
-//             />
-//         </>
-//     );
-// };
-
-// ScaleZ.args = {
-//     id: "ScaleZ",
-//     layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
-//     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-
-//     views: {
-//         layout: [1, 2],
-//         viewports: [
-//             {
-//                 id: "view_1",
-//                 layerIds: ["axes-layer2", "mesh-layer", "north-arrow-layer"],
-//                 show3D: true,
-//                 isSync: true,
-//             },
-//             {
-//                 id: "view_2",
-//                 layerIds: ["axes-layer2", "wells-layer", "north-arrow-layer"],
-//                 show3D: true,
-//                 isSync: true,
-//             },
-//         ],
-//     },
-// };
-
-// ScaleZ.parameters = {
-//     docs: {
-//         ...defaultParameters.docs,
-//         description: {
-//             story: `Example scale z.`,
-//         },
-//     },
-// };
 
 export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
     const [home, setHome] = React.useState<number>(0);
@@ -421,56 +371,6 @@ ResetCameraProperty.parameters = {
             story: `Example using optional 'triggerHome' property.
                     When this property is changed camera will reset to home position.
                     Using the button the property will change its value.`,
-        },
-    },
-};
-
-export const AddLayer: ComponentStory<typeof DeckGLMap> = (args) => {
-    const [layers, setLayers] = React.useState([
-        axes_hugin,
-        meshMapLayerPng,
-        north_arrow_layer,
-    ]);
-
-    const handleChange = () => {
-        setLayers([axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer]);
-    };
-
-    const props = {
-        ...args,
-        layers,
-    };
-
-    return (
-        <>
-            <div className={useStyles().main}>
-                <DeckGLMap {...props} />
-            </div>
-            <button onClick={handleChange}> Add layer </button>
-        </>
-    );
-};
-
-AddLayer.args = {
-    id: "AddLayer",
-
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
-};
-
-AddLayer.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: `Example using button to add a layer.`,
         },
     },
 };
