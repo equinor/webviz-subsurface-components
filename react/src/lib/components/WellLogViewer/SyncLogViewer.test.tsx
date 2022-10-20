@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
+import { axisTitles, axisMnemos } from "./utils/axes";
 import { colorTables } from "@emerson-eps/color-tables";
 
 const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
@@ -25,6 +26,9 @@ describe("Sync Log Viewer", () => {
                 id="Sync-Log-Viewer"
                 hideTitles={true}
                 hideLegend={true}
+                primaryAxis={"md"}
+                axisTitles={axisTitles}
+                axisMnemos={axisMnemos}
                 welllogs={[exampleWellLog]}
                 templates={[exampleTemplate]}
                 colorTables={[exampleColorTables]}

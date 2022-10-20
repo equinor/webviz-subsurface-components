@@ -1,5 +1,6 @@
 import React from "react";
 import WellLogView from "./WellLogView";
+import { argTypesWellLogViewProp } from "./WellLogView";
 import { colorTables } from "@emerson-eps/color-tables";
 
 const ComponentCode =
@@ -28,54 +29,10 @@ export default {
         },
     },
     argTypes: {
+        ...argTypesWellLogViewProp,
         id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
-        },
-        horizontal: {
-            description: "Orientation of the track plots on the screen.",
-            defaultValue: false,
-        },
-        welllog: {
-            description: "JSON object describing well log data.",
-        },
-        template: {
-            description: "Prop containing track template data.",
-        },
-        colorTables: {
-            description: "Prop containing color table data.",
-        },
-        primaryAxis: {
-            description: "primaryAxis",
-            defaultValue: "md",
-        },
-        maxVisibleTrackNum: {
-            description: "maxVisibleTrackNum",
-            defaultValue: 4,
-        },
-        maxContentZoom: {
-            description: "maxContentZoom",
-            defaultValue: 256,
-        },
-        checkDatafileSchema: {
-            description: "Validate JSON datafile against schems",
-            defaultValue: false,
-        },
-        hideTitles: {
-            description: "Hide Titles on the tracks",
-            defaultValue: false,
-        },
-        hideLegend: {
-            description: "Hide Legends on the tracks",
-            defaultValue: false,
-        },
-        axisMnemos: {
-            description: "axisMnemos",
-            defaultValue: axisMnemos,
-        },
-        axisTitles: {
-            description: "axisTitles",
-            defaultValue: axisTitles,
         },
     },
 };
@@ -92,16 +49,22 @@ const Template = (args) => {
 
 export const Default = Template.bind({});
 Default.args = {
+    id: "Well-Log-View",
     horizontal: false,
     welllog: require("../../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../../demo/example-data/welllog_template_1.json"),
     colorTables: colorTables,
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
 };
 
 export const Discrete = Template.bind({});
 Discrete.args = {
+    id: "Well-Log-View-Discrete",
     horizontal: false,
     welllog: require("../../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../../demo/example-data/welllog_template_2.json"),
     colorTables: colorTables,
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
 };

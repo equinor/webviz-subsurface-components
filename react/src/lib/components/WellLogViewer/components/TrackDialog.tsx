@@ -143,7 +143,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
         );
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         const templateTrack = this.props.templateTrack;
         const title = templateTrack ? "Edit track" : "Add New Track";
         return (
