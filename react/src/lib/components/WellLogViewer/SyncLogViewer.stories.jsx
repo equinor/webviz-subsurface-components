@@ -1,5 +1,6 @@
 import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
+import { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +
@@ -19,6 +20,8 @@ const ComponentCode =
     '    colorTables={require("../../../demo/example-data/color-tables.json")} \r\n' +
     "/>";
 
+import { axisTitles, axisMnemos } from "./utils/axes";
+
 export default {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
@@ -34,62 +37,10 @@ export default {
         },
     },
     argTypes: {
+        ...argTypesSyncLogViewerProp,
         id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
-        },
-        welllogs: {
-            description: "Array of JSON objects describing well log data.",
-        },
-        templates: {
-            description: "Array of track template data.",
-        },
-        colorTables: {
-            description: "Prop containing color table data.",
-        },
-        horizontal: {
-            description: "Orientation of the track plots on the screen.",
-            defaultValue: false,
-        },
-        hideTitles: {
-            description: "Hide titles on the tracks.",
-            defaultValue: false,
-        },
-        hideLegend: {
-            description: "Hide legends on the tracks.",
-            defaultValue: false,
-        },
-        syncTrackPos: {
-            description: "Synchronize first visible track",
-            defaultValue: false,
-        },
-        syncContentDomain: {
-            description: "Synchronize visible content domain",
-            defaultValue: false,
-        },
-        syncContentSelection: {
-            description: "Synchronize content selection",
-            defaultValue: false,
-        },
-        syncTemplate: {
-            description: "Synchronize templates in the views",
-            defaultValue: false,
-        },
-        readoutOptions: {
-            description:
-                "Options for readout panel.<br/>" +
-                "allTracks: boolean — Show not only visible tracks,<br/>" +
-                "grouping: string — How group values.",
-            defaultValue: {
-                allTracks: false,
-                grouping: "by_track",
-            },
-        },
-        domain: {
-            description: "Initial visible interval of the log data.",
-        },
-        selection: {
-            description: "Initial selected interval of the log data.",
         },
     },
 };
@@ -165,6 +116,81 @@ const Template = (args) => {
     );
 };
 
+const patterns = [
+    require("../../../demo/example-data/patterns/anhydrite.png"),
+    require("../../../demo/example-data/patterns/brown_coal.png"),
+    require("../../../demo/example-data/patterns/calcareous_dolostone.png"),
+    require("../../../demo/example-data/patterns/chalk.png"),
+    require("../../../demo/example-data/patterns/claystone.png"),
+    require("../../../demo/example-data/patterns/conglomerate.png"),
+    require("../../../demo/example-data/patterns/Diagonal.png"),
+    require("../../../demo/example-data/patterns/Diagonalx2.png"),
+    require("../../../demo/example-data/patterns/Diagonalx2_right.png"),
+    require("../../../demo/example-data/patterns/Diagonalx4.png"),
+    require("../../../demo/example-data/patterns/Diagonalx4_right.png"),
+    require("../../../demo/example-data/patterns/dolomitic_limestone.png"),
+    require("../../../demo/example-data/patterns/dolostone.png"),
+    require("../../../demo/example-data/patterns/fissile_mudstone.png"),
+    require("../../../demo/example-data/patterns/fissile_siltstone.png"),
+    require("../../../demo/example-data/patterns/gypsum.png"),
+    require("../../../demo/example-data/patterns/gypsum_anhydrite_unspecified.png"),
+    require("../../../demo/example-data/patterns/halite.png"),
+    require("../../../demo/example-data/patterns/Horizontal_lines.png"),
+    require("../../../demo/example-data/patterns/Horizontal_linesx2.png"),
+    require("../../../demo/example-data/patterns/Horizontal_vertical_lines.png"),
+    require("../../../demo/example-data/patterns/Horizontal_vertical_linesx2.png"),
+    require("../../../demo/example-data/patterns/Horizontal_vertical_linesx4.png"),
+    require("../../../demo/example-data/patterns/limestone.png"),
+    require("../../../demo/example-data/patterns/marl.png"),
+    require("../../../demo/example-data/patterns/mudstone.png"),
+    require("../../../demo/example-data/patterns/salt_general.png"),
+    require("../../../demo/example-data/patterns/sandstone.png"),
+    require("../../../demo/example-data/patterns/sedimentary_breccia.png"),
+    require("../../../demo/example-data/patterns/shale.png"),
+    require("../../../demo/example-data/patterns/silicic_plutonic_rocks.png"),
+    require("../../../demo/example-data/patterns/siltstone.png"),
+    require("../../../demo/example-data/patterns/Vertical_lines.png"),
+    require("../../../demo/example-data/patterns/Vertical_linesx2.png"),
+    require("../../../demo/example-data/patterns/vulcanic_rock_general.png"),
+];
+const patternNames = [
+    "Anhydrite",
+    "Brown coal",
+    "Calcareous dolostone",
+    "Chalk",
+    "Claystone",
+    "Conglomerate",
+    "Diagonal",
+    "Diagonalx2",
+    "Diagonalx2 right",
+    "Diagonalx4",
+    "Diagonalx4 right",
+    "Dolomitic limestone",
+    "Dolostone",
+    "Fissile mudstone",
+    "Fissile siltstone",
+    "Gypsum",
+    "Gypsum anhydrite unspecified",
+    "Halite",
+    "Horizontal lines",
+    "Horizontal linesx2",
+    "Horizontal vertical lines",
+    "Horizontal vertical linesx2",
+    "Horizontal vertical linesx4",
+    "Limestone",
+    "Marl",
+    "Mudstone",
+    "Salt general",
+    "Sandstone",
+    "Sedimentary breccia",
+    "Shale",
+    "Silicic plutonic rocks",
+    "Siltstone",
+    "Vertical lines",
+    "Vertical linesx2",
+    "vulcanic rock general",
+];
+
 export const Default = Template.bind({});
 Default.args = {
     id: "Sync-Log-Viewer",
@@ -206,6 +232,19 @@ Default.args = {
             color: "Stratigraphy",
         },
     ],
+    patternsTable: {
+        patternSize: 24,
+        patterns: patterns,
+        names: patternNames,
+    },
+    patterns: require("../../../demo/example-data/horizon_patterns.json"),
+
     spacers: [312, 255],
-    wellDistances: [2048.3, 512.7],
+    wellDistances: {
+        units: "m",
+        distances: [2048.3, 512.7],
+    },
+
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
 };
