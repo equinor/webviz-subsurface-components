@@ -45,10 +45,8 @@ import { cloneDeep } from "lodash";
 
 import { colorTables } from "@emerson-eps/color-tables";
 import { getModelMatrixScale } from "../layers/utils/layerTools";
-//
-//import { Controller } from "deck.gl";
-import { OrbitController, OrthographicController } from "@deck.gl/core";
-import { updateCurrentNodeInfo } from "lib/components/GroupTree/redux/actions";
+import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
+import { MjolnirEvent } from "mjolnir.js";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -519,15 +517,12 @@ const Map: React.FC<MapProps> = ({
         }
     }, [cameraPosition]);
 
-
-    //XXX
+    // Used for scaling in z direction using arrow keys.
     const [scaleZ, setScaleZ] = useState<number>(1);
     const [scaleZUp, setScaleZUp] = useState<number>(1);
     const [scaleZDown, setScaleZDown] = useState<number>(1);
 
     const scaleUpFunction = () => {
-        console.log("scaleUpFunction called. ", scaleZUp)
-        //setScaleZUp(scaleZUp + 1);
         setScaleZUp(Math.random());
     };
 
@@ -536,11 +531,11 @@ const Map: React.FC<MapProps> = ({
     };
 
     useEffect(() => {
-        setScaleZ(scaleZ * 1.05)
+        setScaleZ(scaleZ * 1.05);
     }, [scaleZUp]);
 
     useEffect(() => {
-        setScaleZ(scaleZ * 0.95)
+        setScaleZ(scaleZ * 0.95);
     }, [scaleZDown]);
 
     useEffect(() => {
@@ -553,12 +548,10 @@ const Map: React.FC<MapProps> = ({
         );
     }, [views]);
 
-    // XXX del denne i to...
     useEffect(() => {
         if (st_layers == undefined || layers == undefined) return;
 
         const m = getModelMatrixScale(scaleZ);
-        console.log("scaleX in useEffect: ", scaleZ)
 
         let layers_copy = cloneDeep(layers);
         layers_copy = layers_copy.map((layer) => {
@@ -578,7 +571,6 @@ const Map: React.FC<MapProps> = ({
         const layers_default = getLayersWithDefaultProps(updated_layers);
         const updated_spec = { layers: layers_default, views: views };
         dispatch(setSpec(updated_spec));
-        console.log("dispatch")
     }, [scaleZ, layers, dispatch]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
@@ -1064,16 +1056,23 @@ function getViewState3D(
 }
 
 // construct views object for DeckGL component
-function getViews(views: ViewsType | undefined, scaleUpFunction, scaleDownFunction): ViewportType[] {
+function getViews(
+    views: ViewsType | undefined,
+    scaleUpFunction: { (): void; (): void },
+    scaleDownFunction: { (): void; (): void }
+): ViewportType[] {
+    // Use modified controller to handle key events.
     class ZScaleOrbitController extends OrbitController {
-        handleEvent(event: { type: string; key: string }) {
+        handleEvent(event: MjolnirEvent): boolean {
             if (event.type === "keydown" && event.key === "ArrowUp") {
                 scaleUpFunction();
+                return true;
             } else if (event.type === "keydown" && event.key === "ArrowDown") {
                 scaleDownFunction();
-            } else {
-                super.handleEvent(event);
+                return true;
             }
+
+            return super.handleEvent(event);
         }
     }
 
