@@ -637,7 +637,7 @@ class SyncLogViewer extends Component<Props, State> {
                 spacer.update();
             }
         }
-        return updated
+        return updated;
     }
 
     syncContentSelection(iView: number): void {
