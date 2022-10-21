@@ -6,9 +6,10 @@ import "@testing-library/jest-dom";
 import React from "react";
 import Map from "./Map";
 import { Wrapper } from "../../DeckGLMap/test/TestWrapper";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const mapData = require("../../../../demo/example-data/deckgl-map.json");
-const colorTablesData = require("../../../../demo/example-data/color-tables.json");
+const colorTablesData = colorTables;
 
 describe("Test Map component", () => {
     it("snapshot test", () => {
