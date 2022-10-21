@@ -573,59 +573,153 @@ class SyncLogViewer extends Component<Props, State> {
         return updated;
     }
 
-    syncContentScrollPos(iView: number): boolean {
+    makeFlattingCoeffs(): { A: number[][]; B: number[][] } {
+        const wellpickFlatting = this.props.wellpickFlatting;
+        if (!wellpickFlatting) return { A: [], B: [] };
+
+        const flattingA: number[][] = [];
+        const flattingB: number[][] = [];
+
+        const nView = this.controllers.length;
+        const newBaseDomain: [number, number][] = [];
+        for (let i = 0; i < nView; i++) {
+            newBaseDomain.push([
+                Number.POSITIVE_INFINITY,
+                Number.NEGATIVE_INFINITY,
+            ]);
+        }
+        for (const controller of this.controllers) {
+            const wellLogView = controller as WellLogView;
+            const wps = wellLogView ? getWellPicks(wellLogView) : [];
+            let wp1: number | undefined = undefined;
+            let wp2: number | undefined = undefined;
+            for (const wp of wps) {
+                if (wellpickFlatting[0] === wp.horizon) wp1 = wp.vPrimary;
+                if (wellpickFlatting[1] === wp.horizon) wp2 = wp.vPrimary;
+            }
+
+            const _flattingA: number[] = [];
+            const _flattingB: number[] = [];
+            let i = -1;
+            for (const _controller of this.controllers) {
+                i++;
+                if (!_controller || !controller) {
+                    _flattingA.push(0.0);
+                    _flattingB.push(0.0);
+                    continue;
+                }
+                const _wellLogView = _controller as WellLogView;
+                const _wps = getWellPicks(_wellLogView);
+                let _wp1: number | undefined = undefined;
+                let _wp2: number | undefined = undefined;
+                for (const wp of _wps) {
+                    if (wellpickFlatting[0] === wp.horizon) _wp1 = wp.vPrimary;
+                    if (wellpickFlatting[1] === wp.horizon) _wp2 = wp.vPrimary;
+                }
+
+                if (wp1 && _wp1) {
+                    let a: number;
+                    if (wp2 !== undefined && _wp2 !== undefined && wp2 - wp1)
+                        a = (_wp2 - _wp1) / (wp2 - wp1);
+                    else a = 1;
+                    const b = _wp1 - a * wp1;
+                    _flattingA.push(a);
+                    _flattingB.push(b);
+
+                    const baseDomain = controller.getContentBaseDomain();
+                    const baseDomainNew: [number, number] = [
+                        a * baseDomain[0] + b,
+                        a * baseDomain[1] + b,
+                    ];
+                    //console.log("i=",i, "a=", a, "b=", b, "baseDomainNew=",baseDomainNew)
+
+                    checkMinMax(newBaseDomain[i], baseDomainNew);
+                } else {
+                    // The first well pick undefined
+                    _flattingA.push(0.0);
+                    _flattingB.push(0.0);
+                }
+            }
+            flattingA.push(_flattingA);
+            flattingB.push(_flattingB);
+        }
+
+        console.log("newBaseDomain=", newBaseDomain);
+
+        let i = -1;
+        for (const controller of this.controllers) {
+            i++;
+            if (!controller) continue;
+            const baseDomain = controller.getContentBaseDomain();
+            if (!isEqDomains(baseDomain, newBaseDomain[i])) {
+                controller.setContentBaseDomain(newBaseDomain[i]);
+            }
+        }
+
+        return { A: flattingA, B: flattingB };
+    }
+
+    syncContentScrollPos(iView: number): void {
+        const controller = this.controllers[iView];
+        if (!controller) return;
+
         let updated = false;
         const wellpickFlatting = this.props.wellpickFlatting;
         const syncContentDomain = this.props.syncContentDomain;
-        if (syncContentDomain /* || wellpickFlatting*/)
+        if (!syncContentDomain && wellpickFlatting) {
+            /*const coeff=*/ this.makeFlattingCoeffs();
+        }
+        {
             // synchronize base domains
             updated = this.syncContentBaseDomain();
-        const controller = this.controllers[iView];
-        if (!controller) return updated;
-        const domain = controller.getContentDomain();
+            const domain = controller.getContentDomain();
 
-        for (const _controller of this.controllers) {
-            if (!_controller || _controller == controller) continue;
-            if (syncContentDomain) {
-                const _domain = _controller.getContentDomain();
-                if (!isEqDomains(_domain, domain)) {
-                    _controller.zoomContentTo(domain);
-                    updated = true;
-                }
-            } else if (this.props.wellpicks && wellpickFlatting) {
-                const wellLogView = controller as WellLogView;
-                const wps = getWellPicks(wellLogView);
-                let A: number | undefined = undefined;
-                let B: number | undefined = undefined;
-                for (const wp of wps) {
-                    if (wellpickFlatting[0] === wp.horizon) A = wp.vPrimary;
-                    if (wellpickFlatting[1] === wp.horizon) B = wp.vPrimary;
-                }
-                if (A === undefined) continue;
+            for (const _controller of this.controllers) {
+                if (!_controller || _controller == controller) continue;
+                if (syncContentDomain) {
+                    const _domain = _controller.getContentDomain();
+                    if (!isEqDomains(_domain, domain)) {
+                        _controller.zoomContentTo(domain);
+                        updated = true;
+                    }
+                } else if (this.props.wellpicks && wellpickFlatting) {
+                    const wellLogView = controller as WellLogView;
+                    const wps = getWellPicks(wellLogView);
+                    let A: number | undefined = undefined;
+                    let B: number | undefined = undefined;
+                    for (const wp of wps) {
+                        if (wellpickFlatting[0] === wp.horizon) A = wp.vPrimary;
+                        if (wellpickFlatting[1] === wp.horizon) B = wp.vPrimary;
+                    }
+                    if (A === undefined) continue;
 
-                const _wellLogView = _controller as WellLogView;
-                const _wps = getWellPicks(_wellLogView);
-                let _A: number | undefined = undefined;
-                let _B: number | undefined = undefined;
-                for (const wp of _wps) {
-                    if (wellpickFlatting[0] === wp.horizon) _A = wp.vPrimary;
-                    if (wellpickFlatting[1] === wp.horizon) _B = wp.vPrimary;
-                }
-                if (_A === undefined) continue;
+                    const _wellLogView = _controller as WellLogView;
+                    const _wps = getWellPicks(_wellLogView);
+                    let _A: number | undefined = undefined;
+                    let _B: number | undefined = undefined;
+                    for (const wp of _wps) {
+                        if (wellpickFlatting[0] === wp.horizon)
+                            _A = wp.vPrimary;
+                        if (wellpickFlatting[1] === wp.horizon)
+                            _B = wp.vPrimary;
+                    }
+                    if (_A === undefined) continue;
 
-                const _domain = _controller.getContentDomain();
-                let a: number;
-                if (B !== undefined && _B !== undefined && B - A)
-                    a = (_B - _A) / (B - A);
-                else a = 1;
-                const b = _A - a * A;
-                const domainNew: [number, number] = [
-                    a * domain[0] + b,
-                    a * domain[1] + b,
-                ];
-                if (!isEqDomains(_domain, domainNew)) {
-                    _controller.zoomContentTo(domainNew);
-                    updated = true;
+                    let a: number;
+                    if (B !== undefined && _B !== undefined && B - A)
+                        a = (_B - _A) / (B - A);
+                    else a = 1;
+                    const b = _A - a * A;
+
+                    const domainNew: [number, number] = [
+                        a * domain[0] + b,
+                        a * domain[1] + b,
+                    ];
+                    const _domain = _controller.getContentDomain();
+                    if (!isEqDomains(_domain, domainNew)) {
+                        _controller.zoomContentTo(domainNew);
+                        updated = true;
+                    }
                 }
             }
         }
@@ -637,7 +731,6 @@ class SyncLogViewer extends Component<Props, State> {
                 spacer.update();
             }
         }
-        return updated;
     }
 
     syncContentSelection(iView: number): void {
