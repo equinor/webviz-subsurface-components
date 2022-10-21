@@ -5,9 +5,10 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import DeckGLMap from "./DeckGLMap";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const mapData = require("../../../demo/example-data/deckgl-map.json");
-const colorTablesData = require("../../../demo/example-data/color-tables.json");
+const colorTablesData = colorTables;
 
 describe("Test Map component", () => {
     it("snapshot test", () => {

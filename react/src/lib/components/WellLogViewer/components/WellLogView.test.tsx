@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import WellLogView from "./WellLogView";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const exampleTemplate = require("../../../../demo/example-data/welllog_template_1.json");
 //const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
@@ -12,7 +13,7 @@ const exampleWellLog = {
     curves: [],
     data: [],
 };
-const exampleColorTable = require("../../../../demo/example-data/color-tables.json");
+const exampleColorTable = colorTables;
 
 describe("Test Well Log View Component", () => {
     it("snapshot test", () => {

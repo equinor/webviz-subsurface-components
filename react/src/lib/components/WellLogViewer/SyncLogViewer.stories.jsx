@@ -1,6 +1,7 @@
 import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { argTypesSyncLogViewerProp } from "./SyncLogViewer";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +
@@ -17,7 +18,7 @@ const ComponentCode =
     '       require("../../../demo/example-data/synclog_template.json"), \r\n' +
     '       require("../../../demo/example-data/synclog_template.json"), \r\n' +
     "    } \r\n" +
-    '    colorTables={require("../../../demo/example-data/color-tables.json")} \r\n' +
+    "    colorTables={colorTables} \r\n" +
     "/>";
 
 import { axisTitles, axisMnemos } from "./utils/axes";
@@ -211,7 +212,7 @@ Default.args = {
         require("../../../demo/example-data/synclog_template.json"),
         require("../../../demo/example-data/synclog_template.json"),
     ],
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     wellpicks: [
         {
             wellpick: require("../../../demo/example-data/wellpicks.json")[0],
