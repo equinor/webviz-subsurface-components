@@ -316,4 +316,3 @@ Default.args = {
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
 };
-

@@ -546,56 +546,53 @@ class SyncLogViewer extends Component<Props, State> {
             Number.POSITIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
         ];
-        //const wellpickFlatting=this.props.wellpickFlatting
-        const syncContentDomain = this.props.syncContentDomain;
         for (const controller of this.controllers) {
             if (!controller) continue;
-
-            if (syncContentDomain)
-                checkMinMax(
-                    commonBaseDomain,
-                    controller.getContentBaseDomain()
-                );
-            else {
-                // if(wellpickFlatting)
-            }
+            checkMinMax(commonBaseDomain, controller.getContentBaseDomain());
         }
         return commonBaseDomain;
     }
 
-    syncContentBaseDomain(): void {
-        const commonBaseDomain: [number, number] =
-            this.getCommonContentBaseDomain();
-        for (const controller of this.controllers) {
-            if (!controller) continue;
-            const baseDomain = controller.getContentBaseDomain();
-            if (!isEqDomains(baseDomain, commonBaseDomain))
-                controller.setContentBaseDomain(commonBaseDomain);
+    syncContentBaseDomain(): boolean {
+        let updated = false;
+        if (this.props.syncContentDomain) {
+            const commonBaseDomain: [number, number] =
+                this.getCommonContentBaseDomain();
+            for (const controller of this.controllers) {
+                if (!controller) continue;
+                const baseDomain = controller.getContentBaseDomain();
+                if (!isEqDomains(baseDomain, commonBaseDomain)) {
+                    controller.setContentBaseDomain(commonBaseDomain);
+                    updated = true;
+                }
+            }
+        } else {
+            // this.props.wellpickFlatting
+            //const wellpickFlatting=this.props.wellpickFlatting
         }
+        return updated;
     }
 
-    syncContentScrollPos(iView: number): void {
+    syncContentScrollPos(iView: number): boolean {
+        let updated = false;
         const wellpickFlatting = this.props.wellpickFlatting;
         const syncContentDomain = this.props.syncContentDomain;
         if (syncContentDomain /* || wellpickFlatting*/)
             // synchronize base domains
-            this.syncContentBaseDomain();
+            updated = this.syncContentBaseDomain();
         const controller = this.controllers[iView];
-        if (!controller) return;
+        if (!controller) return updated;
         const domain = controller.getContentDomain();
 
-        //let i=-1;
         for (const _controller of this.controllers) {
-            //i++;
             if (!_controller || _controller == controller) continue;
             if (syncContentDomain) {
                 const _domain = _controller.getContentDomain();
-                if (!isEqDomains(_domain, domain))
+                if (!isEqDomains(_domain, domain)) {
                     _controller.zoomContentTo(domain);
-            } else if (
-                this.props.wellpicks &&
-                wellpickFlatting /*&& iView===0*/
-            ) {
+                    updated = true;
+                }
+            } else if (this.props.wellpicks && wellpickFlatting) {
                 const wellLogView = controller as WellLogView;
                 const wps = getWellPicks(wellLogView);
                 let A: number | undefined = undefined;
@@ -616,9 +613,7 @@ class SyncLogViewer extends Component<Props, State> {
                 }
                 if (_A === undefined) continue;
 
-                //const _wellpick = this.props.wellpicks[0];
                 const _domain = _controller.getContentDomain();
-                //const wellpick = this.props.wellpicks[i];
                 let a: number;
                 if (B !== undefined && _B !== undefined && B - A)
                     a = (_B - _A) / (B - A);
@@ -628,16 +623,21 @@ class SyncLogViewer extends Component<Props, State> {
                     a * domain[0] + b,
                     a * domain[1] + b,
                 ];
-                if (!isEqDomains(_domain, domainNew))
+                if (!isEqDomains(_domain, domainNew)) {
                     _controller.zoomContentTo(domainNew);
+                    updated = true;
+                }
             }
         }
 
-        for (let i = iView - 1; i <= iView; i++) {
-            const spacer = this.spacers[i];
-            if (!spacer) continue;
-            spacer.update();
+        if (updated) {
+            for (let i = iView - 1; i <= iView; i++) {
+                const spacer = this.spacers[i];
+                if (!spacer) continue;
+                spacer.update();
+            }
         }
+        return updated
     }
 
     syncContentSelection(iView: number): void {
