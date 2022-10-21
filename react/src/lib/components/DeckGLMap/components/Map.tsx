@@ -705,6 +705,7 @@ const Map: React.FC<MapProps> = ({
 
                     if (!ev.wellname)
                         if (info.object) {
+                            console.log(info.object);
                             ev.wellname = info.object.header?.["well"]; // object is WellLog
                         }
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any

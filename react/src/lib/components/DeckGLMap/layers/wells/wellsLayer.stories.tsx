@@ -7,6 +7,7 @@ import {
     ColorLegend,
     colorTables,
 } from "@emerson-eps/color-tables";
+import { MapMouseEvent } from "../../components/Map";
 
 export default {
     component: DeckGLMap,
@@ -57,6 +58,32 @@ VolveWells.parameters = {
         inlineStories: false,
         iframeHeight: 500,
     },
+};
+
+// Volve wells with mouseCallback function without logs
+const VolveWellsWithMouseCallback: ComponentStory<typeof DeckGLMap> = (
+    args
+) => {
+    const onMouseEvent = React.useCallback((event: MapMouseEvent) => {
+        console.log(event);
+    }, []);
+    return (
+        <>
+            <DeckGLMap {...args} onMouseEvent={onMouseEvent} />
+            <div
+                style={{
+                    position: "absolute",
+                    marginLeft: 200,
+                }}
+            ></div>
+        </>
+    );
+};
+
+export const volveWells2 = VolveWellsWithMouseCallback.bind({});
+
+volveWells2.args = {
+    ...defaultProps,
 };
 
 // Volve wells with logs.
