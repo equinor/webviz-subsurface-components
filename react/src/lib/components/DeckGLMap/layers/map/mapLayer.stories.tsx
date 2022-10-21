@@ -16,6 +16,17 @@ type NumberQuad = [number, number, number, number];
 
 const valueRange = [-3071, 41048];
 
+const wellsLayer = {
+    "@@type": "WellsLayer",
+    id: "wells-layer",
+    data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
+    logData:
+        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+    logrunName: "BLOCKING",
+    logName: "ZONELOG",
+    logColor: "Stratigraphy",
+};
+
 // Example using "Map" layer. Uses float32 mesh and properties binary arrays. Not PNG.
 const meshMapLayerBig = {
     "@@type": "MapLayer",
@@ -173,6 +184,7 @@ const axes_hugin = {
     id: "axes-layer2",
     bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
 };
+
 const north_arrow_layer = {
     "@@type": "NorthArrow3DLayer",
     id: "north-arrow-layer",
@@ -237,15 +249,85 @@ MapLayer3dPng.parameters = {
     },
 };
 
-export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
-    const [home, setHome] = React.useState<number>(0);
+export const ScaleZ: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [layers, setLayers] = React.useState([
+        axes_hugin,
+        meshMapLayerPng,
+        north_arrow_layer,
+    ]);
 
     const handleChange = () => {
-        setHome(home + 1);
+        setLayers([axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer]);
     };
 
     const props = {
         ...args,
+        layers,
+    };
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+            </div>
+            <button onClick={handleChange}> Add layer </button>
+        </>
+    );
+};
+
+ScaleZ.args = {
+    id: "ScaleZ",
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+
+    views: {
+        layout: [1, 2],
+        viewports: [
+            {
+                id: "view_1",
+                layerIds: ["axes-layer2", "mesh-layer", "north-arrow-layer"],
+                show3D: true,
+                isSync: true,
+            },
+            {
+                id: "view_2",
+                layerIds: ["axes-layer2", "wells-layer", "north-arrow-layer"],
+                show3D: true,
+                isSync: true,
+            },
+        ],
+    },
+};
+
+ScaleZ.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Example scaling in z direction using arrow up/down buttons.",
+        },
+    },
+};
+
+export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [home, setHome] = React.useState<number>(0);
+    const [camera, setCamera] = React.useState({
+        rotationOrbit: 0,
+        rotationX: 89,
+        target: [435775, 6478650, -1750],
+        zoom: -3.5109619192773796,
+    });
+
+    const handleChange1 = () => {
+        setHome(home + 1);
+    };
+
+    const handleChange2 = () => {
+        setCamera({ ...camera, rotationOrbit: camera.rotationOrbit + 5 });
+    };
+
+    const props = {
+        ...args,
+        cameraPosition: camera,
         triggerHome: home,
     };
 
@@ -254,16 +336,23 @@ export const ResetCameraProperty: ComponentStory<typeof DeckGLMap> = (args) => {
             <div className={useStyles().main}>
                 <DeckGLMap {...props} />
             </div>
-            <button onClick={handleChange}> Reset Camera </button>
+            <button onClick={handleChange1}> Reset Camera </button>
+            <button onClick={handleChange2}> Change Camera </button>
         </>
     );
 };
 
 ResetCameraProperty.args = {
-    id: "map",
+    id: "ResetCameraProperty",
     layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    cameraPosition: {
+        rotationOrbit: 0,
+        rotationX: 80,
+        target: [435775, 6478650, -1750],
+        zoom: -3.5109619192773796,
+    },
     views: {
         layout: [1, 1],
         viewports: [

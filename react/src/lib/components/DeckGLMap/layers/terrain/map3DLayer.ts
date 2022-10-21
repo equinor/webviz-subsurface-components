@@ -13,6 +13,7 @@ import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import { ContinuousLegendDataType } from "../../components/ColorLegend";
+import { Matrix4 } from "math.gl";
 
 type MeshType = {
     attributes: {
@@ -477,8 +478,19 @@ export default class Map3DLayer extends CompositeLayer<
             center[1]
         );
 
+        const isModelMatrix =
+            typeof this.props.modelMatrix !== "undefined" &&
+            this.props.modelMatrix !== null;
+
+        if (isModelMatrix) {
+            rotatingModelMatrix.multiplyRight(
+                this.props.modelMatrix as Matrix4
+            );
+        }
+
         const isMesh =
             typeof this.props.mesh !== "undefined" && this.props.mesh !== "";
+
         const layer = new TerrainMapLayer(
             this.getSubLayerProps({
                 mesh: this.state["mesh"],
