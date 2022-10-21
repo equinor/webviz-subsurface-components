@@ -16,6 +16,9 @@ import { ColorTable } from "./components/ColorTableTypes";
 
 import { WellLogController, WellPickProps } from "./components/WellLogView";
 
+import WellLogView from "./components/WellLogView";
+import { getWellPicks } from "./components/WellLogView";
+
 import { getAvailableAxes } from "./utils/tracks";
 
 import { checkMinMax } from "./utils/minmax";
@@ -57,6 +60,11 @@ interface Props {
      * Horizon to pattern index map
      */
     patterns?: [string, number][];
+
+    /**
+     * Horizon names for wellpick flatting (syncContentDomain should be false)
+     */
+    wellpickFlatting?: string[]; // For example ["Hor_5", "Hor_3"];
 
     /**
      * Set to true or spacer width or to array of widths if WellLogSpacers should be used
@@ -538,9 +546,19 @@ class SyncLogViewer extends Component<Props, State> {
             Number.POSITIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
         ];
+        //const wellpickFlatting=this.props.wellpickFlatting
+        const syncContentDomain = this.props.syncContentDomain;
         for (const controller of this.controllers) {
             if (!controller) continue;
-            checkMinMax(commonBaseDomain, controller.getContentBaseDomain());
+
+            if (syncContentDomain)
+                checkMinMax(
+                    commonBaseDomain,
+                    controller.getContentBaseDomain()
+                );
+            else {
+                // if(wellpickFlatting)
+            }
         }
         return commonBaseDomain;
     }
@@ -557,18 +575,61 @@ class SyncLogViewer extends Component<Props, State> {
     }
 
     syncContentScrollPos(iView: number): void {
-        if (this.props.syncContentDomain)
+        const wellpickFlatting = this.props.wellpickFlatting;
+        const syncContentDomain = this.props.syncContentDomain;
+        if (syncContentDomain /* || wellpickFlatting*/)
             // synchronize base domains
             this.syncContentBaseDomain();
         const controller = this.controllers[iView];
         if (!controller) return;
         const domain = controller.getContentDomain();
+
+        //let i=-1;
         for (const _controller of this.controllers) {
+            //i++;
             if (!_controller || _controller == controller) continue;
-            if (this.props.syncContentDomain) {
+            if (syncContentDomain) {
                 const _domain = _controller.getContentDomain();
                 if (!isEqDomains(_domain, domain))
                     _controller.zoomContentTo(domain);
+            } else if (
+                this.props.wellpicks &&
+                wellpickFlatting /*&& iView===0*/
+            ) {
+                const wellLogView = controller as WellLogView;
+                const wps = getWellPicks(wellLogView);
+                let A: number | undefined = undefined;
+                let B: number | undefined = undefined;
+                for (const wp of wps) {
+                    if (wellpickFlatting[0] === wp.horizon) A = wp.vPrimary;
+                    if (wellpickFlatting[1] === wp.horizon) B = wp.vPrimary;
+                }
+                if (A === undefined) continue;
+
+                const _wellLogView = _controller as WellLogView;
+                const _wps = getWellPicks(_wellLogView);
+                let _A: number | undefined = undefined;
+                let _B: number | undefined = undefined;
+                for (const wp of _wps) {
+                    if (wellpickFlatting[0] === wp.horizon) _A = wp.vPrimary;
+                    if (wellpickFlatting[1] === wp.horizon) _B = wp.vPrimary;
+                }
+                if (_A === undefined) continue;
+
+                //const _wellpick = this.props.wellpicks[0];
+                const _domain = _controller.getContentDomain();
+                //const wellpick = this.props.wellpicks[i];
+                let a: number;
+                if (B !== undefined && _B !== undefined && B - A)
+                    a = (_B - _A) / (B - A);
+                else a = 1;
+                const b = _A - a * A;
+                const domainNew: [number, number] = [
+                    a * domain[0] + b,
+                    a * domain[1] + b,
+                ];
+                if (!isEqDomains(_domain, domainNew))
+                    _controller.zoomContentTo(domainNew);
             }
         }
 
@@ -861,13 +922,22 @@ SyncLogViewer.propTypes = {
     patterns: PropTypes.array,
 
     /**
-     * Set to true or to array of spacer widths if WellLogSpacers should be used
+     * Horizon names for wellpick flatting (syncContentDomain should be false)
      */
-    spacers: PropTypes.array,
+    wellpickFlatting: PropTypes.arrayOf(PropTypes.string),
+
+    /**
+     * Set to true or to array of spaser widths if WellLogSpacers should be used
+     */
+    spacers: PropTypes.oneOfType([
+        PropTypes.bool,
+        PropTypes.arrayOf(PropTypes.number),
+    ]),
+
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances: PropTypes.object,
+    wellDistances: PropTypes.arrayOf(PropTypes.number), //!!! (number | undefined)[];
 
     /**
      * Orientation of the track plots on the screen. Default is false
