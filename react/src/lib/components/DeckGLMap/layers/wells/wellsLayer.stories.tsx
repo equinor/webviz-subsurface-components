@@ -83,7 +83,22 @@ const VolveWellsWithMouseCallback: ComponentStory<typeof DeckGLMap> = (
 export const volveWells2 = VolveWellsWithMouseCallback.bind({});
 
 volveWells2.args = {
-    ...defaultProps,
+    id: "volve-wells",
+    resources: {
+        wellsData: "./volve_wells.json",
+    },
+    bounds: [432150, 6475800, 439400, 6481500] as [
+        number,
+        number,
+        number,
+        number
+    ],
+    layers: [
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData",
+        },
+    ],
 };
 
 // Volve wells with logs.
