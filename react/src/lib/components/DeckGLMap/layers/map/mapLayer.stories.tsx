@@ -685,7 +685,13 @@ export const StepFunctionColorMap: ComponentStory<typeof DeckGLMap> = () => {
     const args = {
         ...defaultArgs,
         id: "nearest-color-map",
-        layers: [{ ...meshMapLayerFloat32, colorMapFunction: nearestColorMap }],
+        layers: [
+            {
+                ...meshMapLayerFloat32,
+                material: true,
+                colorMapFunction: nearestColorMap,
+            },
+        ],
     };
 
     return <DeckGLMap {...args} />;

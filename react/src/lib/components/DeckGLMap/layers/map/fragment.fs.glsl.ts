@@ -21,6 +21,20 @@ out vec4 fragColor;
 in vec3 worldPos;
 in float property;
 
+// XXXX =========
+uniform sampler2D colormap;
+
+uniform float valueRangeMin;
+uniform float valueRangeMax;
+uniform float colorMapRangeMin;
+uniform float colorMapRangeMax;
+
+uniform vec3 colorMapClampColor;
+uniform bool isClampColor;
+uniform bool isColorMapClampColorTransparent;
+
+
+
 void main(void) {
    geometry.uv = vTexCoord;
 
@@ -33,16 +47,12 @@ void main(void) {
    //    normal = normals_commonspace;
    // }
 
-   vec4 color = vColor;
-
-   float propertyValue = property;
-
    // // Discard transparent pixels. KEEP
    // if (!picking_uActive && isnan(propertyValue)) {
    //    discard;
    //    return;
    // }
-
+   
    //Picking pass.
    if (picking_uActive) {
       // Express triangle index in 255 system.
@@ -67,6 +77,34 @@ void main(void) {
       fragColor = vec4(r / 255.0, g / 255.0, b / 255.0,  1.0);
       return;
    }
+
+
+   vec4 color = vec4(1.0, 1.0, 1.0,  1.0);;
+   float propertyValue = property;
+
+   float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
+   if (x < 0.0 || x > 1.0) {
+      // Out of range. Use clampcolor.
+      if (isClampColor) {
+         color = vec4(colorMapClampColor.rgb, 1.0);
+
+      }
+      else if (isColorMapClampColorTransparent) {
+         discard;
+         return;
+      }
+      else {
+         // Use min/max color to clamp.
+         x = max(0.0, x);
+         x = min(1.0, x);
+
+         color = texture2D(colormap, vec2(x, 0.5));
+      }
+   }
+   else {
+      color = texture2D(colormap, vec2(x, 0.5));
+   }
+
   
    bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
    if (is_contours) {

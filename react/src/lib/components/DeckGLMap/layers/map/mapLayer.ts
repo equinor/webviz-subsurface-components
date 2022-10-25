@@ -9,6 +9,7 @@ import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 import { DeckGLLayerContext } from "../../components/Map";
 import { TerrainMapLayerData } from "../terrain/terrainMapLayer";
+import { ContinuousLegendDataType } from "../../components/ColorLegend";
 import { makeFullMesh } from "./webworker";
 import { Matrix4 } from "math.gl";
 
@@ -40,6 +41,8 @@ export type Params = {
     colorMapClampColor: Color | undefined | boolean;
 };
 
+
+// XXX Kan fjernes.. sammen med alt annet farge greier...
 function getColorMapColors(
     colorMapName: string,
     colorTables: colorTablesArray,
@@ -257,10 +260,13 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
             );
             const url = URL.createObjectURL(blob);
             const webWorker = new Worker(url);
-            function webWorkerTerminate() {
-                webWorker.terminate();
-            }
 
+            // XXX remove
+            // function webWorkerTerminate() {
+            //     webWorker.terminate();
+            // }
+
+            // XXX disse to fjerenes??
             const colorTables = (this.context as DeckGLLayerContext).userData
                 .colorTables;
 
@@ -282,10 +288,11 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
 
             webWorker.postMessage(webworkerParams);
             webWorker.onmessage = (e) => {
-                const [mesh, mesh_lines, valueRange] = e.data;
+                const [mesh, mesh_lines, meshZValueRange, propertyValueRange] = e.data;
                 this.setState({
                     mesh,
                     mesh_lines,
+                    propertyValueRange,
                 });
 
                 if (
@@ -300,10 +307,10 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
 
                     const xMin = this.props.frame?.origin?.[0] ?? 0;
                     const yMin = this.props.frame?.origin?.[1] ?? 0;
-                    const zMin = -valueRange[0];
+                    const zMin = -meshZValueRange[0];
                     const xMax = xMin + xinc * xcount;
                     const yMax = yMin + yinc * ycount;
-                    const zMax = -valueRange[0];
+                    const zMax = -meshZValueRange[0];
 
                     this.props.setReportedBoundingBox([
                         xMin,
@@ -315,7 +322,8 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                     ]);
                 }
 
-                webWorkerTerminate();
+                //webWorkerTerminate();
+                webWorker.terminate();
             };
         });
     }
@@ -332,16 +340,16 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
         props: MapLayerProps<unknown>;
         oldProps: MapLayerProps<unknown>;
     }): void {
-        const needs_reload =
-            !isEqual(props.meshUrl, oldProps.meshUrl) ||
-            !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
-            !isEqual(props.frame, oldProps.frame) ||
-            !isEqual(props.gridLines, oldProps.gridLines) ||
-            !isEqual(props.colorMapName, oldProps.colorMapName) ||
-            !isEqual(props.colorMapRange, oldProps.colorMapRange) ||
-            !isEqual(props.colorMapClampColor, oldProps.colorMapClampColor) ||
-            !isEqual(props.colorMapFunction, oldProps.colorMapFunction) ||
-            !isEqual(props.material, oldProps.material);
+        const needs_reload = true;
+            // !isEqual(props.meshUrl, oldProps.meshUrl) ||
+            // !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
+            // !isEqual(props.frame, oldProps.frame) ||
+            // !isEqual(props.gridLines, oldProps.gridLines) ||
+            // !isEqual(props.colorMapName, oldProps.colorMapName) ||
+            // !isEqual(props.colorMapRange, oldProps.colorMapRange) ||
+            // !isEqual(props.colorMapClampColor, oldProps.colorMapClampColor) ||
+            // !isEqual(props.colorMapFunction, oldProps.colorMapFunction) ||
+            // !isEqual(props.material, oldProps.material);  // XXX ikka alle disse trengs aa sjekkes mer...
 
         if (needs_reload) {
             const reportBoundingBox = false;
@@ -385,10 +393,23 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 contours: this.props.contours,
                 gridLines: this.props.gridLines,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
+
+
+                colorMapName: this.props.colorMapName,
+                colorMapRange: this.props.colorMapRange,
+                colorMapClampColor: this.props.colorMapClampColor,
+                colorMapFunction: this.props.colorMapFunction,
+                propertyValueRange: this.state["propertyValueRange"],
+
+
                 material: this.props.material,
             })
         );
         return [layer];
+    }
+
+    getLegendData(): ContinuousLegendDataType {
+        console.log("getLegendData() not implemented!")
     }
 }
 
