@@ -402,15 +402,20 @@ const Map: React.FC<MapProps> = ({
             );
         } else {
             tempViewStates = Object.fromEntries(
-                viewsProps.map((item, index) => [
-                    item.id,
-                    getViewState(
-                        boundsInitial,
-                        views?.viewports[index].target,
-                        views?.viewports[index].zoom,
-                        deckRef.current?.deck
-                    ),
-                ])
+                viewsProps.map((item, index) => {
+                    const viewState = viewStates[item.id];
+                    return [
+                        item.id,
+                        typeof viewState !== "undefined"
+                            ? viewState
+                            : getViewState(
+                                  boundsInitial,
+                                  views?.viewports[index].target,
+                                  views?.viewports[index].zoom,
+                                  deckRef.current?.deck
+                              ),
+                    ];
+                })
             );
         }
         if (viewsProps[0] !== undefined) {
@@ -556,7 +561,7 @@ const Map: React.FC<MapProps> = ({
         let layers_copy = cloneDeep(layers);
         layers_copy = layers_copy.map((layer) => {
             // Inject "setReportedBoundingBox" function into layer for it to report
-            // back its respective bounding boxe.
+            // back its respective bounding box.
             layer["setReportedBoundingBox"] = setReportedBoundingBox;
 
             // Set "modelLayer" matrix to reflect correct z scaling.
@@ -1107,6 +1112,7 @@ function getViews(
 
                 const cur_viewport: ViewportType =
                     views.viewports[deckgl_views.length];
+
                 const view_type: string = cur_viewport.show3D
                     ? "OrbitView"
                     : cur_viewport.id === "intersection_view"

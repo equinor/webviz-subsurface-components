@@ -375,6 +375,56 @@ ResetCameraProperty.parameters = {
     },
 };
 
+export const AddLayer: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [layers, setLayers] = React.useState([
+        axes_hugin,
+        meshMapLayerPng,
+        north_arrow_layer,
+    ]);
+
+    const handleChange = () => {
+        setLayers([axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer]);
+    };
+
+    const props = {
+        ...args,
+        layers,
+    };
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap {...props} />
+            </div>
+            <button onClick={handleChange}> Add layer </button>
+        </>
+    );
+};
+
+AddLayer.args = {
+    id: "map",
+
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+AddLayer.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: `Example using button to add a layer.`,
+        },
+    },
+};
+
 export const MapLayer2d: ComponentStory<typeof DeckGLMap> = (args) => {
     return <DeckGLMap {...args} />;
 };
