@@ -566,16 +566,17 @@ class SyncLogViewer extends Component<Props, State> {
                     updated = true;
                 }
             }
-        } else {
-            // this.props.wellpickFlatting
-            //const wellpickFlatting=this.props.wellpickFlatting
         }
         return updated;
     }
 
-    makeFlattingCoeffs(): { A: number[][]; B: number[][] } {
+    makeFlattingCoeffs(): {
+        A: number[][];
+        B: number[][];
+        newBaseDomain: [number, number][];
+    } {
         const wellpickFlatting = this.props.wellpickFlatting;
-        if (!wellpickFlatting) return { A: [], B: [] };
+        if (!wellpickFlatting) return { A: [], B: [], newBaseDomain: [] };
 
         const flattingA: number[][] = [];
         const flattingB: number[][] = [];
@@ -600,9 +601,9 @@ class SyncLogViewer extends Component<Props, State> {
 
             const _flattingA: number[] = [];
             const _flattingB: number[] = [];
-            let i = -1;
+            let j = -1;
             for (const _controller of this.controllers) {
-                i++;
+                j++;
                 if (!_controller || !controller) {
                     _flattingA.push(0.0);
                     _flattingB.push(0.0);
@@ -612,16 +613,39 @@ class SyncLogViewer extends Component<Props, State> {
                 const _wps = getWellPicks(_wellLogView);
                 let _wp1: number | undefined = undefined;
                 let _wp2: number | undefined = undefined;
-                for (const wp of _wps) {
-                    if (wellpickFlatting[0] === wp.horizon) _wp1 = wp.vPrimary;
-                    if (wellpickFlatting[1] === wp.horizon) _wp2 = wp.vPrimary;
+                for (const _wp of _wps) {
+                    if (wellpickFlatting[0] === _wp.horizon)
+                        _wp1 = _wp.vPrimary;
+                    if (wellpickFlatting[1] === _wp.horizon)
+                        _wp2 = _wp.vPrimary;
                 }
 
-                if (wp1 && _wp1) {
+                if (
+                    Number.isFinite(wp1) &&
+                    Number.isFinite(_wp1) &&
+                    wp1 !== undefined &&
+                    _wp1 !== undefined
+                ) {
                     let a: number;
-                    if (wp2 !== undefined && _wp2 !== undefined && wp2 - wp1)
+                    if (
+                        Number.isFinite(wp2) &&
+                        Number.isFinite(_wp2) &&
+                        wp2 !== undefined &&
+                        _wp2 !== undefined &&
+                        wp2 - wp1
+                    )
                         a = (_wp2 - _wp1) / (wp2 - wp1);
-                    else a = 1;
+                    else {
+                        /*
+                        const domain = controller.getContentDomain();
+                        const _domain = _controller.getContentDomain();
+                        if(_domain[1] - _domain[0] && domain[1] - domain[0])
+                            a = (_domain[1] - _domain[0]) / (domain[1] - domain[0]);
+                        else
+                            a = 1;
+                        */
+                        a = 1;
+                    }
                     const b = _wp1 - a * wp1;
                     _flattingA.push(a);
                     _flattingB.push(b);
@@ -633,10 +657,10 @@ class SyncLogViewer extends Component<Props, State> {
                     ];
                     //console.log("i=",i, "a=", a, "b=", b, "baseDomainNew=",baseDomainNew)
 
-                    checkMinMax(newBaseDomain[i], baseDomainNew);
+                    checkMinMax(newBaseDomain[j], baseDomainNew);
                 } else {
                     // The first well pick undefined
-                    _flattingA.push(0.0);
+                    _flattingA.push(controller === _controller ? 1.0 : 0.0);
                     _flattingB.push(0.0);
                 }
             }
@@ -644,19 +668,7 @@ class SyncLogViewer extends Component<Props, State> {
             flattingB.push(_flattingB);
         }
 
-        console.log("newBaseDomain=", newBaseDomain);
-
-        let i = -1;
-        for (const controller of this.controllers) {
-            i++;
-            if (!controller) continue;
-            const baseDomain = controller.getContentBaseDomain();
-            if (!isEqDomains(baseDomain, newBaseDomain[i])) {
-                controller.setContentBaseDomain(newBaseDomain[i]);
-            }
-        }
-
-        return { A: flattingA, B: flattingB };
+        return { A: flattingA, B: flattingB, newBaseDomain: newBaseDomain };
     }
 
     syncContentScrollPos(iView: number): void {
@@ -666,15 +678,22 @@ class SyncLogViewer extends Component<Props, State> {
         let updated = false;
         const wellpickFlatting = this.props.wellpickFlatting;
         const syncContentDomain = this.props.syncContentDomain;
-        if (!syncContentDomain && wellpickFlatting) {
-            /*const coeff=*/ this.makeFlattingCoeffs();
+        let coeff: {
+            A: number[][];
+            B: number[][];
+            newBaseDomain: [number, number][];
+        } | null = null;
+        if (!syncContentDomain && this.props.wellpicks && wellpickFlatting) {
+            coeff = this.makeFlattingCoeffs();
         }
         {
             // synchronize base domains
             updated = this.syncContentBaseDomain();
             const domain = controller.getContentDomain();
 
+            let j = -1;
             for (const _controller of this.controllers) {
+                j++;
                 if (!_controller || _controller == controller) continue;
                 if (syncContentDomain) {
                     const _domain = _controller.getContentDomain();
@@ -682,47 +701,57 @@ class SyncLogViewer extends Component<Props, State> {
                         _controller.zoomContentTo(domain);
                         updated = true;
                     }
-                } else if (this.props.wellpicks && wellpickFlatting) {
-                    const wellLogView = controller as WellLogView;
-                    const wps = getWellPicks(wellLogView);
-                    let A: number | undefined = undefined;
-                    let B: number | undefined = undefined;
-                    for (const wp of wps) {
-                        if (wellpickFlatting[0] === wp.horizon) A = wp.vPrimary;
-                        if (wellpickFlatting[1] === wp.horizon) B = wp.vPrimary;
-                    }
-                    if (A === undefined) continue;
+                } else if (coeff) {
+                    const a = coeff.A[iView][j];
+                    const b = coeff.B[iView][j];
 
-                    const _wellLogView = _controller as WellLogView;
-                    const _wps = getWellPicks(_wellLogView);
-                    let _A: number | undefined = undefined;
-                    let _B: number | undefined = undefined;
-                    for (const wp of _wps) {
-                        if (wellpickFlatting[0] === wp.horizon)
-                            _A = wp.vPrimary;
-                        if (wellpickFlatting[1] === wp.horizon)
-                            _B = wp.vPrimary;
-                    }
-                    if (_A === undefined) continue;
-
-                    let a: number;
-                    if (B !== undefined && _B !== undefined && B - A)
-                        a = (_B - _A) / (B - A);
-                    else a = 1;
-                    const b = _A - a * A;
+                    //console.log("a=", a, "b=", b)
 
                     const domainNew: [number, number] = [
                         a * domain[0] + b,
                         a * domain[1] + b,
                     ];
+                    //console.log("!domainNew =", domainNew)
                     const _domain = _controller.getContentDomain();
-                    if (!isEqDomains(_domain, domainNew)) {
-                        _controller.zoomContentTo(domainNew);
-                        updated = true;
-                    }
+                    if (
+                        Number.isFinite(domainNew[0]) &&
+                        Number.isFinite(domainNew[1])
+                    )
+                        if (!isEqDomains(_domain, domainNew)) {
+                            _controller.zoomContentTo(domainNew);
+                            updated = true;
+                        }
+
+                    const newBaseDomain = coeff.newBaseDomain[j];
+                    const baseDomain = _controller.getContentBaseDomain();
+                    console.log(
+                        "j=",
+                        j,
+                        " newBaseDomain =",
+                        newBaseDomain,
+                        baseDomain
+                    );
+                    if (
+                        Number.isFinite(newBaseDomain[0]) &&
+                        Number.isFinite(newBaseDomain[1])
+                    )
+                        if (!isEqDomains(baseDomain, newBaseDomain)) {
+                            _controller.setContentBaseDomain(newBaseDomain);
+                        }
                 }
             }
         }
+
+        /*if(coeff) {
+            const newBaseDomain = coeff.newBaseDomain[iView];
+            const baseDomain = controller.getContentBaseDomain();
+            const j=iView;
+            console.log("j=", j, " newBaseDomain =", newBaseDomain, baseDomain)
+            if (Number.isFinite(newBaseDomain[0]) && Number.isFinite(newBaseDomain[1]))
+            if (!isEqDomains(baseDomain, newBaseDomain)) {
+                //controller.setContentBaseDomain(newBaseDomain);
+            }
+        }*/
 
         if (updated) {
             for (let i = iView - 1; i <= iView; i++) {
@@ -1030,7 +1059,7 @@ SyncLogViewer.propTypes = {
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances: PropTypes.arrayOf(PropTypes.number), //!!! (number | undefined)[];
+    wellDistances: PropTypes.object,
 
     /**
      * Orientation of the track plots on the screen. Default is false
