@@ -17,6 +17,7 @@ const colorName = "Stratigraphy";
 const dataObjectName = "Wells / ZONELOG";
 const position = [16, 10];
 const horizontal = false;
+const invertLegend = false;
 
 const Template = (args) => {
     return <DiscreteColorLegend {...args} />;
@@ -30,4 +31,5 @@ DiscreteTemplate.args = {
     colorName,
     colorTables,
     horizontal,
+    invertLegend,
 };

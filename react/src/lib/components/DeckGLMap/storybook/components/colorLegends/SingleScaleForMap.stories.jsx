@@ -33,7 +33,7 @@ const max = 0.35;
 const dataObjectName = "Legend";
 const position = [16, 10];
 const horizontal = true;
-const reverseRange = false;
+const invertLegend = false;
 
 // 4 maps with same color scale for all maps
 const mapWithScaleTemplate = (args) => {
@@ -76,7 +76,7 @@ SingleScaleForMap.args = {
         visible: false,
     },
     zoom: -5,
-    reverseRange,
+    invertLegend,
     views: {
         layout: [2, 2],
         showLabel: true,

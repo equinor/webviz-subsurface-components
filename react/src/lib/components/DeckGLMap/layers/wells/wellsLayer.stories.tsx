@@ -477,7 +477,7 @@ const discreteData = {
     H1: [[], 13],
     BELOW: [[], 14],
 };
-const reverseRange = false;
+const invertLegend = false;
 
 //eslint-disable-next-line
 const wellLayerTemplate = (args: any) => {
@@ -528,7 +528,7 @@ LegendWithColorSelector.args = {
     legend: {
         visible: false,
     },
-    reverseRange,
+    invertLegend,
 };
 
 LegendWithColorSelector.parameters = {

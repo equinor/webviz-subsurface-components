@@ -40,7 +40,7 @@ describe("Test Color Legend", () => {
                 }
                 horizontal={true}
                 colorTables={colorTables}
-                reverseRange={true}
+                invertLegend={true}
             />
         );
         expect(container.firstChild).toMatchSnapshot();
@@ -51,7 +51,7 @@ describe("Test Color Legend", () => {
                 layers={[]}
                 horizontal={true}
                 colorTables={colorTables}
-                reverseRange={true}
+                invertLegend={true}
             />
         );
         expect(container.firstChild).toMatchSnapshot();

@@ -26,14 +26,14 @@ interface ColorLegendProps {
     horizontal?: boolean | null;
     layer: ExtendedLayer<unknown>;
     colorTables: colorTablesArray | string | undefined;
-    reverseRange?: boolean;
+    invertLegend?: boolean;
 }
 
 const ColorLegend: React.FC<ColorLegendProps> = ({
     horizontal,
     layer,
     colorTables,
-    reverseRange,
+    invertLegend,
 }: ColorLegendProps) => {
     const [legendData, setLegendData] = React.useState<
         DiscreteLegendDataType | ContinuousLegendDataType
@@ -56,6 +56,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     colorName={legendData.colorName}
                     horizontal={horizontal}
                     colorTables={colorTables}
+                    invertLegend={invertLegend}
                 />
             )}
             {!legendData.discrete && (
@@ -68,7 +69,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
                     id={layer.props.id}
                     colorTables={colorTables}
                     colorMapFunction={legendData.colorMapFunction}
-                    reverseRange={reverseRange}
+                    invertLegend={invertLegend}
                 />
             )}
         </div>

@@ -24,7 +24,7 @@ describe("Test Color Legend component", () => {
                 }
                 colorTables={colorTables}
                 horizontal={false}
-                reverseRange={false}
+                invertLegend={false}
             />
         );
         expect(container.firstChild).toMatchSnapshot();

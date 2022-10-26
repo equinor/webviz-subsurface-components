@@ -37,6 +37,7 @@ export interface DeckGLMapProps {
         visible?: boolean | null;
         cssStyle?: Record<string, unknown> | null;
         horizontal?: boolean | null;
+        invertLegend?: boolean | null;
     };
     colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
@@ -296,6 +297,10 @@ DeckGLMap.propTypes = {
          * Orientation of color legend
          */
         horizontal: PropTypes.bool,
+        /**
+         * Invert color legend
+         */
+        invertLegend: PropTypes.bool,
     }),
 
     /**

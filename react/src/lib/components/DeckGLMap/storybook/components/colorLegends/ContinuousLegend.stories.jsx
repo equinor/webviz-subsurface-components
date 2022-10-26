@@ -12,7 +12,7 @@ const position = [16, 10];
 const name = "PORO";
 const horizontal = false;
 const colorName = "Rainbow";
-const reverseRange = false;
+const invertLegend = false;
 
 const Template = (args) => {
     return <ContinuousLegend {...args} />;
@@ -28,5 +28,5 @@ ContinuousTemplate.args = {
     colorName,
     colorTables,
     horizontal,
-    reverseRange,
+    invertLegend,
 };

@@ -21,7 +21,8 @@
         "right": 10,
         "top": 10
       },
-      "horizontal": false
+      "horizontal": false,
+      "invertLegend": false
     },
     "toolbar": {
       "visible": true

@@ -736,7 +736,7 @@ ColorMapLayerColorSelector.args = {
     legend: {
         visible: false,
     },
-    reverseRange: false,
+    invertLegend: false,
 };
 
 ColorMapLayerColorSelector.parameters = {
