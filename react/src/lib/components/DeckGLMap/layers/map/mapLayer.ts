@@ -5,11 +5,7 @@ import { layersDefaultProps } from "../layersDefaultProps";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import * as png from "@vivaxy/png";
-import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
-import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
-import { DeckGLLayerContext } from "../../components/Map";
 import { TerrainMapLayerData } from "../terrain/terrainMapLayer";
-import { ContinuousLegendDataType } from "../../components/ColorLegend";
 import { makeFullMesh } from "./webworker";
 import { Matrix4 } from "math.gl";
 
@@ -36,39 +32,7 @@ export type Params = {
     propertiesData: Float32Array;
     isMesh: boolean;
     frame: Frame;
-    colors: Color[];
-    colorMapRange: [number, number];
-    colorMapClampColor: Color | undefined | boolean;
 };
-
-
-// XXX Kan fjernes.. sammen med alt annet farge greier...
-function getColorMapColors(
-    colorMapName: string,
-    colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | undefined
-) {
-    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
-    const isColorMapNameDefined = !!colorMapName;
-
-    const colors: Color[] = [];
-
-    const defaultColorMap = createDefaultContinuousColorScale;
-
-    const colorMap = isColorMapFunctionDefined
-        ? colorMapFunction
-        : isColorMapNameDefined
-        ? (value: number) => rgbValues(value, colorMapName, colorTables)
-        : defaultColorMap();
-
-    for (let i = 0; i < 256; i++) {
-        const value = i / 255.0;
-        const color = colorMap ? colorMap(value) : [0, 0, 0];
-        colors.push(color as Color);
-    }
-
-    return colors;
-}
 
 async function load_mesh_and_properties(
     meshUrl: string,
@@ -261,34 +225,17 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
             const url = URL.createObjectURL(blob);
             const webWorker = new Worker(url);
 
-            // XXX remove
-            // function webWorkerTerminate() {
-            //     webWorker.terminate();
-            // }
-
-            // XXX disse to fjerenes??
-            const colorTables = (this.context as DeckGLLayerContext).userData
-                .colorTables;
-
-            const colors: Color[] = getColorMapColors(
-                this.props.colorMapName,
-                colorTables,
-                this.props.colorMapFunction
-            );
-
             const webworkerParams = {
                 meshData,
                 propertiesData,
                 isMesh,
                 frame: this.props.frame,
-                colors,
-                colorMapRange: this.props.colorMapRange,
-                colorMapClampColor: this.props.colorMapClampColor,
             };
 
             webWorker.postMessage(webworkerParams);
             webWorker.onmessage = (e) => {
-                const [mesh, mesh_lines, meshZValueRange, propertyValueRange] = e.data;
+                const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =
+                    e.data;
                 this.setState({
                     mesh,
                     mesh_lines,
@@ -322,7 +269,6 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                     ]);
                 }
 
-                //webWorkerTerminate();
                 webWorker.terminate();
             };
         });
@@ -340,16 +286,11 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
         props: MapLayerProps<unknown>;
         oldProps: MapLayerProps<unknown>;
     }): void {
-        const needs_reload = true;
-            // !isEqual(props.meshUrl, oldProps.meshUrl) ||
-            // !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
-            // !isEqual(props.frame, oldProps.frame) ||
-            // !isEqual(props.gridLines, oldProps.gridLines) ||
-            // !isEqual(props.colorMapName, oldProps.colorMapName) ||
-            // !isEqual(props.colorMapRange, oldProps.colorMapRange) ||
-            // !isEqual(props.colorMapClampColor, oldProps.colorMapClampColor) ||
-            // !isEqual(props.colorMapFunction, oldProps.colorMapFunction) ||
-            // !isEqual(props.material, oldProps.material);  // XXX ikka alle disse trengs aa sjekkes mer...
+        const needs_reload =
+            !isEqual(props.meshUrl, oldProps.meshUrl) ||
+            !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
+            !isEqual(props.frame, oldProps.frame) ||
+            !isEqual(props.gridLines, oldProps.gridLines);
 
         if (needs_reload) {
             const reportBoundingBox = false;
@@ -393,23 +334,15 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 contours: this.props.contours,
                 gridLines: this.props.gridLines,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
-
-
                 colorMapName: this.props.colorMapName,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
                 colorMapFunction: this.props.colorMapFunction,
                 propertyValueRange: this.state["propertyValueRange"],
-
-
                 material: this.props.material,
             })
         );
         return [layer];
-    }
-
-    getLegendData(): ContinuousLegendDataType {
-        console.log("getLegendData() not implemented!")
     }
 }
 

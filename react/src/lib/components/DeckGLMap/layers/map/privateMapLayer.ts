@@ -39,7 +39,6 @@ export type MeshType = {
         positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
         normals?: { value: Float32Array; size: number };
-        colors: { value: Float32Array; size: number };
         properties: { value: Float32Array; size: number };
         vertex_indexs: { value: Int32Array; size: number };
     };
@@ -101,14 +100,11 @@ export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
     contours: [number, number];
     gridLines: boolean;
     isContoursDepth: boolean;
-
-
     colorMapName: string;
     colorMapRange: [number, number];
-    colorMapClampColor: Color | undefined | boolean
+    colorMapClampColor: Color | undefined | boolean;
     colorMapFunction?: colorMapFunctionType;
     propertyValueRange: [number, number];
-
 }
 
 const defaultProps = {
@@ -116,7 +112,6 @@ const defaultProps = {
     contours: [-1, -1],
     isContoursDepth: true,
     gridLines: false,
-
     colorMapName: "",
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
@@ -164,7 +159,6 @@ export default class privateMapLayer extends Layer<
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
-                    colors: this.props.mesh.attributes.colors,
                     properties: this.props.mesh.attributes.properties,
                     vertex_indexs: this.props.mesh.attributes.vertex_indexs,
                 },
@@ -204,13 +198,6 @@ export default class privateMapLayer extends Layer<
 
         const [model_mesh, mesh_lines_model] = this.state["models"];
 
-        // XXXX =============================================================================================
-        // console.log("colorMapName: ", this.props.colorMapName);
-        // console.log("colorMapRange: ", this.props.colorMapRange);
-        // console.log("colorMapClampColor: ", this.props.colorMapClampColor);
-        // console.log("colorMapFunction: ", this.props.colorMapFunction);
-        // console.log("propertyValueRange: ", this.props.propertyValueRange);
-
         const valueRangeMin = this.props.propertyValueRange[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange[1] ?? 1.0;
 
@@ -234,8 +221,6 @@ export default class privateMapLayer extends Layer<
 
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
-        // XXXX =============================================================================================
-    
 
         gl.enable(gl.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
@@ -245,7 +230,6 @@ export default class privateMapLayer extends Layer<
                 contourReferencePoint,
                 contourInterval,
                 isContoursDepth,
-
                 colormap: new Texture2D(context.gl, {
                     width: 256,
                     height: 1,
@@ -262,14 +246,9 @@ export default class privateMapLayer extends Layer<
                 valueRangeMax,
                 colorMapRangeMin,
                 colorMapRangeMax,
-                //contourReferencePoint,
-                //contourInterval,
-                //isContoursDepth,
                 colorMapClampColor,
                 isColorMapClampColorTransparent,
                 isClampColor,
-
-
             })
             .draw();
         gl.disable(gl.POLYGON_OFFSET_FILL);
@@ -296,10 +275,6 @@ export default class privateMapLayer extends Layer<
         const b = info.color[2];
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
-
-        // XXX
-        //console.log("vertexIndex: ", vertexIndex, b)
-        //console.log("indices: ",  this.props.mesh.indices)
 
         const vertexs = this.props.mesh.attributes.positions.value;
         const depth = -vertexs[3 * vertexIndex + 2];

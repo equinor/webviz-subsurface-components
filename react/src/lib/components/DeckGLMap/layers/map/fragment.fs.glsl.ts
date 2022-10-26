@@ -78,7 +78,6 @@ void main(void) {
       return;
    }
 
-
    vec4 color = vec4(1.0, 1.0, 1.0,  1.0);;
    float propertyValue = property;
 
