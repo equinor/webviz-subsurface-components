@@ -550,7 +550,7 @@ export default class WellsLayer extends CompositeLayer<
 
         let md_property = getMdProperty(
             coordinate,
-            info.object as unknown as Feature,
+            info.object as Feature,
             this.props.lineStyle?.color,
             (info as WellsPickInfo).featureType
         );
@@ -565,7 +565,7 @@ export default class WellsLayer extends CompositeLayer<
         }
         let tvd_property = getTvdProperty(
             coordinate,
-            info.object as unknown as Feature,
+            info.object as Feature,
             this.props.lineStyle?.color,
             (info as WellsPickInfo).featureType
         );
