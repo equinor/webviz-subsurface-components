@@ -26,13 +26,15 @@ const defaultProps = {
 
 // Grid 3d story
 /* eslint-disable @typescript-eslint/no-var-requires */
+const POINTS = require("../../../../../demo/example-data/vtk-grid/points.json");
+const POLYS = require("../../../../../demo/example-data/vtk-grid/polys.json");
 const SCALAR = require("../../../../../demo/example-data/vtk-grid/scalar.json");
 const grid3dLayer = {
     "@@type": "Grid3DLayer",
     id: "Grid3DLayer",
     data: {
-        points: "https://raw.githubusercontent.com/HansKallekleiv/vtk-test/main/points.json",
-        polys: "https://raw.githubusercontent.com/HansKallekleiv/vtk-test/main/polys.json",
+        points: POINTS,
+        polys: POLYS,
         scalar: SCALAR,
     },
 };
