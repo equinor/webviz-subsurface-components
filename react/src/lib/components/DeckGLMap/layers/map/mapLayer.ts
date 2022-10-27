@@ -236,10 +236,20 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
             webWorker.onmessage = (e) => {
                 const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =
                     e.data;
+
+                const legend = {
+                    discrete: false,
+                    valueRange: this.props.colorMapRange ?? propertyValueRange,
+                    colorName: this.props.colorMapName,
+                    title: "MapLayer",
+                    colorMapFunction: this.props.colorMapFunction,
+                };
+
                 this.setState({
                     mesh,
                     mesh_lines,
                     propertyValueRange,
+                    legend,
                 });
 
                 if (
