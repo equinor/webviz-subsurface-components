@@ -154,16 +154,15 @@ export default class Grid3DLayer extends CompositeLayer<
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
         const layer_properties: PropertyDataType[] = [];
 
-        const depth_value = (info.layer?.props.data as POLYDATA).points[
+        const depth_value = (info.sourceLayer?.props.data as POLYDATA).points[
             (info.index + 1) * 3 - 1
         ];
         if (depth_value) {
             layer_properties.push(createPropertyData("Depth", depth_value));
         }
 
-        const property_value = (info.layer?.props.data as POLYDATA).scalar?.[
-            info.index
-        ];
+        const property_value = (info.sourceLayer?.props.data as POLYDATA)
+            .scalar?.[info.index];
         if (property_value) {
             layer_properties.push(
                 createPropertyData("Property", property_value)
