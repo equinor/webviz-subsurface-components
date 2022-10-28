@@ -362,6 +362,7 @@ const Map: React.FC<MapProps> = ({
             target.pop(); // In 2D "target" should only contain x and y.
         }
 
+        console.log("calcDefaultViewStates");
         let tempViewStates: Record<string, ViewStateType> = {};
         tempViewStates = Object.fromEntries(
             viewsProps.map((item, index) => [
@@ -401,6 +402,7 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
         } else {
+            console.log("else1");
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => {
                     const viewState = viewStates[item.id];
@@ -432,6 +434,7 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
         } else {
+            console.log("onLoadelse");
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
                     item.id,
@@ -482,6 +485,7 @@ const Map: React.FC<MapProps> = ({
 
     // react on bounds prop change
     useEffect(() => {
+        console.log("boundsPropChange");
         let tempViewStates: Record<string, ViewStateType> = {};
         if (cameraPosition && Object.keys(cameraPosition).length === 0) {
             tempViewStates = Object.fromEntries(
@@ -805,6 +809,7 @@ const Map: React.FC<MapProps> = ({
         [views]
     );
 
+    console.log(viewStates);
     const [didUserChangeCamera, setDidUserChangeCamera] =
         useState<boolean>(false);
     const onViewStateChange = useCallback(
@@ -996,7 +1001,7 @@ function getViewState(
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     target?: number[],
     zoom?: number,
-    deck?: Deck
+    deck?: Deck,
 ): ViewStateType {
     let bounds = [0, 0, 1, 1];
     if (typeof bounds_accessor == "function") {
@@ -1004,13 +1009,14 @@ function getViewState(
     } else {
         bounds = bounds_accessor;
     }
-
+    
     let width = bounds[2] - bounds[0]; // right - left
     let height = bounds[3] - bounds[1]; // top - bottom
     if (deck) {
         width = deck.width;
         height = deck.height;
     }
+    console.log("getViewState");
     const fitted_bound = fitBounds({ width, height, bounds });
     const view_state: ViewStateType = {
         target: target ?? [fitted_bound.x, fitted_bound.y, 0],
@@ -1049,9 +1055,13 @@ function getViewState3D(
         yMin + (yMax - yMin) / 2,
         is3D ? zMin + (zMax - zMin) / 2 : 0,
     ];
-
+    console.log("getViewState3D");
     const bounds2D = [xMin, yMin, xMax, yMax];
-    const fitted_bound = fitBounds({ width, height, bounds: bounds2D });
+    const fitted_bound = fitBounds({
+        width,
+        height,
+        bounds: bounds2D,
+    });
     const view_state: ViewStateType = {
         target,
         zoom: zoom ?? fitted_bound.zoom * 1.2,
