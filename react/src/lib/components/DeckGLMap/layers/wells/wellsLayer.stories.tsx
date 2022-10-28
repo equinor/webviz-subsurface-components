@@ -7,6 +7,7 @@ import {
     ColorLegend,
     colorTables,
 } from "@emerson-eps/color-tables";
+import { MapMouseEvent } from "../../components/Map";
 
 export default {
     component: DeckGLMap,
@@ -57,6 +58,47 @@ VolveWells.parameters = {
         inlineStories: false,
         iframeHeight: 500,
     },
+};
+
+// Volve wells with mouseCallback function without logs
+const VolveWellsWithMouseCallback: ComponentStory<typeof DeckGLMap> = (
+    args
+) => {
+    const onMouseEvent = React.useCallback((event: MapMouseEvent) => {
+        console.log(event);
+    }, []);
+    return (
+        <>
+            <DeckGLMap {...args} onMouseEvent={onMouseEvent} />
+            <div
+                style={{
+                    position: "absolute",
+                    marginLeft: 200,
+                }}
+            ></div>
+        </>
+    );
+};
+
+export const volveWells2 = VolveWellsWithMouseCallback.bind({});
+
+volveWells2.args = {
+    id: "volve-wells",
+    resources: {
+        wellsData: "./volve_wells.json",
+    },
+    bounds: [432150, 6475800, 439400, 6481500] as [
+        number,
+        number,
+        number,
+        number
+    ],
+    layers: [
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData",
+        },
+    ],
 };
 
 // Volve wells with logs.
@@ -123,6 +165,44 @@ DashedWells.parameters = {
     },
 };
 
+// Volve wells default example.
+export const MultipleVolveWells = Template.bind({});
+MultipleVolveWells.args = {
+    id: "volve-wells",
+    resources: {
+        wellsData: "./volve_wells_1.json",
+        wellsData2: "./volve_wells_2.json",
+    },
+    bounds: [432150, 6475800, 439400, 6481500] as [
+        number,
+        number,
+        number,
+        number
+    ],
+    layers: [
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData",
+            id: "id1",
+        },
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData2",
+            id: "id2",
+        },
+    ],
+};
+
+MultipleVolveWells.parameters = {
+    docs: {
+        description: {
+            story: "Multiple Volve wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 export const CustomColoredWells = Template.bind({});
 CustomColoredWells.args = {
     ...defaultProps,
@@ -136,6 +216,7 @@ CustomColoredWells.args = {
         },
     ],
 };
+
 CustomColoredWells.parameters = {
     docs: {
         description: {
@@ -158,6 +239,7 @@ CustomWidthWells.args = {
         },
     ],
 };
+
 CustomColoredWells.parameters = {
     docs: {
         description: {

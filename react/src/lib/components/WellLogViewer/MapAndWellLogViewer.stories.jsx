@@ -3,6 +3,8 @@ import React from "react";
 import { MapAndWellLogViewer } from "./MapAndWellLogViewer";
 
 import exampleData from "../../../demo/example-data/deckgl-map.json";
+import { colorTables } from "@emerson-eps/color-tables";
+
 const drawing_layer = exampleData[0].layers.find(
     (item) => item["@@type"] === "DrawingLayer"
 );
@@ -130,6 +132,6 @@ const Template = (args) => {
 export const Default = Template.bind({});
 Default.args = {
     ...exampleData[0],
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     id: "MapAndWellLog", // redefine id from exampleData[0]
 };

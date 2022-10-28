@@ -210,45 +210,13 @@ export default class WellsLayer extends CompositeLayer<
     WellsLayerProps<FeatureCollection<Geometry, GeoJsonProperties>>
 > {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
-    onClick(info: WellsPickInfo, event: any): boolean {
+    onClick(info: WellsPickInfo): boolean {
         // Make selection only when drawing is disabled
         if (isDrawingEnabled(this.context.layerManager)) {
             return false;
         } else {
-            if (event.srcEvent.ctrlKey) {
-                if (
-                    Object.keys(this.state).length === 0 ||
-                    !this.state["multipleSelectionWells"]
-                ) {
-                    this.state["multipleSelectionWells"] = [];
-                    this.state["multipleSelectionWells"].push(
-                        (info.object as Feature).properties?.["name"]
-                    );
-                } else {
-                    if (
-                        !this.state["multipleSelectionWells"].includes(
-                            (info.object as Feature).properties?.["name"]
-                        )
-                    ) {
-                        this.state["multipleSelectionWells"].push(
-                            (info.object as Feature).properties?.["name"]
-                        );
-                    } else {
-                        this.state["multipleSelectionWells"] = this.state[
-                            "multipleSelectionWells"
-                        ].filter(
-                            (item: string) =>
-                                item !==
-                                (info.object as Feature).properties?.["name"]
-                        );
-                    }
-                }
-            } else {
-                this.state["multipleSelectionWells"] = [];
-            }
             this.context.userData.setEditedData({
                 selectedWell: (info.object as Feature).properties?.["name"],
-                multiSelectedWells: this.state["multipleSelectionWells"],
             });
             return false; // do not return true to allow DeckGL props.onClick to be called
         }
@@ -877,7 +845,17 @@ function getLogColor(
 
             if (rgb) {
                 if (Array.isArray(rgb)) {
-                    attributesObject[key] = [[rgb[1], rgb[2], rgb[3]], point];
+                    if (rgb.length === 3) {
+                        attributesObject[key] = [
+                            [rgb[0], rgb[1], rgb[2]],
+                            point,
+                        ];
+                    } else {
+                        attributesObject[key] = [
+                            [rgb[1], rgb[2], rgb[3]],
+                            point,
+                        ];
+                    }
                 } else {
                     attributesObject[key] = [[rgb.r, rgb.g, rgb.b], point];
                 }

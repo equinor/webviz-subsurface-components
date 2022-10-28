@@ -1,13 +1,17 @@
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
+import { argTypesWellLogViewerProp } from "./WellLogViewer";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
     "    horizontal=false \r\n" +
     '    welllog={require("../../../demo/example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../demo/example-data/welllog_template_1.json")} \r\n' +
-    '    colorTables={require("../../../demo/example-data/color-tables.json")} \r\n' +
+    "    colorTables={colorTables} \r\n" +
     "/>";
+
+import { axisTitles, axisMnemos } from "./utils/axes";
 
 export default {
     component: WellLogViewer,
@@ -25,46 +29,10 @@ export default {
         },
     },
     argTypes: {
+        ...argTypesWellLogViewerProp,
         id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
-        },
-        welllog: {
-            description: "Array of JSON objects describing well log data.",
-        },
-        template: {
-            description: "Prop containing track template data.",
-        },
-        colorTables: {
-            description: "Prop containing color table data.",
-        },
-        horizontal: {
-            description: "Orientation of the track plots on the screen.",
-            defaultValue: false,
-        },
-        hideTitles: {
-            description: "Hide titles on the tracks.",
-            defaultValue: false,
-        },
-        hideLegend: {
-            description: "Hide legends on the tracks.",
-            defaultValue: false,
-        },
-        readoutOptions: {
-            description:
-                "Options for readout panel.<br/>" +
-                "allTracks: boolean — Show not only visible tracks,<br/>" +
-                "grouping: string — How group values.",
-            defaultValue: {
-                allTracks: false,
-                grouping: "by_track",
-            },
-        },
-        domain: {
-            description: "Initial visible interval of the log data.",
-        },
-        selection: {
-            description: "Initial selected interval of the log data.",
         },
     },
 };
@@ -136,7 +104,7 @@ const Template = (args) => {
 const wellpick = {
     wellpick: require("../../../demo/example-data/wellpicks.json")[0],
     name: "HORIZON",
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     color: "Stratigraphy",
 };
 
@@ -148,8 +116,10 @@ Default.args = {
     hideLegend: false,
     welllog: require("../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../demo/example-data/welllog_template_1.json"),
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     wellpick: wellpick,
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
 };
 
 export const Horizontal = Template.bind({});
@@ -159,7 +129,7 @@ Horizontal.args = {
     welllog:
         require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     wellpick: wellpick,
 };
 Horizontal.parameters = {
@@ -176,7 +146,7 @@ Discrete.args = {
     horizontal: false,
     welllog: require("../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
-    colorTables: require("../../../demo/example-data/color-tables.json"),
+    colorTables: colorTables,
     wellpick: wellpick,
 };
 Discrete.parameters = {

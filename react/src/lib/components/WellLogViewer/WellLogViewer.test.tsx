@@ -5,10 +5,12 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import { WellLogController } from "./components/WellLogView";
+import { axisTitles, axisMnemos } from "./utils/axes";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
 const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
-const exampleColorTable = require("../../../demo/example-data/color-tables.json");
+const exampleColorTable = colorTables;
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -29,6 +31,9 @@ describe("Test Well Log Viewer Component", () => {
                 horizontal={true}
                 hideLegend={true}
                 hideTitles={true}
+                primaryAxis={"md"}
+                axisTitles={axisTitles}
+                axisMnemos={axisMnemos}
                 readoutOptions={{
                     allTracks: false,
                     grouping: "by_track",

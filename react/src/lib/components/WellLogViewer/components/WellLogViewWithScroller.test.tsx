@@ -4,10 +4,10 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
+import { colorTables } from "@emerson-eps/color-tables";
 
 const welllog = require("../../../../demo/example-data/L898MUD.json")[0];
 const template = require("../../../../demo/example-data/welllog_template_1.json");
-const colorTables = require("../../../../demo/example-data/color-tables.json");
 
 window.ResizeObserver =
     window.ResizeObserver ||

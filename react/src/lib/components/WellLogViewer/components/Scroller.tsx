@@ -150,7 +150,7 @@ class Scroller extends Component<Props> {
         return false;
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         return (
             <div
                 ref={(el) => (this.scroller = el as HTMLDivElement)}

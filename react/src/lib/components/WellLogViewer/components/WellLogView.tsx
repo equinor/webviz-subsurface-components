@@ -1,5 +1,7 @@
-import React, { Component, ReactNode } from "react";
+import React, { Component } from "react";
 import { LogViewer } from "@equinor/videx-wellog";
+
+import PropTypes from "prop-types";
 
 import {
     InterpolatedScaleHandler,
@@ -42,6 +44,7 @@ import {
     removeGraphTrackPlot,
 } from "../utils/tracks";
 import { getPlotType } from "../utils/tracks";
+import { getAvailableAxes } from "../utils/tracks";
 
 import { TemplatePlot, TemplateTrack } from "./WellLogTemplateTypes";
 
@@ -175,9 +178,10 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const value = caller.scale.invert(horizontal ? x : y);
             const elem = event.target;
             if (elem) {
-                const axisTitle = parent.props.axisTitles
-                    ? parent.props.axisTitles[parent.props.primaryAxis]
-                    : undefined;
+                const axisTitle =
+                    !parent.props.axisTitles || !parent.props.primaryAxis
+                        ? undefined
+                        : parent.props.axisTitles[parent.props.primaryAxis];
                 elem.textContent = Number.isFinite(value)
                     ? `Pinned ${axisTitle ? axisTitle : ""}: ${value.toFixed(
                           1
@@ -192,9 +196,11 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
             const elem = event.target;
             if (elem) {
-                const axisTitle = parent.props.axisTitles
-                    ? parent.props.axisTitles[parent.props.primaryAxis]
-                    : undefined;
+                const axisTitle = !parent.props.axisTitles
+                    ? undefined
+                    : !parent.props.primaryAxis
+                    ? parent.props.axisTitles[0]
+                    : parent.props.axisTitles[parent.props.primaryAxis];
                 elem.textContent = Number.isFinite(value)
                     ? `${axisTitle ? axisTitle : ""}: ${value.toFixed(1)}`
                     : "-";
@@ -302,7 +308,7 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
 export interface WellPickProps {
     wellpick: WellLog; // JSON Log Format
     name: string; //  "HORIZON"
-    md?: string; //  default is "MD"
+    md?: string; //  Log mnemonics for depth log. default is "MD"
     /**
      * Prop containing color table data.
      */
@@ -357,12 +363,10 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
     if (!wellpick) return wps;
 
     const curves = wellpick.wellpick.curves;
-    const md = _getLogIndexByNames(curves, [wellpick.md ? wellpick.md : "MD"]);
+    const mnemo = wellpick.md ? wellpick.md : "MD";
+    const md = _getLogIndexByNames(curves, [mnemo]);
     if (md < 0) {
-        console.error(
-            "MD log is not found for wellpicks ",
-            wellpick.md ? wellpick.md : ""
-        );
+        console.error("Depth log '" + mnemo + "' is not found for wellpicks");
         return wps;
     }
 
@@ -778,7 +782,7 @@ export interface WellLogController {
 
 import { Info } from "./InfoTypes";
 
-interface Props {
+export interface WellLogViewProps {
     /**
      * Object from JSON file describing single well log data.
      */
@@ -788,10 +792,12 @@ interface Props {
      * Prop containing track template data.
      */
     template: Template;
+
     /**
      * Prop containing color table data.
      */
     colorTables: ColorTable[];
+
     /**
      * Well Picks data
      */
@@ -800,7 +806,11 @@ interface Props {
      * Orientation of the track plots on the screen.
      */
     horizontal?: boolean;
-    primaryAxis: string;
+
+    /**
+     * Primary axis id: "md", "tvd", "time"... Default is the first available from axisMnemos
+     */
+    primaryAxis?: string;
     /**
      * Show Titles on the tracks
      */
@@ -810,11 +820,35 @@ interface Props {
      */
     hideLegend?: boolean;
 
+    /**
+     * Log mnemonics for axes
+     */
     axisTitles: Record<string, string>;
+
+    /**
+     * Names for axes
+     */
     axisMnemos: Record<string, string[]>;
 
+    /**
+     * The maximum number of visible tracks
+     */
     maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
+
+    /**
+     * The maximum zoom value
+     */
     maxContentZoom?: number; // default is 256
+
+    /**
+     * Initial visible range
+     */
+    domain?: [number, number];
+
+    /**
+     * Initial selected range
+     */
+    selection?: [number | undefined, number | undefined];
 
     /**
      * Validate JSON datafile against schems
@@ -857,6 +891,106 @@ interface Props {
     onTemplateChanged?: () => void;
 }
 
+export const argTypesWellLogViewProp = {
+    horizontal: {
+        description: "Orientation of the track plots on the screen.",
+        defaultValue: false,
+    },
+    welllog: {
+        description: "JSON object describing well log data.",
+    },
+    template: {
+        description: "Prop containing track template data.",
+    },
+    colorTables: {
+        description: "Prop containing color table data.",
+    },
+    wellpick: {
+        description: "Well Picks data",
+    },
+    primaryAxis: {
+        description: "Primary axis id",
+        defaultValue: "md",
+    },
+    maxVisibleTrackNum: {
+        description: "The maximum number of visible tracks",
+        defaultValue: 5,
+    },
+    maxContentZoom: {
+        description: "The maximum zoom value",
+        defaultValue: 256,
+    },
+    domain: {
+        description: "Initial visible range",
+    },
+    selection: {
+        description: "Initial selected range",
+    },
+    checkDatafileSchema: {
+        description: "Validate JSON datafile against schema",
+        defaultValue: false,
+    },
+    hideTitles: {
+        description: "Hide Titles on the tracks",
+        defaultValue: false,
+    },
+    hideLegend: {
+        description: "Hide Legends on the tracks",
+        defaultValue: false,
+    },
+    axisMnemos: {
+        description: "Log mnemonics for axes",
+        //defaultValue: axisMnemos,
+    },
+    axisTitles: {
+        description: "Names for axes",
+        //defaultValue: axisTitles,
+    },
+    // callbacks...
+};
+
+export function shouldUpdateWellLogView(
+    props: WellLogViewProps,
+    nextProps: WellLogViewProps
+): boolean {
+    // Props could contain some unknown object key:value so we should ignore they
+    // so compare only known key:values
+    if (props.horizontal !== nextProps.horizontal) return true;
+    if (props.hideTitles !== nextProps.hideTitles) return true;
+    if (props.hideLegend !== nextProps.hideLegend) return true;
+
+    if (props.welllog !== nextProps.welllog) return true;
+    if (props.template !== nextProps.template) return true;
+    if (props.colorTables !== nextProps.colorTables) return true;
+    if (props.wellpick !== nextProps.wellpick) return true;
+    if (props.primaryAxis !== nextProps.primaryAxis) return true;
+    if (props.axisTitles !== nextProps.axisTitles) return true;
+    if (props.axisMnemos !== nextProps.axisMnemos) return true;
+
+    if (props.maxVisibleTrackNum !== nextProps.maxVisibleTrackNum) return true;
+    if (props.maxContentZoom !== nextProps.maxContentZoom) return true;
+
+    if (!isEqualRanges(props.domain, nextProps.domain)) return true;
+    if (!isEqualRanges(props.selection, nextProps.selection)) return true;
+
+    if (props.checkDatafileSchema !== nextProps.checkDatafileSchema)
+        return true;
+
+    // callbacks
+    // ignore all?
+
+    return false;
+}
+
+function isEqualRanges(
+    d1: undefined | [number | undefined, number | undefined],
+    d2: undefined | [number | undefined, number | undefined]
+): boolean {
+    if (!d1) return !d2;
+    if (!d2) return !d1;
+    return d1[0] !== d2[0] || d1[1] !== d2[1];
+}
+
 interface State {
     infos: Info[];
 
@@ -864,7 +998,12 @@ interface State {
     errorText?: string;
 }
 
-class WellLogView extends Component<Props, State> implements WellLogController {
+class WellLogView
+    extends Component<WellLogViewProps, State>
+    implements WellLogController
+{
+    public static propTypes: Record<string, unknown>;
+
     container?: HTMLElement;
     logController?: LogViewer;
     selCurrent: number | undefined; // current mouse position
@@ -875,7 +1014,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     scaleInterpolator: ScaleInterpolator | undefined;
 
-    constructor(props: Props) {
+    constructor(props: WellLogViewProps) {
         super(props);
         this.container = undefined;
         this.logController = undefined;
@@ -902,6 +1041,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
         // set callback to component's caller
         if (this.props.onCreateController) this.props.onCreateController(this);
+
+        this.setControllerZoom();
     }
 
     componentDidMount(): void {
@@ -911,33 +1052,18 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setTracks(true);
     }
 
-    shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
-        if (this.props.horizontal !== nextProps.horizontal) return true;
-        if (this.props.hideTitles !== nextProps.hideTitles) return true;
-        if (this.props.hideLegend !== nextProps.hideLegend) return true;
+    shouldComponentUpdate(
+        nextProps: WellLogViewProps,
+        nextState: State
+    ): boolean {
+        if (shouldUpdateWellLogView(this.props, nextProps)) return true;
 
-        if (this.props.welllog !== nextProps.welllog) return true;
-        if (this.props.template !== nextProps.template) return true;
-        if (this.props.colorTables !== nextProps.colorTables) return true;
-        if (this.props.wellpick !== nextProps.wellpick) return true;
-        if (this.props.primaryAxis !== nextProps.primaryAxis) return true;
-        if (this.props.axisTitles !== nextProps.axisTitles) return true;
-        if (this.props.axisMnemos !== nextProps.axisMnemos) return true;
-
-        if (this.props.maxVisibleTrackNum !== nextProps.maxVisibleTrackNum)
-            return true;
         if (this.state.scrollTrackPos !== nextState.scrollTrackPos) return true;
         if (this.state.errorText !== nextState.errorText) return true;
 
-        if (this.props.maxContentZoom !== nextProps.maxContentZoom) return true;
-        if (this.props.checkDatafileSchema !== nextProps.checkDatafileSchema)
-            return true;
-
-        // callbacks
-
         return false;
     }
-    componentDidUpdate(prevProps: Props, prevState: State): void {
+    componentDidUpdate(prevProps: WellLogViewProps, prevState: State): void {
         // Typical usage (don't forget to compare props):
         if (this.props.onCreateController !== prevProps.onCreateController) {
             // update callback to component's caller
@@ -1004,6 +1130,24 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             this.onTrackSelection();
             this.setInfo();
         }
+
+        if (
+            this.props.domain &&
+            (!prevProps.domain ||
+                this.props.domain[0] !== prevProps.domain[0] ||
+                this.props.domain[1] !== prevProps.domain[1])
+        ) {
+            this.setControllerZoom();
+        }
+
+        if (
+            this.props.selection &&
+            (!prevProps.selection ||
+                this.props.selection[0] !== prevProps.selection[0] ||
+                this.props.selection[1] !== prevProps.selection[1])
+        ) {
+            this.setControllerSelection();
+        }
     }
 
     createLogViewer(): void {
@@ -1037,15 +1181,22 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         this.setInfo();
     }
     getAxesInfo(): AxesInfo {
+        // get Object keys available in the welllog
+        const axes = getAvailableAxes(
+            this.props.welllog,
+            this.props.axisMnemos
+        );
+        const primaryAxisIndex = axes.findIndex(
+            (value: string) => value === this.props.primaryAxis
+        );
         return {
-            primaryAxis: this.props.primaryAxis,
+            primaryAxis: this.props.primaryAxis || "",
             secondaryAxis:
                 this.props.template &&
                 this.props.template.scale &&
-                this.props.template.scale.allowSecondary
-                    ? this.props.primaryAxis == "md"
-                        ? "tvd"
-                        : "md"
+                this.props.template.scale.allowSecondary &&
+                axes.length > 1 // get next in available axes
+                    ? axes[primaryAxisIndex + 1] || axes[0]
                     : "",
             titles: this.props.axisTitles,
             mnemos: this.props.axisMnemos,
@@ -1087,6 +1238,12 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         return this.logController?.tracks.find(function (track: Track) {
             return track.id === trackId;
         });
+    }
+    setControllerZoom(): void {
+        if (this.props.domain) this.zoomContentTo(this.props.domain);
+    }
+    setControllerSelection(): void {
+        if (this.props.selection) this.selectContent(this.props.selection);
     }
 
     /**
@@ -1203,7 +1360,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
 
     setContentBaseDomain(domain: [number, number]): void {
         if (this.logController)
-            return setContentBaseDomain(this.logController, domain);
+            setContentBaseDomain(this.logController, domain);
     }
     getContentBaseDomain(): [number, number] {
         if (this.logController) return getContentBaseDomain(this.logController);
@@ -1239,6 +1396,8 @@ class WellLogView extends Component<Props, State> implements WellLogController {
     _maxVisibleTrackNum(): number {
         return this.props.maxVisibleTrackNum
             ? this.props.maxVisibleTrackNum
+            : this.props.horizontal
+            ? 3
             : 5 /*some default value*/;
     }
 
@@ -1303,11 +1462,16 @@ class WellLogView extends Component<Props, State> implements WellLogController {
                 tracks.push(deepCopy(templateTrack));
             }
         }
+        const axes = getAvailableAxes(
+            this.props.welllog,
+            this.props.axisMnemos
+        );
         return {
             name: template.name,
             scale: {
-                primary: this.props.primaryAxis,
-                allowSecondary: template.scale?.allowSecondary,
+                primary: this.props.primaryAxis || "" /* no scale track */,
+                allowSecondary:
+                    template.scale?.allowSecondary && axes.length > 1,
             },
             tracks: tracks,
             styles: template.styles,
@@ -1475,7 +1639,7 @@ class WellLogView extends Component<Props, State> implements WellLogController {
         }
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         return (
             <div
                 style={{
@@ -1500,6 +1664,94 @@ class WellLogView extends Component<Props, State> implements WellLogController {
             </div>
         );
     }
+}
+
+WellLogView.propTypes = _propTypesWellLogView();
+
+export function _propTypesWellLogView(): Record<string, unknown> {
+    return {
+        /**
+         * The ID of this component, used to identify dash components
+         * in callbacks. The ID needs to be unique across all of the
+         * components in an app.
+         */
+        id: PropTypes.string,
+
+        /**
+         * An object from JSON file describing well log data
+         */
+        welllog: PropTypes.object, //.isRequired,
+
+        /**
+         * Prop containing track template data
+         */
+        template: PropTypes.object.isRequired,
+
+        /**
+         * Prop containing color table data
+         */
+        colorTables: PropTypes.array.isRequired,
+
+        /**
+         * Well picks data
+         */
+        wellpick: PropTypes.object,
+
+        /**
+         * Orientation of the track plots on the screen. Default is false
+         */
+        horizontal: PropTypes.bool,
+
+        /**
+         * Primary axis id: " md", "tvd", "time"...
+         */
+        primaryAxis: PropTypes.string,
+
+        /**
+         * Hide titles of the track. Default is false
+         */
+        hideTitles: PropTypes.bool,
+
+        /**
+         * Hide legends of the track. Default is false
+         */
+        hideLegend: PropTypes.bool,
+
+        /**
+         * Log mnemonics for axes
+         */
+        axisTitles: PropTypes.object,
+
+        /**
+         * Names for axes
+         */
+        axisMnemos: PropTypes.object,
+
+        /**
+         * The maximum number of visible tracks
+         */
+        maxVisibleTrackNum: PropTypes.number,
+
+        /**
+         * The maximum zoom value
+         */
+        maxContentZoom: PropTypes.number,
+
+        /**
+         * Initial visible interval of the log data
+         */
+        domain: PropTypes.arrayOf(PropTypes.number),
+
+        /**
+         * Initial selected interval of the log data
+         */
+        selection: PropTypes.arrayOf(PropTypes.number),
+
+        /**
+         * Validate JSON datafile against schems
+         */
+        checkDatafileSchema: PropTypes.bool,
+    };
 }
 
 export default WellLogView;

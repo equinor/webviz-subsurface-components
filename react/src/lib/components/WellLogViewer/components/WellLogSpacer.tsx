@@ -7,6 +7,48 @@ import WellLogView from "./WellLogView";
 
 import { ColorTable } from "./ColorTableTypes";
 
+export interface PatternsTable {
+    patternSize: number;
+    patterns: string[];
+    patternNames?: string[];
+}
+
+function patternId(uid: number, index: number) {
+    return "pattern" + uid + "_" + index;
+}
+
+function createPattern(
+    uid: number,
+    index: number,
+    patternsTable: PatternsTable
+): ReactNode {
+    const patternSize = patternsTable.patternSize;
+    const pattern = patternsTable.patterns[index];
+    const id = patternId(uid, index);
+    return (
+        <pattern
+            key={id}
+            id={id}
+            width={patternSize}
+            height={patternSize}
+            patternUnits="userSpaceOnUse"
+        >
+            <image width={patternSize} height={patternSize} href={pattern} />
+        </pattern>
+    );
+}
+
+function createDefs(uid: number, patternsTable?: PatternsTable): ReactNode {
+    if (!patternsTable) return null;
+    return (
+        <defs key="defs">
+            {patternsTable.patterns.map((_value: string, index: number) =>
+                createPattern(uid, index, patternsTable)
+            )}
+        </defs>
+    );
+}
+
 interface Props {
     width?: number;
 
@@ -21,7 +63,16 @@ interface Props {
      */
     wellpicks?: WellPickProps[];
 
-    distance?: number;
+    patternsTable?: PatternsTable;
+    patterns?: [string, number][];
+
+    /**
+     * Distanse between wells to show on the spacer
+     */
+    distance?: {
+        units: string;
+        value: number | undefined;
+    };
 
     /**
      * Orientation of the track plots on the screen.
@@ -41,11 +92,23 @@ interface Props {
 
 //interface State {}
 
+// see also colors in Overlays in WellLogView.ts
+const selColor = "rgba(0, 0, 0, 0.1)";
+const curColor = "rgba(255, 0, 0, 0.1)";
+const pinColor = "rgba(0, 255, 0, 0.1)";
+
+let count = 0;
+
 class WellLogSpacer extends Component<Props /*, State*/> {
     container: HTMLElement | undefined = undefined;
 
+    uid: number = count++; // generate some unique id prefix for pattern ids in SVGs
+
+    defs: ReactNode;
+
     constructor(props: Props) {
         super(props);
+        this.defs = createDefs(this.uid, this.props.patternsTable);
     }
 
     update(): void {
@@ -58,6 +121,9 @@ class WellLogSpacer extends Component<Props /*, State*/> {
             // update callback to component's caller
             if (this.props.onCreateSpacer) this.props.onCreateSpacer(this);
         }
+        if (this.props.patternsTable !== prevProps.patternsTable) {
+            this.defs = createDefs(this.uid, this.props.patternsTable);
+        }
     }
 
     shouldComponentUpdate(nextProps: Props /*, nextState: State*/): boolean {
@@ -68,16 +134,16 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         return false;
     }
 
-    render(): ReactNode {
-        // see also colors in Overlays in WellLogView.ts
-        const selColor = "rgba(0, 0, 0, 0.1)";
-        const curColor = "rgba(255, 0, 0, 0.1)";
-        const pinColor = "rgba(0, 255, 0, 0.1)";
-
+    render(): JSX.Element {
         const horizontal = this.props.horizontal;
 
         let ymax = 0;
-        const picks: { color: string; from: number; to: number }[] = [];
+        const picks: {
+            color: string;
+            pattern: string;
+            from: number;
+            to: number;
+        }[] = [];
 
         let offsetTop = 1157;
         let offsetLeft = 1157;
@@ -108,9 +174,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
 
             for (const wp of wps) {
                 const horizon = wp.horizon;
-                //const vMD = wp.vMD;
                 const vPrimary = wp.vPrimary;
-                //const vSecondary = wp.vSecondary;
                 const color = wp.color;
 
                 const rgba =
@@ -121,6 +185,17 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                     "," +
                     color[2] +
                     ",0.8)";
+
+                let pattern = "";
+
+                if (this.props.patterns) {
+                    const p = this.props.patterns.find(
+                        (val) => val[0] === horizon
+                    );
+                    if (p) {
+                        pattern = "url(#" + patternId(this.uid, p[1]) + ")";
+                    }
+                }
 
                 const vCur = vPrimary;
                 if (vCur === undefined) continue;
@@ -143,6 +218,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                             from: v,
                             to: v2,
                             color: rgba,
+                            pattern: pattern,
                         });
 
                         break;
@@ -226,24 +302,48 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                   height +
                   " " +
                   to1 +
-                  " " +
-                  height +
-                  " " +
-                  from1 +
-                  " 0"
+                  (" " + height + " " + from1 + " 0")
                 : "0 " +
                   from0 +
                   " " +
                   width +
                   " " +
                   to0 +
-                  " " +
-                  width +
-                  " " +
-                  to1 +
-                  " 0 " +
-                  from1;
+                  (" " + width + " " + to1 + " 0 " + from1);
         }
+
+        const fillPoints: string[] = [];
+        picks.map((value, index) => {
+            if (index + 1 >= picks.length) return;
+            const value1 = picks[index + 1];
+            fillPoints.push(
+                horizontal
+                    ? value.from.toFixed(1) +
+                          " 0 " +
+                          value.to.toFixed(1) +
+                          " " +
+                          height +
+                          " " +
+                          (value1.to.toFixed(1) +
+                              " " +
+                              height +
+                              " " +
+                              value1.from.toFixed(1) +
+                              " 0")
+                    : "0 " +
+                          value.from.toFixed(1) +
+                          " " +
+                          width +
+                          " " +
+                          value.to.toFixed(1) +
+                          " " +
+                          (width +
+                              " " +
+                              value1.to.toFixed(1) +
+                              " 0 " +
+                              value1.from.toFixed(1))
+            );
+        });
 
         return (
             <div
@@ -273,9 +373,13 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                 >
                     {!this.props.hideTitles ? <br /> : null}
                     {!this.props.hideLegend &&
-                    this.props.distance !== undefined ? (
+                    this.props.distance !== undefined &&
+                    this.props.distance.value !== undefined ? (
                         <div style={{ fontSize: 12, textAlign: "center" }}>
-                            {"←" + this.props.distance.toFixed(0) + "m→"}
+                            {"←" +
+                                this.props.distance.value.toFixed(0) +
+                                this.props.distance.units +
+                                "→"}
                         </div>
                     ) : null}
                 </div>
@@ -294,41 +398,28 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                         stroke="currentColor"
                         strokeWidth={3}
                     >
-                        {picks.map((value, index) =>
-                            index + 1 < picks.length ? (
-                                <polygon
-                                    key={index}
-                                    fill={value.color}
-                                    stroke="none"
-                                    points={
-                                        horizontal
-                                            ? value.from.toFixed(1) +
-                                              " 0 " +
-                                              value.to.toFixed(1) +
-                                              " " +
-                                              height +
-                                              " " +
-                                              picks[index + 1].to.toFixed(1) +
-                                              " " +
-                                              height +
-                                              " " +
-                                              picks[index + 1].from.toFixed(1) +
-                                              " 0"
-                                            : "0 " +
-                                              value.from.toFixed(1) +
-                                              " " +
-                                              width +
-                                              " " +
-                                              value.to.toFixed(1) +
-                                              " " +
-                                              width +
-                                              " " +
-                                              picks[index + 1].to.toFixed(1) +
-                                              " 0 " +
-                                              picks[index + 1].from.toFixed(1)
-                                    }
-                                />
-                            ) : null
+                        {this.defs}
+                        {picks.map(
+                            (value, index) =>
+                                index + 1 < picks.length && [
+                                    value.color && (
+                                        <polygon
+                                            key={index}
+                                            fill={value.color}
+                                            stroke="none"
+                                            points={fillPoints[index]}
+                                        />
+                                    ),
+                                    value.pattern && (
+                                        <polygon
+                                            key={"p" + index}
+                                            fill={value.pattern}
+                                            fillOpacity={0.45}
+                                            stroke="none"
+                                            points={fillPoints[index]}
+                                        />
+                                    ),
+                                ]
                         )}
                         {picks.map((value, index) => (
                             <path

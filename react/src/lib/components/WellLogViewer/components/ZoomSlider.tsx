@@ -1,4 +1,4 @@
-import React, { Component, ReactNode } from "react";
+import React, { Component } from "react";
 
 import Slider from "@material-ui/core/Slider";
 
@@ -64,7 +64,7 @@ class ZoomSlider extends Component<Props, State> {
         }
     }
 
-    render(): ReactNode {
+    render(): JSX.Element {
         return (
             <Slider
                 value={this.state.level}
