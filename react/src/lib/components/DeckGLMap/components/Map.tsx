@@ -475,7 +475,7 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-        if (!didUserChangeCamera) {
+        if (!didUserChangeCamera && !cameraPosition) {
             calcDefaultViewStates();
         }
     }, [reportedBoundingBox]);
@@ -1075,9 +1075,12 @@ function getViewState3D(
         yMin + (yMax - yMin) / 2,
         is3D ? zMin + (zMax - zMin) / 2 : 0,
     ];
-
     const bounds2D = [xMin, yMin, xMax, yMax];
-    const fitted_bound = fitBounds({ width, height, bounds: bounds2D });
+    const fitted_bound = fitBounds({
+        width,
+        height,
+        bounds: bounds2D,
+    });
     const view_state: ViewStateType = {
         target,
         zoom: zoom ?? fitted_bound.zoom * 1.2,
