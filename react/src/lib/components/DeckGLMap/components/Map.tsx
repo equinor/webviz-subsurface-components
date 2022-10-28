@@ -478,7 +478,7 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-        if (!didUserChangeCamera) {
+        if (!didUserChangeCamera && !cameraPosition) {
             calcDefaultViewStates();
         }
     }, [reportedBoundingBox]);
@@ -1001,7 +1001,7 @@ function getViewState(
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     target?: number[],
     zoom?: number,
-    deck?: Deck,
+    deck?: Deck
 ): ViewStateType {
     let bounds = [0, 0, 1, 1];
     if (typeof bounds_accessor == "function") {
@@ -1009,7 +1009,7 @@ function getViewState(
     } else {
         bounds = bounds_accessor;
     }
-    
+
     let width = bounds[2] - bounds[0]; // right - left
     let height = bounds[3] - bounds[1]; // top - bottom
     if (deck) {
