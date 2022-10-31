@@ -655,7 +655,6 @@ class SyncLogViewer extends Component<Props, State> {
                         a * baseDomain[0] + b,
                         a * baseDomain[1] + b,
                     ];
-                    //console.log("i=",i, "a=", a, "b=", b, "baseDomainNew=",baseDomainNew)
 
                     checkMinMax(newBaseDomain[j], baseDomainNew);
                 } else {
@@ -686,51 +685,47 @@ class SyncLogViewer extends Component<Props, State> {
         if (!syncContentDomain && this.props.wellpicks && wellpickFlatting) {
             coeff = this.makeFlattingCoeffs();
         }
-        {
-            // synchronize base domains
-            updated = this.syncContentBaseDomain();
-            const domain = controller.getContentDomain();
+        // synchronize base domains
+        updated = this.syncContentBaseDomain();
+        const domain = controller.getContentDomain();
 
-            let j = -1;
-            for (const _controller of this.controllers) {
-                j++;
-                if (!_controller || _controller == controller) continue;
-                if (syncContentDomain) {
-                    const _domain = _controller.getContentDomain();
-                    if (!isEqDomains(_domain, domain)) {
-                        _controller.zoomContentTo(domain);
+        let j = -1;
+        for (const _controller of this.controllers) {
+            j++;
+            if (!_controller || _controller == controller) continue;
+            if (syncContentDomain) {
+                const _domain = _controller.getContentDomain();
+                if (!isEqDomains(_domain, domain)) {
+                    _controller.zoomContentTo(domain);
+                    updated = true;
+                }
+            } else if (coeff) {
+                const a = coeff.A[iView][j];
+                const b = coeff.B[iView][j];
+
+                const domainNew: [number, number] = [
+                    a * domain[0] + b,
+                    a * domain[1] + b,
+                ];
+                const _domain = _controller.getContentDomain();
+                if (
+                    Number.isFinite(domainNew[0]) &&
+                    Number.isFinite(domainNew[1])
+                ) {
+                    if (!isEqDomains(_domain, domainNew)) {
+                        _controller.zoomContentTo(domainNew);
                         updated = true;
                     }
-                } else if (coeff) {
-                    const a = coeff.A[iView][j];
-                    const b = coeff.B[iView][j];
 
-                    //console.log("a=", a, "b=", b)
-
-                    const domainNew: [number, number] = [
-                        a * domain[0] + b,
-                        a * domain[1] + b,
-                    ];
-                    //console.log("!domainNew =", domainNew)
-                    const _domain = _controller.getContentDomain();
-                    if (
-                        Number.isFinite(domainNew[0]) &&
-                        Number.isFinite(domainNew[1])
-                    )
-                        if (!isEqDomains(_domain, domainNew)) {
-                            _controller.zoomContentTo(domainNew);
-                            updated = true;
-                        }
-
-                    const newBaseDomain = coeff.newBaseDomain[j];
                     const baseDomain = _controller.getContentBaseDomain();
-                    console.log(
-                        "j=",
-                        j,
-                        " newBaseDomain =",
-                        newBaseDomain,
-                        baseDomain
-                    );
+
+                    //const newBaseDomain = coeff.newBaseDomain[j];
+                    const newBaseDomain : [number, number] = [domainNew[0], domainNew[1]];
+                    if (baseDomain[0] > newBaseDomain[0])
+                        newBaseDomain[0] = baseDomain[0];
+                    if (baseDomain[1] < newBaseDomain[1])
+                        newBaseDomain[1] = baseDomain[1];
+
                     if (
                         Number.isFinite(newBaseDomain[0]) &&
                         Number.isFinite(newBaseDomain[1])
@@ -741,17 +736,6 @@ class SyncLogViewer extends Component<Props, State> {
                 }
             }
         }
-
-        /*if(coeff) {
-            const newBaseDomain = coeff.newBaseDomain[iView];
-            const baseDomain = controller.getContentBaseDomain();
-            const j=iView;
-            console.log("j=", j, " newBaseDomain =", newBaseDomain, baseDomain)
-            if (Number.isFinite(newBaseDomain[0]) && Number.isFinite(newBaseDomain[1]))
-            if (!isEqDomains(baseDomain, newBaseDomain)) {
-                //controller.setContentBaseDomain(newBaseDomain);
-            }
-        }*/
 
         if (updated) {
             for (let i = iView - 1; i <= iView; i++) {
