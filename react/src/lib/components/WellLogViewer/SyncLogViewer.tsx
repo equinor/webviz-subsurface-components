@@ -720,7 +720,10 @@ class SyncLogViewer extends Component<Props, State> {
                     const baseDomain = _controller.getContentBaseDomain();
 
                     //const newBaseDomain = coeff.newBaseDomain[j];
-                    const newBaseDomain : [number, number] = [domainNew[0], domainNew[1]];
+                    const newBaseDomain: [number, number] = [
+                        domainNew[0],
+                        domainNew[1],
+                    ];
                     if (baseDomain[0] > newBaseDomain[0])
                         newBaseDomain[0] = baseDomain[0];
                     if (baseDomain[1] < newBaseDomain[1])
