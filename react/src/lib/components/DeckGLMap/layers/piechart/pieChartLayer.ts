@@ -3,11 +3,13 @@ import {
     Color,
     Position,
     PickingInfo,
+    UpdateParameters,
 } from "@deck.gl/core/typed";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { SolidPolygonLayer } from "@deck.gl/layers/typed";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
+import { Vector3 } from "@math.gl/core";
 
 type PieProperties = [{ color: Color; label: string }];
 
@@ -56,7 +58,25 @@ export default class PieChartLayer extends CompositeLayer<
         }
     }
 
+    shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
+        return changeFlags.viewportChanged;
+    }
+
     renderLayers(): SolidPolygonLayer<PolygonData>[] {
+        const is_orthographic =
+            this.context.viewport.constructor.name === "OrthographicViewport";
+
+        const npixels = 100;
+        const p1 = is_orthographic ? [0, 0, 0] : [0, 0];
+        const p2 = is_orthographic ? [npixels, 0, 0] : [npixels, 0];
+
+        const v1 = new Vector3(this.context.viewport.unproject(p1));
+        const v2 = new Vector3(this.context.viewport.unproject(p2));
+        const d = v1.distance(v2);
+
+        // Factor to convert a length in pixels to a length in world space.
+        const pixels2world = d / npixels;
+
         const pieData = this.props.data as unknown as PiesData;
         if (!pieData?.pies) {
             // this.props.data is a sum type, and since TS doesn't have
@@ -66,7 +86,7 @@ export default class PieChartLayer extends CompositeLayer<
 
         const layer = new SolidPolygonLayer<PolygonData>(
             this.getSubLayerProps({
-                data: makePies(pieData),
+                data: makePies(pieData, pixels2world),
                 getFillColor: (d: PolygonData) => d.properties.color,
             })
         );
@@ -81,11 +101,13 @@ PieChartLayer.defaultProps = layersDefaultProps[
 
 //================= Local help functions. ==================
 
-function makePies(data: PiesData): PolygonData[] {
+function makePies(data: PiesData, pixels2world: number): PolygonData[] {
     let polygons: PolygonData[] = [];
     let pie_index = 0;
     for (const pie of data.pies) {
-        polygons = polygons.concat(makePie(pie, data.properties, pie_index++));
+        polygons = polygons.concat(
+            makePie(pie, data.properties, pie_index++, pixels2world)
+        );
     }
     return polygons;
 }
@@ -94,13 +116,14 @@ function makePies(data: PiesData): PolygonData[] {
 function makePie(
     pie: PieData,
     properties: PieProperties,
-    pieIndex: number
+    pieIndex: number,
+    pixels2world: number
 ): PolygonData[] {
     const dA = 10; // delta angle
 
     const x = pie.x;
     const y = pie.y;
-    const R = pie.R;
+    const R = pie.R * pixels2world; // R: Radius in world coordinates.
 
     // Normalize
     let sum = 0;
