@@ -26,9 +26,9 @@ jobs:
             run-performance-tests: false
           - python-version: "3.10"
             run-performance-tests: false
-            e2e-tests: true
           - python-version: "3.10" # This particular job in the matrix is allowed to fail(for performance and cypress test)
             run-performance-tests: true
+            e2e-tests: true
 
     steps:
       - name: 📖 Checkout commit locally
@@ -117,9 +117,6 @@ jobs:
       - name: install cypress binary
         if: github.event_name != 'release' && matrix.e2e-tests
         run: |
-          echo "${{ github.event.pull_request.head.repo.full_name }}"
-          echo "${{ github.head_ref }}"
-          echo "${{ github.event.pull_request.head.ref }}"
           cd react
           npx cypress install
 
@@ -140,37 +137,6 @@ jobs:
             react/cypress/screenshots
             react/cypress-visual-screenshots
           retention-days: 5
-
-      - name: check if the tests failed due to difference in snapshots
-        id: check_file_changed
-        if: github.event_name != 'release' && matrix.e2e-tests && failure()
-        run: |
-          if [[ -d react/cypress-visual-screenshots/diff ]]
-          then
-            echo ::set-output name=docs_changed::true
-          else
-            echo ::set-output name=docs_changed::false
-          fi
-
-      - name: replace newly captured snapshots
-        if: steps.check_file_changed.outputs.docs_changed == 'true' && failure()
-        run: |
-          cd react
-          npx cypress-image-diff -u
-          rm -rf cypress-visual-screenshots/comparison
-          rm -rf cypress-visual-screenshots/diff
-          rm -rf cypress/screenshots
-          rm -rf cypress/videos
-
-      - name: create pull request
-        if: steps.check_file_changed.outputs.docs_changed == 'true' && failure()
-        run: | 
-          git config user.name ${{ github.actor }}
-          git checkout -b update_snaps
-          git commit -am "updating snapshots"
-          gh pr create --reviewer ${{ github.actor }} -B ${{ github.actor }}:${{ github.head_ref }} -H ${{ github.actor }}:update_snaps --title 'Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}' --body 'Created by Github action'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
@@ -206,7 +172,7 @@ jobs:
         run: npm run build-storybook --prefix ./react
 
       - name: 📚 Update Storybook and GitHub demo application
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8'
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8' && failure() && matrix.e2e-tests
         run: |
           cp -r ./react/{index.html,output.css,output.js,storybook-static} ..
 
@@ -226,4 +192,26 @@ jobs:
           else
             git commit -m "Update Github Pages"
             git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+          fi
+
+      - name: create automated pull request
+        id: check_file_changed
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -d "react/cypress-visual-screenshots/diff" ]
+          then
+            cd react
+            npx cypress-image-diff -u
+            rm -rf cypress-visual-screenshots/comparison
+            rm -rf cypress-visual-screenshots/diff
+            rm -rf cypress/screenshots
+            rm -rf cypress/videos
+            git config --local user.email "webviz-github-action"
+            git config --local user.name "webviz-github-action"
+            git checkout -b update_snaps
+            git commit -am "updating snapshots"
+            git push -u origin update_snaps
+            gh pr create --reviewer ${{ github.actor }} --title 'Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}' --body 'Created by Github action'
           fi
