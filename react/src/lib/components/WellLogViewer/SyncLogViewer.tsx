@@ -724,9 +724,9 @@ class SyncLogViewer extends Component<Props, State> {
                         domainNew[0],
                         domainNew[1],
                     ];
-                    if (baseDomain[0] > newBaseDomain[0])
+                    if (baseDomain[0] < newBaseDomain[0])
                         newBaseDomain[0] = baseDomain[0];
-                    if (baseDomain[1] < newBaseDomain[1])
+                    if (baseDomain[1] > newBaseDomain[1])
                         newBaseDomain[1] = baseDomain[1];
 
                     if (
