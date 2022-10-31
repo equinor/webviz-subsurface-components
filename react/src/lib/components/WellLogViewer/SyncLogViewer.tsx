@@ -735,6 +735,7 @@ class SyncLogViewer extends Component<Props, State> {
                     )
                         if (!isEqDomains(baseDomain, newBaseDomain)) {
                             _controller.setContentBaseDomain(newBaseDomain);
+                            updated = true;
                         }
                 }
             }
