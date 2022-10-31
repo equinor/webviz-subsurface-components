@@ -53,8 +53,7 @@ export default {
             description: "Prop containing color table data.",
         },
         wellpickFlatting: {
-            description:
-                "Horizon names for wellpick flatting (syncContentDomain should be false)",
+            description: "Horizon names for wellpick flatting",
         },
         spacers: {
             description:
@@ -81,7 +80,7 @@ export default {
             defaultValue: false,
         },
         syncContentDomain: {
-            description: "Synchronize visible content domain",
+            description: "Synchronize visible content domain (pan and zoom)",
             defaultValue: false,
         },
         syncContentSelection: {

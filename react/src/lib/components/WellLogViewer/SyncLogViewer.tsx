@@ -62,7 +62,7 @@ interface Props {
     patterns?: [string, number][];
 
     /**
-     * Horizon names for wellpick flatting (syncContentDomain should be false)
+     * Horizon names for wellpick flatting (pan and zoom)
      */
     wellpickFlatting?: string[]; // For example ["Hor_5", "Hor_3"];
 
@@ -198,7 +198,7 @@ export const argTypesSyncLogViewerProp = {
         defaultValue: false,
     },
     syncContentDomain: {
-        description: "Synchronize visible content domain",
+        description: "Synchronize visible content domain (pan and zoom)",
         defaultValue: false,
     },
     syncContentSelection: {
@@ -501,7 +501,10 @@ class SyncLogViewer extends Component<Props, State> {
         const domain = controller.getContentDomain();
         for (const _controller of this.controllers) {
             if (!_controller || _controller == controller) continue;
-            if (this.props.syncContentDomain) {
+            if (
+                !(this.props.wellpickFlatting && this.props.wellpicks) &&
+                this.props.syncContentDomain
+            ) {
                 const _domain = _controller.getContentDomain();
                 if (!isEqDomains(_domain, domain))
                     _controller.zoomContentTo(domain);
@@ -555,7 +558,10 @@ class SyncLogViewer extends Component<Props, State> {
 
     syncContentBaseDomain(): boolean {
         let updated = false;
-        if (this.props.syncContentDomain) {
+        if (
+            !(this.props.wellpickFlatting && this.props.wellpicks) &&
+            this.props.syncContentDomain
+        ) {
             const commonBaseDomain: [number, number] =
                 this.getCommonContentBaseDomain();
             for (const controller of this.controllers) {
@@ -636,15 +642,20 @@ class SyncLogViewer extends Component<Props, State> {
                     )
                         a = (_wp2 - _wp1) / (wp2 - wp1);
                     else {
-                        /*
-                        const domain = controller.getContentDomain();
-                        const _domain = _controller.getContentDomain();
-                        if(_domain[1] - _domain[0] && domain[1] - domain[0])
-                            a = (_domain[1] - _domain[0]) / (domain[1] - domain[0]);
-                        else
+                        if (this.props.syncContentDomain) {
                             a = 1;
-                        */
-                        a = 1;
+                        } else {
+                            const domain = controller.getContentDomain();
+                            const _domain = _controller.getContentDomain();
+                            if (
+                                _domain[1] - _domain[0] &&
+                                domain[1] - domain[0]
+                            )
+                                a =
+                                    (_domain[1] - _domain[0]) /
+                                    (domain[1] - domain[0]);
+                            else a = 1;
+                        }
                     }
                     const b = _wp1 - a * wp1;
                     _flattingA.push(a);
@@ -682,7 +693,7 @@ class SyncLogViewer extends Component<Props, State> {
             B: number[][];
             newBaseDomain: [number, number][];
         } | null = null;
-        if (!syncContentDomain && this.props.wellpicks && wellpickFlatting) {
+        if (this.props.wellpicks && wellpickFlatting) {
             coeff = this.makeFlattingCoeffs();
         }
         // synchronize base domains
@@ -693,14 +704,8 @@ class SyncLogViewer extends Component<Props, State> {
         for (const _controller of this.controllers) {
             j++;
             if (!_controller || _controller == controller) continue;
-            if (syncContentDomain) {
-                const _domain = _controller.getContentDomain();
-                if (!isEqDomains(_domain, domain)) {
-                    _controller.zoomContentTo(domain);
-                    updated = true;
-                }
-            } else if (coeff) {
-                const a = coeff.A[iView][j];
+            if (coeff) {
+                /* wellpick flatting */ const a = coeff.A[iView][j];
                 const b = coeff.B[iView][j];
 
                 const domainNew: [number, number] = [
@@ -717,8 +722,8 @@ class SyncLogViewer extends Component<Props, State> {
                         updated = true;
                     }
 
+                    // sync scroll bar: not work yet
                     const baseDomain = _controller.getContentBaseDomain();
-
                     //const newBaseDomain = coeff.newBaseDomain[j];
                     const newBaseDomain: [number, number] = [
                         domainNew[0],
@@ -728,7 +733,6 @@ class SyncLogViewer extends Component<Props, State> {
                         newBaseDomain[0] = baseDomain[0];
                     if (baseDomain[1] > newBaseDomain[1])
                         newBaseDomain[1] = baseDomain[1];
-
                     if (
                         Number.isFinite(newBaseDomain[0]) &&
                         Number.isFinite(newBaseDomain[1])
@@ -737,6 +741,12 @@ class SyncLogViewer extends Component<Props, State> {
                             //_controller.setContentBaseDomain(newBaseDomain);
                             //updated = true;
                         }
+                }
+            } else if (syncContentDomain) {
+                const _domain = _controller.getContentDomain();
+                if (!isEqDomains(_domain, domain)) {
+                    _controller.zoomContentTo(domain);
+                    updated = true;
                 }
             }
         }
@@ -1032,7 +1042,7 @@ SyncLogViewer.propTypes = {
     patterns: PropTypes.array,
 
     /**
-     * Horizon names for wellpick flatting (syncContentDomain should be false)
+     * Horizon names for wellpick flatting (pan and zoom)
      */
     wellpickFlatting: PropTypes.arrayOf(PropTypes.string),
 
