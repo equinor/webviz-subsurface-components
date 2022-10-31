@@ -573,7 +573,7 @@ class SyncLogViewer extends Component<Props, State> {
     makeFlattingCoeffs(): {
         A: number[][];
         B: number[][];
-        newBaseDomain: [number, number][];
+        newBaseDomain: [number, number][]; // not used
     } {
         const wellpickFlatting = this.props.wellpickFlatting;
         if (!wellpickFlatting) return { A: [], B: [], newBaseDomain: [] };
