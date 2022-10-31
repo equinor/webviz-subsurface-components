@@ -705,7 +705,8 @@ class SyncLogViewer extends Component<Props, State> {
             j++;
             if (!_controller || _controller == controller) continue;
             if (coeff) {
-                /* wellpick flatting */ const a = coeff.A[iView][j];
+                // wellpick flatting
+                const a = coeff.A[iView][j];
                 const b = coeff.B[iView][j];
 
                 const domainNew: [number, number] = [
