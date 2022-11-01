@@ -175,49 +175,40 @@ export const argTypesSyncLogViewerProp = {
 
     horizontal: {
         description: "Orientation of the track plots on the screen.",
-        defaultValue: false,
     },
     maxVisibleTrackNum: {
-        description: "The maximum number of visible tracks",
-        defaultValue: 3,
+        description: "The maximum number of visible tracks", // defaultValue: 3 
     },
     maxContentZoom: {
-        description: "The maximum zoom value",
-        defaultValue: 256,
+        description: "The maximum zoom value", // defaultValue: 256
     },
     hideTitles: {
-        description: "Hide titles on the tracks.",
-        defaultValue: false,
+        description: "Hide titles on the tracks.", // defaultValue: false
     },
     hideLegend: {
-        description: "Hide legends on the tracks.",
-        defaultValue: false,
+        description: "Hide legends on the tracks.", // defaultValue: false
     },
     syncTrackPos: {
-        description: "Synchronize first visible track",
-        defaultValue: false,
+        description: "Synchronize first visible track", // defaultValue: false
     },
     syncContentDomain: {
-        description: "Synchronize visible content domain (pan and zoom)",
-        defaultValue: false,
+        description: "Synchronize visible content domain (pan and zoom)", // defaultValue: false
     },
     syncContentSelection: {
-        description: "Synchronize content selection",
-        defaultValue: false,
+        description: "Synchronize content selection", // defaultValue: false
     },
     syncTemplate: {
-        description: "Synchronize templates in the views",
-        defaultValue: false,
+        description: "Synchronize templates in the views", // defaultValue: false
     },
     readoutOptions: {
         description:
             "Options for readout panel.<br/>" +
             "allTracks: boolean — Show not only visible tracks,<br/>" +
             "grouping: string — How group values.",
-        defaultValue: {
-            allTracks: false,
-            grouping: "by_track",
-        },
+        //defaultValue: {
+        //    allTracks: false,
+        //    grouping: "by_track",
+        //},
     },
     domain: {
         description: "Initial visible interval of the log data.",

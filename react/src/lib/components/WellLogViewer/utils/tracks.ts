@@ -374,7 +374,7 @@ function getColorTable(
         for (let i = 0; i < colorTables.length; i++) {
             if (colorTables[i].name == id) return colorTables[i];
         }
-        console.log(
+        console.error(
             "colorTable id='" + id + "' is not found in getColorTable()"
         );
         return defColorTable;
