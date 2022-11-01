@@ -113,9 +113,9 @@
             "type": "array",
             "items": {
                 "anyOf": [
-                    { "type": "number", "minimum": 0 },
-                    { "type": "string", "minimum": 0 },
-                    { "type": "null", "minimum": 0 }
+                    { "type": "number" },
+                    { "type": "string" },
+                    { "type": "null" }
                 ]
             }
         },
