@@ -140,7 +140,7 @@ interface Props {
 
     onCreateController?: (iView: number, controller: WellLogController) => void;
 }
-/*
+/**/
 export const argTypesSyncLogViewerProp = {
     id: {
         description:
@@ -177,10 +177,10 @@ export const argTypesSyncLogViewerProp = {
         description: "Orientation of the track plots on the screen.",
     },
     maxVisibleTrackNum: {
-        description: "The maximum number of visible tracks", // defaultValue: 3 
+        description: "The maximum number of visible tracks", // defaultValue: 3
     },
     maxContentZoom: {
-        description: "The maximum zoom value", // defaultValue: 256
+        description: "The maximum zoom value (default 256)",
     },
     hideTitles: {
         description: "Hide titles on the tracks.", // defaultValue: false
@@ -218,7 +218,7 @@ export const argTypesSyncLogViewerProp = {
     },
     // callbacks...
 };
-*/
+/**/
 interface State {
     axes: string[]; // axes available in welllog
     primaryAxis: string;
