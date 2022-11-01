@@ -112,7 +112,11 @@
         "data_row": {
             "type": "array",
             "items": {
-                "type": ["number", "string", "null"]
+                "anyOf": [
+                    { "type": "number", "minimum": 0 },
+                    { "type": "string", "minimum": 0 },
+                    { "type": "null", "minimum": 0 }
+                ]
             }
         },
         "metadata_discrete": {
