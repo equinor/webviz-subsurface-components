@@ -8,6 +8,8 @@ import {
     colorTables,
 } from "@emerson-eps/color-tables";
 import { MapMouseEvent } from "../../components/Map";
+import { makeStyles } from "@material-ui/core";
+import { iteratorSymbol } from "immer/dist/internal";
 
 export default {
     component: DeckGLMap,
@@ -36,6 +38,20 @@ const defaultProps = {
         },
     ],
 };
+
+const useStyles = makeStyles({
+    main: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+    legend: {
+        width: 100,
+        position: "absolute",
+        top: "0",
+        right: "0",
+    },
+});
 
 const continuousLogsLayer = {
     ...defaultProps.layers[0],
@@ -240,14 +256,55 @@ CustomWidthWells.args = {
     ],
 };
 
-CustomColoredWells.parameters = {
-    docs: {
-        description: {
-            story: "Volve wells example with thick lines.",
-        },
-        inlineStories: false,
-        iframeHeight: 500,
+export const VolveWellsWithResetButton: ComponentStory<typeof DeckGLMap> = (
+    args
+) => {
+    const [editedData, setEditedData] = React.useState(args.editedData);
+    const [triggerResetOption, setTriggerResetOption] = React.useState<
+        Record<string, boolean>
+    >({ resetMultipleWells: false });
+    React.useEffect(() => {
+        setEditedData(args.editedData);
+    }, [args.editedData]);
+
+    const onClick = React.useCallback(() => {
+        const temp = { resetMultipleWells: true };
+        setTriggerResetOption(temp);
+    }, []);
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap
+                    {...args}
+                    editedData={editedData}
+                    setProps={(updatedProps) => {
+                        setEditedData(updatedProps);
+                    }}
+                    triggerResetOption={triggerResetOption}
+                />
+            </div>
+            <button onClick={onClick}> Reset Camera </button>
+        </>
+    );
+};
+
+VolveWellsWithResetButton.args = {
+    id: "volve-wells",
+    resources: {
+        wellsData: "./volve_wells.json",
     },
+    bounds: [432150, 6475800, 439400, 6481500] as [
+        number,
+        number,
+        number,
+        number
+    ],
+    layers: [
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData",
+        },
+    ],
 };
 
 function wellheadSizeCallback(object: Record<string, Record<string, unknown>>) {

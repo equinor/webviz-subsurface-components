@@ -263,6 +263,8 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
+
+    triggerResetOption?: Record<string, boolean>;
 }
 
 export interface MapMouseEvent {
@@ -318,9 +320,9 @@ const Map: React.FC<MapProps> = ({
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
     triggerHome,
+    triggerResetOption,
 }: MapProps) => {
     const deckRef = useRef<DeckGLRef>(null);
-
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
 
@@ -914,6 +916,12 @@ const Map: React.FC<MapProps> = ({
                                 updated_prop["multiSelectedWells"] = temp;
                                 setMultipleWells(temp);
                             }
+                        }
+                        if (triggerResetOption["resetMultipleWells"] === true) {
+                            const temp = [];
+                            updated_prop["multiSelectedWells"] = temp;
+                            setMultipleWells(temp);
+                            triggerResetOption["resetMultipleWells"] = false;
                         }
                         setEditedData?.(updated_prop);
                     },
