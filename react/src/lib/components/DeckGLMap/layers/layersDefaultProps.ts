@@ -148,4 +148,12 @@ export const layersDefaultProps: Record<string, unknown> = {
             features: [],
         },
     },
+    Grid3DLayer: {
+        "@@type": "Grid3DLayer",
+        name: "Grid 3D",
+        id: "grid-3d-layer",
+        visible: true,
+        filled: true,
+        material: true,
+    },
 };
