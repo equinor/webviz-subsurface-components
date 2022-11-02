@@ -9,7 +9,6 @@ import {
 } from "@emerson-eps/color-tables";
 import { MapMouseEvent } from "../../components/Map";
 import { makeStyles } from "@material-ui/core";
-import { iteratorSymbol } from "immer/dist/internal";
 
 export default {
     component: DeckGLMap,
