@@ -611,11 +611,23 @@ const Map: React.FC<MapProps> = ({
                 layers,
                 "WellsLayer"
             )?.[0] as WellsLayer;
-
+            
             wellslayer?.setSelection(selection?.well, selection?.selection);
         }
     }, [selection]);
 
+    useEffect(() => {
+        const layers = deckRef.current?.deck?.props.layers;
+        if (layers) {
+            const wellslayer = getLayersByType(
+                layers,
+                "WellsLayer"
+            )?.[0] as WellsLayer;
+            
+            wellslayer?.setSelection(selection?.well, selection?.selection);
+        }
+    }, [selection]);
+    
     // multiple well layers
     const [multipleWells, setMultipleWells] = useState<string[]>([]);
 

@@ -83,6 +83,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedWell: string;
+    multipleSelectedWells: string[];
     logData: string | LogCurveDataType[];
     logName: string;
     logColor: string;
@@ -234,6 +235,16 @@ export default class WellsLayer extends CompositeLayer<
         }
     }
 
+    setMultiSelection(
+        well: string | undefined,
+    ): void {
+        if (this.internalState) {
+            this.setState({
+                well: well,
+            });
+        }
+    }
+
     shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
         return (
             changeFlags.viewportChanged ||
@@ -356,6 +367,7 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
+        console.log(this.props);
         // Highlight the selected well.
         const highlight = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
