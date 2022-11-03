@@ -33,6 +33,18 @@ import { LogViewer } from "@equinor/videx-wellog";
 
 import { Info, InfoOptions } from "./components/InfoTypes";
 
+function isArr2Differ(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    src1: any[] | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    src2: any[] | undefined
+): boolean {
+    if (!src1) return !!src2;
+    if (!src2) return true;
+
+    return src1[0] !== src2[0] || src1[1] !== src2[1];
+}
+
 interface Props {
     /**
      * Object from JSON file describing single well log data.
@@ -140,7 +152,7 @@ interface Props {
 
     onCreateController?: (iView: number, controller: WellLogController) => void;
 }
-/**/
+
 export const argTypesSyncLogViewerProp = {
     id: {
         description:
@@ -218,7 +230,7 @@ export const argTypesSyncLogViewerProp = {
     },
     // callbacks...
 };
-/**/
+
 interface State {
     axes: string[]; // axes available in welllog
     primaryAxis: string;
@@ -353,28 +365,28 @@ class SyncLogViewer extends Component<Props, State> {
             });
         }
 
-        if (
-            this.props.domain &&
-            (!prevProps.domain ||
-                this.props.domain[0] !== prevProps.domain[0] ||
-                this.props.domain[1] !== prevProps.domain[1])
-        ) {
+        if (isArr2Differ(this.props.domain, prevProps.domain)) {
             this.setControllersZoom();
         }
 
         if (
-            this.props.selection &&
-            (!prevProps.selection ||
-                this.props.selection[0] !== prevProps.selection[0] ||
-                this.props.selection[1] !== prevProps.selection[1])
+            isArr2Differ(
+                this.props.wellpickFlatting,
+                prevProps.wellpickFlatting
+            ) ||
+            this.props.wellpicks !== prevProps.wellpicks
         ) {
+            this.syncContentScrollPos(0); // force to redraw
+        }
+
+        if (isArr2Differ(this.props.selection, prevProps.selection)) {
             this.setControllersSelection();
         }
 
         if (
             this.props.syncContentSelection !== prevProps.syncContentSelection
         ) {
-            this.syncContentSelection(0);
+            this.syncContentSelection(0); // force to redraw selection
         }
 
         if (
