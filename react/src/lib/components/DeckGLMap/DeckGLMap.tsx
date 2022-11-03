@@ -73,7 +73,7 @@ export interface DeckGLMapProps {
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
 
-    triggerResetOption?: Record<string, boolean>;
+    triggerResetOption?: boolean;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({

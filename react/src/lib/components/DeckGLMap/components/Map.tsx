@@ -264,7 +264,7 @@ export interface MapProps {
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
 
-    triggerResetOption?: Record<string, boolean>;
+    triggerResetOption?: boolean;
 }
 
 export interface MapMouseEvent {
@@ -919,14 +919,12 @@ const Map: React.FC<MapProps> = ({
                         }
                         if (triggerResetOption) {
                             if (
-                                triggerResetOption["resetMultipleWells"] ===
-                                true
+                                triggerResetOption ===true
                             ) {
                                 const temp: string[] = [];
                                 updated_prop["multiSelectedWells"] = temp;
                                 setMultipleWells(temp);
-                                triggerResetOption["resetMultipleWells"] =
-                                    false;
+                                triggerResetOption =false;
                             }
                         }
                         setEditedData?.(updated_prop);

@@ -259,16 +259,15 @@ export const VolveWellsWithResetButton: ComponentStory<typeof DeckGLMap> = (
     args
 ) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
-    const [triggerResetOption, setTriggerResetOption] = React.useState<
-        Record<string, boolean>
-    >({ resetMultipleWells: false });
+    const [triggerResetOption, setTriggerResetOption] =
+        React.useState<boolean>(false);
     React.useEffect(() => {
         setEditedData(args.editedData);
     }, [args.editedData]);
 
+    console.log(editedData);
     const onClick = React.useCallback(() => {
-        const temp = { resetMultipleWells: true };
-        setTriggerResetOption(temp);
+        setTriggerResetOption(true);
     }, []);
     return (
         <>
