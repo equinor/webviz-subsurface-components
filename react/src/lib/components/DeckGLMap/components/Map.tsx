@@ -630,18 +630,19 @@ const Map: React.FC<MapProps> = ({
     // multiple well layers
     const [multipleWells, setMultipleWells] = useState<string[]>([]);
 
-    useEffect(() => {
-        console.log("getCalled");
-        const layers = deckRef.current?.deck?.props.layers;
-        if (layers) {
-            const wellslayer = getLayersByType(
-                layers,
-                "WellsLayer"
-            )?.[0] as WellsLayer;
+    // useEffect(() => {
+    //     console.log("getCalled");
+    //     const layers = deckRef.current?.deck?.props.layers;
+    //     if (layers) {
+    //         const wellslayer = getLayersByType(
+    //             layers,
+    //             "WellsLayer"
+    //         )?.[0] as WellsLayer;
             
-            wellslayer?.setMultiSelection(multipleWells);
-        }
-    }, [multipleWells]);
+    //         wellslayer?.setMultiSelection(multipleWells);
+    //     }
+    //     console.log(multipleWells);
+    // }, [multipleWells]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
@@ -912,6 +913,16 @@ const Map: React.FC<MapProps> = ({
                                 setMultipleWells(temp);
                             }
                         }
+                        const layers = deckRef.current?.deck?.props.layers;
+                        if (layers) {
+                            const wellslayer = getLayersByType(
+                                layers,
+                                "WellsLayer"
+                            )?.[0] as WellsLayer;
+                            
+                            wellslayer?.setMultiSelection(updated_prop["multiSelectedWells"]);
+                        }
+                        console.log(updated_prop["multiSelectedWells"]);
                         setEditedData?.(updated_prop);
                     },
                     colorTables: colorTables,
