@@ -265,7 +265,6 @@ export const VolveWellsWithResetButton: ComponentStory<typeof DeckGLMap> = (
         setEditedData(args.editedData);
     }, [args.editedData]);
 
-    console.log(editedData);
     const onClick = React.useCallback(() => {
         setTriggerResetOption(true);
     }, []);

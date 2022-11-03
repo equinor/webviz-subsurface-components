@@ -918,13 +918,11 @@ const Map: React.FC<MapProps> = ({
                             }
                         }
                         if (triggerResetOption) {
-                            if (
-                                triggerResetOption ===true
-                            ) {
+                            if (triggerResetOption === true) {
                                 const temp: string[] = [];
                                 updated_prop["multiSelectedWells"] = temp;
                                 setMultipleWells(temp);
-                                triggerResetOption =false;
+                                triggerResetOption = false;
                             }
                         }
                         setEditedData?.(updated_prop);
