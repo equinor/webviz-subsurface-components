@@ -194,28 +194,6 @@ jobs:
             git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
           fi
 
-      - name: create automated pull request
-        id: check_file_changed
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ -d "react/cypress-visual-screenshots/diff" ]
-          then
-            cd react
-            npx cypress-image-diff -u
-            rm -rf cypress-visual-screenshots/comparison
-            rm -rf cypress-visual-screenshots/diff
-            rm -rf cypress/screenshots
-            rm -rf cypress/videos
-            git config --local user.email "webviz-github-action"
-            git config --local user.name "webviz-github-action"
-            git checkout -b update_snaps
-            git commit -am "updating snapshots"
-            git push -u origin update_snaps
-            gh pr create --reviewer ${{ github.actor }} --title 'Cypress - New Snapshots for PR number ${{ github.event.number }} by ${{ github.actor }}' --body 'Created by Github action'
-          fi
-
       - name: prepare for automated pull request
         id: check_file_changed
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
