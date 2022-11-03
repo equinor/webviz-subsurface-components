@@ -83,7 +83,6 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     lineWidthScale: number;
     outline: boolean;
     selectedWell: string;
-    multipleSelectedWells: string[];
     logData: string | LogCurveDataType[];
     logName: string;
     logColor: string;
@@ -235,12 +234,10 @@ export default class WellsLayer extends CompositeLayer<
         }
     }
 
-    setMultiSelection(
-        well: string | undefined,
-    ): void {
+    setMultiSelection(wells: string[] | undefined): void {
         if (this.internalState) {
             this.setState({
-                well: well,
+                selectedMultiWells: wells,
             });
         }
     }
@@ -367,7 +364,6 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        console.log(this.props);
         // Highlight the selected well.
         const highlight = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
@@ -391,6 +387,33 @@ export default class WellsLayer extends CompositeLayer<
                 ),
                 getFillColor: getColor(this.props.wellHeadStyle?.color),
                 getLineColor: getColor(this.props.lineStyle?.color),
+            })
+        );
+
+        // Highlight the multi selected wells.
+        const highlightMultiWells = new UnfoldedGeoJsonLayer(
+            this.getSubLayerProps({
+                id: "highlight",
+                data: getWellObjectsByName(
+                    data.features,
+                    this.state.selectedMultiWells
+                ),
+                pickable: false,
+                stroked: false,
+                positionFormat,
+                pointRadiusUnits: "pixels",
+                lineWidthUnits: "pixels",
+                pointRadiusScale: this.props.pointRadiusScale,
+                lineWidthScale: this.props.lineWidthScale,
+                getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
+                getPointRadius: getSize(
+                    POINT,
+                    this.props.wellHeadStyle?.size,
+                    2
+                ),
+                // getFillColor: getColor(this.props.wellHeadStyle?.color),
+                getFillColor: [0, 0, 0],
+                getLineColor: [0, 0, 0],
             })
         );
 
@@ -520,7 +543,15 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        return [outline, log_layer, colors, highlight, selection_layer, names];
+        return [
+            outline,
+            log_layer,
+            colors,
+            highlight,
+            highlightMultiWells,
+            selection_layer,
+            names,
+        ];
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
@@ -681,6 +712,25 @@ function getWellObjectByName(
         (item) =>
             item.properties?.["name"]?.toLowerCase() === name?.toLowerCase()
     );
+}
+
+function getWellObjectsByName(
+    wells_data: Feature[],
+    name: string[]
+): Feature[] | undefined {
+    console.log("1");
+    const res: Feature[] = [];
+    for (let i = 0; i < name?.length; i++) {
+        wells_data?.find((item) => {
+            if (
+                item.properties?.["name"]?.toLowerCase() ===
+                name[i]?.toLowerCase()
+            ) {
+                res.push(item);
+            }
+        });
+    }
+    return res;
 }
 
 function getPointGeometry(well_object: Feature): Point {

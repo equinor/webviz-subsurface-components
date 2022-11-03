@@ -617,6 +617,21 @@ const Map: React.FC<MapProps> = ({
     }, [selection]);
 
     useEffect(() => {
+      
+        if (layers) {
+            const wellslayer = getLayersByType(
+                layers,
+                "WellsLayer"
+            )?.[0] as WellsLayer;
+            
+            wellslayer?.setMultiSelection(selection?.well, selection?.selection);
+        }
+    }, [])
+    // multiple well layers
+    const [multipleWells, setMultipleWells] = useState<string[]>([]);
+
+    useEffect(() => {
+        console.log("getCalled");
         const layers = deckRef.current?.deck?.props.layers;
         if (layers) {
             const wellslayer = getLayersByType(
@@ -624,13 +639,9 @@ const Map: React.FC<MapProps> = ({
                 "WellsLayer"
             )?.[0] as WellsLayer;
             
-            wellslayer?.setSelection(selection?.well, selection?.selection);
+            wellslayer?.setMultiSelection(multipleWells);
         }
-    }, [selection]);
-    
-    // multiple well layers
-    const [multipleWells, setMultipleWells] = useState<string[]>([]);
-
+    }, [multipleWells]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
