@@ -20,19 +20,16 @@ export default {
     },
     argTypes: {
         value: {
-            description: "Zoom value",
-            defaultValue: 1,
+            description: "Zoom value (default 1)",
         },
         max: {
-            description: "Max zoom value",
-            defaultValue: 256,
+            description: "Max zoom value (default 256)",
         },
         onChange: {
             description: "zoom value callback",
         },
         step: {
-            description: "zoom level step",
-            defaultValue: 0.5,
+            description: "zoom level step (default 0.5)",
         },
     },
 };

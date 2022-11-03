@@ -16,6 +16,9 @@ import { ColorTable } from "./components/ColorTableTypes";
 
 import { WellLogController, WellPickProps } from "./components/WellLogView";
 
+import WellLogView from "./components/WellLogView";
+import { getWellPicks } from "./components/WellLogView";
+
 import { getAvailableAxes } from "./utils/tracks";
 
 import { checkMinMax } from "./utils/minmax";
@@ -29,6 +32,18 @@ import { fillInfos } from "./utils/fill-info";
 import { LogViewer } from "@equinor/videx-wellog";
 
 import { Info, InfoOptions } from "./components/InfoTypes";
+
+function isArr2Differ(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    src1: any[] | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    src2: any[] | undefined
+): boolean {
+    if (!src1) return !!src2;
+    if (!src2) return true;
+
+    return src1[0] !== src2[0] || src1[1] !== src2[1];
+}
 
 interface Props {
     /**
@@ -57,6 +72,11 @@ interface Props {
      * Horizon to pattern index map
      */
     patterns?: [string, number][];
+
+    /**
+     * Horizon names for wellpick flatting (pan and zoom)
+     */
+    wellpickFlatting?: string[]; // For example ["Hor_5", "Hor_3"];
 
     /**
      * Set to true or spacer width or to array of widths if WellLogSpacers should be used
@@ -132,7 +152,7 @@ interface Props {
 
     onCreateController?: (iView: number, controller: WellLogController) => void;
 }
-/*
+
 export const argTypesSyncLogViewerProp = {
     id: {
         description:
@@ -167,49 +187,40 @@ export const argTypesSyncLogViewerProp = {
 
     horizontal: {
         description: "Orientation of the track plots on the screen.",
-        defaultValue: false,
     },
     maxVisibleTrackNum: {
-        description: "The maximum number of visible tracks",
-        defaultValue: 3,
+        description: "The maximum number of visible tracks", // defaultValue: 3
     },
     maxContentZoom: {
-        description: "The maximum zoom value",
-        defaultValue: 256,
+        description: "The maximum zoom value (default 256)",
     },
     hideTitles: {
-        description: "Hide titles on the tracks.",
-        defaultValue: false,
+        description: "Hide titles on the tracks.", // defaultValue: false
     },
     hideLegend: {
-        description: "Hide legends on the tracks.",
-        defaultValue: false,
+        description: "Hide legends on the tracks.", // defaultValue: false
     },
     syncTrackPos: {
-        description: "Synchronize first visible track",
-        defaultValue: false,
+        description: "Synchronize first visible track", // defaultValue: false
     },
     syncContentDomain: {
-        description: "Synchronize visible content domain",
-        defaultValue: false,
+        description: "Synchronize visible content domain (pan and zoom)", // defaultValue: false
     },
     syncContentSelection: {
-        description: "Synchronize content selection",
-        defaultValue: false,
+        description: "Synchronize content selection", // defaultValue: false
     },
     syncTemplate: {
-        description: "Synchronize templates in the views",
-        defaultValue: false,
+        description: "Synchronize templates in the views", // defaultValue: false
     },
     readoutOptions: {
         description:
             "Options for readout panel.<br/>" +
             "allTracks: boolean — Show not only visible tracks,<br/>" +
             "grouping: string — How group values.",
-        defaultValue: {
-            allTracks: false,
-            grouping: "by_track",
-        },
+        //defaultValue: {
+        //    allTracks: false,
+        //    grouping: "by_track",
+        //},
     },
     domain: {
         description: "Initial visible interval of the log data.",
@@ -219,7 +230,7 @@ export const argTypesSyncLogViewerProp = {
     },
     // callbacks...
 };
-*/
+
 interface State {
     axes: string[]; // axes available in welllog
     primaryAxis: string;
@@ -354,28 +365,28 @@ class SyncLogViewer extends Component<Props, State> {
             });
         }
 
-        if (
-            this.props.domain &&
-            (!prevProps.domain ||
-                this.props.domain[0] !== prevProps.domain[0] ||
-                this.props.domain[1] !== prevProps.domain[1])
-        ) {
+        if (isArr2Differ(this.props.domain, prevProps.domain)) {
             this.setControllersZoom();
         }
 
         if (
-            this.props.selection &&
-            (!prevProps.selection ||
-                this.props.selection[0] !== prevProps.selection[0] ||
-                this.props.selection[1] !== prevProps.selection[1])
+            isArr2Differ(
+                this.props.wellpickFlatting,
+                prevProps.wellpickFlatting
+            ) ||
+            this.props.wellpicks !== prevProps.wellpicks
         ) {
+            this.syncContentScrollPos(0); // force to redraw
+        }
+
+        if (isArr2Differ(this.props.selection, prevProps.selection)) {
             this.setControllersSelection();
         }
 
         if (
             this.props.syncContentSelection !== prevProps.syncContentSelection
         ) {
-            this.syncContentSelection(0);
+            this.syncContentSelection(0); // force to redraw selection
         }
 
         if (
@@ -493,7 +504,10 @@ class SyncLogViewer extends Component<Props, State> {
         const domain = controller.getContentDomain();
         for (const _controller of this.controllers) {
             if (!_controller || _controller == controller) continue;
-            if (this.props.syncContentDomain) {
+            if (
+                !(this.props.wellpickFlatting && this.props.wellpicks) &&
+                this.props.syncContentDomain
+            ) {
                 const _domain = _controller.getContentDomain();
                 if (!isEqDomains(_domain, domain))
                     _controller.zoomContentTo(domain);
@@ -545,37 +559,208 @@ class SyncLogViewer extends Component<Props, State> {
         return commonBaseDomain;
     }
 
-    syncContentBaseDomain(): void {
-        const commonBaseDomain: [number, number] =
-            this.getCommonContentBaseDomain();
-        for (const controller of this.controllers) {
-            if (!controller) continue;
-            const baseDomain = controller.getContentBaseDomain();
-            if (!isEqDomains(baseDomain, commonBaseDomain))
-                controller.setContentBaseDomain(commonBaseDomain);
+    syncContentBaseDomain(): boolean {
+        let updated = false;
+        if (
+            !(this.props.wellpickFlatting && this.props.wellpicks) &&
+            this.props.syncContentDomain
+        ) {
+            const commonBaseDomain: [number, number] =
+                this.getCommonContentBaseDomain();
+            for (const controller of this.controllers) {
+                if (!controller) continue;
+                const baseDomain = controller.getContentBaseDomain();
+                if (!isEqDomains(baseDomain, commonBaseDomain)) {
+                    controller.setContentBaseDomain(commonBaseDomain);
+                    updated = true;
+                }
+            }
         }
+        return updated;
+    }
+
+    makeFlattingCoeffs(): {
+        A: number[][];
+        B: number[][];
+        newBaseDomain: [number, number][]; // not used
+    } {
+        const wellpickFlatting = this.props.wellpickFlatting;
+        if (!wellpickFlatting) return { A: [], B: [], newBaseDomain: [] };
+
+        const flattingA: number[][] = [];
+        const flattingB: number[][] = [];
+
+        const nView = this.controllers.length;
+        const newBaseDomain: [number, number][] = [];
+        for (let i = 0; i < nView; i++) {
+            newBaseDomain.push([
+                Number.POSITIVE_INFINITY,
+                Number.NEGATIVE_INFINITY,
+            ]);
+        }
+        for (const controller of this.controllers) {
+            const wellLogView = controller as WellLogView;
+            const wps = wellLogView ? getWellPicks(wellLogView) : [];
+            let wp1: number | undefined = undefined;
+            let wp2: number | undefined = undefined;
+            for (const wp of wps) {
+                if (wellpickFlatting[0] === wp.horizon) wp1 = wp.vPrimary;
+                if (wellpickFlatting[1] === wp.horizon) wp2 = wp.vPrimary;
+            }
+
+            const _flattingA: number[] = [];
+            const _flattingB: number[] = [];
+            let j = -1;
+            for (const _controller of this.controllers) {
+                j++;
+                if (!_controller || !controller) {
+                    _flattingA.push(0.0);
+                    _flattingB.push(0.0);
+                    continue;
+                }
+                const _wellLogView = _controller as WellLogView;
+                const _wps = getWellPicks(_wellLogView);
+                let _wp1: number | undefined = undefined;
+                let _wp2: number | undefined = undefined;
+                for (const _wp of _wps) {
+                    if (wellpickFlatting[0] === _wp.horizon)
+                        _wp1 = _wp.vPrimary;
+                    if (wellpickFlatting[1] === _wp.horizon)
+                        _wp2 = _wp.vPrimary;
+                }
+
+                if (
+                    Number.isFinite(wp1) &&
+                    Number.isFinite(_wp1) &&
+                    wp1 !== undefined &&
+                    _wp1 !== undefined
+                ) {
+                    let a: number;
+                    if (
+                        Number.isFinite(wp2) &&
+                        Number.isFinite(_wp2) &&
+                        wp2 !== undefined &&
+                        _wp2 !== undefined &&
+                        wp2 - wp1
+                    )
+                        a = (_wp2 - _wp1) / (wp2 - wp1);
+                    else {
+                        if (this.props.syncContentDomain) {
+                            a = 1;
+                        } else {
+                            const domain = controller.getContentDomain();
+                            const _domain = _controller.getContentDomain();
+                            if (
+                                _domain[1] - _domain[0] &&
+                                domain[1] - domain[0]
+                            )
+                                a =
+                                    (_domain[1] - _domain[0]) /
+                                    (domain[1] - domain[0]);
+                            else a = 1;
+                        }
+                    }
+                    const b = _wp1 - a * wp1;
+                    _flattingA.push(a);
+                    _flattingB.push(b);
+
+                    const baseDomain = controller.getContentBaseDomain();
+                    const baseDomainNew: [number, number] = [
+                        a * baseDomain[0] + b,
+                        a * baseDomain[1] + b,
+                    ];
+
+                    checkMinMax(newBaseDomain[j], baseDomainNew);
+                } else {
+                    // The first well pick undefined
+                    _flattingA.push(controller === _controller ? 1.0 : 0.0);
+                    _flattingB.push(0.0);
+                }
+            }
+            flattingA.push(_flattingA);
+            flattingB.push(_flattingB);
+        }
+
+        return { A: flattingA, B: flattingB, newBaseDomain: newBaseDomain };
     }
 
     syncContentScrollPos(iView: number): void {
-        if (this.props.syncContentDomain)
-            // synchronize base domains
-            this.syncContentBaseDomain();
         const controller = this.controllers[iView];
         if (!controller) return;
+
+        let updated = false;
+        const wellpickFlatting = this.props.wellpickFlatting;
+        const syncContentDomain = this.props.syncContentDomain;
+        let coeff: {
+            A: number[][];
+            B: number[][];
+            newBaseDomain: [number, number][];
+        } | null = null;
+        if (this.props.wellpicks && wellpickFlatting) {
+            coeff = this.makeFlattingCoeffs();
+        }
+        // synchronize base domains
+        updated = this.syncContentBaseDomain();
         const domain = controller.getContentDomain();
+
+        let j = -1;
         for (const _controller of this.controllers) {
+            j++;
             if (!_controller || _controller == controller) continue;
-            if (this.props.syncContentDomain) {
+            if (coeff) {
+                // wellpick flatting
+                const a = coeff.A[iView][j];
+                const b = coeff.B[iView][j];
+
+                const domainNew: [number, number] = [
+                    a * domain[0] + b,
+                    a * domain[1] + b,
+                ];
                 const _domain = _controller.getContentDomain();
-                if (!isEqDomains(_domain, domain))
+                if (
+                    Number.isFinite(domainNew[0]) &&
+                    Number.isFinite(domainNew[1])
+                ) {
+                    if (!isEqDomains(_domain, domainNew)) {
+                        _controller.zoomContentTo(domainNew);
+                        updated = true;
+                    }
+
+                    // sync scroll bar: not work yet
+                    const baseDomain = _controller.getContentBaseDomain();
+                    //const newBaseDomain = coeff.newBaseDomain[j];
+                    const newBaseDomain: [number, number] = [
+                        domainNew[0],
+                        domainNew[1],
+                    ];
+                    if (baseDomain[0] < newBaseDomain[0])
+                        newBaseDomain[0] = baseDomain[0];
+                    if (baseDomain[1] > newBaseDomain[1])
+                        newBaseDomain[1] = baseDomain[1];
+                    if (
+                        Number.isFinite(newBaseDomain[0]) &&
+                        Number.isFinite(newBaseDomain[1])
+                    )
+                        if (!isEqDomains(baseDomain, newBaseDomain)) {
+                            //_controller.setContentBaseDomain(newBaseDomain);
+                            //updated = true;
+                        }
+                }
+            } else if (syncContentDomain) {
+                const _domain = _controller.getContentDomain();
+                if (!isEqDomains(_domain, domain)) {
                     _controller.zoomContentTo(domain);
+                    updated = true;
+                }
             }
         }
 
-        for (let i = iView - 1; i <= iView; i++) {
-            const spacer = this.spacers[i];
-            if (!spacer) continue;
-            spacer.update();
+        if (updated) {
+            for (let i = iView - 1; i <= iView; i++) {
+                const spacer = this.spacers[i];
+                if (!spacer) continue;
+                spacer.update();
+            }
         }
     }
 
@@ -861,9 +1046,18 @@ SyncLogViewer.propTypes = {
     patterns: PropTypes.array,
 
     /**
-     * Set to true or to array of spacer widths if WellLogSpacers should be used
+     * Horizon names for wellpick flatting (pan and zoom)
      */
-    spacers: PropTypes.array,
+    wellpickFlatting: PropTypes.arrayOf(PropTypes.string),
+
+    /**
+     * Set to true or to array of spaser widths if WellLogSpacers should be used
+     */
+    spacers: PropTypes.oneOfType([
+        PropTypes.bool,
+        PropTypes.arrayOf(PropTypes.number),
+    ]),
+
     /**
      * Distanses between wells to show on the spacers
      */
