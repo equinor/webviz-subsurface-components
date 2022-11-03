@@ -11,6 +11,7 @@ export { default as AxesLayer } from "./axes/axesLayer";
 export { default as SelectableGeoJsonLayer } from "./selectable_geojson/selectableGeoJsonLayer";
 export { default as NorthArrow3DLayer } from "./northarrow/northArrow3DLayer";
 export { default as UnfoldedGeoJsonLayer } from "./intersection/unfoldedGeoJsonLayer";
+export { default as Grid3DLayer } from "./grid3d/grid3dLayer";
 
 export { AxesLayerProps } from "./axes/axesLayer";
 export { ColormapLayerProps } from "./colormap/colormapLayer";
@@ -23,3 +24,4 @@ export { NorthArrow3DLayerProps } from "./northarrow/northArrow3DLayer";
 export { PieChartLayerProps } from "./piechart/pieChartLayer";
 export { Map3DLayerProps } from "./terrain/map3DLayer";
 export { WellsLayerProps } from "./wells/wellsLayer";
+export { Grid3DLayerProps } from "./grid3d/grid3dLayer";
