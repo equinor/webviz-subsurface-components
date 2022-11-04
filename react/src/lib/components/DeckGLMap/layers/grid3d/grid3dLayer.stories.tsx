@@ -25,10 +25,13 @@ const defaultProps = {
 };
 
 // Grid 3d story
-/* eslint-disable @typescript-eslint/no-var-requires */
-const POINTS = require("../../../../../demo/example-data/vtk-grid/points.json");
-const POLYS = require("../../../../../demo/example-data/vtk-grid/polys.json");
-const SCALAR = require("../../../../../demo/example-data/vtk-grid/scalar.json");
+const POINTS =
+    "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/vtk-grid/points.json";
+const POLYS =
+    "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/vtk-grid/polys.json";
+const SCALAR =
+    "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/vtk-grid/scalar.json";
+
 const grid3dLayer = {
     "@@type": "Grid3DLayer",
     id: "Grid3DLayer",
@@ -57,8 +60,10 @@ Grid3D.parameters = {
 };
 
 // 3D grid with intersection data story
-const IPOINTS = require("../../../../../demo/example-data/vtk-grid/intersection_points.json");
-const IPOLYS = require("../../../../../demo/example-data/vtk-grid/intersection_polys.json");
+const IPOINTS =
+    "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/vtk-grid/intersection_points.json";
+const IPOLYS =
+    "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/vtk-grid/intersection_polys.json";
 
 const intersectionLayer = {
     "@@type": "Grid3DLayer",
