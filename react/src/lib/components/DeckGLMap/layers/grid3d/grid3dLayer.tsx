@@ -35,8 +35,43 @@ const getPolygon = (index: number, data: POLYDATA) => {
         const position = data.points.slice(p * 3, p * 3 + 3) as number[];
         positions.push(position);
     });
-    positions.push(positions[0]);
-    return positions;
+    const sorted_positions = sortPositions(positions);
+    sorted_positions.push(sorted_positions[0]);
+
+    return sorted_positions;
+};
+
+const sortPositions = (points: number[][]): number[][] => {
+    // Get the center (mean value) using reduce
+    const center = points.reduce(
+        (acc, [x, y, z]) => {
+            acc.x += x / points.length;
+            acc.y += y / points.length;
+            acc.z += z / points.length;
+            return acc;
+        },
+        { x: 0, y: 0, z: 0 }
+    );
+
+    // Add an angle property to each point using tan(angle) = y/x
+    const angles = points.map((point) => {
+        return {
+            point: point,
+            angle:
+                (Math.atan2(
+                    // point[2] - center.z,
+                    point[1] - center.y,
+                    point[0] - center.x
+                ) *
+                    180) /
+                Math.PI,
+        };
+    });
+
+    // Sort your points by angle
+    const pointsSorted = angles.sort((a, b) => a.angle - b.angle);
+    const sortedPoints = pointsSorted.map((point) => point.point);
+    return sortedPoints;
 };
 
 const getFillColor = (index: number, scalar: number[]) => {
@@ -140,7 +175,7 @@ export default class Grid3DLayer extends CompositeLayer<
 
                 material: this.props.material,
                 stroked: true,
-                wireframe: true,
+                wireframe: true, // it works only if extruded = true
 
                 autoHighlight: true,
                 highlightColor: [0, 0, 128, 128],
