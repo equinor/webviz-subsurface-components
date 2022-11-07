@@ -54,7 +54,7 @@
                     "type": "gradientfill",
                     "color": "blue",
                     "colorTable": "Physics",
-                    "inverseColorTable": "Physics reverse"
+                    "inverseColorTable": "Physics"
                 }
             ]
         },
