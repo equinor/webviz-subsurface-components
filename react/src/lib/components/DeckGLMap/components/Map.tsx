@@ -892,7 +892,7 @@ const Map: React.FC<MapProps> = ({
                 // @ts-expect-error this prop doesn't exists directly on DeckGL, but on Deck.Context
                 userData={{
                     setEditedData: (updated_prop: Record<string, unknown>) => {
-                        setSelectedWell(updated_prop["selectedWell"]);
+                        setSelectedWell(updated_prop["selectedWell"] as string);
                         if (
                             Object.keys(updated_prop).includes("selectedWell")
                         ) {
