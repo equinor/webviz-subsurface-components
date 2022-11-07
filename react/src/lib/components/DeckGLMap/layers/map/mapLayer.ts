@@ -193,7 +193,8 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     // Optional function property.
     // If defined this function will override the color map.
     // Takes a value in the range [0,1] and returns a color.
-    colorMapFunction?: colorMapFunctionType;
+    // E.g. (x) => [x * 255, x * 255, x * 255]
+    colorMapFunction?: colorMapFunctionType | false;
 
     // Surface material properties.
     // material: true  = default material, coloring depends on surface orientation and lighting.

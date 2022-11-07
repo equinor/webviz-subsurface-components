@@ -66,9 +66,9 @@ export type Material =
 function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | undefined
+    colorMapFunction: colorMapFunctionType | false | undefined
 ) {
-    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
+    const isColorMapFunctionDefined = typeof colorMapFunction === "function";
     const isColorMapNameDefined = !!colorMapName;
 
     const data = new Uint8Array(256 * 3);
@@ -103,7 +103,7 @@ export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapName: string;
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
-    colorMapFunction?: colorMapFunctionType;
+    colorMapFunction?: colorMapFunctionType | false;
     propertyValueRange: [number, number];
 }
 
