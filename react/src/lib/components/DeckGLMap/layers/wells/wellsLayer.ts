@@ -211,7 +211,6 @@ export default class WellsLayer extends CompositeLayer<
 > {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
     onClick(info: WellsPickInfo): boolean {
-       
         // Make selection only when drawing is disabled
         if (isDrawingEnabled(this.context.layerManager)) {
             return false;
@@ -222,7 +221,7 @@ export default class WellsLayer extends CompositeLayer<
             return false; // do not return true to allow DeckGL props.onClick to be called
         }
     }
-    
+
     setSelection(
         well: string | undefined,
         _selection?: [number | undefined, number | undefined]
@@ -386,20 +385,18 @@ export default class WellsLayer extends CompositeLayer<
                     this.props.wellHeadStyle?.size,
                     2
                 ),
-                getFillColor: [0, 0, 0],
-                getLineColor: [0, 0, 0],
-                // getFillColor: getColor(this.props.wellHeadStyle?.color),
-                // getLineColor: getColor(this.props.lineStyle?.color),
+                getFillColor: getColor(this.props.wellHeadStyle?.color),
+                getLineColor: getColor(this.props.lineStyle?.color),
             })
         );
-        console.log(this.props["selectedWell"]);
+
         // Highlight the multi selected wells.
         const highlightMultiWells = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "highlight2",
                 data: getWellObjectsByName(
                     data.features,
-                    this.state.selectedMultiWells
+                    this.state["selectedMultiWells"]
                 ),
                 pickable: false,
                 stroked: false,
@@ -414,9 +411,8 @@ export default class WellsLayer extends CompositeLayer<
                     this.props.wellHeadStyle?.size,
                     2
                 ),
-                // getFillColor: getColor(this.props.wellHeadStyle?.color),
-                getFillColor: [0, 0, 0],
-                getLineColor: [0, 0, 0],
+                getFillColor: [255, 140, 0],
+                getLineColor: [255, 140, 0],
             })
         );
 
@@ -721,7 +717,6 @@ function getWellObjectsByName(
     wells_data: Feature[],
     name: string[]
 ): Feature[] | undefined {
-    console.log("1");
     const res: Feature[] = [];
     for (let i = 0; i < name?.length; i++) {
         wells_data?.find((item) => {
