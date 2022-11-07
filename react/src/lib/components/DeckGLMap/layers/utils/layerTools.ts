@@ -132,6 +132,43 @@ export function getLayersByType(layers: LayersList, type: string): LayersList {
     return layers.filter((l) => l?.constructor.name === type);
 }
 
+export type NewLayersList = LayersList & {
+    id: string;
+    props: prop;
+};
+
+type prop = {
+    data: wellData;
+};
+
+type wellData = {
+    features: feature[];
+    type: string;
+    unit?: string;
+};
+
+type feature = {
+    properties: {
+        name: string;
+    };
+};
+
+export function getWellLayerByTypeAndSelectedWells(
+    layers: LayersList,
+    type: string,
+    selectedWell: string
+): LayersList {
+    if (!layers) return [];
+    return layers.filter((l) => {
+        return (
+            l?.constructor.name === type &&
+            (l as NewLayersList).props.data.features.find(
+                (item) => item.properties.name === selectedWell
+            )
+        );
+    });
+}
+
 export function getLayersById(layers: LayersList, id: string): LayersList {
     if (!layers) return [];
     return layers.filter((l) => (l as Layer).id === id);
