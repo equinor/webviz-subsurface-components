@@ -25,7 +25,8 @@ function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
     colorMapFunction?: colorMapFunctionType,
-    breakpoint?: number[]
+    breakpoint?: number[],
+    isLog?: boolean,
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
 
@@ -37,7 +38,7 @@ function getImageData(
             ? (colorMapFunction as colorMapFunctionType)(i / 255)
             : // Passing argument "breakpoint" is temporary solution for now since the colortable does not save the edited breakpoints
               // When save functionality of breakpoint is done, prop "breakpoint" will be removed from here
-              getRgbData(value, colorMapName, colorTables, breakpoint);
+              getRgbData(value, colorMapName, colorTables, breakpoint, isLog);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -99,6 +100,9 @@ export interface ColormapLayerProps extends BitmapLayerProps {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setReportedBoundingBox?: any;
+
+    // check for logarithmic values
+    isLog?: boolean;
 }
 
 const defaultProps = layersDefaultProps["ColormapLayer"] as ColormapLayerProps;
@@ -169,7 +173,8 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
                         this.props.colorMapFunction,
-                        this.props.breakPoint
+                        this.props.breakPoint,
+                        this.props.isLog
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),

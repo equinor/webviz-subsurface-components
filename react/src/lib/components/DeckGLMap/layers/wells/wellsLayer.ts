@@ -16,7 +16,7 @@ import {
     colorTablesArray,
     getColors,
 } from "@emerson-eps/color-tables/";
-
+import { scaleSymlog } from "d3";
 import {
     Feature,
     GeometryCollection,
@@ -97,6 +97,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameAtTop: boolean;
     wellNameSize: number;
     wellNameColor: Color;
+    isLog: boolean;
 }
 
 export interface LogCurveDataType {
@@ -407,7 +408,8 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
-                        this.props.colorMappingFunction
+                        this.props.colorMappingFunction,
+                        this.props.isLog
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
@@ -419,6 +421,7 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
+                            this.props.isLog
                     ],
                     getWidth: [
                         this.props.logrunName,
@@ -782,28 +785,29 @@ function getLogColor(
     logColor: string,
     colorTables: colorTablesArray,
     // eslint-disable-next-line
-    colorMappingFunction: any
+    colorMappingFunction: any,
+    isLog: boolean
 ): Color[] {
-    const log_data = getLogValues(d, logrun_name, log_name);
-    const log_info = getLogInfo(d, logrun_name, log_name);
+    const log_data = getLogValues(d, logrun_name, "PORO");
+    const log_info = getLogInfo(d, logrun_name, "PORO");
     if (log_data.length == 0 || log_info == undefined) return [];
     const log_color: Color[] = [];
-
     if (log_info.description == "continuous") {
         const min = Math.min(...log_data);
         const max = Math.max(...log_data);
         const max_delta = max - min;
-
         log_data.forEach((value) => {
-            const rgb = colorMappingFunction
-                ? colorMappingFunction((value - min) / max_delta)
-                : rgbValues((value - min) / max_delta, logColor, colorTables);
+            const rgb = 
+            // colorMappingFunction
+            //     ? colorMappingFunction((value - min) / max_delta)
+            //     : rgbValues((value - min) / max_delta, logColor, colorTables);
+            rgbValues((value) - min / max_delta, logColor, colorTables, isLog);
 
             if (rgb) {
                 if (Array.isArray(rgb)) {
                     log_color.push([rgb[0], rgb[1], rgb[2]]);
                 } else {
-                    log_color.push([rgb.r, rgb.g, rgb.b]);
+                    log_color.push([rgb?.r, rgb?.g, rgb?.b]);
                 }
             } else {
                 log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values

@@ -113,8 +113,8 @@ DiscreteWellLogs.args = {
             outline: false,
             logData: "volve_blocking_zonelog_logs.json",
             logrunName: "BLOCKING",
-            logName: "ZONELOG",
-            logColor: "Stratigraphy",
+            logName: "PORO",
+            logColor: "Rainbow"
         },
     ],
 };
@@ -482,7 +482,6 @@ const reverseRange = false;
 //eslint-disable-next-line
 const wellLayerTemplate = (args: any) => {
     const [getColorName, setColorName] = React.useState("Rainbow");
-
     const wellLayerData = React.useCallback((data) => {
         setColorName(data);
     }, []);
@@ -492,6 +491,7 @@ const wellLayerTemplate = (args: any) => {
             ...args.wellLayers[0],
             colorMappingFunction: createColorMapFunction(getColorName),
             logColor: getColorName ? getColorName : wellLayers[0].logColor,
+            isLog: args.isLog
         },
     ];
     return (
@@ -529,6 +529,7 @@ LegendWithColorSelector.args = {
         visible: false,
     },
     reverseRange,
+    isLog : false
 };
 
 LegendWithColorSelector.parameters = {

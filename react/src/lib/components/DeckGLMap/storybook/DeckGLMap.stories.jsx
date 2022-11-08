@@ -668,6 +668,7 @@ const mapDataTemplate = (args) => {
     const [colorRange, setRange] = React.useState();
     const [isAuto, setAuto] = React.useState();
     const [breakPoint, setBreakPoint] = React.useState();
+    const [isLog, setLog] = React.useState(false);
 
     // user defined breakpoint(domain)
     const userDefinedBreakPoint = React.useCallback((data) => {
@@ -685,6 +686,11 @@ const mapDataTemplate = (args) => {
         setAuto(data.isAuto);
     }, []);
 
+    // interpolation method
+    const getInterpolateMethod = React.useCallback((data) => {
+        setLog(data.isLog);
+    }, []);
+
     const updatedLayerData = [
         {
             ...args.layers[0],
@@ -696,6 +702,7 @@ const mapDataTemplate = (args) => {
             // Passing "breakpoint" is temporary solution for now since the colortable does not save the edited breakpoints
             // When save functionality of breakpoint is done, prop "breakpoint" will be removed from here
             breakPoint: breakPoint ? breakPoint : [],
+            isLog: isLog
         },
     ];
     return (
@@ -714,6 +721,7 @@ const mapDataTemplate = (args) => {
                     getColorName={colorNameFromSelector}
                     getColorRange={userDefinedRange}
                     getBreakpointValue={userDefinedBreakPoint}
+                    getInterpolateMethod={getInterpolateMethod}
                 />
             </div>
             <DeckGLMap {...args} layers={updatedLayerData} />
