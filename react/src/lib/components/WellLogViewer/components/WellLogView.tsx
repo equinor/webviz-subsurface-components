@@ -802,6 +802,7 @@ export interface WellLogViewProps {
      * Well Picks data
      */
     wellpick?: WellPickProps;
+
     /**
      * Orientation of the track plots on the screen.
      */
@@ -811,14 +812,6 @@ export interface WellLogViewProps {
      * Primary axis id: "md", "tvd", "time"... Default is the first available from axisMnemos
      */
     primaryAxis?: string;
-    /**
-     * Show Titles on the tracks
-     */
-    hideTitles?: boolean;
-    /**
-     * Hide Legends on the tracks
-     */
-    hideLegend?: boolean;
 
     /**
      * Log mnemonics for axes
@@ -829,6 +822,11 @@ export interface WellLogViewProps {
      * Names for axes
      */
     axisMnemos: Record<string, string[]>;
+
+    /**
+     * The view title. Set desired string or true for default value from welllog file
+     */
+    viewTitle?: boolean | string;
 
     /**
      * The maximum number of visible tracks
@@ -854,6 +852,15 @@ export interface WellLogViewProps {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema?: boolean;
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTitles?: boolean;
+    /**
+     * Hide Legends on the tracks
+     */
+    hideLegend?: boolean;
 
     // callbacks:
     onCreateController?: (controller: WellLogController) => void;
@@ -923,14 +930,7 @@ export const argTypesWellLogViewProp = {
         description: "Initial selected range",
     },
     checkDatafileSchema: {
-        description:
-            "Validate JSON datafile against schema" /* defaultValue: false */,
-    },
-    hideTitles: {
-        description: "Hide Titles on the tracks" /* defaultValue: false */,
-    },
-    hideLegend: {
-        description: "Hide Legends on the tracks" /* defaultValue: false */,
+        description: "Validate JSON datafile against schema", // defaultValue: false
     },
     axisMnemos: {
         description: "Log mnemonics for axes",
@@ -938,6 +938,17 @@ export const argTypesWellLogViewProp = {
     axisTitles: {
         description: "Names for axes",
     },
+    viewTitle: {
+        description:
+            "The view title. Set desired string or true for default value from welllog file",
+    },
+    hideTitles: {
+        description: "Hide Titles on the tracks", // defaultValue: false
+    },
+    hideLegend: {
+        description: "Hide Legends on the tracks", // defaultValue: false
+    },
+
     // callbacks...
 };
 
@@ -1632,27 +1643,55 @@ class WellLogView
     }
 
     render(): JSX.Element {
+        const horizontal = this.props.horizontal;
         return (
             <div
                 style={{
                     width: "100%",
                     height: "100%",
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: horizontal ? "row" : "column",
                 }}
             >
-                <div
-                    style={{ flex: "1, 1" }}
-                    className="welllogview"
-                    ref={(el) => (this.container = el as HTMLElement)}
-                />
-                {this.state.errorText ? (
-                    <div style={{ flex: "0, 0" }} className="welllogview-error">
-                        {this.state.errorText}
+                {this.props.viewTitle && (
+                    <div
+                        style={{
+                            flex: "0, 0",
+                            writingMode: horizontal ? "vertical-lr" : undefined,
+                            transform: horizontal
+                                ? "rotate(180deg)"
+                                : undefined,
+                        }}
+                        className="welllogview-title"
+                    >
+                        {this.props.viewTitle === true
+                            ? this.props.welllog?.header.well
+                            : this.props.viewTitle}
                     </div>
-                ) : (
-                    <></>
                 )}
+                <div
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        flex: "1, 1",
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
+                    <div
+                        style={{ flex: "1, 1" }}
+                        className="welllogview"
+                        ref={(el) => (this.container = el as HTMLElement)}
+                    />
+                    {this.state.errorText && (
+                        <div
+                            style={{ flex: "0, 0" }}
+                            className="welllogview-error"
+                        >
+                            {this.state.errorText}
+                        </div>
+                    )}
+                </div>
             </div>
         );
     }
@@ -1700,16 +1739,6 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         primaryAxis: PropTypes.string,
 
         /**
-         * Hide titles of the track. Default is false
-         */
-        hideTitles: PropTypes.bool,
-
-        /**
-         * Hide legends of the track. Default is false
-         */
-        hideLegend: PropTypes.bool,
-
-        /**
          * Log mnemonics for axes
          */
         axisTitles: PropTypes.object,
@@ -1718,6 +1747,11 @@ export function _propTypesWellLogView(): Record<string, unknown> {
          * Names for axes
          */
         axisMnemos: PropTypes.object,
+
+        /**
+         * Set to true for default titles or to array of individial welllog titles
+         */
+        viewTitle: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 
         /**
          * The maximum number of visible tracks
@@ -1743,6 +1777,16 @@ export function _propTypesWellLogView(): Record<string, unknown> {
          * Validate JSON datafile against schems
          */
         checkDatafileSchema: PropTypes.bool,
+
+        /**
+         * Hide titles of the track. Default is false
+         */
+        hideTitles: PropTypes.bool,
+
+        /**
+         * Hide legends of the track. Default is false
+         */
+        hideLegend: PropTypes.bool,
     };
 }
 

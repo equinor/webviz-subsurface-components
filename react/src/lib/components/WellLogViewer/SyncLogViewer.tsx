@@ -60,6 +60,11 @@ interface Props {
      */
     colorTables: ColorTable[];
     /**
+     * Set to true for default titles or to array of individial welllog titles
+     */
+    viewTitles?: boolean | string[];
+
+    /**
      * Well Picks data array
      */
     wellpicks?: WellPickProps[];
@@ -100,15 +105,6 @@ interface Props {
     syncTemplate?: boolean;
 
     /**
-     * Show Titles on the tracks
-     */
-    hideTitles?: boolean;
-    /**
-     * Hide Legends on the tracks
-     */
-    hideLegend?: boolean;
-
-    /**
      * Log mnemonics for axes
      */
     axisTitles: Record<string, string>;
@@ -142,6 +138,16 @@ interface Props {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema?: boolean;
+
+    /**
+     * Hide titles on the tracks. Default is false
+     */
+    hideTitles?: boolean;
+
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideLegend?: boolean;
 
     readoutOptions?: InfoOptions; // options for readout
 
@@ -194,12 +200,6 @@ export const argTypesSyncLogViewerProp = {
     maxContentZoom: {
         description: "The maximum zoom value (default 256)",
     },
-    hideTitles: {
-        description: "Hide titles on the tracks.", // defaultValue: false
-    },
-    hideLegend: {
-        description: "Hide legends on the tracks.", // defaultValue: false
-    },
     syncTrackPos: {
         description: "Synchronize first visible track", // defaultValue: false
     },
@@ -227,6 +227,16 @@ export const argTypesSyncLogViewerProp = {
     },
     selection: {
         description: "Initial selected interval of the log data.",
+    },
+    viewTitles: {
+        description:
+            "Set to true for default titles or to array of individial welllog titles",
+    },
+    hideTitles: {
+        description: "Hide titles on the tracks.", // defaultValue: false
+    },
+    hideLegend: {
+        description: "Hide legends on the tracks.", // defaultValue: false
     },
     // callbacks...
 };
@@ -823,20 +833,25 @@ class SyncLogViewer extends Component<Props, State> {
 
     createView(index: number): ReactNode {
         const callbacks = this.callbacks[index];
+        const wellLog = this.props.welllogs[index];
         return (
             <WellLogViewWithScroller
                 key={index}
-                welllog={this.props.welllogs[index]}
+                welllog={wellLog}
                 template={
                     this.props.templates[index]
                         ? this.props.templates[index]
                         : this.props.templates[0]
                 }
                 colorTables={this.props.colorTables}
+                viewTitle={
+                    this.props.viewTitles &&
+                    (this.props.viewTitles === true
+                        ? true
+                        : this.props.viewTitles[index])
+                }
                 wellpick={this.props.wellpicks?.[index]}
                 horizontal={this.props.horizontal}
-                hideTitles={this.props.hideTitles}
-                hideLegend={this.props.hideLegend}
                 axisTitles={this.props.axisTitles}
                 axisMnemos={this.props.axisMnemos}
                 maxVisibleTrackNum={
@@ -845,6 +860,8 @@ class SyncLogViewer extends Component<Props, State> {
                 }
                 maxContentZoom={this.props.maxContentZoom}
                 primaryAxis={this.state.primaryAxis}
+                hideTitles={this.props.hideTitles}
+                hideLegend={this.props.hideLegend}
                 onInfo={callbacks.onInfoBind}
                 onCreateController={callbacks.onCreateControllerBind}
                 onTrackMouseEvent={onTrackMouseEvent}
@@ -1074,16 +1091,6 @@ SyncLogViewer.propTypes = {
     primaryAxis: PropTypes.string,
 
     /**
-     * Hide titles of the track. Default is false
-     */
-    hideTitles: PropTypes.bool,
-
-    /**
-     * Hide legends of the track. Default is false
-     */
-    hideLegend: PropTypes.bool,
-
-    /**
      * Log mnemonics for axes
      */
     axisTitles: PropTypes.object,
@@ -1117,6 +1124,24 @@ SyncLogViewer.propTypes = {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema: PropTypes.bool,
+
+    /**
+     * Set to true for default titles or to array of individial welllog titles
+     */
+    viewTitles: PropTypes.oneOfType([
+        PropTypes.bool,
+        PropTypes.arrayOf(PropTypes.string),
+    ]),
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTitles: PropTypes.bool,
+
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideLegend: PropTypes.bool,
 
     /**
      * Options for readout panel
