@@ -125,6 +125,7 @@ jobs:
         if: github.event_name != 'release' && matrix.e2e-tests
         run: |
           cd react
+          git checkout cypress-snaps -- cypress-visual-screenshots
           npx cypress run -b chrome --component --headed
 
       # upload the failure screenshots for reference
@@ -208,7 +209,7 @@ jobs:
             rm -rf cypress/screenshots
             rm -rf cypress/videos
           else
-            echo "false" >> $GITHUB_OUTPUT
+            echo '::set-output name=status::false'
           fi
 
       - name: Create Pull Request
@@ -219,6 +220,6 @@ jobs:
           commit-message: updated cypress snapshots
           title: Cypress - New Snapshots generated for the commit "${{ github.event.head_commit.message }}" by ${{ github.event.commits[0].author.email }}
           body: This is an auto-generated PR to update cypress snapshots.
-          base: ${{ github.head_ref }}
+          base: cypress-snaps
           reviewers: ${{ github.event.sender.login }}
           delete-branch: true
