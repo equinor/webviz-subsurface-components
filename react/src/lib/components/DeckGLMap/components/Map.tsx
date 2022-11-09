@@ -644,8 +644,12 @@ const Map: React.FC<MapProps> = ({
                 selectedWell
             )?.[0] as WellsLayer;
             wellslayer?.setMultiSelection(multipleWells);
+            if (triggerResetOption) {
+                console.log("1");
+                setMultipleWells([]);            
+            }
         }
-    }, [multipleWells]);
+    }, [multipleWells, triggerResetOption]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
@@ -893,7 +897,7 @@ const Map: React.FC<MapProps> = ({
                 layers={deckGLLayers}
                 // @ts-expect-error this prop doesn't exists directly on DeckGL, but on Deck.Context
                 userData={{
-                    setEditedData: (updated_prop: Record<string, unknown>) => {
+                    setEditedData: (updated_prop: Record<string, unknown> ,event: any) => {
                         setSelectedWell(updated_prop["selectedWell"] as string);
                         if (
                             Object.keys(updated_prop).includes("selectedWell")
@@ -907,22 +911,12 @@ const Map: React.FC<MapProps> = ({
                                     (item) =>
                                         item !== updated_prop["selectedWell"]
                                 );
-                                updated_prop["multiSelectedWells"] = temp;
                                 setMultipleWells(temp);
                             } else {
                                 const temp = multipleWells.concat(
                                     updated_prop["selectedWell"] as string
                                 );
-                                updated_prop["multiSelectedWells"] = temp;
                                 setMultipleWells(temp);
-                            }
-                        }
-                        if (triggerResetOption) {
-                            if (triggerResetOption === true) {
-                                const temp: string[] = [];
-                                updated_prop["multiSelectedWells"] = temp;
-                                setMultipleWells(temp);
-                                triggerResetOption = false;
                             }
                         }
                         setEditedData?.(updated_prop);
