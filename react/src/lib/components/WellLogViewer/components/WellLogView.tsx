@@ -893,8 +893,7 @@ export interface WellLogViewProps {
 
 export const argTypesWellLogViewProp = {
     horizontal: {
-        description: "Orientation of the track plots on the screen.",
-        defaultValue: false,
+        description: "Orientation of the track plots on the screen.", // defaultValue: false
     },
     welllog: {
         description: "JSON object describing well log data.",
@@ -909,16 +908,13 @@ export const argTypesWellLogViewProp = {
         description: "Well Picks data",
     },
     primaryAxis: {
-        description: "Primary axis id",
-        defaultValue: "md",
+        description: "Primary axis id", //?? defaultValue: "md"
     },
     maxVisibleTrackNum: {
-        description: "The maximum number of visible tracks",
-        defaultValue: 5,
+        description: "The maximum number of visible tracks (default 5)",
     },
     maxContentZoom: {
-        description: "The maximum zoom value",
-        defaultValue: 256,
+        description: "The maximum zoom value (default 256)",
     },
     domain: {
         description: "Initial visible range",
@@ -927,24 +923,20 @@ export const argTypesWellLogViewProp = {
         description: "Initial selected range",
     },
     checkDatafileSchema: {
-        description: "Validate JSON datafile against schema",
-        defaultValue: false,
+        description:
+            "Validate JSON datafile against schema" /* defaultValue: false */,
     },
     hideTitles: {
-        description: "Hide Titles on the tracks",
-        defaultValue: false,
+        description: "Hide Titles on the tracks" /* defaultValue: false */,
     },
     hideLegend: {
-        description: "Hide Legends on the tracks",
-        defaultValue: false,
+        description: "Hide Legends on the tracks" /* defaultValue: false */,
     },
     axisMnemos: {
         description: "Log mnemonics for axes",
-        //defaultValue: axisMnemos,
     },
     axisTitles: {
         description: "Names for axes",
-        //defaultValue: axisTitles,
     },
     // callbacks...
 };

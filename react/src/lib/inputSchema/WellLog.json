@@ -112,7 +112,11 @@
         "data_row": {
             "type": "array",
             "items": {
-                "type": ["number", "string", "null"]
+                "anyOf": [
+                    { "type": "number" },
+                    { "type": "string" },
+                    { "type": "null" }
+                ]
             }
         },
         "metadata_discrete": {
