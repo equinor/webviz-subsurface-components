@@ -259,15 +259,16 @@ export const VolveWellsWithResetButton: ComponentStory<typeof DeckGLMap> = (
     args
 ) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
-    const [triggerResetOption, setTriggerResetOption] =
-        React.useState<boolean>(false);
+    const [triggerResetMultipleWells, setTriggerResetMultipleWells] =
+        React.useState<number>(0);
+    const handleChange1 = () => {
+        setTriggerResetMultipleWells(triggerResetMultipleWells + 1);
+    };
+
     React.useEffect(() => {
         setEditedData(args.editedData);
     }, [args.editedData]);
 
-    const onClick = React.useCallback(() => {
-        setTriggerResetOption(true);
-    }, []);
     return (
         <>
             <div className={useStyles().main}>
@@ -277,10 +278,10 @@ export const VolveWellsWithResetButton: ComponentStory<typeof DeckGLMap> = (
                     setProps={(updatedProps) => {
                         setEditedData(updatedProps);
                     }}
-                    triggerResetOption={triggerResetOption}
+                    triggerResetMultipleWells={triggerResetMultipleWells}
                 />
             </div>
-            <button onClick={onClick}> Reset Camera </button>
+            <button onClick={handleChange1}> Reset Multiple Wells </button>
         </>
     );
 };

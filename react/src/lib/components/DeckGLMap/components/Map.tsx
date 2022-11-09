@@ -253,7 +253,7 @@ export interface MapProps {
      * If changed will reset camera to default position.
      */
     triggerHome?: number;
-
+    triggerResetMultipleWells?: number;
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
@@ -263,8 +263,6 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
-
-    triggerResetOption?: boolean;
 }
 
 export interface MapMouseEvent {
@@ -320,7 +318,7 @@ const Map: React.FC<MapProps> = ({
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
     triggerHome,
-    triggerResetOption,
+    triggerResetMultipleWells,
 }: MapProps) => {
     const deckRef = useRef<DeckGLRef>(null);
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
@@ -644,12 +642,15 @@ const Map: React.FC<MapProps> = ({
                 selectedWell
             )?.[0] as WellsLayer;
             wellslayer?.setMultiSelection(multipleWells);
-            if (triggerResetOption) {
-                console.log("1");
-                setMultipleWells([]);            
-            }
         }
-    }, [multipleWells, triggerResetOption]);
+    }, [multipleWells]);
+
+    useEffect(() => {
+        if (typeof triggerResetMultipleWells !== "undefined") {
+            setMultipleWells([]);
+        }
+    }, [triggerResetMultipleWells]);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
@@ -897,7 +898,7 @@ const Map: React.FC<MapProps> = ({
                 layers={deckGLLayers}
                 // @ts-expect-error this prop doesn't exists directly on DeckGL, but on Deck.Context
                 userData={{
-                    setEditedData: (updated_prop: Record<string, unknown> ,event: any) => {
+                    setEditedData: (updated_prop: Record<string, unknown>) => {
                         setSelectedWell(updated_prop["selectedWell"] as string);
                         if (
                             Object.keys(updated_prop).includes("selectedWell")

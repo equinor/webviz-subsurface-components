@@ -58,7 +58,7 @@ export interface DeckGLMapProps {
      * If changed will reset camera to default position.
      */
     triggerHome?: number;
-
+    triggerResetMultipleWells?: number;
     /**
      * Range selection of the current well
      */
@@ -72,8 +72,6 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
-
-    triggerResetOption?: boolean;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -97,7 +95,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     cameraPosition,
     getCameraPosition,
     triggerHome,
-    triggerResetOption,
+    triggerResetMultipleWells,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -161,7 +159,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 cameraPosition={cameraPosition}
                 getCameraPosition={getCameraPosition}
                 triggerHome={triggerHome}
-                triggerResetOption={triggerResetOption}
+                triggerResetMultipleWells={triggerResetMultipleWells}
             />
         </ReduxProvider>
     );
