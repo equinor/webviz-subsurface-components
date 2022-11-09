@@ -153,7 +153,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "Grid 3D",
         id: "grid-3d-layer",
         visible: true,
-        filled: true,
         material: true,
     },
 };
