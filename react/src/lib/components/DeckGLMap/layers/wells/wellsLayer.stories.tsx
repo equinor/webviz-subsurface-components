@@ -482,14 +482,14 @@ const reverseRange = false;
 //eslint-disable-next-line
 const wellLayerTemplate = (args: any) => {
     const [getColorName, setColorName] = React.useState("Rainbow");
-    const [isLog, setLog] = React.useState(false);
+    const [isLog, setIsLog] = React.useState(false);
     const wellLayerData = React.useCallback((data) => {
         setColorName(data);
     }, []);
 
     // interpolation method
     const getInterpolateMethod = React.useCallback((data) => {
-        setLog(data.isLog);
+        setIsLog(data.isLog);
     }, []);
 
     const layers = [

@@ -668,7 +668,7 @@ const mapDataTemplate = (args) => {
     const [colorRange, setRange] = React.useState();
     const [isAuto, setAuto] = React.useState();
     const [breakPoint, setBreakPoint] = React.useState();
-    const [isLog, setLog] = React.useState(false);
+    const [isLog, setIsLog] = React.useState(false);
 
     // user defined breakpoint(domain)
     const userDefinedBreakPoint = React.useCallback((data) => {
@@ -688,7 +688,7 @@ const mapDataTemplate = (args) => {
 
     // interpolation method
     const getInterpolateMethod = React.useCallback((data) => {
-        setLog(data.isLog);
+        setIsLog(data.isLog);
     }, []);
 
     const updatedLayerData = [
