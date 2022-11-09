@@ -220,21 +220,34 @@ function createColorMap(breakpoint: number) {
     return (value: number) => breakpointColorMap(value, breakpoint);
 }
 
+//////////////////////////////////////////////////////////
+const myAxes = {
+    "@@type": "AxesLayer",
+    id: "axes-layer2",
+    bounds: [0, 0, -1, 2, 2, 1],
+};
+
+const pieLayer = {
+    "@@type": "PieChartLayer",
+    data: "piechart.json",
+};
+
 export const MapLayer3dPng: ComponentStory<typeof DeckGLMap> = (args) => {
     return <DeckGLMap {...args} />;
 };
 
 MapLayer3dPng.args = {
     id: "map",
-    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+    layers: [myAxes, pieLayer, north_arrow_layer], // meshMapLayerPng
 
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    //bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    bounds: [0, 0, 2, 2] as NumberQuad,
     views: {
         layout: [1, 1],
         viewports: [
             {
                 id: "view_1",
-                show3D: true,
+                show3D: false,
             },
         ],
     },

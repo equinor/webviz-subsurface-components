@@ -58,8 +58,38 @@ export default class PieChartLayer extends CompositeLayer<
         }
     }
 
-    shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
-        return changeFlags.viewportChanged;
+    initializeState(args: DeckGLLayerContext | undefined): void {
+        super.initializeState(args as DeckGLLayerContext);
+    }
+
+    shouldUpdateState({
+        props,
+        oldProps,
+        context,
+        changeFlags,
+    }: UpdateParameters<this>): boolean {
+        return (
+            super.shouldUpdateState({
+                props,
+                oldProps,
+                context,
+                changeFlags,
+            }) || changeFlags.viewportChanged
+        );
+    }
+
+    updateState({
+        props,
+        oldProps,
+        context,
+        changeFlags,
+    }: UpdateParameters<this>): void {
+        super.updateState({
+            props,
+            oldProps,
+            context,
+            changeFlags,
+        });
     }
 
     renderLayers(): SolidPolygonLayer<PolygonData>[] {
@@ -132,6 +162,11 @@ function makePie(
     }
 
     const pie_polygons: PolygonData[] = [];
+
+    if (sum === 0) {
+        return pie_polygons;
+    }
+
     let start_a = -90.0;
     for (let i = 0; i < pie.fractions.length; i++) {
         const frac = pie.fractions[i].value / sum;
