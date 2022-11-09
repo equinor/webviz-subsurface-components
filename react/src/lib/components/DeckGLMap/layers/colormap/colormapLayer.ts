@@ -26,7 +26,7 @@ function getImageData(
     colorTables: colorTablesArray,
     colorMapFunction?: colorMapFunctionType,
     breakpoint?: number[],
-    isLog?: boolean,
+    isLog?: boolean
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
 

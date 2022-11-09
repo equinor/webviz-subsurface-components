@@ -16,7 +16,6 @@ import {
     colorTablesArray,
     getColors,
 } from "@emerson-eps/color-tables/";
-import { scaleSymlog } from "d3";
 import {
     Feature,
     GeometryCollection,
@@ -455,7 +454,7 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
-                            this.props.isLog
+                        this.props.isLog,
                     ],
                     getWidth: [
                         this.props.logrunName,
@@ -848,8 +847,8 @@ function getLogColor(
     colorMappingFunction: any,
     isLog: boolean
 ): Color[] {
-    const log_data = getLogValues(d, logrun_name, "PORO");
-    const log_info = getLogInfo(d, logrun_name, "PORO");
+    const log_data = getLogValues(d, logrun_name, log_name);
+    const log_info = getLogInfo(d, logrun_name, log_name);
     if (log_data.length == 0 || log_info == undefined) return [];
     const log_color: Color[] = [];
     if (log_info.description == "continuous") {
@@ -857,11 +856,10 @@ function getLogColor(
         const max = Math.max(...log_data);
         const max_delta = max - min;
         log_data.forEach((value) => {
-            const rgb = 
-            // colorMappingFunction
-            //     ? colorMappingFunction((value - min) / max_delta)
-            //     : rgbValues((value - min) / max_delta, logColor, colorTables);
-            rgbValues((value) - min / max_delta, logColor, colorTables, isLog);
+            const rgb = colorMappingFunction
+                ? colorMappingFunction((value - min) / max_delta)
+                : rgbValues((value - min) / max_delta, logColor, colorTables);
+            rgbValues(value - min / max_delta, logColor, colorTables, isLog);
 
             if (rgb) {
                 if (Array.isArray(rgb)) {

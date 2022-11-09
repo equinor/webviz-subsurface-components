@@ -113,8 +113,8 @@ DiscreteWellLogs.args = {
             outline: false,
             logData: "volve_blocking_zonelog_logs.json",
             logrunName: "BLOCKING",
-            logName: "PORO",
-            logColor: "Rainbow"
+            logName: "ZONELOG",
+            logColor: "Stratigraphy",
         },
     ],
 };
@@ -482,8 +482,14 @@ const reverseRange = false;
 //eslint-disable-next-line
 const wellLayerTemplate = (args: any) => {
     const [getColorName, setColorName] = React.useState("Rainbow");
+    const [isLog, setLog] = React.useState(false);
     const wellLayerData = React.useCallback((data) => {
         setColorName(data);
+    }, []);
+
+    // interpolation method
+    const getInterpolateMethod = React.useCallback((data) => {
+        setLog(data.isLog);
     }, []);
 
     const layers = [
@@ -491,7 +497,7 @@ const wellLayerTemplate = (args: any) => {
             ...args.wellLayers[0],
             colorMappingFunction: createColorMapFunction(getColorName),
             logColor: getColorName ? getColorName : wellLayers[0].logColor,
-            isLog: args.isLog
+            isLog: isLog,
         },
     ];
     return (
@@ -504,7 +510,11 @@ const wellLayerTemplate = (args: any) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} getColorName={wellLayerData} />
+                <ColorLegend
+                    {...args}
+                    getColorName={wellLayerData}
+                    getInterpolateMethod={getInterpolateMethod}
+                />
             </div>
             <DeckGLMap {...args} layers={layers} />
         </div>
@@ -529,7 +539,6 @@ LegendWithColorSelector.args = {
         visible: false,
     },
     reverseRange,
-    isLog : false
 };
 
 LegendWithColorSelector.parameters = {
