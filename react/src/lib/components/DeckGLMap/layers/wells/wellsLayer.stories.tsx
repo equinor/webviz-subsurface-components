@@ -8,6 +8,7 @@ import {
     colorTables,
 } from "@emerson-eps/color-tables";
 import { MapMouseEvent } from "../../components/Map";
+import { makeStyles } from "@material-ui/core";
 
 export default {
     component: DeckGLMap,
@@ -36,6 +37,20 @@ const defaultProps = {
         },
     ],
 };
+
+const useStyles = makeStyles({
+    main: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+    legend: {
+        width: 100,
+        position: "absolute",
+        top: "0",
+        right: "0",
+    },
+});
 
 const continuousLogsLayer = {
     ...defaultProps.layers[0],
@@ -240,14 +255,54 @@ CustomWidthWells.args = {
     ],
 };
 
-CustomColoredWells.parameters = {
-    docs: {
-        description: {
-            story: "Volve wells example with thick lines.",
-        },
-        inlineStories: false,
-        iframeHeight: 500,
+export const VolveWellsWithResetButton: ComponentStory<typeof DeckGLMap> = (
+    args
+) => {
+    const [editedData, setEditedData] = React.useState(args.editedData);
+    const [triggerResetMultipleWells, setTriggerResetMultipleWells] =
+        React.useState<number>(0);
+    const handleChange1 = () => {
+        setTriggerResetMultipleWells(triggerResetMultipleWells + 1);
+    };
+
+    React.useEffect(() => {
+        setEditedData(args.editedData);
+    }, [args.editedData]);
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap
+                    {...args}
+                    editedData={editedData}
+                    setProps={(updatedProps) => {
+                        setEditedData(updatedProps);
+                    }}
+                    triggerResetMultipleWells={triggerResetMultipleWells}
+                />
+            </div>
+            <button onClick={handleChange1}> Reset Multiple Wells </button>
+        </>
+    );
+};
+
+VolveWellsWithResetButton.args = {
+    id: "volve-wells",
+    resources: {
+        wellsData: "./volve_wells.json",
     },
+    bounds: [432150, 6475800, 439400, 6481500] as [
+        number,
+        number,
+        number,
+        number
+    ],
+    layers: [
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData",
+        },
+    ],
 };
 
 function wellheadSizeCallback(object: Record<string, Record<string, unknown>>) {
@@ -482,9 +537,14 @@ const reverseRange = false;
 //eslint-disable-next-line
 const wellLayerTemplate = (args: any) => {
     const [getColorName, setColorName] = React.useState("Rainbow");
-
+    const [isLog, setIsLog] = React.useState(false);
     const wellLayerData = React.useCallback((data) => {
         setColorName(data);
+    }, []);
+
+    // interpolation method
+    const getInterpolateMethod = React.useCallback((data) => {
+        setIsLog(data.isLog);
     }, []);
 
     const layers = [
@@ -492,6 +552,7 @@ const wellLayerTemplate = (args: any) => {
             ...args.wellLayers[0],
             colorMappingFunction: createColorMapFunction(getColorName),
             logColor: getColorName ? getColorName : wellLayers[0].logColor,
+            isLog: isLog,
         },
     ];
     return (
@@ -504,7 +565,11 @@ const wellLayerTemplate = (args: any) => {
                     position: "relative",
                 }}
             >
-                <ColorLegend {...args} getColorName={wellLayerData} />
+                <ColorLegend
+                    {...args}
+                    getColorName={wellLayerData}
+                    getInterpolateMethod={getInterpolateMethod}
+                />
             </div>
             <DeckGLMap {...args} layers={layers} />
         </div>
