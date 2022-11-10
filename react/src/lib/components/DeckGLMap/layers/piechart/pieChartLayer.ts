@@ -3,7 +3,7 @@ import {
     Color,
     Position,
     PickingInfo,
-    //UpdateParameters,
+    UpdateParameters,
 } from "@deck.gl/core/typed";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { SolidPolygonLayer } from "@deck.gl/layers/typed";
@@ -58,25 +58,25 @@ export default class PieChartLayer extends CompositeLayer<
         }
     }
 
-    // initializeState(args: DeckGLLayerContext | undefined): void {
-    //     super.initializeState(args as DeckGLLayerContext);
-    // }
+    initializeState(args: DeckGLLayerContext | undefined): void {
+        super.initializeState(args as DeckGLLayerContext);
+    }
 
-    // shouldUpdateState({
-    //     props,
-    //     oldProps,
-    //     context,
-    //     changeFlags,
-    // }: UpdateParameters<this>): boolean {
-    //     return (
-    //         super.shouldUpdateState({
-    //             props,
-    //             oldProps,
-    //             context,
-    //             changeFlags,
-    //         }) || changeFlags.viewportChanged
-    //     );
-    // }
+    shouldUpdateState({
+        props,
+        oldProps,
+        context,
+        changeFlags,
+    }: UpdateParameters<this>): boolean {
+        return (
+            super.shouldUpdateState({
+                props,
+                oldProps,
+                context,
+                changeFlags,
+            }) || changeFlags.viewportChanged
+        );
+    }
 
     // updateState({
     //     props,
