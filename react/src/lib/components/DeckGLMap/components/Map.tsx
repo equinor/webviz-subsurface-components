@@ -656,18 +656,8 @@ const Map: React.FC<MapProps> = ({
     const onHover = useCallback(
         (pickInfo, event) => {
             const infos = getPickingInfos(pickInfo, event);
-
-            // preventing deep picking of Grid3DLayer
-            const filtered_infos = infos.filter((info, index) => {
-                const idx = infos.findIndex(
-                    (object) =>
-                        object.layer?.constructor.name === "Grid3DLayer" &&
-                        object.layer?.id === info.layer?.id
-                );
-                return index === idx;
-            });
-            setHoverInfo(filtered_infos); // for InfoCard pickInfos
-            callOnMouseEvent("hover", infos, event);
+            setHoverInfo(infos); //  for InfoCard pickInfos
+            callOnMouseEvent?.("hover", infos, event);
         },
         [coords, onMouseEvent]
     );
