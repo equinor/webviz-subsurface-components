@@ -241,7 +241,11 @@ export default class privateLayer extends Layer<privateLayerProps<unknown>> {
     }
 
     decodePickingColor(): number {
-        return 0;
+        return this.nullPickingColor() as unknown as number;
+    }
+
+    encodePickingColor(): number[] {
+        return this.nullPickingColor();
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
