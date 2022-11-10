@@ -253,7 +253,7 @@ export interface MapProps {
      * If changed will reset camera to default position.
      */
     triggerHome?: number;
-    triggerResetMultipleWells?: number;
+
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
@@ -263,6 +263,8 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
+
+    triggerResetOption?: boolean;
 }
 
 export interface MapMouseEvent {
@@ -318,7 +320,7 @@ const Map: React.FC<MapProps> = ({
     cameraPosition = {} as ViewStateType,
     getCameraPosition,
     triggerHome,
-    triggerResetMultipleWells,
+    triggerResetOption,
 }: MapProps) => {
     const deckRef = useRef<DeckGLRef>(null);
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
@@ -632,7 +634,30 @@ const Map: React.FC<MapProps> = ({
     // multiple well layers
     const [multipleWells, setMultipleWells] = useState<string[]>([]);
     const [selectedWell, setSelectedWell] = useState<string>("");
+    const [shiftHeld, setShiftHeld] = useState(false);
 
+    function downHandler({key}) {
+        console.log(key);
+        if (key === 'Shift') {
+            setShiftHeld(true);
+        }
+      }
+    
+    function upHandler({key}) {
+        if (key === 'Shift') {
+            setShiftHeld(false);
+        }
+      }
+    
+    useEffect(() => {
+        window.addEventListener('keydown', downHandler);
+        window.addEventListener('keyup', upHandler);
+        return () => {
+            window.removeEventListener('keydown', downHandler);
+            window.removeEventListener('keyup', upHandler);
+        };
+      }, []);
+    
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
         if (layers) {
@@ -641,16 +666,20 @@ const Map: React.FC<MapProps> = ({
                 "WellsLayer",
                 selectedWell
             )?.[0] as WellsLayer;
-            wellslayer?.setMultiSelection(multipleWells);
+            if (shiftHeld) {
+                wellslayer?.setMultiSelection(multipleWells);
+            }
         }
     }, [multipleWells]);
 
     useEffect(() => {
-        if (typeof triggerResetMultipleWells !== "undefined") {
-            setMultipleWells([]);
+        if (triggerResetOption) {
+            console.log("1");
+            setMultipleWells([]); 
+            triggerResetOption = false;           
         }
-    }, [triggerResetMultipleWells]);
-
+              console.log(triggerResetOption)
+    }, [triggerResetOption])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
@@ -735,6 +764,7 @@ const Map: React.FC<MapProps> = ({
             if (ev.type === "click") {
                 if (event.rightButton) ev.type = "contextmenu";
             }
+            
             for (const info of infos as LayerPickInfo[]) {
                 if (info.coordinate) {
                     ev.x = info.coordinate[0];
@@ -898,26 +928,30 @@ const Map: React.FC<MapProps> = ({
                 layers={deckGLLayers}
                 // @ts-expect-error this prop doesn't exists directly on DeckGL, but on Deck.Context
                 userData={{
-                    setEditedData: (updated_prop: Record<string, unknown>) => {
+                    setEditedData: (updated_prop: Record<string, unknown> ,event: any) => {
                         setSelectedWell(updated_prop["selectedWell"] as string);
                         if (
                             Object.keys(updated_prop).includes("selectedWell")
                         ) {
-                            if (
-                                multipleWells.includes(
-                                    updated_prop["selectedWell"] as string
-                                )
-                            ) {
-                                const temp = multipleWells.filter(
-                                    (item) =>
-                                        item !== updated_prop["selectedWell"]
-                                );
-                                setMultipleWells(temp);
+                            if (shiftHeld) {
+                                if (
+                                    multipleWells.includes(
+                                        updated_prop["selectedWell"] as string
+                                    )
+                                ) {
+                                    const temp = multipleWells.filter(
+                                        (item) =>
+                                            item !== updated_prop["selectedWell"]
+                                    );
+                                    setMultipleWells(temp);
+                                } else {
+                                    const temp = multipleWells.concat(
+                                        updated_prop["selectedWell"] as string
+                                    );
+                                    setMultipleWells(temp);
+                                }
                             } else {
-                                const temp = multipleWells.concat(
-                                    updated_prop["selectedWell"] as string
-                                );
-                                setMultipleWells(temp);
+                                setMultipleWells([]);
                             }
                         }
                         setEditedData?.(updated_prop);
