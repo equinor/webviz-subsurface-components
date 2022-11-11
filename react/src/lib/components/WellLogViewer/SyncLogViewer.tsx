@@ -62,7 +62,7 @@ interface Props {
     /**
      * Set to true for default titles or to array of individial welllog titles
      */
-    viewTitles?: boolean | string[];
+    viewTitles?: boolean | (boolean | string | JSX.Element)[];
 
     /**
      * Well Picks data array
@@ -1131,6 +1131,7 @@ SyncLogViewer.propTypes = {
     viewTitles: PropTypes.oneOfType([
         PropTypes.bool,
         PropTypes.arrayOf(PropTypes.string),
+        PropTypes.arrayOf(PropTypes.object) /* JSX.Elenet */,
     ]),
 
     /**

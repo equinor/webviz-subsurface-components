@@ -55,7 +55,11 @@ Default.args = {
     horizontal: false,
     welllog: welllogDefault,
     template: require("../../../../demo/example-data/welllog_template_1.json"),
-    viewTitle: "Well '" + welllogDefault.header.well + "'",
+    viewTitle: (
+        <div>
+            <i>Well</i> <b>{welllogDefault.header.well}</b>
+        </div>
+    ),
     colorTables: colorTables,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,

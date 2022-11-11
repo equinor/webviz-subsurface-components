@@ -98,7 +98,7 @@ export default {
         },
         viewTitles: {
             description:
-                "The view title. Set desired string or true for default value from welllog file",
+                "The view title. Set desired string or react element or true for default value from welllog file",
         },
         hideTitles: {
             description: "Hide titles on the tracks.", // defaultValue: false

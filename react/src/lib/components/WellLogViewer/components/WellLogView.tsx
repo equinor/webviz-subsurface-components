@@ -824,9 +824,9 @@ export interface WellLogViewProps {
     axisMnemos: Record<string, string[]>;
 
     /**
-     * The view title. Set desired string or true for default value from welllog file
+     * The view title. Set desired string or react element or true for default value from welllog file
      */
-    viewTitle?: boolean | string;
+    viewTitle?: boolean | string | JSX.Element;
 
     /**
      * The maximum number of visible tracks
@@ -940,7 +940,7 @@ export const argTypesWellLogViewProp = {
     },
     viewTitle: {
         description:
-            "The view title. Set desired string or true for default value from welllog file",
+            "The view title. Set desired string or react element or true for default value from welllog file",
     },
     hideTitles: {
         description: "Hide Titles on the tracks", // defaultValue: false
@@ -978,6 +978,8 @@ export function shouldUpdateWellLogView(
 
     if (props.checkDatafileSchema !== nextProps.checkDatafileSchema)
         return true;
+
+    if (props.viewTitle !== nextProps.viewTitle) return true;
 
     // callbacks
     // ignore all?
@@ -1664,7 +1666,10 @@ class WellLogView
                         }}
                         className="welllogview-title"
                     >
-                        {this.props.viewTitle === true
+                        {typeof this.props.viewTitle ===
+                        "object" /*react element*/
+                            ? this.props.viewTitle
+                            : this.props.viewTitle === true
                             ? this.props.welllog?.header.well
                             : this.props.viewTitle}
                     </div>
@@ -1749,9 +1754,13 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         axisMnemos: PropTypes.object,
 
         /**
-         * Set to true for default titles or to array of individial welllog titles
+         * Set to true for default title or to some string or JSX.Element
          */
-        viewTitle: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+        viewTitle: PropTypes.oneOfType([
+            PropTypes.bool,
+            PropTypes.string,
+            PropTypes.object,
+        ]),
 
         /**
          * The maximum number of visible tracks
