@@ -13,8 +13,8 @@ render(<Default />).unmount();
 describe("Map Story Tests", () => {
   before("activate hooks",() => {
     Cypress.on('fail', (error, runnable) => {
-      if (!error.message.includes('not to exist in the DOM, but it was continuously found')) {
-      throw error
+      if (error.message.includes('not to exist in the DOM, but it was continuously found')) {
+      return false
       }
     })
     mount(<Default />)
