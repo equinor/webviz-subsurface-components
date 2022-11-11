@@ -11,7 +11,7 @@ const { Default } = composeStories(stories);
 render(<Default />).unmount();
 
 describe("Map Story Tests", () => {
-  before("activate hooks",() => {
+  it("activate hooks",() => {
     Cypress.on('fail', (error, runnable) => {
       if (error.message.includes('not to exist in the DOM, but it was continuously found')) {
       return false
@@ -20,7 +20,6 @@ describe("Map Story Tests", () => {
     mount(<Default />)
     cy.get("svg[role='progressbar']")
     cy.get("svg[role='progressbar']", {timeout: 30000}).should("not.exist")
-    unmount()
   })
   it("should diplay default story",() => {
       mount(<Default />);
