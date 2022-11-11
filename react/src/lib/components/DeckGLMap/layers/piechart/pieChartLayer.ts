@@ -63,6 +63,13 @@ export default class PieChartLayer extends CompositeLayer<
     }
 
     renderLayers(): SolidPolygonLayer<PolygonData>[] {
+        const pieData = this.props.data as unknown as PiesData;
+        if (!pieData?.pies) {
+            // this.props.data is a sum type, and since TS doesn't have
+            // pattern matching, we must check it this way.
+            return [];
+        }
+
         const is_orthographic =
             this.context.viewport.constructor.name === "OrthographicViewport";
 
@@ -76,13 +83,6 @@ export default class PieChartLayer extends CompositeLayer<
 
         // Factor to convert a length in pixels to a length in world space.
         const pixels2world = d / npixels;
-
-        const pieData = this.props.data as unknown as PiesData;
-        if (!pieData?.pies) {
-            // this.props.data is a sum type, and since TS doesn't have
-            // pattern matching, we must check it this way.
-            return [];
-        }
 
         const layer = new SolidPolygonLayer<PolygonData>(
             this.getSubLayerProps({
@@ -100,7 +100,6 @@ PieChartLayer.defaultProps = layersDefaultProps[
 ] as PieChartLayerProps<PiesData>;
 
 //================= Local help functions. ==================
-
 function makePies(data: PiesData, pixels2world: number): PolygonData[] {
     let polygons: PolygonData[] = [];
     let pie_index = 0;
@@ -132,6 +131,11 @@ function makePie(
     }
 
     const pie_polygons: PolygonData[] = [];
+
+    if (sum === 0) {
+        return pie_polygons;
+    }
+
     let start_a = -90.0;
     for (let i = 0; i < pie.fractions.length; i++) {
         const frac = pie.fractions[i].value / sum;
