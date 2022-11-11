@@ -94,12 +94,9 @@ function getImageData(
     return data ? data : [0, 0, 0];
 }
 
-export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
+export interface privateLayerProps<D> extends ExtendedLayerProps<D> {
     mesh: MeshType;
     meshLines: MeshTypeLines;
-    contours: [number, number];
-    gridLines: boolean;
-    isContoursDepth: boolean;
     colorMapName: string;
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
@@ -108,20 +105,13 @@ export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
 }
 
 const defaultProps = {
-    data: ["dummy"],
-    contours: [-1, -1],
-    isContoursDepth: true,
-    gridLines: false,
     colorMapName: "",
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
-    meshValueRange: [0.0, 1.0],
 };
 
 // This is a private layer used only by the composite Map3DLayer
-export default class privateMapLayer extends Layer<
-    privateMapLayerProps<unknown>
-> {
+export default class privateLayer extends Layer<privateLayerProps<unknown>> {
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
         const [model_mesh, mesh_lines_model] = this._getModels(gl);
@@ -192,14 +182,10 @@ export default class privateMapLayer extends Layer<
         const { uniforms, context } = args;
         const { gl } = context;
 
-        const contourReferencePoint = this.props.contours[0] ?? -1.0;
-        const contourInterval = this.props.contours[1] ?? -1.0;
-        const isContoursDepth = this.props.isContoursDepth;
-
         const [model_mesh, mesh_lines_model] = this.state["models"];
 
-        const valueRangeMin = this.props.propertyValueRange[0] ?? 0.0;
-        const valueRangeMax = this.props.propertyValueRange[1] ?? 1.0;
+        const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
+        const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
 
         // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
@@ -227,9 +213,6 @@ export default class privateMapLayer extends Layer<
         model_mesh
             .setUniforms({
                 ...uniforms,
-                contourReferencePoint,
-                contourInterval,
-                isContoursDepth,
                 colormap: new Texture2D(context.gl, {
                     width: 256,
                     height: 1,
@@ -253,13 +236,16 @@ export default class privateMapLayer extends Layer<
             .draw();
         gl.disable(gl.POLYGON_OFFSET_FILL);
 
-        if (this.props.gridLines) {
-            mesh_lines_model.draw();
-        }
+        // Draw lines.
+        mesh_lines_model.draw();
     }
 
     decodePickingColor(): number {
-        return 0;
+        return this.nullPickingColor() as unknown as number;
+    }
+
+    encodePickingColor(): number[] {
+        return this.nullPickingColor();
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
@@ -269,7 +255,7 @@ export default class privateMapLayer extends Layer<
 
         const layer_properties: PropertyDataType[] = [];
 
-        // Note these colors are in the  0-255 range.
+        // Note these colors are in the 0-255 range.
         const r = info.color[0];
         const g = info.color[1];
         const b = info.color[2];
@@ -291,5 +277,5 @@ export default class privateMapLayer extends Layer<
     }
 }
 
-privateMapLayer.layerName = "privateMapLayer";
-privateMapLayer.defaultProps = defaultProps;
+privateLayer.layerName = "privateLayer";
+privateLayer.defaultProps = defaultProps;

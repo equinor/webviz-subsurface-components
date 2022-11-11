@@ -42,10 +42,12 @@ export const argTypesWellLogViewerProp = {
             "Options for readout panel.<br/>" +
             "allTracks: boolean — Show not only visible tracks,<br/>" +
             "grouping: string — How group values.",
+        /*
         defaultValue: {
             allTracks: false,
             grouping: "by_track",
-        },
+        }
+        */
     },
     // callbacks...
 };

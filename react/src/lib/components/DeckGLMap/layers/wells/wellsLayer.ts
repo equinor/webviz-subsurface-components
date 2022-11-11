@@ -16,7 +16,6 @@ import {
     colorTablesArray,
     getColors,
 } from "@emerson-eps/color-tables/";
-
 import {
     Feature,
     GeometryCollection,
@@ -97,6 +96,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameAtTop: boolean;
     wellNameSize: number;
     wellNameColor: Color;
+    isLog: boolean;
 }
 
 export interface LogCurveDataType {
@@ -230,6 +230,14 @@ export default class WellsLayer extends CompositeLayer<
             this.setState({
                 well: well,
                 selection: _selection,
+            });
+        }
+    }
+
+    setMultiSelection(wells: string[] | undefined): void {
+        if (this.internalState) {
+            this.setState({
+                selectedMultiWells: wells,
             });
         }
     }
@@ -382,6 +390,32 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
+        // Highlight the multi selected wells.
+        const highlightMultiWells = new UnfoldedGeoJsonLayer(
+            this.getSubLayerProps({
+                id: "highlight2",
+                data: getWellObjectsByName(
+                    data.features,
+                    this.state["selectedMultiWells"]
+                ),
+                pickable: false,
+                stroked: false,
+                positionFormat,
+                pointRadiusUnits: "pixels",
+                lineWidthUnits: "pixels",
+                pointRadiusScale: this.props.pointRadiusScale,
+                lineWidthScale: this.props.lineWidthScale,
+                getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
+                getPointRadius: getSize(
+                    POINT,
+                    this.props.wellHeadStyle?.size,
+                    2
+                ),
+                getFillColor: [255, 140, 0],
+                getLineColor: [255, 140, 0],
+            })
+        );
+
         const log_layer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
                 id: "log_curve",
@@ -407,7 +441,8 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
-                        this.props.colorMappingFunction
+                        this.props.colorMappingFunction,
+                        this.props.isLog
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
                     this.props.logRadius ||
@@ -419,6 +454,7 @@ export default class WellsLayer extends CompositeLayer<
                         this.props.logColor,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
+                        this.props.isLog,
                     ],
                     getWidth: [
                         this.props.logrunName,
@@ -508,7 +544,15 @@ export default class WellsLayer extends CompositeLayer<
             })
         );
 
-        return [outline, log_layer, colors, highlight, selection_layer, names];
+        return [
+            outline,
+            log_layer,
+            colors,
+            highlight,
+            highlightMultiWells,
+            selection_layer,
+            names,
+        ];
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
@@ -671,6 +715,24 @@ function getWellObjectByName(
     );
 }
 
+function getWellObjectsByName(
+    wells_data: Feature[],
+    name: string[]
+): Feature[] | undefined {
+    const res: Feature[] = [];
+    for (let i = 0; i < name?.length; i++) {
+        wells_data?.find((item) => {
+            if (
+                item.properties?.["name"]?.toLowerCase() ===
+                name[i]?.toLowerCase()
+            ) {
+                res.push(item);
+            }
+        });
+    }
+    return res;
+}
+
 function getPointGeometry(well_object: Feature): Point {
     return (well_object.geometry as GeometryCollection)?.geometries.find(
         (item: { type: string }) => item.type == "Point"
@@ -782,28 +844,28 @@ function getLogColor(
     logColor: string,
     colorTables: colorTablesArray,
     // eslint-disable-next-line
-    colorMappingFunction: any
+    colorMappingFunction: any,
+    isLog: boolean
 ): Color[] {
     const log_data = getLogValues(d, logrun_name, log_name);
     const log_info = getLogInfo(d, logrun_name, log_name);
     if (log_data.length == 0 || log_info == undefined) return [];
     const log_color: Color[] = [];
-
     if (log_info.description == "continuous") {
         const min = Math.min(...log_data);
         const max = Math.max(...log_data);
         const max_delta = max - min;
-
         log_data.forEach((value) => {
             const rgb = colorMappingFunction
                 ? colorMappingFunction((value - min) / max_delta)
                 : rgbValues((value - min) / max_delta, logColor, colorTables);
+            rgbValues(value - min / max_delta, logColor, colorTables, isLog);
 
             if (rgb) {
                 if (Array.isArray(rgb)) {
                     log_color.push([rgb[0], rgb[1], rgb[2]]);
                 } else {
-                    log_color.push([rgb.r, rgb.g, rgb.b]);
+                    log_color.push([rgb?.r, rgb?.g, rgb?.b]);
                 }
             } else {
                 log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
