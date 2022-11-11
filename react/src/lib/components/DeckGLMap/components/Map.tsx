@@ -632,6 +632,30 @@ const Map: React.FC<MapProps> = ({
     // multiple well layers
     const [multipleWells, setMultipleWells] = useState<string[]>([]);
     const [selectedWell, setSelectedWell] = useState<string>("");
+    const [shiftHeld, setShiftHeld] = useState(false);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function downHandler({ key }: any) {
+        if (key === "Shift") {
+            setShiftHeld(true);
+        }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function upHandler({ key }: any) {
+        if (key === "Shift") {
+            setShiftHeld(false);
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener("keydown", downHandler);
+        window.addEventListener("keyup", upHandler);
+        return () => {
+            window.removeEventListener("keydown", downHandler);
+            window.removeEventListener("keyup", upHandler);
+        };
+    }, []);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -893,21 +917,26 @@ const Map: React.FC<MapProps> = ({
                         if (
                             Object.keys(updated_prop).includes("selectedWell")
                         ) {
-                            if (
-                                multipleWells.includes(
-                                    updated_prop["selectedWell"] as string
-                                )
-                            ) {
-                                const temp = multipleWells.filter(
-                                    (item) =>
-                                        item !== updated_prop["selectedWell"]
-                                );
-                                setMultipleWells(temp);
+                            if (shiftHeld) {
+                                if (
+                                    multipleWells.includes(
+                                        updated_prop["selectedWell"] as string
+                                    )
+                                ) {
+                                    const temp = multipleWells.filter(
+                                        (item) =>
+                                            item !==
+                                            updated_prop["selectedWell"]
+                                    );
+                                    setMultipleWells(temp);
+                                } else {
+                                    const temp = multipleWells.concat(
+                                        updated_prop["selectedWell"] as string
+                                    );
+                                    setMultipleWells(temp);
+                                }
                             } else {
-                                const temp = multipleWells.concat(
-                                    updated_prop["selectedWell"] as string
-                                );
-                                setMultipleWells(temp);
+                                setMultipleWells([]);
                             }
                         }
                         setEditedData?.(updated_prop);
