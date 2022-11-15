@@ -987,13 +987,15 @@ export function shouldUpdateWellLogView(
     return false;
 }
 
-function isEqualRanges(
-    d1: undefined | [number | undefined, number | undefined],
-    d2: undefined | [number | undefined, number | undefined]
+export function isEqualRanges(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d1: undefined | [any, any],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d2: undefined | [any, any]
 ): boolean {
     if (!d1) return !d2;
     if (!d2) return !d1;
-    return d1[0] !== d2[0] || d1[1] !== d2[1];
+    return d1[0] === d2[0] && d1[1] === d2[1];
 }
 
 interface State {
@@ -1355,8 +1357,11 @@ class WellLogView
         }
     }
     selectContent(selection: [number | undefined, number | undefined]): void {
+        const selPinned = selection[1];
+        if (this.selCurrent === selection[0] && this.selPinned === selPinned)
+            return;
         this.selCurrent = selection[0];
-        this.selPinned = selection[1];
+        this.selPinned = selPinned;
         this.selPersistent = this.selPinned !== undefined;
 
         this.showSelection();

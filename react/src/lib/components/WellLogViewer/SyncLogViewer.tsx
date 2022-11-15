@@ -33,16 +33,24 @@ import { LogViewer } from "@equinor/videx-wellog";
 
 import { Info, InfoOptions } from "./components/InfoTypes";
 
-function isArr2Differ(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    src1: any[] | undefined,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    src2: any[] | undefined
-): boolean {
-    if (!src1) return !!src2;
-    if (!src2) return true;
+import { isEqualRanges } from "./components/WellLogView";
 
-    return src1[0] !== src2[0] || src1[1] !== src2[1];
+export function isEqualArrays(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d1: undefined | any[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d2: undefined | any[]
+): boolean {
+    if (!d1) return !d2;
+    if (!d2) return !d1;
+
+    const n = d1.length;
+    if (n !== d2.length) return false;
+
+    for (let i = 0; i < n; i++) {
+        if (d1[i] !== d2[i]) return false;
+    }
+    return true;
 }
 
 interface Props {
@@ -375,21 +383,21 @@ class SyncLogViewer extends Component<Props, State> {
             });
         }
 
-        if (isArr2Differ(this.props.domain, prevProps.domain)) {
+        if (isEqualRanges(this.props.domain, prevProps.domain)) {
             this.setControllersZoom();
         }
 
         if (
-            isArr2Differ(
+            this.props.wellpicks !== prevProps.wellpicks ||
+            !isEqualArrays(
                 this.props.wellpickFlatting,
                 prevProps.wellpickFlatting
-            ) ||
-            this.props.wellpicks !== prevProps.wellpicks
+            )
         ) {
             this.syncContentScrollPos(0); // force to redraw
         }
 
-        if (isArr2Differ(this.props.selection, prevProps.selection)) {
+        if (isEqualRanges(this.props.selection, prevProps.selection)) {
             this.setControllersSelection();
         }
 
@@ -782,10 +790,7 @@ class SyncLogViewer extends Component<Props, State> {
             if (!_controller || _controller == controller) continue;
             if (this.props.syncContentSelection) {
                 const _selection = _controller.getContentSelection();
-                if (
-                    _selection[0] !== selection[0] ||
-                    _selection[1] !== selection[1]
-                )
+                if (!isEqualRanges(_selection, selection))
                     _controller.selectContent(selection);
             }
         }
@@ -1131,7 +1136,7 @@ SyncLogViewer.propTypes = {
     viewTitles: PropTypes.oneOfType([
         PropTypes.bool,
         PropTypes.arrayOf(PropTypes.string),
-        PropTypes.arrayOf(PropTypes.object) /* JSX.Elenet */,
+        PropTypes.arrayOf(PropTypes.object) /* react elemenet */,
     ]),
 
     /**
