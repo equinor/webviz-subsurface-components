@@ -126,7 +126,7 @@ jobs:
         run: |
           mkdir clone
           cd clone
-          git clone --branch cypress-snaps --depth 1 --filter=blob:none https://github.com/avanti-em/webviz-subsurface-components
+          git clone --branch cypress-snaps --depth 1 --filter=blob:none https://github.com/equinor/webviz-subsurface-components
           cd webviz-subsurface-components
           git sparse-checkout set react/cypress-visual-screenshots
           cd react
@@ -181,7 +181,7 @@ jobs:
         run: npm run build-storybook --prefix ./react
 
       - name: 📚 Update Storybook and GitHub demo application
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8' && failure() && matrix.e2e-tests
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8'
         run: |
           cp -r ./react/{index.html,output.css,output.js,storybook-static} ..
 
