@@ -52,6 +52,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         // If contour lines should follow depth or properties.
         isContoursDepth: true,
         gridLines: false,
+        enableSmoothShading: true,
+        material: true,
     },
 
     Map3DLayer: {

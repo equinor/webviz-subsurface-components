@@ -10,7 +10,7 @@ uniform float contourInterval;
 
 in vec2 vTexCoord;
 in vec3 cameraPosition;
-//in vec3 normals_commonspace;
+in vec3 normals_commonspace;
 in vec4 position_commonspace;
 in vec4 vColor;
 
@@ -21,7 +21,6 @@ out vec4 fragColor;
 in vec3 worldPos;
 in float property;
 
-// XXXX =========
 uniform sampler2D colormap;
 
 uniform float valueRangeMin;
@@ -32,20 +31,17 @@ uniform float colorMapRangeMax;
 uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
-
+uniform bool enableSmoothShading;
 
 
 void main(void) {
    geometry.uv = vTexCoord;
 
-   vec3 normal = vec3(0.0, 0.0, 1.0);
-   bool nomals_available = false;
-   if (!nomals_available) {
+   vec3 normal = normals_commonspace;
+
+   if (!enableSmoothShading) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    } 
-   // else {
-   //    normal = normals_commonspace;
-   // }
 
    // // Discard transparent pixels. KEEP
    // if (!picking_uActive && isnan(propertyValue)) {
@@ -120,7 +116,7 @@ void main(void) {
       color = color * vec4(c, c, c, 1.0);
    }
 
-   // Use normal lighting.
+   // Use normal lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
    fragColor = vec4(lightColor, 1.0);
 
