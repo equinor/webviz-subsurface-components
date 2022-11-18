@@ -31,7 +31,7 @@ uniform float colorMapRangeMax;
 uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
-uniform bool enableSmoothShading;
+uniform bool smoothShading;
 
 
 void main(void) {
@@ -39,7 +39,7 @@ void main(void) {
 
    vec3 normal = normals_commonspace;
 
-   if (!enableSmoothShading) {
+   if (!smoothShading) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    } 
 

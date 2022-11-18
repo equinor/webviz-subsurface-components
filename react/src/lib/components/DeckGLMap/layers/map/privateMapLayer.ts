@@ -105,7 +105,7 @@ export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapClampColor: Color | undefined | boolean;
     colorMapFunction?: colorMapFunctionType | false;
     propertyValueRange: [number, number];
-    enableSmoothShading: boolean;
+    smoothShading: boolean;
 }
 
 const defaultProps = {
@@ -224,7 +224,7 @@ export default class privateMapLayer extends Layer<
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
 
-        const enableSmoothShading = this.props.enableSmoothShading;
+        const smoothShading = this.props.smoothShading;
 
         gl.enable(gl.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
@@ -253,7 +253,7 @@ export default class privateMapLayer extends Layer<
                 colorMapClampColor,
                 isColorMapClampColorTransparent,
                 isClampColor,
-                enableSmoothShading,
+                smoothShading,
             })
             .draw();
         gl.disable(gl.POLYGON_OFFSET_FILL);

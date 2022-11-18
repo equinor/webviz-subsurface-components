@@ -120,7 +120,7 @@ const cellCenteredPropertiesLayer = {
         value * 255,
         value * 255,
     ],
-    enableSmoothShading: true,
+    smoothShading: true,
 };
 
 // Example using "Map" layer. Uses PNG float for mesh and properties.
@@ -139,7 +139,7 @@ const meshMapLayerPng = {
     isContoursDepth: true,
     gridLines: false,
     material: true,
-    enableSmoothShading: true,
+    smoothShading: true,
     colorMapName: "Physics",
 };
 

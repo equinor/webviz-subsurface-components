@@ -13,7 +13,7 @@ export function makeFullMesh(e: { data: Params }): void {
     const propertiesData = params.propertiesData;
     const isMesh = params.isMesh;
     const frame = params.frame;
-    const enableSmoothShading = params.enableSmoothShading;
+    const smoothShading = params.smoothShading;
 
     function getFloat32ArrayMinMax(data: Float32Array) {
         let max = -99999999;
@@ -47,12 +47,12 @@ export function makeFullMesh(e: { data: Params }): void {
         nx: number,
         ny: number,
         isMesh: boolean,
-        enableSmoothShading: boolean,
+        smoothShading: boolean,
         meshData: Float32Array,
         ox: number,
         oy: number
     ) {
-        if (!enableSmoothShading) {
+        if (!smoothShading) {
             return [1, 1, 1];
         }
 
@@ -185,7 +185,7 @@ export function makeFullMesh(e: { data: Params }): void {
 
                 positions.push(x0, y0, z);
 
-                const normal = calcNormal(w, h, nx, ny, isMesh, enableSmoothShading, meshData, ox, oy); // eslint-disable-line
+                const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy); // eslint-disable-line
                 normals.push(normal[0], normal[1], normal[2]);
 
                 vertexProperties.push(propertyValue);
@@ -282,10 +282,10 @@ export function makeFullMesh(e: { data: Params }): void {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const normal0 = calcNormal(w, h, nx, ny, isMesh, enableSmoothShading, meshData, ox, oy);         // eslint-disable-line
-                const normal1 = calcNormal(w + 1, h, nx, ny, isMesh, enableSmoothShading, meshData, ox, oy);     // eslint-disable-line
-                const normal2 = calcNormal(w + 1, h + 1, nx, ny, isMesh, enableSmoothShading, meshData, ox, oy); // eslint-disable-line
-                const normal3 = calcNormal(w, h + 1, nx, ny, isMesh, enableSmoothShading, meshData, ox, oy);     // eslint-disable-line
+                const normal0 = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy);         // eslint-disable-line
+                const normal1 = calcNormal(w + 1, h, nx, ny, isMesh, smoothShading, meshData, ox, oy);     // eslint-disable-line
+                const normal2 = calcNormal(w + 1, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy); // eslint-disable-line
+                const normal3 = calcNormal(w, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy);     // eslint-disable-line
 
                 const i0_act = !isNaN(meshData[i0]); // eslint-disable-line
                 const i1_act = !isNaN(meshData[i1]); // eslint-disable-line

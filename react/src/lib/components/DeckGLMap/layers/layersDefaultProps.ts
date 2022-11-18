@@ -52,7 +52,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         // If contour lines should follow depth or properties.
         isContoursDepth: true,
         gridLines: false,
-        enableSmoothShading: true,
+        smoothShading: true,
         material: true,
     },
 
@@ -73,7 +73,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         contours: [-1.0, -1.0],
         // If contour lines should follow depth or properties.
         isContoursDepth: true,
-        enableSmoothShading: true,
+        smoothShading: true,
         material: true,
     },
     GridLayer: {
