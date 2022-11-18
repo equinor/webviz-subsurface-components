@@ -145,12 +145,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             this.setState({ editedData: this.props.editedData });
             0;
         }
-        console.log(
-            this.state.selection?.[0],
-            this.state.selection?.[1],
-            prevState.selection?.[0],
-            prevState.selection?.[1]
-        );
         if (!isEqualRanges(this.state.selection, prevState.selection)) {
             const controller = this.state.controller;
             if (controller && this.state.selection) {
