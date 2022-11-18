@@ -6,13 +6,17 @@
 
 import json
 import time
+import pytest
 
 import dash
 import webviz_subsurface_components
 
 
 # Basic test for the component rendering.
-def test_render_deckgl_map(dash_duo: dash.testing.composite.DashComposite) -> None:
+@pytest.mark.parametrize("dev_tools_serve_dev_bundles", [False, True])
+def test_render_deckgl_map(
+    dev_tools_serve_dev_bundles, dash_duo: dash.testing.composite.DashComposite
+) -> None:
 
     with open(
         "react/src/demo/example-data/deckgl-map.json", encoding="utf8"
@@ -22,6 +26,6 @@ def test_render_deckgl_map(dash_duo: dash.testing.composite.DashComposite) -> No
     app = dash.Dash(__name__)
     app.layout = webviz_subsurface_components.DeckGLMap(**deckgl_data)
 
-    dash_duo.start_server(app)
+    dash_duo.start_server(app, dev_tools_serve_dev_bundles=dev_tools_serve_dev_bundles)
     time.sleep(5)
     assert dash_duo.get_logs() == []  # Console should have no errors
