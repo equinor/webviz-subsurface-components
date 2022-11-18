@@ -74,8 +74,8 @@ export default class PieChartLayer extends CompositeLayer<
             this.context.viewport.constructor.name === "OrthographicViewport";
 
         const npixels = 100;
-        const p1 = is_orthographic ? [0, 0, 0] : [0, 0];
-        const p2 = is_orthographic ? [npixels, 0, 0] : [npixels, 0];
+        const p1 = is_orthographic ? [0, 0] : [0, 0, 0];
+        const p2 = is_orthographic ? [npixels, 0] : [npixels, 0, 0];
 
         const v1 = new Vector3(this.context.viewport.unproject(p1));
         const v2 = new Vector3(this.context.viewport.unproject(p2));
