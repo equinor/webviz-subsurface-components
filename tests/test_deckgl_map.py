@@ -5,6 +5,7 @@
 # Copyright (C) 2020 - Equinor ASA.
 
 import json
+import time
 
 import dash
 import webviz_subsurface_components
@@ -22,4 +23,5 @@ def test_render_deckgl_map(dash_duo: dash.testing.composite.DashComposite) -> No
     app.layout = webviz_subsurface_components.DeckGLMap(**deckgl_data)
 
     dash_duo.start_server(app)
+    time.sleep(5)
     assert dash_duo.get_logs() == []  # Console should have no errors
