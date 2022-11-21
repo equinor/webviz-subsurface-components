@@ -200,10 +200,10 @@ export function makeFullMesh(e: { data: Params }): void {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const i0_act = !isNaN(meshData[i0]) && !isNaN(propertiesData[i0]); // eslint-disable-line
-                const i1_act = !isNaN(meshData[i1]) && !isNaN(propertiesData[i1]); // eslint-disable-line
-                const i2_act = !isNaN(meshData[i2]) && !isNaN(propertiesData[i2]); // eslint-disable-line
-                const i3_act = !isNaN(meshData[i3]) && !isNaN(propertiesData[i3]); // eslint-disable-line
+                const i0_act = !isMesh || (!isNaN(meshData[i0]) && !isNaN(propertiesData[i0])); // eslint-disable-line
+                const i1_act = !isMesh || (!isNaN(meshData[i1]) && !isNaN(propertiesData[i1])); // eslint-disable-line
+                const i2_act = !isMesh || (!isNaN(meshData[i2]) && !isNaN(propertiesData[i2])); // eslint-disable-line
+                const i3_act = !isMesh || (!isNaN(meshData[i3]) && !isNaN(propertiesData[i3])); // eslint-disable-line
 
                 const hh = ny - h - 1; // See note above.
 
@@ -287,10 +287,10 @@ export function makeFullMesh(e: { data: Params }): void {
                 const normal2 = calcNormal(w + 1, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy); // eslint-disable-line
                 const normal3 = calcNormal(w, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy);     // eslint-disable-line
 
-                const i0_act = !isNaN(meshData[i0]); // eslint-disable-line
-                const i1_act = !isNaN(meshData[i1]); // eslint-disable-line
-                const i2_act = !isNaN(meshData[i2]); // eslint-disable-line
-                const i3_act = !isNaN(meshData[i3]); // eslint-disable-line
+                const i0_act = !isMesh || (!isNaN(meshData[i0]) && !isNaN(propertiesData[i0])); // eslint-disable-line
+                const i1_act = !isMesh || (!isNaN(meshData[i1]) && !isNaN(propertiesData[i1])); // eslint-disable-line
+                const i2_act = !isMesh || (!isNaN(meshData[i2]) && !isNaN(propertiesData[i2])); // eslint-disable-line
+                const i3_act = !isMesh || (!isNaN(meshData[i3]) && !isNaN(propertiesData[i3])); // eslint-disable-line
 
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
