@@ -802,6 +802,7 @@ export interface WellLogViewProps {
      * Well Picks data
      */
     wellpick?: WellPickProps;
+
     /**
      * Orientation of the track plots on the screen.
      */
@@ -811,14 +812,6 @@ export interface WellLogViewProps {
      * Primary axis id: "md", "tvd", "time"... Default is the first available from axisMnemos
      */
     primaryAxis?: string;
-    /**
-     * Show Titles on the tracks
-     */
-    hideTitles?: boolean;
-    /**
-     * Hide Legends on the tracks
-     */
-    hideLegend?: boolean;
 
     /**
      * Log mnemonics for axes
@@ -829,6 +822,11 @@ export interface WellLogViewProps {
      * Names for axes
      */
     axisMnemos: Record<string, string[]>;
+
+    /**
+     * The view title. Set desired string or react element or true for default value from welllog file
+     */
+    viewTitle?: boolean | string | JSX.Element;
 
     /**
      * The maximum number of visible tracks
@@ -854,6 +852,15 @@ export interface WellLogViewProps {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema?: boolean;
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTitles?: boolean;
+    /**
+     * Hide Legends on the tracks
+     */
+    hideLegend?: boolean;
 
     // callbacks:
     onCreateController?: (controller: WellLogController) => void;
@@ -923,14 +930,7 @@ export const argTypesWellLogViewProp = {
         description: "Initial selected range",
     },
     checkDatafileSchema: {
-        description:
-            "Validate JSON datafile against schema" /* defaultValue: false */,
-    },
-    hideTitles: {
-        description: "Hide Titles on the tracks" /* defaultValue: false */,
-    },
-    hideLegend: {
-        description: "Hide Legends on the tracks" /* defaultValue: false */,
+        description: "Validate JSON datafile against schema", // defaultValue: false
     },
     axisMnemos: {
         description: "Log mnemonics for axes",
@@ -938,6 +938,17 @@ export const argTypesWellLogViewProp = {
     axisTitles: {
         description: "Names for axes",
     },
+    viewTitle: {
+        description:
+            "The view title. Set desired string or react element or true for default value from welllog file",
+    },
+    hideTitles: {
+        description: "Hide Titles on the tracks", // defaultValue: false
+    },
+    hideLegend: {
+        description: "Hide Legends on the tracks", // defaultValue: false
+    },
+
     // callbacks...
 };
 
@@ -968,19 +979,23 @@ export function shouldUpdateWellLogView(
     if (props.checkDatafileSchema !== nextProps.checkDatafileSchema)
         return true;
 
+    if (props.viewTitle !== nextProps.viewTitle) return true;
+
     // callbacks
     // ignore all?
 
     return false;
 }
 
-function isEqualRanges(
-    d1: undefined | [number | undefined, number | undefined],
-    d2: undefined | [number | undefined, number | undefined]
+export function isEqualRanges(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d1: undefined | [any, any],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d2: undefined | [any, any]
 ): boolean {
     if (!d1) return !d2;
     if (!d2) return !d1;
-    return d1[0] !== d2[0] || d1[1] !== d2[1];
+    return d1[0] === d2[0] && d1[1] === d2[1];
 }
 
 interface State {
@@ -1342,8 +1357,11 @@ class WellLogView
         }
     }
     selectContent(selection: [number | undefined, number | undefined]): void {
+        const selPinned = selection[1];
+        if (this.selCurrent === selection[0] && this.selPinned === selPinned)
+            return;
         this.selCurrent = selection[0];
-        this.selPinned = selection[1];
+        this.selPinned = selPinned;
         this.selPersistent = this.selPinned !== undefined;
 
         this.showSelection();
@@ -1632,27 +1650,58 @@ class WellLogView
     }
 
     render(): JSX.Element {
+        const horizontal = this.props.horizontal;
         return (
             <div
                 style={{
                     width: "100%",
                     height: "100%",
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: horizontal ? "row" : "column",
                 }}
             >
-                <div
-                    style={{ flex: "1, 1" }}
-                    className="welllogview"
-                    ref={(el) => (this.container = el as HTMLElement)}
-                />
-                {this.state.errorText ? (
-                    <div style={{ flex: "0, 0" }} className="welllogview-error">
-                        {this.state.errorText}
+                {this.props.viewTitle && (
+                    <div
+                        style={{
+                            flex: "0, 0",
+                            writingMode: horizontal ? "vertical-lr" : undefined,
+                            transform: horizontal
+                                ? "rotate(180deg)"
+                                : undefined,
+                        }}
+                        className="welllogview-title"
+                    >
+                        {typeof this.props.viewTitle ===
+                        "object" /*react element*/
+                            ? this.props.viewTitle
+                            : this.props.viewTitle === true
+                            ? this.props.welllog?.header.well
+                            : this.props.viewTitle}
                     </div>
-                ) : (
-                    <></>
                 )}
+                <div
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        flex: "1, 1",
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
+                    <div
+                        style={{ flex: "1, 1" }}
+                        className="welllogview"
+                        ref={(el) => (this.container = el as HTMLElement)}
+                    />
+                    {this.state.errorText && (
+                        <div
+                            style={{ flex: "0, 0" }}
+                            className="welllogview-error"
+                        >
+                            {this.state.errorText}
+                        </div>
+                    )}
+                </div>
             </div>
         );
     }
@@ -1700,16 +1749,6 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         primaryAxis: PropTypes.string,
 
         /**
-         * Hide titles of the track. Default is false
-         */
-        hideTitles: PropTypes.bool,
-
-        /**
-         * Hide legends of the track. Default is false
-         */
-        hideLegend: PropTypes.bool,
-
-        /**
          * Log mnemonics for axes
          */
         axisTitles: PropTypes.object,
@@ -1718,6 +1757,15 @@ export function _propTypesWellLogView(): Record<string, unknown> {
          * Names for axes
          */
         axisMnemos: PropTypes.object,
+
+        /**
+         * Set to true for default title or to some string or JSX.Element
+         */
+        viewTitle: PropTypes.oneOfType([
+            PropTypes.bool,
+            PropTypes.string,
+            PropTypes.object,
+        ]),
 
         /**
          * The maximum number of visible tracks
@@ -1743,6 +1791,16 @@ export function _propTypesWellLogView(): Record<string, unknown> {
          * Validate JSON datafile against schems
          */
         checkDatafileSchema: PropTypes.bool,
+
+        /**
+         * Hide titles of the track. Default is false
+         */
+        hideTitles: PropTypes.bool,
+
+        /**
+         * Hide legends of the track. Default is false
+         */
+        hideLegend: PropTypes.bool,
     };
 }
 

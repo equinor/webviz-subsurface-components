@@ -52,12 +52,14 @@ const Template = (args) => {
     );
 };
 
+const wellLog = require("../../../../demo/example-data/L898MUD.json")[0];
 export const Default = Template.bind({});
 Default.args = {
     id: "Well-Log-Viewer-With-Scroller",
     horizontal: false,
-    welllog: require("../../../../demo/example-data/L898MUD.json")[0],
+    welllog: wellLog,
     template: require("../../../../demo/example-data/welllog_template_1.json"),
+    viewTitle: "Well '" + wellLog.header.well + "'",
     colorTables: colorTables,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
