@@ -2,10 +2,13 @@ import { MeshType, MeshTypeLines } from "./privateLayer";
 import { WebWorkerParams } from "./grid3dLayer";
 
 export function makeFullMesh(e: { data: WebWorkerParams }): void {
+    // Keep
+    const t0 = performance.now();
+
     const params = e.data;
 
-    const points = structuredClone(params.points);
-    const polys = structuredClone(params.polys);
+    const points = params.points;
+    const polys = params.polys;
     const properties = params.properties;
 
     const positions: number[] = [];
@@ -17,10 +20,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     let propertyValueRangeMax = -99999999;
 
     let pn = 0;
+    let indice = 0;
     let i = 0;
-    while (polys.length > 0) {
-        const n = polys[0];
-        const pts = polys.splice(0, n + 1);
+    while (i < polys.length) {
+        const n = polys[i];
         const propertyValue = properties[pn++];
 
         if (propertyValue !== null) {
@@ -36,9 +39,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         }
 
         // Lines.
-        for (let i = 1; i < pts.length - 1; i++) {
-            const i1 = pts[i];
-            const i2 = pts[i + 1];
+        for (let j = i + 1; j < i + n; j++) {
+            const i1 = polys[j];
+            const i2 = polys[j + 1];
 
             const x0 = points[3 * i1 + 0];
             const y0 = points[3 * i1 + 1];
@@ -54,10 +57,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
         // Triangles.
         if (n == 4) {
-            const i1 = pts[1];
-            const i2 = pts[2];
-            const i3 = pts[3];
-            const i4 = pts[4];
+            const i1 = polys[i + 1];
+            const i2 = polys[i + 2];
+            const i3 = polys[i + 3];
+            const i4 = polys[i + 4];
 
             const x1 = points[3 * i1 + 0];
             const y1 = points[3 * i1 + 1];
@@ -76,7 +79,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             const z4 = points[3 * i4 + 2];
 
             // t1
-            indices.push(i++, i++, i++);
+            indices.push(indice++, indice++, indice++);
 
             positions.push(x1, y1, z1);
             positions.push(x2, y2, z2);
@@ -87,7 +90,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             vertexProperties.push(propertyValue);
 
             // t2
-            indices.push(i++, i++, i++);
+            indices.push(indice++, indice++, indice++);
 
             positions.push(x1, y1, z1);
             positions.push(x3, y3, z3);
@@ -98,9 +101,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             vertexProperties.push(propertyValue);
         } else if (n == 3) {
             // Refactor this n == 3 && n == 4.
-            const i1 = pts[1];
-            const i2 = pts[2];
-            const i3 = pts[3];
+            const i1 = polys[i + 1];
+            const i2 = polys[i + 2];
+            const i3 = polys[i + 3];
 
             const x1 = points[3 * i1 + 0];
             const y1 = points[3 * i1 + 1];
@@ -115,7 +118,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             const z3 = points[3 * i3 + 2];
 
             // t1
-            indices.push(i++, i++, i++);
+            indices.push(indice++, indice++, indice++);
 
             positions.push(x1, y1, z1);
             positions.push(x2, y2, z2);
@@ -127,7 +130,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         } else {
             console.error("Only triangles or four corners are expected.");
         }
+
+        i = i + n + 1;
     }
+    console.log("Number of polygons: ", pn);
 
     const mesh: MeshType = {
         drawMode: 4, // corresponds to GL.TRIANGLES,
@@ -148,9 +154,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         vertexCount: line_positions.length / 3,
     };
 
-    //const t1 = performance.now();
-    // Keep this.
-    //console.log(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
+    const t1 = performance.now();
+    //Keep this.
+    console.log(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
 
     // Note: typescript gives this error "error TS2554: Expected 2-3 arguments, but got 1."
     // Disabling this for now as the second argument should be optional.
