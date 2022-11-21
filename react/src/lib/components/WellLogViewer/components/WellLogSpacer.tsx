@@ -145,8 +145,8 @@ class WellLogSpacer extends Component<Props /*, State*/> {
             to: number;
         }[] = [];
 
-        let offsetTop = 1157;
-        let offsetLeft = 1157;
+        let offsetTop = 3000; // try to draw initially out of screen
+        let offsetLeft = 3000;
         let height = 1;
         let width = 1;
         const controller = this.props.controllers[0] as WellLogView;
@@ -158,10 +158,13 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         if (wps && wps2 && logViewer) {
             const overlay = logViewer?.overlay;
             const source = overlay?.elm.node();
-
             if (source) {
                 offsetTop = source.offsetTop;
                 offsetLeft = source.offsetLeft;
+                if (source.offsetParent) {
+                    if (!horizontal) offsetTop += source.offsetParent.offsetTop;
+                    else offsetLeft += source.offsetParent.offsetLeft;
+                }
                 height = source.clientHeight;
                 width = source.clientWidth;
             }

@@ -39,7 +39,7 @@ export default {
     },
     argTypes: {
         ...argTypesSyncLogViewerProp,
-        id: {
+        /*id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
         },
@@ -62,33 +62,21 @@ export default {
         wellDistances: {
             description: "Distanses between wells to show on the spacers",
         },
-
+        */
         horizontal: {
-            description:
-                "Orientation of the track plots on the screen." /* defaultValue: false */,
-        },
-        hideTitles: {
-            description: "Hide titles on the tracks." /* defaultValue: false */,
-        },
-        hideLegend: {
-            description:
-                "Hide legends on the tracks." /* defaultValue: false */,
+            description: "Orientation of the track plots on the screen.", // defaultValue: false
         },
         syncTrackPos: {
-            description:
-                "Synchronize first visible track" /* defaultValue: false */,
+            description: "Synchronize first visible track", // defaultValue: false
         },
         syncContentDomain: {
-            description:
-                "Synchronize visible content domain (pan and zoom)" /* defaultValue: false */,
+            description: "Synchronize visible content domain (pan and zoom)", // defaultValue: false
         },
         syncContentSelection: {
-            description:
-                "Synchronize content selection" /* defaultValue: false */,
+            description: "Synchronize content selection", // defaultValue: false
         },
         syncTemplate: {
-            description:
-                "Synchronize templates in the views" /* defaultValue: false */,
+            description: "Synchronize templates in the views", // defaultValue: false
         },
         readoutOptions: {
             description:
@@ -107,6 +95,16 @@ export default {
         },
         selection: {
             description: "Initial selected interval of the log data.",
+        },
+        viewTitles: {
+            description:
+                "The view title. Set desired string or react element or true for default value from welllog file",
+        },
+        hideTitles: {
+            description: "Hide titles on the tracks.", // defaultValue: false
+        },
+        hideLegend: {
+            description: "Hide legends on the tracks.", // defaultValue: false
         },
     },
 };
@@ -266,8 +264,6 @@ Default.args = {
     syncTemplate: true,
     horizontal: false,
 
-    hideTitles: false,
-    hideLegend: false,
     welllogs: [
         require("../../../demo/example-data/L898MUD.json")[0],
         require("../../../demo/example-data/L916MUD.json")[0],
@@ -315,4 +311,9 @@ Default.args = {
 
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
+
+    viewTitles: true, // show default welllog view titles (a wellname from the welllog)
+
+    hideTitles: false,
+    hideLegend: false,
 };
