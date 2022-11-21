@@ -32,6 +32,7 @@ export type Params = {
     propertiesData: Float32Array;
     isMesh: boolean;
     frame: Frame;
+    smoothShading: boolean;
 };
 
 async function load_mesh_and_properties(
@@ -207,6 +208,10 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     //           specularColor: [255, 255, 255],
     //       }
     material: Material;
+
+    // Will calculate normals for each vertex and enable phong shading.
+    // If not set the shader will calculate constant normal for each triangle.
+    smoothShading: boolean;
 }
 
 export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
@@ -231,6 +236,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 propertiesData,
                 isMesh,
                 frame: this.props.frame,
+                smoothShading: this.props.smoothShading,
             };
 
             webWorker.postMessage(webworkerParams);
@@ -351,6 +357,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 colorMapFunction: this.props.colorMapFunction,
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
+                smoothShading: this.props.smoothShading,
             })
         );
         return [layer];
