@@ -29,9 +29,9 @@ describe("Sync Log Viewer", () => {
                 primaryAxis={"md"}
                 axisTitles={axisTitles}
                 axisMnemos={axisMnemos}
-                welllogs={[exampleWellLog]}
-                templates={[exampleTemplate]}
-                colorTables={[exampleColorTables]}
+                welllogs={[exampleWellLog]} // the same log for all wellog viewers
+                templates={[exampleTemplate]} // the same template for all wellog viewers
+                colorTables={[exampleColorTables]} // the same colortables for all wellog viewers
             />
         );
         expect(container.firstChild).toMatchSnapshot();
