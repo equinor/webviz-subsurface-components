@@ -669,6 +669,7 @@ const mapDataTemplate = (args) => {
     const [isAuto, setAuto] = React.useState();
     const [breakPoint, setBreakPoint] = React.useState();
     const [isLog, setIsLog] = React.useState(false);
+    const [isNearest, setIsNearest] = React.useState(false);
 
     // user defined breakpoint(domain)
     const userDefinedBreakPoint = React.useCallback((data) => {
@@ -689,6 +690,7 @@ const mapDataTemplate = (args) => {
     // interpolation method
     const getInterpolateMethod = React.useCallback((data) => {
         setIsLog(data.isLog);
+        setIsNearest(data.isNearest);
     }, []);
 
     const updatedLayerData = [
@@ -703,6 +705,7 @@ const mapDataTemplate = (args) => {
             // When save functionality of breakpoint is done, prop "breakpoint" will be removed from here
             breakPoint: breakPoint ? breakPoint : [],
             isLog: isLog,
+            isNearest: isNearest,
         },
     ];
     return (
