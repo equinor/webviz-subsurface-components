@@ -216,7 +216,7 @@ async function load_mesh_and_texture(
     bounds: Bounds,
     meshMaxError: number,
     meshValueRange: [number, number],
-    enableSmoothShading: boolean,
+    smoothShading: boolean,
     texture_name: string
 ) {
     const isMesh = mesh_name !== "";
@@ -253,7 +253,7 @@ async function load_mesh_and_texture(
         });
 
         // Note: mesh contains triangles. No normals they must be added.
-        if (enableSmoothShading) {
+        if (smoothShading) {
             mesh = add_normals(mesh, meshImageData, bounds);
         }
     } else {
@@ -339,7 +339,7 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapFunction?: colorMapFunctionType;
 
     // Will calculate normals and enable phong shading.
-    enableSmoothShading: boolean;
+    smoothShading: boolean;
 
     // Surface material properties.
     // material: true  = default material,
@@ -381,7 +381,7 @@ export default class Map3DLayer extends CompositeLayer<
             bounds,
             this.props.meshMaxError,
             this.props.meshValueRange,
-            this.props.enableSmoothShading,
+            this.props.smoothShading,
             this.props.propertyTexture
         );
 
@@ -434,7 +434,7 @@ export default class Map3DLayer extends CompositeLayer<
             !isEqual(props.frame, oldProps.frame) ||
             !isEqual(props.meshMaxError, oldProps.meshMaxError) ||
             !isEqual(props.meshValueRange, oldProps.meshValueRange) ||
-            !isEqual(props.enableSmoothShading, oldProps.enableSmoothShading) ||
+            !isEqual(props.smoothShading, oldProps.smoothShading) ||
             !isEqual(props.propertyTexture, oldProps.propertyTexture);
 
         if (needs_reload) {

@@ -35,6 +35,7 @@
         "test_perf": "jest _performance",
         "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
         "test": "jest --coverage",
+        "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
         "build:npm": "rimraf dist && tsc -project tsconfig.build.json --declaration && npm run copy-files",
         "copy-files": "copyfiles package.json dist && copyfiles --up 1 ../README.md dist && copyfiles --exclude **/*.{tsx,jsx,js,ts,snap} --up 2 \"src/lib/**/*\" dist/",

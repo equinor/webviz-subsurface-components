@@ -9,7 +9,7 @@ import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { SolidPolygonLayer } from "@deck.gl/layers/typed";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
-import { Vector3 } from "@math.gl/core";
+import { Vector2 } from "@math.gl/core";
 
 type PieProperties = [{ color: Color; label: string }];
 
@@ -70,15 +70,15 @@ export default class PieChartLayer extends CompositeLayer<
             return [];
         }
 
-        const is_orthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
-
         const npixels = 100;
-        const p1 = is_orthographic ? [0, 0] : [0, 0, 0];
-        const p2 = is_orthographic ? [npixels, 0] : [npixels, 0, 0];
+        const p1 = [0, 0];
+        const p2 = [npixels, 0];
 
-        const v1 = new Vector3(this.context.viewport.unproject(p1));
-        const v2 = new Vector3(this.context.viewport.unproject(p2));
+        const p1_unproj = this.context.viewport.unproject(p1);
+        const p2_unproj = this.context.viewport.unproject(p2);
+
+        const v1 = new Vector2(p1_unproj[0], p1_unproj[1]);
+        const v2 = new Vector2(p2_unproj[0], p2_unproj[1]);
         const d = v1.distance(v2);
 
         // Factor to convert a length in pixels to a length in world space.
