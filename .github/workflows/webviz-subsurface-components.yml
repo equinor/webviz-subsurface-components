@@ -28,7 +28,7 @@ jobs:
             run-performance-tests: false
           - python-version: "3.10" # This particular job in the matrix is allowed to fail(for performance and cypress test)
             run-performance-tests: true
-            e2e-on-firefox: true
+            e2e-tests: true
 
     steps:
       - name: 📖 Checkout commit locally
@@ -56,7 +56,7 @@ jobs:
           # check:
           grep -q '"lockfileVersion": 2,' ./react/package-lock.json
 
-          npm ci --ignore-scripts --prefix ./react
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts --prefix ./react
           npm run copy-package-json --prefix ./react
           pip install "werkzeug<2.1"  # ...while waiting for https://github.com/plotly/dash/issues/1992
           pip install "dash<2.5"  # Build issue upstream in dash==2.5
@@ -102,24 +102,50 @@ jobs:
           npm run test_correctness --prefix ./react
           pytest ./tests --headless
 
-      # Run cypress tests on firefox browser
-      # - name: E2E on firefox
-      #   if: github.event_name != 'release' && matrix.e2e-on-firefox
-      #   uses: cypress-io/github-action@33ec2f03412577367c7c6aac7b646c88e646e33c
-      #   with:
-      #     browser: firefox
-      #     working-directory: ./react
-      #     start: npm run storybook
-      #     wait-on: "http://localhost:6006"
-      # - uses: actions/upload-artifact@v2
-      #   if: failure()
-      #   with:
-      #     name: cypress-screenshots
-      #     path: |
-      #       react/cypress/screenshots
-      #       react/cypress/snapshots
-      #       !react/cypress/snapshots/*/*.snap.png
-      #     retention-days: 5
+      # This action allows caching cypress dependencies
+      - name: Cache Cypress
+        if: github.event_name != 'release' && matrix.e2e-tests
+        id: cache-cypress
+        uses: actions/cache@v1
+        with:
+          # list of files to cache and restore
+          path: ~/.cache/Cypress
+          # An explicit key for restoring and saving the cache
+          key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+
+      # now let's install Cypress binary
+      - name: install cypress binary
+        if: github.event_name != 'release' && matrix.e2e-tests
+        run: |
+          cd react
+          npx cypress install
+
+      # run the cypress tests
+      - name: e2e on firefox
+        if: github.event_name != 'release' && matrix.e2e-tests
+        run: |
+          mkdir clone
+          cd clone
+          git clone --branch cypress-snaps --depth 1 --filter=blob:none https://github.com/equinor/webviz-subsurface-components
+          cd webviz-subsurface-components
+          git sparse-checkout set react/cypress-visual-screenshots
+          cd react
+          mv * ../../../react/
+          cd ../../../
+          rm -rf clone
+          cd react
+          npx cypress run -b chrome --component --headed
+
+      # upload the failure screenshots for reference
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        if: github.event_name != 'release' && failure() && matrix.e2e-tests
+        with:
+          name: cypress-screenshots
+          path: |
+            react/cypress/screenshots
+            react/cypress-visual-screenshots
+          retention-days: 5
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
@@ -176,3 +202,32 @@ jobs:
             git commit -m "Update Github Pages"
             git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
           fi
+
+      - name: prepare for automated pull request
+        id: check_file_changed
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
+        run: |
+          if [ -d "react/cypress-visual-screenshots/diff" ]
+          then
+            echo '::set-output name=status::true'
+            cd react
+            npx cypress-image-diff -u
+            rm -rf cypress-visual-screenshots/comparison
+            rm -rf cypress-visual-screenshots/diff
+            rm -rf cypress/screenshots
+            rm -rf cypress/videos
+          else
+            echo '::set-output name=status::false'
+          fi
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@5a6b15373e5788c38d83296b674ad5abea28085c
+        if: steps.check_file_changed.outputs.status == 'true' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
+        with:
+          commit-message: updated cypress snapshots
+          title: Cypress - New Snapshots generated for the commit "${{ github.event.head_commit.message }}" by ${{ github.event.commits[0].author.email }}
+          body: This is an auto-generated PR to update cypress snapshots.
+          base: cypress-snaps
+          reviewers: ${{ github.event.sender.login }}
+          delete-branch: true
