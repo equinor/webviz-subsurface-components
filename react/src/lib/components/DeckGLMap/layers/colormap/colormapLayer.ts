@@ -24,10 +24,7 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction?: colorMapFunctionType,
-    breakpoints?: number[],
-    isLog?: boolean,
-    isNearest?: boolean
+    colorMapFunction?: colorMapFunctionType
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
 
@@ -37,16 +34,7 @@ function getImageData(
         const value = i / 255.0;
         const rgb = isColorMapFunctionDefined
             ? (colorMapFunction as colorMapFunctionType)(i / 255)
-            : // Passing argument "breakpoints" is temporary solution for now since the colortable does not save the edited breakpoints
-              // When save functionality of breakpoints is done, prop "breakpoints" will be removed from here
-              getRgbData(
-                  value,
-                  colorMapName,
-                  colorTables,
-                  breakpoints,
-                  isLog,
-                  isNearest
-              );
+            : getRgbData(value, colorMapName, colorTables);
         let color: number[] = [];
         if (rgb != undefined) {
             if (Array.isArray(rgb)) {
@@ -103,17 +91,8 @@ export interface ColormapLayerProps extends BitmapLayerProps {
     // Rotates image around bounds upper left corner counterclockwise in degrees.
     rotDeg: number;
 
-    // user defined domains
-    breakPoints?: number[];
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setReportedBoundingBox?: any;
-
-    // check for logarithmic values
-    isLog?: boolean;
-
-    // // check for nearest interpolation
-    isNearest?: boolean;
 }
 
 const defaultProps = layersDefaultProps["ColormapLayer"] as ColormapLayerProps;
@@ -183,10 +162,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                         this.props.colorMapName,
                         (this.context as DeckGLLayerContext).userData
                             .colorTables,
-                        this.props.colorMapFunction,
-                        this.props.breakPoints,
-                        this.props.isLog,
-                        this.props.isNearest
+                        this.props.colorMapFunction
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
