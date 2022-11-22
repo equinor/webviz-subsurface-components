@@ -35,6 +35,8 @@ import { fillInfos } from "./utils/fill-info";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 import { deepCopy } from "./utils/tracks";
 
+import { isEqualRanges } from "./components/WellLogView";
+
 function getTemplatePlotColorTable(
     template: Template,
     templatePlot: TemplatePlot
@@ -138,10 +140,19 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
 
         this.onMouseEvent = this.onMouseEvent.bind(this);
     }
-    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
+    componentDidUpdate(prevProps: Props, prevState: State): void {
         if (this.props.editedData !== prevProps.editedData) {
             this.setState({ editedData: this.props.editedData });
             0;
+        }
+        if (!isEqualRanges(this.state.selection, prevState.selection)) {
+            const controller = this.state.controller;
+            if (controller && this.state.selection) {
+                controller.selectContent([
+                    this.state.selection[0],
+                    this.state.selection[1],
+                ]);
+            }
         }
     }
     onInfo(
@@ -284,11 +295,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                 if (event.md !== undefined) {
                     this.setState((state: Readonly<State>) => {
                         if (state.selPersistent) return null;
-
-                        this.state.controller?.selectContent([
-                            event.md,
-                            this.state.selection?.[1],
-                        ]);
+                        if (event.md === state.selection?.[0]) return null;
 
                         return {
                             selection: [event.md, state.selection?.[1]],
@@ -306,6 +313,35 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
         const wellName = this.state.wellName;
         const wellColor = this.state.wellColor;
         const wellIndex = this.state.wellIndex;
+        const viewTitle = (
+            <div style={{ fontSize: "16px" }}>
+                {wellColor && (
+                    <span
+                        style={{
+                            color: wellColor
+                                ? "rgb(" +
+                                  wellColor[0] +
+                                  "," +
+                                  wellColor[1] +
+                                  "," +
+                                  wellColor[2] +
+                                  ")"
+                                : undefined,
+                            fontSize: "small",
+                        }}
+                    >
+                        {"\u2B24 " /*big circle*/}
+                    </span>
+                )}
+                {wellName || "Select a well by clicking on the map"}
+                {wellIndex === -1 && (
+                    <div className="welllogview-error">
+                        No well logs found for the well
+                    </div>
+                )}
+            </div>
+        );
+
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <div
@@ -338,46 +374,12 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                 >
                     <div
                         style={{
-                            textAlign: "center",
-                            flex: "0 0",
-                        }}
-                    >
-                        {wellColor && (
-                            <span
-                                style={{
-                                    color: wellColor
-                                        ? "rgb(" +
-                                          wellColor[0] +
-                                          "," +
-                                          wellColor[1] +
-                                          "," +
-                                          wellColor[2] +
-                                          ")"
-                                        : undefined,
-                                    fontSize: "small",
-                                }}
-                            >
-                                {"\u2B24 " /*big circle*/}
-                            </span>
-                        )}
-
-                        {wellName
-                            ? wellName
-                            : "Select well by clicking on the map"}
-                    </div>
-                    <div
-                        style={{
                             flex: "1 1",
                             height: "90%",
                             minWidth: "25px",
                             width: "100%",
                         }}
                     >
-                        <div className="welllogview-error">
-                            {wellIndex === -1
-                                ? "No well logs for the well '" + wellName + "'"
-                                : ""}
-                        </div>
                         <WellLogViewWithScroller
                             welllog={
                                 wellIndex !== undefined
@@ -391,6 +393,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             primaryAxis={"md"}
                             axisTitles={axisTitles}
                             axisMnemos={axisMnemos}
+                            viewTitle={viewTitle}
                             onInfo={this.onInfo}
                             onCreateController={this.onCreateController}
                             onContentSelection={this.onContentSelection}

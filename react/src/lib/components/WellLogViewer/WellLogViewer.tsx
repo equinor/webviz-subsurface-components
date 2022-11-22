@@ -257,14 +257,14 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     colorTables={this.props.colorTables}
                     wellpick={this.props.wellpick}
                     horizontal={this.props.horizontal}
-                    hideTitles={this.props.hideTitles}
-                    hideLegend={this.props.hideLegend}
                     maxVisibleTrackNum={this.props.maxVisibleTrackNum}
                     maxContentZoom={maxContentZoom}
                     checkDatafileSchema={checkDatafileSchema}
                     primaryAxis={this.state.primaryAxis}
                     axisTitles={this.props.axisTitles}
                     axisMnemos={this.props.axisMnemos}
+                    hideTitles={this.props.hideTitles}
+                    hideLegend={this.props.hideLegend}
                     onInfo={this.onInfo}
                     onCreateController={this.onCreateController}
                     onTrackMouseEvent={onTrackMouseEvent}
@@ -359,16 +359,6 @@ WellLogViewer.propTypes = {
     horizontal: PropTypes.bool,
 
     /**
-     * Hide titles of the track. Default is false
-     */
-    hideTitles: PropTypes.bool,
-
-    /**
-     * Hide legends of the track. Default is false
-     */
-    hideLegend: PropTypes.bool,
-
-    /**
      * Initial visible interval of the log data
      */
     domain: PropTypes.arrayOf(PropTypes.number),
@@ -412,6 +402,25 @@ WellLogViewer.propTypes = {
      * Validate JSON datafile against schems
      */
     checkDatafileSchema: PropTypes.bool,
+
+    /**
+     * Set to true for default titles or to array of individial welllog titles
+     */
+    viewTitle: PropTypes.oneOfType([
+        PropTypes.bool,
+        PropTypes.arrayOf(PropTypes.string),
+        PropTypes.arrayOf(PropTypes.object) /* react elemenet */,
+    ]),
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTitles: PropTypes.bool,
+
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideLegend: PropTypes.bool,
 
     /**
      * Options for readout panel
