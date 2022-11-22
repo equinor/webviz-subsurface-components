@@ -6,7 +6,7 @@ import { render } from "@testing-library/react";
 
 import * as stories from "../../src/lib/components/DeckGLMap/storybook/DeckGLMap.stories";
 
-const { Default, MultiColorMap } = composeStories(stories);
+const { Default } = composeStories(stories);
 
 render(<Default />).unmount();
 
@@ -19,10 +19,10 @@ describe("Map Story Tests", () => {
     })
     mount(<Default />)
     cy.get("svg[role='progressbar']")
-    cy.get("svg[role='progressbar']", {timeout: 30000}).should("not.exist")
+    cy.get("svg[role='progressbar']", {timeout: 1000}).should("not.exist")
   })
   it("should diplay default story",() => {
-      mount(<MultiColorMap />);
+      mount(<Default />);
       // cy.get("svg[role='progressbar']")
       // cy.get("svg[role='progressbar']", {timeout: 30000}).should("not.exist")
       // cy.wait(1000)
