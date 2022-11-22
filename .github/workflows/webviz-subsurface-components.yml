@@ -89,7 +89,7 @@ jobs:
         run: |
           npm run validate --prefix ./react
           black --check webviz_subsurface_components/ tests/ setup.py examples/
-          pylint webviz_subsurface_components/setup.py
+          pylint webviz_subsurface_components/ setup.py
           bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
 
       - name: 🤖 Run performance tests
