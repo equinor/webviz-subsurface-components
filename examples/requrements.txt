@@ -1,0 +1,5 @@
+dash
+geojson>=2.5.0
+orjson>=3.8.2
+vtk>=9.2.2
+xtgeo>=2.20.3
