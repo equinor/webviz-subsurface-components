@@ -4,7 +4,7 @@ import dash
 import webviz_subsurface_components as wsc
 
 from utils.xtgeo_surface_to_float32 import get_surface_float32
-from utils.xtgeo_polygons_to_json import xtgeo_polygons_to_geojson
+from utils.xtgeo_polygons_to_json import xtgeo_polygons_to_polylines_geojson
 
 # Import a depth surface and a property surface using xtgeo
 depth_surface = xtgeo.surface_from_file("examples/example-data/topvolantis_depth.gri")
@@ -110,7 +110,7 @@ def send_map(map_name: str):
 
 @app.server.route("/faults/faults.json")
 def send_faults():
-    return xtgeo_polygons_to_geojson(polygons, xy_only=True)
+    return xtgeo_polygons_to_polylines_geojson(polygons, xy_only=True)
 
 
 if __name__ == "__main__":
