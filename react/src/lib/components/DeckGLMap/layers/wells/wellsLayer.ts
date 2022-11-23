@@ -6,7 +6,7 @@ import {
     UpdateParameters,
     PickingInfo,
     OrbitViewport,
-    OrthographicViewport, 
+    OrthographicViewport,
 } from "@deck.gl/core/typed";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { PathLayer, TextLayer } from "@deck.gl/layers/typed";
