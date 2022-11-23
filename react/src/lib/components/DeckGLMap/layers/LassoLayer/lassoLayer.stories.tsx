@@ -1,6 +1,5 @@
 import { makeStyles } from "@material-ui/core";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import { exampleData } from "../../../../../demo/example-data/deckgl-map.json";
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
 
@@ -25,12 +24,15 @@ const useStyles = makeStyles({
 
 export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
-    const [triggerResetMultipleWells, setTriggerResetMultipleWells] =
-        React.useState<number>(0);
+    const [enableLassoVisible, setEnableLassoVisible] =
+        React.useState<boolean>(false);
     const handleChange1 = () => {
-        setTriggerResetMultipleWells(triggerResetMultipleWells + 1);
+        setEnableLassoVisible(true);
     };
 
+    const handleChange2 = () => {
+        setEnableLassoVisible(false);
+    };
     React.useEffect(() => {
         setEditedData(args.editedData);
     }, [args.editedData]);
@@ -44,10 +46,11 @@ export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
                     setProps={(updatedProps) => {
                         setEditedData(updatedProps);
                     }}
-                    triggerResetMultipleWells={triggerResetMultipleWells}
+                    enableLassoVisible={enableLassoVisible}
                 />
             </div>
-            <button onClick={handleChange1}> Reset Multiple Wells </button>
+            <button onClick={handleChange1}> Enable Lasso Selection </button>
+            <button onClick={handleChange2}> Disable Lasso Selection </button>
         </>
     );
 };
@@ -123,11 +126,13 @@ lassoLayerTemplate.args = {
             data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json",
         },
         {
-            "@@type": "DrawingLayer",
-        },
-        {
             "@@type": "LassoLayer",
             visible: false,
+            data: "@@#resources.wellsData",
+            logData: "@@#resources.logData",
+            logrunName: "BLOCKING",
+            logName: "ZONELOG",
+            logColor: "Stratigraphy",
         },
     ],
     editedData: {},
