@@ -42,7 +42,7 @@ import {
 } from "../../components/ColorLegend";
 import { getLayersById } from "../../layers/utils/layerTools";
 import UnfoldedGeoJsonLayer from "../intersection/unfoldedGeoJsonLayer";
-\
+
 type StyleAccessorFunction = (
     object: Feature,
     objectInfo?: Record<string, unknown>
