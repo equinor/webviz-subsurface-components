@@ -40,11 +40,12 @@ type WellHeadStyleAccessor = {
     size?: SizeAccessor;
 };
 
-// Composite layer that contains an EditableGeoJsonLayer from nebula.gl
-// See https://nebula.gl/docs/api-reference/layers/editable-geojson-layer
+// Composite layer that contains an Selection Lyaer from nebula.gl
+// See https://nebula.gl/docs/api-reference/layers/selection-layer
 export default class LassoLayer extends CompositeLayer<
     LassoLayerProps<FeatureCollection>
 > {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setMultiSelection(pickingInfos: any[]): void {
         if (this.internalState) {
             const data = pickingInfos

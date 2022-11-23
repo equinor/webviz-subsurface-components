@@ -29,7 +29,6 @@ import {
     ExtendedLayer,
     getLayersInViewport,
     getLayersWithDefaultProps,
-    NewLayersList,
 } from "../layers/utils/layerTools";
 import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";

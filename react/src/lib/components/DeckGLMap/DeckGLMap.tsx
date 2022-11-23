@@ -72,7 +72,7 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
-    enableLassoVisible?: boolean
+    enableLassoVisible?: boolean;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
