@@ -118,6 +118,16 @@ export default {
         setProps: {
             description: "For reacting to prop changes",
         },
+
+        welllogOptions: {
+            description:
+                "Options for well log view:<br/>" +
+                "maxContentZoom: The maximum zoom value (default 256)<br/>" +
+                "maxVisibleTrackNum: The maximum number of visible tracks<br/>" +
+                "checkDatafileSchema: Validate JSON datafile against schema<br/>" +
+                "hideTrackTitle: Hide titles on the tracks<br/>" +
+                "hideLegend: Hide legends on the tracks.",
+        },
     },
 };
 

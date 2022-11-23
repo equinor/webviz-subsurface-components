@@ -55,9 +55,7 @@ import {
 
 import { updateLegendRows } from "./log-viewer";
 
-export function deepCopy<T>(source: T): T {
-    return JSON.parse(JSON.stringify(source)) as T;
-}
+import { deepCopy } from "./deepcopy";
 
 export function indexOfElementByName(array: Named[], name: string): number {
     if (array && name) {

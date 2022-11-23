@@ -238,7 +238,7 @@ export interface MapProps {
     setEditedData?: (data: Record<string, unknown>) => void;
 
     /**
-     * Validate JSON datafile against schems
+     * Validate JSON datafile against schema
      */
     checkDatafileSchema?: boolean;
 
