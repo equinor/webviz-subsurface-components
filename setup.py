@@ -35,14 +35,18 @@ TESTS_REQUIRE = [
     "bandit",
     "black>=20.8b1",
     "dash[testing]",
+    "geojson>=2.5.0",
     "jsonpatch>=1.32",
     "jsonpointer>=2.1",
     "matplotlib>=3.0",
+    "orjson>=3.8.2",
     "Pillow>=6.0",
     "pylint>=2.4",
     "scipy>=1.2",
     "selenium>=3.141",
+    "vtk>=9.2.2",
     "webviz-core-components>=0.6.0",
+    "xtgeo>=2.20.3",
 ]
 
 setup(
