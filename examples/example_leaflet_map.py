@@ -68,76 +68,75 @@ DEFAULT_COLORSCALE_COLORS = [
     "#f0f921",
 ]
 
-if __name__ == "__main__":
 
-    # The data below is a modified version of one of the surfaces
-    # taken from the Volve data set provided by Equinor and the former
-    # Volve Licence partners under CC BY-NC-SA 4.0 license, and only
-    # used here as an example data set.
-    # https://creativecommons.org/licenses/by-nc-sa/4.0/
-    map_data = np.loadtxt("examples/example-data/layered-map-data.npz.gz")
+# The data below is a modified version of one of the surfaces
+# taken from the Volve data set provided by Equinor and the former
+# Volve Licence partners under CC BY-NC-SA 4.0 license, and only
+# used here as an example data set.
+# https://creativecommons.org/licenses/by-nc-sa/4.0/
+map_data = np.loadtxt("examples/example-data/layered-map-data.npz.gz")
 
-    min_value = np.nanmin(map_data)
-    max_value = np.nanmax(map_data)
+min_value = np.nanmin(map_data)
+max_value = np.nanmax(map_data)
 
-    # Shift the values to start from 0 and scale them to cover
-    # the whole RGB range for increased precision.
-    # The client will need to reverse this operation.
-    scale_factor = (256 * 256 * 256 - 1) / (max_value - min_value)
-    map_data = (map_data - min_value) * scale_factor
+# Shift the values to start from 0 and scale them to cover
+# the whole RGB range for increased precision.
+# The client will need to reverse this operation.
+scale_factor = (256 * 256 * 256 - 1) / (max_value - min_value)
+map_data = (map_data - min_value) * scale_factor
 
-    map_data = array2d_to_png(map_data)
+map_data = array2d_to_png(map_data)
 
-    leaflet_map_1 = webviz_subsurface_components.LeafletMap(
-        id="example-map",
-        layers=[
-            {
-                "name": "A seismic horizon with colormap",
-                "id": 1,
-                "baseLayer": True,
-                "checked": True,
-                "action": None,
-                "data": [
-                    {
-                        "type": "image",
-                        "url": map_data,
-                        "colorScale": {
-                            "colors": DEFAULT_COLORSCALE_COLORS,
-                            "prefixZeroAlpha": False,
-                            "scaleType": "linear",
-                            "cutPointMin": 0,
-                            "cutPointMax": 1,
-                            "remapPointMin": 0,
-                            "remapPointMax": 1,
-                        },
-                        "minvalue": min_value,
-                        "maxvalue": max_value,
-                        "bounds": [[432205, 6475078], [437720, 6481113]],
-                        "shader": {
-                            "type": "terrainRGB",
-                            "applyColorScale": True,
-                            "applyHillshading": True,
-                            "ambientLightIntensity": 0.5,
-                            "diffuseLightIntensity": 0.5,
-                        },
+leaflet_map_1 = webviz_subsurface_components.LeafletMap(
+    id="example-map",
+    layers=[
+        {
+            "name": "A seismic horizon with colormap",
+            "id": 1,
+            "baseLayer": True,
+            "checked": True,
+            "action": None,
+            "data": [
+                {
+                    "type": "image",
+                    "url": map_data,
+                    "colorScale": {
+                        "colors": DEFAULT_COLORSCALE_COLORS,
+                        "prefixZeroAlpha": False,
+                        "scaleType": "linear",
+                        "cutPointMin": 0,
+                        "cutPointMax": 1,
+                        "remapPointMin": 0,
+                        "remapPointMax": 1,
                     },
-                ],
-            },
-        ],
-        colorBar={"position": "bottomleft"},
-        defaultBounds=[[0, 0], [30, 30]],
-        mouseCoords={
-            "coordinatePosition": "bottomright",
+                    "minvalue": min_value,
+                    "maxvalue": max_value,
+                    "bounds": [[432205, 6475078], [437720, 6481113]],
+                    "shader": {
+                        "type": "terrainRGB",
+                        "applyColorScale": True,
+                        "applyHillshading": True,
+                        "ambientLightIntensity": 0.5,
+                        "diffuseLightIntensity": 0.5,
+                    },
+                },
+            ],
         },
-        updateMode="",
-        minZoom=-5,
-    )
+    ],
+    colorBar={"position": "bottomleft"},
+    defaultBounds=[[0, 0], [30, 30]],
+    mouseCoords={
+        "coordinatePosition": "bottomright",
+    },
+    updateMode="",
+    minZoom=-5,
+)
 
-    app = dash.Dash(__name__)
+app = dash.Dash(__name__)
 
-    app.layout = html.Div(
-        style={"height": "80vh"},
-        children=leaflet_map_1,
-    )
-
+app.layout = html.Div(
+    style={"height": "80vh"},
+    children=leaflet_map_1,
+)
+if __name__ == "__main__":
     app.run_server(debug=True)
