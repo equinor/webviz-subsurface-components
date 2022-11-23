@@ -3,6 +3,3 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #
 # Copyright (C) 2020 - Equinor ASA.
-import sys
-
-sys.path.append("examples")

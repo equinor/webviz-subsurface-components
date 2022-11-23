@@ -5,6 +5,9 @@
 # Copyright (C) 2020 - Equinor ASA.
 
 import time
+import sys
+
+sys.path.append("examples")
 
 
 from example_deckgl_selectable_colored_feature import app
