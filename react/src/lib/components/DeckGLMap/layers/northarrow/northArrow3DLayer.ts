@@ -4,6 +4,7 @@ import {
     LayerContext,
     UpdateParameters,
     project,
+    OrthographicViewport,
 } from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/engine";
@@ -49,7 +50,7 @@ export default class NorthArrow3DLayer extends Layer<
         const model_lines = GetArrowLines();
 
         const is_orthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
+            this.context.viewport.constructor === OrthographicViewport;
 
         const view_at = new Vector3(this.unproject([100, 100, 0]));
         let view_from = new Vector3(this.context.viewport.cameraPosition);
