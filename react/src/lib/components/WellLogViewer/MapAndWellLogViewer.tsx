@@ -1,4 +1,6 @@
 import React from "react";
+import PropTypes from "prop-types";
+
 import { WeakValidationMap } from "react";
 import DeckGLMap from "../DeckGLMap";
 import { DeckGLMapProps } from "../DeckGLMap";
@@ -33,8 +35,9 @@ import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { axisTitles, axisMnemos } from "./utils/axes";
 import { fillInfos } from "./utils/fill-info";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
-import { deepCopy } from "./utils/tracks";
+import { deepCopy } from "./utils/deepcopy";
 
+import { WellLogViewOptions } from "./components/WellLogView";
 import { isEqualRanges } from "./components/WellLogView";
 
 function getTemplatePlotColorTable(
@@ -58,7 +61,12 @@ function getTemplatePlotColorTable(
     return colorTable;
 }
 
-type Props = DeckGLMapProps;
+interface Props extends DeckGLMapProps {
+    /**
+     * Options for well log view
+     */
+    welllogOptions?: WellLogViewOptions;
+}
 
 interface State {
     wellIndex: number | undefined;
@@ -389,11 +397,15 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             template={template}
                             colorTables={this.props.colorTables as ColorTable[]}
                             wellpick={wellpick}
-                            maxVisibleTrackNum={1}
                             primaryAxis={"md"}
                             axisTitles={axisTitles}
                             axisMnemos={axisMnemos}
                             viewTitle={viewTitle}
+                            options={{
+                                checkDatafileSchema:
+                                    this.props.checkDatafileSchema,
+                                maxVisibleTrackNum: 1,
+                            }}
                             onInfo={this.onInfo}
                             onCreateController={this.onCreateController}
                             onContentSelection={this.onContentSelection}
@@ -417,4 +429,35 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
     }
 }
 
-MapAndWellLogViewer.propTypes = { ...DeckGLMap.propTypes };
+const WellLogViewOptions_propTypes = PropTypes.shape({
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom: PropTypes.number,
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum: PropTypes.number,
+    /**
+     * Validate JSON datafile against schema
+     */
+    checkDatafileSchema: PropTypes.bool,
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTrackTitle: PropTypes.bool,
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideTrackLegend: PropTypes.bool,
+});
+
+MapAndWellLogViewer.propTypes = {
+    ...DeckGLMap.propTypes,
+
+    /**
+     * WellLogView additional options
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    welllogOptions: WellLogViewOptions_propTypes as any /*PropTypes.object,*/,
+};

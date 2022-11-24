@@ -78,17 +78,23 @@ export default {
         syncTemplate: {
             description: "Synchronize templates in the views", // defaultValue: false
         },
+        welllogOptions: {
+            description:
+                "Options for well log view:<br/>" +
+                "maxContentZoom: The maximum zoom value (default 256)<br/>" +
+                "maxVisibleTrackNum: The maximum number of visible tracks<br/>" +
+                "checkDatafileSchema: Validate JSON datafile against schema<br/>" +
+                "hideTrackTitle: Hide titles on the tracks<br/>" +
+                "hideLegend: Hide legends on the tracks.",
+        },
+        spacerOptions: {
+            description: "Options for well log spacer",
+        },
         readoutOptions: {
             description:
                 "Options for readout panel.<br/>" +
                 "allTracks: boolean — Show not only visible tracks,<br/>" +
                 "grouping: string — How group values.",
-            /*
-            defaultValue: {
-                allTracks: false,
-                grouping: "by_track",
-            },
-            */
         },
         domain: {
             description: "Initial visible interval of the log data.",
@@ -99,12 +105,6 @@ export default {
         viewTitles: {
             description:
                 "The view title. Set desired string or react element or true for default value from welllog file",
-        },
-        hideTitles: {
-            description: "Hide titles on the tracks.", // defaultValue: false
-        },
-        hideLegend: {
-            description: "Hide legends on the tracks.", // defaultValue: false
         },
     },
 };
@@ -180,7 +180,7 @@ const Template = (args) => {
     );
 };
 
-const patterns = [
+const patternImages = [
     require("../../../demo/example-data/patterns/anhydrite.png"),
     require("../../../demo/example-data/patterns/brown_coal.png"),
     require("../../../demo/example-data/patterns/calcareous_dolostone.png"),
@@ -296,7 +296,7 @@ Default.args = {
     ],
     patternsTable: {
         patternSize: 24,
-        patterns: patterns,
+        patternImages: patternImages,
         names: patternNames,
     },
     patterns: require("../../../demo/example-data/horizon_patterns.json"),
@@ -314,6 +314,12 @@ Default.args = {
 
     viewTitles: true, // show default welllog view titles (a wellname from the welllog)
 
-    hideTitles: false,
-    hideLegend: false,
+    welllogOptions: {
+        wellpickColorFill: true,
+        wellpickPatternFill: true,
+    },
+    spacerOptions: {
+        wellpickColorFill: true,
+        wellpickPatternFill: true,
+    },
 };

@@ -24,8 +24,10 @@ describe("Sync Log Viewer", () => {
         const { container } = render(
             <SyncLogViewer
                 id="Sync-Log-Viewer"
-                hideTitles={true}
-                hideLegend={true}
+                welllogOptions={{
+                    hideTrackTitle: true,
+                    hideTrackLegend: true,
+                }}
                 primaryAxis={"md"}
                 axisTitles={axisTitles}
                 axisMnemos={axisMnemos}

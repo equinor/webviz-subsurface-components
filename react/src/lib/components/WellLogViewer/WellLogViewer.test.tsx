@@ -25,8 +25,10 @@ describe("Test Well Log Viewer Component", () => {
         const { container } = render(
             <WellLogViewer
                 id="Well-Log-Viewer"
-                hideLegend={true}
-                hideTitles={true}
+                options={{
+                    hideTrackTitle: true,
+                    hideTrackLegend: true,
+                }}
                 welllog={exampleWellLog}
                 template={exampleTemplate}
                 colorTables={exampleColorTable}
