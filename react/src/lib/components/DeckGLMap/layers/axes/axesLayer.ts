@@ -5,6 +5,7 @@ import {
     Viewport,
     UpdateParameters,
     LayersList,
+    OrthographicViewport,
 } from "@deck.gl/core/typed";
 import BoxLayer from "./boxLayer";
 import { Position3D, ExtendedLayerProps } from "../utils/layerTools";
@@ -31,7 +32,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
         const box_lines = GetBoxLines(this.props.bounds);
 
         const is_orthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
+            this.context.viewport.constructor === OrthographicViewport;
 
         const [tick_lines, tick_labels] = GetTickLines(
             is_orthographic,
@@ -68,7 +69,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
 
     updateState(): void {
         const is_orthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
+            this.context.viewport.constructor === OrthographicViewport;
 
         const box_lines = GetBoxLines(this.props.bounds);
 
@@ -137,7 +138,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
 
     renderLayers(): LayersList {
         const is_orthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
+            this.context.viewport.constructor === OrthographicViewport;
 
         const lines = [...this.state["box_lines"], ...this.state["tick_lines"]];
 
