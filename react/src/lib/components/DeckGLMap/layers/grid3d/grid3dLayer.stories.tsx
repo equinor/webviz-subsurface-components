@@ -32,7 +32,6 @@ const grid3dLayer = {
     id: "Grid3DLayer",
     material: true,
     colorMapName: "Rainbow",
-    scaleZ: 1,
 };
 
 const axes = {

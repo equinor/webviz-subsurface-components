@@ -348,7 +348,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 meshLines: this.state["mesh_lines"],
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
-                contours: !isMesh ? [-1, -1] : this.props.contours,
+                contours: this.props.contours,
                 gridLines: this.props.gridLines,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
                 colorMapName: this.props.colorMapName,

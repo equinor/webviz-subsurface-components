@@ -5,6 +5,8 @@ import {
     CompositeLayer,
     UpdateParameters,
     PickingInfo,
+    OrbitViewport,
+    OrthographicViewport,
 } from "@deck.gl/core/typed";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { PathLayer, TextLayer } from "@deck.gl/layers/typed";
@@ -299,9 +301,9 @@ export default class WellsLayer extends CompositeLayer<
             ? splineRefine(this.props.data as unknown as FeatureCollection) // smooth well paths.
             : (this.props.data as unknown as FeatureCollection);
 
-        const is3d = this.context.viewport.constructor.name === "OrbitViewport";
+        const is3d = this.context.viewport.constructor === OrbitViewport;
         const isOrthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
+            this.context.viewport.constructor === OrthographicViewport;
         const positionFormat = isOrthographic ? "XY" : "XYZ";
 
         const isDashed = !!this.props.lineStyle?.dash;

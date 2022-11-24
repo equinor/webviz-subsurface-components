@@ -38,18 +38,12 @@ function GetBBox(
 async function load_data(
     pointsUrl: string,
     polysUrl: string,
-    propertiesUrl: string,
-    scaleZ: number
+    propertiesUrl: string
 ) {
     // FULL GRID
     const points = await load(pointsUrl, JSONLoader);
     const polys = await load(polysUrl, JSONLoader);
     const properties = await load(propertiesUrl, JSONLoader);
-
-    // z scale.
-    for (let i = 0; i < points.length / 3; i++) {
-        points[3 * i + 2] = scaleZ * points[3 * i + 2];
-    }
 
     return Promise.all([points, polys, properties]);
 }
@@ -62,13 +56,11 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
     polysUrl: string;
     propertiesUrl: string;
 
-    scaleZ: number;
-
     // Name of color map. E.g "PORO"
     colorMapName: string;
 
     // Use color map in this range.
-    colorMapRange: [number, number];
+    colorMapRange?: [number, number];
 
     // Clamp colormap to this color at ends.
     // Given as array of three values (r,g,b) e.g: [255, 0, 0]
@@ -97,9 +89,7 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
 
 const defaultProps = {
     colorMapName: "",
-    colorMapRange: [0, 1],
     propertyValueRange: [0.0, 1.0],
-    scaleZ: 1,
 };
 
 export default class Grid3DLayer extends CompositeLayer<
@@ -109,8 +99,7 @@ export default class Grid3DLayer extends CompositeLayer<
         const p = load_data(
             this.props.pointsUrl,
             this.props.polysUrl,
-            this.props.propertiesUrl,
-            this.props.scaleZ
+            this.props.propertiesUrl
         );
 
         p.then(([points, polys, properties]) => {
@@ -176,8 +165,7 @@ export default class Grid3DLayer extends CompositeLayer<
         const needs_reload =
             !isEqual(props.pointsUrl, oldProps.pointsUrl) ||
             !isEqual(props.polysUrl, oldProps.polysUrl) ||
-            !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
-            !isEqual(props.scaleZ, oldProps.scaleZ);
+            !isEqual(props.propertiesUrl, oldProps.propertiesUrl);
 
         if (needs_reload) {
             const reportBoundingBox = false;

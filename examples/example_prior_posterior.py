@@ -36,22 +36,20 @@ def generate_synthetic_data(means, sigmas, n_iter, n_real):
     return data
 
 
+MEANS = [400, 700, 500, 600]
+SIGMAS = [300, 200, 100, 70]
+N_REAL = 1000
+N_ITER = 4
+
+app = dash.Dash(__name__)
+
+app.layout = html.Div(
+    children=[
+        wsc.PriorPosteriorDistribution(
+            id="parameters",
+            data=generate_synthetic_data(MEANS, SIGMAS, N_ITER, N_REAL),
+        )
+    ]
+)
 if __name__ == "__main__":
-
-    MEANS = [400, 700, 500, 600]
-    SIGMAS = [300, 200, 100, 70]
-    N_REAL = 1000
-    N_ITER = 4
-
-    app = dash.Dash(__name__)
-
-    app.layout = html.Div(
-        children=[
-            wsc.PriorPosteriorDistribution(
-                id="parameters",
-                data=generate_synthetic_data(MEANS, SIGMAS, N_ITER, N_REAL),
-            )
-        ]
-    )
-
     app.run_server(debug=True)
