@@ -119,8 +119,10 @@ Default.args = {
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
-    hideTitles: false,
-    hideLegend: false,
+    options: {
+        hideTrackTitle: false,
+        hideTrackLegend: false,
+    },
 };
 
 export const Horizontal = Template.bind({});

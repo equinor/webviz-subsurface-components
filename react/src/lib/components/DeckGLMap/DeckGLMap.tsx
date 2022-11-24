@@ -43,7 +43,7 @@ export interface DeckGLMapProps {
     setProps?: (data: Record<string, unknown>) => void;
 
     /**
-     * Validate JSON datafile against schems
+     * Validate JSON datafile against schema
      */
     checkDatafileSchema?: boolean;
 
@@ -316,7 +316,7 @@ DeckGLMap.propTypes = {
     setProps: PropTypes.func,
 
     /**
-     * Validate JSON datafile against schems
+     * Validate JSON datafile against schema
      */
     checkDatafileSchema: PropTypes.bool,
 

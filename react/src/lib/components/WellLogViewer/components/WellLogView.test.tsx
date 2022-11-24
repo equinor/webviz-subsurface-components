@@ -20,8 +20,11 @@ describe("Test Well Log View Component", () => {
         const { container } = render(
             <WellLogView
                 welllog={exampleWellLog}
-                hideLegend={true}
-                hideTitles={true}
+                options={{
+                    checkDatafileSchema: true,
+                    hideTrackLegend: true,
+                    hideTrackTitle: true,
+                }}
                 template={exampleTemplate}
                 colorTables={exampleColorTable}
                 primaryAxis={"md"}
