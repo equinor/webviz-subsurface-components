@@ -4,6 +4,7 @@ import { Feature } from "geojson";
 import { LineString } from "geojson";
 import { isEqual, zip } from "lodash";
 import { distance } from "mathjs";
+import IntersectionViewport from "../../viewports/intersectionViewport";
 
 const planeY = 2000;
 
@@ -81,7 +82,7 @@ export default class UnfoldedGeoJsonLayer<
         layer: Layer;
         viewport: Viewport;
     }): boolean {
-        if (viewport.constructor.name === "IntersectionViewport") {
+        if (viewport.constructor === IntersectionViewport) {
             return layer.id.search("-for-intersection-view") != -1;
         }
         return layer.id.search("-for-intersection-view") == -1;
