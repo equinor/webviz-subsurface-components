@@ -24,14 +24,14 @@ const useStyles = makeStyles({
 
 export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
-    const [enableLassoVisible, setEnableLassoVisible] =
+    const [isLassoSelectionAvailable, setIsLassoSelectionAvailable] =
         React.useState<boolean>(false);
     const handleChange1 = () => {
-        setEnableLassoVisible(true);
+        setIsLassoSelectionAvailable(true);
     };
 
     const handleChange2 = () => {
-        setEnableLassoVisible(false);
+        setIsLassoSelectionAvailable(false);
     };
     React.useEffect(() => {
         setEditedData(args.editedData);
@@ -46,7 +46,7 @@ export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
                     setProps={(updatedProps) => {
                         setEditedData(updatedProps);
                     }}
-                    enableLassoVisible={enableLassoVisible}
+                    isLassoSelectionAvailable={isLassoSelectionAvailable}
                 />
             </div>
             <button onClick={handleChange1}> Enable Lasso Selection </button>
@@ -70,56 +70,12 @@ lassoLayerTemplate.args = {
     bounds: [432205, 6475078, 437720, 6481113],
     layers: [
         {
-            "@@type": "ColormapLayer",
-            image: "@@#resources.propertyMap",
-            rotDeg: 0,
-            bounds: [432205, 6475078, 437720, 6481113],
-            colorMapName: "Rainbow",
-            valueRange: [2782, 3513],
-            colorMapRange: [2782, 3513],
-        },
-        {
-            "@@type": "Hillshading2DLayer",
-            bounds: [432205, 6475078, 437720, 6481113],
-            valueRange: [2782, 3513],
-            rotDeg: 0,
-            image: "@@#resources.depthMap",
-        },
-        {
-            "@@type": "GridLayer",
-            id: "grid-layer",
-            data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
-            colorMapName: "Rainbow",
-            valueRange: [0, 1],
-            colorMapRange: [0, 1],
-            visible: false,
-        },
-        {
-            "@@type": "Map3DLayer",
-            bounds: [432205, 6475078, 437720, 6481113],
-            meshMaxError: 5.0,
-            mesh: "hugin_depth_25_m_normalized_margin.png",
-            meshValueRange: [2782, 3513],
-            propertyTexture: "kh_netmap_25_m_normalized_margin.png",
-            propertyValueRange: [2782, 3513],
-            rotDeg: 0,
-            contours: [0, 50.0],
-            isContoursDepth: true,
-            colorMapName: "Physics",
-            colorMapRange: [2782, 3513],
-            visible: false,
-        },
-        {
             "@@type": "WellsLayer",
             data: "@@#resources.wellsData",
             logData: "@@#resources.logData",
             logrunName: "BLOCKING",
             logName: "ZONELOG",
             logColor: "Stratigraphy",
-        },
-        {
-            "@@type": "FaultPolygonsLayer",
-            data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/fault_polygons.geojson",
         },
         {
             "@@type": "PieChartLayer",

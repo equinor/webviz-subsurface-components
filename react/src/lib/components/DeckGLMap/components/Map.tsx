@@ -263,7 +263,7 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
-    enableLassoVisible?: boolean;
+    isLassoSelectionAvailable?: boolean;
 }
 
 export interface MapMouseEvent {
@@ -320,7 +320,7 @@ const Map: React.FC<MapProps> = ({
     getCameraPosition,
     triggerHome,
     triggerResetMultipleWells,
-    enableLassoVisible,
+    isLassoSelectionAvailable,
 }: MapProps) => {
     const deckRef = useRef<DeckGLRef>(null);
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
@@ -654,15 +654,18 @@ const Map: React.FC<MapProps> = ({
                 (l) => l?.constructor.name === "LassoLayer"
             );
             if (lassoLayer) {
-                if (enableLassoVisible === undefined) {
-                    enableLassoVisible = false;
+                if (isLassoSelectionAvailable === undefined) {
+                    isLassoSelectionAvailable = false;
                 }
                 dispatch(
-                    updateVisibleLayers(["lasso-layer", enableLassoVisible])
+                    updateVisibleLayers([
+                        "lasso-layer",
+                        isLassoSelectionAvailable,
+                    ])
                 );
             }
         }
-    }, [enableLassoVisible]);
+    }, [isLassoSelectionAvailable]);
 
     useEffect(() => {
         if (typeof triggerResetMultipleWells !== "undefined") {

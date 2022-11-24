@@ -72,7 +72,7 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
-    enableLassoVisible?: boolean;
+    isLassoSelectionAvailable?: boolean;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -97,7 +97,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     getCameraPosition,
     triggerHome,
     triggerResetMultipleWells,
-    enableLassoVisible,
+    isLassoSelectionAvailable,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -162,7 +162,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 getCameraPosition={getCameraPosition}
                 triggerHome={triggerHome}
                 triggerResetMultipleWells={triggerResetMultipleWells}
-                enableLassoVisible={enableLassoVisible}
+                isLassoSelectionAvailable={isLassoSelectionAvailable}
             />
         </ReduxProvider>
     );

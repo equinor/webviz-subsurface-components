@@ -2,7 +2,7 @@ import { CompositeLayer, PickingInfo, LayersList } from "@deck.gl/core/typed";
 import { FeatureCollection } from "@nebula.gl/edit-modes";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { SelectionLayer } from "@nebula.gl/layers";
-import UnfoldedGeoJsonLayer from "../intersection/unfoldedGeoJsonLayer";
+import { GeoJsonLayer } from "@deck.gl/layers/typed";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { getSize } from "../wells/wellsLayer";
 import { Color } from "@deck.gl/core/typed";
@@ -69,7 +69,7 @@ export default class LassoLayer extends CompositeLayer<
             this.context.viewport.constructor.name === "OrthographicViewport";
         const positionFormat = isOrthographic ? "XY" : "XYZ";
 
-        const geoJsonLayer = new UnfoldedGeoJsonLayer({
+        const geoJsonLayer = new GeoJsonLayer({
             id: "geoJson",
             data: this.state["data"],
             pickable: false,
@@ -97,7 +97,7 @@ export default class LassoLayer extends CompositeLayer<
                 onSelect: ({ pickingInfos }: any) => {
                     this.setMultiSelection(pickingInfos);
                 },
-                layerIds: ["wells-layer"],
+                layerIds: ["wells-layer", "pie-layer"],
                 getTentativeFillColor: () => [255, 0, 255, 100],
                 getTentativeLineColor: () => [0, 0, 255, 255],
                 getTentativeLineDashArray: () => [0, 0],
