@@ -35,7 +35,7 @@ describe("Map Story Tests", () => {
     cy.get("svg[role='progressbar']")
     cy.wait(15000)
     for (let i = 0; i < 2; i++) {
-      cy.get(mainView2D).type("{+}");
+      cy.get("view-view_1_2D").type("{+}");
       cy.wait(1000);
     }
     cy.compareSnapshot('default-map-story_zoomed_in')
@@ -46,8 +46,8 @@ it("should diplay default story zoomed out",() => {
   cy.get("svg[role='progressbar']")
   cy.wait(15000)
   for (let i = 0; i < 2; i++) {
-    cy.get(mainView2D).type("{-}");
-    cy.wait(2000);
+    cy.get("view-view_1_2D").type("{-}");
+    cy.wait(1000);
   }
   cy.compareSnapshot('default-map-story_zoomed_out')
 });
