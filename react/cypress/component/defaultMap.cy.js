@@ -9,19 +9,20 @@ import * as stories from "../../src/lib/components/DeckGLMap/storybook/DeckGLMap
 const { Default } = composeStories(stories);
 
 render(<Default />).unmount();
-it("activate hooks",(done) => {
-  cy.on('fail', (error, runnable) => {
-    done()
-    return false;
-  })
-  
-  mount(<Default />)
-  cy.get("svg[role='progressbar']")
-  cy.get("svg[role='progressbar']", {timeout: 30000}).should("not.exist")
-  done()
-})
 
 describe("Map Story Tests", () => {
+  it("activate hooks",(done) => {
+    cy.on('fail', (error, runnable) => {
+      done()
+      return false;
+    })
+    
+    mount(<Default />)
+    cy.get("svg[role='progressbar']")
+    cy.get("svg[role='progressbar']", {timeout: 30000}).should("not.exist")
+    done()
+  })
+  
   it("should diplay default story",() => {
       mount(<Default />);
       cy.get("svg[role='progressbar']")
