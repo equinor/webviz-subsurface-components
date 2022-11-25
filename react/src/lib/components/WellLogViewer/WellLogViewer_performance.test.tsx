@@ -36,8 +36,10 @@ describe("Well Log Viewer perfomance", () => {
                         <WellLogViewer
                             id=""
                             welllog={exampleWellLog}
-                            hideLegend={true}
-                            hideTitles={true}
+                            options={{
+                                hideTrackTitle: true,
+                                hideTrackLegend: true,
+                            }}
                             primaryAxis={"md"}
                             axisTitles={axisTitles}
                             axisMnemos={axisMnemos}

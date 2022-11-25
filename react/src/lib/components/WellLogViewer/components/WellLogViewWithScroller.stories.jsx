@@ -63,4 +63,7 @@ Default.args = {
     colorTables: colorTables,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
+    options: {
+        checkDatafileSchema: true,
+    },
 };

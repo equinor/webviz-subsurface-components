@@ -27,6 +27,7 @@ import { select } from "d3";
 import { WellLog, WellLogCurve } from "./WellLogTypes";
 import { Template } from "./WellLogTemplateTypes";
 import { ColorTable } from "./ColorTableTypes";
+import { PatternsTable } from "../utils/pattern";
 
 import { getDiscreteColorAndName, getDiscreteMeta } from "../utils/tracks";
 import { createTracks } from "../utils/tracks";
@@ -35,7 +36,7 @@ import { AxesInfo } from "../utils/tracks";
 import { ExtPlotOptions } from "../utils/tracks";
 import { getTrackTemplate } from "../utils/tracks";
 import { isScaleTrack } from "../utils/tracks";
-import { deepCopy } from "../utils/tracks";
+import { deepCopy } from "../utils/deepcopy";
 
 import {
     addOrEditGraphTrack,
@@ -310,7 +311,7 @@ export interface WellPickProps {
     name: string; //  "HORIZON"
     md?: string; //  Log mnemonics for depth log. default is "MD"
     /**
-     * Prop containing color table data.
+     * Prop containing color table data for well picks
      */
     colorTables: ColorTable[];
     color: string; // "Stratigraphy" ...
@@ -338,6 +339,49 @@ function showWellPicks(
 
     pinelm.style[horizontal ? "left" : "top"] = `${v - offset}px`;
     pinelm.style.visibility = "visible";
+}
+
+function fillWellPicks(
+    pinelm: HTMLElement,
+    vCur: number | undefined,
+    vCur2: number | undefined,
+    horizontal: boolean | undefined,
+    logViewer: LogViewer /*LogController*/
+) {
+    if (vCur === undefined) {
+        pinelm.style.visibility = "hidden";
+        return;
+    }
+    const v = logViewer.scale(vCur);
+    if (!Number.isFinite(v)) {
+        // logViewer could be empty
+        pinelm.style.visibility = "hidden";
+        return;
+    }
+    if (vCur2 === undefined) {
+        pinelm.style.visibility = "hidden";
+        return;
+    }
+    const v2 = logViewer.scale(vCur2);
+    if (!Number.isFinite(v2)) {
+        // logViewer could be empty
+        pinelm.style.visibility = "hidden";
+        return;
+    }
+
+    //const wpSize = 3; //9;
+    //const offset = wpSize / 2;
+
+    pinelm.style[horizontal ? "left" : "top"] = `${v}px`; // /*- offset*/
+    pinelm.style[horizontal ? "width" : "height"] = `${v2 - v}px`;
+    pinelm.style.visibility = "visible";
+
+    const pin = pinelm.querySelector("div");
+    if (pin) {
+        const backgroundPosition =
+            "background-position-" + (horizontal ? "x" : "y");
+        pin.style[backgroundPosition as unknown as number] = `${-v}px`;
+    }
 }
 
 function _getLogIndexByNames(curves: WellLogCurve[], names: string[]): number {
@@ -415,6 +459,14 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     const primaryAxis = parent.props.primaryAxis;
     const horizontal = parent.props.horizontal;
 
+    const wellpickColorFill = parent.props.options?.wellpickColorFill;
+    const patternsTable = parent.props.patternsTable;
+    const patterns = parent.props.patterns;
+    const wellpickPatternFill =
+        patternsTable && patterns && parent.props.options?.wellpickPatternFill;
+    const patternSize = patternsTable?.patternSize;
+    const patternImages = patternsTable?.patternImages;
+
     for (const wp of wps) {
         const horizon = wp.horizon;
         const vPrimary = wp.vPrimary;
@@ -428,8 +480,9 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             ? ""
             : (primaryAxis === "md" ? "TVD:" : "MD:") + vSecondary?.toFixed(0);
 
-        instance.overlay.remove("wp" + horizon); // clear old if exists
-        const pinelm = instance.overlay.create("wp" + horizon, {});
+        const elmName = "wp" + horizon;
+        instance.overlay.remove(elmName); // clear old if exists
+        const pinelm = instance.overlay.create(elmName, {});
 
         const rgba =
             "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.8)";
@@ -443,12 +496,12 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             ",0.16)'";
 
         const pin = select(pinelm)
-            .classed("wellpick", true)
+            .classed("welllogview-wellpick", true)
             .style(horizontal ? "width" : "height", `${wpSize}px`)
             .style(horizontal ? "height" : "width", `${100}%`)
             .style(horizontal ? "top" : "left", `${0}px`)
-            .style("background-color", rgba)
             .style("position", "absolute")
+            .style("background-color", rgba)
             .style("visibility", "false");
 
         pin.append("div")
@@ -481,12 +534,52 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                           txtSecondary +
                           "</td></tr></table>"
             )
+            .style("position", "absolute")
             .style(horizontal ? "width" : "height", "1px")
             .style(horizontal ? "height" : "width", `${100}%`)
-            ///.style(horizontal ? "left" : "top", `${offset}px`)
-            .style("background-color", rgba)
-            //.style("position", "relative");
-            .style("position", "absolute");
+            .style("background-color", rgba);
+        {
+            // Filling
+            const elmName = "wpFill" + horizon;
+            instance.overlay.remove(elmName); // clear old if exists
+            if (wellpickPatternFill || wellpickColorFill) {
+                const pinelm = instance.overlay.create(elmName, {});
+                const pin = select(pinelm)
+                    .classed("welllogview-wellpickFillColor", true)
+                    .style("position", "absolute")
+                    .style(horizontal ? "width" : "height", `${wpSize}px`)
+                    .style(horizontal ? "height" : "width", `${100}%`)
+                    .style(horizontal ? "top" : "left", `${0}px`)
+                    // should be get from .CSS .style("opacity", "0.45")
+                    .style("visibility", "false");
+                if (wellpickColorFill) pin.style("background-color", rgba);
+                if (wellpickPatternFill) {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    const pattern = patterns!.find(
+                        (value: [string, number]) => value[0] === horizon
+                    );
+
+                    if (pattern !== undefined) {
+                        const imageIndex = pattern[1];
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        const patternImage = patternImages![imageIndex];
+                        pin.append("div")
+                            .classed("welllogview-wellpickFillPattern", true)
+                            .style("width", "100%")
+                            .style("height", "100%")
+                            // should be get from .CSS .style("opacity", "0.45")
+                            .style(
+                                "background-size",
+                                patternSize + "px " + patternSize + "px"
+                            )
+                            .style(
+                                "background-image",
+                                "url('" + patternImage + "')"
+                            );
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -782,6 +875,38 @@ export interface WellLogController {
 
 import { Info } from "./InfoTypes";
 
+export interface WellLogViewOptions {
+    /**
+     * Fill with color between well picks
+     */
+    wellpickColorFill?: boolean;
+    /**
+     * Fill with pattern between well picks
+     */
+    wellpickPatternFill?: boolean;
+
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom?: number; // default is 256
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
+    /**
+     * Validate JSON datafile against schema
+     */
+    checkDatafileSchema?: boolean;
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTrackTitle?: boolean;
+    /**
+     * Hide Legends on the tracks
+     */
+    hideTrackLegend?: boolean;
+}
+
 export interface WellLogViewProps {
     /**
      * Object from JSON file describing single well log data.
@@ -794,7 +919,7 @@ export interface WellLogViewProps {
     template: Template;
 
     /**
-     * Prop containing color table data.
+     * Prop containing color table data for discrete well logs
      */
     colorTables: ColorTable[];
 
@@ -802,6 +927,16 @@ export interface WellLogViewProps {
      * Well Picks data
      */
     wellpick?: WellPickProps;
+
+    /**
+     * Patterns table
+     */
+    patternsTable?: PatternsTable;
+
+    /**
+     * Horizon to pattern index map
+     */
+    patterns?: [string, number][];
 
     /**
      * Orientation of the track plots on the screen.
@@ -829,16 +964,6 @@ export interface WellLogViewProps {
     viewTitle?: boolean | string | JSX.Element;
 
     /**
-     * The maximum number of visible tracks
-     */
-    maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
-
-    /**
-     * The maximum zoom value
-     */
-    maxContentZoom?: number; // default is 256
-
-    /**
      * Initial visible range
      */
     domain?: [number, number];
@@ -849,18 +974,9 @@ export interface WellLogViewProps {
     selection?: [number | undefined, number | undefined];
 
     /**
-     * Validate JSON datafile against schems
+     * Additional options
      */
-    checkDatafileSchema?: boolean;
-
-    /**
-     * Hide titles of the track. Default is false
-     */
-    hideTitles?: boolean;
-    /**
-     * Hide Legends on the tracks
-     */
-    hideLegend?: boolean;
+    options?: WellLogViewOptions;
 
     // callbacks:
     onCreateController?: (controller: WellLogController) => void;
@@ -909,28 +1025,26 @@ export const argTypesWellLogViewProp = {
         description: "Prop containing track template data.",
     },
     colorTables: {
-        description: "Prop containing color table data.",
+        description: "Prop containing color table data for discrete well logs.",
     },
     wellpick: {
         description: "Well Picks data",
     },
+    patternsTable: {
+        description: "Patterns table",
+    },
+    patterns: {
+        description: "Horizon to pattern index map",
+    },
+
     primaryAxis: {
         description: "Primary axis id", //?? defaultValue: "md"
-    },
-    maxVisibleTrackNum: {
-        description: "The maximum number of visible tracks (default 5)",
-    },
-    maxContentZoom: {
-        description: "The maximum zoom value (default 256)",
     },
     domain: {
         description: "Initial visible range",
     },
     selection: {
         description: "Initial selected range",
-    },
-    checkDatafileSchema: {
-        description: "Validate JSON datafile against schema", // defaultValue: false
     },
     axisMnemos: {
         description: "Log mnemonics for axes",
@@ -942,13 +1056,15 @@ export const argTypesWellLogViewProp = {
         description:
             "The view title. Set desired string or react element or true for default value from welllog file",
     },
-    hideTitles: {
-        description: "Hide Titles on the tracks", // defaultValue: false
+    options: {
+        description:
+            "Additional options:<br/>" +
+            "maxContentZoom: The maximum zoom value (default 256)<br/>" +
+            "maxVisibleTrackNum: The maximum number of visible tracks<br/>" +
+            "checkDatafileSchema: Validate JSON datafile against schema<br/>" +
+            "hideTrackTitle: Hide titles on the tracks<br/>" +
+            "hideLegend: Hide legends on the tracks.",
     },
-    hideLegend: {
-        description: "Hide Legends on the tracks", // defaultValue: false
-    },
-
     // callbacks...
 };
 
@@ -959,8 +1075,10 @@ export function shouldUpdateWellLogView(
     // Props could contain some unknown object key:value so we should ignore they
     // so compare only known key:values
     if (props.horizontal !== nextProps.horizontal) return true;
-    if (props.hideTitles !== nextProps.hideTitles) return true;
-    if (props.hideLegend !== nextProps.hideLegend) return true;
+    if (props.options?.hideTrackTitle !== nextProps.options?.hideTrackTitle)
+        return true;
+    if (props.options?.hideTrackLegend !== nextProps.options?.hideTrackLegend)
+        return true;
 
     if (props.welllog !== nextProps.welllog) return true;
     if (props.template !== nextProps.template) return true;
@@ -970,13 +1088,32 @@ export function shouldUpdateWellLogView(
     if (props.axisTitles !== nextProps.axisTitles) return true;
     if (props.axisMnemos !== nextProps.axisMnemos) return true;
 
-    if (props.maxVisibleTrackNum !== nextProps.maxVisibleTrackNum) return true;
-    if (props.maxContentZoom !== nextProps.maxContentZoom) return true;
+    if (
+        props.options?.maxVisibleTrackNum !==
+        nextProps.options?.maxVisibleTrackNum
+    )
+        return true;
+    if (props.options?.maxContentZoom !== nextProps.options?.maxContentZoom)
+        return true;
 
     if (!isEqualRanges(props.domain, nextProps.domain)) return true;
     if (!isEqualRanges(props.selection, nextProps.selection)) return true;
 
-    if (props.checkDatafileSchema !== nextProps.checkDatafileSchema)
+    if (
+        props.options?.checkDatafileSchema !==
+        nextProps.options?.checkDatafileSchema
+    )
+        return true;
+
+    if (
+        props.options?.wellpickColorFill !==
+        nextProps.options?.wellpickColorFill
+    )
+        return true;
+    if (
+        props.options?.wellpickPatternFill !==
+        nextProps.options?.wellpickPatternFill
+    )
         return true;
 
     if (props.viewTitle !== nextProps.viewTitle) return true;
@@ -1085,9 +1222,12 @@ class WellLogView
         let checkSchema = false;
         if (
             this.props.horizontal !== prevProps.horizontal ||
-            this.props.hideTitles !== prevProps.hideTitles ||
-            this.props.hideLegend !== prevProps.hideLegend ||
-            this.props.maxContentZoom !== prevProps.maxContentZoom
+            this.props.options?.hideTrackTitle !==
+                prevProps.options?.hideTrackTitle ||
+            this.props.options?.hideTrackLegend !==
+                prevProps.options?.hideTrackLegend ||
+            this.props.options?.maxContentZoom !==
+                prevProps.options?.maxContentZoom
         ) {
             selection = this.getContentSelection();
             selectedTrackIndices = this.getSelectedTrackIndices();
@@ -1097,7 +1237,8 @@ class WellLogView
 
         if (
             this.props.welllog !== prevProps.welllog ||
-            this.props.checkDatafileSchema !== prevProps.checkDatafileSchema
+            this.props.options?.checkDatafileSchema !==
+                prevProps.options?.checkDatafileSchema
         ) {
             shouldSetTracks = true;
             checkSchema = true;
@@ -1120,18 +1261,26 @@ class WellLogView
             selection = this.getContentSelection();
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true; //??
-        } else if (this.props.wellpick !== prevProps.wellpick) {
-            if (this.logController)
+        } else if (
+            this.props.wellpick !== prevProps.wellpick ||
+            this.props.options?.wellpickPatternFill !==
+                prevProps.options?.wellpickPatternFill ||
+            this.props.options?.wellpickColorFill !==
+                prevProps.options?.wellpickColorFill
+        ) {
+            if (this.logController) {
                 addWellPickOverlay(this.logController, this);
+                this.showSelection();
+            }
         }
-
         if (shouldSetTracks) {
             this.setTracks(checkSchema); // use this.template
             setSelectedTrackIndices(this.logController, selectedTrackIndices);
             if (selection) this.selectContent(selection);
         } else if (
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
-            this.props.maxVisibleTrackNum !== prevProps.maxVisibleTrackNum
+            this.props.options?.maxVisibleTrackNum !==
+                prevProps.options?.maxVisibleTrackNum
         ) {
             this.onTrackScroll();
             this.onTrackSelection();
@@ -1170,9 +1319,9 @@ class WellLogView
             // create new LogViewer
             this.logController = new LogViewer({
                 horizontal: this.props.horizontal,
-                showTitles: !this.props.hideTitles,
-                showLegend: !this.props.hideLegend,
-                maxZoom: this.props.maxContentZoom,
+                showTitles: !this.props.options?.hideTrackTitle,
+                showLegend: !this.props.options?.hideTrackLegend,
+                maxZoom: this.props.options?.maxContentZoom,
                 onTrackEnter: (elm: HTMLElement, track: Track) =>
                     addTrackMouseEventHandlers(
                         elm,
@@ -1217,7 +1366,7 @@ class WellLogView
             //check against the json schema
             try {
                 validateSchema(this.template, "WellLogTemplate");
-                if (this.props.checkDatafileSchema) {
+                if (this.props.options?.checkDatafileSchema) {
                     validateSchema(this.props.welllog, "WellLog");
                 }
             } catch (e) {
@@ -1318,8 +1467,9 @@ class WellLogView
     }
     showSelection(): void {
         if (this.logController) {
-            const rbelm = this.logController.overlay.elements["rubber-band"];
-            const pinelm = this.logController.overlay.elements["pinned"];
+            const elements = this.logController.overlay.elements;
+            const rbelm = elements["rubber-band"];
+            const pinelm = elements["pinned"];
             if (rbelm && pinelm) {
                 rbelm.style.visibility =
                     this.selCurrent === undefined ? "hidden" : "visible";
@@ -1339,12 +1489,12 @@ class WellLogView
             if (wellpick) {
                 const wps = getWellPicks(this);
                 if (!wps.length) return;
+                let i = 0;
                 for (const wp of wps) {
                     const horizon = wp.horizon;
                     const vPrimary = wp.vPrimary;
-
-                    const pinelm =
-                        this.logController.overlay.elements["wp" + horizon];
+                    const elmName = "wp" + horizon;
+                    const pinelm = elements[elmName];
                     if (!pinelm) continue;
                     showWellPicks(
                         pinelm,
@@ -1352,6 +1502,22 @@ class WellLogView
                         this.props.horizontal,
                         this.logController
                     );
+                    if (this.props.patterns) {
+                        const elmName1 = "wpFill" + horizon;
+                        const pinelm1 = elements[elmName1];
+                        if (pinelm1) {
+                            const wp2 = wps[i + 1];
+                            const vPrimary2 = wp2?.vPrimary;
+                            fillWellPicks(
+                                pinelm1,
+                                vPrimary,
+                                vPrimary2,
+                                this.props.horizontal,
+                                this.logController
+                            );
+                        }
+                    }
+                    i++;
                 }
             }
         }
@@ -1404,8 +1570,8 @@ class WellLogView
         return newPos;
     }
     _maxVisibleTrackNum(): number {
-        return this.props.maxVisibleTrackNum
-            ? this.props.maxVisibleTrackNum
+        return this.props.options?.maxVisibleTrackNum
+            ? this.props.options?.maxVisibleTrackNum
             : this.props.horizontal
             ? 3
             : 5 /*some default value*/;
@@ -1651,6 +1817,7 @@ class WellLogView
 
     render(): JSX.Element {
         const horizontal = this.props.horizontal;
+        const viewTitle = this.props.viewTitle;
         return (
             <div
                 style={{
@@ -1660,7 +1827,7 @@ class WellLogView
                     flexDirection: horizontal ? "row" : "column",
                 }}
             >
-                {this.props.viewTitle && (
+                {viewTitle && (
                     <div
                         style={{
                             flex: "0, 0",
@@ -1671,12 +1838,11 @@ class WellLogView
                         }}
                         className="welllogview-title"
                     >
-                        {typeof this.props.viewTitle ===
-                        "object" /*react element*/
-                            ? this.props.viewTitle
-                            : this.props.viewTitle === true
+                        {typeof viewTitle === "object" /*react element*/
+                            ? viewTitle
+                            : viewTitle === true
                             ? this.props.welllog?.header.well
-                            : this.props.viewTitle}
+                            : viewTitle}
                     </div>
                 )}
                 <div
@@ -1707,6 +1873,33 @@ class WellLogView
     }
 }
 
+const WellLogViewOptions_propTypes = PropTypes.shape({
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom: PropTypes.number,
+
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum: PropTypes.number,
+
+    /**
+     * Validate JSON datafile against schema4
+     */
+    checkDatafileSchema: PropTypes.bool,
+
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTrackTitle: PropTypes.bool,
+
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideTrackLegend: PropTypes.bool,
+});
+
 WellLogView.propTypes = _propTypesWellLogView();
 
 export function _propTypesWellLogView(): Record<string, unknown> {
@@ -1729,7 +1922,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         template: PropTypes.object.isRequired,
 
         /**
-         * Prop containing color table data
+         * Prop containing color table data for discrete well logs
          */
         colorTables: PropTypes.array.isRequired,
 
@@ -1737,6 +1930,16 @@ export function _propTypesWellLogView(): Record<string, unknown> {
          * Well picks data
          */
         wellpick: PropTypes.object,
+
+        /**
+         * Patterns table
+         */
+        patternsTable: PropTypes.object,
+
+        /**
+         * Horizon to pattern index map
+         */
+        patterns: PropTypes.array, // [string, number][];
 
         /**
          * Orientation of the track plots on the screen. Default is false
@@ -1768,16 +1971,6 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         ]),
 
         /**
-         * The maximum number of visible tracks
-         */
-        maxVisibleTrackNum: PropTypes.number,
-
-        /**
-         * The maximum zoom value
-         */
-        maxContentZoom: PropTypes.number,
-
-        /**
          * Initial visible interval of the log data
          */
         domain: PropTypes.arrayOf(PropTypes.number),
@@ -1788,19 +1981,9 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         selection: PropTypes.arrayOf(PropTypes.number),
 
         /**
-         * Validate JSON datafile against schems
+         * Additional options
          */
-        checkDatafileSchema: PropTypes.bool,
-
-        /**
-         * Hide titles of the track. Default is false
-         */
-        hideTitles: PropTypes.bool,
-
-        /**
-         * Hide legends of the track. Default is false
-         */
-        hideLegend: PropTypes.bool,
+        options: WellLogViewOptions_propTypes,
     };
 }
 
