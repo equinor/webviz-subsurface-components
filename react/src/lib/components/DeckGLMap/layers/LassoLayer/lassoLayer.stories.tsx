@@ -29,6 +29,7 @@ export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
     const [argsState, setArgsState] =
         React.useState<Record<string, unknown>>(disableLassoArgs);
     const [alignment, setAlignment] = React.useState("");
+
     const handleChange1 = React.useCallback(
         (
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,40 +82,21 @@ export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
     );
 };
 
-const enableLassoArgs = {
+const disableLassoArgs = {
     id: "DeckGL-Map",
     resources: {
-        propertyMap:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-        depthMap:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-        wellsData:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-        logData:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+        wellsData: "./volve_wells.json",
     },
     bounds: [432205, 6475078, 437720, 6481113],
     layers: [
         {
             "@@type": "WellsLayer",
             data: "@@#resources.wellsData",
-            logData: "@@#resources.logData",
-            logrunName: "BLOCKING",
-            logName: "ZONELOG",
-            logColor: "Stratigraphy",
-        },
-        {
-            "@@type": "PieChartLayer",
-            data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json",
         },
         {
             "@@type": "LassoLayer",
-            visible: true,
+            visible: false,
             data: "@@#resources.wellsData",
-            logData: "@@#resources.logData",
-            logrunName: "BLOCKING",
-            logName: "ZONELOG",
-            logColor: "Stratigraphy",
         },
     ],
     editedData: {},
@@ -131,52 +113,17 @@ const enableLassoArgs = {
     },
 };
 
-const disableLassoArgs = {
-    id: "DeckGL-Map",
-    resources: {
-        propertyMap:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-        depthMap:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-        wellsData:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-        logData:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
-    },
-    bounds: [432205, 6475078, 437720, 6481113],
+const enableLassoArgs = {
+    ...disableLassoArgs,
     layers: [
         {
             "@@type": "WellsLayer",
             data: "@@#resources.wellsData",
-            logData: "@@#resources.logData",
-            logrunName: "BLOCKING",
-            logName: "ZONELOG",
-            logColor: "Stratigraphy",
-        },
-        {
-            "@@type": "PieChartLayer",
-            data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/piechart.json",
         },
         {
             "@@type": "LassoLayer",
-            visible: false,
+            visible: true,
             data: "@@#resources.wellsData",
-            logData: "@@#resources.logData",
-            logrunName: "BLOCKING",
-            logName: "ZONELOG",
-            logColor: "Stratigraphy",
         },
     ],
-    editedData: {},
-    views: {
-        layout: [1, 1],
-        showLabel: false,
-        viewports: [
-            {
-                id: "view_1",
-                show3D: false,
-                layerIds: [],
-            },
-        ],
-    },
 };
