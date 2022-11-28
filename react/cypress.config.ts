@@ -7,7 +7,7 @@ export default defineConfig({
       framework: "create-react-app",
       bundler: "webpack",
     },
-    video:false,
+    video:true,
     setupNodeEvents(on, config) {
       getCompareSnapshotsPlugin(on, config),
       on('before:browser:launch', (browser = {}, launchOptions) => {

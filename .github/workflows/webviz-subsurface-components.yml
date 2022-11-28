@@ -143,11 +143,12 @@ jobs:
       # upload the failure screenshots for reference
       - name: upload artifacts
         uses: actions/upload-artifact@v2
-        if: github.event_name != 'release' && failure() && matrix.e2e-tests
+        if: github.event_name != 'release' && matrix.e2e-tests
         with:
           name: cypress-screenshots
           path: |
             react/cypress/screenshots
+            react/cypress/videos
             react/cypress-visual-screenshots
           retention-days: 5
 

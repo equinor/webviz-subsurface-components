@@ -1,11 +1,10 @@
 /// <reference types="cypress" />
 import * as React from "react";
-import { mount, unmount } from "@cypress/react";
+import { mount} from "@cypress/react";
 import { composeStories } from "@storybook/testing-react";
 import { render } from "@testing-library/react";
 
 import * as stories from "../../src/lib/components/DeckGLMap/storybook/DeckGLMap.stories";
-import { done } from "@equinor/eds-icons";
 
 const { Default } = composeStories(stories);
 
