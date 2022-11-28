@@ -6,6 +6,7 @@
 
 import time
 import sys
+import pytest
 
 sys.path.append("examples")
 
@@ -13,7 +14,10 @@ sys.path.append("examples")
 from example_deckgl_selectable_colored_feature import app
 
 
-def test_render_deckgl_selectable_colored_feature(dash_duo) -> None:
+@pytest.mark.parametrize("dev_tools_serve_dev_bundles", [False, True])
+def test_render_deckgl_selectable_colored_feature(
+    dev_tools_serve_dev_bundles, dash_duo
+) -> None:
     dash_duo.start_server(app)
     time.sleep(5)
     assert dash_duo.get_logs() == []  # Console should have no errors
