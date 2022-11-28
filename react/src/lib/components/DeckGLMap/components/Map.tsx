@@ -17,7 +17,7 @@ import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
 import { useSelector, useDispatch } from "react-redux";
-import { setSpec, updateVisibleLayers } from "../redux/actions";
+import { setSpec } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
@@ -263,7 +263,6 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
-    isLassoSelectionAvailable?: boolean;
 }
 
 export interface MapMouseEvent {
@@ -320,7 +319,6 @@ const Map: React.FC<MapProps> = ({
     getCameraPosition,
     triggerHome,
     triggerResetMultipleWells,
-    isLassoSelectionAvailable,
 }: MapProps) => {
     const deckRef = useRef<DeckGLRef>(null);
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
@@ -605,7 +603,7 @@ const Map: React.FC<MapProps> = ({
         else enumerations.push({ editedData: {} });
 
         setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-    }, [st_layers, resources, editedData]);
+    }, [st_layers, resources, editedData, layers]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -646,26 +644,6 @@ const Map: React.FC<MapProps> = ({
             wellslayer?.setMultiSelection(multipleWells);
         }
     }, [multipleWells]);
-
-    useEffect(() => {
-        const layers = deckRef.current?.deck?.props.layers;
-        if (layers) {
-            const lassoLayer = layers.filter(
-                (l) => l?.constructor.name === "LassoLayer"
-            );
-            if (lassoLayer) {
-                if (isLassoSelectionAvailable === undefined) {
-                    isLassoSelectionAvailable = false;
-                }
-                dispatch(
-                    updateVisibleLayers([
-                        "lasso-layer",
-                        isLassoSelectionAvailable,
-                    ])
-                );
-            }
-        }
-    }, [isLassoSelectionAvailable]);
 
     useEffect(() => {
         if (typeof triggerResetMultipleWells !== "undefined") {
