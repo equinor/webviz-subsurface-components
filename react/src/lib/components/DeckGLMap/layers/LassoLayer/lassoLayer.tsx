@@ -97,7 +97,7 @@ export default class LassoLayer extends CompositeLayer<
                 onSelect: ({ pickingInfos }: any) => {
                     this.setMultiSelection(pickingInfos);
                 },
-                layerIds: ["wells-layer", "pie-layer"],
+                layerIds: ["wells-layer"],
                 getTentativeFillColor: () => [255, 0, 255, 100],
                 getTentativeLineColor: () => [0, 0, 255, 255],
                 getTentativeLineDashArray: () => [0, 0],

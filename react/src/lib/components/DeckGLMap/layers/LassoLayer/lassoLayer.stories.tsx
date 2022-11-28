@@ -30,7 +30,7 @@ export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
         React.useState<Record<string, unknown>>(disableLassoArgs);
     const [alignment, setAlignment] = React.useState("");
 
-    const handleChange1 = React.useCallback(
+    const handleChange = React.useCallback(
         (
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             _event: any,
@@ -71,7 +71,7 @@ export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
             <ToggleButtonGroup
                 value={alignment}
                 exclusive
-                onChange={handleChange1}
+                onChange={handleChange}
                 aria-label="text alignment"
             >
                 <ToggleButton value="left" aria-label="left aligned">
