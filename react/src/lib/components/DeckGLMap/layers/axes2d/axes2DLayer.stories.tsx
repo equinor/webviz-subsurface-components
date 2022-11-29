@@ -8,8 +8,8 @@ export default {
 } as ComponentMeta<typeof DeckGLMap>;
 
 const layerProps = {
-    marginH: 8, // Horizontal margin (%)
-    marginV: 5, // Vertical margin (%)
+    marginH: 80, // Horizontal margin (in pixels)
+    marginV: 40, // Vertical margin (in pixels)
 };
 
 const meshMapLayerPng = {

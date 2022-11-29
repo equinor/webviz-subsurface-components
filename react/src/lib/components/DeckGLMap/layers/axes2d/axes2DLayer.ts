@@ -11,6 +11,7 @@ import BoxLayer from "./boxLayer";
 import { Position3D, ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { TextLayer } from "@deck.gl/layers/typed";
+import { Vector2 } from "@math.gl/core";
 
 export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
     labelColor?: Color;
@@ -94,19 +95,29 @@ export default class Axes2DLayer extends CompositeLayer<
     }
 
     renderLayers(): LayersList {
+        // pixels2world: factor to convert a length from pixels to world space.
+        const npixels = 100;
+        const p1 = [0, 0];
+        const p2 = [npixels, 0];
+
+        const p1_unproj = this.context.viewport.unproject(p1);
+        const p2_unproj = this.context.viewport.unproject(p2);
+
+        const v1 = new Vector2(p1_unproj[0], p1_unproj[1]);
+        const v2 = new Vector2(p2_unproj[0], p2_unproj[1]);
+        const d = v1.distance(v2);
+
+        const pixels2world = d / npixels;
+
+        const mh = this.props.marginH * pixels2world;
+        const mv = this.props.marginV * pixels2world;
+
+        const xMarginLeft = mh;
+        const xMarginRight = mh;
+        const yMarginTop = mv;
+        const yMarginBottom = mv;
+
         const vpBounds = this.context.viewport.getBounds();
-
-        const mh = this.props.marginH / 100; // to percentage.
-        const mv = this.props.marginV / 100;
-
-        const dx = vpBounds[2] - vpBounds[0];
-        const dy = vpBounds[3] - vpBounds[1];
-
-        const xMarginLeft = dx * mh;
-        const xMarginRight = dx * mh;
-        const yMarginTop = dy * mv;
-        const yMarginBottom = dy * mv;
-
         const xMin = vpBounds[0] + xMarginLeft;
         const xMax = vpBounds[2] + xMarginRight; // Note: "+" so that the axis extends outside viewport
         const yMin = vpBounds[1] + yMarginBottom;
