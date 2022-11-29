@@ -138,7 +138,7 @@ jobs:
           cd ../../../
           rm -rf clone
           cd react
-          DEBUG=cypress:server:util:process_profilernpx cypress run -b chrome --component --headed 
+          DEBUG=cypress:server:util:process_profiler npx cypress run -b chrome --component --headed 
 
       # upload the failure screenshots for reference
       - name: upload artifacts
