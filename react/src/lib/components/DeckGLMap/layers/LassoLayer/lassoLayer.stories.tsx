@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core";
+import { FormControlLabel, makeStyles } from "@material-ui/core";
 import Switch from "@material-ui/core/Switch";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
@@ -23,7 +23,7 @@ const useStyles = makeStyles({
     },
 });
 
-export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
+export const lassoSelection: ComponentStory<typeof DeckGLMap> = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
     const [argsState, setArgsState] =
         React.useState<Record<string, unknown>>(enableLassoArgs);
@@ -62,15 +62,17 @@ export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
                 />
             </div>
             <div style={{ textAlign: "center" }}>
-                <div style={{ display: "inline" }}>Display lasso layer</div>
-                <Switch
-                    style={{ display: "inline" }}
-                    checked={state}
-                    onChange={handleChange}
-                    color="primary"
-                    name="checkedB"
-                    inputProps={{ "aria-label": "primary checkbox" }}
-                    title="display lasso layer"
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={state}
+                            onChange={handleChange}
+                            color="primary"
+                            name="checkedB"
+                            inputProps={{ "aria-label": "primary checkbox" }}
+                        />
+                    }
+                    label="Display Lasso Selection"
                 />
             </div>
         </>
