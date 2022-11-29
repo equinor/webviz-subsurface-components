@@ -61,13 +61,18 @@ export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
                     legend={{ visible: false }}
                 />
             </div>
-            <Switch
-                checked={state}
-                onChange={handleChange}
-                color="primary"
-                name="checkedB"
-                inputProps={{ "aria-label": "primary checkbox" }}
-            />
+            <div style={{ textAlign: "center" }}>
+                <div style={{ display: "inline" }}>Display lasso layer</div>
+                <Switch
+                    style={{ display: "inline" }}
+                    checked={state}
+                    onChange={handleChange}
+                    color="primary"
+                    name="checkedB"
+                    inputProps={{ "aria-label": "primary checkbox" }}
+                    title="display lasso layer"
+                />
+            </div>
         </>
     );
 };
