@@ -1,6 +1,5 @@
-import LayersIcon from "@material-ui/icons/Layers";
 import { makeStyles } from "@material-ui/core";
-import { ToggleButtonGroup, ToggleButton } from "@material-ui/lab";
+import Switch from "@material-ui/core/Switch";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
@@ -27,30 +26,23 @@ const useStyles = makeStyles({
 export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
     const [argsState, setArgsState] =
-        React.useState<Record<string, unknown>>(disableLassoArgs);
-    const [alignment, setAlignment] = React.useState("");
+        React.useState<Record<string, unknown>>(enableLassoArgs);
+    const [state, setState] = React.useState<boolean>(true);
 
-    const handleChange = React.useCallback(
-        (
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            _event: any,
-            newAlignment: React.SetStateAction<string>
-        ) => {
-            const lassoLayer = disableLassoArgs.layers.filter(
-                (item) => item["@@type"] === "LassoLayer"
-            );
-            if (lassoLayer[0].visible !== undefined) {
-                lassoLayer[0].visible = !lassoLayer[0].visible;
-            }
-            setAlignment(newAlignment);
-            if (lassoLayer[0].visible) {
-                setArgsState(enableLassoArgs);
-            } else {
-                setArgsState(disableLassoArgs);
-            }
-        },
-        [argsState]
-    );
+    const handleChange = React.useCallback(() => {
+        const lassoLayer = enableLassoArgs.layers.filter(
+            (item) => item["@@type"] === "LassoLayer"
+        );
+        if (lassoLayer[0].visible !== undefined) {
+            lassoLayer[0].visible = !lassoLayer[0].visible;
+        }
+        if (lassoLayer[0].visible) {
+            setArgsState(enableLassoArgs);
+        } else {
+            setArgsState(disableLassoArgs);
+        }
+        setState(!state);
+    }, [state]);
 
     React.useEffect(() => {
         setEditedData(args.editedData);
@@ -66,18 +58,16 @@ export const lassoLayerTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
                     setProps={(updatedProps) => {
                         setEditedData(updatedProps);
                     }}
+                    legend={{ visible: false }}
                 />
             </div>
-            <ToggleButtonGroup
-                value={alignment}
-                exclusive
+            <Switch
+                checked={state}
                 onChange={handleChange}
-                aria-label="text alignment"
-            >
-                <ToggleButton value="left" aria-label="left aligned">
-                    <LayersIcon />
-                </ToggleButton>
-            </ToggleButtonGroup>
+                color="primary"
+                name="checkedB"
+                inputProps={{ "aria-label": "primary checkbox" }}
+            />
         </>
     );
 };
