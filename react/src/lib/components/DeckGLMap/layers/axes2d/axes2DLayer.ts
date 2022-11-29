@@ -136,7 +136,6 @@ export default class Axes2DLayer extends CompositeLayer<
         const textlayerData = maketextLayerData(
             tick_lines,
             tick_labels,
-            bounds,
             this.props.labelFontSize
         );
 
@@ -197,7 +196,6 @@ function LineLengthInPixels(
 function maketextLayerData(
     tick_lines: number[],
     tick_labels: string[],
-    bounds: [number, number, number, number],
     labelFontSize?: number
 ): [TextLayerData] {
     const data = [];
