@@ -1,5 +1,4 @@
-import { FormControlLabel, makeStyles } from "@material-ui/core";
-import Switch from "@material-ui/core/Switch";
+import { FormControlLabel, makeStyles, Switch } from "@material-ui/core";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
