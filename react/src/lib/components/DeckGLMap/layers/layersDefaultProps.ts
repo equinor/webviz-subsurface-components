@@ -158,6 +158,20 @@ export const layersDefaultProps: Record<string, unknown> = {
             features: [],
         },
     },
+    LassoLayer: {
+        "@@type": "LassoLayer",
+        name: "Lasso",
+        id: "lasso-layer",
+        pickable: true,
+        visible: false,
+
+        // Props used to get/set data in the drawing layer.
+        selectedFeatureIndexes: [] as number[],
+        data: {
+            type: "FeatureCollection",
+            features: [],
+        },
+    },
     Grid3DLayer: {
         "@@type": "Grid3DLayer",
         name: "Grid 3D",
