@@ -128,6 +128,14 @@ export const layersDefaultProps: Record<string, unknown> = {
         id: "axes-layer",
         visible: true,
     },
+    Axes2DLayer: {
+        "@@type": "Axes2DLayer",
+        name: "Axes2D",
+        id: "axes2d-layer",
+        visible: true,
+        marginH: 10, // Horizontal margin (%)
+        marginV: 10, // Vertical margin (%)
+    },
     NorthArrow3DLayer: {
         "@@type": "NorthArrow3DLayer",
         name: "NorthArrow3D",
