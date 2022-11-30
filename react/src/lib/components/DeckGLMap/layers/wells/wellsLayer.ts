@@ -187,7 +187,7 @@ function getColor(accessor: ColorAccessor) {
     };
 }
 
-function getSize(
+export function getSize(
     type: string,
     accessor: SizeAccessor,
     offset = 0

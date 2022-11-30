@@ -603,7 +603,7 @@ const Map: React.FC<MapProps> = ({
         else enumerations.push({ editedData: {} });
 
         setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-    }, [st_layers, resources, editedData]);
+    }, [st_layers, resources, editedData, layers]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
