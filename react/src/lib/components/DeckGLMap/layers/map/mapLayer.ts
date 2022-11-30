@@ -1,4 +1,4 @@
-import { CompositeLayer, Color } from "@deck.gl/core/typed";
+import { CompositeLayer, Color, UpdateParameters } from "@deck.gl/core/typed";
 import privateMapLayer, { Material } from "./privateMapLayer";
 import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
@@ -296,13 +296,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
         this.rebuildData(reportBoundingBox);
     }
 
-    updateState({
-        props,
-        oldProps,
-    }: {
-        props: MapLayerProps<unknown>;
-        oldProps: MapLayerProps<unknown>;
-    }): void {
+    updateState({ props, oldProps }: UpdateParameters<MapLayer>): void {
         const needs_reload =
             !isEqual(props.meshUrl, oldProps.meshUrl) ||
             !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
