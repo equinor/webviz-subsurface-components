@@ -39,7 +39,7 @@ export default {
     },
     argTypes: {
         ...argTypesSyncLogViewerProp,
-        id: {
+        /*id: {
             description:
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
         },
@@ -62,51 +62,49 @@ export default {
         wellDistances: {
             description: "Distanses between wells to show on the spacers",
         },
-
+        */
         horizontal: {
-            description:
-                "Orientation of the track plots on the screen." /* defaultValue: false */,
-        },
-        hideTitles: {
-            description: "Hide titles on the tracks." /* defaultValue: false */,
-        },
-        hideLegend: {
-            description:
-                "Hide legends on the tracks." /* defaultValue: false */,
+            description: "Orientation of the track plots on the screen.", // defaultValue: false
         },
         syncTrackPos: {
-            description:
-                "Synchronize first visible track" /* defaultValue: false */,
+            description: "Synchronize first visible track", // defaultValue: false
         },
         syncContentDomain: {
-            description:
-                "Synchronize visible content domain (pan and zoom)" /* defaultValue: false */,
+            description: "Synchronize visible content domain (pan and zoom)", // defaultValue: false
         },
         syncContentSelection: {
-            description:
-                "Synchronize content selection" /* defaultValue: false */,
+            description: "Synchronize content selection", // defaultValue: false
         },
         syncTemplate: {
+            description: "Synchronize templates in the views", // defaultValue: false
+        },
+        welllogOptions: {
             description:
-                "Synchronize templates in the views" /* defaultValue: false */,
+                "Options for well log view:<br/>" +
+                "maxContentZoom: The maximum zoom value (default 256)<br/>" +
+                "maxVisibleTrackNum: The maximum number of visible tracks<br/>" +
+                "checkDatafileSchema: Validate JSON datafile against schema<br/>" +
+                "hideTrackTitle: Hide titles on the tracks<br/>" +
+                "hideLegend: Hide legends on the tracks.",
+        },
+        spacerOptions: {
+            description: "Options for well log spacer",
         },
         readoutOptions: {
             description:
                 "Options for readout panel.<br/>" +
                 "allTracks: boolean — Show not only visible tracks,<br/>" +
                 "grouping: string — How group values.",
-            /*
-            defaultValue: {
-                allTracks: false,
-                grouping: "by_track",
-            },
-            */
         },
         domain: {
             description: "Initial visible interval of the log data.",
         },
         selection: {
             description: "Initial selected interval of the log data.",
+        },
+        viewTitles: {
+            description:
+                "The view title. Set desired string or react element or true for default value from welllog file",
         },
     },
 };
@@ -182,7 +180,7 @@ const Template = (args) => {
     );
 };
 
-const patterns = [
+const patternImages = [
     require("../../../demo/example-data/patterns/anhydrite.png"),
     require("../../../demo/example-data/patterns/brown_coal.png"),
     require("../../../demo/example-data/patterns/calcareous_dolostone.png"),
@@ -266,8 +264,6 @@ Default.args = {
     syncTemplate: true,
     horizontal: false,
 
-    hideTitles: false,
-    hideLegend: false,
     welllogs: [
         require("../../../demo/example-data/L898MUD.json")[0],
         require("../../../demo/example-data/L916MUD.json")[0],
@@ -300,7 +296,7 @@ Default.args = {
     ],
     patternsTable: {
         patternSize: 24,
-        patterns: patterns,
+        patternImages: patternImages,
         names: patternNames,
     },
     patterns: require("../../../demo/example-data/horizon_patterns.json"),
@@ -315,4 +311,15 @@ Default.args = {
 
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
+
+    viewTitles: true, // show default welllog view titles (a wellname from the welllog)
+
+    welllogOptions: {
+        wellpickColorFill: true,
+        wellpickPatternFill: true,
+    },
+    spacerOptions: {
+        wellpickColorFill: true,
+        wellpickPatternFill: true,
+    },
 };

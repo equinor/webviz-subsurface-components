@@ -6,47 +6,17 @@ import { WellLogController, WellPickProps, getWellPicks } from "./WellLogView";
 import WellLogView from "./WellLogView";
 
 import { ColorTable } from "./ColorTableTypes";
+import { PatternsTable, createDefs, patternId } from "../utils/pattern";
 
-export interface PatternsTable {
-    patternSize: number;
-    patterns: string[];
-    patternNames?: string[];
-}
-
-function patternId(uid: number, index: number) {
-    return "pattern" + uid + "_" + index;
-}
-
-function createPattern(
-    uid: number,
-    index: number,
-    patternsTable: PatternsTable
-): ReactNode {
-    const patternSize = patternsTable.patternSize;
-    const pattern = patternsTable.patterns[index];
-    const id = patternId(uid, index);
-    return (
-        <pattern
-            key={id}
-            id={id}
-            width={patternSize}
-            height={patternSize}
-            patternUnits="userSpaceOnUse"
-        >
-            <image width={patternSize} height={patternSize} href={pattern} />
-        </pattern>
-    );
-}
-
-function createDefs(uid: number, patternsTable?: PatternsTable): ReactNode {
-    if (!patternsTable) return null;
-    return (
-        <defs key="defs">
-            {patternsTable.patterns.map((_value: string, index: number) =>
-                createPattern(uid, index, patternsTable)
-            )}
-        </defs>
-    );
+export interface WellLogSpacerOptions {
+    /**
+     * Fill with color between well picks
+     */
+    wellpickColorFill?: boolean;
+    /**
+     * Fill with pattern between well picks
+     */
+    wellpickPatternFill?: boolean;
 }
 
 interface Props {
@@ -63,7 +33,14 @@ interface Props {
      */
     wellpicks?: WellPickProps[];
 
+    /**
+     * Patterns table
+     */
     patternsTable?: PatternsTable;
+
+    /**
+     * Horizon to pattern index map
+     */
     patterns?: [string, number][];
 
     /**
@@ -78,14 +55,11 @@ interface Props {
      * Orientation of the track plots on the screen.
      */
     horizontal?: boolean;
+
     /**
-     * Show Titles on the tracks
+     * Additional options
      */
-    hideTitles?: boolean;
-    /**
-     * Hide Legends on the tracks
-     */
-    hideLegend?: boolean;
+    options?: WellLogSpacerOptions;
 
     onCreateSpacer?: (spacer: WellLogSpacer) => void;
 }
@@ -108,7 +82,10 @@ class WellLogSpacer extends Component<Props /*, State*/> {
 
     constructor(props: Props) {
         super(props);
-        this.defs = createDefs(this.uid, this.props.patternsTable);
+        this.defs =
+            this.props.options?.wellpickPatternFill &&
+            this.props.patterns &&
+            createDefs(this.uid, this.props.patternsTable);
     }
 
     update(): void {
@@ -116,20 +93,48 @@ class WellLogSpacer extends Component<Props /*, State*/> {
     }
 
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
-        // Typical usage (don't forget to compare props):
+        // called after render()!?
         if (this.props.onCreateSpacer !== prevProps.onCreateSpacer) {
             // update callback to component's caller
             if (this.props.onCreateSpacer) this.props.onCreateSpacer(this);
         }
-        if (this.props.patternsTable !== prevProps.patternsTable) {
-            this.defs = createDefs(this.uid, this.props.patternsTable);
+        if (
+            this.props.patternsTable !== prevProps.patternsTable ||
+            this.props.patterns !== prevProps.patterns ||
+            this.props.options?.wellpickPatternFill !==
+                prevProps.options?.wellpickPatternFill
+        ) {
+            this.defs =
+                this.props.options?.wellpickPatternFill &&
+                this.props.patterns &&
+                createDefs(this.uid, this.props.patternsTable);
+
+            this.forceUpdate(); // force to show pattern fill with new this.defs
         }
     }
 
     shouldComponentUpdate(nextProps: Props /*, nextState: State*/): boolean {
-        if (this.props.colorTables !== nextProps.colorTables) return true;
-        if (this.props.controllers !== nextProps.controllers) return true;
-        if (this.props.wellpicks !== nextProps.wellpicks) return true;
+        if (this.props.colorTables !== nextProps.colorTables) {
+            return true;
+        }
+        if (this.props.controllers !== nextProps.controllers) {
+            return true;
+        }
+        if (this.props.wellpicks !== nextProps.wellpicks) {
+            return true;
+        }
+
+        if (
+            this.props.options?.wellpickColorFill !==
+            nextProps.options?.wellpickColorFill
+        )
+            return true;
+        if (
+            this.props.options?.wellpickPatternFill !==
+            nextProps.options?.wellpickPatternFill
+        ) {
+            return true;
+        }
 
         return false;
     }
@@ -145,8 +150,8 @@ class WellLogSpacer extends Component<Props /*, State*/> {
             to: number;
         }[] = [];
 
-        let offsetTop = 1157;
-        let offsetLeft = 1157;
+        let offsetTop = 3000; // try to draw initially out of screen
+        let offsetLeft = 3000;
         let height = 1;
         let width = 1;
         const controller = this.props.controllers[0] as WellLogView;
@@ -158,10 +163,13 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         if (wps && wps2 && logViewer) {
             const overlay = logViewer?.overlay;
             const source = overlay?.elm.node();
-
             if (source) {
                 offsetTop = source.offsetTop;
                 offsetLeft = source.offsetLeft;
+                if (source.offsetParent) {
+                    if (!horizontal) offsetTop += source.offsetParent.offsetTop;
+                    else offsetLeft += source.offsetParent.offsetLeft;
+                }
                 height = source.clientHeight;
                 width = source.clientWidth;
             }
@@ -171,6 +179,11 @@ class WellLogSpacer extends Component<Props /*, State*/> {
 
             //const wpSize = 3; //9;
             //const offset = wpSize / 2;
+
+            const patterns =
+                this.props.options?.wellpickPatternFill &&
+                this.props.patternsTable &&
+                this.props.patterns;
 
             for (const wp of wps) {
                 const horizon = wp.horizon;
@@ -184,17 +197,12 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                     color[1] +
                     "," +
                     color[2] +
-                    ",0.8)";
+                    ",0.8)"; /*TODO: get from CSS ???*/
 
                 let pattern = "";
-
-                if (this.props.patterns) {
-                    const p = this.props.patterns.find(
-                        (val) => val[0] === horizon
-                    );
-                    if (p) {
-                        pattern = "url(#" + patternId(this.uid, p[1]) + ")";
-                    }
+                if (patterns) {
+                    const p = patterns.find((val) => val[0] === horizon);
+                    if (p) pattern = "url(#" + patternId(this.uid, p[1]) + ")";
                 }
 
                 const vCur = vPrimary;
@@ -345,8 +353,11 @@ class WellLogSpacer extends Component<Props /*, State*/> {
             );
         });
 
+        const distance = this.props.distance;
+
         return (
             <div
+                className="welllogspacer"
                 style={{
                     width: "100%",
                     height: "100%",
@@ -371,19 +382,20 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                             : { height: offsetTop + "px", width: width + "px" }
                     }
                 >
-                    {!this.props.hideTitles ? <br /> : null}
-                    {!this.props.hideLegend &&
-                    this.props.distance !== undefined &&
-                    this.props.distance.value !== undefined ? (
+                    {!controller?.props.options?.hideTrackTitle ? <br /> : null}
+                    {!controller?.props.options?.hideTrackLegend &&
+                    distance !== undefined &&
+                    distance.value !== undefined ? (
                         <div style={{ fontSize: 12, textAlign: "center" }}>
                             {"←" +
-                                this.props.distance.value.toFixed(0) +
-                                this.props.distance.units +
+                                distance.value.toFixed(0) +
+                                distance.units +
                                 "→"}
                         </div>
                     ) : null}
                 </div>
                 <div
+                    className="welllogspacer-wellpickFill"
                     style={
                         horizontal
                             ? { height: height + "px" }
@@ -402,19 +414,22 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                         {picks.map(
                             (value, index) =>
                                 index + 1 < picks.length && [
-                                    value.color && (
-                                        <polygon
-                                            key={index}
-                                            fill={value.color}
-                                            stroke="none"
-                                            points={fillPoints[index]}
-                                        />
-                                    ),
+                                    this.props.options?.wellpickColorFill &&
+                                        value.color && (
+                                            <polygon
+                                                key={index}
+                                                fill={value.color}
+                                                stroke="none"
+                                                points={fillPoints[index]}
+                                            />
+                                        ),
                                     value.pattern && (
                                         <polygon
                                             key={"p" + index}
                                             fill={value.pattern}
-                                            fillOpacity={0.45}
+                                            fillOpacity={
+                                                0.45 /*TODO: get from CSS ???*/
+                                            }
                                             stroke="none"
                                             points={fillPoints[index]}
                                         />

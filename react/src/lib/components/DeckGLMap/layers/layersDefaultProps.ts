@@ -52,6 +52,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         // If contour lines should follow depth or properties.
         isContoursDepth: true,
         gridLines: false,
+        smoothShading: true,
+        material: true,
     },
 
     Map3DLayer: {
@@ -71,7 +73,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         contours: [-1.0, -1.0],
         // If contour lines should follow depth or properties.
         isContoursDepth: true,
-        enableSmoothShading: true,
+        smoothShading: true,
         material: true,
     },
     GridLayer: {
@@ -125,6 +127,14 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "Axes",
         id: "axes-layer",
         visible: true,
+    },
+    Axes2DLayer: {
+        "@@type": "Axes2DLayer",
+        name: "Axes2D",
+        id: "axes2d-layer",
+        visible: true,
+        marginH: 10, // Horizontal margin (%)
+        marginV: 10, // Vertical margin (%)
     },
     NorthArrow3DLayer: {
         "@@type": "NorthArrow3DLayer",

@@ -112,14 +112,17 @@ export const Default = Template.bind({});
 Default.args = {
     id: "Well-Log-Viewer",
     horizontal: false,
-    hideTitles: false,
-    hideLegend: false,
     welllog: require("../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../demo/example-data/welllog_template_1.json"),
     colorTables: colorTables,
     wellpick: wellpick,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
+    viewTitle: true, // show default welllog view title (a wellname from the welllog)
+    options: {
+        hideTrackTitle: false,
+        hideTrackLegend: false,
+    },
 };
 
 export const Horizontal = Template.bind({});
@@ -131,6 +134,7 @@ Horizontal.args = {
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: colorTables,
     wellpick: wellpick,
+    viewTitle: true, // show default welllog view title (a wellname from the welllog)
 };
 Horizontal.parameters = {
     docs: {
@@ -148,6 +152,7 @@ Discrete.args = {
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: colorTables,
     wellpick: wellpick,
+    viewTitle: true, // show default welllog view title (a wellname from the welllog)
 };
 Discrete.parameters = {
     docs: {

@@ -248,7 +248,6 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
 
     render(): JSX.Element {
         const maxContentZoom = 256;
-        const checkDatafileSchema = true;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <WellLogViewWithScroller
@@ -257,14 +256,11 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     colorTables={this.props.colorTables}
                     wellpick={this.props.wellpick}
                     horizontal={this.props.horizontal}
-                    hideTitles={this.props.hideTitles}
-                    hideLegend={this.props.hideLegend}
-                    maxVisibleTrackNum={this.props.maxVisibleTrackNum}
                     maxContentZoom={maxContentZoom}
-                    checkDatafileSchema={checkDatafileSchema}
                     primaryAxis={this.state.primaryAxis}
                     axisTitles={this.props.axisTitles}
                     axisMnemos={this.props.axisMnemos}
+                    options={this.props.options}
                     onInfo={this.onInfo}
                     onCreateController={this.onCreateController}
                     onTrackMouseEvent={onTrackMouseEvent}
@@ -318,6 +314,29 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
 }
 
 ///
+const WellLogViewOptions_propTypes = PropTypes.shape({
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom: PropTypes.number,
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum: PropTypes.number,
+    /**
+     * Validate JSON datafile against schema
+     */
+    checkDatafileSchema: PropTypes.bool,
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTrackTitle: PropTypes.bool,
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideTrackLegend: PropTypes.bool,
+});
+
 const InfoOptions_propTypes = PropTypes.shape({
     /**
      * Show not only visible tracks
@@ -359,16 +378,6 @@ WellLogViewer.propTypes = {
     horizontal: PropTypes.bool,
 
     /**
-     * Hide titles of the track. Default is false
-     */
-    hideTitles: PropTypes.bool,
-
-    /**
-     * Hide legends of the track. Default is false
-     */
-    hideLegend: PropTypes.bool,
-
-    /**
      * Initial visible interval of the log data
      */
     domain: PropTypes.arrayOf(PropTypes.number),
@@ -399,19 +408,23 @@ WellLogViewer.propTypes = {
     axisMnemos: PropTypes.object,
 
     /**
-     * The maximum number of visible tracks
-     */
-    maxVisibleTrackNum: PropTypes.number,
-
-    /**
      * The maximum zoom value
      */
     maxContentZoom: PropTypes.number,
 
     /**
-     * Validate JSON datafile against schems
+     * Set to true for default titles or to array of individial welllog titles
      */
-    checkDatafileSchema: PropTypes.bool,
+    viewTitle: PropTypes.oneOfType([
+        PropTypes.bool,
+        PropTypes.arrayOf(PropTypes.string),
+        PropTypes.arrayOf(PropTypes.object) /* react elemenet */,
+    ]),
+
+    /**
+     * WellLogView additional options
+     */
+    options: WellLogViewOptions_propTypes /*PropTypes.object,*/,
 
     /**
      * Options for readout panel

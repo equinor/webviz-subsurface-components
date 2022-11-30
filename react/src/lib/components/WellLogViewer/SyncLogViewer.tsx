@@ -3,7 +3,6 @@ import React, { Component, ReactNode } from "react";
 import PropTypes from "prop-types";
 
 import WellLogSpacer from "./components/WellLogSpacer";
-import { PatternsTable } from "./components/WellLogSpacer";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import InfoPanel from "./components/InfoPanel";
 import AxisSelector from "./components/AxisSelector";
@@ -13,10 +12,13 @@ import ZoomSlider from "./components/ZoomSlider";
 import { WellLog } from "./components/WellLogTypes";
 import { Template } from "./components/WellLogTemplateTypes";
 import { ColorTable } from "./components/ColorTableTypes";
+import { PatternsTable } from "./utils/pattern";
 
 import { WellLogController, WellPickProps } from "./components/WellLogView";
 
 import WellLogView from "./components/WellLogView";
+import { WellLogViewOptions } from "./components/WellLogView";
+import { WellLogSpacerOptions } from "./components/WellLogSpacer";
 import { getWellPicks } from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
@@ -33,16 +35,25 @@ import { LogViewer } from "@equinor/videx-wellog";
 
 import { Info, InfoOptions } from "./components/InfoTypes";
 
-function isArr2Differ(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    src1: any[] | undefined,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    src2: any[] | undefined
-): boolean {
-    if (!src1) return !!src2;
-    if (!src2) return true;
+import { isEqualRanges } from "./components/WellLogView";
+//import { boolean } from "mathjs";
 
-    return src1[0] !== src2[0] || src1[1] !== src2[1];
+export function isEqualArrays(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d1: undefined | any[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d2: undefined | any[]
+): boolean {
+    if (!d1) return !d2;
+    if (!d2) return !d1;
+
+    const n = d1.length;
+    if (n !== d2.length) return false;
+
+    for (let i = 0; i < n; i++) {
+        if (d1[i] !== d2[i]) return false;
+    }
+    return true;
 }
 
 interface Props {
@@ -59,6 +70,11 @@ interface Props {
      * Prop containing color table data.
      */
     colorTables: ColorTable[];
+    /**
+     * Set to true for default titles or to array of individial welllog titles
+     */
+    viewTitles?: boolean | (boolean | string | JSX.Element)[];
+
     /**
      * Well Picks data array
      */
@@ -79,7 +95,7 @@ interface Props {
     wellpickFlatting?: string[]; // For example ["Hor_5", "Hor_3"];
 
     /**
-     * Set to true or spacer width or to array of widths if WellLogSpacers should be used
+     * Set to true or to spacer width or to array of widths if WellLogSpacers should be used
      */
     spacers?: boolean | number | number[];
     /**
@@ -100,15 +116,6 @@ interface Props {
     syncTemplate?: boolean;
 
     /**
-     * Show Titles on the tracks
-     */
-    hideTitles?: boolean;
-    /**
-     * Hide Legends on the tracks
-     */
-    hideLegend?: boolean;
-
-    /**
      * Log mnemonics for axes
      */
     axisTitles: Record<string, string>;
@@ -117,16 +124,6 @@ interface Props {
      * Names for axes
      */
     axisMnemos: Record<string, string[]>;
-
-    /**
-     * The maximum number of visible tracks
-     */
-    maxVisibleTrackNum?: number; // default is horizontal ? 3: 5
-
-    /**
-     * The maximum zoom value
-     */
-    maxContentZoom?: number; // default is 256
 
     /**
      * Initial visible range
@@ -139,10 +136,16 @@ interface Props {
     selection?: [number | undefined, number | undefined];
 
     /**
-     * Validate JSON datafile against schems
+     * Options for well log views
      */
-    checkDatafileSchema?: boolean;
-
+    welllogOptions?: WellLogViewOptions;
+    /**
+     * Options for well log spacers
+     */
+    spacerOptions?: WellLogSpacerOptions;
+    /**
+     * Options for readout
+     */
     readoutOptions?: InfoOptions; // options for readout
 
     // callbacks
@@ -188,18 +191,6 @@ export const argTypesSyncLogViewerProp = {
     horizontal: {
         description: "Orientation of the track plots on the screen.",
     },
-    maxVisibleTrackNum: {
-        description: "The maximum number of visible tracks", // defaultValue: 3
-    },
-    maxContentZoom: {
-        description: "The maximum zoom value (default 256)",
-    },
-    hideTitles: {
-        description: "Hide titles on the tracks.", // defaultValue: false
-    },
-    hideLegend: {
-        description: "Hide legends on the tracks.", // defaultValue: false
-    },
     syncTrackPos: {
         description: "Synchronize first visible track", // defaultValue: false
     },
@@ -211,6 +202,15 @@ export const argTypesSyncLogViewerProp = {
     },
     syncTemplate: {
         description: "Synchronize templates in the views", // defaultValue: false
+    },
+    welllogOptions: {
+        description:
+            "Options for well log views:<br/>" +
+            "maxContentZoom: The maximum zoom value (default 256)<br/>" +
+            "maxVisibleTrackNum: The maximum number of visible tracks<br/>" +
+            "checkDatafileSchema: Validate JSON datafile against schema<br/>" +
+            "hideTrackTitle: Hide titles on the tracks<br/>" +
+            "hideLegend: Hide legends on the tracks.",
     },
     readoutOptions: {
         description:
@@ -227,6 +227,10 @@ export const argTypesSyncLogViewerProp = {
     },
     selection: {
         description: "Initial selected interval of the log data.",
+    },
+    viewTitles: {
+        description:
+            "Set to true for default titles or to array of individial welllog titles",
     },
     // callbacks...
 };
@@ -329,10 +333,10 @@ class SyncLogViewer extends Component<Props, State> {
 
     shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
         //?!
-        return (
+        const ret =
             !Object.is(this.props, nextProps) ||
-            !Object.is(this.state, nextState)
-        );
+            !Object.is(this.state, nextState);
+        return ret;
     }
 
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
@@ -365,21 +369,21 @@ class SyncLogViewer extends Component<Props, State> {
             });
         }
 
-        if (isArr2Differ(this.props.domain, prevProps.domain)) {
+        if (isEqualRanges(this.props.domain, prevProps.domain)) {
             this.setControllersZoom();
         }
 
         if (
-            isArr2Differ(
+            this.props.wellpicks !== prevProps.wellpicks ||
+            !isEqualArrays(
                 this.props.wellpickFlatting,
                 prevProps.wellpickFlatting
-            ) ||
-            this.props.wellpicks !== prevProps.wellpicks
+            )
         ) {
             this.syncContentScrollPos(0); // force to redraw
         }
 
-        if (isArr2Differ(this.props.selection, prevProps.selection)) {
+        if (isEqualRanges(this.props.selection, prevProps.selection)) {
             this.setControllersSelection();
         }
 
@@ -772,10 +776,7 @@ class SyncLogViewer extends Component<Props, State> {
             if (!_controller || _controller == controller) continue;
             if (this.props.syncContentSelection) {
                 const _selection = _controller.getContentSelection();
-                if (
-                    _selection[0] !== selection[0] ||
-                    _selection[1] !== selection[1]
-                )
+                if (!isEqualRanges(_selection, selection))
                     _controller.selectContent(selection);
             }
         }
@@ -823,28 +824,33 @@ class SyncLogViewer extends Component<Props, State> {
 
     createView(index: number): ReactNode {
         const callbacks = this.callbacks[index];
+        const wellLog = this.props.welllogs[index];
+        const templates = this.props.templates;
+        const template = templates[index] ? templates[index] : templates[0];
+        const viewTitles = this.props.viewTitles;
+        const viewTitle =
+            viewTitles && (viewTitles === true ? true : viewTitles[index]);
+        const options = {
+            ...this.props.welllogOptions,
+            maxVisibleTrackNum:
+                this.props.welllogOptions?.maxVisibleTrackNum ||
+                (this.props.horizontal ? 2 : 3),
+        };
         return (
             <WellLogViewWithScroller
                 key={index}
-                welllog={this.props.welllogs[index]}
-                template={
-                    this.props.templates[index]
-                        ? this.props.templates[index]
-                        : this.props.templates[0]
-                }
+                welllog={wellLog}
+                viewTitle={viewTitle}
+                template={template}
                 colorTables={this.props.colorTables}
                 wellpick={this.props.wellpicks?.[index]}
+                patternsTable={this.props.patternsTable}
+                patterns={this.props.patterns}
                 horizontal={this.props.horizontal}
-                hideTitles={this.props.hideTitles}
-                hideLegend={this.props.hideLegend}
                 axisTitles={this.props.axisTitles}
                 axisMnemos={this.props.axisMnemos}
-                maxVisibleTrackNum={
-                    this.props.maxVisibleTrackNum ||
-                    (this.props.horizontal ? 2 : 3)
-                }
-                maxContentZoom={this.props.maxContentZoom}
                 primaryAxis={this.state.primaryAxis}
+                options={options}
                 onInfo={callbacks.onInfoBind}
                 onCreateController={callbacks.onCreateControllerBind}
                 onTrackMouseEvent={onTrackMouseEvent}
@@ -890,6 +896,7 @@ class SyncLogViewer extends Component<Props, State> {
                             : "",
                         value: this.props.wellDistances?.distances[prev],
                     }}
+                    colorTables={this.props.colorTables}
                     wellpicks={
                         this.props.wellpicks
                             ? [
@@ -898,12 +905,10 @@ class SyncLogViewer extends Component<Props, State> {
                               ]
                             : []
                     }
-                    colorTables={this.props.colorTables}
                     patternsTable={this.props.patternsTable}
                     patterns={this.props.patterns}
+                    options={this.props.spacerOptions}
                     horizontal={this.props.horizontal}
-                    hideTitles={this.props.hideTitles}
-                    hideLegend={this.props.hideLegend}
                     onCreateSpacer={(spacer: WellLogSpacer): void => {
                         this.spacers[index] = spacer;
                     }}
@@ -953,7 +958,10 @@ class SyncLogViewer extends Component<Props, State> {
                     >
                         <ZoomSlider
                             value={this.state.sliderValue}
-                            max={this.props.maxContentZoom || 256 /*default*/}
+                            max={
+                                this.props.welllogOptions?.maxContentZoom ||
+                                256 /*default*/
+                            }
                             onChange={this.onZoomSliderChange}
                         />
                     </span>
@@ -995,6 +1003,29 @@ class SyncLogViewer extends Component<Props, State> {
 }
 
 ///
+const WellLogViewOptions_propTypes = PropTypes.shape({
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom: PropTypes.number,
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum: PropTypes.number,
+    /**
+     * Validate JSON datafile against schema
+     */
+    checkDatafileSchema: PropTypes.bool,
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTrackTitle: PropTypes.bool,
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideTrackLegend: PropTypes.bool,
+});
+
 const InfoOptions_propTypes = PropTypes.shape({
     /**
      * Show not only visible tracks
@@ -1043,7 +1074,7 @@ SyncLogViewer.propTypes = {
     /**
      * Horizon to pattern index map
      */
-    patterns: PropTypes.array,
+    patterns: PropTypes.array, // [string, number][];
 
     /**
      * Horizon names for wellpick flatting (pan and zoom)
@@ -1074,16 +1105,6 @@ SyncLogViewer.propTypes = {
     primaryAxis: PropTypes.string,
 
     /**
-     * Hide titles of the track. Default is false
-     */
-    hideTitles: PropTypes.bool,
-
-    /**
-     * Hide legends of the track. Default is false
-     */
-    hideLegend: PropTypes.bool,
-
-    /**
      * Log mnemonics for axes
      */
     axisTitles: PropTypes.object,
@@ -1092,11 +1113,6 @@ SyncLogViewer.propTypes = {
      * Names for axes
      */
     axisMnemos: PropTypes.object,
-
-    /**
-     * The maximum number of visible tracks
-     */
-    maxVisibleTrackNum: PropTypes.number,
 
     /**
      * The maximum zoom value
@@ -1114,9 +1130,18 @@ SyncLogViewer.propTypes = {
     selection: PropTypes.arrayOf(PropTypes.number),
 
     /**
-     * Validate JSON datafile against schems
+     * Set to true for default titles or to array of individial welllog titles
      */
-    checkDatafileSchema: PropTypes.bool,
+    viewTitles: PropTypes.oneOfType([
+        PropTypes.bool,
+        PropTypes.arrayOf(PropTypes.string),
+        PropTypes.arrayOf(PropTypes.object) /* react elemenet */,
+    ]),
+
+    /**
+     * WellLogView additional options
+     */
+    welllogOptions: WellLogViewOptions_propTypes /*PropTypes.object,*/,
 
     /**
      * Options for readout panel

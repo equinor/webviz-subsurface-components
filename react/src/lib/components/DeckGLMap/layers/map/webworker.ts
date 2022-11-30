@@ -1,6 +1,8 @@
 import { MeshType, MeshTypeLines } from "./privateMapLayer";
 import { Params } from "./mapLayer";
 
+type Vec = [number, number, number];
+
 export function makeFullMesh(e: { data: Params }): void {
     const params = e.data;
 
@@ -11,6 +13,7 @@ export function makeFullMesh(e: { data: Params }): void {
     const propertiesData = params.propertiesData;
     const isMesh = params.isMesh;
     const frame = params.frame;
+    const smoothShading = params.smoothShading;
 
     function getFloat32ArrayMinMax(data: Float32Array) {
         let max = -99999999;
@@ -20,6 +23,116 @@ export function makeFullMesh(e: { data: Params }): void {
             min = data[i] < min ? data[i] : min;
         }
         return [min, max];
+    }
+
+    function crossProduct(a: Vec, b: Vec): Vec {
+        const c = [
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0],
+        ];
+        return c as Vec;
+    }
+
+    function normalize(a: Vec): void {
+        const L = Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+        a[0] /= L;
+        a[1] /= L;
+        a[2] /= L;
+    }
+
+    function calcNormal(
+        w: number,
+        h: number,
+        nx: number,
+        ny: number,
+        isMesh: boolean,
+        smoothShading: boolean,
+        meshData: Float32Array,
+        ox: number,
+        oy: number
+    ) {
+        if (!smoothShading) {
+            return [1, 1, 1];
+        }
+
+        if (!isMesh) {
+            return [0, 0, 1];
+        }
+
+        const i0 = h * nx + w;
+        const i1 = h * nx + (w - 1);
+        const i2 = (h + 1) * nx + w;
+        const i3 = h * nx + (w + 1);
+        const i4 = (h - 1) * nx + w;
+
+        const i0_act =                 !isNaN(meshData[i0]); // eslint-disable-line
+        const i1_act = (w - 1) >= 0 && !isNaN(meshData[i1]); // eslint-disable-line
+        const i2_act = (h + 1) < ny && !isNaN(meshData[i2]); // eslint-disable-line
+        const i3_act = (w + 1) < nx && !isNaN(meshData[i3]); // eslint-disable-line
+        const i4_act = (h - 1) >= 0 && !isNaN(meshData[i4]); // eslint-disable-line
+
+        const noNormal = [0, 0, 1]; // signals a normal could not be calculated.
+        if (!i0_act) {
+            return noNormal;
+        }
+
+        const hh = ny - 1 - h; // Note use hh for h for getting y values.
+        const p0 = [ox + w * dx,         oy + hh * dy,        i0_act ? -meshData[i0] : 0]; // eslint-disable-line
+        const p1 = [ ox + (w - 1) * dx,  oy + hh * dy,        i1_act ? -meshData[i1] : 0]; // eslint-disable-line
+        const p2 = [ ox + w * dx,        oy + (hh + 1) * dy,  i2_act ? -meshData[i2] : 0]; // eslint-disable-line
+        const p3 = [ ox + (w + 1) * dx,  oy + hh * dy,        i3_act ? -meshData[i3] : 0]; // eslint-disable-line
+        const p4 = [ ox + w * dx,        oy + (hh - 1) * dy,  i4_act ? -meshData[i4] : 0]; // eslint-disable-line
+
+        const v1 = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]] as Vec;
+        const v2 = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]] as Vec;
+        const v3 = [p3[0] - p0[0], p3[1] - p0[1], p3[2] - p0[2]] as Vec;
+        const v4 = [p4[0] - p0[0], p4[1] - p0[1], p4[2] - p0[2]] as Vec;
+
+        // Estimating a normal vector at p0:
+        // Take cross product of vectors v1, v2,
+        // Do this for all 4 quadrants.
+        // The resulting normal will be the mean of these four normals.
+        //        p2
+        //         |
+        //   p1 - p0 - p3
+        //         |
+        //        p4
+
+        const normals = [];
+        if (i1_act && i2_act) {
+            const normal = crossProduct(v2, v1);
+            normals.push(normal);
+        }
+
+        if (i2_act && i3_act) {
+            const normal = crossProduct(v3, v2);
+            normals.push(normal);
+        }
+
+        if (i3_act && i4_act) {
+            const normal = crossProduct(v4, v3);
+            normals.push(normal);
+        }
+
+        if (i4_act && i1_act) {
+            const normal = crossProduct(v1, v4);
+            normals.push(normal);
+        }
+
+        if (normals.length === 0) {
+            return noNormal;
+        }
+
+        const mean = normals[0];
+        for (let i = 1; i < normals.length; i++) {
+            mean[0] += normals[i][0];
+            mean[1] += normals[i][1];
+            mean[2] += normals[i][2];
+        }
+
+        normalize(mean);
+        return mean;
     }
 
     const meshZValueRange = getFloat32ArrayMinMax(meshData);
@@ -45,6 +158,7 @@ export function makeFullMesh(e: { data: Params }): void {
     }
 
     const positions: number[] = [];
+    const normals: number[] = [];
     const indices: number[] = [];
     const vertexProperties: number[] = [];
     const vertexIndexs: number[] = [];
@@ -71,6 +185,9 @@ export function makeFullMesh(e: { data: Params }): void {
 
                 positions.push(x0, y0, z);
 
+                const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy); // eslint-disable-line
+                normals.push(normal[0], normal[1], normal[2]);
+
                 vertexProperties.push(propertyValue);
                 vertexIndexs.push(i++);
             }
@@ -83,10 +200,10 @@ export function makeFullMesh(e: { data: Params }): void {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const i0_act = !isNaN(meshData[i0]) && !isNaN(propertiesData[i0]); // eslint-disable-line
-                const i1_act = !isNaN(meshData[i1]) && !isNaN(propertiesData[i1]); // eslint-disable-line
-                const i2_act = !isNaN(meshData[i2]) && !isNaN(propertiesData[i2]); // eslint-disable-line
-                const i3_act = !isNaN(meshData[i3]) && !isNaN(propertiesData[i3]); // eslint-disable-line
+                const i0_act = !isMesh || (!isNaN(meshData[i0]) && !isNaN(propertiesData[i0])); // eslint-disable-line
+                const i1_act = !isMesh || (!isNaN(meshData[i1]) && !isNaN(propertiesData[i1])); // eslint-disable-line
+                const i2_act = !isMesh || (!isNaN(meshData[i2]) && !isNaN(propertiesData[i2])); // eslint-disable-line
+                const i3_act = !isMesh || (!isNaN(meshData[i3]) && !isNaN(propertiesData[i3])); // eslint-disable-line
 
                 const hh = ny - h - 1; // See note above.
 
@@ -105,11 +222,6 @@ export function makeFullMesh(e: { data: Params }): void {
                 const x3 = ox + w * dx;
                 const y3 = oy + (hh - 1) * dy;
                 const z3 = isMesh ? -meshData[i3] : 0;
-
-                //   i0---------i1
-                //   |          |
-                //   |          |
-                //   i3---------i2
 
                 if (i1_act && i3_act) {
                     // diagonal i1, i3
@@ -170,10 +282,15 @@ export function makeFullMesh(e: { data: Params }): void {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const i0_act = !isNaN(meshData[i0]); // eslint-disable-line
-                const i1_act = !isNaN(meshData[i1]); // eslint-disable-line
-                const i2_act = !isNaN(meshData[i2]); // eslint-disable-line
-                const i3_act = !isNaN(meshData[i3]); // eslint-disable-line
+                const normal0 = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy);         // eslint-disable-line
+                const normal1 = calcNormal(w + 1, h, nx, ny, isMesh, smoothShading, meshData, ox, oy);     // eslint-disable-line
+                const normal2 = calcNormal(w + 1, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy); // eslint-disable-line
+                const normal3 = calcNormal(w, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy);     // eslint-disable-line
+
+                const i0_act = !isMesh || !isNaN(meshData[i0]); // eslint-disable-line
+                const i1_act = !isMesh || !isNaN(meshData[i1]); // eslint-disable-line
+                const i2_act = !isMesh || !isNaN(meshData[i2]); // eslint-disable-line
+                const i3_act = !isMesh || !isNaN(meshData[i3]); // eslint-disable-line
 
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
@@ -207,6 +324,10 @@ export function makeFullMesh(e: { data: Params }): void {
                         positions.push(x3, y3, z3);
                         positions.push(x0, y0, z0);
 
+                        normals.push(normal1[0], normal1[1], normal1[2]);
+                        normals.push(normal3[0], normal3[1], normal3[2]);
+                        normals.push(normal0[0], normal0[1], normal0[2]);
+
                         vertexIndexs.push(
                             i_vertices++,
                             i_vertices++,
@@ -230,6 +351,10 @@ export function makeFullMesh(e: { data: Params }): void {
                         positions.push(x1, y1, z1);
                         positions.push(x3, y3, z3);
                         positions.push(x2, y2, z2);
+
+                        normals.push(normal1[0], normal1[1], normal1[2]);
+                        normals.push(normal3[0], normal3[1], normal3[2]);
+                        normals.push(normal2[0], normal2[1], normal2[2]);
 
                         vertexIndexs.push(
                             i_vertices++,
@@ -262,6 +387,10 @@ export function makeFullMesh(e: { data: Params }): void {
                         positions.push(x2, y2, z2);
                         positions.push(x0, y0, z0);
 
+                        normals.push(normal1[0], normal1[1], normal1[2]);
+                        normals.push(normal2[0], normal2[1], normal2[2]);
+                        normals.push(normal0[0], normal0[1], normal0[2]);
+
                         vertexIndexs.push(
                             i_vertices++,
                             i_vertices++,
@@ -285,6 +414,10 @@ export function makeFullMesh(e: { data: Params }): void {
                         positions.push(x0, y0, z0);
                         positions.push(x3, y3, z3);
                         positions.push(x2, y2, z2);
+
+                        normals.push(normal0[0], normal0[1], normal0[2]);
+                        normals.push(normal3[0], normal3[1], normal3[2]);
+                        normals.push(normal2[0], normal2[1], normal2[2]);
 
                         vertexIndexs.push(
                             i_vertices++,
@@ -318,6 +451,7 @@ export function makeFullMesh(e: { data: Params }): void {
         drawMode: 4, // corresponds to GL.TRIANGLES,
         attributes: {
             positions: { value: new Float32Array(positions), size: 3 },
+            normals: { value: new Float32Array(normals), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
             vertex_indexs: { value: new Int32Array(vertexIndexs), size: 1 },
         },

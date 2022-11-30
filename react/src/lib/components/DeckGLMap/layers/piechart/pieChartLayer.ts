@@ -9,7 +9,7 @@ import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { SolidPolygonLayer } from "@deck.gl/layers/typed";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
-import { Vector3 } from "@math.gl/core";
+import { Vector2 } from "@math.gl/core";
 
 type PieProperties = [{ color: Color; label: string }];
 
@@ -63,26 +63,26 @@ export default class PieChartLayer extends CompositeLayer<
     }
 
     renderLayers(): SolidPolygonLayer<PolygonData>[] {
-        const is_orthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
-
-        const npixels = 100;
-        const p1 = is_orthographic ? [0, 0, 0] : [0, 0];
-        const p2 = is_orthographic ? [npixels, 0, 0] : [npixels, 0];
-
-        const v1 = new Vector3(this.context.viewport.unproject(p1));
-        const v2 = new Vector3(this.context.viewport.unproject(p2));
-        const d = v1.distance(v2);
-
-        // Factor to convert a length in pixels to a length in world space.
-        const pixels2world = d / npixels;
-
         const pieData = this.props.data as unknown as PiesData;
         if (!pieData?.pies) {
             // this.props.data is a sum type, and since TS doesn't have
             // pattern matching, we must check it this way.
             return [];
         }
+
+        const npixels = 100;
+        const p1 = [0, 0];
+        const p2 = [npixels, 0];
+
+        const p1_unproj = this.context.viewport.unproject(p1);
+        const p2_unproj = this.context.viewport.unproject(p2);
+
+        const v1 = new Vector2(p1_unproj[0], p1_unproj[1]);
+        const v2 = new Vector2(p2_unproj[0], p2_unproj[1]);
+        const d = v1.distance(v2);
+
+        // Factor to convert a length in pixels to a length in world space.
+        const pixels2world = d / npixels;
 
         const layer = new SolidPolygonLayer<PolygonData>(
             this.getSubLayerProps({
@@ -100,7 +100,6 @@ PieChartLayer.defaultProps = layersDefaultProps[
 ] as PieChartLayerProps<PiesData>;
 
 //================= Local help functions. ==================
-
 function makePies(data: PiesData, pixels2world: number): PolygonData[] {
     let polygons: PolygonData[] = [];
     let pie_index = 0;
@@ -132,6 +131,11 @@ function makePie(
     }
 
     const pie_polygons: PolygonData[] = [];
+
+    if (sum === 0) {
+        return pie_polygons;
+    }
+
     let start_a = -90.0;
     for (let i = 0; i < pie.fractions.length; i++) {
         const frac = pie.fractions[i].value / sum;

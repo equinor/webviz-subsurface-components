@@ -26,7 +26,31 @@ $scale_slave_scale_bg: #ff0000;
     pointer-events: all; // to allow mouse events handling
   }
 }
+.welllogview-title {
+  color: rgb(0, 0, 0);
+  background-color: rgb(241, 241, 241);
+  font-size: 13px;
+  text-align: center;
+}
 .welllogview-error {
   color: rgb(255, 64, 64);
   background-color: rgb(255, 255, 192)
+}
+
+.welllogview-wellpick {
+}
+.welllogview-wellpickFillColor {
+  opacity: 0.45
+}
+.welllogview-wellpickFillPattern {
+  opacity: 0.45
+}
+
+
+// 
+.welllogspacer {
+}
+
+.welllogspacer-wellpickFill {
+  opacity: 0.75
 }
