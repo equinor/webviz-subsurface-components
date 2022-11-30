@@ -139,7 +139,7 @@ jobs:
           rm -rf clone
           cd react
           npm run
-          npm run test-cypress
+          npm run test:cypress
 
       # upload the failure screenshots for reference
       - name: upload artifacts
