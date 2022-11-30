@@ -39,7 +39,7 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import { WellsLayer } from "../layers";
+import { LassoLayer, WellsLayer } from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
@@ -290,6 +290,7 @@ function defaultTooltip(info: PickingInfo) {
     if ((info as WellsPickInfo)?.logName) {
         return (info as WellsPickInfo)?.logName;
     } else if (info.layer?.id === "drawing-layer") {
+        console.log("info");
         return (info as LayerPickInfo).propertyValue?.toFixed(2);
     }
     const feat = info.object as Feature;
@@ -675,6 +676,13 @@ const Map: React.FC<MapProps> = ({
         }
     }, [triggerResetMultipleWells]);
 
+    useEffect(() => {
+        if (deckGLLayers[1]) {
+            const lassoLayer = deckGLLayers[1] as LassoLayer;
+            console.log(lassoLayer.getBounds());
+            console.log(deckGLLayers.state);
+        }
+    },[deckGLLayers[1]])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
@@ -749,6 +757,7 @@ const Map: React.FC<MapProps> = ({
             if (ev.type === "click") {
                 if (event.rightButton) ev.type = "contextmenu";
             }
+            console.log()
             for (const info of infos as LayerPickInfo[]) {
                 if (info.coordinate) {
                     ev.x = info.coordinate[0];
@@ -900,6 +909,7 @@ const Map: React.FC<MapProps> = ({
         },
         [viewStates]
     );
+
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
     return (
@@ -913,6 +923,7 @@ const Map: React.FC<MapProps> = ({
                 // @ts-expect-error this prop doesn't exists directly on DeckGL, but on Deck.Context
                 userData={{
                     setEditedData: (updated_prop: Record<string, unknown>) => {
+                        console.log(updated_prop);
                         setSelectedWell(updated_prop["selectedWell"] as string);
                         if (
                             Object.keys(updated_prop).includes("selectedWell")

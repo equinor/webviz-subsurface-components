@@ -43,6 +43,7 @@ export const lassoSelection: ComponentStory<typeof DeckGLMap> = (args) => {
         setState(!state);
     }, [state]);
 
+    console.log(argsState);
     React.useEffect(() => {
         setEditedData(args.editedData);
     }, [args.editedData]);
