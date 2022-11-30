@@ -296,10 +296,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
         this.rebuildData(reportBoundingBox);
     }
 
-    updateState({
-        props,
-        oldProps,
-    }: UpdateParameters<MapLayer>): void {
+    updateState({ props, oldProps }: UpdateParameters<MapLayer>): void {
         const needs_reload =
             !isEqual(props.meshUrl, oldProps.meshUrl) ||
             !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
