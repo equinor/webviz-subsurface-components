@@ -139,6 +139,7 @@ jobs:
           rm -rf clone
 
       - name: Run the cypress tests
+        if: github.event_name != 'release' && matrix.e2e-tests
         uses: cypress-io/github-action@d79d2d530a66e641eb4a5f227e13bc985c60b964
         with:
           browser: chrome
