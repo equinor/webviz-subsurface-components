@@ -138,7 +138,7 @@ jobs:
           cd ../../../
           rm -rf clone
           cd react
-          npx cypress run -b chrome --component --headed
+          npm run test:cypress
 
       # upload the failure screenshots for reference
       - name: upload artifacts
