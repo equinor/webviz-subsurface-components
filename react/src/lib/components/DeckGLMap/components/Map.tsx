@@ -900,7 +900,6 @@ const Map: React.FC<MapProps> = ({
         },
         [viewStates]
     );
-
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
     return (

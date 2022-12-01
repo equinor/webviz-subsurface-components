@@ -92,7 +92,6 @@ const disableLassoArgs = {
         {
             "@@type": "LassoLayer",
             visible: false,
-            data: "@@#resources.wellsData",
         },
     ],
     editedData: {},
@@ -119,7 +118,6 @@ const enableLassoArgs = {
         {
             "@@type": "LassoLayer",
             visible: true,
-            data: "@@#resources.wellsData",
         },
     ],
 };
@@ -149,7 +147,6 @@ export const lassoSelectionWithCallback: ComponentStory<
             {
                 "@@type": "LassoLayer",
                 visible: true,
-                data: "@@#resources.wellsData",
                 getSelectedWellsData: getSelectedWellsDataCallBack,
             },
         ],

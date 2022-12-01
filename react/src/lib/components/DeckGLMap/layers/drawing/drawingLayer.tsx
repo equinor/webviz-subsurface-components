@@ -32,7 +32,6 @@ class CustomModifyMode extends ModifyMode {
         super.handleKeyUp(event, props);
 
         if (event.key === "Delete") {
-            console.log("In");
             const updatedData = new ImmutableFeatureCollection(props.data)
                 .deleteFeatures(props.selectedIndexes)
                 .getObject();
@@ -155,7 +154,6 @@ export default class DrawingLayer extends CompositeLayer<
     // Callback for various editing events. Most events will update this component
     // through patches sent to the map parent. See patchLayerPropsin layerTools.ts.
     _onEdit(editAction: EditAction<FeatureCollection>): void {
-        console.log(editAction.editType);
         switch (editAction.editType) {
             case "addFeature":
                 this.setState({

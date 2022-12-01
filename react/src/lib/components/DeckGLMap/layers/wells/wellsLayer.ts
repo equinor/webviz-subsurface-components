@@ -295,6 +295,7 @@ export default class WellsLayer extends CompositeLayer<
         if (!(this.props.data as unknown as FeatureCollection).features) {
             return [];
         }
+
         const refine = this.props.refine;
         const data = refine
             ? splineRefine(this.props.data as unknown as FeatureCollection) // smooth well paths.
