@@ -43,8 +43,9 @@
         "postpack": "npm run tidy-up",
         "prepublishOnly": "npm test && npm run lint",
         "preversion": "npm run lint",
-        "test:cypress": "concurrently \"npm run storybook\" \"npm run cypress:test\" -k -s first",
-        "cypress:test": "wait-on http://localhost:6006 && cypress run -b chrome --e2e --headed"
+        "test-cypress": "concurrently 'npm run storybook' 'npm run cypress:test' -k -s first",
+        "cypress:test": "wait-on http://localhost:6006 && cypress:run",
+        "cypress:run": "cypress run -b chrome --e2e --headed"
     },
     "browserslist": [
         "last 1 version",

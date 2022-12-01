@@ -107,25 +107,25 @@ jobs:
           pytest ./tests --headless
 
       # This action allows caching cypress dependencies
-      - name: Cache Cypress
-        if: github.event_name != 'release' && matrix.e2e-tests
-        id: cache-cypress
-        uses: actions/cache@v3
-        with:
-          # list of files to cache and restore
-          path: ~/.cache/Cypress
-          # An explicit key for restoring and saving the cache
-          key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+      # - name: Cache Cypress
+      #   if: github.event_name != 'release' && matrix.e2e-tests
+      #   id: cache-cypress
+      #   uses: actions/cache@v3
+      #   with:
+      #     # list of files to cache and restore
+      #     path: ~/.cache/Cypress
+      #     # An explicit key for restoring and saving the cache
+      #     key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
-      # now let's install Cypress binary
-      - name: install cypress binary
-        if: github.event_name != 'release' && matrix.e2e-tests
-        run: |
-          cd react
-          npx cypress install
+      # # now let's install Cypress binary
+      # - name: install cypress binary
+      #   if: github.event_name != 'release' && matrix.e2e-tests
+      #   run: |
+      #     cd react
+      #     npx cypress install
 
       # run the cypress tests
-      - name: e2e on firefox
+      - name: Prepare for cypress tests
         if: github.event_name != 'release' && matrix.e2e-tests
         run: |
           mkdir clone
@@ -137,8 +137,15 @@ jobs:
           mv * ../../../react/
           cd ../../../
           rm -rf clone
-          cd react
-          npm run test:cypress
+
+      - name: Run the cypress tests
+        uses: cypress-io/github-action@d79d2d530a66e641eb4a5f227e13bc985c60b964
+        with:
+          browser: chrome
+          working-directory: ./react
+          start: npm run storybook
+          wait-on: "http://localhost:6006"
+          headed: true
 
       # upload the failure screenshots for reference
       - name: upload artifacts
