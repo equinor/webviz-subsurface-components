@@ -2,7 +2,6 @@ import { FormControlLabel, makeStyles, Switch } from "@material-ui/core";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
-import LassoLayer from "./lassoLayer";
 
 export default {
     component: DeckGLMap,
@@ -44,7 +43,6 @@ export const lassoSelection: ComponentStory<typeof DeckGLMap> = (args) => {
         setState(!state);
     }, [state]);
 
-    console.log(argsState);
     React.useEffect(() => {
         setEditedData(args.editedData);
     }, [args.editedData]);
@@ -80,52 +78,7 @@ export const lassoSelection: ComponentStory<typeof DeckGLMap> = (args) => {
     );
 };
 
-export const lassoSelectionWithCallback: ComponentStory<typeof DeckGLMap> = (
-    args
-) => {
-    const [data, setData] = React.useState([]);
-    const getSelectedWellsDataCallBack = React.useCallback(
-        (pickingInfos: any[]) => {
-            setData(pickingInfos[0]);
-        },
-        []
-    );
-    const lassoArgsWithSelectedWellsDataCallback: Record<string, unknown> = {
-        ...disableLassoArgs,
-        layers: [
-            {
-                "@@type": "WellsLayer",
-                data: "@@#resources.wellsData",
-            },
-            {
-                "@@type": "LassoLayer",
-                visible: true,
-                data: "@@#resources.wellsData",
-                getSelectedWellsData: getSelectedWellsDataCallBack,
-            },
-        ],
-    };
-
-    return (
-        <>
-            <div className={useStyles().main}>
-                <DeckGLMap
-                    id={"DeckGL-Map"}
-                    {...lassoArgsWithSelectedWellsDataCallback}
-                    legend={{ visible: false }}
-                />
-            </div>
-            <div>{data}</div>
-        </>
-    );
-};
-
-// function getSelectedWellsDataCallBack(pickingInfos: any[]) {
-//     console.log(pickingInfos);
-//     return pickingInfos;
-// }
-
-const disableLassoArgs: Record<string, unknown> = {
+const disableLassoArgs = {
     id: "DeckGL-Map",
     resources: {
         wellsData: "./volve_wells.json",
@@ -156,7 +109,7 @@ const disableLassoArgs: Record<string, unknown> = {
     },
 };
 
-const enableLassoArgs: Record<string, unknown> = {
+const enableLassoArgs = {
     ...disableLassoArgs,
     layers: [
         {
@@ -171,18 +124,50 @@ const enableLassoArgs: Record<string, unknown> = {
     ],
 };
 
-// const lassoArgsWithSelectedWellsDataCallback: Record<string, unknown> = {
-//     ...disableLassoArgs,
-//     layers: [
-//         {
-//             "@@type": "WellsLayer",
-//             data: "@@#resources.wellsData",
-//         },
-//         {
-//             "@@type": "LassoLayer",
-//             visible: true,
-//             data: "@@#resources.wellsData",
-//             getSelectedWellsData: getSelectedWellsDataCallBack,
-//         },
-//     ],
-// };
+export const lassoSelectionWithCallback: ComponentStory<
+    typeof DeckGLMap
+> = () => {
+    const [data, setData] = React.useState<string[]>([]);
+    const getSelectedWellsDataCallBack = React.useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (pickingInfos: any[]) => {
+            const selectedWells = pickingInfos
+                .map((item) => item.object)
+                .filter((item) => item.type === "Feature")
+                .map((item) => item.properties["name"]) as string[];
+            setData(selectedWells);
+        },
+        []
+    );
+    const lassoArgsWithSelectedWellsDataCallback: Record<string, unknown> = {
+        ...disableLassoArgs,
+        layers: [
+            {
+                "@@type": "WellsLayer",
+                data: "@@#resources.wellsData",
+            },
+            {
+                "@@type": "LassoLayer",
+                visible: true,
+                data: "@@#resources.wellsData",
+                getSelectedWellsData: getSelectedWellsDataCallBack,
+            },
+        ],
+    };
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap
+                    id={"DeckGL-Map"}
+                    {...lassoArgsWithSelectedWellsDataCallback}
+                    legend={{ visible: false }}
+                />
+            </div>
+            <div>
+                {data.map((item) => (
+                    <div key={item}>{item}</div>
+                ))}
+            </div>
+        </>
+    );
+};

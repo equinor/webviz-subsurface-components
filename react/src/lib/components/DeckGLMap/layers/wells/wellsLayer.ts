@@ -557,7 +557,6 @@ export default class WellsLayer extends CompositeLayer<
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
-        console.log("test");
         if (!info.object) return { ...info, properties: [], logName: "" };
 
         const coordinate = (info.coordinate || [0, 0, 0]) as Position;

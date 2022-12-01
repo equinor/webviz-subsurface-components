@@ -675,11 +675,6 @@ const Map: React.FC<MapProps> = ({
         }
     }, [triggerResetMultipleWells]);
 
-    useEffect(() => {
-        if (deckGLLayers[1]) {
-            const lassoLayer = deckGLLayers[1] as LassoLayer;
-        }
-    }, [deckGLLayers[1]]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(

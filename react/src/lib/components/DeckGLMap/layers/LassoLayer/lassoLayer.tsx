@@ -16,6 +16,7 @@ export interface LassoLayerProps<D> extends ExtendedLayerProps<D> {
     lineWidthScale: number;
     lineStyle: LineStyleAccessor;
     wellHeadStyle: WellHeadStyleAccessor;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getSelectedWellsData: (pickingInfos: any[]) => void;
 }
 
@@ -69,7 +70,6 @@ export default class LassoLayer extends CompositeLayer<
         const isOrthographic =
             this.context.viewport.constructor.name === "OrthographicViewport";
         const positionFormat = isOrthographic ? "XY" : "XYZ";
-        console.log(this.props);
         const geoJsonLayer = new GeoJsonLayer({
             id: "geoJson",
             data: this.state["data"],
