@@ -97,7 +97,9 @@ export default class LassoLayer extends CompositeLayer<
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onSelect: ({ pickingInfos }: any) => {
                     this.setMultiSelection(pickingInfos);
-                    this.props.getSelectedWellsData(pickingInfos);
+                    if (this.props.getSelectedWellsData) {
+                        this.props.getSelectedWellsData(pickingInfos);
+                    }
                 },
                 layerIds: ["wells-layer"],
                 getTentativeFillColor: () => [255, 0, 255, 100],
