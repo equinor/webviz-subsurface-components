@@ -2,6 +2,7 @@ import { FormControlLabel, makeStyles, Switch } from "@material-ui/core";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
+import LassoLayer from "./lassoLayer";
 
 export default {
     component: DeckGLMap,
@@ -79,7 +80,52 @@ export const lassoSelection: ComponentStory<typeof DeckGLMap> = (args) => {
     );
 };
 
-const disableLassoArgs = {
+export const lassoSelectionWithCallback: ComponentStory<typeof DeckGLMap> = (
+    args
+) => {
+    const [data, setData] = React.useState([]);
+    const getSelectedWellsDataCallBack = React.useCallback(
+        (pickingInfos: any[]) => {
+            setData(pickingInfos[0]);
+        },
+        []
+    );
+    const lassoArgsWithSelectedWellsDataCallback: Record<string, unknown> = {
+        ...disableLassoArgs,
+        layers: [
+            {
+                "@@type": "WellsLayer",
+                data: "@@#resources.wellsData",
+            },
+            {
+                "@@type": "LassoLayer",
+                visible: true,
+                data: "@@#resources.wellsData",
+                getSelectedWellsData: getSelectedWellsDataCallBack,
+            },
+        ],
+    };
+
+    return (
+        <>
+            <div className={useStyles().main}>
+                <DeckGLMap
+                    id={"DeckGL-Map"}
+                    {...lassoArgsWithSelectedWellsDataCallback}
+                    legend={{ visible: false }}
+                />
+            </div>
+            <div>{data}</div>
+        </>
+    );
+};
+
+// function getSelectedWellsDataCallBack(pickingInfos: any[]) {
+//     console.log(pickingInfos);
+//     return pickingInfos;
+// }
+
+const disableLassoArgs: Record<string, unknown> = {
     id: "DeckGL-Map",
     resources: {
         wellsData: "./volve_wells.json",
@@ -110,7 +156,7 @@ const disableLassoArgs = {
     },
 };
 
-const enableLassoArgs = {
+const enableLassoArgs: Record<string, unknown> = {
     ...disableLassoArgs,
     layers: [
         {
@@ -124,3 +170,19 @@ const enableLassoArgs = {
         },
     ],
 };
+
+// const lassoArgsWithSelectedWellsDataCallback: Record<string, unknown> = {
+//     ...disableLassoArgs,
+//     layers: [
+//         {
+//             "@@type": "WellsLayer",
+//             data: "@@#resources.wellsData",
+//         },
+//         {
+//             "@@type": "LassoLayer",
+//             visible: true,
+//             data: "@@#resources.wellsData",
+//             getSelectedWellsData: getSelectedWellsDataCallBack,
+//         },
+//     ],
+// };

@@ -295,7 +295,6 @@ export default class WellsLayer extends CompositeLayer<
         if (!(this.props.data as unknown as FeatureCollection).features) {
             return [];
         }
-
         const refine = this.props.refine;
         const data = refine
             ? splineRefine(this.props.data as unknown as FeatureCollection) // smooth well paths.
@@ -558,6 +557,7 @@ export default class WellsLayer extends CompositeLayer<
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
+        console.log("test");
         if (!info.object) return { ...info, properties: [], logName: "" };
 
         const coordinate = (info.coordinate || [0, 0, 0]) as Position;

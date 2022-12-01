@@ -3,7 +3,7 @@ import { FeatureCollection } from "@nebula.gl/edit-modes";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { SelectionLayer } from "@nebula.gl/layers";
 import { GeoJsonLayer } from "@deck.gl/layers/typed";
-import { ExtendedLayerProps, LayerPickInfo } from "../utils/layerTools";
+import { ExtendedLayerProps } from "../utils/layerTools";
 import { getSize } from "../wells/wellsLayer";
 import { Color } from "@deck.gl/core/typed";
 import { Feature } from "geojson";
@@ -16,6 +16,7 @@ export interface LassoLayerProps<D> extends ExtendedLayerProps<D> {
     lineWidthScale: number;
     lineStyle: LineStyleAccessor;
     wellHeadStyle: WellHeadStyleAccessor;
+    getSelectedWellsData: (pickingInfos: any[]) => void;
 }
 
 type StyleAccessorFunction = (
@@ -58,13 +59,6 @@ export default class LassoLayer extends CompositeLayer<
         }
     }
 
-    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
-        if (!info.object) return info;
-        console.log(info);
-        return {
-            ...info,
-        };
-    }
     renderLayers(): LayersList {
         if (this.props.visible == false) {
             return [];
@@ -75,7 +69,7 @@ export default class LassoLayer extends CompositeLayer<
         const isOrthographic =
             this.context.viewport.constructor.name === "OrthographicViewport";
         const positionFormat = isOrthographic ? "XY" : "XYZ";
-
+        console.log(this.props);
         const geoJsonLayer = new GeoJsonLayer({
             id: "geoJson",
             data: this.state["data"],
@@ -103,6 +97,7 @@ export default class LassoLayer extends CompositeLayer<
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onSelect: ({ pickingInfos }: any) => {
                     this.setMultiSelection(pickingInfos);
+                    this.props.getSelectedWellsData(pickingInfos);
                 },
                 layerIds: ["wells-layer"],
                 getTentativeFillColor: () => [255, 0, 255, 100],
