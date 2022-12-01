@@ -7,21 +7,28 @@ export default defineConfig({
       framework: "create-react-app",
       bundler: "webpack",
     },
-    video:false,
+    video: false,
     setupNodeEvents(on, config) {
       getCompareSnapshotsPlugin(on, config),
-      on('before:browser:launch', (browser = {}, launchOptions) => {
-        if (browser.family === 'chromium' && browser.name !== 'electron') {
-          launchOptions.args.push('--start-fullscreen')
-      
-          return launchOptions
-        }
-        if (browser.name === 'electron') {
-          launchOptions.preferences.fullscreen = true
-      
-          return launchOptions
-        }
-      })
-    }
+        on("before:browser:launch", (browser = {}, launchOptions) => {
+          if (browser.family === "chromium" && browser.name !== "electron") {
+            launchOptions.args.push("--start-fullscreen");
+
+            return launchOptions;
+          }
+          if (browser.name === "electron") {
+            launchOptions.preferences.fullscreen = true;
+
+            return launchOptions;
+          }
+        });
+    },
+  },
+
+  e2e: {
+    video: false,
+    setupNodeEvents(on, config) {
+      getCompareSnapshotsPlugin(on, config)
+    },
   },
 });
