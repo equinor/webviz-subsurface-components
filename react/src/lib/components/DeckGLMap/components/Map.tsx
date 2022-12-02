@@ -559,7 +559,7 @@ const Map: React.FC<MapProps> = ({
         const newScaleZ = scaleZ * 1.05;
         setScaleZ(newScaleZ);
         // Make camera target follow the scaling.
-        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ)
+        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
         setViewStates(vs);
     }, [scaleZUp]);
 
