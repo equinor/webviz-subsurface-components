@@ -540,11 +540,35 @@ const Map: React.FC<MapProps> = ({
     };
 
     useEffect(() => {
-        setScaleZ(scaleZ * 1.05);
+        const newScaleZ = scaleZ * 1.05;
+        setScaleZ(newScaleZ);
+
+        // Make camera target follow the scaling.
+        const vs = cloneDeep(viewStates);
+        for (const key in vs) {
+            if (typeof vs[key].target !== "undefined") {
+                const t = vs[key].target;
+                const z = newScaleZ * (t[2] / scaleZ);
+                vs[key].target = [t[0], t[1], z];
+            }
+        }
+        setViewStates(vs);
     }, [scaleZUp]);
 
     useEffect(() => {
-        setScaleZ(scaleZ * 0.95);
+        const newScaleZ = scaleZ * 0.95;
+        setScaleZ(newScaleZ);
+
+        // Make camera target follow the scaling.
+        const vs = cloneDeep(viewStates);
+        for (const key in vs) {
+            if (typeof vs[key].target !== "undefined") {
+                const t = vs[key].target;
+                const z = newScaleZ * (t[2] / scaleZ);
+                vs[key].target = [t[0], t[1], z];
+            }
+        }
+        setViewStates(vs);
     }, [scaleZDown]);
 
     useEffect(() => {
