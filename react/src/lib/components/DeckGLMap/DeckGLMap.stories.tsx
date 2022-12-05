@@ -198,3 +198,48 @@ customizedCameraPosition.args = {
     ...defaultProps,
     cameraPosition,
 };
+
+const mapLayer = {
+    "@@type": "MapLayer",
+    id: "hugin",
+    meshUrl: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.float32",
+    contours: [0, 100],
+    material: false,
+    colorMapName: "Physics",
+};
+
+export const MultiViewAnnotation = Template.bind({});
+MultiViewAnnotation.args = {
+    legend: {
+        visible: true,
+    },
+    layers: [
+        mapLayer,
+        {
+            ...mapLayer,
+            id: "kh_netmap",
+            propertiesUrl: "hugin_depth_25_m.float32",
+        },
+    ],
+    views: {
+        layout: [1, 2],
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                layerIds: ["hugin"],
+            },
+            {
+                id: "view_2",
+                layerIds: ["kh_netmap"],
+            },
+        ],
+    },
+};
