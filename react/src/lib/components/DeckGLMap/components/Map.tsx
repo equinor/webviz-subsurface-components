@@ -296,6 +296,22 @@ function defaultTooltip(info: PickingInfo) {
     return feat?.properties?.["name"];
 }
 
+function adjustCameraTarget(
+    viewStates: Record<string, ViewStateType>,
+    scale: number,
+    newScale: number
+): Record<string, ViewStateType> {
+    const vs = cloneDeep(viewStates);
+    for (const key in vs) {
+        if (typeof vs[key].target !== "undefined") {
+            const t = vs[key].target;
+            const z = newScale * (t[2] / scale);
+            vs[key].target = [t[0], t[1], z];
+        }
+    }
+    return vs;
+}
+
 const Map: React.FC<MapProps> = ({
     id,
     resources,
@@ -540,11 +556,19 @@ const Map: React.FC<MapProps> = ({
     };
 
     useEffect(() => {
-        setScaleZ(scaleZ * 1.05);
+        const newScaleZ = scaleZ * 1.05;
+        setScaleZ(newScaleZ);
+        // Make camera target follow the scaling.
+        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+        setViewStates(vs);
     }, [scaleZUp]);
 
     useEffect(() => {
-        setScaleZ(scaleZ * 0.95);
+        const newScaleZ = scaleZ * 0.95;
+        setScaleZ(newScaleZ);
+        // Make camera target follow the scaling.
+        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+        setViewStates(vs);
     }, [scaleZDown]);
 
     useEffect(() => {
