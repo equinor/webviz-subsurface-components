@@ -7,7 +7,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { getSize } from "../wells/wellsLayer";
 import { Color } from "@deck.gl/core/typed";
 import { Feature } from "geojson";
-export interface LassoLayerProps<D> extends ExtendedLayerProps<D> {
+export interface BoxSelectionLayerProps<D> extends ExtendedLayerProps<D> {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
     pickingInfos: PickingInfo[];
@@ -17,7 +17,7 @@ export interface LassoLayerProps<D> extends ExtendedLayerProps<D> {
     lineStyle: LineStyleAccessor;
     wellHeadStyle: WellHeadStyleAccessor;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getSelectedWellsData: (pickingInfos: any[]) => void;
+    handleSelection: (pickingInfos: any[]) => void;
 }
 
 type StyleAccessorFunction = (
@@ -44,8 +44,8 @@ type WellHeadStyleAccessor = {
 
 // Composite layer that contains an Selection Lyaer from nebula.gl
 // See https://nebula.gl/docs/api-reference/layers/selection-layer
-export default class LassoLayer extends CompositeLayer<
-    LassoLayerProps<FeatureCollection>
+export default class BoxSelectionLayer extends CompositeLayer<
+    BoxSelectionLayerProps<FeatureCollection>
 > {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setMultiSelection(pickingInfos: any[]): void {
@@ -97,8 +97,8 @@ export default class LassoLayer extends CompositeLayer<
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onSelect: ({ pickingInfos }: any) => {
                     this.setMultiSelection(pickingInfos);
-                    if (this.props.getSelectedWellsData) {
-                        this.props.getSelectedWellsData(pickingInfos);
+                    if (this.props.handleSelection) {
+                        this.props.handleSelection(pickingInfos);
                     }
                 },
                 layerIds: ["wells-layer"],
@@ -113,7 +113,7 @@ export default class LassoLayer extends CompositeLayer<
     }
 }
 
-LassoLayer.layerName = "LassoLayer";
-LassoLayer.defaultProps = layersDefaultProps[
-    "LassoLayer"
-] as LassoLayerProps<FeatureCollection>;
+BoxSelectionLayer.layerName = "BoxSelectionLayer";
+BoxSelectionLayer.defaultProps = layersDefaultProps[
+    "BoxSelectionLayer"
+] as BoxSelectionLayerProps<FeatureCollection>;

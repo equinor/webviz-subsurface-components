@@ -5,7 +5,7 @@ import DeckGLMap from "../../DeckGLMap";
 
 export default {
     component: DeckGLMap,
-    title: "DeckGLMap / Lasso Layer",
+    title: "DeckGLMap / Box Selection Layer",
 } as ComponentMeta<typeof DeckGLMap>;
 
 const useStyles = makeStyles({
@@ -22,20 +22,20 @@ const useStyles = makeStyles({
     },
 });
 
-export const lassoSelection: ComponentStory<typeof DeckGLMap> = (args) => {
+export const boxSelection: ComponentStory<typeof DeckGLMap> = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
     const [argsState, setArgsState] =
         React.useState<Record<string, unknown>>(enableLassoArgs);
     const [state, setState] = React.useState<boolean>(true);
 
     const handleChange = React.useCallback(() => {
-        const lassoLayer = enableLassoArgs.layers.filter(
-            (item) => item["@@type"] === "LassoLayer"
+        const BoxSelectionLayer = enableLassoArgs.layers.filter(
+            (item) => item["@@type"] === "BoxSelectionLayer"
         );
-        if (lassoLayer[0].visible !== undefined) {
-            lassoLayer[0].visible = !lassoLayer[0].visible;
+        if (BoxSelectionLayer[0].visible !== undefined) {
+            BoxSelectionLayer[0].visible = !BoxSelectionLayer[0].visible;
         }
-        if (lassoLayer[0].visible) {
+        if (BoxSelectionLayer[0].visible) {
             setArgsState(enableLassoArgs);
         } else {
             setArgsState(disableLassoArgs);
@@ -90,7 +90,7 @@ const disableLassoArgs = {
             data: "@@#resources.wellsData",
         },
         {
-            "@@type": "LassoLayer",
+            "@@type": "BoxSelectionLayer",
             visible: false,
         },
     ],
@@ -116,13 +116,13 @@ const enableLassoArgs = {
             data: "@@#resources.wellsData",
         },
         {
-            "@@type": "LassoLayer",
+            "@@type": "BoxSelectionLayer",
             visible: true,
         },
     ],
 };
 
-export const lassoSelectionWithCallback: ComponentStory<
+export const boxSelectionWithCallback: ComponentStory<
     typeof DeckGLMap
 > = () => {
     const [data, setData] = React.useState<string[]>([]);
@@ -145,9 +145,9 @@ export const lassoSelectionWithCallback: ComponentStory<
                 data: "@@#resources.wellsData",
             },
             {
-                "@@type": "LassoLayer",
+                "@@type": "BoxSelectionLayer",
                 visible: true,
-                getSelectedWellsData: getSelectedWellsDataCallBack,
+                handleSelection: getSelectedWellsDataCallBack,
             },
         ],
     };

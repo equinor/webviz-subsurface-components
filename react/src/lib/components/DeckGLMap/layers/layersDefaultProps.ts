@@ -158,10 +158,10 @@ export const layersDefaultProps: Record<string, unknown> = {
             features: [],
         },
     },
-    LassoLayer: {
-        "@@type": "LassoLayer",
-        name: "Lasso",
-        id: "lasso-layer",
+    BoxSelectionLayer: {
+        "@@type": "BoxSelectionLayer",
+        name: "boxSelection",
+        id: "boxSelection-layer",
         pickable: true,
         visible: false,
 
