@@ -163,9 +163,9 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "boxSelection",
         id: "boxSelection-layer",
         pickable: true,
-        visible: false,
+        visible: true,
 
-        // Props used to get/set data in the drawing layer.
+        // Props used to get/set data in the box selection layer.
         selectedFeatureIndexes: [] as number[],
         data: {
             type: "FeatureCollection",
