@@ -7,6 +7,7 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { getSize } from "../wells/wellsLayer";
 import { Color } from "@deck.gl/core/typed";
 import { Feature } from "geojson";
+import { PickInfo } from "lib";
 export interface BoxSelectionLayerProps<D> extends ExtendedLayerProps<D> {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
@@ -16,8 +17,7 @@ export interface BoxSelectionLayerProps<D> extends ExtendedLayerProps<D> {
     lineWidthScale: number;
     lineStyle: LineStyleAccessor;
     wellHeadStyle: WellHeadStyleAccessor;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleSelection: (pickingInfos: any[]) => void;
+    handleSelection: (pickingInfos: PickInfo[]) => void;
 }
 
 type StyleAccessorFunction = (

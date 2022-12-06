@@ -1,5 +1,6 @@
 import { FormControlLabel, makeStyles, Switch } from "@material-ui/core";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { PickInfo } from "lib";
 import React from "react";
 import DeckGLMap from "../../DeckGLMap";
 
@@ -22,8 +23,7 @@ const useStyles = makeStyles({
     },
 });
 
-export const boxSelection: ComponentStory<typeof DeckGLMap> = (args) => {
-    const [editedData, setEditedData] = React.useState(args.editedData);
+export const boxSelection: ComponentStory<typeof DeckGLMap> = () => {
     const [argsState, setArgsState] =
         React.useState<Record<string, unknown>>(enableLassoArgs);
     const [state, setState] = React.useState<boolean>(true);
@@ -34,7 +34,7 @@ export const boxSelection: ComponentStory<typeof DeckGLMap> = (args) => {
         );
         if (boxSelectionLayer[0].visible !== undefined) {
             boxSelectionLayer[0].visible = !boxSelectionLayer[0].visible;
-        }
+        };
         if (boxSelectionLayer[0].visible) {
             setArgsState(enableLassoArgs);
         } else {
@@ -43,22 +43,10 @@ export const boxSelection: ComponentStory<typeof DeckGLMap> = (args) => {
         setState(!state);
     }, [state]);
 
-    React.useEffect(() => {
-        setEditedData(args.editedData);
-    }, [args.editedData]);
-
     return (
         <>
             <div className={useStyles().main}>
-                <DeckGLMap
-                    id={"DeckGL-Map"}
-                    {...argsState}
-                    editedData={editedData}
-                    setProps={(updatedProps) => {
-                        setEditedData(updatedProps);
-                    }}
-                    legend={{ visible: false }}
-                />
+                <DeckGLMap id={"DeckGL-Map"} {...argsState} />
             </div>
             <div style={{ textAlign: "center" }}>
                 <FormControlLabel
@@ -128,7 +116,7 @@ export const boxSelectionWithCallback: ComponentStory<
     const [data, setData] = React.useState<string[]>([]);
     const getSelectedWellsDataCallBack = React.useCallback(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (pickingInfos: any[]) => {
+        (pickingInfos: PickInfo[]) => {
             const selectedWells = pickingInfos
                 .map((item) => item.object)
                 .filter((item) => item.type === "Feature")
