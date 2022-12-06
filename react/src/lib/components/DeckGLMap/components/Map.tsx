@@ -979,7 +979,7 @@ const Map: React.FC<MapProps> = ({
                 onAfterRender={onAfterRender}
             >
                 {children}
-                {views?.viewports &&
+                {/*views?.viewports &&
                     views.viewports.map((view, index) => (
                         // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
                         <View
@@ -1014,7 +1014,7 @@ const Map: React.FC<MapProps> = ({
                                 </ViewFooter>
                             )}
                         </View>
-                    ))}
+                                ))*/}
             </DeckGL>
             {scale?.visible ? (
                 <DistanceScale

@@ -2,6 +2,7 @@ import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import DeckGLMap from "./DeckGLMap";
+import Map from "./components/Map";
 import {
     TooltipCallback,
     LayerPickInfo,
@@ -11,6 +12,7 @@ import {
     FeatureCollection,
 } from "../..";
 import { PickingInfo } from "@deck.gl/core/typed";
+import View from "@deck.gl/react/typed";
 import { ViewStateType } from "./components/Map";
 
 export default {
@@ -215,7 +217,21 @@ const mapLayer = {
     colorMapName: "Physics",
 };
 
-export const MultiViewAnnotation = Template.bind({});
+const MultiViewAnnotationTemplate: ComponentStory<typeof DeckGLMap> = (
+    args: any
+) => (
+    <DeckGLMap {...args}>
+        <View id="view_1" key="view_1">
+            <div>asrjgfiarjgjroigj</div>
+        </View>
+        <View id="view_2" key="view_2">
+            <div>kh_netmap</div>
+        </View>
+    </DeckGLMap>
+);
+
+export const MultiViewAnnotation = MultiViewAnnotationTemplate.bind({});
+
 MultiViewAnnotation.args = {
     legend: {
         visible: true,

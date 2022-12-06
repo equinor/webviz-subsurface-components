@@ -72,6 +72,8 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
+
+    children?: React.ReactNode;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -96,6 +98,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     getCameraPosition,
     triggerHome,
     triggerResetMultipleWells,
+    children,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -160,7 +163,9 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 getCameraPosition={getCameraPosition}
                 triggerHome={triggerHome}
                 triggerResetMultipleWells={triggerResetMultipleWells}
-            />
+            >
+                {children}
+            </Map>
         </ReduxProvider>
     );
 };
