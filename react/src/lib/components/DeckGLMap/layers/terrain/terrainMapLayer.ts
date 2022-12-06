@@ -113,6 +113,8 @@ export interface TerrainMapLayerProps<D> extends SimpleMeshLayerProps<D> {
     // If not set or set to true, it will clamp to color map min and max values.
     // If set to false the clamp color will be completely transparent.
     colorMapClampColor: Color | undefined | boolean;
+
+    depthTest: boolean;
 }
 
 const defaultProps = {
@@ -129,6 +131,7 @@ const defaultProps = {
     textureImageData: { value: null, type: "object", async: true },
     meshImageData: { value: null, type: "object", async: true },
     meshValueRange: [0.0, 1.0],
+    depthTest: true,
 };
 
 // This is a private layer used only by the composite Map3DLayer.
@@ -142,6 +145,8 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ uniforms, context }: any): void {
+        const { gl } = context;
+
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isContoursDepth = this.props.isContoursDepth;
@@ -170,6 +175,10 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
 
+        if (!this.props.depthTest) {
+            gl.disable(GL.DEPTH_TEST);
+        }
+
         super.draw({
             uniforms: {
                 ...uniforms,
@@ -197,6 +206,10 @@ export default class TerrainMapLayer extends SimpleMeshLayer<
                 isClampColor,
             },
         });
+
+        if (!this.props.depthTest) {
+            gl.enable(GL.DEPTH_TEST);
+        }
     }
 
     getShaders(): unknown {

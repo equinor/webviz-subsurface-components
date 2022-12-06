@@ -42,6 +42,7 @@ import {
 } from "../../components/ColorLegend";
 import { getLayersById } from "../../layers/utils/layerTools";
 import UnfoldedGeoJsonLayer from "../intersection/unfoldedGeoJsonLayer";
+import GL from "@luma.gl/constants";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -99,6 +100,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameSize: number;
     wellNameColor: Color;
     isLog: boolean;
+    depthTest: boolean;
 }
 
 export interface LogCurveDataType {
@@ -315,6 +317,12 @@ export default class WellsLayer extends CompositeLayer<
             }),
         ];
 
+        const parameters = isOrthographic
+            ? {
+                  [GL.DEPTH_TEST]: this.props.depthTest,
+              }
+            : {};
+
         const outline = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "outline",
@@ -333,6 +341,7 @@ export default class WellsLayer extends CompositeLayer<
                 getDashArray: getDashFactor(this.props.lineStyle?.dash),
                 lineBillboard: true,
                 pointBillboard: true,
+                parameters,
             })
         );
 
@@ -363,6 +372,7 @@ export default class WellsLayer extends CompositeLayer<
                 ),
                 lineBillboard: true,
                 pointBillboard: true,
+                parameters,
             })
         );
 
@@ -389,6 +399,7 @@ export default class WellsLayer extends CompositeLayer<
                 ),
                 getFillColor: getColor(this.props.wellHeadStyle?.color),
                 getLineColor: getColor(this.props.lineStyle?.color),
+                parameters,
             })
         );
 
@@ -415,6 +426,7 @@ export default class WellsLayer extends CompositeLayer<
                 ),
                 getFillColor: [255, 140, 0],
                 getLineColor: [255, 140, 0],
+                parameters,
             })
         );
 
@@ -468,6 +480,7 @@ export default class WellsLayer extends CompositeLayer<
                 onDataLoad: (value: LogCurveDataType[]) => {
                     this.setLegend(value);
                 },
+                parameters,
             })
         );
 
@@ -522,6 +535,7 @@ export default class WellsLayer extends CompositeLayer<
                 onDataLoad: (value: LogCurveDataType[]) => {
                     this.setLegend(value);
                 },
+                parameters,
             })
         );
 
@@ -543,6 +557,7 @@ export default class WellsLayer extends CompositeLayer<
                 getAnchor: "start",
                 getAlignmentBaseline: "bottom",
                 getSize: this.props.wellNameSize,
+                parameters,
             })
         );
 
