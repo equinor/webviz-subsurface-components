@@ -123,14 +123,13 @@ jobs:
       - name: Run the cypress tests
         if: github.event_name != 'release' && matrix.e2e-tests
         uses: cypress-io/github-action@d79d2d530a66e641eb4a5f227e13bc985c60b964
-        timeout-minutes: 10
+        timeout-minutes: 15
         with:
-          install: false
           working-directory: react
-          start: npm run storybook
-          wait-on: "http://localhost:6006"
+          config-file: cypress.config.js
           browser: chrome
           headed: true
+          component: true
 
       # upload the failure screenshots for reference
       - name: upload artifacts
