@@ -34,7 +34,7 @@ export const boxSelection: ComponentStory<typeof DeckGLMap> = () => {
         );
         if (boxSelectionLayer[0].visible !== undefined) {
             boxSelectionLayer[0].visible = !boxSelectionLayer[0].visible;
-        };
+        }
         if (boxSelectionLayer[0].visible) {
             setArgsState(enableLassoArgs);
         } else {
