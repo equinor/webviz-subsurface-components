@@ -54,6 +54,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         gridLines: false,
         smoothShading: true,
         material: true,
+        depthTest: true,
     },
 
     Map3DLayer: {
@@ -75,6 +76,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         isContoursDepth: true,
         smoothShading: true,
         material: true,
+        depthTest: true,
     },
     GridLayer: {
         "@@type": "GridLayer",
@@ -84,6 +86,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         valueRange: { type: "array", value: [0, 1] },
         colorMapRange: { type: "array", value: [0, 1] },
         material: true,
+        depthTest: true,
     },
     WellsLayer: {
         "@@type": "WellsLayer",
@@ -104,6 +107,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         wellNameSize: 14,
         wellNameColor: [0, 0, 0, 255],
         selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
+        depthTest: true,
     },
     FaultPolygonsLayer: {
         "@@type": "FaultPolygonsLayer",
@@ -113,6 +117,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         visible: true,
         filled: true,
         lineWidthMinPixels: 2,
+        depthTest: true,
     },
     PieChartLayer: {
         "@@type": "PieChartLayer",
@@ -121,6 +126,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         visible: true,
         selectedPie: "@@editedData.selectedPie", // used to get data from deckgl layer
+        depthTest: true,
     },
     AxesLayer: {
         "@@type": "AxesLayer",
