@@ -1,6 +1,8 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
+import { PickingInfo, View } from "@deck.gl/core/typed";
+import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";
 import DeckGLMap from "./DeckGLMap";
 import Map from "./components/Map";
 import {
@@ -11,9 +13,8 @@ import {
     PropertyDataType,
     FeatureCollection,
 } from "../..";
-import { PickingInfo } from "@deck.gl/core/typed";
-import View from "@deck.gl/react/typed";
 import { ViewStateType } from "./components/Map";
+import ViewFooter from "./components/ViewFooter";
 
 export default {
     component: DeckGLMap,
@@ -214,25 +215,33 @@ const mapLayer = {
     propertiesUrl: "kh_netmap_25_m.float32",
     contours: [0, 100],
     material: false,
-    colorMapName: "Physics",
 };
 
 const MultiViewAnnotationTemplate: ComponentStory<typeof DeckGLMap> = (
-    args: any
+    args
 ) => (
     <DeckGLMap {...args}>
-        <View id="view_1" key="view_1">
-            <div>asrjgfiarjgjroigj</div>
-        </View>
-        <View id="view_2" key="view_2">
-            <div>kh_netmap</div>
-        </View>
+        {
+            // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
+            <View id="view_1">
+                <ContinuousLegend min={-3071} max={41048} />
+                <ViewFooter>kH netmap</ViewFooter>
+            </View>
+        }
+        {
+            // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
+            <View id="view_2">
+                <ContinuousLegend min={2725} max={3396} />
+                <ViewFooter>Hugin</ViewFooter>
+            </View>
+        }
     </DeckGLMap>
 );
 
 export const MultiViewAnnotation = MultiViewAnnotationTemplate.bind({});
 
 MultiViewAnnotation.args = {
+    id: "multi_view_annotation",
     legend: {
         visible: true,
     },
