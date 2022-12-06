@@ -1011,11 +1011,6 @@ Map.defaultProps = {
     toolbar: {
         visible: false,
     },
-    legend: {
-        visible: true,
-        cssStyle: { top: 5, right: 10 },
-        horizontal: false,
-    },
     coordinateUnit: "m",
     views: {
         layout: [1, 1],

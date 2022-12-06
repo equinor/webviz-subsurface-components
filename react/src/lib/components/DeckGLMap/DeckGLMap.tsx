@@ -85,8 +85,12 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     coords,
     scale,
     coordinateUnit,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     legend,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     toolbar,
     colorTables,

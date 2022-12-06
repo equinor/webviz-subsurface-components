@@ -2,9 +2,8 @@ import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo, View } from "@deck.gl/core/typed";
-import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";
+import { ContinuousLegend } from "@emerson-eps/color-tables";
 import DeckGLMap from "./DeckGLMap";
-import Map from "./components/Map";
 import {
     TooltipCallback,
     LayerPickInfo,
