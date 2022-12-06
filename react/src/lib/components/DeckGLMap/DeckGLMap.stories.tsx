@@ -217,6 +217,7 @@ const mapLayer = {
 
 export const MultiViewAnnotation = Template.bind({});
 MultiViewAnnotation.args = {
+    id: "multi_view_annotation",
     legend: {
         visible: true,
     },
