@@ -149,6 +149,7 @@ export const boxSelectionWithCallback: ComponentStory<
                 />
             </div>
             <div>
+                <div>Selected Wells:</div>
                 {data.map((item) => (
                     <div key={item}>{item}</div>
                 ))}
