@@ -29,13 +29,13 @@ export const boxSelection: ComponentStory<typeof DeckGLMap> = (args) => {
     const [state, setState] = React.useState<boolean>(true);
 
     const handleChange = React.useCallback(() => {
-        const BoxSelectionLayer = enableLassoArgs.layers.filter(
+        const boxSelectionLayer = enableLassoArgs.layers.filter(
             (item) => item["@@type"] === "BoxSelectionLayer"
         );
-        if (BoxSelectionLayer[0].visible !== undefined) {
-            BoxSelectionLayer[0].visible = !BoxSelectionLayer[0].visible;
+        if (boxSelectionLayer[0].visible !== undefined) {
+            boxSelectionLayer[0].visible = !boxSelectionLayer[0].visible;
         }
-        if (BoxSelectionLayer[0].visible) {
+        if (boxSelectionLayer[0].visible) {
             setArgsState(enableLassoArgs);
         } else {
             setArgsState(disableLassoArgs);
