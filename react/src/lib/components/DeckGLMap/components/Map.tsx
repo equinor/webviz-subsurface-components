@@ -13,7 +13,6 @@ import {
 } from "@deck.gl/core/typed";
 import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
 import { useSelector, useDispatch } from "react-redux";
@@ -23,14 +22,10 @@ import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import ColorLegends from "./ColorLegends";
 import {
     applyPropsOnLayers,
-    ExtendedLayer,
-    getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
-import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";
 import {
     validateColorTables,
@@ -216,12 +211,6 @@ export interface MapProps {
         visible?: boolean | null;
     };
 
-    legend?: {
-        visible?: boolean | null;
-        cssStyle?: Record<string, unknown> | null;
-        horizontal?: boolean | null;
-    };
-
     /**
      * Prop containing color table data
      */
@@ -321,8 +310,6 @@ const Map: React.FC<MapProps> = ({
     coords,
     scale,
     coordinateUnit,
-    toolbar,
-    legend,
     colorTables,
     editedData,
     setEditedData,
@@ -979,42 +966,6 @@ const Map: React.FC<MapProps> = ({
                 onAfterRender={onAfterRender}
             >
                 {children}
-                {views?.viewports &&
-                    views.viewports.map((view, index) => (
-                        // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
-                        <View
-                            key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
-                            id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
-                        >
-                            {legend?.visible && (
-                                <ColorLegends
-                                    {...legend}
-                                    layers={
-                                        getLayersInViewport(
-                                            deckGLLayers,
-                                            view.layerIds
-                                        ) as ExtendedLayer<unknown>[]
-                                    }
-                                    colorTables={colorTables}
-                                />
-                            )}
-                            {toolbar?.visible && (
-                                <Settings
-                                    viewportId={view.id}
-                                    layerIds={view.layerIds}
-                                />
-                            )}
-                            {views.showLabel && (
-                                <ViewFooter>
-                                    {`${
-                                        view.name
-                                            ? view.name
-                                            : `View_${index + 1}`
-                                    } `}
-                                </ViewFooter>
-                            )}
-                        </View>
-                    ))}
             </DeckGL>
             {scale?.visible ? (
                 <DistanceScale
@@ -1059,11 +1010,6 @@ Map.defaultProps = {
     },
     toolbar: {
         visible: false,
-    },
-    legend: {
-        visible: true,
-        cssStyle: { top: 5, right: 10 },
-        horizontal: false,
     },
     coordinateUnit: "m",
     views: {
@@ -1234,8 +1180,7 @@ function getViews(
                     : cur_viewport.id === "intersection_view"
                     ? "IntersectionView"
                     : "OrthographicView";
-                const id_suffix = cur_viewport.show3D ? "_3D" : "_2D";
-                const view_id: string = cur_viewport.id + id_suffix;
+                const view_id: string = cur_viewport.id;
 
                 const far = 99999;
                 const near = cur_viewport.show3D ? 0.01 : -99999;
