@@ -6,7 +6,6 @@ import {
     UpdateParameters,
     PickingInfo,
     OrbitViewport,
-    OrthographicViewport,
 } from "@deck.gl/core/typed";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { PathLayer, TextLayer } from "@deck.gl/layers/typed";
@@ -304,10 +303,7 @@ export default class WellsLayer extends CompositeLayer<
             : (this.props.data as unknown as FeatureCollection);
 
         const is3d = this.context.viewport.constructor === OrbitViewport;
-        const isOrthographic =
-            this.context.viewport.constructor === OrthographicViewport;
-        const positionFormat = isOrthographic ? "XY" : "XYZ";
-
+        const positionFormat = "XYZ";
         const isDashed = !!this.props.lineStyle?.dash;
 
         const extensions = [
@@ -317,11 +313,9 @@ export default class WellsLayer extends CompositeLayer<
             }),
         ];
 
-        const parameters = isOrthographic
-            ? {
-                  [GL.DEPTH_TEST]: this.props.depthTest,
-              }
-            : {};
+        const parameters = {
+            [GL.DEPTH_TEST]: this.props.depthTest,
+        };
 
         const outline = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
