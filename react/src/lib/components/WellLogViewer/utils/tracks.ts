@@ -1134,7 +1134,9 @@ function addScaleTracks(
     data: WellLogDataRow[],
     iPrimaryAxis: number
 ): void {
-    const titlePrimaryAxis = axes.titles[axes.primaryAxis];
+    const titlePrimaryAxis = axes.titles
+        ? axes.titles[axes.primaryAxis]
+        : axes.primaryAxis;
     const curvePrimaryAxis = curves[iPrimaryAxis];
     const iSecondaryAxis = !axes.mnemos
         ? -1
@@ -1150,7 +1152,9 @@ function addScaleTracks(
             )
         );
 
-        const titleSecondaryAxis = axes.titles[axes.secondaryAxis];
+        const titleSecondaryAxis = axes.titles
+            ? axes.titles[axes.secondaryAxis]
+            : axes.secondaryAxis;
         const curveSecondaryAxis = curves[iSecondaryAxis];
         info.tracks.push(
             newDualScaleTrack(

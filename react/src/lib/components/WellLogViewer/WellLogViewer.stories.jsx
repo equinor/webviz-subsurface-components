@@ -134,6 +134,8 @@ Horizontal.args = {
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: colorTables,
     wellpick: wellpick,
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
 };
 Horizontal.parameters = {
@@ -152,6 +154,8 @@ Discrete.args = {
     template: require("../../../demo/example-data/welllog_template_2.json"),
     colorTables: colorTables,
     wellpick: wellpick,
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
 };
 Discrete.parameters = {

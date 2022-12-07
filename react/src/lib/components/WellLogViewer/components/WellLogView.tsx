@@ -1087,14 +1087,14 @@ export const argTypesWellLogViewProp = {
         description: "Horizon to pattern index map",
     },
 
-    primaryAxis: {
-        description: "Primary axis id", //?? defaultValue: "md"
-    },
     domain: {
         description: "Initial visible range",
     },
     selection: {
         description: "Initial selected range",
+    },
+    primaryAxis: {
+        description: "Primary axis id", //?? defaultValue: "md"
     },
     axisMnemos: {
         description: "Log mnemonics for axes",
