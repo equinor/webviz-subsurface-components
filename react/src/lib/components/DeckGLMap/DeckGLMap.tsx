@@ -72,6 +72,8 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
+
+    children?: React.ReactNode;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -83,7 +85,13 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     coords,
     scale,
     coordinateUnit,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     legend,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     toolbar,
     colorTables,
     editedData,
@@ -96,6 +104,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     getCameraPosition,
     triggerHome,
     triggerResetMultipleWells,
+    children,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -147,8 +156,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 coords={coords}
                 scale={scale}
                 coordinateUnit={coordinateUnit}
-                toolbar={toolbar}
-                legend={legend}
                 colorTables={colorTables}
                 editedData={editedData}
                 setEditedData={setEditedData}
@@ -160,7 +167,9 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
                 getCameraPosition={getCameraPosition}
                 triggerHome={triggerHome}
                 triggerResetMultipleWells={triggerResetMultipleWells}
-            />
+            >
+                {children}
+            </Map>
         </ReduxProvider>
     );
 };
@@ -273,7 +282,7 @@ DeckGLMap.propTypes = {
     coordinateUnit: PropTypes.string,
 
     /**
-     * Parameters to control toolbar
+     * @deprecated Toolbar should be added as annotation. This prop has no function.
      */
     toolbar: PropTypes.shape({
         /**
@@ -283,7 +292,7 @@ DeckGLMap.propTypes = {
     }),
 
     /**
-     * Parameters for the legend
+     * @deprecated Legends should be added as annotations. This prop has no function.
      */
     legend: PropTypes.shape({
         /**

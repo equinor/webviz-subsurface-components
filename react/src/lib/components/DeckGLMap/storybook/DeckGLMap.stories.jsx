@@ -610,42 +610,6 @@ MapInContainer.args = {
     ...exampleData[0],
 };
 
-export const MultiColorMap = EditDataTemplate.bind({});
-MultiColorMap.args = {
-    ...exampleData[0],
-    legend: {
-        visible: true,
-    },
-    zoom: -5,
-    layers: [
-        exampleData[0].layers[0],
-        {
-            ...exampleData[0].layers[0],
-            colorMapRange: [3000, 3100],
-            valueRange: [3000, 3100],
-            id: "colormap-2-layer",
-        },
-    ],
-    views: {
-        layout: [1, 2],
-        showLabel: true,
-        viewports: [
-            {
-                id: "view_1",
-                name: "Colormap layer",
-                show3D: false,
-                layerIds: ["colormap-layer"],
-            },
-            {
-                id: "view_2",
-                name: "Colormap 2 layer",
-                show3D: false,
-                layerIds: ["colormap-2-layer"],
-            },
-        ],
-    },
-};
-
 // ColormapLayer with color selector component
 const defaultProps = {
     id: "DeckGlMap",
