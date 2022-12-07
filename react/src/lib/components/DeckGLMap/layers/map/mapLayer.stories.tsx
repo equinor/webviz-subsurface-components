@@ -907,7 +907,7 @@ export const ColorMapRange: ComponentStory<typeof DeckGLMap> = (args) => {
                 max={41048}
                 defaultValue={41048}
                 step={1000}
-                onChangeCommitted={handleChange}
+                onChange={handleChange}
             />
         </>
     );
