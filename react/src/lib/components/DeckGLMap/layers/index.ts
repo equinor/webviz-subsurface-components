@@ -13,7 +13,7 @@ export { default as SelectableGeoJsonLayer } from "./selectable_geojson/selectab
 export { default as NorthArrow3DLayer } from "./northarrow/northArrow3DLayer";
 export { default as UnfoldedGeoJsonLayer } from "./intersection/unfoldedGeoJsonLayer";
 export { default as Grid3DLayer } from "./grid3d/grid3dLayer";
-export { default as LassoLayer } from "./LassoLayer/lassoLayer";
+export { default as BoxSelectionLayer } from "./BoxSelectionLayer/boxSelectionLayer";
 
 export { AxesLayerProps } from "./axes/axesLayer";
 export { Axes2DLayerProps } from "./axes2d/axes2DLayer";
@@ -28,4 +28,4 @@ export { PieChartLayerProps } from "./piechart/pieChartLayer";
 export { Map3DLayerProps } from "./terrain/map3DLayer";
 export { WellsLayerProps } from "./wells/wellsLayer";
 export { Grid3DLayerProps } from "./grid3d/grid3dLayer";
-export { LassoLayerProps } from "./LassoLayer/lassoLayer";
+export { BoxSelectionLayerProps } from "./BoxSelectionLayer/boxSelectionLayer";
