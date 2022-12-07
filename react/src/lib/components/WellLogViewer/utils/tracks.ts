@@ -598,7 +598,8 @@ function addGraphTrackPlot(
         if (iCurve < 0) console.log("iCurve < 0");
         const curve = curves[iCurve];
 
-        const dimensions = curve.dimensions===undefined? 1: curve.dimensions;
+        const dimensions =
+            curve.dimensions === undefined ? 1 : curve.dimensions;
         if (dimensions !== 1) console.log("curve.dimensions !== 1");
         if (curve.valueType === "string")
             console.log('curve.valueType === "string"');
@@ -697,7 +698,8 @@ function editGraphTrackPlot(
         if (iCurve < 0) console.log("iCurve < 0");
         const curve = curves[iCurve];
 
-        const dimensions = curve.dimensions===undefined? 1: curve.dimensions;
+        const dimensions =
+            curve.dimensions === undefined ? 1 : curve.dimensions;
         if (dimensions !== 1) console.log("curve.dimensions !== 1");
         if (curve.valueType === "string")
             console.log('curve.valueType === "string"');
@@ -1213,7 +1215,8 @@ function addGraphTrack(
             if (iCurve < 0) continue; // curve not found
             const curve = curves[iCurve];
 
-            const dimensions = curve.dimensions===undefined? 1: curve.dimensions;
+            const dimensions =
+                curve.dimensions === undefined ? 1 : curve.dimensions;
             if (dimensions !== 1) continue;
             if (curve.valueType === "string") continue;
 
@@ -1295,7 +1298,7 @@ function addStackedTrack(
     if (iCurve < 0) return; // curve not found
     const curve = curves[iCurve];
 
-    const dimensions = curve.dimensions===undefined? 1: curve.dimensions;
+    const dimensions = curve.dimensions === undefined ? 1 : curve.dimensions;
     if (dimensions !== 1) return;
 
     const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
