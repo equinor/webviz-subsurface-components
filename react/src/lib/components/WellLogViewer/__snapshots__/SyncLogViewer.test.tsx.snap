@@ -284,6 +284,7 @@ exports[`Sync Log Viewer snapshot test 1`] = `
         </legend>
         <div>
           <input
+            checked=""
             type="radio"
             value="md"
           />
@@ -291,7 +292,6 @@ exports[`Sync Log Viewer snapshot test 1`] = `
         </div>
         <div>
           <input
-            checked=""
             type="radio"
             value="tvd"
           />
@@ -317,7 +317,7 @@ exports[`Sync Log Viewer snapshot test 1`] = `
                 ⬤
               </td>
               <td>
-                DVER
+                DEPT
               </td>
               <td
                 style="width: 90px; padding-left: 1.5em; text-align: right;"
@@ -335,7 +335,7 @@ exports[`Sync Log Viewer snapshot test 1`] = `
                 ⬤
               </td>
               <td>
-                DEPT
+                DVER
               </td>
               <td
                 style="width: 90px; padding-left: 1.5em; text-align: right;"
