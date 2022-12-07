@@ -144,7 +144,6 @@ export const boxSelectionWithCallback: ComponentStory<
                 <DeckGLMap
                     id={"DeckGL-Map"}
                     {...lassoArgsWithSelectedWellsDataCallback}
-                    legend={{ visible: false }}
                 />
             </div>
             <div>
