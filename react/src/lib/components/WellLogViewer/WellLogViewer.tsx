@@ -417,8 +417,8 @@ WellLogViewer.propTypes = {
      */
     viewTitle: PropTypes.oneOfType([
         PropTypes.bool,
-        PropTypes.arrayOf(PropTypes.string),
-        PropTypes.arrayOf(PropTypes.object) /* react elemenet */,
+        PropTypes.string,
+        PropTypes.object /* react element */,
     ]),
 
     /**

@@ -65,6 +65,9 @@ import {
     setSelectedTrackIndices,
 } from "../utils/log-viewer";
 
+const rubberBandSize = 9;
+const rubberBandOffset = rubberBandSize / 2;
+
 function showSelection(
     rbelm: HTMLElement,
     pinelm: HTMLElement,
@@ -86,22 +89,23 @@ function showSelection(
         return;
     }
 
-    const rubberBandSize = 9;
-    const offset = rubberBandSize / 2;
-
-    rbelm.style[horizontal ? "left" : "top"] = `${v - offset}px`;
+    rbelm.style[horizontal ? "left" : "top"] = `${v - rubberBandOffset}px`;
     rbelm.style.visibility = "visible";
 
     if (vPin !== undefined && Number.isFinite(vPin)) {
         const pinelm1 = pinelm.firstElementChild as HTMLElement;
         let min, max;
         if (vPin < vCur) {
-            pinelm1.style[horizontal ? "left" : "top"] = `${offset}px`;
+            pinelm1.style[
+                horizontal ? "left" : "top"
+            ] = `${rubberBandOffset}px`;
             pinelm1.style[horizontal ? "right" : "bottom"] = "";
             min = vPin;
             max = vCur;
         } else {
-            pinelm1.style[horizontal ? "right" : "bottom"] = `${offset}px`;
+            pinelm1.style[
+                horizontal ? "right" : "bottom"
+            ] = `${rubberBandOffset}px`;
             pinelm1.style[horizontal ? "left" : "top"] = "";
             min = vCur;
             max = vPin;
@@ -110,18 +114,16 @@ function showSelection(
         min = logViewer.scale(min);
         max = logViewer.scale(max);
 
-        const x = min - offset;
+        const x = min - rubberBandOffset;
         const w = max - min + rubberBandSize;
-        pinelm.style[horizontal ? "width" : "height"] = `${w}px`;
         pinelm.style[horizontal ? "left" : "top"] = `${x}px`;
+        pinelm.style[horizontal ? "width" : "height"] = `${w}px`;
     } else {
         pinelm.style.visibility = "hidden";
     }
 }
 
 function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
-    const rubberBandSize = 9;
-    const offset = rubberBandSize / 2;
     const horizontal = parent.props.horizontal;
     const rbelm = instance.overlay.create("rubber-band", {
         onMouseMove: (event: OverlayMouseMoveEvent) => {
@@ -157,17 +159,15 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
     });
 
     const rb = select(rbelm)
-        .classed("rubber-band", true)
+        .classed("rubber-band", true) // for CSS customization
         .style(horizontal ? "width" : "height", `${rubberBandSize}px`)
         .style(horizontal ? "height" : "width", `${100}%`)
-        .style("background-color", "rgba(255,0,0,0.1)")
         .style("visibility", "hidden");
 
     rb.append("div")
         .style(horizontal ? "width" : "height", "1px")
         .style(horizontal ? "height" : "width", `${100}%`)
-        .style(horizontal ? "left" : "top", `${offset}px`)
-        .style("background-color", "rgba(255,0,0,0.7)")
+        .style(horizontal ? "left" : "top", `${rubberBandOffset}px`)
         .style("position", "relative");
 }
 
@@ -197,11 +197,12 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const value = caller.scale.invert(parent.props.horizontal ? x : y);
             const elem = event.target;
             if (elem) {
-                const axisTitle = !parent.props.axisTitles
+                const axisTitles = parent.props.axisTitles;
+                const axisTitle = !axisTitles
                     ? undefined
-                    : !parent.props.primaryAxis
-                    ? parent.props.axisTitles[0]
-                    : parent.props.axisTitles[parent.props.primaryAxis];
+                    : parent.props.primaryAxis
+                    ? axisTitles[parent.props.primaryAxis]
+                    : axisTitles[0];
                 elem.textContent = Number.isFinite(value)
                     ? `${axisTitle ? axisTitle : ""}: ${value.toFixed(1)}`
                     : "-";
@@ -235,21 +236,12 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             }
         },
     });
+    elm.className = "depth"; // for CSS customization
     elm.style.visibility = "hidden";
-    elm.style.display = "inline-block";
-    elm.style.padding = "2px";
-    elm.style.borderRadius = "4px";
-    elm.style.textAlign = "right";
     elm.style.position = "absolute";
-    elm.style.backgroundColor = "rgba(0,0,0,0.5)";
-    elm.style.color = "white";
-    elm.style.right = "5px";
-    elm.style.bottom = "5px";
 }
 
 function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
-    const rubberBandSize = 9;
-    const offset = rubberBandSize / 2;
     const horizontal = parent.props.horizontal;
     const pinelm = instance.overlay.create("pinned", {
         onClick: (event: OverlayClickEvent): void => {
@@ -289,20 +281,17 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
     });
 
     const pin = select(pinelm)
-        .classed("pinned", true)
+        .classed("pinned", true) // for CSS customization
         .style(horizontal ? "width" : "height", `${rubberBandSize}px`)
         .style(horizontal ? "height" : "width", `${100}%`)
         .style(horizontal ? "top" : "left", `${0}px`)
-        .style("background-color", "rgba(0,0,0,0.1)")
         .style("position", "absolute")
         .style("visibility", "hidden");
 
     pin.append("div")
         .style(horizontal ? "width" : "height", "1px")
         .style(horizontal ? "height" : "width", `${100}%`)
-        .style(horizontal ? "left" : "top", `${offset}px`)
-        .style("background-color", "rgba(0,255,0,0.7)")
-        //.style("position", "relative");
+        .style(horizontal ? "left" : "top", `${rubberBandOffset}px`)
         .style("position", "absolute");
 }
 
@@ -317,70 +306,67 @@ export interface WellPickProps {
     color: string; // "Stratigraphy" ...
 }
 
-function showWellPicks(
-    pinelm: HTMLElement,
+const wpSize = 3; //9;
+const wpOffset = wpSize / 2;
+
+function showWellPick(
+    elm: HTMLElement,
     vCur: number | undefined,
     horizontal: boolean | undefined,
     logViewer: LogViewer /*LogController*/
 ) {
     if (vCur === undefined) {
-        pinelm.style.visibility = "hidden";
+        elm.style.visibility = "hidden";
         return;
     }
     const v = logViewer.scale(vCur);
     if (!Number.isFinite(v)) {
         // logViewer could be empty
-        pinelm.style.visibility = "hidden";
+        elm.style.visibility = "hidden";
         return;
     }
 
-    const wpSize = 3; //9;
-    const offset = wpSize / 2;
-
-    pinelm.style[horizontal ? "left" : "top"] = `${v - offset}px`;
-    pinelm.style.visibility = "visible";
+    elm.style[horizontal ? "left" : "top"] = `${v - wpOffset}px`;
+    elm.style.visibility = "visible";
 }
 
 function fillWellPicks(
-    pinelm: HTMLElement,
+    elm: HTMLElement,
     vCur: number | undefined,
     vCur2: number | undefined,
     horizontal: boolean | undefined,
     logViewer: LogViewer /*LogController*/
 ) {
     if (vCur === undefined) {
-        pinelm.style.visibility = "hidden";
+        elm.style.visibility = "hidden";
         return;
     }
     const v = logViewer.scale(vCur);
     if (!Number.isFinite(v)) {
         // logViewer could be empty
-        pinelm.style.visibility = "hidden";
+        elm.style.visibility = "hidden";
         return;
     }
     if (vCur2 === undefined) {
-        pinelm.style.visibility = "hidden";
+        elm.style.visibility = "hidden";
         return;
     }
     const v2 = logViewer.scale(vCur2);
     if (!Number.isFinite(v2)) {
         // logViewer could be empty
-        pinelm.style.visibility = "hidden";
+        elm.style.visibility = "hidden";
         return;
     }
 
-    //const wpSize = 3; //9;
-    //const offset = wpSize / 2;
+    elm.style[horizontal ? "left" : "top"] = `${v}px`; // /*- offset*/
+    elm.style[horizontal ? "width" : "height"] = `${v2 - v}px`;
+    elm.style.visibility = "visible";
 
-    pinelm.style[horizontal ? "left" : "top"] = `${v}px`; // /*- offset*/
-    pinelm.style[horizontal ? "width" : "height"] = `${v2 - v}px`;
-    pinelm.style.visibility = "visible";
-
-    const pin = pinelm.querySelector("div");
-    if (pin) {
+    const elm1 = elm.querySelector("div.wellpick-pattern") as HTMLDivElement;
+    if (elm1) {
         const backgroundPosition =
             "background-position-" + (horizontal ? "x" : "y");
-        pin.style[backgroundPosition as unknown as number] = `${-v}px`;
+        elm1.style[backgroundPosition as unknown as number] = `${-v}px`;
     }
 }
 
@@ -405,6 +391,10 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
     const wps: WellPick[] = [];
     const wellpick = wellLogView.props.wellpick;
     if (!wellpick) return wps;
+    if (!wellpick.wellpick) {
+        console.error("No WellLog object in WellLogView prop.wellpick given");
+        return wps;
+    }
 
     const curves = wellpick.wellpick.curves;
     const mnemo = wellpick.md ? wellpick.md : "MD";
@@ -447,16 +437,48 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
     return wps;
 }
 
-function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
-    const wpSize = 3; //9;
-    //const offset = wpSize / 2;
-    const wps = getWellPicks(parent);
-    if (!wps.length) return;
+function posWellPickTitles(instance: LogViewer, parent: WellLogView) {
+    if (parent.logController && parent.props.wellpick) {
+        const element: HTMLElement = instance.overlay.elm.node();
+        if (element) {
+            const horizontal = parent.props.horizontal;
+            let i = 0;
+            for (const track of parent.logController.tracks) {
+                if (!isScaleTrack(track)) continue;
+                const elm = (track as Track).elm;
+                const style = "wp-title-" + i;
+                for (const _td of element.querySelectorAll("td." + style)) {
+                    const td = _td as HTMLElement;
+                    td.style.position = "absolute";
+                    if (horizontal) {
+                        td.style.top = elm.offsetTop + "px";
+                    } else {
+                        td.style.left = elm.offsetLeft + "px";
+                        if (elm.offsetWidth < 38) {
+                            td.style.width = "";
+                            td.style.top = "-11px";
+                            td.classList.add("vertical-text");
+                        } else {
+                            td.style.width = elm.offsetWidth + "px";
+                            td.style.top = "";
+                            td.classList.remove("vertical-text");
+                        }
+                    }
+                }
+                i++;
+            }
+        }
+    }
+}
 
+function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     const wellpick = parent.props.wellpick;
     if (!wellpick) return;
 
-    const primaryAxis = parent.props.primaryAxis;
+    const wps = getWellPicks(parent);
+    if (!wps.length) return;
+
+    //const primaryAxis = parent.props.primaryAxis;
     const horizontal = parent.props.horizontal;
 
     const wellpickColorFill = parent.props.options?.wellpickColorFill;
@@ -478,7 +500,9 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             : vPrimary?.toFixed(0);
         const txtSecondary = !Number.isFinite(vSecondary)
             ? ""
-            : (primaryAxis === "md" ? "TVD:" : "MD:") + vSecondary?.toFixed(0);
+            : /*(primaryAxis === "md" ? "TVD:" : "MD:") +*/ vSecondary?.toFixed(
+                  0
+              );
 
         const elmName = "wp" + horizon;
         instance.overlay.remove(elmName); // clear old if exists
@@ -496,7 +520,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             ",0.16)'";
 
         const pin = select(pinelm)
-            .classed("welllogview-wellpick", true)
+            .classed("wellpick", true) // for CSS customization
             .style(horizontal ? "width" : "height", `${wpSize}px`)
             .style(horizontal ? "height" : "width", `${100}%`)
             .style(horizontal ? "top" : "left", `${0}px`)
@@ -507,32 +531,52 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
         pin.append("div")
             .html(
                 horizontal
-                    ? "<font size=1><table height=100%'><tr><td><span " +
+                    ? "<table height=100%'>" +
+                          "<tr><td class='wp-title-0'>" +
+                          "<span " +
                           styleText +
                           ">" +
                           txtPrimary +
-                          "</span></td></tr><tr><td height=100%><span  " +
-                          styleText +
-                          ">" +
-                          horizon +
-                          "</span></td></tr><tr><td><span " +
+                          "</span>" +
+                          "</td></tr>" +
+                          "<tr><td class='wp-title-1'>" +
+                          "<span " +
                           styleText +
                           ">" +
                           txtSecondary +
-                          "</span></td></tr></table>"
-                    : "<font size=1><table width=100% style='position:relative; top:-1.5em;'><tr><td " +
+                          "</span>" +
+                          "</td></tr>" +
+                          "<tr><td height=100%>" +
+                          "<span " +
+                          styleText +
+                          ">" +
+                          horizon +
+                          "</span>" +
+                          "</td></tr>" +
+                          "</table>"
+                    : "<table width=100% style='position:relative; top:-1.5em;'><tr>" +
+                          "<td class='wp-title-0'>" +
+                          "<span " +
                           styleText +
                           ">" +
                           txtPrimary +
-                          "</td><td width=100% align=center><span  " +
-                          styleText +
-                          ">" +
-                          horizon +
-                          "</span></td><td " +
+                          "</span>" +
+                          "</td>" +
+                          "<td class='wp-title-1'>" +
+                          "<span " +
                           styleText +
                           ">" +
                           txtSecondary +
-                          "</td></tr></table>"
+                          "</span>" +
+                          "</td>" +
+                          "<td align=center>" +
+                          "<span " +
+                          styleText +
+                          ">" +
+                          horizon +
+                          "</span>" +
+                          "</td>" +
+                          "</tr></table>"
             )
             .style("position", "absolute")
             .style(horizontal ? "width" : "height", "1px")
@@ -545,14 +589,18 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             if (wellpickPatternFill || wellpickColorFill) {
                 const pinelm = instance.overlay.create(elmName, {});
                 const pin = select(pinelm)
-                    .classed("welllogview-wellpickFillColor", true)
                     .style("position", "absolute")
                     .style(horizontal ? "width" : "height", `${wpSize}px`)
                     .style(horizontal ? "height" : "width", `${100}%`)
                     .style(horizontal ? "top" : "left", `${0}px`)
-                    // should be get from .CSS .style("opacity", "0.45")
                     .style("visibility", "false");
-                if (wellpickColorFill) pin.style("background-color", rgba);
+                if (wellpickColorFill) {
+                    pin.append("div")
+                        .classed("wellpick-fill", true) // for CSS customization
+                        .style("width", "100%")
+                        .style("height", "100%")
+                        .style("background-color", rgba);
+                }
                 if (wellpickPatternFill) {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     const pattern = patterns!.find(
@@ -564,10 +612,12 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const patternImage = patternImages![imageIndex];
                         pin.append("div")
-                            .classed("welllogview-wellpickFillPattern", true)
+                            .classed("wellpick-pattern", true) // for CSS customization
+                            .style("position", "absolute")
+                            .style("left", "0px")
+                            .style("top", "0px")
                             .style("width", "100%")
                             .style("height", "100%")
-                            // should be get from .CSS .style("opacity", "0.45")
                             .style(
                                 "background-size",
                                 patternSize + "px " + patternSize + "px"
@@ -1149,6 +1199,8 @@ class WellLogView
     public static propTypes: Record<string, unknown>;
 
     container?: HTMLElement;
+    resizeObserver: ResizeObserver;
+
     logController?: LogViewer;
     selCurrent: number | undefined; // current mouse position
     selPinned: number | undefined; // pinned position
@@ -1165,6 +1217,17 @@ class WellLogView
         this.selCurrent = undefined;
         this.selPinned = undefined;
         this.selPersistent = undefined;
+
+        this.resizeObserver = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (entry && entry.target) {
+                //const Width = (entry.target as HTMLElement).offsetWidth;
+                //const Height = (entry.target as HTMLElement).offsetHeight;
+
+                if (this.logController)
+                    posWellPickTitles(this.logController, this);
+            }
+        });
 
         this.template = {
             name: "",
@@ -1331,6 +1394,8 @@ class WellLogView
             });
 
             this.logController.init(this.container);
+            if (this.container) this.resizeObserver.observe(this.container);
+            //if (this.container) this.resizeObserver.unobserve(this.container);
 
             initOverlays(this.logController, this);
         }
@@ -1466,60 +1531,60 @@ class WellLogView
         return false;
     }
     showSelection(): void {
-        if (this.logController) {
-            const elements = this.logController.overlay.elements;
-            const rbelm = elements["rubber-band"];
-            const pinelm = elements["pinned"];
-            if (rbelm && pinelm) {
-                rbelm.style.visibility =
-                    this.selCurrent === undefined ? "hidden" : "visible";
-                pinelm.style.visibility =
-                    this.selPinned === undefined ? "hidden" : "visible";
-                showSelection(
-                    rbelm,
+        if (!this.logController) return;
+        const elements = this.logController.overlay.elements;
+        const rbelm = elements["rubber-band"];
+        const pinelm = elements["pinned"];
+        if (rbelm && pinelm) {
+            rbelm.style.visibility =
+                this.selCurrent === undefined ? "hidden" : "visible";
+            pinelm.style.visibility =
+                this.selPinned === undefined ? "hidden" : "visible";
+            showSelection(
+                rbelm,
+                pinelm,
+                this.selCurrent,
+                this.selPinned,
+                this.props.horizontal,
+                this.logController
+            );
+        }
+
+        const wellpick = this.props.wellpick;
+        if (wellpick) {
+            const wps = getWellPicks(this);
+            if (!wps.length) return;
+            let i = 0;
+            for (const wp of wps) {
+                const horizon = wp.horizon;
+                const vPrimary = wp.vPrimary;
+                const elmName = "wp" + horizon;
+                const pinelm = elements[elmName];
+                if (!pinelm) continue;
+                showWellPick(
                     pinelm,
-                    this.selCurrent,
-                    this.selPinned,
+                    vPrimary,
                     this.props.horizontal,
                     this.logController
                 );
-            }
-
-            const wellpick = this.props.wellpick;
-            if (wellpick) {
-                const wps = getWellPicks(this);
-                if (!wps.length) return;
-                let i = 0;
-                for (const wp of wps) {
-                    const horizon = wp.horizon;
-                    const vPrimary = wp.vPrimary;
-                    const elmName = "wp" + horizon;
-                    const pinelm = elements[elmName];
-                    if (!pinelm) continue;
-                    showWellPicks(
-                        pinelm,
-                        vPrimary,
-                        this.props.horizontal,
-                        this.logController
-                    );
-                    if (this.props.patterns) {
-                        const elmName1 = "wpFill" + horizon;
-                        const pinelm1 = elements[elmName1];
-                        if (pinelm1) {
-                            const wp2 = wps[i + 1];
-                            const vPrimary2 = wp2?.vPrimary;
-                            fillWellPicks(
-                                pinelm1,
-                                vPrimary,
-                                vPrimary2,
-                                this.props.horizontal,
-                                this.logController
-                            );
-                        }
+                if (this.props.patterns) {
+                    const elmName1 = "wpFill" + horizon;
+                    const pinelm1 = elements[elmName1];
+                    if (pinelm1) {
+                        const wp2 = wps[i + 1];
+                        const vPrimary2 = wp2?.vPrimary;
+                        fillWellPicks(
+                            pinelm1,
+                            vPrimary,
+                            vPrimary2,
+                            this.props.horizontal,
+                            this.logController
+                        );
                     }
-                    i++;
                 }
+                i++;
             }
+            posWellPickTitles(this.logController, this);
         }
     }
     selectContent(selection: [number | undefined, number | undefined]): void {
@@ -1820,6 +1885,7 @@ class WellLogView
         const viewTitle = this.props.viewTitle;
         return (
             <div
+                className="welllogview"
                 style={{
                     width: "100%",
                     height: "100%",
@@ -1836,7 +1902,7 @@ class WellLogView
                                 ? "rotate(180deg)"
                                 : undefined,
                         }}
-                        className="welllogview-title"
+                        className="title"
                     >
                         {typeof viewTitle === "object" /*react element*/
                             ? viewTitle
@@ -1856,14 +1922,10 @@ class WellLogView
                 >
                     <div
                         style={{ flex: "1, 1" }}
-                        className="welllogview"
                         ref={(el) => (this.container = el as HTMLElement)}
                     />
                     {this.state.errorText && (
-                        <div
-                            style={{ flex: "0, 0" }}
-                            className="welllogview-error"
-                        >
+                        <div style={{ flex: "0, 0" }} className="error">
                             {this.state.errorText}
                         </div>
                     )}
@@ -1967,7 +2029,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         viewTitle: PropTypes.oneOfType([
             PropTypes.bool,
             PropTypes.string,
-            PropTypes.object,
+            PropTypes.object /* react element */,
         ]),
 
         /**

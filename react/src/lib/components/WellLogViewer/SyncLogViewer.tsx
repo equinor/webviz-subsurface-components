@@ -1134,8 +1134,13 @@ SyncLogViewer.propTypes = {
      */
     viewTitles: PropTypes.oneOfType([
         PropTypes.bool,
-        PropTypes.arrayOf(PropTypes.string),
-        PropTypes.arrayOf(PropTypes.object) /* react elemenet */,
+        PropTypes.arrayOf(
+            PropTypes.oneOfType([
+                PropTypes.bool,
+                PropTypes.string,
+                PropTypes.object,
+            ])
+        ) /* bool, string or react element */,
     ]),
 
     /**
