@@ -115,7 +115,6 @@ export const boxSelectionWithCallback: ComponentStory<
 > = () => {
     const [data, setData] = React.useState<string[]>([]);
     const getSelectedWellsDataCallBack = React.useCallback(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (pickingInfos: PickInfo[]) => {
             const selectedWells = pickingInfos
                 .map((item) => item.object)
