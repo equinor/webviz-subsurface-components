@@ -251,66 +251,6 @@ MapLayer3dPng.parameters = {
     },
 };
 
-const wellsLayerNoDepthTest = {
-    ...wellsLayer,
-    id: "wells-layer-no-depth-test",
-    depthTest: false,
-};
-
-export const DepthTest: ComponentStory<typeof DeckGLMap> = (args) => {
-    const props = {
-        ...args,
-        layers: [meshMapLayerPng, wellsLayer, wellsLayerNoDepthTest],
-    };
-
-    return (
-        <>
-            <div className={useStyles().main}>
-                <DeckGLMap {...props} />
-            </div>
-            <h4>
-                View on the right depthTest for the wells layer property is set
-                to false and wells layer is given last so that it will be
-                painted on top. Otherwise as on the left parts of the wells are
-                hidden beneath the surface.
-            </h4>
-        </>
-    );
-};
-
-DepthTest.args = {
-    id: "DepthTest",
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    layers: [meshMapLayerPng, wellsLayer, wellsLayerNoDepthTest],
-
-    views: {
-        layout: [1, 2],
-        viewports: [
-            {
-                id: "view_1",
-                layerIds: ["mesh-layer", "wells-layer"],
-                show3D: false,
-                isSync: true,
-            },
-            {
-                id: "view_2",
-                layerIds: ["mesh-layer", "wells-layer-no-depth-test"],
-                show3D: false,
-                isSync: true,
-            },
-        ],
-    },
-};
-
-DepthTest.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using the depthTest property. If this is set to false it will disable depth testing for the layer",
-        },
-    },
-};
-
 export const ScaleZ: ComponentStory<typeof DeckGLMap> = (args) => {
     const [layers, setLayers] = React.useState([
         axes_hugin,
