@@ -1165,8 +1165,8 @@ function getViews(
                     : "OrthographicView";
                 const view_id: string = cur_viewport.id;
 
-                const far = 99999;
-                const near = cur_viewport.show3D ? 0.01 : -99999;
+                const far = 9999;
+                const near = cur_viewport.show3D ? 0.1 : -9999;
 
                 deckgl_views.push({
                     "@@type": view_type,
@@ -1186,6 +1186,8 @@ function getViews(
                     flipY: false,
                     far,
                     near,
+                    minZoom: cur_viewport.show3D ? -12 : -15,
+                    maxZoom: cur_viewport.show3D ? +12 : +15,
                     isSync: views.viewports[deckgl_views.length].isSync,
                 });
                 xPos = xPos + 99.5 / nX;
