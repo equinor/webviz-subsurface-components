@@ -15,6 +15,14 @@ const exampleWellLog = {
 };
 const exampleColorTable = colorTables;
 
+window.ResizeObserver =
+    window.ResizeObserver ||
+    jest.fn().mockImplementation(() => ({
+        disconnect: jest.fn(),
+        observe: jest.fn(),
+        unobserve: jest.fn(),
+    }));
+
 describe("Test Well Log View Component", () => {
     it("snapshot test", () => {
         const { container } = render(

@@ -54,6 +54,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         gridLines: false,
         smoothShading: true,
         material: true,
+        depthTest: true,
     },
 
     Map3DLayer: {
@@ -75,6 +76,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         isContoursDepth: true,
         smoothShading: true,
         material: true,
+        depthTest: true,
     },
     GridLayer: {
         "@@type": "GridLayer",
@@ -84,6 +86,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         valueRange: { type: "array", value: [0, 1] },
         colorMapRange: { type: "array", value: [0, 1] },
         material: true,
+        depthTest: true,
     },
     WellsLayer: {
         "@@type": "WellsLayer",
@@ -104,6 +107,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         wellNameSize: 14,
         wellNameColor: [0, 0, 0, 255],
         selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
+        depthTest: true,
     },
     FaultPolygonsLayer: {
         "@@type": "FaultPolygonsLayer",
@@ -113,6 +117,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         visible: true,
         filled: true,
         lineWidthMinPixels: 2,
+        depthTest: true,
     },
     PieChartLayer: {
         "@@type": "PieChartLayer",
@@ -121,12 +126,21 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         visible: true,
         selectedPie: "@@editedData.selectedPie", // used to get data from deckgl layer
+        depthTest: true,
     },
     AxesLayer: {
         "@@type": "AxesLayer",
         name: "Axes",
         id: "axes-layer",
         visible: true,
+    },
+    Axes2DLayer: {
+        "@@type": "Axes2DLayer",
+        name: "Axes2D",
+        id: "axes2d-layer",
+        visible: true,
+        marginH: 10, // Horizontal margin (%)
+        marginV: 10, // Vertical margin (%)
     },
     NorthArrow3DLayer: {
         "@@type": "NorthArrow3DLayer",
@@ -150,11 +164,28 @@ export const layersDefaultProps: Record<string, unknown> = {
             features: [],
         },
     },
+    BoxSelectionLayer: {
+        "@@type": "BoxSelectionLayer",
+        name: "boxSelection",
+        id: "boxSelection-layer",
+        pickable: true,
+        visible: true,
+
+        // Props used to get/set data in the box selection layer.
+        selectedFeatureIndexes: [] as number[],
+        data: {
+            type: "FeatureCollection",
+            features: [],
+        },
+    },
     Grid3DLayer: {
         "@@type": "Grid3DLayer",
         name: "Grid 3D",
         id: "grid-3d-layer",
         visible: true,
         material: true,
+        colorMapName: "",
+        propertyValueRange: [0.0, 1.0],
+        depthTest: true,
     },
 };

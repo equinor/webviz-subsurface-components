@@ -7,9 +7,6 @@ import Map, {
 import { MapMouseEvent } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
-import { Provider as ReduxProvider } from "react-redux";
-import { createStore } from "./redux/store";
-import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 export interface DeckGLMapProps {
@@ -72,6 +69,8 @@ export interface DeckGLMapProps {
      */
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
+
+    children?: React.ReactNode;
 }
 
 const DeckGLMap: React.FC<DeckGLMapProps> = ({
@@ -83,7 +82,13 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     coords,
     scale,
     coordinateUnit,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     legend,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     toolbar,
     colorTables,
     editedData,
@@ -96,6 +101,7 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     getCameraPosition,
     triggerHome,
     triggerResetMultipleWells,
+    children,
 }: DeckGLMapProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -125,43 +131,30 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
         [setProps, layerEditedData]
     );
 
-    // create store once with layers data
-    const store = React.useMemo(() => {
-        if (layers == undefined) return;
-
-        return createStore({
-            layers: getLayersWithDefaultProps(layers),
-            views: views,
-        });
-    }, []);
-
-    if (store == undefined) return null;
     return (
-        <ReduxProvider store={store}>
-            <Map
-                id={id}
-                resources={resources}
-                layers={layers}
-                bounds={bounds}
-                views={views}
-                coords={coords}
-                scale={scale}
-                coordinateUnit={coordinateUnit}
-                toolbar={toolbar}
-                legend={legend}
-                colorTables={colorTables}
-                editedData={editedData}
-                setEditedData={setEditedData}
-                checkDatafileSchema={checkDatafileSchema}
-                onMouseEvent={onMouseEvent}
-                selection={selection}
-                getTooltip={getTooltip}
-                cameraPosition={cameraPosition}
-                getCameraPosition={getCameraPosition}
-                triggerHome={triggerHome}
-                triggerResetMultipleWells={triggerResetMultipleWells}
-            />
-        </ReduxProvider>
+        <Map
+            id={id}
+            resources={resources}
+            layers={layers}
+            bounds={bounds}
+            views={views}
+            coords={coords}
+            scale={scale}
+            coordinateUnit={coordinateUnit}
+            colorTables={colorTables}
+            editedData={editedData}
+            setEditedData={setEditedData}
+            checkDatafileSchema={checkDatafileSchema}
+            onMouseEvent={onMouseEvent}
+            selection={selection}
+            getTooltip={getTooltip}
+            cameraPosition={cameraPosition}
+            getCameraPosition={getCameraPosition}
+            triggerHome={triggerHome}
+            triggerResetMultipleWells={triggerResetMultipleWells}
+        >
+            {children}
+        </Map>
     );
 };
 
@@ -273,7 +266,7 @@ DeckGLMap.propTypes = {
     coordinateUnit: PropTypes.string,
 
     /**
-     * Parameters to control toolbar
+     * @deprecated Toolbar should be added as annotation. This prop has no function.
      */
     toolbar: PropTypes.shape({
         /**
@@ -283,7 +276,7 @@ DeckGLMap.propTypes = {
     }),
 
     /**
-     * Parameters for the legend
+     * @deprecated Legends should be added as annotations. This prop has no function.
      */
     legend: PropTypes.shape({
         /**
@@ -324,20 +317,6 @@ DeckGLMap.propTypes = {
      * For get mouse events
      */
     onMouseEvent: PropTypes.func,
-
-    /**
-     * Range selection of the current well
-     */
-    //selection: PropTypes.shape({
-    //    /**
-    //     * Current well name
-    //     */
-    //	well: PropTypes.string,
-    //    /**
-    //     * [from/cuurrent, to]
-    //     */
-    //    selection: PropTypes.arrayOf(PropTypes.number)
-    //}),
 };
 
 export default DeckGLMap;

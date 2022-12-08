@@ -1,6 +1,8 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
+import { PickingInfo, View } from "@deck.gl/core/typed";
+import { ContinuousLegend } from "@emerson-eps/color-tables";
 import DeckGLMap from "./DeckGLMap";
 import {
     TooltipCallback,
@@ -10,8 +12,8 @@ import {
     PropertyDataType,
     FeatureCollection,
 } from "../..";
-import { PickingInfo } from "@deck.gl/core/typed";
 import { ViewStateType } from "./components/Map";
+import ViewFooter from "./components/ViewFooter";
 
 export default {
     component: DeckGLMap,
@@ -197,4 +199,131 @@ const cameraPosition: ViewStateType = {
 customizedCameraPosition.args = {
     ...defaultProps,
     cameraPosition,
+};
+
+const mapLayer = {
+    "@@type": "MapLayer",
+    id: "hugin",
+    meshUrl: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.float32",
+    contours: [0, 100],
+    material: false,
+};
+
+const MultiViewAnnotationTemplate: ComponentStory<typeof DeckGLMap> = (
+    args
+) => (
+    <DeckGLMap {...args}>
+        {
+            // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
+            <View id="view_1">
+                <ContinuousLegend min={-3071} max={41048} />
+                <ViewFooter>kH netmap</ViewFooter>
+            </View>
+        }
+        {
+            // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
+            <View id="view_2">
+                <ContinuousLegend min={2725} max={3396} />
+                <ViewFooter>Hugin</ViewFooter>
+            </View>
+        }
+    </DeckGLMap>
+);
+
+export const MultiViewAnnotation = MultiViewAnnotationTemplate.bind({});
+
+MultiViewAnnotation.args = {
+    id: "multi_view_annotation",
+    legend: {
+        visible: true,
+    },
+    layers: [
+        mapLayer,
+        {
+            ...mapLayer,
+            id: "kh_netmap",
+            propertiesUrl: "hugin_depth_25_m.float32",
+        },
+    ],
+    views: {
+        layout: [1, 2],
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                layerIds: ["hugin"],
+            },
+            {
+                id: "view_2",
+                layerIds: ["kh_netmap"],
+            },
+        ],
+    },
+};
+
+const wellsLayerNoDepthTest = {
+    ...defaultWellsLayer,
+    id: "wells-layer-no-depth-test",
+    depthTest: false,
+};
+
+export const DepthTest: ComponentStory<typeof DeckGLMap> = (args) => {
+    const props = {
+        ...args,
+        layers: [mapLayer, defaultWellsLayer, wellsLayerNoDepthTest],
+    };
+
+    return (
+        <>
+            <div>
+                <DeckGLMap {...props} />
+            </div>
+            <h4>
+                View on the right depthTest for the wells layer property is set
+                to false and wells layer is given last so that it will be
+                painted on top. On the left parts of the wells are hidden
+                beneath the surface.
+            </h4>
+        </>
+    );
+};
+
+DepthTest.args = {
+    id: "DepthTest",
+    resources: {
+        wellsData: "./volve_wells.json",
+    },
+
+    views: {
+        layout: [1, 2],
+        viewports: [
+            {
+                id: "view_1",
+                layerIds: ["hugin", "wells-layer"],
+                show3D: false,
+                isSync: true,
+            },
+            {
+                id: "view_2",
+                layerIds: ["hugin", "wells-layer-no-depth-test"],
+                show3D: false,
+                isSync: true,
+            },
+        ],
+    },
+};
+
+DepthTest.parameters = {
+    docs: {
+        description: {
+            story: "Example using the depthTest property. If this is set to false it will disable depth testing for the layer",
+        },
+    },
 };

@@ -395,7 +395,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                     ) : null}
                 </div>
                 <div
-                    className="welllogspacer-wellpickFill"
+                    className="wellpick" // for CSS customization
                     style={
                         horizontal
                             ? { height: height + "px" }
@@ -419,6 +419,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                                             <polygon
                                                 key={index}
                                                 fill={value.color}
+                                                className="wellpick-fill" // for CSS customization
                                                 stroke="none"
                                                 points={fillPoints[index]}
                                             />
@@ -427,9 +428,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                                         <polygon
                                             key={"p" + index}
                                             fill={value.pattern}
-                                            fillOpacity={
-                                                0.45 /*TODO: get from CSS ???*/
-                                            }
+                                            className="wellpick-pattern" // for CSS customization
                                             stroke="none"
                                             points={fillPoints[index]}
                                         />

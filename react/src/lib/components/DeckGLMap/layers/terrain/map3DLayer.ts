@@ -352,6 +352,9 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     //           specularColor: [255, 255, 255],
     //       }
     material: Material;
+
+    // Enable/disable depth testing when rendering layer. Default true.
+    depthTest: boolean;
 }
 
 export default class Map3DLayer extends CompositeLayer<
@@ -509,6 +512,7 @@ export default class Map3DLayer extends CompositeLayer<
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
                 material: this.props.material,
                 wireframe: false,
+                depthTest: this.props.depthTest,
             })
         );
         return [layer];

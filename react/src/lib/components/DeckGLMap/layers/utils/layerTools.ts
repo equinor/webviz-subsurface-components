@@ -139,6 +139,7 @@ export type NewLayersList = LayersList & {
 
 type prop = {
     data: wellData;
+    visible: boolean;
 };
 
 type wellData = {

@@ -29,5 +29,4 @@ const ViewFooter: React.FC<ViewFooterProps> = ({
     return <div className={classes.viewFooter}>{children}</div>;
 };
 
-ViewFooter.displayName = "ViewFooter";
 export default ViewFooter;

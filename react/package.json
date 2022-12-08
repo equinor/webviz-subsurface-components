@@ -52,8 +52,12 @@
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
     "dependencies": {
+<<<<<<< HEAD
         "@deck.gl/arcgis": "^8.8.20",
         "@emerson-eps/color-tables": "^0.4.25",
+=======
+        "@emerson-eps/color-tables": "^0.4.33",
+>>>>>>> 9e2c2f41dc5ca0aa0fc5f2d7cc2f007411e94eed
         "@equinor/eds-core-react": "^0.12.1",
         "@equinor/eds-icons": "^0.9.1",
         "@equinor/videx-wellog": "^0.7.0",

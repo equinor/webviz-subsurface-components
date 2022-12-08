@@ -79,6 +79,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
             if (axes.indexOf(this.props.template.scale.primary) >= 0)
                 primaryAxis = this.props.template.scale.primary;
         }
+        if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
         this.state = {
             primaryAxis: primaryAxis, //"md"
             axes: axes, //["md", "tvd"]
@@ -129,7 +130,9 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     ): void {
         if (
             this.props.welllog !== prevProps.welllog ||
-            this.props.template !== prevProps.template /*||
+            this.props.template !== prevProps.template ||
+            this.props.axisMnemos !== prevProps.axisMnemos ||
+            this.props.primaryAxis !== prevProps.primaryAxis /*||
             this.props.colorTables !== prevProps.colorTables*/
         ) {
             const axes = getAvailableAxes(
@@ -142,6 +145,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     primaryAxis = this.props.template.scale.primary;
                 } else if (this.props.welllog === prevProps.welllog) return; // nothing to update
             }
+            if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
             this.setState({
                 primaryAxis: primaryAxis,
                 axes: axes,
@@ -417,8 +421,8 @@ WellLogViewer.propTypes = {
      */
     viewTitle: PropTypes.oneOfType([
         PropTypes.bool,
-        PropTypes.arrayOf(PropTypes.string),
-        PropTypes.arrayOf(PropTypes.object) /* react elemenet */,
+        PropTypes.string,
+        PropTypes.object /* react element */,
     ]),
 
     /**
