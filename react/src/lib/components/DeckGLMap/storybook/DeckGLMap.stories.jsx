@@ -439,33 +439,6 @@ colorMapFunction.args = {
     },
 };
 
-// GridLayer.
-const gridLayer = exampleData[0].layers[2];
-export const GridLayer = EditDataTemplate.bind({});
-GridLayer.args = {
-    ...exampleData[0],
-    layers: [
-        {
-            ...gridLayer,
-            visible: true,
-        },
-        axes,
-    ],
-    toolbar: {
-        visible: false,
-    },
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-                layerIds: [],
-            },
-        ],
-    },
-};
-
 // custom layer example
 export const UserDefinedLayer1 = EditDataTemplate.bind({});
 UserDefinedLayer1.args = {
