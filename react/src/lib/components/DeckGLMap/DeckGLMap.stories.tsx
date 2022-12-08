@@ -267,3 +267,63 @@ MultiViewAnnotation.args = {
         ],
     },
 };
+
+const wellsLayerNoDepthTest = {
+    ...defaultWellsLayer,
+    id: "wells-layer-no-depth-test",
+    depthTest: false,
+};
+
+export const DepthTest: ComponentStory<typeof DeckGLMap> = (args) => {
+    const props = {
+        ...args,
+        layers: [mapLayer, defaultWellsLayer, wellsLayerNoDepthTest],
+    };
+
+    return (
+        <>
+            <div>
+                <DeckGLMap {...props} />
+            </div>
+            <h4>
+                View on the right depthTest for the wells layer property is set
+                to false and wells layer is given last so that it will be
+                painted on top. On the left parts of the wells are hidden
+                beneath the surface.
+            </h4>
+        </>
+    );
+};
+
+DepthTest.args = {
+    id: "DepthTest",
+    resources: {
+        wellsData: "./volve_wells.json",
+    },
+
+    views: {
+        layout: [1, 2],
+        viewports: [
+            {
+                id: "view_1",
+                layerIds: ["hugin", "wells-layer"],
+                show3D: false,
+                isSync: true,
+            },
+            {
+                id: "view_2",
+                layerIds: ["hugin", "wells-layer-no-depth-test"],
+                show3D: false,
+                isSync: true,
+            },
+        ],
+    },
+};
+
+DepthTest.parameters = {
+    docs: {
+        description: {
+            story: "Example using the depthTest property. If this is set to false it will disable depth testing for the layer",
+        },
+    },
+};

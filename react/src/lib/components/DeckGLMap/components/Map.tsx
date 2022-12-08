@@ -869,9 +869,10 @@ const Map: React.FC<MapProps> = ({
             );
             if (cur_view?.layerIds && cur_view.layerIds.length > 0) {
                 const layer_ids = cur_view.layerIds;
-                return layer_ids.some((layer_id) =>
-                    args.layer.id.match(new RegExp("\\b" + layer_id + "\\b"))
-                );
+                return layer_ids.some((layer_id) => {
+                    const t = layer_id === args.layer.id;
+                    return t;
+                });
             } else {
                 return true;
             }

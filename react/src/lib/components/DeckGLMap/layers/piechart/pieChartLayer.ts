@@ -10,6 +10,7 @@ import { SolidPolygonLayer } from "@deck.gl/layers/typed";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
 import { Vector2 } from "@math.gl/core";
+import GL from "@luma.gl/constants";
 
 type PieProperties = [{ color: Color; label: string }];
 
@@ -38,6 +39,9 @@ interface PolygonData {
 
 export interface PieChartLayerProps<D> extends ExtendedLayerProps<D> {
     selectedPie: D;
+
+    // Enable/disable depth testing when rendering layer. Default true.
+    depthTest: boolean;
 }
 
 export default class PieChartLayer extends CompositeLayer<
@@ -88,6 +92,9 @@ export default class PieChartLayer extends CompositeLayer<
             this.getSubLayerProps({
                 data: makePies(pieData, pixels2world),
                 getFillColor: (d: PolygonData) => d.properties.color,
+                parameters: {
+                    [GL.DEPTH_TEST]: this.props.depthTest,
+                },
             })
         );
         return [layer];

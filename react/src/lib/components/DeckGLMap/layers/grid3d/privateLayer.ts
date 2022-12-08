@@ -102,12 +102,14 @@ export interface privateLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapClampColor: Color | undefined | boolean;
     colorMapFunction?: colorMapFunctionType | false;
     propertyValueRange: [number, number];
+    depthTest: boolean;
 }
 
 const defaultProps = {
     colorMapName: "",
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
+    depthTest: true,
 };
 
 // This is a private layer used only by the composite Map3DLayer
@@ -210,6 +212,11 @@ export default class privateLayer extends Layer<privateLayerProps<unknown>> {
 
         gl.enable(gl.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
+
+        if (!this.props.depthTest) {
+            gl.disable(gl.DEPTH_TEST);
+        }
+
         model_mesh
             .setUniforms({
                 ...uniforms,
@@ -238,6 +245,10 @@ export default class privateLayer extends Layer<privateLayerProps<unknown>> {
 
         // Draw lines.
         mesh_lines_model.draw();
+
+        if (!this.props.depthTest) {
+            gl.enable(gl.DEPTH_TEST);
+        }
     }
 
     decodePickingColor(): number {
