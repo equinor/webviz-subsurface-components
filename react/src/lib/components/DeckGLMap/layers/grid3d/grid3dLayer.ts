@@ -4,6 +4,7 @@ import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 export type WebWorkerParams = {
     points: number[];
@@ -89,11 +90,6 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
     // Enable/disable depth testing when rendering layer. Default true.
     depthTest: boolean;
 }
-
-const defaultProps = {
-    colorMapName: "",
-    propertyValueRange: [0.0, 1.0],
-};
 
 export default class Grid3DLayer extends CompositeLayer<
     Grid3DLayerProps<unknown>
@@ -200,4 +196,6 @@ export default class Grid3DLayer extends CompositeLayer<
 }
 
 Grid3DLayer.layerName = "Grid3DLayer";
-Grid3DLayer.defaultProps = defaultProps as unknown as Grid3DLayerProps<unknown>;
+Grid3DLayer.defaultProps = layersDefaultProps[
+    "Grid3DLayer"
+] as Grid3DLayerProps<unknown>;
