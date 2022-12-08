@@ -401,12 +401,6 @@ MapClampColor.parameters = {
     },
 };
 
-const axes = {
-    "@@type": "AxesLayer",
-    id: "axes-layer",
-    bounds: [432205, 6475078, -3500, 437930, 6482353, 0],
-};
-
 // Example using "colorMapFunction" property.
 const layer = {
     ...meshMapLayer,
