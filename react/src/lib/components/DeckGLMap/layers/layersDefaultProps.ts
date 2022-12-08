@@ -184,5 +184,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         id: "grid-3d-layer",
         visible: true,
         material: true,
+        colorMapName: "",
+        propertyValueRange: [0.0, 1.0],
+        depthTest: true,
     },
 };
