@@ -329,7 +329,7 @@ const Map: React.FC<MapProps> = ({
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
-    const [alteredLayers, setAlteredLayers] = useState([]);
+    const [alteredLayers, setAlteredLayers] = useState([{}]);
 
     const initialViewState = getViewState(
         boundsInitial,
@@ -600,6 +600,7 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZ, layers /*dispatch*/]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
+    /*
     useEffect(() => {
         if (deckGLLayers) {
             const wellsLayer = getLayersByType(
@@ -609,6 +610,7 @@ const Map: React.FC<MapProps> = ({
             if (wellsLayer) wellsLayer.setupLegend();
         }
     }, [deckGLLayers]);
+    */
 
     useEffect(() => {
         const layers = alteredLayers;
@@ -621,7 +623,7 @@ const Map: React.FC<MapProps> = ({
         else enumerations.push({ editedData: {} });
 
         setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-    }, [st_layers, resources, editedData, layers]);
+    }, [st_layers, resources, editedData, layers, alteredLayers]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
