@@ -7,9 +7,6 @@ import Map, {
 import { MapMouseEvent } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
-import { Provider as ReduxProvider } from "react-redux";
-import { createStore } from "./redux/store";
-import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 export interface DeckGLMapProps {
@@ -134,43 +131,30 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
         [setProps, layerEditedData]
     );
 
-    // create store once with layers data
-    const store = React.useMemo(() => {
-        if (layers == undefined) return;
-
-        return createStore({
-            layers: getLayersWithDefaultProps(layers),
-            views: views,
-        });
-    }, []);
-
-    if (store == undefined) return null;
     return (
-        <ReduxProvider store={store}>
-            <Map
-                id={id}
-                resources={resources}
-                layers={layers}
-                bounds={bounds}
-                views={views}
-                coords={coords}
-                scale={scale}
-                coordinateUnit={coordinateUnit}
-                colorTables={colorTables}
-                editedData={editedData}
-                setEditedData={setEditedData}
-                checkDatafileSchema={checkDatafileSchema}
-                onMouseEvent={onMouseEvent}
-                selection={selection}
-                getTooltip={getTooltip}
-                cameraPosition={cameraPosition}
-                getCameraPosition={getCameraPosition}
-                triggerHome={triggerHome}
-                triggerResetMultipleWells={triggerResetMultipleWells}
-            >
-                {children}
-            </Map>
-        </ReduxProvider>
+        <Map
+            id={id}
+            resources={resources}
+            layers={layers}
+            bounds={bounds}
+            views={views}
+            coords={coords}
+            scale={scale}
+            coordinateUnit={coordinateUnit}
+            colorTables={colorTables}
+            editedData={editedData}
+            setEditedData={setEditedData}
+            checkDatafileSchema={checkDatafileSchema}
+            onMouseEvent={onMouseEvent}
+            selection={selection}
+            getTooltip={getTooltip}
+            cameraPosition={cameraPosition}
+            getCameraPosition={getCameraPosition}
+            triggerHome={triggerHome}
+            triggerResetMultipleWells={triggerResetMultipleWells}
+        >
+            {children}
+        </Map>
     );
 };
 
@@ -333,20 +317,6 @@ DeckGLMap.propTypes = {
      * For get mouse events
      */
     onMouseEvent: PropTypes.func,
-
-    /**
-     * Range selection of the current well
-     */
-    //selection: PropTypes.shape({
-    //    /**
-    //     * Current well name
-    //     */
-    //	well: PropTypes.string,
-    //    /**
-    //     * [from/cuurrent, to]
-    //     */
-    //    selection: PropTypes.arrayOf(PropTypes.number)
-    //}),
 };
 
 export default DeckGLMap;

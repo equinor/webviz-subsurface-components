@@ -14,9 +14,6 @@ import {
 import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
-import { MapState } from "../redux/store";
-import { useSelector, useDispatch } from "react-redux";
-import { setSpec } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
@@ -329,6 +326,7 @@ const Map: React.FC<MapProps> = ({
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
+    const [alteredLayers, setAlteredLayers] = useState([{}]);
 
     const initialViewState = getViewState(
         boundsInitial,
@@ -350,7 +348,7 @@ const Map: React.FC<MapProps> = ({
         );
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
-        const axesLayer = st_layers.find((e) => {
+        const axesLayer = layers?.find((e) => {
             return e["@@type"] === "AxesLayer";
         });
         const isAxesLayer = typeof axesLayer !== "undefined";
@@ -459,12 +457,6 @@ const Map: React.FC<MapProps> = ({
         setDeckGLViews(jsonToObject(viewsProps) as View[]);
     }, [viewsProps]);
 
-    // update store if any of the layer prop is changed
-    const dispatch = useDispatch();
-    const st_layers = useSelector(
-        (st: MapState) => st.spec["layers"]
-    ) as Record<string, unknown>[];
-
     const [reportedBoundingBox, setReportedBoundingBox] =
         useState<BoundingBox>(bboxInitial);
     const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
@@ -569,7 +561,7 @@ const Map: React.FC<MapProps> = ({
     }, [views]);
 
     useEffect(() => {
-        if (st_layers == undefined || layers == undefined) return;
+        if (layers == undefined) return;
 
         const m = getModelMatrixScale(scaleZ);
 
@@ -587,25 +579,15 @@ const Map: React.FC<MapProps> = ({
             return layer;
         });
 
-        const updated_layers = applyPropsOnLayers(st_layers, layers_copy);
+        const updated_layers = applyPropsOnLayers(layers, layers_copy);
         const layers_default = getLayersWithDefaultProps(updated_layers);
-        const updated_spec = { layers: layers_default, views: views };
-        dispatch(setSpec(updated_spec));
-    }, [scaleZ, layers, dispatch]);
+        setAlteredLayers(layers_default);
+    }, [scaleZ, layers /*dispatch*/]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
-    useEffect(() => {
-        if (deckGLLayers) {
-            const wellsLayer = getLayersByType(
-                deckGLLayers,
-                "WellsLayer"
-            )?.[0] as WellsLayer;
-            if (wellsLayer) wellsLayer.setupLegend();
-        }
-    }, [deckGLLayers]);
 
     useEffect(() => {
-        const layers = st_layers;
+        const layers = alteredLayers;
         if (!layers || layers.length == 0) return;
 
         const enumerations = [];
@@ -614,7 +596,7 @@ const Map: React.FC<MapProps> = ({
         else enumerations.push({ editedData: {} });
 
         setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-    }, [st_layers, resources, editedData, layers]);
+    }, [resources, editedData, layers, alteredLayers]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
