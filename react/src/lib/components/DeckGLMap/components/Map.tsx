@@ -14,9 +14,6 @@ import {
 import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
-import { MapState } from "../redux/store";
-//import { useSelector, useDispatch } from "react-redux";
-import { setSpec } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
@@ -460,13 +457,6 @@ const Map: React.FC<MapProps> = ({
         setDeckGLViews(jsonToObject(viewsProps) as View[]);
     }, [viewsProps]);
 
-    // update store if any of the layer prop is changed
-    //const dispatch = useDispatch();
-    /*
-    const st_layers = useSelector(
-        (st: MapState) => st.spec["layers"]
-    ) as Record<string, unknown>[];
-    */
     const st_layers = layers;
 
     const [reportedBoundingBox, setReportedBoundingBox] =
@@ -593,28 +583,13 @@ const Map: React.FC<MapProps> = ({
 
         const updated_layers = applyPropsOnLayers(st_layers, layers_copy);
         const layers_default = getLayersWithDefaultProps(updated_layers);
-        //const updated_spec = { layers: layers_default, views: views };
-        //dispatch(setSpec(updated_spec));
-        //st_layers = layers_default;
         setAlteredLayers(layers_default);
     }, [scaleZ, layers /*dispatch*/]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
-    /*
-    useEffect(() => {
-        if (deckGLLayers) {
-            const wellsLayer = getLayersByType(
-                deckGLLayers,
-                "WellsLayer"
-            )?.[0] as WellsLayer;
-            if (wellsLayer) wellsLayer.setupLegend();
-        }
-    }, [deckGLLayers]);
-    */
 
     useEffect(() => {
         const layers = alteredLayers;
-        //const layers = st_layers;
         if (!layers || layers.length == 0) return;
 
         const enumerations = [];

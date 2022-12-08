@@ -7,7 +7,6 @@ import Map, {
 import { MapMouseEvent } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
-//import { getLayersWithDefaultProps } from "./layers/utils/layerTools";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 export interface DeckGLMapProps {
