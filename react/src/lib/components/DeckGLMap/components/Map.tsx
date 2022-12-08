@@ -15,7 +15,7 @@ import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { MapState } from "../redux/store";
-import { useSelector, useDispatch } from "react-redux";
+//import { useSelector, useDispatch } from "react-redux";
 import { setSpec } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
@@ -329,6 +329,7 @@ const Map: React.FC<MapProps> = ({
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
+    const [alteredLayers, setAlteredLayers] = useState([]);
 
     const initialViewState = getViewState(
         boundsInitial,
@@ -350,7 +351,7 @@ const Map: React.FC<MapProps> = ({
         );
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
-        const axesLayer = st_layers.find((e) => {
+        const axesLayer = st_layers?.find((e) => {
             return e["@@type"] === "AxesLayer";
         });
         const isAxesLayer = typeof axesLayer !== "undefined";
@@ -460,10 +461,13 @@ const Map: React.FC<MapProps> = ({
     }, [viewsProps]);
 
     // update store if any of the layer prop is changed
-    const dispatch = useDispatch();
+    //const dispatch = useDispatch();
+    /*
     const st_layers = useSelector(
         (st: MapState) => st.spec["layers"]
     ) as Record<string, unknown>[];
+    */
+    const st_layers = layers;
 
     const [reportedBoundingBox, setReportedBoundingBox] =
         useState<BoundingBox>(bboxInitial);
@@ -589,9 +593,11 @@ const Map: React.FC<MapProps> = ({
 
         const updated_layers = applyPropsOnLayers(st_layers, layers_copy);
         const layers_default = getLayersWithDefaultProps(updated_layers);
-        const updated_spec = { layers: layers_default, views: views };
-        dispatch(setSpec(updated_spec));
-    }, [scaleZ, layers, dispatch]);
+        //const updated_spec = { layers: layers_default, views: views };
+        //dispatch(setSpec(updated_spec));
+        //st_layers = layers_default;
+        setAlteredLayers(layers_default);
+    }, [scaleZ, layers /*dispatch*/]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
     useEffect(() => {
@@ -605,7 +611,8 @@ const Map: React.FC<MapProps> = ({
     }, [deckGLLayers]);
 
     useEffect(() => {
-        const layers = st_layers;
+        const layers = alteredLayers;
+        //const layers = st_layers;
         if (!layers || layers.length == 0) return;
 
         const enumerations = [];
