@@ -85,6 +85,9 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
     //           specularColor: [255, 255, 255],
     //       }
     material: Material;
+
+    // Enable/disable depth testing when rendering layer. Default true.
+    depthTest: boolean;
 }
 
 const defaultProps = {
@@ -189,6 +192,7 @@ export default class Grid3DLayer extends CompositeLayer<
                 colorMapFunction: this.props.colorMapFunction,
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
+                depthTest: this.props.depthTest,
             })
         );
         return [layer];
