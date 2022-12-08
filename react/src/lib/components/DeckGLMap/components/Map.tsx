@@ -348,7 +348,7 @@ const Map: React.FC<MapProps> = ({
         );
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
-        const axesLayer = st_layers?.find((e) => {
+        const axesLayer = layers?.find((e) => {
             return e["@@type"] === "AxesLayer";
         });
         const isAxesLayer = typeof axesLayer !== "undefined";
@@ -457,8 +457,6 @@ const Map: React.FC<MapProps> = ({
         setDeckGLViews(jsonToObject(viewsProps) as View[]);
     }, [viewsProps]);
 
-    const st_layers = layers;
-
     const [reportedBoundingBox, setReportedBoundingBox] =
         useState<BoundingBox>(bboxInitial);
     const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
@@ -563,7 +561,7 @@ const Map: React.FC<MapProps> = ({
     }, [views]);
 
     useEffect(() => {
-        if (st_layers == undefined || layers == undefined) return;
+        if (layers == undefined) return;
 
         const m = getModelMatrixScale(scaleZ);
 
@@ -581,7 +579,7 @@ const Map: React.FC<MapProps> = ({
             return layer;
         });
 
-        const updated_layers = applyPropsOnLayers(st_layers, layers_copy);
+        const updated_layers = applyPropsOnLayers(layers, layers_copy);
         const layers_default = getLayersWithDefaultProps(updated_layers);
         setAlteredLayers(layers_default);
     }, [scaleZ, layers /*dispatch*/]);
@@ -598,7 +596,7 @@ const Map: React.FC<MapProps> = ({
         else enumerations.push({ editedData: {} });
 
         setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-    }, [st_layers, resources, editedData, layers, alteredLayers]);
+    }, [resources, editedData, layers, alteredLayers]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
