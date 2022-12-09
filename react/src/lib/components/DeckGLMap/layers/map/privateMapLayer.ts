@@ -229,7 +229,6 @@ export default class privateMapLayer extends Layer<
         const smoothShading = this.props.smoothShading;
 
         gl.enable(GL.POLYGON_OFFSET_FILL);
-
         if (!this.props.depthTest) {
             gl.disable(GL.DEPTH_TEST);
         }
