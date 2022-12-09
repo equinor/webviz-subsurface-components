@@ -25,10 +25,11 @@ exports[`Map and Well Log Viewer snapshot test 1`] = `
             style="position: absolute;"
           >
             <div
+              class="welllogview"
               style="width: 100%; height: 100%; display: flex; flex-direction: column;"
             >
               <div
-                class="welllogview-title"
+                class="title"
               >
                 <div
                   style="font-size: 16px;"
@@ -40,269 +41,288 @@ exports[`Map and Well Log Viewer snapshot test 1`] = `
                 style="width: 100%; height: 100%; display: flex; flex-direction: column;"
               >
                 <div
-                  class="welllogview log-controller"
+                  class="log-controller"
                 >
                   <div
                     class="overlay"
                     style="width: 0px; left: 0px; overflow: hidden;"
                   >
                     <div
-                      style="position: absolute; pointer-events: none; visibility: hidden; display: inline-block; padding: 2px; border-radius: 4px; text-align: right; background-color: rgba(0, 0, 0, 0.5); color: white; right: 5px; bottom: 5px;"
+                      class="depth"
+                      style="position: absolute; pointer-events: none; visibility: hidden;"
                     />
                     <div
                       class="rubber-band"
-                      style="position: relative; pointer-events: none; height: 9px; width: 100%; background-color: rgba(255, 0, 0, 0.1); visibility: hidden;"
+                      style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
                     >
                       <div
-                        style="height: 1px; width: 100%; top: 4.5px; background-color: rgba(255, 0, 0, 0.7); position: relative;"
+                        style="height: 1px; width: 100%; top: 4.5px; position: relative;"
                       />
                     </div>
                     <div
                       class="pinned"
-                      style="position: absolute; pointer-events: none; height: 9px; width: 100%; left: 0px; background-color: rgba(0, 0, 0, 0.1); visibility: hidden;"
+                      style="position: absolute; pointer-events: none; height: 9px; width: 100%; left: 0px; visibility: hidden;"
                     >
                       <div
-                        style="height: 1px; width: 100%; top: 4.5px; background-color: rgba(0, 255, 0, 0.7); position: absolute;"
+                        style="height: 1px; width: 100%; top: 4.5px; position: absolute;"
                       />
                     </div>
                     <div
-                      class="welllogview-wellpick"
+                      class="wellpick"
                       style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 193, 0, 0.8); visibility: false;"
                     >
                       <div
                         style="position: absolute; height: 1px; width: 100%; background-color: rgba(255, 193, 0, 0.8);"
                       >
-                        <font
-                          size="1"
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
                         >
-                          <table
-                            style="position:relative; top:-1.5em;"
-                            width="100%"
-                          >
-                            <tbody>
-                              <tr>
-                                <td
+                          <tbody>
+                            <tr>
+                              <td
+                                class="wp-title-0"
+                              >
+                                <span
                                   style="background-color:rgba(255,193,0,0.16)"
                                 >
                                   1644
-                                </td>
-                                <td
-                                  align="center"
-                                  width="100%"
-                                >
-                                  <span
-                                    style="background-color:rgba(255,193,0,0.16)"
-                                  >
-                                    Hor_1
-                                  </span>
-                                </td>
-                                <td
+                                </span>
+                              </td>
+                              <td
+                                class="wp-title-1"
+                              >
+                                <span
                                   style="background-color:rgba(255,193,0,0.16)"
                                 />
-                              </tr>
-                            </tbody>
-                          </table>
-                        </font>
+                              </td>
+                              <td
+                                align="center"
+                              >
+                                <span
+                                  style="background-color:rgba(255,193,0,0.16)"
+                                >
+                                  Hor_1
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                     <div
-                      class="welllogview-wellpick"
+                      class="wellpick"
                       style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 120, 61, 0.8); visibility: false;"
                     >
                       <div
                         style="position: absolute; height: 1px; width: 100%; background-color: rgba(255, 120, 61, 0.8);"
                       >
-                        <font
-                          size="1"
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
                         >
-                          <table
-                            style="position:relative; top:-1.5em;"
-                            width="100%"
-                          >
-                            <tbody>
-                              <tr>
-                                <td
+                          <tbody>
+                            <tr>
+                              <td
+                                class="wp-title-0"
+                              >
+                                <span
                                   style="background-color:rgba(255,120,61,0.16)"
                                 >
                                   2788
-                                </td>
-                                <td
-                                  align="center"
-                                  width="100%"
-                                >
-                                  <span
-                                    style="background-color:rgba(255,120,61,0.16)"
-                                  >
-                                    Hor_2
-                                  </span>
-                                </td>
-                                <td
+                                </span>
+                              </td>
+                              <td
+                                class="wp-title-1"
+                              >
+                                <span
                                   style="background-color:rgba(255,120,61,0.16)"
                                 />
-                              </tr>
-                            </tbody>
-                          </table>
-                        </font>
+                              </td>
+                              <td
+                                align="center"
+                              >
+                                <span
+                                  style="background-color:rgba(255,120,61,0.16)"
+                                >
+                                  Hor_2
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                     <div
-                      class="welllogview-wellpick"
+                      class="wellpick"
                       style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 155, 76, 0.8); visibility: false;"
                     >
                       <div
                         style="position: absolute; height: 1px; width: 100%; background-color: rgba(255, 155, 76, 0.8);"
                       >
-                        <font
-                          size="1"
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
                         >
-                          <table
-                            style="position:relative; top:-1.5em;"
-                            width="100%"
-                          >
-                            <tbody>
-                              <tr>
-                                <td
+                          <tbody>
+                            <tr>
+                              <td
+                                class="wp-title-0"
+                              >
+                                <span
                                   style="background-color:rgba(255,155,76,0.16)"
                                 >
                                   3288
-                                </td>
-                                <td
-                                  align="center"
-                                  width="100%"
-                                >
-                                  <span
-                                    style="background-color:rgba(255,155,76,0.16)"
-                                  >
-                                    Hor_3
-                                  </span>
-                                </td>
-                                <td
+                                </span>
+                              </td>
+                              <td
+                                class="wp-title-1"
+                              >
+                                <span
                                   style="background-color:rgba(255,155,76,0.16)"
                                 />
-                              </tr>
-                            </tbody>
-                          </table>
-                        </font>
+                              </td>
+                              <td
+                                align="center"
+                              >
+                                <span
+                                  style="background-color:rgba(255,155,76,0.16)"
+                                >
+                                  Hor_3
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                     <div
-                      class="welllogview-wellpick"
+                      class="wellpick"
                       style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 223, 161, 0.8); visibility: false;"
                     >
                       <div
                         style="position: absolute; height: 1px; width: 100%; background-color: rgba(255, 223, 161, 0.8);"
                       >
-                        <font
-                          size="1"
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
                         >
-                          <table
-                            style="position:relative; top:-1.5em;"
-                            width="100%"
-                          >
-                            <tbody>
-                              <tr>
-                                <td
+                          <tbody>
+                            <tr>
+                              <td
+                                class="wp-title-0"
+                              >
+                                <span
                                   style="background-color:rgba(255,223,161,0.16)"
                                 >
                                   3611
-                                </td>
-                                <td
-                                  align="center"
-                                  width="100%"
-                                >
-                                  <span
-                                    style="background-color:rgba(255,223,161,0.16)"
-                                  >
-                                    Hor_4
-                                  </span>
-                                </td>
-                                <td
+                                </span>
+                              </td>
+                              <td
+                                class="wp-title-1"
+                              >
+                                <span
                                   style="background-color:rgba(255,223,161,0.16)"
                                 />
-                              </tr>
-                            </tbody>
-                          </table>
-                        </font>
+                              </td>
+                              <td
+                                align="center"
+                              >
+                                <span
+                                  style="background-color:rgba(255,223,161,0.16)"
+                                >
+                                  Hor_4
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                     <div
-                      class="welllogview-wellpick"
+                      class="wellpick"
                       style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 223, 161, 0.8); visibility: false;"
                     >
                       <div
                         style="position: absolute; height: 1px; width: 100%; background-color: rgba(255, 223, 161, 0.8);"
                       >
-                        <font
-                          size="1"
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
                         >
-                          <table
-                            style="position:relative; top:-1.5em;"
-                            width="100%"
-                          >
-                            <tbody>
-                              <tr>
-                                <td
+                          <tbody>
+                            <tr>
+                              <td
+                                class="wp-title-0"
+                              >
+                                <span
                                   style="background-color:rgba(255,223,161,0.16)"
                                 >
                                   3911
-                                </td>
-                                <td
-                                  align="center"
-                                  width="100%"
-                                >
-                                  <span
-                                    style="background-color:rgba(255,223,161,0.16)"
-                                  >
-                                    Hor_5
-                                  </span>
-                                </td>
-                                <td
+                                </span>
+                              </td>
+                              <td
+                                class="wp-title-1"
+                              >
+                                <span
                                   style="background-color:rgba(255,223,161,0.16)"
                                 />
-                              </tr>
-                            </tbody>
-                          </table>
-                        </font>
+                              </td>
+                              <td
+                                align="center"
+                              >
+                                <span
+                                  style="background-color:rgba(255,223,161,0.16)"
+                                >
+                                  Hor_5
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                     <div
-                      class="welllogview-wellpick"
+                      class="wellpick"
                       style="position: absolute; pointer-events: none; height: 3px; width: 100%; left: 0px; background-color: rgba(255, 223, 161, 0.8); visibility: false;"
                     >
                       <div
                         style="position: absolute; height: 1px; width: 100%; background-color: rgba(255, 223, 161, 0.8);"
                       >
-                        <font
-                          size="1"
+                        <table
+                          style="position:relative; top:-1.5em;"
+                          width="100%"
                         >
-                          <table
-                            style="position:relative; top:-1.5em;"
-                            width="100%"
-                          >
-                            <tbody>
-                              <tr>
-                                <td
+                          <tbody>
+                            <tr>
+                              <td
+                                class="wp-title-0"
+                              >
+                                <span
                                   style="background-color:rgba(255,223,161,0.16)"
                                 >
                                   4411
-                                </td>
-                                <td
-                                  align="center"
-                                  width="100%"
-                                >
-                                  <span
-                                    style="background-color:rgba(255,223,161,0.16)"
-                                  >
-                                    Hor_6
-                                  </span>
-                                </td>
-                                <td
+                                </span>
+                              </td>
+                              <td
+                                class="wp-title-1"
+                              >
+                                <span
                                   style="background-color:rgba(255,223,161,0.16)"
                                 />
-                              </tr>
-                            </tbody>
-                          </table>
-                        </font>
+                              </td>
+                              <td
+                                align="center"
+                              >
+                                <span
+                                  style="background-color:rgba(255,223,161,0.16)"
+                                >
+                                  Hor_6
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>

@@ -106,6 +106,7 @@ export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapFunction?: colorMapFunctionType | false;
     propertyValueRange: [number, number];
     smoothShading: boolean;
+    depthTest: boolean;
 }
 
 const defaultProps = {
@@ -117,6 +118,7 @@ const defaultProps = {
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
     meshValueRange: [0.0, 1.0],
+    depthTest: true,
 };
 
 // This is a private layer used only by the composite Map3DLayer
@@ -226,7 +228,11 @@ export default class privateMapLayer extends Layer<
 
         const smoothShading = this.props.smoothShading;
 
-        gl.enable(gl.POLYGON_OFFSET_FILL);
+        gl.enable(GL.POLYGON_OFFSET_FILL);
+        if (!this.props.depthTest) {
+            gl.disable(GL.DEPTH_TEST);
+        }
+
         gl.polygonOffset(1, 1);
         model_mesh
             .setUniforms({
@@ -256,7 +262,11 @@ export default class privateMapLayer extends Layer<
                 smoothShading,
             })
             .draw();
-        gl.disable(gl.POLYGON_OFFSET_FILL);
+        gl.disable(GL.POLYGON_OFFSET_FILL);
+
+        if (!this.props.depthTest) {
+            gl.enable(GL.DEPTH_TEST);
+        }
 
         if (this.props.gridLines) {
             mesh_lines_model.draw();

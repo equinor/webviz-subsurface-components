@@ -116,6 +116,11 @@ interface Props {
     syncTemplate?: boolean;
 
     /**
+     * Primary axis id: "md", "tvd", "time"... Default is the first available from axisMnemos
+     */
+    primaryAxis?: string;
+
+    /**
      * Log mnemonics for axes
      */
     axisTitles: Record<string, string>;
@@ -284,7 +289,7 @@ class SyncLogViewer extends Component<Props, State> {
                     primaryAxis = this.props.templates[0].scale.primary;
             }
         }
-
+        if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
         this.state = {
             primaryAxis: primaryAxis, //"md"
             axes: axes, //["md", "tvd"]
@@ -342,7 +347,9 @@ class SyncLogViewer extends Component<Props, State> {
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
         if (
             this.props.welllogs !== prevProps.welllogs ||
-            this.props.templates !== prevProps.templates /*||
+            this.props.templates !== prevProps.templates ||
+            this.props.axisMnemos !== prevProps.axisMnemos ||
+            this.props.primaryAxis !== prevProps.primaryAxis /*||
             this.props.colorTables !== prevProps.colorTables*/
         ) {
             const _axes = this.props.welllogs.map((welllog) =>
@@ -362,6 +369,7 @@ class SyncLogViewer extends Component<Props, State> {
                     }
                 }
             }
+            if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
             this.setState({
                 primaryAxis: primaryAxis,
                 axes: axes,
@@ -1134,8 +1142,13 @@ SyncLogViewer.propTypes = {
      */
     viewTitles: PropTypes.oneOfType([
         PropTypes.bool,
-        PropTypes.arrayOf(PropTypes.string),
-        PropTypes.arrayOf(PropTypes.object) /* react elemenet */,
+        PropTypes.arrayOf(
+            PropTypes.oneOfType([
+                PropTypes.bool,
+                PropTypes.string,
+                PropTypes.object,
+            ])
+        ) /* bool, string or react element */,
     ]),
 
     /**

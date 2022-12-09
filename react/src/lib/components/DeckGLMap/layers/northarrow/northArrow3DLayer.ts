@@ -68,7 +68,7 @@ export default class NorthArrow3DLayer extends Layer<
             view_at[2] - view_from[2],
         ]);
         dir.normalize();
-        dir.scale(1000.0);
+        dir.scale(9999);
 
         // pos: World coordinate for north arrow. Will be fixed relative to camera.
         const pos = new Vector3([
@@ -81,7 +81,8 @@ export default class NorthArrow3DLayer extends Layer<
 
         const zoom = this.context.viewport.zoom;
         const zoom_scale = Math.pow(2, zoom);
-        const scale = is_orthographic ? 15 / zoom_scale : 20;
+        const scale = is_orthographic ? 15 / zoom_scale : 99;
+
         for (let i = 0; i < model_lines.length / 3; i = i + 1) {
             const x = model_lines[i * 3 + 0] * scale + pos[0];
             const y = model_lines[i * 3 + 1] * scale + pos[1];
@@ -89,7 +90,6 @@ export default class NorthArrow3DLayer extends Layer<
             lines.push(x, y, z);
         }
 
-        // FIX dette  console.log(this.props.color)
         const color = this.props.color.map((x?: number) => (x ?? 0) / 255);
         color[3] = 1;
 

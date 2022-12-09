@@ -401,12 +401,6 @@ MapClampColor.parameters = {
     },
 };
 
-const axes = {
-    "@@type": "AxesLayer",
-    id: "axes-layer",
-    bounds: [432205, 6475078, -3500, 437930, 6482353, 0],
-};
-
 // Example using "colorMapFunction" property.
 const layer = {
     ...meshMapLayer,
@@ -427,33 +421,6 @@ colorMapFunction.args = {
         },
     ],
     bounds: [432150, 6475800, 439400, 6481500],
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-                layerIds: [],
-            },
-        ],
-    },
-};
-
-// GridLayer.
-const gridLayer = exampleData[0].layers[2];
-export const GridLayer = EditDataTemplate.bind({});
-GridLayer.args = {
-    ...exampleData[0],
-    layers: [
-        {
-            ...gridLayer,
-            visible: true,
-        },
-        axes,
-    ],
-    toolbar: {
-        visible: false,
-    },
     views: {
         layout: [1, 1],
         viewports: [

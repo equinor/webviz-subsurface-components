@@ -212,6 +212,9 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     // Will calculate normals for each vertex and enable phong shading.
     // If not set the shader will calculate constant normal for each triangle.
     smoothShading: boolean;
+
+    // Enable/disable depth testing when rendering layer. Default true.
+    depthTest: boolean;
 }
 
 export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
@@ -352,6 +355,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
                 smoothShading: this.props.smoothShading,
+                depthTest: this.props.depthTest,
             })
         );
         return [layer];

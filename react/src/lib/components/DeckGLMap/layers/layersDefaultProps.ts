@@ -54,6 +54,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         gridLines: false,
         smoothShading: true,
         material: true,
+        depthTest: true,
     },
 
     Map3DLayer: {
@@ -75,15 +76,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         isContoursDepth: true,
         smoothShading: true,
         material: true,
-    },
-    GridLayer: {
-        "@@type": "GridLayer",
-        id: "grid-layer",
-        name: "Grid",
-        pickable: true,
-        valueRange: { type: "array", value: [0, 1] },
-        colorMapRange: { type: "array", value: [0, 1] },
-        material: true,
+        depthTest: true,
     },
     WellsLayer: {
         "@@type": "WellsLayer",
@@ -104,6 +97,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         wellNameSize: 14,
         wellNameColor: [0, 0, 0, 255],
         selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
+        depthTest: true,
     },
     FaultPolygonsLayer: {
         "@@type": "FaultPolygonsLayer",
@@ -113,6 +107,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         visible: true,
         filled: true,
         lineWidthMinPixels: 2,
+        depthTest: true,
     },
     PieChartLayer: {
         "@@type": "PieChartLayer",
@@ -121,6 +116,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         pickable: true,
         visible: true,
         selectedPie: "@@editedData.selectedPie", // used to get data from deckgl layer
+        depthTest: true,
     },
     AxesLayer: {
         "@@type": "AxesLayer",
@@ -158,14 +154,14 @@ export const layersDefaultProps: Record<string, unknown> = {
             features: [],
         },
     },
-    LassoLayer: {
-        "@@type": "LassoLayer",
-        name: "Lasso",
-        id: "lasso-layer",
+    BoxSelectionLayer: {
+        "@@type": "BoxSelectionLayer",
+        name: "boxSelection",
+        id: "boxSelection-layer",
         pickable: true,
-        visible: false,
+        visible: true,
 
-        // Props used to get/set data in the drawing layer.
+        // Props used to get/set data in the box selection layer.
         selectedFeatureIndexes: [] as number[],
         data: {
             type: "FeatureCollection",
@@ -178,5 +174,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         id: "grid-3d-layer",
         visible: true,
         material: true,
+        colorMapName: "",
+        propertyValueRange: [0.0, 1.0],
+        depthTest: true,
     },
 };
