@@ -248,7 +248,7 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
-    cameraPosition?: ViewStateType | undefined;
+    cameraPosition?: ViewStateType;
 }
 
 export interface MapMouseEvent {
@@ -315,7 +315,7 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
-    cameraPosition = {} as ViewStateType,
+    cameraPosition,
     getCameraPosition,
     triggerHome,
     triggerResetMultipleWells,
@@ -339,9 +339,7 @@ const Map: React.FC<MapProps> = ({
     function calcDefaultViewStates() {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-        const isBoundsDefined =
-            typeof bounds !== "undefined" &&
-            typeof cameraPosition !== "undefined";
+
         const union_of_reported_bboxes = addBoundingBoxes(
             reportedBoundingBoxAcc,
             reportedBoundingBox
@@ -365,6 +363,7 @@ const Map: React.FC<MapProps> = ({
         }
 
         let tempViewStates: Record<string, ViewStateType> = {};
+        const isBoundsDefined = typeof bounds !== "undefined";
         tempViewStates = Object.fromEntries(
             viewsProps.map((item, index) => [
                 item.id,
@@ -390,7 +389,7 @@ const Map: React.FC<MapProps> = ({
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
         {
-            "main-view_2D": cameraPosition,
+            "main-view_2D": cameraPosition ?? ({} as ViewStateType),
         }
     );
     const [firstViewStateId, setFirstViewStatesId] =
@@ -498,6 +497,8 @@ const Map: React.FC<MapProps> = ({
                 setFirstViewStatesId(viewsProps[0].id);
             }
             setViewStates(tempViewStates);
+        } else {
+            calcDefaultViewStates();
         }
     }, [bounds]);
 
