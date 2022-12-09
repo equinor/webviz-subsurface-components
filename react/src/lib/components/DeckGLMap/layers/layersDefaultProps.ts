@@ -78,16 +78,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         material: true,
         depthTest: true,
     },
-    GridLayer: {
-        "@@type": "GridLayer",
-        id: "grid-layer",
-        name: "Grid",
-        pickable: true,
-        valueRange: { type: "array", value: [0, 1] },
-        colorMapRange: { type: "array", value: [0, 1] },
-        material: true,
-        depthTest: true,
-    },
     WellsLayer: {
         "@@type": "WellsLayer",
         name: "Wells",
