@@ -5,7 +5,6 @@ import {
     brush,
     fault,
     pie_chart,
-    grid_layer,
     hill_shading,
     surface_layer,
 } from "@equinor/eds-icons";
@@ -17,7 +16,6 @@ Icon.add({
     brush,
     fault,
     pie_chart,
-    grid_layer,
     hill_shading,
     surface_layer,
 });
@@ -107,7 +105,6 @@ export const LayerIcons = {
     WellsLayer: "well",
     Map3DLayer: "map",
     PieChartLayer: "pie_chart",
-    GridLayer: "grid_layer",
     FaultPolygonsLayer: "fault",
     DrawingLayer: "brush",
     AxesLayer: "brush",

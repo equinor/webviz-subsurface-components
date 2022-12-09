@@ -76,21 +76,6 @@
         "image": "@@#resources.depthMap"
       },
       {
-        "@@type": "GridLayer",
-        "id": "grid-layer",
-        "data": "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/grid_layer.json",
-        "colorMapName": "Rainbow",
-        "valueRange": [
-          0,
-          1
-        ],
-        "colorMapRange": [
-          0,
-          1
-        ],
-        "visible": false
-      },
-      {
         "@@type": "Map3DLayer",
         "bounds": [
           432205,
