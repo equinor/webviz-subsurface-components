@@ -129,8 +129,8 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "Axes2D",
         id: "axes2d-layer",
         visible: true,
-        marginH: 10, // Horizontal margin (%)
-        marginV: 10, // Vertical margin (%)
+        marginH: 30, // Horizontal margin (in pixles)
+        marginV: 30, // Vertical margin (in pixles)
     },
     NorthArrow3DLayer: {
         "@@type": "NorthArrow3DLayer",
