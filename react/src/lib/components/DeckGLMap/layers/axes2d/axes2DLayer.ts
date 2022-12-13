@@ -95,6 +95,13 @@ export default class Axes2DLayer extends CompositeLayer<
     }
 
     renderLayers(): LayersList {
+        const is_orthographic =
+            this.context.viewport.constructor === OrthographicViewport;
+
+        if (!is_orthographic) {
+            return [];
+        }
+
         // pixels2world: factor to convert a length from pixels to world space.
         const npixels = 100;
         const p1 = [0, 0];
@@ -129,13 +136,6 @@ export default class Axes2DLayer extends CompositeLayer<
             number,
             number
         ];
-
-        const is_orthographic =
-            this.context.viewport.constructor === OrthographicViewport;
-
-        if (!is_orthographic) {
-            return [];
-        }
 
         const box_lines = GetBoxLines(bounds);
 
