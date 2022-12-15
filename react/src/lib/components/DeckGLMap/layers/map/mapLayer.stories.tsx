@@ -88,7 +88,7 @@ const nodeCenteredPropertiesLayer = {
     propertiesUrl:
         "data:text/plain;base64,ZmYmQM3MLEAzMzNAmpk5QM3MDEAzMxNAmpkZQAAAIEBmZuY/MzPzPwAAAEBmZgZAMzOzPwAAwD/NzMw/mpnZPwAAgD/NzIw/mpmZP2Zmpj8=",
     gridLines: true,
-    material: false,
+    material: true,
     // black to white colors.
     colorMapFunction: (value: number) => [
         value * 255,
@@ -113,13 +113,14 @@ const cellCenteredPropertiesLayer = {
     propertiesUrl:
         "data:text/plain;base64,ZmZmPwAAgD/NzIw/mpkZPzMzMz/NzEw/mpmZPs3MzD4AAAA/AAAAAM3MzD3NzEw+",
     gridLines: true,
-    material: false,
+    material: true,
     // black to white colors.
     colorMapFunction: (value: number) => [
         value * 255,
         value * 255,
         value * 255,
     ],
+    smoothShading: true,
 };
 
 // Example using "Map" layer. Uses PNG float for mesh and properties.
@@ -138,6 +139,7 @@ const meshMapLayerPng = {
     isContoursDepth: true,
     gridLines: false,
     material: true,
+    smoothShading: true,
     colorMapName: "Physics",
 };
 
@@ -580,7 +582,7 @@ SmallMap.args = {
         viewports: [
             {
                 id: "view_1",
-                show3D: false,
+                show3D: true,
             },
         ],
     },
@@ -598,7 +600,7 @@ SmallMap.parameters = {
 const axes_lite = {
     "@@type": "AxesLayer",
     id: "axes_small",
-    bounds: [-1, -1, -30, 4, 5, 0],
+    bounds: [-1, -1, -3, 4, 5, 0],
 };
 
 //-- CellCenteredPropMap --
@@ -615,7 +617,7 @@ CellCenteredPropMap.args = {
         viewports: [
             {
                 id: "view_1",
-                show3D: false,
+                show3D: true,
             },
         ],
     },
@@ -644,7 +646,7 @@ NodeCenteredPropMap.args = {
         viewports: [
             {
                 id: "view_1",
-                show3D: false,
+                show3D: true,
             },
         ],
     },
@@ -905,7 +907,7 @@ export const ColorMapRange: ComponentStory<typeof DeckGLMap> = (args) => {
                 max={41048}
                 defaultValue={41048}
                 step={1000}
-                onChangeCommitted={handleChange}
+                onChange={handleChange}
             />
         </>
     );

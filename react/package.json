@@ -35,6 +35,7 @@
         "test_perf": "jest _performance",
         "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
         "test": "jest --coverage",
+        "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
         "build:npm": "rimraf dist && tsc -project tsconfig.build.json --declaration && npm run copy-files",
         "copy-files": "copyfiles package.json dist && copyfiles --up 1 ../README.md dist && copyfiles --exclude **/*.{tsx,jsx,js,ts,snap} --up 2 \"src/lib/**/*\" dist/",
@@ -51,7 +52,7 @@
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL",
     "dependencies": {
-        "@emerson-eps/color-tables": "^0.4.25",
+        "@emerson-eps/color-tables": "^0.4.33",
         "@equinor/eds-core-react": "^0.12.1",
         "@equinor/eds-icons": "^0.9.1",
         "@equinor/videx-wellog": "^0.7.0",

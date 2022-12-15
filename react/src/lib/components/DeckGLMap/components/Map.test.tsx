@@ -24,7 +24,6 @@ describe("Test Map component", () => {
                         coords={mapData[0].coords}
                         scale={mapData[0].scale}
                         coordinateUnit={mapData[0].coordinateUnit}
-                        legend={mapData[0].legend}
                         editedData={mapData[0].editedData}
                         views={{
                             layout: [1, 1],
@@ -55,7 +54,6 @@ describe("Test Map component", () => {
                         coords={mapData[0].coords}
                         scale={mapData[0].scale}
                         coordinateUnit={mapData[0].coordinateUnit}
-                        legend={mapData[0].legend}
                         editedData={{}}
                         views={{
                             layout: [1, 1],

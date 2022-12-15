@@ -1,15 +1,23 @@
 import {
-    CompositeLayer,
-    Color,
-    Position,
+    Layer,
     PickingInfo,
+    picking,
+    Color,
     UpdateParameters,
+    project,
 } from "@deck.gl/core/typed";
-import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
-import { SolidPolygonLayer } from "@deck.gl/layers/typed";
+import {
+    LayerPickInfo,
+    PropertyDataType,
+    createPropertyData,
+} from "../utils/layerTools";
+import { ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
-import { DeckGLLayerContext } from "../../components/Map";
-import { Vector3 } from "@math.gl/core";
+import { Vector2 } from "@math.gl/core";
+import vertexShader from "./vertex.glsl";
+import fragmentShader from "./fragment.glsl";
+import GL from "@luma.gl/constants";
+import { Model, Geometry } from "@luma.gl/engine";
 
 type PieProperties = [{ color: Color; label: string }];
 
@@ -26,71 +34,202 @@ interface PiesData {
     properties: PieProperties;
 }
 
-// These are the data SolidPolygonLayer expects.
-interface PolygonData {
-    polygon: Position[];
-    properties: {
-        color: Color;
-        name: string;
-        pieIndex: number;
-    };
-}
-
 export interface PieChartLayerProps<D> extends ExtendedLayerProps<D> {
     selectedPie: D;
+
+    // Enable/disable depth testing when rendering layer. Default true.
+    depthTest: boolean;
 }
 
-export default class PieChartLayer extends CompositeLayer<
-    PieChartLayerProps<PiesData>
-> {
-    onClick(info: PickingInfo): boolean {
-        // Make selection only when drawing is disabled
-        if (isDrawingEnabled(this.context.layerManager)) {
-            return false;
-        } else {
-            const pie_idx = (info.object as PolygonData)?.properties.pieIndex;
-            (this.context as DeckGLLayerContext).userData.setEditedData({
-                selectedPie: (this.props.data as unknown as PiesData)?.pies[
-                    pie_idx
-                ],
-            });
-            return true;
+export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
+    initializeState(): void {
+        return;
+    }
+
+    shouldUpdateState(): boolean {
+        return true;
+    }
+
+    updateState({ context }: UpdateParameters<this>): void {
+        if (!this.state?.["model"]) {
+            const pieData = this.props.data as unknown as PiesData;
+            if (pieData?.pies) {
+                const { gl } = context;
+                this.setState(this.getModel(gl, pieData));
+            }
         }
     }
 
-    shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
-        return changeFlags.viewportChanged;
-    }
+    //eslint-disable-next-line
+    getModel(gl: any, pieData: PiesData) {
+        const vertexs: number[] = [];
+        const colors: number[] = [];
+        const mx: number[] = [];
+        const my: number[] = [];
+        const doScale: number[] = [];
+        const pieInfo: string[][] = [];
+        const pieInfoIndex: number[] = [];
 
-    renderLayers(): SolidPolygonLayer<PolygonData>[] {
-        const pieData = this.props.data as unknown as PiesData;
-        if (!pieData?.pies) {
-            // this.props.data is a sum type, and since TS doesn't have
-            // pattern matching, we must check it this way.
-            return [];
+        const dA = 5; // delta angle
+
+        let infoIndex = 0;
+        for (const pie of pieData.pies) {
+            const x = pie.x;
+            const y = pie.y;
+            const R = pie.R;
+
+            // Normalize
+            let sum = 0;
+            for (const frac of pie.fractions) {
+                sum += frac.value;
+            }
+
+            if (sum === 0) {
+                continue;
+            }
+
+            let start_a = -90.0;
+            for (let i = 0; i < pie.fractions.length; i++) {
+                const frac = pie.fractions[i].value / sum;
+                const end_a = start_a + frac * 360.0;
+
+                const prop = pieData.properties[pie.fractions[i].idx];
+                let col: number[] = (prop?.color as number[]) ?? [
+                    255, 0, 255, 255,
+                ]; // magenta
+                col = col.map(
+                    (x) => (x ?? 0) / 255 // Normalize to [0,1] range.
+                );
+
+                const name = prop?.label ?? "no label";
+                const frac_string = (frac * 100).toFixed(1) + "%";
+                pieInfo.push([name, frac_string]);
+
+                // Make triangles for one pie pice.
+                for (let a = start_a; a < end_a; a += dA) {
+                    const a1 = a;
+                    const rad1 = (a1 * (2.0 * Math.PI)) / 360.0;
+                    const xx1 = R * Math.cos(rad1) + x;
+                    const yy1 = R * Math.sin(rad1) + y;
+
+                    const a2 = Math.min(a1 + dA, end_a);
+                    const rad2 = (a2 * (2.0 * Math.PI)) / 360.0;
+                    const xx2 = R * Math.cos(rad2) + x;
+                    const yy2 = R * Math.sin(rad2) + y;
+
+                    vertexs.push(x, y, 0);
+                    mx.push(x);
+                    my.push(y);
+                    colors.push(...col);
+                    pieInfoIndex.push(infoIndex);
+                    doScale.push(0);
+
+                    vertexs.push(xx1, yy1, 0);
+                    mx.push(x);
+                    my.push(y);
+                    colors.push(...col);
+                    pieInfoIndex.push(infoIndex);
+                    doScale.push(1);
+
+                    vertexs.push(xx2, yy2, 0);
+                    mx.push(x);
+                    my.push(y);
+                    colors.push(...col);
+                    pieInfoIndex.push(infoIndex);
+                    doScale.push(1);
+                }
+
+                infoIndex++;
+
+                start_a = end_a;
+            }
         }
 
-        const is_orthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
+        const model = new Model(gl, {
+            id: `${this.props.id}-pie`,
+            vs: vertexShader,
+            fs: fragmentShader,
+            geometry: new Geometry({
+                drawMode: GL.TRIANGLES,
+                attributes: {
+                    positions: { value: new Float32Array(vertexs), size: 3 },
+                    colors: { value: new Float32Array(colors), size: 3 },
+                    pie_index: { value: new Int32Array(pieInfoIndex), size: 1 },
+                    mx: { value: new Float32Array(mx), size: 1 },
+                    my: { value: new Float32Array(my), size: 1 },
+                    do_scale: { value: new Float32Array(doScale), size: 1 },
+                },
+                vertexCount: vertexs.length / 3,
+            }),
+
+            modules: [project, picking],
+            isInstanced: false, // This only works when set to false.
+        });
+
+        return { model, pieInfo };
+    }
+
+    // Signature from the base class, eslint doesn't like the any type.
+    // eslint-disable-next-line
+    draw(args: any): void {
+        if (!this.state?.["model"]) {
+            return;
+        }
+
+        const { context } = args;
+        const { gl } = context;
 
         const npixels = 100;
-        const p1 = is_orthographic ? [0, 0, 0] : [0, 0];
-        const p2 = is_orthographic ? [npixels, 0, 0] : [npixels, 0];
+        const p1 = [0, 0];
+        const p2 = [npixels, 0];
 
-        const v1 = new Vector3(this.context.viewport.unproject(p1));
-        const v2 = new Vector3(this.context.viewport.unproject(p2));
+        const p1_unproj = this.context.viewport.unproject(p1);
+        const p2_unproj = this.context.viewport.unproject(p2);
+
+        const v1 = new Vector2(p1_unproj[0], p1_unproj[1]);
+        const v2 = new Vector2(p2_unproj[0], p2_unproj[1]);
         const d = v1.distance(v2);
 
         // Factor to convert a length in pixels to a length in world space.
         const pixels2world = d / npixels;
+        const scale = pixels2world;
 
-        const layer = new SolidPolygonLayer<PolygonData>(
-            this.getSubLayerProps({
-                data: makePies(pieData, pixels2world),
-                getFillColor: (d: PolygonData) => d.properties.color,
-            })
-        );
-        return [layer];
+        const model = this.state["model"];
+
+        if (!this.props.depthTest) {
+            gl.disable(GL.DEPTH_TEST);
+        }
+
+        model.setUniforms({ scale }).draw();
+
+        if (!this.props.depthTest) {
+            gl.enable(GL.DEPTH_TEST);
+        }
+    }
+
+    decodePickingColor(): number {
+        return this.nullPickingColor() as unknown as number;
+    }
+
+    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
+        if (!info.color) {
+            return info;
+        }
+        // Note these colors are in the  0-255 range.
+        const r = info.color[0];
+        const g = info.color[1];
+        const b = info.color[2];
+
+        const pieIndex = 256 * 256 * r + 256 * g + b;
+
+        const [pie_label, pie_frac] = this.state["pieInfo"][pieIndex];
+        const layer_properties: PropertyDataType[] = [];
+        layer_properties.push(createPropertyData(pie_label, pie_frac));
+
+        return {
+            ...info,
+            properties: layer_properties,
+        };
     }
 }
 
@@ -98,75 +237,3 @@ PieChartLayer.layerName = "PieChartLayer";
 PieChartLayer.defaultProps = layersDefaultProps[
     "PieChartLayer"
 ] as PieChartLayerProps<PiesData>;
-
-//================= Local help functions. ==================
-function makePies(data: PiesData, pixels2world: number): PolygonData[] {
-    let polygons: PolygonData[] = [];
-    let pie_index = 0;
-    for (const pie of data.pies) {
-        polygons = polygons.concat(
-            makePie(pie, data.properties, pie_index++, pixels2world)
-        );
-    }
-    return polygons;
-}
-
-// return array of one pie's polygon's
-function makePie(
-    pie: PieData,
-    properties: PieProperties,
-    pieIndex: number,
-    pixels2world: number
-): PolygonData[] {
-    const dA = 10; // delta angle
-
-    const x = pie.x;
-    const y = pie.y;
-    const R = pie.R * pixels2world; // R: Radius in world coordinates.
-
-    // Normalize
-    let sum = 0;
-    for (const frac of pie.fractions) {
-        sum += frac.value;
-    }
-
-    const pie_polygons: PolygonData[] = [];
-
-    if (sum === 0) {
-        return pie_polygons;
-    }
-
-    let start_a = -90.0;
-    for (let i = 0; i < pie.fractions.length; i++) {
-        const frac = pie.fractions[i].value / sum;
-        const end_a = start_a + frac * 360.0;
-        const coordinates: Position[] = [];
-        coordinates.push([x, y]);
-        for (let a = start_a; a < end_a; a += dA) {
-            const rad = (a * (2.0 * Math.PI)) / 360.0;
-            const xx = R * Math.cos(rad) + x;
-            const yy = R * Math.sin(rad) + y;
-            coordinates.push([xx, yy]);
-        }
-        const rad = (end_a * (2.0 * Math.PI)) / 360.0;
-        const xx = R * Math.cos(rad) + x;
-        const yy = R * Math.sin(rad) + y;
-        coordinates.push([xx, yy]);
-        coordinates.push([x, y]);
-
-        const prop = properties[pie.fractions[i].idx];
-        const col = prop?.color ?? [255, 0, 255]; // magenta
-        const label = prop?.label ?? "no label";
-
-        pie_polygons.push({
-            polygon: coordinates,
-            properties: {
-                color: col,
-                name: label + ": " + (frac * 100).toFixed(1) + "%",
-                pieIndex: pieIndex,
-            },
-        });
-        start_a = end_a;
-    }
-    return pie_polygons;
-}

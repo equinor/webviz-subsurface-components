@@ -5,6 +5,7 @@ import {
     CompositeLayer,
     UpdateParameters,
     PickingInfo,
+    OrbitViewport,
 } from "@deck.gl/core/typed";
 import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
 import { PathLayer, TextLayer } from "@deck.gl/layers/typed";
@@ -40,6 +41,7 @@ import {
 } from "../../components/ColorLegend";
 import { getLayersById } from "../../layers/utils/layerTools";
 import UnfoldedGeoJsonLayer from "../intersection/unfoldedGeoJsonLayer";
+import GL from "@luma.gl/constants";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -97,6 +99,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameSize: number;
     wellNameColor: Color;
     isLog: boolean;
+    depthTest: boolean;
 }
 
 export interface LogCurveDataType {
@@ -185,7 +188,7 @@ function getColor(accessor: ColorAccessor) {
     };
 }
 
-function getSize(
+export function getSize(
     type: string,
     accessor: SizeAccessor,
     offset = 0
@@ -299,11 +302,8 @@ export default class WellsLayer extends CompositeLayer<
             ? splineRefine(this.props.data as unknown as FeatureCollection) // smooth well paths.
             : (this.props.data as unknown as FeatureCollection);
 
-        const is3d = this.context.viewport.constructor.name === "OrbitViewport";
-        const isOrthographic =
-            this.context.viewport.constructor.name === "OrthographicViewport";
-        const positionFormat = isOrthographic ? "XY" : "XYZ";
-
+        const is3d = this.context.viewport.constructor === OrbitViewport;
+        const positionFormat = "XYZ";
         const isDashed = !!this.props.lineStyle?.dash;
 
         const extensions = [
@@ -312,6 +312,10 @@ export default class WellsLayer extends CompositeLayer<
                 highPrecisionDash: isDashed,
             }),
         ];
+
+        const parameters = {
+            [GL.DEPTH_TEST]: this.props.depthTest,
+        };
 
         const outline = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
@@ -331,6 +335,7 @@ export default class WellsLayer extends CompositeLayer<
                 getDashArray: getDashFactor(this.props.lineStyle?.dash),
                 lineBillboard: true,
                 pointBillboard: true,
+                parameters,
             })
         );
 
@@ -361,6 +366,7 @@ export default class WellsLayer extends CompositeLayer<
                 ),
                 lineBillboard: true,
                 pointBillboard: true,
+                parameters,
             })
         );
 
@@ -387,6 +393,7 @@ export default class WellsLayer extends CompositeLayer<
                 ),
                 getFillColor: getColor(this.props.wellHeadStyle?.color),
                 getLineColor: getColor(this.props.lineStyle?.color),
+                parameters,
             })
         );
 
@@ -413,6 +420,7 @@ export default class WellsLayer extends CompositeLayer<
                 ),
                 getFillColor: [255, 140, 0],
                 getLineColor: [255, 140, 0],
+                parameters,
             })
         );
 
@@ -466,6 +474,7 @@ export default class WellsLayer extends CompositeLayer<
                 onDataLoad: (value: LogCurveDataType[]) => {
                     this.setLegend(value);
                 },
+                parameters,
             })
         );
 
@@ -520,6 +529,7 @@ export default class WellsLayer extends CompositeLayer<
                 onDataLoad: (value: LogCurveDataType[]) => {
                     this.setLegend(value);
                 },
+                parameters,
             })
         );
 
@@ -541,6 +551,7 @@ export default class WellsLayer extends CompositeLayer<
                 getAnchor: "start",
                 getAlignmentBaseline: "bottom",
                 getSize: this.props.wellNameSize,
+                parameters,
             })
         );
 

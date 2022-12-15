@@ -13,24 +13,16 @@ import {
 } from "@deck.gl/core/typed";
 import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import Settings from "./settings/Settings";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
-import { MapState } from "../redux/store";
-import { useSelector, useDispatch } from "react-redux";
-import { setSpec } from "../redux/actions";
 import { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import ColorLegends from "./ColorLegends";
 import {
     applyPropsOnLayers,
-    ExtendedLayer,
-    getLayersInViewport,
     getLayersWithDefaultProps,
 } from "../layers/utils/layerTools";
-import ViewFooter from "./ViewFooter";
 import fitBounds from "../utils/fit-bounds";
 import {
     validateColorTables,
@@ -216,12 +208,6 @@ export interface MapProps {
         visible?: boolean | null;
     };
 
-    legend?: {
-        visible?: boolean | null;
-        cssStyle?: Record<string, unknown> | null;
-        horizontal?: boolean | null;
-    };
-
     /**
      * Prop containing color table data
      */
@@ -238,7 +224,7 @@ export interface MapProps {
     setEditedData?: (data: Record<string, unknown>) => void;
 
     /**
-     * Validate JSON datafile against schems
+     * Validate JSON datafile against schema
      */
     checkDatafileSchema?: boolean;
 
@@ -262,7 +248,7 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
-    cameraPosition?: ViewStateType | undefined;
+    cameraPosition?: ViewStateType;
 }
 
 export interface MapMouseEvent {
@@ -296,6 +282,22 @@ function defaultTooltip(info: PickingInfo) {
     return feat?.properties?.["name"];
 }
 
+function adjustCameraTarget(
+    viewStates: Record<string, ViewStateType>,
+    scale: number,
+    newScale: number
+): Record<string, ViewStateType> {
+    const vs = cloneDeep(viewStates);
+    for (const key in vs) {
+        if (typeof vs[key].target !== "undefined") {
+            const t = vs[key].target;
+            const z = newScale * (t[2] / scale);
+            vs[key].target = [t[0], t[1], z];
+        }
+    }
+    return vs;
+}
+
 const Map: React.FC<MapProps> = ({
     id,
     resources,
@@ -305,8 +307,6 @@ const Map: React.FC<MapProps> = ({
     coords,
     scale,
     coordinateUnit,
-    toolbar,
-    legend,
     colorTables,
     editedData,
     setEditedData,
@@ -315,7 +315,7 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
-    cameraPosition = {} as ViewStateType,
+    cameraPosition,
     getCameraPosition,
     triggerHome,
     triggerResetMultipleWells,
@@ -326,6 +326,7 @@ const Map: React.FC<MapProps> = ({
 
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
+    const [alteredLayers, setAlteredLayers] = useState([{}]);
 
     const initialViewState = getViewState(
         boundsInitial,
@@ -338,16 +339,14 @@ const Map: React.FC<MapProps> = ({
     function calcDefaultViewStates() {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-        const isBoundsDefined =
-            typeof bounds !== "undefined" &&
-            typeof cameraPosition !== "undefined";
+
         const union_of_reported_bboxes = addBoundingBoxes(
             reportedBoundingBoxAcc,
             reportedBoundingBox
         );
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
-        const axesLayer = st_layers.find((e) => {
+        const axesLayer = layers?.find((e) => {
             return e["@@type"] === "AxesLayer";
         });
         const isAxesLayer = typeof axesLayer !== "undefined";
@@ -364,6 +363,7 @@ const Map: React.FC<MapProps> = ({
         }
 
         let tempViewStates: Record<string, ViewStateType> = {};
+        const isBoundsDefined = typeof bounds !== "undefined";
         tempViewStates = Object.fromEntries(
             viewsProps.map((item, index) => [
                 item.id,
@@ -389,7 +389,7 @@ const Map: React.FC<MapProps> = ({
     // set initial view state based on supplied bounds and zoom in viewState
     const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
         {
-            "main-view_2D": cameraPosition,
+            "main-view_2D": cameraPosition ?? ({} as ViewStateType),
         }
     );
     const [firstViewStateId, setFirstViewStatesId] =
@@ -455,12 +455,6 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         setDeckGLViews(jsonToObject(viewsProps) as View[]);
     }, [viewsProps]);
-
-    // update store if any of the layer prop is changed
-    const dispatch = useDispatch();
-    const st_layers = useSelector(
-        (st: MapState) => st.spec["layers"]
-    ) as Record<string, unknown>[];
 
     const [reportedBoundingBox, setReportedBoundingBox] =
         useState<BoundingBox>(bboxInitial);
@@ -540,11 +534,19 @@ const Map: React.FC<MapProps> = ({
     };
 
     useEffect(() => {
-        setScaleZ(scaleZ * 1.05);
+        const newScaleZ = scaleZ * 1.05;
+        setScaleZ(newScaleZ);
+        // Make camera target follow the scaling.
+        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+        setViewStates(vs);
     }, [scaleZUp]);
 
     useEffect(() => {
-        setScaleZ(scaleZ * 0.95);
+        const newScaleZ = scaleZ * 0.95;
+        setScaleZ(newScaleZ);
+        // Make camera target follow the scaling.
+        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+        setViewStates(vs);
     }, [scaleZDown]);
 
     useEffect(() => {
@@ -558,7 +560,7 @@ const Map: React.FC<MapProps> = ({
     }, [views]);
 
     useEffect(() => {
-        if (st_layers == undefined || layers == undefined) return;
+        if (layers == undefined) return;
 
         const m = getModelMatrixScale(scaleZ);
 
@@ -576,25 +578,15 @@ const Map: React.FC<MapProps> = ({
             return layer;
         });
 
-        const updated_layers = applyPropsOnLayers(st_layers, layers_copy);
+        const updated_layers = applyPropsOnLayers(layers, layers_copy);
         const layers_default = getLayersWithDefaultProps(updated_layers);
-        const updated_spec = { layers: layers_default, views: views };
-        dispatch(setSpec(updated_spec));
-    }, [scaleZ, layers, dispatch]);
+        setAlteredLayers(layers_default);
+    }, [scaleZ, layers /*dispatch*/]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
-    useEffect(() => {
-        if (deckGLLayers) {
-            const wellsLayer = getLayersByType(
-                deckGLLayers,
-                "WellsLayer"
-            )?.[0] as WellsLayer;
-            if (wellsLayer) wellsLayer.setupLegend();
-        }
-    }, [deckGLLayers]);
 
     useEffect(() => {
-        const layers = st_layers;
+        const layers = alteredLayers;
         if (!layers || layers.length == 0) return;
 
         const enumerations = [];
@@ -603,7 +595,7 @@ const Map: React.FC<MapProps> = ({
         else enumerations.push({ editedData: {} });
 
         setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-    }, [st_layers, resources, editedData]);
+    }, [resources, editedData, layers, alteredLayers]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -632,6 +624,30 @@ const Map: React.FC<MapProps> = ({
     // multiple well layers
     const [multipleWells, setMultipleWells] = useState<string[]>([]);
     const [selectedWell, setSelectedWell] = useState<string>("");
+    const [shiftHeld, setShiftHeld] = useState(false);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function downHandler({ key }: any) {
+        if (key === "Shift") {
+            setShiftHeld(true);
+        }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function upHandler({ key }: any) {
+        if (key === "Shift") {
+            setShiftHeld(false);
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener("keydown", downHandler);
+        window.addEventListener("keyup", upHandler);
+        return () => {
+            window.removeEventListener("keydown", downHandler);
+            window.removeEventListener("keyup", upHandler);
+        };
+    }, []);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -834,9 +850,10 @@ const Map: React.FC<MapProps> = ({
             );
             if (cur_view?.layerIds && cur_view.layerIds.length > 0) {
                 const layer_ids = cur_view.layerIds;
-                return layer_ids.some((layer_id) =>
-                    args.layer.id.match(new RegExp("\\b" + layer_id + "\\b"))
-                );
+                return layer_ids.some((layer_id) => {
+                    const t = layer_id === args.layer.id;
+                    return t;
+                });
             } else {
                 return true;
             }
@@ -893,21 +910,26 @@ const Map: React.FC<MapProps> = ({
                         if (
                             Object.keys(updated_prop).includes("selectedWell")
                         ) {
-                            if (
-                                multipleWells.includes(
-                                    updated_prop["selectedWell"] as string
-                                )
-                            ) {
-                                const temp = multipleWells.filter(
-                                    (item) =>
-                                        item !== updated_prop["selectedWell"]
-                                );
-                                setMultipleWells(temp);
+                            if (shiftHeld) {
+                                if (
+                                    multipleWells.includes(
+                                        updated_prop["selectedWell"] as string
+                                    )
+                                ) {
+                                    const temp = multipleWells.filter(
+                                        (item) =>
+                                            item !==
+                                            updated_prop["selectedWell"]
+                                    );
+                                    setMultipleWells(temp);
+                                } else {
+                                    const temp = multipleWells.concat(
+                                        updated_prop["selectedWell"] as string
+                                    );
+                                    setMultipleWells(temp);
+                                }
                             } else {
-                                const temp = multipleWells.concat(
-                                    updated_prop["selectedWell"] as string
-                                );
-                                setMultipleWells(temp);
+                                setMultipleWells([]);
                             }
                         }
                         setEditedData?.(updated_prop);
@@ -926,42 +948,6 @@ const Map: React.FC<MapProps> = ({
                 onAfterRender={onAfterRender}
             >
                 {children}
-                {views?.viewports &&
-                    views.viewports.map((view, index) => (
-                        // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
-                        <View
-                            key={`${view.id}_${view.show3D ? "3D" : "2D"}`}
-                            id={`${view.id}_${view.show3D ? "3D" : "2D"}`}
-                        >
-                            {legend?.visible && (
-                                <ColorLegends
-                                    {...legend}
-                                    layers={
-                                        getLayersInViewport(
-                                            deckGLLayers,
-                                            view.layerIds
-                                        ) as ExtendedLayer<unknown>[]
-                                    }
-                                    colorTables={colorTables}
-                                />
-                            )}
-                            {toolbar?.visible && (
-                                <Settings
-                                    viewportId={view.id}
-                                    layerIds={view.layerIds}
-                                />
-                            )}
-                            {views.showLabel && (
-                                <ViewFooter>
-                                    {`${
-                                        view.name
-                                            ? view.name
-                                            : `View_${index + 1}`
-                                    } `}
-                                </ViewFooter>
-                            )}
-                        </View>
-                    ))}
             </DeckGL>
             {scale?.visible ? (
                 <DistanceScale
@@ -1006,11 +992,6 @@ Map.defaultProps = {
     },
     toolbar: {
         visible: false,
-    },
-    legend: {
-        visible: true,
-        cssStyle: { top: 5, right: 10 },
-        horizontal: false,
     },
     coordinateUnit: "m",
     views: {
@@ -1184,8 +1165,8 @@ function getViews(
                 const id_suffix = cur_viewport.show3D ? "_3D" : "_2D";
                 const view_id: string = cur_viewport.id + id_suffix;
 
-                const far = 99999;
-                const near = cur_viewport.show3D ? 0.01 : -99999;
+                const far = 9999;
+                const near = cur_viewport.show3D ? 0.1 : -9999;
 
                 deckgl_views.push({
                     "@@type": view_type,
@@ -1205,6 +1186,8 @@ function getViews(
                     flipY: false,
                     far,
                     near,
+                    minZoom: cur_viewport.show3D ? -12 : -15,
+                    maxZoom: cur_viewport.show3D ? +12 : +15,
                     isSync: views.viewports[deckgl_views.length].isSync,
                 });
                 xPos = xPos + 99.5 / nX;

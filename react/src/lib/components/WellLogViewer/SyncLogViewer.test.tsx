@@ -24,14 +24,16 @@ describe("Sync Log Viewer", () => {
         const { container } = render(
             <SyncLogViewer
                 id="Sync-Log-Viewer"
-                hideTitles={true}
-                hideLegend={true}
+                welllogOptions={{
+                    hideTrackTitle: true,
+                    hideTrackLegend: true,
+                }}
                 primaryAxis={"md"}
                 axisTitles={axisTitles}
                 axisMnemos={axisMnemos}
-                welllogs={[exampleWellLog]}
-                templates={[exampleTemplate]}
-                colorTables={[exampleColorTables]}
+                welllogs={[exampleWellLog]} // the same log for all wellog viewers
+                templates={[exampleTemplate]} // the same template for all wellog viewers
+                colorTables={[exampleColorTables]} // the same colortables for all wellog viewers
             />
         );
         expect(container.firstChild).toMatchSnapshot();

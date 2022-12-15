@@ -79,6 +79,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
             if (axes.indexOf(this.props.template.scale.primary) >= 0)
                 primaryAxis = this.props.template.scale.primary;
         }
+        if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
         this.state = {
             primaryAxis: primaryAxis, //"md"
             axes: axes, //["md", "tvd"]
@@ -129,7 +130,9 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     ): void {
         if (
             this.props.welllog !== prevProps.welllog ||
-            this.props.template !== prevProps.template /*||
+            this.props.template !== prevProps.template ||
+            this.props.axisMnemos !== prevProps.axisMnemos ||
+            this.props.primaryAxis !== prevProps.primaryAxis /*||
             this.props.colorTables !== prevProps.colorTables*/
         ) {
             const axes = getAvailableAxes(
@@ -142,6 +145,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     primaryAxis = this.props.template.scale.primary;
                 } else if (this.props.welllog === prevProps.welllog) return; // nothing to update
             }
+            if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
             this.setState({
                 primaryAxis: primaryAxis,
                 axes: axes,
@@ -248,7 +252,6 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
 
     render(): JSX.Element {
         const maxContentZoom = 256;
-        const checkDatafileSchema = true;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <WellLogViewWithScroller
@@ -257,14 +260,11 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     colorTables={this.props.colorTables}
                     wellpick={this.props.wellpick}
                     horizontal={this.props.horizontal}
-                    hideTitles={this.props.hideTitles}
-                    hideLegend={this.props.hideLegend}
-                    maxVisibleTrackNum={this.props.maxVisibleTrackNum}
                     maxContentZoom={maxContentZoom}
-                    checkDatafileSchema={checkDatafileSchema}
                     primaryAxis={this.state.primaryAxis}
                     axisTitles={this.props.axisTitles}
                     axisMnemos={this.props.axisMnemos}
+                    options={this.props.options}
                     onInfo={this.onInfo}
                     onCreateController={this.onCreateController}
                     onTrackMouseEvent={onTrackMouseEvent}
@@ -318,6 +318,29 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
 }
 
 ///
+const WellLogViewOptions_propTypes = PropTypes.shape({
+    /**
+     * The maximum zoom value
+     */
+    maxContentZoom: PropTypes.number,
+    /**
+     * The maximum number of visible tracks
+     */
+    maxVisibleTrackNum: PropTypes.number,
+    /**
+     * Validate JSON datafile against schema
+     */
+    checkDatafileSchema: PropTypes.bool,
+    /**
+     * Hide titles of the track. Default is false
+     */
+    hideTrackTitle: PropTypes.bool,
+    /**
+     * Hide legends of the track. Default is false
+     */
+    hideTrackLegend: PropTypes.bool,
+});
+
 const InfoOptions_propTypes = PropTypes.shape({
     /**
      * Show not only visible tracks
@@ -359,16 +382,6 @@ WellLogViewer.propTypes = {
     horizontal: PropTypes.bool,
 
     /**
-     * Hide titles of the track. Default is false
-     */
-    hideTitles: PropTypes.bool,
-
-    /**
-     * Hide legends of the track. Default is false
-     */
-    hideLegend: PropTypes.bool,
-
-    /**
      * Initial visible interval of the log data
      */
     domain: PropTypes.arrayOf(PropTypes.number),
@@ -399,19 +412,23 @@ WellLogViewer.propTypes = {
     axisMnemos: PropTypes.object,
 
     /**
-     * The maximum number of visible tracks
-     */
-    maxVisibleTrackNum: PropTypes.number,
-
-    /**
      * The maximum zoom value
      */
     maxContentZoom: PropTypes.number,
 
     /**
-     * Validate JSON datafile against schems
+     * Set to true for default titles or to array of individial welllog titles
      */
-    checkDatafileSchema: PropTypes.bool,
+    viewTitle: PropTypes.oneOfType([
+        PropTypes.bool,
+        PropTypes.string,
+        PropTypes.object /* react element */,
+    ]),
+
+    /**
+     * WellLogView additional options
+     */
+    options: WellLogViewOptions_propTypes /*PropTypes.object,*/,
 
     /**
      * Options for readout panel

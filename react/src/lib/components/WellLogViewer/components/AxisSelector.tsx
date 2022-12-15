@@ -34,7 +34,9 @@ class AxisSelector extends Component<Props> {
                     <legend>{this.props.header}</legend>
                     {this.props.axes.map((axis) => {
                         return this.createItem(
-                            this.props.axisLabels[axis],
+                            this.props.axisLabels
+                                ? this.props.axisLabels[axis]
+                                : axis,
                             axis
                         );
                     })}

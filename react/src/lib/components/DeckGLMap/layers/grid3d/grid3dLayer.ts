@@ -4,6 +4,7 @@ import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
+import { layersDefaultProps } from "../layersDefaultProps";
 
 export type WebWorkerParams = {
     points: number[];
@@ -38,18 +39,12 @@ function GetBBox(
 async function load_data(
     pointsUrl: string,
     polysUrl: string,
-    propertiesUrl: string,
-    scaleZ: number
+    propertiesUrl: string
 ) {
     // FULL GRID
     const points = await load(pointsUrl, JSONLoader);
     const polys = await load(polysUrl, JSONLoader);
     const properties = await load(propertiesUrl, JSONLoader);
-
-    // z scale.
-    for (let i = 0; i < points.length / 3; i++) {
-        points[3 * i + 2] = scaleZ * points[3 * i + 2];
-    }
 
     return Promise.all([points, polys, properties]);
 }
@@ -62,13 +57,11 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
     polysUrl: string;
     propertiesUrl: string;
 
-    scaleZ: number;
-
     // Name of color map. E.g "PORO"
     colorMapName: string;
 
     // Use color map in this range.
-    colorMapRange: [number, number];
+    colorMapRange?: [number, number];
 
     // Clamp colormap to this color at ends.
     // Given as array of three values (r,g,b) e.g: [255, 0, 0]
@@ -93,14 +86,10 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
     //           specularColor: [255, 255, 255],
     //       }
     material: Material;
-}
 
-const defaultProps = {
-    colorMapName: "",
-    colorMapRange: [0, 1],
-    propertyValueRange: [0.0, 1.0],
-    scaleZ: 1,
-};
+    // Enable/disable depth testing when rendering layer. Default true.
+    depthTest: boolean;
+}
 
 export default class Grid3DLayer extends CompositeLayer<
     Grid3DLayerProps<unknown>
@@ -109,8 +98,7 @@ export default class Grid3DLayer extends CompositeLayer<
         const p = load_data(
             this.props.pointsUrl,
             this.props.polysUrl,
-            this.props.propertiesUrl,
-            this.props.scaleZ
+            this.props.propertiesUrl
         );
 
         p.then(([points, polys, properties]) => {
@@ -176,8 +164,7 @@ export default class Grid3DLayer extends CompositeLayer<
         const needs_reload =
             !isEqual(props.pointsUrl, oldProps.pointsUrl) ||
             !isEqual(props.polysUrl, oldProps.polysUrl) ||
-            !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
-            !isEqual(props.scaleZ, oldProps.scaleZ);
+            !isEqual(props.propertiesUrl, oldProps.propertiesUrl);
 
         if (needs_reload) {
             const reportBoundingBox = false;
@@ -201,6 +188,7 @@ export default class Grid3DLayer extends CompositeLayer<
                 colorMapFunction: this.props.colorMapFunction,
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
+                depthTest: this.props.depthTest,
             })
         );
         return [layer];
@@ -208,4 +196,6 @@ export default class Grid3DLayer extends CompositeLayer<
 }
 
 Grid3DLayer.layerName = "Grid3DLayer";
-Grid3DLayer.defaultProps = defaultProps as unknown as Grid3DLayerProps<unknown>;
+Grid3DLayer.defaultProps = layersDefaultProps[
+    "Grid3DLayer"
+] as Grid3DLayerProps<unknown>;

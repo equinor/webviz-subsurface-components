@@ -38,7 +38,7 @@ export type MeshType = {
     attributes: {
         positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
-        normals?: { value: Float32Array; size: number };
+        normals: { value: Float32Array; size: number };
         properties: { value: Float32Array; size: number };
         vertex_indexs: { value: Int32Array; size: number };
     };
@@ -105,6 +105,8 @@ export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapClampColor: Color | undefined | boolean;
     colorMapFunction?: colorMapFunctionType | false;
     propertyValueRange: [number, number];
+    smoothShading: boolean;
+    depthTest: boolean;
 }
 
 const defaultProps = {
@@ -116,6 +118,7 @@ const defaultProps = {
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
     meshValueRange: [0.0, 1.0],
+    depthTest: true,
 };
 
 // This is a private layer used only by the composite Map3DLayer
@@ -159,6 +162,7 @@ export default class privateMapLayer extends Layer<
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
+                    normals: this.props.mesh.attributes.normals,
                     properties: this.props.mesh.attributes.properties,
                     vertex_indexs: this.props.mesh.attributes.vertex_indexs,
                 },
@@ -222,7 +226,13 @@ export default class privateMapLayer extends Layer<
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
 
-        gl.enable(gl.POLYGON_OFFSET_FILL);
+        const smoothShading = this.props.smoothShading;
+
+        gl.enable(GL.POLYGON_OFFSET_FILL);
+        if (!this.props.depthTest) {
+            gl.disable(GL.DEPTH_TEST);
+        }
+
         gl.polygonOffset(1, 1);
         model_mesh
             .setUniforms({
@@ -249,9 +259,14 @@ export default class privateMapLayer extends Layer<
                 colorMapClampColor,
                 isColorMapClampColorTransparent,
                 isClampColor,
+                smoothShading,
             })
             .draw();
-        gl.disable(gl.POLYGON_OFFSET_FILL);
+        gl.disable(GL.POLYGON_OFFSET_FILL);
+
+        if (!this.props.depthTest) {
+            gl.enable(GL.DEPTH_TEST);
+        }
 
         if (this.props.gridLines) {
             mesh_lines_model.draw();

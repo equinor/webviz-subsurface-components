@@ -11,249 +11,255 @@ exports[`Test Well Log View Component with Scroller snapshot test 1`] = `
       style="position: absolute;"
     >
       <div
+        class="welllogview"
         style="width: 100%; height: 100%; display: flex; flex-direction: column;"
       >
         <div
-          class="welllogview log-controller"
+          style="width: 100%; height: 100%; display: flex; flex-direction: column;"
         >
           <div
-            class="overlay"
-            style="width: 0px; left: 0px; overflow: hidden;"
+            class="log-controller"
           >
             <div
-              style="position: absolute; pointer-events: none; visibility: hidden; display: inline-block; padding: 2px; border-radius: 4px; text-align: right; background-color: rgba(0, 0, 0, 0.5); color: white; right: 5px; bottom: 5px;"
-            />
-            <div
-              class="rubber-band"
-              style="position: relative; pointer-events: none; height: 9px; width: 100%; background-color: rgba(255, 0, 0, 0.1); visibility: hidden;"
+              class="overlay"
+              style="width: 0px; left: 0px; overflow: hidden;"
             >
               <div
-                style="height: 1px; width: 100%; top: 4.5px; background-color: rgba(255, 0, 0, 0.7); position: relative;"
+                class="depth"
+                style="position: absolute; pointer-events: none; visibility: hidden;"
               />
+              <div
+                class="rubber-band"
+                style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
+              >
+                <div
+                  style="height: 1px; width: 100%; top: 4.5px; position: relative;"
+                />
+              </div>
+              <div
+                class="pinned"
+                style="position: absolute; pointer-events: none; height: 9px; width: 100%; left: 0px; visibility: hidden;"
+              >
+                <div
+                  style="height: 1px; width: 100%; top: 4.5px; position: absolute;"
+                />
+              </div>
             </div>
             <div
-              class="pinned"
-              style="position: absolute; pointer-events: none; height: 9px; width: 100%; left: 0px; background-color: rgba(0, 0, 0, 0.1); visibility: hidden;"
+              class="track"
+              style="max-width: 50px; flex: 2;"
             >
               <div
-                style="height: 1px; width: 100%; top: 4.5px; background-color: rgba(0, 255, 0, 0.7); position: absolute;"
-              />
+                class="track-container"
+              >
+                <svg
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="max-width: 50px; flex: 2;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="max-width: 50px; flex: 2;"
             >
-              <svg
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <svg
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="max-width: 50px; flex: 2;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: flex; flex: 3;"
             >
-              <svg
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: flex; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: flex; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: flex; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: flex; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: flex; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: flex; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: flex; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: flex; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: flex; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
             <div
-              class="track-container"
+              class="track"
+              style="display: none; flex: 3;"
             >
-              <canvas
-                style="position: absolute;"
-              />
-            </div>
-          </div>
-          <div
-            class="track"
-            style="display: none; flex: 3;"
-          >
-            <div
-              class="track-container"
-            >
-              <canvas
-                style="position: absolute;"
-              />
+              <div
+                class="track-container"
+              >
+                <canvas
+                  style="position: absolute;"
+                />
+              </div>
             </div>
           </div>
         </div>

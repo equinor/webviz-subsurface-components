@@ -55,9 +55,7 @@ import {
 
 import { updateLegendRows } from "./log-viewer";
 
-export function deepCopy<T>(source: T): T {
-    return JSON.parse(JSON.stringify(source)) as T;
-}
+import { deepCopy } from "./deepcopy";
 
 export function indexOfElementByName(array: Named[], name: string): number {
     if (array && name) {
@@ -600,7 +598,9 @@ function addGraphTrackPlot(
         if (iCurve < 0) console.log("iCurve < 0");
         const curve = curves[iCurve];
 
-        if (curve.dimensions !== 1) console.log("curve.dimensions !== 1");
+        const dimensions =
+            curve.dimensions === undefined ? 1 : curve.dimensions;
+        if (dimensions !== 1) console.log("curve.dimensions !== 1");
         if (curve.valueType === "string")
             console.log('curve.valueType === "string"');
 
@@ -698,7 +698,9 @@ function editGraphTrackPlot(
         if (iCurve < 0) console.log("iCurve < 0");
         const curve = curves[iCurve];
 
-        if (curve.dimensions !== 1) console.log("curve.dimensions !== 1");
+        const dimensions =
+            curve.dimensions === undefined ? 1 : curve.dimensions;
+        if (dimensions !== 1) console.log("curve.dimensions !== 1");
         if (curve.valueType === "string")
             console.log('curve.valueType === "string"');
 
@@ -1132,7 +1134,9 @@ function addScaleTracks(
     data: WellLogDataRow[],
     iPrimaryAxis: number
 ): void {
-    const titlePrimaryAxis = axes.titles[axes.primaryAxis];
+    const titlePrimaryAxis = axes.titles
+        ? axes.titles[axes.primaryAxis]
+        : axes.primaryAxis;
     const curvePrimaryAxis = curves[iPrimaryAxis];
     const iSecondaryAxis = !axes.mnemos
         ? -1
@@ -1148,7 +1152,9 @@ function addScaleTracks(
             )
         );
 
-        const titleSecondaryAxis = axes.titles[axes.secondaryAxis];
+        const titleSecondaryAxis = axes.titles
+            ? axes.titles[axes.secondaryAxis]
+            : axes.secondaryAxis;
         const curveSecondaryAxis = curves[iSecondaryAxis];
         info.tracks.push(
             newDualScaleTrack(
@@ -1213,7 +1219,9 @@ function addGraphTrack(
             if (iCurve < 0) continue; // curve not found
             const curve = curves[iCurve];
 
-            if (curve.dimensions !== 1) continue;
+            const dimensions =
+                curve.dimensions === undefined ? 1 : curve.dimensions;
+            if (dimensions !== 1) continue;
             if (curve.valueType === "string") continue;
 
             const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
@@ -1294,7 +1302,8 @@ function addStackedTrack(
     if (iCurve < 0) return; // curve not found
     const curve = curves[iCurve];
 
-    if (curve.dimensions !== 1) return;
+    const dimensions = curve.dimensions === undefined ? 1 : curve.dimensions;
+    if (dimensions !== 1) return;
 
     const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
     checkMinMax(info.minmaxPrimaryAxis, plotData.minmaxPrimaryAxis);
