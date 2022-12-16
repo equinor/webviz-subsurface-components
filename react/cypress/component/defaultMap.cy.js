@@ -22,6 +22,13 @@ describe("Map Story Tests", () => {
       cy.get("svg[role='progressbar']", {timeout: 60000}).should("not.exist")
       cy.get("#DeckGL-Map-wrapper").compareSnapshot('default-map-story')
   });
+
+  it("should diplay default story with depth test true",() => {
+    cy.fixture('example.json').then((exampleData) => {mount(<Default { ...exampleData[0] }/>);})
+    cy.get("svg[role='progressbar']")
+    cy.get("svg[role='progressbar']", {timeout: 60000}).should("not.exist")
+    cy.get("#DeckGL-Map-wrapper").compareSnapshot('wells_on_top')
+  });
   
   it("should diplay default story zoomed in",() => {
     mount(<Default />);
