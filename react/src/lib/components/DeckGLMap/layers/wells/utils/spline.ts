@@ -272,7 +272,7 @@ export function GetBoundingBox(
 
         const coords = lineString.coordinates as Position3D[];
         const n = coords.length;
-        for (let i = 0; i < n - 1; i += 1) {
+        for (let i = 0; i < n; i++) {
             const xyz = coords[i];
 
             xMin = xyz[0] < xMin ? xyz[0] : xMin;
