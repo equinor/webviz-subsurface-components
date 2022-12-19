@@ -41,12 +41,6 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
         return !Object.is(this.props, nextProps);
     }
 
-    updateReadoutPanel(): void {
-        const controller = this.controller;
-        if (controller)
-            controller.selectContent(controller.getContentSelection()); // force to update readout panel
-    }
-
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;

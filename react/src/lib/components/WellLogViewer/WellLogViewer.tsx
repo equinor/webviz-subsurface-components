@@ -15,6 +15,10 @@ import AxisSelector from "./components/AxisSelector";
 import ZoomSlider from "./components/ZoomSlider";
 
 import { WellLogController } from "./components/WellLogView";
+import WellLogView from "./components/WellLogView";
+import { WellLog } from "./components/WellLogTypes";
+import { Template } from "./components/WellLogTemplateTypes";
+
 
 import { getAvailableAxes } from "./utils/tracks";
 
@@ -53,19 +57,246 @@ export const argTypesWellLogViewerProp = {
 };
 
 interface State {
-    axes: string[]; // axes available in welllog
     primaryAxis: string;
+}
+
+interface RightPanelProps {
+    parent : any;
+    maxContentZoom: number| undefined;
+
+    /**
+     * Object from JSON file describing single well log data.
+     */
+    welllog: WellLog | undefined;
+
+    /**
+     * Prop containing track template data.
+     */
+    template: Template;
+
+    readoutOptions?: InfoOptions; // options for readout
+
+    onZoomChange: (zoom: number)=>void;
+}
+
+interface RightPanelState {
+    axes: string[]; // axes available in welllog
+    //primaryAxis: string;
     infos: Info[];
 
-    sliderValue: number; // value for zoom slider
+    zoomValue: number; // value for zoom slider
 }
+
+class RightPanel extends Component<RightPanelProps, RightPanelState> {
+    collapsedTrackIds: (string | number)[];
+
+    constructor(props: RightPanelProps) {
+        super(props);
+
+        const axes = getAvailableAxes(
+            this.props.parent.props.welllog,
+            this.props.parent.props.axisMnemos
+        );
+
+        this.state = {
+            axes: axes, //["md", "tvd"]
+            infos: [],
+
+            zoomValue: 4.0,
+        };
+
+        this.collapsedTrackIds = [];
+
+        this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
+        this.onVertScaleChange = this.onVertScaleChange.bind(this);
+        this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
+     }
+
+    componentDidUpdate(
+        prevProps: RightPanelProps /*, prevState: RightPanelState*/
+    ): void {
+        if (
+            this.props.parent.props.welllog !== prevProps.parent.props.welllog ||
+            this.props.parent.props.axisMnemos !== prevProps.parent.props.axisMnemos
+        ) {
+            const axes = getAvailableAxes(
+                this.props.parent.props.welllog,
+                this.props.parent.props.axisMnemos
+            );
+            this.setState({
+                axes: axes,
+                // will be changed by callback! infos: [],
+            });
+        }
+
+        if (
+            this.props.readoutOptions &&
+            (!prevProps.readoutOptions ||
+                this.props.readoutOptions.allTracks !==
+                    prevProps.readoutOptions.allTracks ||
+                this.props.readoutOptions.grouping !==
+                    prevProps.readoutOptions.grouping)
+        ) {
+            this.updateReadoutPanel();
+        }
+    }
+
+
+    // callback function from zoom slider
+    onZoomSliderChange(zoom: number): void {
+        if (this.props.onZoomChange) 
+            this.props.onZoomChange(zoom);
+    }
+
+    // callback function from Vertical Scale combobox
+    onVertScaleChange(event: React.ChangeEvent<HTMLSelectElement>): void {
+        event.preventDefault();
+        const zoom = this.getBaseVertScale()/parseFloat(event.target.value);
+        if (this.props.onZoomChange) 
+            this.props.onZoomChange(zoom);
+    }
+
+    // callback function from WellLogView
+    onInfo(
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ): void {
+        const infos = fillInfos(
+            x,
+            logController,
+            iFrom,
+            iTo,
+            this.collapsedTrackIds,
+            this.props.readoutOptions
+        );
+
+        this.setState({
+            infos: infos,
+        });
+    }
+
+    onInfoGroupClick(trackId: string | number): void {
+        const i = this.collapsedTrackIds.indexOf(trackId);
+        if (i < 0) this.collapsedTrackIds.push(trackId);
+        else delete this.collapsedTrackIds[i];
+
+        this.updateReadoutPanel();
+    }
+   
+
+    updateReadoutPanel()
+    {        
+        this.props.parent.updateReadoutPanel();
+    }
+
+    // set zoom value to slider
+    setZoomValue(): void {
+        this.setState((state: Readonly<RightPanelState>) => {
+            if (!this.props.parent.controller) return null;
+            const zoom = this.props.parent.controller.getContentZoom();
+            if (Math.abs(Math.log(state.zoomValue / zoom)) < 0.01)
+                return null;
+            return { zoomValue: zoom };
+        });
+    }
+
+    getBaseVertScale() : number {
+        const controller=this.props.parent.controller;
+        if(controller) {
+           const base=controller.getContentBaseDomain();
+           const wellLogView = controller as WellLogView;
+           const logController = wellLogView.logController;
+           if(logController) {
+              const overlay = logController?.overlay;
+              const source = overlay?.elm.node();
+              if (source) {
+                const clientSize=this.props.parent.props.horizontal? source.clientWidth: source.clientHeight
+                const m=clientSize*(0.0254/96); // "screen" CSS height in meters
+                let scale=(base[1]-base[0])/m;
+                console.log("1:", scale.toFixed(0))
+                return scale
+              }
+           }
+        }
+        return 16000
+    }
+
+    render(): JSX.Element {
+        let vertScale = this.getBaseVertScale()/this.state.zoomValue
+        let r=vertScale>2000? 500: vertScale>200? 50: vertScale>20? 5: 1;
+        let _vertScale = Number((vertScale/r).toFixed(0))*r
+        if(vertScale<1500) vertScale=1000
+        else if(vertScale<3500) vertScale=2000
+        else if(vertScale<7500) vertScale=5000
+        else if(vertScale<15000) vertScale=10000
+        else if(vertScale<35000) vertScale=20000
+        else if(vertScale<75000) vertScale=50000
+        else vertScale=100000
+        return <div
+            style={{
+                flexDirection: "column",
+                width: "100%",
+                height: "100%",
+            }}
+        >
+        <div style={{ paddingLeft: "10px", display: "flex" }}>
+            <span>Scale value:</span>
+            <span style={{ paddingLeft: "10px"}}>
+                <select onChange={this.onVertScaleChange} value={_vertScale}>
+                    {_vertScale==vertScale? null: <option value={_vertScale}>{"1:"+_vertScale}</option>}
+                    <option value="1000">1:1000</option> // 1 cm == 10 m
+                    <option value="2000">1:2000</option>
+                    <option value="5000">1:5000</option>
+                    <option value="10000">1:10000</option> // 1 cm == 100 m
+                    <option value="20000">1:20000</option>
+                    <option value="50000">1:50000</option>
+                    <option value="100000">1:100000</option> // 1 cm == 1 km
+                </select>
+            </span>
+        </div>
+
+        <AxisSelector
+            header="Primary scale"
+            axes={this.state.axes}
+            axisLabels={this.props.parent.props.axisTitles}
+            value={this.props.parent.state.primaryAxis}
+            onChange={this.props.parent.onChangePrimaryAxis}
+        />
+        <InfoPanel
+            header="Readout"
+            onGroupClick={this.onInfoGroupClick}
+            infos={this.state.infos}
+        />
+        <br />
+        <div style={{ paddingLeft: "10px", display: "flex" }}>
+            <span>Zoom:</span>
+            <span
+                style={{
+                    flex: "1 1 100px",
+                    padding: "0 20px 0 10px",
+                }}
+            >
+                <ZoomSlider
+                    value={this.state.zoomValue}
+                    max={this.props.maxContentZoom}
+                    onChange={this.onZoomSliderChange}
+                />
+            </span>
+         </div>
+      </div>
+    }
+}
+
 
 class WellLogViewer extends Component<WellLogViewerProps, State> {
     public static propTypes: Record<string, unknown>;
 
     controller: WellLogController | null;
 
-    collapsedTrackIds: (string | number)[];
+    right:RightPanel|null;
+    
 
     constructor(props: WellLogViewerProps) {
         super(props);
@@ -82,17 +313,11 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
         this.state = {
             primaryAxis: primaryAxis, //"md"
-            axes: axes, //["md", "tvd"]
-            infos: [],
-
-            sliderValue: 4.0,
         };
 
         this.controller = null;
 
-        this.collapsedTrackIds = [];
-
-        this.collapsedTrackIds = [];
+        this.right = null;
 
         this.onCreateController = this.onCreateController.bind(this);
 
@@ -104,13 +329,12 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         this.onContentSelection = this.onContentSelection.bind(this);
         this.onTemplateChanged = this.onTemplateChanged.bind(this);
 
-        this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
-
-        this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
+        this.onZoomChange = this.onZoomChange.bind(this);
     }
 
     componentDidMount(): void {
-        this.setSliderValue();
+        this.setZoomValue();
+        this.updateReadoutPanel();
     }
 
     shouldComponentUpdate(
@@ -148,8 +372,6 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
             if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
             this.setState({
                 primaryAxis: primaryAxis,
-                axes: axes,
-                // will be changed by callback! infos: [],
             });
         }
 
@@ -166,9 +388,9 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     }
 
     updateReadoutPanel(): void {
-        const controller = this.controller;
-        if (controller)
-            controller.selectContent(controller.getContentSelection()); // force to update readout panel
+        const wellLogView = this.controller as WellLogView;
+        if (wellLogView)
+            wellLogView.setInfo(); // reflect new values
     }
 
     // callback function from WellLogView
@@ -178,80 +400,56 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         iFrom: number,
         iTo: number
     ): void {
-        const infos = fillInfos(
-            x,
-            logController,
-            iFrom,
-            iTo,
-            this.collapsedTrackIds,
-            this.props.readoutOptions
-        );
-
-        this.setState({
-            infos: infos,
-        });
+        this.right?.onInfo(x, logController, iFrom, iTo)
     }
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;
-        if (this.props.onCreateController)
-            // set callback to component's caller
-            this.props.onCreateController(controller);
+        this.props.onCreateController?.(controller); // set callback to component's caller
     }
     // callback function from WellLogView
     onContentRescale(): void {
-        this.setSliderValue();
-        if (this.props.onContentRescale) this.props.onContentRescale();
+        this.setZoomValue();
+        this.props.onContentRescale?.();
     }
     // callback function from WellLogView
     onContentSelection(): void {
-        this.setSliderValue();
-        if (this.props.onContentSelection) this.props.onContentSelection();
+        this.setZoomValue();
+        this.props.onContentSelection?.();
     }
     onTemplateChanged(): void {
-        if (this.props.onTemplateChanged) {
-            if (this.props.onTemplateChanged) this.props.onTemplateChanged();
-        }
+        this.props.onTemplateChanged?.();
     }
 
     // callback function from Axis selector
     onChangePrimaryAxis(value: string): void {
         this.setState({ primaryAxis: value });
     }
-    // callback function from Zoom slider
-    onZoomSliderChange(value: number): void {
-        const controller = this.controller;
-        if (controller) {
-            controller.zoomContent(value);
-        }
+    
+    // callback function from Right Panel
+    onZoomChange(zoom: number): void {
+        this.controller?.zoomContent(zoom);
     }
 
-    // set zoom value to slider
-    setSliderValue(): void {
-        this.setState((state: Readonly<State>) => {
-            if (!this.controller) return null;
-            const zoom = this.controller.getContentZoom();
-            if (Math.abs(Math.log(state.sliderValue / zoom)) < 0.01)
-                return null;
-            return { sliderValue: zoom };
-        });
+    // set zoom value to Right Panel
+    setZoomValue(): void {
+        this.right?.setZoomValue();
     }
 
-    onInfoGroupClick(trackId: string | number): void {
-        const i = this.collapsedTrackIds.indexOf(trackId);
-        if (i < 0) this.collapsedTrackIds.push(trackId);
-        else delete this.collapsedTrackIds[i];
+    createRightPanel(): JSX.Element {
+      return <RightPanel
+        ref = { (el) => this.right = el }
+        parent ={this}
+        maxContentZoom={this.props.options?.maxContentZoom} 
+        welllog={this.props.welllog}
+        template={this.props.template}
+        readoutOptions={this.props.readoutOptions}
 
-        this.updateReadoutPanel();
-
-        if (this.controller)
-            this.controller.selectContent(
-                this.controller.getContentSelection()
-            ); // force to update readout panel
+        onZoomChange={this.onZoomChange}
+      />;
     }
 
     render(): JSX.Element {
-        const maxContentZoom = 256;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <WellLogViewWithScroller
@@ -260,7 +458,6 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     colorTables={this.props.colorTables}
                     wellpick={this.props.wellpick}
                     horizontal={this.props.horizontal}
-                    maxContentZoom={maxContentZoom}
                     primaryAxis={this.state.primaryAxis}
                     axisTitles={this.props.axisTitles}
                     axisMnemos={this.props.axisMnemos}
@@ -276,41 +473,13 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     style={{
                         flex: "0, 0",
                         display: "flex",
-                        flexDirection: "column",
                         height: "100%",
                         width: "255px",
                         minWidth: "255px",
                         maxWidth: "255px",
                     }}
                 >
-                    <AxisSelector
-                        header="Primary scale"
-                        axes={this.state.axes}
-                        axisLabels={this.props.axisTitles}
-                        value={this.state.primaryAxis}
-                        onChange={this.onChangePrimaryAxis}
-                    />
-                    <InfoPanel
-                        header="Readout"
-                        onGroupClick={this.onInfoGroupClick}
-                        infos={this.state.infos}
-                    />
-                    <br />
-                    <div style={{ paddingLeft: "10px", display: "flex" }}>
-                        <span>Zoom:</span>
-                        <span
-                            style={{
-                                flex: "1 1 100px",
-                                padding: "0 20px 0 10px",
-                            }}
-                        >
-                            <ZoomSlider
-                                value={this.state.sliderValue}
-                                max={maxContentZoom}
-                                onChange={this.onZoomSliderChange}
-                            />
-                        </span>
-                    </div>
+                    {this.createRightPanel()}
                 </div>
             </div>
         );

@@ -123,6 +123,10 @@ Default.args = {
         hideTrackTitle: false,
         hideTrackLegend: false,
     },
+    readoutOptions: {
+        allTracks: false,
+        grouping: "by_track",
+    },    
 };
 
 export const Horizontal = Template.bind({});
