@@ -80,10 +80,16 @@ function createColorItems(): ReactNode[] {
 
 function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
     const nodes: ReactNode[] = [];
-    for (const colorTable of colorTables) {
+    if(!colorTables) {
+       console.error("colorTables is missed or empty in createColorTableItems()")
+    }
+    else for (const colorTable of colorTables) {
         if (colorTable.discrete)
             // skip discrete color tables
             continue;
+        if(!colorTable.name) {
+            console.log("colorTable.name is empty in createColorTableItems()")
+        }
         nodes.push(<option key={colorTable.name}>{colorTable.name}</option>);
     }
     return nodes;
@@ -188,7 +194,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   inverseColor: "",
 
                   // for 'gradientfill' plot
-                  colorTable: this.props.wellLogView.props.colorTables[0].name,
+                  colorTable: this.props.wellLogView.props.colorTables?.[0]?.name,
                   inverseColorTable: undefined,
                   colorScale: undefined,
                   inverseColorScale: undefined,
@@ -262,7 +268,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
             );
         }
         return (
-            <FormControl fullWidth>
+            <FormControl fullWidth key={valueName}>
                 <InputLabel>{label}</InputLabel>
                 <NativeSelect
                     value={value}

@@ -698,7 +698,7 @@ function setTracksToController(
     axes: AxesInfo,
     welllog: WellLog | undefined, // JSON Log Format
     template: Template, // JSON
-    colorTables: ColorTable[] // JSON
+    colorTables?: ColorTable[] // JSON
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
