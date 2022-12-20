@@ -472,6 +472,13 @@ function posWellPickTitles(instance: LogViewer, parent: WellLogView) {
 }
 
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
+    { // clear old wellpicks
+        for(let elmName in instance.overlay.elements) {
+          if(elmName.substring(0,2)=="wp") // "wpFill" + horizon; "wp" + horizon; 
+             instance.overlay.remove(elmName); // clear old if exists
+        }
+    }
+
     const wellpick = parent.props.wellpick;
     if (!wellpick) return;
 
@@ -505,7 +512,6 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
               );
 
         const elmName = "wp" + horizon;
-        instance.overlay.remove(elmName); // clear old if exists
         const pinelm = instance.overlay.create(elmName, {});
 
         const rgba =
@@ -585,7 +591,6 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
         {
             // Filling
             const elmName = "wpFill" + horizon;
-            instance.overlay.remove(elmName); // clear old if exists
             if (wellpickPatternFill || wellpickColorFill) {
                 const pinelm = instance.overlay.create(elmName, {});
                 const pin = select(pinelm)
