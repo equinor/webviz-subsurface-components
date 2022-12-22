@@ -27,9 +27,6 @@ export interface DeckGLMapProps {
         cssStyle?: Record<string, unknown> | null;
     };
     coordinateUnit?: string;
-    toolbar?: {
-        visible?: boolean | null;
-    };
     legend?: {
         visible?: boolean | null;
         cssStyle?: Record<string, unknown> | null;
@@ -85,8 +82,6 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // test
-    toolbar,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -265,16 +260,6 @@ DeckGLMap.propTypes = {
      * Unit for the scale ruler
      */
     coordinateUnit: PropTypes.string,
-
-    /**
-     * @deprecated Toolbar should be added as annotation. This prop has no function.
-     */
-    toolbar: PropTypes.shape({
-        /**
-         * Toggle toolbar visibility
-         */
-        visible: PropTypes.bool,
-    }),
 
     /**
      * @deprecated Legends should be added as annotations. This prop has no function.
