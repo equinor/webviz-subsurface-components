@@ -8,7 +8,7 @@ import * as stories from "../../src/lib/components/DeckGLMap/storybook/DeckGLMap
 
 const { Default } = composeStories(stories);
 
-render(<Default />).unmount();
+//render(<Default />).unmount();
 
 describe("Map Story Tests", () => {
   xit("activate hooks",() => {
