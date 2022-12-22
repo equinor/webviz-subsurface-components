@@ -85,11 +85,12 @@ const DeckGLMap: React.FC<DeckGLMapProps> = ({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    legend,
+    // test
+    toolbar,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    toolbar,
+    legend,
     colorTables,
     editedData,
     setProps,
