@@ -132,14 +132,13 @@ jobs:
         run: |
           mkdir clone
           cd clone
-          git clone --branch cypress-snaps --depth 1 --filter=blob:none https://github.com/equinor/webviz-subsurface-components
-          cd webviz-subsurface-components
-          git sparse-checkout set react/cypress-visual-screenshots
-          cd react
+          git clone --branch cypress-snapshots --depth 1 --filter=blob:none https://github.com/avanti-em/webviz-subsurface-components
+          cd webviz-subsurface-components/react
           mv * ../../../react/
           cd ../../../
           rm -rf clone
           cd react
+          git add -f cypress-visual-screenshots/**
           npx cypress run -b chrome --component --headed
 
       # upload the failure screenshots for reference
@@ -234,6 +233,6 @@ jobs:
           commit-message: updated cypress snapshots
           title: Cypress - New Snapshots generated for the commit "${{ github.event.head_commit.message }}" by ${{ github.event.commits[0].author.email }}
           body: This is an auto-generated PR to update cypress snapshots.
-          base: cypress-snaps
+          base: cypress-snapshots
           reviewers: ${{ github.event.sender.login }}
           delete-branch: true

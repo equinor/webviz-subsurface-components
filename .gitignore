@@ -21,6 +21,7 @@ react/storybook-static/**/*
 # Cypress stuff
 chromedriver
 chromedriver_linux64.zip
+react/cypress-visual-screenshots/*
 
 # Created by .ignore support plugin (hsz.mobi)
 ### VisualStudioCode template
