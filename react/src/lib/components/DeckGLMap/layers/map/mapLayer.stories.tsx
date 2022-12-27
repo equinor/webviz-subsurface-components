@@ -5,7 +5,8 @@ import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { Slider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import { ContinuousLegend } from "@emerson-eps/color-tables";
+import { ContinuousLegend, ColorLegend, colorTables, createColorMapFunction } from "@emerson-eps/color-tables";
+import { View } from "@deck.gl/core/typed";
 
 export default {
     component: DeckGLMap,
@@ -935,3 +936,99 @@ ColorMapRange.parameters = {
         },
     },
 };
+
+// Map layer with color colorselector
+
+
+const MapLayerColorSelectorTemplate: ComponentStory<typeof DeckGLMap> = (args) => {
+    const [colorName, setColorName] = React.useState("Rainbow");
+    const [colorRange, setRange] = React.useState();
+    const [isAuto, setAuto] = React.useState();
+    const [isLog, setIsLog] = React.useState(false);
+    const [isNearest, setIsNearest] = React.useState(false);
+
+    // user defined breakpoint(domain)
+    const userDefinedBreakPoint = React.useCallback((data) => {
+        console.log("data", data)
+       // if (data) setBreakPoint(data);
+    }, []);
+
+    // Get color name from color selector
+    const colorNameFromSelector = React.useCallback((data) => {
+        setColorName(data);
+    }, []);
+
+    // user defined range
+    const userDefinedRange = React.useCallback((data) => {
+        if (data.range) setRange(data.range);
+        setAuto(data.isAuto);
+    }, []);
+
+    // Get interpolation method from color selector to layer
+    const getInterpolateMethod = React.useCallback((data) => {
+        setIsLog(data.isLog);
+        setIsNearest(data.isNearest);
+    }, []);
+
+    // color map function
+    const colorMapFunc = React.useCallback(() => {
+        return createColorMapFunction(colorName, isLog, isNearest);
+    }, [isLog, isNearest, colorName]);
+
+    const updatedLayerData = [
+        { 
+            ...meshMapLayerFloat32, 
+            colorMapName: colorName, 
+            colorMapFunction: colorMapFunc(), 
+        }
+    ];
+    return (
+        <DeckGLMap {...args} layers={updatedLayerData}>
+        {
+            // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
+            <View id="view_1">
+                <div style={{marginTop: 50}}>
+                    <ColorLegend 
+                        min={1500} 
+                        max={4500} 
+                        colorTables={colorTables} 
+                        getColorName={colorNameFromSelector}
+                        getColorRange={userDefinedRange}
+                        getInterpolateMethod={getInterpolateMethod}
+                        getBreakpointValue={userDefinedBreakPoint}
+                        horizontal={true}
+                        isRangeShown={true}
+                    />
+                </div>
+            </View>
+        }
+    </DeckGLMap>
+    ) 
+};
+
+export const MapLayerColorSelector = MapLayerColorSelectorTemplate.bind({});
+
+MapLayerColorSelector.args = {
+    ...defaultArgs,
+    id: "map_layer_color_selector",
+    legend: {
+        visible: true,
+    },
+    layers: [{ ...meshMapLayerFloat32, }],
+    views: {
+        layout: [1, 1],
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                zoom: -4,
+            },
+        ],
+    },
+};
+
+// to fix, remove colortsbles
+// change name getcolorname
+// ismodal by default
+// check about range in maplayer
+// try not to use colormpafunc

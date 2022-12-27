@@ -613,6 +613,7 @@ const mapDataTemplate = (args) => {
 
     // Get selected legend color name from color selector
     const colorNameFromSelector = React.useCallback((data) => {
+        console.log(data)
         setColorName(data);
     }, []);
 
@@ -629,6 +630,7 @@ const mapDataTemplate = (args) => {
     }, []);
 
     const colorMapFunc = React.useCallback(() => {
+        
         return createColorMapFunction(getColorName, isLog, isNearest);
     }, [isLog, isNearest, getColorName]);
 
