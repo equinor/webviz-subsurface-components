@@ -222,14 +222,14 @@ const MultiViewAnnotationTemplate: ComponentStory<typeof DeckGLMap> = (
     <DeckGLMap {...args}>
         {
             // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
-            <View id="view_1">
+            <View id="view_1_2D">
                 <ContinuousLegend min={-3071} max={41048} />
                 <ViewFooter>kH netmap</ViewFooter>
             </View>
         }
         {
             // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
-            <View id="view_2">
+            <View id="view_2_2D">
                 <ContinuousLegend min={2725} max={3396} />
                 <ViewFooter>Hugin</ViewFooter>
             </View>
