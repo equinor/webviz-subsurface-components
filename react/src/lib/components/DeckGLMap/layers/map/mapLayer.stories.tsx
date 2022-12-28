@@ -8,7 +8,6 @@ import { makeStyles } from "@material-ui/styles";
 import {
     ContinuousLegend,
     ColorLegend,
-    colorTables,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
 import { View } from "@deck.gl/core/typed";
@@ -948,8 +947,8 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof DeckGLMap> = (
     args
 ) => {
     const [colorName, setColorName] = React.useState("Rainbow");
-    // const [setRange] = React.useState();
-    // const [setAuto] = React.useState();
+    const [colorRange, setRange] = React.useState();
+    const [isAuto, setAuto] = React.useState();
     const [breakPoints, setBreakPoint] = React.useState();
     const [isLog, setIsLog] = React.useState(false);
     const [isNearest, setIsNearest] = React.useState(false);
@@ -965,9 +964,9 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof DeckGLMap> = (
     }, []);
 
     // user defined range
-    const userDefinedRange = React.useCallback(() => {
-        // if (data.range) setRange(data.range);
-        // setAuto(data.isAuto);
+    const userDefinedRange = React.useCallback((data) => {
+        if (data.range) setRange(data.range);
+        setAuto(data.isAuto);
     }, []);
 
     // Get interpolation method from color selector to layer
@@ -981,10 +980,15 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof DeckGLMap> = (
         return createColorMapFunction(colorName, isLog, isNearest, breakPoints);
     }, [colorName, isLog, isNearest, breakPoints]);
 
+    const min = 100;
+    const max = 1000;
+
     const updatedLayerData = [
         {
             ...meshMapLayerFloat32,
             colorMapName: colorName,
+            colorMapRange:
+                colorRange && isAuto == false ? colorRange : [min, max],
             colorMapFunction: colorMapFunc(),
         },
     ];
@@ -995,15 +999,14 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof DeckGLMap> = (
                 <View id="view_1">
                     <div style={{ marginTop: 50 }}>
                         <ColorLegend
-                            min={1500}
-                            max={4500}
-                            colorTables={colorTables}
-                            getColorName={colorNameFromSelector}
+                            min={min}
+                            max={max}
+                            colorNameFromSelector={colorNameFromSelector}
                             getColorRange={userDefinedRange}
                             getInterpolateMethod={getInterpolateMethod}
                             getBreakpointValue={userDefinedBreakPoint}
                             horizontal={true}
-                            isRangeShown={true}
+                            numberOfTicks={2}
                         />
                     </div>
                 </View>
@@ -1032,9 +1035,3 @@ MapLayerColorSelector.args = {
         ],
     },
 };
-
-// to fix, remove colortsbles
-// change name getcolorname
-// ismodal by default
-// check about range in maplayer
-// try not to use colormpafunc
