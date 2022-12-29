@@ -24,7 +24,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     let i = 0;
     while (i < polys.length) {
         const n = polys[i];
-        const propertyValue = properties[pn++];
+        const propertyValue = properties[pn];
 
         if (propertyValue !== null) {
             // For some reason propertyValue happens to be null.
@@ -132,6 +132,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         }
 
         i = i + n + 1;
+        pn += 1;
     }
     console.log("Number of polygons: ", pn);
 
