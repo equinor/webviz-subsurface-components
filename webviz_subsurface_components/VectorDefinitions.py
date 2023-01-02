@@ -5,7 +5,6 @@ from typing import Dict, TypedDict
 
 
 class VectorDefinition(TypedDict):
-
     description: str
     type: str
 

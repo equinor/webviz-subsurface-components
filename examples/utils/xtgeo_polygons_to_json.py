@@ -7,7 +7,6 @@ def xtgeo_polygons_to_geojson(polygons: xtgeo.Polygons, xy_only: bool = False) -
     validate_geometry = True
     feature_arr = []
     for poly_id, poly_df in polygons.dataframe.groupby("POLY_ID"):
-
         x_arr = poly_df["X_UTME"].values
         y_arr = poly_df["Y_UTMN"].values
         if xy_only:
@@ -40,7 +39,6 @@ def xtgeo_polygons_to_polylines_geojson(
     validate_geometry = True
     feature_arr = []
     for poly_id, poly_df in polygons.dataframe.groupby("POLY_ID"):
-
         x_arr = poly_df["X_UTME"].values
         y_arr = poly_df["Y_UTMN"].values
         if xy_only:
