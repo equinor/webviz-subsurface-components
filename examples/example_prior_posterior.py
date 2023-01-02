@@ -25,7 +25,6 @@ def generate_synthetic_data(means, sigmas, n_iter, n_real):
     data["values"] = []
 
     for iteration in range(n_iter):
-
         # Simulate that not all realizations are successfull usually.
         n_real = random.randint(int(0.95 * n_real), n_real)  # nosec - bandit B311
         samples = np.random.normal(means[iteration], sigmas[iteration], n_real)
