@@ -22,11 +22,9 @@ interface ViewFooterProps {
     children?: React.ReactNode;
 }
 
-const ViewFooter: React.FC<ViewFooterProps> = ({
+export const ViewFooter: React.FC<ViewFooterProps> = ({
     children,
 }: ViewFooterProps) => {
     const classes = useStyles();
     return <div className={classes.viewFooter}>{children}</div>;
 };
-
-export default ViewFooter;

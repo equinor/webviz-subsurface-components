@@ -12,7 +12,7 @@ import {
     PropertyDataType,
     FeatureCollection,
     ViewFooter,
-    ViewAnnotation,
+    View,
 } from "../..";
 import { ViewStateType } from "./components/Map";
 
@@ -222,13 +222,13 @@ const MultiViewAnnotationTemplate: ComponentStory<typeof DeckGLMap> = (
 ) => (
     <DeckGLMap {...args}>
         {
-            <View id="view_1_2D">
+            <View id="view_1">
                 <ContinuousLegend min={-3071} max={41048} />
                 <ViewFooter>kH netmap</ViewFooter>
             </View>
         }
         {
-            <View id="view_2_2D">
+            <View id="view_2">
                 <ContinuousLegend min={2725} max={3396} />
                 <ViewFooter>Hugin</ViewFooter>
             </View>

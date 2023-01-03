@@ -19,7 +19,7 @@ import { WellLogViewer } from "./components/WellLogViewer";
 import { SyncLogViewer } from "./components/WellLogViewer";
 import WebVizContinuousLegend from "./components/ColorLegends/WebVizContinuousLegend";
 import WebVizDiscreteLegend from "./components/ColorLegends/WebVizDiscreteLegend";
-import { PickInfo } from "deck.gl";
+import { PickInfo, View } from "deck.gl";
 import { TooltipCallback } from "./components/DeckGLMap/components/Map";
 import {
     ExtendedLayerProps,
@@ -30,7 +30,6 @@ import { WellsPickInfo } from "./components/DeckGLMap/layers/wells/wellsLayer";
 import TerrainMapPickInfo from "./components/DeckGLMap/layers/terrain/terrainMapLayer";
 import { FeatureCollection } from "@nebula.gl/edit-modes";
 import { ViewFooter } from "./components/DeckGLMap/components/ViewFooter";
-import { ViewAnnotation } from "./components/DeckGLMap/components/ViewAnnotation";
 
 export {
     HistoryMatch,
@@ -57,5 +56,5 @@ export {
     FeatureCollection,
     LayerPickInfo,
     ViewFooter,
-    ViewAnnotation,
+    View,
 };
