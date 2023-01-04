@@ -267,6 +267,25 @@ MultiViewAnnotation.args = {
     },
 };
 
+export const ViewObjectInitializedAsEmpty = MultiViewAnnotationTemplate.bind(
+    {}
+);
+
+ViewObjectInitializedAsEmpty.args = {
+    id: "view_initialized_as_empty",
+    legend: {
+        visible: true,
+    },
+    layers: [
+        mapLayer,
+        {
+            ...mapLayer,
+            id: "kh_netmap",
+            propertiesUrl: "hugin_depth_25_m.float32",
+        },
+    ],
+    views: {} as ViewsType,
+};
 const wellsLayerNoDepthTest = {
     ...defaultWellsLayer,
     id: "wells-layer-no-depth-test",
