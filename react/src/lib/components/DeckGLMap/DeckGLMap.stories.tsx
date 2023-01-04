@@ -1,7 +1,7 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
-import { PickingInfo, View } from "@deck.gl/core/typed";
+import { PickingInfo } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 import DeckGLMap from "./DeckGLMap";
 import {
@@ -11,9 +11,10 @@ import {
     ExtendedLayerProps,
     PropertyDataType,
     FeatureCollection,
+    ViewFooter,
+    View,
 } from "../..";
 import { ViewStateType } from "./components/Map";
-import ViewFooter from "./components/ViewFooter";
 
 export default {
     component: DeckGLMap,
@@ -221,15 +222,13 @@ const MultiViewAnnotationTemplate: ComponentStory<typeof DeckGLMap> = (
 ) => (
     <DeckGLMap {...args}>
         {
-            // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
-            <View id="view_1_2D">
+            <View id="view_1">
                 <ContinuousLegend min={-3071} max={41048} />
                 <ViewFooter>kH netmap</ViewFooter>
             </View>
         }
         {
-            // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
-            <View id="view_2_2D">
+            <View id="view_2">
                 <ContinuousLegend min={2725} max={3396} />
                 <ViewFooter>Hugin</ViewFooter>
             </View>
