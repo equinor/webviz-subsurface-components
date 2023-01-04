@@ -286,6 +286,7 @@ ViewObjectInitializedAsEmpty.args = {
     ],
     views: {} as ViewsType,
 };
+
 const wellsLayerNoDepthTest = {
     ...defaultWellsLayer,
     id: "wells-layer-no-depth-test",
