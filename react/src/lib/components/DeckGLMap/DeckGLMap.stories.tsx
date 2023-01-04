@@ -14,7 +14,7 @@ import {
     ViewFooter,
     View,
 } from "../..";
-import { ViewStateType } from "./components/Map";
+import { ViewStateType, ViewsType } from "./components/Map";
 
 export default {
     component: DeckGLMap,
