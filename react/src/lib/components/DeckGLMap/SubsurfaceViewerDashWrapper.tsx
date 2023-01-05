@@ -65,13 +65,20 @@ export interface SubsurfaceViewerDashWrapperProps {
     cameraPosition?: ViewStateType | undefined;
 
     children?: React.ReactNode;
+
+    /**
+     * A mapping associating annotation components to view ids.
+     * Example: {"view_1": <ColorLegend/>}
+     */
     annotation?: Record<string, unknown>;
 }
 
 function mapAnnotation(annotation: Record<string, unknown>) {
-    return Object.entries(annotation).map(([viewId, annotation]) => {
-        <View id={viewId}>{annotation}</View>;
-    });
+    return Object.entries(annotation).map(([viewId, annotation]) => (
+        <View key={viewId} id={viewId}>
+            {annotation}
+        </View>
+    ));
 }
 
 const SubsurfaceViewerDashWrapper: React.FC<
@@ -121,6 +128,8 @@ const SubsurfaceViewerDashWrapper: React.FC<
         triggerResetMultipleWells: triggerResetMultipleWells,
         children: children,
     };
+
+    //console.log(annotation);
 
     return (
         <>
@@ -260,4 +269,12 @@ SubsurfaceViewerDashWrapper.propTypes = {
      * For get mouse events
      */
     onMouseEvent: PropTypes.func,
+
+    /**
+     * A mapping associating annotation components to view ids.
+     * Example: {"view_1": <ColorLegend/>}
+     */
+    annotation: PropTypes.any,
 };
+
+export default SubsurfaceViewerDashWrapper;
