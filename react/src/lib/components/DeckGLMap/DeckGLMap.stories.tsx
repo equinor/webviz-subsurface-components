@@ -240,9 +240,6 @@ export const MultiViewAnnotation = MultiViewAnnotationTemplate.bind({});
 
 MultiViewAnnotation.args = {
     id: "multi_view_annotation",
-    legend: {
-        visible: true,
-    },
     layers: [
         mapLayer,
         {
@@ -273,9 +270,6 @@ export const ViewObjectInitializedAsEmpty = MultiViewAnnotationTemplate.bind(
 
 ViewObjectInitializedAsEmpty.args = {
     id: "view_initialized_as_empty",
-    legend: {
-        visible: true,
-    },
     layers: [
         mapLayer,
         {

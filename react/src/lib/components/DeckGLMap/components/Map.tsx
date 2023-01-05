@@ -323,15 +323,16 @@ const Map: React.FC<MapProps> = ({
     const deckRef = useRef<DeckGLRef>(null);
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
-
+    const isViewsDefined =
+        typeof views !== undefined && Object.keys(views).length !== 0;
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState([{}]);
 
     const initialViewState = getViewState(
         boundsInitial,
-        JSON.stringify(views) !== "{}" ? views?.viewports[0].target : undefined,
-        JSON.stringify(views) !== "{}" ? views?.viewports[0].zoom : undefined,
+        isViewsDefined ? views?.viewports[0].target : undefined,
+        isViewsDefined ? views?.viewports[0].zoom : undefined,
         deckRef.current?.deck
     );
 
@@ -371,7 +372,7 @@ const Map: React.FC<MapProps> = ({
                     ? getViewState(
                           boundsInitial,
                           target,
-                          JSON.stringify(views) !== "{}"
+                          isViewsDefined
                               ? views?.viewports[index].zoom
                               : undefined,
                           deckRef.current?.deck
@@ -379,7 +380,7 @@ const Map: React.FC<MapProps> = ({
                     : getViewState3D(
                           is3D,
                           union_of_reported_bboxes,
-                          JSON.stringify(views) !== "{}"
+                          isViewsDefined
                               ? views?.viewports[index].zoom
                               : undefined,
                           deckRef.current?.deck
@@ -415,10 +416,10 @@ const Map: React.FC<MapProps> = ({
                             ? viewState
                             : getViewState(
                                   boundsInitial,
-                                  JSON.stringify(views) !== "{}"
+                                  isViewsDefined
                                       ? views?.viewports[index].target
                                       : undefined,
-                                  JSON.stringify(views) !== "{}"
+                                  isViewsDefined
                                       ? views?.viewports[index].zoom
                                       : undefined,
                                   deckRef.current?.deck
@@ -446,10 +447,10 @@ const Map: React.FC<MapProps> = ({
                     item.id,
                     getViewState(
                         boundsInitial,
-                        JSON.stringify(views) !== "{}"
+                        isViewsDefined
                             ? views?.viewports[index].target
                             : undefined,
-                        JSON.stringify(views) !== "{}"
+                        isViewsDefined
                             ? views?.viewports[index].zoom
                             : undefined,
                         deckRef.current?.deck
@@ -499,8 +500,12 @@ const Map: React.FC<MapProps> = ({
                     item.id,
                     getViewState(
                         boundsInitial,
-                        views?.viewports[index].target,
-                        views?.viewports[index].zoom,
+                        isViewsDefined
+                            ? views?.viewports[index].target
+                            : undefined,
+                        isViewsDefined
+                            ? views?.viewports[index].zoom
+                            : undefined,
                         deckRef.current?.deck
                     ),
                 ])
