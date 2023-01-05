@@ -129,8 +129,6 @@ const SubsurfaceViewerDashWrapper: React.FC<
         children: children,
     };
 
-    //console.log(annotation);
-
     return (
         <>
             <DeckGLMap {...mapArgs}>{mapAnnotation(annotation)}</DeckGLMap>
