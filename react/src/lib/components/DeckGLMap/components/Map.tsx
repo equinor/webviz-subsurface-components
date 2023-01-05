@@ -323,12 +323,11 @@ const Map: React.FC<MapProps> = ({
     const deckRef = useRef<DeckGLRef>(null);
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
-    const isViewsDefined =
-        typeof views !== undefined && Object.keys(views).length !== 0;
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState([{}]);
-
+    const isViewsDefined =
+        typeof views !== undefined && Object.keys(views).length !== 0;
     const initialViewState = getViewState(
         boundsInitial,
         isViewsDefined ? views?.viewports[0].target : undefined,
