@@ -996,7 +996,7 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof DeckGLMap> = (
         <DeckGLMap {...args} layers={updatedLayerData}>
             {
                 // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
-                <View id="view_1_2D">
+                <View id="view_1">
                     <div style={{ marginTop: 50 }}>
                         <ColorLegend
                             min={min}
