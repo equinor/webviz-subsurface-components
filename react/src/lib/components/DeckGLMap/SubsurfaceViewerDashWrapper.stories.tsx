@@ -5,7 +5,7 @@ import { ViewFooter } from "../..";
 
 export default {
     component: SubsurfaceViewerDashWrapper,
-    title: "SubsurfaceViewerDashWrapper",
+    title: "DeckGLMap / SubsurfaceViewerDashWrapper",
 } as ComponentMeta<typeof SubsurfaceViewerDashWrapper>;
 
 const mapLayer = {
