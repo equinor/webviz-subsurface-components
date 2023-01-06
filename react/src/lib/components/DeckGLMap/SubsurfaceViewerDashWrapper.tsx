@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { View } from "../..";
+import { View } from "@deck.gl/core/typed";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import DeckGLMap, { DeckGLMapProps } from "./DeckGLMap";
 import {
@@ -75,6 +75,7 @@ export interface SubsurfaceViewerDashWrapperProps {
 
 function mapAnnotation(annotation: Record<string, unknown>) {
     return Object.entries(annotation).map(([viewId, annotation]) => (
+        // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
         <View key={viewId} id={viewId}>
             {annotation}
         </View>
