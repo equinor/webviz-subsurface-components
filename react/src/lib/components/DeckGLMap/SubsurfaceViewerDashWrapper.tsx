@@ -129,11 +129,7 @@ const SubsurfaceViewerDashWrapper: React.FC<
         children: children,
     };
 
-    return (
-        <>
-            <DeckGLMap {...mapArgs}>{mapAnnotation(annotation)}</DeckGLMap>
-        </>
-    );
+    return <DeckGLMap {...mapArgs}>{mapAnnotation(annotation)}</DeckGLMap>;
 };
 
 SubsurfaceViewerDashWrapper.defaultProps = {

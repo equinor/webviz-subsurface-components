@@ -1,5 +1,5 @@
 export { default, DeckGLMapProps } from "./DeckGLMap";
 export {
-    SubsurfaceViewerDashWrapper,
+    default as SubsurfaceViewerDashWrapper,
     SubsurfaceViewerDashWrapperProps,
 } from "./SubsurfaceViewerDashWrapper";

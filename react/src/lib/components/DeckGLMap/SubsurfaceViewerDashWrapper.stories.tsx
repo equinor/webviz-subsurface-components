@@ -1,7 +1,6 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import SubsurfaceViewerDashWrapper from "./SubsurfaceViewerDashWrapper";
-import { ViewFooter } from "../..";
+import { ViewFooter, SubsurfaceViewerDashWrapper } from "../..";
 
 export default {
     component: SubsurfaceViewerDashWrapper,
@@ -23,11 +22,11 @@ const mapLayer = {
     material: false,
 };
 
-const Template: ComponentStory<typeof SubsurfaceViewerDashWrapper> = (args) => (
-    <SubsurfaceViewerDashWrapper {...args} />
-);
+const DashWrapperTemplate: ComponentStory<
+    typeof SubsurfaceViewerDashWrapper
+> = (args) => <SubsurfaceViewerDashWrapper {...args} />;
 
-export const DashWrapperViewAnnotation = Template.bind({});
+export const DashWrapperViewAnnotation = DashWrapperTemplate.bind({});
 
 DashWrapperViewAnnotation.args = {
     id: "dash_annotation",
