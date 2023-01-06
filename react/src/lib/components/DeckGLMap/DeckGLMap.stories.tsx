@@ -255,6 +255,10 @@ MultiViewAnnotation.args = {
             {
                 id: "view_1",
                 layerIds: ["hugin"],
+                target: [437500, 6475000],
+                zoom: -5.0,
+                rotationX: 90,
+                rotationOrbit: 0,
             },
             {
                 id: "view_2",
@@ -278,7 +282,19 @@ ViewObjectInitializedAsEmpty.args = {
             propertiesUrl: "hugin_depth_25_m.float32",
         },
     ],
-    views: {} as ViewsType,
+    views: {
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                layerIds: ["hugin"],
+                target: [47500, 647000],
+                zoom: -5.0,
+                rotationX: 90,
+                rotationOrbit: 0,
+            },
+        ],
+    },
 };
 
 const wellsLayerNoDepthTest = {
