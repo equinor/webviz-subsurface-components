@@ -298,6 +298,15 @@ function adjustCameraTarget(
     return vs;
 }
 
+function checkIfViewsIsDefined(views: ViewsType | undefined) {
+    if (!views) {
+        return false;
+    } else if (Object.keys(views).length === 0) {
+        return false;
+    }
+    return true;
+}
+
 const Map: React.FC<MapProps> = ({
     id,
     resources,
@@ -327,7 +336,7 @@ const Map: React.FC<MapProps> = ({
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState([{}]);
 
-    const isViewsDefined = checkIfViewsIsDefined();
+    const isViewsDefined = checkIfViewsIsDefined(views);
     const initialViewState = getViewState(
         boundsInitial,
         isViewsDefined ? views?.viewports[0].target : undefined,
@@ -336,14 +345,6 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Local help function.
-    function checkIfViewsIsDefined() {
-        if (!views) {
-            return false;
-        } else if (Object.keys(views).length === 0) {
-            return false;
-        }
-        return true;
-    }
     function calcDefaultViewStates() {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
