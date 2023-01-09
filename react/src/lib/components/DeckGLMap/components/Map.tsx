@@ -1162,15 +1162,13 @@ function getViews(
                     : cur_viewport.id === "intersection_view"
                     ? "IntersectionView"
                     : "OrthographicView";
-                const id_suffix = cur_viewport.show3D ? "_3D" : "_2D";
-                const view_id: string = cur_viewport.id + id_suffix;
 
                 const far = 9999;
                 const near = cur_viewport.show3D ? 0.1 : -9999;
 
                 deckgl_views.push({
                     "@@type": view_type,
-                    id: view_id,
+                    id: cur_viewport.id,
                     controller: {
                         type: cur_viewport.show3D
                             ? ZScaleOrbitController

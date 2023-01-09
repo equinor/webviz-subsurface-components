@@ -21,7 +21,6 @@ from vtkmodules.vtkFiltersGeometry import vtkExplicitStructuredGridSurfaceFilter
 def _create_vtk_esgrid_from_verts_and_conn(
     point_dims: np.ndarray, vertex_arr_np: np.ndarray, conn_arr_np: np.ndarray
 ) -> vtkExplicitStructuredGrid:
-
     vertex_arr_np = vertex_arr_np.reshape(-1, 3)
     points_vtkarr = numpy_to_vtk(vertex_arr_np, deep=1)
     vtk_points = vtkPoints()
@@ -44,7 +43,6 @@ def _create_vtk_esgrid_from_verts_and_conn(
 def xtgeo_grid_to_vtk_explicit_structured_grid(
     xtg_grid: xtgeo.Grid,
 ) -> vtkExplicitStructuredGrid:
-
     # Create geometry data suitable for use with VTK's explicit structured grid
     # based on the specified xtgeo 3d grid
     pt_dims, vertex_arr, conn_arr, inactive_arr = xtg_grid.get_vtk_esg_geometry_data()
@@ -76,7 +74,6 @@ def get_surface(
     xtgeo_grid: xtgeo.Grid,
     xtgeo_grid_property: xtgeo.GridProperty,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-
     es_grid = xtgeo_grid_to_vtk_explicit_structured_grid(xtgeo_grid)
     polydata = _calc_grid_surface(es_grid)
     points_np = vtk_to_numpy(polydata.GetPoints().GetData()).ravel()
