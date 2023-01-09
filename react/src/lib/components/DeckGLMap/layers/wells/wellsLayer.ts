@@ -315,6 +315,7 @@ export default class WellsLayer extends CompositeLayer<
 
         const parameters = {
             [GL.DEPTH_TEST]: this.props.depthTest,
+            [GL.POLYGON_OFFSET_FILL]: true,
         };
 
         const outline = new UnfoldedGeoJsonLayer(
