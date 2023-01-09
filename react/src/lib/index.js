@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2020 - Equinor ASA. */
 
-import DeckGLMap from "./components/DeckGLMap";
+import DeckGLMap, { SubsurfaceViewerDashWrapper } from "./components/DeckGLMap";
 import GroupTree from "./components/GroupTree";
 import HistoryMatch from "./components/HistoryMatch";
 import LayeredMap from "./components/LayeredMap";
@@ -57,4 +57,5 @@ export {
     LayerPickInfo,
     ViewFooter,
     View,
+    SubsurfaceViewerDashWrapper,
 };
