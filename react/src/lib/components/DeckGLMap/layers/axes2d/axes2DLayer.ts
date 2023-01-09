@@ -19,6 +19,8 @@ import { ImageLoader } from "@loaders.gl/images";
 import { vec4, mat4 } from "gl-matrix";
 import { Color } from "@deck.gl/core/typed";
 
+import { fontAtlas } from "./font-atlas.txt";
+
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
     [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
@@ -121,7 +123,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
     initializeState(context: LayerContext): void {
         const { gl } = context;
 
-        const promise = load("font-atlas.png", ImageLoader, {
+        // 
+        //console.log(fontAtlas)
+
+        const text = JSON.stringify(fontAtlas);
+        const data = new Blob([text], { type: "text/plain" });
+        const url = window.URL.createObjectURL(data);
+
+        //const promise = load("font-atlas.png", ImageLoader, {
+        const promise = load(url, ImageLoader, {
             image: { type: "data" }, // Will load as ImageData.
         });
 
