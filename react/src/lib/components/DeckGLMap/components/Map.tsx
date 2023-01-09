@@ -326,8 +326,6 @@ const Map: React.FC<MapProps> = ({
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState([{}]);
-    // console.log(views);
-    const isViewsDefined = !isEmpty(views);
 
     const initialViewState = getViewState(
         boundsInitial,

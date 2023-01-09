@@ -21,6 +21,8 @@ export default {
     title: "DeckGLMap",
 } as ComponentMeta<typeof DeckGLMap>;
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const exampleData = require("../../../demo/example-data/deckgl-map.json");
 const defaultWellsLayer = {
     "@@type": "WellsLayer",
     data: "@@#resources.wellsData",
@@ -267,6 +269,18 @@ MultiViewAnnotation.args = {
 export const ViewObjectInitializedAsEmpty = MultiViewAnnotationTemplate.bind(
     {}
 );
+
+// multiple view with empty View Object
+export const MultiView2 = MultiViewAnnotationTemplate.bind({});
+MultiView2.args = {
+    ...exampleData[0],
+    legend: {
+        visible: false,
+    },
+    id: "test",
+    layers: [...exampleData[0].layers],
+    views: {},
+};
 
 ViewObjectInitializedAsEmpty.args = {
     id: "view_initialized_as_empty",
