@@ -452,7 +452,6 @@ MultiView.args = {
     legend: {
         visible: false,
     },
-    id: "test",
     layers: [
         ...exampleData[0].layers,
         customLayerWithPolylineData,
