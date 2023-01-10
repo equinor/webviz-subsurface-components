@@ -335,10 +335,10 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Local help function.
-    function calcDefaultViewStates() {
+    function calcDefaultViewStates(input?: ViewportType[]) {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-
+        console.log("get Called");
         const union_of_reported_bboxes = addBoundingBoxes(
             reportedBoundingBoxAcc,
             reportedBoundingBox
@@ -363,24 +363,48 @@ const Map: React.FC<MapProps> = ({
 
         let tempViewStates: Record<string, ViewStateType> = {};
         const isBoundsDefined = typeof bounds !== "undefined";
-        tempViewStates = Object.fromEntries(
-            viewsProps.map((item, index) => [
-                item.id,
-                isBoundsDefined
-                    ? getViewState(
-                          boundsInitial,
-                          target,
-                          views?.viewports?.[index].zoom,
-                          deckRef.current?.deck
-                      )
-                    : getViewState3D(
-                          is3D,
-                          union_of_reported_bboxes,
-                          views?.viewports?.[index].zoom,
-                          deckRef.current?.deck
-                      ),
-            ])
-        );
+        if (input) {
+            console.log("1");
+            tempViewStates = Object.fromEntries(
+                input.map((item, index) => [
+                    item.id,
+                    isBoundsDefined
+                        ? getViewState(
+                              boundsInitial,
+                              target,
+                              -5,
+                              deckRef.current?.deck
+                          )
+                        : getViewState3D(
+                              is3D,
+                              union_of_reported_bboxes,
+                              -5,
+                              deckRef.current?.deck
+                          ),
+                ])
+            );
+        } else {
+            console.log("2");
+            tempViewStates = Object.fromEntries(
+                viewsProps.map((item, index) => [
+                    item.id,
+                    isBoundsDefined
+                        ? getViewState(
+                              boundsInitial,
+                              target,
+                              -5,
+                              deckRef.current?.deck
+                          )
+                        : getViewState3D(
+                              is3D,
+                              union_of_reported_bboxes,
+                              -5,
+                              deckRef.current?.deck
+                          ),
+                ])
+            );
+        }
+       
         setDidUserChangeCamera(false);
         setViewStates(tempViewStates);
     }
@@ -549,6 +573,14 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZDown]);
 
     useEffect(() => {
+        console.log(views?.viewports.length);
+        const viewProps = getViews(
+            views,
+            scaleUpFunction,
+            scaleDownFunction
+        ) as ViewportType[]
+
+        console.log(viewProps);
         setViewsProps(
             getViews(
                 views,
@@ -556,6 +588,9 @@ const Map: React.FC<MapProps> = ({
                 scaleDownFunction
             ) as ViewportType[]
         );
+        if (!bounds) {
+            calcDefaultViewStates(viewProps);
+        }
     }, [views]);
 
     useEffect(() => {
@@ -892,6 +927,7 @@ const Map: React.FC<MapProps> = ({
         },
         [viewStates]
     );
+
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
     return (
