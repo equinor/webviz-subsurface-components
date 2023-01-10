@@ -323,15 +323,14 @@ const Map: React.FC<MapProps> = ({
     const deckRef = useRef<DeckGLRef>(null);
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
-
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState([{}]);
 
     const initialViewState = getViewState(
         boundsInitial,
-        views?.viewports[0].target,
-        views?.viewports[0].zoom,
+        views?.viewports?.[0].target,
+        views?.viewports?.[0].zoom,
         deckRef.current?.deck
     );
 
@@ -371,13 +370,13 @@ const Map: React.FC<MapProps> = ({
                     ? getViewState(
                           boundsInitial,
                           target,
-                          views?.viewports[index].zoom,
+                          views?.viewports?.[index].zoom,
                           deckRef.current?.deck
                       )
                     : getViewState3D(
                           is3D,
                           union_of_reported_bboxes,
-                          views?.viewports[index].zoom,
+                          views?.viewports?.[index].zoom,
                           deckRef.current?.deck
                       ),
             ])
@@ -411,8 +410,8 @@ const Map: React.FC<MapProps> = ({
                             ? viewState
                             : getViewState(
                                   boundsInitial,
-                                  views?.viewports[index].target,
-                                  views?.viewports[index].zoom,
+                                  views?.viewports?.[index].target,
+                                  views?.viewports?.[index].zoom,
                                   deckRef.current?.deck
                               ),
                     ];
@@ -438,8 +437,8 @@ const Map: React.FC<MapProps> = ({
                     item.id,
                     getViewState(
                         boundsInitial,
-                        views?.viewports[index].target,
-                        views?.viewports[index].zoom,
+                        views?.viewports?.[index].target,
+                        views?.viewports?.[index].zoom,
                         deckRef.current?.deck
                     ),
                 ])
@@ -487,8 +486,8 @@ const Map: React.FC<MapProps> = ({
                     item.id,
                     getViewState(
                         boundsInitial,
-                        views?.viewports[index].target,
-                        views?.viewports[index].zoom,
+                        views?.viewports?.[index].target,
+                        views?.viewports?.[index].zoom,
                         deckRef.current?.deck
                     ),
                 ])
