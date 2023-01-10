@@ -1,6 +1,6 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import { ViewFooter, SubsurfaceViewerDashWrapper } from "../..";
+import { ViewFooter, SubsurfaceViewerDashWrapper, ViewAnnotation } from "../..";
 
 export default {
     component: SubsurfaceViewerDashWrapper,
@@ -24,7 +24,16 @@ const mapLayer = {
 
 const DashWrapperTemplate: ComponentStory<
     typeof SubsurfaceViewerDashWrapper
-> = (args) => <SubsurfaceViewerDashWrapper {...args} />;
+> = (args) => (
+    <SubsurfaceViewerDashWrapper {...args}>
+        <ViewAnnotation id="view_1">
+            <ViewFooter>view_1</ViewFooter>
+        </ViewAnnotation>
+        <ViewAnnotation id="view_2">
+            <ViewFooter>view_2</ViewFooter>
+        </ViewAnnotation>
+    </SubsurfaceViewerDashWrapper>
+);
 
 export const DashWrapperViewAnnotation = DashWrapperTemplate.bind({});
 
@@ -51,9 +60,5 @@ DashWrapperViewAnnotation.args = {
                 layerIds: ["kh_netmap"],
             },
         ],
-    },
-    annotation: {
-        view_1: <ViewFooter>Hugin</ViewFooter>,
-        view_2: <ViewFooter>kH Netmap</ViewFooter>,
     },
 };

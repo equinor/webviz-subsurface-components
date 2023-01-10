@@ -30,6 +30,7 @@ import { WellsPickInfo } from "./components/DeckGLMap/layers/wells/wellsLayer";
 import TerrainMapPickInfo from "./components/DeckGLMap/layers/terrain/terrainMapLayer";
 import { FeatureCollection } from "@nebula.gl/edit-modes";
 import { ViewFooter } from "./components/DeckGLMap/components/ViewFooter";
+import { ViewAnnotation } from "./components/DeckGLMap/components/ViewAnnotation";
 
 export {
     HistoryMatch,
@@ -58,4 +59,5 @@ export {
     ViewFooter,
     View,
     SubsurfaceViewerDashWrapper,
+    ViewAnnotation,
 };
