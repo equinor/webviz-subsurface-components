@@ -18,8 +18,9 @@ import { Texture2D } from "@luma.gl/webgl";
 import { ImageLoader } from "@loaders.gl/images";
 import { vec4, mat4 } from "gl-matrix";
 import { Color } from "@deck.gl/core/typed";
-import { Buffer } from "buffer";
-import { fontAtlas } from "./font-atlas";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import fontAtlasPng from "./font-atlas.png";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -123,12 +124,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
     initializeState(context: LayerContext): void {
         const { gl } = context;
 
-        const bytes = Buffer.from(fontAtlas, "base64");
-        const byteArray = new Uint8Array(bytes);
-        const blob = new Blob([byteArray], { type: "image/png" });
-        const url = window.URL.createObjectURL(blob);
-
-        const promise = load(url, ImageLoader, {
+        const promise = load(fontAtlasPng, ImageLoader, {
             image: { type: "data" }, // Will load as ImageData.
         });
 
@@ -220,7 +216,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         const { projectionMatrix } = this.context.viewport;
 
-        //gl.disable(gl.DEPTH_TEST);
+        //gl.disable(gl.DEPTH_TEST); KEEP for now.
 
         const { label_models, line_model } = this._getModels(gl);
 
