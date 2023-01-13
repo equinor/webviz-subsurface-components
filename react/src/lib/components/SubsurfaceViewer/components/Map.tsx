@@ -396,7 +396,10 @@ const Map: React.FC<MapProps> = ({
 
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
+        const isCameraPositionDefined =
+            typeof cameraPosition !== "undefined" &&
+            Object.keys(cameraPosition).length !== 0;
+        if (isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
@@ -427,7 +430,10 @@ const Map: React.FC<MapProps> = ({
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
+        const isCameraPositionDefined =
+            typeof cameraPosition !== "undefined" &&
+            Object.keys(cameraPosition).length !== 0;
+        if (isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
@@ -480,7 +486,10 @@ const Map: React.FC<MapProps> = ({
     // react on bounds prop change
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (cameraPosition && Object.keys(cameraPosition).length === 0) {
+        const isCameraPositionDefined =
+            typeof cameraPosition !== "undefined" &&
+            Object.keys(cameraPosition).length !== 0;
+        if (!isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
                     item.id,
@@ -502,7 +511,10 @@ const Map: React.FC<MapProps> = ({
     // react on cameraPosition prop change
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
+        const isCameraPositionDefined =
+            typeof cameraPosition !== "undefined" &&
+            Object.keys(cameraPosition).length !== 0;
+        if (isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
             );
