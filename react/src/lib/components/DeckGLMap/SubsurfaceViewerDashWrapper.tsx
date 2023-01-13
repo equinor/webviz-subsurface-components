@@ -65,17 +65,11 @@ export interface SubsurfaceViewerDashWrapperProps {
     cameraPosition?: ViewStateType | undefined;
 
     children?: React.ReactNode;
-
-    /**
-     * A mapping associating annotation components to view ids.
-     * Example: {"view_1": <ColorLegend/>}
-     */
-    annotation?: Record<string, unknown>;
 }
 
 function mapAnnotation(annotationContainers: React.ReactNode) {
     return React.Children.map(annotationContainers, (annotationContainer) => {
-        const viewId = (annotationContainer as React.ReactElement).props.id;
+        const viewId = (annotationContainer as React.ReactElement).key;
         return (
             // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
             <View key={viewId} id={viewId}>
@@ -266,11 +260,7 @@ SubsurfaceViewerDashWrapper.propTypes = {
      */
     onMouseEvent: PropTypes.func,
 
-    /**
-     * A mapping associating annotation components to view ids.
-     * Example: {"view_1": <ColorLegend/>}
-     */
-    annotation: PropTypes.any,
+    children: PropTypes.any,
 };
 
 export default SubsurfaceViewerDashWrapper;
