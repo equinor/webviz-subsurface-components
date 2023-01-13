@@ -402,7 +402,7 @@ const Map: React.FC<MapProps> = ({
         if (isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
-            );
+            ) as unknown as Record<string, ViewStateType>;
         } else {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => {
