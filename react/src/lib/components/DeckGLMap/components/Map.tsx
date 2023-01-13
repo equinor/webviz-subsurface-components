@@ -335,10 +335,9 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Local help function.
-    function calcDefaultViewStates() {
+    function calcDefaultViewStates(input?: ViewportType[]) {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-
         const union_of_reported_bboxes = addBoundingBoxes(
             reportedBoundingBoxAcc,
             reportedBoundingBox
@@ -363,8 +362,9 @@ const Map: React.FC<MapProps> = ({
 
         let tempViewStates: Record<string, ViewStateType> = {};
         const isBoundsDefined = typeof bounds !== "undefined";
+        const updatedViewProps = input ? input : viewsProps;
         tempViewStates = Object.fromEntries(
-            viewsProps.map((item, index) => [
+            updatedViewProps.map((item, index) => [
                 item.id,
                 isBoundsDefined
                     ? getViewState(
@@ -549,13 +549,17 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZDown]);
 
     useEffect(() => {
-        setViewsProps(
-            getViews(
-                views,
-                scaleUpFunction,
-                scaleDownFunction
-            ) as ViewportType[]
-        );
+        const viewProps = getViews(
+            views,
+            scaleUpFunction,
+            scaleDownFunction
+        ) as ViewportType[];
+
+        setViewsProps(viewProps);
+
+        if (!bounds) {
+            calcDefaultViewStates(viewProps);
+        }
     }, [views]);
 
     useEffect(() => {
@@ -892,6 +896,7 @@ const Map: React.FC<MapProps> = ({
         },
         [viewStates]
     );
+
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
     return (
