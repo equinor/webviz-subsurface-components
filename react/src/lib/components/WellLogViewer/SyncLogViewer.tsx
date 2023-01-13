@@ -280,14 +280,12 @@ class SyncLogViewer extends Component<Props, State> {
         const axes = _axes?.[0];
         let primaryAxis = axes?.[0];
         if (this.props.templates) {
-            if (this.props.templates[0] && axes) {
-                this.props.templates[0].scale.primary = "tvd"; //!!!!!
-                if (
-                    this.props.templates[0] &&
-                    this.props.templates[0].scale.primary
-                ) {
-                    if (axes.indexOf(this.props.templates[0].scale.primary) >= 0)
-                        primaryAxis = this.props.templates[0].scale.primary;
+            const template = this.props.templates[0];
+            if (template) {
+                template.scale.primary = "tvd"; //!!!!!
+                if (template.scale.primary && axes) {
+                    if (axes.indexOf(template.scale.primary) >= 0)
+                        primaryAxis = template.scale.primary;
                 }
             }
         }
@@ -360,15 +358,15 @@ class SyncLogViewer extends Component<Props, State> {
             const axes = _axes?.[0];
             let primaryAxis = axes[0];
             if (this.props.templates) {
-                if (this.props.templates[0]) {
-                    this.props.templates[0].scale.primary = "tvd"; //!!!!!
-                    if (this.props.templates[0].scale.primary) {
-                        if (
-                            axes.indexOf(this.props.templates[0].scale.primary) < 0
-                        ) {
-                            if (this.props.welllogs === prevProps.welllogs) return; // nothing to update
+                const template = this.props.templates[0];
+                if (template) {
+                    template.scale.primary = "tvd"; //!!!!!
+                    if (template.scale.primary && axes) {
+                        if (axes.indexOf(template.scale.primary) < 0) {
+                            if (this.props.welllogs === prevProps.welllogs)
+                                return; // nothing to update
                         } else {
-                            primaryAxis = this.props.templates[0].scale.primary;
+                            primaryAxis = template.scale.primary;
                         }
                     }
                 }
@@ -951,16 +949,19 @@ class SyncLogViewer extends Component<Props, State> {
                     value={this.state.primaryAxis}
                     onChange={this.onChangePrimaryAxis}
                 />
-                {this.props.welllogs?.map((_welllog: WellLog, index: number) => (
-                    <InfoPanel
-                        key={index}
-                        header={
-                            "Readout " + this.props.welllogs[index].header.well
-                        }
-                        onGroupClick={this.onInfoGroupClick}
-                        infos={this.state.infos[index]}
-                    />
-                ))}
+                {this.props.welllogs?.map(
+                    (_welllog: WellLog, index: number) => (
+                        <InfoPanel
+                            key={index}
+                            header={
+                                "Readout " +
+                                this.props.welllogs[index].header.well
+                            }
+                            onGroupClick={this.onInfoGroupClick}
+                            infos={this.state.infos[index]}
+                        />
+                    )
+                )}
                 <div style={{ paddingLeft: "10px", display: "flex" }}>
                     <span>Zoom:</span>
                     <span

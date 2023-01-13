@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from "react";
 
 interface Props {
-    header: string; // language dependent string
+    header?: string; // language dependent string
     axes: string[];
     axisLabels: Record<string, string>; // language dependent strings
     value: string;
@@ -31,7 +31,7 @@ class AxisSelector extends Component<Props> {
         return (
             <div>
                 <fieldset>
-                    <legend>{this.props.header}</legend>
+                    {this.props.header && <legend>{this.props.header}</legend>}
                     {this.props.axes.map((axis) => {
                         return this.createItem(
                             this.props.axisLabels

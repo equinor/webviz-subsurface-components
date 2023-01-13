@@ -472,10 +472,12 @@ function posWellPickTitles(instance: LogViewer, parent: WellLogView) {
 }
 
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
-    { // clear old wellpicks
-        for(let elmName in instance.overlay.elements) {
-          if(elmName.substring(0,2)=="wp") // "wpFill" + horizon; "wp" + horizon; 
-             instance.overlay.remove(elmName); // clear old if exists
+    {
+        /* clear old wellpicks */
+        for (const elmName in instance.overlay.elements) {
+            if (elmName.substring(0, 2) == "wp")
+                // "wpFill" + horizon; "wp" + horizon;
+                instance.overlay.remove(elmName); // clear old if exists
         }
     }
 
@@ -1223,16 +1225,20 @@ class WellLogView
         this.selPinned = undefined;
         this.selPersistent = undefined;
 
-        this.resizeObserver = new ResizeObserver((entries) => {
-            const entry = entries[0];
-            if (entry && entry.target) {
-                //const Width = (entry.target as HTMLElement).offsetWidth;
-                //const Height = (entry.target as HTMLElement).offsetHeight;
+        this.resizeObserver = new ResizeObserver(
+            (entries: ResizeObserverEntry[]): void => {
+                const entry = entries[0];
+                if (entry && entry.target) {
+                    //const Width = (entry.target as HTMLElement).offsetWidth;
+                    //const Height = (entry.target as HTMLElement).offsetHeight;
 
-                if (this.logController)
-                    posWellPickTitles(this.logController, this);
+                    if (this.logController)
+                        posWellPickTitles(this.logController, this);
+
+                    this.onContentRescale();
+                }
             }
-        });
+        );
 
         this.template = {
             name: "",

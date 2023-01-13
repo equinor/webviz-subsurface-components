@@ -38,20 +38,22 @@ class Scroller extends Component<Props> {
         this.scrollable = null;
         this.content = null;
 
-        this.resizeObserver = new ResizeObserver((entries) => {
-            const entry = entries[0];
-            if (entry && entry.target) {
-                const Width = (entry.target as HTMLElement).offsetWidth;
-                const Height = (entry.target as HTMLElement).offsetHeight;
+        this.resizeObserver = new ResizeObserver(
+            (entries: ResizeObserverEntry[]): void => {
+                const entry = entries[0];
+                if (entry && entry.target) {
+                    const Width = (entry.target as HTMLElement).offsetWidth;
+                    const Height = (entry.target as HTMLElement).offsetHeight;
 
-                if (this.content) {
-                    const { vertical, horizontal } = getScrollbarSizes();
+                    if (this.content) {
+                        const { vertical, horizontal } = getScrollbarSizes();
 
-                    this.content.style.width = Width - vertical + "px";
-                    this.content.style.height = Height - horizontal + "px";
+                        this.content.style.width = Width - vertical + "px";
+                        this.content.style.height = Height - horizontal + "px";
+                    }
                 }
             }
-        });
+        );
 
         this.onScroll = this.onScroll.bind(this);
     }

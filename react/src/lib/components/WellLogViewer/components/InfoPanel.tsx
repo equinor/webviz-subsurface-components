@@ -3,7 +3,7 @@ import React, { Component, ReactNode } from "react";
 import { Info } from "./InfoTypes";
 
 interface Props {
-    header: string;
+    header?: string;
     infos: Info[];
     onGroupClick?: (trackId: string | number) => void;
 }
@@ -123,7 +123,7 @@ class InfoPanel extends Component<Props> {
         return (
             <div style={{ overflowY: "auto", overflowX: "hidden" }}>
                 <fieldset>
-                    <legend>{this.props.header}</legend>
+                    {this.props.header && <legend>{this.props.header}</legend>}
 
                     <table
                         style={{

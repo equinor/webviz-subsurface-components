@@ -372,10 +372,9 @@ function getColorTable(
         return undefined; //defColorTable;
     }
 
-    if(!colorTables) {
-        console.log("no colorTables is given in getColorTable()")
-    }
-    else {
+    if (!colorTables) {
+        console.log("no colorTables is given in getColorTable()");
+    } else {
         for (let i = 0; i < colorTables.length; i++) {
             if (colorTables[i].name == id) return colorTables[i];
         }

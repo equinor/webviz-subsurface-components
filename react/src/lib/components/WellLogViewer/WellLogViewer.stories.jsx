@@ -94,6 +94,10 @@ const Template = (args) => {
                     onCreateController={onCreateController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
+                    //left={(parent) => <RightPanel parent={parent} />}
+                    //right={(parent) => <RightPanel parent={parent} />}
+                    //top={<div>Top</div>}
+                    //bottom={<div>Bottom</div>}
                 />
             </div>
             <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
@@ -107,6 +111,9 @@ const wellpick = {
     colorTables: colorTables,
     color: "Stratigraphy",
 };
+
+import { RightPanel, WellLogZoomSlider, WellLogScaleSelector } from "./WellLogViewer";
+
 
 export const Default = Template.bind({});
 Default.args = {
@@ -126,7 +133,14 @@ Default.args = {
     readoutOptions: {
         allTracks: false,
         grouping: "by_track",
-    },    
+    },
+    right: (parent) => <RightPanel parent={parent} />,
+    left: (parent) => <RightPanel parent={parent} />,
+    top: (parent) => <div><WellLogScaleSelector 
+                    label="Scale value:"
+                    parent={parent}
+                /><br></br></div>,
+    bottom: (parent) => <WellLogZoomSlider label="Zoom:" parent={parent} />,
 };
 
 export const Horizontal = Template.bind({});
@@ -141,6 +155,8 @@ Horizontal.args = {
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
+
+    left: (parent) => <RightPanel parent={parent} />,
 };
 Horizontal.parameters = {
     docs: {
@@ -161,6 +177,8 @@ Discrete.args = {
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
+
+    right: (parent) => <RightPanel parent={parent} />,
 };
 Discrete.parameters = {
     docs: {
