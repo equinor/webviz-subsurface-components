@@ -96,7 +96,6 @@ app.layout = wsc.SubsurfaceViewerDashWrapper(
                 "isSync": True,
             },
         ],
-
     },
     children=[
         wsc.ViewAnnotation(id="view_1", children=[wsc.ViewFooter(children="Hugin")]),
