@@ -930,6 +930,30 @@ export interface WellLogController {
     getTemplate(): Template;
 }
 
+export function getBaseVertScale(
+    controller: WellLogController | null,
+    horizontal: boolean | undefined
+): number {
+    if (controller) {
+        const base = controller.getContentBaseDomain();
+        const wellLogView = controller as WellLogView;
+        const logController = wellLogView.logController;
+        if (logController) {
+            const overlay = logController?.overlay;
+            const source = overlay?.elm.node();
+            if (source) {
+                const clientSize = horizontal
+                    ? source.clientWidth
+                    : source.clientHeight;
+                const m = clientSize * (0.0254 / 96); // "screen" CSS height in meters
+                const scale = (base[1] - base[0]) / m;
+                return scale;
+            }
+        }
+    }
+    return 16000;
+}
+
 import { Info } from "./InfoTypes";
 
 export interface WellLogViewOptions {

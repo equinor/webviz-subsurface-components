@@ -94,10 +94,6 @@ const Template = (args) => {
                     onCreateController={onCreateController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
-                    //left={(parent) => <RightPanel parent={parent} />}
-                    //right={(parent) => <RightPanel parent={parent} />}
-                    //top={<div>Top</div>}
-                    //bottom={<div>Bottom</div>}
                 />
             </div>
             <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
@@ -112,11 +108,12 @@ const wellpick = {
     color: "Stratigraphy",
 };
 
-import {
-    RightPanel,
-    WellLogZoomSlider,
-    WellLogScaleSelector,
-} from "./WellLogViewer";
+import { DefaultRightPanel } from "./components/DefaultRightPanel";
+
+import WellLogZoomSlider from "./components/WellLogZoomSlider";
+import WellLogInfoPanel from "./components/WellLogInfoPanel";
+import WellLogScaleSelector from "./components/WellLogScaleSelector";
+import WellLogAxesPanel from "./components/WellLogAxesPanel";
 
 export const Default = Template.bind({});
 Default.args = {
@@ -152,7 +149,7 @@ Horizontal.args = {
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
 
-    left: (parent) => <RightPanel parent={parent} />,
+    left: (parent) => <DefaultRightPanel parent={parent} />,
     right: null, // remove default right panel
 };
 Horizontal.parameters = {
@@ -180,7 +177,12 @@ Discrete.args = {
             <WellLogScaleSelector label="Scale value:" parent={parent} />
         </div>
     ),
-    right: (parent) => <RightPanel parent={parent} />,
+    right: (parent) => (
+        <div style={{ width: "255px" }}>
+            <WellLogAxesPanel header="Primary scale" parent={parent} />
+            <WellLogInfoPanel parent={parent} />
+        </div>
+    ),
     bottom: (parent) => <WellLogZoomSlider label="Zoom:" parent={parent} />,
 };
 Discrete.parameters = {
