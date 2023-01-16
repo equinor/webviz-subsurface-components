@@ -8,7 +8,7 @@ export default {
 } as ComponentMeta<typeof DeckGLMap>;
 
 const layerProps = {
-    marginH: 80, // Horizontal margin (in pixels)
+    marginH: 100, // Horizontal margin (in pixels)
     marginV: 40, // Vertical margin (in pixels)
 };
 
@@ -31,6 +31,12 @@ const meshMapLayerPng = {
     colorMapName: "Physics",
 };
 
+const axes_hugin = {
+    "@@type": "AxesLayer",
+    id: "axes-layer2",
+    bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
+};
+
 const axes2D = {
     "@@type": "Axes2DLayer",
     id: "axes-layer2D",
@@ -43,7 +49,7 @@ export const Base: ComponentStory<typeof DeckGLMap> = (args) => {
 
 Base.args = {
     id: "map",
-    layers: [axes2D, meshMapLayerPng],
+    layers: [axes_hugin, meshMapLayerPng, axes2D],
 
     bounds: [432150, 6475800, 439400, 6481500],
     views: {
@@ -51,6 +57,7 @@ Base.args = {
         viewports: [
             {
                 id: "view_1",
+                zoom: -3.5,
                 show3D: false,
             },
         ],

@@ -1,5 +1,6 @@
 import React from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,4 +28,8 @@ export const ViewFooter: React.FC<ViewFooterProps> = ({
 }: ViewFooterProps) => {
     const classes = useStyles();
     return <div className={classes.viewFooter}>{children}</div>;
+};
+
+ViewFooter.propTypes = {
+    children: PropTypes.any,
 };

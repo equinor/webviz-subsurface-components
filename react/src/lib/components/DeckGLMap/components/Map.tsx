@@ -323,23 +323,21 @@ const Map: React.FC<MapProps> = ({
     const deckRef = useRef<DeckGLRef>(null);
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
-
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState([{}]);
 
     const initialViewState = getViewState(
         boundsInitial,
-        views?.viewports[0].target,
-        views?.viewports[0].zoom,
+        views?.viewports?.[0].target,
+        views?.viewports?.[0].zoom,
         deckRef.current?.deck
     );
 
     // Local help function.
-    function calcDefaultViewStates() {
+    function calcDefaultViewStates(input?: ViewportType[]) {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-
         const union_of_reported_bboxes = addBoundingBoxes(
             reportedBoundingBoxAcc,
             reportedBoundingBox
@@ -364,20 +362,21 @@ const Map: React.FC<MapProps> = ({
 
         let tempViewStates: Record<string, ViewStateType> = {};
         const isBoundsDefined = typeof bounds !== "undefined";
+        const updatedViewProps = input ? input : viewsProps;
         tempViewStates = Object.fromEntries(
-            viewsProps.map((item, index) => [
+            updatedViewProps.map((item, index) => [
                 item.id,
                 isBoundsDefined
                     ? getViewState(
                           boundsInitial,
                           target,
-                          views?.viewports[index].zoom,
+                          views?.viewports?.[index].zoom,
                           deckRef.current?.deck
                       )
                     : getViewState3D(
                           is3D,
                           union_of_reported_bboxes,
-                          views?.viewports[index].zoom,
+                          views?.viewports?.[index].zoom,
                           deckRef.current?.deck
                       ),
             ])
@@ -411,8 +410,8 @@ const Map: React.FC<MapProps> = ({
                             ? viewState
                             : getViewState(
                                   boundsInitial,
-                                  views?.viewports[index].target,
-                                  views?.viewports[index].zoom,
+                                  views?.viewports?.[index].target,
+                                  views?.viewports?.[index].zoom,
                                   deckRef.current?.deck
                               ),
                     ];
@@ -438,8 +437,8 @@ const Map: React.FC<MapProps> = ({
                     item.id,
                     getViewState(
                         boundsInitial,
-                        views?.viewports[index].target,
-                        views?.viewports[index].zoom,
+                        views?.viewports?.[index].target,
+                        views?.viewports?.[index].zoom,
                         deckRef.current?.deck
                     ),
                 ])
@@ -487,8 +486,8 @@ const Map: React.FC<MapProps> = ({
                     item.id,
                     getViewState(
                         boundsInitial,
-                        views?.viewports[index].target,
-                        views?.viewports[index].zoom,
+                        views?.viewports?.[index].target,
+                        views?.viewports?.[index].zoom,
                         deckRef.current?.deck
                     ),
                 ])
@@ -550,13 +549,17 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZDown]);
 
     useEffect(() => {
-        setViewsProps(
-            getViews(
-                views,
-                scaleUpFunction,
-                scaleDownFunction
-            ) as ViewportType[]
-        );
+        const viewProps = getViews(
+            views,
+            scaleUpFunction,
+            scaleDownFunction
+        ) as ViewportType[];
+
+        setViewsProps(viewProps);
+
+        if (!bounds) {
+            calcDefaultViewStates(viewProps);
+        }
     }, [views]);
 
     useEffect(() => {
@@ -893,6 +896,7 @@ const Map: React.FC<MapProps> = ({
         },
         [viewStates]
     );
+
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
     return (

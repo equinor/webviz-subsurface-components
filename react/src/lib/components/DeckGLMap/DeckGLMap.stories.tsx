@@ -14,7 +14,7 @@ import {
     ViewFooter,
     View,
 } from "../..";
-import { ViewStateType } from "./components/Map";
+import { ViewStateType, ViewsType } from "./components/Map";
 
 export default {
     component: DeckGLMap,
@@ -240,9 +240,6 @@ export const MultiViewAnnotation = MultiViewAnnotationTemplate.bind({});
 
 MultiViewAnnotation.args = {
     id: "multi_view_annotation",
-    legend: {
-        visible: true,
-    },
     layers: [
         mapLayer,
         {
@@ -265,6 +262,23 @@ MultiViewAnnotation.args = {
             },
         ],
     },
+};
+
+export const ViewObjectInitializedAsEmpty = MultiViewAnnotationTemplate.bind(
+    {}
+);
+
+ViewObjectInitializedAsEmpty.args = {
+    id: "view_initialized_as_empty",
+    layers: [
+        mapLayer,
+        {
+            ...mapLayer,
+            id: "kh_netmap",
+            propertiesUrl: "hugin_depth_25_m.float32",
+        },
+    ],
+    views: {} as ViewsType,
 };
 
 const wellsLayerNoDepthTest = {
