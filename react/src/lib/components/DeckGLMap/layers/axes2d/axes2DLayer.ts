@@ -196,9 +196,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         return labels; // as Text3DLayerData;
     }
 
-    // Signature from the base class, eslint doesn't like the any type.
-    // eslint-disable-next-line
-    draw({ moduleParameters, uniforms, context }: any): void {
+    draw({
+        moduleParameters,
+        uniforms,
+        context,
+    }: {
+        moduleParameters: unknown;
+        uniforms: unknown;
+        context: LayerContext;
+    }): void {
         const is_orthographic =
             this.context.viewport.constructor === OrthographicViewport;
         if (
@@ -228,8 +234,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         //gl.enable(gl.DEPTH_TEST);
     }
 
-    //eslint-disable-next-line
-    _getModels(gl: any) {
+    _getModels(gl: WebGLRenderingContext): {
+        label_models: Model[];
+        line_model: Model;
+    } {
         // MAKE MODEL FOR THE AXES LINES (tick marks and axes).
 
         // Margins.
