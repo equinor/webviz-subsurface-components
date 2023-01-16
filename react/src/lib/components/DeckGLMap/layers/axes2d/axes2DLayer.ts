@@ -18,8 +18,6 @@ import { Texture2D } from "@luma.gl/webgl";
 import { ImageLoader } from "@loaders.gl/images";
 import { vec4, mat4 } from "gl-matrix";
 import { Color } from "@deck.gl/core/typed";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import fontAtlasPng from "./font-atlas.png";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
