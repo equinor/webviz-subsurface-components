@@ -77,6 +77,7 @@
         "deck.gl": "^8.8.11",
         "deep-equal": "^2.0.5",
         "fast-json-patch": "^3.0.0-1",
+        "gl-matrix": "^3.4.3",
         "jsonschema": "^1.4.0",
         "jsverify": "^0.8.4",
         "leaflet": "^1.6.0",
