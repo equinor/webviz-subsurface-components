@@ -28,10 +28,12 @@ import { Info, InfoOptions } from "./components/InfoTypes";
 export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     readoutOptions?: InfoOptions; // options for readout
 
+    header?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     left?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     right?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     top?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     bottom?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
+    footer?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
 
     // callbacks
     onContentRescale?: () => void;
@@ -59,12 +61,14 @@ export const argTypesWellLogViewerProp = {
 };
 
 interface State {
-    primaryAxis: string;
+    primaryAxis: string; // for WellLogView
 
+    header: JSX.Element | null;
     left: JSX.Element | null;
     right: JSX.Element | null;
     top: JSX.Element | null;
     bottom: JSX.Element | null;
+    footer: JSX.Element | null;
 }
 
 class WellLogZoomSliderProps {
@@ -144,21 +148,49 @@ export class WellLogZoomSlider extends Component<
     }
 }
 
-function getVertScale(vertScale: number): {
-    _vertScale: number;
-    vertScale: number;
+function getScale(
+    scale: number,
+    values: number[]
+): {
+    shouldAddCustomValue: boolean;
+    scale: number;
 } {
-    const r =
-        vertScale > 2000 ? 500 : vertScale > 200 ? 50 : vertScale > 20 ? 5 : 1;
-    const _vertScale = Number((vertScale / r).toFixed(0)) * r;
-    if (vertScale < 1500) vertScale = 1000;
-    else if (vertScale < 3500) vertScale = 2000;
-    else if (vertScale < 7500) vertScale = 5000;
-    else if (vertScale < 15000) vertScale = 10000;
-    else if (vertScale < 35000) vertScale = 20000;
-    else if (vertScale < 75000) vertScale = 50000;
-    else vertScale = 100000;
-    return { _vertScale, vertScale };
+    // get nearest value in the list
+    let nearestScale: number | undefined = undefined;
+    if (values.length) {
+        nearestScale = values[values.length - 1];
+        for (let i = 1; i < values.length; i++) {
+            if (scale < (values[i - 1] + values[i]) * 0.5) {
+                nearestScale = values[i - 1];
+                break;
+            }
+        }
+    }
+
+    // make a "round value"
+    const r = // "round" step
+        scale > 5000
+            ? 1000
+            : scale > 2000
+            ? 500
+            : scale > 1000
+            ? 200
+            : scale > 500
+            ? 100
+            : scale > 200
+            ? 50
+            : scale > 100
+            ? 20
+            : scale > 50
+            ? 10
+            : scale > 20
+            ? 5
+            : scale > 10
+            ? 2
+            : 1;
+    scale = Number((scale / r).toFixed(0)) * r;
+
+    return { shouldAddCustomValue: nearestScale !== scale, scale: scale };
 }
 
 function getBaseVertScale(
@@ -315,16 +347,19 @@ export class WellLogAxesPanel extends Component<
 interface WellLogScaleSelectorProps {
     parent: WellLogViewer;
     label?: string;
+    values?: number[];
 }
 interface WellLogScaleSelectorState {
-    baseVertScale: number; // value for scale combo
-    zoomValue: number; // value for zoom slider
+    scale: number; // value for scale combo
 }
 
 export class WellLogScaleSelector extends Component<
     WellLogScaleSelectorProps,
     WellLogScaleSelectorState
 > {
+    static defValues: number[] = [
+        100, 200, 500, 1000 /* 1 cm == 10 m */, 2000, 5000, 10000, 20000, 50000,
+    ];
     constructor(
         props: WellLogScaleSelectorProps,
         state: WellLogScaleSelectorState
@@ -332,22 +367,21 @@ export class WellLogScaleSelector extends Component<
         super(props, state);
 
         this.state = {
-            baseVertScale: 1.0, // this.getBaseVertScale()
-            zoomValue: 4.0,
+            scale: 1.0,
         };
 
         this.props.parent.onContentRescales.push(
             this.onContentRescale.bind(this)
         );
 
-        this.onVertScaleChange = this.onVertScaleChange.bind(this);
+        this.onScaleChange = this.onScaleChange.bind(this);
     }
     componentWillUnmount(): void {
         //this.props.parent.onContentRescales.length=0;
     }
 
     // callback function from Vertical Scale combobox
-    onVertScaleChange(event: React.ChangeEvent<HTMLSelectElement>): void {
+    onScaleChange(event: React.ChangeEvent<HTMLSelectElement>): void {
         event.preventDefault();
         const zoom =
             getBaseVertScale(
@@ -358,10 +392,6 @@ export class WellLogScaleSelector extends Component<
     }
 
     onContentRescale(): void {
-        this.setZoomValue();
-    }
-
-    setZoomValue(): void {
         this.setState((state: Readonly<WellLogScaleSelectorState>) => {
             const controller = this.props.parent.controller;
             if (!controller) return null;
@@ -370,45 +400,37 @@ export class WellLogScaleSelector extends Component<
                 this.props.parent.controller,
                 this.props.parent.props.horizontal
             );
-            if (
-                Math.abs(Math.log(state.zoomValue / zoomValue)) < 0.01 &&
-                Math.abs(state.baseVertScale - baseVertScale) < 10
-            )
-                return null;
+            const scale = baseVertScale / zoomValue;
+            if (Math.abs(state.scale - scale) < 1) return null;
             return {
-                baseVertScale: baseVertScale,
-                zoomValue: zoomValue,
+                scale: scale,
             };
         });
     }
 
     render(): JSX.Element {
-        const { _vertScale, vertScale } = getVertScale(
-            this.state.baseVertScale / this.state.zoomValue
+        const values = this.props.values
+            ? this.props.values
+            : WellLogScaleSelector.defValues;
+        const { shouldAddCustomValue, scale } = getScale(
+            this.state.scale,
+            values
         );
         return (
             <div style={{ paddingLeft: "10px", display: "flex" }}>
                 {this.props.label && <span>{this.props.label}</span>}
                 <span style={{ paddingLeft: "10px" }}>
-                    <select
-                        onChange={this.onVertScaleChange}
-                        value={_vertScale}
-                    >
-                        {_vertScale == vertScale ? null : (
-                            <option value={_vertScale}>
-                                {"1:" + _vertScale}
+                    <select onChange={this.onScaleChange} value={scale}>
+                        {shouldAddCustomValue && (
+                            <option key={scale} value={scale}>
+                                {"1:" + scale}
                             </option>
                         )}
-                        <option value="1000">1:1000</option>{" "}
-                        {/* 1 cm == 10 m */}
-                        <option value="2000">1:2000</option>
-                        <option value="5000">1:5000</option>
-                        <option value="10000">1:10000</option>{" "}
-                        {/* 1 cm == 100 m */}
-                        <option value="20000">1:20000</option>
-                        <option value="50000">1:50000</option>
-                        <option value="100000">1:100000</option>{" "}
-                        {/* 1 cm == 1 km */}
+                        {values.map((scale) => (
+                            <option key={scale} value={scale}>
+                                {"1:" + scale}
+                            </option>
+                        ))}
                     </select>
                 </span>
             </div>
@@ -422,22 +444,17 @@ interface RightPanelProps {
 
 export class RightPanel extends Component<RightPanelProps> {
     render(): JSX.Element {
-        const width = "255px";
+        const width = "255px"; // default width for InfoPanel
         return (
             <div
                 style={{
                     flexDirection: "column",
+                    height: "100%",
                     width: width,
                     minWidth: width,
                     maxWidth: width,
-                    height: "100%",
                 }}
             >
-                {/*<WellLogScaleSelector
-                    label="Scale value:"
-                    parent={this.props.parent}
-                />*/}
-
                 <WellLogAxesPanel
                     header="Primary scale"
                     parent={this.props.parent}
@@ -453,6 +470,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     public static propTypes: Record<string, unknown>;
 
     controller: WellLogController | null;
+    defaultRight?: JSX.Element | ((parent: WellLogViewer) => JSX.Element); // default panet if props.right not given (props.right===undefined)
 
     onInfos: ((
         x: number,
@@ -466,24 +484,21 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     constructor(props: WellLogViewerProps) {
         super(props);
 
-        const axes = getAvailableAxes(
-            this.props.welllog,
-            this.props.axisMnemos
-        );
-        let primaryAxis = axes[0];
-        if (this.props.template && this.props.template.scale.primary) {
-            if (axes.indexOf(this.props.template.scale.primary) >= 0)
-                primaryAxis = this.props.template.scale.primary;
-        }
-        if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
+        this.defaultRight = (parent) => <RightPanel parent={parent} />;
 
         this.state = {
-            primaryAxis: primaryAxis, //"md"
+            primaryAxis: this.getPrimaryAxis(), //"md"
 
+            header: this.createPanel(this.props.header),
             left: this.createPanel(this.props.left),
-            right: this.createPanel(this.props.right),
+            right: this.createPanel(
+                this.props.right === undefined
+                    ? this.defaultRight
+                    : this.props.right
+            ),
             top: this.createPanel(this.props.top),
             bottom: this.createPanel(this.props.bottom),
+            footer: this.createPanel(this.props.footer),
         };
 
         this.controller = null;
@@ -529,36 +544,33 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     componentDidUpdate(
         prevProps: WellLogViewerProps /*, prevState: State*/
     ): void {
+        if (this.props.header !== prevProps.header)
+            this.setState({ header: this.createPanel(this.props.header) });
         if (this.props.left !== prevProps.left)
             this.setState({ left: this.createPanel(this.props.left) });
         if (this.props.right !== prevProps.right)
-            this.setState({ right: this.createPanel(this.props.right) });
+            this.setState({
+                right: this.createPanel(
+                    this.props.right === undefined
+                        ? this.defaultRight
+                        : this.props.right
+                ),
+            });
         if (this.props.top !== prevProps.top)
             this.setState({ top: this.createPanel(this.props.top) });
         if (this.props.bottom !== prevProps.bottom)
             this.setState({ bottom: this.createPanel(this.props.bottom) });
+        if (this.props.footer !== prevProps.footer)
+            this.setState({ footer: this.createPanel(this.props.footer) });
 
         if (
             this.props.welllog !== prevProps.welllog ||
             this.props.template !== prevProps.template ||
             this.props.axisMnemos !== prevProps.axisMnemos ||
-            this.props.primaryAxis !== prevProps.primaryAxis /*||
-            this.props.colorTables !== prevProps.colorTables*/
+            this.props.primaryAxis !== prevProps.primaryAxis
         ) {
-            const axes = getAvailableAxes(
-                this.props.welllog,
-                this.props.axisMnemos
-            );
-            let primaryAxis = axes[0];
-            if (this.props.template && this.props.template.scale.primary) {
-                if (axes.indexOf(this.props.template.scale.primary) >= 0) {
-                    primaryAxis = this.props.template.scale.primary;
-                } else if (this.props.welllog === prevProps.welllog) return; // nothing to update
-            }
-            if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
-
             this.setState({
-                primaryAxis: primaryAxis,
+                primaryAxis: this.getPrimaryAxis(),
             });
         }
 
@@ -597,12 +609,6 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     onContentRescale(): void {
         for (const onContentRescale of this.onContentRescales)
             onContentRescale();
-        /*if(this.state.right) {
-          const p=this.state.right["onContentRescale"];
-          if(p)
-            p();
-        }*/
-
         this.props.onContentRescale?.(); // call callback to component's caller
     }
     // callback function from WellLogView
@@ -620,7 +626,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         this.setState({ primaryAxis: value });
     }
 
-    getDefaultPrimaryAxis(): string {
+    getPrimaryAxis(): string {
         const axes = getAvailableAxes(
             this.props.welllog,
             this.props.axisMnemos
@@ -649,51 +655,71 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     height: "100%",
                     width: "100%",
                     display: "flex",
-                    flexDirection: "row",
+                    flexDirection: "column",
                 }}
             >
-                {this.state.left && (
-                    <div style={{ flex: "0", height: "100%" }}>
-                        {this.state.left}
+                {this.state.header && (
+                    <div style={{ flex: "0", width: "100%" }}>
+                        {this.state.header}
                     </div>
                 )}
                 <div
                     style={{
                         flex: "1",
-                        height: "100%",
-                        width: "0%",
+                        height: "0%",
+                        width: "100%",
                         display: "flex",
-                        flexDirection: "column",
+                        flexDirection: "row",
                     }}
                 >
-                    {this.state.top && (
-                        <div style={{ flex: "0" }}>{this.state.top}</div>
+                    {this.state.left && (
+                        <div style={{ flex: "0", height: "100%" }}>
+                            {this.state.left}
+                        </div>
                     )}
-                    <WellLogViewWithScroller
-                        welllog={this.props.welllog}
-                        template={this.props.template}
-                        colorTables={this.props.colorTables}
-                        wellpick={this.props.wellpick}
-                        horizontal={this.props.horizontal}
-                        axisTitles={this.props.axisTitles}
-                        axisMnemos={this.props.axisMnemos}
-                        options={this.props.options}
-                        primaryAxis={this.state.primaryAxis}
-                        // callbacks
-                        onTrackMouseEvent={onTrackMouseEvent}
-                        onInfo={this.onInfo}
-                        onCreateController={this.onCreateController}
-                        onContentRescale={this.onContentRescale}
-                        onContentSelection={this.onContentSelection}
-                        onTemplateChanged={this.onTemplateChanged}
-                    />
-                    {this.state.bottom && (
-                        <div style={{ flex: "0" }}>{this.state.bottom}</div>
+                    <div
+                        style={{
+                            flex: "1",
+                            height: "100%",
+                            width: "0%",
+                            display: "flex",
+                            flexDirection: "column",
+                        }}
+                    >
+                        {this.state.top && (
+                            <div style={{ flex: "0" }}>{this.state.top}</div>
+                        )}
+                        <WellLogViewWithScroller
+                            welllog={this.props.welllog}
+                            template={this.props.template}
+                            colorTables={this.props.colorTables}
+                            wellpick={this.props.wellpick}
+                            horizontal={this.props.horizontal}
+                            axisTitles={this.props.axisTitles}
+                            axisMnemos={this.props.axisMnemos}
+                            options={this.props.options}
+                            primaryAxis={this.state.primaryAxis}
+                            // callbacks
+                            onTrackMouseEvent={onTrackMouseEvent}
+                            onInfo={this.onInfo}
+                            onCreateController={this.onCreateController}
+                            onContentRescale={this.onContentRescale}
+                            onContentSelection={this.onContentSelection}
+                            onTemplateChanged={this.onTemplateChanged}
+                        />
+                        {this.state.bottom && (
+                            <div style={{ flex: "0" }}>{this.state.bottom}</div>
+                        )}
+                    </div>
+                    {this.state.right && (
+                        <div style={{ flex: "0", height: "100%" }}>
+                            {this.state.right}
+                        </div>
                     )}
                 </div>
-                {this.state.right && (
-                    <div style={{ flex: "0", height: "100%" }}>
-                        {this.state.right}
+                {this.state.footer && (
+                    <div style={{ flex: "0", width: "100%" }}>
+                        {this.state.footer}
                     </div>
                 )}
             </div>
