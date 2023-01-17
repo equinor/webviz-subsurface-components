@@ -587,7 +587,8 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZ, layers /*dispatch*/]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
-    const [isDeckGLLayersChanged, setIsDeckGLLayersChanged] = useState<boolean>(false);
+    const [isDeckGLLayersChanged, setIsDeckGLLayersChanged] =
+        useState<boolean>(false);
 
     useEffect(() => {
         const layers = alteredLayers;
@@ -599,7 +600,7 @@ const Map: React.FC<MapProps> = ({
         else enumerations.push({ editedData: {} });
 
         setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-        setIsDeckGLLayersChanged(true)
+        setIsDeckGLLayersChanged(true);
     }, [resources, editedData, layers, alteredLayers]);
 
     useEffect(() => {
@@ -821,7 +822,7 @@ const Map: React.FC<MapProps> = ({
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
         if (isDeckGLLayersChanged) {
-        setIsLoaded(true);
+            setIsLoaded(true);
         }
     }, [isDeckGLLayersChanged]);
 
