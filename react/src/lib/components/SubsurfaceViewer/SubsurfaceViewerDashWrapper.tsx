@@ -65,21 +65,18 @@ export interface SubsurfaceViewerDashWrapperProps {
     cameraPosition?: ViewStateType | undefined;
 
     children?: React.ReactNode;
-
-    /**
-     * A mapping associating annotation components to view ids.
-     * Example: {"view_1": <ColorLegend/>}
-     */
-    annotation?: Record<string, unknown>;
 }
 
-function mapAnnotation(annotation: Record<string, unknown>) {
-    return Object.entries(annotation).map(([viewId, annotation]) => (
-        // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
-        <View key={viewId} id={viewId}>
-            {annotation}
-        </View>
-    ));
+function mapAnnotation(annotationContainers: React.ReactNode) {
+    return React.Children.map(annotationContainers, (annotationContainer) => {
+        const viewId = (annotationContainer as React.ReactElement).key;
+        return (
+            // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
+            <View key={viewId} id={viewId}>
+                {annotationContainer}
+            </View>
+        );
+    });
 }
 
 const SubsurfaceViewerDashWrapper: React.FC<
@@ -105,7 +102,6 @@ const SubsurfaceViewerDashWrapper: React.FC<
     triggerHome,
     triggerResetMultipleWells,
     children,
-    annotation = {},
 }: SubsurfaceViewerDashWrapperProps) => {
     const mapArgs: SubsurfaceViewerProps = {
         id: id,
@@ -127,12 +123,11 @@ const SubsurfaceViewerDashWrapper: React.FC<
         getCameraPosition: getCameraPosition,
         triggerHome: triggerHome,
         triggerResetMultipleWells: triggerResetMultipleWells,
-        children: children,
     };
 
     return (
         <SubsurfaceViewer {...mapArgs}>
-            {mapAnnotation(annotation)}
+            {mapAnnotation(children)}
         </SubsurfaceViewer>
     );
 };
@@ -269,11 +264,7 @@ SubsurfaceViewerDashWrapper.propTypes = {
      */
     onMouseEvent: PropTypes.func,
 
-    /**
-     * A mapping associating annotation components to view ids.
-     * Example: {"view_1": <ColorLegend/>}
-     */
-    annotation: PropTypes.any,
+    children: PropTypes.any,
 };
 
 export default SubsurfaceViewerDashWrapper;
