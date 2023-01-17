@@ -5,7 +5,7 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import Map from "./Map";
-import { Wrapper } from "../../DeckGLMap/test/TestWrapper";
+import { Wrapper } from "../../SubsurfaceViewer/test/TestWrapper";
 import { colorTables } from "@emerson-eps/color-tables";
 
 const mapData = require("../../../../demo/example-data/deckgl-map.json");

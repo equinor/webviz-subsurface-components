@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { View } from "@deck.gl/core/typed";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import DeckGLMap, { DeckGLMapProps } from "./DeckGLMap";
+import SubsurfaceViewer, { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import {
     ViewsType,
     TooltipCallback,
@@ -107,7 +107,7 @@ const SubsurfaceViewerDashWrapper: React.FC<
     children,
     annotation = {},
 }: SubsurfaceViewerDashWrapperProps) => {
-    const mapArgs: DeckGLMapProps = {
+    const mapArgs: SubsurfaceViewerProps = {
         id: id,
         resources: resources,
         layers: layers,
@@ -130,7 +130,11 @@ const SubsurfaceViewerDashWrapper: React.FC<
         children: children,
     };
 
-    return <DeckGLMap {...mapArgs}>{mapAnnotation(annotation)}</DeckGLMap>;
+    return (
+        <SubsurfaceViewer {...mapArgs}>
+            {mapAnnotation(annotation)}
+        </SubsurfaceViewer>
+    );
 };
 
 SubsurfaceViewerDashWrapper.defaultProps = {

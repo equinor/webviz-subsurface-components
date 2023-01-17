@@ -1,7 +1,7 @@
 import React from "react";
 import { Provider } from "react-redux";
 import { createStore } from "../redux/store";
-import { testState } from "../../DeckGLMap/test/testReduxState";
+import { testState } from "../../SubsurfaceViewer/test/testReduxState";
 
 export const testStore = createStore(testState);
 testStore.dispatch = jest.fn() as never;
