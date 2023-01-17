@@ -113,7 +113,6 @@ import { DefaultRightPanel } from "./components/DefaultRightPanel";
 import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogInfoPanel from "./components/WellLogInfoPanel";
 import WellLogScaleSelector from "./components/WellLogScaleSelector";
-import WellLogAxesPanel from "./components/WellLogAxesPanel";
 
 export const Default = Template.bind({});
 Default.args = {
@@ -179,8 +178,7 @@ Discrete.args = {
     ),
     right: (parent) => (
         <div style={{ width: "255px" }}>
-            <WellLogAxesPanel header="Primary scale" parent={parent} />
-            <WellLogInfoPanel parent={parent} />
+            <WellLogInfoPanel header="Readout" parent={parent} />
         </div>
     ),
     bottom: (parent) => <WellLogZoomSlider label="Zoom:" parent={parent} />,

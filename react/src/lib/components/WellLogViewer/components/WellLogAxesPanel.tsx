@@ -13,6 +13,7 @@ interface Props {
 
 interface State {
     axes: string[]; // axes available in welllog
+    primaryAxis: string;
 }
 
 export class WellLogAxesPanel extends Component<Props, State> {
@@ -26,7 +27,22 @@ export class WellLogAxesPanel extends Component<Props, State> {
 
         this.state = {
             axes: axes, //["md", "tvd"]
+            primaryAxis: this.props.parent.state.primaryAxis, //??
         };
+
+        this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
+
+        this.props.parent.registerCallback(
+            "onChangePrimaryAxis",
+            this.onChangePrimaryAxis
+        );
+    }
+
+    componentWillUnmount(): void {
+        this.props.parent.unregisterCallback(
+            "onChangePrimaryAxis",
+            this.onChangePrimaryAxis
+        );
     }
 
     componentDidUpdate(prevProps: Props): void {
@@ -42,9 +58,11 @@ export class WellLogAxesPanel extends Component<Props, State> {
             );
             this.setState({
                 axes: axes,
-                // will be changed by callback! infos: [],
             });
         }
+    }
+    onChangePrimaryAxis(value: string): void {
+        this.setState({ primaryAxis: value });
     }
 
     render(): JSX.Element {
@@ -52,9 +70,11 @@ export class WellLogAxesPanel extends Component<Props, State> {
             <AxisSelector
                 header={this.props.header}
                 axes={this.state.axes}
+                axis={this.state.primaryAxis}
                 axisLabels={this.props.parent.props.axisTitles}
-                value={this.props.parent.state.primaryAxis}
-                onChange={this.props.parent.onChangePrimaryAxis}
+                onChange={(value: string) =>
+                    this.props.parent.setPrimaryAxis(value)
+                }
             />
         );
     }

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import WellLogViewer from "../WellLogViewer";
 
@@ -10,28 +10,21 @@ interface Props {
     parent: WellLogViewer;
 }
 
-export class DefaultRightPanel extends Component<Props> {
-    render(): JSX.Element {
-        const width = "255px"; // default width for InfoPanel
-        return (
-            <div
-                style={{
-                    flexDirection: "column",
-                    height: "100%",
-                    width: width,
-                    //minWidth: width,
-                    //maxWidth: width,
-                }}
-            >
-                <WellLogAxesPanel
-                    header="Primary scale"
-                    parent={this.props.parent}
-                />
-                <WellLogInfoPanel header="Readout" parent={this.props.parent} />
-                <WellLogZoomSlider label="Zoom:" parent={this.props.parent} />
-            </div>
-        );
-    }
+export function DefaultRightPanel(props: Props): JSX.Element {
+    const parent = props.parent;
+    return (
+        <div
+            style={{
+                flexDirection: "column",
+                height: "100%",
+                width: "255px",
+            }}
+        >
+            <WellLogAxesPanel header="Primary scale" parent={parent} />
+            <WellLogInfoPanel header="Readout" parent={parent} />
+            <WellLogZoomSlider label="Zoom:" parent={parent} />
+        </div>
+    );
 }
 
 export default DefaultRightPanel;

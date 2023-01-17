@@ -29,12 +29,10 @@ export class WellLogInfoPanel extends Component<Props, State> {
 
         this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
         this.onInfo = this.onInfo.bind(this);
-
-        this.props.parent.onInfos.push(this.onInfo);
+        this.props.parent.registerCallback("onInfo", this.onInfo);
     }
     componentWillUnmount(): void {
-        const i = this.props.parent.onInfos.indexOf(this.onInfo);
-        if (i >= 0) this.props.parent.onInfos.slice(i, 1);
+        this.props.parent.registerCallback("onInfo", this.onInfo);
     }
 
     // callback function from WellLogView

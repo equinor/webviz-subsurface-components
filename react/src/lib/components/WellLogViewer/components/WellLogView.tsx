@@ -916,6 +916,8 @@ export interface WellLogController {
     getContentDomain(): [number, number]; // visible range
     getContentZoom(): number;
     getContentSelection(): [number | undefined, number | undefined]; // [current, pinned]
+    setContentScale(value: number): void;
+    getContentScale(): number;
 
     scrollTrackTo(pos: number): void;
     scrollTrackBy(delta: number): void;
@@ -930,7 +932,7 @@ export interface WellLogController {
     getTemplate(): Template;
 }
 
-export function getBaseVertScale(
+export function getContentBaseScale(
     controller: WellLogController | null,
     horizontal: boolean | undefined
 ): number {
@@ -946,12 +948,21 @@ export function getBaseVertScale(
                     ? source.clientWidth
                     : source.clientHeight;
                 const m = clientSize * (0.0254 / 96); // "screen" CSS height in meters
-                const scale = (base[1] - base[0]) / m;
-                return scale;
+                return (base[1] - base[0]) / m;
             }
         }
     }
     return 16000;
+}
+export function setContentScale(
+    controller: WellLogController | null,
+    horizontal: boolean | undefined,
+    value: number
+): void {
+    if (controller) {
+        const zoom = getContentBaseScale(controller, horizontal) / value;
+        controller.zoomContent(zoom);
+    }
 }
 
 import { Info } from "./InfoTypes";
@@ -1653,6 +1664,14 @@ class WellLogView
     getContentSelection(): [number | undefined, number | undefined] {
         if (!this.logController) return [undefined, undefined];
         return [this.selCurrent, this.selPinned];
+    }
+    setContentScale(value: number): void {
+        return setContentScale(this, this.props.horizontal, value);
+    }
+    getContentScale(): number {
+        const zoomValue = this.getContentZoom();
+        const baseScale = getContentBaseScale(this, this.props.horizontal);
+        return baseScale / zoomValue;
     }
 
     // tracks

@@ -946,7 +946,7 @@ class SyncLogViewer extends Component<Props, State> {
                     header="Primary scale"
                     axes={this.state.axes}
                     axisLabels={this.props.axisTitles}
-                    value={this.state.primaryAxis}
+                    axis={this.state.primaryAxis}
                     onChange={this.onChangePrimaryAxis}
                 />
                 {this.props.welllogs?.map(

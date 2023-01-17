@@ -12,7 +12,7 @@ describe("Test Axis Selector", () => {
                 header="Primary scale"
                 axes={["md", "tvd"]}
                 axisLabels={{ md: "MD", tvd: "TVD" }}
-                value="md"
+                axis="md"
                 onChange={(value: string) => value}
             />
         );
@@ -26,7 +26,7 @@ describe("Test Axis Selector", () => {
                 header="Primary scale"
                 axes={["md", "tvd"]}
                 axisLabels={{ md: "MD", tvd: "TVD" }}
-                value="md"
+                axis="md"
                 onChange={mockFn}
             />
         );
@@ -41,7 +41,7 @@ describe("Test Axis Selector", () => {
                 header="Primary scale"
                 axes={[]}
                 axisLabels={{ md: "MD", tvd: "TVD" }}
-                value="md"
+                axis="md"
                 onChange={(value: string) => value}
             />
         );

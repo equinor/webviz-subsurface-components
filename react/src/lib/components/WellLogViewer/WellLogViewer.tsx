@@ -73,14 +73,52 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     controller: WellLogController | null;
     defaultRight?: JSX.Element | ((parent: WellLogViewer) => JSX.Element); // default panet if props.right not given (props.right===undefined)
 
-    onInfos: ((
+    onInfoCallbacks: ((
         x: number,
         logController: LogViewer,
         iFrom: number,
         iTo: number
     ) => void)[];
-    onContentRescales: (() => void)[];
-    onContentSelections: (() => void)[];
+    onContentRescaleCallbacks: (() => void)[];
+    onContentSelectionCallbacks: (() => void)[];
+    onChangePrimaryAxisCallbacks: ((primaryAxis: string) => void)[];
+
+    //[key: string]: string;
+
+    registerCallback<CallbackFunction>(
+        name: string,
+        callback: CallbackFunction
+    ): void {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const table = this[name + "Callbacks"];
+        if (table) table.push(callback);
+        else
+            console.log(
+                "WellLogViewer.registerCallback: " + name + "s" + " not found"
+            );
+    }
+    unregisterCallback<CallbackFunction>(
+        name: string,
+        callback: CallbackFunction
+    ): void {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const table = this[name + "Callbacks"];
+        if (table)
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            this[name + "Callbacks"] = table.filter(
+                (p: CallbackFunction) => p !== callback
+            );
+        else
+            console.log(
+                "WellLogViewer.unregisterCallback: " +
+                    name +
+                    "Callbacks" +
+                    " not found"
+            );
+    }
 
     constructor(props: WellLogViewerProps) {
         super(props);
@@ -88,7 +126,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         this.defaultRight = (parent) => <DefaultRightPanel parent={parent} />;
 
         this.state = {
-            primaryAxis: this.getPrimaryAxis(), //"md"
+            primaryAxis: this.getDefaultPrimaryAxis(), //"md"
 
             header: this.createPanel(this.props.header),
             left: this.createPanel(this.props.left),
@@ -104,15 +142,14 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
 
         this.controller = null;
 
-        this.onInfos = [];
-        this.onContentRescales = [];
-        this.onContentSelections = [];
+        this.onInfoCallbacks = [];
+        this.onContentRescaleCallbacks = [];
+        this.onContentSelectionCallbacks = [];
+        this.onChangePrimaryAxisCallbacks = [];
 
         this.onCreateController = this.onCreateController.bind(this);
 
         this.onInfo = this.onInfo.bind(this);
-
-        this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
 
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
@@ -125,9 +162,11 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     }
     componentWillUnmount(): void {
         // clear all callback lists
+        /*
         this.onInfos.length = 0;
         this.onContentRescales.length = 0;
         this.onContentSelections.length = 0;
+        */
     }
 
     shouldComponentUpdate(
@@ -171,7 +210,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
             this.props.primaryAxis !== prevProps.primaryAxis
         ) {
             this.setState({
-                primaryAxis: this.getPrimaryAxis(),
+                primaryAxis: this.getDefaultPrimaryAxis(),
             });
         }
 
@@ -199,7 +238,8 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         iFrom: number,
         iTo: number
     ): void {
-        for (const onInfo of this.onInfos) onInfo(x, logController, iFrom, iTo);
+        for (const onInfo of this.onInfoCallbacks)
+            onInfo(x, logController, iFrom, iTo);
     }
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
@@ -208,13 +248,13 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     }
     // callback function from WellLogView
     onContentRescale(): void {
-        for (const onContentRescale of this.onContentRescales)
+        for (const onContentRescale of this.onContentRescaleCallbacks)
             onContentRescale();
         this.props.onContentRescale?.(); // call callback to component's caller
     }
     // callback function from WellLogView
     onContentSelection(): void {
-        for (const onContentSelection of this.onContentSelections)
+        for (const onContentSelection of this.onContentSelectionCallbacks)
             onContentSelection();
         this.props.onContentSelection?.(); // call callback to component's caller
     }
@@ -222,12 +262,15 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         this.props.onTemplateChanged?.(); // call callback to component's caller
     }
 
-    // callback function from Axis selector
-    onChangePrimaryAxis(value: string): void {
+    setPrimaryAxis(value: string): void {
         this.setState({ primaryAxis: value });
+        for (const onChangePrimaryAxis of this.onChangePrimaryAxisCallbacks)
+            onChangePrimaryAxis(value);
     }
-
     getPrimaryAxis(): string {
+        return this.state.primaryAxis;
+    }
+    getDefaultPrimaryAxis(): string {
         const axes = getAvailableAxes(
             this.props.welllog,
             this.props.axisMnemos
