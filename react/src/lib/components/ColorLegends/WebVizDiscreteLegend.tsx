@@ -5,8 +5,13 @@ import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface LegendProps {
     discreteData: { objects: Record<string, [number[], number]> };
-    title: string;
-    position?: number[] | null;
+    title?: string;
+    cssLegendStyles?: {
+        left?: string;
+        top?: string;
+        right?: string;
+        bottom?: string;
+    };
     colorName: string;
     colorTables: colorTablesArray | string | undefined;
     horizontal?: boolean | null;
@@ -15,7 +20,7 @@ interface LegendProps {
 const DiscreteLegendWrapper: React.FC<LegendProps> = ({
     discreteData,
     title,
-    position,
+    cssLegendStyles,
     colorName,
     colorTables,
     horizontal,
@@ -24,7 +29,7 @@ const DiscreteLegendWrapper: React.FC<LegendProps> = ({
         <DiscreteColorLegend
             discreteData={discreteData}
             dataObjectName={title}
-            position={position}
+            cssLegendStyles={cssLegendStyles}
             colorName={colorName}
             colorTables={colorTables}
             horizontal={horizontal}
@@ -34,8 +39,8 @@ const DiscreteLegendWrapper: React.FC<LegendProps> = ({
 
 DiscreteLegendWrapper.propTypes = {
     discreteData: PropTypes.any.isRequired,
-    title: PropTypes.string.isRequired,
-    position: PropTypes.arrayOf(PropTypes.number.isRequired),
+    title: PropTypes.string,
+    cssLegendStyles: PropTypes.objectOf(PropTypes.string),
     colorName: PropTypes.string.isRequired,
     colorTables: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     horizontal: PropTypes.bool,
