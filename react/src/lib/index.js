@@ -4,7 +4,9 @@
  *
  * Copyright (C) 2020 - Equinor ASA. */
 
-import DeckGLMap, { SubsurfaceViewerDashWrapper } from "./components/DeckGLMap";
+import SubsurfaceViewer, {
+    SubsurfaceViewerDashWrapper,
+} from "./components/DeckGLMap";
 import GroupTree from "./components/GroupTree";
 import HistoryMatch from "./components/HistoryMatch";
 import LayeredMap from "./components/LayeredMap";
@@ -38,7 +40,13 @@ export {
     LayeredMap,
     PriorPosteriorDistribution,
     LeafletMap,
-    DeckGLMap,
+    SubsurfaceViewer,
+    /**
+     * Component for rendering subsurface data.
+     *
+     * @deprecated Use the {@link SubsurfaceViewer} component instead.
+     */
+    SubsurfaceViewer as DeckGLMap, // For backwards compatibility
     VectorSelector,
     WellCompletions,
     VectorCalculator,
