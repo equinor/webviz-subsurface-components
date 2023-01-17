@@ -335,10 +335,9 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Local help function.
-    function calcDefaultViewStates() {
+    function calcDefaultViewStates(input?: ViewportType[]) {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-
         const union_of_reported_bboxes = addBoundingBoxes(
             reportedBoundingBoxAcc,
             reportedBoundingBox
@@ -363,8 +362,9 @@ const Map: React.FC<MapProps> = ({
 
         let tempViewStates: Record<string, ViewStateType> = {};
         const isBoundsDefined = typeof bounds !== "undefined";
+        const updatedViewProps = input ? input : viewsProps;
         tempViewStates = Object.fromEntries(
-            viewsProps.map((item, index) => [
+            updatedViewProps.map((item, index) => [
                 item.id,
                 isBoundsDefined
                     ? getViewState(
@@ -396,7 +396,6 @@ const Map: React.FC<MapProps> = ({
 
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-
         if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
@@ -550,13 +549,17 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZDown]);
 
     useEffect(() => {
-        setViewsProps(
-            getViews(
-                views,
-                scaleUpFunction,
-                scaleDownFunction
-            ) as ViewportType[]
-        );
+        const viewProps = getViews(
+            views,
+            scaleUpFunction,
+            scaleDownFunction
+        ) as ViewportType[];
+
+        setViewsProps(viewProps);
+
+        if (!bounds) {
+            calcDefaultViewStates(viewProps);
+        }
     }, [views]);
 
     useEffect(() => {
@@ -585,7 +588,7 @@ const Map: React.FC<MapProps> = ({
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
     const [isDeckGLLayersChanged, setIsDeckGLLayersChanged] = useState<boolean>(false);
-    // const deckGLLayersLength =
+
     useEffect(() => {
         const layers = alteredLayers;
         if (!layers || layers.length == 0) return;
@@ -817,7 +820,9 @@ const Map: React.FC<MapProps> = ({
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
+        if (isDeckGLLayersChanged) {
         setIsLoaded(true);
+        }
     }, [isDeckGLLayersChanged]);
 
     // validate layers data
@@ -890,6 +895,7 @@ const Map: React.FC<MapProps> = ({
         },
         [viewStates]
     );
+
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
     return (
