@@ -6,7 +6,7 @@
 
 import SubsurfaceViewer, {
     SubsurfaceViewerDashWrapper,
-} from "./components/DeckGLMap";
+} from "./components/SubsurfaceViewer";
 import GroupTree from "./components/GroupTree";
 import HistoryMatch from "./components/HistoryMatch";
 import LayeredMap from "./components/LayeredMap";
@@ -22,17 +22,17 @@ import { SyncLogViewer } from "./components/WellLogViewer";
 import WebVizContinuousLegend from "./components/ColorLegends/WebVizContinuousLegend";
 import WebVizDiscreteLegend from "./components/ColorLegends/WebVizDiscreteLegend";
 import { PickInfo, View } from "deck.gl";
-import { TooltipCallback } from "./components/DeckGLMap/components/Map";
+import { TooltipCallback } from "./components/SubsurfaceViewer/components/Map";
 import {
     ExtendedLayerProps,
     PropertyDataType,
     LayerPickInfo,
-} from "./components/DeckGLMap/layers/utils/layerTools";
-import { WellsPickInfo } from "./components/DeckGLMap/layers/wells/wellsLayer";
-import TerrainMapPickInfo from "./components/DeckGLMap/layers/terrain/terrainMapLayer";
+} from "./components/SubsurfaceViewer/layers/utils/layerTools";
+import { WellsPickInfo } from "./components/SubsurfaceViewer/layers/wells/wellsLayer";
+import TerrainMapPickInfo from "./components/SubsurfaceViewer/layers/terrain/terrainMapLayer";
 import { FeatureCollection } from "@nebula.gl/edit-modes";
-import { ViewFooter } from "./components/DeckGLMap/components/ViewFooter";
-import { ViewAnnotation } from "./components/DeckGLMap/components/ViewAnnotation";
+import { ViewFooter } from "./components/SubsurfaceViewer/components/ViewFooter";
+import { ViewAnnotation } from "./components/SubsurfaceViewer/components/ViewAnnotation";
 
 export {
     HistoryMatch,
