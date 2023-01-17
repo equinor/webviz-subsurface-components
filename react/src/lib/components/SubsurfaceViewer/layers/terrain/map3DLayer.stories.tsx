@@ -114,7 +114,9 @@ GradientFunctionColorMap.parameters = {
     },
 };
 
-export const StepFunctionColorMap: ComponentStory<typeof SubsurfaceViewer> = () => {
+export const StepFunctionColorMap: ComponentStory<
+    typeof SubsurfaceViewer
+> = () => {
     const args = {
         ...defaultArgs,
         id: "nearest-color-map",
@@ -133,7 +135,9 @@ StepFunctionColorMap.parameters = {
     },
 };
 
-export const DefaultColorScale: ComponentStory<typeof SubsurfaceViewer> = () => {
+export const DefaultColorScale: ComponentStory<
+    typeof SubsurfaceViewer
+> = () => {
     const args = {
         ...defaultArgs,
         id: "default-color-scale",
@@ -198,7 +202,9 @@ const useStyles = makeStyles({
     },
 });
 
-export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
 
     const colorMap = React.useCallback(
@@ -261,7 +267,9 @@ BreakpointColorMap.parameters = {
     },
 };
 
-export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     const [colorMapUpper, setColorMapUpper] = React.useState<number>(41048);
 
     const props = React.useMemo(() => {

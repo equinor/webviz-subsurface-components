@@ -255,9 +255,9 @@ CustomWidthWells.args = {
     ],
 };
 
-export const VolveWellsWithResetButton: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const VolveWellsWithResetButton: ComponentStory<
+    typeof SubsurfaceViewer
+> = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
     const [triggerResetMultipleWells, setTriggerResetMultipleWells] =
         React.useState<number>(0);

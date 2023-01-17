@@ -227,7 +227,9 @@ function createColorMap(breakpoint: number) {
     return (value: number) => breakpointColorMap(value, breakpoint);
 }
 
-export const MapLayer3dPng: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const MapLayer3dPng: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -315,7 +317,9 @@ ScaleZ.parameters = {
     },
 };
 
-export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     const [home, setHome] = React.useState<number>(0);
     const [camera, setCamera] = React.useState({
         rotationOrbit: 0,
@@ -464,7 +468,9 @@ MapLayer2d.parameters = {
     },
 };
 
-export const MapLayer2dDarkMode: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const MapLayer2dDarkMode: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -503,7 +509,9 @@ MapLayer2dDarkMode.parameters = {
     backgrounds: { default: "dark" },
 };
 
-export const MapLayerRotated: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const MapLayerRotated: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -531,7 +539,9 @@ MapLayerRotated.parameters = {
     },
 };
 
-export const MapLayerBigMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const MapLayerBigMap: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -541,7 +551,9 @@ MapLayerBigMap.args = {
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
 };
 
-export const MapLayerBigMap3d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const MapLayerBigMap3d: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -609,7 +621,9 @@ const axes_lite = {
 };
 
 //-- CellCenteredPropMap --
-export const CellCenteredPropMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const CellCenteredPropMap: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -638,7 +652,9 @@ CellCenteredPropMap.parameters = {
 };
 
 //-- NodeCenteredPropMap --
-export const NodeCenteredPropMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const NodeCenteredPropMap: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -688,7 +704,9 @@ GradientFunctionColorMap.parameters = {
     },
 };
 
-export const StepFunctionColorMap: ComponentStory<typeof SubsurfaceViewer> = () => {
+export const StepFunctionColorMap: ComponentStory<
+    typeof SubsurfaceViewer
+> = () => {
     const args = {
         ...defaultArgs,
         id: "nearest-color-map",
@@ -713,7 +731,9 @@ StepFunctionColorMap.parameters = {
     },
 };
 
-export const DefaultColorScale: ComponentStory<typeof SubsurfaceViewer> = () => {
+export const DefaultColorScale: ComponentStory<
+    typeof SubsurfaceViewer
+> = () => {
     const args = {
         ...defaultArgs,
         id: "default-color-scale",
@@ -817,7 +837,9 @@ const useStyles = makeStyles({
     },
 });
 
-export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
 
     const colorMap = React.useCallback(
@@ -885,7 +907,9 @@ BreakpointColorMap.parameters = {
     },
 };
 
-export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     const [colorMapUpper, setColorMapUpper] = React.useState<number>(41048);
 
     const layer = {
