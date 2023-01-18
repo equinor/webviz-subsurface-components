@@ -1,11 +1,9 @@
 import { CompositeLayer, Color, UpdateParameters } from "@deck.gl/core/typed";
 import privateMapLayer, { Material } from "./privateMapLayer";
 import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import * as png from "@vivaxy/png";
-import { TerrainMapLayerData } from "../terrain/terrainMapLayer";
 import { makeFullMesh } from "./webworker";
 import { Matrix4 } from "math.gl";
 
@@ -217,6 +215,26 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     depthTest: boolean;
 }
 
+const defaultProps = {
+    "@@type": "MapLayer",
+    name: "Map",
+    id: "map3d-layer-float32",
+    pickable: true,
+    visible: true,
+    // Url for the height field.
+    meshUrl: "",
+    propertiesUrl: "",
+    bounds: { type: "object", value: null, false: true, compare: true },
+    colorMapRange: { type: "array" },
+    contours: [-1.0, -1.0],
+    // If contour lines should follow depth or properties.
+    isContoursDepth: true,
+    gridLines: false,
+    smoothShading: true,
+    material: true,
+    depthTest: true,
+};
+
 export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
     rebuildData(reportBoundingBox: boolean): void {
         const p = load_mesh_and_properties(
@@ -363,6 +381,4 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
 }
 
 MapLayer.layerName = "MapLayer";
-MapLayer.defaultProps = layersDefaultProps[
-    "MapLayer"
-] as MapLayerProps<TerrainMapLayerData>;
+MapLayer.defaultProps = defaultProps;
