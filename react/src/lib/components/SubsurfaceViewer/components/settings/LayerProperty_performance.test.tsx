@@ -26,7 +26,7 @@ describe("Test Layer Property", () => {
             );
         if (obj.perf_metrics[0][2] > 100) {
             core.warning(
-                "Layer Property Component in '/components/DeckGLMap/components/settings/' seems to have performance issues. Actual render time:" +
+                "Layer Property Component in '/components/SubsurfaceViewer/components/settings/' seems to have performance issues. Actual render time:" +
                     obj.perf_metrics[0][2] +
                     " Expected render time: 200"
             );
