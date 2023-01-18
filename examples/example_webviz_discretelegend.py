@@ -25,10 +25,10 @@ Discrete_Data = {
 legend_obj = wsc.WebVizDiscreteLegend(
     discreteData=Discrete_Data,
     title="DiscreteLegend",
-    position=[16, 10],
     colorName="Stratigraphy",
     horizontal=True,
     colorTables=COLOR_TABLES,
+    cssLegendStyles={"left": "0vw", "top": "0vh"},
 )
 
 app = dash.Dash(__name__)
