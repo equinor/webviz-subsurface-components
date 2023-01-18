@@ -38,9 +38,26 @@ export interface Hillshading2DProps extends BitmapLayerProps {
     setReportedBoundingBox?: any;
 }
 
-const defaultProps = layersDefaultProps[
-    "Hillshading2DLayer"
-] as Hillshading2DProps;
+const defaultProps = {
+    "@@type": "Hillshading2DLayer",
+    name: "Hill shading",
+    id: "hillshading-layer",
+    opacity: 1.0,
+    pickable: true,
+    visible: true,
+    rotDeg: 0,
+    valueRange: { type: "array", value: [0, 1] },
+    lightDirection: [1, 1, 1],
+    ambientLightIntensity: 0.5,
+    diffuseLightIntensity: 0.5,
+    valueDecoder: {
+        rgbScaler: [1, 1, 1],
+        // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
+        floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
+        offset: 0,
+        step: 0,
+    },
+};
 
 export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> {
     initializeState(): void {

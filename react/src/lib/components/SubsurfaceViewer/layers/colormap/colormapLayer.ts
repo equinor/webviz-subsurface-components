@@ -95,7 +95,24 @@ export interface ColormapLayerProps extends BitmapLayerProps {
     setReportedBoundingBox?: any;
 }
 
-const defaultProps = layersDefaultProps["ColormapLayer"] as ColormapLayerProps;
+const defaultProps = {
+    "@@type": "ColormapLayer",
+    name: "Property map",
+    id: "colormap-layer",
+    pickable: true,
+    visible: true,
+    valueRange: { type: "array", value: [0, 1] },
+    colorMapRange: { type: "array" },
+    valueDecoder: {
+        rgbScaler: [1, 1, 1],
+        // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
+        floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
+        offset: 0,
+        step: 0,
+    },
+    rotDeg: 0,
+    colorMapName: "Rainbow",
+};
 
 export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
     initializeState(): void {
