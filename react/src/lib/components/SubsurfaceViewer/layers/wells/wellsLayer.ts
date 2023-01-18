@@ -102,7 +102,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     depthTest: boolean;
     // If true means that input z values are interpreted as depths.
     // For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
-    isZDepht: boolean;
+    isZDepth: boolean;
 }
 
 export interface LogCurveDataType {
@@ -305,7 +305,7 @@ export default class WellsLayer extends CompositeLayer<
             ? splineRefine(this.props.data as unknown as FeatureCollection) // smooth well paths.
             : (this.props.data as unknown as FeatureCollection);
 
-        if (!this.props.isZDepht) {
+        if (!this.props.isZDepth) {
             data = invertPath(data);
         }
 

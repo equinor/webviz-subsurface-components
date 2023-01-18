@@ -36,7 +36,7 @@ export type Params = {
 async function load_mesh_and_properties(
     meshUrl: string,
     propertiesUrl: string,
-    isZDepht: boolean
+    isZDepth: boolean
 ) {
     // Keep
     //const t0 = performance.now();
@@ -129,7 +129,7 @@ async function load_mesh_and_properties(
         }
     }
 
-    if (!isZDepht) {
+    if (!isZDepth) {
         for (let i = 0; i < meshData.length; i++) {
             meshData[i] *= -1;
         }
@@ -223,7 +223,7 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
 
     // If true means that input z values are interpreted as depths.
     // For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
-    isZDepht: boolean;
+    isZDepth: boolean;
 }
 
 const defaultProps = {
@@ -251,7 +251,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
         const p = load_mesh_and_properties(
             this.props.meshUrl,
             this.props.propertiesUrl,
-            this.props.isZDepht
+            this.props.isZDepth
         );
 
         p.then(([isMesh, meshData, propertiesData]) => {
