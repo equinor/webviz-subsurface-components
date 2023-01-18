@@ -4,10 +4,10 @@ import { ContinuousLegend } from "@emerson-eps/color-tables";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface LegendProps {
-    title: string;
+    title?: string;
     min: number;
     max: number;
-    position?: number[] | null;
+    cssLegendStyles?: Record<string, unknown>;
     colorName: string;
     horizontal?: boolean | null;
     colorTables: colorTablesArray | string | undefined;
@@ -17,7 +17,7 @@ const ContinuousLegendWrapper: React.FC<LegendProps> = ({
     title,
     min,
     max,
-    position,
+    cssLegendStyles,
     colorName,
     horizontal,
     colorTables,
@@ -27,7 +27,7 @@ const ContinuousLegendWrapper: React.FC<LegendProps> = ({
             min={min}
             max={max}
             dataObjectName={title}
-            position={position}
+            cssLegendStyles={cssLegendStyles}
             colorName={colorName}
             horizontal={horizontal}
             colorTables={colorTables}
@@ -36,10 +36,10 @@ const ContinuousLegendWrapper: React.FC<LegendProps> = ({
 };
 
 ContinuousLegendWrapper.propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
     min: PropTypes.number.isRequired,
     max: PropTypes.number.isRequired,
-    position: PropTypes.arrayOf(PropTypes.number.isRequired),
+    cssLegendStyles: PropTypes.objectOf(PropTypes.string),
     colorName: PropTypes.string.isRequired,
     horizontal: PropTypes.bool,
     colorTables: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
