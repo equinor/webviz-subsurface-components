@@ -37,6 +37,27 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
     },
+    MapLayer: {
+        "@@type": "MapLayer",
+        name: "Map",
+        id: "map3d-layer-float32",
+        pickable: true,
+        visible: true,
+        // Url for the height field.
+        meshUrl: "",
+        propertiesUrl: "",
+        bounds: { type: "object", value: null, false: true, compare: true },
+        colorMapRange: { type: "array" },
+        contours: [-1.0, -1.0],
+        // If contour lines should follow depth or properties.
+        isContoursDepth: true,
+        gridLines: false,
+        smoothShading: true,
+        material: true,
+        depthTest: true,
+        isZDepth: true,
+    },
+
     Map3DLayer: {
         "@@type": "Map3DLayer",
         name: "Map 3D",
@@ -70,7 +91,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         outline: true,
         logRadius: 10,
         logCurves: true,
-        refine: true,
+        refine: false,
         visible: true,
         wellNameVisible: false,
         wellNameAtTop: false,
@@ -78,6 +99,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         wellNameColor: [0, 0, 0, 255],
         selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
         depthTest: true,
+        isZDepth: true,
     },
     FaultPolygonsLayer: {
         "@@type": "FaultPolygonsLayer",
@@ -103,6 +125,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "Axes",
         id: "axes-layer",
         visible: true,
+        isZDepth: false,
     },
     Axes2DLayer: {
         "@@type": "Axes2DLayer",
@@ -157,5 +180,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         colorMapName: "",
         propertyValueRange: [0.0, 1.0],
         depthTest: true,
+        isZDepth: true,
     },
 };
