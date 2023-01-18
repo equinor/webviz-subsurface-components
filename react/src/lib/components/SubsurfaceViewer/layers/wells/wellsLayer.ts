@@ -100,8 +100,9 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameColor: Color;
     isLog: boolean;
     depthTest: boolean;
-    // If true means that input z values are interpreted as depths.
-    // For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
+    /**  If true means that input z values are interpreted as depths.
+     * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
+     */
     isZDepth: boolean;
 }
 

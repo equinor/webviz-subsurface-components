@@ -19,8 +19,9 @@ export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     labelFontSize?: number;
     fontFamily?: string;
     axisColor?: Color;
-    // If true means that input z values are interpreted as depths.
-    // For example depth of z = 1000 corresponds to -1000 on the z axis. Default false.
+    /** If true means that input z values are interpreted as depths.
+     * For example depth of z = 1000 corresponds to -1000 on the z axis. Default false.
+     */
     isZDepth: boolean;
 }
 
