@@ -8,7 +8,7 @@ export default {
     title: "SubsurfaceViewer / Experimental Intersection View",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
-const DeckGLMapTemplate: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+const StoryTemplate: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -58,7 +58,7 @@ const polyline_data = {
 };
 
 // Intersection view example with sample polyline data
-export const WithSamplePolylineData = DeckGLMapTemplate.bind({});
+export const WithSamplePolylineData = StoryTemplate.bind({});
 WithSamplePolylineData.args = {
     ...defaultProps,
     bounds: [0, 0, 2000, 3000] as [number, number, number, number],
@@ -79,7 +79,7 @@ WithSamplePolylineData.args = {
 };
 
 // Intersection view example with wells data
-export const WithWellsData = DeckGLMapTemplate.bind({});
+export const WithWellsData = StoryTemplate.bind({});
 WithWellsData.args = {
     ...defaultProps,
     bounds: [432205, 6475078, 437720, 6481113] as [
@@ -145,7 +145,7 @@ const FencePolygonData = {
 };
 
 // With fence polygon data
-export const FencePolygon = DeckGLMapTemplate.bind({});
+export const FencePolygon = StoryTemplate.bind({});
 FencePolygon.args = {
     ...defaultProps,
     bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
@@ -268,7 +268,7 @@ const IntersectionViewData = {
 };
 
 // An intersection view example with sample surface, wells data laong with fence.
-export const IntersectionViewExample = DeckGLMapTemplate.bind({});
+export const IntersectionViewExample = StoryTemplate.bind({});
 IntersectionViewExample.args = {
     ...defaultProps,
     bounds: [500, 1000, 1200, 1500] as [number, number, number, number],

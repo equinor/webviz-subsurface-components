@@ -16,11 +16,11 @@ export default {
 };
 
 // Template for when edited data needs to be captured.
-const DeckGLMapTemplate = (args) => {
+const StoryTemplate = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-export const WellsLayerValidation = DeckGLMapTemplate.bind();
+export const WellsLayerValidation = StoryTemplate.bind();
 WellsLayerValidation.args = {
     ...exampleData[0],
     layers: [
@@ -39,7 +39,7 @@ WellsLayerValidation.args = {
     checkDatafileSchema: true,
 };
 
-export const PieLayerValidation = DeckGLMapTemplate.bind();
+export const PieLayerValidation = StoryTemplate.bind();
 PieLayerValidation.args = {
     ...exampleData[0],
     layers: [
@@ -51,7 +51,7 @@ PieLayerValidation.args = {
     checkDatafileSchema: true,
 };
 
-export const GridLayerValidation = DeckGLMapTemplate.bind();
+export const GridLayerValidation = StoryTemplate.bind();
 GridLayerValidation.args = {
     ...exampleData[0],
     layers: [
@@ -64,7 +64,7 @@ GridLayerValidation.args = {
     checkDatafileSchema: true,
 };
 
-export const FaultPolygonsValidation = DeckGLMapTemplate.bind();
+export const FaultPolygonsValidation = StoryTemplate.bind();
 FaultPolygonsValidation.args = {
     ...exampleData[0],
     layers: [
@@ -76,7 +76,7 @@ FaultPolygonsValidation.args = {
     checkDatafileSchema: true,
 };
 
-export const ColorTableValidation = DeckGLMapTemplate.bind();
+export const ColorTableValidation = StoryTemplate.bind();
 ColorTableValidation.args = {
     ...exampleData[0],
     layers: [
