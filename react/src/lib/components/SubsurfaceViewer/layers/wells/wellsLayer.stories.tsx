@@ -9,7 +9,6 @@ import {
 } from "@emerson-eps/color-tables";
 import { MapMouseEvent } from "../../components/Map";
 import { makeStyles } from "@material-ui/core";
-import { View } from "@deck.gl/core/typed";
 
 export default {
     component: SubsurfaceViewer,
@@ -537,10 +536,10 @@ const reverseRange = false;
 
 //eslint-disable-next-line
 const wellLayerTemplate = (args: any) => {
-    const [getColorName, setColorName] = React.useState("Stratigraphy");
+    const [getColorName, setColorName] = React.useState("Rainbow");
     const [isLog, setIsLog] = React.useState(false);
     const wellLayerData = React.useCallback((data) => {
-        setColorName(data.name ? data.name : data.legendColorName);
+        setColorName(data);
     }, []);
 
     // interpolation method
@@ -557,37 +556,23 @@ const wellLayerTemplate = (args: any) => {
         },
     ];
     return (
-        // <div>
-        //     <div
-        //         style={{
-        //             float: "right",
-        //             zIndex: 999,
-        //             opacity: 1,
-        //             position: "relative",
-        //         }}
-        //     >
-        //         <ColorLegend
-        //             {...args}
-        //             getScale={wellLayerData}
-        //             getInterpolateMethod={getInterpolateMethod}
-        //         />
-        //     </div>
-        //     <DeckGLMap {...args} layers={layers} />
-        // </div>
-        <DeckGLMap {...args} layers={layers}>
-            {
-                // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
-                <View id="view_1">
-                    <div style={{ marginTop: 50 }}>
-                        <ColorLegend
-                            {...args}
-                            getScale={wellLayerData}
-                            getInterpolateMethod={getInterpolateMethod}
-                        />
-                    </div>
-                </View>
-            }
-        </DeckGLMap>
+        <div>
+            <div
+                style={{
+                    float: "right",
+                    zIndex: 999,
+                    opacity: 1,
+                    position: "relative",
+                }}
+            >
+                <ColorLegend
+                    {...args}
+                    getColorName={wellLayerData}
+                    getInterpolateMethod={getInterpolateMethod}
+                />
+            </div>
+            <DeckGLMap {...args} layers={layers} />
+        </div>
     );
 };
 
@@ -609,16 +594,6 @@ LegendWithColorSelector.args = {
         visible: false,
     },
     reverseRange,
-    views: {
-        layout: [1, 1],
-        showLabel: true,
-        viewports: [
-            {
-                id: "view_1",
-                zoom: -4,
-            },
-        ],
-    },
 };
 
 LegendWithColorSelector.parameters = {
