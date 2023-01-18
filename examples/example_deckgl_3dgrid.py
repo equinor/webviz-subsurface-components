@@ -16,7 +16,7 @@ grid_polys, grid_points, grid_scalar = get_surface(xtgeo_grid, xtgeo_grid_proper
 grid_geometrics = xtgeo_grid.get_geometrics(allcells=True, return_dict=True)
 app = dash.Dash(__name__)
 
-app.layout = wsc.DeckGLMap(
+app.layout = wsc.SubsurfaceViewerDashWrapper(
     id="deckgl-map",
     layers=[
         {

@@ -2,14 +2,11 @@
 import * as React from "react";
 import { mount } from "@cypress/react";
 import { composeStories } from "@storybook/testing-react";
-//import { render } from "@testing-library/react";
 
-import * as stories from "../../src/lib/components/DeckGLMap/layers/wells/wellsLayer.stories";
+import * as stories from "../../src/lib/components/SubsurfaceViewer/layers/wells/wellsLayer.stories";
 
 const { VolveWells, DashedWells, CustomColoredWells, CustomWidthWells } =
     composeStories(stories);
-
-//render().unmount();
 
 xdescribe("Wells", () => {
     it("should display volve wells story", () => {

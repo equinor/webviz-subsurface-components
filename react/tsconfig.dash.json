@@ -5,7 +5,7 @@
     },
     "include": [],
     "files": [
-        "src/lib/components/DeckGLMap/components/ViewFooter.tsx",
-        "src/lib/components/DeckGLMap/components/ViewAnnotation.tsx"
+        "src/lib/components/SubsurfaceViewer/components/ViewFooter.tsx",
+        "src/lib/components/SubsurfaceViewer/components/ViewAnnotation.tsx"
     ]
 }
