@@ -1,5 +1,5 @@
 import React from "react";
-import DeckGLMap from "../../DeckGLMap";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
 import {
     sampleLogData,
     sampleWellsData,
@@ -11,13 +11,13 @@ import {
 import exampleData from "../../../../../demo/example-data/deckgl-map.json";
 
 export default {
-    component: DeckGLMap,
-    title: "DeckGLMap/SchemaValidation",
+    component: SubsurfaceViewer,
+    title: "SubsurfaceViewer/SchemaValidation",
 };
 
 // Template for when edited data needs to be captured.
 const DeckGLMapTemplate = (args) => {
-    return <DeckGLMap {...args} />;
+    return <SubsurfaceViewer {...args} />;
 };
 
 export const WellsLayerValidation = DeckGLMapTemplate.bind();
