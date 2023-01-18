@@ -24,7 +24,7 @@ app.layout = dash.html.Div(
         ),
         dash.html.Div(
             style={"flex": "5", "position": "relative", "height": "90vh"},
-            children=wsc.DeckGLMap(
+            children=wsc.SubsurfaceViewerDashWrapper(
                 id="deckgl-map",
                 bounds=[456150, 5925800, 467400, 5939500],
                 layers=[
