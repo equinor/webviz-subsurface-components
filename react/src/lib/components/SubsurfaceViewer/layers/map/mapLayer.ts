@@ -263,6 +263,7 @@ const defaultProps = {
     smoothShading: true,
     material: true,
     depthTest: true,
+    isZDepth: true,
 };
 
 export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
