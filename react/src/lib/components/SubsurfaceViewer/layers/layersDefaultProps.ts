@@ -37,26 +37,6 @@ export const layersDefaultProps: Record<string, unknown> = {
             step: 0,
         },
     },
-    MapLayer: {
-        "@@type": "MapLayer",
-        name: "Map",
-        id: "map3d-layer-float32",
-        pickable: true,
-        visible: true,
-        // Url for the height field.
-        meshUrl: "",
-        propertiesUrl: "",
-        bounds: { type: "object", value: null, false: true, compare: true },
-        colorMapRange: { type: "array" },
-        contours: [-1.0, -1.0],
-        // If contour lines should follow depth or properties.
-        isContoursDepth: true,
-        gridLines: false,
-        smoothShading: true,
-        material: true,
-        depthTest: true,
-    },
-
     Map3DLayer: {
         "@@type": "Map3DLayer",
         name: "Map 3D",
