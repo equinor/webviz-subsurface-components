@@ -36,6 +36,13 @@ function GetBBox(
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
+// XXX
+function FlipZ(points: number[]): void {
+    for (let i = 0; i < points.length / 3; i++) {
+        points[3 * i + 2] *= -1;
+    }
+}
+
 async function load_data(
     pointsUrl: string,
     polysUrl: string,
@@ -89,6 +96,10 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Enable/disable depth testing when rendering layer. Default true.
     depthTest: boolean;
+
+    // If true means that input z values are interpreted as depths.
+    // For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
+    isZDepht: boolean;
 }
 
 export default class Grid3DLayer extends CompositeLayer<
@@ -102,6 +113,10 @@ export default class Grid3DLayer extends CompositeLayer<
         );
 
         p.then(([points, polys, properties]) => {
+            if (!this.props.isZDepht) {
+                FlipZ(points);
+            }
+
             const bbox = GetBBox(points);
 
             // Using inline web worker for calculating the triangle mesh from

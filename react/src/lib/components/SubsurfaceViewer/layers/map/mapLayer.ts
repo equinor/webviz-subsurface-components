@@ -35,7 +35,8 @@ export type Params = {
 
 async function load_mesh_and_properties(
     meshUrl: string,
-    propertiesUrl: string
+    propertiesUrl: string,
+    isZDepht: boolean
 ) {
     // Keep
     //const t0 = performance.now();
@@ -128,6 +129,12 @@ async function load_mesh_and_properties(
         }
     }
 
+    if (!isZDepht) {
+        for (let i = 0; i < meshData.length; i++) {
+            meshData[i] *= -1;
+        }
+    }
+
     //const t1 = performance.now();
     // Keep this.
     //console.log(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
@@ -213,6 +220,10 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
 
     // Enable/disable depth testing when rendering layer. Default true.
     depthTest: boolean;
+
+    // If true means that input z values are interpreted as depths.
+    // For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
+    isZDepht: boolean;
 }
 
 const defaultProps = {
@@ -239,7 +250,8 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
     rebuildData(reportBoundingBox: boolean): void {
         const p = load_mesh_and_properties(
             this.props.meshUrl,
-            this.props.propertiesUrl
+            this.props.propertiesUrl,
+            this.props.isZDepht
         );
 
         p.then(([isMesh, meshData, propertiesData]) => {

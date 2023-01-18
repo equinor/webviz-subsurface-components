@@ -11,6 +11,7 @@ import BoxLayer from "./boxLayer";
 import { Position3D, ExtendedLayerProps } from "../utils/layerTools";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { TextLayer } from "@deck.gl/layers/typed";
+import { cloneDeep } from "lodash";
 
 export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     bounds: [number, number, number, number, number, number];
@@ -18,6 +19,9 @@ export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     labelFontSize?: number;
     fontFamily?: string;
     axisColor?: Color;
+    // If true means that input z values are interpreted as depths.
+    // For example depth of z = 1000 corresponds to -1000 on the z axis. Default false.
+    isZDepht: boolean;
 }
 
 type TextLayerData = {
@@ -29,14 +33,20 @@ type TextLayerData = {
 
 export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
     initializeState(): void {
-        const box_lines = GetBoxLines(this.props.bounds);
+        const bounds = cloneDeep(this.props.bounds);
+        if (this.props.isZDepht) {
+            bounds[2] *= -1;
+            bounds[5] *= -1;
+        }
+
+        const box_lines = GetBoxLines(bounds);
 
         const is_orthographic =
             this.context.viewport.constructor === OrthographicViewport;
 
         const [tick_lines, tick_labels] = GetTickLines(
             is_orthographic,
-            this.props.bounds,
+            bounds,
             this.context.viewport
         );
 
@@ -44,7 +54,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
             is_orthographic,
             tick_lines,
             tick_labels,
-            this.props.bounds,
+            bounds,
             this.props.labelFontSize
         );
 
@@ -71,11 +81,17 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
         const is_orthographic =
             this.context.viewport.constructor === OrthographicViewport;
 
-        const box_lines = GetBoxLines(this.props.bounds);
+        const bounds = cloneDeep(this.props.bounds);
+        if (this.props.isZDepht) {
+            bounds[2] *= -1;
+            bounds[5] *= -1;
+        }
+
+        const box_lines = GetBoxLines(bounds);
 
         const [tick_lines, tick_labels] = GetTickLines(
             is_orthographic,
-            this.props.bounds,
+            bounds,
             this.context.viewport
         );
 
@@ -83,7 +99,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
             is_orthographic,
             tick_lines,
             tick_labels,
-            this.props.bounds,
+            bounds,
             this.props.labelFontSize
         );
 
@@ -214,11 +230,12 @@ function maketextLayerData(
     const z_min = bounds[2];
     const z_max = bounds[5];
 
-    const dx = x_max - x_min;
-    const dy = y_max - y_min;
-    const dz = z_max - z_min;
+    const dx = Math.abs(x_max - x_min);
+    const dy = Math.abs(y_max - y_min);
+    const dz = Math.abs(z_max - z_min);
 
     const offset = ((dx + dy + dz) / 3.0) * 0.1;
+
     const data = [
         {
             label: "X",
