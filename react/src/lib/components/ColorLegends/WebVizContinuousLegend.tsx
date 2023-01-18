@@ -7,12 +7,7 @@ interface LegendProps {
     title?: string;
     min: number;
     max: number;
-    cssLegendStyles?: {
-        left?: string;
-        top?: string;
-        right?: string;
-        bottom?: string;
-    };
+    cssLegendStyles?: Record<string, unknown>;
     colorName: string;
     horizontal?: boolean | null;
     colorTables: colorTablesArray | string | undefined;
