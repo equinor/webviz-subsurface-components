@@ -24,7 +24,7 @@ polygons = xtgeo.polygons_from_file(
 
 app = dash.Dash(__name__)
 
-app.layout = wsc.DeckGLMap(
+app.layout = wsc.SubsurfaceViewerDashWrapper(
     id="deckgl-map",
     layers=[
         {
