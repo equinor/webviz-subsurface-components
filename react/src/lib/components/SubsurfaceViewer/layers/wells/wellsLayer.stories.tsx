@@ -579,11 +579,11 @@ const wellLayerTemplate = (args: any) => {
                 // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
                 <View id="view_1">
                     <div style={{ marginTop: 50 }}>
-                    <ColorLegend
-                    {...args}
-                    getScale={wellLayerData}
-                    getInterpolateMethod={getInterpolateMethod}
-                />
+                        <ColorLegend
+                            {...args}
+                            getScale={wellLayerData}
+                            getInterpolateMethod={getInterpolateMethod}
+                        />
                     </div>
                 </View>
             }
