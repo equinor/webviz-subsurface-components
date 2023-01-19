@@ -581,9 +581,7 @@ const Map: React.FC<MapProps> = ({
             return layer;
         });
 
-        const updated_layers = applyPropsOnLayers(layers, layers_copy);
-        const layers_default = getLayersWithDefaultProps(updated_layers);
-        setAlteredLayers(layers_default);
+        setAlteredLayers(layers_copy);
     }, [scaleZ, layers /*dispatch*/]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
