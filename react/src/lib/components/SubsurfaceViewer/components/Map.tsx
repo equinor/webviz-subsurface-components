@@ -320,6 +320,10 @@ const Map: React.FC<MapProps> = ({
     triggerHome,
     triggerResetMultipleWells,
 }: MapProps) => {
+    const isCameraPositionDefined =
+        typeof cameraPosition !== "undefined" &&
+        Object.keys(cameraPosition).length !== 0;
+
     const deckRef = useRef<DeckGLRef>(null);
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
@@ -396,10 +400,10 @@ const Map: React.FC<MapProps> = ({
 
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
+        if (isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
-            );
+            ) as unknown as Record<string, ViewStateType>;
         } else {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => {
@@ -427,10 +431,10 @@ const Map: React.FC<MapProps> = ({
     // calculate view state on deckgl context load (based on viewport size)
     const onLoad = useCallback(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
+        if (isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
-            );
+            ) as unknown as Record<string, ViewStateType>;
         } else {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
@@ -469,9 +473,6 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-        const isCameraPositionDefined =
-            typeof cameraPosition !== "undefined" &&
-            Object.keys(cameraPosition).length !== 0;
         if (!didUserChangeCamera && !isCameraPositionDefined) {
             calcDefaultViewStates();
         }
@@ -480,7 +481,7 @@ const Map: React.FC<MapProps> = ({
     // react on bounds prop change
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (cameraPosition && Object.keys(cameraPosition).length === 0) {
+        if (!isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
                     item.id,
@@ -502,10 +503,10 @@ const Map: React.FC<MapProps> = ({
     // react on cameraPosition prop change
     useEffect(() => {
         let tempViewStates: Record<string, ViewStateType> = {};
-        if (cameraPosition && Object.keys(cameraPosition).length !== 0) {
+        if (isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item) => [item.id, cameraPosition])
-            );
+            ) as unknown as Record<string, ViewStateType>;
             setViewStates(tempViewStates);
             if (viewsProps[0] !== undefined) {
                 setFirstViewStatesId(viewsProps[0].id);
