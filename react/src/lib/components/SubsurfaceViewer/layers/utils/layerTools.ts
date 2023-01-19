@@ -7,8 +7,6 @@ import {
     CompositeLayerProps,
 } from "@deck.gl/core/typed";
 import { Matrix4 } from "math.gl";
-import { cloneDeep } from "lodash";
-import { layersDefaultProps } from "../layersDefaultProps";  // XXX 
 import {
     ContinuousLegendDataType,
     DiscreteLegendDataType,

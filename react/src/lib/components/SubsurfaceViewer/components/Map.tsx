@@ -19,10 +19,6 @@ import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import {
-    applyPropsOnLayers,
-    getLayersWithDefaultProps,
-} from "../layers/utils/layerTools";
 import fitBounds from "../utils/fit-bounds";
 import {
     validateColorTables,

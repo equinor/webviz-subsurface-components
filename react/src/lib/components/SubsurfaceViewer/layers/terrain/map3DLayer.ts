@@ -1,9 +1,5 @@
 import { CompositeLayer, Color } from "@deck.gl/core/typed";
-import TerrainMapLayer, {
-    TerrainMapLayerData,
-    DECODER,
-    Material,
-} from "./terrainMapLayer";
+import TerrainMapLayer, { DECODER, Material } from "./terrainMapLayer";
 import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { ImageLoader } from "@loaders.gl/images";

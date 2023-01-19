@@ -1,45 +1,35 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
-import userEvent from "@testing-library/user-event";
-import { testStore, Wrapper } from "../../test/TestWrapper";
+import { EmptyWrapper } from "../../test/TestWrapper";
 import LayerProperty from "./LayerProperty";
-import { testState } from "../../test/testReduxState";
+
+const drawingLayer = {
+    "@@type": "DrawingLayer",
+    name: "Drawing",
+    id: "drawing-layer",
+    pickable: true,
+    visible: true,
+    mode: "drawLineString",
+
+    // Props used to get/set data in the drawing layer.
+    selectedFeatureIndexes: [] as number[],
+    data: {
+        type: "FeatureCollection",
+        features: [],
+    },
+};
 
 describe("Test Layer Property", () => {
     it("snapshot test", () => {
-        const drawing_layer = testState.layers.find(
-            (item) => item["@@type"] === "DrawingLayer"
-        );
-        const { container } = drawing_layer
+        const { container } = drawingLayer
             ? render(
-                  Wrapper({
-                      children: <LayerProperty layer={drawing_layer} />,
+                  EmptyWrapper({
+                      children: <LayerProperty layer={drawingLayer} />,
                   })
               )
             : render(<div />);
         expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it("select option to dispatch redux action", async () => {
-        const drawing_layer = testState.layers.find(
-            (item) => item["@@type"] === "DrawingLayer"
-        );
-        drawing_layer &&
-            render(
-                Wrapper({
-                    children: <LayerProperty layer={drawing_layer} />,
-                })
-            );
-        userEvent.selectOptions(
-            screen.getByRole("combobox", { name: /draw mode/i }),
-            "View"
-        );
-        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
-        expect(testStore.dispatch).toBeCalledWith({
-            payload: ["drawing-layer", "view"],
-            type: "spec/updateDrawingMode",
-        });
     });
 });
