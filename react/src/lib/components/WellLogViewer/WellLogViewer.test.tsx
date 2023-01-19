@@ -12,7 +12,6 @@ const exampleColorTable = colorTables as unknown as ColorTable[]; // equivalent 
 const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
 const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
 
-
 window.ResizeObserver =
     window.ResizeObserver ||
     jest.fn().mockImplementation(() => ({

@@ -3,8 +3,7 @@ import WellLogViewer from "./WellLogViewer";
 import { argTypesWellLogViewerProp } from "./WellLogViewer";
 import { colorTables } from "@emerson-eps/color-tables";
 //import { ColorTable } from "./components/ColorTableTypes";
-const exampleColorTable = colorTables /*as unknown as ColorTable[]*/; // equivalent types, should be merged
-
+const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +

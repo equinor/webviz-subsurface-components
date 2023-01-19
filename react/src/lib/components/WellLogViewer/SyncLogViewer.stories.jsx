@@ -3,8 +3,8 @@ import SyncLogViewer from "./SyncLogViewer";
 import { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import { colorTables } from "@emerson-eps/color-tables";
 //import { ColorTable } from "./components/ColorTableTypes";
-const exampleColorTable = colorTables /*as unknown as ColorTable[]*/; // equivalent types, should be merged
-const wellpickColorTable = require("../../../demo/example-data/wellpick_colors.json"),
+const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
+const wellpickColorTable = require("../../../demo/example-data/wellpick_colors.json");
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +

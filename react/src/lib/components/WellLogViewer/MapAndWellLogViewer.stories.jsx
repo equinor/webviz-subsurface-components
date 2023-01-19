@@ -5,8 +5,7 @@ import { MapAndWellLogViewer } from "./MapAndWellLogViewer";
 import exampleData from "../../../demo/example-data/deckgl-map.json";
 import { colorTables } from "@emerson-eps/color-tables";
 //import { ColorTable } from "./components/ColorTableTypes";
-const exampleColorTable = colorTables/* as unknown as ColorTable[]*/; // equivalent types, should be merged
-
+const exampleColorTable = colorTables; /* as unknown as ColorTable[]*/ // equivalent types, should be merged
 
 const drawing_layer = exampleData[0].layers.find(
     (item) => item["@@type"] === "DrawingLayer"

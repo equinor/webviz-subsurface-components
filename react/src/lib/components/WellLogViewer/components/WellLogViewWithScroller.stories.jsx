@@ -3,7 +3,7 @@ import WellLogViewWithScroller from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { colorTables } from "@emerson-eps/color-tables";
 //import { ColorTable } from "./ColorTableTypes";
-const exampleColorTable = colorTables /*as unknown as ColorTable[]*/; // equivalent types, should be merged
+const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
 const exampleWelllog = require("../../../../demo/example-data/L898MUD.json")[0];
 const exampleTemplate = require("../../../../demo/example-data/welllog_template_1.json");
 
@@ -56,14 +56,13 @@ const Template = (args) => {
     );
 };
 
-
 export const Default = Template.bind({});
 Default.args = {
     id: "Well-Log-Viewer-With-Scroller",
     horizontal: false,
     welllog: exampleWelllog,
     template: exampleTemplate,
-    viewTitle: "Well '" + wellLog.header.well + "'",
+    viewTitle: "Well '" + exampleWelllog.header.well + "'",
     colorTables: exampleColorTable,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,

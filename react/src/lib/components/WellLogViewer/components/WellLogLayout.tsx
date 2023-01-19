@@ -6,7 +6,7 @@ import WellLogViewer from "../WellLogViewer";
 
 import { LogViewer } from "@equinor/videx-wellog";
 
-export interface Props  {
+export interface Props {
     parent: WellLogViewer;
     center?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
 
@@ -19,7 +19,7 @@ export interface Props  {
 }
 
 interface State {
-    center: JSX.Element | null;    
+    center: JSX.Element | null;
 
     header: JSX.Element | null;
     left: JSX.Element | null;
@@ -29,10 +29,9 @@ interface State {
     footer: JSX.Element | null;
 }
 
-const styleHeaderFooter={ flex: "0", width: "100%" };
-const styleTopBottom={ flex: "0" };
-const styleLeftRight={ flex: "0", height: "100%" };
-
+const styleHeaderFooter = { flex: "0", width: "100%" };
+const styleTopBottom = { flex: "0" };
+const styleLeftRight = { flex: "0", height: "100%" };
 
 class WellLogLayout extends Component<Props, State> {
     controller: WellLogController | null;
@@ -127,9 +126,7 @@ class WellLogLayout extends Component<Props, State> {
         */
     }
 
-    componentDidUpdate(
-        prevProps: Props /*, prevState: State*/
-    ): void {
+    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
         if (this.props.header !== prevProps.header)
             this.setState({ header: this.createPanel(this.props.header) });
         if (this.props.left !== prevProps.left)
@@ -233,9 +230,15 @@ class WellLogLayout extends Component<Props, State> {
                             flexDirection: "column",
                         }}
                     >
-                        {this.state.top && <div style={styleTopBottom}>{this.state.top}</div>}
+                        {this.state.top && (
+                            <div style={styleTopBottom}>{this.state.top}</div>
+                        )}
                         {this.state.center /* The main view component */}
-                        {this.state.bottom && <div style={styleTopBottom}>{this.state.bottom}</div>}
+                        {this.state.bottom && (
+                            <div style={styleTopBottom}>
+                                {this.state.bottom}
+                            </div>
+                        )}
                     </div>
                     {this.state.right && (
                         <div style={styleLeftRight}>{this.state.right}</div>
@@ -248,6 +251,5 @@ class WellLogLayout extends Component<Props, State> {
         );
     }
 }
-
 
 export default WellLogLayout;
