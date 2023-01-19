@@ -301,14 +301,14 @@ export default class WellsLayer extends CompositeLayer<
             return [];
         }
 
-        const refine = this.props.refine;
-        let data = refine
-            ? splineRefine(this.props.data as unknown as FeatureCollection) // smooth well paths.
-            : (this.props.data as unknown as FeatureCollection);
-
+        let data = this.props.data as unknown as FeatureCollection;
         if (!this.props.isZDepth) {
             data = invertPath(data);
         }
+        const refine = this.props.refine;
+        data = refine
+            ? splineRefine(data) // smooth well paths.
+            : data;
 
         const is3d = this.context.viewport.constructor === OrbitViewport;
         const positionFormat = "XYZ";
