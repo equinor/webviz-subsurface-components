@@ -4,7 +4,7 @@ import { mount, unmount } from "@cypress/react";
 import { composeStories } from "@storybook/testing-react";
 import { render } from "@testing-library/react";
 
-import * as stories from "../../src/lib/components/DeckGLMap/storybook/DeckGLMap.stories";
+import * as stories from "../../src/lib/components/SubsurfaceViewer/storybook/SubsurfaceViewer.stories";
 
 const { Default } = composeStories(stories);
 

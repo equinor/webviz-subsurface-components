@@ -2,11 +2,11 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import { WeakValidationMap } from "react";
-import DeckGLMap from "../DeckGLMap";
-import { DeckGLMapProps } from "../DeckGLMap";
+import SubsurfaceViewer from "../SubsurfaceViewer";
+import { SubsurfaceViewerProps } from "../SubsurfaceViewer";
 import { Color } from "@deck.gl/core/typed";
 
-import { WellsLayer } from "../DeckGLMap/layers";
+import { WellsLayer } from "../SubsurfaceViewer/layers";
 import {
     Template,
     TemplateTrack,
@@ -28,7 +28,7 @@ import { ColorTable } from "./components/ColorTableTypes";
 import { WellLogController } from "./components/WellLogView";
 import { LogViewer } from "@equinor/videx-wellog";
 import { Info } from "./components/InfoTypes";
-import { MapMouseEvent } from "../DeckGLMap/components/Map";
+import { MapMouseEvent } from "../SubsurfaceViewer/components/Map";
 
 import InfoPanel from "./components/InfoPanel";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
@@ -61,7 +61,7 @@ function getTemplatePlotColorTable(
     return colorTable;
 }
 
-interface Props extends DeckGLMapProps {
+interface Props extends SubsurfaceViewerProps {
     /**
      * Options for well log view
      */
@@ -360,7 +360,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                     }}
                 >
                     <div>
-                        <DeckGLMap
+                        <SubsurfaceViewer
                             {...this.props}
                             layers={this.state.layers}
                             editedData={this.state.editedData}
@@ -453,7 +453,7 @@ const WellLogViewOptions_propTypes = PropTypes.shape({
 });
 
 MapAndWellLogViewer.propTypes = {
-    ...DeckGLMap.propTypes,
+    ...SubsurfaceViewer.propTypes,
 
     /**
      * WellLogView additional options

@@ -1,23 +1,16 @@
-import glob
-
 import numpy as np
 import xtgeo
 import dash
 import webviz_subsurface_components as wsc
 
 from utils.xtgeo_surface_to_float32 import get_surface_float32
-from utils.xtgeo_wells_to_json import xtgeo_wells_to_geojson
 from utils.xtgeo_polygons_to_json import xtgeo_polygons_to_polylines_geojson
 
-# Import a depth surface
+# Import a depth surface and a property surface using xtgeo
 depth_surface = xtgeo.surface_from_file("examples/example-data/topvolantis_depth.gri")
-
-# Import wells
-wells = [
-    xtgeo.well_from_file(wellfile, mdlogname="MDepth")
-    for wellfile in glob.glob("examples/example-data/*.rmswell")
-]
-
+property_surface = xtgeo.surface_from_file(
+    "examples/example-data/topvolantis_seismic_attribute.gri"
+)
 polygons = xtgeo.polygons_from_file(
     "examples/example-data/topvolantis_faultpolygons.pol"
 )
@@ -57,10 +50,21 @@ app.layout = wsc.SubsurfaceViewerDashWrapper(
             "name": "mesh",
         },
         {
-            "@@type": "WellsLayer",
-            "id": "wells-layer",
-            "data": "/wells/wells.json",
-            "refine": False,
+            "@@type": "MapLayer",
+            "id": "mesh-and-property-layer",
+            "meshUrl": "/map/mesh",
+            "propertiesUrl": "/map/property",
+            "frame": {
+                "origin": [depth_surface.xori, depth_surface.yori],
+                "count": [depth_surface.ncol, depth_surface.nrow],
+                "increment": [depth_surface.xinc, depth_surface.yinc],
+                "rotDeg": depth_surface.rotation,
+            },
+            "isContoursDepth": True,
+            "gridLines": False,
+            "material": True,
+            "colorMapName": "Seismic",
+            "name": "mesh",
         },
         {
             "@@type": "FaultPolygonsLayer",
@@ -75,20 +79,28 @@ app.layout = wsc.SubsurfaceViewerDashWrapper(
         "viewports": [
             {
                 "id": "view_1",
-                "show3D": True,
+                "show3D": False,
                 "name": "Depth surface",
-                "layerIds": ["axes-layer", "mesh-layer", "wells-layer"],
+                "layerIds": ["axes-layer", "mesh-layer"],
                 "isSync": True,
             },
             {
                 "id": "view_2",
-                "show3D": True,
-                "name": "Depth surface",
-                "layerIds": ["axes-layer", "wells-layer", "fault-layer"],
+                "show3D": False,
+                "name": "Property mapped on depth surface",
+                "layerIds": [
+                    "fault-layer",
+                    "axes-layer",
+                    "mesh-and-property-layer",
+                ],
                 "isSync": True,
             },
         ],
     },
+    children=[
+        wsc.ViewAnnotation(id="view_1", children=[wsc.ViewFooter(children="Hugin")]),
+        wsc.ViewAnnotation(id="view_2", children=[wsc.ViewFooter(children="sdfsfd")]),
+    ],
 )
 
 
@@ -96,16 +108,13 @@ app.layout = wsc.SubsurfaceViewerDashWrapper(
 def send_map(map_name: str):
     if map_name == "mesh":
         return get_surface_float32(depth_surface)
-
-
-@app.server.route("/wells/wells.json")
-def send_wells():
-    return xtgeo_wells_to_geojson(wells)
+    if map_name == "property":
+        return get_surface_float32(property_surface)
 
 
 @app.server.route("/faults/faults.json")
 def send_faults():
-    return xtgeo_polygons_to_polylines_geojson(polygons)
+    return xtgeo_polygons_to_polylines_geojson(polygons, xy_only=True)
 
 
 if __name__ == "__main__":
