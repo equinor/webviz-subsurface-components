@@ -23,16 +23,13 @@ export interface Props {
     layout?: ViewerLayout;
 }
 
-import DefaultRightPanel from "./DefaultRightPanel";
-function defaultRightPanel(parent: WellLogViewer) {
-    return <DefaultRightPanel parent={parent} />;
-}
+import { defaultRightPanel } from "./DefaultRightPanel";
 
 const styleHeaderFooter = { flex: "0", width: "100%" };
 const styleTopBottom = { flex: "0" };
 const styleLeftRight = { flex: "0", height: "100%" };
 
-class WellLogLayout extends Component<Props> {
+export class WellLogLayout extends Component<Props> {
     controller: WellLogController | null;
 
     onInfoCallbacks: ((

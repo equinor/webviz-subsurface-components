@@ -110,8 +110,7 @@ const wellpick = {
     color: "Stratigraphy",
 };
 
-import { DefaultRightPanel } from "./components/DefaultRightPanel";
-
+import { defaultRightPanel } from "./components/DefaultRightPanel";
 import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogInfoPanel from "./components/WellLogInfoPanel";
 import WellLogScaleSelector from "./components/WellLogScaleSelector";
@@ -151,7 +150,7 @@ Horizontal.args = {
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
 
     layout: {
-        left: (parent) => <DefaultRightPanel parent={parent} />,
+        left: defaultRightPanel,
     },
 };
 Horizontal.parameters = {

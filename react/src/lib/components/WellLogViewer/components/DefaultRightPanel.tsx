@@ -6,12 +6,7 @@ import WellLogZoomSlider from "./WellLogZoomSlider";
 import WellLogInfoPanel from "./WellLogInfoPanel";
 import WellLogAxesPanel from "./WellLogAxesPanel";
 
-interface Props {
-    parent: WellLogViewer;
-}
-
-export function DefaultRightPanel(props: Props): JSX.Element {
-    const parent = props.parent;
+export function defaultRightPanel(parent: WellLogViewer): JSX.Element {
     return (
         <div
             style={{
@@ -34,5 +29,3 @@ export function DefaultRightPanel(props: Props): JSX.Element {
         </div>
     );
 }
-
-export default DefaultRightPanel;

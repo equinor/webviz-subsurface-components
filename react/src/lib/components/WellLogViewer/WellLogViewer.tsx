@@ -2,6 +2,8 @@ import React, { Component } from "react";
 
 import PropTypes from "prop-types";
 
+import WellLogLayout from "./components/WellLogLayout";
+
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
@@ -11,8 +13,6 @@ import { shouldUpdateWellLogView } from "./components/WellLogView";
 
 import { WellLogController } from "./components/WellLogView";
 import WellLogView from "./components/WellLogView";
-
-import DefaultRightPanel from "./components/DefaultRightPanel";
 
 import { getAvailableAxes } from "./utils/tracks";
 
@@ -62,10 +62,6 @@ export const argTypesWellLogViewerProp = {
 
 interface State {
     primaryAxis: string; // for WellLogView
-}
-
-function defaultRightPanel(parent: WellLogViewer) {
-    return <DefaultRightPanel parent={parent} />;
 }
 
 class WellLogViewer extends Component<WellLogViewerProps, State> {
@@ -261,92 +257,31 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     }
 
     render(): JSX.Element {
-        let header: JSX.Element | null;
-        let left: JSX.Element | null;
-        let right: JSX.Element | null;
-        let top: JSX.Element | null;
-        let bottom: JSX.Element | null;
-        let footer: JSX.Element | null;
-        const layout = this.props.layout;
-        if (!layout) {
-            // use default layout with default right panel
-            header = null;
-            left = null;
-            right = this.createPanel(defaultRightPanel);
-            top = null;
-            bottom = null;
-            footer = null;
-        } else {
-            header = this.createPanel(layout.header);
-            left = this.createPanel(layout.left);
-            right = this.createPanel(layout.right);
-            top = this.createPanel(layout.top);
-            bottom = this.createPanel(layout.bottom);
-            footer = this.createPanel(layout.footer);
-        }
-
         return (
-            <div
-                style={{
-                    height: "100%",
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                }}
-            >
-                {header && (
-                    <div style={{ flex: "0", width: "100%" }}>{header}</div>
-                )}
-                <div
-                    style={{
-                        flex: "1",
-                        height: "0%",
-                        width: "100%",
-                        display: "flex",
-                        flexDirection: "row",
-                    }}
-                >
-                    {left && (
-                        <div style={{ flex: "0", height: "100%" }}>{left}</div>
-                    )}
-                    <div
-                        style={{
-                            flex: "1",
-                            height: "100%",
-                            width: "0%",
-                            display: "flex",
-                            flexDirection: "column",
-                        }}
-                    >
-                        {top && <div style={{ flex: "0" }}>{top}</div>}
-                        <WellLogViewWithScroller
-                            welllog={this.props.welllog}
-                            template={this.props.template}
-                            colorTables={this.props.colorTables}
-                            wellpick={this.props.wellpick}
-                            horizontal={this.props.horizontal}
-                            axisTitles={this.props.axisTitles}
-                            axisMnemos={this.props.axisMnemos}
-                            options={this.props.options}
-                            primaryAxis={this.state.primaryAxis}
-                            // callbacks
-                            onTrackMouseEvent={onTrackMouseEvent}
-                            onInfo={this.onInfo}
-                            onCreateController={this.onCreateController}
-                            onContentRescale={this.onContentRescale}
-                            onContentSelection={this.onContentSelection}
-                            onTemplateChanged={this.onTemplateChanged}
-                        />
-                        {bottom && <div style={{ flex: "0" }}>{bottom}</div>}
-                    </div>
-                    {right && (
-                        <div style={{ flex: "0", height: "100%" }}>{right}</div>
-                    )}
-                </div>
-                {footer && (
-                    <div style={{ flex: "0", width: "100%" }}>{footer}</div>
-                )}
-            </div>
+            <WellLogLayout
+                parent={this}
+                center={
+                    <WellLogViewWithScroller
+                        welllog={this.props.welllog}
+                        template={this.props.template}
+                        colorTables={this.props.colorTables}
+                        wellpick={this.props.wellpick}
+                        horizontal={this.props.horizontal}
+                        axisTitles={this.props.axisTitles}
+                        axisMnemos={this.props.axisMnemos}
+                        options={this.props.options}
+                        primaryAxis={this.state.primaryAxis}
+                        // callbacks
+                        onTrackMouseEvent={onTrackMouseEvent}
+                        onInfo={this.onInfo}
+                        onCreateController={this.onCreateController}
+                        onContentRescale={this.onContentRescale}
+                        onContentSelection={this.onContentSelection}
+                        onTemplateChanged={this.onTemplateChanged}
+                    />
+                }
+                layout={this.props.layout}
+            />
         );
     }
 }
