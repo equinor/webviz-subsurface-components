@@ -21,8 +21,16 @@ export function DefaultRightPanel(props: Props): JSX.Element {
             }}
         >
             <WellLogAxesPanel header="Primary scale" parent={parent} />
-            <WellLogInfoPanel header="Readout" parent={parent} />
-            <WellLogZoomSlider label="Zoom:" parent={parent} />
+            <WellLogInfoPanel
+                header="Readout"
+                parent={parent}
+                readoutOptions={parent.props.readoutOptions}
+            />
+            <WellLogZoomSlider
+                label="Zoom:"
+                parent={parent}
+                max={parent.props.options?.maxContentZoom}
+            />
         </div>
     );
 }

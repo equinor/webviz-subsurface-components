@@ -6,10 +6,7 @@ import WellLogViewer from "../WellLogViewer";
 
 import { LogViewer } from "@equinor/videx-wellog";
 
-export interface Props {
-    parent: WellLogViewer;
-    center?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
-
+export interface ViewerLayout {
     header?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     left?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     right?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
@@ -18,22 +15,24 @@ export interface Props {
     footer?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
 }
 
-interface State {
-    center: JSX.Element | null;
+export interface Props {
+    parent: WellLogViewer;
 
-    header: JSX.Element | null;
-    left: JSX.Element | null;
-    right: JSX.Element | null;
-    top: JSX.Element | null;
-    bottom: JSX.Element | null;
-    footer: JSX.Element | null;
+    center?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
+
+    layout?: ViewerLayout;
+}
+
+import DefaultRightPanel from "./DefaultRightPanel";
+function defaultRightPanel(parent: WellLogViewer) {
+    return <DefaultRightPanel parent={parent} />;
 }
 
 const styleHeaderFooter = { flex: "0", width: "100%" };
 const styleTopBottom = { flex: "0" };
 const styleLeftRight = { flex: "0", height: "100%" };
 
-class WellLogLayout extends Component<Props, State> {
+class WellLogLayout extends Component<Props> {
     controller: WellLogController | null;
 
     onInfoCallbacks: ((
@@ -86,17 +85,6 @@ class WellLogLayout extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = {
-            center: this.createPanel(this.props.center),
-
-            header: this.createPanel(this.props.header),
-            left: this.createPanel(this.props.left),
-            right: this.createPanel(this.props.right),
-            top: this.createPanel(this.props.top),
-            bottom: this.createPanel(this.props.bottom),
-            footer: this.createPanel(this.props.footer),
-        };
-
         this.controller = null;
 
         this.onInfoCallbacks = [];
@@ -124,32 +112,6 @@ class WellLogLayout extends Component<Props, State> {
         this.onContentRescales.length = 0;
         this.onContentSelections.length = 0;
         */
-    }
-
-    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
-        if (this.props.header !== prevProps.header)
-            this.setState({ header: this.createPanel(this.props.header) });
-        if (this.props.left !== prevProps.left)
-            this.setState({ left: this.createPanel(this.props.left) });
-        if (this.props.right !== prevProps.right)
-            this.setState({ right: this.createPanel(this.props.right) });
-        if (this.props.top !== prevProps.top)
-            this.setState({ top: this.createPanel(this.props.top) });
-        if (this.props.bottom !== prevProps.bottom)
-            this.setState({ bottom: this.createPanel(this.props.bottom) });
-        if (this.props.footer !== prevProps.footer)
-            this.setState({ footer: this.createPanel(this.props.footer) });
-
-        if (
-            this.props.parent.props.readoutOptions &&
-            (!prevProps.parent.props.readoutOptions ||
-                this.props.parent.props.readoutOptions.allTracks !==
-                    prevProps.parent.props.readoutOptions.allTracks ||
-                this.props.parent.props.readoutOptions.grouping !==
-                    prevProps.parent.props.readoutOptions.grouping)
-        ) {
-            this.updateReadoutPanel();
-        }
     }
 
     updateReadoutPanel(): void {
@@ -197,6 +159,32 @@ class WellLogLayout extends Component<Props, State> {
     }
 
     render(): JSX.Element {
+        const center = this.createPanel(this.props.center);
+
+        let header: JSX.Element | null;
+        let left: JSX.Element | null;
+        let right: JSX.Element | null;
+        let top: JSX.Element | null;
+        let bottom: JSX.Element | null;
+        let footer: JSX.Element | null;
+        const layout = this.props.layout;
+        if (!layout) {
+            // use default layout with default right panel
+            header = null;
+            left = null;
+            right = this.createPanel(defaultRightPanel);
+            top = null;
+            bottom = null;
+            footer = null;
+        } else {
+            header = this.createPanel(layout.header);
+            left = this.createPanel(layout.left);
+            right = this.createPanel(layout.right);
+            top = this.createPanel(layout.top);
+            bottom = this.createPanel(layout.bottom);
+            footer = this.createPanel(layout.footer);
+        }
+
         return (
             <div
                 style={{
@@ -206,9 +194,7 @@ class WellLogLayout extends Component<Props, State> {
                     flexDirection: "column",
                 }}
             >
-                {this.state.header && (
-                    <div style={styleHeaderFooter}>{this.state.header}</div>
-                )}
+                {header && <div style={styleHeaderFooter}>{header}</div>}
                 <div
                     style={{
                         flex: "1",
@@ -218,9 +204,7 @@ class WellLogLayout extends Component<Props, State> {
                         flexDirection: "row",
                     }}
                 >
-                    {this.state.left && (
-                        <div style={styleLeftRight}>{this.state.left}</div>
-                    )}
+                    {left && <div style={styleLeftRight}>{left}</div>}
                     <div
                         style={{
                             flex: "1",
@@ -230,23 +214,13 @@ class WellLogLayout extends Component<Props, State> {
                             flexDirection: "column",
                         }}
                     >
-                        {this.state.top && (
-                            <div style={styleTopBottom}>{this.state.top}</div>
-                        )}
-                        {this.state.center /* The main view component */}
-                        {this.state.bottom && (
-                            <div style={styleTopBottom}>
-                                {this.state.bottom}
-                            </div>
-                        )}
+                        {top && <div style={styleTopBottom}>{top}</div>}
+                        {center /* The main view component */}
+                        {bottom && <div style={styleTopBottom}>{bottom}</div>}
                     </div>
-                    {this.state.right && (
-                        <div style={styleLeftRight}>{this.state.right}</div>
-                    )}
+                    {right && <div style={styleLeftRight}>{right}</div>}
                 </div>
-                {this.state.footer && (
-                    <div style={styleHeaderFooter}>{this.state.footer}</div>
-                )}
+                {footer && <div style={styleHeaderFooter}>{footer}</div>}
             </div>
         );
     }

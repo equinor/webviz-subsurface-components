@@ -21,15 +21,19 @@ import { LogViewer } from "@equinor/videx-wellog";
 
 import { InfoOptions } from "./components/InfoTypes";
 
-export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
-    readoutOptions?: InfoOptions; // options for readout
-
+export interface ViewerLayout {
     header?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     left?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     right?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     top?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     bottom?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
     footer?: JSX.Element | ((parent: WellLogViewer) => JSX.Element);
+}
+
+export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
+    readoutOptions?: InfoOptions; // options for readout
+
+    layout?: ViewerLayout;
 
     // callbacks
     onContentRescale?: () => void;
@@ -58,20 +62,16 @@ export const argTypesWellLogViewerProp = {
 
 interface State {
     primaryAxis: string; // for WellLogView
+}
 
-    header: JSX.Element | null;
-    left: JSX.Element | null;
-    right: JSX.Element | null;
-    top: JSX.Element | null;
-    bottom: JSX.Element | null;
-    footer: JSX.Element | null;
+function defaultRightPanel(parent: WellLogViewer) {
+    return <DefaultRightPanel parent={parent} />;
 }
 
 class WellLogViewer extends Component<WellLogViewerProps, State> {
     public static propTypes: Record<string, unknown>;
 
     controller: WellLogController | null;
-    defaultRight?: JSX.Element | ((parent: WellLogViewer) => JSX.Element); // default panet if props.right not given (props.right===undefined)
 
     onInfoCallbacks: ((
         x: number,
@@ -123,21 +123,8 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     constructor(props: WellLogViewerProps) {
         super(props);
 
-        this.defaultRight = (parent) => <DefaultRightPanel parent={parent} />;
-
         this.state = {
             primaryAxis: this.getDefaultPrimaryAxis(), //"md"
-
-            header: this.createPanel(this.props.header),
-            left: this.createPanel(this.props.left),
-            right: this.createPanel(
-                this.props.right === undefined
-                    ? this.defaultRight
-                    : this.props.right
-            ),
-            top: this.createPanel(this.props.top),
-            bottom: this.createPanel(this.props.bottom),
-            footer: this.createPanel(this.props.footer),
         };
 
         this.controller = null;
@@ -184,25 +171,6 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     componentDidUpdate(
         prevProps: WellLogViewerProps /*, prevState: State*/
     ): void {
-        if (this.props.header !== prevProps.header)
-            this.setState({ header: this.createPanel(this.props.header) });
-        if (this.props.left !== prevProps.left)
-            this.setState({ left: this.createPanel(this.props.left) });
-        if (this.props.right !== prevProps.right)
-            this.setState({
-                right: this.createPanel(
-                    this.props.right === undefined
-                        ? this.defaultRight
-                        : this.props.right
-                ),
-            });
-        if (this.props.top !== prevProps.top)
-            this.setState({ top: this.createPanel(this.props.top) });
-        if (this.props.bottom !== prevProps.bottom)
-            this.setState({ bottom: this.createPanel(this.props.bottom) });
-        if (this.props.footer !== prevProps.footer)
-            this.setState({ footer: this.createPanel(this.props.footer) });
-
         if (
             this.props.welllog !== prevProps.welllog ||
             this.props.template !== prevProps.template ||
@@ -293,6 +261,30 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     }
 
     render(): JSX.Element {
+        let header: JSX.Element | null;
+        let left: JSX.Element | null;
+        let right: JSX.Element | null;
+        let top: JSX.Element | null;
+        let bottom: JSX.Element | null;
+        let footer: JSX.Element | null;
+        const layout = this.props.layout;
+        if (!layout) {
+            // use default layout with default right panel
+            header = null;
+            left = null;
+            right = this.createPanel(defaultRightPanel);
+            top = null;
+            bottom = null;
+            footer = null;
+        } else {
+            header = this.createPanel(layout.header);
+            left = this.createPanel(layout.left);
+            right = this.createPanel(layout.right);
+            top = this.createPanel(layout.top);
+            bottom = this.createPanel(layout.bottom);
+            footer = this.createPanel(layout.footer);
+        }
+
         return (
             <div
                 style={{
@@ -302,10 +294,8 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                     flexDirection: "column",
                 }}
             >
-                {this.state.header && (
-                    <div style={{ flex: "0", width: "100%" }}>
-                        {this.state.header}
-                    </div>
+                {header && (
+                    <div style={{ flex: "0", width: "100%" }}>{header}</div>
                 )}
                 <div
                     style={{
@@ -316,10 +306,8 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                         flexDirection: "row",
                     }}
                 >
-                    {this.state.left && (
-                        <div style={{ flex: "0", height: "100%" }}>
-                            {this.state.left}
-                        </div>
+                    {left && (
+                        <div style={{ flex: "0", height: "100%" }}>{left}</div>
                     )}
                     <div
                         style={{
@@ -330,9 +318,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                             flexDirection: "column",
                         }}
                     >
-                        {this.state.top && (
-                            <div style={{ flex: "0" }}>{this.state.top}</div>
-                        )}
+                        {top && <div style={{ flex: "0" }}>{top}</div>}
                         <WellLogViewWithScroller
                             welllog={this.props.welllog}
                             template={this.props.template}
@@ -351,20 +337,14 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                             onContentSelection={this.onContentSelection}
                             onTemplateChanged={this.onTemplateChanged}
                         />
-                        {this.state.bottom && (
-                            <div style={{ flex: "0" }}>{this.state.bottom}</div>
-                        )}
+                        {bottom && <div style={{ flex: "0" }}>{bottom}</div>}
                     </div>
-                    {this.state.right && (
-                        <div style={{ flex: "0", height: "100%" }}>
-                            {this.state.right}
-                        </div>
+                    {right && (
+                        <div style={{ flex: "0", height: "100%" }}>{right}</div>
                     )}
                 </div>
-                {this.state.footer && (
-                    <div style={{ flex: "0", width: "100%" }}>
-                        {this.state.footer}
-                    </div>
+                {footer && (
+                    <div style={{ flex: "0", width: "100%" }}>{footer}</div>
                 )}
             </div>
         );

@@ -7,6 +7,8 @@ import ZoomSlider from "./ZoomSlider";
 interface Props {
     parent: WellLogViewer;
     label?: string;
+
+    max?: number;
 }
 
 interface State {
@@ -70,7 +72,7 @@ export class WellLogZoomSlider extends Component<Props, State> {
                 >
                     <ZoomSlider
                         value={this.state.zoomValue}
-                        max={this.props.parent.props.options?.maxContentZoom}
+                        max={this.props.max}
                         onChange={this.onZoomSliderChange}
                     />
                 </span>

@@ -150,8 +150,9 @@ Horizontal.args = {
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
 
-    left: (parent) => <DefaultRightPanel parent={parent} />,
-    right: null, // remove default right panel
+    layout: {
+        left: (parent) => <DefaultRightPanel parent={parent} />,
+    },
 };
 Horizontal.parameters = {
     docs: {
@@ -173,17 +174,29 @@ Discrete.args = {
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
 
-    header: (parent) => (
-        <div style={{ paddingBottom: "5px" }}>
-            <WellLogScaleSelector label="Scale value:" parent={parent} />
-        </div>
-    ),
-    right: (parent) => (
-        <div style={{ width: "255px" }}>
-            <WellLogInfoPanel header="Readout" parent={parent} />
-        </div>
-    ),
-    bottom: (parent) => <WellLogZoomSlider label="Zoom:" parent={parent} />,
+    layout: {
+        header: (parent) => (
+            <div style={{ paddingBottom: "5px" }}>
+                <WellLogScaleSelector label="Scale value:" parent={parent} />
+            </div>
+        ),
+        right: (parent) => (
+            <div style={{ width: "255px" }}>
+                <WellLogInfoPanel
+                    header="Readout"
+                    parent={parent}
+                    readoutOptions={parent.props.readoutOptions}
+                />
+            </div>
+        ),
+        bottom: (parent) => (
+            <WellLogZoomSlider
+                label="Zoom:"
+                parent={parent}
+                max={parent.props.options?.maxContentZoom}
+            />
+        ),
+    },
 };
 Discrete.parameters = {
     docs: {

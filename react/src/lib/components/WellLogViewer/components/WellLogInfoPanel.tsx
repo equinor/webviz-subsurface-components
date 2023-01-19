@@ -5,13 +5,15 @@ import { LogViewer } from "@equinor/videx-wellog";
 import WellLogViewer from "../WellLogViewer";
 
 import InfoPanel from "./InfoPanel";
-import { Info } from "./InfoTypes";
+import { Info, InfoOptions } from "./InfoTypes";
 
 import { fillInfos } from "../utils/fill-info";
 
 interface Props {
     parent: WellLogViewer;
     header?: string;
+
+    readoutOptions?: InfoOptions; // options for readout
 }
 
 interface State {
@@ -32,7 +34,20 @@ export class WellLogInfoPanel extends Component<Props, State> {
         this.props.parent.registerCallback("onInfo", this.onInfo);
     }
     componentWillUnmount(): void {
-        this.props.parent.registerCallback("onInfo", this.onInfo);
+        this.props.parent.unregisterCallback("onInfo", this.onInfo);
+    }
+
+    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
+        if (
+            this.props.readoutOptions &&
+            (!prevProps.readoutOptions ||
+                this.props.readoutOptions.allTracks !==
+                    prevProps.readoutOptions.allTracks ||
+                this.props.readoutOptions.grouping !==
+                    prevProps.readoutOptions.grouping)
+        ) {
+            this.props.parent.updateReadoutPanel(); // force onInfo callback to be called
+        }
     }
 
     // callback function from WellLogView
@@ -49,7 +64,7 @@ export class WellLogInfoPanel extends Component<Props, State> {
                 iFrom,
                 iTo,
                 this.collapsedTrackIds,
-                this.props.parent.props.readoutOptions
+                this.props.readoutOptions
             ),
         });
     }

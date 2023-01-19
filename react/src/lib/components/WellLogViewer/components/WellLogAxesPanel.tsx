@@ -6,6 +6,8 @@ import AxisSelector from "./AxisSelector";
 
 import { getAvailableAxes } from "../utils/tracks";
 
+import { WellLog } from "./WellLogTypes";
+
 interface Props {
     parent: WellLogViewer;
     header?: string;
@@ -17,13 +19,15 @@ interface State {
 }
 
 export class WellLogAxesPanel extends Component<Props, State> {
+    welllog: WellLog | undefined;
+    axisMnemos: Record<string, string[]>;
+
     constructor(props: Props) {
         super(props);
 
-        const axes = getAvailableAxes(
-            this.props.parent.props.welllog,
-            this.props.parent.props.axisMnemos
-        );
+        this.welllog = this.props.parent.props.welllog;
+        this.axisMnemos = this.props.parent.props.axisMnemos;
+        const axes = getAvailableAxes(this.welllog, this.axisMnemos);
 
         this.state = {
             axes: axes, //["md", "tvd"]
@@ -45,17 +49,14 @@ export class WellLogAxesPanel extends Component<Props, State> {
         );
     }
 
-    componentDidUpdate(prevProps: Props): void {
+    componentDidUpdate(/*prevProps: Props*/): void {
         if (
-            this.props.parent.props.welllog !==
-                prevProps.parent.props.welllog ||
-            this.props.parent.props.axisMnemos !==
-                prevProps.parent.props.axisMnemos
+            this.welllog !== this.props.parent.props.welllog ||
+            this.axisMnemos !== this.props.parent.props.axisMnemos
         ) {
-            const axes = getAvailableAxes(
-                this.props.parent.props.welllog,
-                this.props.parent.props.axisMnemos
-            );
+            this.welllog = this.props.parent.props.welllog;
+            this.axisMnemos = this.props.parent.props.axisMnemos;
+            const axes = getAvailableAxes(this.welllog, this.axisMnemos);
             this.setState({
                 axes: axes,
             });
