@@ -6,10 +6,10 @@ import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { axisTitles, axisMnemos } from "./utils/axes";
 import { colorTables } from "@emerson-eps/color-tables";
-
+import { ColorTable } from "./components/ColorTableTypes";
+const exampleColorTable = colorTables as unknown as ColorTable[]; // equivalent types, should be merged
 const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
 const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
-const exampleColorTables = colorTables;
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -33,7 +33,7 @@ describe("Sync Log Viewer", () => {
                 axisMnemos={axisMnemos}
                 welllogs={[exampleWellLog]} // the same log for all wellog viewers
                 templates={[exampleTemplate]} // the same template for all wellog viewers
-                colorTables={[exampleColorTables]} // the same colortables for all wellog viewers
+                colorTables={exampleColorTable} // the same colortables for all wellog viewers
             />
         );
         expect(container.firstChild).toMatchSnapshot();

@@ -2,6 +2,9 @@ import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import { colorTables } from "@emerson-eps/color-tables";
+//import { ColorTable } from "./components/ColorTableTypes";
+const exampleColorTable = colorTables /*as unknown as ColorTable[]*/; // equivalent types, should be merged
+const wellpickColorTable = require("../../../demo/example-data/wellpick_colors.json"),
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +
@@ -307,24 +310,24 @@ Default.args = {
         require("../../../demo/example-data/synclog_template.json"),
         require("../../../demo/example-data/synclog_template.json"),
     ],
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     wellpicks: [
         {
             wellpick: require("../../../demo/example-data/wellpicks.json")[0],
             name: "HORIZON",
-            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            colorTables: wellpickColorTable,
             color: "Stratigraphy",
         },
         {
             wellpick: require("../../../demo/example-data/wellpicks.json")[1],
             name: "HORIZON",
-            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            colorTables: wellpickColorTable,
             color: "Stratigraphy",
         },
         {
             wellpick: require("../../../demo/example-data/wellpicks.json")[0],
             name: "HORIZON",
-            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            colorTables: wellpickColorTable,
             color: "Stratigraphy",
         },
     ],

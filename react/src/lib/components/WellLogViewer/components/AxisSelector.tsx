@@ -33,7 +33,7 @@ export function AxisSelector(props: Props): JSX.Element {
                 {props.axes.map((axis) => {
                     return createItem(
                         props,
-                        props.axisLabels ? props.axisLabels[axis] : axis,
+                        props.axisLabels?.[axis] || axis,
                         axis
                     );
                 })}

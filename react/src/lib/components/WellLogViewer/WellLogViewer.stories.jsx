@@ -2,6 +2,9 @@ import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import { argTypesWellLogViewerProp } from "./WellLogViewer";
 import { colorTables } from "@emerson-eps/color-tables";
+//import { ColorTable } from "./components/ColorTableTypes";
+const exampleColorTable = colorTables /*as unknown as ColorTable[]*/; // equivalent types, should be merged
+
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
@@ -104,7 +107,7 @@ const Template = (args) => {
 const wellpick = {
     wellpick: require("../../../demo/example-data/wellpicks.json")[0],
     name: "HORIZON",
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     color: "Stratigraphy",
 };
 
@@ -120,7 +123,7 @@ Default.args = {
     horizontal: false,
     welllog: require("../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../demo/example-data/welllog_template_1.json"),
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     wellpick: wellpick,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
@@ -142,7 +145,7 @@ Horizontal.args = {
     welllog:
         require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     wellpick: wellpick,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
@@ -165,7 +168,7 @@ Discrete.args = {
     horizontal: false,
     welllog: require("../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     wellpick: wellpick,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
