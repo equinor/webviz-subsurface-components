@@ -70,7 +70,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         outline: true,
         logRadius: 10,
         logCurves: true,
-        refine: true,
+        refine: false,
         visible: true,
         wellNameVisible: false,
         wellNameAtTop: false,
@@ -78,6 +78,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         wellNameColor: [0, 0, 0, 255],
         selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
         depthTest: true,
+        isZDepth: true,
     },
     FaultPolygonsLayer: {
         "@@type": "FaultPolygonsLayer",
@@ -103,6 +104,7 @@ export const layersDefaultProps: Record<string, unknown> = {
         name: "Axes",
         id: "axes-layer",
         visible: true,
+        isZDepth: false,
     },
     Axes2DLayer: {
         "@@type": "Axes2DLayer",
@@ -157,5 +159,6 @@ export const layersDefaultProps: Record<string, unknown> = {
         colorMapName: "",
         propertyValueRange: [0.0, 1.0],
         depthTest: true,
+        isZDepth: true,
     },
 };

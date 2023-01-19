@@ -31,7 +31,7 @@ import {
     PropertyDataType,
     createPropertyData,
 } from "../utils/layerTools";
-import { splineRefine, GetBoundingBox } from "./utils/spline";
+import { splineRefine, invertPath, GetBoundingBox } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
@@ -100,6 +100,10 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     wellNameColor: Color;
     isLog: boolean;
     depthTest: boolean;
+    /**  If true means that input z values are interpreted as depths.
+     * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
+     */
+    isZDepth: boolean;
 }
 
 export interface LogCurveDataType {
@@ -297,10 +301,14 @@ export default class WellsLayer extends CompositeLayer<
             return [];
         }
 
+        let data = this.props.data as unknown as FeatureCollection;
+        if (!this.props.isZDepth) {
+            data = invertPath(data);
+        }
         const refine = this.props.refine;
-        const data = refine
-            ? splineRefine(this.props.data as unknown as FeatureCollection) // smooth well paths.
-            : (this.props.data as unknown as FeatureCollection);
+        data = refine
+            ? splineRefine(data) // smooth well paths.
+            : data;
 
         const is3d = this.context.viewport.constructor === OrbitViewport;
         const positionFormat = "XYZ";

@@ -36,6 +36,12 @@ function GetBBox(
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
+function FlipZ(points: number[]): void {
+    for (let i = 0; i < points.length / 3; i++) {
+        points[3 * i + 2] *= -1;
+    }
+}
+
 async function load_data(
     pointsUrl: string,
     polysUrl: string,
@@ -57,38 +63,49 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
     polysUrl: string;
     propertiesUrl: string;
 
-    // Name of color map. E.g "PORO"
+    /**  Name of color map. E.g "PORO"
+     */
     colorMapName: string;
 
-    // Use color map in this range.
+    /**  Use color map in this range.
+     */
     colorMapRange?: [number, number];
 
-    // Clamp colormap to this color at ends.
-    // Given as array of three values (r,g,b) e.g: [255, 0, 0]
-    // If not set or set to true, it will clamp to color map min and max values.
-    // If set to false the clamp color will be completely transparent.
+    /** Clamp colormap to this color at ends.
+     *   Given as array of three values (r,g,b) e.g: [255, 0, 0]
+     *   If not set or set to true, it will clamp to color map min and max values.
+     *   If set to false the clamp color will be completely transparent.
+     */
     colorMapClampColor: Color | undefined | boolean;
 
-    // Optional function property.
-    // If defined this function will override the color map.
-    // Takes a value in the range [0,1] and returns a color.
-    // E.g. (x) => [x * 255, x * 255, x * 255]
+    /**  Optional function property.
+     * If defined this function will override the color map.
+     * Takes a value in the range [0,1] and returns a color.
+     * E.g. (x) => [x * 255, x * 255, x * 255]
+     */
     colorMapFunction?: colorMapFunctionType | false;
 
-    // Surface material properties.
-    // material: true  = default material, coloring depends on surface orientation and lighting.
-    //           false = no material,  coloring is independent on surface orientation and lighting.
-    //           or full spec:
-    //      material: {
-    //           ambient: 0.35,
-    //           diffuse: 0.6,
-    //           shininess: 32,
-    //           specularColor: [255, 255, 255],
-    //       }
+    /** Surface material properties.
+     * material: true  = default material, coloring depends on surface orientation and lighting.
+     *           false = no material,  coloring is independent on surface orientation and lighting.
+     *           or full spec:
+     *      material: {
+     *           ambient: 0.35,
+     *           diffuse: 0.6,
+     *           shininess: 32,
+     *           specularColor: [255, 255, 255],
+     *       }
+     */
     material: Material;
 
-    // Enable/disable depth testing when rendering layer. Default true.
+    /** Enable/disable depth testing when rendering layer. Default true.
+     */
     depthTest: boolean;
+
+    /** If true means that input z values are interpreted as depths.
+     *   For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
+     */
+    isZDepth: boolean;
 }
 
 export default class Grid3DLayer extends CompositeLayer<
@@ -102,6 +119,10 @@ export default class Grid3DLayer extends CompositeLayer<
         );
 
         p.then(([points, polys, properties]) => {
+            if (!this.props.isZDepth) {
+                FlipZ(points);
+            }
+
             const bbox = GetBBox(points);
 
             // Using inline web worker for calculating the triangle mesh from
