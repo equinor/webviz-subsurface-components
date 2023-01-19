@@ -18,6 +18,14 @@ export interface NorthArrow3DLayerProps<D> extends ExtendedLayerProps<D> {
     color: Color;
 }
 
+const defaultProps = {
+    "@@type": "NorthArrow3DLayer",
+    name: "NorthArrow3D",
+    id: "north-arrow-layer",
+    visible: true,
+    color: [0, 0, 0, 1],
+};
+
 export default class NorthArrow3DLayer extends Layer<
     NorthArrow3DLayerProps<unknown>
 > {
@@ -117,6 +125,9 @@ export default class NorthArrow3DLayer extends Layer<
         };
     }
 }
+
+NorthArrow3DLayer.layerName = "NorthArrow3DLayer";
+NorthArrow3DLayer.defaultProps = defaultProps;
 
 //-- Local functions. --------------------------------------
 

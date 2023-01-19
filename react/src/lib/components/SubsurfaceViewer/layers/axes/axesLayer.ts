@@ -9,7 +9,6 @@ import {
 } from "@deck.gl/core/typed";
 import BoxLayer from "./boxLayer";
 import { Position3D, ExtendedLayerProps } from "../utils/layerTools";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { TextLayer } from "@deck.gl/layers/typed";
 
 export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
@@ -19,6 +18,13 @@ export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     fontFamily?: string;
     axisColor?: Color;
 }
+
+const defaultProps = {
+    "@@type": "AxesLayer",
+    name: "Axes",
+    id: "axes-layer",
+    visible: true,
+};
 
 type TextLayerData = {
     label: string;
@@ -175,9 +181,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
 }
 
 AxesLayer.layerName = "AxesLayer";
-AxesLayer.defaultProps = layersDefaultProps[
-    "AxesLayer"
-] as AxesLayerProps<unknown>;
+AxesLayer.defaultProps = defaultProps;
 
 //-- Local functions. -------------------------------------------------
 

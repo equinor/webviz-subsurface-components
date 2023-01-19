@@ -4,7 +4,6 @@ import { PickingInfo, Texture } from "@deck.gl/core/typed";
 import { decoder } from "../shader_modules";
 import { decodeRGB, ValueDecoder } from "../utils/propertyMapTools";
 import { getModelMatrix } from "../utils/layerTools";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { LayerPickInfo } from "../../layers/utils/layerTools";
 
 import fsHillshading from "./hillshading2d.fs.glsl";

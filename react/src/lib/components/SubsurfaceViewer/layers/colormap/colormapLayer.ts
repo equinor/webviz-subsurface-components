@@ -7,7 +7,6 @@ import { LayerPickInfo } from "../../layers/utils/layerTools";
 import { decoder } from "../shader_modules";
 import { decodeRGB, ValueDecoder } from "../utils/propertyMapTools";
 import { getModelMatrix, colorMapFunctionType } from "../utils/layerTools";
-import { layersDefaultProps } from "../layersDefaultProps";
 import fsColormap from "./colormap.fs.glsl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { colorTablesArray } from "@emerson-eps/color-tables/";

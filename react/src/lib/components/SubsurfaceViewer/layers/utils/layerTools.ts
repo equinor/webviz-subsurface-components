@@ -104,14 +104,14 @@ export function applyPropsOnLayers(
     return result;
 }
 
-export function getLayersWithDefaultProps(
-    layers: Record<string, unknown>[]
-): Record<string, unknown>[] {
-    return applyPropsOnLayers(
-        Object.values(layersDefaultProps) as Record<string, unknown>[],
-        layers
-    );
-}
+// export function getLayersWithDefaultProps(
+//     layers: Record<string, unknown>[]
+// ): Record<string, unknown>[] {
+//     return applyPropsOnLayers(
+//         Object.values(layersDefaultProps) as Record<string, unknown>[],
+//         layers
+//     );
+// }
 
 export function getLayersInViewport(
     layers: Record<string, unknown>[] | LayersList,

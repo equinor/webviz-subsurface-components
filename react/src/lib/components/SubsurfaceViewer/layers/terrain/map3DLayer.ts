@@ -5,7 +5,6 @@ import TerrainMapLayer, {
     Material,
 } from "./terrainMapLayer";
 import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
