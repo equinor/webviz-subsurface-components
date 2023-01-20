@@ -1,6 +1,5 @@
 import { CompositeLayer, PickingInfo, LayersList } from "@deck.gl/core/typed";
 import { FeatureCollection } from "@nebula.gl/edit-modes";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { SelectionLayer } from "@nebula.gl/layers";
 import { GeoJsonLayer } from "@deck.gl/layers/typed";
 import { ExtendedLayerProps } from "../utils/layerTools";
@@ -19,6 +18,21 @@ export interface BoxSelectionLayerProps<D> extends ExtendedLayerProps<D> {
     wellHeadStyle: WellHeadStyleAccessor;
     handleSelection: (pickingInfos: PickInfo[]) => void;
 }
+
+const defaultProps = {
+    "@@type": "BoxSelectionLayer",
+    name: "boxSelection",
+    id: "boxSelection-layer",
+    pickable: true,
+    visible: true,
+
+    // Props used to get/set data in the box selection layer.
+    selectedFeatureIndexes: [] as number[],
+    data: {
+        type: "FeatureCollection",
+        features: [],
+    },
+};
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -114,6 +128,5 @@ export default class BoxSelectionLayer extends CompositeLayer<
 }
 
 BoxSelectionLayer.layerName = "BoxSelectionLayer";
-BoxSelectionLayer.defaultProps = layersDefaultProps[
-    "BoxSelectionLayer"
-] as BoxSelectionLayerProps<FeatureCollection>;
+BoxSelectionLayer.defaultProps =
+    defaultProps as unknown as BoxSelectionLayerProps<FeatureCollection>;

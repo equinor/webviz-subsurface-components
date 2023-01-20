@@ -9,7 +9,6 @@ import {
 } from "@deck.gl/core/typed";
 import BoxLayer from "./boxLayer";
 import { Position3D, ExtendedLayerProps } from "../utils/layerTools";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { TextLayer } from "@deck.gl/layers/typed";
 import { cloneDeep } from "lodash";
 
@@ -24,6 +23,14 @@ export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
      */
     isZDepth: boolean;
 }
+
+const defaultProps = {
+    "@@type": "AxesLayer",
+    name: "Axes",
+    id: "axes-layer",
+    visible: true,
+    isZDepth: false,
+};
 
 type TextLayerData = {
     label: string;
@@ -192,9 +199,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
 }
 
 AxesLayer.layerName = "AxesLayer";
-AxesLayer.defaultProps = layersDefaultProps[
-    "AxesLayer"
-] as AxesLayerProps<unknown>;
+AxesLayer.defaultProps = defaultProps;
 
 //-- Local functions. -------------------------------------------------
 
