@@ -480,32 +480,61 @@ const MultiColorSelectorTemplate = (args: any) => {
 
     const layers = [
         {
-            ...args.wellLayers[0],
-            colorMappingFunction: createColorMapFunction(getColorName),
-            logColor: getColorName ? getColorName : wellLayers[0].logColor,
-            isLog: isLog,
-        },
-        {
             ...meshMapLayerFloat32,
             colorMapName: colorName,
             colorMapRange:
                 colorRange && isAuto == false ? colorRange : [min, max],
             colorMapFunction: colorMapFunc(),
         },
+        {
+            ...args.wellLayers[0],
+            colorMappingFunction: createColorMapFunction(getColorName),
+            logColor: getColorName ? getColorName : wellLayers[0].logColor,
+            isLog: isLog,
+            depthTest: false,
+        },
     ];
     return (
-        <>
-            <div className={useStyles().colorSelector}>
-                <div style={{ marginTop: 50, height: 70 }}>
-                    <ColorLegend
+        // <>
+        //     <div className={useStyles().colorSelector}>
+        //         <div style={{ marginTop: 50, height: 70 }}>
+        //             <ColorLegend
+        //                 {...args}
+        //                 getScale={wellLayerData}
+        //                 getInterpolateMethod={getInterpolateMethod}
+        //                 dataObjectName={"WellLogColorSelector"}
+        //             />
+        //         </div>
+        //         <div style={{ marginTop: 50, height: 70 }}>
+        //             <ColorLegend
+        //                 min={min}
+        //                 max={max}
+        //                 colorNameFromSelector={colorNameFromSelector}
+        //                 getColorRange={userDefinedRange}
+        //                 getInterpolateMethod={getMapLayerInterpolateMethod}
+        //                 getBreakpointValue={userDefinedBreakPoint}
+        //                 horizontal={true}
+        //                 numberOfTicks={2}
+        //                 dataObjectName={"MapLayerColorSelector"}
+        //             />
+        //         </div>
+        //     </div>
+
+        //     <div className={useStyles().main}>
+        //         <DeckGLMap {...args} layers={layers} />
+        //     </div>
+        // </>
+        <DeckGLMap {...args} layers={layers}>
+        {
+            <View id="view_1">
+               <ColorLegend
                         {...args}
                         getScale={wellLayerData}
                         getInterpolateMethod={getInterpolateMethod}
                         dataObjectName={"WellLogColorSelector"}
+                        cssLegendStyle={{ top: 50, left: 0, position: "absolute"}}
                     />
-                </div>
-                <div style={{ marginTop: 50, height: 70 }}>
-                    <ColorLegend
+                <ColorLegend
                         min={min}
                         max={max}
                         colorNameFromSelector={colorNameFromSelector}
@@ -516,13 +545,9 @@ const MultiColorSelectorTemplate = (args: any) => {
                         numberOfTicks={2}
                         dataObjectName={"MapLayerColorSelector"}
                     />
-                </div>
-            </div>
-
-            <div className={useStyles().main}>
-                <DeckGLMap {...args} layers={layers} />
-            </div>
-        </>
+            </View>
+}
+    </DeckGLMap>
     );
 };
 
