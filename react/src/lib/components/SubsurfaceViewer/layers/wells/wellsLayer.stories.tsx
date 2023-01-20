@@ -571,7 +571,7 @@ const wellLayerTemplate = (args: any) => {
                     getInterpolateMethod={getInterpolateMethod}
                 />
             </div>
-            <DeckGLMap {...args} layers={layers} />
+            <SubsurfaceViewer {...args} layers={layers} />
         </div>
     );
 };
