@@ -33,7 +33,6 @@ import {
 } from "../utils/layerTools";
 import { splineRefine, invertPath, GetBoundingBox } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
 import {
     ContinuousLegendDataType,
@@ -105,6 +104,29 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
      */
     isZDepth: boolean;
 }
+
+const defaultProps = {
+    "@@type": "WellsLayer",
+    name: "Wells",
+    id: "wells-layer",
+    autoHighlight: true,
+    opacity: 1,
+    lineWidthScale: 1,
+    pointRadiusScale: 1,
+    lineStyle: { dash: false },
+    outline: true,
+    logRadius: 10,
+    logCurves: true,
+    refine: false,
+    visible: true,
+    wellNameVisible: false,
+    wellNameAtTop: false,
+    wellNameSize: 14,
+    wellNameColor: [0, 0, 0, 255],
+    selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
+    depthTest: true,
+    isZDepth: true,
+};
 
 export interface LogCurveDataType {
     header: {
@@ -640,7 +662,7 @@ export default class WellsLayer extends CompositeLayer<
 
 WellsLayer.layerName = "WellsLayer";
 WellsLayer.defaultProps = {
-    ...(layersDefaultProps["WellsLayer"] as WellsLayerProps<FeatureCollection>),
+    ...defaultProps,
     onDataLoad: (data, context): void => onDataLoad(data, context),
 };
 

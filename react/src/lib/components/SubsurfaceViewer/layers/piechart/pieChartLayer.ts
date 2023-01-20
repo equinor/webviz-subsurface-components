@@ -12,7 +12,6 @@ import {
     createPropertyData,
 } from "../utils/layerTools";
 import { ExtendedLayerProps } from "../utils/layerTools";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { Vector2 } from "@math.gl/core";
 import vertexShader from "./vertex.glsl";
 import fragmentShader from "./fragment.glsl";
@@ -40,6 +39,16 @@ export interface PieChartLayerProps<D> extends ExtendedLayerProps<D> {
     // Enable/disable depth testing when rendering layer. Default true.
     depthTest: boolean;
 }
+
+const defaultProps = {
+    "@@type": "PieChartLayer",
+    name: "Pie chart",
+    id: "pie-layer",
+    pickable: true,
+    visible: true,
+    selectedPie: "@@editedData.selectedPie", // used to get data from deckgl layer
+    depthTest: true,
+};
 
 export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
     initializeState(): void {
@@ -234,6 +243,4 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
 }
 
 PieChartLayer.layerName = "PieChartLayer";
-PieChartLayer.defaultProps = layersDefaultProps[
-    "PieChartLayer"
-] as PieChartLayerProps<PiesData>;
+PieChartLayer.defaultProps = defaultProps;
