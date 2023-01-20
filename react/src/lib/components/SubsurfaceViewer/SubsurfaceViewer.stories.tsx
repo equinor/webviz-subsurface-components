@@ -360,31 +360,6 @@ const wellLayers = [
     },
 ];
 
-// prop for legend
-const wellLayerMin = 0;
-const wellLayerMax = 0.35;
-const dataObjectName = "ZONELOG";
-const position = [16, 10];
-const horizontal = true;
-const discreteData = {
-    Above_BCU: [[], 0],
-    ABOVE: [[], 1],
-    H12: [[], 2],
-    H11: [[], 3],
-    H10: [[], 4],
-    H9: [[], 5],
-    H8: [[], 6],
-    H7: [[], 7],
-    H6: [[], 8],
-    H5: [[], 9],
-    H4: [[], 10],
-    H3: [[], 11],
-    H2: [[], 12],
-    H1: [[], 13],
-    BELOW: [[], 14],
-};
-
-const reverseRange = false;
 const meshMapLayerFloat32 = {
     "@@type": "MapLayer",
     id: "mesh-layer",
@@ -405,18 +380,22 @@ const meshMapLayerFloat32 = {
 
 //eslint-disable-next-line
 const MultiColorSelectorTemplate = (args: any) => {
-    const [getColorName, setColorName] = React.useState("Stratigraphy");
+    const [wellLogColorName, setWellLogColorName] = React.useState("Stratigraphy");
     const [isLog, setIsLog] = React.useState(false);
-    const wellLayerData = React.useCallback((data) => {
-        setColorName(data.name ? data.name : data.legendColorName);
-    }, []);
+    const wellLayerData = React.useCallback(
+        (data) => {
+            console.log(data);
+            setWellLogColorName(data.name ? data.name : data.legendColorName);
+        },
+        [wellLogColorName]
+    );
 
     // interpolation method
     const getInterpolateMethod = React.useCallback((data) => {
         setIsLog(data.isLog);
     }, []);
 
-    const [colorName, setColorName1] = React.useState("Tableau10");
+    const [mapLayerColorName, setMapLayerColorName1] = React.useState("Physics");
     const [colorRange, setRange] = React.useState();
     const [isAuto, setAuto] = React.useState();
     const [breakPoints, setBreakPoint] = React.useState();
@@ -430,7 +409,7 @@ const MultiColorSelectorTemplate = (args: any) => {
 
     // Get color name from color selector
     const colorNameFromSelector = React.useCallback((data) => {
-        setColorName1(data);
+        setMapLayerColorName1(data);
     }, []);
 
     // user defined range
@@ -448,28 +427,30 @@ const MultiColorSelectorTemplate = (args: any) => {
     // color map function
     const colorMapFunc = React.useCallback(() => {
         return createColorMapFunction(
-            colorName,
+            mapLayerColorName,
             isMapLayerLog,
             isNearest,
             breakPoints
         );
-    }, [colorName, isMapLayerLog, isNearest, breakPoints]);
+    }, [mapLayerColorName, isMapLayerLog, isNearest, breakPoints]);
 
-    const min = 100;
-    const max = 1000;
+    const min = -3071;
+    const max = 41048;
 
     const layers = [
         {
             ...meshMapLayerFloat32,
-            colorMapName: colorName,
+            colorMapName: mapLayerColorName,
             colorMapRange:
                 colorRange && isAuto == false ? colorRange : [min, max],
             colorMapFunction: colorMapFunc(),
         },
         {
             ...args.wellLayers[0],
-            colorMappingFunction: createColorMapFunction(getColorName),
-            logColor: getColorName ? getColorName : wellLayers[0].logColor,
+            colorMappingFunction: createColorMapFunction(wellLogColorName),
+            logColor: wellLogColorName
+                ? wellLogColorName
+                : wellLayers[0].logColor,
             isLog: isLog,
             depthTest: false,
         },
@@ -484,10 +465,12 @@ const MultiColorSelectorTemplate = (args: any) => {
                         getInterpolateMethod={getInterpolateMethod}
                         dataObjectName={"WellLogColorSelector"}
                         cssLegendStyles={{ top: 50, left: 0 }}
+                        colorName={wellLogColorName}
                     />
                     <ColorLegend
+                        {...args}
                         min={min}
-                        max={max}
+                        max={41048}
                         colorNameFromSelector={colorNameFromSelector}
                         getColorRange={userDefinedRange}
                         getInterpolateMethod={getMapLayerInterpolateMethod}
@@ -496,6 +479,7 @@ const MultiColorSelectorTemplate = (args: any) => {
                         numberOfTicks={2}
                         dataObjectName={"MapLayerColorSelector"}
                         cssLegendStyles={{ top: 90, left: 0 }}
+                        colorName={mapLayerColorName}
                     />
                 </View>
             }
@@ -506,12 +490,31 @@ const MultiColorSelectorTemplate = (args: any) => {
 //eslint-disable-next-line
 export const MultiColorSelector: any = MultiColorSelectorTemplate.bind({});
 
+// prop for legend
+const discreteData = {
+    Above_BCU: [[], 0],
+    ABOVE: [[], 1],
+    H12: [[], 2],
+    H11: [[], 3],
+    H10: [[], 4],
+    H9: [[], 5],
+    H8: [[], 6],
+    H7: [[], 7],
+    H6: [[], 8],
+    H5: [[], 9],
+    H4: [[], 10],
+    H3: [[], 11],
+    H2: [[], 12],
+    H1: [[], 13],
+    BELOW: [[], 14],
+};
+
 MultiColorSelector.args = {
-    wellLayerMin,
-    wellLayerMax,
-    dataObjectName,
-    position,
-    horizontal,
+    wellLayerMin: 0,
+    wellLayerMax: 0.35,
+    dataObjectName: "ZONELOG",
+    position: [16, 10],
+    horizontal: true,
     colorTables,
     discreteData,
     ...defaultProps,
@@ -520,7 +523,7 @@ MultiColorSelector.args = {
     legend: {
         visible: false,
     },
-    reverseRange,
+    reverseRange: false,
     views: {
         layout: [1, 1],
         showLabel: true,
