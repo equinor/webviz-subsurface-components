@@ -380,7 +380,8 @@ const meshMapLayerFloat32 = {
 
 //eslint-disable-next-line
 const MultiColorSelectorTemplate = (args: any) => {
-    const [wellLogColorName, setWellLogColorName] = React.useState("Stratigraphy");
+    const [wellLogColorName, setWellLogColorName] =
+        React.useState("Stratigraphy");
     const [isLog, setIsLog] = React.useState(false);
     const wellLayerData = React.useCallback(
         (data) => {
@@ -395,7 +396,8 @@ const MultiColorSelectorTemplate = (args: any) => {
         setIsLog(data.isLog);
     }, []);
 
-    const [mapLayerColorName, setMapLayerColorName1] = React.useState("Physics");
+    const [mapLayerColorName, setMapLayerColorName1] =
+        React.useState("Physics");
     const [colorRange, setRange] = React.useState();
     const [isAuto, setAuto] = React.useState();
     const [breakPoints, setBreakPoint] = React.useState();
