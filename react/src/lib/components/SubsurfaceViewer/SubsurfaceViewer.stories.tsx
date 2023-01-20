@@ -20,7 +20,6 @@ import {
     ColorLegend,
     colorTables,
 } from "@emerson-eps/color-tables";
-import { makeStyles } from "@material-ui/core";
 
 export default {
     component: SubsurfaceViewer,
@@ -348,25 +347,6 @@ DepthTest.parameters = {
 };
 
 // Example using "Map" layer. Uses float32 float for mesh and properties.
-// colorselector for welllayer
-const useStyles = makeStyles({
-    main: {
-        height: 500,
-        border: "1px solid black",
-        position: "relative",
-    },
-    colorSelector: {
-        height: 20,
-        position: "absolute",
-    },
-    legend: {
-        width: 100,
-        position: "absolute",
-        top: "0",
-        right: "0",
-    },
-});
-
 const wellLayers = [
     {
         ...defaultProps.layers[0],
@@ -436,7 +416,7 @@ const MultiColorSelectorTemplate = (args: any) => {
         setIsLog(data.isLog);
     }, []);
 
-    const [colorName, setColorName1] = React.useState("GasWater");
+    const [colorName, setColorName1] = React.useState("Tableau10");
     const [colorRange, setRange] = React.useState();
     const [isAuto, setAuto] = React.useState();
     const [breakPoints, setBreakPoint] = React.useState();
@@ -495,46 +475,17 @@ const MultiColorSelectorTemplate = (args: any) => {
         },
     ];
     return (
-        // <>
-        //     <div className={useStyles().colorSelector}>
-        //         <div style={{ marginTop: 50, height: 70 }}>
-        //             <ColorLegend
-        //                 {...args}
-        //                 getScale={wellLayerData}
-        //                 getInterpolateMethod={getInterpolateMethod}
-        //                 dataObjectName={"WellLogColorSelector"}
-        //             />
-        //         </div>
-        //         <div style={{ marginTop: 50, height: 70 }}>
-        //             <ColorLegend
-        //                 min={min}
-        //                 max={max}
-        //                 colorNameFromSelector={colorNameFromSelector}
-        //                 getColorRange={userDefinedRange}
-        //                 getInterpolateMethod={getMapLayerInterpolateMethod}
-        //                 getBreakpointValue={userDefinedBreakPoint}
-        //                 horizontal={true}
-        //                 numberOfTicks={2}
-        //                 dataObjectName={"MapLayerColorSelector"}
-        //             />
-        //         </div>
-        //     </div>
-
-        //     <div className={useStyles().main}>
-        //         <DeckGLMap {...args} layers={layers} />
-        //     </div>
-        // </>
-        <DeckGLMap {...args} layers={layers}>
-        {
-            <View id="view_1">
-               <ColorLegend
+        <SubsurfaceViewer {...args} layers={layers}>
+            {
+                <View id="view_1">
+                    <ColorLegend
                         {...args}
                         getScale={wellLayerData}
                         getInterpolateMethod={getInterpolateMethod}
                         dataObjectName={"WellLogColorSelector"}
-                        cssLegendStyle={{ top: 50, left: 0, position: "absolute"}}
+                        cssLegendStyles={{ top: 50, left: 0 }}
                     />
-                <ColorLegend
+                    <ColorLegend
                         min={min}
                         max={max}
                         colorNameFromSelector={colorNameFromSelector}
@@ -544,10 +495,11 @@ const MultiColorSelectorTemplate = (args: any) => {
                         horizontal={true}
                         numberOfTicks={2}
                         dataObjectName={"MapLayerColorSelector"}
+                        cssLegendStyles={{ top: 90, left: 0 }}
                     />
-            </View>
-}
-    </DeckGLMap>
+                </View>
+            }
+        </SubsurfaceViewer>
     );
 };
 
