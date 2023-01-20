@@ -184,6 +184,7 @@ Discrete.args = {
                 <WellLogInfoPanel
                     header="Readout"
                     parent={parent}
+                    callbacksManager={parent.callbacksManager}
                     readoutOptions={parent.props.readoutOptions}
                 />
             </div>
@@ -192,6 +193,7 @@ Discrete.args = {
             <WellLogZoomSlider
                 label="Zoom:"
                 parent={parent}
+                callbacksManager={parent.callbacksManager}
                 max={parent.props.options?.maxContentZoom}
             />
         ),

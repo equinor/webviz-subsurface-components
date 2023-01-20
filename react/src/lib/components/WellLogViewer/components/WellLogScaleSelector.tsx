@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 
 import WellLogViewer from "../WellLogViewer";
+//import SyncLogViewer from "../SyncLogViewer";
 
 import ScaleSelector from "./ScaleSelector";
 
 interface Props {
-    parent: WellLogViewer;
+    parent: /*SyncLogViewer |*/ WellLogViewer;
     label?: string;
     values?: number[];
 }
@@ -23,13 +24,13 @@ export class WellLogScaleSelector extends Component<Props, State> {
 
         this.onScaleChange = this.onScaleChange.bind(this);
         this.onContentRescale = this.onContentRescale.bind(this);
-        this.props.parent.registerCallback(
+        this.props.parent.callbacksManager.registerCallback(
             "onContentRescale",
             this.onContentRescale
         );
     }
     componentWillUnmount(): void {
-        this.props.parent.unregisterCallback(
+        this.props.parent.callbacksManager.unregisterCallback(
             "onContentRescale",
             this.onContentRescale
         );
@@ -37,14 +38,14 @@ export class WellLogScaleSelector extends Component<Props, State> {
 
     // callback function from Vertical Scale combobox
     onScaleChange(value: number): void {
-        const controller = this.props.parent.controller;
+        const controller = this.props.parent.callbacksManager.controller;
         if (!controller) return;
         controller.setContentScale(value);
     }
 
     onContentRescale(): void {
         this.setState((state: Readonly<State>) => {
-            const controller = this.props.parent.controller;
+            const controller = this.props.parent.callbacksManager.controller;
             if (!controller) return null;
             const scale = controller.getContentScale();
             if (Math.abs(state.scale - scale) < 1) return null;

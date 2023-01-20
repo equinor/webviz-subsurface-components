@@ -15,15 +15,21 @@ export function defaultRightPanel(parent: WellLogViewer): JSX.Element {
                 width: "255px",
             }}
         >
-            <WellLogAxesPanel header="Primary scale" parent={parent} />
+            <WellLogAxesPanel
+                header="Primary scale"
+                parent={parent}
+                callbacksManager={parent.callbacksManager}
+            />
             <WellLogInfoPanel
                 header="Readout"
                 parent={parent}
+                callbacksManager={parent.callbacksManager}
                 readoutOptions={parent.props.readoutOptions}
             />
             <WellLogZoomSlider
                 label="Zoom:"
                 parent={parent}
+                callbacksManager={parent.callbacksManager}
                 max={parent.props.options?.maxContentZoom}
             />
         </div>

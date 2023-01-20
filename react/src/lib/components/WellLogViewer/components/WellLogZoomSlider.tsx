@@ -1,14 +1,18 @@
 import React, { Component } from "react";
 
 import WellLogViewer from "../WellLogViewer";
+import SyncLogViewer from "../SyncLogViewer";
+
+import { CallbackManager } from "./CallbackManager";
 
 import ZoomSlider from "./ZoomSlider";
 
 interface Props {
-    parent: WellLogViewer;
+    parent: SyncLogViewer | WellLogViewer;
     label?: string;
 
     max?: number;
+    callbacksManager: CallbackManager<SyncLogViewer | WellLogViewer>;
 }
 
 interface State {
@@ -25,13 +29,13 @@ export class WellLogZoomSlider extends Component<Props, State> {
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
 
-        this.props.parent.registerCallback(
+        this.props.callbacksManager.registerCallback(
             "onContentRescale",
             this.onContentRescale
         );
     }
     componentWillUnmount(): void {
-        this.props.parent.unregisterCallback(
+        this.props.callbacksManager.unregisterCallback(
             "onContentRescale",
             this.onContentRescale
         );
@@ -39,7 +43,7 @@ export class WellLogZoomSlider extends Component<Props, State> {
 
     onContentRescale(): void {
         this.setState((state: Readonly<State>) => {
-            const controller = this.props.parent.controller;
+            const controller = this.props.callbacksManager.controller;
             if (!controller) return null;
             const zoom = controller.getContentZoom();
             if (Math.abs(Math.log(state.zoomValue / zoom)) < 0.01) return null;
@@ -51,7 +55,7 @@ export class WellLogZoomSlider extends Component<Props, State> {
 
     // callback function from zoom slider
     onZoomSliderChange(zoom: number): void {
-        this.props.parent.controller?.zoomContent(zoom);
+        this.props.callbacksManager.controller?.zoomContent(zoom);
     }
 
     render(): JSX.Element {

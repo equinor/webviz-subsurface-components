@@ -1,8 +1,5 @@
 import React, { Component } from "react";
 
-//import WellLogViewer from "../WellLogViewer";
-
-
 export interface ViewerLayout<Parent> {
     header?: JSX.Element | ((parent: Parent) => JSX.Element);
     left?: JSX.Element | ((parent: Parent) => JSX.Element);
@@ -18,16 +15,15 @@ export interface Props<Parent> {
     center?: JSX.Element | ((parent: Parent) => JSX.Element);
 
     layout?: ViewerLayout<Parent>;
-}
 
-import { defaultRightPanel } from "./DefaultRightPanel";
+    defaultRightPanel?: JSX.Element | ((parent: Parent) => JSX.Element);
+}
 
 const styleHeaderFooter = { flex: "0", width: "100%" };
 const styleTopBottom = { flex: "0" };
 const styleLeftRight = { flex: "0", height: "100%" };
 
 export class WellLogLayout<Parent> extends Component<Props<Parent>> {
-
     constructor(props: Props<Parent>) {
         super(props);
     }
@@ -54,7 +50,7 @@ export class WellLogLayout<Parent> extends Component<Props<Parent>> {
             // use default layout with default right panel
             header = null;
             left = null;
-            right = null // this.createPanel(defaultRightPanel);
+            right = this.createPanel(this.props.defaultRightPanel);
             top = null;
             bottom = null;
             footer = null;
