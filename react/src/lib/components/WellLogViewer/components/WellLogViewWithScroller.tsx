@@ -37,10 +37,6 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
         this.setScrollerPosAndZoom();
     }
 
-    shouldComponentUpdate(nextProps: WellLogViewWithScrollerProps): boolean {
-        return !Object.is(this.props, nextProps);
-    }
-
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;

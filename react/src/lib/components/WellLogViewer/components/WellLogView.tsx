@@ -1167,11 +1167,6 @@ export function shouldUpdateWellLogView(
     // Props could contain some unknown object key:value so we should ignore they
     // so compare only known key:values
     if (props.horizontal !== nextProps.horizontal) return true;
-    if (props.options?.hideTrackTitle !== nextProps.options?.hideTrackTitle)
-        return true;
-    if (props.options?.hideTrackLegend !== nextProps.options?.hideTrackLegend)
-        return true;
-
     if (props.welllog !== nextProps.welllog) return true;
     if (props.template !== nextProps.template) return true;
     if (props.colorTables !== nextProps.colorTables) return true;
@@ -1179,7 +1174,15 @@ export function shouldUpdateWellLogView(
     if (props.primaryAxis !== nextProps.primaryAxis) return true;
     if (props.axisTitles !== nextProps.axisTitles) return true;
     if (props.axisMnemos !== nextProps.axisMnemos) return true;
+    if (props.viewTitle !== nextProps.viewTitle) return true;
 
+    if (!isEqualRanges(props.domain, nextProps.domain)) return true;
+    if (!isEqualRanges(props.selection, nextProps.selection)) return true;
+
+    if (props.options?.hideTrackTitle !== nextProps.options?.hideTrackTitle)
+        return true;
+    if (props.options?.hideTrackLegend !== nextProps.options?.hideTrackLegend)
+        return true;
     if (
         props.options?.maxVisibleTrackNum !==
         nextProps.options?.maxVisibleTrackNum
@@ -1187,9 +1190,6 @@ export function shouldUpdateWellLogView(
         return true;
     if (props.options?.maxContentZoom !== nextProps.options?.maxContentZoom)
         return true;
-
-    if (!isEqualRanges(props.domain, nextProps.domain)) return true;
-    if (!isEqualRanges(props.selection, nextProps.selection)) return true;
 
     if (
         props.options?.checkDatafileSchema !==
@@ -1207,8 +1207,6 @@ export function shouldUpdateWellLogView(
         nextProps.options?.wellpickPatternFill
     )
         return true;
-
-    if (props.viewTitle !== nextProps.viewTitle) return true;
 
     // callbacks
     // ignore all?
@@ -1251,6 +1249,8 @@ class WellLogView
     template: Template;
 
     scaleInterpolator: ScaleInterpolator | undefined;
+
+    _isMount: boolean;
 
     constructor(props: WellLogViewProps) {
         super(props);
@@ -1296,6 +1296,8 @@ class WellLogView
         if (this.props.onCreateController) this.props.onCreateController(this);
 
         this.setControllerZoom();
+
+        this._isMount = false;
     }
 
     componentDidMount(): void {
@@ -1303,6 +1305,12 @@ class WellLogView
 
         this.template = deepCopy(this.props.template); // save external template content to current
         this.setTracks(true);
+
+        this._isMount = true;
+    }
+
+    componentWillUnmount(): void {
+        this._isMount = false;
     }
 
     shouldComponentUpdate(
@@ -1697,19 +1705,21 @@ class WellLogView
     }
 
     scrollTrackBy(delta: number): void {
-        this.setState((state: Readonly<State>) => ({
-            scrollTrackPos: this._newTrackScrollPos(
-                state.scrollTrackPos + delta
-            ),
-        }));
+        if (this._isMount)
+            this.setState((state: Readonly<State>) => ({
+                scrollTrackPos: this._newTrackScrollPos(
+                    state.scrollTrackPos + delta
+                ),
+            }));
     }
 
     scrollTrackTo(pos: number): void {
-        this.setState((state: Readonly<State>) => {
-            const newPos = this._newTrackScrollPos(pos);
-            if (state.scrollTrackPos === newPos) return null;
-            return { scrollTrackPos: newPos };
-        });
+        if (this._isMount)
+            this.setState((state: Readonly<State>) => {
+                const newPos = this._newTrackScrollPos(pos);
+                if (state.scrollTrackPos === newPos) return null;
+                return { scrollTrackPos: newPos };
+            });
     }
     getTrackScrollPos(): number {
         return this.state.scrollTrackPos;

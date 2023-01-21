@@ -24,6 +24,7 @@ if (wells_layer) {
     */
     wells_layer.logName = "ZONE_MAIN"; //
     wells_layer.logColor = "Stratigraphy"; //"Stratigraphy";
+    wells_layer.depthTest = false;
 }
 
 export default {

@@ -110,10 +110,11 @@ const wellpick = {
     color: "Stratigraphy",
 };
 
-import { defaultRightPanel } from "./components/DefaultRightPanel";
+import { defaultRightPanel } from "./components/DefaultWellLogViewerRightPanel";
 import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogInfoPanel from "./components/WellLogInfoPanel";
 import WellLogScaleSelector from "./components/WellLogScaleSelector";
+//import WellLogAxesPanel from "./components/WellLogAxesPanel";
 
 export const Default = Template.bind({});
 Default.args = {
@@ -176,14 +177,16 @@ Discrete.args = {
     layout: {
         header: (parent) => (
             <div style={{ paddingBottom: "5px" }}>
-                <WellLogScaleSelector label="Scale value:" parent={parent} />
+                <WellLogScaleSelector
+                    label="Scale value:"
+                    callbacksManager={parent.callbacksManager}
+                />
             </div>
         ),
         right: (parent) => (
             <div style={{ width: "255px" }}>
                 <WellLogInfoPanel
                     header="Readout"
-                    parent={parent}
                     callbacksManager={parent.callbacksManager}
                     readoutOptions={parent.props.readoutOptions}
                 />
@@ -192,7 +195,6 @@ Discrete.args = {
         bottom: (parent) => (
             <WellLogZoomSlider
                 label="Zoom:"
-                parent={parent}
                 callbacksManager={parent.callbacksManager}
                 max={parent.props.options?.maxContentZoom}
             />

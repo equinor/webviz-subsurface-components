@@ -25,20 +25,18 @@ const template =
 
 import { ColorTable } from "./components/ColorTableTypes";
 
-import { WellLogController } from "./components/WellLogView";
-import { LogViewer } from "@equinor/videx-wellog";
-import { Info } from "./components/InfoTypes";
 import { MapMouseEvent } from "../SubsurfaceViewer/components/Map";
 
-import InfoPanel from "./components/InfoPanel";
+import WellLogInfoPanel from "./components/WellLogInfoPanel";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { axisTitles, axisMnemos } from "./utils/axes";
-import { fillInfos } from "./utils/fill-info";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 import { deepCopy } from "./utils/deepcopy";
 
 import { WellLogViewOptions } from "./components/WellLogView";
 import { isEqualRanges } from "./components/WellLogView";
+
+import { CallbackManager } from "./components/CallbackManager";
 
 function getTemplatePlotColorTable(
     template: Template,
@@ -70,8 +68,6 @@ interface Props extends SubsurfaceViewerProps {
 
 interface State {
     wellIndex: number | undefined;
-    infos: Info[];
-    controller?: WellLogController;
     editedData?: Record<string, unknown>;
 
     layers?: Record<string, unknown>[];
@@ -133,20 +129,25 @@ const wellpick = {
 
 export class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
+    callbacksManager: CallbackManager;
+
     constructor(props: Props, state: State) {
         super(props, state);
         this.state = {
             wellIndex: undefined,
-            infos: [],
             editedData: props.editedData,
             layers: props.layers,
         };
-        this.onInfo = this.onInfo.bind(this);
-        this.onCreateController = this.onCreateController.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
         this.onTrackScroll = this.onTrackScroll.bind(this);
 
-        this.onMouseEvent = this.onMouseEvent.bind(this);
+        this.onMapMouseEvent = this.onMapMouseEvent.bind(this);
+
+        this.callbacksManager = new CallbackManager(() => {
+            return this.state.wellIndex === undefined
+                ? undefined
+                : welllogs[this.state.wellIndex];
+        });
     }
     componentDidUpdate(prevProps: Props, prevState: State): void {
         if (this.props.editedData !== prevProps.editedData) {
@@ -154,7 +155,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             0;
         }
         if (!isEqualRanges(this.state.selection, prevState.selection)) {
-            const controller = this.state.controller;
+            const controller = this.callbacksManager.controller;
             if (controller && this.state.selection) {
                 controller.selectContent([
                     this.state.selection[0],
@@ -163,29 +164,14 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             }
         }
     }
-    onInfo(
-        x: number,
-        logController: LogViewer,
-        iFrom: number,
-        iTo: number
-    ): void {
-        const infos = fillInfos(
-            x,
-            logController,
-            iFrom,
-            iTo,
-            [] //this.collapsedTrackIds,
-            //this.props.readoutOptions
-        );
-
-        this.setState({ infos: infos });
+    componentWillUnmount(): void {
+        this.callbacksManager.unregisterAll();
     }
 
-    onCreateController(controller: WellLogController): void {
-        this.setState({ controller: controller });
-    }
     onContentSelection(): void {
-        const controller = this.state.controller;
+        this.callbacksManager.onContentSelection();
+
+        const controller = this.callbacksManager.controller;
         if (!controller) return;
         const selection = controller.getContentSelection();
 
@@ -198,7 +184,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
         }
     }
     onTrackScroll(): void {
-        const controller = this.state.controller;
+        const controller = this.callbacksManager.controller;
         if (!controller) return;
         const iTrack = controller.getTrackScrollPos();
         if (iTrack >= 0) {
@@ -225,18 +211,20 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                         const layers = deepCopy(this.props.layers);
                         this.setState({ layers: layers });
 
+                        /*
                         // Force to rerender ColorLegend after
                         setTimeout(() => {
                             const layers = deepCopy(this.props.layers);
                             this.setState({ layers: layers });
                         }, 200);
+                        */
                     }
                 }
             }
         }
     }
 
-    onMouseEvent(event: MapMouseEvent): void {
+    onMapMouseEvent(event: MapMouseEvent): void {
         if (event.wellname !== undefined) {
             if (event.type == "click") {
                 const iWell = findWellLogIndex(welllogs, event.wellname);
@@ -275,7 +263,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                     };
                 });
 
-                const controller = this.state.controller;
+                const controller = this.callbacksManager.controller;
                 if (controller) {
                     const wellsLayer = findWellsLayer(event);
                     if (wellsLayer) {
@@ -354,7 +342,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <div
                     style={{
-                        height: "100%",
                         width: "70%",
                         position: "relative",
                     }}
@@ -364,7 +351,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             {...this.props}
                             layers={this.state.layers}
                             editedData={this.state.editedData}
-                            onMouseEvent={this.onMouseEvent}
+                            onMouseEvent={this.onMapMouseEvent}
                             selection={{
                                 well: wellName,
                                 selection: this.state.selection,
@@ -374,7 +361,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                 </div>
                 <div
                     style={{
-                        height: "85%",
                         width: "30%",
                         display: "flex",
                         flexDirection: "column",
@@ -382,8 +368,8 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                 >
                     <div
                         style={{
-                            flex: "1 1",
-                            height: "90%",
+                            flex: "1",
+                            height: "0%",
                             minWidth: "25px",
                             width: "100%",
                         }}
@@ -406,23 +392,18 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                                     this.props.checkDatafileSchema,
                                 maxVisibleTrackNum: 1,
                             }}
-                            onInfo={this.onInfo}
-                            onCreateController={this.onCreateController}
+                            onCreateController={
+                                this.callbacksManager.onCreateController
+                            }
+                            onInfo={this.callbacksManager.onInfo}
                             onContentSelection={this.onContentSelection}
                             onTrackScroll={this.onTrackScroll}
                         />
                     </div>
-                    <div
-                        style={{
-                            flex: "0 0",
-                            display: "flex",
-                            flexDirection: "column",
-                            height: "100%",
-                            width: "100%",
-                        }}
-                    >
-                        <InfoPanel header="Readout" infos={this.state.infos} />
-                    </div>
+                    <WellLogInfoPanel
+                        header="Readout"
+                        callbacksManager={this.callbacksManager}
+                    />
                 </div>
             </div>
         );

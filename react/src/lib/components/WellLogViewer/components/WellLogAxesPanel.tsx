@@ -1,8 +1,5 @@
 import React, { Component } from "react";
 
-import WellLogViewer from "../WellLogViewer";
-import SyncLogViewer from "../SyncLogViewer";
-
 import AxisSelector from "./AxisSelector";
 
 import { getAvailableAxes } from "../utils/tracks";
@@ -11,12 +8,23 @@ import { WellLog } from "./WellLogTypes";
 import { CallbackManager } from "./CallbackManager";
 
 interface Props {
-    parent: SyncLogViewer | WellLogViewer;
+    callbacksManager: CallbackManager;
+
     header?: string;
 
-    callbacksManager: CallbackManager<SyncLogViewer | WellLogViewer>;
-}
+    /**
+     * Log mnemonics for axes
+     */
+    axisTitles: Record<string, string>;
+    /**
+     * Names for axes
+     */
+    axisMnemos: Record<string, string[]>;
 
+    primaryAxis: string;
+
+    onChangePrimaryAxis: (value: string) => void;
+}
 interface State {
     axes: string[]; // axes available in welllog
     primaryAxis: string;
@@ -24,18 +32,16 @@ interface State {
 
 export class WellLogAxesPanel extends Component<Props, State> {
     welllog: WellLog | undefined;
-    axisMnemos: Record<string, string[]>;
 
     constructor(props: Props) {
         super(props);
 
         this.welllog = this.props.callbacksManager.welllog();
-        this.axisMnemos = this.props.parent.props.axisMnemos;
-        const axes = getAvailableAxes(this.welllog, this.axisMnemos);
+        const axes = getAvailableAxes(this.welllog, this.props.axisMnemos);
 
         this.state = {
-            axes: axes, //["md", "tvd"]
-            primaryAxis: this.props.parent.state.primaryAxis, //??
+            axes: axes,
+            primaryAxis: this.props.primaryAxis,
         };
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
@@ -53,15 +59,14 @@ export class WellLogAxesPanel extends Component<Props, State> {
         );
     }
 
-    componentDidUpdate(/*prevProps: Props*/): void {
+    componentDidUpdate(prevProps: Props): void {
         const wellog = this.props.callbacksManager.welllog();
         if (
             this.welllog !== wellog ||
-            this.axisMnemos !== this.props.parent.props.axisMnemos
+            prevProps.axisMnemos !== this.props.axisMnemos
         ) {
             this.welllog = wellog;
-            this.axisMnemos = this.props.parent.props.axisMnemos;
-            const axes = getAvailableAxes(this.welllog, this.axisMnemos);
+            const axes = getAvailableAxes(this.welllog, this.props.axisMnemos);
             this.setState({
                 axes: axes,
             });
@@ -78,9 +83,9 @@ export class WellLogAxesPanel extends Component<Props, State> {
                     header={this.props.header}
                     axes={this.state.axes}
                     axis={this.state.primaryAxis}
-                    axisLabels={this.props.parent.props.axisTitles}
+                    axisTitles={this.props.axisTitles}
                     onChange={(value: string) =>
-                        this.props.parent.setPrimaryAxis(value)
+                        this.props.onChangePrimaryAxis(value)
                     }
                 />
             </div>

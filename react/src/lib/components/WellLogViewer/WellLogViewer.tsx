@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import WellLogLayout, { ViewerLayout } from "./components/WellLogLayout";
-import { defaultRightPanel } from "./components/DefaultRightPanel";
+import { defaultRightPanel } from "./components/DefaultWellLogViewerRightPanel";
 
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
@@ -13,13 +13,10 @@ import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScr
 import { shouldUpdateWellLogView } from "./components/WellLogView";
 
 import { WellLogController } from "./components/WellLogView";
-import WellLogView from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
 
 import { onTrackMouseEvent } from "./utils/edit-track";
-
-import { LogViewer } from "@equinor/videx-wellog";
 
 import { CallbackManager } from "./components/CallbackManager";
 
@@ -62,9 +59,7 @@ interface State {
 class WellLogViewer extends Component<WellLogViewerProps, State> {
     public static propTypes: Record<string, unknown>;
 
-    collapsedTrackIds: (string | number)[];
-
-    callbacksManager: CallbackManager<WellLogViewer>;
+    callbacksManager: CallbackManager;
 
     constructor(props: WellLogViewerProps) {
         super(props);
@@ -73,16 +68,9 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
             primaryAxis: this.getDefaultPrimaryAxis(), //"md"
         };
 
-        this.collapsedTrackIds = [];
-
-        this.callbacksManager = new CallbackManager(
-            this,
-            () => this.props.welllog
-        );
+        this.callbacksManager = new CallbackManager(() => this.props.welllog);
 
         this.onCreateController = this.onCreateController.bind(this);
-
-        this.onInfo = this.onInfo.bind(this);
 
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
@@ -90,32 +78,18 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     }
 
     // callback function from WellLogView
-    onInfo(
-        x: number,
-        logController: LogViewer,
-        iFrom: number,
-        iTo: number
-    ): void {
-        for (const onInfo of this.callbacksManager.onInfoCallbacks)
-            onInfo(x, logController, iFrom, iTo);
-    }
-    // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
-        this.callbacksManager.controller = controller;
+        this.callbacksManager.onCreateController(controller);
         this.props.onCreateController?.(controller); // call callback to component's caller
     }
     // callback function from WellLogView
     onContentRescale(): void {
-        for (const onContentRescale of this.callbacksManager
-            .onContentRescaleCallbacks)
-            onContentRescale();
+        this.callbacksManager.onContentRescale();
         this.props.onContentRescale?.(); // call callback to component's caller
     }
     // callback function from WellLogView
     onContentSelection(): void {
-        for (const onContentSelection of this.callbacksManager
-            .onContentSelectionCallbacks)
-            onContentSelection();
+        this.callbacksManager.onContentSelection();
         this.props.onContentSelection?.(); // call callback to component's caller
     }
     onTemplateChanged(): void {
@@ -123,14 +97,11 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
     }
 
     onChangePrimaryAxis(value: string): void {
-        for (const onChangePrimaryAxis of this.callbacksManager
-            .onChangePrimaryAxisCallbacks)
-            onChangePrimaryAxis(value);
+        this.callbacksManager.onChangePrimaryAxis(value);
     }
 
     componentDidMount(): void {
         this.onContentRescale();
-        this.updateReadoutPanel();
     }
 
     componentWillUnmount(): void {
@@ -162,22 +133,6 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                 primaryAxis: this.getDefaultPrimaryAxis(),
             });
         }
-
-        if (
-            this.props.readoutOptions &&
-            (!prevProps.readoutOptions ||
-                this.props.readoutOptions.allTracks !==
-                    prevProps.readoutOptions.allTracks ||
-                this.props.readoutOptions.grouping !==
-                    prevProps.readoutOptions.grouping)
-        ) {
-            this.updateReadoutPanel();
-        }
-    }
-
-    updateReadoutPanel(): void {
-        const wellLogView = this.callbacksManager.controller as WellLogView;
-        if (wellLogView) wellLogView.setInfo(); // reflect new values
     }
 
     setPrimaryAxis(value: string): void {
@@ -219,7 +174,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
                         // callbacks
                         onTrackMouseEvent={onTrackMouseEvent}
                         onCreateController={this.onCreateController}
-                        onInfo={this.onInfo}
+                        onInfo={this.callbacksManager.onInfo}
                         onContentRescale={this.onContentRescale}
                         onContentSelection={this.onContentSelection}
                         onTemplateChanged={this.onTemplateChanged}

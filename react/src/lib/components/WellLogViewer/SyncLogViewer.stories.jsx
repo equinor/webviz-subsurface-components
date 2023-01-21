@@ -361,41 +361,43 @@ Default.args = {
     },
 };
 
-//import WellLogScaleSelector from "./components/WellLogScaleSelector";
+//import { defaultRightPanel } from "./components/DefaultSyncLogViewerRightPanel";
 import WellLogZoomSlider from "./components/WellLogZoomSlider";
-//import WellLogInfoPanel from "./components/WellLogInfoPanel";
+import WellLogInfoPanel from "./components/WellLogInfoPanel";
+import WellLogScaleSelector from "./components/WellLogScaleSelector";
 //import WellLogAxesPanel from "./components/WellLogAxesPanel";
 
 export const CustomLayout = Template.bind({});
 CustomLayout.args = {
     ...Default.args,
     id: "Well-Log-Viewer-Discrete",
+    readoutOptions: {
+        grouping: "by_track",
+    },
     layout: {
-        /*
-        header: (parent) => (
-            <div style={{ paddingBottom: "5px" }}>
-                <WellLogScaleSelector label="Scale value:" parent={parent} />
-            </div>
-        ),
-        */
-        /*
         right: (parent) => (
-            <div style={{ width: "255px" }}>
-                <WellLogInfoPanel
-                    header="Readout"
-                    parent={parent}
-                    callbacksManager={parent.callbacksManager}
-                    readoutOptions={parent.props.readoutOptions}
-                />
-            </div>
+            <>
+                <div style={{ paddingBottom: "5px" }}>
+                    <WellLogScaleSelector
+                        label="Scale value:"
+                        callbacksManager={parent.callbacksManagers[0]}
+                    />
+                </div>
+                <div style={{ width: "255px" }}>
+                    {parent.props.welllogs?.map((_welllog, index) => (
+                        <WellLogInfoPanel
+                            key={index}
+                            callbacksManager={parent.callbacksManagers[index]}
+                            readoutOptions={parent.props.readoutOptions}
+                        />
+                    ))}
+                </div>
+            </>
         ),
-        */
-        right: (parent) => parent.createRightPanel(),
         bottom: (parent) => (
             <WellLogZoomSlider
                 label="Zoom:"
-                parent={parent}
-                callbacksManager={parent.callbacksManager[0]}
+                callbacksManager={parent.callbacksManagers[0]}
                 max={parent.props.options?.maxContentZoom}
             />
         ),

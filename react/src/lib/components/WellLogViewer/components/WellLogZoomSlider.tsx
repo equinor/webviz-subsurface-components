@@ -1,20 +1,15 @@
 import React, { Component } from "react";
 
-import WellLogViewer from "../WellLogViewer";
-import SyncLogViewer from "../SyncLogViewer";
-
 import { CallbackManager } from "./CallbackManager";
 
 import ZoomSlider from "./ZoomSlider";
 
 interface Props {
-    parent: SyncLogViewer | WellLogViewer;
+    callbacksManager: CallbackManager;
+
     label?: string;
-
     max?: number;
-    callbacksManager: CallbackManager<SyncLogViewer | WellLogViewer>;
 }
-
 interface State {
     zoomValue: number; // value for zoom slider
 }

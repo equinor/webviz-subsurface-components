@@ -10,6 +10,7 @@ export function defaultRightPanel(parent: WellLogViewer): JSX.Element {
     return (
         <div
             style={{
+                display: "flex",
                 flexDirection: "column",
                 height: "100%",
                 width: "255px",
@@ -17,18 +18,19 @@ export function defaultRightPanel(parent: WellLogViewer): JSX.Element {
         >
             <WellLogAxesPanel
                 header="Primary scale"
-                parent={parent}
                 callbacksManager={parent.callbacksManager}
+                axisTitles={parent.props.axisTitles}
+                axisMnemos={parent.props.axisMnemos}
+                primaryAxis={parent.getPrimaryAxis()}
+                onChangePrimaryAxis={parent.onChangePrimaryAxis}
             />
             <WellLogInfoPanel
                 header="Readout"
-                parent={parent}
                 callbacksManager={parent.callbacksManager}
                 readoutOptions={parent.props.readoutOptions}
             />
             <WellLogZoomSlider
                 label="Zoom:"
-                parent={parent}
                 callbacksManager={parent.callbacksManager}
                 max={parent.props.options?.maxContentZoom}
             />

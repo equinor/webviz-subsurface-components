@@ -79,6 +79,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
     uid: number = count++; // generate some unique id prefix for pattern ids in SVGs
 
     defs: ReactNode;
+    _isMount: boolean;
 
     constructor(props: Props) {
         super(props);
@@ -86,10 +87,12 @@ class WellLogSpacer extends Component<Props /*, State*/> {
             this.props.options?.wellpickPatternFill &&
             this.props.patterns &&
             createDefs(this.uid, this.props.patternsTable);
+
+        this._isMount = false;
     }
 
     update(): void {
-        this.forceUpdate();
+        if (this._isMount) this.forceUpdate();
     }
 
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
@@ -109,7 +112,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
                 this.props.patterns &&
                 createDefs(this.uid, this.props.patternsTable);
 
-            this.forceUpdate(); // force to show pattern fill with new this.defs
+            this.update(); // force to show pattern fill with new this.defs
         }
     }
 
@@ -137,6 +140,13 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         }
 
         return false;
+    }
+
+    componentDidMount(): void {
+        this._isMount = true;
+    }
+    componentWillUnmount(): void {
+        this._isMount = false;
     }
 
     render(): JSX.Element {

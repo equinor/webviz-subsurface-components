@@ -11,7 +11,6 @@ interface Props {
 function createSeparator() {
     return (
         <tr key={"separator"}>
-            {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
             <td colSpan={4}>
                 {" "}
                 <hr />
@@ -47,12 +46,8 @@ class InfoPanel extends Component<Props> {
         this.createRow = this.createRow.bind(this);
     }
 
-    onRowClick(
-        trackId: string | number /*,
-        ev: React.MouseEvent<HTMLTableRowElement>*/
-    ): void {
-        if (!this.props.onGroupClick) return;
-        this.props.onGroupClick(trackId);
+    onRowClick(trackId: string | number): void {
+        this.props.onGroupClick?.(trackId);
     }
 
     createRow(info: Info): ReactNode {

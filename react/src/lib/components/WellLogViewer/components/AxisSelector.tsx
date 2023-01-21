@@ -6,7 +6,7 @@ interface Props {
 
     header?: string; // language dependent string
     axes: string[];
-    axisLabels: Record<string, string>; // language dependent strings
+    axisTitles: Record<string, string>; // language dependent strings
 }
 
 function createItem(props: Props, label: string, axis: string): JSX.Element {
@@ -33,7 +33,7 @@ export function AxisSelector(props: Props): JSX.Element {
                 {props.axes.map((axis) => {
                     return createItem(
                         props,
-                        props.axisLabels?.[axis] || axis,
+                        props.axisTitles?.[axis] || axis,
                         axis
                     );
                 })}

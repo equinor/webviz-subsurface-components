@@ -2,8 +2,6 @@ import React, { Component } from "react";
 
 import { LogViewer } from "@equinor/videx-wellog";
 
-import WellLogViewer from "../WellLogViewer";
-import SyncLogViewer from "../SyncLogViewer";
 import { CallbackManager } from "./CallbackManager";
 
 import InfoPanel from "./InfoPanel";
@@ -12,15 +10,15 @@ import { Info, InfoOptions } from "./InfoTypes";
 import { fillInfos } from "../utils/fill-info";
 
 interface Props {
-    parent: SyncLogViewer | WellLogViewer;
-    header?: string;
+    callbacksManager: CallbackManager;
 
-    callbacksManager: CallbackManager<SyncLogViewer | WellLogViewer>;
+    header?: string;
     readoutOptions?: InfoOptions; // options for readout
 }
-
 interface State {
     infos: Info[];
+
+    collapsedTrackIds: (string | number)[];
 }
 
 export class WellLogInfoPanel extends Component<Props, State> {
@@ -28,6 +26,7 @@ export class WellLogInfoPanel extends Component<Props, State> {
         super(props);
         this.state = {
             infos: [],
+            collapsedTrackIds: [],
         };
 
         this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
@@ -47,7 +46,7 @@ export class WellLogInfoPanel extends Component<Props, State> {
                 this.props.readoutOptions.grouping !==
                     prevProps.readoutOptions.grouping)
         ) {
-            this.props.parent.updateReadoutPanel(); // force onInfo callback to be called
+            this.props.callbacksManager.updateInfo(); // force onInfo callback to be called
         }
     }
 
@@ -64,18 +63,19 @@ export class WellLogInfoPanel extends Component<Props, State> {
                 logController,
                 iFrom,
                 iTo,
-                this.props.parent.collapsedTrackIds,
+                this.state.collapsedTrackIds,
                 this.props.readoutOptions
             ),
         });
     }
 
     onInfoGroupClick(trackId: string | number): void {
-        const i = this.props.parent.collapsedTrackIds.indexOf(trackId);
-        if (i < 0) this.props.parent.collapsedTrackIds.push(trackId);
-        else delete this.props.parent.collapsedTrackIds[i];
+        const collapsedTrackIds = this.state.collapsedTrackIds;
+        const i = collapsedTrackIds.indexOf(trackId);
+        if (i < 0) collapsedTrackIds.push(trackId);
+        else delete collapsedTrackIds[i];
 
-        this.props.parent.updateReadoutPanel(); // force to get onInfo call from WellLogView
+        this.props.callbacksManager.updateInfo(); // force to get onInfo call from WellLogView
     }
 
     render(): JSX.Element {
