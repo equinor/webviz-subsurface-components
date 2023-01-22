@@ -241,10 +241,7 @@ export const argTypesSyncLogViewerProp = {
 };
 
 interface State {
-    axes: string[]; // axes available in welllog
     primaryAxis: string;
-
-    sliderValue: number; // value for zoom slider
 }
 
 class SyncLogViewer extends Component<Props, State> {
@@ -275,27 +272,10 @@ class SyncLogViewer extends Component<Props, State> {
 
         this._isMount = false;
 
-        const _axes = this.props.welllogs?.map((welllog: WellLog) =>
-            getAvailableAxes(welllog, this.props.axisMnemos)
-        );
-        const axes = _axes?.[0];
-        let primaryAxis = axes?.[0];
-        if (this.props.templates) {
-            const template = this.props.templates[0];
-            if (template) {
-                template.scale.primary = "tvd"; //!!!!!
-                if (template.scale.primary && axes) {
-                    if (axes.indexOf(template.scale.primary) >= 0)
-                        primaryAxis = template.scale.primary;
-                }
-            }
-        }
-        if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
+        const primaryAxis = this.getDefaultPrimaryAxis();
+
         this.state = {
             primaryAxis: primaryAxis, //"md"
-            axes: axes, //["md", "tvd"]
-
-            sliderValue: 4.0, // zoom
         };
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
@@ -325,7 +305,6 @@ class SyncLogViewer extends Component<Props, State> {
         this.syncTrackScrollPos(0);
         this.syncContentScrollPos(0);
         this.syncContentSelection(0);
-        this.setSliderValue();
         this._isMount = true;
     }
 
@@ -340,32 +319,11 @@ class SyncLogViewer extends Component<Props, State> {
             this.props.welllogs !== prevProps.welllogs ||
             this.props.templates !== prevProps.templates ||
             this.props.axisMnemos !== prevProps.axisMnemos ||
-            this.props.primaryAxis !== prevProps.primaryAxis /*||
-            this.props.colorTables !== prevProps.colorTables*/
+            this.props.primaryAxis !== prevProps.primaryAxis
         ) {
-            const _axes = this.props.welllogs.map((welllog) =>
-                getAvailableAxes(welllog, this.props.axisMnemos)
-            );
-            const axes = _axes?.[0];
-            let primaryAxis = axes[0];
-            if (this.props.templates) {
-                const template = this.props.templates[0];
-                if (template) {
-                    template.scale.primary = "tvd"; //!!!!!
-                    if (template.scale.primary && axes) {
-                        if (axes.indexOf(template.scale.primary) < 0) {
-                            if (this.props.welllogs === prevProps.welllogs)
-                                return; // nothing to update
-                        } else {
-                            primaryAxis = template.scale.primary;
-                        }
-                    }
-                }
-            }
-            if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
+            const primaryAxis = this.getDefaultPrimaryAxis();
             this.setState({
                 primaryAxis: primaryAxis,
-                axes: axes,
             });
         }
 
@@ -397,6 +355,25 @@ class SyncLogViewer extends Component<Props, State> {
     getPrimaryAxis(): string {
         return this.state.primaryAxis;
     }
+    getDefaultPrimaryAxis(): string {
+        const _axes = this.props.welllogs?.map((welllog: WellLog) =>
+            getAvailableAxes(welllog, this.props.axisMnemos)
+        );
+        const axes = _axes?.[0];
+        let primaryAxis = axes?.[0];
+        if (this.props.templates) {
+            const template = this.props.templates[0];
+            if (template) {
+                template.scale.primary = "tvd"; //!!!!!
+                if (template.scale.primary && axes) {
+                    if (axes.indexOf(template.scale.primary) >= 0)
+                        primaryAxis = template.scale.primary;
+                }
+            }
+        }
+        if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
+        return primaryAxis;
+    }
 
     // callback function from WellLogView
     onCreateController(iView: number, controller: WellLogController): void {
@@ -425,7 +402,6 @@ class SyncLogViewer extends Component<Props, State> {
         this.syncContentScrollPos(iView);
         this.syncContentSelection(iView);
 
-        this.setSliderValue();
         this.props.onContentRescale?.(iView);
     }
     // callback function from WellLogView
@@ -437,6 +413,8 @@ class SyncLogViewer extends Component<Props, State> {
     }
     // callback function from WellLogView
     onTemplateChanged(iView: number): void {
+        this.callbacksManagers[iView].onTemplateChanged();
+
         this.syncTemplate(iView);
 
         this.props.onTemplateChanged?.(iView);
@@ -475,19 +453,6 @@ class SyncLogViewer extends Component<Props, State> {
             }
             if (this.props.syncTrackPos) _controller.scrollTrackTo(posTrack);
         }
-    }
-
-    // set zoom value to slider
-    setSliderValue(): void {
-        if (this._isMount)
-            this.setState((state: Readonly<State>) => {
-                const controller = this.callbacksManagers[0].controller;
-                if (!controller) return null;
-                const zoom = controller.getContentZoom();
-                if (Math.abs(Math.log(state.sliderValue / zoom)) < 0.01)
-                    return null;
-                return { sliderValue: zoom };
-            });
     }
 
     syncTrackScrollPos(iView: number): void {

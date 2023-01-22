@@ -75,6 +75,8 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
         this.onTemplateChanged = this.onTemplateChanged.bind(this);
+        
+        this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
     }
 
     // callback function from WellLogView
@@ -92,10 +94,12 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         this.callbacksManager.onContentSelection();
         this.props.onContentSelection?.(); // call callback to component's caller
     }
+    // callback function from WellLogView
     onTemplateChanged(): void {
+        this.callbacksManager.onTemplateChanged();
         this.props.onTemplateChanged?.(); // call callback to component's caller
     }
-
+    // callback function from Axis selector
     onChangePrimaryAxis(value: string): void {
         this.callbacksManager.onChangePrimaryAxis(value);
     }
@@ -135,10 +139,6 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         }
     }
 
-    setPrimaryAxis(value: string): void {
-        this.setState({ primaryAxis: value });
-        this.onChangePrimaryAxis(value);
-    }
     getPrimaryAxis(): string {
         return this.state.primaryAxis;
     }

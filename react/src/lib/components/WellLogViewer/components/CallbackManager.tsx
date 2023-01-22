@@ -16,6 +16,7 @@ export class CallbackManager {
     ) => void)[];
     onContentRescaleCallbacks: (() => void)[];
     onContentSelectionCallbacks: (() => void)[];
+    onTemplateChangedCallbacks: (() => void)[];
     onChangePrimaryAxisCallbacks: ((primaryAxis: string) => void)[];
 
     constructor(welllog: () => WellLog | undefined) {
@@ -25,6 +26,7 @@ export class CallbackManager {
         this.onInfoCallbacks = [];
         this.onContentRescaleCallbacks = [];
         this.onContentSelectionCallbacks = [];
+        this.onTemplateChangedCallbacks = [];
         this.onChangePrimaryAxisCallbacks = [];
 
         this.onCreateController = this.onCreateController.bind(this);
@@ -101,7 +103,11 @@ export class CallbackManager {
         for (const onContentSelection of this.onContentSelectionCallbacks)
             onContentSelection();
     }
-
+    // callback function from WellLogView
+    onTemplateChanged(): void {    
+        for (const onTemplateChanged of this.onTemplateChangedCallbacks)
+            onTemplateChanged();
+    }
     // callback function from Axis selector
     onChangePrimaryAxis(value: string): void {
         for (const onChangePrimaryAxis of this.onChangePrimaryAxisCallbacks)

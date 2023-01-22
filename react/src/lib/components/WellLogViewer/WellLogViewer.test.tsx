@@ -44,7 +44,7 @@ describe("Test Well Log Viewer Component", () => {
                     controller
                 }
                 onContentRescale={function (): void {
-                    throw new Error("Function not implemented.");
+                    //throw new Error("Function not implemented.");
                 }}
             />
         );
