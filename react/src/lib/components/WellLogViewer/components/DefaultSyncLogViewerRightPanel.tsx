@@ -29,16 +29,16 @@ export function defaultRightPanel(parent: SyncLogViewer): JSX.Element {
                 primaryAxis={parent.getPrimaryAxis()}
                 onChangePrimaryAxis={parent.onChangePrimaryAxis}
             />
-            {parent.props.welllogs?.map((_welllog: WellLog, index: number) => (
-                <WellLogInfoPanel
-                    key={index}
-                    header={
-                        "Readout " + parent.props.welllogs[index].header.well
-                    }
-                    callbacksManager={parent.callbacksManagers[index]}
-                    readoutOptions={parent.props.readoutOptions}
-                />
-            ))}
+            {parent.props.welllogs?.map(
+                (welllog: WellLog, iWellLog: number) => (
+                    <WellLogInfoPanel
+                        key={iWellLog}
+                        header={"Readout " + welllog.header.well}
+                        callbacksManager={parent.callbacksManagers[iWellLog]}
+                        readoutOptions={parent.props.readoutOptions}
+                    />
+                )
+            )}
             <WellLogZoomSlider
                 label="Zoom:"
                 callbacksManager={parent.callbacksManagers[0]}

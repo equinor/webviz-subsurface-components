@@ -146,20 +146,20 @@ const Template = (args) => {
     };
     const [controller, setController] = React.useState(null); // the first WellLog
     const onCreateController = React.useCallback(
-        (iView, controller) => {
-            if (iView === 0) setController(controller);
+        (iWellLog, controller) => {
+            if (iWellLog === 0) setController(controller);
         },
         [controller]
     );
     const onContentRescale = React.useCallback(
-        (iView) => {
-            if (iView === 0) setInfo(fillInfo(controller));
+        (iWellLog) => {
+            if (iWellLog === 0) setInfo(fillInfo(controller));
         },
         [controller]
     );
     const onContentSelection = React.useCallback(
-        (/*_iView*/) => {
-            /*if(iView===0)*/ setInfo(fillInfo(controller));
+        (/*iWellLog*/) => {
+            /*if(iWellLog===0)*/ setInfo(fillInfo(controller));
         },
         [controller]
     );
@@ -384,10 +384,12 @@ CustomLayout.args = {
                     />
                 </div>
                 <div style={{ width: "255px" }}>
-                    {parent.props.welllogs?.map((_welllog, index) => (
+                    {parent.props.welllogs?.map((_welllog, iWellLog) => (
                         <WellLogInfoPanel
-                            key={index}
-                            callbacksManager={parent.callbacksManagers[index]}
+                            key={iWellLog}
+                            callbacksManager={
+                                parent.callbacksManagers[iWellLog]
+                            }
                             readoutOptions={parent.props.readoutOptions}
                         />
                     ))}

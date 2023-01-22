@@ -99,7 +99,7 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         // called after render()!?
         if (this.props.onCreateSpacer !== prevProps.onCreateSpacer) {
             // update callback to component's caller
-            if (this.props.onCreateSpacer) this.props.onCreateSpacer(this);
+            this.props.onCreateSpacer?.(this);
         }
         if (
             this.props.patternsTable !== prevProps.patternsTable ||

@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 
 import { LogViewer } from "@equinor/videx-wellog";
+//import WellLogView from "./WellLogView";
+//import { isScaleTrack } from "../utils/tracks";
 
 import { CallbackManager } from "./CallbackManager";
 
@@ -17,19 +19,27 @@ interface Props {
 }
 interface State {
     infos: Info[];
+}
 
-    collapsedTrackIds: (string | number)[];
+function toggleId(
+    trackIds: (string | number)[],
+    trackId: string | number
+): void {
+    const i = trackIds.indexOf(trackId);
+    if (i < 0) trackIds.push(trackId);
+    else trackIds.splice(i, 1);
 }
 
 export class WellLogInfoPanel extends Component<Props, State> {
-    onGroupClick: (trackId: string | number) => void;
+    onGroupClick: (info: Info) => void;
+    collapsedTrackIds: (string | number)[];
 
     constructor(props: Props) {
         super(props);
         this.state = {
             infos: [],
-            collapsedTrackIds: [],
         };
+        this.collapsedTrackIds = [];
 
         this.onInfo = this.onInfo.bind(this);
         this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
@@ -76,24 +86,41 @@ export class WellLogInfoPanel extends Component<Props, State> {
         iFrom: number,
         iTo: number
     ): void {
-        this.setState({
-            infos: fillInfos(
-                x,
-                logController,
-                iFrom,
-                iTo,
-                this.state.collapsedTrackIds,
-                this.props.readoutOptions
-            ),
-        });
+        const infos = fillInfos(
+            x,
+            logController,
+            iFrom,
+            iTo,
+            this.collapsedTrackIds,
+            this.props.readoutOptions
+        );
+        this.setState({ infos: infos });
     }
 
-    onInfoGroupClick(trackId: string | number): void {
-        const collapsedTrackIds = this.state.collapsedTrackIds;
-        const i = collapsedTrackIds.indexOf(trackId);
-        if (i < 0) collapsedTrackIds.push(trackId);
-        else delete collapsedTrackIds[i];
-
+    onInfoGroupClick(info: Info): void {
+        const collapsedTrackIds = this.collapsedTrackIds;
+        /* 
+        const controller = this.props.callbacksManager.controller;
+        if (controller) { // info.trackId could be for another controller so map iTrack to trackid for the curent controller
+            const wellLogView = controller as WellLogView;
+            const logController = wellLogView.logController;
+            const tracks = logController?.tracks;
+            if (tracks) {
+                let iTrack = 0;
+                for (const track of tracks) {
+                    if (isScaleTrack(track)) continue;
+                    if (info.iTrack == iTrack) {
+                        toggleId(collapsedTrackIds, track.id);
+                        break;
+                    }
+                    iTrack++;
+                }
+            }
+        }
+        else*/ {
+            // old code
+            toggleId(collapsedTrackIds, info.trackId);
+        }
         this.props.callbacksManager.updateInfo(); // force to get onInfo call from WellLogView
     }
 

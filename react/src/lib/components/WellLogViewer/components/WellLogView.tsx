@@ -1293,7 +1293,7 @@ class WellLogView
         this.onTrackMouseEvent = this.onTrackMouseEvent.bind(this);
 
         // set callback to component's caller
-        if (this.props.onCreateController) this.props.onCreateController(this);
+        this.props.onCreateController?.(this);
 
         this.setControllerZoom();
 
@@ -1328,8 +1328,7 @@ class WellLogView
         // Typical usage (don't forget to compare props):
         if (this.props.onCreateController !== prevProps.onCreateController) {
             // update callback to component's caller
-            if (this.props.onCreateController)
-                this.props.onCreateController(this);
+            this.props.onCreateController?.(this);
         }
 
         let selectedTrackIndices: number[] = []; // Indices to restore
@@ -1529,10 +1528,10 @@ class WellLogView
         const iTo = iFrom + this._maxVisibleTrackNum();
         if (this.logController) scrollTracksTo(this.logController, iFrom, iTo);
 
-        if (this.props.onTrackScroll) this.props.onTrackScroll();
+        this.props.onTrackScroll?.();
     }
     onTrackSelection(): void {
-        if (this.props.onTrackSelection) this.props.onTrackSelection();
+        this.props.onTrackSelection?.();
     }
 
     setInfo(x: number = Number.NaN): void {
@@ -1554,12 +1553,11 @@ class WellLogView
 
     onContentSelection(): void {
         this.showSelection();
-        if (this.props.onContentSelection) this.props.onContentSelection();
+        this.props.onContentSelection?.();
     }
 
     onTrackMouseEvent(ev: TrackMouseEvent): void {
-        if (this.props.onTrackMouseEvent)
-            this.props.onTrackMouseEvent(this, ev);
+        this.props.onTrackMouseEvent?.(this, ev);
     }
 
     onTemplateChanged(): void {
@@ -1567,7 +1565,7 @@ class WellLogView
 
         this.template = this._generateTemplate(); // save current template
 
-        if (this.props.onTemplateChanged) this.props.onTemplateChanged();
+        this.props.onTemplateChanged?.();
     }
 
     // content

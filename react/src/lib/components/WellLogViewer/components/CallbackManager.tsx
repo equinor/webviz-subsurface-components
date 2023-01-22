@@ -46,6 +46,7 @@ export class CallbackManager {
         this.onInfoCallbacks.length = 0;
         this.onContentRescaleCallbacks.length = 0;
         this.onContentSelectionCallbacks.length = 0;
+        this.onTemplateChangedCallbacks.length = 0;
         this.onChangePrimaryAxisCallbacks.length = 0;
         */
         for (const key in this) {
@@ -154,7 +155,7 @@ export class CallbackManager {
 
     updateInfo(): void {
         const wellLogView = this.controller as WellLogView;
-        if (wellLogView) wellLogView.setInfo(); // reflect new values
+        wellLogView?.setInfo(); // reflect new values
     }
 }
 

@@ -89,8 +89,7 @@ class Scroller extends Component<Props> {
         const elOuter = this.scroller;
         if (!elOuter) return;
         // notify parent
-        if (this.props.onScroll)
-            this.props.onScroll(this.getScrollX(), this.getScrollY());
+        this.props.onScroll?.(this.getScrollX(), this.getScrollY());
     }
 
     /* functions to externally set zoom and scroll position */
