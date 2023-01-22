@@ -22,7 +22,6 @@ import {
     ViewMode,
 } from "@nebula.gl/edit-modes";
 import { EditableGeoJsonLayer } from "@nebula.gl/layers";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { DeckGLLayerContext } from "../../components/Map";
 import { area, length } from "../../utils/measurement";
 
@@ -102,6 +101,22 @@ export interface DrawingLayerProps<D> extends ExtendedLayerProps<D> {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
 }
+
+const defaultProps = {
+    "@@type": "DrawingLayer",
+    name: "Drawing",
+    id: "drawing-layer",
+    pickable: true,
+    visible: true,
+    mode: "drawLineString",
+
+    // Props used to get/set data in the drawing layer.
+    selectedFeatureIndexes: [] as number[],
+    data: {
+        type: "FeatureCollection",
+        features: [],
+    },
+};
 
 // Composite layer that contains an EditableGeoJsonLayer from nebula.gl
 // See https://nebula.gl/docs/api-reference/layers/editable-geojson-layer
@@ -237,6 +252,5 @@ export default class DrawingLayer extends CompositeLayer<
 }
 
 DrawingLayer.layerName = "DrawingLayer";
-DrawingLayer.defaultProps = layersDefaultProps[
-    "DrawingLayer"
-] as DrawingLayerProps<FeatureCollection>;
+DrawingLayer.defaultProps =
+    defaultProps as unknown as DrawingLayerProps<FeatureCollection>;

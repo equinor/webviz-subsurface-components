@@ -2,13 +2,13 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React, { FormEvent } from "react";
-import { Wrapper } from "../../test/TestWrapper";
+import { EmptyWrapper } from "../../test/TestWrapper";
 import SliderInput from "./SliderInput";
 
 describe("Test Slider Input", () => {
     it("snapshot test", () => {
         const { container } = render(
-            Wrapper({
+            EmptyWrapper({
                 children: (
                     <SliderInput
                         label="Opacity"

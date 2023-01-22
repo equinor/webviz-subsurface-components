@@ -1,7 +1,6 @@
 import { COORDINATE_SYSTEM, Color, CompositeLayer } from "@deck.gl/core/typed";
 import { GeoJsonLayer, GeoJsonLayerProps } from "@deck.gl/layers/typed";
 import { Feature } from "geojson";
-import { layersDefaultProps } from "../layersDefaultProps";
 import GL from "@luma.gl/constants";
 
 const getColor = (d: Feature): Color => {
@@ -16,6 +15,17 @@ export interface FaultPolygonsLayerProps extends GeoJsonLayerProps {
     // Enable/disable depth testing when rendering layer. Default true.
     depthTest: boolean;
 }
+
+const defaultProps = {
+    "@@type": "FaultPolygonsLayer",
+    name: "Fault polygons",
+    id: "fault-polygons-layer",
+    pickable: true,
+    visible: true,
+    filled: true,
+    lineWidthMinPixels: 2,
+    depthTest: true,
+};
 
 export default class FaultPolygonsLayer extends CompositeLayer<FaultPolygonsLayerProps> {
     renderLayers(): GeoJsonLayer<Feature>[] {
@@ -41,6 +51,4 @@ export default class FaultPolygonsLayer extends CompositeLayer<FaultPolygonsLaye
 }
 
 FaultPolygonsLayer.layerName = "FaultPolygonsLayer";
-FaultPolygonsLayer.defaultProps = layersDefaultProps[
-    "FaultPolygonsLayer"
-] as FaultPolygonsLayerProps;
+FaultPolygonsLayer.defaultProps = defaultProps;

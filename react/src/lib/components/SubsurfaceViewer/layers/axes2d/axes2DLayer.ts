@@ -59,9 +59,13 @@ export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
 }
 
 const defaultProps = {
+    "@@type": "Axes2DLayer",
     name: "Axes2D",
-    id: "axes-2d-layer",
+    id: "axes2d-layer",
+    visible: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+    marginH: 30, // Horizontal margin (in pixles)
+    marginV: 30, // Vertical margin (in pixles)
 };
 
 // FONT ATLAS

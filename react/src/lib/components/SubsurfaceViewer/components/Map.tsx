@@ -19,10 +19,6 @@ import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import {
-    applyPropsOnLayers,
-    getLayersWithDefaultProps,
-} from "../layers/utils/layerTools";
 import fitBounds from "../utils/fit-bounds";
 import {
     validateColorTables,
@@ -582,9 +578,7 @@ const Map: React.FC<MapProps> = ({
             return layer;
         });
 
-        const updated_layers = applyPropsOnLayers(layers, layers_copy);
-        const layers_default = getLayersWithDefaultProps(updated_layers);
-        setAlteredLayers(layers_default);
+        setAlteredLayers(layers_copy);
     }, [scaleZ, layers /*dispatch*/]);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);

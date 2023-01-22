@@ -5,19 +5,23 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import userEvent from "@testing-library/user-event";
-import { testStore, Wrapper, EmptyWrapper } from "../../test/TestWrapper";
+import { EmptyWrapper } from "../../test/TestWrapper";
 import LayersButton from "./LayersButton";
-import { testState } from "../../test/testReduxState";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const exampleData = require("../../../../../demo/example-data/deckgl-map.json");
+
+const testLayers: Record<string, unknown>[] = exampleData[0].layers;
 
 describe("test 'layers' button", () => {
     it("snapshot test", () => {
         Icon.add({ layers });
         const { container } = render(
-            Wrapper({
+            EmptyWrapper({
                 children: (
                     <LayersButton
                         id={"layers-button-view_1"}
-                        layers={testState.layers}
+                        layers={testLayers}
                     />
                 ),
             })
@@ -27,34 +31,25 @@ describe("test 'layers' button", () => {
     it("click to dispatch redux action", async () => {
         Icon.add({ layers });
         render(
-            Wrapper({
+            EmptyWrapper({
                 children: (
                     <LayersButton
                         id={"layers-button-view_1"}
-                        layers={testState.layers}
+                        layers={testLayers}
                     />
                 ),
             })
         );
         userEvent.click(screen.getByRole("button"));
         expect(screen.getByRole("menu")).toBeInTheDocument();
-        const property_map_checkbox = screen.getAllByRole("checkbox", {
-            name: "Property map",
-        })[0];
-        userEvent.click(property_map_checkbox);
-        expect(testStore.dispatch).toHaveBeenCalledTimes(2);
-        expect(testStore.dispatch).toBeCalledWith({
-            payload: ["colormap-layer", false],
-            type: "spec/updateVisibleLayers",
-        });
     });
     it("should close menu when clicked on backdrop", async () => {
         render(
-            Wrapper({
+            EmptyWrapper({
                 children: (
                     <LayersButton
                         id={"layers-button-view_1"}
-                        layers={testState.layers}
+                        layers={testLayers}
                     />
                 ),
             })
@@ -67,11 +62,11 @@ describe("test 'layers' button", () => {
     });
     it("should close menu when clicked twice on layers button", async () => {
         render(
-            Wrapper({
+            EmptyWrapper({
                 children: (
                     <LayersButton
                         id={"layers-button-view_1"}
-                        layers={testState.layers}
+                        layers={testLayers}
                     />
                 ),
             })
@@ -88,7 +83,7 @@ describe("test 'layers' button", () => {
                 children: (
                     <LayersButton
                         id={"layers-button-view_1"}
-                        layers={testState.layers}
+                        layers={testLayers}
                     />
                 ),
             })
@@ -97,7 +92,7 @@ describe("test 'layers' button", () => {
     });
     it("test with no layers present", () => {
         const { container } = render(
-            Wrapper({
+            EmptyWrapper({
                 children: (
                     <LayersButton id={"layers-button-view_1"} layers={[]} />
                 ),
