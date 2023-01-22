@@ -22,6 +22,8 @@ interface State {
 }
 
 export class WellLogInfoPanel extends Component<Props, State> {
+    onGroupClick: (trackId: string | number) => void;
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -29,12 +31,29 @@ export class WellLogInfoPanel extends Component<Props, State> {
             collapsedTrackIds: [],
         };
 
-        this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
         this.onInfo = this.onInfo.bind(this);
-        this.props.callbacksManager.registerCallback("onInfo", this.onInfo);
+        this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
+
+        const callbacksManager = this.props.callbacksManager;
+        callbacksManager.registerCallback("onInfo", this.onInfo);
+        callbacksManager.registerCallback(
+            "onInfoGroupClick",
+            this.onInfoGroupClick,
+            true
+        );
+
+        this.onGroupClick = callbacksManager.callCallbacks.bind(
+            callbacksManager,
+            "onInfoGroupClick"
+        );
     }
     componentWillUnmount(): void {
-        this.props.callbacksManager.unregisterCallback("onInfo", this.onInfo);
+        const callbacksManager = this.props.callbacksManager;
+        callbacksManager.unregisterCallback("onInfo", this.onInfo);
+        callbacksManager.unregisterCallback(
+            "onInfoGroupClick",
+            this.onInfoGroupClick
+        );
     }
 
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
@@ -83,7 +102,7 @@ export class WellLogInfoPanel extends Component<Props, State> {
             <InfoPanel
                 header={this.props.header}
                 infos={this.state.infos}
-                onGroupClick={this.onInfoGroupClick}
+                onGroupClick={this.onGroupClick}
             />
         );
     }

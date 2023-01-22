@@ -8,6 +8,7 @@ export class CallbackManager {
     controller: WellLogController | null;
     welllog: () => WellLog | undefined;
 
+    onCreateControllerCallbacks: ((controller: WellLogController) => void)[];
     onInfoCallbacks: ((
         x: number,
         logController: LogViewer,
@@ -23,6 +24,7 @@ export class CallbackManager {
         this.welllog = welllog;
         this.controller = null;
 
+        this.onCreateControllerCallbacks = [];
         this.onInfoCallbacks = [];
         this.onContentRescaleCallbacks = [];
         this.onContentSelectionCallbacks = [];
@@ -33,28 +35,53 @@ export class CallbackManager {
         this.onInfo = this.onInfo.bind(this);
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
+        this.onTemplateChanged = this.onTemplateChanged.bind(this);
+        this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
     }
 
     unregisterAll(): void {
         // clear all callback lists
+        /* predefined
+        this.onCreateControllerCallbacks = 0;
         this.onInfoCallbacks.length = 0;
         this.onContentRescaleCallbacks.length = 0;
         this.onContentSelectionCallbacks.length = 0;
         this.onChangePrimaryAxisCallbacks.length = 0;
+        */
+        for (const key in this) {
+            if (key.indexOf("Callbacks") >= 0) {
+                // predefined and user callback tables
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                this[key].length = 0;
+            }
+        }
     }
 
     registerCallback<CallbackFunction>(
         name: string,
-        callback: CallbackFunction
+        callback: CallbackFunction,
+        userDefined?: boolean
     ): void {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const table = this[name + "Callbacks"];
-        if (table) table.push(callback);
-        else
-            console.log(
-                "CallbackManager.registerCallback: " + name + "s" + " not found"
-            );
+        let table = this[name + "Callbacks"];
+        if (!table) {
+            if (!userDefined) {
+                console.log(
+                    "CallbackManager.registerCallback: " +
+                        name +
+                        "s" +
+                        " not found"
+                );
+                return;
+            }
+            // create new callback table
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            table = this[name + "Callbacks"] = [];
+        }
+        table.push(callback);
     }
     unregisterCallback<CallbackFunction>(
         name: string,
@@ -63,26 +90,37 @@ export class CallbackManager {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const table = this[name + "Callbacks"];
-        if (table)
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            this[name + "Callbacks"] = table.filter(
-                (p: CallbackFunction) => p !== callback
-            );
-        else
+        if (!table) {
             console.log(
                 "CallbackManager.unregisterCallback: " +
                     name +
                     "Callbacks" +
                     " not found"
             );
+            return;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        this[name + "Callbacks"] = table.filter(
+            (p: CallbackFunction) => p !== callback
+        );
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
+    callCallbacks(name: string, ...args: any): void {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const table = this[name + "Callbacks"];
+        for (const callback of table) callback(...args);
     }
 
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;
+        for (const onCreateController of this.onCreateControllerCallbacks)
+            onCreateController(controller);
     }
-
     // callback function from WellLogView
     onInfo(
         x: number,
@@ -104,7 +142,7 @@ export class CallbackManager {
             onContentSelection();
     }
     // callback function from WellLogView
-    onTemplateChanged(): void {    
+    onTemplateChanged(): void {
         for (const onTemplateChanged of this.onTemplateChangedCallbacks)
             onTemplateChanged();
     }

@@ -75,7 +75,7 @@ class WellLogViewer extends Component<WellLogViewerProps, State> {
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
         this.onTemplateChanged = this.onTemplateChanged.bind(this);
-        
+
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
     }
 

@@ -278,12 +278,20 @@ class SyncLogViewer extends Component<Props, State> {
             primaryAxis: primaryAxis, //"md"
         };
 
+        this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
 
         this.props.welllogs?.map((_welllog: WellLog, index: number) => {
-            this.callbacksManagers.push(
-                new CallbackManager(() => this.props.welllogs[index])
+            const callbacksManager = new CallbackManager(
+                () => this.props.welllogs[index]
             );
+            this.callbacksManagers.push(callbacksManager);
+            callbacksManager.registerCallback(
+                "onInfoGroupClick",
+                this.onInfoGroupClick,
+                true
+            );
+
             this.callbacks.push({
                 onCreateControllerBind: this.onCreateController.bind(
                     this,
@@ -309,8 +317,9 @@ class SyncLogViewer extends Component<Props, State> {
     }
 
     componentWillUnmount(): void {
-        for (const callbacksManager of this.callbacksManagers)
+        for (const callbacksManager of this.callbacksManagers) {
             callbacksManager.unregisterAll();
+        }
         this._isMount = false;
     }
 
@@ -373,6 +382,17 @@ class SyncLogViewer extends Component<Props, State> {
         }
         if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
         return primaryAxis;
+    }
+
+    onInfoGroupClick(/*iView: number, trackId: string | number*/): void {
+        /*
+        let i = 0;
+        for (const callbacksManager of this.callbacksManagers) {
+            if(i!=iView)
+                callbacksManager.callCallbacks("onInfoGroupClick", trackId);
+            i++;
+        }
+        */
     }
 
     // callback function from WellLogView
