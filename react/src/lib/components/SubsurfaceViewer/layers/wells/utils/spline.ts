@@ -247,6 +247,35 @@ export function flattenPath(data_in: FeatureCollection): FeatureCollection {
     return data;
 }
 
+export function invertPath(data_in: FeatureCollection): FeatureCollection {
+    const data = cloneDeep(data_in);
+
+    const no_wells = data.features.length;
+    for (let well_no = 0; well_no < no_wells; well_no++) {
+        const geometryCollection = data.features[well_no]
+            .geometry as GeometryCollection;
+        const lineString = geometryCollection?.geometries[1] as LineString;
+
+        if (lineString.coordinates?.length === undefined) {
+            continue;
+        }
+
+        const coords = lineString.coordinates as Position3D[];
+
+        // Invert path by multiplying depth with -1.
+        const coords_inverted: Position3D[] = coords.map((e: Position3D) => {
+            return [e[0], e[1], -e[2]];
+        });
+
+        (
+            (data.features[well_no].geometry as GeometryCollection)
+                .geometries[1] as LineString
+        ).coordinates = coords_inverted;
+    }
+
+    return data;
+}
+
 /**
  * Calculates bounding box of all wells.
  */

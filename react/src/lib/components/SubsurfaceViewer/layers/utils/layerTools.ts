@@ -7,8 +7,6 @@ import {
     CompositeLayerProps,
 } from "@deck.gl/core/typed";
 import { Matrix4 } from "math.gl";
-import { cloneDeep } from "lodash";
-import { layersDefaultProps } from "../layersDefaultProps";
 import {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -76,41 +74,6 @@ export function getModelMatrixScale(scaleZ: number): Matrix4 {
     const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
     const mScaleZ = new Matrix4(IDENTITY).scale([1, 1, scaleZ]);
     return mScaleZ;
-}
-
-// update layer object to include additional props
-export function applyPropsOnLayers(
-    layer_props: Record<string, unknown>[],
-    layers: Record<string, unknown>[]
-): Record<string, unknown>[] {
-    const result = cloneDeep(layers);
-
-    result?.forEach((layer) => {
-        const props = layer_props.find((l) => {
-            if (layer["id"]) return l["id"] === layer["id"];
-            else return l["@@type"] === layer["@@type"];
-        });
-        if (props) {
-            Object.entries(props).forEach(([prop, value]) => {
-                if (layer[prop] == undefined) layer[prop] = value;
-            });
-        } else {
-            // if it's a user defined layer and its name and visibility are not specified
-            // set layer id as its default name
-            if (layer["name"] == undefined) layer["name"] = layer["id"];
-            if (layer["visible"] == undefined) layer["visible"] = true;
-        }
-    });
-    return result;
-}
-
-export function getLayersWithDefaultProps(
-    layers: Record<string, unknown>[]
-): Record<string, unknown>[] {
-    return applyPropsOnLayers(
-        Object.values(layersDefaultProps) as Record<string, unknown>[],
-        layers
-    );
 }
 
 export function getLayersInViewport(

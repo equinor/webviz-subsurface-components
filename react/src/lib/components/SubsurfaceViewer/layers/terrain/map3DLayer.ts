@@ -1,11 +1,6 @@
 import { CompositeLayer, Color } from "@deck.gl/core/typed";
-import TerrainMapLayer, {
-    TerrainMapLayerData,
-    DECODER,
-    Material,
-} from "./terrainMapLayer";
+import TerrainMapLayer, { DECODER, Material } from "./terrainMapLayer";
 import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
-import { layersDefaultProps } from "../layersDefaultProps";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
@@ -357,6 +352,28 @@ export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
     depthTest: boolean;
 }
 
+const defaultProps = {
+    "@@type": "Map3DLayer",
+    name: "Map 3D",
+    id: "map3d-layer",
+    pickable: true,
+    visible: true,
+    // Url to png image for height field.
+    mesh: "",
+    meshValueRange: { type: "array", value: [0, 1] },
+    // Mesh error in meters. The output mesh is in higher resolution (more vertices) if the error is smaller.
+    meshMaxError: { type: "number", value: 5 },
+    // Url to png image for map properties. (ex, poro or perm values as a texture)
+    propertyTexture: "",
+    propertyValueRange: { type: "array", value: [0, 1] },
+    contours: [-1.0, -1.0],
+    // If contour lines should follow depth or properties.
+    isContoursDepth: true,
+    smoothShading: true,
+    material: true,
+    depthTest: true,
+};
+
 export default class Map3DLayer extends CompositeLayer<
     Map3DLayerProps<unknown>
 > {
@@ -536,6 +553,4 @@ export default class Map3DLayer extends CompositeLayer<
 }
 
 Map3DLayer.layerName = "Map3DLayer";
-Map3DLayer.defaultProps = layersDefaultProps[
-    "Map3DLayer"
-] as Map3DLayerProps<TerrainMapLayerData>;
+Map3DLayer.defaultProps = defaultProps;

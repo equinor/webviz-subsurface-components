@@ -5,7 +5,7 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import Map from "./Map";
-import { Wrapper } from "../../SubsurfaceViewer/test/TestWrapper";
+import { EmptyWrapper } from "../../SubsurfaceViewer/test/TestWrapper";
 import { colorTables } from "@emerson-eps/color-tables";
 
 const mapData = require("../../../../demo/example-data/deckgl-map.json");
@@ -14,7 +14,7 @@ const colorTablesData = colorTables;
 describe("Test Map component", () => {
     it("snapshot test", () => {
         const { container } = render(
-            Wrapper({
+            EmptyWrapper({
                 children: (
                     <Map
                         id={mapData[0].id}
@@ -44,7 +44,7 @@ describe("Test Map component", () => {
     });
     it("snapshot test with edited data", () => {
         const { container } = render(
-            Wrapper({
+            EmptyWrapper({
                 children: (
                     <Map
                         id={mapData[0].id}
