@@ -5,7 +5,7 @@
  * Copyright (C) 2020 - Equinor ASA. */
 
 import SubsurfaceViewer, {
-    SubsurfaceViewerDashWrapper,
+    DashSubsurfaceViewer,
 } from "./components/SubsurfaceViewer";
 import GroupTree from "./components/GroupTree";
 import HistoryMatch from "./components/HistoryMatch";
@@ -66,6 +66,6 @@ export {
     LayerPickInfo,
     ViewFooter,
     View,
-    SubsurfaceViewerDashWrapper,
+    DashSubsurfaceViewer,
     ViewAnnotation,
 };
