@@ -11,7 +11,7 @@ import {
 } from "./components/Map";
 import { MapMouseEvent } from "./components/Map";
 
-export interface SubsurfaceViewerDashWrapperProps {
+export interface DashSubsurfaceViewerProps {
     id: string;
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[];
@@ -79,9 +79,7 @@ function mapAnnotation(annotationContainers: React.ReactNode) {
     });
 }
 
-const SubsurfaceViewerDashWrapper: React.FC<
-    SubsurfaceViewerDashWrapperProps
-> = ({
+const DashSubsurfaceViewer: React.FC<DashSubsurfaceViewerProps> = ({
     id,
     resources,
     layers,
@@ -102,7 +100,7 @@ const SubsurfaceViewerDashWrapper: React.FC<
     triggerHome,
     triggerResetMultipleWells,
     children,
-}: SubsurfaceViewerDashWrapperProps) => {
+}: DashSubsurfaceViewerProps) => {
     const mapArgs: SubsurfaceViewerProps = {
         id: id,
         resources: resources,
@@ -123,6 +121,7 @@ const SubsurfaceViewerDashWrapper: React.FC<
         getCameraPosition: getCameraPosition,
         triggerHome: triggerHome,
         triggerResetMultipleWells: triggerResetMultipleWells,
+        children: children,
     };
 
     return (
@@ -132,7 +131,7 @@ const SubsurfaceViewerDashWrapper: React.FC<
     );
 };
 
-SubsurfaceViewerDashWrapper.defaultProps = {
+DashSubsurfaceViewer.defaultProps = {
     views: {
         layout: [1, 1],
         showLabel: false,
@@ -141,7 +140,7 @@ SubsurfaceViewerDashWrapper.defaultProps = {
     checkDatafileSchema: false,
 };
 
-SubsurfaceViewerDashWrapper.propTypes = {
+DashSubsurfaceViewer.propTypes = {
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
@@ -267,4 +266,4 @@ SubsurfaceViewerDashWrapper.propTypes = {
     children: PropTypes.any,
 };
 
-export default SubsurfaceViewerDashWrapper;
+export default DashSubsurfaceViewer;
