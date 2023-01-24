@@ -57,13 +57,35 @@ Simgrid.args = {
         axes,
         {
             ...grid3dLayer,
-            pointsUrl: "vtk-grid/Simgrid_points.json",
-            polysUrl: "vtk-grid/Simgrid_polys.json",
-            propertiesUrl: "vtk-grid/Simgrid_scalar.json",
+            pointsData: "vtk-grid/Simgrid_points.json",
+            polysData: "vtk-grid/Simgrid_polys.json",
+            propertiesData: "vtk-grid/Simgrid_scalar.json",
         },
     ],
 };
 Simgrid.parameters = parameters;
+
+export const SimgridArrayInput = Template.bind({});
+SimgridArrayInput.args = {
+    ...defaultProps,
+    id: "grid-3darray",
+    layers: [
+        axes,
+        {
+            ...grid3dLayer,
+            pointsData: [
+                456063, 5935991, -1729, 456063, 5935991, -1731, 456138,
+                5935861.518843642, -1727.820068359375, 456138.5, 5935861.5,
+                -1726.3526611328125, 456193.90625, 5936066, -1730.7259521484375,
+                456193.8825946293, 5936065.981075703, -1732.200439453125,
+                456268.9375, 5935936.5, -1726.6915283203125,
+            ],
+            polysData: [4, 0, 1, 2, 3, 4, 0, 4, 5, 1, 4, 0, 3, 6, 4],
+            propertiesData: [0.2, 0.6, 0.8],
+        },
+    ],
+};
+SimgridArrayInput.parameters = parameters;
 
 export const Simgrid2x = Template.bind({});
 Simgrid2x.args = {
@@ -73,9 +95,9 @@ Simgrid2x.args = {
         axes,
         {
             ...grid3dLayer,
-            pointsUrl: "vtk-grid/Simgrid2x_points.json",
-            polysUrl: "vtk-grid/Simgrid2x_polys.json",
-            propertiesUrl: "vtk-grid/Simgrid2x_scalar.json",
+            pointsData: "vtk-grid/Simgrid2x_points.json",
+            polysData: "vtk-grid/Simgrid2x_polys.json",
+            propertiesData: "vtk-grid/Simgrid2x_scalar.json",
         },
     ],
 };
@@ -89,9 +111,9 @@ Simgrid4x.args = {
         axes,
         {
             ...grid3dLayer,
-            pointsUrl: "vtk-grid/Simgrid4x_points.json",
-            polysUrl: "vtk-grid/Simgrid4x_polys.json",
-            propertiesUrl: "vtk-grid/Simgrid4x_scalar.json",
+            pointsData: "vtk-grid/Simgrid4x_points.json",
+            polysData: "vtk-grid/Simgrid4x_polys.json",
+            propertiesData: "vtk-grid/Simgrid4x_scalar.json",
         },
     ],
 };
@@ -105,9 +127,9 @@ Simgrid8xIJonly.args = {
         axes,
         {
             ...grid3dLayer,
-            pointsUrl: "vtk-grid/Simgrid8xIJonly_points.json",
-            polysUrl: "vtk-grid/Simgrid8xIJonly_polys.json",
-            propertiesUrl: "vtk-grid/Simgrid8xIJonly_scalar.json",
+            pointsData: "vtk-grid/Simgrid8xIJonly_points.json",
+            polysData: "vtk-grid/Simgrid8xIJonly_polys.json",
+            propertiesData: "vtk-grid/Simgrid8xIJonly_scalar.json",
         },
     ],
 };
@@ -123,9 +145,9 @@ Simgrid8xIJonly.parameters = parameters;
 // const intersection = {
 //     "@@type": "Grid3DLayer",
 //     id: "Grid3DLayer",
-//     pointsUrl: "vtk-grid/intersection_points.json",
-//     polysUrl: "vtk-grid/intersection_polys.json",
-//     propertiesUrl: "vtk-grid/intersection_scalar.json",
+//     pointsData: "vtk-grid/intersection_points.json",
+//     polysData: "vtk-grid/intersection_polys.json",
+//     propertiesData: "vtk-grid/intersection_scalar.json",
 //     material: true,
 //     colorMapName: "Rainbow",
 //     scaleZ: 5,

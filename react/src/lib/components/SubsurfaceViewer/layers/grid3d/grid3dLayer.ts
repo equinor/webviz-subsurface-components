@@ -42,14 +42,21 @@ function FlipZ(points: number[]): void {
 }
 
 async function load_data(
-    pointsUrl: string,
-    polysUrl: string,
-    propertiesUrl: string
+    pointsData: string | number[],
+    polysData: string | number[],
+    propertiesData: string | number[]
 ) {
-    // FULL GRID
-    const points = await load(pointsUrl, JSONLoader);
-    const polys = await load(polysUrl, JSONLoader);
-    const properties = await load(propertiesUrl, JSONLoader);
+    const points = Array.isArray(pointsData)
+        ? pointsData
+        : await load(pointsData as string, JSONLoader);
+
+    const polys = Array.isArray(polysData)
+        ? polysData
+        : await load(polysData as string, JSONLoader);
+
+    const properties = Array.isArray(propertiesData)
+        ? propertiesData
+        : await load(propertiesData as string, JSONLoader);
 
     return Promise.all([points, polys, properties]);
 }
@@ -58,9 +65,23 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setReportedBoundingBox?: any;
 
-    pointsUrl: string;
-    polysUrl: string;
-    propertiesUrl: string;
+    /**  Url or native javascript array. Set of points.
+     * [x1, y1, z1, x2, y2, z2, ...]
+     */
+    pointsData: string | number[];
+
+    /**  Url or native javascript array.
+     * For each polygon ["number of points in poly", p1, , p2 ... ]
+     * Example One polygn ith 4 poitns and one with 3 points.
+     * [4, 3, 1, 9, 77, 3, 6, 44, 23]
+     */
+    polysData: string | number[];
+
+    /**  Url or native javascript array..
+     *  A scalar property for each polygon.
+     * [0.23, 0.11. 0.98, ...]
+     */
+    propertiesData: string | number[];
 
     /**  Name of color map. E.g "PORO"
      */
@@ -123,13 +144,15 @@ export default class Grid3DLayer extends CompositeLayer<
     Grid3DLayerProps<unknown>
 > {
     rebuildData(reportBoundingBox: boolean): void {
+
         const p = load_data(
-            this.props.pointsUrl,
-            this.props.polysUrl,
-            this.props.propertiesUrl
+            this.props.pointsData,
+            this.props.polysData,
+            this.props.propertiesData
         );
 
         p.then(([points, polys, properties]) => {
+            console.log(properties)
             if (!this.props.isZDepth) {
                 FlipZ(points);
             }
@@ -194,9 +217,9 @@ export default class Grid3DLayer extends CompositeLayer<
         oldProps: Grid3DLayerProps<unknown>;
     }): void {
         const needs_reload =
-            !isEqual(props.pointsUrl, oldProps.pointsUrl) ||
-            !isEqual(props.polysUrl, oldProps.polysUrl) ||
-            !isEqual(props.propertiesUrl, oldProps.propertiesUrl);
+            !isEqual(props.pointsData, oldProps.pointsData) ||
+            !isEqual(props.polysData, oldProps.polysData) ||
+            !isEqual(props.propertiesData, oldProps.propertiesData);
 
         if (needs_reload) {
             const reportBoundingBox = false;
