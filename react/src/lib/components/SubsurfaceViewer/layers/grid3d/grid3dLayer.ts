@@ -144,7 +144,6 @@ export default class Grid3DLayer extends CompositeLayer<
     Grid3DLayerProps<unknown>
 > {
     rebuildData(reportBoundingBox: boolean): void {
-
         const p = load_data(
             this.props.pointsData,
             this.props.polysData,
@@ -152,7 +151,6 @@ export default class Grid3DLayer extends CompositeLayer<
         );
 
         p.then(([points, polys, properties]) => {
-            console.log(properties)
             if (!this.props.isZDepth) {
                 FlipZ(points);
             }
