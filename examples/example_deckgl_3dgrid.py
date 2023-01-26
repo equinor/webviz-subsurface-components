@@ -37,9 +37,9 @@ app.layout = wsc.DashSubsurfaceViewer(
             "material": True,
             "colorMapName": "Rainbow",
             "scaleZ": 1,
-            "pointsUrl": "grid/points",
-            "polysUrl": "grid/polys",
-            "propertiesUrl": "grid/scalar",
+            "pointsData": "grid/points",
+            "polysData": "grid/polys",
+            "propertiesData": "grid/scalar",
         },
     ],
     views={
