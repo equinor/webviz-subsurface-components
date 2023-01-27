@@ -102,6 +102,29 @@ const nodeCenteredPropertiesLayer = {
     ],
 };
 
+const nodeCenteredPropertiesLayerWithArrayInput = {
+    "@@type": "MapLayer",
+    id: "node-centered-layer",
+
+    meshUrl: Array.from(Array(20)).map(() => Math.random()), // Array of 20 random numbers
+    frame: {
+        origin: [0, 0],
+        count: [4, 5],
+        increment: [1, 1],
+        rotDeg: 0,
+    },
+    propertiesUrl: Array.from(Array(20)).map(() => Math.random()), // Array of 20 random numbers,
+
+    gridLines: true,
+    material: true,
+    // black to white colors.
+    colorMapFunction: (value: number) => [
+        value * 255,
+        value * 255,
+        value * 255,
+    ],
+};
+
 // This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
 const cellCenteredPropertiesLayer = {
     "@@type": "MapLayer",
@@ -678,6 +701,41 @@ NodeCenteredPropMap.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "A small map with properties given at nodes. Each cell will be interpolated in color.",
+        },
+    },
+};
+
+//-- NodeCenteredPropMap  with native javascript arrays as input --
+export const NodeCenteredPropMapWithArrayInput: ComponentStory<
+    typeof SubsurfaceViewer
+> = (args) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+NodeCenteredPropMapWithArrayInput.args = {
+    id: "map",
+    layers: [
+        axes_lite,
+        nodeCenteredPropertiesLayerWithArrayInput,
+        north_arrow_layer,
+    ],
+    bounds: [-1, -1, 4, 5] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+NodeCenteredPropMapWithArrayInput.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
         },
     },
 };
