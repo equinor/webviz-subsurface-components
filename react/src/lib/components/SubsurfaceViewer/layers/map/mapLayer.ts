@@ -59,10 +59,7 @@ async function load_mesh_and_properties(
 
     //-- PROPERTIES. --
     let properties: Float32Array;
-    if (propertiesData.constructor === Float32Array) {
-        // Input data is Float32Array.
-        properties = propertiesData;
-    } else if (Array.isArray(propertiesData)) {
+    if (Array.isArray(propertiesData)) {
         // Input data is native javascript array.
         properties = new Float32Array(propertiesData);
     } else {
