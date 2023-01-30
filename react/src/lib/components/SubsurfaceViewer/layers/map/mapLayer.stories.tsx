@@ -105,16 +105,14 @@ const nodeCenteredPropertiesLayer = {
 const nodeCenteredPropertiesLayerWithArrayInput = {
     "@@type": "MapLayer",
     id: "node-centered-layer",
-
-    meshUrl: Array.from(Array(20)).map(() => Math.random()), // Array of 20 random numbers
     frame: {
         origin: [0, 0],
         count: [4, 5],
         increment: [1, 1],
         rotDeg: 0,
     },
-    propertiesUrl: Array.from(Array(20)).map(() => Math.random()), // Array of 20 random numbers,
-
+    meshData: Array.from(Array(20)).map(() => Math.random()), // Array of 20 random numbers
+    propertiesData: Array.from(Array(20)).map(() => Math.random()),
     gridLines: true,
     material: true,
     // black to white colors.

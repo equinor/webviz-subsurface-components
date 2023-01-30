@@ -39,35 +39,37 @@ export type Params = {
 };
 
 async function load_mesh_and_properties(
-    meshUrl: string,
-    propertiesUrl: string | number[],
+    meshData: string | number[],
+    propertiesData: string | number[],
     isZDepth: boolean
 ) {
     // Keep
     //const t0 = performance.now();
 
-    const isMesh = typeof meshUrl !== "undefined" && meshUrl !== "";
-    const isProperties =
-        typeof propertiesUrl !== "undefined" && propertiesUrl !== "";
+    const isMesh = typeof meshData !== "undefined";
+    const isProperties = typeof propertiesData !== "undefined";
 
     if (!isMesh && !isProperties) {
         console.error("Error. One or both of texture and mesh must be given!");
     }
 
     if (isMesh && !isProperties) {
-        propertiesUrl = meshUrl;
+        propertiesData = meshData;
     }
 
     //-- PROPERTIES. --
-    let propertiesData: Float32Array = new Float32Array();
-    if (Array.isArray(propertiesUrl)) {
+    let properties: Float32Array;
+    if (propertiesData.constructor === Float32Array) {
+        // Input data is Float32Array.
+        properties = propertiesData;
+    } else if (Array.isArray(propertiesData)) {
         // Input data is native javascript array.
-        propertiesData = new Float32Array(propertiesUrl);
+        properties = new Float32Array(propertiesData);
     } else {
         // Input data is an URL.
-        const response = await fetch(propertiesUrl);
+        const response = await fetch(propertiesData);
         if (!response.ok) {
-            console.error("Could not load ", propertiesUrl);
+            console.error("Could not load ", propertiesData);
         }
 
         const blob = await response.blob();
@@ -75,7 +77,7 @@ async function load_mesh_and_properties(
         const isPng = contentType === "image/png";
         if (isPng) {
             // Load as Png  with abolute float values.
-            propertiesData = await new Promise((resolve) => {
+            properties = await new Promise((resolve) => {
                 const fileReader = new FileReader();
                 fileReader.readAsArrayBuffer(blob);
                 fileReader.onload = () => {
@@ -97,21 +99,21 @@ async function load_mesh_and_properties(
         } else {
             // Load as binary array of floats.
             const buffer = await blob.arrayBuffer();
-            propertiesData = new Float32Array(buffer);
+            properties = new Float32Array(buffer);
         }
     }
 
     //-- MESH --
-    let meshData: Float32Array = new Float32Array();
+    let mesh: Float32Array = new Float32Array();
     if (isMesh) {
-        if (Array.isArray(meshUrl)) {
+        if (Array.isArray(meshData)) {
             // Input data is native javascript array.
-            meshData = new Float32Array(meshUrl);
+            mesh = new Float32Array(meshData);
         } else {
             // Input data is an URL.
-            const response_mesh = await fetch(meshUrl);
+            const response_mesh = await fetch(meshData);
             if (!response_mesh.ok) {
-                console.error("Could not load ", meshUrl);
+                console.error("Could not load mesh");
             }
 
             const blob_mesh = await response_mesh.blob();
@@ -119,7 +121,7 @@ async function load_mesh_and_properties(
             const isPng_mesh = contentType_mesh === "image/png";
             if (isPng_mesh) {
                 // Load as Png  with abolute float values.
-                meshData = await new Promise((resolve) => {
+                mesh = await new Promise((resolve) => {
                     const fileReader = new FileReader();
                     fileReader.readAsArrayBuffer(blob_mesh);
                     fileReader.onload = () => {
@@ -141,14 +143,14 @@ async function load_mesh_and_properties(
             } else {
                 // Load as binary array of floats.
                 const buffer = await blob_mesh.arrayBuffer();
-                meshData = new Float32Array(buffer);
+                mesh = new Float32Array(buffer);
             }
         }
     }
 
     if (!isZDepth) {
         for (let i = 0; i < meshData.length; i++) {
-            meshData[i] *= -1;
+            mesh[i] *= -1;
         }
     }
 
@@ -156,7 +158,7 @@ async function load_mesh_and_properties(
     // Keep this.
     //console.log(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
 
-    return Promise.all([isMesh, meshData, propertiesData]);
+    return Promise.all([isMesh, mesh, properties]);
 }
 
 export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
@@ -165,7 +167,8 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
 
     /**  Url to the height (z values) mesh.
      */
-    meshUrl: string;
+    meshUrl: string; // Deprecated
+    meshData: string | number[];
 
     /**  Horizontal extent of the terrain mesh. Format:
      {
@@ -184,7 +187,8 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
      * each direction then the property values will be pr cell and the cell will be constant
      * colored.
      */
-    propertiesUrl: string | number[];
+    propertiesUrl: string; // Deprecated
+    propertiesData: string | number[];
 
     /**  Contourlines reference point and interval.
      * A value of [-1.0, -1.0] will disable contour lines.
@@ -263,9 +267,6 @@ const defaultProps = {
     id: "map3d-layer-float32",
     pickable: true,
     visible: true,
-    // Url for the height field.
-    meshUrl: "",
-    propertiesUrl: "",
     bounds: { type: "object", value: null, false: true, compare: true },
     colorMapRange: { type: "array" },
     contours: [-1.0, -1.0],
@@ -280,9 +281,21 @@ const defaultProps = {
 
 export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
     rebuildData(reportBoundingBox: boolean): void {
+        if (typeof this.props.meshUrl !== "undefined") {
+            console.warn('"meshUrl" is deprecated. Use "meshData"');
+        }
+
+        if (typeof this.props.propertiesUrl !== "undefined") {
+            console.warn('"propertiesUrl" is deprecated. Use "propertiesData"');
+        }
+
+        const meshData = this.props.meshData ?? this.props.meshUrl;
+        const propertiesData =
+            this.props.propertiesData ?? this.props.propertiesUrl;
+
         const p = load_mesh_and_properties(
-            this.props.meshUrl,
-            this.props.propertiesUrl,
+            meshData,
+            propertiesData,
             this.props.isZDepth
         );
 
@@ -364,7 +377,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
     updateState({ props, oldProps }: UpdateParameters<MapLayer>): void {
         const needs_reload =
             !isEqual(props.meshUrl, oldProps.meshUrl) ||
-            !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
+            !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||  // XXX
             !isEqual(props.frame, oldProps.frame) ||
             !isEqual(props.gridLines, oldProps.gridLines);
 
