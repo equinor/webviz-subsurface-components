@@ -469,7 +469,7 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-        if (!didUserChangeCamera && !isCameraPositionDefined) {
+        if (!didUserChangeCamera && !isCameraPositionDefined && !bounds) {
             calcDefaultViewStates();
         }
     }, [reportedBoundingBox]);
