@@ -349,19 +349,33 @@ const Map: React.FC<MapProps> = ({
         });
         const isAxesLayer = typeof axesLayer !== "undefined";
         // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
-        const target = boundingBoxCenter(
+        let target = boundingBoxCenter(
             isAxesLayer
                 ? (axesLayer?.["bounds"] as BoundingBox)
                 : (union_of_reported_bboxes as BoundingBox)
         );
 
+        const isBoundsDefined = typeof bounds !== "undefined";
+
         const is3D = views?.viewports?.[0]?.show3D ?? false;
-        if (!is3D) {
-            target.pop(); // In 2D "target" should only contain x and y.
+        if (!isBoundsDefined) {
+            if (!is3D) {
+                target.pop(); // In 2D "target" should only contain x and y.
+            }
+        } else {
+            // if bounds are defined we only use z value of target and x,y set to middle of bounds.
+            const z = target[2];
+            const bounds_ =
+                typeof boundsInitial == "function"
+                    ? boundsInitial()
+                    : boundsInitial;
+
+            const x = bounds_[0] + 0.5 * (bounds_[2] - bounds_[0]); // right - left
+            const y = bounds_[1] + 0.5 * (bounds_[3] - bounds_[1]); // top - bottom
+            target = [x, y, z];
         }
 
         let tempViewStates: Record<string, ViewStateType> = {};
-        const isBoundsDefined = typeof bounds !== "undefined";
         const updatedViewProps = input ? input : viewsProps;
         tempViewStates = Object.fromEntries(
             updatedViewProps.map((item, index) => [
@@ -469,7 +483,7 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
-        if (!didUserChangeCamera && !isCameraPositionDefined && !bounds) {
+        if (!didUserChangeCamera && !isCameraPositionDefined) {
             calcDefaultViewStates();
         }
     }, [reportedBoundingBox]);
