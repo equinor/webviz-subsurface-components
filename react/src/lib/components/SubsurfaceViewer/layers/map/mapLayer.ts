@@ -230,6 +230,13 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
      */
     colorMapFunction?: colorMapFunctionType | false;
 
+    /**  Optional.
+     * If defined this color will override alother and use for whole map as a constant color .
+     * Takes a value in the range [0,1] and returns a color.
+     * E.g. [255, 0, 0] for blue color
+     */
+    useConstantColor?: [number, number, number];
+
     /**  Surface material properties.
      * material: true  = default material, coloring depends on surface orientation and lighting.
      *           false = no material,  coloring is independent on surface orientation and lighting.
@@ -319,12 +326,16 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =
                     e.data;
 
+                const colorFunc = this.props.useConstantColor
+                    ? () => this.props.useConstantColor
+                    : this.props.colorMapFunction;
+
                 const legend = {
                     discrete: false,
                     valueRange: this.props.colorMapRange ?? propertyValueRange,
                     colorName: this.props.colorMapName,
                     title: "MapLayer",
-                    colorMapFunction: this.props.colorMapFunction,
+                    colorMapFunction: colorFunc,
                 };
 
                 this.setState({
@@ -425,7 +436,9 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 colorMapName: this.props.colorMapName,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
-                colorMapFunction: this.props.colorMapFunction,
+                colorMapFunction: this.props.useConstantColor
+                    ? () => this.props.useConstantColor
+                    : this.props.colorMapFunction,
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
                 smoothShading: this.props.smoothShading,

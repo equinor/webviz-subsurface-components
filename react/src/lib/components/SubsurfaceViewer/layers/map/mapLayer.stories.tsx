@@ -279,6 +279,44 @@ MapLayer3dPng.parameters = {
     },
 };
 
+export const MapLayerConstantColor: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+MapLayerConstantColor.args = {
+    id: "map",
+    layers: [
+        axes_hugin,
+        {
+            ...meshMapLayerPng,
+            useConstantColor: [120, 120, 255], // Use constant color.
+        },
+        north_arrow_layer,
+    ],
+
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+MapLayerConstantColor.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: 'Example using the property"useConstantColor" to color the surface in one color only',
+        },
+    },
+};
+
 export const ScaleZ: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     const [layers, setLayers] = React.useState([
         axes_hugin,
