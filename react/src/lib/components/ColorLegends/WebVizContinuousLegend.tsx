@@ -12,7 +12,6 @@ interface LegendProps {
     horizontal?: boolean | null;
     colorTables?: colorTablesArray | string;
     id?: string;
-    colorMapFunction?: (x: number) => [number, number, number];
     isRangeShown?: boolean;
     legendFontSize?: number;
     tickFontSize?: number;
@@ -29,7 +28,6 @@ const ContinuousLegendWrapper: React.FC<LegendProps> = ({
     horizontal,
     colorTables,
     id,
-    colorMapFunction,
     isRangeShown,
     legendFontSize,
     tickFontSize,
@@ -46,7 +44,6 @@ const ContinuousLegendWrapper: React.FC<LegendProps> = ({
             horizontal={horizontal}
             colorTables={colorTables}
             id={id}
-            colorMapFunction={colorMapFunction}
             isRangeShown={isRangeShown}
             legendFontSize={legendFontSize}
             tickFontSize={tickFontSize}
@@ -65,7 +62,6 @@ ContinuousLegendWrapper.propTypes = {
     horizontal: PropTypes.bool,
     colorTables: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     id: PropTypes.string,
-    colorMapFunction: PropTypes.func,
     isRangeShown: PropTypes.bool,
     legendFontSize: PropTypes.number,
     tickFontSize: PropTypes.number,
