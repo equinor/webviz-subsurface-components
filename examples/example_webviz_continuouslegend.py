@@ -21,6 +21,13 @@ legend_obj = wsc.WebVizContinuousLegend(
     horizontal=True,
     colorTables=COLOR_TABLES,
     cssLegendStyles={"left": "0vw", "top": "0vh"},
+    id="contLegend"
+    colorMapFunction=(x) => [255 - x * 100, 255 - x * 100, 255 * x]
+    isRangeShown=False
+    legendFontSize=18
+    tickFontSize=12
+    numberOfTicks=3
+    legendScaleSize=200
 )
 
 app = dash.Dash(__name__)
