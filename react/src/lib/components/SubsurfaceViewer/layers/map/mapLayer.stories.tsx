@@ -291,7 +291,7 @@ MapLayerConstantColor.args = {
         axes_hugin,
         {
             ...meshMapLayerPng,
-            useConstantColor: [120, 120, 255], // Use constant color.
+            colorMapFunction: [0, 255, 0], // Use constant color instead of function
         },
         north_arrow_layer,
     ],
