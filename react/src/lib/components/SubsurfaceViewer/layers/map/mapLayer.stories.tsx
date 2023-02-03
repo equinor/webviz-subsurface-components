@@ -312,7 +312,7 @@ MapLayerConstantColor.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: 'Example using the property"useConstantColor" to color the surface in one color only',
+            story: 'Example using the property "colorMapFunction" to color the surface in one color only',
         },
     },
 };
