@@ -66,21 +66,21 @@ export type Material =
 function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType
+    colorMapFunction: colorMapFunctionType | undefined
 ) {
+    type funcType = (x: number) => Color;
+
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
     const isColorMapNameDefined = !!colorMapName;
 
     const defaultColorMap = createDefaultContinuousColorScale;
-    let colorMap = defaultColorMap as unknown as (
-        x: number
-    ) => [number, number, number];
+    let colorMap = defaultColorMap as unknown as funcType;
 
     if (isColorMapFunctionDefined) {
         colorMap =
             typeof colorMapFunction === "function"
-                ? colorMapFunction
-                : () => colorMapFunction;
+                ? (colorMapFunction as funcType)
+                : ((() => colorMapFunction) as unknown as funcType);
     } else if (isColorMapNameDefined) {
         colorMap = (value: number) =>
             rgbValues(value, colorMapName, colorTables);
