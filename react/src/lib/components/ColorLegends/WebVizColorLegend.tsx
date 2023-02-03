@@ -4,7 +4,7 @@ import { ColorLegend } from "@emerson-eps/color-tables";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface LegendProps {
-    colorTables?: colorTablesArray
+    colorTables?: colorTablesArray | string;
     min?: number;
     max?: number;
     title?: string;
