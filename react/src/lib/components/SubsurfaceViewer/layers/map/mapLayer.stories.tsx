@@ -1060,8 +1060,8 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
         return createColorMapFunction(colorName, isLog, isNearest, breakPoints);
     }, [colorName, isLog, isNearest, breakPoints]);
 
-    const min = 100;
-    const max = 1000;
+    const min = -3071;
+    const max = 41048;
 
     const updatedLayerData = [
         {
@@ -1087,6 +1087,7 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
                             getBreakpointValue={userDefinedBreakPoint}
                             horizontal={true}
                             numberOfTicks={2}
+                            colorName={colorName}
                         />
                     </div>
                 </View>

@@ -15,6 +15,11 @@ import {
     View,
 } from "../..";
 import { ViewStateType, ViewsType } from "./components/Map";
+import {
+    createColorMapFunction,
+    ColorLegend,
+    colorTables,
+} from "@emerson-eps/color-tables";
 
 export default {
     component: SubsurfaceViewer,
@@ -338,5 +343,207 @@ DepthTest.parameters = {
         description: {
             story: "Example using the depthTest property. If this is set to false it will disable depth testing for the layer",
         },
+    },
+};
+
+// Example using "Map" layer. Uses float32 float for mesh and properties.
+const wellLayers = [
+    {
+        ...defaultProps.layers[0],
+        refine: false,
+        outline: false,
+        logData: "./volve_logs.json",
+        logrunName: "BLOCKING",
+        logName: "ZONELOG",
+        logColor: "Stratigraphy",
+        colorMappingFunction: createColorMapFunction("Stratigraphy"),
+    },
+];
+
+const meshMapLayerFloat32 = {
+    "@@type": "MapLayer",
+    id: "mesh-layer",
+    meshUrl: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.float32",
+    contours: [0, 100],
+    isContoursDepth: true,
+    gridLines: false,
+    material: false,
+    colorMapName: "Physics",
+};
+
+//eslint-disable-next-line
+const MultiColorSelectorTemplate = (args: any) => {
+    const [wellLogColorName, setWellLogColorName] =
+        React.useState("Stratigraphy");
+    const [isLog, setIsLog] = React.useState(false);
+    const wellLayerData = React.useCallback(
+        (data) => {
+            console.log(data);
+            setWellLogColorName(data.name ? data.name : data.legendColorName);
+        },
+        [wellLogColorName]
+    );
+
+    // interpolation method
+    const getInterpolateMethod = React.useCallback((data) => {
+        setIsLog(data.isLog);
+    }, []);
+
+    const [mapLayerColorName, setMapLayerColorName1] =
+        React.useState("Physics");
+    const [colorRange, setRange] = React.useState();
+    const [isAuto, setAuto] = React.useState();
+    const [breakPoints, setBreakPoint] = React.useState();
+    const [isMapLayerLog, setIsMapLayerLog] = React.useState(false);
+    const [isNearest, setIsNearest] = React.useState(false);
+
+    // user defined breakpoint(domain)
+    const userDefinedBreakPoint = React.useCallback((data) => {
+        if (data) setBreakPoint(data.colorArray);
+    }, []);
+
+    // Get color name from color selector
+    const colorNameFromSelector = React.useCallback((data) => {
+        setMapLayerColorName1(data);
+    }, []);
+
+    // user defined range
+    const userDefinedRange = React.useCallback((data) => {
+        if (data.range) setRange(data.range);
+        setAuto(data.isAuto);
+    }, []);
+
+    // Get interpolation method from color selector to layer
+    const getMapLayerInterpolateMethod = React.useCallback((data) => {
+        setIsMapLayerLog(data.isLog);
+        setIsNearest(data.isNearest);
+    }, []);
+
+    // color map function
+    const colorMapFunc = React.useCallback(() => {
+        return createColorMapFunction(
+            mapLayerColorName,
+            isMapLayerLog,
+            isNearest,
+            breakPoints
+        );
+    }, [mapLayerColorName, isMapLayerLog, isNearest, breakPoints]);
+
+    const min = -3071;
+    const max = 41048;
+
+    const layers = [
+        {
+            ...meshMapLayerFloat32,
+            colorMapName: mapLayerColorName,
+            colorMapRange:
+                colorRange && isAuto == false ? colorRange : [min, max],
+            colorMapFunction: colorMapFunc(),
+        },
+        {
+            ...args.wellLayers[0],
+            colorMappingFunction: createColorMapFunction(wellLogColorName),
+            logColor: wellLogColorName
+                ? wellLogColorName
+                : wellLayers[0].logColor,
+            isLog: isLog,
+            depthTest: false,
+        },
+    ];
+    return (
+        <SubsurfaceViewer {...args} layers={layers}>
+            {
+                <View id="view_1">
+                    <ColorLegend
+                        {...args}
+                        getScale={wellLayerData}
+                        getInterpolateMethod={getInterpolateMethod}
+                        dataObjectName={"WellLogColorSelector"}
+                        cssLegendStyles={{ top: 50, left: 0 }}
+                        colorName={wellLogColorName}
+                    />
+                    <ColorLegend
+                        {...args}
+                        min={min}
+                        max={41048}
+                        colorNameFromSelector={colorNameFromSelector}
+                        getColorRange={userDefinedRange}
+                        getInterpolateMethod={getMapLayerInterpolateMethod}
+                        getBreakpointValue={userDefinedBreakPoint}
+                        horizontal={true}
+                        numberOfTicks={2}
+                        dataObjectName={"MapLayerColorSelector"}
+                        cssLegendStyles={{ top: 90, left: 0 }}
+                        colorName={mapLayerColorName}
+                    />
+                </View>
+            }
+        </SubsurfaceViewer>
+    );
+};
+
+//eslint-disable-next-line
+export const MultiColorSelector: any = MultiColorSelectorTemplate.bind({});
+
+// prop for legend
+const discreteData = {
+    Above_BCU: [[], 0],
+    ABOVE: [[], 1],
+    H12: [[], 2],
+    H11: [[], 3],
+    H10: [[], 4],
+    H9: [[], 5],
+    H8: [[], 6],
+    H7: [[], 7],
+    H6: [[], 8],
+    H5: [[], 9],
+    H4: [[], 10],
+    H3: [[], 11],
+    H2: [[], 12],
+    H1: [[], 13],
+    BELOW: [[], 14],
+};
+
+MultiColorSelector.args = {
+    wellLayerMin: 0,
+    wellLayerMax: 0.35,
+    dataObjectName: "ZONELOG",
+    position: [16, 10],
+    horizontal: true,
+    colorTables,
+    discreteData,
+    ...defaultProps,
+    id: defaultProps.id,
+    wellLayers,
+    legend: {
+        visible: false,
+    },
+    reverseRange: false,
+    views: {
+        layout: [1, 1],
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                zoom: -4,
+            },
+        ],
+    },
+};
+
+MultiColorSelector.parameters = {
+    docs: {
+        description: {
+            story: "Clicking on legend opens(toggle) the color selector component and then click on the color scale to update the layer that the selector target with.",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
     },
 };
