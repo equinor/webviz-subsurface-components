@@ -125,7 +125,7 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
     /** If true means that input z values are interpreted as depths.
      *   For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
-    isZDepth: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 const defaultProps = {
@@ -137,7 +137,7 @@ const defaultProps = {
     colorMapName: "",
     propertyValueRange: [0.0, 1.0],
     depthTest: true,
-    isZDepth: true,
+    ZIncreasingDownwards: true,
 };
 
 export default class Grid3DLayer extends CompositeLayer<
@@ -151,7 +151,7 @@ export default class Grid3DLayer extends CompositeLayer<
         );
 
         p.then(([points, polys, properties]) => {
-            if (!this.props.isZDepth) {
+            if (!this.props.ZIncreasingDownwards) {
                 FlipZ(points);
             }
 

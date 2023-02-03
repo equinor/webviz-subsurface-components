@@ -21,7 +21,7 @@ export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
     /** If true means that input z values are interpreted as depths.
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default false.
      */
-    isZDepth: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 const defaultProps = {
@@ -29,7 +29,7 @@ const defaultProps = {
     name: "Axes",
     id: "axes-layer",
     visible: true,
-    isZDepth: false,
+    ZIncreasingDownwards: false,
 };
 
 type TextLayerData = {
@@ -42,7 +42,7 @@ type TextLayerData = {
 export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
     initializeState(): void {
         const bounds = cloneDeep(this.props.bounds);
-        if (this.props.isZDepth) {
+        if (this.props.ZIncreasingDownwards) {
             bounds[2] *= -1;
             bounds[5] *= -1;
         }
@@ -90,7 +90,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
             this.context.viewport.constructor === OrthographicViewport;
 
         const bounds = cloneDeep(this.props.bounds);
-        if (this.props.isZDepth) {
+        if (this.props.ZIncreasingDownwards) {
             bounds[2] *= -1;
             bounds[5] *= -1;
         }

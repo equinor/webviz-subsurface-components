@@ -98,7 +98,7 @@ void main(void) {
       color = texture2D(colormap, vec2(x, 0.5));
    }
 
-   // Use normal lighting.
+   // Use normal lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
    fragColor = vec4(lightColor, 1.0);
 
