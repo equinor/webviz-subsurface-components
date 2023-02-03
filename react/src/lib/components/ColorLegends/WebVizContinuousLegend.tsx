@@ -4,23 +4,35 @@ import { ContinuousLegend } from "@emerson-eps/color-tables";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface LegendProps {
-    title?: string;
     min: number;
     max: number;
+    title?: string;
     cssLegendStyles?: Record<string, unknown>;
-    colorName: string;
+    colorName?: string;
     horizontal?: boolean | null;
-    colorTables: colorTablesArray | string | undefined;
+    colorTables?: colorTablesArray | string;
+    id?: string;
+    isRangeShown?: boolean;
+    legendFontSize?: number;
+    tickFontSize?: number;
+    numberOfTicks?: number;
+    legendScaleSize?: number;
 }
 
 const ContinuousLegendWrapper: React.FC<LegendProps> = ({
-    title,
     min,
     max,
+    title,
     cssLegendStyles,
     colorName,
     horizontal,
     colorTables,
+    id,
+    isRangeShown,
+    legendFontSize,
+    tickFontSize,
+    numberOfTicks,
+    legendScaleSize,
 }) => {
     return (
         <ContinuousLegend
@@ -31,18 +43,30 @@ const ContinuousLegendWrapper: React.FC<LegendProps> = ({
             colorName={colorName}
             horizontal={horizontal}
             colorTables={colorTables}
+            id={id}
+            isRangeShown={isRangeShown}
+            legendFontSize={legendFontSize}
+            tickFontSize={tickFontSize}
+            numberOfTicks={numberOfTicks}
+            legendScaleSize={legendScaleSize}
         />
     );
 };
 
 ContinuousLegendWrapper.propTypes = {
-    title: PropTypes.string,
     min: PropTypes.number.isRequired,
     max: PropTypes.number.isRequired,
+    title: PropTypes.string,
     cssLegendStyles: PropTypes.objectOf(PropTypes.string),
     colorName: PropTypes.string.isRequired,
     horizontal: PropTypes.bool,
     colorTables: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+    id: PropTypes.string,
+    isRangeShown: PropTypes.bool,
+    legendFontSize: PropTypes.number,
+    tickFontSize: PropTypes.number,
+    numberOfTicks: PropTypes.number,
+    legendScaleSize: PropTypes.number,
 };
 
 export default ContinuousLegendWrapper;
