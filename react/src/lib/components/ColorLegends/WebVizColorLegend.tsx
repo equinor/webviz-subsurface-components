@@ -19,6 +19,7 @@ interface LegendProps {
     numberOfTicks?: number;
     legendScaleSize?: number;
     cssLegendStyles?: Record<string, unknown>;
+    openColorSelector?: boolean;
 }
 
 const ColorLegendWrapper: React.FC<LegendProps> = ({
@@ -37,6 +38,7 @@ const ColorLegendWrapper: React.FC<LegendProps> = ({
     numberOfTicks,
     legendScaleSize,
     cssLegendStyles,
+    openColorSelector,
 }) => {
     return (
         <ColorLegend
@@ -55,6 +57,7 @@ const ColorLegendWrapper: React.FC<LegendProps> = ({
             numberOfTicks={numberOfTicks}
             legendScaleSize={legendScaleSize}
             cssLegendStyles={cssLegendStyles}
+            openColorSelector={openColorSelector}
         />
     );
 };
@@ -75,6 +78,7 @@ ColorLegendWrapper.propTypes = {
     tickFontSize: PropTypes.number,
     numberOfTicks: PropTypes.number,
     legendScaleSize: PropTypes.number,
+    openColorSelector: PropTypes.bool,
 };
 
 export default ColorLegendWrapper;
