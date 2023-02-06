@@ -29,6 +29,7 @@ legend_obj = wsc.WebVizColorLegend(
     tickFontSize=12,
     numberOfTicks=3,
     legendScaleSize=200,
+    openColorSelector=False,
 )
 
 app = dash.Dash(__name__)
