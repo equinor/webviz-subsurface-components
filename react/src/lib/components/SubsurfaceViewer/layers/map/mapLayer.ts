@@ -342,7 +342,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                     const zMin = -meshZValueRange[0];
                     const xMax = xMin + xinc * xcount;
                     const yMax = yMin + yinc * ycount;
-                    const zMax = -meshZValueRange[0];
+                    const zMax = -meshZValueRange[1];
 
                     this.props.setReportedBoundingBox([
                         xMin,
