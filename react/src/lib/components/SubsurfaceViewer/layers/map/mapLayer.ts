@@ -321,26 +321,10 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =
                     e.data;
 
-                const isConstantColor =
-                    typeof this.props.colorMapFunction !== "function";
-
-                const colorFunc = !isConstantColor
-                    ? () => this.props.colorMapFunction
-                    : this.props.colorMapFunction;
-
-                const legend = {
-                    discrete: false,
-                    valueRange: this.props.colorMapRange ?? propertyValueRange,
-                    colorName: this.props.colorMapName,
-                    title: "MapLayer",
-                    colorMapFunction: colorFunc,
-                };
-
                 this.setState({
                     mesh,
                     mesh_lines,
                     propertyValueRange,
-                    legend,
                 });
 
                 if (
