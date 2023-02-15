@@ -66,20 +66,27 @@ export type Material =
 function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | false | undefined
+    colorMapFunction: colorMapFunctionType | undefined
 ) {
-    const isColorMapFunctionDefined = typeof colorMapFunction === "function";
+    type funcType = (x: number) => Color;
+
+    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
     const isColorMapNameDefined = !!colorMapName;
 
-    const data = new Uint8Array(256 * 3);
-
     const defaultColorMap = createDefaultContinuousColorScale;
+    let colorMap = defaultColorMap as unknown as funcType;
 
-    const colorMap = isColorMapFunctionDefined
-        ? colorMapFunction
-        : isColorMapNameDefined
-        ? (value: number) => rgbValues(value, colorMapName, colorTables)
-        : defaultColorMap();
+    if (isColorMapFunctionDefined) {
+        colorMap =
+            typeof colorMapFunction === "function"
+                ? (colorMapFunction as funcType)
+                : ((() => colorMapFunction) as unknown as funcType);
+    } else if (isColorMapNameDefined) {
+        colorMap = (value: number) =>
+            rgbValues(value, colorMapName, colorTables);
+    }
+
+    const data = new Uint8Array(256 * 3);
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
@@ -103,7 +110,7 @@ export interface privateMapLayerProps<D> extends ExtendedLayerProps<D> {
     colorMapName: string;
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
-    colorMapFunction?: colorMapFunctionType | false;
+    colorMapFunction?: colorMapFunctionType;
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;
