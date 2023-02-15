@@ -514,26 +514,13 @@ function word2view(
         vec4.create(),
         pos_w,
         mat4.fromValues(
-            viewMatrix[0],
-            viewMatrix[1],
-            viewMatrix[2],
-            viewMatrix[3],
-            viewMatrix[4],
-            viewMatrix[5],
-            viewMatrix[6],
-            viewMatrix[7],
-            viewMatrix[8],
-            viewMatrix[9],
-            viewMatrix[10],
-            viewMatrix[11],
-            viewMatrix[12],
-            viewMatrix[13],
-            viewMatrix[14],
-            viewMatrix[15]
+            ...(viewMatrix.slice(0, mat4.fromValues.length) as Parameters<
+                typeof mat4.fromValues
+            >)
         )
     );
 
-    return [pos_v[0], pos_v[1], pos_v[2]];
+    return pos_v.slice(0, 3) as [number, number, number];
 }
 
 function LineLengthInPixels(
