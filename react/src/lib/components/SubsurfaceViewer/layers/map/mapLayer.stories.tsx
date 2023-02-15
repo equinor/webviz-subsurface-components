@@ -606,9 +606,7 @@ BigMap.args = {
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
 };
 
-export const BigMap3d: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const BigMap3d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
