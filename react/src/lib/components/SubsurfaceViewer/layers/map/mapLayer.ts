@@ -227,8 +227,10 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
      * If defined this function will override the color map.
      * Takes a value in the range [0,1] and returns a color.
      * E.g. (x) => [x * 255, x * 255, x * 255]
+     * May also be set as constant color:
+     * E.g. [255, 0, 0] for constant red surface.
      */
-    colorMapFunction?: colorMapFunctionType | false;
+    colorMapFunction?: colorMapFunctionType;
 
     /**  Surface material properties.
      * material: true  = default material, coloring depends on surface orientation and lighting.
@@ -319,19 +321,10 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =
                     e.data;
 
-                const legend = {
-                    discrete: false,
-                    valueRange: this.props.colorMapRange ?? propertyValueRange,
-                    colorName: this.props.colorMapName,
-                    title: "MapLayer",
-                    colorMapFunction: this.props.colorMapFunction,
-                };
-
                 this.setState({
                     mesh,
                     mesh_lines,
                     propertyValueRange,
-                    legend,
                 });
 
                 if (

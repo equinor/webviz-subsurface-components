@@ -279,6 +279,44 @@ MapLayer3dPng.parameters = {
     },
 };
 
+export const ConstantColor: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+ConstantColor.args = {
+    id: "map",
+    layers: [
+        axes_hugin,
+        {
+            ...meshMapLayerPng,
+            colorMapFunction: [0, 255, 0], // Use constant color instead of function
+        },
+        north_arrow_layer,
+    ],
+
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+ConstantColor.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: 'Example using the property "colorMapFunction" to color the surface in one color only',
+        },
+    },
+};
+
 export const ScaleZ: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     const [layers, setLayers] = React.useState([
         axes_hugin,
@@ -530,13 +568,11 @@ MapLayer2dDarkMode.parameters = {
     backgrounds: { default: "dark" },
 };
 
-export const MapLayerRotated: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const Rotated: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-MapLayerRotated.args = {
+Rotated.args = {
     id: "map",
     layers: [axes_hugin, meshMapLayerRotated, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
@@ -551,7 +587,7 @@ MapLayerRotated.args = {
     },
 };
 
-MapLayerRotated.parameters = {
+Rotated.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
@@ -560,25 +596,21 @@ MapLayerRotated.parameters = {
     },
 };
 
-export const MapLayerBigMap: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const BigMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-MapLayerBigMap.args = {
+BigMap.args = {
     id: "map",
     layers: [axes_hugin, meshMapLayerBig, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
 };
 
-export const MapLayerBigMap3d: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const BigMap3d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-MapLayerBigMap3d.args = {
+BigMap3d.args = {
     id: "map",
     layers: [axes_hugin, meshMapLayerBig, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
@@ -593,7 +625,7 @@ MapLayerBigMap3d.args = {
     },
 };
 
-MapLayerBigMap3d.parameters = {
+BigMap3d.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
@@ -1095,9 +1127,9 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
     );
 };
 
-export const MapLayerColorSelector = MapLayerColorSelectorTemplate.bind({});
+export const ColorSelector = MapLayerColorSelectorTemplate.bind({});
 
-MapLayerColorSelector.args = {
+ColorSelector.args = {
     ...defaultArgs,
     id: "map_layer_color_selector",
     legend: {
