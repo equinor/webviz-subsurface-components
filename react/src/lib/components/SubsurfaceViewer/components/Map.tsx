@@ -356,13 +356,7 @@ const Map: React.FC<MapProps> = ({
         );
 
         const isBoundsDefined = typeof bounds !== "undefined";
-
-        const is3D = views?.viewports?.[0]?.show3D ?? false;
-        if (!isBoundsDefined) {
-            if (!is3D) {
-                target.pop(); // In 2D "target" should only contain x and y.
-            }
-        } else {
+        if (isBoundsDefined) {
             // if bounds are defined we only use z value of target and x,y set to middle of bounds.
             const z = target[2];
             const bounds_ =
@@ -373,6 +367,11 @@ const Map: React.FC<MapProps> = ({
             const x = bounds_[0] + 0.5 * (bounds_[2] - bounds_[0]); // right - left
             const y = bounds_[1] + 0.5 * (bounds_[3] - bounds_[1]); // top - bottom
             target = [x, y, z];
+        }
+
+        const is3D = views?.viewports?.[0]?.show3D ?? false;
+        if (!is3D) {
+            target.pop(); // In 2D "target" should only contain x and y.
         }
 
         let tempViewStates: Record<string, ViewStateType> = {};
