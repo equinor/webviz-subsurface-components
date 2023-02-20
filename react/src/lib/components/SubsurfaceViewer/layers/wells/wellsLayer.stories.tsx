@@ -113,6 +113,13 @@ volveWells2.args = {
             "@@type": "WellsLayer",
             data: "@@#resources.wellsData",
         },
+        {
+            "@@type": "Axes2DLayer",
+            id: "axes-layer2D",
+            axisColor: [100, 100, 255],
+            marginH: 100, // Horizontal margin (in pixels)
+            marginV: 40, // Vertical margin (in pixels)
+        },
     ],
 };
 
