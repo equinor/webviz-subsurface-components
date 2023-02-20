@@ -503,7 +503,7 @@ MapLayer2d.args = {
     id: "map",
     layers: [
         axes_hugin,
-        { ...meshMapLayerFloat32, material: false },
+        { ...meshMapLayerFloat32, material: true },
         north_arrow_layer,
     ],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
