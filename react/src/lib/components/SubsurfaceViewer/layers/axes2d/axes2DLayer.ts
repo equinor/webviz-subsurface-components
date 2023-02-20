@@ -238,7 +238,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         line_model.draw();
 
+        // When both parameters are negative, (decreased depth), the mesh is pulled towards the camera (hence, gets in front).
+        // When both parameters are positive, (increased depth), the mesh is pushed away from the camera (hence, gets behind).
+        gl.enable(GL.POLYGON_OFFSET_FILL);
+        gl.polygonOffset(1, 1);
         background_model.setUniforms({ projectionMatrix }).draw();
+        gl.disable(GL.POLYGON_OFFSET_FILL);
 
         //gl.enable(gl.DEPTH_TEST);
     }
@@ -453,7 +458,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         //-- Background model --
         const width = 140;
-        const z = -1;
+        const z = 90; // Depth of background square
         // Y axis
         const p1_w = vec4.fromValues(xMin, yMin, z, 1);
         const p2_w = vec4.fromValues(xMin, yMax, z, 1);
@@ -617,7 +622,10 @@ function GetTickLines(
 
     const x_ticks = GetTicks(x_min, x_max, Lx); // Note: this may be replaced by NiceTicks npm package.
     y_tick = y_min;
-    const z_tick = 0;
+
+    // z value of all lines and labels. In camera/view coordinates. This
+    // ensures lines will be closer to camera than rest of model.
+    const z_tick = 100;
     for (let i = 0; i < x_ticks.length; i++) {
         const tick = x_ticks[i];
 
@@ -685,7 +693,6 @@ function GetTickLines(
         tick_labels.push(label);
 
         const x_tick = x_min;
-        const z_tick = 0;
 
         // tick line start
         lines.push(x_tick, tick, z_tick);
