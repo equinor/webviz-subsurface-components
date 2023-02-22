@@ -27,7 +27,7 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import { WellsLayer } from "../layers";
+import { WellsLayer, AxesLayer, NorthArrow3DLayer, Grid3DLayer, MapLayer } from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
@@ -163,7 +163,7 @@ export interface MapProps {
      * Each JSON object will consist of layer type with key as "@@type" and
      * layer specific data, if any.
      */
-    layers?: Record<string, unknown>[];
+    layers?: LayersList;
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
@@ -325,7 +325,7 @@ const Map: React.FC<MapProps> = ({
     const boundsInitial = bounds ?? [0, 0, 1, 1];
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
-    const [alteredLayers, setAlteredLayers] = useState([{}]);
+    const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
     const initialViewState = getViewState(
         boundsInitial,
@@ -345,15 +345,16 @@ const Map: React.FC<MapProps> = ({
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
         const axesLayer = layers?.find((e) => {
-            return e["@@type"] === "AxesLayer";
-        });
-        const isAxesLayer = typeof axesLayer !== "undefined";
+            return e?.constructor.name === AxesLayer.name;
+        }) as AxesLayer;
+        //const isAxesLayer = typeof axesLayer !== "undefined";
         // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
-        let target = boundingBoxCenter(
+        let target = boundingBoxCenter((axesLayer?.props.bounds ?? union_of_reported_bboxes) as BoundingBox);
+/*         let target = boundingBoxCenter(
             isAxesLayer
                 ? (axesLayer?.["bounds"] as BoundingBox)
                 : (union_of_reported_bboxes as BoundingBox)
-        );
+        ); */
 
         const isBoundsDefined = typeof bounds !== "undefined";
         if (isBoundsDefined) {
@@ -577,26 +578,50 @@ const Map: React.FC<MapProps> = ({
 
         const m = getModelMatrixScale(scaleZ);
 
-        let layers_copy = cloneDeep(layers);
+        //console.log("layers: ", layers);
+        let layers_copy = layers;
+        //let layers_copy = cloneDeep(layers);
+        //console.log("layers_copy: ", layers_copy);
         layers_copy = layers_copy.map((layer) => {
             // Inject "setReportedBoundingBox" function into layer for it to report
             // back its respective bounding box.
-            layer["setReportedBoundingBox"] = setReportedBoundingBox;
+            //layer["setReportedBoundingBox"] = setReportedBoundingBox;
 
             // Set "modelLayer" matrix to reflect correct z scaling.
-            if (layer["@@type"] !== "NorthArrow3DLayer") {
+/*             if (layer["@@type"] !== "NorthArrow3DLayer") {
                 layer["modelMatrix"] = m;
-            }
+            } */
 
-            return layer;
+            if (layer?.constructor.name === NorthArrow3DLayer.name)
+                return layer;
+
+            console.log((layer as Layer)?.props)
+
+            const scaledLayer = (layer as Layer)?.clone({modelMatrix: m});
+
+            //const boundedLayer = scaledLayer as Grid3DLayer | MapLayer | AxesLayer;
+            const boundedLayer = scaledLayer.clone({
+                setReportedBoundingBox: setReportedBoundingBox});
+
+            //console.log(layer);
+
+            return boundedLayer ?? scaledLayer;
+            //return layer;
         });
 
         setAlteredLayers(layers_copy);
     }, [scaleZ, layers /*dispatch*/]);
 
+    //console.log("alteredLayers: ", alteredLayers);
+
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
 
-    useEffect(() => {
+    
+      useEffect(() => {
+        setDeckGLLayers(alteredLayers);
+    }, [alteredLayers]);
+
+/*      useEffect(() => {
         const layers = alteredLayers;
         if (!layers || layers.length == 0) return;
 
@@ -607,8 +632,21 @@ const Map: React.FC<MapProps> = ({
 
         setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
     }, [resources, editedData, layers, alteredLayers]);
+ */
 
     useEffect(() => {
+        const layers = deckRef.current?.deck?.props.layers;
+        if (layers) {
+            const wellslayer = getLayersByType(
+                layers,
+                WellsLayer.name
+            )?.[0] as WellsLayer;
+
+            wellslayer?.setSelection(selection?.well, selection?.selection);
+        }
+    }, [selection]);
+
+/*     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
         if (layers) {
             const wellslayer = getLayersByType(
@@ -619,19 +657,7 @@ const Map: React.FC<MapProps> = ({
             wellslayer?.setSelection(selection?.well, selection?.selection);
         }
     }, [selection]);
-
-    useEffect(() => {
-        const layers = deckRef.current?.deck?.props.layers;
-        if (layers) {
-            const wellslayer = getLayersByType(
-                layers,
-                "WellsLayer"
-            )?.[0] as WellsLayer;
-
-            wellslayer?.setSelection(selection?.well, selection?.selection);
-        }
-    }, [selection]);
-
+ */
     // multiple well layers
     const [multipleWells, setMultipleWells] = useState<string[]>([]);
     const [selectedWell, setSelectedWell] = useState<string>("");
@@ -907,6 +933,9 @@ const Map: React.FC<MapProps> = ({
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
+
+    //console.log(deckGLLayers);
+
     return (
         <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
@@ -1021,10 +1050,14 @@ export default Map;
 
 // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
 // See https://deck.gl/docs/api-reference/json/overview for more details.
-function jsonToObject(
+export function jsonToObject(
     data: Record<string, unknown>[] | LayerProps[],
     enums: Record<string, unknown>[] | undefined = undefined
 ): LayersList | View[] {
+
+    if (!data)
+        return [];
+
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {

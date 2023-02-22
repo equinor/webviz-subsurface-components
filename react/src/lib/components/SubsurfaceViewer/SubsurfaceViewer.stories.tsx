@@ -24,6 +24,7 @@ export default {
 const defaultWellsLayer = {
     "@@type": "WellsLayer",
     data: "@@#resources.wellsData",
+    id: "default_wells",
 };
 
 const defaultProps = {
