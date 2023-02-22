@@ -15,17 +15,26 @@ import {
     View,
 } from "../..";
 import { ViewStateType, ViewsType } from "./components/Map";
+import { WellsLayer, MapLayer } from "./layers";
 
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
+/*
 const defaultWellsLayer = {
     "@@type": "WellsLayer",
     data: "@@#resources.wellsData",
-    id: "default_wells",
 };
+*/
+const defaultWellsProps = {
+    data: "./volve_wells.json",
+};
+
+const defaultWellsLayer = new WellsLayer({
+    ...defaultWellsProps,
+});
 
 const defaultProps = {
     id: "volve-wells",
@@ -203,20 +212,26 @@ customizedCameraPosition.args = {
     cameraPosition,
 };
 
-const mapLayer = {
-    "@@type": "MapLayer",
-    id: "hugin",
+const mapProps = {
+    id: "kh_netmap",
     meshUrl: "hugin_depth_25_m.float32",
     frame: {
-        origin: [432150, 6475800],
-        count: [291, 229],
-        increment: [25, 25],
+        origin: [432150, 6475800] as [number, number],
+        count: [291, 229] as [number, number],
+        increment: [25, 25] as [number, number],
         rotDeg: 0,
     },
     propertiesUrl: "kh_netmap_25_m.float32",
-    contours: [0, 100],
+    contours: [0, 100] as [number, number],
     material: false,
 };
+
+const netmapLayer = new MapLayer({ ...mapProps });
+const huginLayer = new MapLayer({
+    ...mapProps,
+    id: "hugin",
+    propertiesUrl: "hugin_depth_25_m.float32",
+});
 
 const MultiViewAnnotationTemplate: ComponentStory<typeof SubsurfaceViewer> = (
     args
@@ -241,14 +256,7 @@ export const MultiViewAnnotation = MultiViewAnnotationTemplate.bind({});
 
 MultiViewAnnotation.args = {
     id: "multi_view_annotation",
-    layers: [
-        mapLayer,
-        {
-            ...mapLayer,
-            id: "kh_netmap",
-            propertiesUrl: "hugin_depth_25_m.float32",
-        },
-    ],
+    layers: [netmapLayer, huginLayer],
     views: {
         layout: [1, 2],
         showLabel: true,
@@ -271,27 +279,20 @@ export const ViewObjectInitializedAsEmpty = MultiViewAnnotationTemplate.bind(
 
 ViewObjectInitializedAsEmpty.args = {
     id: "view_initialized_as_empty",
-    layers: [
-        mapLayer,
-        {
-            ...mapLayer,
-            id: "kh_netmap",
-            propertiesUrl: "hugin_depth_25_m.float32",
-        },
-    ],
+    layers: [netmapLayer, huginLayer],
     views: {} as ViewsType,
 };
 
-const wellsLayerNoDepthTest = {
-    ...defaultWellsLayer,
+const wellsLayerNoDepthTest = new WellsLayer({
+    ...defaultWellsProps,
     id: "wells-layer-no-depth-test",
     depthTest: false,
-};
+});
 
 export const DepthTest: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     const props = {
         ...args,
-        layers: [mapLayer, defaultWellsLayer, wellsLayerNoDepthTest],
+        layers: [netmapLayer, defaultWellsLayer, wellsLayerNoDepthTest],
     };
 
     return (
