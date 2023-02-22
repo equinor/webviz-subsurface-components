@@ -7,6 +7,19 @@ import * as png from "@vivaxy/png";
 import { makeFullMesh } from "./webworker";
 import { Matrix4 } from "math.gl";
 
+// Rotate x,y around x0, y0 rad radians
+function rotate(
+    x: number,
+    y: number,
+    x0: number,
+    y0: number,
+    rad: number
+): [number, number] {
+    const xRot = Math.cos(rad) * (x - x0) - Math.sin(rad) * (y - y0) + x0; // eslint-disable-line
+    const yRot = Math.sin(rad) * (x - x0) + Math.cos(rad) * (y - y0) + y0; // eslint-disable-line
+    return [xRot, yRot];
+}
+
 // These two types both describes the mesh' extent in the horizontal plane.
 type Frame = {
     /** mesh origin
@@ -342,14 +355,32 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                     const zMin = -meshZValueRange[0];
                     const xMax = xMin + xinc * xcount;
                     const yMax = yMin + yinc * ycount;
-                    const zMax = -meshZValueRange[0];
+                    const zMax = -meshZValueRange[1];
+
+                    // If map is rotated the bounding box must reflect that.
+                    const center =
+                        this.props.frame.rotPoint ?? this.props.frame.origin;
+                    const rotDeg = this.props.frame.rotDeg ?? 0;
+                    const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
+
+                    // Rotate x,y around "center" "rad" radians
+                    const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                    const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                    const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
+                    const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
+
+                    // Rotated bounds in x/y plane.
+                    const x_min = Math.min(x0, x1, x2, x3);
+                    const x_max = Math.max(x0, x1, x2, x3);
+                    const y_min = Math.min(y0, y1, y2, y3);
+                    const y_max = Math.max(y0, y1, y2, y3);
 
                     this.props.setReportedBoundingBox([
-                        xMin,
-                        yMin,
+                        x_min,
+                        y_min,
                         zMin,
-                        xMax,
-                        yMax,
+                        x_max,
+                        y_max,
                         zMax,
                     ]);
                 }
