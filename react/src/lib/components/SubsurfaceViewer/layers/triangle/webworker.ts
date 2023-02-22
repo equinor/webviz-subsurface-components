@@ -6,8 +6,7 @@ type Vec = [number, number, number];
 export function makeFullMesh(e: { data: Params }): void {
     const params = e.data;
 
-    // Keep
-    //const t0 = performance.now();
+    const t0 = performance.now();
 
     function crossProduct(a: Vec, b: Vec): Vec {
         const c = [
@@ -119,20 +118,21 @@ export function makeFullMesh(e: { data: Params }): void {
         vertexsNormals[3 * vertex_no + 1] = normal_mean[1];
         vertexsNormals[3 * vertex_no + 2] = normal_mean[2];
 
-        // KEEP!
-        // DEBUG SHOW NORMALS ////////////////////////////////
-        // const x0 = vertexArray[3 * vertex_no + 0];
-        // const y0 = vertexArray[3 * vertex_no + 1];
-        // const z0 = vertexArray[3 * vertex_no + 2];
+        // Debug. Verify normal calculations.
+        const isDebug = false;
+        if (isDebug) {
+            const x0 = vertexArray[3 * vertex_no + 0];
+            const y0 = vertexArray[3 * vertex_no + 1];
+            const z0 = vertexArray[3 * vertex_no + 2];
 
-        // const scale = 5;
-        // const x1 = x0 + normal_mean[0] * scale;
-        // const y1 = y0 + normal_mean[1] * scale;
-        // const z1 = z0 + normal_mean[2] * scale;
+            const scale = 5;
+            const x1 = x0 + normal_mean[0] * scale;
+            const y1 = y0 + normal_mean[1] * scale;
+            const z1 = z0 + normal_mean[2] * scale;
 
-        // line_positions.push(x0, y0, z0);
-        // line_positions.push(x1, y1, z1);
-        ///////////////////////////////////////////////////////
+            line_positions.push(x0, y0, z0);
+            line_positions.push(x1, y1, z1);
+        }
     }
 
     const geometryTriangles: GeometryTriangles = {
@@ -154,9 +154,8 @@ export function makeFullMesh(e: { data: Params }): void {
         vertexCount: line_positions.length / 3,
     };
 
-    //const t1 = performance.now();
-    // Keep this.
-    //console.log(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
+    const t1 = performance.now();
+    console.debug(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
 
     // Note: typescript gives this error "error TS2554: Expected 2-3 arguments, but got 1."
     // Disabling this for now as the second argument should be optional.
