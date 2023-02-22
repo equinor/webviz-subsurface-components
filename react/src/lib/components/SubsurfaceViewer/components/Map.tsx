@@ -347,8 +347,10 @@ const Map: React.FC<MapProps> = ({
         }) as AxesLayer;
         //const isAxesLayer = typeof axesLayer !== "undefined";
         // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
-        let target = boundingBoxCenter((axesLayer?.props.bounds ?? union_of_reported_bboxes) as BoundingBox);
-/*         let target = boundingBoxCenter(
+        let target = boundingBoxCenter(
+            (axesLayer?.props.bounds ?? union_of_reported_bboxes) as BoundingBox
+        );
+        /*         let target = boundingBoxCenter(
             isAxesLayer
                 ? (axesLayer?.["bounds"] as BoundingBox)
                 : (union_of_reported_bboxes as BoundingBox)
@@ -586,20 +588,21 @@ const Map: React.FC<MapProps> = ({
             //layer["setReportedBoundingBox"] = setReportedBoundingBox;
 
             // Set "modelLayer" matrix to reflect correct z scaling.
-/*             if (layer["@@type"] !== "NorthArrow3DLayer") {
+            /*             if (layer["@@type"] !== "NorthArrow3DLayer") {
                 layer["modelMatrix"] = m;
             } */
 
             if (layer?.constructor.name === NorthArrow3DLayer.name)
                 return layer;
 
-            console.log((layer as Layer)?.props)
+            console.log((layer as Layer)?.props);
 
-            const scaledLayer = (layer as Layer)?.clone({modelMatrix: m});
+            const scaledLayer = (layer as Layer)?.clone({ modelMatrix: m });
 
             //const boundedLayer = scaledLayer as Grid3DLayer | MapLayer | AxesLayer;
             const boundedLayer = scaledLayer.clone({
-                setReportedBoundingBox: setReportedBoundingBox});
+                setReportedBoundingBox: setReportedBoundingBox,
+            });
 
             //console.log(layer);
 
@@ -614,12 +617,11 @@ const Map: React.FC<MapProps> = ({
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
 
-    
-      useEffect(() => {
+    useEffect(() => {
         setDeckGLLayers(alteredLayers);
     }, [alteredLayers]);
 
-/*      useEffect(() => {
+    /*      useEffect(() => {
         const layers = alteredLayers;
         if (!layers || layers.length == 0) return;
 
@@ -644,7 +646,7 @@ const Map: React.FC<MapProps> = ({
         }
     }, [selection]);
 
-/*     useEffect(() => {
+    /*     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
         if (layers) {
             const wellslayer = getLayersByType(
@@ -1052,9 +1054,7 @@ export function jsonToObject(
     data: Record<string, unknown>[] | LayerProps[],
     enums: Record<string, unknown>[] | undefined = undefined
 ): LayersList | View[] {
-
-    if (!data)
-        return [];
+    if (!data) return [];
 
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {

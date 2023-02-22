@@ -115,7 +115,10 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
-        const layersList = jsonToObject(layersJson as Record<string, unknown>[], enumerations) as LayersList;
+        const layersList = jsonToObject(
+            layersJson as Record<string, unknown>[],
+            enumerations
+        ) as LayersList;
         setLayerInstances(layersList ?? layers);
     }, [layers]);
 
