@@ -1,4 +1,4 @@
-import { Layer, LayersList } from "@deck.gl/core/typed";
+import { LayersList } from "@deck.gl/core/typed";
 import Map, {
     ViewsType,
     TooltipCallback,
@@ -147,7 +147,6 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     return (
         <Map
             id={id}
-            resources={resources}
             layers={layerInstances}
             bounds={bounds}
             views={views}
@@ -155,7 +154,6 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             scale={scale}
             coordinateUnit={coordinateUnit}
             colorTables={colorTables}
-            editedData={editedData}
             setEditedData={setEditedData}
             checkDatafileSchema={checkDatafileSchema}
             onMouseEvent={onMouseEvent}

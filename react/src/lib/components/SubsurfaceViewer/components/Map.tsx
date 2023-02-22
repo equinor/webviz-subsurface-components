@@ -27,7 +27,7 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import { WellsLayer, AxesLayer, NorthArrow3DLayer, Grid3DLayer, MapLayer } from "../layers";
+import { WellsLayer, AxesLayer, NorthArrow3DLayer } from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
@@ -296,7 +296,6 @@ function adjustCameraTarget(
 
 const Map: React.FC<MapProps> = ({
     id,
-    resources,
     layers,
     bounds,
     views,
@@ -304,7 +303,6 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     colorTables,
-    editedData,
     setEditedData,
     checkDatafileSchema,
     onMouseEvent,
