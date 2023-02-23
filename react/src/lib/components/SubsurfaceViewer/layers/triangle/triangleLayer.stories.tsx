@@ -14,7 +14,7 @@ const defaultParameters = {
     },
 };
 
-const north_arrow_layer = {
+const northArrowLayer = {
     "@@type": "NorthArrow3DLayer",
     id: "north-arrow-layer",
 };
@@ -50,7 +50,7 @@ const triangleLayer = {
     /*eslint-enable */
 };
 
-const axes_lite = {
+const axesLayer = {
     "@@type": "AxesLayer",
     id: "axes_small",
     bounds: [-10, -10, -10, 20, 10, 0],
@@ -64,7 +64,7 @@ export const SmallTriangleLayer: ComponentStory<typeof SubsurfaceViewer> = (
 
 SmallTriangleLayer.args = {
     id: "map",
-    layers: [axes_lite, triangleLayer, north_arrow_layer],
+    layers: [axesLayer, triangleLayer, northArrowLayer],
     bounds: [-10, -10, 17, 10],
     views: {
         layout: [1, 1],

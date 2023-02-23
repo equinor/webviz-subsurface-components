@@ -1,8 +1,9 @@
 import { CompositeLayer, UpdateParameters } from "@deck.gl/core/typed";
-import privateTriangleLayer, { Material } from "./privateTriangleLayer";
+import PrivateTriangleLayer, { Material } from "./privateTriangleLayer";
 import { ExtendedLayerProps } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import { makeFullMesh } from "./webworker";
+import React from "react";
 
 export type Params = {
     vertexArray: Float32Array;
@@ -10,7 +11,7 @@ export type Params = {
     smoothShading: boolean;
 };
 
-async function load_mesh_and_properties(
+async function loadData(
     pointsData: string | number[],
     triangleData: string | number[],
     ZIncreasingDownwards: boolean
@@ -118,8 +119,9 @@ export interface TriangleLayerProps<D> extends ExtendedLayerProps<D> {
     ZIncreasingDownwards: boolean;
 
     // Non public properties:
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setReportedBoundingBox?: any;
+    setReportedBoundingBox?: React.Dispatch<
+        React.SetStateAction<[number, number, number, number, number, number]>
+    >;
 }
 
 const defaultProps = {
@@ -144,7 +146,7 @@ export default class TriangleLayer extends CompositeLayer<
         const pointsData = this.props.pointsData;
         const triangleData = this.props.triangleData;
 
-        const p = load_mesh_and_properties(
+        const p = loadData(
             pointsData,
             triangleData,
             this.props.ZIncreasingDownwards
@@ -236,12 +238,12 @@ export default class TriangleLayer extends CompositeLayer<
         }
     }
 
-    renderLayers(): [privateTriangleLayer?] {
+    renderLayers(): [PrivateTriangleLayer?] {
         if (Object.keys(this.state).length === 0) {
             return [];
         }
 
-        const layer = new privateTriangleLayer(
+        const layer = new PrivateTriangleLayer(
             this.getSubLayerProps({
                 geometryTriangles: this.state["geometryTriangles"],
                 geometryLines: this.state["geometryLines"],

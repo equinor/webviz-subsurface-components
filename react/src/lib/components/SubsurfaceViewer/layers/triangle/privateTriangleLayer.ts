@@ -51,7 +51,7 @@ export type Material =
       }
     | boolean;
 
-export interface privateTriangleLayerProps<D> extends ExtendedLayerProps<D> {
+export interface PrivateTriangleLayerProps<D> extends ExtendedLayerProps<D> {
     geometryTriangles: GeometryTriangles;
     geometryLines: GeometryLines;
     contours: [number, number];
@@ -72,8 +72,8 @@ const defaultProps = {
 };
 
 // This is a private layer used only by the composite TriangleLayer
-export default class privateTriangleLayer extends Layer<
-    privateTriangleLayerProps<unknown>
+export default class PrivateTriangleLayer extends Layer<
+    PrivateTriangleLayerProps<unknown>
 > {
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
@@ -102,7 +102,6 @@ export default class privateTriangleLayer extends Layer<
     }
 
     _getModels(gl: WebGLRenderingContext): [unknown, unknown] {
-        // MESH MODEL
         const triangleModel = new Model(gl, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
@@ -112,7 +111,6 @@ export default class privateTriangleLayer extends Layer<
             isInstanced: false, // This only works when set to false.
         });
 
-        // MESH LINES
         const lineModel = new Model(gl, {
             id: `${this.props.id}-lines`,
             vs: vsLineShader,
@@ -202,5 +200,5 @@ export default class privateTriangleLayer extends Layer<
     }
 }
 
-privateTriangleLayer.layerName = "privateTriangleLayer";
-privateTriangleLayer.defaultProps = defaultProps;
+PrivateTriangleLayer.layerName = "privateTriangleLayer";
+PrivateTriangleLayer.defaultProps = defaultProps;
