@@ -343,7 +343,7 @@ const Map: React.FC<MapProps> = ({
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
         const axesLayer = layers?.find((e) => {
-            return e?.constructor.name === AxesLayer.name;
+            return e?.constructor === AxesLayer;
         }) as AxesLayer;
         // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
         let target = boundingBoxCenter(
