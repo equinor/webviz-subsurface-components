@@ -67,10 +67,10 @@ export const TooltipApi = Template.bind({});
 TooltipApi.args = {
     ...defaultProps,
     layers: [
-        {
-            ...defaultWellsLayer,
+        new WellsLayer({
+            ...defaultWellsProps,
             lineStyle: { width: 7 },
-        },
+        }),
     ],
     getTooltip: mdTooltip,
     bounds: [433000, 6476000, 439000, 6480000],
@@ -149,10 +149,10 @@ const tooltipImpFunc: TooltipCallback = (
 TooltipStyle.args = {
     ...defaultProps,
     layers: [
-        {
-            ...defaultWellsLayer,
+        new WellsLayer({
+            ...defaultWellsProps,
             lineStyle: { width: 7 },
-        },
+        }),
     ],
     getTooltip: tooltipImpFunc,
     bounds: [433000, 6476000, 439000, 6480000],

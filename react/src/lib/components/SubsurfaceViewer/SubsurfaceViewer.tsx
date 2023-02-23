@@ -1,4 +1,4 @@
-import { LayersList } from "@deck.gl/core/typed";
+import { LayersList, Layer } from "@deck.gl/core/typed";
 import Map, {
     ViewsType,
     TooltipCallback,
@@ -110,7 +110,13 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     const [layerInstances, setLayerInstances] = React.useState<LayersList>([]);
 
     React.useEffect(() => {
+        if (layers?.[0] instanceof Layer) {
+            setLayerInstances(layers as LayersList);
+            return;
+        }
+
         const enumerations = [];
+        console.log("layers: ", layers);
         const layersJson = layers as unknown;
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
@@ -119,7 +125,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             layersJson as Record<string, unknown>[],
             enumerations
         ) as LayersList;
-        setLayerInstances(layersList ?? layers);
+        setLayerInstances(layersList);
     }, [layers]);
 
     React.useEffect(() => {

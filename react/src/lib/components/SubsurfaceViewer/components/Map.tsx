@@ -582,7 +582,7 @@ const Map: React.FC<MapProps> = ({
         let layers_copy = layers;
         //let layers_copy = cloneDeep(layers);
         //console.log("layers_copy: ", layers_copy);
-        layers_copy = layers_copy.map((layer) => {
+        layers_copy = layers_copy.map((item) => {
             // Inject "setReportedBoundingBox" function into layer for it to report
             // back its respective bounding box.
             //layer["setReportedBoundingBox"] = setReportedBoundingBox;
@@ -592,12 +592,15 @@ const Map: React.FC<MapProps> = ({
                 layer["modelMatrix"] = m;
             } */
 
-            if (layer?.constructor.name === NorthArrow3DLayer.name)
-                return layer;
+            if (item?.constructor.name === NorthArrow3DLayer.name)
+                return item;
 
-            console.log((layer as Layer)?.props);
+            
+            const layer = item as Layer;
 
-            const scaledLayer = (layer as Layer)?.clone({ modelMatrix: m });
+            console.log("layer: ", layer);
+
+            const scaledLayer = layer.clone({ modelMatrix: m });
 
             //const boundedLayer = scaledLayer as Grid3DLayer | MapLayer | AxesLayer;
             const boundedLayer = scaledLayer.clone({
