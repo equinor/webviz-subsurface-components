@@ -205,14 +205,14 @@ customizedCameraPosition.args = {
 
 const mapProps = {
     id: "kh_netmap",
-    meshUrl: "hugin_depth_25_m.float32",
+    meshData: "hugin_depth_25_m.float32",
     frame: {
         origin: [432150, 6475800] as [number, number],
         count: [291, 229] as [number, number],
         increment: [25, 25] as [number, number],
         rotDeg: 0,
     },
-    propertiesUrl: "kh_netmap_25_m.float32",
+    propertiesData: "kh_netmap_25_m.float32",
     contours: [0, 100] as [number, number],
     material: false,
 };
@@ -221,7 +221,7 @@ const netmapLayer = new MapLayer({ ...mapProps });
 const huginLayer = new MapLayer({
     ...mapProps,
     id: "hugin",
-    propertiesUrl: "hugin_depth_25_m.float32",
+    propertiesData: "hugin_depth_25_m.float32",
 });
 
 const MultiViewAnnotationTemplate: ComponentStory<typeof SubsurfaceViewer> = (
