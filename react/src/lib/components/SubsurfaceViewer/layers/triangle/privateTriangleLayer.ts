@@ -6,6 +6,7 @@ import {
     phongLighting,
     PickingInfo,
     UpdateParameters,
+    LayerContext,
 } from "@deck.gl/core/typed";
 import {
     createPropertyData,
@@ -100,10 +101,8 @@ export default class privateTriangleLayer extends Layer<
         this.initializeState(context as DeckGLLayerContext);
     }
 
-    //eslint-disable-next-line
-    _getModels(gl: any) {
+    _getModels(gl: WebGLRenderingContext): [unknown, unknown] {
         // MESH MODEL
-        // const mesh_model = {};
         const triangleModel = new Model(gl, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
@@ -126,9 +125,11 @@ export default class privateTriangleLayer extends Layer<
         return [triangleModel, lineModel];
     }
 
-    // Signature from the base class, eslint doesn't like the any type.
-    // eslint-disable-next-line
-    draw(args: any): void {
+    draw(args: {
+        moduleParameters?: unknown;
+        uniforms: number[];
+        context: LayerContext;
+    }): void {
         if (!this.state["models"]) {
             return;
         }
