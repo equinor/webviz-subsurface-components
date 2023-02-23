@@ -139,7 +139,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             wellIndex: undefined,
             infos: [],
             editedData: props.editedData,
-            layers: props.layers,
+            layers: props.layers as Record<string, unknown>[],
         };
         this.onInfo = this.onInfo.bind(this);
         this.onCreateController = this.onCreateController.bind(this);
@@ -207,8 +207,11 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             if (track) {
                 const templatePlot = track.plots[0];
                 if (templatePlot) {
-                    const wells_layer = this.props.layers?.find(
-                        (item) => item["@@type"] === "WellsLayer"
+                    const wells_layer = (
+                        this.props.layers as Record<string, unknown>[]
+                    )?.find(
+                        (item: Record<string, unknown>) =>
+                            item["@@type"] === "WellsLayer"
                     );
                     if (
                         wells_layer &&
@@ -223,12 +226,16 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                         //(wells_layer.context as DeckGLLayerContext).userData.colorTables=colorTables;
 
                         const layers = deepCopy(this.props.layers);
-                        this.setState({ layers: layers });
+                        this.setState({
+                            layers: layers as Record<string, unknown>[],
+                        });
 
                         // Force to rerender ColorLegend after
                         setTimeout(() => {
                             const layers = deepCopy(this.props.layers);
-                            this.setState({ layers: layers });
+                            this.setState({
+                                layers: layers as Record<string, unknown>[],
+                            });
                         }, 200);
                     }
                 }
