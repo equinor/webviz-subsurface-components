@@ -345,16 +345,10 @@ const Map: React.FC<MapProps> = ({
         const axesLayer = layers?.find((e) => {
             return e?.constructor.name === AxesLayer.name;
         }) as AxesLayer;
-        //const isAxesLayer = typeof axesLayer !== "undefined";
         // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
         let target = boundingBoxCenter(
             (axesLayer?.props.bounds ?? union_of_reported_bboxes) as BoundingBox
         );
-        /*         let target = boundingBoxCenter(
-            isAxesLayer
-                ? (axesLayer?.["bounds"] as BoundingBox)
-                : (union_of_reported_bboxes as BoundingBox)
-        ); */
 
         const isBoundsDefined = typeof bounds !== "undefined";
         if (isBoundsDefined) {
@@ -578,45 +572,27 @@ const Map: React.FC<MapProps> = ({
 
         const m = getModelMatrixScale(scaleZ);
 
-        //console.log("layers: ", layers);
-        let layers_copy = layers;
-        //let layers_copy = cloneDeep(layers);
-        //console.log("layers_copy: ", layers_copy);
-        layers_copy = layers_copy.map((item) => {
-            // Inject "setReportedBoundingBox" function into layer for it to report
-            // back its respective bounding box.
-            //layer["setReportedBoundingBox"] = setReportedBoundingBox;
-
-            // Set "modelLayer" matrix to reflect correct z scaling.
-            /*             if (layer["@@type"] !== "NorthArrow3DLayer") {
-                layer["modelMatrix"] = m;
-            } */
-
+        const layers_copy = layers.map((item) => {
             if (item?.constructor.name === NorthArrow3DLayer.name)
                 return item;
-
             
             const layer = item as Layer;
 
-            console.log("layer: ", layer);
-
+            // Set "modelLayer" matrix to reflect correct z scaling.
             const scaledLayer = layer.clone({ modelMatrix: m });
 
-            //const boundedLayer = scaledLayer as Grid3DLayer | MapLayer | AxesLayer;
+            // Inject "setReportedBoundingBox" function into layer for it to report
+            // back its respective bounding box.
             const boundedLayer = scaledLayer.clone({
                 setReportedBoundingBox: setReportedBoundingBox,
             });
 
-            //console.log(layer);
 
             return boundedLayer ?? scaledLayer;
-            //return layer;
         });
 
         setAlteredLayers(layers_copy);
     }, [scaleZ, layers /*dispatch*/]);
-
-    //console.log("alteredLayers: ", alteredLayers);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
 
@@ -624,18 +600,6 @@ const Map: React.FC<MapProps> = ({
         setDeckGLLayers(alteredLayers);
     }, [alteredLayers]);
 
-    /*      useEffect(() => {
-        const layers = alteredLayers;
-        if (!layers || layers.length == 0) return;
-
-        const enumerations = [];
-        if (resources) enumerations.push({ resources: resources });
-        if (editedData) enumerations.push({ editedData: editedData });
-        else enumerations.push({ editedData: {} });
-
-        setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-    }, [resources, editedData, layers, alteredLayers]);
- */
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -649,18 +613,6 @@ const Map: React.FC<MapProps> = ({
         }
     }, [selection]);
 
-    /*     useEffect(() => {
-        const layers = deckRef.current?.deck?.props.layers;
-        if (layers) {
-            const wellslayer = getLayersByType(
-                layers,
-                "WellsLayer"
-            )?.[0] as WellsLayer;
-
-            wellslayer?.setSelection(selection?.well, selection?.selection);
-        }
-    }, [selection]);
- */
     // multiple well layers
     const [multipleWells, setMultipleWells] = useState<string[]>([]);
     const [selectedWell, setSelectedWell] = useState<string>("");
@@ -936,9 +888,6 @@ const Map: React.FC<MapProps> = ({
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
-
-    //console.log(deckGLLayers);
-
     return (
         <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
