@@ -74,7 +74,7 @@ function getImageData(
     const isColorMapNameDefined = !!colorMapName;
 
     const defaultColorMap = createDefaultContinuousColorScale;
-    let colorMap = defaultColorMap as unknown as funcType;
+    let colorMap = defaultColorMap() as unknown as funcType;
 
     if (isColorMapFunctionDefined) {
         colorMap =
