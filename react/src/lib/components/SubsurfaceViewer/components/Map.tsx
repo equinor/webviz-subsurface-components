@@ -573,9 +573,8 @@ const Map: React.FC<MapProps> = ({
         const m = getModelMatrixScale(scaleZ);
 
         const layers_copy = layers.map((item) => {
-            if (item?.constructor.name === NorthArrow3DLayer.name)
-                return item;
-            
+            if (item?.constructor.name === NorthArrow3DLayer.name) return item;
+
             const layer = item as Layer;
 
             // Set "modelLayer" matrix to reflect correct z scaling.
@@ -586,7 +585,6 @@ const Map: React.FC<MapProps> = ({
             const boundedLayer = scaledLayer.clone({
                 setReportedBoundingBox: setReportedBoundingBox,
             });
-
 
             return boundedLayer ?? scaledLayer;
         });
@@ -599,7 +597,6 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         setDeckGLLayers(alteredLayers);
     }, [alteredLayers]);
-
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
