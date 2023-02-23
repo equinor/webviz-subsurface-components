@@ -27,7 +27,7 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import { WellsLayer } from "../layers";
+import { WellsLayer, AxesLayer, NorthArrow3DLayer } from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
@@ -163,7 +163,7 @@ export interface MapProps {
      * Each JSON object will consist of layer type with key as "@@type" and
      * layer specific data, if any.
      */
-    layers?: Record<string, unknown>[];
+    layers?: LayersList;
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
@@ -296,7 +296,6 @@ function adjustCameraTarget(
 
 const Map: React.FC<MapProps> = ({
     id,
-    resources,
     layers,
     bounds,
     views,
@@ -304,7 +303,6 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     colorTables,
-    editedData,
     setEditedData,
     checkDatafileSchema,
     onMouseEvent,
@@ -325,7 +323,7 @@ const Map: React.FC<MapProps> = ({
     const boundsInitial = bounds ?? [0, 0, 1, 1];
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
-    const [alteredLayers, setAlteredLayers] = useState([{}]);
+    const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
     const initialViewState = getViewState(
         boundsInitial,
@@ -345,14 +343,11 @@ const Map: React.FC<MapProps> = ({
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
         const axesLayer = layers?.find((e) => {
-            return e["@@type"] === "AxesLayer";
-        });
-        const isAxesLayer = typeof axesLayer !== "undefined";
+            return e?.constructor === AxesLayer;
+        }) as AxesLayer;
         // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
         let target = boundingBoxCenter(
-            isAxesLayer
-                ? (axesLayer?.["bounds"] as BoundingBox)
-                : (union_of_reported_bboxes as BoundingBox)
+            (axesLayer?.props.bounds ?? union_of_reported_bboxes) as BoundingBox
         );
 
         const isBoundsDefined = typeof bounds !== "undefined";
@@ -577,18 +572,21 @@ const Map: React.FC<MapProps> = ({
 
         const m = getModelMatrixScale(scaleZ);
 
-        let layers_copy = cloneDeep(layers);
-        layers_copy = layers_copy.map((layer) => {
-            // Inject "setReportedBoundingBox" function into layer for it to report
-            // back its respective bounding box.
-            layer["setReportedBoundingBox"] = setReportedBoundingBox;
+        const layers_copy = layers.map((item) => {
+            if (item?.constructor.name === NorthArrow3DLayer.name) return item;
+
+            const layer = item as Layer;
 
             // Set "modelLayer" matrix to reflect correct z scaling.
-            if (layer["@@type"] !== "NorthArrow3DLayer") {
-                layer["modelMatrix"] = m;
-            }
+            const scaledLayer = layer.clone({ modelMatrix: m });
 
-            return layer;
+            // Inject "setReportedBoundingBox" function into layer for it to report
+            // back its respective bounding box.
+            const boundedLayer = scaledLayer.clone({
+                setReportedBoundingBox: setReportedBoundingBox,
+            });
+
+            return boundedLayer ?? scaledLayer;
         });
 
         setAlteredLayers(layers_copy);
@@ -597,35 +595,15 @@ const Map: React.FC<MapProps> = ({
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
 
     useEffect(() => {
-        const layers = alteredLayers;
-        if (!layers || layers.length == 0) return;
-
-        const enumerations = [];
-        if (resources) enumerations.push({ resources: resources });
-        if (editedData) enumerations.push({ editedData: editedData });
-        else enumerations.push({ editedData: {} });
-
-        setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-    }, [resources, editedData, layers, alteredLayers]);
+        setDeckGLLayers(alteredLayers);
+    }, [alteredLayers]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
         if (layers) {
             const wellslayer = getLayersByType(
                 layers,
-                "WellsLayer"
-            )?.[0] as WellsLayer;
-
-            wellslayer?.setSelection(selection?.well, selection?.selection);
-        }
-    }, [selection]);
-
-    useEffect(() => {
-        const layers = deckRef.current?.deck?.props.layers;
-        if (layers) {
-            const wellslayer = getLayersByType(
-                layers,
-                "WellsLayer"
+                WellsLayer.name
             )?.[0] as WellsLayer;
 
             wellslayer?.setSelection(selection?.well, selection?.selection);
@@ -1021,10 +999,12 @@ export default Map;
 
 // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
 // See https://deck.gl/docs/api-reference/json/overview for more details.
-function jsonToObject(
+export function jsonToObject(
     data: Record<string, unknown>[] | LayerProps[],
     enums: Record<string, unknown>[] | undefined = undefined
 ): LayersList | View[] {
+    if (!data) return [];
+
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {
