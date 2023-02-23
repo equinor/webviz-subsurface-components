@@ -22,12 +22,6 @@ export default {
     title: "SubsurfaceViewer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
-/*
-const defaultWellsLayer = {
-    "@@type": "WellsLayer",
-    data: "@@#resources.wellsData",
-};
-*/
 const defaultWellsProps = {
     data: "./volve_wells.json",
 };
@@ -38,9 +32,6 @@ const defaultWellsLayer = new WellsLayer({
 
 const defaultProps = {
     id: "volve-wells",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
     bounds: [432150, 6475800, 439400, 6481500] as [
         number,
         number,
@@ -312,10 +303,6 @@ export const DepthTest: ComponentStory<typeof SubsurfaceViewer> = (args) => {
 
 DepthTest.args = {
     id: "DepthTest",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
-
     views: {
         layout: [1, 2],
         viewports: [
