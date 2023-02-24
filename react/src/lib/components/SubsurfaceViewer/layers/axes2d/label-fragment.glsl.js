@@ -17,6 +17,7 @@ void main(void) {
   vec4 color = texture(fontTexture, _vTexCoord);
   
   float x = 1.0 - (color.r + color.g + color.b) / 3.0;  // intensity of text color
+  x = smoothstep(0.0, 0.2, x);  
 
   float text_r = uAxisColor.r;
   float text_g = uAxisColor.g;

@@ -58,7 +58,7 @@ export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
     labelFontSize?: number;
     fontFamily?: string;
     axisColor?: Color;
-    backGroundColor?: Color;
+    backgroundColor?: Color;
 }
 
 const defaultProps = {
@@ -307,8 +307,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         // Color on axes background.
         let bColor = [1.0, 1.0, 1.0, 1.0];
-        if (typeof this.props.backGroundColor !== "undefined") {
-            bColor = this.props.backGroundColor as number[];
+        if (typeof this.props.backgroundColor !== "undefined") {
+            bColor = this.props.backgroundColor as number[];
             if (bColor.length === 3) {
                 bColor.push(255);
             }

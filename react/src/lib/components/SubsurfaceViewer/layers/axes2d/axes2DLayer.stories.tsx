@@ -72,7 +72,7 @@ ColoredTextAndBackGround.args = {
         {
             ...axes2D,
             axisColor: [100, 100, 255],
-            backGroundColor: [255, 255, 100],
+            backgroundColor: [255, 255, 100],
         },
     ],
 
