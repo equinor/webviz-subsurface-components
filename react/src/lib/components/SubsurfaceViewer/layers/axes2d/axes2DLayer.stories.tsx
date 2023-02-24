@@ -58,7 +58,9 @@ Base.args = {
     },
 };
 
-export const ColoredTextAndBackGround: ComponentStory<typeof SubsurfaceViewer> = (args) => {
+export const ColoredTextAndBackGround: ComponentStory<
+    typeof SubsurfaceViewer
+> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
