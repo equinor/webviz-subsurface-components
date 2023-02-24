@@ -67,8 +67,8 @@ const defaultProps = {
     id: "axes2d-layer",
     visible: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    marginH: 30, // Horizontal margin (in pixles)
-    marginV: 30, // Vertical margin (in pixles)
+    marginH: 100, // Horizontal margin (in pixles)
+    marginV: 40, // Vertical margin (in pixles)
 };
 
 // FONT ATLAS
