@@ -58,6 +58,7 @@ export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
     labelFontSize?: number;
     fontFamily?: string;
     axisColor?: Color;
+    backGroundColor?: Color;
 }
 
 const defaultProps = {
@@ -294,6 +295,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         const lines = [...axes_lines, ...tick_lines];
 
+        // Color on axes and text.
         let color = [0.0, 0.0, 0.0, 1.0];
         if (typeof this.props.axisColor !== "undefined") {
             color = this.props.axisColor as number[];
@@ -303,11 +305,21 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             color = color.map((x) => (x ?? 0) / 255);
         }
 
+        // Color on axes background.
+        let bColor = [1.0, 1.0, 1.0, 1.0];
+        if (typeof this.props.backGroundColor !== "undefined") {
+            bColor = this.props.backGroundColor as number[];
+            if (bColor.length === 3) {
+                bColor.push(255);
+            }
+            bColor = bColor.map((x) => (x ?? 0) / 255);
+        }
+
         const line_model = new Model(gl, {
             id: `${this.props.id}-lines`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
-            uniforms: { uColor: color },
+            uniforms: { uAxisColor: color },
             geometry: new Geometry({
                 drawMode: GL.LINES,
                 attributes: {
@@ -437,6 +449,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
                 id,
                 vs: labelVertexShader,
                 fs: labelFragmentShader,
+                uniforms: { uAxisColor: color, uBackGroundColor: bColor },
                 geometry: new Geometry({
                     drawMode: GL.TRIANGLES,
                     attributes: {
@@ -490,6 +503,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             id: `${this.props.id}-background`,
             vs: backgroundVertexShader,
             fs: backgroundFragmentShader,
+            uniforms: { uBackGroundColor: bColor },
             geometry: new Geometry({
                 drawMode: GL.TRIANGLES,
                 attributes: {
