@@ -4,10 +4,12 @@ export default `\
 
 precision highp float;
 
+uniform vec4 uBackGroundColor;
+
 out vec4 fragColor;
 
 void main(void) {
-  vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
+  vec4 color = uBackGroundColor;
   fragColor = color;
 }
 `;
