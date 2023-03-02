@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo } from "@deck.gl/core/typed";
@@ -14,7 +14,7 @@ import {
     ViewFooter,
     View,
 } from "../..";
-import { MapMouseEvent, ViewStateType, ViewsType } from "./components/Map";
+import { ViewStateType, ViewsType } from "./components/Map";
 import { WellsLayer, MapLayer } from "./layers";
 
 export default {
@@ -215,7 +215,6 @@ const mapProps = {
     propertiesData: "kh_netmap_25_m.float32",
     contours: [0, 100] as [number, number],
     material: false,
-    //isContoursDepth: false,
 };
 
 const netmapLayer = new MapLayer({ ...mapProps });
@@ -329,21 +328,4 @@ DepthTest.parameters = {
             story: "Example using the depthTest property. If this is set to false it will disable depth testing for the layer",
         },
     },
-};
-
-function onMouseEvent(event: MapMouseEvent) {
-    console.log(event);
-}
-
-export const MouseEvent: ComponentStory<typeof SubsurfaceViewer> = () => {
-    const props = {
-        ...defaultProps,
-        layers: [defaultWellsLayer, netmapLayer],
-        onMouseEvent: onMouseEvent,
-        views: {
-            layout: [1, 1] as [number, number],
-            viewports: [{ id: "test", show3D: true }],
-        },
-    };
-    return <SubsurfaceViewer {...props} />;
 };
