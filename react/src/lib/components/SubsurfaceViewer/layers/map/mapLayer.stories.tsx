@@ -1267,7 +1267,7 @@ export const ContourLines: ComponentStory<typeof ContourLinesStory> = (
 ContourLines.args = {
     syncViewports: true,
     show3d: true,
-    contourOffset: 0.1,
+    contourOffset: 0,
     zContourInterval: 100,
     propertyContourInterval: 5000,
 };
