@@ -833,9 +833,7 @@ const Map: React.FC<MapProps> = ({
             if (!views || !views.viewports || !views.layout) return true;
 
             const cur_view = views.viewports.find(
-                ({ id }) =>
-                    args.viewport.id &&
-                    new RegExp("^" + id).test(args.viewport.id)
+                ({ id }) => args.viewport.id && id === args.viewport.id
             );
             if (cur_view?.layerIds && cur_view.layerIds.length > 0) {
                 const layer_ids = cur_view.layerIds;

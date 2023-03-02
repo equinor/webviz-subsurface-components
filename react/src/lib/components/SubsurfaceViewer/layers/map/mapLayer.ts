@@ -424,8 +424,10 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
         );
 
         const isMesh =
-            typeof this.props.meshUrl !== "undefined" &&
-            this.props.meshUrl !== "";
+            (typeof this.props.meshUrl !== "undefined" &&
+                this.props.meshUrl !== "") ||
+            (typeof this.props.meshData !== "undefined" &&
+                this.props.meshData !== "");
 
         const isModelMatrix =
             typeof this.props.modelMatrix !== "undefined" &&
