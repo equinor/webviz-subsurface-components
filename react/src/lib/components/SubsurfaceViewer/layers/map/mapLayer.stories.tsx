@@ -1,5 +1,5 @@
 import React from "react";
-import { useHoverInfo } from "../../components/Map";
+import { ViewsType, useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
@@ -10,7 +10,9 @@ import {
     ColorLegend,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
-import { View } from "@deck.gl/core/typed";
+import { View } from "../../../..";
+import MapLayer from "./mapLayer";
+import { ViewFooter } from "../../components/ViewFooter";
 
 export default {
     component: SubsurfaceViewer,
@@ -20,6 +22,20 @@ export default {
 type NumberQuad = [number, number, number, number];
 
 const valueRange = [-3071, 41048];
+
+const defaultMapLayerProps = {
+    id: "default_map",
+    meshData: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800] as [number, number],
+        count: [291, 229] as [number, number],
+        increment: [25, 25] as [number, number],
+        rotDeg: 0,
+    },
+    propertiesData: "kh_netmap_25_m.float32",
+};
+
+const defaultMapLayer = new MapLayer({ ...defaultMapLayerProps });
 
 const wellsLayer = {
     "@@type": "WellsLayer",
@@ -1107,7 +1123,6 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
     return (
         <SubsurfaceViewer {...args} layers={updatedLayerData}>
             {
-                // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
                 <View id="view_1">
                     <div style={{ marginTop: 50 }}>
                         <ColorLegend
@@ -1146,4 +1161,113 @@ ColorSelector.args = {
             },
         ],
     },
+};
+
+const ContourLinesStory = (props: {
+    syncViewports: boolean;
+    show3d: boolean;
+    contourOffset: number;
+    zContourInterval: number;
+    propertyContourInterval: number;
+}) => {
+    const views: ViewsType = {
+        layout: [2, 2],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: props.show3d,
+                layerIds: ["default_map"],
+                isSync: props.syncViewports,
+            },
+            {
+                id: "view_2",
+                show3D: props.show3d,
+                layerIds: ["contours"],
+                isSync: props.syncViewports,
+            },
+            {
+                id: "view_3",
+                show3D: props.show3d,
+                layerIds: ["property_contours"],
+                isSync: props.syncViewports,
+            },
+            {
+                id: "view_4",
+                show3D: props.show3d,
+                layerIds: ["flat"],
+                isSync: props.syncViewports,
+            },
+        ],
+    };
+
+    const contourMapLayer = new MapLayer({
+        ...defaultMapLayerProps,
+        id: "contours",
+        contours: [props.contourOffset, props.zContourInterval],
+    });
+
+    const propertyContourMapLayer = new MapLayer({
+        ...defaultMapLayerProps,
+        id: "property_contours",
+        contours: [props.contourOffset, props.propertyContourInterval],
+        isContoursDepth: false,
+    });
+
+    const flatMapLayerProps = {
+        ...defaultMapLayerProps,
+        id: "flat",
+        meshData: undefined,
+        contours: [props.contourOffset, props.propertyContourInterval] as [
+            number,
+            number
+        ],
+    };
+
+    const flatPropertyContourMapLayer = new MapLayer({
+        ...flatMapLayerProps,
+    });
+
+    return (
+        <SubsurfaceViewer
+            id={"test"}
+            layers={[
+                defaultMapLayer,
+                contourMapLayer,
+                propertyContourMapLayer,
+                flatPropertyContourMapLayer,
+            ]}
+            views={views}
+        >
+            <View id="view_1">
+                <ViewFooter>Default - no contour lines</ViewFooter>
+            </View>
+            <View id="view_2">
+                <ViewFooter>
+                    Contour lines enabled - default is Z value
+                </ViewFooter>
+            </View>
+            <View id="view_3">
+                <ViewFooter>Contour lines on property value</ViewFooter>
+            </View>
+            <View id="view_4">
+                <ViewFooter>
+                    Contour lines on flat map - default is property value
+                </ViewFooter>
+            </View>
+        </SubsurfaceViewer>
+    );
+};
+
+export const ContourLines: ComponentStory<typeof ContourLinesStory> = (
+    args
+) => {
+    return <ContourLinesStory {...args} />;
+};
+
+ContourLines.args = {
+    syncViewports: true,
+    show3d: true,
+    contourOffset: 0.1,
+    zContourInterval: 100,
+    propertyContourInterval: 5000,
 };
