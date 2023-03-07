@@ -144,16 +144,29 @@ const cellCenteredPropertiesLayer = {
     "@@type": "MapLayer",
     id: "cell-centered-layer",
 
-    meshUrl:
-        "data:text/plain;base64,zczMP5qZ2T9mZuY/MzPzP5qZmT9mZqY/MzOzPwAAwD/NzEw/ZmZmPwAAgD/NzIw/zczMPgAAAD+amRk/MzMzPwAAAIDNzMw9zcxMPpqZmT4=",
+    /*eslint-disable */
+    // One depth pr node
+    meshData: [
+        1.6, 1.7, 1.8, 1.9,
+        1.2, 1.3, 1.4, 1.5,
+        0.8, 0.9, 1.0, 1.1,
+        0.4, 0.5, 0.6, 0.7,
+        0.0, 0.1, 0.2, 0.3 ],
+
+    // One property pr cell.
+    propertiesData: [0.9,  1.0,  1.1, 
+                     0.6,  0.7,  0.8,
+                     0.3,  0.4,  0.5, 
+                     0.0,  0.1,  0.2],
+    /*eslint-enable */
+
     frame: {
         origin: [0, 0],
         count: [4, 5],
         increment: [1, 1],
         rotDeg: 0,
     },
-    propertiesUrl:
-        "data:text/plain;base64,ZmZmPwAAgD/NzIw/mpkZPzMzMz/NzEw/mpmZPs3MzD4AAAA/AAAAAM3MzD3NzEw+",
+
     gridLines: true,
     material: true,
     // black to white colors.
