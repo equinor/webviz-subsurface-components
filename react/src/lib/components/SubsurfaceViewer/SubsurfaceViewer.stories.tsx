@@ -344,6 +344,7 @@ export const MouseEvent: ComponentStory<typeof SubsurfaceViewer> = () => {
             layout: [1, 1] as [number, number],
             viewports: [{ id: "test", show3D: true }],
         },
+        coords: { visible: false },
     };
     return <SubsurfaceViewer {...props} />;
 };
