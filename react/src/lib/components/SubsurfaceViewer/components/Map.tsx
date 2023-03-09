@@ -716,91 +716,18 @@ const Map: React.FC<MapProps> = ({
     /**
      * call onMouseEvent callback
      */
-    const callOnMouseEvent = (
-        type: "click" | "hover",
-        infos: PickingInfo[],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        event: any
-    ): void => {
-        if (onMouseEvent) {
-            const ev: MapMouseEvent = {
-                type: type,
-                infos: infos,
-            };
-            if (ev.type === "click") {
-                if (event.rightButton) ev.type = "contextmenu";
-            }
-            for (const info of infos as LayerPickInfo[]) {
-                if (info.coordinate) {
-                    ev.x = info.coordinate[0];
-                    ev.y = info.coordinate[1];
-                }
-                //const layer_name = (info.layer?.props as ExtendedLayerProps<FeatureCollection>)?.name;
-                if (info.layer && info.layer.id === "wells-layer") {
-                    // info.object is Feature or WellLog;
-                    {
-                        // try to use Object info (see DeckGL getToolTip callback)
-                        const feat = info.object as Feature;
-                        const properties = feat?.properties;
-                        if (properties) {
-                            ev.wellname = properties["name"];
-                            ev.wellcolor = properties["color"];
-                        }
-                    }
-
-                    if (!ev.wellname)
-                        if (info.object) {
-                            ev.wellname = info.object.header?.["well"]; // object is WellLog
-                        }
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    if (info.properties) {
-                        for (const property of info.properties) {
-                            if (!ev.wellcolor) ev.wellcolor = property.color;
-                            let propname = property.name;
-                            if (propname) {
-                                const sep = propname.indexOf(" ");
-                                if (sep >= 0) {
-                                    if (!ev.wellname) {
-                                        ev.wellname = propname.substring(
-                                            sep + 1
-                                        );
-                                    }
-                                    propname = propname.substring(0, sep);
-                                }
-                            }
-                            const names_md = [
-                                "DEPTH",
-                                "DEPT",
-                                "MD" /*Measured Depth*/,
-                                "TDEP" /*"Tool DEPth"*/,
-                                "MD_RKB" /*Rotary Relly Bushing*/,
-                            ]; // aliases for MD
-                            const names_tvd = [
-                                "TVD" /*True Vertical Depth*/,
-                                "TVDSS" /*SubSea*/,
-                                "DVER" /*"VERtical Depth"*/,
-                                "TVD_MSL" /*below Mean Sea Level*/,
-                            ]; // aliases for MD
-
-                            if (names_md.find((name) => name == propname))
-                                ev.md = parseFloat(property.value as string);
-                            else if (names_tvd.find((name) => name == propname))
-                                ev.tvd = parseFloat(property.value as string);
-
-                            if (
-                                ev.md !== undefined &&
-                                ev.tvd !== undefined &&
-                                ev.wellname !== undefined
-                            )
-                                break;
-                        }
-                    }
-                    break;
-                }
-            }
+    const callOnMouseEvent = useCallback(
+        (
+            type: "click" | "hover",
+            infos: PickingInfo[],
+            event: Record<string, unknown>
+        ): void => {
+            if (!onMouseEvent) return;
+            const ev = handleMouseEvent(type, infos, event);
             onMouseEvent(ev);
-        }
-    };
+        },
+        [onMouseEvent]
+    );
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
@@ -1184,4 +1111,84 @@ function getViews(
         }
     }
     return deckgl_views;
+}
+
+function handleMouseEvent(
+    type: "click" | "hover",
+    infos: PickingInfo[],
+    event: Record<string, unknown>
+) {
+    const ev: MapMouseEvent = {
+        type: type,
+        infos: infos,
+    };
+    if (ev.type === "click") {
+        if (event["rightButton"]) ev.type = "contextmenu";
+    }
+    for (const info of infos as LayerPickInfo[]) {
+        if (info.coordinate) {
+            ev.x = info.coordinate[0];
+            ev.y = info.coordinate[1];
+        }
+        if (info.layer && info.layer.id === "wells-layer") {
+            // info.object is Feature or WellLog;
+            {
+                // try to use Object info (see DeckGL getToolTip callback)
+                const feat = info.object as Feature;
+                const properties = feat?.properties;
+                if (properties) {
+                    ev.wellname = properties["name"];
+                    ev.wellcolor = properties["color"];
+                }
+            }
+
+            if (!ev.wellname)
+                if (info.object) {
+                    ev.wellname = info.object.header?.["well"]; // object is WellLog
+                }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if (info.properties) {
+                for (const property of info.properties) {
+                    if (!ev.wellcolor) ev.wellcolor = property.color;
+                    let propname = property.name;
+                    if (propname) {
+                        const sep = propname.indexOf(" ");
+                        if (sep >= 0) {
+                            if (!ev.wellname) {
+                                ev.wellname = propname.substring(sep + 1);
+                            }
+                            propname = propname.substring(0, sep);
+                        }
+                    }
+                    const names_md = [
+                        "DEPTH",
+                        "DEPT",
+                        "MD" /*Measured Depth*/,
+                        "TDEP" /*"Tool DEPth"*/,
+                        "MD_RKB" /*Rotary Relly Bushing*/,
+                    ]; // aliases for MD
+                    const names_tvd = [
+                        "TVD" /*True Vertical Depth*/,
+                        "TVDSS" /*SubSea*/,
+                        "DVER" /*"VERtical Depth"*/,
+                        "TVD_MSL" /*below Mean Sea Level*/,
+                    ]; // aliases for MD
+
+                    if (names_md.find((name) => name == propname))
+                        ev.md = parseFloat(property.value as string);
+                    else if (names_tvd.find((name) => name == propname))
+                        ev.tvd = parseFloat(property.value as string);
+
+                    if (
+                        ev.md !== undefined &&
+                        ev.tvd !== undefined &&
+                        ev.wellname !== undefined
+                    )
+                        break;
+                }
+            }
+            break;
+        }
+    }
+    return ev;
 }

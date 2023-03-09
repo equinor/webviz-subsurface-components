@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo } from "@deck.gl/core/typed";
@@ -16,6 +16,7 @@ import {
 } from "../..";
 import { MapMouseEvent, ViewStateType, ViewsType } from "./components/Map";
 import { WellsLayer, MapLayer } from "./layers";
+import InfoCard from "./components/InfoCard";
 
 export default {
     component: SubsurfaceViewer,
@@ -331,20 +332,45 @@ DepthTest.parameters = {
     },
 };
 
-function onMouseEvent(event: MapMouseEvent) {
-    console.log(event);
+function getReadout(event: MapMouseEvent) {
+    const pickInfo = event.infos;
+    return <InfoCard pickInfos={pickInfo} />;
 }
 
-export const MouseEvent: ComponentStory<typeof SubsurfaceViewer> = () => {
+const MouseEventStory = (args: { show3d: boolean }) => {
+    const [event, setEvent] = useState<MapMouseEvent>({
+        type: "click",
+        infos: [],
+    });
+
+    const handleEvent = useCallback((event) => {
+        setEvent(event);
+    }, []);
+
     const props = {
         ...defaultProps,
         layers: [defaultWellsLayer, netmapLayer],
-        onMouseEvent: onMouseEvent,
+        onMouseEvent: handleEvent,
         views: {
             layout: [1, 1] as [number, number],
-            viewports: [{ id: "test", show3D: true }],
+            viewports: [{ id: "test", show3D: args.show3d }],
         },
         coords: { visible: false },
     };
-    return <SubsurfaceViewer {...props} />;
+    return (
+        <SubsurfaceViewer {...props}>
+            <View id="test">
+                {getReadout(event)}
+                <ViewFooter>Mouse event example</ViewFooter>
+            </View>
+        </SubsurfaceViewer>
+    );
+};
+
+export const MouseEvent: ComponentStory<typeof MouseEventStory> = (args) => {
+    return <MouseEventStory {...args} />;
+};
+
+MouseEvent.args = {
+    show3d: true,
 };
