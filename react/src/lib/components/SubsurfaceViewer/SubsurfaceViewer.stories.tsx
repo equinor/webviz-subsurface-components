@@ -42,6 +42,14 @@ const defaultProps = {
     layers: [defaultWellsLayer],
 };
 
+const wellsLayerWithlogs = new WellsLayer({
+    ...defaultWellsProps,
+    logData: "./volve_logs.json",
+    logrunName: "BLOCKING",
+    logName: "PORO",
+    logColor: "Physics",
+});
+
 const Template: ComponentStory<typeof SubsurfaceViewer> = (args) => (
     <SubsurfaceViewer {...args} />
 );
@@ -349,7 +357,7 @@ const MouseEventStory = (args: { show3d: boolean }) => {
 
     const props = {
         ...defaultProps,
-        layers: [defaultWellsLayer, netmapLayer],
+        layers: [wellsLayerWithlogs, netmapLayer],
         onMouseEvent: handleEvent,
         views: {
             layout: [1, 1] as [number, number],
