@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo } from "@deck.gl/core/typed";
@@ -14,8 +14,9 @@ import {
     ViewFooter,
     View,
 } from "../..";
-import { ViewStateType, ViewsType } from "./components/Map";
+import { MapMouseEvent, ViewStateType, ViewsType } from "./components/Map";
 import { WellsLayer, MapLayer } from "./layers";
+import InfoCard from "./components/InfoCard";
 
 export default {
     component: SubsurfaceViewer,
@@ -40,6 +41,14 @@ const defaultProps = {
     ],
     layers: [defaultWellsLayer],
 };
+
+const wellsLayerWithlogs = new WellsLayer({
+    ...defaultWellsProps,
+    logData: "./volve_logs.json",
+    logrunName: "BLOCKING",
+    logName: "PORO",
+    logColor: "Physics",
+});
 
 const Template: ComponentStory<typeof SubsurfaceViewer> = (args) => (
     <SubsurfaceViewer {...args} />
@@ -328,4 +337,54 @@ DepthTest.parameters = {
             story: "Example using the depthTest property. If this is set to false it will disable depth testing for the layer",
         },
     },
+};
+
+function getReadout(event: MapMouseEvent) {
+    const pickInfo = event.infos;
+    return <InfoCard pickInfos={pickInfo} />;
+}
+
+const MouseEventStory = (args: { show3d: boolean }) => {
+    const [event, setEvent] = useState<MapMouseEvent>({
+        type: "click",
+        infos: [],
+    });
+
+    const handleEvent = useCallback(
+        (event) => {
+            setEvent(event);
+        },
+        [setEvent]
+    );
+
+    const useProps = useMemo(() => {
+        const props = {
+            ...defaultProps,
+            layers: [wellsLayerWithlogs, netmapLayer],
+            onMouseEvent: handleEvent,
+            views: {
+                layout: [1, 1] as [number, number],
+                viewports: [{ id: "test", show3D: args.show3d }],
+            },
+            coords: { visible: false },
+        };
+        return props;
+    }, [handleEvent, args.show3d]);
+
+    return (
+        <SubsurfaceViewer {...useProps}>
+            <View id="test">
+                {getReadout(event)}
+                <ViewFooter>Mouse event example</ViewFooter>
+            </View>
+        </SubsurfaceViewer>
+    );
+};
+
+export const MouseEvent: ComponentStory<typeof MouseEventStory> = (args) => {
+    return <MouseEventStory {...args} />;
+};
+
+MouseEvent.args = {
+    show3d: true,
 };

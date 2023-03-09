@@ -285,7 +285,7 @@ SubsurfaceViewer.propTypes = {
     coordinateUnit: PropTypes.string,
 
     /**
-     * @deprecated Toolbar should be added as annotation. This prop has no function.
+     * @obsolete Toolbar should be added as annotation. This prop has no function.
      */
     toolbar: PropTypes.shape({
         /**
@@ -295,7 +295,7 @@ SubsurfaceViewer.propTypes = {
     }),
 
     /**
-     * @deprecated Legends should be added as annotations. This prop has no function.
+     * @obsolete Legends should be added as annotations. This prop has no function.
      */
     legend: PropTypes.shape({
         /**
