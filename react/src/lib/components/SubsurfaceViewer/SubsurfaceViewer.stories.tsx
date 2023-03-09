@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-import SubsurfaceViewer from "./SubsurfaceViewer";
+import SubsurfaceViewer, { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import {
     TooltipCallback,
     LayerPickInfo,
@@ -350,22 +350,29 @@ const MouseEventStory = (args: { show3d: boolean }) => {
         infos: [],
     });
 
-    const handleEvent = useCallback((event) => {
-        setEvent(event);
-    }, []);
-
-    const props = {
-        ...defaultProps,
-        layers: [wellsLayerWithlogs, netmapLayer],
-        onMouseEvent: handleEvent,
-        views: {
-            layout: [1, 1] as [number, number],
-            viewports: [{ id: "test", show3D: args.show3d }],
+    const handleEvent = useCallback(
+        (event) => {
+            setEvent(event);
         },
-        coords: { visible: false },
-    };
+        [setEvent]
+    );
+
+    const useProps = useMemo(() => {
+        const props = {
+            ...defaultProps,
+            layers: [wellsLayerWithlogs, netmapLayer],
+            onMouseEvent: handleEvent,
+            views: {
+                layout: [1, 1] as [number, number],
+                viewports: [{ id: "test", show3D: args.show3d }],
+            },
+            coords: { visible: false },
+        };
+        return props;
+    }, [handleEvent, args.show3d]);
+
     return (
-        <SubsurfaceViewer {...props}>
+        <SubsurfaceViewer {...useProps}>
             <View id="test">
                 {getReadout(event)}
                 <ViewFooter>Mouse event example</ViewFooter>
