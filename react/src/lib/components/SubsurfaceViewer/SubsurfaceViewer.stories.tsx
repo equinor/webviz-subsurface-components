@@ -224,7 +224,6 @@ const mapProps = {
     propertiesData: "kh_netmap_25_m.float32",
     contours: [0, 100] as [number, number],
     material: false,
-    //isContoursDepth: false,
 };
 
 const netmapLayer = new MapLayer({ ...mapProps });
