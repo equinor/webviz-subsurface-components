@@ -20,7 +20,7 @@ function rotate(
     return [xRot, yRot];
 }
 
-// These two types both describes the mesh' extent in the horizontal plane.
+// This type describes the mesh' extent in the horizontal plane.
 type Frame = {
     /** mesh origin
      */
@@ -30,7 +30,7 @@ type Frame = {
      */
     increment: [number, number];
 
-    /** no cells in each direction.
+    /** number of nodes in each direction.
      */
     count: [number, number];
 
@@ -184,7 +184,7 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
      {
          origin: [number, number];     // mesh origin in x, y
          increment: [number, number];  // cell size dx, dy
-         count: [number, number];      // number of cells in both directions.
+         count: [number, number];      // number of nodes in both directions.
      }
      */
     frame: Frame;
@@ -347,14 +347,14 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                     const xinc = this.props.frame?.increment?.[0] ?? 0;
                     const yinc = this.props.frame?.increment?.[1] ?? 0;
 
-                    const xcount = this.props.frame?.count?.[0] ?? 1;
-                    const ycount = this.props.frame?.count?.[1] ?? 1;
+                    const nnodes_x = this.props.frame?.count?.[0] ?? 2; // number of nodes in x direction
+                    const nnodes_y = this.props.frame?.count?.[1] ?? 2;
 
                     const xMin = this.props.frame?.origin?.[0] ?? 0;
                     const yMin = this.props.frame?.origin?.[1] ?? 0;
                     const zMin = -meshZValueRange[0];
-                    const xMax = xMin + xinc * xcount;
-                    const yMax = yMin + yinc * ycount;
+                    const xMax = xMin + xinc * (nnodes_x - 1);
+                    const yMax = yMin + yinc * (nnodes_y - 1);
                     const zMax = -meshZValueRange[1];
 
                     // If map is rotated the bounding box must reflect that.
