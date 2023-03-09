@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-import SubsurfaceViewer, { SubsurfaceViewerProps } from "./SubsurfaceViewer";
+import SubsurfaceViewer from "./SubsurfaceViewer";
 import {
     TooltipCallback,
     LayerPickInfo,
