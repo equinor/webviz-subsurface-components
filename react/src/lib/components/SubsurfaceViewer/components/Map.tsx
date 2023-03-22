@@ -369,26 +369,34 @@ const Map: React.FC<MapProps> = ({
             target.pop(); // In 2D "target" should only contain x and y.
         }
 
-        let tempViewStates: Record<string, ViewStateType> = {};
         const updatedViewProps = input ? input : viewsProps;
-        tempViewStates = Object.fromEntries(
-            updatedViewProps.map((item, index) => [
+
+        const viewStateMap = updatedViewProps.map((item, index) => {
+            const viewState = isBoundsDefined
+                ? getViewState(
+                      boundsInitial,
+                      target,
+                      views?.viewports?.[index].zoom,
+                      deckRef.current?.deck
+                  )
+                : getViewState3D(
+                      is3D,
+                      union_of_reported_bboxes,
+                      views?.viewports?.[index].zoom,
+                      deckRef.current?.deck
+                  );
+
+            const minZoom = is3D ? -12 : -15;
+            const maxZoom = is3D ? +12 : +15;
+
+            return [
                 item.id,
-                isBoundsDefined
-                    ? getViewState(
-                          boundsInitial,
-                          target,
-                          views?.viewports?.[index].zoom,
-                          deckRef.current?.deck
-                      )
-                    : getViewState3D(
-                          is3D,
-                          union_of_reported_bboxes,
-                          views?.viewports?.[index].zoom,
-                          deckRef.current?.deck
-                      ),
-            ])
-        );
+                { ...viewState, minZoom: minZoom, maxZoom: maxZoom },
+            ];
+        });
+
+        const tempViewStates = Object.fromEntries(viewStateMap);
+
         setDidUserChangeCamera(false);
         setViewStates(tempViewStates);
     }
@@ -1098,8 +1106,6 @@ function getViews(
                     flipY: false,
                     far,
                     near,
-                    minZoom: cur_viewport.show3D ? -12 : -15,
-                    maxZoom: cur_viewport.show3D ? +12 : +15,
                 });
                 xPos = xPos + 99.5 / nX;
             }
