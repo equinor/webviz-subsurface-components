@@ -10,6 +10,8 @@ import {
     View,
     Viewport,
     PickingInfo,
+    OrthographicView,
+    OrbitView,
 } from "@deck.gl/core/typed";
 import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
@@ -36,6 +38,7 @@ import { colorTables } from "@emerson-eps/color-tables";
 import { getModelMatrixScale } from "../layers/utils/layerTools";
 import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
 import { MjolnirEvent } from "mjolnir.js";
+import IntersectionView from "../views/intersectionView";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -466,11 +469,6 @@ const Map: React.FC<MapProps> = ({
         }
     }, [bounds, cameraPosition]);
 
-    const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
-    useEffect(() => {
-        setDeckGLViews(jsonToObject(viewsProps) as View[]);
-    }, [viewsProps]);
-
     const [reportedBoundingBox, setReportedBoundingBox] =
         useState<BoundingBox>(bboxInitial);
     const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
@@ -808,14 +806,21 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
-            setFirstViewStatesId(viewsProps[0].id);
+            setFirstViewStatesId(viewsProps[0]?.id);
             setDidUserChangeCamera(true);
         },
-        [viewStates, views]
+        [views]
+        //[viewStates, views]
     );
+
+    const deckGLViews = React.useMemo(() => {
+        return createViews(views, scaleUpFunction, scaleDownFunction);
+    }, [views, scaleUpFunction, scaleDownFunction]);
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
+
+    console.log(viewStates);
     return (
         <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
@@ -1026,6 +1031,96 @@ function getViewState3D(
         rotationOrbit: 0,
     };
     return view_state;
+}
+
+// construct views object for DeckGL component
+function createViews(
+    views: ViewsType | undefined,
+    scaleUpFunction: { (): void; (): void },
+    scaleDownFunction: { (): void; (): void }
+): View[] {
+    // Use modified controller to handle key events.
+    class ZScaleOrbitController extends OrbitController {
+        handleEvent(event: MjolnirEvent): boolean {
+            if (event.type === "keydown" && event.key === "ArrowUp") {
+                scaleUpFunction();
+                return true;
+            } else if (event.type === "keydown" && event.key === "ArrowDown") {
+                scaleDownFunction();
+                return true;
+            }
+
+            return super.handleEvent(event);
+        }
+    }
+
+    const deckgl_views = [];
+    // if props for multiple viewport are not proper, return 2d view
+    if (!views || !views.viewports || !views.layout) {
+        deckgl_views.push(
+            new OrthographicView({
+                id: "main",
+                controller: { doubleClickZoom: false },
+                x: "0%",
+                y: "0%",
+                width: "100%",
+                height: "100%",
+                flipY: false,
+                far: 99999,
+                near: -99999,
+            })
+        );
+    } else {
+        let yPos = 0;
+        const [nY, nX] = views.layout;
+        for (let y = 1; y <= nY; y++) {
+            let xPos = 0;
+            for (let x = 1; x <= nX; x++) {
+                if (
+                    views.viewports == undefined ||
+                    deckgl_views.length >= views.viewports.length
+                )
+                    return deckgl_views;
+
+                const cur_viewport: ViewportType =
+                    views.viewports[deckgl_views.length];
+
+                const ViewType = cur_viewport.show3D
+                    ? OrbitView
+                    : cur_viewport.id === "intersection_view"
+                    ? IntersectionView
+                    : OrthographicView;
+
+                const far = 9999;
+                const near = cur_viewport.show3D ? 0.1 : -9999;
+
+                deckgl_views.push(
+                    new ViewType({
+                        id: cur_viewport.id,
+                        controller: {
+                            type: cur_viewport.show3D
+                                ? ZScaleOrbitController
+                                : OrthographicController,
+                            doubleClickZoom: false,
+                            dragPan: true,
+                        },
+                        x: xPos + "%",
+                        y: yPos + "%",
+
+                        // Using 99.5% of viewport to avoid flickering of deckgl canvas
+                        width: 99.5 / nX + "%",
+                        height: 99.5 / nY + "%",
+                        flipY: false,
+                        far,
+                        near,
+                    })
+                );
+                xPos = xPos + 99.5 / nX;
+            }
+            yPos = yPos + 99.5 / nY;
+        }
+    }
+    return deckgl_views;
 }
 
 // construct views object for DeckGL component
