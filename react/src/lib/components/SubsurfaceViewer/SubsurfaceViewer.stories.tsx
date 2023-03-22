@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-import SubsurfaceViewer, { SubsurfaceViewerProps } from "./SubsurfaceViewer";
+import SubsurfaceViewer from "./SubsurfaceViewer";
 import {
     TooltipCallback,
     LayerPickInfo,
@@ -394,7 +394,6 @@ const ViewStateSynchronizationStory = (args: {
     show3d: boolean;
     sync: string[];
 }) => {
-    console.log(args.sync);
     const subsurfaceViewerArgs = {
         id: "view_state_synchronization",
         layers: [netmapLayer, huginLayer, defaultWellsLayer],
@@ -428,7 +427,6 @@ const ViewStateSynchronizationStory = (args: {
             ],
         },
     };
-    console.log(subsurfaceViewerArgs);
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
 

@@ -783,10 +783,10 @@ const Map: React.FC<MapProps> = ({
                 .filter((item) => item.isSync)
                 .map((item) => item.id);
             if (isSyncIds?.includes(viewId)) {
-                const viewStateMap = views?.viewports
+                const viewStateTable = views?.viewports
                     .filter((item) => item.isSync)
                     .map((item) => [item.id, viewState]);
-                const tempViewStates = Object.fromEntries(viewStateMap ?? []);
+                const tempViewStates = Object.fromEntries(viewStateTable ?? []);
                 setViewStates((currentViewStates) => ({
                     ...currentViewStates,
                     ...tempViewStates,
