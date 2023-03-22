@@ -779,16 +779,14 @@ const Map: React.FC<MapProps> = ({
         useState<boolean>(false);
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
-            const isSyncIds = viewsProps
+            const isSyncIds = views?.viewports
                 .filter((item) => item.isSync)
                 .map((item) => item.id);
-            if (isSyncIds.includes(viewId)) {
-                let tempViewStates: Record<string, ViewStateType> = {};
-                tempViewStates = Object.fromEntries(
-                    viewsProps
-                        .filter((item) => item.isSync)
-                        .map((item) => [item.id, viewState])
-                );
+            if (isSyncIds?.includes(viewId)) {
+                const viewStateTable = views?.viewports
+                    .filter((item) => item.isSync)
+                    .map((item) => [item.id, viewState]);
+                const tempViewStates = Object.fromEntries(viewStateTable ?? []);
                 setViewStates((currentViewStates) => ({
                     ...currentViewStates,
                     ...tempViewStates,
@@ -805,7 +803,7 @@ const Map: React.FC<MapProps> = ({
             setFirstViewStatesId(viewsProps[0].id);
             setDidUserChangeCamera(true);
         },
-        [viewStates]
+        [viewStates, views]
     );
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
@@ -1057,7 +1055,6 @@ function getViews(
             flipY: false,
             far: 99999,
             near: -99999,
-            isSync: false,
         });
     } else {
         let yPos = 0;
@@ -1103,7 +1100,6 @@ function getViews(
                     near,
                     minZoom: cur_viewport.show3D ? -12 : -15,
                     maxZoom: cur_viewport.show3D ? +12 : +15,
-                    isSync: views.viewports[deckgl_views.length].isSync,
                 });
                 xPos = xPos + 99.5 / nX;
             }

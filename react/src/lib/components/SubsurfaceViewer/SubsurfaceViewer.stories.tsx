@@ -24,6 +24,7 @@ export default {
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 const defaultWellsProps = {
+    id: "volve-wells",
     data: "./volve_wells.json",
 };
 
@@ -387,4 +388,62 @@ export const MouseEvent: ComponentStory<typeof MouseEventStory> = (args) => {
 
 MouseEvent.args = {
     show3d: true,
+};
+
+const ViewStateSynchronizationStory = (args: {
+    show3d: boolean;
+    sync: string[];
+}) => {
+    const subsurfaceViewerArgs = {
+        id: "view_state_synchronization",
+        layers: [netmapLayer, huginLayer, defaultWellsLayer],
+        views: {
+            layout: [2, 2] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: ["hugin"],
+                    show3D: args.show3d,
+                    isSync: args.sync.includes("view_1"),
+                },
+                {
+                    id: "view_2",
+                    layerIds: ["kh_netmap"],
+                    show3D: args.show3d,
+                    isSync: args.sync.includes("view_2"),
+                },
+                {
+                    id: "view_3",
+                    layerIds: ["volve-wells"],
+                    show3D: args.show3d,
+                    isSync: args.sync.includes("view_3"),
+                },
+                {
+                    id: "view_4",
+                    layerIds: ["volve-wells", "hugin"],
+                    show3D: args.show3d,
+                    isSync: args.sync.includes("view_4"),
+                },
+            ],
+        },
+    };
+    return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
+};
+
+export const ViewStateSynchronization: ComponentStory<
+    typeof ViewStateSynchronizationStory
+> = (args) => {
+    return <ViewStateSynchronizationStory {...args} />;
+};
+
+ViewStateSynchronization.args = {
+    show3d: false,
+    sync: ["view_1", "view_2", "view_3", "view_4"],
+};
+
+ViewStateSynchronization.argTypes = {
+    sync: {
+        options: ["view_1", "view_2", "view_3", "view_4"],
+        control: "check",
+    },
 };
