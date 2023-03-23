@@ -1092,14 +1092,9 @@ function createViews(
                     ? ZScaleOrbitController
                     : OrthographicController;
 
-                const dragRotate = currentViewport.show3D;
-
                 const controller = {
                     type: Controller,
                     doubleClickZoom: false,
-                    dragPan: !dragRotate,
-                    dragRotate: dragRotate,
-
                 };
 
                 deckgl_views.push(
