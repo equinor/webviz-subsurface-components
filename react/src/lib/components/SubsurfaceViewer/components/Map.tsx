@@ -781,7 +781,8 @@ const Map: React.FC<MapProps> = ({
         useState<boolean>(false);
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
-            const isSyncIds = views?.viewports
+            const viewports = views?.viewports || [];
+            const isSyncIds = viewports
                 .filter((item) => item.isSync)
                 .map((item) => item.id);
             if (isSyncIds?.includes(viewId)) {
@@ -814,7 +815,6 @@ const Map: React.FC<MapProps> = ({
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
-
     return (
         <div onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
