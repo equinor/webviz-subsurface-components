@@ -159,7 +159,7 @@ async function load_mesh_and_properties(
     }
 
     if (!ZIncreasingDownwards) {
-        for (let i = 0; i < meshData.length; i++) {
+        for (let i = 0; i < mesh.length; i++) {
             mesh[i] *= -1;
         }
     }
@@ -402,6 +402,10 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
             !isEqual(props.meshData, oldProps.meshData) ||
             !isEqual(props.propertiesData, oldProps.propertiesData) ||
             !isEqual(props.frame, oldProps.frame) ||
+            !isEqual(
+                props.ZIncreasingDownwards,
+                oldProps.ZIncreasingDownwards
+            ) ||
             !isEqual(props.gridLines, oldProps.gridLines);
 
         if (needs_reload) {

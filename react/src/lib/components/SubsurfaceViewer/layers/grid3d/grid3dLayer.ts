@@ -217,7 +217,8 @@ export default class Grid3DLayer extends CompositeLayer<
         const needs_reload =
             !isEqual(props.pointsData, oldProps.pointsData) ||
             !isEqual(props.polysData, oldProps.polysData) ||
-            !isEqual(props.propertiesData, oldProps.propertiesData);
+            !isEqual(props.propertiesData, oldProps.propertiesData)  ||
+            !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
             const reportBoundingBox = false;

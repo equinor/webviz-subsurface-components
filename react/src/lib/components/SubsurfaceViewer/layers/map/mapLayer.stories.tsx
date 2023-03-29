@@ -33,6 +33,7 @@ const defaultMapLayerProps = {
         rotDeg: 0,
     },
     propertiesData: "kh_netmap_25_m.float32",
+    ZIncreasingDownwards: true,
 };
 
 const defaultMapLayer = new MapLayer({ ...defaultMapLayerProps });
@@ -196,6 +197,7 @@ const meshMapLayerPng = {
     material: true,
     smoothShading: true,
     colorMapName: "Physics",
+    ZIncreasingDownwards: true,
 };
 
 // Example using "Map" layer. Uses float32 float for mesh and properties.

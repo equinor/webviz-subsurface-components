@@ -24,7 +24,8 @@ const defaultProps = {
     resources: {
         wellsData: "./volve_wells.json",
     },
-    bounds: [432150, 6475800, 439400, 6481500] as [
+    //bounds: [432150, 6475800, 439400, 6481500] as [
+    bounds: [433787, 6476544, 437962, 6479482] as [
         number,
         number,
         number,
