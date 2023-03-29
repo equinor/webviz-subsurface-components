@@ -52,12 +52,16 @@ module.exports = (env) => {
         output: {
             assetModuleFilename: "assets/[name].[hash][ext]",
             asyncChunks: true,
-            library: packageJson.name,
-            libraryTarget: "window",
+            library: {
+                type: "module",
+            },
             filename: "[name].js",
             chunkFilename: isEnvProduction
                 ? "[name].[contenthash:8].chunk.js"
                 : "[name].chunk.js",
+        },
+        experiments: {
+            outputModule: true,
         },
         plugins: [
             new MiniCssExtractPlugin({
