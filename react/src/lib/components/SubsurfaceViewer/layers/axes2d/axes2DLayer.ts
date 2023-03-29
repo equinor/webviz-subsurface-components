@@ -490,12 +490,20 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         const p4_v_2 = [p2_v_2[0], p2_v_2[1] - width, p2_v_2[2]];
 
         /*eslint-disable */
-        const background_lines: number[] = [ 
-                                             ...p1_v, ...p2_v, ...p3_v,  // t1 y axis
-                                             ...p3_v, ...p4_v, ...p2_v,  // t2 y axis
+        const background_lines: number[] = [
+            ...p1_v,
+            ...p2_v,
+            ...p3_v, // t1 y axis
+            ...p3_v,
+            ...p4_v,
+            ...p2_v, // t2 y axis
 
-                                             ...p1_v_2, ...p2_v_2, ...p4_v_2,  // t1 x axis
-                                             ...p1_v_2, ...p4_v_2, ...p3_v_2,  // t2 x axis
+            ...p1_v_2,
+            ...p2_v_2,
+            ...p4_v_2, // t1 x axis
+            ...p1_v_2,
+            ...p4_v_2,
+            ...p3_v_2, // t2 x axis
         ];
         /*eslint-enable */
 
@@ -612,7 +620,9 @@ function GetTickLines(
     const y_max = bounds[3];
 
     const lines: number[] = [];
-    const tick_labels = [];
+
+    // @rmt: Added missing type
+    const tick_labels: string[] = [];
 
     // ADD TICK LINES.
     let y_tick = 0;

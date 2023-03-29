@@ -1,14 +1,22 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import { FeatureOf, LineString, Polygon } from "@nebula.gl/edit-modes";
 import { Position } from "@deck.gl/core/typed";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const meta = require("@turf/meta");
+import meta from "@turf/meta";
+
+/*
+@rmt: The types seem pretty messed up here and this problem was hidden due to using require instead of import. 
+      @aspentech: Nice, if you can fix this issue. I will disable typechecking for now.
+*/
 
 export function length(geojson: FeatureOf<LineString>): number {
     // Calculate distance from 2-vertex line segments
     return meta.segmentReduce(
+        // @ts-ignore
         geojson,
-        function (previousValue: number, segment: FeatureOf<LineString>) {
+        function (previousValue?: number, segment?: FeatureOf<LineString>) {
+            if (segment === undefined || previousValue === undefined) return 0;
             const coords = segment.geometry.coordinates;
             return previousValue + distance(coords[0], coords[1]);
         },
@@ -21,6 +29,7 @@ export function length(geojson: FeatureOf<LineString>): number {
  */
 export function area(geojson: FeatureOf<Polygon>): number {
     return meta.geomReduce(
+        // @ts-ignore
         geojson,
         function (value: number, geom: Polygon) {
             return value + calculateArea(geom);

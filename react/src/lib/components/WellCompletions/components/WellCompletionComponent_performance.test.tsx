@@ -7,8 +7,9 @@ import { Wrapper } from "../test/TestWrapper";
 import WellCompletionComponent from "./WellCompletionComponent";
 import logTimes, { obj } from "../../../performanceUtility/onRenderFunction";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const exampleData = require("../../../../demo/example-data/well-completions.json");
+// @rmt: Changed from require to import
+import exampleData from "../../../../demo/example-data/well-completions.json";
+import { Data } from "../redux/types";
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -27,7 +28,10 @@ describe("Test Well Completion Component Performance", () => {
                         id="Well Completion Component"
                         onRender={logTimes}
                     >
-                        <WellCompletionComponent id={""} data={exampleData} />
+                        <WellCompletionComponent
+                            id={""}
+                            data={exampleData as unknown as Data}
+                        />
                     </Profiler>
                 ),
             })

@@ -4,7 +4,8 @@ import { ColorLegend } from "@emerson-eps/color-tables";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface LegendProps {
-    colorTables?: colorTablesArray | string;
+    // @rmt: Not matching the type in @emerson-eps/color-tables
+    colorTables?: colorTablesArray;
     min?: number;
     max?: number;
     title?: string;
@@ -63,7 +64,7 @@ const ColorLegendWrapper: React.FC<LegendProps> = ({
 };
 
 ColorLegendWrapper.propTypes = {
-    colorTables: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+    colorTables: PropTypes.array,
     min: PropTypes.number,
     max: PropTypes.number,
     title: PropTypes.string,

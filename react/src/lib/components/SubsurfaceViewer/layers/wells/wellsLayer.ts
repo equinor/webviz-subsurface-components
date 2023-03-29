@@ -669,7 +669,8 @@ WellsLayer.defaultProps = {
 //================= Local help functions. ==================
 
 function getColumn<D>(data: D[][], col: number): D[] {
-    const column = [];
+    // @rmt: Missing type
+    const column: D[] = [];
     for (let i = 0; i < data.length; i++) {
         column.push(data[i][col]);
     }

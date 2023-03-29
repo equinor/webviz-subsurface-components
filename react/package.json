@@ -1,5 +1,6 @@
 {
     "name": "@webviz/subsurface-components",
+    "version": "0.0.0",
     "description": "Custom Dash components for use in Webviz",
     "repository": {
         "type": "git",
@@ -10,7 +11,7 @@
     },
     "homepage": "https://github.com/equinor/webviz-subsurface-components",
     "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "types": "dist/lib/index.d.ts",
     "files": [
         "dist/**/*"
     ],
@@ -30,7 +31,7 @@
         "lint": "eslint *.js *.json \"src/**/*.+(ts|tsx|js|jsx|json|css)\"",
         "validate": "npm run typecheck && npm run lint",
         "setup-deckgl-types": "cd ./node_modules/@danmarshall/deckgl-typings/ && indefinitely-typed --folder deck.gl__aggregation-layers --folder deck.gl__core --folder deck.gl__extensions --folder deck.gl__geo-layers --folder deck.gl__google-maps --folder deck.gl__json --folder deck.gl__layers --folder deck.gl__mapbox --folder deck.gl__mesh-layers --folder deck.gl__react --folder deck.gl --folder luma.gl__constants --folder luma.gl__core --folder luma.gl__gltools --folder luma.gl__webgl-state-tracker --folder luma.gl__webgl --folder math.gl__core --folder math.gl",
-        "storybook": "start-storybook -p 6006",
+        "storybook": "NODE_RUNNING_STORYBOOK=true start-storybook -p 6006",
         "build-storybook": "build-storybook",
         "test_perf": "jest _performance",
         "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
@@ -38,8 +39,9 @@
         "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
         "build:npm": "rimraf dist && tsc -project tsconfig.build.json --declaration && npm run copy-files",
+        "build:npm:dist": "tsc --project tsconfig.dist.json --emitDeclarationOnly && webpack --mode production --config webpack.config.dist.js",
         "copy-files": "copyfiles package.json dist && copyfiles --up 1 ../README.md dist && copyfiles --exclude **/*.{tsx,jsx,js,ts,snap} --up 2 \"src/lib/**/*\" dist/",
-        "prepare": "npm run build:npm",
+        "prepare": "npm run build:npm:dist",
         "postpack": "npm run tidy-up",
         "prepublishOnly": "npm test && npm run lint",
         "preversion": "npm run lint"
@@ -84,8 +86,6 @@
         "lodash": "^4.17.21",
         "mathjs": "^9.4.2",
         "nebula.gl": "^0.22.3",
-        "react": "^17.0.2",
-        "react-dom": "^17.0.2",
         "react-dropdown-tree-select": "^2.5.1",
         "react-leaflet": "2.8",
         "react-leaflet-draw": "^0.19.8",
@@ -114,6 +114,7 @@
         "@storybook/manager-webpack5": "^6.5.9",
         "@storybook/react": "^6.5.9",
         "@storybook/testing-react": "^1.3.0",
+        "@svgr/webpack": "^7.0.0",
         "@testing-library/jest-dom": "^5.11.9",
         "@testing-library/react": "^12.1.2",
         "@testing-library/user-event": "^13.1.9",
@@ -159,6 +160,8 @@
         "prettier": "^2.5.1",
         "process": "^0.11.10",
         "raw-loader": "^4.0.2",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
         "react-ace": "^9.5.0",
         "react-docgen": "^5.3.1",
         "react-scripts": "^5.0.1",
@@ -182,5 +185,9 @@
     "engines": {
         "node": ">=14.17",
         "npm": ">=6.14"
+    },
+    "peerDependencies": {
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2"
     }
 }

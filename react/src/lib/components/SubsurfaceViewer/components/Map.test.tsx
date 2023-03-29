@@ -19,7 +19,7 @@ import {
     WellsLayer,
 } from "../layers";
 
-const mapData = require("../../../../demo/example-data/deckgl-map.json");
+import mapData from "../../../../demo/example-data/deckgl-map.json";
 const colorTablesData = colorTables;
 const testBounds = [432205, 6475078, 437720, 6481113] as [
     number,

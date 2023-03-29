@@ -1,10 +1,13 @@
 import React, { FC } from "react";
+// @rmt: Added import
+import { Data } from "../redux/types";
 import { DataContext } from "../components/DataLoader";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-export const exampleData = require("../../../../demo/example-data/well-completions.json");
+// @rmt: Changed require to import
+import exampleData from "../../../../demo/example-data/well-completions.json";
 
 export const exampleDataDecorator = (Story: FC): JSX.Element => (
-    <DataContext.Provider value={exampleData}>
+    // @rmt: Added type
+    <DataContext.Provider value={exampleData as unknown as Data}>
         <Story />
     </DataContext.Provider>
 );

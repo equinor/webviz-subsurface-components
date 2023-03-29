@@ -8,7 +8,7 @@ import GroupTree from "./GroupTree";
 import logTimes, { obj } from "../../performanceUtility/onRenderFunction";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const exampleData = require("../../../demo/example-data/group-tree.json");
+import exampleData from "../../../demo/example-data/group-tree.json";
 
 describe("Test GroupTree perfomance", () => {
     it("initial performance test", () => {

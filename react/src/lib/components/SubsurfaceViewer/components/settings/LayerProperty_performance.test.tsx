@@ -8,7 +8,7 @@ import * as core from "@actions/core";
 import { obj } from "../../../../performanceUtility/onRenderFunction";
 import logTimes from "../../../../performanceUtility/onRenderFunction";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const exampleData = require("../../../../../demo/example-data/deckgl-map.json");
+import exampleData from "../../../../../demo/example-data/deckgl-map.json";
 
 const layers: Record<string, unknown>[] = exampleData[0].layers;
 

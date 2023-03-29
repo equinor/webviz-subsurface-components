@@ -6,7 +6,7 @@ import { Wrapper } from "../GroupTree/test/TestWrapper";
 import GroupTree from "./GroupTree";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const exampleData = require("../../../demo/example-data/group-tree.json");
+import exampleData from "../../../demo/example-data/group-tree.json";
 
 describe("Test GroupTree Default Component", () => {
     it("snapshot test", () => {

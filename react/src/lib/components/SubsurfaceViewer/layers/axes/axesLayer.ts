@@ -348,7 +348,7 @@ function GetTickLines(
     const z_max = bounds[5];
 
     const lines: number[] = [];
-    const tick_labels = [];
+    const tick_labels: string[] = [];
 
     // ADD TICK LINES.
     const dx = x_max - x_min;
