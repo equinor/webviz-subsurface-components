@@ -46,10 +46,11 @@ module.exports = (env) => {
         mode: isEnvProduction ? "production" : "development",
         target: "web",
         entry: {
-            index: path.resolve(paths.src, "lib/index.js"),
+            VectorSelector: path.resolve(paths.dist, "lib/components/VectorSelector/index.js"),
         },
         devtool: isEnvDevelopment ? "cheap-module-source-map" : "source-map",
         output: {
+            path: path.resolve(paths.dist, "package"),
             assetModuleFilename: "assets/[name].[hash][ext]",
             asyncChunks: true,
             library: {
@@ -94,20 +95,13 @@ module.exports = (env) => {
                         },
                     ],
                 },
-                {
-                    test: /\.(png|jpg|gif|svg)$/i,
-                    use: [
-                        {
-                            loader: "url-loader",
-                        },
-                    ],
-                },
             ],
         },
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".jsx"],
         },
         optimization: {
+            minimize: false,
             minimizer: [new TerserJSPlugin({}), new CssMinimizerPlugin({})],
         },
     };

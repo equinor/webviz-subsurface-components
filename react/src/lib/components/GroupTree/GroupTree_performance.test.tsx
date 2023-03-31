@@ -7,7 +7,7 @@ import { Wrapper } from "../GroupTree/test/TestWrapper";
 import GroupTree from "./GroupTree";
 import logTimes, { obj } from "../../performanceUtility/onRenderFunction";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// @rmt: Changed require to import
 import exampleData from "../../../demo/example-data/group-tree.json";
 
 describe("Test GroupTree perfomance", () => {

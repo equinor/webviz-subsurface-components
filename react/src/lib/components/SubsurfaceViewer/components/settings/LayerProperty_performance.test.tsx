@@ -7,7 +7,7 @@ import LayerProperty from "./LayerProperty";
 import * as core from "@actions/core";
 import { obj } from "../../../../performanceUtility/onRenderFunction";
 import logTimes from "../../../../performanceUtility/onRenderFunction";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// @rmt: Changed require to import
 import exampleData from "../../../../../demo/example-data/deckgl-map.json";
 
 const layers: Record<string, unknown>[] = exampleData[0].layers;

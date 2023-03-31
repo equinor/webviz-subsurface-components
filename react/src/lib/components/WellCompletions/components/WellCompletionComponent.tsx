@@ -6,7 +6,7 @@ import ErrorPlaceholder from "./Common/ErrorPlaceholder";
 import DataProvider from "./DataLoader";
 import WellCompletionsViewer from "./WellCompletionsViewer";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// @rmt: Changed require to import
 import inputSchema from "../../../inputSchema/wellCompletions.json";
 
 const ajv = new Ajv();

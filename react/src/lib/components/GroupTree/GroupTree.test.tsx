@@ -5,7 +5,7 @@ import React from "react";
 import { Wrapper } from "../GroupTree/test/TestWrapper";
 import GroupTree from "./GroupTree";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// @rmt: Changed require to import
 import exampleData from "../../../demo/example-data/group-tree.json";
 
 describe("Test GroupTree Default Component", () => {
