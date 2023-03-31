@@ -20,7 +20,7 @@ import {
 import { BlinkingTableRow } from "./BlinkingTableRow";
 import { EnhancedTableHead } from "./EnhancedTableHead";
 
-import "!style-loader!css-loader!../../../VectorCalculator.css";
+import "../../../VectorCalculator.css";
 
 interface ExpressionsTableProps {
     blinkingExpressions: ExpressionType[];

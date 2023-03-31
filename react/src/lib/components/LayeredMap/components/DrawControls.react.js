@@ -8,7 +8,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withLeaflet } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
-import "!style-loader!css-loader!leaflet-draw/dist/leaflet.draw.css";
+import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
 // work around broken icons when using webpack, see https://github.com/PaulLeCam/react-leaflet/issues/255

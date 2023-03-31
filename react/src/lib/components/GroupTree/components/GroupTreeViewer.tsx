@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { GroupTreeState } from "../redux/store";
 import { DataContext } from "./DataLoader";
-import "!style-loader!css-loader!./Plot/dynamic_tree.css";
+import "./Plot/dynamic_tree.css";
 import GroupTree from "./Plot/group_tree";
 import SettingsBar from "./Settings/SettingsBar";
 import { DataInfos } from "../redux/types";

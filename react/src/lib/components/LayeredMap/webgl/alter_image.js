@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2020 - Equinor ASA. */
 
-import vertexShaderSource from "!!raw-loader!../shaders/vertexShader.vs.glsl";
-import fragmentShaderSourceWithHillshading from "!!raw-loader!../shaders/fragmentShaderWithHillshading.fs.glsl";
-import fragmentShaderSourceWithoutHillshading from "!!raw-loader!../shaders/fragmentShaderWithoutHillshading.fs.glsl";
+import vertexShaderSource from "../shaders/vertexShader.vs.glsl";
+import fragmentShaderSourceWithHillshading from "../shaders/fragmentShaderWithHillshading.fs.glsl";
+import fragmentShaderSourceWithoutHillshading from "../shaders/fragmentShaderWithoutHillshading.fs.glsl";
 
 function alter_image(
     canvas,

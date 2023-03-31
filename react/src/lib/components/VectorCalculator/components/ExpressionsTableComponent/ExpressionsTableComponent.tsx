@@ -18,7 +18,7 @@ import {
     getDefaultExpression,
 } from "../../utils/VectorCalculatorHelperFunctions";
 
-import "!style-loader!css-loader!../../VectorCalculator.css";
+import "../../VectorCalculator.css";
 
 interface ExpressionsTableComponentProps {
     containerRef: React.RefObject<HTMLDivElement | null>;

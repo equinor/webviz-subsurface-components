@@ -11,7 +11,7 @@ import {
 
 import { getExpressionParseData } from "../../../utils/ExpressionParser";
 
-import "!style-loader!css-loader!../../../VectorCalculator.css";
+import "../../../VectorCalculator.css";
 
 type ExpressionInputTextFieldVariantType = "success" | "error" | "default";
 

@@ -6,7 +6,7 @@
 
 import { useEffect, useContext, useRef } from "react";
 import PropTypes from "prop-types";
-import "!style-loader!css-loader!leaflet-draw/dist/leaflet.draw.css";
+import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 
 // Context
