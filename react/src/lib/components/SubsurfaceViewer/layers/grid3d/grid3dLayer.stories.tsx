@@ -32,6 +32,7 @@ const grid3dLayer = {
     id: "Grid3DLayer",
     material: true,
     colorMapName: "Rainbow",
+    ZIncreasingDownwards: true,
 };
 
 const axes = {

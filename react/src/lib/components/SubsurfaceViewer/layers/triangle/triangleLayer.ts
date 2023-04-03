@@ -230,7 +230,8 @@ export default class TriangleLayer extends CompositeLayer<
     updateState({ props, oldProps }: UpdateParameters<TriangleLayer>): void {
         const needs_reload =
             !isEqual(props.pointsData, oldProps.pointsData) ||
-            !isEqual(props.triangleData, oldProps.triangleData);
+            !isEqual(props.triangleData, oldProps.triangleData) ||
+            !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
             const reportBoundingBox = false;

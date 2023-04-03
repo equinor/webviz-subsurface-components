@@ -46,6 +46,7 @@ const triangleLayer = {
     gridLines: true,             // If true will draw lines around triangles.
     material: true,              // If true will use triangle normals for shading.
     smoothShading: true,         // If true will use vertex calculated mean normals for shading.
+    ZIncreasingDownwards: true,
     //contours: [0, 1],          // If used will display contour lines.
     /*eslint-enable */
 };
