@@ -151,7 +151,8 @@ export default class Grid3DLayer extends CompositeLayer<
         );
 
         p.then(([points, polys, properties]) => {
-            if (!this.props.ZIncreasingDownwards) {
+            if (this.props.ZIncreasingDownwards) {
+                // Will flip to webviz axes which have z axis pointing up.
                 FlipZ(points);
             }
 
