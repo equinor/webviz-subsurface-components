@@ -530,12 +530,20 @@ export const MapLayer2d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
+const axesLayer2D = {
+    "@@type": "Axes2DLayer",
+    id: "axes-layer2D",
+    marginH: 100, // Horizontal margin (in pixels)
+    marginV: 100, // Vertical margin (in pixels)
+    backgroundColor: [255, 255, 0, 100],
+};
+
 MapLayer2d.args = {
     id: "map",
     layers: [
-        axes_hugin,
+        //axes_hugin,
         { ...meshMapLayerFloat32, material: true },
-        north_arrow_layer,
+        axesLayer2D,
     ],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {

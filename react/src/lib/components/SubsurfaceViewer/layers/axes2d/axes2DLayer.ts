@@ -470,7 +470,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         }
 
         //-- Background model --
-        const width = 140;
+        const width = 999; // sufficent for the background to always cover.
         const z = 90; // Depth of background square
         // Y axis
         const p1_w = vec4.fromValues(xMin, yMin, z, 1);

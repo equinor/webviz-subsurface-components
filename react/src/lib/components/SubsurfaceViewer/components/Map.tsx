@@ -29,7 +29,7 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import { WellsLayer, AxesLayer, NorthArrow3DLayer } from "../layers";
+import { WellsLayer, AxesLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
@@ -328,7 +328,13 @@ const Map: React.FC<MapProps> = ({
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
+    // Viewport margins. Will differ from 0 if axes2Dlayer is used.
+    const [marginLeft, setMarginLeft] = useState<number>(0);
+    const [marginBottom, setMarginBottom] = useState<number>(0);
+
     const initialViewState = getViewState(
+        marginLeft,
+        marginBottom,
         boundsInitial,
         views?.viewports?.[0].target,
         views?.viewports?.[0].zoom,
@@ -336,7 +342,7 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Local help function.
-    function calcDefaultViewStates(input?: ViewportType[]) {
+    function calcDefaultViewStates(marginLeft: number, marginBottom: number, input?: ViewportType[]) {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         const union_of_reported_bboxes = addBoundingBoxes(
@@ -367,18 +373,17 @@ const Map: React.FC<MapProps> = ({
             target = [x, y, z];
         }
 
-        const is3D = views?.viewports?.[0]?.show3D ?? false;
-        if (!is3D) {
-            target.pop(); // In 2D "target" should only contain x and y.
-        }
-
         const updatedViewProps = input ? input : viewsProps;
 
         const viewStateMap = updatedViewProps.map((item, index) => {
+            const is3D = views?.viewports?.[index]?.show3D ?? false;
+
             const viewState = isBoundsDefined
                 ? getViewState(
+                      marginLeft,
+                      marginBottom,
                       boundsInitial,
-                      target,
+                      is3D ? target : undefined,
                       views?.viewports?.[index].zoom,
                       deckRef.current?.deck
                   )
@@ -428,6 +433,8 @@ const Map: React.FC<MapProps> = ({
                         typeof viewState !== "undefined"
                             ? viewState
                             : getViewState(
+                                  marginLeft,
+                                  marginBottom,
                                   boundsInitial,
                                   views?.viewports?.[index].target,
                                   views?.viewports?.[index].zoom,
@@ -455,6 +462,8 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
+                        marginLeft,
+                        marginBottom,
                         boundsInitial,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
@@ -476,7 +485,7 @@ const Map: React.FC<MapProps> = ({
 
     useEffect(() => {
         if (typeof triggerHome !== "undefined") {
-            calcDefaultViewStates();
+            calcDefaultViewStates(marginLeft, marginBottom);
         }
     }, [triggerHome]);
 
@@ -484,7 +493,7 @@ const Map: React.FC<MapProps> = ({
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         if (!didUserChangeCamera && !isCameraPositionDefined) {
-            calcDefaultViewStates();
+            calcDefaultViewStates(marginLeft, marginBottom);
         }
     }, [reportedBoundingBox]);
 
@@ -496,6 +505,8 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
+                        marginLeft,
+                        marginBottom,
                         boundsInitial,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
@@ -565,13 +576,24 @@ const Map: React.FC<MapProps> = ({
         setViewsProps(viewProps);
 
         if (!bounds) {
-            calcDefaultViewStates(viewProps);
+            calcDefaultViewStates(marginLeft, marginBottom, viewProps);
         }
     }, [views]);
 
     useEffect(() => {
         if (layers == undefined) return;
 
+        // Margins on the viewport are extracted from a potenial axes2D layer.
+        const axes2DLayer = layers?.find((e) => {
+            return e?.constructor === Axes2DLayer;
+        }) as Axes2DLayer;
+        
+        const marginLeft = axes2DLayer ? axes2DLayer.props.marginH : 0;
+        const marginBottom = axes2DLayer ? axes2DLayer.props.marginV : 0;
+        setMarginLeft(marginLeft);
+        setMarginBottom(marginBottom);
+
+        
         const m = getModelMatrixScale(scaleZ);
 
         const layers_copy = layers.map((item) => {
@@ -956,10 +978,12 @@ export function jsonToObject(
 
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
+    marginLeft: number,
+    marginBottom: number,
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     target?: number[],
     zoom?: number,
-    deck?: Deck
+    deck?: Deck,
 ): ViewStateType {
     let bounds = [0, 0, 1, 1];
     if (typeof bounds_accessor == "function") {
@@ -968,16 +992,39 @@ function getViewState(
         bounds = bounds_accessor;
     }
 
-    let width = bounds[2] - bounds[0]; // right - left
-    let height = bounds[3] - bounds[1]; // top - bottom
+    let w = bounds[2] - bounds[0]; // right - left
+    let h = bounds[3] - bounds[1]; // top - bottom
+
+    const fb = fitBounds({ width: w, height: h, bounds });
+    let fb_target = [fb.x, fb.y, 0];
+    let fb_zoom = fb.zoom;
+
     if (deck) {
-        width = deck.width;
-        height = deck.height;
+        // If there are margins in the viewport (axes2DLayer) we have to account for that.
+        // Camera target should be in the middle of viewport minus the margins.
+        const w_bounds = w;
+        const h_bounds = h;
+
+        // Subtract margins.
+        w = deck.width - marginLeft; // width of the viewport minus margin.
+        h = deck.height - marginBottom;
+
+        const port_aspect = h / w;
+        const bounds_aspect = h_bounds / w_bounds;
+
+        const m_pr_pixel = bounds_aspect > port_aspect ? h_bounds / h : w_bounds / w;
+
+        const translate_x = 0.5 * marginLeft * m_pr_pixel;
+        const translate_y = 0.5 * marginBottom * m_pr_pixel;
+
+        const fb = fitBounds({ width: w, height: h, bounds });
+        fb_target = [fb.x - translate_x, fb.y - translate_y, 0];
+        fb_zoom = fb.zoom;
     }
-    const fitted_bound = fitBounds({ width, height, bounds });
+
     const view_state: ViewStateType = {
-        target: target ?? [fitted_bound.x, fitted_bound.y, 0],
-        zoom: zoom ?? fitted_bound.zoom,
+        target: target ?? fb_target,
+        zoom: zoom ?? fb_zoom,
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
     };
@@ -1026,6 +1073,7 @@ function getViewState3D(
     };
     return view_state;
 }
+
 
 // construct views object for DeckGL component
 function createViews(
