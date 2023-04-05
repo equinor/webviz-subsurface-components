@@ -47,7 +47,7 @@ def generate_synthetic_data(num_groups, num_iter, num_realizations):
             realization_pos = scale * pos
             realization_neg = scale * neg
 
-            df = df._append(
+            df = df.append(
                 pd.DataFrame(
                     OrderedDict(
                         [
