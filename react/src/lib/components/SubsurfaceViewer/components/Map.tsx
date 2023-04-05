@@ -29,7 +29,12 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import { WellsLayer, AxesLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
+import {
+    WellsLayer,
+    AxesLayer,
+    Axes2DLayer,
+    NorthArrow3DLayer,
+} from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
@@ -342,7 +347,11 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Local help function.
-    function calcDefaultViewStates(marginLeft: number, marginBottom: number, input?: ViewportType[]) {
+    function calcDefaultViewStates(
+        marginLeft: number,
+        marginBottom: number,
+        input?: ViewportType[]
+    ) {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         const union_of_reported_bboxes = addBoundingBoxes(
@@ -587,13 +596,12 @@ const Map: React.FC<MapProps> = ({
         const axes2DLayer = layers?.find((e) => {
             return e?.constructor === Axes2DLayer;
         }) as Axes2DLayer;
-        
+
         const marginLeft = axes2DLayer ? axes2DLayer.props.marginH : 0;
         const marginBottom = axes2DLayer ? axes2DLayer.props.marginV : 0;
         setMarginLeft(marginLeft);
         setMarginBottom(marginBottom);
 
-        
         const m = getModelMatrixScale(scaleZ);
 
         const layers_copy = layers.map((item) => {
@@ -983,7 +991,7 @@ function getViewState(
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     target?: number[],
     zoom?: number,
-    deck?: Deck,
+    deck?: Deck
 ): ViewStateType {
     let bounds = [0, 0, 1, 1];
     if (typeof bounds_accessor == "function") {
@@ -1012,7 +1020,8 @@ function getViewState(
         const port_aspect = h / w;
         const bounds_aspect = h_bounds / w_bounds;
 
-        const m_pr_pixel = bounds_aspect > port_aspect ? h_bounds / h : w_bounds / w;
+        const m_pr_pixel =
+            bounds_aspect > port_aspect ? h_bounds / h : w_bounds / w;
 
         const translate_x = 0.5 * marginLeft * m_pr_pixel;
         const translate_y = 0.5 * marginBottom * m_pr_pixel;
@@ -1073,7 +1082,6 @@ function getViewState3D(
     };
     return view_state;
 }
-
 
 // construct views object for DeckGL component
 function createViews(
