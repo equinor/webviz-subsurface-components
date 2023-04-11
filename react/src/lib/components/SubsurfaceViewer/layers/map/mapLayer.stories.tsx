@@ -12,6 +12,7 @@ import {
 } from "@emerson-eps/color-tables";
 import { View } from "../../../..";
 import MapLayer from "./mapLayer";
+import Axes2DLayer from "../axes2d/axes2DLayer";
 import { ViewFooter } from "../../components/ViewFooter";
 
 export default {
@@ -530,21 +531,33 @@ export const MapLayer2d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-const axesLayer2D = {
-    "@@type": "Axes2DLayer",
-    id: "axes-layer2D",
+const axesLayer2D = new Axes2DLayer({
+    id: "axesLayer2D",
     marginH: 100, // Horizontal margin (in pixels)
-    marginV: 100, // Vertical margin (in pixels)
+    marginV: 40, // Vertical margin (in pixels)
     backgroundColor: [255, 255, 0, 100],
-};
+});
+
+const mapLayer = new MapLayer({
+    id: "MapLayer",
+    meshUrl: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.float32",
+    contours: [0, 100],
+    isContoursDepth: true,
+    gridLines: false,
+    material: true,
+    colorMapName: "Physics",
+});
 
 MapLayer2d.args = {
     id: "map",
-    layers: [
-        //axes_hugin,
-        { ...meshMapLayerFloat32, material: true },
-        axesLayer2D,
-    ],
+    layers: [mapLayer, axesLayer2D],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
         layout: [1, 1],
