@@ -118,14 +118,14 @@ export function makeFullMesh(e: { data: Params }): void {
         vertexsNormals[3 * vertex_no + 1] = normal_mean[1];
         vertexsNormals[3 * vertex_no + 2] = normal_mean[2];
 
-        // Debug. Verify normal calculations.
-        const isDebug = false;
+        // Debug. Verify normal calculations by displaying normals.
+        const isDebug = params.displayNormals;
         if (isDebug) {
             const x0 = vertexArray[3 * vertex_no + 0];
             const y0 = vertexArray[3 * vertex_no + 1];
             const z0 = vertexArray[3 * vertex_no + 2];
 
-            const scale = 5;
+            const scale = 50;
             const x1 = x0 + normal_mean[0] * scale;
             const y1 = y0 + normal_mean[1] * scale;
             const z1 = z0 + normal_mean[2] * scale;
