@@ -40,7 +40,7 @@ const defaultParameters = {
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer",
-    bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+    bounds: [432205, 6475078, 0, 437720, 6481113, 3500],
 };
 const north_arrow_layer = {
     "@@type": "NorthArrow3DLayer",
@@ -100,6 +100,7 @@ export const GradientFunctionColorMap: ComponentStory<
     const args = {
         ...defaultArgs,
         id: "gradient-color-map",
+        bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
         layers: [{ ...meshMapLayer, colorMapFunction: gradientColorMap }],
     };
     return <SubsurfaceViewer {...args} />;
@@ -120,6 +121,7 @@ export const StepFunctionColorMap: ComponentStory<
     const args = {
         ...defaultArgs,
         id: "nearest-color-map",
+        bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
         layers: [{ ...meshMapLayer, colorMapFunction: nearestColorMap }],
     };
 
@@ -141,6 +143,7 @@ export const DefaultColorScale: ComponentStory<
     const args = {
         ...defaultArgs,
         id: "default-color-scale",
+        bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
         layers: [{ ...meshMapLayer }],
     };
 
@@ -163,6 +166,7 @@ export const Readout: ComponentStory<typeof SubsurfaceViewer> = () => {
         return {
             ...defaultArgs,
             id: "readout",
+            bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
             layers: [{ ...meshMapLayer }],
             coords: {
                 visible: false,
@@ -217,6 +221,7 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
     const props = React.useMemo(() => {
         return {
             ...args,
+            bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
             layers: [
                 {
                     ...meshMapLayer,
@@ -275,6 +280,7 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
     const props = React.useMemo(() => {
         return {
             ...args,
+            bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
             layers: [
                 {
                     ...meshMapLayer,

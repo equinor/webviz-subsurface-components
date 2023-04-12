@@ -242,7 +242,7 @@ const meshMapLayerRotated = {
 const axes_hugin = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
+    bounds: [432150, 6475800, 0, 439400, 6481500, 3500],
 };
 
 const north_arrow_layer = {
@@ -689,7 +689,7 @@ BigMap3d.parameters = {
 const axes_small = {
     "@@type": "AxesLayer",
     id: "axes_small",
-    bounds: [459790, 5929776, -30, 460590, 5930626, 0],
+    bounds: [459790, 5929776, 0, 460590, 5930626, 30],
 };
 export const SmallMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
@@ -722,7 +722,7 @@ SmallMap.parameters = {
 const axes_lite = {
     "@@type": "AxesLayer",
     id: "axes_small",
-    bounds: [-1, -1, -3, 4, 5, 0],
+    bounds: [-1, -1, 0, 4, 5, 3],
 };
 
 //-- CellCenteredPropMap --

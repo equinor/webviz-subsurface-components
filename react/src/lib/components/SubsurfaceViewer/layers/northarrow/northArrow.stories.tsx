@@ -14,7 +14,7 @@ const white = [255, 255, 255, 255];
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [434150, 6476800, -100, 437400, 6480500, 100],
+    bounds: [432150, 6475800, 0, 439400, 6481500, 100],
 };
 
 const north_arrow_layer = {
