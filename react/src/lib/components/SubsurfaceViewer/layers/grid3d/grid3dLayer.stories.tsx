@@ -38,7 +38,7 @@ const grid3dLayer = {
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [453150, 5925800, -2000, 469400, 5939500, 0],
+    bounds: [453150, 5925800, 0, 469400, 5939500, 2000],
 };
 const parameters = {
     docs: {

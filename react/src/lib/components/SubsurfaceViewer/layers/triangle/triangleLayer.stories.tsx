@@ -54,7 +54,7 @@ const triangleLayer = {
 const axesLayer = {
     "@@type": "AxesLayer",
     id: "axes_small",
-    bounds: [-10, -10, -10, 20, 10, 0],
+    bounds: [-10, -10, 0, 20, 10, 10],
 };
 
 export const SmallTriangleLayer: ComponentStory<typeof SubsurfaceViewer> = (

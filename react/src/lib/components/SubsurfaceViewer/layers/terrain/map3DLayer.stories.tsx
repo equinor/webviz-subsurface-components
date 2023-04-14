@@ -27,7 +27,7 @@ const meshMapLayer = {
 };
 
 const defaultArgs = {
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
 };
 
 const defaultParameters = {
@@ -40,7 +40,7 @@ const defaultParameters = {
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer",
-    bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+    bounds: [432205, 6475078, 0, 437720, 6481113, 3500],
 };
 const north_arrow_layer = {
     "@@type": "NorthArrow3DLayer",
@@ -217,6 +217,7 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
     const props = React.useMemo(() => {
         return {
             ...args,
+            bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
             layers: [
                 {
                     ...meshMapLayer,
@@ -275,6 +276,7 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
     const props = React.useMemo(() => {
         return {
             ...args,
+            bounds: [432205, 6475078, 437720, 6481113] as NumberQuad,
             layers: [
                 {
                     ...meshMapLayer,
