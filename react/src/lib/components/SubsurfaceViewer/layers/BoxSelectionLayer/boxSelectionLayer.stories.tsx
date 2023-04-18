@@ -1,8 +1,10 @@
 import { FormControlLabel, makeStyles, Switch } from "@material-ui/core";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import { PickInfo } from "lib";
+// import { PickInfo } from "lib";
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
+
+type PickInfo = any;
 
 export default {
     component: SubsurfaceViewer,

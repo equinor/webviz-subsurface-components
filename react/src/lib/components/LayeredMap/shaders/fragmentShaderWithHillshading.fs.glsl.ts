@@ -1,4 +1,4 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
+const fragmentShader = `// This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
@@ -36,5 +36,7 @@ void main() {
     vec4 color = texture2D(u_colormap_frame, vec2((map_array * (u_colormap_length - 1.0) + 0.5) / u_colormap_length, 0.5));
 
     gl_FragColor = color * vec4(light, light, light, 1.0);
-}
+}`; 
+
+export default fragmentShader;
 

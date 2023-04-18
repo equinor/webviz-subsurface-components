@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "baseUrl": "src",
+        "baseUrl": "./src",
         "outDir": "./dist/",
         "declaration": true,
         "sourceMap": true,
@@ -22,5 +22,5 @@
         "skipLibCheck": true,
         "resolveJsonModule": true
     },
-    "include": ["./src/lib", "./src/custom.d.ts"]
+    "include": ["./src/lib", "./src/lib/custom.d.ts"],
 }

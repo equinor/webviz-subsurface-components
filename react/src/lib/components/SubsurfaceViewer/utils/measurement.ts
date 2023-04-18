@@ -3,7 +3,7 @@
 import { FeatureOf, LineString, Polygon } from "@nebula.gl/edit-modes";
 import { Position } from "@deck.gl/core/typed";
 
-import meta from "@turf/meta";
+import {segmentReduce, geomReduce} from "@turf/meta";
 
 /*
 @rmt: The types seem pretty messed up here and this problem was hidden due to using require instead of import. 
@@ -12,7 +12,7 @@ import meta from "@turf/meta";
 
 export function length(geojson: FeatureOf<LineString>): number {
     // Calculate distance from 2-vertex line segments
-    return meta.segmentReduce(
+    return segmentReduce(
         // @ts-ignore
         geojson,
         function (previousValue?: number, segment?: FeatureOf<LineString>) {
@@ -28,7 +28,7 @@ export function length(geojson: FeatureOf<LineString>): number {
  * Takes one or more features and returns their area in square meters.
  */
 export function area(geojson: FeatureOf<Polygon>): number {
-    return meta.geomReduce(
+    return geomReduce(
         // @ts-ignore
         geojson,
         function (value: number, geom: Polygon) {

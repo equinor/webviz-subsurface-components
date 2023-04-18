@@ -8,8 +8,8 @@ import EQGL from "../eqGL";
 import vec3 from "../vec3";
 
 // Shaders
-import positionVShader from "!../../shaders/position.vs.glsl";
-import terrainRGBFSShader from "!../../shaders/terrainRGB.fs.glsl";
+import positionVShader from "../../shaders/position.vs.glsl";
+import terrainRGBFSShader from "../../shaders/terrainRGB.fs.glsl";
 
 // CONSTANTS
 const DEFAULT_ELEVATION_SCALE = -1.0;
