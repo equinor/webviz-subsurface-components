@@ -25,8 +25,7 @@ def generate_synthetic_data(num_groups, num_iter, num_realizations):
     obs_group_names = [f"Obs. group {i}" for i in range(num_groups)]
     number_dp = np.random.randint(low=10, high=100, size=num_groups)
 
-    df = pd.DataFrame()
-
+    dfs = []
     for i in range(num_iter):
         ensemble_name = f"Iteration {i}"
 
@@ -47,7 +46,7 @@ def generate_synthetic_data(num_groups, num_iter, num_realizations):
             realization_pos = scale * pos
             realization_neg = scale * neg
 
-            df = df.append(
+            dfs.append(
                 pd.DataFrame(
                     OrderedDict(
                         [
@@ -61,6 +60,7 @@ def generate_synthetic_data(num_groups, num_iter, num_realizations):
                     )
                 )
             )
+    df = pd.concat(dfs)
 
     return df.set_index(["obs_group_name", "ensemble_name", "realization"])
 
@@ -123,7 +123,7 @@ class HistoryMatch:
         iterations = []
         for ensemble in ensemble_labels:
             df = data[data.ensemble_name == ensemble]
-            iterations.append(df.groupby("obs_group_name").mean())
+            iterations.append(df.groupby("obs_group_name").mean(numeric_only=True))
 
         sorted_iterations = HistoryMatch._sort_iterations(iterations)
 

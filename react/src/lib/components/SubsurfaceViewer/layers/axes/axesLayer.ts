@@ -13,15 +13,26 @@ import { TextLayer } from "@deck.gl/layers/typed";
 import { cloneDeep } from "lodash";
 
 export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
+    /**
+     *  [xmin, ymin, zmin, xmax, ymax, zmax]
+     *  Note that z values are default interptreted as going downwards. See property "ZIncreasingDownwards".
+     *  So by default zmax is expected to be bigger than zmin.
+     */
     bounds: [number, number, number, number, number, number];
     labelColor?: Color;
     labelFontSize?: number;
     fontFamily?: string;
     axisColor?: Color;
     /** If true means that input z values are interpreted as depths.
-     * For example depth of z = 1000 corresponds to -1000 on the z axis. Default false.
+     * For example a depth of 2000 will be further down than a depth value of 1000.
+     * Default true.
      */
-    isZDepth: boolean;
+    ZIncreasingDownwards: boolean;
+
+    // Non public properties:
+    setReportedBoundingBox?: React.Dispatch<
+        React.SetStateAction<[number, number, number, number, number, number]>
+    >;
 }
 
 const defaultProps = {
@@ -29,7 +40,7 @@ const defaultProps = {
     name: "Axes",
     id: "axes-layer",
     visible: true,
-    isZDepth: false,
+    ZIncreasingDownwards: true,
 };
 
 type TextLayerData = {
@@ -42,7 +53,11 @@ type TextLayerData = {
 export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
     initializeState(): void {
         const bounds = cloneDeep(this.props.bounds);
-        if (this.props.isZDepth) {
+        if (this.props.ZIncreasingDownwards) {
+            const tmp = bounds[5];
+            bounds[5] = bounds[2];
+            bounds[2] = tmp;
+
             bounds[2] *= -1;
             bounds[5] *= -1;
         }
@@ -67,6 +82,10 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
         );
 
         this.setState({ box_lines, tick_lines, textlayerData });
+
+        if (typeof this.props.setReportedBoundingBox !== "undefined") {
+            this.props.setReportedBoundingBox(bounds);
+        }
     }
 
     shouldUpdateState({
@@ -90,7 +109,11 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
             this.context.viewport.constructor === OrthographicViewport;
 
         const bounds = cloneDeep(this.props.bounds);
-        if (this.props.isZDepth) {
+        if (this.props.ZIncreasingDownwards) {
+            const tmp = bounds[5];
+            bounds[5] = bounds[2];
+            bounds[2] = tmp;
+
             bounds[2] *= -1;
             bounds[5] *= -1;
         }

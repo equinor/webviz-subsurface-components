@@ -7,7 +7,20 @@ import * as png from "@vivaxy/png";
 import { makeFullMesh } from "./webworker";
 import { Matrix4 } from "math.gl";
 
-// These two types both describes the mesh' extent in the horizontal plane.
+// Rotate x,y around x0, y0 rad radians
+function rotate(
+    x: number,
+    y: number,
+    x0: number,
+    y0: number,
+    rad: number
+): [number, number] {
+    const xRot = Math.cos(rad) * (x - x0) - Math.sin(rad) * (y - y0) + x0; // eslint-disable-line
+    const yRot = Math.sin(rad) * (x - x0) + Math.cos(rad) * (y - y0) + y0; // eslint-disable-line
+    return [xRot, yRot];
+}
+
+// This type describes the mesh' extent in the horizontal plane.
 type Frame = {
     /** mesh origin
      */
@@ -17,7 +30,7 @@ type Frame = {
      */
     increment: [number, number];
 
-    /** no cells in each direction.
+    /** number of nodes in each direction.
      */
     count: [number, number];
 
@@ -41,7 +54,7 @@ export type Params = {
 async function load_mesh_and_properties(
     meshData: string | number[],
     propertiesData: string | number[],
-    isZDepth: boolean
+    ZIncreasingDownwards: boolean
 ) {
     // Keep
     //const t0 = performance.now();
@@ -145,8 +158,8 @@ async function load_mesh_and_properties(
         }
     }
 
-    if (!isZDepth) {
-        for (let i = 0; i < meshData.length; i++) {
+    if (!ZIncreasingDownwards) {
+        for (let i = 0; i < mesh.length; i++) {
             mesh[i] *= -1;
         }
     }
@@ -171,7 +184,7 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
      {
          origin: [number, number];     // mesh origin in x, y
          increment: [number, number];  // cell size dx, dy
-         count: [number, number];      // number of cells in both directions.
+         count: [number, number];      // number of nodes in both directions.
      }
      */
     frame: Frame;
@@ -227,8 +240,10 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
      * If defined this function will override the color map.
      * Takes a value in the range [0,1] and returns a color.
      * E.g. (x) => [x * 255, x * 255, x * 255]
+     * May also be set as constant color:
+     * E.g. [255, 0, 0] for constant red surface.
      */
-    colorMapFunction?: colorMapFunctionType | false;
+    colorMapFunction?: colorMapFunctionType;
 
     /**  Surface material properties.
      * material: true  = default material, coloring depends on surface orientation and lighting.
@@ -255,7 +270,7 @@ export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
     /**  If true means that input z values are interpreted as depths.
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
-    isZDepth: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 const defaultProps = {
@@ -273,7 +288,7 @@ const defaultProps = {
     smoothShading: true,
     material: true,
     depthTest: true,
-    isZDepth: true,
+    ZIncreasingDownwards: true,
 };
 
 export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
@@ -293,7 +308,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
         const p = load_mesh_and_properties(
             meshData,
             propertiesData,
-            this.props.isZDepth
+            this.props.ZIncreasingDownwards
         );
 
         p.then(([isMesh, meshData, propertiesData]) => {
@@ -319,19 +334,10 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                 const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =
                     e.data;
 
-                const legend = {
-                    discrete: false,
-                    valueRange: this.props.colorMapRange ?? propertyValueRange,
-                    colorName: this.props.colorMapName,
-                    title: "MapLayer",
-                    colorMapFunction: this.props.colorMapFunction,
-                };
-
                 this.setState({
                     mesh,
                     mesh_lines,
                     propertyValueRange,
-                    legend,
                 });
 
                 if (
@@ -341,22 +347,40 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
                     const xinc = this.props.frame?.increment?.[0] ?? 0;
                     const yinc = this.props.frame?.increment?.[1] ?? 0;
 
-                    const xcount = this.props.frame?.count?.[0] ?? 1;
-                    const ycount = this.props.frame?.count?.[1] ?? 1;
+                    const nnodes_x = this.props.frame?.count?.[0] ?? 2; // number of nodes in x direction
+                    const nnodes_y = this.props.frame?.count?.[1] ?? 2;
 
                     const xMin = this.props.frame?.origin?.[0] ?? 0;
                     const yMin = this.props.frame?.origin?.[1] ?? 0;
                     const zMin = -meshZValueRange[0];
-                    const xMax = xMin + xinc * xcount;
-                    const yMax = yMin + yinc * ycount;
-                    const zMax = -meshZValueRange[0];
+                    const xMax = xMin + xinc * (nnodes_x - 1);
+                    const yMax = yMin + yinc * (nnodes_y - 1);
+                    const zMax = -meshZValueRange[1];
+
+                    // If map is rotated the bounding box must reflect that.
+                    const center =
+                        this.props.frame.rotPoint ?? this.props.frame.origin;
+                    const rotDeg = this.props.frame.rotDeg ?? 0;
+                    const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
+
+                    // Rotate x,y around "center" "rad" radians
+                    const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                    const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                    const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
+                    const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
+
+                    // Rotated bounds in x/y plane.
+                    const x_min = Math.min(x0, x1, x2, x3);
+                    const x_max = Math.max(x0, x1, x2, x3);
+                    const y_min = Math.min(y0, y1, y2, y3);
+                    const y_max = Math.max(y0, y1, y2, y3);
 
                     this.props.setReportedBoundingBox([
-                        xMin,
-                        yMin,
+                        x_min,
+                        y_min,
                         zMin,
-                        xMax,
-                        yMax,
+                        x_max,
+                        y_max,
                         zMax,
                     ]);
                 }
@@ -378,6 +402,10 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
             !isEqual(props.meshData, oldProps.meshData) ||
             !isEqual(props.propertiesData, oldProps.propertiesData) ||
             !isEqual(props.frame, oldProps.frame) ||
+            !isEqual(
+                props.ZIncreasingDownwards,
+                oldProps.ZIncreasingDownwards
+            ) ||
             !isEqual(props.gridLines, oldProps.gridLines);
 
         if (needs_reload) {
@@ -400,8 +428,10 @@ export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
         );
 
         const isMesh =
-            typeof this.props.meshUrl !== "undefined" &&
-            this.props.meshUrl !== "";
+            (typeof this.props.meshUrl !== "undefined" &&
+                this.props.meshUrl !== "") ||
+            (typeof this.props.meshData !== "undefined" &&
+                this.props.meshData !== "");
 
         const isModelMatrix =
             typeof this.props.modelMatrix !== "undefined" &&

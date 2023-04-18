@@ -136,7 +136,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
         this.state = {
             wellIndex: undefined,
             editedData: props.editedData,
-            layers: props.layers,
+            layers: props.layers as Record<string, unknown>[],
         };
         this.onContentSelection = this.onContentSelection.bind(this);
         this.onTrackScroll = this.onTrackScroll.bind(this);
@@ -193,8 +193,11 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             if (track) {
                 const templatePlot = track.plots[0];
                 if (templatePlot) {
-                    const wells_layer = this.props.layers?.find(
-                        (item) => item["@@type"] === "WellsLayer"
+                    const wells_layer = (
+                        this.props.layers as Record<string, unknown>[]
+                    )?.find(
+                        (item: Record<string, unknown>) =>
+                            item["@@type"] === "WellsLayer"
                     );
                     if (
                         wells_layer &&
@@ -209,13 +212,17 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                         //(wells_layer.context as DeckGLLayerContext).userData.colorTables=colorTables;
 
                         const layers = deepCopy(this.props.layers);
-                        this.setState({ layers: layers });
+                        this.setState({
+                            layers: layers as Record<string, unknown>[],
+                        });
 
                         /*
                         // Force to rerender ColorLegend after
                         setTimeout(() => {
                             const layers = deepCopy(this.props.layers);
-                            this.setState({ layers: layers });
+                            this.setState({
+                                layers: layers as Record<string, unknown>[],
+                            });
                         }, 200);
                         */
                     }

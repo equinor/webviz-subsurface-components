@@ -125,7 +125,7 @@ export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
     /** If true means that input z values are interpreted as depths.
      *   For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
-    isZDepth: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 const defaultProps = {
@@ -137,7 +137,7 @@ const defaultProps = {
     colorMapName: "",
     propertyValueRange: [0.0, 1.0],
     depthTest: true,
-    isZDepth: true,
+    ZIncreasingDownwards: true,
 };
 
 export default class Grid3DLayer extends CompositeLayer<
@@ -151,7 +151,8 @@ export default class Grid3DLayer extends CompositeLayer<
         );
 
         p.then(([points, polys, properties]) => {
-            if (!this.props.isZDepth) {
+            if (this.props.ZIncreasingDownwards) {
+                // Will flip to webviz axes which have z axis pointing up.
                 FlipZ(points);
             }
 
@@ -217,7 +218,8 @@ export default class Grid3DLayer extends CompositeLayer<
         const needs_reload =
             !isEqual(props.pointsData, oldProps.pointsData) ||
             !isEqual(props.polysData, oldProps.polysData) ||
-            !isEqual(props.propertiesData, oldProps.propertiesData);
+            !isEqual(props.propertiesData, oldProps.propertiesData) ||
+            !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
             const reportBoundingBox = false;

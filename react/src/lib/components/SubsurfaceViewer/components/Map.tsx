@@ -10,6 +10,8 @@ import {
     View,
     Viewport,
     PickingInfo,
+    OrthographicView,
+    OrbitView,
 } from "@deck.gl/core/typed";
 import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
@@ -27,7 +29,12 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import { WellsLayer } from "../layers";
+import {
+    WellsLayer,
+    AxesLayer,
+    Axes2DLayer,
+    NorthArrow3DLayer,
+} from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
@@ -36,6 +43,7 @@ import { colorTables } from "@emerson-eps/color-tables";
 import { getModelMatrixScale } from "../layers/utils/layerTools";
 import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
 import { MjolnirEvent } from "mjolnir.js";
+import IntersectionView from "../views/intersectionView";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -163,7 +171,7 @@ export interface MapProps {
      * Each JSON object will consist of layer type with key as "@@type" and
      * layer specific data, if any.
      */
-    layers?: Record<string, unknown>[];
+    layers?: LayersList;
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
@@ -296,7 +304,6 @@ function adjustCameraTarget(
 
 const Map: React.FC<MapProps> = ({
     id,
-    resources,
     layers,
     bounds,
     views,
@@ -304,7 +311,6 @@ const Map: React.FC<MapProps> = ({
     scale,
     coordinateUnit,
     colorTables,
-    editedData,
     setEditedData,
     checkDatafileSchema,
     onMouseEvent,
@@ -325,9 +331,15 @@ const Map: React.FC<MapProps> = ({
     const boundsInitial = bounds ?? [0, 0, 1, 1];
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
-    const [alteredLayers, setAlteredLayers] = useState([{}]);
+    const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
+
+    // Viewport margins. Will differ from 0 if axes2Dlayer is used.
+    const [marginLeft, setMarginLeft] = useState<number>(0);
+    const [marginBottom, setMarginBottom] = useState<number>(0);
 
     const initialViewState = getViewState(
+        marginLeft,
+        marginBottom,
         boundsInitial,
         views?.viewports?.[0].target,
         views?.viewports?.[0].zoom,
@@ -335,7 +347,11 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Local help function.
-    function calcDefaultViewStates(input?: ViewportType[]) {
+    function calcDefaultViewStates(
+        marginLeft: number,
+        marginBottom: number,
+        input?: ViewportType[]
+    ) {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         const union_of_reported_bboxes = addBoundingBoxes(
@@ -345,42 +361,59 @@ const Map: React.FC<MapProps> = ({
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
         const axesLayer = layers?.find((e) => {
-            return e["@@type"] === "AxesLayer";
-        });
-        const isAxesLayer = typeof axesLayer !== "undefined";
+            return e?.constructor === AxesLayer;
+        }) as AxesLayer;
         // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
-        const target = boundingBoxCenter(
-            isAxesLayer
-                ? (axesLayer?.["bounds"] as BoundingBox)
-                : (union_of_reported_bboxes as BoundingBox)
+        let target = boundingBoxCenter(
+            (axesLayer?.props.bounds ?? union_of_reported_bboxes) as BoundingBox
         );
 
-        const is3D = views?.viewports?.[0]?.show3D ?? false;
-        if (!is3D) {
-            target.pop(); // In 2D "target" should only contain x and y.
+        const isBoundsDefined = typeof bounds !== "undefined";
+        if (isBoundsDefined) {
+            // if bounds are defined we only use z value of target and x,y set to middle of bounds.
+            const z = target[2];
+            const bounds_ =
+                typeof boundsInitial == "function"
+                    ? boundsInitial()
+                    : boundsInitial;
+
+            const x = bounds_[0] + 0.5 * (bounds_[2] - bounds_[0]); // right - left
+            const y = bounds_[1] + 0.5 * (bounds_[3] - bounds_[1]); // top - bottom
+            target = [x, y, z];
         }
 
-        let tempViewStates: Record<string, ViewStateType> = {};
-        const isBoundsDefined = typeof bounds !== "undefined";
         const updatedViewProps = input ? input : viewsProps;
-        tempViewStates = Object.fromEntries(
-            updatedViewProps.map((item, index) => [
+
+        const viewStateMap = updatedViewProps.map((item, index) => {
+            const is3D = views?.viewports?.[index]?.show3D ?? false;
+
+            const viewState = isBoundsDefined
+                ? getViewState(
+                      marginLeft,
+                      marginBottom,
+                      boundsInitial,
+                      is3D ? target : undefined,
+                      views?.viewports?.[index].zoom,
+                      deckRef.current?.deck
+                  )
+                : getViewState3D(
+                      is3D,
+                      union_of_reported_bboxes,
+                      views?.viewports?.[index].zoom,
+                      deckRef.current?.deck
+                  );
+
+            const minZoom = is3D ? -12 : -15;
+            const maxZoom = is3D ? +12 : +15;
+
+            return [
                 item.id,
-                isBoundsDefined
-                    ? getViewState(
-                          boundsInitial,
-                          target,
-                          views?.viewports?.[index].zoom,
-                          deckRef.current?.deck
-                      )
-                    : getViewState3D(
-                          is3D,
-                          union_of_reported_bboxes,
-                          views?.viewports?.[index].zoom,
-                          deckRef.current?.deck
-                      ),
-            ])
-        );
+                { ...viewState, minZoom: minZoom, maxZoom: maxZoom },
+            ];
+        });
+
+        const tempViewStates = Object.fromEntries(viewStateMap);
+
         setDidUserChangeCamera(false);
         setViewStates(tempViewStates);
     }
@@ -409,6 +442,8 @@ const Map: React.FC<MapProps> = ({
                         typeof viewState !== "undefined"
                             ? viewState
                             : getViewState(
+                                  marginLeft,
+                                  marginBottom,
                                   boundsInitial,
                                   views?.viewports?.[index].target,
                                   views?.viewports?.[index].zoom,
@@ -436,6 +471,8 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
+                        marginLeft,
+                        marginBottom,
                         boundsInitial,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
@@ -450,11 +487,6 @@ const Map: React.FC<MapProps> = ({
         }
     }, [bounds, cameraPosition]);
 
-    const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
-    useEffect(() => {
-        setDeckGLViews(jsonToObject(viewsProps) as View[]);
-    }, [viewsProps]);
-
     const [reportedBoundingBox, setReportedBoundingBox] =
         useState<BoundingBox>(bboxInitial);
     const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
@@ -462,7 +494,7 @@ const Map: React.FC<MapProps> = ({
 
     useEffect(() => {
         if (typeof triggerHome !== "undefined") {
-            calcDefaultViewStates();
+            calcDefaultViewStates(marginLeft, marginBottom);
         }
     }, [triggerHome]);
 
@@ -470,7 +502,7 @@ const Map: React.FC<MapProps> = ({
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         if (!didUserChangeCamera && !isCameraPositionDefined) {
-            calcDefaultViewStates();
+            calcDefaultViewStates(marginLeft, marginBottom);
         }
     }, [reportedBoundingBox]);
 
@@ -482,6 +514,8 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
+                        marginLeft,
+                        marginBottom,
                         boundsInitial,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
@@ -546,36 +580,45 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZDown]);
 
     useEffect(() => {
-        const viewProps = getViews(
-            views,
-            scaleUpFunction,
-            scaleDownFunction
-        ) as ViewportType[];
+        const viewProps = getViews(views) as ViewportType[];
 
         setViewsProps(viewProps);
 
         if (!bounds) {
-            calcDefaultViewStates(viewProps);
+            calcDefaultViewStates(marginLeft, marginBottom, viewProps);
         }
     }, [views]);
 
     useEffect(() => {
         if (layers == undefined) return;
 
+        // Margins on the viewport are extracted from a potenial axes2D layer.
+        const axes2DLayer = layers?.find((e) => {
+            return e?.constructor === Axes2DLayer;
+        }) as Axes2DLayer;
+
+        const marginLeft = axes2DLayer ? axes2DLayer.props.marginH : 0;
+        const marginBottom = axes2DLayer ? axes2DLayer.props.marginV : 0;
+        setMarginLeft(marginLeft);
+        setMarginBottom(marginBottom);
+
         const m = getModelMatrixScale(scaleZ);
 
-        let layers_copy = cloneDeep(layers);
-        layers_copy = layers_copy.map((layer) => {
-            // Inject "setReportedBoundingBox" function into layer for it to report
-            // back its respective bounding box.
-            layer["setReportedBoundingBox"] = setReportedBoundingBox;
+        const layers_copy = layers.map((item) => {
+            if (item?.constructor.name === NorthArrow3DLayer.name) return item;
+
+            const layer = item as Layer;
 
             // Set "modelLayer" matrix to reflect correct z scaling.
-            if (layer["@@type"] !== "NorthArrow3DLayer") {
-                layer["modelMatrix"] = m;
-            }
+            const scaledLayer = layer.clone({ modelMatrix: m });
 
-            return layer;
+            // Inject "setReportedBoundingBox" function into layer for it to report
+            // back its respective bounding box.
+            const boundedLayer = scaledLayer.clone({
+                setReportedBoundingBox: setReportedBoundingBox,
+            });
+
+            return boundedLayer ?? scaledLayer;
         });
 
         setAlteredLayers(layers_copy);
@@ -584,16 +627,8 @@ const Map: React.FC<MapProps> = ({
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
 
     useEffect(() => {
-        const layers = alteredLayers;
-        if (!layers || layers.length == 0) return;
-
-        const enumerations = [];
-        if (resources) enumerations.push({ resources: resources });
-        if (editedData) enumerations.push({ editedData: editedData });
-        else enumerations.push({ editedData: {} });
-
-        setDeckGLLayers(jsonToObject(layers, enumerations) as LayersList);
-    }, [resources, editedData, layers, alteredLayers]);
+        setDeckGLLayers(alteredLayers);
+    }, [alteredLayers]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -601,6 +636,7 @@ const Map: React.FC<MapProps> = ({
             const wellslayer = getLayersByType(
                 layers,
                 "WellsLayer"
+                WellsLayer.name
             )?.[0] as WellsLayer;
 
             wellslayer?.setSelection(selection?.well, selection?.selection);
@@ -713,91 +749,18 @@ const Map: React.FC<MapProps> = ({
     /**
      * call onMouseEvent callback
      */
-    const callOnMouseEvent = (
-        type: "click" | "hover",
-        infos: PickingInfo[],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        event: any
-    ): void => {
-        if (onMouseEvent) {
-            const ev: MapMouseEvent = {
-                type: type,
-                infos: infos,
-            };
-            if (ev.type === "click") {
-                if (event.rightButton) ev.type = "contextmenu";
-            }
-            for (const info of infos as LayerPickInfo[]) {
-                if (info.coordinate) {
-                    ev.x = info.coordinate[0];
-                    ev.y = info.coordinate[1];
-                }
-                //const layer_name = (info.layer?.props as ExtendedLayerProps<FeatureCollection>)?.name;
-                if (info.layer && info.layer.id === "wells-layer") {
-                    // info.object is Feature or WellLog;
-                    {
-                        // try to use Object info (see DeckGL getToolTip callback)
-                        const feat = info.object as Feature;
-                        const properties = feat?.properties;
-                        if (properties) {
-                            ev.wellname = properties["name"];
-                            ev.wellcolor = properties["color"];
-                        }
-                    }
-
-                    if (!ev.wellname)
-                        if (info.object) {
-                            ev.wellname = info.object.header?.["well"]; // object is WellLog
-                        }
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    if (info.properties) {
-                        for (const property of info.properties) {
-                            if (!ev.wellcolor) ev.wellcolor = property.color;
-                            let propname = property.name;
-                            if (propname) {
-                                const sep = propname.indexOf(" ");
-                                if (sep >= 0) {
-                                    if (!ev.wellname) {
-                                        ev.wellname = propname.substring(
-                                            sep + 1
-                                        );
-                                    }
-                                    propname = propname.substring(0, sep);
-                                }
-                            }
-                            const names_md = [
-                                "DEPTH",
-                                "DEPT",
-                                "MD" /*Measured Depth*/,
-                                "TDEP" /*"Tool DEPth"*/,
-                                "MD_RKB" /*Rotary Relly Bushing*/,
-                            ]; // aliases for MD
-                            const names_tvd = [
-                                "TVD" /*True Vertical Depth*/,
-                                "TVDSS" /*SubSea*/,
-                                "DVER" /*"VERtical Depth"*/,
-                                "TVD_MSL" /*below Mean Sea Level*/,
-                            ]; // aliases for MD
-
-                            if (names_md.find((name) => name == propname))
-                                ev.md = parseFloat(property.value as string);
-                            else if (names_tvd.find((name) => name == propname))
-                                ev.tvd = parseFloat(property.value as string);
-
-                            if (
-                                ev.md !== undefined &&
-                                ev.tvd !== undefined &&
-                                ev.wellname !== undefined
-                            )
-                                break;
-                        }
-                    }
-                    break;
-                }
-            }
+    const callOnMouseEvent = useCallback(
+        (
+            type: "click" | "hover",
+            infos: PickingInfo[],
+            event: Record<string, unknown>
+        ): void => {
+            if (!onMouseEvent) return;
+            const ev = handleMouseEvent(type, infos, event);
             onMouseEvent(ev);
-        }
-    };
+        },
+        [onMouseEvent]
+    );
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
@@ -830,9 +793,7 @@ const Map: React.FC<MapProps> = ({
             if (!views || !views.viewports || !views.layout) return true;
 
             const cur_view = views.viewports.find(
-                ({ id }) =>
-                    args.viewport.id &&
-                    new RegExp("^" + id).test(args.viewport.id)
+                ({ id }) => args.viewport.id && id === args.viewport.id
             );
             if (cur_view?.layerIds && cur_view.layerIds.length > 0) {
                 const layer_ids = cur_view.layerIds;
@@ -851,16 +812,15 @@ const Map: React.FC<MapProps> = ({
         useState<boolean>(false);
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
-            const isSyncIds = viewsProps
+            const viewports = views?.viewports || [];
+            const isSyncIds = viewports
                 .filter((item) => item.isSync)
                 .map((item) => item.id);
-            if (isSyncIds.includes(viewId)) {
-                let tempViewStates: Record<string, ViewStateType> = {};
-                tempViewStates = Object.fromEntries(
-                    viewsProps
-                        .filter((item) => item.isSync)
-                        .map((item) => [item.id, viewState])
-                );
+            if (isSyncIds?.includes(viewId)) {
+                const viewStateTable = views?.viewports
+                    .filter((item) => item.isSync)
+                    .map((item) => [item.id, viewState]);
+                const tempViewStates = Object.fromEntries(viewStateTable ?? []);
                 setViewStates((currentViewStates) => ({
                     ...currentViewStates,
                     ...tempViewStates,
@@ -874,11 +834,15 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
-            setFirstViewStatesId(viewsProps[0].id);
+            setFirstViewStatesId(viewsProps[0]?.id);
             setDidUserChangeCamera(true);
         },
-        [viewStates]
+        [views]
     );
+
+    const deckGLViews = React.useMemo(() => {
+        return createViews(views, scaleUpFunction, scaleDownFunction);
+    }, [views]);
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
@@ -996,10 +960,12 @@ export default Map;
 
 // Add the resources as an enum in the Json Configuration and then convert the spec to actual objects.
 // See https://deck.gl/docs/api-reference/json/overview for more details.
-function jsonToObject(
+export function jsonToObject(
     data: Record<string, unknown>[] | LayerProps[],
     enums: Record<string, unknown>[] | undefined = undefined
 ): LayersList | View[] {
+    if (!data) return [];
+
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {
@@ -1021,6 +987,8 @@ function jsonToObject(
 
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
+    marginLeft: number,
+    marginBottom: number,
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     target?: number[],
     zoom?: number,
@@ -1033,16 +1001,40 @@ function getViewState(
         bounds = bounds_accessor;
     }
 
-    let width = bounds[2] - bounds[0]; // right - left
-    let height = bounds[3] - bounds[1]; // top - bottom
+    let w = bounds[2] - bounds[0]; // right - left
+    let h = bounds[3] - bounds[1]; // top - bottom
+
+    const fb = fitBounds({ width: w, height: h, bounds });
+    let fb_target = [fb.x, fb.y, 0];
+    let fb_zoom = fb.zoom;
+
     if (deck) {
-        width = deck.width;
-        height = deck.height;
+        // If there are margins in the viewport (axes2DLayer) we have to account for that.
+        // Camera target should be in the middle of viewport minus the margins.
+        const w_bounds = w;
+        const h_bounds = h;
+
+        // Subtract margins.
+        w = deck.width - marginLeft; // width of the viewport minus margin.
+        h = deck.height - marginBottom;
+
+        const port_aspect = h / w;
+        const bounds_aspect = h_bounds / w_bounds;
+
+        const m_pr_pixel =
+            bounds_aspect > port_aspect ? h_bounds / h : w_bounds / w;
+
+        const translate_x = 0.5 * marginLeft * m_pr_pixel;
+        const translate_y = 0.5 * marginBottom * m_pr_pixel;
+
+        const fb = fitBounds({ width: w, height: h, bounds });
+        fb_target = [fb.x - translate_x, fb.y - translate_y, 0];
+        fb_zoom = fb.zoom;
     }
-    const fitted_bound = fitBounds({ width, height, bounds });
+
     const view_state: ViewStateType = {
-        target: target ?? [fitted_bound.x, fitted_bound.y, 0],
-        zoom: zoom ?? fitted_bound.zoom,
+        target: target ?? fb_target,
+        zoom: zoom ?? fb_zoom,
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
     };
@@ -1093,11 +1085,11 @@ function getViewState3D(
 }
 
 // construct views object for DeckGL component
-function getViews(
+function createViews(
     views: ViewsType | undefined,
     scaleUpFunction: { (): void; (): void },
     scaleDownFunction: { (): void; (): void }
-): ViewportType[] {
+): View[] {
     // Use modified controller to handle key events.
     class ZScaleOrbitController extends OrbitController {
         handleEvent(event: MjolnirEvent): boolean {
@@ -1116,19 +1108,19 @@ function getViews(
     const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
     if (!views || !views.viewports || !views.layout) {
-        deckgl_views.push({
-            "@@type": "OrthographicView",
-            id: "main",
-            controller: { doubleClickZoom: false },
-            x: "0%",
-            y: "0%",
-            width: "100%",
-            height: "100%",
-            flipY: false,
-            far: 99999,
-            near: -99999,
-            isSync: false,
-        });
+        deckgl_views.push(
+            new OrthographicView({
+                id: "main",
+                controller: { doubleClickZoom: false },
+                x: "0%",
+                y: "0%",
+                width: "100%",
+                height: "100%",
+                flipY: false,
+                far: 99999,
+                near: -99999,
+            })
+        );
     } else {
         let yPos = 0;
         const [nY, nX] = views.layout;
@@ -1141,44 +1133,157 @@ function getViews(
                 )
                     return deckgl_views;
 
-                const cur_viewport: ViewportType =
+                const currentViewport: ViewportType =
                     views.viewports[deckgl_views.length];
 
-                const view_type: string = cur_viewport.show3D
-                    ? "OrbitView"
-                    : cur_viewport.id === "intersection_view"
-                    ? "IntersectionView"
-                    : "OrthographicView";
+                const ViewType = currentViewport.show3D
+                    ? OrbitView
+                    : currentViewport.id === "intersection_view"
+                    ? IntersectionView
+                    : OrthographicView;
 
                 const far = 9999;
-                const near = cur_viewport.show3D ? 0.1 : -9999;
+                const near = currentViewport.show3D ? 0.1 : -9999;
 
-                deckgl_views.push({
-                    "@@type": view_type,
-                    id: cur_viewport.id,
-                    controller: {
-                        type: cur_viewport.show3D
-                            ? ZScaleOrbitController
-                            : OrthographicController,
-                        doubleClickZoom: false,
-                    },
-                    x: xPos + "%",
-                    y: yPos + "%",
+                const Controller = currentViewport.show3D
+                    ? ZScaleOrbitController
+                    : OrthographicController;
 
-                    // Using 99.5% of viewport to avoid flickering of deckgl canvas
-                    width: 99.5 / nX + "%",
-                    height: 99.5 / nY + "%",
-                    flipY: false,
-                    far,
-                    near,
-                    minZoom: cur_viewport.show3D ? -12 : -15,
-                    maxZoom: cur_viewport.show3D ? +12 : +15,
-                    isSync: views.viewports[deckgl_views.length].isSync,
-                });
+                const controller = {
+                    type: Controller,
+                    doubleClickZoom: false,
+                };
+
+                deckgl_views.push(
+                    new ViewType({
+                        id: currentViewport.id,
+                        controller: controller,
+                        x: xPos + "%",
+                        y: yPos + "%",
+
+                        // Using 99.5% of viewport to avoid flickering of deckgl canvas
+                        width: 99.5 / nX + "%",
+                        height: 99.5 / nY + "%",
+                        flipY: false,
+                        far,
+                        near,
+                    })
+                );
                 xPos = xPos + 99.5 / nX;
             }
             yPos = yPos + 99.5 / nY;
         }
     }
     return deckgl_views;
+}
+
+// construct views object for DeckGL component
+function getViews(views: ViewsType | undefined): ViewportType[] {
+    const deckgl_views = [];
+
+    // if props for multiple viewport are not proper, return 2d view
+    if (!views || !views.viewports || !views.layout) {
+        deckgl_views.push({
+            id: "main",
+        });
+    } else {
+        const [nY, nX] = views.layout;
+        for (let y = 1; y <= nY; y++) {
+            for (let x = 1; x <= nX; x++) {
+                if (
+                    views.viewports == undefined ||
+                    deckgl_views.length >= views.viewports.length
+                )
+                    return deckgl_views;
+
+                const cur_viewport: ViewportType =
+                    views.viewports[deckgl_views.length];
+
+                deckgl_views.push({
+                    id: cur_viewport.id,
+                });
+            }
+        }
+    }
+    return deckgl_views;
+}
+
+function handleMouseEvent(
+    type: "click" | "hover",
+    infos: PickingInfo[],
+    event: Record<string, unknown>
+) {
+    const ev: MapMouseEvent = {
+        type: type,
+        infos: infos,
+    };
+    if (ev.type === "click") {
+        if (event["rightButton"]) ev.type = "contextmenu";
+    }
+    for (const info of infos as LayerPickInfo[]) {
+        if (info.coordinate) {
+            ev.x = info.coordinate[0];
+            ev.y = info.coordinate[1];
+        }
+        if (info.layer && info.layer.id === "wells-layer") {
+            // info.object is Feature or WellLog;
+            {
+                // try to use Object info (see DeckGL getToolTip callback)
+                const feat = info.object as Feature;
+                const properties = feat?.properties;
+                if (properties) {
+                    ev.wellname = properties["name"];
+                    ev.wellcolor = properties["color"];
+                }
+            }
+
+            if (!ev.wellname)
+                if (info.object) {
+                    ev.wellname = info.object.header?.["well"]; // object is WellLog
+                }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if (info.properties) {
+                for (const property of info.properties) {
+                    if (!ev.wellcolor) ev.wellcolor = property.color;
+                    let propname = property.name;
+                    if (propname) {
+                        const sep = propname.indexOf(" ");
+                        if (sep >= 0) {
+                            if (!ev.wellname) {
+                                ev.wellname = propname.substring(sep + 1);
+                            }
+                            propname = propname.substring(0, sep);
+                        }
+                    }
+                    const names_md = [
+                        "DEPTH",
+                        "DEPT",
+                        "MD" /*Measured Depth*/,
+                        "TDEP" /*"Tool DEPth"*/,
+                        "MD_RKB" /*Rotary Relly Bushing*/,
+                    ]; // aliases for MD
+                    const names_tvd = [
+                        "TVD" /*True Vertical Depth*/,
+                        "TVDSS" /*SubSea*/,
+                        "DVER" /*"VERtical Depth"*/,
+                        "TVD_MSL" /*below Mean Sea Level*/,
+                    ]; // aliases for MD
+
+                    if (names_md.find((name) => name == propname))
+                        ev.md = parseFloat(property.value as string);
+                    else if (names_tvd.find((name) => name == propname))
+                        ev.tvd = parseFloat(property.value as string);
+
+                    if (
+                        ev.md !== undefined &&
+                        ev.tvd !== undefined &&
+                        ev.wellname !== undefined
+                    )
+                        break;
+                }
+            }
+            break;
+        }
+    }
+    return ev;
 }

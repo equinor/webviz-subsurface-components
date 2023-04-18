@@ -1,5 +1,5 @@
 import React from "react";
-import { useHoverInfo } from "../../components/Map";
+import { ViewsType, useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
@@ -10,7 +10,10 @@ import {
     ColorLegend,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
-import { View } from "@deck.gl/core/typed";
+import { View } from "../../../..";
+import MapLayer from "./mapLayer";
+import Axes2DLayer from "../axes2d/axes2DLayer";
+import { ViewFooter } from "../../components/ViewFooter";
 
 export default {
     component: SubsurfaceViewer,
@@ -20,6 +23,21 @@ export default {
 type NumberQuad = [number, number, number, number];
 
 const valueRange = [-3071, 41048];
+
+const defaultMapLayerProps = {
+    id: "default_map",
+    meshData: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800] as [number, number],
+        count: [291, 229] as [number, number],
+        increment: [25, 25] as [number, number],
+        rotDeg: 0,
+    },
+    propertiesData: "kh_netmap_25_m.float32",
+    ZIncreasingDownwards: true,
+};
+
+const defaultMapLayer = new MapLayer({ ...defaultMapLayerProps });
 
 const wellsLayer = {
     "@@type": "WellsLayer",
@@ -128,16 +146,29 @@ const cellCenteredPropertiesLayer = {
     "@@type": "MapLayer",
     id: "cell-centered-layer",
 
-    meshUrl:
-        "data:text/plain;base64,zczMP5qZ2T9mZuY/MzPzP5qZmT9mZqY/MzOzPwAAwD/NzEw/ZmZmPwAAgD/NzIw/zczMPgAAAD+amRk/MzMzPwAAAIDNzMw9zcxMPpqZmT4=",
+    /*eslint-disable */
+    // One depth pr node
+    meshData: [
+        1.6, 1.7, 1.8, 1.9,
+        1.2, 1.3, 1.4, 1.5,
+        0.8, 0.9, 1.0, 1.1,
+        0.4, 0.5, 0.6, 0.7,
+        0.0, 0.1, 0.2, 0.3 ],
+
+    // One property pr cell.
+    propertiesData: [0.9,  1.0,  1.1, 
+                     0.6,  0.7,  0.8,
+                     0.3,  0.4,  0.5, 
+                     0.0,  0.1,  0.2],
+    /*eslint-enable */
+
     frame: {
         origin: [0, 0],
         count: [4, 5],
         increment: [1, 1],
         rotDeg: 0,
     },
-    propertiesUrl:
-        "data:text/plain;base64,ZmZmPwAAgD/NzIw/mpkZPzMzMz/NzEw/mpmZPs3MzD4AAAA/AAAAAM3MzD3NzEw+",
+
     gridLines: true,
     material: true,
     // black to white colors.
@@ -167,6 +198,7 @@ const meshMapLayerPng = {
     material: true,
     smoothShading: true,
     colorMapName: "Physics",
+    ZIncreasingDownwards: true,
 };
 
 // Example using "Map" layer. Uses float32 float for mesh and properties.
@@ -210,7 +242,7 @@ const meshMapLayerRotated = {
 const axes_hugin = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
+    bounds: [432150, 6475800, 0, 439400, 6481500, 3500],
 };
 
 const north_arrow_layer = {
@@ -275,6 +307,44 @@ MapLayer3dPng.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Example using png as mesh and properties data.",
+        },
+    },
+};
+
+export const ConstantColor: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+ConstantColor.args = {
+    id: "map",
+    layers: [
+        axes_hugin,
+        {
+            ...meshMapLayerPng,
+            colorMapFunction: [0, 255, 0], // Use constant color instead of function
+        },
+        north_arrow_layer,
+    ],
+
+    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+ConstantColor.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: 'Example using the property "colorMapFunction" to color the surface in one color only',
         },
     },
 };
@@ -461,13 +531,33 @@ export const MapLayer2d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
+const axesLayer2D = new Axes2DLayer({
+    id: "axesLayer2D",
+    marginH: 100, // Horizontal margin (in pixels)
+    marginV: 40, // Vertical margin (in pixels)
+    backgroundColor: [255, 255, 0, 100],
+});
+
+const mapLayer = new MapLayer({
+    id: "MapLayer",
+    meshUrl: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.float32",
+    contours: [0, 100],
+    isContoursDepth: true,
+    gridLines: false,
+    material: true,
+    colorMapName: "Physics",
+});
+
 MapLayer2d.args = {
     id: "map",
-    layers: [
-        axes_hugin,
-        { ...meshMapLayerFloat32, material: false },
-        north_arrow_layer,
-    ],
+    layers: [mapLayer, axesLayer2D],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
         layout: [1, 1],
@@ -530,13 +620,11 @@ MapLayer2dDarkMode.parameters = {
     backgrounds: { default: "dark" },
 };
 
-export const MapLayerRotated: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const Rotated: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-MapLayerRotated.args = {
+Rotated.args = {
     id: "map",
     layers: [axes_hugin, meshMapLayerRotated, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
@@ -551,7 +639,7 @@ MapLayerRotated.args = {
     },
 };
 
-MapLayerRotated.parameters = {
+Rotated.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
@@ -560,25 +648,21 @@ MapLayerRotated.parameters = {
     },
 };
 
-export const MapLayerBigMap: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const BigMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-MapLayerBigMap.args = {
+BigMap.args = {
     id: "map",
     layers: [axes_hugin, meshMapLayerBig, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
 };
 
-export const MapLayerBigMap3d: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const BigMap3d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-MapLayerBigMap3d.args = {
+BigMap3d.args = {
     id: "map",
     layers: [axes_hugin, meshMapLayerBig, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
@@ -593,7 +677,7 @@ MapLayerBigMap3d.args = {
     },
 };
 
-MapLayerBigMap3d.parameters = {
+BigMap3d.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
@@ -605,7 +689,7 @@ MapLayerBigMap3d.parameters = {
 const axes_small = {
     "@@type": "AxesLayer",
     id: "axes_small",
-    bounds: [459790, 5929776, -30, 460590, 5930626, 0],
+    bounds: [459790, 5929776, 0, 460590, 5930626, 30],
 };
 export const SmallMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
@@ -638,7 +722,7 @@ SmallMap.parameters = {
 const axes_lite = {
     "@@type": "AxesLayer",
     id: "axes_small",
-    bounds: [-1, -1, -3, 4, 5, 0],
+    bounds: [-1, -1, 0, 4, 5, 3],
 };
 
 //-- CellCenteredPropMap --
@@ -1075,7 +1159,6 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
     return (
         <SubsurfaceViewer {...args} layers={updatedLayerData}>
             {
-                // @ts-expect-error This is demonstrated to work with js, but with ts it gives error
                 <View id="view_1">
                     <div style={{ marginTop: 50 }}>
                         <ColorLegend
@@ -1095,9 +1178,9 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
     );
 };
 
-export const MapLayerColorSelector = MapLayerColorSelectorTemplate.bind({});
+export const ColorSelector = MapLayerColorSelectorTemplate.bind({});
 
-MapLayerColorSelector.args = {
+ColorSelector.args = {
     ...defaultArgs,
     id: "map_layer_color_selector",
     legend: {
@@ -1114,4 +1197,113 @@ MapLayerColorSelector.args = {
             },
         ],
     },
+};
+
+const ContourLinesStory = (props: {
+    syncViewports: boolean;
+    show3d: boolean;
+    contourOffset: number;
+    zContourInterval: number;
+    propertyContourInterval: number;
+}) => {
+    const views: ViewsType = {
+        layout: [2, 2],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: props.show3d,
+                layerIds: ["default_map"],
+                isSync: props.syncViewports,
+            },
+            {
+                id: "view_2",
+                show3D: props.show3d,
+                layerIds: ["contours"],
+                isSync: props.syncViewports,
+            },
+            {
+                id: "view_3",
+                show3D: props.show3d,
+                layerIds: ["property_contours"],
+                isSync: props.syncViewports,
+            },
+            {
+                id: "view_4",
+                show3D: props.show3d,
+                layerIds: ["flat"],
+                isSync: props.syncViewports,
+            },
+        ],
+    };
+
+    const contourMapLayer = new MapLayer({
+        ...defaultMapLayerProps,
+        id: "contours",
+        contours: [props.contourOffset, props.zContourInterval],
+    });
+
+    const propertyContourMapLayer = new MapLayer({
+        ...defaultMapLayerProps,
+        id: "property_contours",
+        contours: [props.contourOffset, props.propertyContourInterval],
+        isContoursDepth: false,
+    });
+
+    const flatMapLayerProps = {
+        ...defaultMapLayerProps,
+        id: "flat",
+        meshData: undefined,
+        contours: [props.contourOffset, props.propertyContourInterval] as [
+            number,
+            number
+        ],
+    };
+
+    const flatPropertyContourMapLayer = new MapLayer({
+        ...flatMapLayerProps,
+    });
+
+    return (
+        <SubsurfaceViewer
+            id={"test"}
+            layers={[
+                defaultMapLayer,
+                contourMapLayer,
+                propertyContourMapLayer,
+                flatPropertyContourMapLayer,
+            ]}
+            views={views}
+        >
+            <View id="view_1">
+                <ViewFooter>Default - no contour lines</ViewFooter>
+            </View>
+            <View id="view_2">
+                <ViewFooter>
+                    Contour lines enabled - default is Z value
+                </ViewFooter>
+            </View>
+            <View id="view_3">
+                <ViewFooter>Contour lines on property value</ViewFooter>
+            </View>
+            <View id="view_4">
+                <ViewFooter>
+                    Contour lines on flat map - default is property value
+                </ViewFooter>
+            </View>
+        </SubsurfaceViewer>
+    );
+};
+
+export const ContourLines: ComponentStory<typeof ContourLinesStory> = (
+    args
+) => {
+    return <ContourLinesStory {...args} />;
+};
+
+ContourLines.args = {
+    syncViewports: true,
+    show3d: true,
+    contourOffset: 0,
+    zContourInterval: 100,
+    propertyContourInterval: 5000,
 };

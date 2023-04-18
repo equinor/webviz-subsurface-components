@@ -73,7 +73,7 @@ WithSamplePolylineData.args = {
         {
             "@@type": "AxesLayer",
             id: "axes-layer",
-            bounds: [0, 0, -1000, 2000, 3000, 0],
+            bounds: [0, 0, 0, 2000, 3000, 1000],
         },
     ],
 };
@@ -95,7 +95,7 @@ WithWellsData.args = {
         {
             "@@type": "AxesLayer",
             id: "axes-layer",
-            bounds: [432205, 6475078, -3500, 437720, 6481113, 0],
+            bounds: [432205, 6475078, 0, 437720, 6481113, 3500],
         },
         {
             "@@type": "WellsLayer",
@@ -153,7 +153,7 @@ FencePolygon.args = {
         {
             "@@type": "AxesLayer",
             id: "axes-layer",
-            bounds: [300, 800, -600, 1300, 1600, -400],
+            bounds: [300, 800, 400, 1300, 1600, 600],
         },
         {
             "@@type": "UnfoldedGeoJsonLayer",
@@ -276,7 +276,7 @@ IntersectionViewExample.args = {
         {
             "@@type": "AxesLayer",
             id: "axes-layer",
-            bounds: [300, 800, -600, 1300, 1600, -400],
+            bounds: [300, 800, 400, 1300, 1600, 600],
         },
         {
             "@@type": "UnfoldedGeoJsonLayer",

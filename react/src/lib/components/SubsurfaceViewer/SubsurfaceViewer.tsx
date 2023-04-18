@@ -1,10 +1,11 @@
+import { LayersList, Layer } from "@deck.gl/core/typed";
 import Map, {
     ViewsType,
     TooltipCallback,
     ViewStateType,
     BoundsAccessor,
 } from "./components/Map";
-import { MapMouseEvent } from "./components/Map";
+import { MapMouseEvent, jsonToObject } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
@@ -12,7 +13,7 @@ import { colorTablesArray } from "@emerson-eps/color-tables/";
 export interface SubsurfaceViewerProps {
     id: string;
     resources?: Record<string, unknown>;
-    layers?: Record<string, unknown>[];
+    layers?: Record<string, unknown>[] | LayersList;
     bounds?: [number, number, number, number] | BoundsAccessor;
     views?: ViewsType;
     coords?: {
@@ -106,6 +107,26 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
 
+    const [layerInstances, setLayerInstances] = React.useState<LayersList>([]);
+
+    React.useEffect(() => {
+        if (layers?.[0] instanceof Layer) {
+            setLayerInstances(layers as LayersList);
+            return;
+        }
+
+        const enumerations = [];
+        const layersJson = layers as unknown;
+        if (resources) enumerations.push({ resources: resources });
+        if (editedData) enumerations.push({ editedData: editedData });
+        else enumerations.push({ editedData: {} });
+        const layersList = jsonToObject(
+            layersJson as Record<string, unknown>[],
+            enumerations
+        ) as LayersList;
+        setLayerInstances(layersList);
+    }, [layers]);
+
     React.useEffect(() => {
         if (!editedData) return;
 
@@ -134,15 +155,13 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     return (
         <Map
             id={id}
-            resources={resources}
-            layers={layers}
+            layers={layerInstances}
             bounds={bounds}
             views={views}
             coords={coords}
             scale={scale}
             coordinateUnit={coordinateUnit}
             colorTables={colorTables}
-            editedData={editedData}
             setEditedData={setEditedData}
             checkDatafileSchema={checkDatafileSchema}
             onMouseEvent={onMouseEvent}
@@ -266,7 +285,7 @@ SubsurfaceViewer.propTypes = {
     coordinateUnit: PropTypes.string,
 
     /**
-     * @deprecated Toolbar should be added as annotation. This prop has no function.
+     * @obsolete Toolbar should be added as annotation. This prop has no function.
      */
     toolbar: PropTypes.shape({
         /**
@@ -276,7 +295,7 @@ SubsurfaceViewer.propTypes = {
     }),
 
     /**
-     * @deprecated Legends should be added as annotations. This prop has no function.
+     * @obsolete Legends should be added as annotations. This prop has no function.
      */
     legend: PropTypes.shape({
         /**

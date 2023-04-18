@@ -8,8 +8,10 @@ import {
 } from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/engine";
-import labelsVertexShader from "./axes-vertex.glsl";
-import labelsFragmentShader from "./axes-fragment.glsl";
+import labelVertexShader from "./label-vertex.glsl";
+import labelFragmentShader from "./label-fragment.glsl";
+import backgroundVertexShader from "./background-vertex.glsl";
+import backgroundFragmentShader from "./background-fragment.glsl";
 import lineVertexShader from "./line-vertex.glsl";
 import lineFragmentShader from "./line-fragment.glsl";
 import { ExtendedLayerProps, Position3D } from "../utils/layerTools";
@@ -44,7 +46,7 @@ type LabelData = {
     pos: Position3D; // tick line start
     anchor?: TEXT_ANCHOR;
     aligment?: ALIGNMENT_BASELINE;
-    //font_size: number; KEEP. Fixed size for now.
+    //font_size: number; KEEP.
 };
 
 type LabelsData = LabelData[];
@@ -56,6 +58,7 @@ export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
     labelFontSize?: number;
     fontFamily?: string;
     axisColor?: Color;
+    backgroundColor?: Color;
 }
 
 const defaultProps = {
@@ -64,8 +67,8 @@ const defaultProps = {
     id: "axes2d-layer",
     visible: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    marginH: 30, // Horizontal margin (in pixles)
-    marginV: 30, // Vertical margin (in pixles)
+    marginH: 100, // Horizontal margin (in pixles)
+    marginV: 40, // Vertical margin (in pixles)
 };
 
 // FONT ATLAS
@@ -197,7 +200,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             labels.push({ label, pos, anchor, aligment });
         }
 
-        return labels; // as Text3DLayerData;
+        return labels;
     }
 
     draw({
@@ -226,7 +229,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         //gl.disable(gl.DEPTH_TEST); KEEP for now.
 
-        const { label_models, line_model } = this._getModels(gl);
+        const { label_models, line_model, background_model } =
+            this._getModels(gl);
 
         const fontTexture = this.state["fontTexture"];
         for (const model of label_models) {
@@ -235,12 +239,20 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         line_model.draw();
 
+        // When both parameters are negative, (decreased depth), the mesh is pulled towards the camera (hence, gets in front).
+        // When both parameters are positive, (increased depth), the mesh is pushed away from the camera (hence, gets behind).
+        gl.enable(GL.POLYGON_OFFSET_FILL);
+        gl.polygonOffset(1, 1);
+        background_model.setUniforms({ projectionMatrix }).draw();
+        gl.disable(GL.POLYGON_OFFSET_FILL);
+
         //gl.enable(gl.DEPTH_TEST);
     }
 
     _getModels(gl: WebGLRenderingContext): {
         label_models: Model[];
         line_model: Model;
+        background_model: Model;
     } {
         // MAKE MODEL FOR THE AXES LINES (tick marks and axes).
 
@@ -283,11 +295,31 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         const lines = [...axes_lines, ...tick_lines];
 
+        // Color on axes and text.
+        let color = [0.0, 0.0, 0.0, 1.0];
+        if (typeof this.props.axisColor !== "undefined") {
+            color = this.props.axisColor as number[];
+            if (color.length === 3) {
+                color.push(255);
+            }
+            color = color.map((x) => (x ?? 0) / 255);
+        }
+
+        // Color on axes background.
+        let bColor = [1.0, 1.0, 1.0, 1.0];
+        if (typeof this.props.backgroundColor !== "undefined") {
+            bColor = this.props.backgroundColor as number[];
+            if (bColor.length === 3) {
+                bColor.push(255);
+            }
+            bColor = bColor.map((x) => (x ?? 0) / 255);
+        }
+
         const line_model = new Model(gl, {
             id: `${this.props.id}-lines`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
-            uniforms: { uColor: [0, 0, 0, 1] },
+            uniforms: { uAxisColor: color },
             geometry: new Geometry({
                 drawMode: GL.LINES,
                 attributes: {
@@ -319,29 +351,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             }
 
             const pos_w = vec4.fromValues(x, y, z, 1); // pos world
-            const pos_v = vec4.transformMat4(
-                vec4.create(),
-                pos_w,
-                mat4.fromValues(
-                    viewMatrix[0],
-                    viewMatrix[1],
-                    viewMatrix[2],
-                    viewMatrix[3],
-                    viewMatrix[4],
-                    viewMatrix[5],
-                    viewMatrix[6],
-                    viewMatrix[7],
-                    viewMatrix[8],
-                    viewMatrix[9],
-                    viewMatrix[10],
-                    viewMatrix[11],
-                    viewMatrix[12],
-                    viewMatrix[13],
-                    viewMatrix[14],
-                    viewMatrix[15]
-                )
-            ); // world to view axes.  vec4.create()
-            const pos_view = [pos_v[0], pos_v[1], pos_v[2]];
+            const pos_view = word2view(viewMatrix, pos_w); // pos view
 
             const pixelScale = 8;
 
@@ -437,8 +447,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             const id = `${this.props.id}-${label}`;
             const model = new Model(gl, {
                 id,
-                vs: labelsVertexShader,
-                fs: labelsFragmentShader,
+                vs: labelVertexShader,
+                fs: labelFragmentShader,
+                uniforms: { uAxisColor: color, uBackGroundColor: bColor },
                 geometry: new Geometry({
                     drawMode: GL.TRIANGLES,
                     attributes: {
@@ -458,7 +469,54 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             label_models.push(model);
         }
 
-        return { label_models, line_model };
+        //-- Background model --
+        const width = 999; // sufficent for the background to always cover.
+        const z = 90; // Depth of background square
+        // Y axis
+        const p1_w = vec4.fromValues(xMin, yMin, z, 1);
+        const p2_w = vec4.fromValues(xMin, yMax, z, 1);
+
+        const p1_v = word2view(viewMatrix, p1_w);
+        const p2_v = word2view(viewMatrix, p2_w);
+        const p3_v = [p1_v[0] - width, p1_v[1], p1_v[2]];
+        const p4_v = [p2_v[0] - width, p2_v[1], p2_v[2]];
+
+        // X axis
+        const p3_w = vec4.fromValues(xMax, yMin, z, 1);
+
+        const p1_v_2 = [p1_v[0] - width, p1_v[1], p1_v[2]];
+        const p2_v_2 = word2view(viewMatrix, p3_w);
+        const p3_v_2 = [p1_v_2[0] - width, p1_v_2[1] - width, p1_v_2[2]];
+        const p4_v_2 = [p2_v_2[0], p2_v_2[1] - width, p2_v_2[2]];
+
+        /*eslint-disable */
+        const background_lines: number[] = [ 
+                                             ...p1_v, ...p2_v, ...p3_v,  // t1 y axis
+                                             ...p3_v, ...p4_v, ...p2_v,  // t2 y axis
+
+                                             ...p1_v_2, ...p2_v_2, ...p4_v_2,  // t1 x axis
+                                             ...p1_v_2, ...p4_v_2, ...p3_v_2,  // t2 x axis
+        ];
+        /*eslint-enable */
+
+        const background_model = new Model(gl, {
+            id: `${this.props.id}-background`,
+            vs: backgroundVertexShader,
+            fs: backgroundFragmentShader,
+            uniforms: { uBackGroundColor: bColor },
+            geometry: new Geometry({
+                drawMode: GL.TRIANGLES,
+                attributes: {
+                    positions: new Float32Array(background_lines),
+                },
+                vertexCount: background_lines.length / 3,
+            }),
+
+            modules: [project],
+            isInstanced: false,
+        });
+
+        return { label_models, line_model, background_model };
     }
 }
 
@@ -466,6 +524,23 @@ Axes2DLayer.layerName = "Axes2DLayer";
 Axes2DLayer.defaultProps = defaultProps;
 
 //-- Local help functions. -------------------------------------------------
+
+function word2view(
+    viewMatrix: number[],
+    pos_w: vec4
+): [number, number, number] {
+    const pos_v = vec4.transformMat4(
+        vec4.create(),
+        pos_w,
+        mat4.fromValues(
+            ...(viewMatrix.slice(0, mat4.fromValues.length) as Parameters<
+                typeof mat4.fromValues
+            >)
+        )
+    );
+
+    return pos_v.slice(0, 3) as [number, number, number];
+}
 
 function LineLengthInPixels(
     p0: Position3D,
@@ -540,12 +615,17 @@ function GetTickLines(
     const tick_labels = [];
 
     // ADD TICK LINES.
-    const dx = x_max - x_min;
-    const dy = y_max - y_min;
-
     let y_tick = 0;
 
-    const delta = ((dx + dy) / 2.0) * 0.015;
+    const m = 20; // Length in pixels
+    const world_from = viewport.unproject([0, 0, 0]);
+    const world_to = viewport.unproject([0, m, 0]);
+    const v = [
+        world_from[0] - world_to[0],
+        world_from[1] - world_to[1],
+        world_from[2] - world_to[2],
+    ];
+    const delta = Math.sqrt(v[0] * v[0] + v[1] * v[1]); // in world
 
     // X axis labels.
     const Lx = LineLengthInPixels(
@@ -554,9 +634,12 @@ function GetTickLines(
         viewport
     );
 
-    const x_ticks = GetTicks(x_min, x_max, Lx);
+    const x_ticks = GetTicks(x_min, x_max, Lx); // Note: this may be replaced by NiceTicks npm package.
     y_tick = y_min;
-    const z_tick = 0;
+
+    // z value of all lines and labels. In camera/view coordinates. This
+    // ensures lines will be closer to camera than rest of model.
+    const z_tick = 100;
     for (let i = 0; i < x_ticks.length; i++) {
         const tick = x_ticks[i];
 
@@ -624,7 +707,6 @@ function GetTickLines(
         tick_labels.push(label);
 
         const x_tick = x_min;
-        const z_tick = 0;
 
         // tick line start
         lines.push(x_tick, tick, z_tick);

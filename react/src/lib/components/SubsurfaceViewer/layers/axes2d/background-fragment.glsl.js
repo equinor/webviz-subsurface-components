@@ -4,14 +4,12 @@ export default `\
 
 precision highp float;
 
+uniform vec4 uBackGroundColor;
+
 out vec4 fragColor;
 
-uniform sampler2D fontTexture;
-
-in vec2 _vTexCoord;
-
 void main(void) {
-  vec4 color = texture(fontTexture, _vTexCoord);
+  vec4 color = uBackGroundColor;
   fragColor = color;
 }
 `;

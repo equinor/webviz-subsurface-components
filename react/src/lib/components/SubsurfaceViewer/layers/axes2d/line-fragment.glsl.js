@@ -4,11 +4,11 @@ export default `\
 
 precision highp float;
 
-uniform vec4 uColor;
+uniform vec4 uAxisColor;
 
 out vec4 fragColor;
 
 void main(void) {
-  fragColor = uColor;
+  fragColor = uAxisColor;
 }
 `;

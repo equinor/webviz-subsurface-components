@@ -102,7 +102,7 @@ export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
     /**  If true means that input z values are interpreted as depths.
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
-    isZDepth: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 const defaultProps = {
@@ -125,7 +125,7 @@ const defaultProps = {
     wellNameColor: [0, 0, 0, 255],
     selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     depthTest: true,
-    isZDepth: true,
+    ZIncreasingDownwards: true,
 };
 
 export interface LogCurveDataType {
@@ -324,7 +324,7 @@ export default class WellsLayer extends CompositeLayer<
         }
 
         let data = this.props.data as unknown as FeatureCollection;
-        if (!this.props.isZDepth) {
+        if (!this.props.ZIncreasingDownwards) {
             data = invertPath(data);
         }
         const refine = this.props.refine;

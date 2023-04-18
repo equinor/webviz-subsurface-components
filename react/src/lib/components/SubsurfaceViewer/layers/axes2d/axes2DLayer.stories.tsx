@@ -31,12 +31,6 @@ const meshMapLayerPng = {
     colorMapName: "Physics",
 };
 
-const axes_hugin = {
-    "@@type": "AxesLayer",
-    id: "axes-layer2",
-    bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
-};
-
 const axes2D = {
     "@@type": "Axes2DLayer",
     id: "axes-layer2D",
@@ -49,7 +43,38 @@ export const Base: ComponentStory<typeof SubsurfaceViewer> = (args) => {
 
 Base.args = {
     id: "map",
-    layers: [axes_hugin, meshMapLayerPng, axes2D],
+    layers: [meshMapLayerPng, axes2D],
+
+    bounds: [432150, 6475800, 439400, 6481500],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                zoom: -3.5,
+                show3D: false,
+            },
+        ],
+    },
+};
+
+export const ColoredTextAndBackGround: ComponentStory<
+    typeof SubsurfaceViewer
+> = (args) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+ColoredTextAndBackGround.args = {
+    id: "map",
+    layers: [
+        meshMapLayerPng,
+        // Yellow background, blue text.
+        {
+            ...axes2D,
+            axisColor: [100, 100, 255],
+            backgroundColor: [255, 255, 100],
+        },
+    ],
 
     bounds: [432150, 6475800, 439400, 6481500],
     views: {

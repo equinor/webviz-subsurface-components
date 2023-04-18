@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo } from "@deck.gl/core/typed";
@@ -14,23 +14,26 @@ import {
     ViewFooter,
     View,
 } from "../..";
-import { ViewStateType, ViewsType } from "./components/Map";
+import { MapMouseEvent, ViewStateType, ViewsType } from "./components/Map";
+import { WellsLayer, MapLayer } from "./layers";
+import InfoCard from "./components/InfoCard";
 
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
-const defaultWellsLayer = {
-    "@@type": "WellsLayer",
-    data: "@@#resources.wellsData",
+const defaultWellsProps = {
+    id: "volve-wells",
+    data: "./volve_wells.json",
 };
+
+const defaultWellsLayer = new WellsLayer({
+    ...defaultWellsProps,
+});
 
 const defaultProps = {
     id: "volve-wells",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
     bounds: [432150, 6475800, 439400, 6481500] as [
         number,
         number,
@@ -39,6 +42,14 @@ const defaultProps = {
     ],
     layers: [defaultWellsLayer],
 };
+
+const wellsLayerWithlogs = new WellsLayer({
+    ...defaultWellsProps,
+    logData: "./volve_logs.json",
+    logrunName: "BLOCKING",
+    logName: "PORO",
+    logColor: "Physics",
+});
 
 const Template: ComponentStory<typeof SubsurfaceViewer> = (args) => (
     <SubsurfaceViewer {...args} />
@@ -57,10 +68,10 @@ export const TooltipApi = Template.bind({});
 TooltipApi.args = {
     ...defaultProps,
     layers: [
-        {
-            ...defaultWellsLayer,
+        new WellsLayer({
+            ...defaultWellsProps,
             lineStyle: { width: 7 },
-        },
+        }),
     ],
     getTooltip: mdTooltip,
     bounds: [433000, 6476000, 439000, 6480000],
@@ -139,10 +150,10 @@ const tooltipImpFunc: TooltipCallback = (
 TooltipStyle.args = {
     ...defaultProps,
     layers: [
-        {
-            ...defaultWellsLayer,
+        new WellsLayer({
+            ...defaultWellsProps,
             lineStyle: { width: 7 },
-        },
+        }),
     ],
     getTooltip: tooltipImpFunc,
     bounds: [433000, 6476000, 439000, 6480000],
@@ -202,20 +213,26 @@ customizedCameraPosition.args = {
     cameraPosition,
 };
 
-const mapLayer = {
-    "@@type": "MapLayer",
-    id: "hugin",
-    meshUrl: "hugin_depth_25_m.float32",
+const mapProps = {
+    id: "kh_netmap",
+    meshData: "hugin_depth_25_m.float32",
     frame: {
-        origin: [432150, 6475800],
-        count: [291, 229],
-        increment: [25, 25],
+        origin: [432150, 6475800] as [number, number],
+        count: [291, 229] as [number, number],
+        increment: [25, 25] as [number, number],
         rotDeg: 0,
     },
-    propertiesUrl: "kh_netmap_25_m.float32",
-    contours: [0, 100],
+    propertiesData: "kh_netmap_25_m.float32",
+    contours: [0, 100] as [number, number],
     material: false,
 };
+
+const netmapLayer = new MapLayer({ ...mapProps });
+const huginLayer = new MapLayer({
+    ...mapProps,
+    id: "hugin",
+    propertiesData: "hugin_depth_25_m.float32",
+});
 
 const MultiViewAnnotationTemplate: ComponentStory<typeof SubsurfaceViewer> = (
     args
@@ -240,14 +257,7 @@ export const MultiViewAnnotation = MultiViewAnnotationTemplate.bind({});
 
 MultiViewAnnotation.args = {
     id: "multi_view_annotation",
-    layers: [
-        mapLayer,
-        {
-            ...mapLayer,
-            id: "kh_netmap",
-            propertiesUrl: "hugin_depth_25_m.float32",
-        },
-    ],
+    layers: [netmapLayer, huginLayer],
     views: {
         layout: [1, 2],
         showLabel: true,
@@ -270,27 +280,20 @@ export const ViewObjectInitializedAsEmpty = MultiViewAnnotationTemplate.bind(
 
 ViewObjectInitializedAsEmpty.args = {
     id: "view_initialized_as_empty",
-    layers: [
-        mapLayer,
-        {
-            ...mapLayer,
-            id: "kh_netmap",
-            propertiesUrl: "hugin_depth_25_m.float32",
-        },
-    ],
+    layers: [netmapLayer, huginLayer],
     views: {} as ViewsType,
 };
 
-const wellsLayerNoDepthTest = {
-    ...defaultWellsLayer,
+const wellsLayerNoDepthTest = new WellsLayer({
+    ...defaultWellsProps,
     id: "wells-layer-no-depth-test",
     depthTest: false,
-};
+});
 
 export const DepthTest: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     const props = {
         ...args,
-        layers: [mapLayer, defaultWellsLayer, wellsLayerNoDepthTest],
+        layers: [netmapLayer, defaultWellsLayer, wellsLayerNoDepthTest],
     };
 
     return (
@@ -310,10 +313,6 @@ export const DepthTest: ComponentStory<typeof SubsurfaceViewer> = (args) => {
 
 DepthTest.args = {
     id: "DepthTest",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
-
     views: {
         layout: [1, 2],
         viewports: [
@@ -338,5 +337,113 @@ DepthTest.parameters = {
         description: {
             story: "Example using the depthTest property. If this is set to false it will disable depth testing for the layer",
         },
+    },
+};
+
+function getReadout(event: MapMouseEvent) {
+    const pickInfo = event.infos;
+    return <InfoCard pickInfos={pickInfo} />;
+}
+
+const MouseEventStory = (args: { show3d: boolean }) => {
+    const [event, setEvent] = useState<MapMouseEvent>({
+        type: "click",
+        infos: [],
+    });
+
+    const handleEvent = useCallback(
+        (event) => {
+            setEvent(event);
+        },
+        [setEvent]
+    );
+
+    const useProps = useMemo(() => {
+        const props = {
+            ...defaultProps,
+            layers: [wellsLayerWithlogs, netmapLayer],
+            onMouseEvent: handleEvent,
+            views: {
+                layout: [1, 1] as [number, number],
+                viewports: [{ id: "test", show3D: args.show3d }],
+            },
+            coords: { visible: false },
+        };
+        return props;
+    }, [handleEvent, args.show3d]);
+
+    return (
+        <SubsurfaceViewer {...useProps}>
+            <View id="test">
+                {getReadout(event)}
+                <ViewFooter>Mouse event example</ViewFooter>
+            </View>
+        </SubsurfaceViewer>
+    );
+};
+
+export const MouseEvent: ComponentStory<typeof MouseEventStory> = (args) => {
+    return <MouseEventStory {...args} />;
+};
+
+MouseEvent.args = {
+    show3d: true,
+};
+
+const ViewStateSynchronizationStory = (args: {
+    show3d: boolean;
+    sync: string[];
+}) => {
+    const subsurfaceViewerArgs = {
+        id: "view_state_synchronization",
+        layers: [netmapLayer, huginLayer, defaultWellsLayer],
+        views: {
+            layout: [2, 2] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: ["hugin"],
+                    show3D: args.show3d,
+                    isSync: args.sync.includes("view_1"),
+                },
+                {
+                    id: "view_2",
+                    layerIds: ["kh_netmap"],
+                    show3D: args.show3d,
+                    isSync: args.sync.includes("view_2"),
+                },
+                {
+                    id: "view_3",
+                    layerIds: ["volve-wells"],
+                    show3D: args.show3d,
+                    isSync: args.sync.includes("view_3"),
+                },
+                {
+                    id: "view_4",
+                    layerIds: ["volve-wells", "hugin"],
+                    show3D: args.show3d,
+                    isSync: args.sync.includes("view_4"),
+                },
+            ],
+        },
+    };
+    return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
+};
+
+export const ViewStateSynchronization: ComponentStory<
+    typeof ViewStateSynchronizationStory
+> = (args) => {
+    return <ViewStateSynchronizationStory {...args} />;
+};
+
+ViewStateSynchronization.args = {
+    show3d: false,
+    sync: ["view_1", "view_2", "view_3", "view_4"],
+};
+
+ViewStateSynchronization.argTypes = {
+    sync: {
+        options: ["view_1", "view_2", "view_3", "view_4"],
+        control: "check",
     },
 };

@@ -13,20 +13,23 @@ COLOR_TABLES = (
     "main/react-app/src/component/color-tables.json"
 )
 
-legend_obj = wsc.WebVizContinuousLegend(
+legend_obj = wsc.WebVizColorLegend(
     min=0,
-    max=0.35,
-    title="ContinuousLegend",
+    max=1,
+    title="ColorLegend",
     colorName="Rainbow",
     horizontal=True,
     colorTables=COLOR_TABLES,
     cssLegendStyles={"left": "0vw", "top": "0vh"},
-    id="contLegend",
+    discreteData={},
+    reverseRange=False,
+    isModal=False,
     isRangeShown=False,
     legendFontSize=18,
     tickFontSize=12,
     numberOfTicks=3,
     legendScaleSize=200,
+    openColorSelector=False,
 )
 
 app = dash.Dash(__name__)
