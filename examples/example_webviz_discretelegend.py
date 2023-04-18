@@ -13,7 +13,8 @@ import requests
 
 COLOR_TABLES = requests.get(
     "https://raw.githubusercontent.com/emerson-eps/color-tables/"
-    "main/react-app/src/component/color-tables.json"
+    "main/react-app/src/component/color-tables.json",
+    timeout=5,
 ).json()
 
 
