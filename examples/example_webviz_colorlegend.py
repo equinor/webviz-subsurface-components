@@ -4,14 +4,16 @@
 #
 # Copyright (C) 2020 - Equinor ASA.
 
+import requests
+
 import dash
 import webviz_subsurface_components as wsc
 
 
-COLOR_TABLES = (
+COLOR_TABLES = requests.get(
     "https://raw.githubusercontent.com/emerson-eps/color-tables/"
     "main/react-app/src/component/color-tables.json"
-)
+).json()
 
 legend_obj = wsc.WebVizColorLegend(
     min=0,
