@@ -83,7 +83,7 @@ module.exports = (env, argv) => {
                 {
                     test: /\.(ts|js)x?$/,
                     exclude: /node_modules/,
-                    use: ["babel-loader", "webpack-conditional-loader"],
+                    use: ["babel-loader"],
                 },
                 {
                     test: /\.css$/,
