@@ -34,7 +34,6 @@ import TerrainMapPickInfo from "./components/SubsurfaceViewer/layers/terrain/ter
 import { FeatureCollection } from "@nebula.gl/edit-modes";
 import { ViewFooter } from "./components/SubsurfaceViewer/components/ViewFooter";
 import { ViewAnnotation } from "./components/SubsurfaceViewer/components/ViewAnnotation";
-import { PickInfo } from "deck.gl";
 
 export {
     HistoryMatch,
