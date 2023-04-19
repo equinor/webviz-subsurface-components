@@ -12,6 +12,7 @@ import {
 } from "@emerson-eps/color-tables";
 import { View } from "../../../..";
 import MapLayer from "./mapLayer";
+import Axes2DLayer from "../axes2d/axes2DLayer";
 import { ViewFooter } from "../../components/ViewFooter";
 
 export default {
@@ -33,6 +34,7 @@ const defaultMapLayerProps = {
         rotDeg: 0,
     },
     propertiesData: "kh_netmap_25_m.float32",
+    ZIncreasingDownwards: true,
 };
 
 const defaultMapLayer = new MapLayer({ ...defaultMapLayerProps });
@@ -196,6 +198,7 @@ const meshMapLayerPng = {
     material: true,
     smoothShading: true,
     colorMapName: "Physics",
+    ZIncreasingDownwards: true,
 };
 
 // Example using "Map" layer. Uses float32 float for mesh and properties.
@@ -239,7 +242,7 @@ const meshMapLayerRotated = {
 const axes_hugin = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [432150, 6475800, -3500, 439400, 6481500, 0],
+    bounds: [432150, 6475800, 0, 439400, 6481500, 3500],
 };
 
 const north_arrow_layer = {
@@ -528,13 +531,33 @@ export const MapLayer2d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
+const axesLayer2D = new Axes2DLayer({
+    id: "axesLayer2D",
+    marginH: 100, // Horizontal margin (in pixels)
+    marginV: 40, // Vertical margin (in pixels)
+    backgroundColor: [255, 255, 0, 100],
+});
+
+const mapLayer = new MapLayer({
+    id: "MapLayer",
+    meshUrl: "hugin_depth_25_m.float32",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.float32",
+    contours: [0, 100],
+    isContoursDepth: true,
+    gridLines: false,
+    material: true,
+    colorMapName: "Physics",
+});
+
 MapLayer2d.args = {
     id: "map",
-    layers: [
-        axes_hugin,
-        { ...meshMapLayerFloat32, material: true },
-        north_arrow_layer,
-    ],
+    layers: [mapLayer, axesLayer2D],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
     views: {
         layout: [1, 1],
@@ -666,7 +689,7 @@ BigMap3d.parameters = {
 const axes_small = {
     "@@type": "AxesLayer",
     id: "axes_small",
-    bounds: [459790, 5929776, -30, 460590, 5930626, 0],
+    bounds: [459790, 5929776, 0, 460590, 5930626, 30],
 };
 export const SmallMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
@@ -699,7 +722,7 @@ SmallMap.parameters = {
 const axes_lite = {
     "@@type": "AxesLayer",
     id: "axes_small",
-    bounds: [-1, -1, -3, 4, 5, 0],
+    bounds: [-1, -1, 0, 4, 5, 3],
 };
 
 //-- CellCenteredPropMap --

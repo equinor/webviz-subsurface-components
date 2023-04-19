@@ -9,6 +9,7 @@ export type Params = {
     vertexArray: Float32Array;
     indexArray: Uint32Array;
     smoothShading: boolean;
+    displayNormals: boolean;
 };
 
 async function loadData(
@@ -118,6 +119,10 @@ export interface TriangleLayerProps<D> extends ExtendedLayerProps<D> {
      */
     ZIncreasingDownwards: boolean;
 
+    /** If true will display normals on all vertex's
+     */
+    debug: boolean;
+
     // Non public properties:
     setReportedBoundingBox?: React.Dispatch<
         React.SetStateAction<[number, number, number, number, number, number]>
@@ -137,6 +142,7 @@ const defaultProps = {
     material: true,
     depthTest: true,
     ZIncreasingDownwards: true,
+    debug: false,
 };
 
 export default class TriangleLayer extends CompositeLayer<
@@ -166,6 +172,7 @@ export default class TriangleLayer extends CompositeLayer<
                 vertexArray,
                 indexArray,
                 smoothShading: this.props.smoothShading,
+                displayNormals: this.props.debug,
             };
 
             webWorker.postMessage(webworkerParams);
@@ -229,8 +236,10 @@ export default class TriangleLayer extends CompositeLayer<
 
     updateState({ props, oldProps }: UpdateParameters<TriangleLayer>): void {
         const needs_reload =
+            !isEqual(props.debug, oldProps.debug) ||
             !isEqual(props.pointsData, oldProps.pointsData) ||
-            !isEqual(props.triangleData, oldProps.triangleData);
+            !isEqual(props.triangleData, oldProps.triangleData) ||
+            !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
             const reportBoundingBox = false;

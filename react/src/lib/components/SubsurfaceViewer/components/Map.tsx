@@ -10,6 +10,8 @@ import {
     View,
     Viewport,
     PickingInfo,
+    OrthographicView,
+    OrbitView,
 } from "@deck.gl/core/typed";
 import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
@@ -27,7 +29,12 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import { WellsLayer, AxesLayer, NorthArrow3DLayer } from "../layers";
+import {
+    WellsLayer,
+    AxesLayer,
+    Axes2DLayer,
+    NorthArrow3DLayer,
+} from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
@@ -36,6 +43,7 @@ import { colorTables } from "@emerson-eps/color-tables";
 import { getModelMatrixScale } from "../layers/utils/layerTools";
 import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
 import { MjolnirEvent } from "mjolnir.js";
+import IntersectionView from "../views/intersectionView";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -325,7 +333,13 @@ const Map: React.FC<MapProps> = ({
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
+    // Viewport margins. Will differ from 0 if axes2Dlayer is used.
+    const [marginLeft, setMarginLeft] = useState<number>(0);
+    const [marginBottom, setMarginBottom] = useState<number>(0);
+
     const initialViewState = getViewState(
+        marginLeft,
+        marginBottom,
         boundsInitial,
         views?.viewports?.[0].target,
         views?.viewports?.[0].zoom,
@@ -333,7 +347,11 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Local help function.
-    function calcDefaultViewStates(input?: ViewportType[]) {
+    function calcDefaultViewStates(
+        marginLeft: number,
+        marginBottom: number,
+        input?: ViewportType[]
+    ) {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         const union_of_reported_bboxes = addBoundingBoxes(
@@ -364,31 +382,38 @@ const Map: React.FC<MapProps> = ({
             target = [x, y, z];
         }
 
-        const is3D = views?.viewports?.[0]?.show3D ?? false;
-        if (!is3D) {
-            target.pop(); // In 2D "target" should only contain x and y.
-        }
-
-        let tempViewStates: Record<string, ViewStateType> = {};
         const updatedViewProps = input ? input : viewsProps;
-        tempViewStates = Object.fromEntries(
-            updatedViewProps.map((item, index) => [
+
+        const viewStateMap = updatedViewProps.map((item, index) => {
+            const is3D = views?.viewports?.[index]?.show3D ?? false;
+
+            const viewState = isBoundsDefined
+                ? getViewState(
+                      marginLeft,
+                      marginBottom,
+                      boundsInitial,
+                      is3D ? target : undefined,
+                      views?.viewports?.[index].zoom,
+                      deckRef.current?.deck
+                  )
+                : getViewState3D(
+                      is3D,
+                      union_of_reported_bboxes,
+                      views?.viewports?.[index].zoom,
+                      deckRef.current?.deck
+                  );
+
+            const minZoom = is3D ? -12 : -15;
+            const maxZoom = is3D ? +12 : +15;
+
+            return [
                 item.id,
-                isBoundsDefined
-                    ? getViewState(
-                          boundsInitial,
-                          target,
-                          views?.viewports?.[index].zoom,
-                          deckRef.current?.deck
-                      )
-                    : getViewState3D(
-                          is3D,
-                          union_of_reported_bboxes,
-                          views?.viewports?.[index].zoom,
-                          deckRef.current?.deck
-                      ),
-            ])
-        );
+                { ...viewState, minZoom: minZoom, maxZoom: maxZoom },
+            ];
+        });
+
+        const tempViewStates = Object.fromEntries(viewStateMap);
+
         setDidUserChangeCamera(false);
         setViewStates(tempViewStates);
     }
@@ -417,6 +442,8 @@ const Map: React.FC<MapProps> = ({
                         typeof viewState !== "undefined"
                             ? viewState
                             : getViewState(
+                                  marginLeft,
+                                  marginBottom,
                                   boundsInitial,
                                   views?.viewports?.[index].target,
                                   views?.viewports?.[index].zoom,
@@ -444,6 +471,8 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
+                        marginLeft,
+                        marginBottom,
                         boundsInitial,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
@@ -458,11 +487,6 @@ const Map: React.FC<MapProps> = ({
         }
     }, [bounds, cameraPosition]);
 
-    const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
-    useEffect(() => {
-        setDeckGLViews(jsonToObject(viewsProps) as View[]);
-    }, [viewsProps]);
-
     const [reportedBoundingBox, setReportedBoundingBox] =
         useState<BoundingBox>(bboxInitial);
     const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
@@ -470,7 +494,7 @@ const Map: React.FC<MapProps> = ({
 
     useEffect(() => {
         if (typeof triggerHome !== "undefined") {
-            calcDefaultViewStates();
+            calcDefaultViewStates(marginLeft, marginBottom);
         }
     }, [triggerHome]);
 
@@ -478,7 +502,7 @@ const Map: React.FC<MapProps> = ({
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         if (!didUserChangeCamera && !isCameraPositionDefined) {
-            calcDefaultViewStates();
+            calcDefaultViewStates(marginLeft, marginBottom);
         }
     }, [reportedBoundingBox]);
 
@@ -490,6 +514,8 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
+                        marginLeft,
+                        marginBottom,
                         boundsInitial,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
@@ -554,21 +580,27 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZDown]);
 
     useEffect(() => {
-        const viewProps = getViews(
-            views,
-            scaleUpFunction,
-            scaleDownFunction
-        ) as ViewportType[];
+        const viewProps = getViews(views) as ViewportType[];
 
         setViewsProps(viewProps);
 
         if (!bounds) {
-            calcDefaultViewStates(viewProps);
+            calcDefaultViewStates(marginLeft, marginBottom, viewProps);
         }
     }, [views]);
 
     useEffect(() => {
         if (layers == undefined) return;
+
+        // Margins on the viewport are extracted from a potenial axes2D layer.
+        const axes2DLayer = layers?.find((e) => {
+            return e?.constructor === Axes2DLayer;
+        }) as Axes2DLayer;
+
+        const marginLeft = axes2DLayer ? axes2DLayer.props.marginH : 0;
+        const marginBottom = axes2DLayer ? axes2DLayer.props.marginV : 0;
+        setMarginLeft(marginLeft);
+        setMarginBottom(marginBottom);
 
         const m = getModelMatrixScale(scaleZ);
 
@@ -779,16 +811,15 @@ const Map: React.FC<MapProps> = ({
         useState<boolean>(false);
     const onViewStateChange = useCallback(
         ({ viewId, viewState }) => {
-            const isSyncIds = viewsProps
+            const viewports = views?.viewports || [];
+            const isSyncIds = viewports
                 .filter((item) => item.isSync)
                 .map((item) => item.id);
-            if (isSyncIds.includes(viewId)) {
-                let tempViewStates: Record<string, ViewStateType> = {};
-                tempViewStates = Object.fromEntries(
-                    viewsProps
-                        .filter((item) => item.isSync)
-                        .map((item) => [item.id, viewState])
-                );
+            if (isSyncIds?.includes(viewId)) {
+                const viewStateTable = views?.viewports
+                    .filter((item) => item.isSync)
+                    .map((item) => [item.id, viewState]);
+                const tempViewStates = Object.fromEntries(viewStateTable ?? []);
                 setViewStates((currentViewStates) => ({
                     ...currentViewStates,
                     ...tempViewStates,
@@ -802,11 +833,15 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
-            setFirstViewStatesId(viewsProps[0].id);
+            setFirstViewStatesId(viewsProps[0]?.id);
             setDidUserChangeCamera(true);
         },
-        [viewStates]
+        [views]
     );
+
+    const deckGLViews = React.useMemo(() => {
+        return createViews(views, scaleUpFunction, scaleDownFunction);
+    }, [views]);
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
@@ -951,6 +986,8 @@ export function jsonToObject(
 
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
+    marginLeft: number,
+    marginBottom: number,
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     target?: number[],
     zoom?: number,
@@ -963,16 +1000,40 @@ function getViewState(
         bounds = bounds_accessor;
     }
 
-    let width = bounds[2] - bounds[0]; // right - left
-    let height = bounds[3] - bounds[1]; // top - bottom
+    let w = bounds[2] - bounds[0]; // right - left
+    let h = bounds[3] - bounds[1]; // top - bottom
+
+    const fb = fitBounds({ width: w, height: h, bounds });
+    let fb_target = [fb.x, fb.y, 0];
+    let fb_zoom = fb.zoom;
+
     if (deck) {
-        width = deck.width;
-        height = deck.height;
+        // If there are margins in the viewport (axes2DLayer) we have to account for that.
+        // Camera target should be in the middle of viewport minus the margins.
+        const w_bounds = w;
+        const h_bounds = h;
+
+        // Subtract margins.
+        w = deck.width - marginLeft; // width of the viewport minus margin.
+        h = deck.height - marginBottom;
+
+        const port_aspect = h / w;
+        const bounds_aspect = h_bounds / w_bounds;
+
+        const m_pr_pixel =
+            bounds_aspect > port_aspect ? h_bounds / h : w_bounds / w;
+
+        const translate_x = 0.5 * marginLeft * m_pr_pixel;
+        const translate_y = 0.5 * marginBottom * m_pr_pixel;
+
+        const fb = fitBounds({ width: w, height: h, bounds });
+        fb_target = [fb.x - translate_x, fb.y - translate_y, 0];
+        fb_zoom = fb.zoom;
     }
-    const fitted_bound = fitBounds({ width, height, bounds });
+
     const view_state: ViewStateType = {
-        target: target ?? [fitted_bound.x, fitted_bound.y, 0],
-        zoom: zoom ?? fitted_bound.zoom,
+        target: target ?? fb_target,
+        zoom: zoom ?? fb_zoom,
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
     };
@@ -1023,11 +1084,11 @@ function getViewState3D(
 }
 
 // construct views object for DeckGL component
-function getViews(
+function createViews(
     views: ViewsType | undefined,
     scaleUpFunction: { (): void; (): void },
     scaleDownFunction: { (): void; (): void }
-): ViewportType[] {
+): View[] {
     // Use modified controller to handle key events.
     class ZScaleOrbitController extends OrbitController {
         handleEvent(event: MjolnirEvent): boolean {
@@ -1062,19 +1123,19 @@ function getViews(
     } & ViewportType)[] = [];
     // if props for multiple viewport are not proper, return 2d view
     if (!views || !views.viewports || !views.layout) {
-        deckgl_views.push({
-            "@@type": "OrthographicView",
-            id: "main",
-            controller: { doubleClickZoom: false },
-            x: "0%",
-            y: "0%",
-            width: "100%",
-            height: "100%",
-            flipY: false,
-            far: 99999,
-            near: -99999,
-            isSync: false,
-        });
+        deckgl_views.push(
+            new OrthographicView({
+                id: "main",
+                controller: { doubleClickZoom: false },
+                x: "0%",
+                y: "0%",
+                width: "100%",
+                height: "100%",
+                flipY: false,
+                far: 99999,
+                near: -99999,
+            })
+        );
     } else {
         let yPos = 0;
         const [nY, nX] = views.layout;
@@ -1087,43 +1148,76 @@ function getViews(
                 )
                     return deckgl_views;
 
-                const cur_viewport: ViewportType =
+                const currentViewport: ViewportType =
                     views.viewports[deckgl_views.length];
 
-                const view_type: string = cur_viewport.show3D
-                    ? "OrbitView"
-                    : cur_viewport.id === "intersection_view"
-                    ? "IntersectionView"
-                    : "OrthographicView";
+                const ViewType = currentViewport.show3D
+                    ? OrbitView
+                    : currentViewport.id === "intersection_view"
+                    ? IntersectionView
+                    : OrthographicView;
 
                 const far = 9999;
-                const near = cur_viewport.show3D ? 0.1 : -9999;
+                const near = currentViewport.show3D ? 0.1 : -9999;
 
-                deckgl_views.push({
-                    "@@type": view_type,
-                    id: cur_viewport.id,
-                    controller: {
-                        type: cur_viewport.show3D
-                            ? ZScaleOrbitController
-                            : OrthographicController,
-                        doubleClickZoom: false,
-                    },
-                    x: xPos + "%",
-                    y: yPos + "%",
+                const Controller = currentViewport.show3D
+                    ? ZScaleOrbitController
+                    : OrthographicController;
 
-                    // Using 99.5% of viewport to avoid flickering of deckgl canvas
-                    width: 99.5 / nX + "%",
-                    height: 99.5 / nY + "%",
-                    flipY: false,
-                    far,
-                    near,
-                    minZoom: cur_viewport.show3D ? -12 : -15,
-                    maxZoom: cur_viewport.show3D ? +12 : +15,
-                    isSync: views.viewports[deckgl_views.length].isSync,
-                });
+                const controller = {
+                    type: Controller,
+                    doubleClickZoom: false,
+                };
+
+                deckgl_views.push(
+                    new ViewType({
+                        id: currentViewport.id,
+                        controller: controller,
+                        x: xPos + "%",
+                        y: yPos + "%",
+
+                        // Using 99.5% of viewport to avoid flickering of deckgl canvas
+                        width: 99.5 / nX + "%",
+                        height: 99.5 / nY + "%",
+                        flipY: false,
+                        far,
+                        near,
+                    })
+                );
                 xPos = xPos + 99.5 / nX;
             }
             yPos = yPos + 99.5 / nY;
+        }
+    }
+    return deckgl_views;
+}
+
+// construct views object for DeckGL component
+function getViews(views: ViewsType | undefined): ViewportType[] {
+    const deckgl_views = [];
+
+    // if props for multiple viewport are not proper, return 2d view
+    if (!views || !views.viewports || !views.layout) {
+        deckgl_views.push({
+            id: "main",
+        });
+    } else {
+        const [nY, nX] = views.layout;
+        for (let y = 1; y <= nY; y++) {
+            for (let x = 1; x <= nX; x++) {
+                if (
+                    views.viewports == undefined ||
+                    deckgl_views.length >= views.viewports.length
+                )
+                    return deckgl_views;
+
+                const cur_viewport: ViewportType =
+                    views.viewports[deckgl_views.length];
+
+                deckgl_views.push({
+                    id: cur_viewport.id,
+                });
+            }
         }
     }
     return deckgl_views;
