@@ -38,7 +38,7 @@
         "test": "jest --coverage",
         "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
-        "build:npm": "rimraf dist && tsc -project tsconfig.build.json && rm -r dist/demo && mv dist/lib/* dist && npm run copy-files",
+        "build:npm": "rimraf dist && tsc --project tsconfig.build.json && rm -r dist/demo && mv dist/lib/* dist && npm run copy-files",
         "copy-files": "copyfiles package.json dist && copyfiles --up 1 ../README.md dist && copyfiles --exclude **/*.{tsx,jsx,js,ts,snap} --up 2 \"src/lib/**/*\" dist/",
         "postpack": "npm run tidy-up",
         "prepublishOnly": "npm test && npm run lint",
