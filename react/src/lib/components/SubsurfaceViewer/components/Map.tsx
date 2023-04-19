@@ -1103,24 +1103,8 @@ function createViews(
             return super.handleEvent(event);
         }
     }
+    const deckgl_views: View[] = [];
 
-    // @rmt: Added missing type as broad type
-    // This is incorrectly implemented.
-    // The function returns ViewportType[] but it is not compatible with the actual return value.
-
-    const deckgl_views: ({
-        "@@type": string;
-        controller: Record<string, unknown>;
-        x: string;
-        y: string;
-        width: string;
-        height: string;
-        flipY: boolean;
-        far: number;
-        near: number;
-        minZoom?: number;
-        maxZoom?: number;
-    } & ViewportType)[] = [];
     // if props for multiple viewport are not proper, return 2d view
     if (!views || !views.viewports || !views.layout) {
         deckgl_views.push(

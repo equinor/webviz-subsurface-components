@@ -1,6 +1,5 @@
 {
     "name": "@webviz/subsurface-components",
-    "version": "0.0.0",
     "description": "Custom Dash components for use in Webviz",
     "repository": {
         "type": "git",
