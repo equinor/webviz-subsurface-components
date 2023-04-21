@@ -49,8 +49,6 @@ type LabelData = {
     //font_size: number; KEEP.
 };
 
-type LabelsData = LabelData[];
-
 export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
     marginH: number;
     marginV: number;
@@ -59,6 +57,10 @@ export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
     fontFamily?: string;
     axisColor?: Color;
     backgroundColor?: Color;
+    isLeftRuler: boolean;
+    isRightRuler: boolean;
+    isBottomRuler: boolean;
+    isTopRuler: boolean;
 }
 
 const defaultProps = {
@@ -67,8 +69,12 @@ const defaultProps = {
     id: "axes2d-layer",
     visible: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    marginH: 100, // Horizontal margin (in pixles)
-    marginV: 40, // Vertical margin (in pixles)
+    marginH: 80, // Horizontal margin (in pixles)
+    marginV: 30, // Vertical margin (in pixles)
+    isLeftRuler: true,
+    isRightRuler: false,
+    isBottomRuler: true,
+    isTopRuler: false,
 };
 
 // FONT ATLAS
@@ -154,8 +160,264 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         });
     }
 
-    makeLabelsData(tick_lines: number[], tick_labels: string[]): LabelsData {
-        const labels: LabelsData = [];
+    GetTickLinesAndLabelsHorizontal(
+        x_min: number,
+        x_max: number,
+        isTop: boolean, // top or bottom ruler.
+        pixel2world: number
+    ): [number[], LabelData[]] {
+        const ndecimals = 0;
+        const n_minor_ticks = 3;
+
+        const lines: number[] = [];
+        const tick_labels = [];
+
+        const mv = this.props.marginV * pixel2world;
+
+        const vpBounds = this.context.viewport.getBounds();
+        const y_start = isTop ? vpBounds[3] - mv : vpBounds[1] + mv;
+
+        const m = 10; // Length in pixels
+        const delta = m * pixel2world;
+
+        const Lx = LineLengthInPixels(
+            [x_min, 0, 0],
+            [x_max, 0, 0],
+            this.context.viewport
+        );
+
+        const x_ticks = GetTicks(x_min, x_max, Lx); // Note: this may be replaced by NiceTicks npm package.
+        const y_tick = y_start;
+
+        // z value of all lines and labels. In camera/view coordinates. This
+        // ensures lines will be closer to camera than rest of model.
+        const z_tick = -100;
+        const tick_length = isTop ? delta : -delta;
+
+        for (let i = 0; i < x_ticks.length; i++) {
+            const tick = x_ticks[i];
+
+            const label = tick.toFixed(ndecimals);
+            tick_labels.push(label);
+
+            // tick line start
+            lines.push(tick, y_tick, z_tick);
+
+            // tick line end.
+            lines.push(tick, y_tick + tick_length, z_tick);
+        }
+
+        // Add minor X ticks.
+        if (x_ticks.length > 1) {
+            const tick1 = x_ticks[0];
+            const tick2 = x_ticks[1];
+            const d = (tick2 - tick1) / (n_minor_ticks + 1);
+            const x_start = tick1;
+
+            // up
+            let i = 0;
+            while (x_start + (i + 1) * d < x_max) {
+                const tick = x_start + (i + 1) * d;
+                tick_labels.push("");
+                i++;
+                // tick line start
+                lines.push(tick, y_tick, z_tick);
+
+                // tick line end.
+                lines.push(tick, y_tick + 0.5 * tick_length, z_tick);
+            }
+
+            // down
+            i = 0;
+            while (x_start - (i + 1) * d > x_min) {
+                const tick = x_start - (i + 1) * d;
+                tick_labels.push("");
+                i++;
+                // tick line start
+                lines.push(tick, y_tick, z_tick);
+
+                // tick line end.
+                lines.push(tick, y_tick + 0.5 * tick_length, z_tick);
+            }
+        }
+
+        const labels = this.makeLabelsData(lines, tick_labels);
+
+        return [lines, labels];
+    }
+
+    GetTickLinesAndLabelsVertical(
+        y_min: number,
+        y_max: number,
+        isLeft: boolean, // top or bottom ruler.
+        pixel2world: number
+    ): [number[], LabelData[]] {
+        const ndecimals = 0;
+        const n_minor_ticks = 3;
+
+        const lines: number[] = [];
+        const tick_labels = [];
+
+        const mh = this.props.marginH * pixel2world;
+
+        const vpBounds = this.context.viewport.getBounds();
+        const x_start = isLeft ? vpBounds[0] + mh : vpBounds[2] - mh;
+
+        const m = 10; // Length in pixels
+        const delta = m * pixel2world;
+
+        const Ly = LineLengthInPixels(
+            [0, y_min, 0],
+            [0, y_max, 0],
+            this.context.viewport
+        );
+
+        const y_ticks = GetTicks(y_min, y_max, Ly); // Note: this may be replaced by NiceTicks npm package.
+        const x_tick = x_start;
+
+        // z value of all lines and labels. In camera/view coordinates. This
+        // ensures lines will be closer to camera than rest of model.
+        const z_tick = -110; // note negative axis points away from camera.
+        const tick_length = isLeft ? -delta : delta;
+
+        for (let i = 0; i < y_ticks.length; i++) {
+            const tick = y_ticks[i];
+
+            const label = tick.toFixed(ndecimals);
+            tick_labels.push(label);
+
+            // tick line start
+            lines.push(x_tick, tick, z_tick);
+
+            // tick line end.
+            lines.push(x_tick + tick_length, tick, z_tick);
+        }
+
+        // Add minor X ticks.
+        if (y_ticks.length > 1) {
+            const tick1 = y_ticks[0];
+            const tick2 = y_ticks[1];
+            const d = (tick2 - tick1) / (n_minor_ticks + 1);
+            const y_start = tick1;
+
+            // up
+            let i = 0;
+            while (y_start + (i + 1) * d < y_max) {
+                const tick = y_start + (i + 1) * d;
+                tick_labels.push("");
+                i++;
+                // tick line start
+                lines.push(x_tick, tick, z_tick);
+
+                // tick line end.
+                lines.push(x_tick + 0.5 * tick_length, tick, z_tick);
+            }
+
+            // down
+            i = 0;
+            while (y_start - (i + 1) * d > y_min) {
+                const tick = y_start - (i + 1) * d;
+                tick_labels.push("");
+                i++;
+                // tick line start
+                lines.push(x_tick, tick, z_tick);
+
+                // tick line end.
+                lines.push(x_tick + 0.5 * tick_length, tick, z_tick);
+            }
+        }
+
+        const labels = this.makeLabelsData(lines, tick_labels);
+
+        return [lines, labels];
+    }
+
+    GetBacgroundTriangleLinesHorizontal(
+        x_min_w: number,
+        x_max_w: number,
+        isTop: boolean,
+        viewMatrix: number[],
+        pixel2world: number
+    ): number[] {
+        const mv = this.props.marginV * pixel2world;
+
+        const vp_bounds = this.context.viewport.getBounds(); // [xmin, ymin, xmax, ymax]
+
+        const y_max = isTop ? vp_bounds[3] : vp_bounds[1] + mv;
+        const y_min = isTop ? vp_bounds[3] - mv : vp_bounds[1];
+
+        const z = 0;
+        const p1 = vec4.fromValues(x_min_w, y_max, z, 1);
+        const p2 = vec4.fromValues(x_max_w, y_max, z, 1);
+        const p3 = vec4.fromValues(x_max_w, y_min, z, 1);
+        const p4 = vec4.fromValues(x_min_w, y_min, z, 1);
+
+        const p1_v = word2view(viewMatrix, p1);
+        const p2_v = word2view(viewMatrix, p2);
+        const p3_v = word2view(viewMatrix, p3);
+        const p4_v = word2view(viewMatrix, p4);
+
+        // Distance camera background in view space.
+        const z_dist = 101;
+        p1_v[2] = -z_dist;
+        p2_v[2] = -z_dist;
+        p3_v[2] = -z_dist;
+        p4_v[2] = -z_dist;
+
+        /*eslint-disable */
+        const background_lines: number[] = [ 
+            ...p1_v, ...p2_v, ...p4_v,  // triangle 1
+            ...p2_v, ...p4_v, ...p3_v,  // triangle 2 
+        ];
+        /*eslint-enable */
+
+        return background_lines;
+    }
+
+    GetBacgroundTriangleLinesVertical(
+        y_min_w: number,
+        y_max_w: number,
+        isLeft: boolean, // left or right ruler.
+        viewMatrix: number[],
+        pixel2world: number
+    ): number[] {
+        const mh = this.props.marginH * pixel2world;
+
+        const vp_bounds = this.context.viewport.getBounds(); // [xmin, ymin, xmax, ymax]
+
+        const x_max = isLeft ? vp_bounds[0] + mh : vp_bounds[2];
+        const x_min = isLeft ? vp_bounds[0] : vp_bounds[2] - mh;
+
+        const z = 0;
+        const p1 = vec4.fromValues(x_max, y_min_w, z, 1);
+        const p2 = vec4.fromValues(x_max, y_max_w, z, 1);
+        const p3 = vec4.fromValues(x_min, y_max_w, z, 1);
+        const p4 = vec4.fromValues(x_min, y_min_w, z, 1);
+
+        const p1_v = word2view(viewMatrix, p1);
+        const p2_v = word2view(viewMatrix, p2);
+        const p3_v = word2view(viewMatrix, p3);
+        const p4_v = word2view(viewMatrix, p4);
+
+        // Distance camera background in view space.
+        const z_dist = 105;
+        p1_v[2] = -z_dist;
+        p2_v[2] = -z_dist;
+        p3_v[2] = -z_dist;
+        p4_v[2] = -z_dist;
+
+        /*eslint-disable */
+        const background_lines: number[] = [ 
+            ...p1_v, ...p2_v, ...p4_v,  // triangle 1
+            ...p2_v, ...p4_v, ...p3_v,  // triangle 2 
+        ];
+        /*eslint-enable */
+
+        return background_lines;
+    }
+
+    makeLabelsData(tick_lines: number[], tick_labels: string[]): LabelData[] {
+        const labels: LabelData[] = [];
 
         for (let i = 0; i < tick_lines.length / 6; i++) {
             const from = [
@@ -254,7 +516,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         line_model: Model;
         background_model: Model;
     } {
-        // MAKE MODEL FOR THE AXES LINES (tick marks and axes).
+        // Make models for background, lines (tick marcs and axis) and labels.
 
         // Margins.
         const m = 100; // Length in pixels
@@ -268,33 +530,117 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         const pixel2world = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / 100;
 
+        const { viewMatrix } = this.context.viewport;
+
         const mh = this.props.marginH * pixel2world;
         const mv = this.props.marginV * pixel2world;
 
-        const vpBounds = this.context.viewport.getBounds();
-        const xMin = vpBounds[0] + mh;
-        const xMax = vpBounds[2] + mh; // Note: "+" so that the axis extends outside viewport
-        const yMin = vpBounds[1] + mv;
-        const yMax = vpBounds[3] + mv; // Note: "+" so that the axis extends outside viewport
+        const viewport_bounds_w = this.context.viewport.getBounds(); //bounds in world coordinates.
+        const xMin = viewport_bounds_w[0];
+        const xMax = viewport_bounds_w[2];
+        const yMin = viewport_bounds_w[1];
+        const yMax = viewport_bounds_w[3];
 
-        const bounds = [xMin, yMin, xMax, yMax] as [
-            number,
-            number,
-            number,
-            number
-        ];
+        let tick_and_axes_lines: number[] = [];
+        let background_lines: number[] = [];
+        let labelData: LabelData[] = [];
 
-        const axes_lines = GetBoxLines(bounds);
+        //- BOTTOM RULER ----------------------------------------
+        if (this.props.isBottomRuler) {
+            const axes = [xMin, yMin + mv, 0, xMax, yMin + mv, 0];
+            const [ticks, labels] = this.GetTickLinesAndLabelsHorizontal(
+                xMin,
+                xMax,
+                false, // isTop
+                pixel2world
+            );
+            const back_lines: number[] =
+                this.GetBacgroundTriangleLinesHorizontal(
+                    xMin,
+                    xMax,
+                    false,
+                    viewMatrix,
+                    pixel2world
+                );
 
-        const [tick_lines, tick_labels] = GetTickLines(
-            bounds,
-            this.context.viewport
-        );
+            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
+            background_lines = [...background_lines, ...back_lines];
+            labelData = [...labelData, ...labels];
+        }
 
-        const labels = this.makeLabelsData(tick_lines, tick_labels);
+        //- TOP RULER ----------------------------------------
+        if (this.props.isTopRuler) {
+            const axes = [xMin, yMax - mv, 0, xMax, yMax - mv, 0];
+            const [ticks, labels] = this.GetTickLinesAndLabelsHorizontal(
+                xMin,
+                xMax,
+                true, // isTop
+                pixel2world
+            );
 
-        const lines = [...axes_lines, ...tick_lines];
+            const back_lines = this.GetBacgroundTriangleLinesHorizontal(
+                xMin,
+                xMax,
+                true, // isTop
+                viewMatrix,
+                pixel2world
+            );
 
+            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
+            background_lines = [...background_lines, ...back_lines];
+            labelData = [...labelData, ...labels];
+        }
+
+        //- LEFT RULER ----------------------------------------
+        if (this.props.isLeftRuler) {
+            const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
+            const ymax = this.props.isTopRuler ? yMax - mv : yMax;
+            const axes = [xMin + mh, ymin, 0, xMin + mh, ymax, 0];
+            const [ticks, labels] = this.GetTickLinesAndLabelsVertical(
+                ymin,
+                yMax - mv,
+                true, // isLeft
+                pixel2world
+            );
+            const back_lines = this.GetBacgroundTriangleLinesVertical(
+                ymin,
+                ymax,
+                true,
+                viewMatrix,
+                pixel2world
+            );
+
+            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
+            background_lines = [...background_lines, ...back_lines];
+            labelData = [...labelData, ...labels];
+        }
+
+        //- RIGHT RULER ----------------------------------------
+        if (this.props.isRightRuler) {
+            const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
+            const ymax = this.props.isTopRuler ? yMax - mv : yMax;
+            const axes = [xMax - mh, ymin, 0, xMax - mh, ymax, 0];
+            const [ticks, labels] = this.GetTickLinesAndLabelsVertical(
+                ymin,
+                ymax,
+                false, // isLeft
+                pixel2world
+            );
+
+            const back_lines = this.GetBacgroundTriangleLinesVertical(
+                ymin,
+                ymax,
+                false,
+                viewMatrix,
+                pixel2world
+            );
+
+            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
+            background_lines = [...background_lines, ...back_lines];
+            labelData = [...labelData, ...labels];
+        }
+
+        // Line models. (axis line and tick lines)
         // Color on axes and text.
         let color = [0.0, 0.0, 0.0, 1.0];
         if (typeof this.props.axisColor !== "undefined") {
@@ -305,6 +651,24 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             color = color.map((x) => (x ?? 0) / 255);
         }
 
+        const line_model = new Model(gl, {
+            id: `${this.props.id}-lines`,
+            vs: lineVertexShader,
+            fs: lineFragmentShader,
+            uniforms: { uAxisColor: color },
+            geometry: new Geometry({
+                drawMode: GL.LINES,
+                attributes: {
+                    positions: new Float32Array(tick_and_axes_lines),
+                },
+                vertexCount: tick_and_axes_lines.length / 3,
+            }),
+
+            modules: [project],
+            isInstanced: false,
+        });
+
+        //-- Background model --
         // Color on axes background.
         let bColor = [1.0, 1.0, 1.0, 1.0];
         if (typeof this.props.backgroundColor !== "undefined") {
@@ -315,29 +679,27 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             bColor = bColor.map((x) => (x ?? 0) / 255);
         }
 
-        const line_model = new Model(gl, {
-            id: `${this.props.id}-lines`,
-            vs: lineVertexShader,
-            fs: lineFragmentShader,
-            uniforms: { uAxisColor: color },
+        const background_model = new Model(gl, {
+            id: `${this.props.id}-background`,
+            vs: backgroundVertexShader,
+            fs: backgroundFragmentShader,
+            uniforms: { uBackGroundColor: bColor },
             geometry: new Geometry({
-                drawMode: GL.LINES,
+                drawMode: GL.TRIANGLES,
                 attributes: {
-                    positions: new Float32Array(lines),
+                    positions: new Float32Array(background_lines),
                 },
-                vertexCount: lines.length / 3,
+                vertexCount: background_lines.length / 3,
             }),
 
             modules: [project],
             isInstanced: false,
         });
 
-        //-- MAKE MODEL FOR THE LABEL TEXT'S --
-        const { viewMatrix } = this.context.viewport;
-
+        //-- Labels model--
         const label_models: Model[] = [];
 
-        for (const item of labels) {
+        for (const item of labelData) {
             const x = item.pos[0];
             const y = item.pos[1];
             const z = item.pos[2];
@@ -469,53 +831,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             label_models.push(model);
         }
 
-        //-- Background model --
-        const width = 999; // sufficent for the background to always cover.
-        const z = 90; // Depth of background square
-        // Y axis
-        const p1_w = vec4.fromValues(xMin, yMin, z, 1);
-        const p2_w = vec4.fromValues(xMin, yMax, z, 1);
-
-        const p1_v = word2view(viewMatrix, p1_w);
-        const p2_v = word2view(viewMatrix, p2_w);
-        const p3_v = [p1_v[0] - width, p1_v[1], p1_v[2]];
-        const p4_v = [p2_v[0] - width, p2_v[1], p2_v[2]];
-
-        // X axis
-        const p3_w = vec4.fromValues(xMax, yMin, z, 1);
-
-        const p1_v_2 = [p1_v[0] - width, p1_v[1], p1_v[2]];
-        const p2_v_2 = word2view(viewMatrix, p3_w);
-        const p3_v_2 = [p1_v_2[0] - width, p1_v_2[1] - width, p1_v_2[2]];
-        const p4_v_2 = [p2_v_2[0], p2_v_2[1] - width, p2_v_2[2]];
-
-        /*eslint-disable */
-        const background_lines: number[] = [ 
-                                             ...p1_v, ...p2_v, ...p3_v,  // t1 y axis
-                                             ...p3_v, ...p4_v, ...p2_v,  // t2 y axis
-
-                                             ...p1_v_2, ...p2_v_2, ...p4_v_2,  // t1 x axis
-                                             ...p1_v_2, ...p4_v_2, ...p3_v_2,  // t2 x axis
-        ];
-        /*eslint-enable */
-
-        const background_model = new Model(gl, {
-            id: `${this.props.id}-background`,
-            vs: backgroundVertexShader,
-            fs: backgroundFragmentShader,
-            uniforms: { uBackGroundColor: bColor },
-            geometry: new Geometry({
-                drawMode: GL.TRIANGLES,
-                attributes: {
-                    positions: new Float32Array(background_lines),
-                },
-                vertexCount: background_lines.length / 3,
-            }),
-
-            modules: [project],
-            isInstanced: false,
-        });
-
         return { label_models, line_model, background_model };
     }
 }
@@ -596,195 +911,4 @@ function GetTicks(
     }
 
     return ticks;
-}
-
-function GetTickLines(
-    bounds: [number, number, number, number],
-    viewport: Viewport
-): [number[], string[]] {
-    const ndecimals = 0;
-    const n_minor_ticks = 3;
-
-    const x_min = bounds[0];
-    const x_max = bounds[2];
-
-    const y_min = bounds[1];
-    const y_max = bounds[3];
-
-    const lines: number[] = [];
-    const tick_labels = [];
-
-    // ADD TICK LINES.
-    let y_tick = 0;
-
-    const m = 20; // Length in pixels
-    const world_from = viewport.unproject([0, 0, 0]);
-    const world_to = viewport.unproject([0, m, 0]);
-    const v = [
-        world_from[0] - world_to[0],
-        world_from[1] - world_to[1],
-        world_from[2] - world_to[2],
-    ];
-    const delta = Math.sqrt(v[0] * v[0] + v[1] * v[1]); // in world
-
-    // X axis labels.
-    const Lx = LineLengthInPixels(
-        [x_min, y_min, 0],
-        [x_max, y_min, 0],
-        viewport
-    );
-
-    const x_ticks = GetTicks(x_min, x_max, Lx); // Note: this may be replaced by NiceTicks npm package.
-    y_tick = y_min;
-
-    // z value of all lines and labels. In camera/view coordinates. This
-    // ensures lines will be closer to camera than rest of model.
-    const z_tick = 100;
-    for (let i = 0; i < x_ticks.length; i++) {
-        const tick = x_ticks[i];
-
-        const label = tick.toFixed(ndecimals);
-        tick_labels.push(label);
-
-        // tick line start
-        lines.push(tick, y_tick, z_tick);
-
-        // tick line end.
-        const z = 0.0;
-        const y = -delta;
-        lines.push(tick, y_tick + y, z_tick + z);
-    }
-
-    // Add minor X ticks.
-    if (x_ticks.length > 1) {
-        const tick1 = x_ticks[0];
-        const tick2 = x_ticks[1];
-        const d = (tick2 - tick1) / (n_minor_ticks + 1);
-        const x_start = tick1;
-
-        // up
-        let i = 0;
-        while (x_start + (i + 1) * d < x_max) {
-            const tick = x_start + (i + 1) * d;
-            tick_labels.push("");
-            i++;
-            // tick line start
-            lines.push(tick, y_tick, z_tick);
-
-            // tick line end.
-            const z = 0.0;
-            const y = -0.5 * delta;
-            lines.push(tick, y_tick + y, z_tick + z);
-        }
-
-        // down
-        i = 0;
-        while (x_start - (i + 1) * d > x_min) {
-            const tick = x_start - (i + 1) * d;
-            tick_labels.push("");
-            i++;
-            // tick line start
-            lines.push(tick, y_tick, z_tick);
-
-            // tick line end.
-            const z = 0.0;
-            const y = -0.5 * delta;
-            lines.push(tick, y_tick + y, z_tick + z);
-        }
-    }
-
-    // Y axis labels.
-    const Ly = LineLengthInPixels(
-        [x_min, y_min, 0],
-        [x_min, y_max, 0],
-        viewport
-    );
-    const y_ticks = GetTicks(y_min, y_max, Ly);
-    for (let i = 0; i < y_ticks.length; i++) {
-        const tick = y_ticks[i];
-
-        const label = tick.toFixed(ndecimals);
-        tick_labels.push(label);
-
-        const x_tick = x_min;
-
-        // tick line start
-        lines.push(x_tick, tick, z_tick);
-
-        // tick line end.
-        const z = 0.0;
-        const x = -delta;
-        lines.push(x_tick + x, tick, z_tick + z);
-
-        // Add minor Y ticks.
-        if (y_ticks.length > 1) {
-            const tick1 = y_ticks[0];
-            const tick2 = y_ticks[1];
-            const d = (tick2 - tick1) / (n_minor_ticks + 1);
-            const y_start = tick1;
-
-            // up
-            let i = 0;
-            while (y_start + (i + 1) * d < y_max) {
-                const tick = y_start + (i + 1) * d;
-                tick_labels.push("");
-                i++;
-                // tick line start
-                lines.push(x_tick, tick, z_tick);
-
-                // tick line end.
-                const z = 0.0;
-                const x = -0.5 * delta;
-                lines.push(x_tick + x, tick, z_tick + z);
-            }
-
-            // down
-            i = 0;
-            while (y_start - (i + 1) * d > y_min) {
-                const tick = y_start - (i + 1) * d;
-                tick_labels.push("");
-                i++;
-                // tick line start
-                lines.push(x_tick, tick, z_tick);
-
-                // tick line end.
-                const z = 0.0;
-                const x = -0.5 * delta;
-                lines.push(x_tick + x, tick, z_tick + z);
-            }
-        }
-    }
-
-    return [lines, tick_labels];
-}
-
-function GetBoxLines(bounds: [number, number, number, number]): number[] {
-    const x_min = bounds[0];
-    const x_max = bounds[2];
-
-    const y_min = bounds[1];
-    const y_max = bounds[3];
-
-    const z_min = 0;
-
-    // ADD LINES OF BOUNDING BOX.
-    const lines = [
-        x_min,
-        y_min,
-        z_min,
-
-        x_max,
-        y_min,
-        z_min,
-
-        x_min,
-        y_min,
-        z_min,
-
-        x_min,
-        y_max,
-        z_min,
-    ];
-
-    return lines;
 }
