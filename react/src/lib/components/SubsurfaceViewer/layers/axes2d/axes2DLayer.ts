@@ -49,6 +49,13 @@ type LabelData = {
     //font_size: number; KEEP.
 };
 
+enum ViewSide {
+    Left,
+    Right,
+    Bottom,
+    Top,
+}
+
 export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
     marginH: number;
     marginV: number;
@@ -160,10 +167,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         });
     }
 
-    GetTickLinesAndLabelsHorizontal(
-        x_min: number,
-        x_max: number,
-        isTop: boolean, // top or bottom ruler.
+    GetTickLinesAndLabels(
+        min: number,
+        max: number,
+        viewSide: ViewSide,
         pixel2world: number
     ): [number[], LabelData[]] {
         const ndecimals = 0;
@@ -173,157 +180,102 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         const tick_labels = [];
 
         const mv = this.props.marginV * pixel2world;
-
-        const vpBounds = this.context.viewport.getBounds();
-        const y_start = isTop ? vpBounds[3] - mv : vpBounds[1] + mv;
-
-        const m = 10; // Length in pixels
-        const delta = m * pixel2world;
-
-        const Lx = LineLengthInPixels(
-            [x_min, 0, 0],
-            [x_max, 0, 0],
-            this.context.viewport
-        );
-
-        const x_ticks = GetTicks(x_min, x_max, Lx); // Note: this may be replaced by NiceTicks npm package.
-        const y_tick = y_start;
-
-        // z value of all lines and labels. In camera/view coordinates. This
-        // ensures lines will be closer to camera than rest of model.
-        const z_tick = -100;
-        const tick_length = isTop ? delta : -delta;
-
-        for (let i = 0; i < x_ticks.length; i++) {
-            const tick = x_ticks[i];
-
-            const label = tick.toFixed(ndecimals);
-            tick_labels.push(label);
-
-            // tick line start
-            lines.push(tick, y_tick, z_tick);
-
-            // tick line end.
-            lines.push(tick, y_tick + tick_length, z_tick);
-        }
-
-        // Add minor X ticks.
-        if (x_ticks.length > 1) {
-            const tick1 = x_ticks[0];
-            const tick2 = x_ticks[1];
-            const d = (tick2 - tick1) / (n_minor_ticks + 1);
-            const x_start = tick1;
-
-            // up
-            let i = 0;
-            while (x_start + (i + 1) * d < x_max) {
-                const tick = x_start + (i + 1) * d;
-                tick_labels.push("");
-                i++;
-                // tick line start
-                lines.push(tick, y_tick, z_tick);
-
-                // tick line end.
-                lines.push(tick, y_tick + 0.5 * tick_length, z_tick);
-            }
-
-            // down
-            i = 0;
-            while (x_start - (i + 1) * d > x_min) {
-                const tick = x_start - (i + 1) * d;
-                tick_labels.push("");
-                i++;
-                // tick line start
-                lines.push(tick, y_tick, z_tick);
-
-                // tick line end.
-                lines.push(tick, y_tick + 0.5 * tick_length, z_tick);
-            }
-        }
-
-        const labels = this.makeLabelsData(lines, tick_labels);
-
-        return [lines, labels];
-    }
-
-    GetTickLinesAndLabelsVertical(
-        y_min: number,
-        y_max: number,
-        isLeft: boolean, // top or bottom ruler.
-        pixel2world: number
-    ): [number[], LabelData[]] {
-        const ndecimals = 0;
-        const n_minor_ticks = 3;
-
-        const lines: number[] = [];
-        const tick_labels = [];
-
         const mh = this.props.marginH * pixel2world;
 
         const vpBounds = this.context.viewport.getBounds();
-        const x_start = isLeft ? vpBounds[0] + mh : vpBounds[2] - mh;
+        let start;
+        let y_tick = 0;
+        let x_tick = 0;
+        if (viewSide === ViewSide.Top) {
+            start = vpBounds[3] - mv;
+            y_tick = start;
+        } else if (viewSide === ViewSide.Bottom) {
+            start = vpBounds[1] + mv;
+            y_tick = start;
+        } else if (viewSide === ViewSide.Left) {
+            start = vpBounds[0] + mh;
+            x_tick = start;
+        } else if (viewSide === ViewSide.Right) {
+            start = vpBounds[2] - mh;
+            x_tick = start;
+        }
 
         const m = 10; // Length in pixels
         const delta = m * pixel2world;
 
-        const Ly = LineLengthInPixels(
-            [0, y_min, 0],
-            [0, y_max, 0],
+        const L = LineLengthInPixels(
+            [min, 0, 0],
+            [max, 0, 0],
             this.context.viewport
         );
 
-        const y_ticks = GetTicks(y_min, y_max, Ly); // Note: this may be replaced by NiceTicks npm package.
-        const x_tick = x_start;
+        const isHorizontal =
+            viewSide === ViewSide.Top || viewSide === ViewSide.Bottom;
+
+        const ticks = GetTicks(min, max, L); // Note: this may be replaced by NiceTicks npm package.  // XXX RENAME
 
         // z value of all lines and labels. In camera/view coordinates. This
         // ensures lines will be closer to camera than rest of model.
-        const z_tick = -110; // note negative axis points away from camera.
-        const tick_length = isLeft ? -delta : delta;
+        const z_tick = isHorizontal ? -100 : -110; // horizontal rulers in front.
 
-        for (let i = 0; i < y_ticks.length; i++) {
-            const tick = y_ticks[i];
+        const tick_length =
+            viewSide === ViewSide.Left || viewSide === ViewSide.Bottom
+                ? -delta
+                : delta;
+
+        for (let i = 0; i < ticks.length; i++) {
+            const tick = ticks[i];
 
             const label = tick.toFixed(ndecimals);
             tick_labels.push(label);
 
             // tick line start
-            lines.push(x_tick, tick, z_tick);
-
-            // tick line end.
-            lines.push(x_tick + tick_length, tick, z_tick);
+            if (isHorizontal) {
+                lines.push(tick, y_tick, z_tick); // tick line start
+                lines.push(tick, y_tick + tick_length, z_tick); // tick line end.
+            } else {
+                lines.push(x_tick, tick, z_tick);
+                lines.push(x_tick + tick_length, tick, z_tick);
+            }
         }
 
         // Add minor X ticks.
-        if (y_ticks.length > 1) {
-            const tick1 = y_ticks[0];
-            const tick2 = y_ticks[1];
+        if (ticks.length > 1) {
+            const tick1 = ticks[0];
+            const tick2 = ticks[1];
             const d = (tick2 - tick1) / (n_minor_ticks + 1);
-            const y_start = tick1;
+            const tick_start = tick1;
 
             // up
             let i = 0;
-            while (y_start + (i + 1) * d < y_max) {
-                const tick = y_start + (i + 1) * d;
+            while (tick_start + (i + 1) * d < max) {
+                const tick = tick_start + (i + 1) * d;
                 tick_labels.push("");
                 i++;
-                // tick line start
-                lines.push(x_tick, tick, z_tick);
 
-                // tick line end.
-                lines.push(x_tick + 0.5 * tick_length, tick, z_tick);
+                if (isHorizontal) {
+                    lines.push(tick, y_tick, z_tick); // tick line start
+                    lines.push(tick, y_tick + 0.5 * tick_length, z_tick); // tick line end.
+                } else {
+                    lines.push(x_tick, tick, z_tick);
+                    lines.push(x_tick + 0.5 * tick_length, tick, z_tick);
+                }
             }
 
             // down
             i = 0;
-            while (y_start - (i + 1) * d > y_min) {
-                const tick = y_start - (i + 1) * d;
+            while (tick_start - (i + 1) * d > min) {
+                const tick = tick_start - (i + 1) * d;
                 tick_labels.push("");
                 i++;
-                // tick line start
-                lines.push(x_tick, tick, z_tick);
 
-                // tick line end.
-                lines.push(x_tick + 0.5 * tick_length, tick, z_tick);
+                if (isHorizontal) {
+                    lines.push(tick, y_tick, z_tick);
+                    lines.push(tick, y_tick + 0.5 * tick_length, z_tick);
+                } else {
+                    lines.push(x_tick, tick, z_tick);
+                    lines.push(x_tick + 0.5 * tick_length, tick, z_tick);
+                }
             }
         }
 
@@ -548,10 +500,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         //- BOTTOM RULER ----------------------------------------
         if (this.props.isBottomRuler) {
             const axes = [xMin, yMin + mv, 0, xMax, yMin + mv, 0];
-            const [ticks, labels] = this.GetTickLinesAndLabelsHorizontal(
+            const [ticks, labels] = this.GetTickLinesAndLabels(
                 xMin,
                 xMax,
-                false, // isTop
+                ViewSide.Bottom,
                 pixel2world
             );
             const back_lines: number[] =
@@ -571,10 +523,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         //- TOP RULER ----------------------------------------
         if (this.props.isTopRuler) {
             const axes = [xMin, yMax - mv, 0, xMax, yMax - mv, 0];
-            const [ticks, labels] = this.GetTickLinesAndLabelsHorizontal(
+            const [ticks, labels] = this.GetTickLinesAndLabels(
                 xMin,
                 xMax,
-                true, // isTop
+                ViewSide.Top,
                 pixel2world
             );
 
@@ -596,10 +548,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
             const ymax = this.props.isTopRuler ? yMax - mv : yMax;
             const axes = [xMin + mh, ymin, 0, xMin + mh, ymax, 0];
-            const [ticks, labels] = this.GetTickLinesAndLabelsVertical(
+            const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
                 yMax - mv,
-                true, // isLeft
+                ViewSide.Left,
                 pixel2world
             );
             const back_lines = this.GetBacgroundTriangleLinesVertical(
@@ -620,10 +572,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
             const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
             const ymax = this.props.isTopRuler ? yMax - mv : yMax;
             const axes = [xMax - mh, ymin, 0, xMax - mh, ymax, 0];
-            const [ticks, labels] = this.GetTickLinesAndLabelsVertical(
+            const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
                 ymax,
-                false, // isLeft
+                ViewSide.Right,
                 pixel2world
             );
 
