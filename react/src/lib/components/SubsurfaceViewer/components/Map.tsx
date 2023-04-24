@@ -635,7 +635,6 @@ const Map: React.FC<MapProps> = ({
         if (layers) {
             const wellslayer = getLayersByType(
                 layers,
-                "WellsLayer"
                 WellsLayer.name
             )?.[0] as WellsLayer;
 
