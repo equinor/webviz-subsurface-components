@@ -9,7 +9,8 @@ import WellLogViewer from "./WellLogViewer";
 import logTimes, { obj } from "../../performanceUtility/onRenderFunction";
 import { axisTitles, axisMnemos } from "./utils/axes";
 import { colorTables } from "@emerson-eps/color-tables";
-
+import { ColorTable } from "./components/ColorTableTypes";
+const exampleColorTable = colorTables as unknown as ColorTable[]; // equivalent types, should be merged
 const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
 //const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
 const exampleWellLog = {
@@ -17,7 +18,6 @@ const exampleWellLog = {
     curves: [],
     data: [],
 };
-const exampleColorTable = colorTables;
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -46,7 +46,7 @@ describe("Well Log Viewer perfomance", () => {
                             template={exampleTemplate}
                             colorTables={exampleColorTable}
                             onContentRescale={function (): void {
-                                throw new Error("Function not implemented.");
+                                //throw new Error("Function not implemented.");
                             }}
                         />
                     </Profiler>

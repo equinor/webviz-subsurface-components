@@ -2,6 +2,9 @@ import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import { colorTables } from "@emerson-eps/color-tables";
+//import { ColorTable } from "./components/ColorTableTypes";
+const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
+const wellpickColorTable = require("../../../demo/example-data/wellpick_colors.json");
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +
@@ -143,20 +146,20 @@ const Template = (args) => {
     };
     const [controller, setController] = React.useState(null); // the first WellLog
     const onCreateController = React.useCallback(
-        (iView, controller) => {
-            if (iView === 0) setController(controller);
+        (iWellLog, controller) => {
+            if (iWellLog === 0) setController(controller);
         },
         [controller]
     );
     const onContentRescale = React.useCallback(
-        (iView) => {
-            if (iView === 0) setInfo(fillInfo(controller));
+        (iWellLog) => {
+            if (iWellLog === 0) setInfo(fillInfo(controller));
         },
         [controller]
     );
     const onContentSelection = React.useCallback(
-        (/*_iView*/) => {
-            /*if(iView===0)*/ setInfo(fillInfo(controller));
+        (/*iWellLog*/) => {
+            /*if(iWellLog===0)*/ setInfo(fillInfo(controller));
         },
         [controller]
     );
@@ -307,24 +310,24 @@ Default.args = {
         require("../../../demo/example-data/synclog_template.json"),
         require("../../../demo/example-data/synclog_template.json"),
     ],
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     wellpicks: [
         {
             wellpick: require("../../../demo/example-data/wellpicks.json")[0],
             name: "HORIZON",
-            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            colorTables: wellpickColorTable,
             color: "Stratigraphy",
         },
         {
             wellpick: require("../../../demo/example-data/wellpicks.json")[1],
             name: "HORIZON",
-            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            colorTables: wellpickColorTable,
             color: "Stratigraphy",
         },
         {
             wellpick: require("../../../demo/example-data/wellpicks.json")[0],
             name: "HORIZON",
-            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            colorTables: wellpickColorTable,
             color: "Stratigraphy",
         },
     ],
@@ -355,5 +358,57 @@ Default.args = {
     spacerOptions: {
         wellpickColorFill: true,
         wellpickPatternFill: true,
+    },
+};
+
+//import { defaultRightPanel } from "./components/DefaultSyncLogViewerRightPanel";
+import WellLogZoomSlider from "./components/WellLogZoomSlider";
+import WellLogInfoPanel from "./components/WellLogInfoPanel";
+import WellLogScaleSelector from "./components/WellLogScaleSelector";
+//import WellLogAxesPanel from "./components/WellLogAxesPanel";
+
+export const CustomLayout = Template.bind({});
+CustomLayout.args = {
+    ...Default.args,
+    id: "Well-Log-Viewer-Discrete",
+    readoutOptions: {
+        grouping: "by_track",
+    },
+    layout: {
+        right: (parent) => (
+            <>
+                <div style={{ paddingBottom: "5px" }}>
+                    <WellLogScaleSelector
+                        label="Scale value:"
+                        callbacksManager={parent.callbacksManagers[0]}
+                    />
+                </div>
+                <div style={{ width: "255px" }}>
+                    {parent.props.welllogs?.map((_welllog, iWellLog) => (
+                        <WellLogInfoPanel
+                            key={iWellLog}
+                            callbacksManager={
+                                parent.callbacksManagers[iWellLog]
+                            }
+                            readoutOptions={parent.props.readoutOptions}
+                        />
+                    ))}
+                </div>
+            </>
+        ),
+        bottom: (parent) => (
+            <WellLogZoomSlider
+                label="Zoom:"
+                callbacksManager={parent.callbacksManagers[0]}
+                max={parent.props.options?.maxContentZoom}
+            />
+        ),
+    },
+};
+CustomLayout.parameters = {
+    docs: {
+        description: {
+            story: "An example custom component layout.",
+        },
     },
 };

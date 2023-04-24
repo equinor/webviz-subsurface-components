@@ -37,40 +37,33 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
         this.setScrollerPosAndZoom();
     }
 
-    shouldComponentUpdate(nextProps: WellLogViewWithScrollerProps): boolean {
-        return !Object.is(this.props, nextProps);
-    }
-
-    updateReadoutPanel(): void {
-        const controller = this.controller;
-        if (controller)
-            controller.selectContent(controller.getContentSelection()); // force to update readout panel
-    }
-
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;
-        if (this.props.onCreateController)
-            // set callback to component's caller
-            this.props.onCreateController(controller);
+        // set callback to component's caller
+        this.props.onCreateController?.(controller);
     }
     // callback function from WellLogView
     onTrackScroll(): void {
         this.setScrollerPosAndZoom();
-        if (this.props.onTrackScroll) this.props.onTrackScroll();
+        // set callback to component's caller
+        this.props.onTrackScroll?.();
     }
     // callback function from WellLogView
     onTrackSelection(): void {
-        if (this.props.onTrackSelection) this.props.onTrackSelection();
+        // set callback to component's caller
+        this.props.onTrackSelection?.();
     }
     // callback function from WellLogView
     onContentRescale(): void {
         this.setScrollerPosAndZoom();
-        if (this.props.onContentRescale) this.props.onContentRescale();
+        // set callback to component's caller
+        this.props.onContentRescale?.();
     }
     // callback function from WellLogView
     onContentSelection(): void {
-        if (this.props.onContentSelection) this.props.onContentSelection();
+        // set callback to component's caller
+        this.props.onContentSelection?.();
     }
 
     // callback function from Scroller

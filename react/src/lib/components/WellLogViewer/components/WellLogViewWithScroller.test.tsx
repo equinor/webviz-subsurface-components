@@ -5,9 +5,10 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
 import { colorTables } from "@emerson-eps/color-tables";
-
-const welllog = require("../../../../demo/example-data/L898MUD.json")[0];
-const template = require("../../../../demo/example-data/welllog_template_1.json");
+import { ColorTable } from "./ColorTableTypes";
+const exampleColorTable = colorTables as unknown as ColorTable[]; // equivalent types, should be merged
+const exampleWelllog = require("../../../../demo/example-data/L898MUD.json")[0];
+const exampleTemplate = require("../../../../demo/example-data/welllog_template_1.json");
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -21,9 +22,9 @@ describe("Test Well Log View Component with Scroller", () => {
     it("snapshot test", () => {
         const { container } = render(
             <WellLogViewWithScroller
-                welllog={welllog}
-                template={template}
-                colorTables={colorTables}
+                welllog={exampleWelllog}
+                template={exampleTemplate}
+                colorTables={exampleColorTable}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",

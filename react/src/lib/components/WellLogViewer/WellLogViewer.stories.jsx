@@ -2,6 +2,8 @@ import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import { argTypesWellLogViewerProp } from "./WellLogViewer";
 import { colorTables } from "@emerson-eps/color-tables";
+//import { ColorTable } from "./components/ColorTableTypes";
+const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
@@ -104,9 +106,15 @@ const Template = (args) => {
 const wellpick = {
     wellpick: require("../../../demo/example-data/wellpicks.json")[0],
     name: "HORIZON",
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     color: "Stratigraphy",
 };
+
+import { defaultRightPanel } from "./components/DefaultWellLogViewerRightPanel";
+import WellLogZoomSlider from "./components/WellLogZoomSlider";
+import WellLogInfoPanel from "./components/WellLogInfoPanel";
+import WellLogScaleSelector from "./components/WellLogScaleSelector";
+//import WellLogAxesPanel from "./components/WellLogAxesPanel";
 
 export const Default = Template.bind({});
 Default.args = {
@@ -114,7 +122,7 @@ Default.args = {
     horizontal: false,
     welllog: require("../../../demo/example-data/L898MUD.json")[0],
     template: require("../../../demo/example-data/welllog_template_1.json"),
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     wellpick: wellpick,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
@@ -122,6 +130,10 @@ Default.args = {
     options: {
         hideTrackTitle: false,
         hideTrackLegend: false,
+    },
+    readoutOptions: {
+        allTracks: false,
+        grouping: "by_track",
     },
 };
 
@@ -132,11 +144,15 @@ Horizontal.args = {
     welllog:
         require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     wellpick: wellpick,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
+
+    layout: {
+        left: defaultRightPanel,
+    },
 };
 Horizontal.parameters = {
     docs: {
@@ -152,11 +168,38 @@ Discrete.args = {
     horizontal: false,
     welllog: require("../../../demo/example-data/volve_logs.json")[0],
     template: require("../../../demo/example-data/welllog_template_2.json"),
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     wellpick: wellpick,
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
+
+    layout: {
+        header: (parent) => (
+            <div style={{ paddingBottom: "5px" }}>
+                <WellLogScaleSelector
+                    label="Scale value:"
+                    callbacksManager={parent.callbacksManager}
+                />
+            </div>
+        ),
+        right: (parent) => (
+            <div style={{ width: "255px" }}>
+                <WellLogInfoPanel
+                    header="Readout"
+                    callbacksManager={parent.callbacksManager}
+                    readoutOptions={parent.props.readoutOptions}
+                />
+            </div>
+        ),
+        bottom: (parent) => (
+            <WellLogZoomSlider
+                label="Zoom:"
+                callbacksManager={parent.callbacksManager}
+                max={parent.props.options?.maxContentZoom}
+            />
+        ),
+    },
 };
 Discrete.parameters = {
     docs: {

@@ -3,15 +3,14 @@ import React, { Component, ReactNode } from "react";
 import { Info } from "./InfoTypes";
 
 interface Props {
-    header: string;
+    header?: string;
     infos: Info[];
-    onGroupClick?: (trackId: string | number) => void;
+    onGroupClick?: (info: Info) => void;
 }
 
 function createSeparator() {
     return (
         <tr key={"separator"}>
-            {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
             <td colSpan={4}>
                 {" "}
                 <hr />
@@ -47,12 +46,8 @@ class InfoPanel extends Component<Props> {
         this.createRow = this.createRow.bind(this);
     }
 
-    onRowClick(
-        trackId: string | number /*,
-        ev: React.MouseEvent<HTMLTableRowElement>*/
-    ): void {
-        if (!this.props.onGroupClick) return;
-        this.props.onGroupClick(trackId);
+    onRowClick(info: Info): void {
+        this.props.onGroupClick?.(info);
     }
 
     createRow(info: Info): ReactNode {
@@ -65,7 +60,7 @@ class InfoPanel extends Component<Props> {
                 <tr
                     style={styleGroupRow}
                     key={"_group_" + info.trackId + "." + info.name}
-                    onClick={this.onRowClick.bind(this, info.trackId)}
+                    onClick={this.onRowClick.bind(this, info)}
                 >
                     <td style={{ color: info.color, fontSize: "small" }}>
                         {
@@ -123,7 +118,7 @@ class InfoPanel extends Component<Props> {
         return (
             <div style={{ overflowY: "auto", overflowX: "hidden" }}>
                 <fieldset>
-                    <legend>{this.props.header}</legend>
+                    {this.props.header && <legend>{this.props.header}</legend>}
 
                     <table
                         style={{
