@@ -49,8 +49,6 @@ type LabelData = {
     //font_size: number; KEEP.
 };
 
-type LabelsData = LabelData[];
-
 enum ViewSide {
     Left,
     Right,
