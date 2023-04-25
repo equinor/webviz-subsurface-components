@@ -29,12 +29,7 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import {
-    WellsLayer,
-    AxesLayer,
-    Axes2DLayer,
-    NorthArrow3DLayer,
-} from "../layers";
+import { WellsLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
