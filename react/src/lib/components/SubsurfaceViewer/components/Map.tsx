@@ -141,6 +141,13 @@ export interface ViewStateType {
     rotationOrbit: number;
 }
 
+interface marginsType {
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+}
+
 export interface DeckGLLayerContext extends LayerContext {
     userData: {
         setEditedData: (data: Record<string, unknown>) => void;
@@ -327,19 +334,23 @@ const Map: React.FC<MapProps> = ({
         Object.keys(cameraPosition).length !== 0;
 
     const deckRef = useRef<DeckGLRef>(null);
+
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
     const boundsInitial = bounds ?? [0, 0, 1, 1];
+
     // state for views prop of DeckGL component
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
-    // Viewport margins. Will differ from 0 if axes2Dlayer is used.
-    const [marginLeft, setMarginLeft] = useState<number>(0);
-    const [marginBottom, setMarginBottom] = useState<number>(0);
+    const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+    });
 
     const initialViewState = getViewState(
-        marginLeft,
-        marginBottom,
+        viewPortMargins,
         boundsInitial,
         views?.viewports?.[0].target,
         views?.viewports?.[0].zoom,
@@ -347,11 +358,7 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Local help function.
-    function calcDefaultViewStates(
-        marginLeft: number,
-        marginBottom: number,
-        input?: ViewportType[]
-    ) {
+    function calcDefaultViewStates(input?: ViewportType[]) {
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         const union_of_reported_bboxes = addBoundingBoxes(
@@ -389,10 +396,9 @@ const Map: React.FC<MapProps> = ({
 
             const viewState = isBoundsDefined
                 ? getViewState(
-                      marginLeft,
-                      marginBottom,
+                      viewPortMargins,
                       boundsInitial,
-                      is3D ? target : undefined,
+                      views?.viewports?.[index].target,
                       views?.viewports?.[index].zoom,
                       deckRef.current?.deck
                   )
@@ -442,8 +448,7 @@ const Map: React.FC<MapProps> = ({
                         typeof viewState !== "undefined"
                             ? viewState
                             : getViewState(
-                                  marginLeft,
-                                  marginBottom,
+                                  viewPortMargins,
                                   boundsInitial,
                                   views?.viewports?.[index].target,
                                   views?.viewports?.[index].zoom,
@@ -471,8 +476,7 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
-                        marginLeft,
-                        marginBottom,
+                        viewPortMargins,
                         boundsInitial,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
@@ -494,7 +498,7 @@ const Map: React.FC<MapProps> = ({
 
     useEffect(() => {
         if (typeof triggerHome !== "undefined") {
-            calcDefaultViewStates(marginLeft, marginBottom);
+            calcDefaultViewStates();
         }
     }, [triggerHome]);
 
@@ -502,7 +506,7 @@ const Map: React.FC<MapProps> = ({
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         if (!didUserChangeCamera && !isCameraPositionDefined) {
-            calcDefaultViewStates(marginLeft, marginBottom);
+            calcDefaultViewStates();
         }
     }, [reportedBoundingBox]);
 
@@ -514,8 +518,7 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item, index) => [
                     item.id,
                     getViewState(
-                        marginLeft,
-                        marginBottom,
+                        viewPortMargins,
                         boundsInitial,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
@@ -585,7 +588,7 @@ const Map: React.FC<MapProps> = ({
         setViewsProps(viewProps);
 
         if (!bounds) {
-            calcDefaultViewStates(marginLeft, marginBottom, viewProps);
+            calcDefaultViewStates();
         }
     }, [views]);
 
@@ -597,10 +600,24 @@ const Map: React.FC<MapProps> = ({
             return e?.constructor === Axes2DLayer;
         }) as Axes2DLayer;
 
-        const marginLeft = axes2DLayer ? axes2DLayer.props.marginH : 0;
-        const marginBottom = axes2DLayer ? axes2DLayer.props.marginV : 0;
-        setMarginLeft(marginLeft);
-        setMarginBottom(marginBottom);
+        const left =
+            axes2DLayer && axes2DLayer.props.isLeftRuler
+                ? axes2DLayer.props.marginH
+                : 0;
+        const right =
+            axes2DLayer && axes2DLayer.props.isRightRuler
+                ? axes2DLayer.props.marginH
+                : 0;
+        const top =
+            axes2DLayer && axes2DLayer.props.isTopRuler
+                ? axes2DLayer.props.marginV
+                : 0;
+        const bottom =
+            axes2DLayer && axes2DLayer.props.isBottomRuler
+                ? axes2DLayer.props.marginV
+                : 0;
+
+        setViewPortMargins({ left, right, top, bottom });
 
         const m = getModelMatrixScale(scaleZ);
 
@@ -986,8 +1003,7 @@ export function jsonToObject(
 
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
-    marginLeft: number,
-    marginBottom: number,
+    viewPortMargins: marginsType,
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     target?: number[],
     zoom?: number,
@@ -1013,9 +1029,16 @@ function getViewState(
         const w_bounds = w;
         const h_bounds = h;
 
+        const ml = viewPortMargins.left;
+        const mr = viewPortMargins.right;
+        const mb = viewPortMargins.bottom;
+        const mt = viewPortMargins.top;
+
         // Subtract margins.
-        w = deck.width - marginLeft; // width of the viewport minus margin.
-        h = deck.height - marginBottom;
+        const marginH = (ml > 0 ? ml : 0) + (mr > 0 ? mr : 0);
+        const marginV = (mb > 0 ? mb : 0) + (mt > 0 ? mt : 0);
+        w = deck.width - marginH; // width of the viewport minus margin.
+        h = deck.height - marginV;
 
         const port_aspect = h / w;
         const bounds_aspect = h_bounds / w_bounds;
@@ -1023,17 +1046,33 @@ function getViewState(
         const m_pr_pixel =
             bounds_aspect > port_aspect ? h_bounds / h : w_bounds / w;
 
-        const translate_x = 0.5 * marginLeft * m_pr_pixel;
-        const translate_y = 0.5 * marginBottom * m_pr_pixel;
+        let translate_x = 0;
+        if (ml > 0 && mr === 0) {
+            // left margin and no right margin
+            translate_x = 0.5 * ml * m_pr_pixel;
+        } else if (ml === 0 && mr > 0) {
+            // no left margin but  right margin
+            translate_x = -0.5 * mr * m_pr_pixel;
+        }
+
+        let translate_y = 0;
+        if (mb > 0 && mt === 0) {
+            translate_y = 0.5 * mb * m_pr_pixel;
+        } else if (mb === 0 && mt > 0) {
+            translate_y = -0.5 * mt * m_pr_pixel;
+        }
 
         const fb = fitBounds({ width: w, height: h, bounds });
         fb_target = [fb.x - translate_x, fb.y - translate_y, 0];
         fb_zoom = fb.zoom;
     }
 
+    const target_ = target ?? fb_target;
+    const zoom_ = zoom ?? fb_zoom;
+
     const view_state: ViewStateType = {
-        target: target ?? fb_target,
-        zoom: zoom ?? fb_zoom,
+        target: target_,
+        zoom: zoom_,
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
     };
