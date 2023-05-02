@@ -371,7 +371,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
     makeLabelsData(tick_lines: number[], tick_labels: string[]): LabelData[] {
         const labels: LabelData[] = [];
 
-
         for (let i = 0; i < tick_lines.length / 6; i++) {
             const from = [
                 tick_lines[6 * i + 0],
