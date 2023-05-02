@@ -8,8 +8,13 @@ export default {
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 const layerProps = {
-    marginH: 100, // Horizontal margin (in pixels)
-    marginV: 40, // Vertical margin (in pixels)
+    marginH: 80, // Horizontal margin (in pixels)
+    marginV: 30, // Vertical margin (in pixels)
+    isLeftRuler: true,
+    isRightRuler: false,
+    isBottomRuler: true,
+    isTopRuler: false,
+    backgroundColor: [155, 155, 155, 255],
 };
 
 const meshMapLayerPng = {
@@ -51,7 +56,6 @@ Base.args = {
         viewports: [
             {
                 id: "view_1",
-                zoom: -3.5,
                 show3D: false,
             },
         ],
@@ -82,7 +86,6 @@ ColoredTextAndBackGround.args = {
         viewports: [
             {
                 id: "view_1",
-                zoom: -3.5,
                 show3D: false,
             },
         ],

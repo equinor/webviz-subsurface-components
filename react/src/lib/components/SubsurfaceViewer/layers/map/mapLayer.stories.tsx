@@ -242,7 +242,7 @@ const meshMapLayerRotated = {
 const axes_hugin = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [432150, 6475800, 0, 439400, 6481500, 3500],
+    bounds: [432150, 6475800, 2000, 439400, 6481500, 3500],
 };
 
 const north_arrow_layer = {
@@ -533,9 +533,7 @@ export const MapLayer2d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
 
 const axesLayer2D = new Axes2DLayer({
     id: "axesLayer2D",
-    marginH: 100, // Horizontal margin (in pixels)
-    marginV: 40, // Vertical margin (in pixels)
-    backgroundColor: [255, 255, 0, 100],
+    backgroundColor: [0, 255, 255],
 });
 
 const mapLayer = new MapLayer({
